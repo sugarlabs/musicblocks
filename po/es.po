@@ -202,7 +202,7 @@ msgstr "En todo el mundo"
 #: js/activity.js:537
 #.TRANS: hide Polar coordinate overlay grid
 msgid "hide grid"
-msgstr ""
+msgstr "ocultar las rejillas de coordenadas"
 
 #: js/activity.js:544
 #: js/activity.js:550
