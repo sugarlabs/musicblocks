@@ -1888,17 +1888,17 @@ msgstr ""
 
 #: js/basicblocks.js:893
 #.TRANS: play each note more than once
-msgid "duplicate notes"
+msgid "duplicate"
 msgstr ""
 
 #: js/basicblocks.js:902
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
-msgid "multiply beat value"
+msgid "multiply note value"
 msgstr ""
 
 #: js/basicblocks.js:911
 #.TRANS: slow down note duration by some factor, e.g. convert 1/8 to 1/4 notes by using a factor of 2
-msgid "divide beat value"
+msgid "divide note value"
 msgstr ""
 
 #: js/basicblocks.js:920

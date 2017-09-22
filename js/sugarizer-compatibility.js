@@ -48,6 +48,7 @@ define(["sugar-web/env", "sugar-web/activity/activity"], function (env, activity
         },
 
         setup: function () {
+            console.log('insideSugarizer? ' + this.isInsideSugarizer());
             if (this.isInsideSugarizer() === false) {
                 return;
             }

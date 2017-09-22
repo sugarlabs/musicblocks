@@ -2219,19 +2219,19 @@ msgstr "warurt'a chimpunaka taktaña"
 #: js/basicblocks.js:883
 #.TRANS: play each note more than once
 #.TRANS: notas duplicadas
-msgid "duplicate notes"
+msgid "duplicate"
 msgstr "warurt'äwi chimpu payachäwi"
 
 #: js/basicblocks.js:892
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 #.TRANS: ritmo multiplican
-msgid "multiply beat value"
+msgid "multiply note value"
 msgstr "putuqi jakhu p'asi"
 
 #: js/basicblocks.js:901
 #.TRANS: slow down note duration by some factor, e.g. convert 1/8 to 1/4 notes by using a factor of 2
 #.TRANS: dividir tiempo
-msgid "divide beat value"
+msgid "divide note value"
 msgstr "putuqi chimpu"
 
 #: js/basicblocks.js:910

@@ -890,7 +890,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     duplicateNotesBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
     //.TRANS: play each note more than once
-    duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
+    duplicateNotesBlock.staticLabels.push(_('duplicate'));
     duplicateNotesBlock.adjustWidthToLabel();
     duplicateNotesBlock.flowClampOneArgBlock();
     duplicateNotesBlock.defaults.push(2);
@@ -899,7 +899,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatFactorBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['multiplybeatfactor'] = beatFactorBlock;
     //.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
-    beatFactorBlock.staticLabels.push(_('multiply beat value'));
+    beatFactorBlock.staticLabels.push(_('multiply note value'));
     beatFactorBlock.adjustWidthToLabel();
     beatFactorBlock.flowClampOneArgBlock();
     beatFactorBlock.defaults.push(2);
@@ -908,7 +908,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatFactorBlock2.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['dividebeatfactor'] = beatFactorBlock2;
     //.TRANS: slow down note duration by some factor, e.g. convert 1/8 to 1/4 notes by using a factor of 2
-    beatFactorBlock2.staticLabels.push(_('divide beat value'));
+    beatFactorBlock2.staticLabels.push(_('divide note value'));
     beatFactorBlock2.adjustWidthToLabel();
     beatFactorBlock2.flowClampOneArgBlock();
     beatFactorBlock2.defaults.push(2);
