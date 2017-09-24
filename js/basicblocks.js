@@ -1152,6 +1152,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     vibratoBlock.defaults.push(10);
     vibratoBlock.defaults.push(1 / 16);
 
+    // deprecated by set timbre block
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
@@ -1161,6 +1162,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     voiceBlock.flowClampOneArgBlock();
     voiceBlock.dockTypes[1] = 'textin';
     voiceBlock.defaults.push(_('violin'));
+    voiceBlock.hidden = true;
 
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
