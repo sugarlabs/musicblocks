@@ -1116,6 +1116,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     //.TRANS: alter the phase of the sound
     phaserBlock.staticLabels.push(_('phaser'));
     phaserBlock.staticLabels.push(_('rate'), _('octaves'), _('base frequency'));
+    phaserBlock.extraWidth = 10;
     phaserBlock.adjustWidthToLabel();
     phaserBlock.flowClampThreeArgBlock();
     phaserBlock.dockTypes[1] = 'numberin';
