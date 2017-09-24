@@ -427,6 +427,32 @@ function getModeName(name) {
 };
 
 
+function initFilterI18N() {
+    for (var i = 0; i < FILTERTYPES.length; i++) {
+      if (FILTERTYPES[i][0] == null) {
+            FILTERTYPES[i][0] = _(FILTERTYPES[i][1]);
+          }
+
+        if (FILTERTYPES[i][0] == null) {
+            FILTERTYPES[i][0] = FILTERTYPES[i][1];
+        }
+    }
+};
+
+
+function initOscI18N() {
+    for (var i = 0; i < OSCTYPES.length; i++) {
+      if (OSCTYPES[i][0] == null) {
+            OSCTYPES[i][0] = _(OSCTYPES[i][1]);
+          }
+
+        if (OSCTYPES[i][0] == null) {
+            OSCTYPES[i][0] = OSCTYPES[i][1];
+        }
+    }
+};
+
+
 function initModeI18N() {
     for (var i = 0; i < MODENAMES.length; i++) {
       if (MODENAMES[i][0] == null) {
@@ -488,6 +514,7 @@ function getDrumName(name) {
     return null;
 };
 
+
 function getFilterTypes(name) {
     if (name === '') {
         console.log('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
@@ -506,6 +533,7 @@ function getFilterTypes(name) {
 
     return null;
 };
+
 
 function getOscillatorTypes(name) {
     if (name === '') {
@@ -1364,7 +1392,14 @@ function Synth() {
 
     // Function that provides default parameters for various synths
     this.getDefaultParamValues = function (sourceName) {
-        if (sourceName.toLowerCase() === 'amsynth') {
+        // sourceName may need to be 'untranslated'
+        var sourceNameLC = sourceName.toLowerCase();
+        if (getOscillatorTypes(sourceNameLC) != null) {
+            sourceNameLC = getOscillatorTypes(sourceNameLC);
+	}
+
+        switch(sourceNameLC) {
+	case 'amsynth':
             var synthOptions = {
                 'harmonicity': 3,
                 'detune': 0,
@@ -1383,8 +1418,9 @@ function Synth() {
                     'sustain': 1,
                     'release': 0.5
                 }
-            };
-        } else if (sourceName.toLowerCase() === 'fmsynth') {
+	    };
+	    break;
+        case'fmsynth':
             var synthOptions = {
                 'harmonicity': 3,
                 'modulationIndex': 10,
@@ -1404,8 +1440,9 @@ function Synth() {
                     'sustain': 1,
                     'release': 0.5
                 }
-            };
-        } else if (sourceName.toLowerCase() === 'monosynth') {
+	    };
+	    break;
+        case 'monosynth':
             var synthOptions = {
                 'oscillator': {
                     'type': 'square'
@@ -1431,7 +1468,8 @@ function Synth() {
                     'exponent': 2
                 }
             };
-        } else if (sourceName.toLowerCase() === 'duosynth') {
+	    break;
+        case 'duosynth':
             var synthOptions = {
                 'vibratoAmount': 0.5,
                 'vibratoRate': 5,
@@ -1475,10 +1513,14 @@ function Synth() {
                     }
                 }
             };
-        } else if ((sourceName.toLowerCase() === 'sine') || (sourceName.toLowerCase() === 'triangle') || (sourceName.toLowerCase() === 'square') | (sourceName.toLowerCase() === 'sawtooth')) {
+	    break;
+        case 'sine':
+	case 'triangle':
+	case 'square':
+	case 'sawtooth':
             var synthOptions = {
                 'oscillator': {
-                    'type': sourceName.toLowerCase()
+                    'type': sourceNameLC
                 },
                 'envelope': {
                     'attack': 0.03,
@@ -1487,18 +1529,22 @@ function Synth() {
                     'release': 0.03
                 },
             };
-        } else if ((sourceName.toLowerCase() === 'pluck')) {
+	    break;
+        case 'pluck':
              var synthOptions = {
                 'attackNoise': 1,
                 'dampening': 4000,
                 'resonance': 0.9
             };
-        } else if ((sourceName.toLowerCase() === 'poly')) {
+	    break;
+	case 'poly':
             var synthOptions = {
                 polyphony: 6
             };
-        } else {
+	    break;
+	default:
             var synthOptions = {};
+	    break;
         }
 
         return synthOptions;

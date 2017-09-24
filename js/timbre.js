@@ -1107,14 +1107,27 @@ function TimbreWidget () {
 
         var myDiv = docById('selOsc');
         var selectOpt = '<select id="selOsc1">';
+
         for (var i = 0; i < OSCTYPES.length; i++) {
-            selectOpt += '<option value="' + OSCTYPES[i][0]+ '">' + OSCTYPES[i][0]+ '</option>';
+            // work around some weird i18n bug
+            if (OSCTYPES[i][0].length === 0) {
+                if (OSCTYPES[i][0] === this.oscParams[0] || OSCTYPES[i][1] === this.oscParams[0]) {
+                    selectOpt += '<option value="' + OSCTYPES[i][1] + '" selected>' + OSCTYPES[i][1] + '</option>';
+                } else {
+                    selectOpt += '<option value="' + OSCTYPES[i][1] + '">' + OSCTYPES[i][1] + '</option>';
+                }
+            } else {
+                if (OSCTYPES[i][0] === this.oscParams[0] || OSCTYPES[i][1] === this.oscParams[0]) {
+                    selectOpt += '<option value="' + OSCTYPES[i][0] + '" selected>' + OSCTYPES[i][0] + '</option>';
+                } else {
+                    selectOpt += '<option value="' + OSCTYPES[i][0] + '">' + OSCTYPES[i][0] + '</option>';
+                }
+            }
         }
 
         selectOpt += '</select>';
 
         myDiv.innerHTML = selectOpt;
-        console.log(myDiv.innerHTML);
 
         document.getElementById('wrapperOsc0').addEventListener('change', function (event) {
             docById('oscillatorButtonCell').style.backgroundColor = '#C8C8C8';
@@ -1262,10 +1275,17 @@ function TimbreWidget () {
         var myDiv = docById(selectorID);
         var selectOpt = '<select class="sel" id="' + selID + '">';
         for (var i = 0; i < FILTERTYPES.length; i++) {
-            if (FILTERTYPES[i][0] === this.filterParams[f * 3]) {
-                selectOpt += '<option value="' + FILTERTYPES[i][0] + '" selected="true">' + FILTERTYPES[i][0]+ '</option>';
+            // work around some weird i18n bug
+            if (FILTERTYPES[i][0].length === 0) {
+                if (FILTERTYPES[i][1] === this.filterParams[f * 3]) {
+                    selectOpt += '<option value="' + FILTERTYPES[i][1] + '" selected>' + FILTERTYPES[i][1] + '</option>';
+                } else {
+                    selectOpt += '<option value="' + FILTERTYPES[i][1] + '">' + FILTERTYPES[i][1] + '</option>';
+                }
+            } else if (FILTERTYPES[i][0] === this.filterParams[f * 3]) {
+                selectOpt += '<option value="' + FILTERTYPES[i][0] + '" selected>' + FILTERTYPES[i][0] + '</option>';
             } else {
-                selectOpt += '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0]+ '</option>';
+                selectOpt += '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0] + '</option>';
             }
         }
 

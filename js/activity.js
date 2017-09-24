@@ -199,6 +199,8 @@ define(MYDEFINES, function (compatibility) {
         initDrumI18N();
         initModeI18N();
         initVoiceI18N();
+        initFilterI18N();
+        initOscI18N();
 
         window.onblur = function () {
             if (!logo.runningLilypond) {
