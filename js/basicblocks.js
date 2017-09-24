@@ -208,6 +208,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     modenameBlock.valueBlock();
     modenameBlock.dockTypes[0] = 'textout';
 
+    var eastindiansolfegeBlock = new ProtoBlock('eastindiansolfege');
+    eastindiansolfegeBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['eastindiansolfege'] = eastindiansolfegeBlock;
+    eastindiansolfegeBlock.valueBlock();
+    eastindiansolfegeBlock.dockTypes[0] = 'solfegeout';
+
     var notenameBlock = new ProtoBlock('notename');
     notenameBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['notename'] = notenameBlock;
@@ -219,12 +225,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['solfege'] = solfegeBlock;
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
-
-    var eastindiansolfegeBlock = new ProtoBlock('eastindiansolfege');
-    eastindiansolfegeBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['eastindiansolfege'] = eastindiansolfegeBlock;
-    eastindiansolfegeBlock.valueBlock();
-    eastindiansolfegeBlock.dockTypes[0] = 'solfegeout';
 
     // Transposition blocks
     var invertBlock = new ProtoBlock('invert1');
@@ -1776,14 +1776,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     headingBlock.adjustWidthToLabel();
     headingBlock.parameterBlock();
 
-    var xBlock = new ProtoBlock('x');
-    xBlock.palette = palettes.dict['mouse'];
-    blocks.protoBlockDict['x'] = xBlock;
-    //.TRANS: x coordinate
-    xBlock.staticLabels.push(_('x'));
-    xBlock.adjustWidthToLabel();
-    xBlock.parameterBlock();
-
     var yBlock = new ProtoBlock('y');
     yBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['y'] = yBlock;
@@ -1791,6 +1783,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     yBlock.staticLabels.push(_('y'));
     yBlock.adjustWidthToLabel();
     yBlock.parameterBlock();
+
+    var xBlock = new ProtoBlock('x');
+    xBlock.palette = palettes.dict['mouse'];
+    blocks.protoBlockDict['x'] = xBlock;
+    //.TRANS: x coordinate
+    xBlock.staticLabels.push(_('x'));
+    xBlock.adjustWidthToLabel();
+    xBlock.parameterBlock();
 
     var clearBlock = new ProtoBlock('clear');
     clearBlock.palette = palettes.dict['mouse'];
@@ -1919,12 +1919,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     fillscreenBlock.adjustWidthToLabel();
     fillscreenBlock.threeArgBlock();
 
-    var colorBlock = new ProtoBlock('color');
-    colorBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['color'] = colorBlock;
-    colorBlock.staticLabels.push(_('color'));
-    colorBlock.adjustWidthToLabel();
-    colorBlock.parameterBlock();
+    var chromaBlock = new ProtoBlock('grey');
+    chromaBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['grey'] = chromaBlock;
+    chromaBlock.staticLabels.push(_('grey'));
+    chromaBlock.adjustWidthToLabel();
+    chromaBlock.parameterBlock();
 
     var shadeBlock = new ProtoBlock('shade');
     shadeBlock.palette = palettes.dict['pen'];
@@ -1933,12 +1933,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     shadeBlock.adjustWidthToLabel();
     shadeBlock.parameterBlock();
 
-    var chromaBlock = new ProtoBlock('grey');
-    chromaBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['grey'] = chromaBlock;
-    chromaBlock.staticLabels.push(_('grey'));
-    chromaBlock.adjustWidthToLabel();
-    chromaBlock.parameterBlock();
+    var colorBlock = new ProtoBlock('color');
+    colorBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['color'] = colorBlock;
+    colorBlock.staticLabels.push(_('color'));
+    colorBlock.adjustWidthToLabel();
+    colorBlock.parameterBlock();
 
     var pensizeBlock = new ProtoBlock('pensize');
     pensizeBlock.palette = palettes.dict['pen'];
@@ -2459,18 +2459,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     saveHeapToApp.defaults.push('appName')
     saveHeapToApp.defaults.push('localhost');
 
-    var setHeapEntry = new ProtoBlock('setHeapEntry');
-    setHeapEntry.palette = palettes.dict['heap'];
-    blocks.protoBlockDict['setHeapEntry'] = setHeapEntry;
-    //.TRANS: set a value in the heap
-    setHeapEntry.staticLabels.push(_('set heap'), _('index'), _('value'));
-    setHeapEntry.adjustWidthToLabel();
-    setHeapEntry.twoArgBlock();
-    setHeapEntry.dockTypes[1] = 'numberin';
-    setHeapEntry.dockTypes[2] = 'anyin';
-    setHeapEntry.defaults.push(1);
-    setHeapEntry.defaults.push(100);
-
     var showHeap = new ProtoBlock('showHeap');
     showHeap.palette = palettes.dict['heap'];
     blocks.protoBlockDict['showHeap'] = showHeap;
@@ -2528,13 +2516,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     indexHeap.dockTypes[1] = 'numberin';
     indexHeap.defaults.push(1);
 
-    var pushBlk = new ProtoBlock('push');
-    pushBlk.palette = palettes.dict['heap'];
-    blocks.protoBlockDict['push'] = pushBlk;
-    pushBlk.staticLabels.push(_('push'));
-    pushBlk.adjustWidthToLabel();
-    pushBlk.oneArgBlock();
-    pushBlk.dockTypes[1] = 'anyin';
+    var setHeapEntry = new ProtoBlock('setHeapEntry');
+    setHeapEntry.palette = palettes.dict['heap'];
+    blocks.protoBlockDict['setHeapEntry'] = setHeapEntry;
+    //.TRANS: set a value in the heap
+    setHeapEntry.staticLabels.push(_('set heap'), _('index'), _('value'));
+    setHeapEntry.adjustWidthToLabel();
+    setHeapEntry.twoArgBlock();
+    setHeapEntry.dockTypes[1] = 'numberin';
+    setHeapEntry.dockTypes[2] = 'anyin';
+    setHeapEntry.defaults.push(1);
+    setHeapEntry.defaults.push(100);
 
     var popBlk = new ProtoBlock('pop');
     popBlk.palette = palettes.dict['heap'];
@@ -2542,6 +2534,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     popBlk.staticLabels.push(_('pop'));
     popBlk.adjustWidthToLabel();
     popBlk.parameterBlock();
+
+    var pushBlk = new ProtoBlock('push');
+    pushBlk.palette = palettes.dict['heap'];
+    blocks.protoBlockDict['push'] = pushBlk;
+    pushBlk.staticLabels.push(_('push'));
+    pushBlk.adjustWidthToLabel();
+    pushBlk.oneArgBlock();
+    pushBlk.dockTypes[1] = 'anyin';
 
     // MEDIA PALETTE
 
