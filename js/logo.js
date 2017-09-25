@@ -1081,6 +1081,12 @@ function Logo () {
 
         this.onRunTurtle();
 
+        // Make sure that there is atleast one turtle.
+        if (this.turtles.turtleList.length === 0) {
+            console.log('No start block... adding a turtle');
+            this.turtles.addTurtle(null);
+        }
+
         // And mark all turtles as not running.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.turtles.turtleList[turtle].running = false;
@@ -1092,7 +1098,7 @@ function Logo () {
             // If a block to start from was passed, find its
             // associated turtle, i.e., which turtle should we use?
             var turtle = 0;
-            while (this.blocks.turtles.turtleList[turtle].trash && turtle < this.turtles.turtleList.length) {
+            while (this.turtles.turtleList[turtle].trash && turtle < this.turtles.turtleList.length) {
                 turtle += 1;
             }
 
@@ -1147,6 +1153,7 @@ function Logo () {
                 }
             }, delayStart);
         } else {
+            console.log('No start block');
             if (this.suppressOutput[turtle]) {
                 this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
