@@ -943,6 +943,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     note4Block.adjustWidthToLabel();
     note4Block.zeroArgBlock();
 
+    var note5Block = new ProtoBlock('note5');
+    note5Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note5'] = note5Block;
+    note5Block.staticLabels.push(_('note value') + ' 7');
+    note5Block.adjustWidthToLabel();
+    note5Block.zeroArgBlock();
+
     var note3Block = new ProtoBlock('note3');
     note3Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note3'] = note3Block;
