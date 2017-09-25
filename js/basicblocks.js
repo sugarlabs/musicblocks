@@ -1009,14 +1009,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     slurFactor.adjustWidthToLabel();
     slurFactor.parameterBlock();
 
-    var notevolumeFactor = new ProtoBlock('notevolumefactor');
-    notevolumeFactor.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
-    //.TRANS: the volume at which notes are played
-    notevolumeFactor.staticLabels.push(_('note volume'));
-    notevolumeFactor.adjustWidthToLabel();
-    notevolumeFactor.parameterBlock();
-
     var keyBlock = new ProtoBlock('key');
     keyBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['key'] = keyBlock;
@@ -1173,99 +1165,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     voiceBlock.dockTypes[1] = 'textin';
     voiceBlock.defaults.push(_('violin'));
     voiceBlock.hidden = true;
-
-    var articulationBlock = new ProtoBlock('articulation');
-    articulationBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['articulation'] = articulationBlock;
-    //.TRANS: set an articulation (change in volume)
-    articulationBlock.staticLabels.push(_('set relative volume'));
-    articulationBlock.adjustWidthToLabel();
-    articulationBlock.flowClampOneArgBlock();
-    articulationBlock.defaults.push(25);
-
-    var pppBlock = new ProtoBlock('ppp');
-    pppBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['ppp'] = pppBlock;
-    pppBlock.staticLabels.push('ppp');
-    pppBlock.adjustWidthToLabel();
-    pppBlock.zeroArgBlock();
-
-    var ppBlock = new ProtoBlock('pp');
-    ppBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['pp'] = ppBlock;
-    ppBlock.staticLabels.push('pp');
-    ppBlock.adjustWidthToLabel();
-    ppBlock.zeroArgBlock();
-
-    var pBlock = new ProtoBlock('p');
-    pBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['p'] = pBlock;
-    pBlock.staticLabels.push('p');
-    pBlock.adjustWidthToLabel();
-    pBlock.zeroArgBlock();
-
-    var mpBlock = new ProtoBlock('mp');
-    mpBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['mp'] = mpBlock;
-    mpBlock.staticLabels.push('mp');
-    mpBlock.adjustWidthToLabel();
-    mpBlock.zeroArgBlock();
-
-    var mfBlock = new ProtoBlock('mf');
-    mfBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['mf'] = mfBlock;
-    mfBlock.staticLabels.push('mf');
-    mfBlock.adjustWidthToLabel();
-    mfBlock.zeroArgBlock();
-
-    var fBlock = new ProtoBlock('f');
-    fBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['f'] = fBlock;
-    fBlock.staticLabels.push('f');
-    fBlock.adjustWidthToLabel();
-    fBlock.zeroArgBlock();
-
-    var ffBlock = new ProtoBlock('ff');
-    ffBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['ff'] = ffBlock;
-    ffBlock.staticLabels.push('ff');
-    ffBlock.adjustWidthToLabel();
-    ffBlock.zeroArgBlock();
-
-    var fffBlock = new ProtoBlock('fff');
-    fffBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['fff'] = fffBlock;
-    fffBlock.staticLabels.push('fff');
-    fffBlock.adjustWidthToLabel();
-    fffBlock.zeroArgBlock();
-
-    var noteVolumeBlock = new ProtoBlock('setnotevolume');
-    noteVolumeBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
-    //.TRANS: set the loudness level
-    noteVolumeBlock.staticLabels.push(_('set volume'));
-    noteVolumeBlock.adjustWidthToLabel();
-    noteVolumeBlock.oneArgBlock();
-    noteVolumeBlock.defaults.push(50);
-
-    var noteVolumeBlock2 = new ProtoBlock('setnotevolume2');
-    noteVolumeBlock2.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setnotevolume2'] = noteVolumeBlock2;
-    //.TRANS: set the loudness level
-    noteVolumeBlock2.staticLabels.push(_('set volume'));
-    noteVolumeBlock2.adjustWidthToLabel();
-    noteVolumeBlock2.flowClampOneArgBlock();
-    noteVolumeBlock2.defaults.push(50);
-    noteVolumeBlock2.hidden = true;
-
-    var crescendoBlock = new ProtoBlock('crescendo');
-    crescendoBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['crescendo'] = crescendoBlock;
-    //.TRANS: a gradual increase in loudness
-    crescendoBlock.staticLabels.push(_('crescendo') + ' +/-');
-    crescendoBlock.adjustWidthToLabel();
-    crescendoBlock.flowClampOneArgBlock();
-    crescendoBlock.defaults.push(5);
 
     var slurBlock = new ProtoBlock('slur');
     slurBlock.palette = palettes.dict['tone'];
@@ -3170,6 +3069,108 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTurtleName2.oneArgBlock();
     setTurtleName2.dockTypes[1] = 'anyin';
     setTurtleName2.defaults.push(_('Mr. Mouse'));
+
+    // Volume palette
+    var notevolumeFactor = new ProtoBlock('notevolumefactor');
+    notevolumeFactor.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
+    //.TRANS: the volume at which notes are played
+    notevolumeFactor.staticLabels.push(_('note volume'));
+    notevolumeFactor.adjustWidthToLabel();
+    notevolumeFactor.parameterBlock();
+
+    var pppBlock = new ProtoBlock('ppp');
+    pppBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['ppp'] = pppBlock;
+    pppBlock.staticLabels.push('ppp');
+    pppBlock.adjustWidthToLabel();
+    pppBlock.zeroArgBlock();
+
+    var ppBlock = new ProtoBlock('pp');
+    ppBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['pp'] = ppBlock;
+    ppBlock.staticLabels.push('pp');
+    ppBlock.adjustWidthToLabel();
+    ppBlock.zeroArgBlock();
+
+    var pBlock = new ProtoBlock('p');
+    pBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['p'] = pBlock;
+    pBlock.staticLabels.push('p');
+    pBlock.adjustWidthToLabel();
+    pBlock.zeroArgBlock();
+
+    var mpBlock = new ProtoBlock('mp');
+    mpBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['mp'] = mpBlock;
+    mpBlock.staticLabels.push('mp');
+    mpBlock.adjustWidthToLabel();
+    mpBlock.zeroArgBlock();
+
+    var mfBlock = new ProtoBlock('mf');
+    mfBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['mf'] = mfBlock;
+    mfBlock.staticLabels.push('mf');
+    mfBlock.adjustWidthToLabel();
+    mfBlock.zeroArgBlock();
+
+    var fBlock = new ProtoBlock('f');
+    fBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['f'] = fBlock;
+    fBlock.staticLabels.push('f');
+    fBlock.adjustWidthToLabel();
+    fBlock.zeroArgBlock();
+
+    var ffBlock = new ProtoBlock('ff');
+    ffBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['ff'] = ffBlock;
+    ffBlock.staticLabels.push('ff');
+    ffBlock.adjustWidthToLabel();
+    ffBlock.zeroArgBlock();
+
+    var fffBlock = new ProtoBlock('fff');
+    fffBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['fff'] = fffBlock;
+    fffBlock.staticLabels.push('fff');
+    fffBlock.adjustWidthToLabel();
+    fffBlock.zeroArgBlock();
+
+    var noteVolumeBlock = new ProtoBlock('setnotevolume');
+    noteVolumeBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
+    //.TRANS: set the loudness level
+    noteVolumeBlock.staticLabels.push(_('set volume'));
+    noteVolumeBlock.adjustWidthToLabel();
+    noteVolumeBlock.oneArgBlock();
+    noteVolumeBlock.defaults.push(50);
+
+    var noteVolumeBlock2 = new ProtoBlock('setnotevolume2');
+    noteVolumeBlock2.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['setnotevolume2'] = noteVolumeBlock2;
+    //.TRANS: set the loudness level
+    noteVolumeBlock2.staticLabels.push(_('set volume'));
+    noteVolumeBlock2.adjustWidthToLabel();
+    noteVolumeBlock2.flowClampOneArgBlock();
+    noteVolumeBlock2.defaults.push(50);
+    noteVolumeBlock2.hidden = true;
+
+    var articulationBlock = new ProtoBlock('articulation');
+    articulationBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['articulation'] = articulationBlock;
+    //.TRANS: set an articulation (change in volume)
+    articulationBlock.staticLabels.push(_('set relative volume'));
+    articulationBlock.adjustWidthToLabel();
+    articulationBlock.flowClampOneArgBlock();
+    articulationBlock.defaults.push(25);
+
+    var crescendoBlock = new ProtoBlock('crescendo');
+    crescendoBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['crescendo'] = crescendoBlock;
+    //.TRANS: a gradual increase in loudness
+    crescendoBlock.staticLabels.push(_('crescendo') + ' +/-');
+    crescendoBlock.adjustWidthToLabel();
+    crescendoBlock.flowClampOneArgBlock();
+    crescendoBlock.defaults.push(5);
 
     // Push protoblocks onto their palettes.
     for (var protoblock in blocks.protoBlockDict) {
