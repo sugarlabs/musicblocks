@@ -16,9 +16,9 @@ const DEFAULTPALETTE = 'rhythm';
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-BUILTINPALETTES = ['rhythm', 'pitch', 'tone', 'intervals', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
+BUILTINPALETTES = ['rhythm', 'pitch', 'meter', 'tone', 'intervals', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
 
-const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('tone'), _('intervals'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('mice'), _('extras')];
+const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('meter'), _('tone'), _('intervals'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('mice'), _('extras')];
 
 
 function getMainToolbarButtonNames(name) {
