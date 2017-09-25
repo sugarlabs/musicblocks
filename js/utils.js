@@ -1,4 +1,4 @@
-// Copyright (c) 2014,2015 Walter Bender
+// Copyright (c) 2014-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -9,26 +9,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-function format(str, data) {
-  str = str.replace(/{([a-zA-Z0-9.]*)}/g,
-                     function (match, name) {
-    x = data;
-    name.split('.').forEach(function (v) {
-      if (x === undefined) {
-        console.log('Undefined value in template string', str, name, x, v);
-      }
-      x = x[v];
+function format (str, data) {
+    str = str.replace(/{([a-zA-Z0-9.]*)}/g, function (match, name) {
+	x = data;
+	name.split('.').forEach(function (v) {
+	    if (x === undefined) {
+		console.log('Undefined value in template string', str, name, x, v);
+	    }
+
+	    x = x[v];
+	});
+
+	return x;
     });
-    return x;
-  });
-  return str.replace(/{_([a-zA-Z0-9]+)}/g,
-                     function (match, item) {
-    return _(item);
-  });
+
+    return str.replace(/{_([a-zA-Z0-9]+)}/g, function (match, item) {
+	return _(item);
+    });
 };
 
 
-function canvasPixelRatio() {
+function canvasPixelRatio () {
     var devicePixelRatio = window.devicePixelRatio || 1;
     var context = document.querySelector('#myCanvas').getContext('2d');
     var backingStoreRatio = context.webkitBackingStorePixelRatio ||
@@ -40,7 +41,7 @@ function canvasPixelRatio() {
 };
 
 
-function windowHeight() {
+function windowHeight () {
     var onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerHeight;
@@ -50,7 +51,7 @@ function windowHeight() {
 };
 
 
-function windowWidth() {
+function windowWidth () {
     var onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerWidth;
@@ -60,11 +61,9 @@ function windowWidth() {
 };
 
 
-function httpGet(projectName) {
+function httpGet (projectName) {
     var xmlHttp = null;
-
     xmlHttp = new XMLHttpRequest();
-
     if (projectName === null) {
         xmlHttp.open("GET", window.server, false);
         xmlHttp.setRequestHeader('x-api-key', '3tgTzMXbbw6xEKX7');
@@ -72,26 +71,28 @@ function httpGet(projectName) {
         xmlHttp.open("GET", window.server + projectName, false);
         xmlHttp.setRequestHeader('x-api-key', '3tgTzMXbbw6xEKX7');
     }
+
     xmlHttp.send();
     if (xmlHttp.status > 299) {
         throw 'Error from server';
     }
+
     return xmlHttp.responseText;
 };
 
 
-function httpPost(projectName, data) {
+function httpPost (projectName, data) {
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", window.server + projectName, false);
     xmlHttp.setRequestHeader('x-api-key', '3tgTzMXbbw6xEKX7');
     xmlHttp.send(data);
-    // return xmlHttp.responseText;
-    return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
+    return xmlHttp.responseText;
+    // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
 };
 
 
-function HttpRequest(url, loadCallback, userCallback) {
+function HttpRequest (url, loadCallback, userCallback) {
     // userCallback is an optional callback-handler.
     var req = this.request = new XMLHttpRequest();
     this.handler = loadCallback;
@@ -102,23 +103,32 @@ function HttpRequest(url, loadCallback, userCallback) {
     var objref = this;
     try {
         req.open('GET', url);
-        req.onreadystatechange = function() { objref.handler(); };
+
+        req.onreadystatechange = function () {
+	    objref.handler();
+	};
+
         req.send('');
-    }
-    catch(e) {
-        if (self.console) console.log('Failed to load resource from ' + url + ': Network error.');
-        if (typeof userCallback === 'function') userCallback(false, 'network error');
+    } catch(e) {
+        if (self.console) {
+	    console.log('Failed to load resource from ' + url + ': Network error.');
+	}
+
+        if (typeof userCallback === 'function') {
+	    userCallback(false, 'network error');
+	}
+
         this.request = this.handler = this.userCallback = null;
     }
 };
 
 
-function docByTagName(tag) {
+function docByTagName (tag) {
     document.getElementsByTagName(tag);
 };
 
 
-function docById(id) {
+function docById (id) {
     return document.getElementById(id);
 };
 
@@ -128,7 +138,7 @@ function docByName(name) {
 };
 
 
-function last(myList) {
+function last (myList) {
     var i = myList.length;
     if (i === 0) {
         return null;
@@ -138,7 +148,7 @@ function last(myList) {
 };
 
 
-function doSVG(canvas, logo, turtles, width, height, scale) {
+function doSVG (canvas, logo, turtles, width, height, scale) {
     // Aggregate SVG output from each turtle. If there is none, use
     // the MUSICICON.
     var MUSICICON = '<g transform="matrix(20,0,0,20,-2500,-200)"> <g style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000" transform="translate(0.32906,-0.2)"> <path d="m 138.47094,26.82 q 0,-1.16 1.24,-2.02 0.96,-0.64 1.94,-0.64 0.68,0.02 1.18,0.34 l 0,-11.84 0.44,0 0,12.94 q 0,1.32 -1.34,2.1 -0.86,0.5 -1.8,0.5 -0.98,0 -1.44,-0.7 -0.22,-0.32 -0.22,-0.68 z" /> </g> <g transform="translate(-12.52094,4.8)" style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"> <path d="m 138.47094,26.82 q 0,-1.16 1.24,-2.02 0.96,-0.64 1.94,-0.64 0.68,0.02 1.18,0.34 l 0,-11.84 0.44,0 0,12.94 q 0,1.32 -1.34,2.1 -0.86,0.5 -1.8,0.5 -0.98,0 -1.44,-0.7 -0.22,-0.32 -0.22,-0.68 z" /> </g> <path style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 130.81346,17 12.29007,-5 0,2 -12.29007,5 z" /> </g>';
@@ -153,17 +163,19 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
     svg += '<g transform="scale(' + scale + ',' + scale + ')">\n';
     svg += logo.svgOutput;
     svg += '</g>';
+
     if (turtleSVG === '') {
         svg += MUSICICON;
     } else {
         svg += turtleSVG;
     }
+
     svg += '</svg>';
     return svg;
 };
 
 
-function isSVGEmpty(turtles) {
+function isSVGEmpty (turtles) {
     for (var turtle in turtles.turtleList) {
         turtles.turtleList[turtle].closeSVG();
         if (turtles.turtleList[turtle].svgOutput !== '') {
@@ -174,16 +186,17 @@ function isSVGEmpty(turtles) {
 };
 
 
-function fileExt(file) {
+function fileExt (file) {
     var parts = file.split('.');
     if (parts.length === 1 || (parts[0] === '' && parts.length === 2)) {
         return '';
     }
+
     return parts.pop();
 };
 
 
-function fileBasename(file) {
+function fileBasename (file) {
     var parts = file.split('.');
     if (parts.length === 1) {
         return parts[0];
@@ -198,12 +211,13 @@ function fileBasename(file) {
 
 // Needed to generate new data for localization.ini
 // var translated = "";
-function _(text) {
+function _ (text) {
     replaced = text;
     replace = [",", "(", ")", "?", "¿", "<", ">", ".", '"\n', '"', ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"];
     for (var p = 0; p < replace.length; p++) {
         replaced = replaced.replace(replace[p], "");
     }
+
     replaced = replaced.replace(/ /g, '-');
     // Needed to generate new data for localization.ini
     // txt = "\n" + replaced + " = " + text;
@@ -223,16 +237,18 @@ function _(text) {
     }
 };
 
-function toTitleCase(str) {
+
+function toTitleCase (str) {
     if (typeof str !== 'string')
         return;
     var tempStr = '';
     if (str.length > 1)
         tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-}
+};
 
-function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
+
+function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
     // console.log(rawData);
     var lineData = rawData.split('\n');
     var cleanData = '';
@@ -243,9 +259,11 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
         if (lineData[i].length === 0) {
             continue;
         }
+
         if (lineData[i][0] === '/') {
             continue;
         }
+
         cleanData += lineData[i];
     }
 
@@ -257,11 +275,12 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
         var obj = null;
         errorMsg('Error loading plugin: ' + e);
     }
+
     return obj;
 };
 
 
-function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
+function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
     // Plugins are JSON-encoded dictionaries.
     // console.log(pluginData);
     var obj = JSON.parse(pluginData);
@@ -278,6 +297,7 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
                     // console.log(fillColor);
                 }
             }
+
             PALETTEFILLCOLORS[name] = fillColor;
 
             var strokeColor = '#ef003e';
@@ -287,6 +307,7 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
                     // console.log(strokeColor);
                 }
             }
+
             PALETTESTROKECOLORS[name] = strokeColor;
 
             var highlightColor = '#ffb1b3';
@@ -296,6 +317,7 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
                     // console.log(highlightColor);
                 }
             }
+
             PALETTEHIGHLIGHTCOLORS[name] = highlightColor;
 
             var strokeHighlightColor = '#404040';
@@ -305,6 +327,7 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
                     // console.log(highlightColor);
                 }
             }
+
             HIGHLIGHTSTROKECOLORS[name] = strokeHighlightColor;
 
             if (name in palettes.buttons) {
@@ -419,7 +442,7 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
 };
 
 
-function updatePluginObj(obj) {
+function updatePluginObj (obj) {
     for (var name in obj['PALETTEPLUGINS']) {
         pluginObjs['PALETTEPLUGINS'][name] = obj['PALETTEPLUGINS'][name];
     }
@@ -473,7 +496,7 @@ function updatePluginObj(obj) {
 };
 
 
-function preparePluginExports(obj) {
+function preparePluginExports (obj) {
     // add obj to plugin dictionary and return as JSON encoded text
     updatePluginObj(obj);
 
@@ -481,7 +504,7 @@ function preparePluginExports(obj) {
 };
 
 
-function processMacroData(macroData, palettes, blocks, macroDict) {
+function processMacroData (macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
     if (macroData !== '{}') {
         var obj = JSON.parse(macroData);
@@ -498,7 +521,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
 };
 
 
-function prepareMacroExports(name, stack, macroDict) {
+function prepareMacroExports (name, stack, macroDict) {
     if (name !== null) {
         macroDict[name] = stack;
     }
@@ -507,23 +530,23 @@ function prepareMacroExports(name, stack, macroDict) {
 };
 
 
-function doSaveSVG(logo, desc) {
+function doSaveSVG (logo, desc) {
     var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
     download(desc, 'data:image/svg+xml;utf8,' + svg, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
 };
 
 
-function doSaveLilypond(logo, desc) {
+function doSaveLilypond (logo, desc) {
     download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
 };
 
 
-function doSaveAbc(logo, desc) {
+function doSaveAbc (logo, desc) {
     download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
 };
 
 
-function download(filename, data) {
+function download (filename, data) {
     var a = document.createElement('a');
     a.setAttribute('href', data);
     a.setAttribute('download', filename);
@@ -535,7 +558,7 @@ function download(filename, data) {
 // Some block-specific code
 
 // Publish to FB
-function doPublish(desc) {
+function doPublish (desc) {
     var url = doSave();
     console.log('push ' + url + ' to FB');
     var descElem = docById("description");
@@ -555,7 +578,7 @@ function doPublish(desc) {
 
 // TODO: Move to camera plugin
 var hasSetupCamera = false;
-function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
+function doUseCamera (args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
     var w = 320;
     var h = 240;
 
@@ -580,6 +603,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
                     var vendorURL = window.URL || window.webkitURL;
                     video.src = vendorURL.createObjectURL(stream);
                 }
+
                 video.play();
                 hasSetupCamera = true;
             }, function (error) {
@@ -615,7 +639,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
         }
     }, false);
 
-    function draw() {
+    function draw () {
         canvas.width = w;
         canvas.height = h;
         canvas.getContext('2d').drawImage(video, 0, 0, w, h);
@@ -625,7 +649,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
 };
 
 
-function doStopVideoCam(cameraID, setCameraID) {
+function doStopVideoCam (cameraID, setCameraID) {
     if (cameraID !== null) {
         window.clearInterval(cameraID);
     }
@@ -635,7 +659,7 @@ function doStopVideoCam(cameraID, setCameraID) {
 };
 
 
-function hideDOMLabel() {
+function hideDOMLabel () {
     var textLabel = docById('textLabel');
     if (textLabel !== null) {
         textLabel.style.display = 'none';
@@ -688,7 +712,7 @@ function hideDOMLabel() {
 };
 
 
-function displayMsg(blocks, text) {
+function displayMsg (blocks, text) {
     /*
     var msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
@@ -748,12 +772,12 @@ function mixedNumber (d) {
 };
 
 
-function LCD(a, b) {
+function LCD (a, b) {
     return Math.abs((a * b) / GCD(a, b));
 };
 
 
-function GCD(a, b) {
+function GCD( a, b) {
     a = Math.abs(a);
     b = Math.abs(b);
 
@@ -1011,4 +1035,3 @@ function oneHundredToFraction (d) {
 
     }
 };
-

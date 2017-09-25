@@ -1092,7 +1092,7 @@ function Logo () {
             // If a block to start from was passed, find its
             // associated turtle, i.e., which turtle should we use?
             var turtle = 0;
-            while(this.blocks.turtles.turtleList[turtle].trash && turtle < this.turtles.turtleList.length) {
+            while (this.blocks.turtles.turtleList[turtle].trash && turtle < this.turtles.turtleList.length) {
                 turtle += 1;
             }
 
