@@ -477,11 +477,11 @@ the graphics commands inside of *Note value* blocks.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg "usage of Free-time block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg "usage of No-clock block")
 
 In this example, because the computation and graphics are more
-complex, a *Free-time* block is used to decouple the graphics from the
-master clock. The "Free-time* block prioritizes the sequence of
+complex, a *No-clock* block is used to decouple the graphics from the
+master clock. The "No-clock* block prioritizes the sequence of
 actions over the specified rhythm.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "rhythm sequence")
