@@ -192,15 +192,17 @@ define(MYDEFINES, function (compatibility) {
 
         pluginsImages = {};
 
-        // Sometimes (race condition?) Firefox does not properly
-        // initialize strings in musicutils. These methods ensure that
-        // the names are never null.
-        console.log('initing i18n for music terms');
-        initDrumI18N();
-        initModeI18N();
-        initVoiceI18N();
-        initFilterI18N();
-        initOscI18N();
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            // Sometimes (race condition?) Firefox does not properly
+            // initialize strings in musicutils. These methods ensure that
+            // the names are never null.
+            console.log('initing i18n for music terms');
+            initDrumI18N();
+            initModeI18N();
+            initVoiceI18N();
+            initFilterI18N();
+            initOscI18N();
+        }
 
         window.onblur = function () {
             if (!logo.runningLilypond) {
@@ -2838,7 +2840,7 @@ handleComplete);
         };
 
         function _makeExtraGridButtons(name, delay) {
-	    setTimeout(function () {
+            setTimeout(function () {
                 var img = new Image();
 
                 img.onload = function () {
@@ -2861,7 +2863,7 @@ handleComplete);
                 };
 
                 img.src = name;
-	    }, delay);
+            }, delay);
         };
 
         function doPopdownPalette() {
