@@ -2179,8 +2179,8 @@ msgstr "Sapa t'ijta pacha t'aqana putuqi"
 
 #: js/basicblocks.js:808
 #.TRANS: don't lock notes to master clock ('run free')
-#.TRANS: tiempo libre
-msgid "free time"
+#.TRANS: no reloj
+msgid "no clock"
 msgstr "jani kuna lurañani"
 
 #: js/basicblocks.js:816

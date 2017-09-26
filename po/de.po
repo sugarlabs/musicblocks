@@ -1847,7 +1847,7 @@ msgstr "Schläge pro Minute (BPM)"
 
 #: js/basicblocks.js:808
 #.TRANS: don't lock notes to master clock ('run free')
-msgid "free time"
+msgid "no clock"
 msgstr "Freizeit"
 
 #: js/basicblocks.js:816
