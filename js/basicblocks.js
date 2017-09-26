@@ -720,14 +720,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     bpmBlock.adjustWidthToLabel();
     bpmBlock.parameterBlock();
 
-    var driftBlock = new ProtoBlock('drift');
-    driftBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['drift'] = driftBlock;
-    //.TRANS: don't lock notes to master clock ('run free')
-    driftBlock.staticLabels.push(_('free time'));
-    driftBlock.adjustWidthToLabel();
-    driftBlock.flowClampZeroArgBlock();
-
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
@@ -908,6 +900,14 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // METER PALETTE
 
+    var driftBlock = new ProtoBlock('drift');
+    driftBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['drift'] = driftBlock;
+    //.TRANS: don't lock notes to master clock
+    driftBlock.staticLabels.push(_('no clock'));
+    driftBlock.adjustWidthToLabel();
+    driftBlock.flowClampZeroArgBlock();
+
     var offBeatDoBlock = new ProtoBlock('offbeatdo');
     offBeatDoBlock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['offbeatdo'] = offBeatDoBlock;
@@ -1008,40 +1008,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     slurFactor.staticLabels.push(_('slur factor'));
     slurFactor.adjustWidthToLabel();
     slurFactor.parameterBlock();
-
-    var keyBlock = new ProtoBlock('key');
-    keyBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['key'] = keyBlock;
-    //.TRANS: the key is a group of pitches with which a music composition is created
-    keyBlock.staticLabels.push(_('key'));
-    keyBlock.adjustWidthToLabel();
-    keyBlock.parameterBlock();
-
-    // Deprecated
-    var setkeyBlock = new ProtoBlock('setkey');
-    setkeyBlock.hidden = true;
-    setkeyBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setkey'] = setkeyBlock;
-    //.TRANS: set the key and mode, e.g. C Major
-    setkeyBlock.staticLabels.push(_('set key'));
-    setkeyBlock.adjustWidthToLabel();
-    setkeyBlock.oneArgBlock();
-    setkeyBlock.dockTypes[1] = 'textin';
-    setkeyBlock.defaults.push('C');
-
-    var setkey2Block = new ProtoBlock('setkey2');
-    setkey2Block.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setkey2'] = setkey2Block;
-    //.TRANS: set the key and mode, e.g. C Major
-    setkey2Block.staticLabels.push(_('set key'));
-    //.TRANS: key, e.g., C in C Major
-    setkey2Block.staticLabels.push(_('key'));
-    //.TRANS: mode, e.g., Major in C Major
-    setkey2Block.staticLabels.push(_('mode'));
-    setkey2Block.adjustWidthToLabel();
-    setkey2Block.twoArgBlock();
-    setkey2Block.dockTypes[1] = 'anyin';
-    setkey2Block.dockTypes[2] = 'anyin';
 
     var amSynthBlock = new ProtoBlock('amsynth');
     amSynthBlock.palette = palettes.dict['tone'];
@@ -1492,6 +1458,40 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.adjustWidthToLabel();
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
+
+    var keyBlock = new ProtoBlock('key');
+    keyBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['key'] = keyBlock;
+    //.TRANS: the key is a group of pitches with which a music composition is created
+    keyBlock.staticLabels.push(_('key'));
+    keyBlock.adjustWidthToLabel();
+    keyBlock.parameterBlock();
+
+    // Deprecated
+    var setkeyBlock = new ProtoBlock('setkey');
+    setkeyBlock.hidden = true;
+    setkeyBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['setkey'] = setkeyBlock;
+    //.TRANS: set the key and mode, e.g. C Major
+    setkeyBlock.staticLabels.push(_('set key'));
+    setkeyBlock.adjustWidthToLabel();
+    setkeyBlock.oneArgBlock();
+    setkeyBlock.dockTypes[1] = 'textin';
+    setkeyBlock.defaults.push('C');
+
+    var setkey2Block = new ProtoBlock('setkey2');
+    setkey2Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['setkey2'] = setkey2Block;
+    //.TRANS: set the key and mode, e.g. C Major
+    setkey2Block.staticLabels.push(_('set key'));
+    //.TRANS: key, e.g., C in C Major
+    setkey2Block.staticLabels.push(_('key'));
+    //.TRANS: mode, e.g., Major in C Major
+    setkey2Block.staticLabels.push(_('mode'));
+    setkey2Block.adjustWidthToLabel();
+    setkey2Block.twoArgBlock();
+    setkey2Block.dockTypes[1] = 'anyin';
+    setkey2Block.dockTypes[2] = 'anyin';
 
     // DRUM PALETTE
     var drumnameBlock = new ProtoBlock('drumname');
