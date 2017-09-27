@@ -1904,7 +1904,7 @@ msgstr ""
 #: js/basicblocks.js:907
 #.TRANS: don't lock notes to master clock
 msgid "no clock"
-msgstr "no reloj"
+msgstr "sin reloj"
 
 #: js/basicblocks.js:915
 msgid "on offbeat do"
