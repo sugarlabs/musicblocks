@@ -24,6 +24,11 @@ If you want to run Music Blocks offline, download this repo and point
 your browser to the index.html file found in the musicblocks directory
 on your local file system.
 
+Sugar users can run Music Blocks as an app embedded in the Browse
+activity (See [Music Blocks
+Embedded](http://github.com/sugarlabs/music-blocks-embedded-activity)
+or simply open Music Blocks in Browse.
+
 See [Using Music
 Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation) and [Music Blocks Guide](http://github.com/walterbender/musicblocks/tree/master/guide)
 
