@@ -26,7 +26,7 @@ on your local file system.
 
 Sugar users can run Music Blocks as an app embedded in the Browse
 activity (See [Music Blocks
-Embedded](http://github.com/sugarlabs/music-blocks-embedded-activity)
+Embedded](http://github.com/sugarlabs/music-blocks-embedded-activity))
 or simply open Music Blocks in Browse.
 
 See [Using Music
