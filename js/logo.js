@@ -142,6 +142,7 @@ function Logo () {
     this.drumBlocks = [];
     this.pitchBlocks = [];
     this.inNoteBlock = [];
+    this.multipleVoices = [];
 
     // parameters used by pitch
     this.transposition = {};
@@ -883,6 +884,7 @@ function Logo () {
             this.cp2x[turtle] = 100;
             this.cp2y[turtle] = 100;
             this.inNoteBlock[turtle] = [];
+            this.multipleVoices[turtle] = false;
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = {};
             this.noteValue[turtle] = {};
@@ -4148,6 +4150,9 @@ function Logo () {
             }
 
             that.inNoteBlock[turtle].push(blk);
+            if (that.inNoteBlock[turtle].length > 1) {
+                that.multipleVoices[turtle] = true;
+            }
 
             if (turtle in that.dotCount) {
                 that.noteValue[turtle][last(that.inNoteBlock[turtle])] = (1 / noteBeatValue) * (2 - (1 / Math.pow(2, that.dotCount[turtle])));
@@ -4159,7 +4164,11 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-		that._processNote(1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])], last(that.inNoteBlock[turtle]), turtle);
+                if (that.multipleVoices[turtle]) {
+                    that.notationVoices(turtle, that.inNoteBlock[turtle].length);
+                }
+
+                that._processNote(1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])], last(that.inNoteBlock[turtle]), turtle);
                 delete that.oscList[turtle][last(that.inNoteBlock[turtle])];
                 delete that.noteBeat[turtle][last(that.inNoteBlock[turtle])];
                 delete that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])];
@@ -4171,6 +4180,11 @@ function Logo () {
                 delete that.noteDrums[turtle][last(that.inNoteBlock[turtle])];
                 delete that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])];
                 that.inNoteBlock[turtle].splice(-1, 1);
+
+                if (that.multipleVoices[turtle] && that.inNoteBlock[turtle].length === 0) {
+                    that.notationVoices(turtle, that.inNoteBlock[turtle].length);
+                    that.multipleVoices[turtle] = false;
+               }
 
                 // FIXME: broken when nesting
                 that.pitchBlocks = [];
@@ -6090,13 +6104,13 @@ function Logo () {
             var duration = noteBeatValue * this.beatFactor[turtle];  // beat value
             // For the outermost note (when nesting), calculate the time for the next note.
             if (duration > 0) {
-		this.previousTurtleTime[turtle] = this.turtleTime[turtle];
-		if (this.inNoteBlock[turtle].length === 1) {
+                this.previousTurtleTime[turtle] = this.turtleTime[turtle];
+                if (this.inNoteBlock[turtle].length === 1) {
                     this.turtleTime[turtle] += ((bpmFactor / duration) + (this.noteDelay / 1000));
                     if (!this.suppressOutput[turtle]) {
-			this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) - turtleLag, 0));
+                        this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) - turtleLag, 0));
                     }
-		}
+                }
             }
 
             var forceSilence = false;
@@ -8531,6 +8545,30 @@ i]) - that.pitchNumberOffset;
 
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
     };
+
+    this.notationVoices = function (turtle, arg) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        switch(arg) {
+        case 1:
+            this.notationStaging[turtle].push('voice one');
+            break;
+        case 2:
+            this.notationStaging[turtle].push('voice two');
+            break;
+        case 3:
+            this.notationStaging[turtle].push('voice three');
+            break;
+        case 4:
+            this.notationStaging[turtle].push('voice four');
+            break;
+        default:
+            this.notationStaging[turtle].push('one voice');
+            break;
+        }
+    }
 
     this.notationMeter = function (turtle, count, value) {
         if (this.notationStaging[turtle] == undefined) {
