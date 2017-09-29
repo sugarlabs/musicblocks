@@ -6470,24 +6470,35 @@ function Logo () {
 
         // Sort the playback queue by time (as graphics embedded in
         // embedded notes can be out of order)
+        var that = this;
         for (t in this.turtles.turtleList) {
-            var sortedList = this.playbackQueue[t].sort(
+            var playbackList = [];
+            for (var i = 0; i < this.playbackQueue[t].length; i++) {
+                playbackList.push([i, this.playbackQueue[t][i]]);
+            }
+
+            var sortedList = playbackList.sort(
                 function(a, b) {
-                    if (a[0] === b[0]) {
-			// Run pen commands first.
-                        if (['fill', 'hollowline', 'setvolume', 'setheading', 'setcolor', 'sethue', 'setshade', 'settranslucency', 'setgrey', 'setpensize', 'penup', 'pendown'].indexOf(b[1]) !== -1) {
+                    if (a[1][0] === b[1][0]) {
+                        // Run pen commands first...
+                        if (['setvolume', 'setheading', 'setcolor', 'sethue', 'setshade', 'settranslucency', 'setgrey', 'setpensize'].indexOf(b[1][1]) !== -1) {
                             return 1;
+                        } else if (['setvolume', 'setheading', 'setcolor', 'sethue', 'setshade', 'settranslucency', 'setgrey', 'setpensize'].indexOf(a[1][1]) !== -1) {
+                            return -1;
                         } else {
-                            return 0;
+                            // But otherwise, preserve the original order.
+                            return a[0] - b[0];
                         }
                     } else {
-                        return a[0] - b[0];
+                        return a[1][0] - b[1][0];
                     }
                 }
             );
 
-            this.playbackQueue[t] = sortedList;
-            console.log(sortedList);
+            this.playbackQueue[t] = [];
+            for (var i = 0; i < sortedList.length; i++) {
+                this.playbackQueue[t].push(sortedList[i][1]);
+            }
         }
 
         var d = new Date();
