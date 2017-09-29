@@ -6468,6 +6468,20 @@ function Logo () {
             var inHollowLineClamp = false;
         }
 
+        // Sort the playback queue by time (as graphics embedded in
+        // embedded notes can be out of order)
+        for (t in this.turtles.turtleList) {
+            var sortedList = this.playbackQueue[t].sort(
+                // FIXME: Pen functions should come before forward,
+                // arc, etc.
+                function(a, b) {
+                    return a[0] - b[0];
+                }
+            );
+
+            this.playbackQueue[t] = sortedList;
+        }
+
         var d = new Date();
         this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
 
