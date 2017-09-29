@@ -6472,14 +6472,22 @@ function Logo () {
         // embedded notes can be out of order)
         for (t in this.turtles.turtleList) {
             var sortedList = this.playbackQueue[t].sort(
-                // FIXME: Pen functions should come before forward,
-                // arc, etc.
                 function(a, b) {
-                    return a[0] - b[0];
+                    if (a[0] === b[0]) {
+			// Run pen commands first.
+                        if (['fill', 'hollowline', 'setvolume', 'setheading', 'setcolor', 'sethue', 'setshade', 'settranslucency', 'setgrey', 'setpensize', 'penup', 'pendown'].indexOf(b[1]) !== -1) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    } else {
+                        return a[0] - b[0];
+                    }
                 }
             );
 
             this.playbackQueue[t] = sortedList;
+            console.log(sortedList);
         }
 
         var d = new Date();
