@@ -5935,7 +5935,7 @@ function Logo () {
         }
 
         if (this.inTimbre) {
-            var noteObj = this.getNote(this.notePitches[turtle][last(that.inNoteBlock[turtle])][0], this.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], this.noteTranspositions[turtle][0], this.keySignature[turtle]);
+            var noteObj = this.getNote(this.notePitches[turtle][last(this.inNoteBlock[turtle])][0], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][0], this.noteTranspositions[turtle][0], this.keySignature[turtle]);
             this.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle].length > 0) {
@@ -5990,16 +5990,16 @@ function Logo () {
                 // similar notes.
                 if (this.tieCarryOver[turtle] > 0) {
                     var match = true;
-                    if (this.tieNote[turtle].length !== this.notePitches[turtle][last(that.inNoteBlock[turtle])].length) {
+                    if (this.tieNote[turtle].length !== this.notePitches[turtle][last(this.inNoteBlock[turtle])].length) {
                         match = false;
                     } else {
                         for (var i = 0; i < this.tieNote[turtle].length; i++) {
-                            if (this.tieNote[turtle][i][0] != this.notePitches[turtle][last(that.inNoteBlock[turtle])][i]) {
+                            if (this.tieNote[turtle][i][0] != this.notePitches[turtle][last(this.inNoteBlock[turtle])][i]) {
                                 match = false;
                                 break;
                             }
 
-                            if (this.tieNote[turtle][i][1] != this.noteOctaves[turtle][last(that.inNoteBlock[turtle])][i]) {
+                            if (this.tieNote[turtle][i][1] != this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][i]) {
                                 match = false;
                                 break;
                             }
