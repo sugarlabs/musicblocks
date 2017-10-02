@@ -3342,10 +3342,12 @@ function Logo () {
             that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(4);
             that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(0);
             that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
-            if (turtle in that.beatFactor) {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-            } else {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+            if (that.inNoteBlock[turtle].length > 0) {
+                if (turtle in that.beatFactor) {
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
+                } else {
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+                }
             }
 
             that.pushedNote[turtle] = true;
@@ -3466,10 +3468,12 @@ function Logo () {
                 that.noteTranspositions[turtle].push(2 * delta);
             }
 
-            if (turtle in that.beatFactor) {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-            } else {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+            if (that.inNoteBlock[turtle].length > 0) {
+                if (turtle in that.beatFactor) {
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
+                } else {
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+                }
             }
 
             that.pushedNote[turtle] = true;
@@ -3528,10 +3532,12 @@ function Logo () {
                 break;
             }
 
-            if (turtle in that.beatFactor) {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-            } else {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+            if (that.inNoteBlock[turtle].length > 0) {
+                if (turtle in that.beatFactor) {
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
+                } else {
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+                }
             }
 
             that.pushedNote[turtle] = true;
@@ -3851,10 +3857,12 @@ function Logo () {
                     that.noteTranspositions[turtle].push(2 * delta);
                 }
 
-                if (turtle in that.beatFactor) {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-                } else {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+                if (that.inNoteBlock[turtle].length > 0) {
+                    if (turtle in that.beatFactor) {
+                        that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
+                    } else {
+                        that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
+                    }
                 }
 
                 that.pushedNote[turtle] = true;
