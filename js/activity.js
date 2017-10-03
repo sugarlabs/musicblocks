@@ -3144,6 +3144,7 @@ handleComplete);
             var formerContainer = container;
 
             container.on('mousedown', function (event) {
+                console.log('MOUSEDOWN');
                 if (locked) {
                     return;
                 } else {
@@ -3151,6 +3152,7 @@ handleComplete);
 
                     lockTimer = setTimeout(function () {
                         locked = false;
+
                         clearTimeout(pressTimer);
                         clearTimeout(pressTimerExtra);
                         if (longImg !== null || extraLongImg !== null) {
@@ -3186,7 +3188,8 @@ handleComplete);
 
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
-                container.on('pressup', function (event) {
+		__pressupFunction = function (event) {
+                    console.log('PRESSUP');
                     clearTimeout(lockTimer);
 
                     hideButtonHighlight(circles, stage);
@@ -3215,7 +3218,14 @@ handleComplete);
                     }
 
                     mousedown = false;
-                });
+                };
+
+                // Remove the previous listener, if any, so we don't
+                // get multiple listeners added to the event.
+                // Why does removeEventListener not work?
+                // container.removeEventListener('pressup', __pressupFunction);
+                container._listeners['pressup'] = [];
+                container.on('pressup', __pressupFunction);
 
                 isLong = false;
                 isExtraLong = false;
