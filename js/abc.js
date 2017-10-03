@@ -181,6 +181,13 @@ processAbcNotes = function (logo, turtle) {
                 // FIXME: how does one define pickup in ABC notation?
                 i += 1;
                 break;
+            case 'voice one':
+            case 'voice two':
+            case 'voice three':
+            case 'voice four':
+            case 'one voice':
+                // FIXME: how does one define multi-voice in ABC notation?
+                break;
             default:
                 logo.notationNotes[turtle] += obj;
                 break;
