@@ -1167,6 +1167,7 @@ define(MYDEFINES, function (compatibility) {
             stage.on('stagemousedown', function (event) {
                 stageMouseDown = true;
                 if (stage.getObjectUnderPoint() != null | turtles.running()) {
+                    stage.removeAllEventListeners('stagemouseup');
                     stage.on('stagemouseup', function (event) {
                         stageMouseDown = false;
                     });
@@ -1180,6 +1181,7 @@ define(MYDEFINES, function (compatibility) {
                     y: event.stageY
                 };
 
+                stage.removeAllEventListeners('stagemousemove');
                 stage.on('stagemousemove', function (event) {
                     if (!moving) {
                         return;
@@ -1197,6 +1199,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                 });
 
+                stage.removeAllEventListeners('stagemouseup');
                 stage.on('stagemouseup', function (event) {
                     stageMouseDown = false;
                     moving = false;
@@ -3144,7 +3147,6 @@ handleComplete);
             var formerContainer = container;
 
             container.on('mousedown', function (event) {
-                console.log('MOUSEDOWN');
                 if (locked) {
                     return;
                 } else {
@@ -3188,8 +3190,7 @@ handleComplete);
 
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
-		__pressupFunction = function (event) {
-                    console.log('PRESSUP');
+                function __pressupFunction (event) {
                     clearTimeout(lockTimer);
 
                     hideButtonHighlight(circles, stage);
@@ -3222,10 +3223,8 @@ handleComplete);
 
                 // Remove the previous listener, if any, so we don't
                 // get multiple listeners added to the event.
-                // Why does removeEventListener not work?
-                // container.removeEventListener('pressup', __pressupFunction);
-                container._listeners['pressup'] = [];
-                container.on('pressup', __pressupFunction);
+                container.removeAllEventListeners('pressup');
+                var closure = container.on('pressup', __pressupFunction);
 
                 isLong = false;
                 isExtraLong = false;
