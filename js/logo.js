@@ -6481,8 +6481,12 @@ function Logo () {
         var that = this;
         for (t in this.turtles.turtleList) {
             var playbackList = [];
+            var maxTime = 0;
             for (var i = 0; i < this.playbackQueue[t].length; i++) {
                 playbackList.push([i, this.playbackQueue[t][i]]);
+                if (this.playbackQueue[t][i][0] > maxTime) {
+                    maxTime = this.playbackQueue[t][i][0];
+                }
             }
 
             var sortedList = playbackList.sort(
@@ -6503,9 +6507,11 @@ function Logo () {
                 }
             );
 
-            this.playbackQueue[t] = [];
-            for (var i = 0; i < sortedList.length; i++) {
-                this.playbackQueue[t].push(sortedList[i][1]);
+            if (maxTime > 0) {
+                this.playbackQueue[t] = [];
+                for (var i = 0; i < sortedList.length; i++) {
+                    this.playbackQueue[t].push(sortedList[i][1]);
+                }
             }
         }
 
