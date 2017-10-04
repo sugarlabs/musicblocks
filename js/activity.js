@@ -1164,19 +1164,21 @@ define(MYDEFINES, function (compatibility) {
                 stageY = event.stageY;
             });
 
+            function __stageMouseUpHandler (event) {
+                stageMouseDown = false;
+                moving = false;
+            };
+
             stage.on('stagemousedown', function (event) {
                 stageMouseDown = true;
                 if (stage.getObjectUnderPoint() != null | turtles.running()) {
                     stage.removeAllEventListeners('stagemouseup');
-                    stage.on('stagemouseup', function (event) {
-                        stageMouseDown = false;
-                    });
-
+                    stage.on('stagemouseup', __stageMouseUpHandler);
                     return;
                 }
 
                 moving = true;
-                lastCords = {
+                var lastCords = {
                     x: event.stageX,
                     y: event.stageY
                 };
@@ -1200,10 +1202,7 @@ define(MYDEFINES, function (compatibility) {
                 });
 
                 stage.removeAllEventListeners('stagemouseup');
-                stage.on('stagemouseup', function (event) {
-                    stageMouseDown = false;
-                    moving = false;
-                });
+                stage.on('stagemouseup', __stageMouseUpHandler);
             });
         };
 
