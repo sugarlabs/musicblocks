@@ -1087,20 +1087,18 @@ function Block(protoblock, blocks, overrideName) {
                 y: Math.round(that.collapseContainer.y - original.y)
             };
 
+            that.collapseContainer.removeAllEventListeners('mouseout');
             that.collapseContainer.on('mouseout', function (event) {
-                if (haveClick) {
-                    return;
-                }
-
                 that._collapseOut(event, moved, haveClick);
                 moved = false;
 		sawMouseDownEvent = false;
             });
 
+            that.collapseContainer.removeAllEventListeners('pressup');
             that.collapseContainer.on('pressup', function (event) {
-                if (sawMouseDownEvent && haveClick) {
-                    return;
-                }
+                // if (sawMouseDownEvent && haveClick) {
+                //     return;
+                // }
 
                 if (!sawMouseDownEvent && !moved) {
                     // Sometimes we don't see a mousedown event, so
@@ -1113,6 +1111,7 @@ function Block(protoblock, blocks, overrideName) {
 		sawMouseDownEvent = false;
             });
 
+            that.collapseContainer.removeAllEventListeners('pressmove');
             that.collapseContainer.on('pressmove', function (event) {
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
@@ -1313,11 +1312,8 @@ function Block(protoblock, blocks, overrideName) {
                 y: Math.round(that.container.y - original.y)
             };
 
+            that.container.removeAllEventListeners('mouseout');
             that.container.on('mouseout', function (event) {
-                if (haveClick) {
-                    return;
-                }
-
                 if (!that.blocks.inLongPress) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
@@ -1325,11 +1321,8 @@ function Block(protoblock, blocks, overrideName) {
                 moved = false;
             });
 
+            that.container.removeAllEventListeners('pressup');
             that.container.on('pressup', function (event) {
-                if (haveClick) {
-                    return;
-                }
-
                 if (!that.blocks.inLongPress) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
@@ -1337,6 +1330,7 @@ function Block(protoblock, blocks, overrideName) {
                 moved = false;
             });
 
+            that.container.removeAllEventListeners('pressmove');
             that.container.on('pressmove', function (event) {
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
