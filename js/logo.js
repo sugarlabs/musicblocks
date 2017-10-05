@@ -549,6 +549,8 @@ function Logo () {
         this.unhighlightQueue = {};
 
         this._restoreConnections();
+
+        document.body.style.cursor = 'default';
     };
 
     this._restoreConnections = function () {
@@ -1154,8 +1156,8 @@ function Logo () {
                 }
             }, delayStart);
         } else {
-            console.log('No start block');
-            if (this.suppressOutput[turtle]) {
+            console.log('Empty start block: ' + turtle + ' ' + this.suppressOutput[turtle]);
+            if (this.suppressOutput[turtle] || this.suppressOutput[turtle] == undefined) {
                 this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
                 this.checkingCompletionState = false;
