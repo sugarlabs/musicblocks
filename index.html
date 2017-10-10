@@ -31,6 +31,9 @@
   <script src="lib/movieclip-0.7.1.min.js"></script>
   <script src="activity/SugarAnimation.js"></script>
 
+  <!--jquery-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	
   <script>
   var canvas, stage, exportRoot;
 
@@ -297,6 +300,12 @@
         row.style.left = modeDivPosition.left + 'px';
         row.style.top = modeDivPosition.top + 'px';
     };
+	  
+    //detect zoom events
+      $(window).resize(function(){
+          alert("Browser size has been changed, original functions may not appear correctly.");
+      });
+	  
   </script>
 
   <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
