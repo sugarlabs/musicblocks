@@ -493,6 +493,8 @@ tree drawing, where the pitch goes up as the branches assend.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree.svg "tree graphic")
 
+[RUN LIVE](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_musicaltree.tb)
+
 ### <a name="BEAT"></a>3.5 Beat
 
 The beat of the music is determined by the *Meter* block (by default,
