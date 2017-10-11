@@ -460,7 +460,7 @@ drum.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg "adding graphics")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png "color range")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.svg "color range")
 
 Turtle graphics can be combined with the music blocks. By placing
 graphics blocks, e.g., *Forward* and *Right*, inside of *Note value*
@@ -470,10 +470,12 @@ right during the eighth note. The pitch is raised by one half step,
 the pen size decreases, and the pen color increases at each step in
 the inner repeat loop.
 
+[RUN LIVE](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_graphicsexample.tb)
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg "synchronizing graphics and music")
 
-In this example, the graphics are synchronized to the music by placing
-the graphics commands inside of *Note value* blocks.
+Another example of graphics synchronized to the music by placing the
+graphics commands inside of *Note value* blocks
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
 
