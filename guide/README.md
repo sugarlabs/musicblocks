@@ -486,6 +486,13 @@ actions over the specified rhythm.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "rhythm sequence")
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree-example.svg "another example of the No-clock block")
+
+Another example of embedding graphics into notes: in case, a recursive
+tree drawing, where the pitch goes up as the branches assend.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree.svg "tree graphic")
+
 ### <a name="BEAT"></a>3.5 Beat
 
 The beat of the music is determined by the *Meter* block (by default,
