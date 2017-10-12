@@ -48,6 +48,10 @@ function Blocks () {
     this.mouseDownTime = 0;
     this.longPressTimeout = null;
 
+    // Paste offset is used to ensure pasted blocks don't overlap.
+    this._pasteDX = 0;
+    this._pasteDY = 0;
+
     // "Copy stack" selects a stack for pasting. Are we selecting?
     this.selectingStack = false;
     // and what did we select?
@@ -2761,6 +2765,9 @@ function Blocks () {
 
         // Update the paster button to indicate a block is selected.
         this.updatePasteButton();
+        // Reset paste offset
+        this._pasteDX = 0;
+        this._pasteDY = 0;
 
         // We display some extra buttons when we long-press an action block.
         if (myBlock.name === 'action') {
@@ -2791,8 +2798,10 @@ function Blocks () {
         }
 
         // Reposition the paste location relative to the stage position.
-        this.selectedBlocksObj[0][2] = 75 - this.stage.x;
-        this.selectedBlocksObj[0][3] = 75 - this.stage.y;
+        this.selectedBlocksObj[0][2] = 75 - this.stage.x + this._pasteDX;
+        this.selectedBlocksObj[0][3] = 75 - this.stage.y + this._pasteDY;
+        this._pasteDX += 21;
+        this._pasteDY += 21;
         this.loadNewBlocks(this.selectedBlocksObj);
     };
 
