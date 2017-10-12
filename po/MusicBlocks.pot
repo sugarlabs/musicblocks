@@ -1,3 +1,11 @@
+# POT file for Music Blocks
+# Copyright (C) 2017 Walter Bender
+# This file is distributed under the AGPL
+# Walter Bender <walter@sugarlabs.org>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
