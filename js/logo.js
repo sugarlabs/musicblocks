@@ -3388,6 +3388,12 @@ function Logo () {
                 break;
             }
 
+            // If we are just counting notes we don't care about the pitch.
+            if (that.justCounting[turtle] && that.lastNotePlayed[turtle] == null) {
+                console.log('Just counting, so spoofing last note played.');
+                that.lastNotePlayed[turtle] = ['G4', 4];
+            }
+
             if (that.lastNotePlayed[turtle] == null) {
                 that.errorMsg('The Step Pitch Block must be preceded by a Pitch Block.', blk);
                 that.stopTurtle = true;
@@ -3400,6 +3406,7 @@ function Logo () {
                     var note2 = that.getNote(note, octave, transposition, that.keySignature[turtle]);
                     that.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
                 }
+
                 that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(note);
                 that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(octave);
                 that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
