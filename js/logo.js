@@ -1612,6 +1612,7 @@ function Logo () {
         case 'print':
             if (!that.inStatusMatrix) {
                 if (args.length === 1) {
+                    console.log(args[0]);
                     if (args[0] !== null) {
                         if (that.inNoteBlock[turtle].length > 0) {
                             that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -7822,8 +7823,7 @@ function Logo () {
                             var obj = ['G', 4];
                         }
 
-                        value = pitchToNumber(obj[0], obj[1], that.keySignature[
-i]) - that.pitchNumberOffset;
+                        value = pitchToNumber(obj[0], obj[1], that.keySignature[i]) - that.pitchNumberOffset;
                         that.blocks.blockList[blk].value = value;
                         break;
                     }
@@ -7836,7 +7836,7 @@ i]) - that.pitchNumberOffset;
                         var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
                         var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                         var obj = [pitch, octave];
-                    } else if (that.notePitches[i].length > 0) {
+                    } else if (that.notePitches[turtle].length > 0) {
                         var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], that.noteTranspositions[turtle][0], that.keySignature[turtle]);
                     } else {
                         console.log('Could not find a note for mouse ' + turtle);
@@ -7921,14 +7921,13 @@ i]) - that.pitchNumberOffset;
                 for (var i = 0; i < that.turtles.turtleList.length; i++) {
                     var thisTurtle = that.turtles.turtleList[i];
                     if (targetTurtle === thisTurtle.name) {
-                        if (that.noteValue[i] !== null) {
-                            value = 1 / that.noteValue[i];
+                        if (that.inNoteBlock[i].length > 0 && last(that.inNoteBlock[i]) in that.noteValue[i]) {
+                            value = 1 / that.noteValue[i][last(that.inNoteBlock[i])];
                         } else if (that.lastNotePlayed[i] !== null) {
                             value = that.lastNotePlayed[i][1];
                         } else if (that.notePitches[i].length > 0) {
                             value = that.noteBeat[i][last(that.inNoteBlock[i])];
                         } else {
-                            console.log('Could not find a note for turtle ' + turtle);
                             value = -1;
                         }
 
@@ -7942,6 +7941,7 @@ i]) - that.pitchNumberOffset;
                         break;
                     }
                 }
+
                 if (value == null) {
                     that.errorMsg('Could not find mouse ' + targetTurtle, blk);
                     that.blocks.blockList[blk].value = -1;
@@ -8306,6 +8306,7 @@ i]) - that.pitchNumberOffset;
                 }
                 break;
             }
+
             return that.blocks.blockList[blk].value;
         } else {
             return blk;
