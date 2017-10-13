@@ -1803,7 +1803,6 @@ function Logo () {
             if (that.inMatrix) {
                 // ignore clear block in matrix
             } else if (that.inNoteBlock[turtle].length > 0) {
-                console.log('embedding clear');
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
             } else {
                 if (that.suppressOutput[turtle]) {
@@ -2214,6 +2213,7 @@ function Logo () {
                 that.parentFlowQueue[targetTurtle] = [];
                 that.unhighlightQueue[targetTurtle] = [];
                 that.parameterQueue[targetTurtle] = [];
+                console.log('stopping ' + targetTurtle);
                 that._doBreak(targetTurtle);
             }
             break;
@@ -6602,7 +6602,6 @@ function Logo () {
                     that.turtles.turtleList[turtle].doSetHeading(that.playbackQueue[turtle][idx][2]);
                     break;
                 case 'clear':
-                    console.log('CLEAR');
                     that.svgBackground = true;
                     that.turtles.turtleList[turtle].penState = false;
                     that.turtles.turtleList[turtle].doSetHeading(0);
