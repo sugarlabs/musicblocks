@@ -3,6 +3,11 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style type="text/css">
+    	ol { counter-reset: item }
+		li { display: block }
+		li:before { content: counters(item, ".") " "; counter-increment: item }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -16,52 +21,63 @@ basics. In this guide, we illustrate the musical features by walking the
 reader through numerous examples.</p>
 <h2 id="TOC">TABLE OF CONTENTS</a></h2>
 <ol>
-<li><a href="#GETTING-STARTED">Getting Started</a></li>
-<li><a href="#NOTES">Making a Sound</a></li>
-<li><a href="#NOTE-VALUE">Note Value Blocks</a></li>
-<li><a href="#PITCH">Pitch Blocks</a></li>
-<li><a href="#CHORDS">Chords</a></li>
-<li><a href="#RESTS">Rests</a></li>
-<li><a href="#DRUMS">Drums</a></li>
-<li><a href="#PROGRAMMING-WITH-MUSIC">Programming with Music</a></li>
-<li><a href="#CHUNKS">Chunks</a></li>
-<li><a href="#TRANSFORMAMusical Transformation</a>TION">
-<ol>
-<li><a href="#STEP-PITCH">Step Pitch Block</a></li>
-<li><a href="#SHARPS-AND-FLATS">Sharps and Flats</a></li>
-<li><a href="#ADJUST-TRANSPOSITION">Adjust-Transposition Block</a></li>
-<li><a href="#DOTTED">Dotted Notes</a></li>
-<li><a href="#MULTIPLY-AND-DIVIDE">Speeding Up and Slowing Down Notes via Mathematical Operations</a></li>
-<li><a href="#REPETITION">Repeating Notes</a></li>
-<li><a href="#SWINGING">Swinging Notes and Tied Notes</a></li>
-<li><a href="#MORE-TRANSFORMATIONS">Set Volume, Crescendo, Staccato, and Slur Blocks</a></li>
-<li><a href="#INTERVALS-AND-ARTICULATION">Intervals and Articulation</a></li>
-<li><a href="#ABSOLUTE-INTERVALS">Absolute Intervals</a></li>
-<li><a href="#INVERSION">Inversion</a></li>
-<li><a href="#BACKWARDS">Backwards</a></li>
-<li><a href="#SETTING">Setting Voice and Keys</a></li>
-<li><a href="#VIBRATO">Vibrato</a></li>
-</ol></li>
-<li><a href="#VOICES">Voices</a></li>
-<li><a href="#GRAPHICS">Graphics</a></li>
-<li><a href="#INTERACTIONS">Interactions</a></li>
-<li><a href="#WIDGETS">Widgets</a></li>
-<li><a href="#status">Monitoring status</a></li>
-<li><a href="#pitch-time">Generating chunks of notes</a>
-<ol>
-<li><a href="#pitch-time">Pitch-Time Matrix</a></li>
-<li><a href="#THE-RHYTHM-BLOCK">The Rhythm Block</a></li>
-<li><a href="#CREATING-TUPLETS">Creating Tuplets</a></li>
-<li><a href="#WHAT-IS-TUPLET">What is a Tuplet?</a></li>
-<li><a href="#INDIVIDUAL-NOTES">Using Individual Notes in the Matrix</a></li>
-</ol></li>
-<li><a href="#rhythms">Generating rhythms</a></li>
-<li><a href="#modes">Musical Modes</a></li>
-<li><a href="#pitch-drum">The Pitch-Drum Matrix</a></li>
-<li><a href="#stairs">Exploring musical proportions</a></li>
-<li><a href="#slider">Generating arbitrary pitches</a></li>
-<li><a href="#tempo">Changing tempo</a></li>
-<li><a href="#BEYOND-MUSIC-BLOCKS">Beyond Music Blocks</a></li>
+	<li><a href="#GETTING-STARTED">Getting Started</a></li>
+	<li><a href="#NOTES">Making a Sound</a>
+		<ol>
+			<li><a href="#NOTE-VALUE">Note Value Blocks</a></li>
+			<li><a href="#PITCH">Pitch Blocks</a></li>
+			<li><a href="#CHORDS">Chords</a></li>
+			<li><a href="#RESTS">Rests</a></li>
+			<li><a href="#DRUMS">Drums</a></li>
+		</ol>
+	</li>
+	<li><a href="#PROGRAMMING-WITH-MUSIC">Programming with Music</a>
+		<ol>
+			<li><a href="#CHUNKS">Chunks</a></li>
+			<li><a href="#TRANSFORMATION">Musical Transformations</a>
+				<ol>
+					<li><a href="#STEP-PITCH">Step Pitch Block</a></li>
+					<li><a href="#SHARPS-AND-FLATS">Sharps and Flats</a></li>
+					<li><a href="#ADJUST-TRANSPOSITION">Adjust-Transposition Block</a></li>
+					<li><a href="#DOTTED">Dotted Notes</a></li>
+					<li><a href="#MULTIPLY-AND-DIVIDE">Speeding Up and Slowing Down Notes via Mathematical Operations</a></li>
+					<li><a href="#REPETITION">Repeating Notes</a></li>
+					<li><a href="#SWINGING">Swinging Notes and Tied Notes</a></li>
+					<li><a href="#MORE-TRANSFORMATIONS">Set Volume, Crescendo, Staccato, and Slur Blocks</a></li>
+					<li><a href="#INTERVALS-AND-ARTICULATION">Intervals and Articulation</a></li>
+					<li><a href="#ABSOLUTE-INTERVALS">Absolute Intervals</a></li>
+					<li><a href="#INVERSION">Inversion</a></li>
+					<li><a href="#BACKWARDS">Backwards</a></li>
+					<li><a href="#SETTING">Setting Voice and Keys</a></li>
+					<li><a href="#VIBRATO">Vibrato</a></li>
+				</ol>
+			</li>
+			<li><a href="#VOICES">Voices</a></li>
+			<li><a href="#GRAPHICS">Graphics</a></li>
+			<li><a href="#INTERACTIONS">Interactions</a></li>
+		</ol>
+	</li>
+	<li><a href="#WIDGETS">Widgets</a>
+		<ol>
+			<li><a href="#status">Monitoring status</a></li>
+			<li><a href="#pitch-time">Generating chunks of notes</a>
+				<ol>
+					<li><a href="#pitch-time">Pitch-Time Matrix</a></li>
+					<li><a href="#THE-RHYTHM-BLOCK">The Rhythm Block</a></li>
+					<li><a href="#CREATING-TUPLETS">Creating Tuplets</a></li>
+					<li><a href="#WHAT-IS-TUPLET">What is a Tuplet?</a></li>
+					<li><a href="#INDIVIDUAL-NOTES">Using Individual Notes in the Matrix</a></li>
+				</ol>
+			</li>
+			<li><a href="#rhythms">Generating rhythms</a></li>
+			<li><a href="#modes">Musical Modes</a></li>
+			<li><a href="#pitch-drum">The Pitch-Drum Matrix</a></li>
+			<li><a href="#stairs">Exploring musical proportions</a></li>
+			<li><a href="#slider">Generating arbitrary pitches</a></li>
+			<li><a href="#tempo">Changing tempo</a></li>
+		</ol>
+	</li>
+	<li><a href="#BEYOND-MUSIC-BLOCKS">Beyond Music Blocks</a></li>
 </ol>
 <p>Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links.</p>
@@ -743,7 +759,7 @@ Tempo.</p>
 widget: the new BPM is determined as the time between the two clicks. For
 example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.</p>
 <p><a name="BEYOND-MUSIC-BLOCKS"></p>
-<h2 id="beyond-music-blocks">5. Beyond Music Blocks</h2>
+<h2 id="beyond-music-blocks">5. BEYOND MUSIC BLOCKS</h2>
 <p></a>
 <a href="#WIDGETS">Previous Section (4. Widgets)</a> | <a href="#TOC">Back to Table of Contents</a></p>
 <p>Music Blocks is a waypoint, not a destination. One of the goals is to
