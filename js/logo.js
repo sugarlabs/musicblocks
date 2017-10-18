@@ -4262,6 +4262,8 @@ function Logo () {
             } else {
                 that.inSetTimbre[turtle] = true;
                 that.instrumentNames[turtle].push(args[0]);
+                that.synth.loadSynth(args[0]);
+
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -5190,6 +5192,7 @@ function Logo () {
             } else {
                 that.transposition[turtle] += 1;
             }
+
             childFlow = args[0];
             childFlowCount = 1;
 
@@ -5212,6 +5215,7 @@ function Logo () {
             } else {
                 that.transposition[turtle] -= 1;
             }
+
             childFlow = args[0];
             childFlowCount = 1;
 
