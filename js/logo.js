@@ -8527,11 +8527,11 @@ function Logo () {
             var mode = obj[3];
 
             // Ensure it is a valid key signature.
-            offset = thisScale.indexOf(myKeySignature);
+            var offset = thisScale.indexOf(myKeySignature);
             if (offset === -1) {
                 console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
-                var offset = 0;
-                var thisScale = NOTESSHARP;
+                offset = 0;
+                thisScale = NOTESSHARP;
             }
 
             if (sharpFlat) {
@@ -8591,7 +8591,29 @@ function Logo () {
 
             octave += deltaOctave;
 
-            if (NOTESSHARP.indexOf(note) !== -1) {
+            if (deltaNote > 0) {
+                i = NOTESSHARP.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+                note = NOTESSHARP[i];
+            } else if (deltaNote < 0) {
+                i = NOTESFLAT.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+                note = NOTESFLAT[i];
+            } else if (NOTESSHARP.indexOf(note) !== -1) {
                 i = NOTESSHARP.indexOf(note);
                 i += deltaNote;
                 if (i < 0) {
