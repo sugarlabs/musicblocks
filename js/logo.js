@@ -7174,6 +7174,15 @@ function Logo () {
                 } else {
                     this.endOfClampSignals[turtle][nextBlock] = [listenerName];
                 }
+            } else {
+		var nextBlock = last(this.blocks.blockList[blk].connections);
+		if (nextBlock != null) {
+                    if (nextBlock in this.endOfClampSignals[turtle]) {
+			this.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                    } else {
+			this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    }
+		}
             }
         } else {
             var nextBlock = last(this.blocks.blockList[blk].connections);
