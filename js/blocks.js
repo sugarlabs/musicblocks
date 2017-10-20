@@ -3858,9 +3858,8 @@ function Blocks () {
                 // sure that the playback queue does not reference turtles
                 // that are not known to us.
 
-                var firstTurtle = 0;
                 // Find the first turtle not in the trash.
-                for (firstTurtle = 0; firstTurtle < that.turtles.turtleList.length; firstTurtie++) {
+                for (var firstTurtle = 0; firstTurtle < that.turtles.turtleList.length; firstTurtie++) {
                     if (!that.turtles.turtleList[firstTurtle].trash) {
                         break;
                     }
