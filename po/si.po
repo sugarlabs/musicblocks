@@ -36,6 +36,9 @@
 #: js/block.js:534
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
+#: js/block.js:534
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:40
 msgid "rest"
 msgstr ""
 
@@ -3384,14 +3387,9 @@ msgstr ""
 #~msgid "Jazz Minor"
 #~msgstr ""
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr ""
-
-#: js/basicblocks.js:901
-
-#~msgid "divide beat value"
+#~msgid "fourths"
 #~msgstr ""
 
 #~msgid "mashape"
@@ -3410,15 +3408,6 @@ msgstr ""
 #: js/musicutils.js:253
 
 #~msgid "Fibonacci"
-#~msgstr ""
-
-#: js/musicutils.js:345
-
-#: js/basicblocks.js:1635
-
-#: js/macros.js:38
-
-#~msgid "chine"
 #~msgstr ""
 
 #: plugins/rodi.rtp:169
@@ -3494,9 +3483,9 @@ msgstr ""
 #~msgid "Enigmatic"
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
+#~msgid "fifths"
 #~msgstr ""
 
 #: plugins/impact.rtp:32
@@ -3576,6 +3565,11 @@ msgstr ""
 #~msgid "turtle note value"
 #~msgstr ""
 
+#: js/basicblocks.js:901
+
+#~msgid "divide beat value"
+#~msgstr ""
+
 #: js/turtledefs.js:76
 
 #~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
@@ -3639,9 +3633,6 @@ msgstr ""
 #~msgid "hspace"
 #~msgstr ""
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr ""
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -3684,12 +3675,22 @@ msgstr ""
 #~msgid "actions"
 #~msgstr ""
 
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr ""
+
 #~msgid "Expand/collapse toolbar"
 #~msgstr ""
 
 #: js/logo.js:3384
 
 #~msgid "Note value must be greater than 0"
+#~msgstr ""
+
+#: js/basicblocks.js:505
+
+#~msgid "pitchslider"
 #~msgstr ""
 
 #: js/basicblocks.js:1370
@@ -3700,6 +3701,15 @@ msgstr ""
 #: plugins/impact.rtp:32
 
 #~msgid "UID"
+#~msgstr ""
+
+#: js/musicutils.js:345
+
+#: js/basicblocks.js:1635
+
+#: js/macros.js:38
+
+#~msgid "chine"
 #~msgstr ""
 
 #: js/musicutils.js:230
@@ -3747,11 +3757,6 @@ msgstr ""
 #: plugins/rodi.rtp:130
 
 #~msgid "sense right"
-#~msgstr ""
-
-#: js/basicblocks.js:505
-
-#~msgid "pitchslider"
 #~msgstr ""
 
 #: js/basicblocks.js:703
@@ -3803,9 +3808,7 @@ msgstr ""
 #~msgid "Arabic"
 #~msgstr ""
 
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
+#~msgid "This button opens and closes the primary toolbar."
 #~msgstr ""
 
 #: plugins/impact.rtp:32
