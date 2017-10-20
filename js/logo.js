@@ -146,6 +146,7 @@ function Logo () {
 
     // parameters used by pitch
     this.transposition = {};
+    this.transpositionValues = {};
 
     // parameters used by notes
     this._masterBPM = TARGETBPM;
@@ -888,6 +889,7 @@ function Logo () {
             this.inNoteBlock[turtle] = [];
             this.multipleVoices[turtle] = false;
             this.transposition[turtle] = 0;
+            this.transpositionValues[turtle] = [];
             this.noteBeat[turtle] = {};
             this.noteValue[turtle] = {};
             this.noteCents[turtle] = {};
@@ -5170,6 +5172,8 @@ function Logo () {
                 that.transposition[turtle] += transValue;
             }
 
+            that.transpositionValues[turtle].push(transValue);
+
             childFlow = args[1];
             childFlowCount = 1;
 
@@ -5177,6 +5181,7 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
+                var transValue = that.transpositionValues[turtle].pop();
                 if (!(that.invertList[turtle].length === 0)) {
                     that.transposition[turtle] += transValue;
                 } else {
