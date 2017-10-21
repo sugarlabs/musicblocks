@@ -3189,6 +3189,7 @@ function Blocks () {
             case 'dividebeatfactor':
             case 'drift':
             case 'duplicatenotes':
+            case 'interval':
             case 'invert1':
             case 'fill':
             case 'flat':
