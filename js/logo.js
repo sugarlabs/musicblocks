@@ -3646,7 +3646,7 @@ function Logo () {
                         var neg = false;
                     }
 
-                    if (args[0] == 0) {
+                    if (args[0] === 0) {
                         note = '?'; // throws an error
                     } else {
                         var obj = keySignatureToMode(that.keySignature[turtle]);
