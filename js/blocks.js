@@ -3860,7 +3860,7 @@ function Blocks () {
                 // that are not known to us.
 
                 // Find the first turtle not in the trash.
-                for (var firstTurtle = 0; firstTurtle < that.turtles.turtleList.length; firstTurtie++) {
+                for (var firstTurtle = 0; firstTurtle < that.turtles.turtleList.length; firstTurtle++) {
                     if (!that.turtles.turtleList[firstTurtle].trash) {
                         break;
                     }
