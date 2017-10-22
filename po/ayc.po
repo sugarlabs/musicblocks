@@ -130,7 +130,7 @@ msgstr "chiqa rixiña"
 #.TRANS: timbre is the character or quality of a musical sound
 #.TRANS: 
 msgid "timbre"
-msgstr ""
+msgstr "art'a"
 
 #: js/block.js:657
 #.TRANS: escalera
@@ -190,7 +190,7 @@ msgstr "wakichata uñachayaña"
 #: js/samplesviewer.js:93
 #.TRANS: Compartir
 msgid "Share"
-msgstr ""
+msgstr "Apakipaña"
 
 #: js/samplesviewer.js:84
 #: js/samplesviewer.js:84
@@ -1991,13 +1991,13 @@ msgstr ""
 #.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 #.TRANS: sostener
 msgid "sustain"
-msgstr ""
+msgstr "qhanta ch'itxta"
 
 #: js/basicblocks.js:412
 #.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 #.TRANS: liberar
 msgid "release"
-msgstr ""
+msgstr "antutäwi"
 
 #: js/basicblocks.js:430
 #: js/timbre.js:610
@@ -2011,14 +2011,14 @@ msgstr ""
 #.TRANS: rolloff is the steepness of a change in frequency.
 #.TRANS: 
 msgid "rolloff"
-msgstr ""
+msgstr "rolloff jithtayaña"
 
 #: js/basicblocks.js:435
 #: js/basicblocks.js:2516
 #: js/timbre.js:1271
 #.TRANS: frecuencia
 msgid "frequency"
-msgstr "Sapa kuti qhantayäwi"
+msgstr "sapa kuti qhantayäwi"
 
 #: js/basicblocks.js:451
 #.TRANS: 1/64 nota
@@ -2315,21 +2315,21 @@ msgstr "jist'thapiña wakichata chimpu"
 #.TRANS: AM (amplitude modulation) synthesizer
 #.TRANS: AM sintetizador
 msgid "AM synth"
-msgstr ""
+msgstr "AM synth chimpu"
 
 #: js/basicblocks.js:1027
 #: js/timbre.js:880
 #.TRANS: FM (frequency modulation) synthesizer
 #.TRANS: FM sintetizador
 msgid "FM synth"
-msgstr ""
+msgstr "FM synth chimpu"
 
 #: js/basicblocks.js:1039
 #: js/timbre.js:880
 #.TRANS: a duo synthesizer combines a synth with a sequencer
 #.TRANS: duo sintetizador
 msgid "duo synth"
-msgstr ""
+msgstr "purapata thaqaña"
 
 #: js/basicblocks.js:1040
 #: js/timbre.js:1041
@@ -2340,19 +2340,19 @@ msgstr ""
 #: js/basicblocks.js:1040
 #.TRANS: intensidad de vibrato
 msgid "vibrato intensity"
-msgstr ""
+msgstr "khatatiri chimpu ch'ama"
 
 #: js/basicblocks.js:1059
 #.TRANS: distortion is an alteration in the sound
 #.TRANS: distorsión
 msgid "distortion"
-msgstr ""
+msgstr "ch'iwxtayiri"
 
 #: js/basicblocks.js:1069
 #.TRANS: a wavering effect in a musical tone
 #.TRANS: 
 msgid "tremolo"
-msgstr ""
+msgstr "wirsu sallayiri"
 
 #: js/basicblocks.js:1071
 #: js/basicblocks.js:1086
@@ -2361,30 +2361,30 @@ msgstr ""
 #.TRANS: rate at which tremolo wavers
 #.TRANS: velocidad
 msgid "rate"
-msgstr ""
+msgstr "chani"
 
 #: js/basicblocks.js:1073
 #: js/basicblocks.js:1102
 #.TRANS: amplitude of tremolo waver
 #.TRANS: intensidad
 msgid "depth"
-msgstr ""
+msgstr "jiskharpayiri"
 
 #: js/basicblocks.js:1085
 #.TRANS: alter the phase of the sound
 #.TRANS: 
 msgid "phaser"
-msgstr ""
+msgstr "ch'usuqiyiri"
 
 #: js/basicblocks.js:1086
 #.TRANS: octavas
 msgid "octaves"
-msgstr ""
+msgstr "8 wirsunaka"
 
 #: js/basicblocks.js:1086
 #.TRANS: frecuencia de base
 msgid "base frequency"
-msgstr ""
+msgstr "wirsu thaqaña"
 
 #: js/basicblocks.js:1101
 #.TRANS: musical effect to simulate a choral sound
@@ -2395,24 +2395,24 @@ msgstr ""
 #: js/basicblocks.js:1102
 #.TRANS: retraso
 msgid "delay"
-msgstr ""
+msgstr "qhipt'a"
 
 #: js/basicblocks.js:1116
 #.TRANS: a rapid, slight variation in pitch
 #.TRANS: 
 msgid "vibrato"
-msgstr ""
+msgstr "khatati"
 
 #: js/basicblocks.js:1117
 #.TRANS: intensidad
 msgid "intensity"
-msgstr ""
+msgstr "ch'amampi"
 
 #: js/basicblocks.js:1128
 #.TRANS: select synthesizer
 #.TRANS: fijar synth
 msgid "set synth"
-msgstr ""
+msgstr "apthapiri tama"
 
 #: js/basicblocks.js:1139
 #: js/basicblocks.js:1170
@@ -2434,7 +2434,7 @@ msgstr "staccato wakichata"
 #.TRANS: set the characteristics of a custom instrument
 #.TRANS: fijar timbre
 msgid "set timbre"
-msgstr ""
+msgstr "art'äwi chimpuña"
 
 #: js/basicblocks.js:1229
 #: js/basicblocks.js:1295
@@ -2444,7 +2444,7 @@ msgstr ""
 #.TRANS: the number of half-steps between notes
 #.TRANS: intervalo
 msgid "interval"
-msgstr ""
+msgstr "jakhukipaña"
 
 #: js/basicblocks.js:1241
 #: js/basicblocks.js:1248
@@ -2737,7 +2737,7 @@ msgstr "raíz cuadrada wakichata"
 #: js/basicblocks.js:2063
 #.TRANS: 
 msgid "abs"
-msgstr ""
+msgstr "abs chimpu"
 
 #: js/basicblocks.js:2112
 #.TRANS: uno de estos
@@ -2969,7 +2969,7 @@ msgstr ""
 #.TRANS: the case statement used in a switch statement in programming
 #.TRANS: caso
 msgid "case"
-msgstr ""
+msgstr "uka chimpu"
 
 #: js/basicblocks.js:2608
 #.TRANS: the switch statement used in programming
@@ -3041,7 +3041,7 @@ msgstr "jani uñt’ata"
 #: js/basicblocks.js:2750
 #.TRANS: guardar como ABC
 msgid "save as ABC"
-msgstr ""
+msgstr "ABC chimpuni imaña"
 
 #: js/basicblocks.js:2753
 #: js/basicblocks.js:2762
@@ -3137,12 +3137,12 @@ msgstr "pacha"
 #: js/basicblocks.js:2900
 #.TRANS: cursor y
 msgid "cursor y"
-msgstr ""
+msgstr "jithiyaña y chimpuni"
 
 #: js/basicblocks.js:2908
 #.TRANS: cursor x
 msgid "cursor x"
-msgstr ""
+msgstr "jithiyaña x chimpuni"
 
 #: js/basicblocks.js:2916
 #.TRANS: botón del ratón
@@ -3162,7 +3162,7 @@ msgstr "qillqañana thaqaña"
 #: js/basicblocks.js:2939
 #.TRANS: parar ratón
 msgid "stop mouse"
-msgstr ""
+msgstr "jithiyaña sayt'ayaña"
 
 #: js/basicblocks.js:2943
 #: js/basicblocks.js:2952
@@ -3179,24 +3179,24 @@ msgstr ""
 #: js/basicblocks.js:3071
 #.TRANS: Sr. Ratón
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "Tata Jithiyaña Achaku"
 
 #: js/basicblocks.js:2948
 #.TRANS: comenzar ratón
 msgid "start mouse"
-msgstr ""
+msgstr "jithuyaña qalltaña"
 
 #: js/basicblocks.js:2958
 #.TRANS: pen color for this mouse
 #.TRANS: color de ratón
 msgid "mouse color"
-msgstr ""
+msgstr "jithiyaña sami"
 
 #: js/basicblocks.js:2968
 #.TRANS: heading (compass direction) for this mouse
 #.TRANS: rumbo de ratón
 msgid "mouse heading"
-msgstr ""
+msgstr "jithiyaña wakichata suti"
 
 #: js/basicblocks.js:2978
 #.TRANS: y position for this mouse
@@ -3220,25 +3220,25 @@ msgstr ""
 #.TRANS: convert current note for this turtle to piano key (1-88)
 #.TRANS: número de tono de ratón
 msgid "mouse pitch number"
-msgstr ""
+msgstr "jithiyaña wairsu jakhu chimpu"
 
 #: js/basicblocks.js:3017
 #: js/basicblocks.js:3027
 #.TRANS: valor de la nota del ratón
 msgid "mouse note value"
-msgstr ""
+msgstr "jithiyäwi wakichata qillqata chani"
 
 #: js/basicblocks.js:3036
 #.TRANS: sincronizar
 msgid "mouse sync"
-msgstr ""
+msgstr "jithiyaña wakichata mayachaña"
 
 #: js/basicblocks.js:3045
 #: js/basicblocks.js:3053
 #: js/basicblocks.js:3067
 #.TRANS: renombrar ratón
 msgid "mouse name"
-msgstr ""
+msgstr "jithiyaña wakichata suti"
 
 #: js/basicblocks.js:3054
 #: plugins/translate.rtp:95
@@ -3272,7 +3272,7 @@ msgstr "siqinaka jach'ata warurt'ayaña"
 #.TRANS: set an articulation (change in volume)
 #.TRANS: fijar volumen relativo
 msgid "set relative volume"
-msgstr ""
+msgstr "jach'ata maya k'ata arsuyaña"
 
 #: js/basicblocks.js:3170
 #.TRANS: a gradual increase in loudness
@@ -3312,7 +3312,7 @@ msgstr "taqi kuna anataña"
 #: js/timbre.js:510
 #.TRANS: sintetizador
 msgid "synthesizer"
-msgstr ""
+msgstr "apthapiri"
 
 #: js/timbre.js:597
 #.TRANS: efectos
@@ -3322,7 +3322,7 @@ msgstr ""
 #: js/timbre.js:640
 #.TRANS: añadir un filtro
 msgid "add filter"
-msgstr ""
+msgstr "ch'umachiri yapxataña"
 
 #: js/timbre.js:656
 #: js/rhythmruler.js:1137
@@ -3335,47 +3335,47 @@ msgstr "kutt'aña"
 #: js/timbre.js:927
 #.TRANS: armonía
 msgid "harmonicity"
-msgstr ""
+msgstr "wirsu"
 
 #: js/timbre.js:984
 #.TRANS: índice de modulación
 msgid "modulation index"
-msgstr ""
+msgstr "thurincha chimpu"
 
 #: js/timbre.js:1042
 #.TRANS: cantidad de vibrato
 msgid "vibrato amount"
-msgstr ""
+msgstr "putuqïwi chani jakhu"
 
 #: js/savebox.js:89
 #.TRANS: Guardar como .tb
 msgid "Save as .tb"
-msgstr ""
+msgstr "tb. Chimpuni imaña"
 
 #: js/savebox.js:97
 #.TRANS: Guardar como .svg
 msgid "Save as .svg"
-msgstr ""
+msgstr "svg. Chimpuni imaña"
 
 #: js/savebox.js:105
 #.TRANS: Guardar como .png
 msgid "Save as .png"
-msgstr ""
+msgstr "png. Chimpuni imaña"
 
 #: js/savebox.js:113
 #.TRANS: Subir al Planeta
 msgid "Upload to Planet"
-msgstr ""
+msgstr "pacharu makataña"
 
 #: js/savebox.js:130
 #.TRANS: Compartir en Facebook
 msgid "Share on Facebook"
-msgstr ""
+msgstr "Facebook taypiru mayachaña"
 
 #: js/savebox.js:140
 #.TRANS: Guardar bloque svg
 msgid "Save block artwork"
-msgstr ""
+msgstr "rixitanaka wakichata t'aqa imaña"
 
 #: js/tempo.js:324
 #.TRANS: acelerar
@@ -3512,7 +3512,7 @@ msgstr "ch"
 #.TRANS: user can tap out a rhythm by clicking on a ruler.
 #.TRANS: tocar un ritmo
 msgid "tap a rhythm"
-msgstr ""
+msgstr "maya wirsu arsuyaña"
 
 #: js/rhythmruler.js:1102
 #.TRANS: guardar ritmos
