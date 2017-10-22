@@ -922,7 +922,7 @@ function Logo () {
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = {};
-            this.bpm[turtle] = [];
+            this.bpm[turtle] = [90];
             this.inSetTimbre[turtle] = false;
             this.instrumentNames[turtle] = [];
             this.crescendoDelta[turtle] = [];
@@ -1308,8 +1308,8 @@ function Logo () {
                 this._setSynthVolume(value, turtle);
             }
 
-            if (!that.justCounting[turtle]) {
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', value]);
+            if (!this.justCounting[turtle]) {
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setvolume', value]);
             }
             break;
         default:
@@ -5856,6 +5856,7 @@ function Logo () {
     this._processNote = function (noteValue, blk, turtle) {
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
+            console.log(bpmFactor);
         } else {
             var bpmFactor = TONEBPM / this._masterBPM;
         }
@@ -7180,14 +7181,14 @@ function Logo () {
                     this.endOfClampSignals[turtle][nextBlock] = [listenerName];
                 }
             } else {
-		var nextBlock = last(this.blocks.blockList[blk].connections);
-		if (nextBlock != null) {
+                var nextBlock = last(this.blocks.blockList[blk].connections);
+                if (nextBlock != null) {
                     if (nextBlock in this.endOfClampSignals[turtle]) {
-			this.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                        this.endOfClampSignals[turtle][nextBlock].push(listenerName);
                     } else {
-			this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                        this.endOfClampSignals[turtle][nextBlock] = [listenerName];
                     }
-		}
+                }
             }
         } else {
             var nextBlock = last(this.blocks.blockList[blk].connections);
@@ -7691,7 +7692,7 @@ function Logo () {
             case 'bpmfactor':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'bpm']);
-        } else if (that.bpm[turtle].length > 0) {
+                } else if (that.bpm[turtle].length > 0) {
                     that.blocks.blockList[blk].value = last(that.bpm[turtle]);
                 } else {
                     that.blocks.blockList[blk].value = that._masterBPM;
