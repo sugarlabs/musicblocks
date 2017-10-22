@@ -1286,6 +1286,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.mouseDownTime = d.getTime();
 
                 that.blocks.longPressTimeout = setTimeout(function () {
+		    that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
                     that.blocks.triggerLongPress(that);
                 }, LONGPRESSTIME);
             }

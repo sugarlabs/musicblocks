@@ -2230,6 +2230,11 @@ function Blocks () {
 
     this.findDragGroup = function (blk) {
         // Generate a drag group from blocks connected to blk
+        if (blk == null) {
+            console.log('null block passed to findDragGroup');
+            return;
+        }
+
         this.dragLoopCounter = 0;
         this.dragGroup = [];
         this._calculateDragGroup(blk);
@@ -2757,6 +2762,11 @@ function Blocks () {
 
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
+        if (this.activeBlock == null) {
+            console.log('null block passed to triggerLongPress');
+            return;
+        }
+
         var topBlock = this.findTopBlock(this.activeBlock);
         this.selectedStack = topBlock;
 
