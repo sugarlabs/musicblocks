@@ -3135,6 +3135,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     fffBlock.adjustWidthToLabel();
     fffBlock.zeroArgBlock();
 
+    var synthVolumeBlock = new ProtoBlock('setsynthvolume');
+    synthVolumeBlock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['setsynthvolume'] = synthVolumeBlock;
+    //.TRANS: set the loudness level
+    synthVolumeBlock.staticLabels.push(_('set synth volume'), _('synth'), _('volume'));
+    synthVolumeBlock.adjustWidthToLabel();
+    synthVolumeBlock.twoArgBlock();
+    synthVolumeBlock.dockTypes[1] = 'textin';
+    synthVolumeBlock.defaults.push('default');
+    synthVolumeBlock.defaults.push(50);
+
     var noteVolumeBlock = new ProtoBlock('setnotevolume');
     noteVolumeBlock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;

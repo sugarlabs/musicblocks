@@ -1867,7 +1867,8 @@ function Synth() {
 
     this.setVolume = function (instrumentName, volume) {
         // volume in decibals
-        instruments[instrumentName].volume.value = volume;
+        var db = this.tone.gainToDb(volume / 100);
+        instruments[instrumentName].volume.value = db;
     };
 
     this.getVolume = function (instrumentName) {
@@ -1875,8 +1876,8 @@ function Synth() {
         return instruments[instrumentName].volume.value;
     };
 
-    this.setMasterVolume = function (vol) {
-        var db = this.tone.gainToDb(vol / 100);
+    this.setMasterVolume = function (volume) {
+        var db = this.tone.gainToDb(volume / 100);
         Tone.Master.volume.rampTo(db, 0.01);
     };
 

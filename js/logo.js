@@ -986,7 +986,7 @@ function Logo () {
         this.pitchNumberOffset = 39;  // C4
 
         if (!this.suppressOutput[turtle]) {
-            this._setSynthVolume(DEFAULTVOLUME, Math.max(this.turtles.turtleList.length - 1), 0);
+            this._setMasterVolume(DEFAULTVOLUME, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
         this.inPitchDrumMatrix = false;
@@ -1305,7 +1305,7 @@ function Logo () {
             var len = this.polyVolume[turtle].length;
             this.polyVolume[turtle][len - 1] = value;
             if (!this.suppressOutput[turtle]) {
-                this._setSynthVolume(value, turtle);
+                this._setMasterVolume(value, turtle);
             }
 
             if (!this.justCounting[turtle]) {
@@ -5250,7 +5250,7 @@ function Logo () {
 
                 that.polyVolume[turtle].push(newVolume);
                 if (!this.suppressOutput[turtle]) {
-                    that._setSynthVolume(newVolume, turtle);
+                    that._setMasterVolume(newVolume, turtle);
                 }
 
                 if (!that.justCounting[turtle]) {
@@ -5282,7 +5282,7 @@ function Logo () {
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 that.polyVolume[turtle].push(args[0]);
                 if (!this.suppressOutput[turtle]) {
-                    that._setSynthVolume(args[0], turtle);
+                    that._setMasterVolume(args[0], turtle);
                 }
 
                 if (!that.justCounting[turtle]) {
@@ -5308,13 +5308,34 @@ function Logo () {
                     that.errorMsg(NANERRORMSG, blk);
                     that.stopTurtle = true;
                 } else {
+                    // fixme: should be master volume
                     that.polyVolume[turtle].push(args[0]);
                     if (!this.suppressOutput[turtle]) {
-                        that._setSynthVolume(args[0], turtle);
+                        that._setMasterVolume(args[0], turtle);
                     }
 
                     if (!that.justCounting[turtle]) {
                         that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', args[0]]);
+                    }
+                }
+            }
+            break;
+        case 'setsynthvolume':
+            if (args.length === 2) {
+                // fixme: check for valid synth
+                if (typeof(args[1]) !== 'number') {
+                    that.errorMsg(NANERRORMSG, blk);
+                    that.stopTurtle = true;
+                } else {
+                    if (!this.suppressOutput[turtle]) {
+                        // fixme: should be [synth, volume]
+                        // that.polyVolume[turtle].push(args[1]);
+                        that._setSynthVolume(args[0], args[1]);
+                    }
+
+                    if (!that.justCounting[turtle]) {
+                        // fixme: not yet implemented in playback
+                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', args[0], args[1]]);
                     }
                 }
             }
@@ -5844,7 +5865,8 @@ function Logo () {
         }
     };
 
-    this._setSynthVolume = function (volume, turtle) {
+    this._setMasterVolume = function (volume, turtle) {
+        // fixme: we don't need the turtle arg
         if (volume > 100) {
             volume = 100;
         } else if (volume < 0) {
@@ -5853,6 +5875,18 @@ function Logo () {
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.setMasterVolume(volume);
+        }
+    };
+
+    this._setSynthVolume = function (synth, volume) {
+        if (volume > 100) {
+            volume = 100;
+        } else if (volume < 0) {
+            volume = 0;
+        }
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.synth.setVolume(synth, volume);
         }
     };
 
@@ -5972,7 +6006,7 @@ function Logo () {
         var carry = 0;
 
         if (this.crescendoDelta[turtle].length === 0) {
-            this._setSynthVolume(last(this.polyVolume[turtle]), turtle);
+            this._setMasterVolume(last(this.polyVolume[turtle]), turtle);
         }
 
         if (this.inTimbre) {
@@ -6493,7 +6527,7 @@ function Logo () {
                 var len = this.crescendoVolume[turtle].length
                 this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
                 if (!that.suppressOutput[turtle]) {
-                    this._setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
+                    this._setMasterVolume(this.crescendoVolume[turtle][len - 1], turtle);
                 }
 
                 var len2 = this.polyVolume[turtle].length;
@@ -6596,7 +6630,7 @@ function Logo () {
                     that.textMsg(that.playbackQueue[turtle][idx][2].toString());
                     break;
                 case 'setvolume':
-                    that._setSynthVolume(that.playbackQueue[turtle][idx][2], turtle);
+                    that._setMasterVolume(that.playbackQueue[turtle][idx][2], turtle);
                     break;
                 case 'arc':
                     that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
