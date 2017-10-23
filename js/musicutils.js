@@ -1865,7 +1865,17 @@ function Synth() {
         Tone.Transport.stop();
     };
 
-    this.setVolume = function (vol) {
+    this.setVolume = function (instrumentName, volume) {
+        // volume in decibals
+        instruments[instrumentName].volume.value = volume;
+    };
+
+    this.getVolume = function (instrumentName) {
+        // volume in decibals
+        return instruments[instrumentName].volume.value;
+    };
+
+    this.setMasterVolume = function (vol) {
         var db = this.tone.gainToDb(vol / 100);
         Tone.Master.volume.rampTo(db, 0.01);
     };

@@ -5844,15 +5844,15 @@ function Logo () {
         }
     };
 
-    this._setSynthVolume = function (vol, turtle) {
-        if (vol > 100) {
-            vol = 100;
-        } else if (vol < 0) {
-            vol = 0;
+    this._setSynthVolume = function (volume, turtle) {
+        if (volume > 100) {
+            volume = 100;
+        } else if (volume < 0) {
+            volume = 0;
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.synth.setVolume(vol);
+            this.synth.setMasterVolume(volume);
         }
     };
 
