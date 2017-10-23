@@ -1302,7 +1302,7 @@ function Logo () {
             }
             break;
         case 'notevolumefactor':
-            var len = this.transposition[turtle].length;
+            var len = this.polyVolume[turtle].length;
             this.polyVolume[turtle][len - 1] = value;
             if (!this.suppressOutput[turtle]) {
                 this._setSynthVolume(value, turtle);
@@ -1614,7 +1614,6 @@ function Logo () {
         case 'print':
             if (!that.inStatusMatrix) {
                 if (args.length === 1) {
-                    console.log(args[0]);
                     if (args[0] !== null) {
                         if (that.inNoteBlock[turtle].length > 0) {
                             that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
