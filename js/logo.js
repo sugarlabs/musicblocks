@@ -3586,7 +3586,7 @@ function Logo () {
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
-            if (that.blocks.blockList[blk].name == 'pitchnumber') {
+            if (that.blocks.blockList[blk].name === 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
                     that.stopTurtle = true;
@@ -3612,7 +3612,7 @@ function Logo () {
                     break;
                 }
 
-                if (typeof(args[0]) === 'number' && that.blocks.blockList[blk].name == 'pitch') {
+                if (typeof(args[0]) === 'number' && that.blocks.blockList[blk].name === 'pitch') {
                     // We interpret numbers two different ways:
                     // (1) a positive integer between 1 and 12 is taken to be
                     // a moveable solfege, e.g., 1 == do; 2 == re...
@@ -3639,6 +3639,12 @@ function Logo () {
                         break;
                     }
                 } else if (typeof(args[0]) === 'number' && that.blocks.blockList[blk].name == 'scaledegree') {
+                    //  (0, 4) --> ti 3; (-1, 4) --> la 3, (-6, 4) --> do 3
+                    //  (1, 4) --> do 4; ( 2, 4) --> re 4; ( 8, 4) --> do 5
+                    if (args[0] < 1) {
+                        args[0] -= 2;
+                    }
+
                     if (args[0] < 0) {
                         var neg = true;
                         args[0] = -args[0];
@@ -3655,7 +3661,6 @@ function Logo () {
                         scaleDegree += 1;
 
                         if (neg) {
-                            // -1, 4 --> do 4; -2, 4 --> ti 3; -8, 4 --> do 3
                             if (scaleDegree > 1) {
                                 scaleDegree = modeLength - scaleDegree + 2;
                             }
@@ -3663,7 +3668,6 @@ function Logo () {
                             var deltaOctave = Math.floor((args[0] + modeLength - 2) / modeLength);
                             var octave = Math.floor(calcOctave(that.currentOctaves[turtle], args[1])) - deltaOctave;
                         } else {
-                            //  1, 4 --> do 4;  2, 4 --> re 4;  8, 4 --> do 5
                             note = scaleDegreeToPitch(that.keySignature[turtle], scaleDegree);
                             var deltaOctave = Math.floor((args[0] - 1) / modeLength);
                             var octave = Math.floor(calcOctave(that.currentOctaves[turtle], args[1])) + deltaOctave;
@@ -5856,7 +5860,6 @@ function Logo () {
     this._processNote = function (noteValue, blk, turtle) {
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
-            console.log(bpmFactor);
         } else {
             var bpmFactor = TONEBPM / this._masterBPM;
         }
