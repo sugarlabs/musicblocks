@@ -1046,12 +1046,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     duoSynthBlock.dockTypes[1] = 'numberin';
     duoSynthBlock.dockTypes[2] = 'numberin';
 
-    var voicenameBlock = new ProtoBlock('voicename');
-    voicenameBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['voicename'] = voicenameBlock;
-    voicenameBlock.valueBlock();
-    voicenameBlock.dockTypes[0] = 'textout';
-
     var distortionBlock = new ProtoBlock('dis');
     distortionBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['dis'] = distortionBlock;
@@ -1152,17 +1146,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     staccatoBlock.defaults.push(32);
     staccatoBlock.hidden = true;
 
-    var setTimbreBlock = new ProtoBlock('settimbre');
-    setTimbreBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['settimbre'] = setTimbreBlock;
-    //.TRANS: set the characteristics of a custom instrument
-    setTimbreBlock.staticLabels.push(_('set timbre'));
-    setTimbreBlock.adjustWidthToLabel();
-    setTimbreBlock.flowClampOneArgBlock();
-    setTimbreBlock.dockTypes[1] = 'textin';
-    //.TRANS: user-defined
-    setTimbreBlock.defaults.push(_('custom'));
-    
     var newslurBlock = new ProtoBlock('newslur');
     newslurBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['newslur'] = newslurBlock;
@@ -1181,6 +1164,23 @@ function initBasicProtoBlocks(palettes, blocks) {
     newstaccatoBlock.flowClampOneArgBlock();
     newstaccatoBlock.defaults.push(1 / 32);
 
+    var voicenameBlock = new ProtoBlock('voicename');
+    voicenameBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['voicename'] = voicenameBlock;
+    voicenameBlock.valueBlock();
+    voicenameBlock.dockTypes[0] = 'textout';
+
+    var setTimbreBlock = new ProtoBlock('settimbre');
+    setTimbreBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['settimbre'] = setTimbreBlock;
+    //.TRANS: set the characteristics of a custom instrument
+    setTimbreBlock.staticLabels.push(_('set timbre'));
+    setTimbreBlock.adjustWidthToLabel();
+    setTimbreBlock.flowClampOneArgBlock();
+    setTimbreBlock.dockTypes[1] = 'textin';
+    //.TRANS: user-defined
+    setTimbreBlock.defaults.push(_('custom'));
+    
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
     var diminished8Block = new ProtoBlock('diminished8');
@@ -3075,7 +3075,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     notevolumeFactor.palette = palettes.dict['volume'];
     blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
     //.TRANS: the volume at which notes are played
-    notevolumeFactor.staticLabels.push(_('note volume'));
+    notevolumeFactor.staticLabels.push(_('master volume'));
     notevolumeFactor.adjustWidthToLabel();
     notevolumeFactor.parameterBlock();
 
@@ -3150,7 +3150,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteVolumeBlock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
     //.TRANS: set the loudness level
-    noteVolumeBlock.staticLabels.push(_('set volume'));
+    noteVolumeBlock.staticLabels.push(_('set master volume'));
     noteVolumeBlock.adjustWidthToLabel();
     noteVolumeBlock.oneArgBlock();
     noteVolumeBlock.defaults.push(50);
@@ -3159,7 +3159,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteVolumeBlock2.palette = palettes.dict['volume'];
     blocks.protoBlockDict['setnotevolume2'] = noteVolumeBlock2;
     //.TRANS: set the loudness level
-    noteVolumeBlock2.staticLabels.push(_('set volume'));
+    noteVolumeBlock2.staticLabels.push(_('set master volume'));
     noteVolumeBlock2.adjustWidthToLabel();
     noteVolumeBlock2.flowClampOneArgBlock();
     noteVolumeBlock2.defaults.push(50);

@@ -87,25 +87,3 @@ const DRUM_SAMPLES = {
     'floor tom tom': FLOORTOMSOUNDSAMPLE,
     'snare drum': SNARESOUNDSAMPLE
 };
-
-const VOICE_SAMPLES = {
-    'violin': VIOLINSOUNDSAMPLE,
-    'cello': CELLOSOUNDSAMPLE,
-    'basse': BASSESOUNDSAMPLE
-};
-
-const BUILTIN_SYNTHS = {
-    'sine': 1,
-    'triangle': 1,
-    'sawtooth': 1,
-    'square': 1,
-    'pluck': 1,
-    'poly': 1
-};
-
-const CUSTOM_SYNTHS = {
-    'amsynth': 1,
-    'fmsynth': 1,
-    'duosynth': 1,
-  //  'monosynth': 1
-};

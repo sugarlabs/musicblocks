@@ -4275,12 +4275,24 @@ function Logo () {
                 childFlowCount = 1;
             } else {
                 that.inSetTimbre[turtle] = true;
-                that.instrumentNames[turtle].push(args[0]);
-                that.synth.loadSynth(args[0]);
 
-                if (that.synthVolume[turtle][args[0]] == undefined) {
-                    that.synthVolume[turtle][args[0]] = [DEFAULTVOLUME];
-                    that.crescendoInitialVolume[turtle][args[0]] = [DEFAULTVOLUME];
+                var synth = args[0];
+                for (var voice in VOICENAMES) {
+                    if (VOICENAMES[voice][0] === args[0]) {
+                        synth = VOICENAMES[voice][1];
+                        break;
+                    } else if (VOICENAMES[voice][1] === args[0]) {
+                        synth = args[0];
+                        break;
+                    }
+                }
+
+                that.instrumentNames[turtle].push(synth);
+                that.synth.loadSynth(synth);
+
+                if (that.synthVolume[turtle][synth] == undefined) {
+                    that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
+                    that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
                 }
 
                 childFlow = args[1];
@@ -4296,7 +4308,6 @@ function Logo () {
 
                 that._setListener(turtle, listenerName, __listener);
             }
-
             break;
         case 'crescendo':
             if (args.length > 1 && args[0] !== 0) {
@@ -5354,14 +5365,51 @@ function Logo () {
                     that.errorMsg(NANERRORMSG, blk);
                     that.stopTurtle = true;
                 } else {
+                    var synth = null;
+
+                    if (args[0] === 'default' || args[0] ===  _('default')) {
+                        synth = 'default';
+                    } else if (args[0] === 'default' || args[0] ===  _('default')) {
+                        synth = 'custom';
+		    }
+
+                    if (synth == null) {
+			for (var voice in VOICENAMES) {
+			    if (VOICENAMES[voice][0] === args[0]) {
+				synth = VOICENAMES[voice][1];
+				break;
+			    } else if (VOICENAMES[voice][1] === args[0]) {
+				synth = args[0];
+				break;
+			    }
+			}
+                    }
+
+                    if (synth == null) {
+			for (var drum in DRUMNAMES) {
+			    if (DRUMNAMES[drum][0] === args[0]) {
+				synth = DRUMNAMES[drum][1];
+				break;
+			    } else if (DRUMNAMES[drum][1] === args[0]) {
+				synth = args[0];
+				break;
+			    }
+			}
+                    }
+
+                    if (synth == null) {
+                        that.errorMsg(synth + 'not found', blk);
+                        synth = 'default';
+                    }
+
                     if (!this.suppressOutput[turtle]) {
-                        that.synthVolume[turtle][args[0]] = args[1];
-                        that._setSynthVolume(args[0], args[1]);
+                        that.synthVolume[turtle][synth] = args[1];
+                        that._setSynthVolume(synth, args[1]);
                     }
 
                     if (!that.justCounting[turtle]) {
                         // fixme: not yet implemented in playback
-                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', args[0], args[1]]);
+                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', synth, args[1]]);
                     }
                 }
             }

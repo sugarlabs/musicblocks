@@ -307,7 +307,15 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     // [_('bass'), 'basse', 'images/voices.svg'],
     //.TRANS: polytone synthesizer
-    [_('poly'), 'poly', 'images/synth.svg'],
+    [_('default'), 'default', 'images/synth.svg'],
+    //.TRANS: simple monotone synthesizer
+    [_('simple 1'), 'mono1', 'images/synth.svg'],
+    //.TRANS: simple monotone synthesizer
+    [_('simple 2'), 'mono2', 'images/synth.svg'],
+    //.TRANS: simple monotone synthesizer
+    [_('simple 3'), 'mono3', 'images/synth.svg'],
+    //.TRANS: simple monotone synthesizer
+    [_('simple 4'), 'mono4', 'images/synth.svg'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg'],
     //.TRANS: square wave
@@ -316,6 +324,8 @@ var VOICENAMES = [
     [_('sawtooth'), 'sawtooth', 'images/synth.svg'],
     //.TRANS: triangle wave
     [_('triangle'), 'triangle', 'images/synth.svg'],
+    //.TRANS: customize voice
+    [_('custom'), 'custom', 'images/synth.svg'],
 ];
 
 var DRUMNAMES = [
@@ -1384,11 +1394,37 @@ var instrumentsFilters = {};
 function Synth() {
     // Isolate synth functions here.
 
+    const VOICE_SAMPLES = {
+        'violin': VIOLINSOUNDSAMPLE,
+        'cello': CELLOSOUNDSAMPLE,
+        'basse': BASSESOUNDSAMPLE
+    };
+
+    const BUILTIN_SYNTHS = {
+        'sine': 1,
+        'triangle': 1,
+        'sawtooth': 1,
+        'square': 1,
+        'pluck': 1,
+        'poly': 1,
+        'mono1': 1,
+        'mono2': 1,
+        'mono3': 1,
+        'mono4': 1,
+        'custom': 1,
+    };
+
+    const CUSTOM_SYNTHS = {
+        'amsynth': 1,
+        'fmsynth': 1,
+        'duosynth': 1,
+    };
+
     // Using Tone.js
     this.tone = new Tone();
 
     Tone.Buffer.onload = function () {
-        console.log('drum loaded');
+        console.log('sample loaded');
     };
 
     // Function that provides default parameters for various synths
@@ -1443,31 +1479,20 @@ function Synth() {
                 }
             };
             break;
-        case 'monosynth':
+        case 'mono1':
+        case 'mono2':
+        case 'mono3':
+        case 'mono4':
             var synthOptions = {
                 'oscillator': {
-                    'type': 'square'
-                },
-                'filter': {
-                    'Q': 6,
-                    'type': 'lowpass',
-                    'rolloff': -24
+                    'type': 'sine'
                 },
                 'envelope': {
-                    'attack': 0.005,
-                    'decay': 0.1,
-                    'sustain': 0.9,
-                    'release': 1
+                    'attack': 0.03,
+                    'decay': 0,
+                    'sustain': 1,
+                    'release': 0.03
                 },
-                'filterEnvelope': {
-                    'attack': 0.06,
-                    'decay': 0.2,
-                    'sustain': 0.5,
-                    'release': 2,
-                    'baseFrequency': 200,
-                    'octaves': 7,
-                    'exponent': 2
-                }
             };
             break;
         case 'duosynth':
@@ -1559,20 +1584,6 @@ function Synth() {
         instrumentsSource['default'] = [0, 'default'];
         instruments['custom'] = default_synth;
         instrumentsSource['custom'] = [0, 'custom'];
-
-        /*
-        for (var blt in BUILTIN_SYNTHS) {
-            this.createSynth(blt, blt, null);
-        }
-
-        for (var voice in VOICE_SAMPLES) {
-            this.createSynth(voice, voice, null);
-        }
-
-        for (var drm in DRUM_SAMPLES) {
-            this.createSynth(drm, drm, null);
-        }
-        */
     };
 
     // Function reponsible for creating the synth using the existing
@@ -1606,6 +1617,14 @@ function Synth() {
         }
 
         switch (sourceName) {
+        case 'mono1':
+        case 'mono2':
+        case 'mono3':
+        case 'mono4':
+            instrumentsSource[instrumentName] = [3, sourceName];
+            console.log(sourceName);
+            var builtin_synth = new Tone.Synth(synthOptions);
+            break;
         case 'sine':
         case 'triangle':
         case 'square':
@@ -1642,13 +1661,10 @@ function Synth() {
         var synthOptions = this.getDefaultParamValues(sourceName);
         synthOptions = validateAndSetParams(synthOptions, params);
 
-        console.log(sourceName);
         if (sourceName.toLowerCase() === 'amsynth') {
             var tempSynth = new Tone.AMSynth(synthOptions);
         } else if (sourceName.toLowerCase() === 'fmsynth') {
             var tempSynth = new Tone.FMSynth(synthOptions);
-        } else if (sourceName.toLowerCase() === 'monosynth') {
-            var tempSynth = new Tone.MonoSynth(synthOptions);
         } else if (sourceName.toLowerCase() === 'duosynth') {
             var tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
@@ -1668,7 +1684,6 @@ function Synth() {
             instruments[instrumentName] = this._createCustomSynth(sourceName, params).toMaster();
             instrumentsSource[instrumentName] = [0, 'poly'];
         } else {
-            console.log(sourceName);
             if (sourceName.length >= 4) {
                 if (sourceName.slice(0, 4) === 'http') {
                     instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
@@ -1866,6 +1881,7 @@ function Synth() {
     };
 
     this.setVolume = function (instrumentName, volume) {
+        console.log(instruments);
         // volume in decibals
         var db = this.tone.gainToDb(volume / 100);
         instruments[instrumentName].volume.value = db;

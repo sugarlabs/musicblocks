@@ -13,7 +13,7 @@
 
 function blockIsMacro (blkname) {
 
-    const BUILTINMACROS= ['action', 'articulation', 'augmented', 'augmentedx', 'augmented1', 'augmented2', 'augmented4', 'augmented5', 'augmented7','augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished', 'diminishedx', 'diminished1', 'diminished4', 'diminished5', 'diminished8', 'dividebeatfactor', 'dog', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'flat', 'floortom', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major', 'majorx', 'major2', 'major3', 'major6', 'major7', 'matrix', 'meter', 'mf', 'midi', 'minor', 'minorx', 'minor2', 'minor3', 'minor6', 'minor7', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'octave', 'oneOf', 'osctime', 'p', 'perfect', 'perfectx', 'perfect1', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'settransposition', 'setvoice', 'sharp', 'sine', 'sixteenthNote', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'steppitch', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'vibrato', 'wholeNote'];
+    const BUILTINMACROS= ['action', 'articulation', 'augmented', 'augmentedx', 'augmented1', 'augmented2', 'augmented4', 'augmented5', 'augmented7','augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished', 'diminishedx', 'diminished1', 'diminished4', 'diminished5', 'diminished8', 'dividebeatfactor', 'dog', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'flat', 'floortom', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major', 'majorx', 'major2', 'major3', 'major6', 'major7', 'matrix', 'meter', 'mf', 'midi', 'minor', 'minorx', 'minor2', 'minor3', 'minor6', 'minor7', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'octave', 'oneOf', 'osctime', 'p', 'perfect', 'perfectx', 'perfect1', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'settimbre', 'settransposition', 'setvoice', 'sharp', 'sine', 'sixteenthNote', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'steppitch', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'vibrato', 'wholeNote'];
 
     return BUILTINMACROS.indexOf(blkname) > -1;
 
@@ -118,6 +118,8 @@ function getMacroExpansion (blkname, x, y) {
     const SAWTOOTHOBJ = [[0, 'note', x, y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'sawtooth', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
     const SETDRUMOBJ = [[0, 'setdrum', x, y, [null, 1, null, 2]], [1, ['drumname', {'value': _(DEFAULTDRUM)}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SETKEYOBJ = [[0, 'setkey2', x, y, [null, 1, 2, null]],  [1, ['notename', {'value': 'C'}], 0, 0, [0]], [2, ['modename', {'value': _('major')}], 0, 0, [0]]];
+    const SETSYNTHVOLUMEOBJ = [[0, 'setsynthvolume', x, y, [null, 1, 2, null]], [1, ['voicename', {'value': _('default')}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0, null]]];
+    const SETTIMBREOBJ = [[0, 'settimbre', x, y, [null, 1, null, 2]], [1, ['voicename', {'value': _('default')}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SETVOICEOBJ = [[0, 'setvoice', x, y, [null, 1, null, 2]], [1, ['voicename', {'value': _('violin')}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SHARPOBJ = [[0, 'sharp', x, y, [null, 1, 10]], [1, 'newnote', x, y, [0, 2, 5, 9]], [2, 'divide', 0, 0, [1, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]], [5, 'vspace', 0, 0, [1, 6]], [6, 'pitch', 0, 0, [5, 7, 8, null]], [7, ['solfege', {'value': 'sol'}], 0, 0, [6]], [8, ['number', {'value': 4}], 0, 0, [6]], [9, 'hidden', 0, 0, [1, null]], [10, 'hidden', 0, 0, [0, null]]];
     const SINEOBJ = [[0, 'note', x, y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'sine', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
@@ -271,7 +273,9 @@ function getMacroExpansion (blkname, x, y) {
         'setdrum': SETDRUMOBJ,
         'setkey2': SETKEYOBJ,
         'setnotevolume2': VOLOBJ,
+        'setsynthvolume': SETSYNTHVOLUMEOBJ,
         'settransposition': TRANSPOBJ,
+        'settimbre': SETTIMBREOBJ,
         'setvoice': SETVOICEOBJ,
         'sharp': SHARPOBJ,
         'sine': SINEOBJ,
