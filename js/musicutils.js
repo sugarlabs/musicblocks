@@ -1881,7 +1881,6 @@ function Synth() {
     };
 
     this.setVolume = function (instrumentName, volume) {
-        console.log(instruments);
         // volume in decibals
         var db = this.tone.gainToDb(volume / 100);
         instruments[instrumentName].volume.value = db;
