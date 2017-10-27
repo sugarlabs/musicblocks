@@ -572,7 +572,11 @@ function Turtle (name, turtles, drum) {
             }
         }
 
-        this.bitmap.rotation = this.orientation;
+        // Could be a race condition on startup
+        if (this.bitmap != null) {
+            this.bitmap.rotation = this.orientation;
+        }
+
         this.updateCache();
 
         // Clear all media.
