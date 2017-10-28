@@ -88,7 +88,7 @@ const LOCAL_PROJECT_TEMPLATE ='\
 const GLOBAL_PROJECT_TEMPLATE = '\
 <img class="thumbnail" src="{img}" /> \
 <div class="options"> \
-    <span>{title}</span><br/> \
+    <span class="projectname">{title}</span><br/> \
     <span class="shareurlspan"> \
     <img class="share icon" title="' + _('Share') + '" alt="' + _('Share') + '" src="header-icons/share.svg" /> \
     <div class="tooltiptriangle" id="plshareurltri_NUM_"></div> \

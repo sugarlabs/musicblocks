@@ -90,7 +90,7 @@ div.back:active {
 }
 
 .canvasHolder.hide {
-    transform: scale(0.24);
+    transform: scale(0.2375);
     top: 117px;
     left: 1%;
     width: 100vw;
@@ -169,12 +169,14 @@ nav ul li {
 .content {
     padding: 0px;
     margin: 0px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .content li {
     display: block;
     list-style: none;
-    width: 24%;
+    width: 23.75%;
     float: left;
     padding-left: 1%;
 }
@@ -185,12 +187,12 @@ nav ul li {
 
 @media (max-width: 500px) {
     .content li {
-    width: 49%;
+    width: 48.5%;
     padding-left: 1%;
     }
     
     .canvasHolder.hide {
-    transform: scale(0.49);
+    transform: scale(0.485);
     }
     
     nav h1 {
@@ -226,6 +228,10 @@ nav ul li {
 .planet-content h2 {
     color: #212121;
     clear: both;
+}
+
+.projectname {
+    word-wrap: break-word;
 }
 
 img.icon {
