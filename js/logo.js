@@ -3745,7 +3745,7 @@ function Logo () {
             } else if (that.scalarTransposition[turtle] < 0) {
                 var n = that.scalarTransposition[turtle];
                 var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle]);
-                for (var i = 0; i < n; i++) {
+                for (var i = 0; i < -n; i++) {
                     var value = getStepSizeDown(that.keySignature[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle]);
                 }
