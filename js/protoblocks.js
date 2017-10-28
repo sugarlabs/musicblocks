@@ -201,7 +201,7 @@ function ProtoBlock(name) {
     // E.g., wait for
     this.oneBooleanArgBlock = function () {
         this.args = 1;
-        this.size = 2.6;
+        this.size = 2;
         this.dockTypes.push('out');
         this.dockTypes.push('booleanin');
         this.dockTypes.push('in');
