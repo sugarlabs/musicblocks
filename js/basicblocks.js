@@ -279,7 +279,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
     //.TRANS: adjust the amount of shift (up or down) of a pitch
-    transpositionBlock.staticLabels.push(_('adjust semi-tone transposition'));
+    transpositionBlock.staticLabels.push(_('transpose by semi-tone'));
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
@@ -288,7 +288,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     scalarTranspositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['setscalartransposition'] = scalarTranspositionBlock;
     //.TRANS: adjust the amount of shift (up or down) of a pitch
-    scalarTranspositionBlock.staticLabels.push(_('adjust scalar transposition'));
+    scalarTranspositionBlock.staticLabels.push(_('transpose by scale degree'));
     scalarTranspositionBlock.adjustWidthToLabel();
     scalarTranspositionBlock.defaults.push('1');
     scalarTranspositionBlock.flowClampOneArgBlock();
