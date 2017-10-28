@@ -2017,6 +2017,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     notBlock.staticLabels.push(_('not'));
     notBlock.booleanOneBooleanArgBlock();
 
+    var trueFalseBlock = new ProtoBlock('boolean');
+    trueFalseBlock.palette = palettes.dict['boolean'];
+    blocks.protoBlockDict['boolean'] = trueFalseBlock;
+    trueFalseBlock.booleanZeroArgBlock();
+
     // Only used to excute methods in the Math library
     var evalBlock = new ProtoBlock('eval');
     evalBlock.palette = palettes.dict['number'];

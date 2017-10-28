@@ -284,6 +284,16 @@ input.drum {
     width: 100px;
 }
 
+input.boolean {
+    background-color: #f2ec4d !important; /* */
+    text-align: center;
+    font-weight: bold !important;
+    resize: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100px;
+}
+
 input.voice {
     background-color: #00a09a !important; /* */
     text-align: center;

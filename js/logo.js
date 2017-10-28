@@ -7459,6 +7459,12 @@ function Logo () {
                 }
             }
             return that.blocks.blockList[blk].value;
+        } else if (that.blocks.blockList[blk].name === 'boolean') {
+            if (typeof(that.blocks.blockList[blk].value) === 'string') {
+		return that.blocks.blockList[blk].value === _('true');
+            } else {
+		return that.blocks.blockList[blk].value;
+            }
         } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {
             case 'pitchness':
@@ -8688,6 +8694,21 @@ function Logo () {
             } else {
                 var solfegePart = solfege.substr(0, 2).toLowerCase();
             }
+
+            offset = 0;
+            /*
+            // With fixed solfege, we need to adjust the solfege based
+            // on the key signature.
+            console.log(keySignature[0][0]);
+            var bar = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
+            var foobar = bar.indexOf(solfegePart);
+            var foo = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6};
+            var fnerk = foobar - foo[keySignature[0][0]];
+            if (fnerk < 0) {
+                fnerk += 7;
+            }
+            solfegePart = bar[fnerk];
+            */
 
             if (solfege.toLowerCase().substr(0, 4) === 'rest') {
                 return ['R', ''];

@@ -14,7 +14,7 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -532,6 +532,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'rest':
                     this.value = _('rest');
+                    break;
+                case 'boolean':
+                    this.value = true;
                     break;
                 case 'number':
                     this.value = NUMBERBLOCKDEFAULT;
@@ -1789,6 +1792,28 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('voicenameLabel');
+        } else if (this.name === 'boolean') {
+            var type = 'boolean';
+            if (this.value != null) {
+                var selectedvalue = this.value;
+            } else {
+                var selectedvalue = true;
+            }
+
+            var BOOLSTRINGS = [[_('true'), 'true'], [_('false'), 'false']];
+
+            var labelHTML = '<select name="booleanstring" id="booleanLabel" style="position: absolute;  background-color: #f2ec4d; width: 60px;">'
+            if (this.value) {
+                labelHTML += '<option value="' + _('true') + '" selected>' + _('true') + '</option>';
+                labelHTML += '<option value="' + _('false') + '">' + _('false') + '</option>';
+            } else {
+                labelHTML += '<option value="' + _('true') + '">' + _('true') + '</option>';
+                labelHTML += '<option value="' + _('false') + '" selected>' + _('false') + '</option>';
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('booleanLabel');
         } else {
             var type = 'number';
             labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';

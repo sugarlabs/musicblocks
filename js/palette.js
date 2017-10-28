@@ -689,6 +689,9 @@ function PaletteModel(palette, palettes, name) {
             case 'notename':
                 label = 'G';
                 break;
+            case 'boolean':
+                label = _('true');
+                break;
             case 'number':
                 label = NUMBERBLOCKDEFAULT.toString();
                 break;
