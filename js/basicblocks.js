@@ -1459,6 +1459,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
 
+    var movableBlock = new ProtoBlock('movable');
+    movableBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['movable'] = movableBlock;
+    movableBlock.staticLabels.push(_('movable'));
+    movableBlock.adjustWidthToLabel();
+    movableBlock.oneBooleanArgBlock();
+
     var keyBlock = new ProtoBlock('key');
     keyBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['key'] = keyBlock;

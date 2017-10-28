@@ -115,6 +115,9 @@ function Logo () {
     // Music-related attributes
     this.notesPlayed = {};
 
+    // Movable solfege?
+    this.movable = false;
+
     // When you run Music Blocks, you are "compiling" your code. The
     // compiled code is stored in the playbackQueue, which can be used
     // to playback the performance without the overhead of
@@ -875,6 +878,7 @@ function Logo () {
         this._masterBPM = TARGETBPM;
         this.defaultBPMFactor = TONEBPM / this._masterBPM;
         this.masterVolume = [DEFAULTVOLUME];
+        this.movable = false;
 
         // Each turtle needs to keep its own wait time and music
         // states.
@@ -1704,6 +1708,11 @@ function Logo () {
                         }
                     }
                 }
+            }
+            break;
+        case 'movable':
+            if (args.length === 1) {
+                that.movable = args[0];
             }
             break;
         case 'waitFor':
@@ -7461,7 +7470,7 @@ function Logo () {
             return that.blocks.blockList[blk].value;
         } else if (that.blocks.blockList[blk].name === 'boolean') {
             if (typeof(that.blocks.blockList[blk].value) === 'string') {
-		return that.blocks.blockList[blk].value === _('true');
+		return that.blocks.blockList[blk].value === _('true') || that.blocks.blockList[blk].value === 'true';
             } else {
 		return that.blocks.blockList[blk].value;
             }
@@ -8663,12 +8672,16 @@ function Logo () {
             var myKeySignature = obj[2];
             var mode = obj[3];
 
-            // Ensure it is a valid key signature.
-            var offset = thisScale.indexOf(myKeySignature);
-            if (offset === -1) {
-                console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
-                offset = 0;
-                thisScale = NOTESSHARP;
+            if (this.movable) {
+                // Ensure it is a valid key signature.
+                var offset = thisScale.indexOf(myKeySignature);
+                if (offset === -1) {
+                    console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
+                    offset = 0;
+                    thisScale = NOTESSHARP;
+                }
+            } else {
+                var offset = 0;
             }
 
             if (sharpFlat) {
@@ -8694,21 +8707,6 @@ function Logo () {
             } else {
                 var solfegePart = solfege.substr(0, 2).toLowerCase();
             }
-
-            offset = 0;
-            /*
-            // With fixed solfege, we need to adjust the solfege based
-            // on the key signature.
-            console.log(keySignature[0][0]);
-            var bar = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
-            var foobar = bar.indexOf(solfegePart);
-            var foo = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6};
-            var fnerk = foobar - foo[keySignature[0][0]];
-            if (fnerk < 0) {
-                fnerk += 7;
-            }
-            solfegePart = bar[fnerk];
-            */
 
             if (solfege.toLowerCase().substr(0, 4) === 'rest') {
                 return ['R', ''];
