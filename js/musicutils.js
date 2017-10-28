@@ -793,10 +793,11 @@ function _getStepSize(keySignature, pitch, direction) {
         }
     }
 
-    // current Note not in the consonant scale if this key.
+    // current Note not in the consonant scale of this key.
     console.log(pitch + ' not found in key of ' + keySignature);
     return 1;
 };
+
 
 function _buildScale(keySignature) {
     var obj = keySignatureToMode(keySignature);

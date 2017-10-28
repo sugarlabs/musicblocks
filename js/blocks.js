@@ -3219,6 +3219,7 @@ function Blocks () {
             case 'rhythmicdot':
             case 'setbpm':
             case 'setnotevolume2':
+            case 'setscalartransposition':
             case 'settransposition':
             case 'setvoice':
             case 'sharp':

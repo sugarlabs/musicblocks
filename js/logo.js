@@ -148,6 +148,8 @@ function Logo () {
     this.multipleVoices = [];
 
     // parameters used by pitch
+    this.scalarTransposition = {};
+    this.scalarTranspositionValues = {};
     this.transposition = {};
     this.transpositionValues = {};
 
@@ -893,6 +895,8 @@ function Logo () {
             this.cp2y[turtle] = 100;
             this.inNoteBlock[turtle] = [];
             this.multipleVoices[turtle] = false;
+            this.scalarTransposition[turtle] = 0;
+            this.scalarTranspositionValues[turtle] = [];
             this.transposition[turtle] = 0;
             this.transpositionValues[turtle] = [];
             this.noteBeat[turtle] = {};
@@ -3435,6 +3439,9 @@ function Logo () {
             var len = that.lastNotePlayed[turtle][0].length;
             if (args[0] >= 1) {
                 var n = Math.floor(args[0]);
+                // add on any scalar transposition
+                n += that.scalarTransposition[turtle];
+
                 var value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle]);
                 for (var i = 1; i < n; i++) {
@@ -3443,6 +3450,9 @@ function Logo () {
                 }
             } else if (args[0] <= -1) {
                 var n = -Math.ceil(args[0]);
+                // add on any scalar transposition
+                n += that.scalarTransposition[turtle];
+
                 value = getStepSizeDown(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle]);
                 for (var i = 1; i < n; i++) {
@@ -3720,6 +3730,30 @@ function Logo () {
                     }
                 }
             }
+
+            // Add scalar transposition
+            if (that.scalarTransposition[turtle] > 0) {
+                var n = that.scalarTransposition[turtle];
+                var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle]);
+                for (var i = 0; i < n; i++) {
+                    var value = getStepSizeUp(that.keySignature[turtle], noteObj[0]);
+                    noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle]);
+                }
+
+                note = noteObj[0];
+                octave = noteObj[1];
+            } else if (that.scalarTransposition[turtle] < 0) {
+                var n = that.scalarTransposition[turtle];
+                var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle]);
+                for (var i = 0; i < n; i++) {
+                    var value = getStepSizeDown(that.keySignature[turtle], noteObj[0]);
+                    noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle]);
+                }
+                note = noteObj[0];
+                octave = noteObj[1];
+            }
+
+            console.log(note);
 
             var delta = 0;
 
@@ -5208,6 +5242,33 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
+        case 'setscalartransposition':
+            var transValue = args[0];
+            if (!(that.invertList[turtle].length === 0)) {
+                that.scalarTransposition[turtle] -= transValue;
+            } else {
+                that.scalarTransposition[turtle] += transValue;
+            }
+
+            that.scalarTranspositionValues[turtle].push(transValue);
+
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_scalar_transposition_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                var transValue = that.scalarTranspositionValues[turtle].pop();
+                if (!(that.invertList[turtle].length === 0)) {
+                    that.scalarTransposition[turtle] += transValue;
+                } else {
+                    that.scalarTransposition[turtle] -= transValue;
+                }
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
         case 'settransposition':
             var transValue = args[0];
             if (!(that.invertList[turtle].length === 0)) {
@@ -5380,30 +5441,30 @@ function Logo () {
                         synth = 'default';
                     } else if (args[0] === 'default' || args[0] ===  _('default')) {
                         synth = 'custom';
-		    }
-
-                    if (synth == null) {
-			for (var voice in VOICENAMES) {
-			    if (VOICENAMES[voice][0] === args[0]) {
-				synth = VOICENAMES[voice][1];
-				break;
-			    } else if (VOICENAMES[voice][1] === args[0]) {
-				synth = args[0];
-				break;
-			    }
-			}
                     }
 
                     if (synth == null) {
-			for (var drum in DRUMNAMES) {
-			    if (DRUMNAMES[drum][0] === args[0]) {
-				synth = DRUMNAMES[drum][1];
-				break;
-			    } else if (DRUMNAMES[drum][1] === args[0]) {
-				synth = args[0];
-				break;
-			    }
-			}
+                        for (var voice in VOICENAMES) {
+                            if (VOICENAMES[voice][0] === args[0]) {
+                                synth = VOICENAMES[voice][1];
+                                break;
+                            } else if (VOICENAMES[voice][1] === args[0]) {
+                                synth = args[0];
+                                break;
+                            }
+                        }
+                    }
+
+                    if (synth == null) {
+                        for (var drum in DRUMNAMES) {
+                            if (DRUMNAMES[drum][0] === args[0]) {
+                                synth = DRUMNAMES[drum][1];
+                                break;
+                            } else if (DRUMNAMES[drum][1] === args[0]) {
+                                synth = args[0];
+                                break;
+                            }
+                        }
                     }
 
                     if (synth == null) {
@@ -7470,9 +7531,9 @@ function Logo () {
             return that.blocks.blockList[blk].value;
         } else if (that.blocks.blockList[blk].name === 'boolean') {
             if (typeof(that.blocks.blockList[blk].value) === 'string') {
-		return that.blocks.blockList[blk].value === _('true') || that.blocks.blockList[blk].value === 'true';
+                return that.blocks.blockList[blk].value === _('true') || that.blocks.blockList[blk].value === 'true';
             } else {
-		return that.blocks.blockList[blk].value;
+                return that.blocks.blockList[blk].value;
             }
         } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {

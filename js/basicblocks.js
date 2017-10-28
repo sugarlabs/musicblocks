@@ -279,10 +279,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
     //.TRANS: adjust the amount of shift (up or down) of a pitch
-    transpositionBlock.staticLabels.push(_('adjust transposition'));
+    transpositionBlock.staticLabels.push(_('adjust semi-tone transposition'));
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
+
+    var scalarTranspositionBlock = new ProtoBlock('setscalartransposition');
+    scalarTranspositionBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['setscalartransposition'] = scalarTranspositionBlock;
+    //.TRANS: adjust the amount of shift (up or down) of a pitch
+    scalarTranspositionBlock.staticLabels.push(_('adjust scalar transposition'));
+    scalarTranspositionBlock.adjustWidthToLabel();
+    scalarTranspositionBlock.defaults.push('1');
+    scalarTranspositionBlock.flowClampOneArgBlock();
 
     var octaveBlock = new ProtoBlock('octave');
     octaveBlock.palette = palettes.dict['pitch'];
