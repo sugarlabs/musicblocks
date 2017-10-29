@@ -741,13 +741,21 @@ function keySignatureToMode(keySignature) {
 };
 
 
-function getStepSizeUp(keySignature, pitch) {
-    return _getStepSize(keySignature, pitch, 'up');
+function getStepSizeUp(keySignature, movable, pitch) {
+    if (movable) {
+        return _getStepSize(keySignature, pitch, 'up');
+    } else {
+	return _getStepSize('C major', pitch, 'up');
+    }
 };
 
 
-function getStepSizeDown(keySignature, pitch) {
-    return _getStepSize(keySignature, pitch, 'down');
+function getStepSizeDown(keySignature, movable, pitch) {
+    if (movable) {
+        return _getStepSize(keySignature, pitch, 'down');
+    } else {
+	return _getStepSize('C major', pitch, 'down');
+    }
 };
 
 
