@@ -930,7 +930,7 @@ function Logo () {
             this.keySignature[turtle] = 'C ' + _('major');
             this.pushedNote[turtle] = false;
             this.oscList[turtle] = {};
-            this.bpm[turtle] = [90];
+            this.bpm[turtle] = [];
             this.inSetTimbre[turtle] = false;
             this.instrumentNames[turtle] = [];
             this.inCrescendo[turtle] = [];
@@ -2791,6 +2791,7 @@ function Logo () {
                 } else {
                     that._masterBPM = args[0];
                 }
+
                 that.defaultBPMFactor = TONEBPM / that._masterBPM;
             }
 
