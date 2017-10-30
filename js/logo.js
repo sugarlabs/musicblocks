@@ -1259,8 +1259,9 @@ function Logo () {
             var len = this.bpm[turtle].length;
             if (len > 0) {
                 this.bpm[turtle][len - 1] = value;
+            } else {
+                this.bpm[turtle].push(value);
             }
-            console.log(this.bpm[turtle]);
             break;
         case 'transpositionfactor':
             var len = this.transposition[turtle].length;
