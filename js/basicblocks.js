@@ -1199,6 +1199,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminished8Block.adjustWidthToLabel();
     diminished8Block.zeroArgBlock();
 
+    var diminished7Block = new ProtoBlock('diminished7');
+    diminished7Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['diminished7'] = diminished7Block;
+    diminished7Block.staticLabels.push(_('diminished') + ' 7');
+    diminished7Block.adjustWidthToLabel();
+    diminished7Block.zeroArgBlock();
+
+    var diminished6Block = new ProtoBlock('diminished6');
+    diminished6Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['diminished6'] = diminished6Block;
+    diminished6Block.staticLabels.push(_('diminished') + ' 6');
+    diminished6Block.adjustWidthToLabel();
+    diminished6Block.zeroArgBlock();
+
     var diminished5Block = new ProtoBlock('diminished5');
     diminished5Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['diminished5'] = diminished5Block;
@@ -1212,6 +1226,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminished4Block.staticLabels.push(_('diminished') + ' 4');
     diminished4Block.adjustWidthToLabel();
     diminished4Block.zeroArgBlock();
+
+    var diminished3Block = new ProtoBlock('diminished3');
+    diminished3Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['diminished3'] = diminished3Block;
+    diminished3Block.staticLabels.push(_('diminished') + ' 3');
+    diminished3Block.adjustWidthToLabel();
+    diminished3Block.zeroArgBlock();
+
+    var diminished2Block = new ProtoBlock('diminished2');
+    diminished2Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['diminished2'] = diminished2Block;
+    diminished2Block.staticLabels.push(_('diminished') + ' 2');
+    diminished2Block.adjustWidthToLabel();
+    diminished2Block.zeroArgBlock();
 
     var diminished1Block = new ProtoBlock('diminished1');
     diminished1Block.palette = palettes.dict['intervals'];
@@ -1259,6 +1287,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     augmented7Block.adjustWidthToLabel();
     augmented7Block.zeroArgBlock();
 
+    var augmented6Block = new ProtoBlock('augmented6');
+    augmented6Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['augmented6'] = augmented6Block;
+    augmented6Block.staticLabels.push(_('augmented') + ' 6');
+    augmented6Block.adjustWidthToLabel();
+    augmented6Block.zeroArgBlock();
+
     var augmented5Block = new ProtoBlock('augmented5');
     augmented5Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['augmented5'] = augmented5Block;
@@ -1273,7 +1308,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     augmented4Block.adjustWidthToLabel();
     augmented4Block.zeroArgBlock();
 
-     var augmented2Block = new ProtoBlock('augmented2');
+    var augmented3Block = new ProtoBlock('augmented3');
+    augmented3Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['augmented3'] = augmented3Block;
+    augmented3Block.staticLabels.push(_('augmented') + ' 3');
+    augmented3Block.adjustWidthToLabel();
+    augmented3Block.zeroArgBlock();
+
+    var augmented2Block = new ProtoBlock('augmented2');
     augmented2Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['augmented2'] = augmented2Block;
     augmented2Block.staticLabels.push(_('augmented') + ' 2');
