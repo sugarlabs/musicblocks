@@ -1257,6 +1257,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminishedBlock.defaults.push(5);
     diminishedBlock.hidden = true;
 
+    // deprecated
     var diminishedxBlock = new ProtoBlock('diminishedx');
     diminishedxBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['diminishedx'] = diminishedxBlock;
@@ -1339,6 +1340,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     augmentedBlock.defaults.push(5);
     augmentedBlock.hidden = true;
 
+    // deprecated
     var augmentedxBlock = new ProtoBlock('augmentedx');
     augmentedxBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['augmentedx'] = augmentedxBlock;
@@ -1390,6 +1392,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     perfectBlock.defaults.push(5);
     perfectBlock.hidden = true;
 
+    // deprecated
     var perfectxBlock = new ProtoBlock('perfectx');
     perfectxBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['perfectx'] = perfectxBlock;
@@ -1441,6 +1444,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     minorBlock.defaults.push(3);
     minorBlock.hidden = true;
 
+    // deprecated
     var minorxBlock = new ProtoBlock('minorx');
     minorxBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['minorx'] = minorxBlock;
@@ -1492,6 +1496,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     majorBlock.defaults.push(3);
     majorBlock.hidden = true;
 
+    // deprecated
     var majorxBlock = new ProtoBlock('majorx');
     majorxBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['majorx'] = majorxBlock;

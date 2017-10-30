@@ -207,11 +207,11 @@ function Logo () {
     this.crescendoInitialVolume = {};
     this.intervals = {};  // relative interval (based on scale degree)
     this.semitoneIntervals = {};  // absolute interval (based on semitones)
-    this.perfect = {};
-    this.diminished = {};
-    this.augmented = {};
-    this.major = {};
-    this.minor = {};
+    this.perfect = {};  // deprecated
+    this.diminished = {};  // deprecated
+    this.augmented = {};  // deprecated
+    this.major = {};  // deprecated
+    this.minor = {};  // deprecated
     this.staccato = {};
     this.swing = {};
     this.swingTarget = {};
@@ -941,11 +941,11 @@ function Logo () {
             this.crescendoInitialVolume[turtle] = {'default': [DEFAULTVOLUME]};
             this.intervals[turtle] = [];
             this.semitoneIntervals[turtle] = [];
-            this.perfect[turtle] = [];
-            this.diminished[turtle] = [];
-            this.augmented[turtle] = [];
-            this.major[turtle] = [];
-            this.minor[turtle] = [];
+            this.perfect[turtle] = [];  // deprecated
+            this.diminished[turtle] = [];  // deprecated
+            this.augmented[turtle] = [];  // deprecated
+            this.major[turtle] = [];  // deprecated
+            this.minor[turtle] = [];  // deprecated
             this.staccato[turtle] = [];
             this.swing[turtle] = [];
             this.swingTarget[turtle] = [];
@@ -3505,26 +3505,31 @@ function Logo () {
                 }
             }
 
+            // deprecated
             if (turtle in that.perfect && that.perfect[turtle].length > 0) {
                 var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
+            // deprecated
             if (turtle in that.diminished && that.diminished[turtle].length > 0) {
                 var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
+            // deprecated
             if (turtle in that.augmented && that.augmented[turtle].length > 0) {
                 var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
+            // deprecated
             if (turtle in that.major && that.major[turtle].length > 0) {
                 var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcMajor(last(that.major[turtle])), that.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
+            // deprecated
             if (turtle in that.minor && that.minor[turtle].length > 0) {
                 var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcMinor(last(that.minor[turtle])), that.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
@@ -3931,26 +3936,31 @@ function Logo () {
                     }
 		}
 
+                // deprecated
                 if (turtle in that.perfect && that.perfect[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
 
+                // deprecated
                 if (turtle in that.diminished && that.diminished[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
 
+                // deprecated
                 if (turtle in that.augmented && that.augmented[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
 
+                // deprecated
                 if (turtle in that.major && that.major[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcMajor(last(that.major[turtle])), that.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
 
+                // deprecated
                 if (turtle in that.minor && that.minor[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcMinor(last(that.minor[turtle])), that.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
@@ -4744,6 +4754,7 @@ function Logo () {
             childFlowCount = 1;
             break;
         case 'perfectx':
+            // deprecated
             if (args[0] < 0) {
                 var interval = mod12(-args[0]);
             } else {
@@ -4791,6 +4802,7 @@ function Logo () {
             childFlowCount = 1;
             break;
         case 'diminishedx':
+            // deprecated
             if (args[0] < 0) {
                 var interval = mod12(-args[0]);
             } else {
@@ -4837,6 +4849,7 @@ function Logo () {
             childFlowCount = 1;
             break;
         case 'augmentedx':
+            // deprecated
             if (args[0] < 0) {
                 var interval = mod12(-args[0]);
             } else {
@@ -4883,6 +4896,7 @@ function Logo () {
             childFlowCount = 1;
             break;
         case 'majorx':
+            // deprecated
             if (args[0] < 0) {
                 var interval = mod12(-args[0]);
             } else {
@@ -4930,6 +4944,7 @@ function Logo () {
             childFlowCount = 1;
             break;
         case 'minorx':
+            // deprecated
             if (args[0] < 0) {
                 var interval = mod12(-args[0]);
             } else {
