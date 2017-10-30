@@ -3217,6 +3217,7 @@ function Blocks () {
             case 'perfect':
             case 'pluck':
             case 'rhythmicdot':
+            case 'semitoneinterval':
             case 'setbpm':
             case 'setnotevolume2':
             case 'setscalartransposition':

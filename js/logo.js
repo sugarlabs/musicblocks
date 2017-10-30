@@ -205,7 +205,8 @@ function Logo () {
     this.inCrescendo = {};
     this.crescendoDelta = {};
     this.crescendoInitialVolume = {};
-    this.intervals = {};
+    this.intervals = {};  // relative interval (based on scale degree)
+    this.semitoneIntervals = {};  // absolute interval (based on semitones)
     this.perfect = {};
     this.diminished = {};
     this.augmented = {};
@@ -939,6 +940,7 @@ function Logo () {
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = {'default': [DEFAULTVOLUME]};
             this.intervals[turtle] = [];
+            this.semitoneIntervals[turtle] = [];
             this.perfect[turtle] = [];
             this.diminished[turtle] = [];
             this.augmented[turtle] = [];
@@ -3496,6 +3498,13 @@ function Logo () {
                 }
             }
 
+            if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
+                for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
+                    var noteObj2 = that.getNote(noteObj[0], noteObj[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], 0);
+                }
+            }
+
             if (turtle in that.perfect && that.perfect[turtle].length > 0) {
                 var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
@@ -3914,6 +3923,13 @@ function Logo () {
                         addPitch(noteObj[0], noteObj[1], cents);
                     }
                 }
+
+		if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
+                    for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
+			var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle]);
+			addPitch(noteObj[0], noteObj[1], cents);
+                    }
+		}
 
                 if (turtle in that.perfect && that.perfect[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle]);
@@ -4690,6 +4706,35 @@ function Logo () {
 
                 var __listener = function (event) {
                     that.intervals[turtle].pop();
+                };
+
+                that._setListener(turtle, listenerName, __listener);
+            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
+            break;
+        case 'semitoneinterval':
+            if (typeof(args[0]) !== 'number') {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] > 0) {
+                var i = Math.floor(args[0]);
+            } else {
+                var i = Math.ceil(args[0]);
+            }
+
+            if (i !== 0) {
+                that.semitoneIntervals[turtle].push(i);
+
+                var listenerName = '_semitone_interval_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.semitoneIntervals[turtle].pop();
                 };
 
                 that._setListener(turtle, listenerName, __listener);
@@ -5579,6 +5624,13 @@ function Logo () {
                         addPitch(noteObj[0], noteObj[1], cents, 0);
                     }
                 }
+
+		if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
+                    for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
+			var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle]);
+			addPitch(noteObj[0], noteObj[1], cents, 0);
+                    }
+		}
 
                 if (turtle in that.perfect && that.perfect[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle]);

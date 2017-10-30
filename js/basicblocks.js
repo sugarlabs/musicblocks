@@ -1243,6 +1243,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminishedxBlock.dockTypes[2] = 'anyin';
     diminishedxBlock.defaults.push(5);
     diminishedxBlock.defaults.push(0);
+    diminishedxBlock.hidden = true;
 
     var augmented8Block = new ProtoBlock('augmented8');
     augmented8Block.palette = palettes.dict['intervals'];
@@ -1308,6 +1309,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     augmentedxBlock.dockTypes[2] = 'anyin';
     augmentedxBlock.defaults.push(5);
     augmentedxBlock.defaults.push(0);
+    augmentedxBlock.hidden = true;
 
     var perfect8Block = new ProtoBlock('perfect8');
     perfect8Block.palette = palettes.dict['intervals'];
@@ -1358,6 +1360,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     perfectxBlock.dockTypes[2] = 'anyin';
     perfectxBlock.defaults.push(5);
     perfectxBlock.defaults.push(0);
+    perfectxBlock.hidden = true;
 
     var minor7Block = new ProtoBlock('minor7');
     minor7Block.palette = palettes.dict['intervals'];
@@ -1408,6 +1411,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     minorxBlock.dockTypes[2] = 'anyin';
     minorxBlock.defaults.push(3);
     minorxBlock.defaults.push(0);
+    minorxBlock.hidden = true;
 
     var major7Block = new ProtoBlock('major7');
     major7Block.palette = palettes.dict['intervals'];
@@ -1458,6 +1462,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     majorxBlock.dockTypes[2] = 'anyin';
     majorxBlock.defaults.push(3);
     majorxBlock.defaults.push(0);
+    majorxBlock.hidden = true;
+
+    var semitoneintervalBlock = new ProtoBlock('semitoneinterval');
+    semitoneintervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['semitoneinterval'] = semitoneintervalBlock;
+    //.TRANS: calculate a relative step between notes based on the current mode
+    semitoneintervalBlock.staticLabels.push(_('absolute interval'));
+    semitoneintervalBlock.adjustWidthToLabel();
+    semitoneintervalBlock.flowClampOneArgBlock();
+    semitoneintervalBlock.defaults.push(5);
 
     var intervalBlock = new ProtoBlock('interval');
     intervalBlock.palette = palettes.dict['intervals'];
