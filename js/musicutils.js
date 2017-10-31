@@ -58,6 +58,7 @@ const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
 const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
+// const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut'] //the "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
 const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
 
 function mod12(a) {
