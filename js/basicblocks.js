@@ -284,6 +284,70 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
 
+    var octaveBlock = new ProtoBlock('octave');
+    octaveBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['octave'] = octaveBlock;
+    //.TRANS: adjusts the shift up or down by one octave (the number of half-steps in the interval between two notes, one having twice or half the frequency of the other.
+    octaveBlock.staticLabels.push(_('octave'));
+    octaveBlock.adjustWidthToLabel();
+    octaveBlock.zeroArgBlock();
+
+    var seventhBlock = new ProtoBlock('seventh');
+    seventhBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['seventh'] = seventhBlock;
+    //.TRANS: seventh means the note is the six scale degrees above unison
+    seventhBlock.staticLabels.push(_('major seventh'));
+    seventhBlock.adjustWidthToLabel();
+    seventhBlock.zeroArgBlock();
+   
+    var sixthBlock = new ProtoBlock('sixth');
+    sixthBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['sixth'] = sixthBlock;
+    //.TRANS: sixth means the note is the five scale degrees above unison
+    sixthBlock.staticLabels.push(_('major sixth'));
+    sixthBlock.adjustWidthToLabel();
+    sixthBlock.zeroArgBlock();
+   
+    var fifthBlock = new ProtoBlock('fifth');
+    fifthBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['fifth'] = fifthBlock;
+    //.TRANS: fifth means the note is the four scale degrees above unison
+    fifthBlock.staticLabels.push(_('major fifth'));
+    fifthBlock.adjustWidthToLabel();
+    fifthBlock.zeroArgBlock();
+   
+    var fourthBlock = new ProtoBlock('fourth');
+    fourthBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['fourth'] = fourthBlock;
+    //.TRANS: major fourth means the note is three scale degrees above unison
+    fourthBlock.staticLabels.push(_('major fourth'));
+    fourthBlock.adjustWidthToLabel();
+    fourthBlock.zeroArgBlock();
+   
+    var thirdBlock = new ProtoBlock('third');
+    thirdBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['third'] = thirdBlock;
+    //.TRANS: major third means the note is two scale degrees above unison
+    thirdBlock.staticLabels.push(_('major third'));
+    thirdBlock.adjustWidthToLabel();
+    thirdBlock.zeroArgBlock();
+   
+    var secondBlock = new ProtoBlock('second');
+    secondBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['second'] = secondBlock;
+    //.TRANS: major second means the note is one scale degree above unison
+    secondBlock.staticLabels.push(_('major second'));
+    secondBlock.adjustWidthToLabel();
+    secondBlock.zeroArgBlock();
+   
+    var unisonBlock = new ProtoBlock('unison');
+    unisonBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['unison'] = unisonBlock;
+    //.TRANS: unison means the note is the same as the current note
+    unisonBlock.staticLabels.push(_('unison'));
+    unisonBlock.adjustWidthToLabel();
+    unisonBlock.zeroArgBlock();
+   
     var scalarTranspositionBlock = new ProtoBlock('setscalartransposition');
     scalarTranspositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['setscalartransposition'] = scalarTranspositionBlock;
@@ -292,14 +356,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     scalarTranspositionBlock.adjustWidthToLabel();
     scalarTranspositionBlock.defaults.push('1');
     scalarTranspositionBlock.flowClampOneArgBlock();
-
-    var octaveBlock = new ProtoBlock('octave');
-    octaveBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['octave'] = octaveBlock;
-    //.TRANS: adjusts the shift up or down by one octave (the number of half-steps in the interval between two notes, one having twice or half the frequency of the other.
-    octaveBlock.staticLabels.push(_('octave'));
-    octaveBlock.adjustWidthToLabel();
-    octaveBlock.zeroArgBlock();
 
     var flatBlock = new ProtoBlock('flat');
     flatBlock.palette = palettes.dict['pitch'];
