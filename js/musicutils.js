@@ -48,7 +48,7 @@ const NOTESTABLE = {1: 'do', 2: 'do♯', 3: 're', 4: 're♯', 5: 'mi', 6: 'fa', 
 const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Halfsteps used in calculating absolute intervals
-const AUGMENTED = {1: 1, 2: 2, 3: 5, 4: 6, 5: 8, 6: 9, 7: 11, 8: 13};
+const AUGMENTED = {1: 1, 2: 3, 3: 5, 4: 6, 5: 8, 6: 10, 7: 12, 8: 13};
 const PERFECT = {1: 0, 4: 5, 5: 7, 8: 12};
 const DIMINISHED = {1: -1, 2: 0, 3: 2, 4: 4, 5: 6, 6: 7, 7: 9, 8: 11};
 const MAJOR = {2: 2, 3: 4, 6: 9, 7: 11};
