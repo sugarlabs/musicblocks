@@ -164,7 +164,8 @@ const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eigh
 
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
-// See http://www.pianoscales.org
+// See http://www.pianoscales.org <== this is in no way definitive
+// TODO: better system of organizing and naming collections of pitches
 const MUSICALMODES = {
      // 12 notes in an octave
     'chromatic': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -205,16 +206,17 @@ const MUSICALMODES = {
     'spanish gypsy': [1, 3, 1, 2, 1, 2, 2],
 
      // 6 notes in an octave
-    'blues': [3, 2, 1, 1, 3, 2],
+    'minor blues': [3, 2, 1, 1, 3, 2],
     'major blues': [2, 1, 1, 3, 2, 2],
     'whole tone': [2, 2, 2, 2, 2, 2],
 
      // 5 notes in an octave
-    'pentatonic': [3, 2, 2, 3, 2],
+    'minor pentatonic': [3, 2, 2, 3, 2], //pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
     'chinese': [4, 2, 1, 4, 1],
     'egyptian': [2, 3, 2, 3, 2],
-    'hirajoshi': [1, 4, 1, 4, 2],
-    'japanese': [1, 4, 2, 3, 2],
+    'hirajoshi (Japan)': [1, 4, 1, 4, 2], //https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
+    'in scale (Japan)': [1, 4, 2, 3, 2], //https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
+    'minyo scale (Japan)': [3, 5, 7, 10], //https://en.wikipedia.org/wiki/Miny%C5%8D_scale
     'fibonacci': [1, 1, 2, 3, 5],
 
      // User definition overrides this constant
