@@ -116,7 +116,7 @@ function Logo () {
     this.notesPlayed = {};
 
     // Movable solfege?
-    this.movable = false;
+    this.movable = {};
 
     // When you run Music Blocks, you are "compiling" your code. The
     // compiled code is stored in the playbackQueue, which can be used
@@ -742,17 +742,17 @@ function Logo () {
             case 'consonantstepsizeup':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = getStepSizeUp(this.keySignature[turtle], this.movable, this.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    value = getStepSizeUp(this.keySignature[turtle], this.movable[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    value = getStepSizeUp(this.keySignature[turtle], this.movable, 'A');
+                    value = getStepSizeUp(this.keySignature[turtle], this.movable[turtle], 'A');
                 }
                 break;
             case 'consonantstepsizedown':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = getStepSizeDown(this.keySignature[turtle], this.movable, this.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    value = getStepSizeDown(this.keySignature[turtle], this.movable[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    value = getStepSizeDown(this.keySignature[turtle], this.movable, 'A');
+                    value = getStepSizeDown(this.keySignature[turtle], this.movable[turtle], 'A');
                 }
                 break;
             case 'transpositionfactor':
@@ -883,7 +883,6 @@ function Logo () {
         this._masterBPM = TARGETBPM;
         this.defaultBPMFactor = TONEBPM / this._masterBPM;
         this.masterVolume = [DEFAULTVOLUME];
-        this.movable = false;
 
         // Each turtle needs to keep its own wait time and music
         // states.
@@ -982,6 +981,8 @@ function Logo () {
             this.currentMeasure[turtle] = 0;
             this.justCounting[turtle] = false;
             this.suppressOutput[turtle] = this.runningLilypond || this.compiling;
+            this.movable[turtle] = false;
+
             if (this.compiling) {
                 this._saveX[turtle] = this.turtles.turtleList[turtle].x;
                 this._saveY[turtle] = this.turtles.turtleList[turtle].y;
@@ -1722,7 +1723,7 @@ function Logo () {
             break;
         case 'movable':
             if (args.length === 1) {
-                that.movable = args[0];
+                that.movable[turtle] = args[0];
             }
             break;
         case 'waitFor':
@@ -3449,10 +3450,10 @@ function Logo () {
                 // add on any scalar transposition
                 n += that.scalarTransposition[turtle];
 
-                var value = getStepSizeUp(that.keySignature[turtle], that.movable, that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                var value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle]);
                 for (var i = 1; i < n; i++) {
-                    var value = getStepSizeUp(that.keySignature[turtle], that.movable, noteObj[0]);
+                    var value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle]);
                 }
             } else if (args[0] <= -1) {
@@ -3460,10 +3461,10 @@ function Logo () {
                 // add on any scalar transposition
                 n += that.scalarTransposition[turtle];
 
-                value = getStepSizeDown(that.keySignature[turtle], that.movable, that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle]);
                 for (var i = 1; i < n; i++) {
-                    var value = getStepSizeDown(that.keySignature[turtle], that.movable, noteObj[0]);
+                    var value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle]);
                 }
             } else {  // Repeat last pitch played.
@@ -3755,7 +3756,7 @@ function Logo () {
                 var n = that.scalarTransposition[turtle];
                 var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle]);
                 for (var i = 0; i < n; i++) {
-                    var value = getStepSizeUp(that.keySignature[turtle], that.movable, noteObj[0]);
+                    var value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle]);
                 }
 
@@ -3765,7 +3766,7 @@ function Logo () {
                 var n = that.scalarTransposition[turtle];
                 var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle]);
                 for (var i = 0; i < -n; i++) {
-                    var value = getStepSizeDown(that.keySignature[turtle], that.movable, noteObj[0]);
+                    var value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle]);
                 }
                 note = noteObj[0];
@@ -7988,17 +7989,17 @@ function Logo () {
             case 'consonantstepsizeup':
                 if (that.lastNotePlayed[turtle] !== null) {
                     var len = that.lastNotePlayed[turtle][0].length;
-                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], that.movable, that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], that.movable, 'A');
+                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], 'A');
                 }
                 break;
             case 'consonantstepsizedown':
                 if (that.lastNotePlayed[turtle] !== null) {
                     var len = that.lastNotePlayed[turtle][0].length;
-                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], that.movable, that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], that.movable, 'A');
+                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], 'A');
                 }
                 break;
             case 'transpositionfactor':
@@ -8803,7 +8804,7 @@ function Logo () {
             var myKeySignature = obj[2];
             var mode = obj[3];
 
-            if (this.movable) {
+            if (this.movable[turtle]) {
                 // Ensure it is a valid key signature.
                 var offset = thisScale.indexOf(myKeySignature);
                 if (offset === -1) {
