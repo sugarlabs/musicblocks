@@ -352,7 +352,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     scalarTranspositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['setscalartransposition'] = scalarTranspositionBlock;
     //.TRANS: adjust the amount of shift (up or down) of a pitch by scalar steps
-    scalarTranspositionBlock.staticLabels.push(_('transpose by scale degree'));
+    scalarTranspositionBlock.staticLabels.push(_('scalar transpose') + ' ' + '(+/–)');
     scalarTranspositionBlock.adjustWidthToLabel();
     scalarTranspositionBlock.defaults.push('1');
     scalarTranspositionBlock.flowClampOneArgBlock();
@@ -1322,7 +1322,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminishedxBlock.staticLabels.push(_('diminished'));
     //.TRANS: the number of half-steps between notes
     diminishedxBlock.staticLabels.push(_('interval'));
-    diminishedxBlock.staticLabels.push(_('octave') + '+/-');
+    diminishedxBlock.staticLabels.push(_('octave') + '+/–');
     diminishedxBlock.extraWidth = 20;
     diminishedxBlock.adjustWidthToLabel();
     diminishedxBlock.flowClampTwoArgBlock();
@@ -1403,7 +1403,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['augmentedx'] = augmentedxBlock;
     //.TRANS: the "augmented" interval in music
     augmentedxBlock.staticLabels.push(_('augmented'));
-    augmentedxBlock.staticLabels.push(_('interval'), _('octave') + '+/-');
+    augmentedxBlock.staticLabels.push(_('interval'), _('octave') + '+/–');
     augmentedxBlock.extraWidth = 20;
     augmentedxBlock.adjustWidthToLabel();
     augmentedxBlock.flowClampTwoArgBlock();
@@ -1455,7 +1455,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['perfectx'] = perfectxBlock;
     //.TRANS: the "perfect" interval in music
     perfectxBlock.staticLabels.push(_('perfect'));
-    perfectxBlock.staticLabels.push(_('interval'), _('octave') + '+/-');
+    perfectxBlock.staticLabels.push(_('interval'), _('octave') + '+/–');
     perfectxBlock.extraWidth = 20;
     perfectxBlock.adjustWidthToLabel();
     perfectxBlock.flowClampTwoArgBlock();
@@ -1507,7 +1507,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['minorx'] = minorxBlock;
     //.TRANS: the minor interval in music
     minorxBlock.staticLabels.push(_('minor'));
-    minorxBlock.staticLabels.push(_('interval'), _('octave') + '+/-');
+    minorxBlock.staticLabels.push(_('interval'), _('octave') + '+/–');
     minorxBlock.extraWidth = 20;
     minorxBlock.adjustWidthToLabel();
     minorxBlock.flowClampTwoArgBlock();
@@ -1559,7 +1559,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['majorx'] = majorxBlock;
     //.TRANS: the "major" interval in music
     majorxBlock.staticLabels.push(_('major'));
-    majorxBlock.staticLabels.push(_('interval'), _('octave') + '+/-');
+    majorxBlock.staticLabels.push(_('interval'), _('octave') + '+/–');
     majorxBlock.extraWidth = 20;
     majorxBlock.adjustWidthToLabel();
     majorxBlock.flowClampTwoArgBlock();
@@ -3318,7 +3318,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     crescendoBlock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['crescendo'] = crescendoBlock;
     //.TRANS: a gradual increase in loudness
-    crescendoBlock.staticLabels.push(_('crescendo') + ' +/-');
+    crescendoBlock.staticLabels.push(_('crescendo') + ' +/–');
     crescendoBlock.adjustWidthToLabel();
     crescendoBlock.flowClampOneArgBlock();
     crescendoBlock.defaults.push(5);
