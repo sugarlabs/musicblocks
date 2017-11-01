@@ -289,16 +289,18 @@ var MODENAMES = [
     //.TRANS: musical scale for Mid-Eastern music
     [_('maqam'), 'maqam'],
     //.TRANS: minor blues scale for music
-    [_('blues'), 'blues'],
+    [_('minor blues'), 'minor blues'],
     //.TRANS: major blues scale for music
     [_('major blues'), 'major blues'],
     [_('whole tone'), 'whole tone'],
     //.TRANS: pentatonic scale in music
-    [_('pentatonic'), 'pentatonic'],
+    [_('minor pentatonic'), 'minor pentatonic'],
     [_('chinese'), 'chinese'],
     [_('egyptian'), 'egyptian'],
     //.TRANS: Japanese pentatonic scale for music
-    [_('hirajoshi'), 'hirajoshi'],
+    [_('hirajoshi (Japan)'), 'hirajoshi (Japan)'],
+    [_('in scale (Japan)'), 'in scale (Japan)'],
+    [_('minyo scale (Japan)'), 'minyo scale (Japan)'],
     [_('japanese'), 'japanese'],
     //.TRANS: Italian mathematician
     [_('fibonacci'), 'fibonacci'],
