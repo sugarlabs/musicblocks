@@ -1571,11 +1571,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     var semitoneintervalBlock = new ProtoBlock('semitoneinterval');
     semitoneintervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['semitoneinterval'] = semitoneintervalBlock;
-    //.TRANS: calculate a relative step between notes based on the current mode
+    //.TRANS: calculate a relative step between notes based on semi-tones
     semitoneintervalBlock.staticLabels.push(_('absolute interval'));
     semitoneintervalBlock.adjustWidthToLabel();
     semitoneintervalBlock.flowClampOneArgBlock();
     semitoneintervalBlock.defaults.push(5);
+    semitoneintervalBlock.hidden = true;
 
     var intervalBlock = new ProtoBlock('interval');
     intervalBlock.palette = palettes.dict['intervals'];
