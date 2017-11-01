@@ -299,8 +299,8 @@ var MODENAMES = [
     [_('egyptian'), 'egyptian'],
     //.TRANS: Japanese pentatonic scale for music
     [_('hirajoshi (Japan)'), 'hirajoshi (Japan)'],
-    [_('in scale (Japan)'), 'in scale (Japan)'],
-    [_('minyo scale (Japan)'), 'minyo scale (Japan)'],
+    [_('in (Japan)'), 'in (Japan)'],
+    [_('minyo (Japan)'), 'minyo (Japan)'],
     [_('japanese'), 'japanese'],
     //.TRANS: Italian mathematician
     [_('fibonacci'), 'fibonacci'],
