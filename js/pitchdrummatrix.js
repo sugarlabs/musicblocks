@@ -582,7 +582,7 @@ function PitchDrumMatrix() {
         var drumName = getDrumSynthName(drumHTML[3]);
 
         // Both solfege and octave are extracted from HTML by getNote.
-        var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
+        var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0], false);
         var note = noteObj[0] + noteObj[1];
 
         if (playNote) {
@@ -661,7 +661,7 @@ function PitchDrumMatrix() {
             var drumHTML = drumRow.cells[col].innerHTML.split('"');
             var drumName = getDrumSynthName(drumHTML[3]);
             // Both solfege and octave are extracted from HTML by getNote.
-            var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
+            var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0], false);
             var pitch = noteObj[0];
             var octave = noteObj[1];
 

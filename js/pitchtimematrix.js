@@ -371,7 +371,7 @@ function PitchTimeMatrix () {
             } else {
                 if (noteIsSolfege(this.rowLabels[i])) {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                    var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
+                    var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false);
                 } else {
                     cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];

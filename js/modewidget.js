@@ -682,7 +682,7 @@ function ModeWidget() {
             }
             that._lastNotePlayed = cell;
 
-            var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i]);
+            var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i], false);
             that._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, 'poly', null, null);
             that.__playNextNote(time, noteCounter + 1);
         }, 1000 * time);
@@ -696,7 +696,7 @@ function ModeWidget() {
 
         var cell = table.rows[MODEMAP[idx][0]].cells[MODEMAP[idx][1]];
         if (cell.style.backgroundColor === 'black') {
-            var noteToPlay = this._logo.getNote(this._pitch, 4, idx);
+            var noteToPlay = this._logo.getNote(this._pitch, 4, idx, false);
             this._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, 'poly', null, null);
         }
     };
