@@ -356,6 +356,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     scalarTranspositionBlock.adjustWidthToLabel();
     scalarTranspositionBlock.defaults.push('1');
     scalarTranspositionBlock.flowClampOneArgBlock();
+    scalarTranspositionBlock.hidden = true;
 
     var flatBlock = new ProtoBlock('flat');
     flatBlock.palette = palettes.dict['pitch'];
