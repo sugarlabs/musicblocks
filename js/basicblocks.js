@@ -410,7 +410,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchStepBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['steppitch'] = pitchStepBlock;
     //.TRANS: step some number of notes in current mode
-    pitchStepBlock.staticLabels.push(_('step pitch'));
+    pitchStepBlock.staticLabels.push(_('scalar step (+/-)'));
     pitchStepBlock.oneArgBlock();
     pitchStepBlock.adjustWidthToLabel();
     pitchStepBlock.dockTypes[1] = 'anyin';
