@@ -744,7 +744,7 @@ function Logo () {
                     var len = this.lastNotePlayed[turtle][0].length;
                     value = getStepSizeUp(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    value = getStepSizeUp(this.keySignature[turtle], 'A');
+                    value = getStepSizeUp(this.keySignature[turtle], 'G');
                 }
                 break;
             case 'consonantstepsizedown':
@@ -752,7 +752,7 @@ function Logo () {
                     var len = this.lastNotePlayed[turtle][0].length;
                     value = getStepSizeDown(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    value = getStepSizeDown(this.keySignature[turtle], 'A');
+                    value = getStepSizeDown(this.keySignature[turtle], 'G');
                 }
                 break;
             case 'transpositionfactor':
@@ -3403,7 +3403,7 @@ function Logo () {
             break;
         case 'steppitch':
             // Similar to pitch but calculated from previous note played.
-            if (that.inNoteBlock[turtle].length === 0) {
+            if (!that.inMatrix && that.inNoteBlock[turtle].length === 0) {
                 that.errorMsg(_('The Step Pitch Block must be used inside of a Note Block.'), blk);
                 that.stopTurtle = true;
                 break;
@@ -3434,14 +3434,16 @@ function Logo () {
                     that.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
                 }
 
-                that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(note);
-                that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(octave);
-                that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
-                if (cents !== 0) {
-                    that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(pitchToFrequency(note, octave, cents, that.keySignature[turtle]));
-                } else {
-                    that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
-                }
+                if (!that.inMatrix) {
+                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(note);
+                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(octave);
+                    that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
+                    if (cents !== 0) {
+                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(pitchToFrequency(note, octave, cents, that.keySignature[turtle]));
+                    } else {
+                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
+                    }
+		}
             }
 
             var len = that.lastNotePlayed[turtle][0].length;
@@ -3490,6 +3492,18 @@ function Logo () {
             }
 
             addPitch(noteObj[0], noteObj[1], 0);
+
+            if (that.inMatrix) {
+                that.pitchTimeMatrix.addRowBlock(blk);
+                if (that.pitchBlocks.indexOf(blk) === -1) {
+                    that.pitchBlocks.push(blk);
+                }
+
+                that.pitchTimeMatrix.rowLabels.push(noteObj[0]);
+                that.pitchTimeMatrix.rowArgs.push(noteObj[1]);
+
+                that.lastNotePlayed[turtle] = [noteObj[0] + noteObj[1], 4];
+            }
 
             if (turtle in that.intervals && that.intervals[turtle].length > 0) {
                 for (var i = 0; i < that.intervals[turtle].length; i++) {
@@ -3872,9 +3886,12 @@ function Logo () {
                     }
 
                     var nnote = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
-                    if (noteIsSolfege(note)) {
+                    that.lastNotePlayed[turtle] = [nnote[0] + nnote[1], 4];
+
+                    if (that.keySignature[turtle][0] === 'C' && that.keySignature[turtle][1].toLowerCase() === 'major' && noteIsSolfege(note)) {
                         nnote[0] = getSolfege(nnote[0]);
                     }
+
 
                     // If we are in a setdrum clamp, override the pitch.
                     if (that.drumStyle[turtle].length > 0) {
@@ -8940,8 +8957,8 @@ function Logo () {
             }
         }
 
-        if (octave < 0) {
-            return [note, 0];
+        if (octave < 1) {
+            return [note, 1];
         } else if (octave > 10) {
             return [note, 10];
         } else {
