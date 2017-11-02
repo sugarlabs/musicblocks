@@ -728,6 +728,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmruler2Block.adjustWidthToLabel();
     rhythmruler2Block.stackClampZeroArgBlock();
 
+    var matrixgMBlock = new ProtoBlock('matrixgmajor');
+    matrixgMBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['matrixgmajor'] = matrixgMBlock;
+    matrixgMBlock.staticLabels.push(_('G major scale'));
+    matrixgMBlock.adjustWidthToLabel();
+    matrixgMBlock.zeroArgBlock();
+
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
