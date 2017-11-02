@@ -742,17 +742,17 @@ function Logo () {
             case 'consonantstepsizeup':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = getStepSizeUp(this.keySignature[turtle], this.movable[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    value = getStepSizeUp(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    value = getStepSizeUp(this.keySignature[turtle], this.movable[turtle], 'A');
+                    value = getStepSizeUp(this.keySignature[turtle], 'A');
                 }
                 break;
             case 'consonantstepsizedown':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = getStepSizeDown(this.keySignature[turtle], this.movable[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    value = getStepSizeDown(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    value = getStepSizeDown(this.keySignature[turtle], this.movable[turtle], 'A');
+                    value = getStepSizeDown(this.keySignature[turtle], 'A');
                 }
                 break;
             case 'transpositionfactor':
@@ -3430,7 +3430,7 @@ function Logo () {
             function addPitch(note, octave, cents) {
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
-                    var note2 = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                    var note2 = that.getNote(note, octave, transposition, that.keySignature[turtle], true); // that.movable[turtle]);
                     that.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
                 }
 
@@ -3450,10 +3450,10 @@ function Logo () {
                 // add on any scalar transposition
                 n += that.scalarTransposition[turtle];
 
-                var value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
+		var value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle]);
                 for (var i = 1; i < n; i++) {
-                    var value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
+                    var value = getStepSizeUp(that.keySignature[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
                 }
             } else if (args[0] <= -1) {
@@ -3461,10 +3461,10 @@ function Logo () {
                 // add on any scalar transposition
                 n += that.scalarTransposition[turtle];
 
-                value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                value = getStepSizeDown(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle]);
                 for (var i = 1; i < n; i++) {
-                    var value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
+                    var value = getStepSizeDown(that.keySignature[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
                 }
             } else {  // Repeat last pitch played.
@@ -3756,7 +3756,7 @@ function Logo () {
                 var n = that.scalarTransposition[turtle];
                 var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
                 for (var i = 0; i < n; i++) {
-                    var value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
+                    var value = getStepSizeUp(that.keySignature[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
                 }
 
@@ -3766,7 +3766,7 @@ function Logo () {
                 var n = that.scalarTransposition[turtle];
                 var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
                 for (var i = 0; i < -n; i++) {
-                    var value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], noteObj[0]);
+                    var value = getStepSizeDown(that.keySignature[turtle], noteObj[0]);
                     noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
                 }
                 note = noteObj[0];
@@ -7996,17 +7996,17 @@ function Logo () {
             case 'consonantstepsizeup':
                 if (that.lastNotePlayed[turtle] !== null) {
                     var len = that.lastNotePlayed[turtle][0].length;
-                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], that.movable[turtle], 'A');
+                    that.blocks.blockList[blk].value = getStepSizeUp(that.keySignature[turtle], 'A');
                 }
                 break;
             case 'consonantstepsizedown':
                 if (that.lastNotePlayed[turtle] !== null) {
                     var len = that.lastNotePlayed[turtle][0].length;
-                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], that.movable[turtle], 'A');
+                    that.blocks.blockList[blk].value = getStepSizeDown(that.keySignature[turtle], 'A');
                 }
                 break;
             case 'transpositionfactor':
