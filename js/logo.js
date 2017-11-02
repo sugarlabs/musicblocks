@@ -7986,6 +7986,13 @@ function Logo () {
                     that.blocks.blockList[blk].value = that.keySignature[turtle];
                 }
                 break;
+            case 'modelength':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'modelength']);
+                } else {
+                    that.blocks.blockList[blk].value = getModeLength(that.keySignature[turtle]);
+                }
+                break;
             case 'consonantstepsizeup':
                 if (that.lastNotePlayed[turtle] !== null) {
                     var len = that.lastNotePlayed[turtle][0].length;

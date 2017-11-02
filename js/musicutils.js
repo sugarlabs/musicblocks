@@ -767,6 +767,12 @@ function getStepSizeDown(keySignature, movable, pitch) {
 };
 
 
+function getModeLength(keySignature) {
+    var obj = _buildScale(keySignature);
+    return obj[1].length;
+};
+
+
 function _getStepSize(keySignature, pitch, direction) {
     // Returns how many half-steps to the next note in this key.
     var obj = _buildScale(keySignature);

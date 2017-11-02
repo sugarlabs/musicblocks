@@ -142,7 +142,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     consonantStepDownBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['consonantstepsizedown'] = consonantStepDownBlock;
     //.TRANS: step down one note in current mode
-    consonantStepDownBlock.staticLabels.push(_('consonant step down'));
+    consonantStepDownBlock.staticLabels.push(_('scalar step down'));
     consonantStepDownBlock.adjustWidthToLabel();
     consonantStepDownBlock.parameterBlock();
 
@@ -150,7 +150,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     consonantStepUpBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['consonantstepsizeup'] = consonantStepUpBlock;
     //.TRANS: step up one note in current mode
-    consonantStepUpBlock.staticLabels.push(_('consonant step up'));
+    consonantStepUpBlock.staticLabels.push(_('scalar step up'));
     consonantStepUpBlock.adjustWidthToLabel();
     consonantStepUpBlock.parameterBlock();
 
@@ -279,7 +279,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
     //.TRANS: adjust the amount of shift (up or down) of a pitch
-    transpositionBlock.staticLabels.push(_('transpose by semi-tone'));
+    transpositionBlock.staticLabels.push(_('semi-tone transpose'));
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
@@ -1572,7 +1572,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     semitoneintervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['semitoneinterval'] = semitoneintervalBlock;
     //.TRANS: calculate a relative step between notes based on semi-tones
-    semitoneintervalBlock.staticLabels.push(_('absolute interval'));
+    semitoneintervalBlock.staticLabels.push(_('semi-tone interval'));
     semitoneintervalBlock.adjustWidthToLabel();
     semitoneintervalBlock.flowClampOneArgBlock();
     semitoneintervalBlock.defaults.push(5);
@@ -1582,7 +1582,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['interval'] = intervalBlock;
     //.TRANS: calculate a relative step between notes based on the current mode
-    intervalBlock.staticLabels.push(_('relative interval'));
+    intervalBlock.staticLabels.push(_('scalar interval'));
     intervalBlock.adjustWidthToLabel();
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
@@ -1593,6 +1593,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     movableBlock.staticLabels.push(_('movable'));
     movableBlock.adjustWidthToLabel();
     movableBlock.oneBooleanArgBlock();
+
+    var modeBlock = new ProtoBlock('modelength');
+    modeBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['modelength'] = modeBlock;
+    //.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
+    modeBlock.staticLabels.push(_('mode length'));
+    modeBlock.adjustWidthToLabel();
+    modeBlock.parameterBlock();
 
     var keyBlock = new ProtoBlock('key');
     keyBlock.palette = palettes.dict['intervals'];
