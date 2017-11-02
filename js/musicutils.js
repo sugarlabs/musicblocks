@@ -931,11 +931,13 @@ function getInterval (interval, keySignature, pitch) {
         var ii = SOLFEGENAMES.indexOf(pitch);
     }
 
-    if (interval > 0) {
+    if (interval === 0) {
+        return 0;
+    } else if (interval > 0) {
         var myOctave = Math.floor(interval / SEMITONES);
         var myInterval = Math.floor(interval) % SEMITONES;
         var j = 0;
-        for (var i = 0; i < (myInterval - 1); i++) {
+	for (var i = 0; i < myInterval; i++) {
             j += halfSteps[(ii + i) % halfSteps.length];
         }
         return j + myOctave * SEMITONES;
@@ -943,7 +945,7 @@ function getInterval (interval, keySignature, pitch) {
         var myOctave = Math.ceil(interval / SEMITONES);
         var myInterval = Math.ceil(interval) % SEMITONES;
         var j = 0;
-        for (var i = 0; i > myInterval + 1; i--) {
+        for (var i = 0; i > myInterval; i--) {
             var z = (ii + i - 1) % halfSteps.length;
             while (z < 0) {
                 z += halfSteps.length;

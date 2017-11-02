@@ -1572,20 +1572,77 @@ function initBasicProtoBlocks(palettes, blocks) {
     semitoneintervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['semitoneinterval'] = semitoneintervalBlock;
     //.TRANS: calculate a relative step between notes based on semi-tones
-    semitoneintervalBlock.staticLabels.push(_('semi-tone interval'));
+    semitoneintervalBlock.staticLabels.push(_('semi-tone interval')+ ' (+/–)');
     semitoneintervalBlock.adjustWidthToLabel();
     semitoneintervalBlock.flowClampOneArgBlock();
     semitoneintervalBlock.defaults.push(5);
     semitoneintervalBlock.hidden = true;
 
+    var seventhIntervalBlock = new ProtoBlock('seventhinterval');
+    seventhIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['seventhinterval'] = seventhIntervalBlock;
+    //.TRANS: seventh means the note is the six scale degrees above current note
+    seventhIntervalBlock.staticLabels.push(_('seventh'));
+    seventhIntervalBlock.adjustWidthToLabel();
+    seventhIntervalBlock.zeroArgBlock();
+   
+    var sixthIntervalBlock = new ProtoBlock('sixthinterval');
+    sixthIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['sixthinterval'] = sixthIntervalBlock;
+    //.TRANS: sixth means the note is the five scale degrees above current note
+    sixthIntervalBlock.staticLabels.push(_('sixth'));
+    sixthIntervalBlock.adjustWidthToLabel();
+    sixthIntervalBlock.zeroArgBlock();
+   
+    var fifthIntervalBlock = new ProtoBlock('fifthinterval');
+    fifthIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['fifthinterval'] = fifthIntervalBlock;
+    //.TRANS: fifth means the note is the four scale degrees above current note
+    fifthIntervalBlock.staticLabels.push(_('fifth'));
+    fifthIntervalBlock.adjustWidthToLabel();
+    fifthIntervalBlock.zeroArgBlock();
+   
+    var fourthIntervalBlock = new ProtoBlock('fourthinterval');
+    fourthIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['fourthinterval'] = fourthIntervalBlock;
+    //.TRANS: fourth means the note is three scale degrees above current note
+    fourthIntervalBlock.staticLabels.push(_('fourth'));
+    fourthIntervalBlock.adjustWidthToLabel();
+    fourthIntervalBlock.zeroArgBlock();
+   
+    var thirdIntervalBlock = new ProtoBlock('thirdinterval');
+    thirdIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['thirdinterval'] = thirdIntervalBlock;
+    //.TRANS: third means the note is two scale degrees above current note
+    thirdIntervalBlock.staticLabels.push(_('third'));
+    thirdIntervalBlock.adjustWidthToLabel();
+    thirdIntervalBlock.zeroArgBlock();
+   
+    var secondIntervalBlock = new ProtoBlock('secondinterval');
+    secondIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['secondinterval'] = secondIntervalBlock;
+    //.TRANS: second means the note is one scale degree above current note
+    secondIntervalBlock.staticLabels.push(_('second'));
+    secondIntervalBlock.adjustWidthToLabel();
+    secondIntervalBlock.zeroArgBlock();
+   
+    var unisonIntervalBlock = new ProtoBlock('unisoninterval');
+    unisonIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['unisoninterval'] = unisonIntervalBlock;
+    //.TRANS: unison means the note is the same as the current note
+    unisonIntervalBlock.staticLabels.push(_('unison'));
+    unisonIntervalBlock.adjustWidthToLabel();
+    unisonIntervalBlock.zeroArgBlock();
+   
     var intervalBlock = new ProtoBlock('interval');
     intervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['interval'] = intervalBlock;
     //.TRANS: calculate a relative step between notes based on the current mode
-    intervalBlock.staticLabels.push(_('scalar interval'));
+    intervalBlock.staticLabels.push(_('scalar interval') + ' (+/–)');
     intervalBlock.adjustWidthToLabel();
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
+    intervalBlock.hidden = true;
 
     var movableBlock = new ProtoBlock('movable');
     movableBlock.palette = palettes.dict['intervals'];
