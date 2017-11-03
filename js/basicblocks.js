@@ -1329,7 +1329,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminishedxBlock.staticLabels.push(_('diminished'));
     //.TRANS: the number of half-steps between notes
     diminishedxBlock.staticLabels.push(_('interval'));
-    diminishedxBlock.staticLabels.push(_('octave') + ' +/–');
+    diminishedxBlock.staticLabels.push(_('octave') + ' (+/–)');
     diminishedxBlock.extraWidth = 20;
     diminishedxBlock.adjustWidthToLabel();
     diminishedxBlock.flowClampTwoArgBlock();
@@ -1410,7 +1410,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['augmentedx'] = augmentedxBlock;
     //.TRANS: the "augmented" interval in music
     augmentedxBlock.staticLabels.push(_('augmented'));
-    augmentedxBlock.staticLabels.push(_('interval'), _('octave') + ' +/–');
+    augmentedxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
     augmentedxBlock.extraWidth = 20;
     augmentedxBlock.adjustWidthToLabel();
     augmentedxBlock.flowClampTwoArgBlock();
@@ -1462,7 +1462,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['perfectx'] = perfectxBlock;
     //.TRANS: the "perfect" interval in music
     perfectxBlock.staticLabels.push(_('perfect'));
-    perfectxBlock.staticLabels.push(_('interval'), _('octave') + ' +/–');
+    perfectxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
     perfectxBlock.extraWidth = 20;
     perfectxBlock.adjustWidthToLabel();
     perfectxBlock.flowClampTwoArgBlock();
@@ -1514,7 +1514,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['minorx'] = minorxBlock;
     //.TRANS: the minor interval in music
     minorxBlock.staticLabels.push(_('minor'));
-    minorxBlock.staticLabels.push(_('interval'), _('octave') + ' +/–');
+    minorxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
     minorxBlock.extraWidth = 20;
     minorxBlock.adjustWidthToLabel();
     minorxBlock.flowClampTwoArgBlock();
@@ -1566,7 +1566,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['majorx'] = majorxBlock;
     //.TRANS: the "major" interval in music
     majorxBlock.staticLabels.push(_('major'));
-    majorxBlock.staticLabels.push(_('interval'), _('octave') + ' +/–');
+    majorxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
     majorxBlock.extraWidth = 20;
     majorxBlock.adjustWidthToLabel();
     majorxBlock.flowClampTwoArgBlock();
@@ -1579,7 +1579,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     semitoneintervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['semitoneinterval'] = semitoneintervalBlock;
     //.TRANS: calculate a relative step between notes based on semi-tones
-    semitoneintervalBlock.staticLabels.push(_('semi-tone interval')+ ' ( +/–)');
+    semitoneintervalBlock.staticLabels.push(_('semi-tone interval')+ ' (+/–)');
     semitoneintervalBlock.adjustWidthToLabel();
     semitoneintervalBlock.flowClampOneArgBlock();
     semitoneintervalBlock.defaults.push(5);
