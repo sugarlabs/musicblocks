@@ -3443,7 +3443,7 @@ function Logo () {
                     } else {
                         that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
                     }
-		}
+                  }
             }
 
             var len = that.lastNotePlayed[turtle][0].length;
@@ -3452,7 +3452,7 @@ function Logo () {
                 // add on any scalar transposition
                 n += that.scalarTransposition[turtle];
 
-		var value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                  var value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle]);
                 for (var i = 1; i < n; i++) {
                     var value = getStepSizeUp(that.keySignature[turtle], noteObj[0]);
@@ -3947,12 +3947,12 @@ function Logo () {
                     }
                 }
 
-		if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
+                if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-			var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
-			addPitch(noteObj[0], noteObj[1], cents);
+                        var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj[0], noteObj[1], cents);
                     }
-		}
+                }
 
                 // deprecated
                 if (turtle in that.perfect && that.perfect[turtle].length > 0) {
@@ -5658,12 +5658,12 @@ function Logo () {
                     }
                 }
 
-		if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
+                if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-			var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
-			addPitch(noteObj[0], noteObj[1], cents, 0);
+                        var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj[0], noteObj[1], cents, 0);
                     }
-		}
+                }
 
                 if (turtle in that.perfect && that.perfect[turtle].length > 0) {
                     var noteObj = that.getNote(note, octave, calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle], that.movable[turtle]);
@@ -8819,10 +8819,15 @@ function Logo () {
             }
 
             if (!keySignature) {
-                keySignature = 'C';
+                keySignature = 'C major';
             }
 
-            var obj = getScaleAndHalfSteps(keySignature);
+            if (movable) {
+                var obj = getScaleAndHalfSteps(keySignature);
+            } else {
+                var obj = getScaleAndHalfSteps('C major');
+            }
+
             var thisScale = obj[0];
             var halfSteps = obj[1];
             var myKeySignature = obj[2];
@@ -8899,15 +8904,15 @@ function Logo () {
             octave += deltaOctave;
 
             if (deltaNote > 0) {
-		if (NOTESSHARP.indexOf(note) !== -1) {
+                if (NOTESSHARP.indexOf(note) !== -1) {
                     i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-			i += 12;
-			octave -= 1;
+                        i += 12;
+                        octave -= 1;
                     } else if (i > 11) {
-			i -= 12;
-			octave += 1;
+                        i -= 12;
+                        octave += 1;
                     }
 
                     note = NOTESSHARP[i];
@@ -8915,45 +8920,45 @@ function Logo () {
                     i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-			i += 12;
-			octave -= 1;
+                        i += 12;
+                        octave -= 1;
                     } else if (i > 11) {
-			i -= 12;
-			octave += 1;
+                        i -= 12;
+                        octave += 1;
                     }
 
                     note = NOTESFLAT[i];
-		} else {
+                } else {
                     console.log('note not found? ' + note);
-		}
+                }
             } else if (deltaNote < 0) {
-		if (NOTESFLAT.indexOf(note) !== -1) {
+                if (NOTESFLAT.indexOf(note) !== -1) {
                     i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-			i += 12;
-			octave -= 1;
+                        i += 12;
+                        octave -= 1;
                     } else if (i > 11) {
-			i -= 12;
-			octave += 1;
+                        i -= 12;
+                        octave += 1;
                     }
 
                     note = NOTESFLAT[i];
-		} else if (NOTESSHARP.indexOf(note) !== -1) {
+                } else if (NOTESSHARP.indexOf(note) !== -1) {
                     i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-			i += 12;
-			octave -= 1;
+                        i += 12;
+                        octave -= 1;
                     } else if (i > 11) {
-			i -= 12;
-			octave += 1;
+                        i -= 12;
+                        octave += 1;
                     }
 
                     note = NOTESSHARP[i];
-		} else {
+                } else {
                     console.log('note not found? ' + note);
-		}
+                }
             }
         }
 
