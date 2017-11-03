@@ -926,12 +926,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     note4Block.adjustWidthToLabel();
     note4Block.zeroArgBlock();
 
-    var note6Block = new ProtoBlock('note6');
-    note6Block.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note6'] = note6Block;
-    note6Block.staticLabels.push(_('note value') + ' +1');
-    note6Block.adjustWidthToLabel();
-    note6Block.zeroArgBlock();
+    var note3Block = new ProtoBlock('note3');
+    note3Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note3'] = note3Block;
+    note3Block.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
+    note3Block.adjustWidthToLabel();
+    note3Block.zeroArgBlock();
 
     var note5Block = new ProtoBlock('note5');
     note5Block.palette = palettes.dict['rhythm'];
@@ -940,12 +940,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     note5Block.adjustWidthToLabel();
     note5Block.zeroArgBlock();
 
-    var note3Block = new ProtoBlock('note3');
-    note3Block.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note3'] = note3Block;
-    note3Block.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
-    note3Block.adjustWidthToLabel();
-    note3Block.zeroArgBlock();
+    var note7Block = new ProtoBlock('note7');
+    note7Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note7'] = note7Block;
+    note7Block.staticLabels.push(_('note value') + ' 5 4');
+    note7Block.adjustWidthToLabel();
+    note7Block.zeroArgBlock();
+
+    var note6Block = new ProtoBlock('note6');
+    note6Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note6'] = note6Block;
+    note6Block.staticLabels.push(_('note value') + ' +1');
+    note6Block.adjustWidthToLabel();
+    note6Block.zeroArgBlock();
 
     var note2Block = new ProtoBlock('note2');
     note2Block.palette = palettes.dict['rhythm'];
