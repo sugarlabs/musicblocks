@@ -1566,7 +1566,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['majorx'] = majorxBlock;
     //.TRANS: the "major" interval in music
     majorxBlock.staticLabels.push(_('major'));
-    majorxBlock.staticLabels.push(_('interval'), _('octave') + ' +/–');
+    majorxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
     majorxBlock.extraWidth = 20;
     majorxBlock.adjustWidthToLabel();
     majorxBlock.flowClampTwoArgBlock();
@@ -1579,7 +1579,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     semitoneintervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['semitoneinterval'] = semitoneintervalBlock;
     //.TRANS: calculate a relative step between notes based on semi-tones
-    semitoneintervalBlock.staticLabels.push(_('semi-tone interval')+ ' ( +/–)');
+    semitoneintervalBlock.staticLabels.push(_('semi-tone interval')+ ' (+/–)');
     semitoneintervalBlock.adjustWidthToLabel();
     semitoneintervalBlock.flowClampOneArgBlock();
     semitoneintervalBlock.defaults.push(5);
