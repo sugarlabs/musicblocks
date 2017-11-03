@@ -3390,7 +3390,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     crescendoBlock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['crescendo'] = crescendoBlock;
     //.TRANS: a gradual increase in loudness
-    crescendoBlock.staticLabels.push(_('crescendo') + ' +/–');
+    crescendoBlock.staticLabels.push(_('crescendo') + ' (+/–)');
     crescendoBlock.adjustWidthToLabel();
     crescendoBlock.flowClampOneArgBlock();
     crescendoBlock.defaults.push(5);
