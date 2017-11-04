@@ -2848,7 +2848,6 @@ function Logo () {
                     if (MODENAMES[i][0] === args[1]) {
                         modename = MODENAMES[i][1];
                         that._modeBlock = that.blocks.blockList[blk].connections[2];
-                        console.log(modename);
                         break;
                     }
                 }
@@ -4726,18 +4725,16 @@ function Logo () {
                 var i = Math.ceil(args[0]);
             }
 
-            if (i !== 0) {
-                that.intervals[turtle].push(i);
+            that.intervals[turtle].push(i);
 
-                var listenerName = '_interval_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
+            var listenerName = '_interval_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function (event) {
-                    that.intervals[turtle].pop();
-                };
+            var __listener = function (event) {
+                that.intervals[turtle].pop();
+            };
 
-                that._setListener(turtle, listenerName, __listener);
-            }
+            that._setListener(turtle, listenerName, __listener);
 
             childFlow = args[1];
             childFlowCount = 1;
@@ -8961,6 +8958,8 @@ function Logo () {
                 }
             }
         }
+
+        // console.log(keySignature + ' ' + getSharpFlatPreference(keySignature));
 
         if (octave < 1) {
             return [note, 1];
