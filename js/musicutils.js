@@ -55,6 +55,10 @@ const DIMINISHED = {1: -1, 2: 0, 3: 2, 4: 4, 5: 6, 6: 7, 7: 9, 8: 11};
 const MAJOR = {2: 2, 3: 4, 6: 9, 7: 11};
 const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
 
+// Preference for sharps or flats
+const SHARPPREFERENCE = ['g major', 'd major', 'a major', 'e major', 'b major', 'f# major', 'c# major', 'e minor', 'b minor', 'f# minor', 'c# minor', 'g# minor', 'd# minor'];
+const FLATPREFERENCE = ['f major', 'bb major', 'eb major', 'ab major', 'db major', 'gb major', 'cb major', 'd minor', 'g minor', 'c minor', 'f minor', 'bb minor', 'eb minor'];
+
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
 const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
@@ -62,6 +66,18 @@ const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
 // const IROHASOLFNOTES = ['ro', 'i', 'to', 'he', 'ho', 'ni', 'ha']; //https://en.wikipedia.org/wiki/Iroha
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
 const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+
+
+function getSharpFlatPreference (keySignature) {
+    if (SHARPPREFERENCE.indexOf(keySignature.toLowerCase()) !== -1) {
+        return 'sharp';
+    } else if (FLATPREFERENCE.indexOf(keySignature.toLowerCase()) !== -1) {
+        return 'flat';
+    } else {
+        return 'natural';
+    }
+};
+
 
 function mod12(a) {
     while (a < 0) {
@@ -926,25 +942,21 @@ function getInterval (interval, keySignature, pitch) {
     if (interval === 0) {
         return 0;
     } else if (interval > 0) {
-        var myOctave = Math.floor(interval / SEMITONES);
-        var myInterval = Math.floor(interval) % SEMITONES;
         var j = 0;
-	for (var i = 0; i < myInterval; i++) {
+	for (var i = 0; i < interval; i++) {
             j += halfSteps[(ii + i) % halfSteps.length];
         }
-        return j + myOctave * SEMITONES;
+        return j;
     } else {
-        var myOctave = Math.ceil(interval / SEMITONES);
-        var myInterval = Math.ceil(interval) % SEMITONES;
         var j = 0;
-        for (var i = 0; i > myInterval; i--) {
+        for (var i = 0; i > interval; i--) {
             var z = (ii + i - 1) % halfSteps.length;
             while (z < 0) {
                 z += halfSteps.length;
             }
             j -= halfSteps[z];
         }
-        return j + myOctave * SEMITONES;
+        return j;
     }
 };
 
