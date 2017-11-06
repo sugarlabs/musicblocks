@@ -48,6 +48,7 @@ const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B
 const PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const NOTESTABLE = {1: 'do', 2: 'do♯', 3: 're', 4: 're♯', 5: 'mi', 6: 'fa', 7: 'fa♯', 8: 'sol', 9: 'sol♯', 10: 'la', 11: 'la♯', 0: 'ti'};
+const FIXEDSOLFEGE = {'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'ti': 'B'};
 const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Halfsteps used in calculating absolute intervals
@@ -933,6 +934,13 @@ function getInterval (interval, keySignature, pitch) {
     var obj = _buildScale(keySignature);
     var scale = obj[0];
     var halfSteps = obj[1];
+    console.log(scale);
+    console.log(halfSteps);
+
+    if (SOLFEGENAMES.indexOf(pitch) !== -1) {
+        pitch = FIXEDSOLFEGE[pitch];
+        console.log(pitch);
+    }
 
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
@@ -966,9 +974,6 @@ function getInterval (interval, keySignature, pitch) {
             console.log('Note ' + pitch + ' not in scale ' + keySignature);
             ii = 0;
         }
-    } else {
-        // In case pitch is solfege, convert it.
-        var ii = SOLFEGENAMES.indexOf(pitch);
     }
 
     if (interval === 0) {
