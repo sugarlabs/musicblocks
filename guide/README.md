@@ -133,11 +133,11 @@ The top *Pitch* block is specified using a *Solfege* block (`Sol` in
 The pitch of the next block is specified using a *Pitch-name* block
 (`G` in `Octave 4`), which contains the notes `C D E F G A B`.
 
-The next block is specified using a *Scale-degree* block (the 5th note
-in the scale, 'G', also in 'Octave 4'), C == 1, D == 2, ...
+The next block is specified using a *Scale-degree* block (the `5th note`
+in the scale, 'G', also in 'Octave 4'), `C == 1, D == 2, ...`
 
-The next block is specified using a *Pitch-number* block (the 7th
-semi-tone above 'C' in 'Octave 4'). The offset for the pitch number
+The next block is specified using a *Pitch-number* block (the `7th
+semi-tone` above `C` in `Octave 4`). The offset for the pitch number
 can be modified using the *Set-pitch-number-offset* block.
 
 The pitch of the last block is specified using the *Hertz* block in
