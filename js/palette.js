@@ -1897,7 +1897,7 @@ function Palette(palettes, name) {
             break;
         }
 
-        if (protoblk.name !== 'namedbox' && blockIsMacro(blkname)) {
+        if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1 && blockIsMacro(blkname)) {
             moved = true;
             saveX = this.protoContainers[blkname].x;
             saveY = this.protoContainers[blkname].y;
@@ -1932,7 +1932,11 @@ function Palette(palettes, name) {
             moved = false;
             this.draggingProtoBlock = false;
 
-            var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
+            if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1) {
+		var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
+            } else {  // Don't apply macro expansion to named blocks.
+		var macroExpansion = null;
+            }
 
             if (macroExpansion != null) {
                 this.palettes.blocks.loadNewBlocks(macroExpansion);
