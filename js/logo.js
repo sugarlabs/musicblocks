@@ -8959,7 +8959,26 @@ function Logo () {
             }
         }
 
-        // console.log(keySignature + ' ' + getSharpFlatPreference(keySignature));
+        // Try to find a note in the current keySignature
+        switch (getSharpFlatPreference(keySignature)) {
+        case 'flat':
+            if (note in EQUIVALENTFLATS) {
+                note = EQUIVALENTFLATS[note];
+            }
+            break;
+        case 'sharp':
+            if (note in EQUIVALENTSHARPS) {
+                note = EQUIVALENTSHARPS[note];
+            }
+            break;
+        case 'natural':
+            if (note in EQUIVALENTNATURALS) {
+                note = EQUIVALENTNATURALS[note];
+            }
+            break;
+        default:
+            break;
+        }
 
         if (octave < 1) {
             return [note, 1];

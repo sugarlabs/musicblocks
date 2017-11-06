@@ -35,7 +35,9 @@ const STOSHARP = {'E#': 'E♯', 'G#': 'G♯', 'A#': 'A♯', 'B#': 'B♯', 'D#': 
 const NOTESSHARP = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const NOTESFLAT = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
 const NOTESFLAT2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
-const EQUIVALENTNOTES = {'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯': 'A♭', 'A♯': 'B♭', 'D♭': 'C♯', 'E♭': 'D♯', 'G♭': 'F♯', 'A♭': 'G♯', 'B♭': 'A♯'};
+const EQUIVALENTFLATS = {'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯': 'A♭', 'A♯': 'B♭'};
+const EQUIVALENTSHARPS = {'D♭': 'C♯', 'E♭': 'D♯', 'G♭': 'F♯', 'A♭': 'G♯', 'B♭': 'A♯'};
+const EQUIVALENTNATURALS = {'E♯': 'F', 'B♯': 'C', 'C♭': 'B', 'F♭': 'E'};
 const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
 const SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
 const SOLFEGECONVERSIONTABLE = {'C': 'do', 'C♯': 'do' + '♯', 'D': 're', 'D♯': 're' + '♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa' + '♯', 'G': 'sol', 'G♯': 'sol' + '♯', 'A': 'la', 'A♯': 'la' + '♯', 'B': 'ti', 'D♭': 're' + '♭', 'E♭': 'mi' + '♭', 'G♭': 'sol' + '♭', 'A♭': 'la' + '♭', 'B♭': 'ti' + '♭', 'R': _('rest')};
@@ -806,11 +808,25 @@ function _getStepSize(keySignature, pitch, direction) {
         }
     }
 
-    if (pitch in EQUIVALENTNOTES) {
-        pitch = EQUIVALENTNOTES[pitch];
+    ii = scale.indexOf(pitch);
+    if (ii === -1) {
+        if (pitch in EQUIVALENTFLATS) {
+            ii = scale.indexOf(EQUIVALENTFLATS[pitch]);
+        }
     }
 
-    ii = scale.indexOf(pitch);
+    if (ii === -1) {
+        if (pitch in EQUIVALENTSHARPS) {
+            ii = scale.indexOf(EQUIVALENTSHARPS[pitch]);
+        }
+    }
+
+    if (ii === -1) {
+        if (pitch in EQUIVALENTNATURALS) {
+            ii = scale.indexOf(EQUIVALENTNATURALS[pitch]);
+        }
+    }
+
     if (ii !== -1) {
         if (direction === 'up') {
             return halfSteps[ii];
@@ -920,17 +936,33 @@ function getInterval (interval, keySignature, pitch) {
 
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
-        ii = scale.indexOf(pitch);
+        var ii = scale.indexOf(pitch);
     } else if (pitch in STOSHARP) {
         pitch = STOSHARP[pitch];
-        ii = scale.indexOf(pitch);
+        var ii = scale.indexOf(pitch);
     } else if (scale.indexOf(pitch) !== -1) {
-        ii = scale.indexOf(pitch);
-    } else if (pitch in EQUIVALENTNOTES) {
-        pitch = EQUIVALENTNOTES[pitch];
-        if (scale.indexOf(pitch) !== -1) {
-            ii = scale.indexOf(pitch);
-        } else {
+        var ii = scale.indexOf(pitch);
+    } else if (PITCHES.indexOf(pitch) !== -1 || PITCHES1.indexOf(pitch) !== -1 || PITCHES2.indexOf(pitch) !== -1 || PITCHES3.indexOf(pitch) !== -1) {
+        var ii = scale.indexOf(pitch);
+        if (ii === -1) {
+            if (pitch in EQUIVALENTFLATS) {
+                ii = scale.indexOf(EQUIVALENTFLATS[pitch]);
+            }
+        }
+
+        if (ii === -1) {
+            if (pitch in EQUIVALENTSHARPS) {
+                ii = scale.indexOf(EQUIVALENTSHARPS[pitch]);
+            }
+        }
+
+        if (ii === -1) {
+            if (pitch in EQUIVALENTNATURALS) {
+                ii = scale.indexOf(EQUIVALENTNATURALS[pitch]);
+            }
+        }
+
+        if (ii === -1) {
             console.log('Note ' + pitch + ' not in scale ' + keySignature);
             ii = 0;
         }
@@ -943,7 +975,7 @@ function getInterval (interval, keySignature, pitch) {
         return 0;
     } else if (interval > 0) {
         var j = 0;
-	for (var i = 0; i < interval; i++) {
+        for (var i = 0; i < interval; i++) {
             j += halfSteps[(ii + i) % halfSteps.length];
         }
         return j;
