@@ -57,11 +57,10 @@ run. Look for `RUN LIVE` links.
 [Back to Table of Contents](#TOC) | [Next Section (2. Making a sound)](#NOTES)
 
 Music Blocks is designed to run in a browser. Most of the development
-has been done in Chrome, but it should also work in Firefox (although
-you may need to disable hardware acceleration). You can run it from
-[github io](http://walterbender.github.io/musicblocks) or by
-downloading a copy of the code and running a local copy directly from
-the file system of your computer.
+has been done in Chrome, but it should also work in Firefox. You can
+run it from [github io](http://walterbender.github.io/musicblocks) or
+by downloading a copy of the code and running a local copy directly
+from the file system of your computer.
 
 For more details on how to use Music Blocks, see [Using Music
 Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
@@ -69,49 +68,81 @@ For more details on how to use Turtle Blocks, see [Using Turtle
 Blocks
 JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
-## <a name="NOTES"></a>2. Making a Sound
-[Previous Section (1. Getting Started)](#GETTING-STARTED) | [Back to Table of Contents](#TOC) | [Next Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC)
+## <a name="NOTES"></a>
+2. Making a Sound [Previous Section (1. Getting
+Started)](#GETTING-STARTED) | [Back to Table of Contents](#TOC) |
+[Next Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC)
 
-Music Blocks incorporates many common elements of music, such as [pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
+Music Blocks incorporates many common elements of music, such as
+[pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
 and, to some degree, [timbre and texture](#VOICES).
 
-### <a name="NOTE-VALUE"></a> 2.1 Note Value Blocks
-At the heart of Music Blocks is the *Note value* block. The *Note
-value* block is a container for a [*Pitch* block](#PITCH) that specifies the duration
-(note value) of the pitch. 
+### <a name="NOTE-VALUE"></a>
+2.1 Note Value Blocks At the heart of Music Blocks is the *Note value*
+block. The *Note value* block is a container for a [*Pitch*
+block](#PITCH) that specifies the duration (note value) of the pitch.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg  "A single Note value block (top) and two consecutive Note value blocks (bottom)")
+![alt
+ tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg
+ "A single Note value block (top) and two consecutive Note value
+ blocks (bottom)")
 
-At the top of the example above, a single (detached) *Note value* block is
-shown. The `1/8` is value of the note, which is, in this case, an eighth note. 
+At the top of the example above, a single (detached) *Note value*
+block is shown. The `1/8` is value of the note, which is, in this
+case, an eighth note.
 
-At the bottom, two notes that are played consecutively are
-shown. They are both `1/8` notes, making the duration of the entire sequence `1/4`. 
+At the bottom, two notes that are played consecutively are shown. They
+are both `1/8` notes, making the duration of the entire sequence
+`1/4`.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg "A quarter note, a sixteenth note, and a half note Note value blocks")
+![alt
+ tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg
+ "A quarter note, a sixteenth note, and a half note Note value
+ blocks")
 
-In this example, different note values are shown. From top to bottom, they are: 
-`1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
-note.
+In this example, different note values are shown. From top to bottom,
+they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
+`1/2` for a half note.
 
-Note that any mathematical operations can be used as input to the *Note value*.
+Note that any mathematical operations can be used as input to the
+*Note value*.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg "A chart of note values and their corresponding note value blocks")
+![alt
+ tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg
+ "A chart of note values and their corresponding note value blocks")
 
-Please refer to the above picture for a visual representation of note values.
+Please refer to the above picture for a visual representation of note
+values.
 
-### <a name="PITCH"></a>2.2 Pitch Blocks
-As we have seen, *Pitch* blocks are used inside the [*Note value*](#NOTE-VALUE)
-blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
-that in combination determines the frequency (and therefore pitch) at which the note is played.
+### <a name="PITCH"></a>
+2.2 Pitch Blocks As we have seen, *Pitch* blocks are used inside the
+[*Note value*](#NOTE-VALUE) blocks. The *Pitch* block specifies the
+pitch name and pitch octave of a note that in combination determines
+the frequency (and therefore pitch) at which the note is played.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg "Specifying a pitch block's name and octave")
+![alt
+ tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg
+ "Specifying a pitch block's name and octave")
 
-There are many systems you can use to specify a *pitch* block's name and octave. Some examples are
-shown above. The top *Pitch* block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
-the notes `Do Re Me Fa Sol La Ti `. The middle block is specified using a *Pitch-name* block (`B flat` in `Octave 4`),
-which contains the notes `C D E F G A B`. The last block is specified using the *Hertz* block in conjunction
-with a *Number* block (`440` Hertz) , which corresponds to the frequency of the sound made.
+There are many systems you can use to specify a *pitch* block's name
+and octave. Some examples are shown above.
+
+The top *Pitch* block is specified using a *Solfege* block (`Sol` in
+`Octave 4`), which contains the notes `Do Re Me Fa Sol La Ti `.
+
+The pitch of the next block is specified using a *Pitch-name* block
+(`G` in `Octave 4`), which contains the notes `C D E F G A B`.
+
+The next block is specified using a *Scale-degree* block (the 5th note
+in the scale, 'G', also in 'Octave 4'), C == 1, D == 2, ...
+
+The next block is specified using a *Pitch-number* block (the 7th
+semi-tone above 'C' in 'Octave 4'). The offset for the pitch number
+can be modified using the *Set-pitch-number-offset* block.
+
+The pitch of the last block is specified using the *Hertz* block in
+conjunction with a *Number* block (`392` Hertz) , which corresponds to
+the frequency of the sound made.
 
 The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
