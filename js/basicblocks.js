@@ -292,6 +292,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     octaveBlock.adjustWidthToLabel();
     octaveBlock.zeroArgBlock();
 
+    var downsixthBlock = new ProtoBlock('downsixth');
+    downsixthBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['downsixth'] = downsixthBlock;
+    //.TRANS: down sixth means the note is five scale degrees below current note
+    downsixthBlock.staticLabels.push(_('down sixth'));
+    downsixthBlock.adjustWidthToLabel();
+    downsixthBlock.zeroArgBlock();
+   
+    var downthirdBlock = new ProtoBlock('downthird');
+    downthirdBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['downthird'] = downthirdBlock;
+    //.TRANS: down third means the note is two scale degrees below current note
+    downthirdBlock.staticLabels.push(_('down third'));
+    downthirdBlock.adjustWidthToLabel();
+    downthirdBlock.zeroArgBlock();
+   
     var seventhBlock = new ProtoBlock('seventh');
     seventhBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['seventh'] = seventhBlock;
@@ -1599,6 +1615,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     semitoneintervalBlock.defaults.push(5);
     semitoneintervalBlock.hidden = true;
 
+    var downsixthIntervalBlock = new ProtoBlock('downsixthinterval');
+    downsixthIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['downsixthinterval'] = downsixthIntervalBlock;
+    //.TRANS: down sixth means the note is five scale degrees below current note
+    downsixthIntervalBlock.staticLabels.push(_('down sixth'));
+    downsixthIntervalBlock.adjustWidthToLabel();
+    downsixthIntervalBlock.zeroArgBlock();
+   
+    var downthirdIntervalBlock = new ProtoBlock('downthirdinterval');
+    downthirdIntervalBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['downthirdinterval'] = downthirdIntervalBlock;
+    //.TRANS: down third means the note is two scale degrees below current note
+    downthirdIntervalBlock.staticLabels.push(_('down third'));
+    downthirdIntervalBlock.adjustWidthToLabel();
+    downthirdIntervalBlock.zeroArgBlock();
+   
     var seventhIntervalBlock = new ProtoBlock('seventhinterval');
     seventhIntervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['seventhinterval'] = seventhIntervalBlock;
