@@ -786,17 +786,18 @@ function getModeLength(keySignature) {
 
 function _getStepSize(keySignature, pitch, direction) {
     // Returns how many half-steps to the next note in this key.
+    var thisPitch = pitch;
     var obj = _buildScale(keySignature);
     var scale = obj[0];
     var halfSteps = obj[1];
 
-    if (pitch in BTOFLAT) {
-        pitch = BTOFLAT[pitch];
-    } else if (pitch in STOSHARP) {
-        pitch = STOSHARP[pitch];
+    if (thisPitch in BTOFLAT) {
+        thisPitch = BTOFLAT[thisPitch];
+    } else if (thisPitch in STOSHARP) {
+        thisPitch = STOSHARP[thisPitch];
     }
 
-    ii = scale.indexOf(pitch);
+    var ii = scale.indexOf(thisPitch);
     if (ii !== -1) {
         if (direction === 'up') {
             return halfSteps[ii];
@@ -809,22 +810,21 @@ function _getStepSize(keySignature, pitch, direction) {
         }
     }
 
-    ii = scale.indexOf(pitch);
     if (ii === -1) {
-        if (pitch in EQUIVALENTFLATS) {
-            ii = scale.indexOf(EQUIVALENTFLATS[pitch]);
+        if (thisPitch in EQUIVALENTFLATS) {
+            ii = scale.indexOf(EQUIVALENTFLATS[thisPitch]);
         }
     }
 
     if (ii === -1) {
-        if (pitch in EQUIVALENTSHARPS) {
-            ii = scale.indexOf(EQUIVALENTSHARPS[pitch]);
+        if (thisPitch in EQUIVALENTSHARPS) {
+            ii = scale.indexOf(EQUIVALENTSHARPS[thisPitch]);
         }
     }
 
     if (ii === -1) {
-        if (pitch in EQUIVALENTNATURALS) {
-            ii = scale.indexOf(EQUIVALENTNATURALS[pitch]);
+        if (thisPitch in EQUIVALENTNATURALS) {
+            ii = scale.indexOf(EQUIVALENTNATURALS[thisPitch]);
         }
     }
 
@@ -840,9 +840,64 @@ function _getStepSize(keySignature, pitch, direction) {
         }
     }
 
-    // current Note not in the consonant scale of this key.
-    console.log(pitch + ' not found in key of ' + keySignature);
-    return 1;
+    // Pitch is not in the consonant scale of this key, so we need to
+    // shift up or down to the next note in the key.
+    var offset = 0;
+    var i = PITCHES.indexOf(thisPitch);
+    if (i !== -1) {
+        while (scale.indexOf(thisPitch) === -1) {
+            var i = PITCHES.indexOf(thisPitch);
+            if (i === -1) {
+		i = PITCHES2.indexOf(thisPitch);
+            }
+
+            if (direction === 'up') {
+                i += 1;
+                thisPitch = PITCHES[i % 12];
+                offset += 1;
+            } else {
+                i -= 1;
+                if (i < 0) {
+                    i += 12;
+                }
+
+                thisPitch = PITCHES[i];
+                offset -= 1;
+            }
+        }
+
+        return offset;
+    }
+
+    var i = PITCHES2.indexOf(thisPitch);
+    if (i !== -1) {
+        while (scale.indexOf(thisPitch) === -1) {
+            var i = PITCHES2.indexOf(thisPitch);
+            if (i === -1) {
+		i = PITCHES.indexOf(thisPitch);
+            }
+
+            if (direction === 'up') {
+                i += 1;
+                thisPitch = PITCHES2[i % 12];
+                offset += 1;
+            } else {
+                i -= 1;
+                if (i < 0) {
+                    i += 12;
+                }
+
+                thisPitch = PITCHES2[i];
+                offset -= 1;
+            }
+        }
+
+        return offset;
+    }
+
+    // Should never get here, but just in case.
+    console.log(thisPitch + ' not found');
+    return 0;
 };
 
 
@@ -934,6 +989,8 @@ function getInterval (interval, keySignature, pitch) {
     var obj = _buildScale(keySignature);
     var scale = obj[0];
     var halfSteps = obj[1];
+    // Offet is used in the case that the pitch is not in the current scale.
+    var offset = 0;
 
     if (SOLFEGENAMES.indexOf(pitch) !== -1) {
         pitch = FIXEDSOLFEGE[pitch];
@@ -947,7 +1004,7 @@ function getInterval (interval, keySignature, pitch) {
         var ii = scale.indexOf(pitch);
     } else if (scale.indexOf(pitch) !== -1) {
         var ii = scale.indexOf(pitch);
-    } else if (PITCHES.indexOf(pitch) !== -1 || PITCHES1.indexOf(pitch) !== -1 || PITCHES2.indexOf(pitch) !== -1 || PITCHES3.indexOf(pitch) !== -1) {
+    } else {  // if (PITCHES.indexOf(pitch) !== -1 || PITCHES1.indexOf(pitch) !== -1 || PITCHES2.indexOf(pitch) !== -1 || PITCHES3.indexOf(pitch) !== -1) {
         var ii = scale.indexOf(pitch);
         if (ii === -1) {
             if (pitch in EQUIVALENTFLATS) {
@@ -968,10 +1025,59 @@ function getInterval (interval, keySignature, pitch) {
         }
 
         if (ii === -1) {
-            console.log('Note ' + pitch + ' not in scale ' + keySignature);
-            ii = 0;
+            // Pitch is not in the consonant scale of this key, so we need to
+            // shift up or down for a close match, step up or down, and then
+            // compensate for the shift.
+            var i = PITCHES.indexOf(pitch);
+            if (i !== -1) {
+                while (scale.indexOf(pitch) === -1) {
+                    var i = PITCHES.indexOf(pitch);
+                    if (interval > 0) {
+                        i += 1;
+                        pitch = PITCHES[i % 12];
+                        offset -= 1;
+                    } else {
+                        i -= 1;
+                        if (i < 0) {
+                            i += 12;
+                        }
+                        pitch = PITCHES[i];
+                        offset += 1;
+                    }
+                }
+
+                ii = scale.indexOf(pitch);
+            } else {
+                var i = PITCHES2.indexOf(pitch);
+                if (i !== -1) {
+                    while (scale.indexOf(pitch) === -1) {
+                        var i = PITCHES2.indexOf(pitch);
+                        if (interval > 0) {
+                            i += 1;
+                            pitch = PITCHES2[i % 12];
+                            offset -= 1;
+                        } else {
+                            i -= 1;
+                            if (i < 0) {
+                                i += 12;
+                            }
+                            pitch = PITCHES2[i];
+                            offset += 1;
+                        }
+                    }
+
+                    ii = scale.indexOf(pitch);
+                } else {
+                    // Should never happen.
+                    console.log(pitch + ' not found');
+                    return 0;
+                }
+            }
         }
     }
+
+    // What do we do with the offset? Is it ignored? Or does it count
+    // as one step in the interval?
 
     if (interval === 0) {
         return 0;
