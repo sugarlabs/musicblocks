@@ -934,12 +934,9 @@ function getInterval (interval, keySignature, pitch) {
     var obj = _buildScale(keySignature);
     var scale = obj[0];
     var halfSteps = obj[1];
-    console.log(scale);
-    console.log(halfSteps);
 
     if (SOLFEGENAMES.indexOf(pitch) !== -1) {
         pitch = FIXEDSOLFEGE[pitch];
-        console.log(pitch);
     }
 
     if (pitch in BTOFLAT) {
