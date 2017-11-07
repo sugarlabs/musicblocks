@@ -167,7 +167,7 @@ function Logo () {
     this.noteOctaves = {};
     this.noteCents = {};
     this.noteHertz = {};
-    this.noteTranspositions = {};
+    this.noteTranspositions = {};  // deprecated
     this.noteBeatValues = {};
     this.embeddedGraphics = {};
     this.lastNotePlayed = {};
@@ -3427,22 +3427,25 @@ function Logo () {
             }
 
             function addPitch(note, octave, cents) {
+                var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], true); // that.movable[turtle]);
+
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
-                    var note2 = that.getNote(note, octave, transposition, that.keySignature[turtle], true); // that.movable[turtle]);
-                    that.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
+                    that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
                 }
 
                 if (!that.inMatrix) {
-                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(note);
-                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(octave);
+                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(noteObj[0]);
+                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(noteObj[1]);
                     that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
                     if (cents !== 0) {
-                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(pitchToFrequency(note, octave, cents, that.keySignature[turtle]));
+                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(pitchToFrequency(noteObj[0], noteObj[1], cents, that.keySignature[turtle]));
                     } else {
                         that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
                     }
-                  }
+                }
+
+                return noteObj;
             }
 
             var len = that.lastNotePlayed[turtle][0].length;
@@ -3451,7 +3454,7 @@ function Logo () {
                 // add on any scalar transposition
                 n += that.scalarTransposition[turtle];
 
-                  var value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
+                var value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
                 var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle]);
                 for (var i = 1; i < n; i++) {
                     var value = getStepSizeUp(that.keySignature[turtle], noteObj[0]);
@@ -3490,7 +3493,14 @@ function Logo () {
                 }
             }
 
-            addPitch(noteObj[0], noteObj[1], 0);
+            var transposition = 2 * delta;
+            if (turtle in that.transposition) {
+                transposition += that.transposition[turtle];
+            }
+
+            var noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
+            // Only apply the transposition to the base note of an interval
+            transposition = 0;
 
             if (that.inMatrix) {
                 that.pitchTimeMatrix.addRowBlock(blk);
@@ -3498,57 +3508,58 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(noteObj[0]);
-                that.pitchTimeMatrix.rowArgs.push(noteObj[1]);
+                that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
+                that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
 
-                that.lastNotePlayed[turtle] = [noteObj[0] + noteObj[1], 4];
+                that.lastNotePlayed[turtle] = [noteObj1[0] + noteObj1[1], 4];
             }
 
             if (turtle in that.intervals && that.intervals[turtle].length > 0) {
                 for (var i = 0; i < that.intervals[turtle].length; i++) {
-                    var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], noteObj[0]);
-                    var noteObj2 = that.getNote(noteObj[0], noteObj[1], ii, that.keySignature[turtle], that.movable[turtle]);
+                    var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], noteObj1[0]);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle]);
                     addPitch(noteObj2[0], noteObj2[1], 0);
                 }
             }
 
             if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                 for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                    var noteObj2 = that.getNote(noteObj[0], noteObj[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
                     addPitch(noteObj2[0], noteObj2[1], 0);
                 }
             }
 
             // deprecated
             if (turtle in that.perfect && that.perfect[turtle].length > 0) {
-                var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle], that.movable[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             // deprecated
             if (turtle in that.diminished && that.diminished[turtle].length > 0) {
-                var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle], that.movable[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             // deprecated
             if (turtle in that.augmented && that.augmented[turtle].length > 0) {
-                var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle], that.movable[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             // deprecated
             if (turtle in that.major && that.major[turtle].length > 0) {
-                var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcMajor(last(that.major[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcMajor(last(that.major[turtle])), that.keySignature[turtle], that.movable[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             // deprecated
             if (turtle in that.minor && that.minor[turtle].length > 0) {
-                var noteObj2 = that.getNote(noteObj[0], noteObj[1], calcMinor(last(that.minor[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcMinor(last(that.minor[turtle])), that.keySignature[turtle], that.movable[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
+            // deprecated
             if (turtle in that.transposition) {
                 that.noteTranspositions[turtle].push(that.transposition[turtle] + 2 * delta);
             } else {
@@ -3813,6 +3824,7 @@ function Logo () {
                         } else {  // odd
                             delta += num2 - num1 + 0.5;
                         }
+
                         num1 += 2 * delta;
                     }
                 }
@@ -3878,17 +3890,16 @@ function Logo () {
                 }
 
                 for (var i = 0; i < duplicateFactor; i++) {
-                    // Apply transpositions
                     var transposition = 2 * delta;
                     if (turtle in that.transposition) {
                         transposition += that.transposition[turtle];
                     }
 
-                    var nnote = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
-                    that.lastNotePlayed[turtle] = [nnote[0] + nnote[1], 4];
+                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                    that.lastNotePlayed[turtle] = [noteObj[0] + noteObj[1], 4];
 
                     if (that.keySignature[turtle][0] === 'C' && that.keySignature[turtle][1].toLowerCase() === 'major' && noteIsSolfege(note)) {
-                        nnote[0] = getSolfege(nnote[0]);
+                        noteObj[0] = getSolfege(noteObj[0]);
                     }
 
 
@@ -3897,26 +3908,29 @@ function Logo () {
                         that.pitchTimeMatrix.rowLabels.push(last(that.drumStyle[turtle]));
                         that.pitchTimeMatrix.rowArgs.push(-1);
                     } else {
-                        that.pitchTimeMatrix.rowLabels.push(nnote[0]);
-                        that.pitchTimeMatrix.rowArgs.push(nnote[1]);
+                        that.pitchTimeMatrix.rowLabels.push(noteObj[0]);
+                        that.pitchTimeMatrix.rowArgs.push(noteObj[1]);
                     }
                 }
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents) {
+                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
                     if (that.drumStyle[turtle].length > 0) {
                         var drumname = last(that.drumStyle[turtle]);
-                        var note2 = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
-                        that.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
+                        that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
                     }
-                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(note);
-                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(octave);
+
+                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(noteObj[0]);
+                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(noteObj[1]);
                     that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
                     if (cents !== 0) {
-                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(pitchToFrequency(note, octave, cents, that.keySignature[turtle]));
+                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(pitchToFrequency(noteObj[0], noteObj[1], cents, that.keySignature[turtle]));
                     } else {
                         that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
                     }
+
+                    return noteObj;
                 }
 
                 if (!(that.invertList[turtle].length === 0)) {
@@ -3936,53 +3950,61 @@ function Logo () {
                     }
                 }
 
-                addPitch(note, octave, cents);
+                var transposition = 2 * delta;
+                if (turtle in that.transposition) {
+                    transposition += that.transposition[turtle];
+                }
+
+                var noteObj1 = addPitch(note, octave, cents);
+                // Only apply the transposition to the base note of an interval
+                transposition = 0;
 
                 if (turtle in that.intervals && that.intervals[turtle].length > 0) {
                     for (var i = 0; i < that.intervals[turtle].length; i++) {
-                        var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], note);
-                        var noteObj = that.getNote(note, octave, ii, that.keySignature[turtle], that.movable[turtle]);
-                        addPitch(noteObj[0], noteObj[1], cents);
+                        var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], noteObj1[0]);
+                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj2[0], noteObj2[1], cents);
                     }
                 }
 
                 if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                        var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
-                        addPitch(noteObj[0], noteObj[1], cents);
+                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj2[0], noteObj2[1], cents);
                     }
                 }
 
                 // deprecated
                 if (turtle in that.perfect && that.perfect[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents);
                 }
 
                 // deprecated
                 if (turtle in that.diminished && that.diminished[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents);
                 }
 
                 // deprecated
                 if (turtle in that.augmented && that.augmented[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents);
                 }
 
                 // deprecated
                 if (turtle in that.major && that.major[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcMajor(last(that.major[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcMajor(last(that.major[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents);
                 }
 
                 // deprecated
                 if (turtle in that.minor && that.minor[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcMinor(last(that.minor[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcMinor(last(that.minor[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents);
                 }
 
+                // deprecated
                 if (turtle in that.transposition) {
                     that.noteTranspositions[turtle].push(that.transposition[turtle] + 2 * delta);
                 } else {
@@ -4000,29 +4022,29 @@ function Logo () {
                 that.pushedNote[turtle] = true;
             } else if (that.drumStyle[turtle].length > 0) {
                 var drumname = last(that.drumStyle[turtle]);
-                var note2 = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
-                that.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
+                var noteObj1 = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                that.pitchDrumTable[turtle][noteObj1[0] + noteObj1[1]] = drumname;
             } else if (that.inPitchStaircase) {
                 var frequency = pitchToFrequency(args[0], calcOctave(that.currentOctaves[turtle], args[1]), 0, that.keySignature[turtle]);
-                var note = that.getNote(args[0], calcOctave(that.currentOctaves[turtle], args[1]), 0, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj1 = that.getNote(args[0], calcOctave(that.currentOctaves[turtle], args[1]), 0, that.keySignature[turtle], that.movable[turtle]);
                 var flag = 0;
 
                 for (var i = 0 ; i < that.pitchStaircase.Stairs.length; i++) {
                     if (that.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
-                        that.pitchStaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency), 1, 1]);
+                        that.pitchStaircase.Stairs.splice(i, 0, [noteObj1[0], noteObj1[1], parseFloat(frequency), 1, 1]);
                         flag = 1;
                         break;
                     }
 
                     if (that.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
-                        that.pitchStaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency), 1, 1]);
+                        that.pitchStaircase.Stairs.splice(i, 1, [noteObj1[0], noteObj1[1], parseFloat(frequency), 1, 1]);
                         flag = 1;
                         break;
                     }
                 }
 
                 if (flag === 0) {
-                    that.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency), 1, 1]);
+                    that.pitchStaircase.Stairs.push([noteObj1[0], noteObj1[1], parseFloat(frequency), 1, 1]);
                 }
             }
             else {
@@ -5617,24 +5639,25 @@ function Logo () {
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, frequency) {
+                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
                     if (that.drumStyle[turtle].length > 0) {
                         var drumname = last(that.drumStyle[turtle]);
-                        var note2 = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
-                        that.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
+                        that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
                     }
-                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(note);
-                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(octave);
+
+                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(noteObj[0]);
+                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(noteObj[1]);
                     that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
                     that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(frequency);
                 }
 
                 if (!(that.invertList[turtle].length === 0)) {
                     var len = that.invertList[turtle].length;
-                    var note1 = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
-                    var num1 = getNumber(note1[0], note1[1]);
+                    var noteObj1 = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                    var num1 = getNumber(noteObj1[0], noteObj1[1]);
                     for (var i = len - 1; i > -1; i--) {
-                        var note2 = that.getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle]);
-                        var num2 = getNumber(note2[0], note2[1]);
+                        var noteObj2 = that.getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle]);
+                        var num2 = getNumber(noteObj2[0], noteObj2[1]);
                         // var a = getNumNote(num1, 0);
                         if (that.invertList[turtle][i][2] === 'even') {
                             delta += num2 - num1;
@@ -5645,48 +5668,54 @@ function Logo () {
                     }
                 }
 
-                addPitch(note, octave, cents, args[0]);
+                var noteObj1 = addPitch(note, octave, cents, args[0]);
 
                 if (turtle in that.intervals && that.intervals[turtle].length > 0) {
                     for (var i = 0; i < that.intervals[turtle].length; i++) {
-                        var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], note);
-                        var noteObj = that.getNote(note, octave, ii, that.keySignature[turtle], that.movable[turtle]);
-                        addPitch(noteObj[0], noteObj[1], cents, 0);
+                        var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], noteObj1[0]);
+                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj2[0], noteObj2[1], cents, 0);
                     }
                 }
 
                 if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                        var noteObj = that.getNote(note, octave, that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
-                        addPitch(noteObj[0], noteObj[1], cents, 0);
+                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj2[0], noteObj2[1], cents, 0);
                     }
                 }
 
+                // deprecated
                 if (turtle in that.perfect && that.perfect[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents, 0);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcPerfect(last(that.perfect[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
                 }
 
+                // deprecated
                 if (turtle in that.diminished && that.diminished[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents, 0);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcDiminished(last(that.diminished[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
                 }
 
+                // deprecated
                 if (turtle in that.augmented && that.augmented[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents, 0);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcAugmented(last(that.augmented[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
                 }
 
+                // deprecated
                 if (turtle in that.major && that.major[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcMajor(last(that.major[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents, 0);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcMajor(last(that.major[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
                 }
 
+                // deprecated
                 if (turtle in that.minor && that.minor[turtle].length > 0) {
-                    var noteObj = that.getNote(note, octave, calcMinor(last(that.minor[turtle])), that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents, 0);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], calcMinor(last(that.minor[turtle])), that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
                 }
 
+                // deprecated
                 if (turtle in that.transposition) {
                     that.noteTranspositions[turtle].push(that.transposition[turtle] + 2 * delta);
                 } else {
@@ -5757,6 +5786,7 @@ function Logo () {
                         that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
                     }
 
+                    // deprecated
                     if (turtle in that.transposition) {
                         that.noteTranspositions[turtle].push(that.transposition[turtle]);
                     } else {
@@ -6256,7 +6286,7 @@ function Logo () {
         }
 
         if (this.inTimbre) {
-            var noteObj = this.getNote(this.notePitches[turtle][last(this.inNoteBlock[turtle])][0], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][0], this.noteTranspositions[turtle][0], this.keySignature[turtle], that.movable[turtle]);
+            var noteObj = this.getNote(this.notePitches[turtle][last(this.inNoteBlock[turtle])][0], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][0], 0, this.keySignature[turtle], that.movable[turtle]);
             this.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle].length > 0) {
@@ -6508,13 +6538,13 @@ function Logo () {
                         if (that.notePitches[turtle][last(that.inNoteBlock[turtle])][i] === 'rest' || forceSilence) {
                             note = 'R';
                         } else {
-                            var noteObj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][i], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][i], that.noteTranspositions[turtle][i], that.keySignature[turtle], that.movable[turtle]);
+                            var noteObj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][i], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][i], 0, that.keySignature[turtle], that.movable[turtle]);
 
                             // If the cents for this note != 0, then
                             // we need to convert to frequency and add
                             // in the cents.
                             if (that.noteCents[turtle][last(that.inNoteBlock[turtle])][i] !== 0) {
-                                if (that.noteHertz[turtle][last(that.inNoteBlock[turtle])][i] !== 0 && that.noteTranspositions[turtle][i] === 0) {
+                                if (that.noteHertz[turtle][last(that.inNoteBlock[turtle])][i] !== 0) {
                                     var note = that.noteHertz[turtle][last(that.inNoteBlock[turtle])][i];
                                 } else {
                                     var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], that.noteCents[turtle][last(that.inNoteBlock[turtle])][i], that.keySignature[turtle]));
@@ -8126,7 +8156,7 @@ function Logo () {
 
                             var obj = [pitch, octave];
                         } else if (that.notePitches[i].length > 0) {
-                            var obj = that.getNote(that.notePitches[i][0], that.noteOctaves[i][0], that.noteTranspositions[i][0], that.keySignature[i], that.movable[turtle]);
+                            var obj = that.getNote(that.notePitches[i][0], that.noteOctaves[i][0], 0, that.keySignature[i], that.movable[turtle]);
                         } else {
                             console.log('Could not find a note for mouse ' + turtle);
                             var obj = ['G', 4];
@@ -8146,7 +8176,7 @@ function Logo () {
                         var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                         var obj = [pitch, octave];
                     } else if (that.notePitches[turtle].length > 0) {
-                        var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], that.noteTranspositions[turtle][0], that.keySignature[turtle], that.movable[turtle]);
+                        var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
                     } else {
                         console.log('Could not find a note for mouse ' + turtle);
                         var obj = ['G', 4];
@@ -8167,7 +8197,7 @@ function Logo () {
                         var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                         var obj = [pitch, octave];
                     } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
-                        var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], that.noteTranspositions[turtle][0], that.keySignature[turtle], that.movable[turtle]);
+                        var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
                     } else {
                         console.log('Could not find a note ');
                         var obj = ['G', 4];
@@ -8764,6 +8794,11 @@ function Logo () {
         var sharpFlat = false;
 
         octave = Math.round(octave);
+
+        if (transposition == undefined) {
+            transposition = 0;
+        }
+
         transposition = Math.round(transposition);
         if (typeof(noteArg) === 'number') {
             noteArg = noteArg.toString();
