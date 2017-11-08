@@ -31,6 +31,7 @@ function Block(protoblock, blocks, overrideName) {
     this.trash = false;  // Is this block in the trash?
     this.loadComplete = false;  // Has the block finished loading?
     this.label = null;  // Editable textview in DOM.
+    this.labelattr = null;  // Editable textview in DOM.
     this.text = null;  // A dynamically generated text label on block itself.
     this.value = null;  // Value for number, text, and media blocks.
     this.privateData = null;  // A block may have some private data,
