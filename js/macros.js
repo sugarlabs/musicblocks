@@ -25,6 +25,13 @@
 // which saves them in the same JSON format as used below. You may
 // need to change the block numbers as they should start with Block 0.
 
+// Note that the numbers at the beginning of each block need to
+// adjusted so the first block starts at 0. If you remove all of
+// the blocks except the ones you want in your macro (and one start
+// block, since that is required) then add a start block and remove
+// the start block you had saved, it will ensure that the macro
+// numbering begins with Block 0 and all of the "connections" are
+// correct.
 
 function blockIsMacro (blkname) {
 
