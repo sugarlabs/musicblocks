@@ -1697,6 +1697,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.defaults.push(5);
     intervalBlock.hidden = true;
 
+    var intervalMeasure = new ProtoBlock('measureintervalsemitones');
+    intervalMeasure.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['measureintervalsemitones'] = intervalMeasure;
+    //.TRANS: measure the distance between two pitches
+    intervalMeasure.staticLabels.push(_('interval measure'));
+    intervalMeasure.argFlowClampBlock();
+    intervalMeasure.adjustWidthToLabel();
+
     var movableBlock = new ProtoBlock('movable');
     movableBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['movable'] = movableBlock;
