@@ -5750,6 +5750,17 @@ function Logo () {
                 }
 
                 that.pushedNote[turtle] = true;
+	    } else if (that.justMeasuring[turtle].length > 0) {
+                // TODO: account for cents
+                var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+
+                var n = that.justMeasuring[turtle].length;
+                var pitchNumber = pitchToNumber(noteObj[0], noteObj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
+                if (that.firstPitch[turtle].length < n) {
+                    that.firstPitch[turtle].push(pitchNumber);
+                } else if (that.lastPitch[turtle].length < n) {
+                    that.lastPitch[turtle].push(pitchNumber);
+                }
             } else if (that.inPitchStaircase) {
                 var frequency = args[0];
                 var note = frequencyToPitch(args[0]);
