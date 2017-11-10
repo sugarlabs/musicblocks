@@ -8838,7 +8838,7 @@ function Logo () {
             // Convert to uppercase, e.g., d♭ -> D♭.
             var note = NOTESFLAT[notesFlat2.indexOf(noteArg)];
         } else {
-            // Not a note, so convert from Solfege.
+            // Not a letter note, so convert from Solfege.
             // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
             if (noteArg.substr(-1) === '>') {
                 // Read octave and solfege from HTML
@@ -8872,6 +8872,15 @@ function Logo () {
                     console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
                     offset = 0;
                     thisScale = NOTESSHARP;
+                }
+
+                // We need to set the octave relative to the tonic.
+		// Starting from C_4 (note_octave)
+		// All keys C# -- F# would remain in octave four
+		// All keys Gb -- B would be in octave three (since
+		// going down is closer than going up)
+                if (offset > 5) {
+                    transposition -= 12;  // go down one octave
                 }
             } else {
                 var offset = 0;
