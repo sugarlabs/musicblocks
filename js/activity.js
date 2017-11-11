@@ -932,12 +932,20 @@ define(MYDEFINES, function (compatibility) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
+				stage.removeAllEventListeners('trashsignal');
+
+                                // Wait for the old blocks to be removed.
+				var __listener = function (event) {
+                                    logo.playbackQueue = {};
+                                    blocks.loadNewBlocks(obj);
+                                    setPlaybackStatus();
+                                };
+
+				stage.addEventListener('trashsignal', __listener, false);
+
                                 sendAllToTrash(false, false);
                                 refreshCanvas();
 
-                                logo.playbackQueue = {};
-                                blocks.loadNewBlocks(obj);
-                                setPlaybackStatus();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             }
@@ -1714,8 +1722,10 @@ define(MYDEFINES, function (compatibility) {
             for (var name in blocks.palettes.dict) {
                 blocks.palettes.dict[name].hideMenu(true);
             }
+
             refreshCanvas();
 
+            var actionBlockCounter = 0;
             var dx = 0;
             var dy = cellSize * 3;
             for (var blk in blocks.blockList) {
@@ -1736,6 +1746,7 @@ define(MYDEFINES, function (compatibility) {
                 } else if (blocks.blockList[blk].name === 'action') {
                     if (!blocks.blockList[blk].trash) {
                         blocks.deleteActionBlock(blocks.blockList[blk]);
+                        actionBlockCounter += 1;                    
                     }
                 }
 
@@ -1752,6 +1763,12 @@ define(MYDEFINES, function (compatibility) {
                 // Overwrite session data too.
                 saveLocally();
             }
+
+            // Wait for palette to clear (#891)
+            // We really need to signal when each palette item is deleted
+            setTimeout(function() {
+                stage.dispatchEvent('trashsignal');
+	    }, 1000 * actionBlockCounter);
 
             update = true;
         };
