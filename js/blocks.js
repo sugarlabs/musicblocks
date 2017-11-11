@@ -283,6 +283,7 @@ function Blocks () {
             }
             if (this.protoBlockDict[proto].style === 'argflowclamp') {
                 this.clampBlocks.push(this.protoBlockDict[proto].name);
+                this.argBlocks.push(this.protoBlockDict[proto].name);
             }
             if (this.protoBlockDict[proto].style === 'argclamparg') {
                 this.argClampBlocks.push(this.protoBlockDict[proto].name);
