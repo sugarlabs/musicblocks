@@ -101,6 +101,9 @@ function Logo () {
 
     // When we leave a clamp block, we need to dispatch a signal.
     this.endOfClampSignals = {};
+    // Don't dispatch these signals (when exiting note counter or
+    // interval measure.
+    this.butNotThese = {};
 
     this.time = 0;
     this.firstNoteTime = null;
@@ -894,6 +897,7 @@ function Logo () {
             this.turtleTime[turtle] = 0;
             this.waitTimes[turtle] = 0;
             this.endOfClampSignals[turtle] = {};
+            this.butNotThese[turtle] = {};
             this.cp1x[turtle] = 0;
             this.cp1y[turtle] = 100;
             this.cp2x[turtle] = 100;
@@ -3806,7 +3810,6 @@ function Logo () {
                     transposition += that.transposition[turtle];
                 }
 
-                console.log('two');
                 var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
                 if (!that.validNote) {
                     that.errorMsg(INVALIDPITCH, blk);
@@ -6065,7 +6068,9 @@ function Logo () {
             for (var b in that.endOfClampSignals[turtle]) {
                 for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
                     if (that.endOfClampSignals[turtle][b][i] != null) {
-                        that.stage.dispatchEvent(that.endOfClampSignals[turtle][b][i]);
+                        if (that.butNotThese[turtle][b] == null || that.butNotThese[turtle][b].indexOf(i) === -1) {
+                            that.stage.dispatchEvent(that.endOfClampSignals[turtle][b][i]);
+                        }
                     }
                 }
             }
@@ -8570,6 +8575,13 @@ function Logo () {
                     that.suppressOutput[turtle] = true;
                     that.justCounting[turtle].push(true);
 
+                    for (var b in that.endOfClampSignals[turtle]) {
+                        that.butNotThese[turtle][b] = [];
+                        for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
+                            that.butNotThese[turtle][b].push(i);
+                        }
+                    }
+
                     var actionArgs = [];
                     var saveNoteCount = that.notesPlayed[turtle];
                     that.turtles.turtleList[turtle].running = true;
@@ -8593,6 +8605,9 @@ function Logo () {
 
                     that.justCounting[turtle].pop();
                     that.suppressOutput[turtle] = saveSuppressStatus;
+
+                    // FIXME: we need to handle cascading.
+                    that.butNotThese[turtle] = {};
                 }
                 break;
             case 'measureintervalsemitones':
@@ -8622,6 +8637,13 @@ function Logo () {
 
                     that.justCounting[turtle].push(true);
                     that.justMeasuring[turtle].push(true);
+
+                    for (var b in that.endOfClampSignals[turtle]) {
+                        that.butNotThese[turtle][b] = [];
+                        for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
+                            that.butNotThese[turtle][b].push(i);
+                        }
+                    }
 
                     var actionArgs = [];
                     var saveNoteCount = that.notesPlayed[turtle];
@@ -8655,6 +8677,9 @@ function Logo () {
                     that.justCounting[turtle].pop();
                     that.justMeasuring[turtle].pop();
                     that.suppressOutput[turtle] = saveSuppressStatus;
+
+                    // FIXME: we need to handle cascading.
+                    that.butNotThese[turtle] = {};
                 }
                 break;
             case 'calc':
