@@ -6536,7 +6536,9 @@ function Logo () {
                     return;
                 }
 
-                that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
+                if (that.inNoteBlock[turtle].length === 1) {
+                    that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
+                }
 
                 var notes = [];
                 var drums = [];
