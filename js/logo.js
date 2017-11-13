@@ -936,7 +936,7 @@ function Logo () {
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
             this.notesPlayed[turtle] = 0;
-	    this.whichNoteToCount[turtle] = 1;
+            this.whichNoteToCount[turtle] = 1;
             this.playbackQueue[turtle] = [];
             this.keySignature[turtle] = 'C ' + _('major');
             this.pushedNote[turtle] = false;
@@ -8744,7 +8744,7 @@ function Logo () {
                         if (last(that.lastPitch[turtle]) === last(that.firstPitch[turtle])) {
                             that.blocks.blockList[blk].value = 0;
                         } else if (last(that.lastPitch[turtle]) > last(that.firstPitch[turtle])) {
-			    var noteObj = numberToPitch(last(that.firstPitch[turtle]) + that.pitchNumberOffset);
+                            var noteObj = numberToPitch(last(that.firstPitch[turtle]) + that.pitchNumberOffset);
                             var i = 0;
                             var n = last(that.firstPitch[turtle]) + that.pitchNumberOffset;
                             while (i < 100) {
@@ -8759,7 +8759,7 @@ function Logo () {
 
                             that.blocks.blockList[blk].value = i;
                         } else {
-			    var noteObj = numberToPitch(last(that.lastPitch[turtle]) + that.pitchNumberOffset);
+                            var noteObj = numberToPitch(last(that.lastPitch[turtle]) + that.pitchNumberOffset);
                             var i = 0;
                             var n = last(that.lastPitch[turtle]) + that.pitchNumberOffset;
                             while (i < 100) {
