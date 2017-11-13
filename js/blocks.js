@@ -429,8 +429,6 @@ function Blocks () {
         }
 
         if (update) {
-            console.log('updating ' + myBlock.name);
-            console.log(slotList);
             myBlock.updateArgSlots(slotList);
         }
     };
@@ -3037,7 +3035,6 @@ function Blocks () {
 
             // FIXME: Use tests in block.js
             if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp', 'argflowclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
-                console.log(name);
                 this._checkArgClampBlocks.push(this.blockList.length + b);
             }
 
@@ -4012,14 +4009,12 @@ function Blocks () {
         }
 
         for (var blk = 0; blk < this._adjustTheseDocks.length; blk++) {
-            console.log('Adjust Docks: ' + this.blockList[this._adjustTheseDocks[blk]].name);
             this.adjustDocks(this._adjustTheseDocks[blk], true);
             // blockBlocks._expandTwoArgs();
             this._expandClamps();
         }
 
         for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
-            console.log('Adjust Stack: ' + this.blockList[this._adjustTheseStacks[blk]].name);
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
         }
 
