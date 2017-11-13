@@ -8744,39 +8744,35 @@ function Logo () {
                         if (last(that.lastPitch[turtle]) === last(that.firstPitch[turtle])) {
                             that.blocks.blockList[blk].value = 0;
                         } else if (last(that.lastPitch[turtle]) > last(that.firstPitch[turtle])) {
-			    var noteObj = numberToPitch(last(that.firstPitch[turtle]));
-			    var lastNoteObj = numberToPitch(last(that.lastPitch[turtle]));
-                            // going up
+			    var noteObj = numberToPitch(last(that.firstPitch[turtle]) + that.pitchNumberOffset);
                             var i = 0;
-                            var n = last(that.firstPitch[turtle]);
-                            while (n < last(that.lastPitch[turtle])) {
+                            var n = last(that.firstPitch[turtle]) + that.pitchNumberOffset;
+                            while (i < 100) {
                                 n += getStepSizeUp(that.keySignature[turtle], noteObj[0]);
-                                noteObj = numberToPitch(n);
                                 i += 1;
-                                if (i > 10) {
-                                    console.log('BREAK');
+                                if (n >= last(that.lastPitch[turtle]) + that.pitchNumberOffset) {
                                     break;
                                 }
+
+                                noteObj = numberToPitch(n);
                             }
 
                             that.blocks.blockList[blk].value = i;
                         } else {
-			    var firstNoteObj = numberToPitch(last(that.firstPitch[turtle]));
-			    var noteObj = numberToPitch(last(that.lastPitch[turtle]));
-                            // going down
+			    var noteObj = numberToPitch(last(that.lastPitch[turtle]) + that.pitchNumberOffset);
                             var i = 0;
-                            var n = last(that.lastPitch[turtle]);
-                            while (n < last(that.firstPitch[turtle])) {
+                            var n = last(that.lastPitch[turtle]) + that.pitchNumberOffset;
+                            while (i < 100) {
                                 n += getStepSizeUp(that.keySignature[turtle], noteObj[0]);
-                                noteObj = numberToPitch(n);
-                                i -= 1;
-                                if (i < -100) {
-                                    console.log('BREAK');
+                                i += 1;
+                                if (n >= last(that.firstPitch[turtle]) + that.pitchNumberOffset) {
                                     break;
                                 }
+
+                                noteObj = numberToPitch(n);
                             }
 
-                            that.blocks.blockList[blk].value = i;
+                            that.blocks.blockList[blk].value = -i;
                         }
 
                         that.firstPitch[turtle].pop();
