@@ -939,7 +939,8 @@ define(MYDEFINES, function (compatibility) {
                                     logo.playbackQueue = {};
                                     blocks.loadNewBlocks(obj);
                                     setPlaybackStatus();
-                                };
+
+				    stage.removeAllEventListeners('trashsignal');                                };
 
 				stage.addEventListener('trashsignal', __listener, false);
 
