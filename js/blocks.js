@@ -283,6 +283,7 @@ function Blocks () {
             }
             if (this.protoBlockDict[proto].style === 'argflowclamp') {
                 this.clampBlocks.push(this.protoBlockDict[proto].name);
+                this.argClampBlocks.push(this.protoBlockDict[proto].name);
                 this.argBlocks.push(this.protoBlockDict[proto].name);
             }
             if (this.protoBlockDict[proto].style === 'argclamparg') {
@@ -420,12 +421,16 @@ function Blocks () {
             if (c != null) {
                 size = Math.max(this._getBlockSize(c), 1);
             }
+
             if (slotList[i] !== size) {
                 slotList[i] = size;
                 update = true;
             }
         }
+
         if (update) {
+            console.log('updating ' + myBlock.name);
+            console.log(slotList);
             myBlock.updateArgSlots(slotList);
         }
     };
@@ -1691,6 +1696,8 @@ function Blocks () {
     this._searchForArgFlow = function () {
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].isArgFlowClampBlock()) {
+                this._searchCounter = 0;
+                this._searchForExpandables(blk);
                 this._expandablesList.push(blk);
             }
         }
@@ -2968,7 +2975,7 @@ function Blocks () {
 
             if (this.blockList[b].name === 'action') {
                 if (this.blockList[b].connections[1] != null) {
-                    console.log(this.blockList[this.blockList[b].connections[1]].value);
+                    // console.log(this.blockList[this.blockList[b].connections[1]].value);
                     currentActionNames.push(this.blockList[this.blockList[b].connections[1]].value);
                 }
             } else if (this.blockList[b].name === 'storein') {
@@ -3030,6 +3037,7 @@ function Blocks () {
 
             // FIXME: Use tests in block.js
             if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp', 'argflowclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
+                console.log(name);
                 this._checkArgClampBlocks.push(this.blockList.length + b);
             }
 
@@ -4004,16 +4012,17 @@ function Blocks () {
         }
 
         for (var blk = 0; blk < this._adjustTheseDocks.length; blk++) {
-            // console.log('Adjust Docks: ' + this.blockList[this._adjustTheseDocks[blk]].name);
+            console.log('Adjust Docks: ' + this.blockList[this._adjustTheseDocks[blk]].name);
             this.adjustDocks(this._adjustTheseDocks[blk], true);
             // blockBlocks._expandTwoArgs();
             this._expandClamps();
         }
 
         for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
-            // console.log('Adjust Stack: ' + this.blockList[this._adjustTheseStacks[blk]].name);
+            console.log('Adjust Stack: ' + this.blockList[this._adjustTheseStacks[blk]].name);
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
         }
+
     };
 
     this.actionHasReturn = function (blk) {
