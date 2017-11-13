@@ -8696,6 +8696,120 @@ function Logo () {
                     that.butNotThese[turtle] = {};
                 }
                 break;
+            case 'measureintervalscalar':
+                var cblk = that.blocks.blockList[blk].connections[1];
+                if (cblk == null) {
+                    that.blocks.blockList[blk].value = 0;
+                } else {
+                    var saveSuppressStatus = that.suppressOutput[turtle];
+
+                    // We need to save the state of the boxes and heap
+                    // although there is a potential of a boxes
+                    // collision with other turtles.
+                    var saveBoxes = JSON.stringify(that.boxes);
+                    var saveTurtleHeaps = JSON.stringify(that.turtleHeaps[turtle]);
+                    // And the turtle state
+                    var saveX = that.turtles.turtleList[turtle].x;
+                    var saveY = that.turtles.turtleList[turtle].y;
+                    var saveColor = that.turtles.turtleList[turtle].color;
+                    var saveValue = that.turtles.turtleList[turtle].value;
+                    var saveChroma = that.turtles.turtleList[turtle].chroma;
+                    var saveStroke = that.turtles.turtleList[turtle].stroke;
+                    var saveCanvasAlpha = that.turtles.turtleList[turtle].canvasAlpha;
+                    var saveOrientation = that.turtles.turtleList[turtle].orientation;
+                    var savePenState = that.turtles.turtleList[turtle].penState;
+
+                    that.suppressOutput[turtle] = true;
+
+                    that.justCounting[turtle].push(true);
+                    that.justMeasuring[turtle].push(true);
+
+                    for (var b in that.endOfClampSignals[turtle]) {
+                        that.butNotThese[turtle][b] = [];
+                        for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
+                            that.butNotThese[turtle][b].push(i);
+                        }
+                    }
+
+                    var actionArgs = [];
+                    var saveNoteCount = that.notesPlayed[turtle];
+                    that.turtles.turtleList[turtle].running = true;
+                    that._runFromBlockNow(that, turtle, cblk, true, actionArgs, that.turtles.turtleList[turtle].queue.length);
+
+                    if (that.firstPitch[turtle].length > 0 && that.lastPitch[turtle].length > 0) {
+                        // Rather than just countinf the semitones, we
+                        // need to count the steps in the current key
+                        // needed to get from first pitch to last
+                        // pitch.
+                        if (last(that.lastPitch[turtle]) === last(that.firstPitch[turtle])) {
+                            that.blocks.blockList[blk].value = 0;
+                        } else if (last(that.lastPitch[turtle]) > last(that.firstPitch[turtle])) {
+			    var noteObj = numberToPitch(last(that.firstPitch[turtle]));
+			    var lastNoteObj = numberToPitch(last(that.lastPitch[turtle]));
+                            // going up
+                            var i = 0;
+                            var n = last(that.firstPitch[turtle]);
+                            while (n < last(that.lastPitch[turtle])) {
+                                n += getStepSizeUp(that.keySignature[turtle], noteObj[0]);
+                                noteObj = numberToPitch(n);
+                                i += 1;
+                                if (i > 10) {
+                                    console.log('BREAK');
+                                    break;
+                                }
+                            }
+
+                            that.blocks.blockList[blk].value = i;
+                        } else {
+			    var firstNoteObj = numberToPitch(last(that.firstPitch[turtle]));
+			    var noteObj = numberToPitch(last(that.lastPitch[turtle]));
+                            // going down
+                            var i = 0;
+                            var n = last(that.lastPitch[turtle]);
+                            while (n < last(that.firstPitch[turtle])) {
+                                n += getStepSizeUp(that.keySignature[turtle], noteObj[0]);
+                                noteObj = numberToPitch(n);
+                                i -= 1;
+                                if (i < -100) {
+                                    console.log('BREAK');
+                                    break;
+                                }
+                            }
+
+                            that.blocks.blockList[blk].value = i;
+                        }
+
+                        that.firstPitch[turtle].pop();
+                        that.lastPitch[turtle].pop();
+                    } else {
+                        that.blocks.blockList[blk].value = 0;
+                        that.errorMsg(_('You must use two pitch blocks when measuring an interval.'));
+                    }
+
+                    that.notesPlayed[turtle] = saveNoteCount;
+
+                    // Restore previous state
+                    that.boxes = JSON.parse(saveBoxes);
+                    that.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+
+                    that.turtles.turtleList[turtle].doPenUp();
+                    that.turtles.turtleList[turtle].doSetXY(saveX, saveY);
+                    that.turtles.turtleList[turtle].color = saveColor;
+                    that.turtles.turtleList[turtle].value = saveValue;
+                    that.turtles.turtleList[turtle].chroma = saveChroma;
+                    that.turtles.turtleList[turtle].stroke = saveStroke;
+                    that.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
+                    that.turtles.turtleList[turtle].doSetHeading(saveOrientation);
+                    that.turtles.turtleList[turtle].penState = savePenState;
+
+                    that.justCounting[turtle].pop();
+                    that.justMeasuring[turtle].pop();
+                    that.suppressOutput[turtle] = saveSuppressStatus;
+
+                    // FIXME: we need to handle cascading.
+                    that.butNotThese[turtle] = {};
+                }
+                break;
             case 'calc':
                 var actionArgs = [];
                 var cblk = that.blocks.blockList[blk].connections[1];

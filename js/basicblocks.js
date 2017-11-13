@@ -1700,10 +1700,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     var intervalMeasure = new ProtoBlock('measureintervalsemitones');
     intervalMeasure.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['measureintervalsemitones'] = intervalMeasure;
-    //.TRANS: measure the distance between two pitches
-    intervalMeasure.staticLabels.push(_('interval measure'));
+    //.TRANS: measure the distance between two pitches in semi-tones
+    intervalMeasure.staticLabels.push(_('semi-tone interval measure'));
     intervalMeasure.argFlowClampBlock();
     intervalMeasure.adjustWidthToLabel();
+
+    var intervalMeasure2 = new ProtoBlock('measureintervalscalar');
+    intervalMeasure2.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['measureintervalscalar'] = intervalMeasure2;
+    //.TRANS: measure the distance between two pitches in scalar steps
+    intervalMeasure2.staticLabels.push(_('scalar interval measure'));
+    intervalMeasure2.argFlowClampBlock();
+    intervalMeasure2.adjustWidthToLabel();
 
     var movableBlock = new ProtoBlock('movable');
     movableBlock.palette = palettes.dict['intervals'];
