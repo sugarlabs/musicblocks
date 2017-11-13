@@ -1286,6 +1286,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
+    var intervalMeasure = new ProtoBlock('measureintervalsemitones');
+    intervalMeasure.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['measureintervalsemitones'] = intervalMeasure;
+    //.TRANS: measure the distance between two pitches in semi-tones
+    intervalMeasure.staticLabels.push(_('semi-tone interval measure'));
+    intervalMeasure.argFlowClampBlock();
+    intervalMeasure.adjustWidthToLabel();
+
+    var intervalMeasure2 = new ProtoBlock('measureintervalscalar');
+    intervalMeasure2.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['measureintervalscalar'] = intervalMeasure2;
+    //.TRANS: measure the distance between two pitches in scalar steps
+    intervalMeasure2.staticLabels.push(_('scalar interval measure'));
+    intervalMeasure2.argFlowClampBlock();
+    intervalMeasure2.adjustWidthToLabel();
+
     var diminished8Block = new ProtoBlock('diminished8');
     diminished8Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['diminished8'] = diminished8Block;
@@ -1696,22 +1712,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
     intervalBlock.hidden = true;
-
-    var intervalMeasure = new ProtoBlock('measureintervalsemitones');
-    intervalMeasure.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['measureintervalsemitones'] = intervalMeasure;
-    //.TRANS: measure the distance between two pitches in semi-tones
-    intervalMeasure.staticLabels.push(_('semi-tone interval measure'));
-    intervalMeasure.argFlowClampBlock();
-    intervalMeasure.adjustWidthToLabel();
-
-    var intervalMeasure2 = new ProtoBlock('measureintervalscalar');
-    intervalMeasure2.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['measureintervalscalar'] = intervalMeasure2;
-    //.TRANS: measure the distance between two pitches in scalar steps
-    intervalMeasure2.staticLabels.push(_('scalar interval measure'));
-    intervalMeasure2.argFlowClampBlock();
-    intervalMeasure2.adjustWidthToLabel();
 
     var movableBlock = new ProtoBlock('movable');
     movableBlock.palette = palettes.dict['intervals'];
@@ -2238,6 +2238,27 @@ function initBasicProtoBlocks(palettes, blocks) {
     intBlock.oneArgMathBlock();
     intBlock.defaults.push(100)
 
+    var notBlock = new ProtoBlock('not');
+    notBlock.palette = palettes.dict['boolean'];
+    blocks.protoBlockDict['not'] = notBlock;
+    notBlock.extraWidth = 30;
+    notBlock.staticLabels.push(_('not'));
+    notBlock.booleanOneBooleanArgBlock();
+
+    var andBlock = new ProtoBlock('and');
+    andBlock.palette = palettes.dict['boolean'];
+    blocks.protoBlockDict['and'] = andBlock;
+    andBlock.extraWidth = 10;
+    andBlock.staticLabels.push(_('and'));
+    andBlock.booleanTwoBooleanArgBlock();
+
+    var orBlock = new ProtoBlock('or');
+    orBlock.palette = palettes.dict['boolean'];
+    blocks.protoBlockDict['or'] = orBlock;
+    orBlock.extraWidth = 10;
+    orBlock.staticLabels.push(_('or'));
+    orBlock.booleanTwoBooleanArgBlock();
+
     var greaterBlock = new ProtoBlock('greater');
     greaterBlock.palette = palettes.dict['boolean'];
     blocks.protoBlockDict['greater'] = greaterBlock;
@@ -2264,27 +2285,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     equalBlock.dockTypes[0] = 'booleanout';
     equalBlock.dockTypes[1] = 'anyin';
     equalBlock.dockTypes[2] = 'anyin';
-
-    var andBlock = new ProtoBlock('and');
-    andBlock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['and'] = andBlock;
-    andBlock.extraWidth = 10;
-    andBlock.staticLabels.push(_('and'));
-    andBlock.booleanTwoBooleanArgBlock();
-
-    var orBlock = new ProtoBlock('or');
-    orBlock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['or'] = orBlock;
-    orBlock.extraWidth = 10;
-    orBlock.staticLabels.push(_('or'));
-    orBlock.booleanTwoBooleanArgBlock();
-
-    var notBlock = new ProtoBlock('not');
-    notBlock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['not'] = notBlock;
-    notBlock.extraWidth = 30;
-    notBlock.staticLabels.push(_('not'));
-    notBlock.booleanOneBooleanArgBlock();
 
     var trueFalseBlock = new ProtoBlock('boolean');
     trueFalseBlock.palette = palettes.dict['boolean'];
