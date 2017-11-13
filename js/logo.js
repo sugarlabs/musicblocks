@@ -117,6 +117,7 @@ function Logo () {
 
     // Music-related attributes
     this.notesPlayed = {};
+    this.whichNoteToCount = {};
 
     // Movable solfege?
     this.movable = {};
@@ -935,6 +936,7 @@ function Logo () {
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
             this.notesPlayed[turtle] = 0;
+	    this.whichNoteToCount[turtle] = 1;
             this.playbackQueue[turtle] = [];
             this.keySignature[turtle] = 'C ' + _('major');
             this.pushedNote[turtle] = false;
@@ -6536,7 +6538,7 @@ function Logo () {
                     return;
                 }
 
-                if (that.inNoteBlock[turtle].length === 1) {
+                if (that.inNoteBlock[turtle].length === that.whichNoteToCount[turtle]) {
                     that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
                 }
 
@@ -8574,6 +8576,8 @@ function Logo () {
                     var saveOrientation = that.turtles.turtleList[turtle].orientation;
                     var savePenState = that.turtles.turtleList[turtle].penState;
 
+                    var saveWhichNoteToCount = that.whichNoteToCount[turtle];
+
                     that.suppressOutput[turtle] = true;
                     that.justCounting[turtle].push(true);
 
@@ -8587,6 +8591,12 @@ function Logo () {
                     var actionArgs = [];
                     var saveNoteCount = that.notesPlayed[turtle];
                     that.turtles.turtleList[turtle].running = true;
+
+                    // FIXME: Test to see if this nests properly.
+                    if (that.inNoteBlock[turtle]) {
+                        that.whichNoteToCount[turtle] += 1;
+                    }
+
                     that._runFromBlockNow(that, turtle, cblk, true, actionArgs, that.turtles.turtleList[turtle].queue.length);
                     that.blocks.blockList[blk].value = that.notesPlayed[turtle] - saveNoteCount;
                     that.notesPlayed[turtle] = saveNoteCount;
@@ -8604,6 +8614,8 @@ function Logo () {
                     that.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
                     that.turtles.turtleList[turtle].doSetHeading(saveOrientation);
                     that.turtles.turtleList[turtle].penState = savePenState;
+
+                    that.whichNoteToCount[turtle] = saveWhichNoteToCount;
 
                     that.justCounting[turtle].pop();
                     that.suppressOutput[turtle] = saveSuppressStatus;
