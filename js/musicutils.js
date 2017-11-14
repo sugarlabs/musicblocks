@@ -183,6 +183,66 @@ const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(e
 
 const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
 
+const INTERVALNAMES = [
+    [_('unison'), 'unison'],
+    [_('augmented unison'), 'augmented unison'],
+    [_('diminished second'), 'diminished second'],
+    [_('minor second'), 'minor second'],
+    [_('major second'), 'major second'],
+    [_('augmented second'), 'augmented second'],
+    [_('diminished third'), 'diminished third'],
+    [_('minor third'), 'minor third'],
+    [_('major third'), 'major third'],
+    [_('augmented third'), 'augmented third'],
+    [_('diminished fourth'), 'diminished fourth'],
+    [_('perfect fourth'), 'perfect fourth'],
+    [_('augmented fourth'), 'augmented fourth'],
+    [_('diminished fifth'), 'diminished fifth'],
+    [_('perfect fifth'), 'perfect fifth'],
+    [_('augmented fifth'), 'augmented fifth'],
+    [_('diminished sixth'), 'diminished sixth'],
+    [_('minor sixth'), 'minor sixth'],
+    [_('major sixth'), 'major sixth'],
+    [_('augmented sixth'), 'augmented sixth'],
+    [_('diminished seventh'), 'diminished seventh'],
+    [_('minor seventh'), 'minor seventh'],
+    [_('major seventh'), 'major seventh'],
+    [_('augmented seventh'), 'augmented seventh'],
+    [_('diminished octave'), 'diminished octave'],
+    [_('perfect octave'), 'perfect octave'],
+    [_('augmented octave'), 'augmented octave'],
+];
+
+const INTERVALVALUES = {
+    'unison': 0,
+    'augmented unison': 1,
+    'diminished second': 0,
+    'minor second': 1,
+    'major second': 2,
+    'augmented second': 3,
+    'diminished third': 2,
+    'minor third': 3,
+    'major third': 4,
+    'augmented third': 5,
+    'diminished fourth': 4,
+    'perfect fourth': 5,
+    'augmented fourth': 6,
+    'diminished fifth': 6,
+    'perfect fifth': 7,
+    'augmented fifth': 8,
+    'diminished sixth': 7,
+    'minor sixth': 8,
+    'major sixth': 9,
+    'augmented sixth': 10,
+    'diminished seventh': 9,
+    'minor seventh': 10,
+    'major seventh': 11,
+    'augmented seventh': 12,
+    'diminished octave': 11,
+    'perfect octave': 12,
+    'augmented octave': 13,
+};
+
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org <== this is in no way definitive
@@ -434,6 +494,7 @@ var OSCTYPES = [
     [_('sawtooth'), 'sawtooth'],
 ];
 
+const DEFAULTINTERVAL = 'perfect fifth';
 const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick drum';
 const DEFAULTMODE = 'major';
@@ -445,6 +506,24 @@ var customMode = MUSICALMODES['custom'];
 // The sample has a pitch which is subsequently transposed. This
 // number is that starting pitch.
 const SAMPLECENTERNO = {'violin': 63, 'cello': 39, 'basse': 15};
+
+
+function getIntervalName(name) {
+    for (var interval in INTERVALNAMES) {
+        if (INTERVALNAMES[interval][0] === name || INTERVALNAMES[interval][1].toLowerCase() === name.toLowerCase()) {
+            if (INTERVALNAMES[interval][0] != '') {
+                return INTERVALNAMES[interval][0];
+            } else {
+                console.log('I18n for interval name is misbehaving.');
+                console.log(name + ' ' + name.toLowerCase() + ' ' + INTERVALNAMES[interval][0].toLowerCase() + ' ' + INTERVALNAMES[interval][1].toLowerCase());
+                return INTERVALNAMES[interval][1];
+            }
+        }
+    }
+
+    console.log(name + ' not found in INTERVALNAMES');
+    return name;
+};
 
 
 function getModeName(name) {
@@ -462,6 +541,19 @@ function getModeName(name) {
 
     console.log(name + ' not found in MODENAMES');
     return name;
+};
+
+
+function initIntervalI18N() {
+    for (var i = 0; i < INTERVALNAMES.length; i++) {
+      if (INTERVALNAMES[i][0] == null) {
+            INTERVALNAMES[i][0] = _(INTERVALNAMES[i][1]);
+          }
+
+        if (INTERVALNAMES[i][0] == null) {
+            INTERVALNAMES[i][0] = INTERVALNAMES[i][1];
+        }
+    }
 };
 
 

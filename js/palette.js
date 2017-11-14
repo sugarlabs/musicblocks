@@ -689,6 +689,9 @@ function PaletteModel(palette, palettes, name) {
             case 'notename':
                 label = 'G';
                 break;
+            case 'intervalname':
+                label = _('interval name');
+                break;
             case 'boolean':
                 label = _('true');
                 break;

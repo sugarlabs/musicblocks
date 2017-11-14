@@ -2574,7 +2574,8 @@ define(MYDEFINES, function (compatibility) {
                     }
                 } else if (myBlock.name === 'matrixData') {
                     var args = {
-                        'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount
+                        'notes': window.savedMatricesNotes,
+			'count': window.savedMatricesCount
                     }
                     hasMatrixDataBlock = true;
                 } else {

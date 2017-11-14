@@ -1286,6 +1286,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
+    var intervalnameBlock = new ProtoBlock('intervalname');
+    intervalnameBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['intervalname'] = intervalnameBlock;
+    intervalnameBlock.valueBlock();
+    intervalnameBlock.extraWidth = 50;
+    intervalnameBlock.adjustWidthToLabel();
+    intervalnameBlock.dockTypes[0] = 'numberout';
+
     var intervalMeasure = new ProtoBlock('measureintervalsemitones');
     intervalMeasure.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['measureintervalsemitones'] = intervalMeasure;

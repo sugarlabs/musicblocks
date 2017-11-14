@@ -14,7 +14,7 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -543,6 +543,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'modename':
                     this.value = getModeName(DEFAULTMODE);
                     break;
+                case 'intervalname':
+                    this.value = DEFAULTINTERVAL;
+                    break;
                 case 'voicename':
                     this.value = DEFAULTVOICE;
                     break;
@@ -578,7 +581,7 @@ function Block(protoblock, blocks, overrideName) {
                 var label = this.value.toString();
             }
 
-            if (label.length > 8) {
+            if (this.name !== 'intervalname' && label.length > 8) {
                 label = label.substr(0, 7) + '...';
             }
 
@@ -980,6 +983,9 @@ function Block(protoblock, blocks, overrideName) {
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
+            if (this.name === 'intervalname') {
+                this.text.x *= 1.75;
+            }
         } else if (this.protoblock.args === 0) {
             var bounds = this.container.getBounds();
             this.text.x = bounds.width - 25;
@@ -1067,7 +1073,7 @@ function Block(protoblock, blocks, overrideName) {
 
             if (!moved) {
                 that.collapseToggle();
-		// haveClick = false;
+                // haveClick = false;
             }
         });
 
@@ -1095,7 +1101,7 @@ function Block(protoblock, blocks, overrideName) {
             that.collapseContainer.on('mouseout', function (event) {
                 that._collapseOut(event, moved, haveClick);
                 moved = false;
-		sawMouseDownEvent = false;
+                sawMouseDownEvent = false;
             });
 
             that.collapseContainer.removeAllEventListeners('pressup');
@@ -1112,7 +1118,7 @@ function Block(protoblock, blocks, overrideName) {
                     that._collapseOut(event, moved, haveClick, true);
                 }
                 moved = false;
-		sawMouseDownEvent = false;
+                sawMouseDownEvent = false;
             });
 
             that.collapseContainer.removeAllEventListeners('pressmove');
@@ -1161,7 +1167,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 that.blocks.refreshCanvas();
-		sawMouseDownEvent = false;
+                sawMouseDownEvent = false;
             });
         });
     };
@@ -1290,7 +1296,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.mouseDownTime = d.getTime();
 
                 that.blocks.longPressTimeout = setTimeout(function () {
-		    that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                    that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
                     that.blocks.triggerLongPress(that);
                 }, LONGPRESSTIME);
             }
@@ -1539,7 +1545,20 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // A place in the DOM to put modifiable labels (textareas).
-        var labelValue = (this.label)?this.label.value:this.value;
+        if (this.name === 'intervalname') {
+            if (this.label != null) {
+                var labelValue = this.label.value
+            } else {
+                var labelValue = this.value;
+            }
+        } else {
+            if (this.label != null) {
+                var labelValue = this.label.value
+            } else {
+                var labelValue = this.value;
+            }
+        }
+
         var labelElem = docById('labelDiv');
 
         if (this.name === 'text') {
@@ -1681,9 +1700,9 @@ function Block(protoblock, blocks, overrideName) {
                 if (MODENAMES[i][0].length === 0) {
                     // work around some weird i18n bug
                     labelHTML += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
-                } else if (selectednote === MODENAMES[i][0]) {
+                } else if (selectedmode === MODENAMES[i][0]) {
                     labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
-                } else if (selectednote === MODENAMES[i][1]) {
+                } else if (selectedmode === MODENAMES[i][1]) {
                     labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
                 } else {
                     labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
@@ -1693,6 +1712,31 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('modenameLabel');
+        } else if (this.name === 'intervalname') {
+            var type = 'intervalname';
+            if (this.value != null) {
+                var selectedinterval = this.value;
+            } else {
+                var selectedinterval = getIntervalName(DEFAULTINTERVAL);
+            }
+
+            var labelHTML = '<select name="intervalname" id="intervalnameLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">'
+            for (var i = 0; i < INTERVALNAMES.length; i++) {
+                if (INTERVALNAMES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + INTERVALNAMES[i][1] + '">' + INTERVALNAMES[i][1] + '</option>';
+                } else if (selectedinterval === INTERVALNAMES[i][0]) {
+                    labelHTML += '<option value="' + selectedinterval + '" selected>' + selectedinterval + '</option>';
+                } else if (selectedinterval === INTERVALNAMES[i][1]) {
+                    labelHTML += '<option value="' + selectedinterval + '" selected>' + selectedinterval + '</option>';
+                } else {
+                    labelHTML += '<option value="' + INTERVALNAMES[i][0] + '">' + INTERVALNAMES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('intervalnameLabel');
         } else if (this.name === 'drumname') {
             var type = 'drumname';
             if (this.value != null) {
@@ -1915,6 +1959,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.label.value === '') {
             this.label.value = '_';
         }
+
         var newValue = this.label.value;
 
         if (this.labelattr != null) {
@@ -2000,7 +2045,7 @@ function Block(protoblock, blocks, overrideName) {
             var label = this.value.toString();
         }
 
-        if (label.length > 8) {
+        if (this.name !== 'intervalname' && label.length > 8) {
             label = label.substr(0, 7) + '...';
         }
 

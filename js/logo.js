@@ -7687,7 +7687,13 @@ function Logo () {
             }
         }
 
-        if (that.blocks.blockList[blk].isValueBlock()) {
+        if (that.blocks.blockList[blk].name === 'intervalname') {
+            if (typeof(that.blocks.blockList[blk].value) === 'string') {
+                return INTERVALVALUES[that.blocks.blockList[blk].value];
+            } else {
+                return 0;
+            }
+        } else if (that.blocks.blockList[blk].isValueBlock()) {
             if (that.blocks.blockList[blk].name === 'number' && typeof(that.blocks.blockList[blk].value) === 'string') {
                 try {
                     that.blocks.blockList[blk].value = Number(that.blocks.blockList[blk].value);

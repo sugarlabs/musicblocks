@@ -1532,15 +1532,16 @@ function Blocks () {
                 label += attr;
             }
         } else {
-            if(typeof myBlock.value !== 'string'){
+            if (myBlock.value == null) {
+               var label = ''; 
+            } else if (typeof myBlock.value !== 'string'){
                var label = myBlock.value.toString(); 
             } else {
                 var label = myBlock.value;  
             }
-            
         }
 
-        if (label.length > maxLength) {
+        if (myBlock.name !== 'intervalname' && label.length > maxLength) {
             label = label.substr(0, maxLength - 1) + '...';
         }
 
@@ -2016,7 +2017,17 @@ function Blocks () {
                 that.blockList[thisBlock].container.updateCache();
             };
 
-            postProcessArg = [thisBlock, 'Major'];
+            postProcessArg = [thisBlock, DEFAULTMODE];
+        } else if (name === 'intervalname') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, DEFAULTINTERVAL];
         } else if (name === 'number') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2141,7 +2152,7 @@ function Blocks () {
                         var value = args[1];
                         that.blockList[thisBlock].value = value;
                         var label = value.toString();
-                        if (label.length > 8) {
+                        if (that.blockList[thisBlock].name !== 'intervalname' && label.length > 8) {
                             label = label.substr(0, 7) + '...';
                         }
                         that.blockList[thisBlock].text.text = label;
@@ -2165,7 +2176,7 @@ function Blocks () {
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
                     var label = value.toString();
-                    if (label.length > 8) {
+                    if (that.blockList[thisBlock].name !== 'intervalname' && label.length > 8) {
                         label = label.substr(0, 7) + '...';
                     }
                     that.blockList[thisBlock].text.text = label;
@@ -2880,7 +2891,7 @@ function Blocks () {
                     blockItem = [b, [myBlock.name, null], x, y, []];
                     break;
                 default:
-                    blockItem = [b, [myBlock.name, myBlock.value], x, y, []];
+                    blockItem = [b, [myBlock.name, {'value': myBlock.value}], x, y, []];
                     break;
                 }
             } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) !== -1) {
@@ -3376,8 +3387,13 @@ function Blocks () {
 
             if (blkInfo[1] == null) {
                 var value = null;
+                var text = '';
             } else {
                 var value = blkInfo[1]['value'];
+                var text = blkInfo[1]['text'];
+                if (text == null) {
+                    text = '';
+                }
             }
 
             if (name in NAMEDICT) {
@@ -3626,6 +3642,15 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'modename':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'intervalname':
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
