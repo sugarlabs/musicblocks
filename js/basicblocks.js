@@ -1359,13 +1359,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminished2Block.adjustWidthToLabel();
     diminished2Block.zeroArgBlock();
 
+    // deprecated
     var diminished1Block = new ProtoBlock('diminished1');
     diminished1Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['diminished1'] = diminished1Block;
     diminished1Block.staticLabels.push(_('diminished') + ' 1');
     diminished1Block.adjustWidthToLabel();
+    diminished1Block.hidden = true;
     diminished1Block.zeroArgBlock();
 
+    // deprecated
     var diminishedBlock = new ProtoBlock('diminished');
     diminishedBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['diminished'] = diminishedBlock;
@@ -1448,6 +1451,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     augmented1Block.adjustWidthToLabel();
     augmented1Block.zeroArgBlock();
 
+    // deprecated
     var augmentedBlock = new ProtoBlock('augmented');
     augmentedBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['augmented'] = augmentedBlock;
@@ -1494,12 +1498,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     perfect4Block.adjustWidthToLabel();
     perfect4Block.zeroArgBlock();
 
+    // deprecated
     var perfect1Block = new ProtoBlock('perfect1');
     perfect1Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['perfect1'] = perfect1Block;
     perfect1Block.staticLabels.push(_('perfect') + ' 1');
     perfect1Block.adjustWidthToLabel();
     perfect1Block.zeroArgBlock();
+    perfect1Block.hidden = true;
 
     var perfectBlock = new ProtoBlock('perfect');
     perfectBlock.palette = palettes.dict['intervals'];
@@ -1553,6 +1559,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     minor2Block.adjustWidthToLabel();
     minor2Block.zeroArgBlock();
 
+    // deprecated
     var minorBlock = new ProtoBlock('minor');
     minorBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['minor'] = minorBlock;
@@ -1605,6 +1612,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     major2Block.adjustWidthToLabel();
     major2Block.zeroArgBlock();
 
+    // deprecated
     var majorBlock = new ProtoBlock('major');
     majorBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['major'] = majorBlock;
