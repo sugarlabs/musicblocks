@@ -8009,9 +8009,20 @@ function Logo () {
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'neg']);
                 } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    that.blocks.blockList[blk].value = that._doMinus(0, a);
+                    var cblk = that.blocks.blockList[blk].connections[1];
+                    if (cblk != null) {
+                        var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                        if (typeof(a) === 'number') {
+                            that.blocks.blockList[blk].value = that._doMinus(0, a);
+                        } else if (typeof(a) === 'string') {
+                            var obj = a.split('');
+                            that.blocks.blockList[blk].value = obj.reverse().join('');
+                        } else {
+                            that.blocks.blockList[blk].value = a;
+                        }
+                    } else {
+                        that.blocks.blockList[blk].value = 0;
+                    }
                 }
                 break;
             case 'toascii':
