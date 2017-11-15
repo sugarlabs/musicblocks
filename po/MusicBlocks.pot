@@ -436,6 +436,10 @@ msgid "note"
 msgstr ""
 
 #: js/logo.js:941
+#: js/musicutils.js:191
+#: js/musicutils.js:195
+#: js/musicutils.js:205
+#: js/musicutils.js:209
 #: js/musicutils.js:329
 #: js/basicblocks.js:1627
 #: js/basicblocks.js:1634
@@ -788,118 +792,35 @@ msgid "unison"
 msgstr ""
 
 #: js/musicutils.js:188
-msgid "augmented' + ' 1"
+#: js/musicutils.js:192
+#: js/musicutils.js:196
+#: js/musicutils.js:199
+#: js/musicutils.js:202
+#: js/musicutils.js:206
+#: js/musicutils.js:210
+#: js/musicutils.js:213
+#: js/basicblocks.js:1410
+#: js/basicblocks.js:1417
+#: js/basicblocks.js:1424
+#: js/basicblocks.js:1431
+#: js/basicblocks.js:1438
+#: js/basicblocks.js:1445
+#: js/basicblocks.js:1452
+#: js/basicblocks.js:1459
+#: js/basicblocks.js:1468
+#: js/basicblocks.js:1479
+#.TRANS: the "augmented" interval in music
+#.TRANS: the "augmented" interval in music
+msgid "augmented"
 msgstr ""
 
 #: js/musicutils.js:189
-msgid "diminished' + ' 2"
-msgstr ""
-
-#: js/musicutils.js:190
-msgid "minor' + ' 2"
-msgstr ""
-
-#: js/musicutils.js:191
-msgid "major' + ' 2"
-msgstr ""
-
-#: js/musicutils.js:192
-msgid "augmented' + ' 2"
-msgstr ""
-
 #: js/musicutils.js:193
-msgid "diminished' + ' 3"
-msgstr ""
-
-#: js/musicutils.js:194
-msgid "minor' + ' 3"
-msgstr ""
-
-#: js/musicutils.js:195
-msgid "major' + ' 3"
-msgstr ""
-
-#: js/musicutils.js:196
-msgid "augmented' + ' 3"
-msgstr ""
-
 #: js/musicutils.js:197
-msgid "diminished' + ' 4"
-msgstr ""
-
-#: js/musicutils.js:198
-msgid "perfect' + ' 4"
-msgstr ""
-
-#: js/musicutils.js:199
-msgid "augmented' + ' 4"
-msgstr ""
-
 #: js/musicutils.js:200
-msgid "diminished' + ' 5"
-msgstr ""
-
-#: js/musicutils.js:201
-msgid "perfect' + ' 5"
-msgstr ""
-
-#: js/musicutils.js:202
-msgid "augmented' + ' 5"
-msgstr ""
-
 #: js/musicutils.js:203
-msgid "diminished' + ' 6"
-msgstr ""
-
-#: js/musicutils.js:204
-msgid "minor' + ' 6"
-msgstr ""
-
-#: js/musicutils.js:205
-msgid "major' + ' 6"
-msgstr ""
-
-#: js/musicutils.js:206
-msgid "augmented' + ' 6"
-msgstr ""
-
 #: js/musicutils.js:207
-msgid "diminished' + ' 7"
-msgstr ""
-
-#: js/musicutils.js:208
-msgid "minor' + ' 7"
-msgstr ""
-
-#: js/musicutils.js:209
-msgid "major' + ' 7"
-msgstr ""
-
-#: js/musicutils.js:210
-msgid "augmented' + ' 7"
-msgstr ""
-
 #: js/musicutils.js:211
-msgid "diminished' + ' 8"
-msgstr ""
-
-#: js/musicutils.js:212
-msgid "perfect' + ' 8"
-msgstr ""
-
-#: js/musicutils.js:213
-msgid "augmented' + ' 8"
-msgstr ""
-
-#: js/musicutils.js:321
-#.TRANS: twelve semi-tone scale for music
-msgid "chromatic"
-msgstr ""
-
-#: js/musicutils.js:322
-msgid "algerian"
-msgstr ""
-
 #: js/musicutils.js:324
 #: js/basicblocks.js:1325
 #: js/basicblocks.js:1332
@@ -914,6 +835,43 @@ msgstr ""
 #.TRANS: modal scale for music
 #.TRANS: the "diminished" interval in music
 msgid "diminished"
+msgstr ""
+
+#: js/musicutils.js:190
+#: js/musicutils.js:194
+#: js/musicutils.js:204
+#: js/musicutils.js:208
+#: js/basicblocks.js:1560
+#: js/basicblocks.js:1567
+#: js/basicblocks.js:1574
+#: js/basicblocks.js:1581
+#: js/basicblocks.js:1589
+#: js/basicblocks.js:1600
+#.TRANS: the minor interval in music
+msgid "minor"
+msgstr ""
+
+#: js/musicutils.js:198
+#: js/musicutils.js:201
+#: js/musicutils.js:212
+#: js/musicutils.js:497
+#: js/basicblocks.js:1492
+#: js/basicblocks.js:1499
+#: js/basicblocks.js:1506
+#: js/basicblocks.js:1514
+#: js/basicblocks.js:1522
+#: js/basicblocks.js:1533
+#.TRANS: the "perfect" interval in music
+msgid "perfect"
+msgstr ""
+
+#: js/musicutils.js:321
+#.TRANS: twelve semi-tone scale for music
+msgid "chromatic"
+msgstr ""
+
+#: js/musicutils.js:322
+msgid "algerian"
 msgstr ""
 
 #: js/musicutils.js:325
@@ -1375,17 +1333,6 @@ msgstr ""
 #: js/musicutils.js:483
 #.TRANS: peaking filter
 msgid "peaking"
-msgstr ""
-
-#: js/musicutils.js:497
-#: js/basicblocks.js:1492
-#: js/basicblocks.js:1499
-#: js/basicblocks.js:1506
-#: js/basicblocks.js:1514
-#: js/basicblocks.js:1522
-#: js/basicblocks.js:1533
-#.TRANS: the "perfect" interval in music
-msgid "perfect"
 msgstr ""
 
 #: js/musicutils.js:1551
@@ -2325,34 +2272,9 @@ msgstr ""
 msgid "interval"
 msgstr ""
 
-#: js/basicblocks.js:1410
-#: js/basicblocks.js:1417
-#: js/basicblocks.js:1424
-#: js/basicblocks.js:1431
-#: js/basicblocks.js:1438
-#: js/basicblocks.js:1445
-#: js/basicblocks.js:1452
-#: js/basicblocks.js:1459
-#: js/basicblocks.js:1468
-#: js/basicblocks.js:1479
-#.TRANS: the "augmented" interval in music
-#.TRANS: the "augmented" interval in music
-msgid "augmented"
-msgstr ""
-
 #: js/basicblocks.js:1546
 #: js/basicblocks.js:1553
 msgid "down minor"
-msgstr ""
-
-#: js/basicblocks.js:1560
-#: js/basicblocks.js:1567
-#: js/basicblocks.js:1574
-#: js/basicblocks.js:1581
-#: js/basicblocks.js:1589
-#: js/basicblocks.js:1600
-#.TRANS: the minor interval in music
-msgid "minor"
 msgstr ""
 
 #: js/basicblocks.js:1613
@@ -3625,5 +3547,109 @@ msgid "You need to select a file."
 msgstr ""
 
 #~msgid ""
+#~msgstr ""
+
+#: js/musicutils.js:188
+#~msgid "augmented' + ' 1"
+#~msgstr ""
+
+#: js/musicutils.js:189
+#~msgid "diminished' + ' 2"
+#~msgstr ""
+
+#: js/musicutils.js:190
+#~msgid "minor' + ' 2"
+#~msgstr ""
+
+#: js/musicutils.js:191
+#~msgid "major' + ' 2"
+#~msgstr ""
+
+#: js/musicutils.js:192
+#~msgid "augmented' + ' 2"
+#~msgstr ""
+
+#: js/musicutils.js:193
+#~msgid "diminished' + ' 3"
+#~msgstr ""
+
+#: js/musicutils.js:194
+#~msgid "minor' + ' 3"
+#~msgstr ""
+
+#: js/musicutils.js:195
+#~msgid "major' + ' 3"
+#~msgstr ""
+
+#: js/musicutils.js:196
+#~msgid "augmented' + ' 3"
+#~msgstr ""
+
+#: js/musicutils.js:197
+#~msgid "diminished' + ' 4"
+#~msgstr ""
+
+#: js/musicutils.js:198
+#~msgid "perfect' + ' 4"
+#~msgstr ""
+
+#: js/musicutils.js:199
+#~msgid "augmented' + ' 4"
+#~msgstr ""
+
+#: js/musicutils.js:200
+#~msgid "diminished' + ' 5"
+#~msgstr ""
+
+#: js/musicutils.js:201
+#~msgid "perfect' + ' 5"
+#~msgstr ""
+
+#: js/musicutils.js:202
+#~msgid "augmented' + ' 5"
+#~msgstr ""
+
+#: js/musicutils.js:203
+#~msgid "diminished' + ' 6"
+#~msgstr ""
+
+#: js/musicutils.js:204
+#~msgid "minor' + ' 6"
+#~msgstr ""
+
+#: js/musicutils.js:205
+#~msgid "major' + ' 6"
+#~msgstr ""
+
+#: js/musicutils.js:206
+#~msgid "augmented' + ' 6"
+#~msgstr ""
+
+#: js/musicutils.js:207
+#~msgid "diminished' + ' 7"
+#~msgstr ""
+
+#: js/musicutils.js:208
+#~msgid "minor' + ' 7"
+#~msgstr ""
+
+#: js/musicutils.js:209
+#~msgid "major' + ' 7"
+#~msgstr ""
+
+#: js/musicutils.js:210
+#~msgid "augmented' + ' 7"
+#~msgstr ""
+
+#: js/musicutils.js:211
+#~msgid "diminished' + ' 8"
+#~msgstr ""
+
+#: js/musicutils.js:212
+#~msgid "perfect' + ' 8"
+#~msgstr ""
+
+#: js/musicutils.js:213
+#~msgid "augmented' + ' 8"
 #~msgstr ""
 
