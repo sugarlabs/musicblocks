@@ -1292,6 +1292,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     // TRANS: doubly means to apply an augmentation or diminishment twice
     doublyBlock.staticLabels.push(_('doubly'));
     doublyBlock.oneArgMathBlock();
+    doublyBlock.dockTypes[0] = 'anyout';
+    doublyBlock.dockTypes[1] = 'anyin';
 
     var intervalnameBlock = new ProtoBlock('intervalname');
     intervalnameBlock.palette = palettes.dict['intervals'];

@@ -7981,19 +7981,29 @@ function Logo () {
                 }
                 break;
             case 'doubly':
+                // FIXME: doubly doubly interval will not work.
                 var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk == null || that.blocks.blockList[cblk].name !== 'intervalname') {
-                    that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) * 2;
+                if (cblk == null) {
+                    that.blocks.blockList[blk].value = 0;
+                } else if (that.blocks.blockList[cblk].name !== 'intervalname') {
+                    var value = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                    if (typeof(value) === 'number') {
+                        that.blocks.blockList[blk].value = value * 2;
+                    } else if (typeof(value) === 'string') {
+                        that.blocks.blockList[blk].value = value + value;
+                    } else {
+                        that.blocks.blockList[blk].value = value;
+                    }
                 } else {
                     // Augmented or diminished only
                     if (that.blocks.blockList[cblk].value[0] === 'a') {
-			that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) + 1;
-		    } else if (that.blocks.blockList[cblk].value[0] === 'd') {
-			that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) - 1;
+                        that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) + 1;
+                    } else if (that.blocks.blockList[cblk].value[0] === 'd') {
+                        that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) - 1;
                     } else {
-			that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                        that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg);
                     }
-		}
+                }
                 break;
             case 'neg':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
