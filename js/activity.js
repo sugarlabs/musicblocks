@@ -197,6 +197,7 @@ define(MYDEFINES, function (compatibility) {
             // initialize strings in musicutils. These methods ensure that
             // the names are never null.
             console.log('initing i18n for music terms');
+            initIntervalI18N();
             initDrumI18N();
             initModeI18N();
             initVoiceI18N();

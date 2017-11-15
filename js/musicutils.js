@@ -494,7 +494,7 @@ var OSCTYPES = [
     [_('sawtooth'), 'sawtooth'],
 ];
 
-const DEFAULTINTERVAL = 'perfect 5';
+const DEFAULTINTERVAL = _('perfect') + ' 5';
 const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick drum';
 const DEFAULTMODE = 'major';
