@@ -2356,6 +2356,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     evalBlock.twoArgMathBlock();
     evalBlock.dockTypes[1] = 'textin';
     evalBlock.defaults.push('abs(x)');
+    evalBlock.hidden = true;  // security hole
     evalBlock.defaults.push(-100);
 
     var modBlock = new ProtoBlock('mod');
@@ -2413,6 +2414,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     negBlock.fontsize = 14;
     negBlock.staticLabels.push('–');
     negBlock.oneArgMathBlock();
+    negBlock.dockTypes[0] = 'anyout';
+    negBlock.dockTypes[1] = 'anyin';
 
     var minusBlock = new ProtoBlock('minus');
     minusBlock.palette = palettes.dict['number'];
