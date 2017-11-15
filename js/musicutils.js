@@ -526,6 +526,20 @@ function getIntervalName(name) {
 };
 
 
+function getIntervalNumber(name) {
+    for (var interval in INTERVALNAMES) {
+        if (INTERVALNAMES[interval][0] === name) {
+	    return INTERVALVALUES[INTERVALNAMES[interval][1]];
+	} else if (INTERVALNAMES[interval][1] === name) {
+	    return INTERVALVALUES[INTERVALNAMES[interval][1]];
+	}
+    }
+
+    console.log(name + ' not found in INTERVALNAMES');
+    return 0;
+};
+
+
 function getModeName(name) {
     for (var mode in MODENAMES) {
         if (MODENAMES[mode][0] === name || MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {

@@ -544,10 +544,10 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = getModeName(DEFAULTMODE);
                     break;
                 case 'intervalname':
-                    this.value = DEFAULTINTERVAL;
+                    this.value = getIntervalName(DEFAULTINTERVAL);
                     break;
                 case 'voicename':
-                    this.value = DEFAULTVOICE;
+                    this.value = getVoiceName(DEFAULTVOICE);
                     break;
                 case 'drumname':
                     this.value = getDrumName(DEFAULTDRUM);

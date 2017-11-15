@@ -7689,7 +7689,7 @@ function Logo () {
 
         if (that.blocks.blockList[blk].name === 'intervalname') {
             if (typeof(that.blocks.blockList[blk].value) === 'string') {
-                return INTERVALVALUES[that.blocks.blockList[blk].value];
+                return getIntervalNumber(that.blocks.blockList[blk].value);
             } else {
                 return 0;
             }
