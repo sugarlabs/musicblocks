@@ -1540,6 +1540,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     perfectxBlock.defaults.push(0);
     perfectxBlock.hidden = true;
 
+    var downminor6Block = new ProtoBlock('downminor6');
+    downminor6Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['downminor6'] = downminor6Block;
+    downminor6Block.staticLabels.push(_('down minor') + ' 6');
+    downminor6Block.adjustWidthToLabel();
+    downminor6Block.zeroArgBlock();
+
+    var downminor3Block = new ProtoBlock('downminor3');
+    downminor3Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['downminor3'] = downminor3Block;
+    downminor3Block.staticLabels.push(_('down minor') + ' 3');
+    downminor3Block.adjustWidthToLabel();
+    downminor3Block.zeroArgBlock();
+
     var minor7Block = new ProtoBlock('minor7');
     minor7Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['minor7'] = minor7Block;
@@ -1592,6 +1606,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     minorxBlock.defaults.push(3);
     minorxBlock.defaults.push(0);
     minorxBlock.hidden = true;
+
+    var downmajor6Block = new ProtoBlock('downmajor6');
+    downmajor6Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['downmajor6'] = downmajor6Block;
+    downmajor6Block.staticLabels.push(_('down major') + ' 6');
+    downmajor6Block.adjustWidthToLabel();
+    downmajor6Block.zeroArgBlock();
+
+    var downmajor3Block = new ProtoBlock('downmajor3');
+    downmajor3Block.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['downmajor3'] = downmajor3Block;
+    downmajor3Block.staticLabels.push(_('down major') + ' 3');
+    downmajor3Block.adjustWidthToLabel();
+    downmajor3Block.zeroArgBlock();
 
     var major7Block = new ProtoBlock('major7');
     major7Block.palette = palettes.dict['intervals'];
