@@ -1286,6 +1286,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
+    var doublyBlock = new ProtoBlock('doubly');
+    doublyBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['doubly'] = doublyBlock;
+    // TRANS: doubly means to apply an augmentation or diminishment twice
+    doublyBlock.staticLabels.push(_('doubly'));
+    doublyBlock.oneArgMathBlock();
+
     var intervalnameBlock = new ProtoBlock('intervalname');
     intervalnameBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['intervalname'] = intervalnameBlock;

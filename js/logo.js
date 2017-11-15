@@ -7980,6 +7980,21 @@ function Logo () {
                     that.blocks.blockList[blk].value = that._doMinus(a, b);
                 }
                 break;
+            case 'doubly':
+                var cblk = that.blocks.blockList[blk].connections[1];
+                if (cblk == null || that.blocks.blockList[cblk].name !== 'intervalname') {
+                    that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) * 2;
+                } else {
+                    // Augmented or diminished only
+                    if (that.blocks.blockList[cblk].value[0] === 'a') {
+			that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) + 1;
+		    } else if (that.blocks.blockList[cblk].value[0] === 'd') {
+			that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) - 1;
+                    } else {
+			that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                    }
+		}
+                break;
             case 'neg':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'neg']);
