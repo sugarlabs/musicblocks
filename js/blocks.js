@@ -3209,10 +3209,8 @@ function Blocks () {
 
             switch (name) {
             case 'articulation':
-            case 'augmented':
             case 'backward':
             case 'crescendo':
-            case 'diminished':
             case 'dividebeatfactor':
             case 'drift':
             case 'duplicatenotes':
@@ -3221,8 +3219,6 @@ function Blocks () {
             case 'fill':
             case 'flat':
             case 'hollowline':
-            case 'major':
-            case 'minor':
             case 'multiplybeatfactor':
             case 'note':
             case 'newnote':
@@ -3231,7 +3227,6 @@ function Blocks () {
             case 'newswing':
             case 'newswing2':
             case 'osctime':
-            case 'perfect':
             case 'pluck':
             case 'rhythmicdot':
             case 'semitoneinterval':
