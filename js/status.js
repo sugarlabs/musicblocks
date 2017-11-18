@@ -342,7 +342,7 @@ function StatusMatrix() {
 
                 var cell = table.rows[activeTurtles + 1].cells[i + 1];
                 if (cell != null) {
-                    cell.innerHTML = note.replace(/#/g, '♯').replace(/b/, '♭');
+                    cell.innerHTML = note.replace(/#/g, '♯').replace(/b/g, '♭');
                 }
             }
 
