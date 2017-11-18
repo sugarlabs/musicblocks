@@ -176,6 +176,7 @@ function Logo () {
     this.embeddedGraphics = {};
     this.lastNotePlayed = {};
     this.noteStatus = {};
+    this.noteDirection = {};
 
     this.pitchNumberOffset = 39;  // C4
 
@@ -915,6 +916,7 @@ function Logo () {
             this.noteHertz[turtle] = {};
             this.lastNotePlayed[turtle] = null;
             this.noteStatus[turtle] = null;
+            this.noteDirection[turtle] = 0;
             this.noteDrums[turtle] = {};
             this.notePitches[turtle] = {};
             this.noteOctaves[turtle] = {};
@@ -3438,8 +3440,8 @@ function Logo () {
                 break;
             }
 
-            function addPitch(note, octave, cents) {
-                var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], true); // that.movable[turtle]);
+            function addPitch(note, octave, cents, direction) {
+                var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], true, direction); // that.movable[turtle]);
 
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
@@ -3536,8 +3538,8 @@ function Logo () {
 
             if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                 for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
-                    addPitch(noteObj2[0], noteObj2[1], 0);
+                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], 0, that.semitoneIntervals[turtle][i][1]);
                 }
             }
 
@@ -3943,8 +3945,8 @@ function Logo () {
                 }
             } else if (that.inNoteBlock[turtle].length > 0) {
 
-                function addPitch(note, octave, cents) {
-                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                function addPitch(note, octave, cents, direction) {
+                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction);
                     if (!that.validNote) {
                         that.errorMsg(INVALIDPITCH, blk);
                         that.stopTurtle = true;
@@ -4003,8 +4005,8 @@ function Logo () {
 
                 if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
-                        addPitch(noteObj2[0], noteObj2[1], cents);
+                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj2[0], noteObj2[1], cents, that.semitoneIntervals[turtle][i][1]);
                     }
                 }
 
@@ -4812,7 +4814,8 @@ function Logo () {
             }
 
             if (i !== 0) {
-                that.semitoneIntervals[turtle].push(i);
+                that.semitoneIntervals[turtle].push([i, that.noteDirection[turtle]]);
+                that.noteDirection[turtle] = 0;
 
                 var listenerName = '_semitone_interval_' + turtle;
                 that._setDispatchBlock(blk, turtle, listenerName);
@@ -5686,8 +5689,8 @@ function Logo () {
                 that.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (that.inNoteBlock[turtle].length > 0) {
 
-                function addPitch(note, octave, cents, frequency) {
-                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                function addPitch(note, octave, cents, frequency, direction) {
+                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction);
                     if (that.drumStyle[turtle].length > 0) {
                         var drumname = last(that.drumStyle[turtle]);
                         that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
@@ -5728,8 +5731,8 @@ function Logo () {
 
                 if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i], that.keySignature[turtle], that.movable[turtle]);
-                        addPitch(noteObj2[0], noteObj2[1], cents, 0);
+                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle]);
+                        addPitch(noteObj2[0], noteObj2[1], cents, 0, that.semitoneIntervals[turtle][i][1]);
                     }
                 }
 
@@ -7689,6 +7692,7 @@ function Logo () {
 
         if (that.blocks.blockList[blk].name === 'intervalname') {
             if (typeof(that.blocks.blockList[blk].value) === 'string') {
+                that.noteDirection[turtle] = getIntervalDirection(that.blocks.blockList[blk].value);
                 return getIntervalNumber(that.blocks.blockList[blk].value);
             } else {
                 return 0;
@@ -9084,7 +9088,7 @@ function Logo () {
         this.refreshCanvas();
     };
 
-    this.getNote = function (noteArg, octave, transposition, keySignature, movable) {
+    this.getNote = function (noteArg, octave, transposition, keySignature, movable, direction) {
         this.validNote = true;
         var sharpFlat = false;
 
@@ -9317,6 +9321,24 @@ function Logo () {
             break;
         default:
             break;
+        }
+
+        // Finally consider the note direction (in the case of intervals)
+        if (direction != undefined) {
+            switch(direction) {
+            case -1:
+                if (note in EQUIVALENTFLATS) {
+                    note = EQUIVALENTFLATS[note];
+                }
+                break;
+            case 1:
+                if (note in EQUIVALENTSHARPS) {
+                    note = EQUIVALENTSHARPS[note];
+                }
+                break;
+            default:
+                break;
+            }
         }
 
         if (octave < 1) {

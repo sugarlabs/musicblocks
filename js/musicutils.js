@@ -213,34 +213,35 @@ const INTERVALNAMES = [
     [_('augmented') + ' 8', 'augmented 8'],
 ];
 
+// [semi-tones, direction -1 == down; 0 == neutral; 1 == up]
 const INTERVALVALUES = {
-    'unison': 0,
-    'augmented 1': 1,
-    'diminished 2': 0,
-    'minor 2': 1,
-    'major 2': 2,
-    'augmented 2': 3,
-    'diminished 3': 2,
-    'minor 3': 3,
-    'major 3': 4,
-    'augmented 3': 5,
-    'diminished 4': 4,
-    'perfect 4': 5,
-    'augmented 4': 6,
-    'diminished 5': 6,
-    'perfect 5': 7,
-    'augmented 5': 8,
-    'diminished 6': 7,
-    'minor 6': 8,
-    'major 6': 9,
-    'augmented 6': 10,
-    'diminished 7': 9,
-    'minor 7': 10,
-    'major 7': 11,
-    'augmented 7': 12,
-    'diminished 8': 11,
-    'perfect 8': 12,
-    'augmented 8': 13,
+    'unison': [0, 0],
+    'augmented 1': [1, 1],
+    'diminished 2': [0, -1],
+    'minor 2': [1, -1],
+    'major 2': [2, 1],
+    'augmented 2': [3, 1],
+    'diminished 3': [2, -1],
+    'minor 3': [3, -1],
+    'major 3': [4, 1],
+    'augmented 3': [5, 1],
+    'diminished 4': [4, -1],
+    'perfect 4': [5, 0],
+    'augmented 4': [6, 1],
+    'diminished 5': [6, -1],
+    'perfect 5': [7, 0],
+    'augmented 5': [8, 1],
+    'diminished 6': [7, -1],
+    'minor 6': [8, -1],
+    'major 6': [9, 1],
+    'augmented 6': [10, 1],
+    'diminished 7': [9, -1],
+    'minor 7': [10, -1],
+    'major 7': [11, 1],
+    'augmented 7': [12, 1],
+    'diminished 8': [11, -1],
+    'perfect 8': [12, 0],
+    'augmented 8': [13, 1]
 };
 
 // The table contains the intervals that define the modes.
@@ -529,9 +530,23 @@ function getIntervalName(name) {
 function getIntervalNumber(name) {
     for (var interval in INTERVALNAMES) {
         if (INTERVALNAMES[interval][0] === name) {
-	    return INTERVALVALUES[INTERVALNAMES[interval][1]];
+	    return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
 	} else if (INTERVALNAMES[interval][1] === name) {
-	    return INTERVALVALUES[INTERVALNAMES[interval][1]];
+	    return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
+	}
+    }
+
+    console.log(name + ' not found in INTERVALNAMES');
+    return 0;
+};
+
+
+function getIntervalDirection(name) {
+    for (var interval in INTERVALNAMES) {
+        if (INTERVALNAMES[interval][0] === name) {
+	    return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
+	} else if (INTERVALNAMES[interval][1] === name) {
+	    return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
 	}
     }
 
