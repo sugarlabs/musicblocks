@@ -68,24 +68,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     restBlock.dockTypes[0] = 'textout';
 
     // deprecated
-    var currentNoteBlock = new ProtoBlock('currentnote');
-    currentNoteBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['currentnote'] = currentNoteBlock;
-    currentNoteBlock.staticLabels.push('current pitch name');
-    currentNoteBlock.hidden = true;
-    currentNoteBlock.adjustWidthToLabel();
-    currentNoteBlock.parameterBlock();
-
-    // deprecated
-    var currentOctaveBlock = new ProtoBlock('currentoctave');
-    currentOctaveBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
-    currentOctaveBlock.staticLabels.push('current pitch octave');
-    currentOctaveBlock.hidden = true;
-    currentOctaveBlock.adjustWidthToLabel();
-    currentOctaveBlock.parameterBlock();
-
-    // deprecated
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['square'] = squareBlock;
@@ -1368,42 +1350,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminished2Block.adjustWidthToLabel();
     diminished2Block.zeroArgBlock();
 
-    // deprecated
-    var diminished1Block = new ProtoBlock('diminished1');
-    diminished1Block.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['diminished1'] = diminished1Block;
-    diminished1Block.staticLabels.push(_('diminished') + ' 1');
-    diminished1Block.adjustWidthToLabel();
-    diminished1Block.hidden = true;
-    diminished1Block.zeroArgBlock();
-
-    // deprecated
-    var diminishedBlock = new ProtoBlock('diminished');
-    diminishedBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['diminished'] = diminishedBlock;
-    diminishedBlock.staticLabels.push(_('diminished'));
-    diminishedBlock.adjustWidthToLabel();
-    diminishedBlock.flowClampOneArgBlock();
-    diminishedBlock.defaults.push(5);
-    diminishedBlock.hidden = true;
-
-    // deprecated
-    var diminishedxBlock = new ProtoBlock('diminishedx');
-    diminishedxBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['diminishedx'] = diminishedxBlock;
-    //.TRANS: the "diminished" interval in music
-    diminishedxBlock.staticLabels.push(_('diminished'));
-    //.TRANS: the number of half-steps between notes
-    diminishedxBlock.staticLabels.push(_('interval'));
-    diminishedxBlock.staticLabels.push(_('octave') + ' (+/–)');
-    diminishedxBlock.extraWidth = 20;
-    diminishedxBlock.adjustWidthToLabel();
-    diminishedxBlock.flowClampTwoArgBlock();
-    diminishedxBlock.dockTypes[2] = 'anyin';
-    diminishedxBlock.defaults.push(5);
-    diminishedxBlock.defaults.push(0);
-    diminishedxBlock.hidden = true;
-
     var augmented8Block = new ProtoBlock('augmented8');
     augmented8Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['augmented8'] = augmented8Block;
@@ -1460,32 +1406,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     augmented1Block.adjustWidthToLabel();
     augmented1Block.zeroArgBlock();
 
-    // deprecated
-    var augmentedBlock = new ProtoBlock('augmented');
-    augmentedBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['augmented'] = augmentedBlock;
-    //.TRANS: the "augmented" interval in music
-    augmentedBlock.staticLabels.push(_('augmented'));
-    augmentedBlock.adjustWidthToLabel();
-    augmentedBlock.flowClampOneArgBlock();
-    augmentedBlock.defaults.push(5);
-    augmentedBlock.hidden = true;
-
-    // deprecated
-    var augmentedxBlock = new ProtoBlock('augmentedx');
-    augmentedxBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['augmentedx'] = augmentedxBlock;
-    //.TRANS: the "augmented" interval in music
-    augmentedxBlock.staticLabels.push(_('augmented'));
-    augmentedxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
-    augmentedxBlock.extraWidth = 20;
-    augmentedxBlock.adjustWidthToLabel();
-    augmentedxBlock.flowClampTwoArgBlock();
-    augmentedxBlock.dockTypes[2] = 'anyin';
-    augmentedxBlock.defaults.push(5);
-    augmentedxBlock.defaults.push(0);
-    augmentedxBlock.hidden = true;
-
     var perfect8Block = new ProtoBlock('perfect8');
     perfect8Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['perfect8'] = perfect8Block;
@@ -1507,15 +1427,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     perfect4Block.adjustWidthToLabel();
     perfect4Block.zeroArgBlock();
 
-    // deprecated
-    var perfect1Block = new ProtoBlock('perfect1');
-    perfect1Block.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['perfect1'] = perfect1Block;
-    perfect1Block.staticLabels.push(_('perfect') + ' 1');
-    perfect1Block.adjustWidthToLabel();
-    perfect1Block.zeroArgBlock();
-    perfect1Block.hidden = true;
-
     var perfectBlock = new ProtoBlock('perfect');
     perfectBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['perfect'] = perfectBlock;
@@ -1524,21 +1435,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     perfectBlock.flowClampOneArgBlock();
     perfectBlock.defaults.push(5);
     perfectBlock.hidden = true;
-
-    // deprecated
-    var perfectxBlock = new ProtoBlock('perfectx');
-    perfectxBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['perfectx'] = perfectxBlock;
-    //.TRANS: the "perfect" interval in music
-    perfectxBlock.staticLabels.push(_('perfect'));
-    perfectxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
-    perfectxBlock.extraWidth = 20;
-    perfectxBlock.adjustWidthToLabel();
-    perfectxBlock.flowClampTwoArgBlock();
-    perfectxBlock.dockTypes[2] = 'anyin';
-    perfectxBlock.defaults.push(5);
-    perfectxBlock.defaults.push(0);
-    perfectxBlock.hidden = true;
 
     var downminor6Block = new ProtoBlock('downminor6');
     downminor6Block.palette = palettes.dict['intervals'];
@@ -1582,31 +1478,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     minor2Block.adjustWidthToLabel();
     minor2Block.zeroArgBlock();
 
-    // deprecated
-    var minorBlock = new ProtoBlock('minor');
-    minorBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['minor'] = minorBlock;
-    minorBlock.staticLabels.push(_('minor'));
-    minorBlock.adjustWidthToLabel();
-    minorBlock.flowClampOneArgBlock();
-    minorBlock.defaults.push(3);
-    minorBlock.hidden = true;
-
-    // deprecated
-    var minorxBlock = new ProtoBlock('minorx');
-    minorxBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['minorx'] = minorxBlock;
-    //.TRANS: the minor interval in music
-    minorxBlock.staticLabels.push(_('minor'));
-    minorxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
-    minorxBlock.extraWidth = 20;
-    minorxBlock.adjustWidthToLabel();
-    minorxBlock.flowClampTwoArgBlock();
-    minorxBlock.dockTypes[2] = 'anyin';
-    minorxBlock.defaults.push(3);
-    minorxBlock.defaults.push(0);
-    minorxBlock.hidden = true;
-
     var downmajor6Block = new ProtoBlock('downmajor6');
     downmajor6Block.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['downmajor6'] = downmajor6Block;
@@ -1649,36 +1520,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     major2Block.adjustWidthToLabel();
     major2Block.zeroArgBlock();
 
-    // deprecated
-    var majorBlock = new ProtoBlock('major');
-    majorBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['major'] = majorBlock;
-    majorBlock.staticLabels.push(_('major'));
-    majorBlock.adjustWidthToLabel();
-    majorBlock.flowClampOneArgBlock();
-    majorBlock.defaults.push(3);
-    majorBlock.hidden = true;
-
-    // deprecated
-    var majorxBlock = new ProtoBlock('majorx');
-    majorxBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['majorx'] = majorxBlock;
-    //.TRANS: the "major" interval in music
-    majorxBlock.staticLabels.push(_('major'));
-    majorxBlock.staticLabels.push(_('interval'), _('octave') + ' (+/–)');
-    majorxBlock.extraWidth = 20;
-    majorxBlock.adjustWidthToLabel();
-    majorxBlock.flowClampTwoArgBlock();
-    majorxBlock.dockTypes[2] = 'anyin';
-    majorxBlock.defaults.push(3);
-    majorxBlock.defaults.push(0);
-    majorxBlock.hidden = true;
-
     var semitoneintervalBlock = new ProtoBlock('semitoneinterval');
     semitoneintervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['semitoneinterval'] = semitoneintervalBlock;
     //.TRANS: calculate a relative step between notes based on semi-tones
-    semitoneintervalBlock.staticLabels.push(_('semi-tone interval')+ ' (+/–)');
+    semitoneintervalBlock.staticLabels.push(_('semi-tone interval') + ' (+/–)');
     semitoneintervalBlock.adjustWidthToLabel();
     semitoneintervalBlock.flowClampOneArgBlock();
     semitoneintervalBlock.defaults.push(5);

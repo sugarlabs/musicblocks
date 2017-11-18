@@ -35,7 +35,7 @@
 
 function blockIsMacro (blkname) {
 
-    const BLOCKISMACRO = ['action', 'articulation', 'augmented', 'augmentedx', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished', 'diminishedx', 'diminished1', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dividebeatfactor', 'dog', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fourth', 'fourthinterval', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major', 'majorx', 'major2', 'major3', 'major6', 'major7', 'matrix', 'matrixgmajor', 'meter', 'mf', 'midi', 'minor', 'minorx', 'minor2', 'minor3', 'minor6', 'minor7', 'movable', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'octave', 'oneOf', 'osctime', 'p', 'perfect', 'perfectx', 'perfect1', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'settimbre', 'setscalartransposition', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'third', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'unison', 'unisoninterval', 'vibrato', 'wholeNote'];
+    const BLOCKISMACRO = ['action', 'articulation', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dividebeatfactor', 'dog', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fourth', 'fourthinterval', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major2', 'major3', 'major6', 'major7', 'matrix', 'matrixgmajor', 'meter', 'mf', 'midi', 'minor2', 'minor3', 'minor6', 'minor7', 'movable', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'octave', 'oneOf', 'osctime', 'p', 'perfect1', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'settimbre', 'setscalartransposition', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'third', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'unison', 'unisoninterval', 'vibrato', 'wholeNote'];
 
     return BLOCKISMACRO.indexOf(blkname) > -1;
 
@@ -53,7 +53,6 @@ function getMacroExpansion (blkname, x, y) {
     const AUGMENTED6OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'augmented 6'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const AUGMENTED7OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'augmented 7'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const AUGMENTED8OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'augmented 8'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
-    const AUGMENTEDOBJ = [[0, 'augmentedx', x, y, [null, 1, 2, null, 3]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, ['number', {'value': 0}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const BACKWARDOBJ = [[0, 'backward', x, y, [null, 1, null]], [1, 'hidden', 0, 0, [0, null]]];
     const BOTTLEOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('bottle')}], 0, 0, [0]]];
     const BPMOBJ = [[0, 'setbpm', x, y, [null, 1, null, 2]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
@@ -68,7 +67,6 @@ function getMacroExpansion (blkname, x, y) {
     const CRICKETOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('cricket')}], 0, 0, [0]]];
     const CUPOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('cup drum')}], 0, 0, [0]]];
     const DARBUKAOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('darbuka drum')}], 0, 0, [0]]];
-    const DIMINISHED1OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': calcDiminished([1, 0])}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const DIMINISHED2OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 2'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const DIMINISHED3OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 3'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const DIMINISHED4OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 4'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
@@ -76,7 +74,6 @@ function getMacroExpansion (blkname, x, y) {
     const DIMINISHED6OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 6'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const DIMINISHED7OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 7'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const DIMINISHED8OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 8'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
-    const DIMINISHEDOBJ = [[0, 'diminishedx', x, y, [null, 1, 2, null, 3]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, ['number', {'value': 0}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const DIVBEATOBJ = [[0, 'dividebeatfactor', x, y, [null, 1, null, 2]], [1, ['number', {'value': 2}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const DOGOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('dog')}], 0, 0, [0]]];
     const DOWNMAJOR3OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'minus', 0, 0, [0, 8, 3]], [2, ['intervalname', {'value': 'major 3'}], 0, 0, [8]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]], [8, 'neg', 0, 0, [1, 2]]];
@@ -112,7 +109,6 @@ function getMacroExpansion (blkname, x, y) {
     const MAJOR3OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'major 3'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const MAJOR6OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'major 6'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const MAJOR7OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'major 7'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
-    const MAJOROBJ = [[0, 'majorx', x, y, [null, 1, 2, null, 3]], [1, ['number', {'value': 3}], 0, 0, [0]], [2, ['number', {'value': 0}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const MATRIXOBJ = [[0, ['matrix', {'collapsed': false}], x, y, [null, 1, 32]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'ti'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'la'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 'sol'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'pitch', 0, 0, [7, 11, 12, 13]], [11, ['solfege', {'value': 'mi'}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]], [13, 'pitch', 0, 0, [10, 14, 15, 30]], [14, ['solfege', {'value': 're'}], 0, 0, [13]], [15, ['number', {'value': 4}], 0, 0, [13]], [16, 'rhythm2', 0, 0, [28, 17, 19, 33]], [17, ['number', {'value': 6}], 0, 0, [16]], [18, ['number', {'value': 1}], 0, 0, [19]],[19, 'divide', 0, 0, [16, 18, 20]],[20,['number', {'value': 4}], 0, 0, [19]], [21, 'rhythm2', 0, 0, [33, 22, 24 , null]], [22, ['number', {'value': 1}], 0, 0, [21]], [23, ['number', {'value': 1}], 0, 0, [24]], [24, 'divide', 0, 0, [21, 23, 25]], [25, ['number', {'value':2}], 0, 0, [24]], [26, 'forward', 0, 0, [30, 27, 28]], [27, ['number', {'value': 100}], 0, 0, [26]], [28, 'right', 0, 0, [26, 29, 16]], [29, ['number', {'value': 90}], 0, 0, [28]], [30, 'playdrum', 0, 0, [13, 31, 26]], [31, ['drumname', {'value': _('snare drum')}], 0, 0, [30]], [32, 'hiddennoflow', 0, 0, [0, null]], [33, 'vspace', 0, 0, [16, 21]]];
     const MATRIXGMAJOBJ = [[0, 'pitch', 0, 0, [5, 1, 2, 8]], [1, ['solfege', {'value': 'sol'}], 0, 0, [0]], [2, ['number', {'value': 5}], 0, 0, [0]], [3, 'steppitch', 0, 0, [8, 4, null]], [4, ['number', {'value': -1}], 0, 0, [3]], [5, 'setkey2', 0, 0, [10, 6, 7, 0]], [6, ['notename', {'value': 'G'}], 0, 0, [5]], [7, ['modename', {'value': 'major'}], 0, 0, [5]], [8, 'repeat', 0, 0, [0, 9, 3, 11]], [9, 'modelength', 0, 0, [8]], [10, ['matrix', {'collapsed': false}], x, y, [null, 5, 21]], [11, 'rhythm2', 0, 0, [8, 12, 14, 22]], [12, ['number', {'value': 6}], 0, 0, [11]], [13, ['number', {'value': 1}], 0, 0, [14]], [14, 'divide', 0, 0, [11, 13, 15]], [15, ['number', {'value': 4}], 0, 0, [14]], [16, 'rhythm2', 0, 0, [22, 17, 19, null]], [17, ['number', {'value': 1}], 0, 0, [16]], [18, ['number', {'value': 1}], 0, 0, [19]], [19, 'divide', 0, 0, [16, 18, 20]], [20, ['number', {'value': 2}], 0, 0.5, [19]], [21, 'hiddennoflow', 0, 0, [10, null]], [22, 'vspace', 0, 0, [11, 16]]];
     const METEROBJ = [[0, 'meter', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
@@ -121,7 +117,6 @@ function getMacroExpansion (blkname, x, y) {
     const MINOR3OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'minor 3'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const MINOR6OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'minor 6'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const MINOR7OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'minor 7'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
-    const MINOROBJ = [[0, 'minorx', x, y, [null, 1, 2, null, 3]], [1, ['number', {'value': 3}], 0, 0, [0]], [2, ['number', {'value': 0}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const MODEWIDGETOBJ = [[0, 'modewidget', x, y, [null, 1, 4]], [1, 'setkey2', 0, 0, [0, 2, 3, null]], [2, ['notename', {'value': 'C'}], 0, 0, [1]], [3, ['modename', {'value': getModeName(DEFAULTMODE)}], 0, 0, [1]], [4, 'hiddennoflow', 0, 0, [0, null]]];
     const MOVABLEOBJ = [[0, 'movable', x, y, [null, 1, null]], [1, ['boolean', {'value': true}], 0, 0, [0]]];
     const MULTBEATOBJ = [[0, 'multiplybeatfactor', x, y, [null, 1, null, 2]], [1, ['number', {'value': 2}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
@@ -145,7 +140,6 @@ function getMacroExpansion (blkname, x, y) {
     const PERFECT4OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'perfect 4'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const PERFECT5OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'perfect 5'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const PERFECT8OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'perfect 8'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
-    const PERFECTOBJ = [[0, 'perfectx', x, y, [null, 1, 2, null, 3]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, ['number', {'value': 0}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const PICKUPOBJ = [[0, 'pickup', x, y, [null, 1, 4]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 0}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, null]]];
     const PITCHDRUMMATRIXOBJ = [[0, 'pitchdrummatrix', x, y, [null, 1, 12]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'sol'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'mi'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 're'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'playdrum', 0, 0, [7, 11, null]], [11, ['drumname', {'value': _(DEFAULTDRUM)}], 0, 0, [10]], [12, 'hiddennoflow', 0, 0, [0, null]]];
     const PITCHSLIDEROBJ = [[0, 'pitchslider', x, y, [null, 1, 3]], [1, 'hertz', 0, 0, [0, 2, null]], [2, ['number', {'value': 392}], 0, 0, [1]], [3, 'hiddennoflow', 0, 0, [0, null]]];
@@ -227,8 +221,6 @@ function getMacroExpansion (blkname, x, y) {
         'augmented6': AUGMENTED6OBJ,
         'augmented7': AUGMENTED7OBJ,
         'augmented8': AUGMENTED8OBJ,
-        'augmented': AUGMENTEDOBJ,
-        'augmentedx': AUGMENTEDOBJ,
         'backward': BACKWARDOBJ,
         'bottle': BOTTLEOBJ,
         'bubbles': BUBBLESOBJ,
@@ -242,7 +234,6 @@ function getMacroExpansion (blkname, x, y) {
         'cricket': CRICKETOBJ,
         'cup': CUPOBJ,
         'darbuka': DARBUKAOBJ,
-        'diminished1': DIMINISHED1OBJ,
         'diminished2': DIMINISHED2OBJ,
         'diminished3': DIMINISHED3OBJ,
         'diminished4': DIMINISHED4OBJ,
@@ -250,8 +241,6 @@ function getMacroExpansion (blkname, x, y) {
         'diminished6': DIMINISHED6OBJ,
         'diminished7': DIMINISHED7OBJ,
         'diminished8': DIMINISHED8OBJ,
-        'diminished': DIMINISHEDOBJ,
-        'diminishedx': DIMINISHEDOBJ,
         'dividebeatfactor': DIVBEATOBJ,
         'dog': DOGOBJ,
         'downmajor3': DOWNMAJOR3OBJ,
@@ -289,8 +278,6 @@ function getMacroExpansion (blkname, x, y) {
         'major3': MAJOR3OBJ,
         'major6': MAJOR6OBJ,
         'major7': MAJOR7OBJ,
-        'major': MAJOROBJ,
-        'majorx': MAJOROBJ,
         'matrix': MATRIXOBJ,
         'matrixgmajor': MATRIXGMAJOBJ,
         'meter': METEROBJ,
@@ -300,8 +287,6 @@ function getMacroExpansion (blkname, x, y) {
         'minor3': MINOR3OBJ,
         'minor6': MINOR6OBJ,
         'minor7': MINOR7OBJ,
-        'minor': MINOROBJ,
-        'minorx': MINOROBJ,
         'modewidget': MODEWIDGETOBJ,
         'movable': MOVABLEOBJ,
         'mp': VOLOBJ45,
@@ -326,8 +311,6 @@ function getMacroExpansion (blkname, x, y) {
         'perfect4': PERFECT4OBJ,
         'perfect5': PERFECT5OBJ,
         'perfect8': PERFECT8OBJ,
-        'perfect': PERFECTOBJ,
-        'perfectx': PERFECTOBJ,
         'pickup': PICKUPOBJ,
         'pitchdrummatrix': PITCHDRUMMATRIXOBJ,
         'pitchslider': PITCHSLIDEROBJ,
