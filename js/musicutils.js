@@ -51,13 +51,6 @@ const NOTESTABLE = {1: 'do', 2: 'do♯', 3: 're', 4: 're♯', 5: 'mi', 6: 'fa', 
 const FIXEDSOLFEGE = {'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'ti': 'B'};
 const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
-// Halfsteps used in calculating absolute intervals
-const AUGMENTED = {1: 1, 2: 3, 3: 5, 4: 6, 5: 8, 6: 10, 7: 12, 8: 13};
-const PERFECT = {1: 0, 4: 5, 5: 7, 8: 12};
-const DIMINISHED = {1: -1, 2: 0, 3: 2, 4: 4, 5: 6, 6: 7, 7: 9, 8: 11};
-const MAJOR = {2: 2, 3: 4, 6: 9, 7: 11};
-const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
-
 // Preference for sharps or flats
 const SHARPPREFERENCE = ['g major', 'd major', 'a major', 'e major', 'b major', 'f# major', 'c# major', 'e minor', 'b minor', 'f# minor', 'c# minor', 'g# minor', 'd# minor'];
 const FLATPREFERENCE = ['f major', 'bb major', 'eb major', 'ab major', 'db major', 'gb major', 'cb major', 'd minor', 'g minor', 'c minor', 'f minor', 'bb minor', 'eb minor'];
@@ -89,62 +82,6 @@ function mod12(a) {
 
     return a % 12;
 }
-
-
-function calcAugmented(obj) {
-    var interval = obj[0];
-    var deltaOctave = obj[1];
-    if (interval < 0) {
-        return -AUGMENTED[-interval] + (12 * deltaOctave);
-    } else {
-        return AUGMENTED[interval] + (12 * deltaOctave);
-    }
-}
-
-
-function calcPerfect(obj) {
-    var interval = obj[0];
-    var deltaOctave = obj[1];
-    if (interval < 0) {
-        return -PERFECT[-interval] + (12 * deltaOctave);
-    } else {
-        return PERFECT[interval] + (12 * deltaOctave);
-    }
-}
-
-
-function calcDiminished(obj) {
-    var interval = obj[0];
-    var deltaOctave = obj[1];
-    if (interval < 0) {
-        return -DIMINISHED[-interval] + (12 * deltaOctave);
-    } else {
-        return DIMINISHED[interval] + (12 * deltaOctave);
-    }
-}
-
-
-function calcMajor(obj) {
-    var interval = obj[0];
-    var deltaOctave = obj[1];
-    if (interval < 0) {
-        return -MAJOR[-interval] + (12 * deltaOctave);
-    } else {
-        return MAJOR[interval] + (12 * deltaOctave);
-    }
-}
-
-
-function calcMinor(obj) {
-    var interval = obj[0];
-    var deltaOctave = obj[1];
-    if (interval < 0) {
-        return -MINOR[-interval] + (12 * deltaOctave);
-    } else {
-        return MINOR[interval] + (12 * deltaOctave);
-    }
-}
-
 
 const SEMITONES = 12;
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
