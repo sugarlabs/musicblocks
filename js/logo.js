@@ -873,6 +873,7 @@ function Logo () {
         this._masterBPM = TARGETBPM;
         this.defaultBPMFactor = TONEBPM / this._masterBPM;
         this.masterVolume = [DEFAULTVOLUME];
+	this.checkingCompletionState = false;
 
         // Each turtle needs to keep its own wait time and music
         // states.
