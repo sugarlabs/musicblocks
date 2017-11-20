@@ -304,12 +304,12 @@ function Palettes () {
         for (var i in this.dict) {
             if (this.dict[i] === this.dict[name]) {
                 this.dict[name]._resetLayout();
-                this.dict[name].showMenu(true);
-                this.dict[name]._showMenuItems(true);
+                this.dict[name].showMenu();
+                this.dict[name]._showMenuItems();
             } else {
                 if (this.dict[i].visible) {
-                    this.dict[i].hideMenu(true);
-                    this.dict[i]._hideMenuItems(false);
+                    this.dict[i].hideMenu();
+                    this.dict[i]._hideMenuItems();
                 }
             }
         }
@@ -348,7 +348,7 @@ function Palettes () {
         }
 
         for (var name in this.dict) {
-            this.dict[name].hideMenu(true);
+            this.dict[name].hideMenu();
         }
 
         if (this.upIndicator != null) {
@@ -389,8 +389,8 @@ function Palettes () {
 
                 for (var i in that.dict) {
                     if (that.dict[i].visible) {
-                        that.dict[i].hideMenu(true);
-                        that.dict[i]._hideMenuItems(true);
+                        that.dict[i].hideMenu();
+                        that.dict[i]._hideMenuItems();
                     }
                 }
             }, 500);
@@ -1294,7 +1294,7 @@ function Palette(palettes, name) {
     this.hideMenu = function () {
         if (this.menuContainer != null) {
             this.menuContainer.visible = false;
-            this._hideMenuItems(true);
+            this._hideMenuItems();
         }
 
         this._moveMenu(this.palettes.cellSize, this.palettes.cellSize);
@@ -1308,7 +1308,7 @@ function Palette(palettes, name) {
         }
     };
 
-    this._hideMenuItems = function (init) {
+    this._hideMenuItems = function () {
         for (var i in this.protoContainers) {
             this.protoContainers[i].visible = false;
         }
@@ -1327,7 +1327,7 @@ function Palette(palettes, name) {
         this.visible = false;
     };
 
-    this._showMenuItems = function (init) {
+    this._showMenuItems = function () {
         if (this.scrollDiff === 0) {
             this.count = 0;
         }
@@ -1568,15 +1568,15 @@ function Palette(palettes, name) {
             for (var p in palette.palettes.dict) {
                 if (palette.name != p) {
                     if (palette.palettes.dict[p].visible) {
-                        palette.palettes.dict[p]._hideMenuItems(false);
+                        palette.palettes.dict[p]._hideMenuItems();
                     }
                 }
             }
 
             if (palette.visible) {
-                palette._hideMenuItems(false);
+                palette._hideMenuItems();
             } else {
-                palette._showMenuItems(false);
+                palette._showMenuItems();
             }
             palette.palettes.refreshCanvas();
         });
@@ -1634,7 +1634,7 @@ function Palette(palettes, name) {
                 }
 
                 // Hide the menu items while drag.
-                palette._hideMenuItems(false);
+                palette._hideMenuItems();
                 palette._moveMenuItemsRelative(dx, dy);
             });
         });
