@@ -95,9 +95,9 @@ msgid "start"
 msgstr "スタート"
 
 #: js/block.js:649
-## ひらがな＝ぎょうれつ;　http://jisho.org/word/%E8%A1%8C%E5%88%97
+## ひらがな＝ぎょうれつ;　http://jisho.org/word/%E8%A1%8C%E5%88%97 ; changed to "music matrix"
 msgid "matrix"
-msgstr "行列"
+msgstr "音楽行列"
 
 #: js/block.js:652
 #: js/basicblocks.js:765
@@ -156,8 +156,9 @@ msgstr "スライダー"
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
+## The spaces must not be "Japanese" spaces
 msgid "ti la sol fa mi re do"
-msgstr "シ　ら　ソル　ファ　ミ　レ　ド"
+msgstr "シ ら ソル ファ ミ レ ド"
 
 #: js/block.js:1848
 #: js/block.js:1852
@@ -218,7 +219,7 @@ msgstr "プラネット"
 
 #: js/samplesviewer.js:576
 msgid "On my device"
-msgstr "デバイスにある"
+msgstr "デバイスにあるファイル"
 
 #: js/samplesviewer.js:577
 msgid "Worldwide"
@@ -226,8 +227,9 @@ msgstr "世界中"
 
 #: js/activity.js:542
 #.TRANS: hide Polar coordinate overlay grid
+## need to verify
 msgid "hide grid"
-msgstr ""
+msgstr "行列を隠す"
 
 #: js/activity.js:549
 #: js/activity.js:555
@@ -282,7 +284,7 @@ msgstr "音符を一つずつに"
 #: js/activity.js:2714
 #: js/turtledefs.js:83
 msgid "Stop"
-msgstr "ステップ実行"
+msgstr "止めます"
 
 #: js/activity.js:2703
 #: js/activity.js:2715
@@ -353,7 +355,7 @@ msgstr "ブロックでマウスの長いクリック押しでコピー。ペー
 #: js/activity.js:2791
 #: js/activity.js:2803
 msgid "playback"
-msgstr ""
+msgstr "プレイバック"
 
 #: js/activity.js:2792
 #: js/activity.js:2804
@@ -496,92 +498,94 @@ msgstr "音符"
 #.TRANS: major scales in music
 #.TRANS: the "major" interval in music
 msgid "major"
-msgstr ""
+msgstr "メジャー"
 
 #: js/logo.js:1352
+## Incomplete
 msgid "Block does not support incrementing."
-msgstr ""
+msgstr "このブロックでIncrementingができません"
 
 #: js/logo.js:2646
 #: js/logo.js:7590
 msgid "You must select a file."
-msgstr ""
+msgstr "ファイルを選ぶ必要があります"
 
 #: js/logo.js:2655
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
-msgstr ""
+msgstr "選んだファイルはvalidなヒープがありません"
 
 #: js/logo.js:2659
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
-msgstr ""
+msgstr "ロードヒープのブロックはロードファイルブロックといっしょうの必要があります"
 
 #: js/logo.js:2675
 msgid "Error parsing JSON data:"
-msgstr ""
+msgstr "JSONのパーシングのエラーです"
 
 #: js/logo.js:2680
 msgid "404: Page not found"
-msgstr ""
+msgstr "404: このページが見つかれません"
 
 #: js/logo.js:2704
+## If the word is suppose to follow this clause, it is difficult to choose a good Japanese grammar. Need to think about it.
 msgid "turtleHeaps does not contain a valid heap for"
-msgstr ""
+msgstr "タートルヒープすはvalidなヒープありません："
 
 #: js/logo.js:2714
 msgid "Index must be > 0."
-msgstr ""
+msgstr "インデクスは0よりの必要があります"
 
 #: js/logo.js:2734
 #: js/logo.js:2757
 #: js/logo.js:2778
 #: js/timbre.js:524
 msgid "Unable to use synth due to existing oscillator"
-msgstr ""
+msgstr "オシレーターの訳でシンセが使えません"
 
 #: js/logo.js:2740
 #: js/logo.js:2762
 msgid "The input cannot be negative."
-msgstr ""
+msgstr "マイナスのインプットはできません"
 
 #: js/logo.js:2805
 #: js/logo.js:2826
 msgid "Beats per minute must be > 30."
-msgstr ""
+msgstr "一分割テンポは３０より必要があります"
 
 #: js/logo.js:2808
 #: js/logo.js:2829
 msgid "Maximum beats per minute is 1000."
-msgstr ""
+msgstr "一分割テンポの高原は１０００"
 
 #: js/logo.js:2980
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr ""
+msgstr "音楽行列は一つの音高ブロックと一つの太鼓ブロックを使う必要があります"
 
 #: js/logo.js:3120
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr ""
+msgstr "音楽行列は一つの音高ブロックと一つのリズムブロックを使う必要があります"
 
 #: js/logo.js:3156
 msgid "Attack value should be from 0 to 100."
-msgstr ""
+msgstr "Attack value は0から１００までの必要があります"
 
 #: js/logo.js:3159
 msgid "Decay value should be from 0 to 100."
-msgstr ""
+msgstr "Decay value　は０から１００までの必要があります"
 
 #: js/logo.js:3162
 msgid "Sustain value should be from 0 to 100."
-msgstr ""
+msgstr "Sustain value は０から１００までの必要があります"
 
 #: js/logo.js:3165
 msgid "Release value should be from 0-100."
-msgstr ""
+msgstr "release value は０から１００までの必要があります"
 
 #: js/logo.js:3181
 msgid "You are adding multiple envelope blocks."
-msgstr ""
+msgstr "一つ以上のenvelopeブロックを増しています"
 
 #: js/logo.js:3210
 #.TRANS: rolloff is the steepness of a change in frequency.
@@ -597,8 +601,9 @@ msgstr ""
 #: js/basicblocks.js:243
 #: js/macros.js:109
 #.TRANS: even or odd number
+## 偶数＝ぐうすう；page 170 Collins Shubun
 msgid "even"
-msgstr ""
+msgstr "偶数"
 
 #: js/logo.js:3272
 #: js/basicblocks.js:237
