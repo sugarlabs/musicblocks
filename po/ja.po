@@ -97,7 +97,7 @@ msgstr "スタート"
 #: js/block.js:649
 ## ひらがな＝ぎょうれつ;　http://jisho.org/word/%E8%A1%8C%E5%88%97 ; changed to "music matrix"
 msgid "matrix"
-msgstr "音楽行列"
+msgstr "音楽グラフ"
 
 #: js/block.js:652
 #: js/basicblocks.js:765
@@ -561,11 +561,11 @@ msgstr "一分割テンポの高原は１０００"
 
 #: js/logo.js:2980
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "音楽行列は一つの音高ブロックと一つの太鼓ブロックを使う必要があります"
+msgstr "音楽グラフは一つの音高ブロックと一つの太鼓ブロックを使う必要があります"
 
 #: js/logo.js:3120
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "音楽行列は一つの音高ブロックと一つのリズムブロックを使う必要があります"
+msgstr "音楽グラフは一つの音高ブロックと一つのリズムブロックを使う必要があります"
 
 #: js/logo.js:3156
 msgid "Attack value should be from 0 to 100."
@@ -590,11 +590,11 @@ msgstr "一つ以上のenvelopeブロックを増しています"
 #: js/logo.js:3210
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
-msgstr ""
+msgstr "Rolloffの数字が-12, -24, -48, また -98 decibels/octaveの必要があります"
 
 #: js/logo.js:3248
 msgid "You are adding multiple oscillator blocks."
-msgstr ""
+msgstr "一つよりのoscillatorブロックを入れていますよ"
 
 #: js/logo.js:3268
 #: js/basicblocks.js:237
@@ -607,37 +607,39 @@ msgstr "偶数"
 
 #: js/logo.js:3272
 #: js/basicblocks.js:237
+## 奇数＝きすう；page 343 Collins Shubun
 msgid "odd"
-msgstr ""
+msgstr "奇数"
 
 #: js/logo.js:3343
 msgid "The Case Block must be used inside of a Switch Block."
-msgstr ""
+msgstr "ケースブロックはスイッチブロックの中に入られている必要があります"
 
 #: js/logo.js:3418
 msgid "The Step Pitch Block must be used inside of a Note Block."
-msgstr ""
+msgstr "ステップ調子ブロックは音符ブロックの中に入られている必要があります"
 
 #: js/logo.js:3645
 msgid "Drum Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "太鼓ブロック：音符ブロックと一緒に使うつもりですか"
 
 #: js/logo.js:4085
 msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "調子ブロック：音符ブロックと一緒に使うつもりですか"
 
 #: js/logo.js:4113
+## Shouldn't this be "polyrhythm"?
 msgid "polyphonic rhythm"
-msgstr ""
+msgstr "ポリリズム"
 
 #: js/logo.js:4136
 msgid "Rhythm Block: Did you mean to use a Matrix block?"
-msgstr ""
+msgstr "リズムブロック：音楽グラフと一緒に使うつもりですか"
 
 #: js/logo.js:4338
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
-msgstr ""
+msgstr "音符の"
 
 #: js/logo.js:4606
 msgid "Vibrato intensity must be between 1 and 100."
@@ -1746,25 +1748,25 @@ msgstr "調子の高さを設定"
 #: js/basicblocks.js:145
 #.TRANS: step down one note in current mode
 msgid "scalar step down"
-msgstr ""
+msgstr "音階の音符を下がり"
 
 #: js/basicblocks.js:153
 #.TRANS: step up one note in current mode
 msgid "scalar step up"
-msgstr ""
+msgstr "音階の音符を上がり"
 
 #: js/basicblocks.js:161
 #: js/basicblocks.js:406
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr ""
+msgstr "調子番号"
 
 #: js/basicblocks.js:177
 #.TRANS: MIDI is a technical standard for electronic music
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
-msgstr ""
+msgstr "調子番号のゼロを設定"
 
 #: js/basicblocks.js:178
 #: js/basicblocks.js:235
@@ -1796,94 +1798,96 @@ msgstr "オクターヴ"
 #: js/basicblocks.js:190
 #.TRANS: convert piano key number (1-88) to pitch
 msgid "number to pitch"
-msgstr ""
+msgstr "数字を調子に"
 
 #: js/basicblocks.js:199
 #.TRANS: convert piano key number (1-88) to octave
 msgid "number to octave"
-msgstr ""
+msgstr "数字をオクターヴに"
 
 #: js/basicblocks.js:234
 #: js/modewidget.js:90
 #.TRANS: pitch inversion rotates a pitch around another pitch
+## 逆さ＝さかさ
 msgid "invert"
-msgstr ""
+msgstr "逆さに"
 
 #: js/basicblocks.js:252
 #.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
-msgstr ""
+msgstr "逆さに (奇数)"
 
 #: js/basicblocks.js:267
 #.TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
-msgstr ""
+msgstr "逆さに (偶数)"
 
 #: js/basicblocks.js:282
 #.TRANS: adjust the amount of shift (up or down) of a pitch
+## 移し替え＝うつしかえ http://jisho.org/word/%E7%A7%BB%E3%81%97%E5%A4%89%E3%81%88%E3%82%8B 
 msgid "semi-tone transpose"
-msgstr ""
+msgstr "半音で移し替え"
 
 #: js/basicblocks.js:299
 #: js/basicblocks.js:1691
 #.TRANS: down sixth means the note is five scale degrees below current note
 #.TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
-msgstr ""
+msgstr "音階で六度下"
 
 #: js/basicblocks.js:307
 #: js/basicblocks.js:1699
 #.TRANS: down third means the note is two scale degrees below current note
 #.TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
-msgstr ""
+msgstr "音階で三度下"
 
 #: js/basicblocks.js:315
 #: js/basicblocks.js:1707
 #.TRANS: seventh means the note is the six scale degrees above current note
 #.TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
-msgstr ""
+msgstr "音階で七度上"
 
 #: js/basicblocks.js:323
 #: js/basicblocks.js:1715
 #.TRANS: sixth means the note is the five scale degrees above current note
 #.TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
-msgstr ""
+msgstr "音階で六度上"
 
 #: js/basicblocks.js:331
 #: js/basicblocks.js:1723
 #.TRANS: fifth means the note is the four scale degrees above current note
 #.TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
-msgstr ""
+msgstr "音階で五度上"
 
 #: js/basicblocks.js:339
 #: js/basicblocks.js:1731
 #.TRANS: fourth means the note is three scale degrees above current note
 #.TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
-msgstr ""
+msgstr "音階で四度上"
 
 #: js/basicblocks.js:347
 #: js/basicblocks.js:1739
 #.TRANS: third means the note is two scale degrees above current note
 #.TRANS: third means the note is two scale degrees above current note
 msgid "third"
-msgstr ""
+msgstr "音階で三度上"
 
 #: js/basicblocks.js:355
 #: js/basicblocks.js:1747
 #.TRANS: second means the note is one scale degree above current note
 #.TRANS: second means the note is one scale degree above current note
 msgid "second"
-msgstr ""
+msgstr "音階で二度上"
 
 #: js/basicblocks.js:371
 #.TRANS: adjust the amount of shift (up or down) of a pitch by scalar steps
 msgid "scalar transpose"
-msgstr ""
+msgstr "音階的の移し替え"
 
 #: js/basicblocks.js:381
 #.TRANS: flat is a half-step down in pitch
@@ -1904,18 +1908,19 @@ msgstr "ハーツ"
 #: js/basicblocks.js:416
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
-msgstr ""
+msgstr "温度"
 
 #: js/basicblocks.js:429
 #.TRANS: step some number of notes in current mode
 msgid "scalar step"
-msgstr ""
+msgstr "音階的のステップ"
 
 #: js/basicblocks.js:454
 #: js/timbre.js:528
 #.TRANS: there are different types (sine, triangle, square...) of oscillators.
+## 発振機=はっしんき　http://jisho.org/word/%E7%99%BA%E6%8C%AF%E6%A9%9F or http://jisho.org/word/%E6%8C%AF%E5%8B%95%E5%AD%90 
 msgid "oscillator"
-msgstr ""
+msgstr "発振機"
 
 #: js/basicblocks.js:455
 #: js/basicblocks.js:514
@@ -1923,51 +1928,53 @@ msgstr ""
 #: js/timbre.js:1269
 #.TRANS: type of filter, e.g., lowpass, highpass, etc.
 msgid "type"
-msgstr ""
+msgstr "種類"
 
 #: js/basicblocks.js:457
 #: js/timbre.js:1097
 #.TRANS: Partials refers to the number of sine waves combined into the sound.
+## 倍音; harmonics
 msgid "partials"
-msgstr ""
+msgstr "倍音"
 
 #: js/basicblocks.js:486
 #: js/timbre.js:563
 #.TRANS: sound envelope (ADSR)
 msgid "envelope"
-msgstr ""
+msgstr "エンベロープ"
 
 #: js/basicblocks.js:488
 #.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
 msgid "attack"
-msgstr ""
+msgstr "アタック"
 
 #: js/basicblocks.js:490
 #.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
+## http://jisho.org/word/%E3%83%87%E3%82%A3%E3%82%B1%E3%82%A4 
 msgid "decay"
-msgstr ""
+msgstr "ディケイ"
 
 #: js/basicblocks.js:492
 #.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 msgid "sustain"
-msgstr ""
+msgstr "サステイン"
 
 #: js/basicblocks.js:494
 #.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 msgid "release"
-msgstr ""
+msgstr "リリース"
 
 #: js/basicblocks.js:512
 #: js/timbre.js:610
 #.TRANS: a filter removes some unwanted components from a signal
 msgid "filter"
-msgstr ""
+msgstr "フィルター"
 
 #: js/basicblocks.js:516
 #: js/timbre.js:1270
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "rolloff"
-msgstr ""
+msgstr "ロールオフ"
 
 #: js/basicblocks.js:517
 #: js/basicblocks.js:2846
@@ -1978,31 +1985,33 @@ msgstr "周波数"
 
 #: js/basicblocks.js:533
 msgid "1/64 note"
-msgstr ""
+msgstr "64分音付"
 
 #: js/basicblocks.js:540
 msgid "1/32 note"
-msgstr ""
+msgstr "32分音付"
 
 #: js/basicblocks.js:547
 msgid "1/16 note"
-msgstr ""
+msgstr "16分音付"
 
 #: js/basicblocks.js:554
 msgid "eighth note"
-msgstr ""
+msgstr "八分音符"
 
 #: js/basicblocks.js:561
+## 四分＝しぶ
 msgid "quarter note"
-msgstr ""
+msgstr "四分音符"
 
 #: js/basicblocks.js:568
+## 二分＝にぶ
 msgid "half note"
-msgstr ""
+msgstr "二分音符"
 
 #: js/basicblocks.js:575
 msgid "whole note"
-msgstr ""
+msgstr "全音符"
 
 #: js/basicblocks.js:583
 #: js/basicblocks.js:596
@@ -2022,56 +2031,56 @@ msgstr "音符の数"
 #: js/basicblocks.js:619
 #.TRANS: A tuplet divided into 7 time values.
 msgid "septuplet"
-msgstr ""
+msgstr "七つタプル"
 
 #: js/basicblocks.js:627
 #.TRANS: A tuplet divided into 5 time values.
 msgid "quintuplet"
-msgstr ""
+msgstr "五つタプル"
 
 #: js/basicblocks.js:635
 #.TRANS: A tuplet divided into 3 time values.
 msgid "triplet"
-msgstr ""
+msgstr "三つタプル"
 
 #: js/basicblocks.js:642
 msgid "simple tuplet"
-msgstr ""
+msgstr "シンプルなタプル"
 
 #: js/basicblocks.js:693
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
-msgstr ""
+msgstr "カスタム音階"
 
 #: js/basicblocks.js:710
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
-msgstr ""
+msgstr "調子-太鼓マッパー"
 
 #: js/basicblocks.js:718
 #.TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
-msgstr ""
+msgstr "調子スライダー"
 
 #: js/basicblocks.js:726
 #.TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
-msgstr ""
+msgstr "ピッチの階段"
 
 #: js/basicblocks.js:734
 #: js/basicblocks.js:743
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm ruler"
-msgstr ""
+msgstr "リズムの物指"
 
 #: js/basicblocks.js:750
 msgid "G major scale"
-msgstr ""
+msgstr "G メジャー音階"
 
 #: js/basicblocks.js:758
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "pitch-time matrix"
-msgstr ""
+msgstr "音楽グラフ"
 
 #: js/basicblocks.js:800
 #.TRANS: number of beats per minute
@@ -2083,25 +2092,24 @@ msgstr "リズムの倍"
 #: js/basicblocks.js:866
 #.TRANS: number of beats played per minute
 msgid "beats per minute"
-msgstr ""
+msgstr "テンポ"
 
 #: js/basicblocks.js:816
 #.TRANS: oscillator time (in micro seconds)
 msgid "osctime"
-msgstr ""
+msgstr "発振機の千割秒の数値"
 
 #: js/basicblocks.js:825
 #: js/basicblocks.js:835
 #: js/basicblocks.js:844
 #.TRANS: swing is a rhythmic variation that emphasises the offbeat
-#.TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
-msgstr ""
+msgstr "スイング"
 
 #: js/basicblocks.js:846
 #.TRANS: the amount to shift to the offbeat note
 msgid "swing value"
-msgstr ""
+msgstr "スイングの数値"
 
 #: js/basicblocks.js:858
 #.TRANS: master beats per minute controls BPM for all mice
@@ -2591,15 +2599,17 @@ msgstr "評す"
 #: js/basicblocks.js:2365
 ## Need to look up this in a more specialized dictionary. I found Modular Programming as モジュラ・プログラミング 
 msgid "mod"
-msgstr "\80""
+msgstr ""
 
 #: js/basicblocks.js:2382
+## 平方根＝へいほうこん http://jisho.org/word/%E5%B9%B3%E6%96%B9%E6%A0%B9 
 msgid "sqrt"
-msgstr ""
+msgstr "平方根"
 
 #: js/basicblocks.js:2391
+## http://jisho.org/word/%E7%B5%B6%E5%AF%BE%E5%80%A4 
 msgid "abs"
-msgstr ""
+msgstr "絶対値"
 
 #: js/basicblocks.js:2442
 ## Literally "one from (inside) of"
@@ -2607,12 +2617,14 @@ msgid "one of"
 msgstr "の中の一つ"
 
 #: js/basicblocks.js:2442
+## need context
 msgid "this"
-msgstr ""
+msgstr "この"
 
 #: js/basicblocks.js:2442
+## need context
 msgid "that"
-msgstr ""
+msgstr "その"
 
 #: js/basicblocks.js:2453
 ## Just looked it up.
@@ -2621,11 +2633,11 @@ msgstr "でたらめな"
 
 #: js/basicblocks.js:2453
 msgid "min"
-msgstr ""
+msgstr "低減"
 
 #: js/basicblocks.js:2453
 msgid "max"
-msgstr ""
+msgstr "高原"
 
 #: js/basicblocks.js:2468
 ## check this
@@ -2646,31 +2658,34 @@ msgstr "最終の状態"
 #: js/basicblocks.js:2765
 #: js/blocks.js:2529
 #: plugins/bitcoin.rtp:27
+## assuming "monetary value" ; many more values 価格、評価
 msgid "value"
-msgstr ""
+msgstr "価値"
 
 #: js/basicblocks.js:2532
 msgid "return"
-msgstr ""
+msgstr "帰ります"
 
 #: js/basicblocks.js:2542
 msgid "return to URL"
-msgstr ""
+msgstr "URLに帰ります"
 
 #: js/basicblocks.js:2546
 msgid "100"
-msgstr ""
+msgstr "百"
 
 #: js/basicblocks.js:2552
 #: js/basicblocks.js:2578
 #: js/basicblocks.js:2597
+## 経産＝けいさん; p69 Collins Shubun
 msgid "calculate"
-msgstr ""
+msgstr "経産"
 
 #: js/basicblocks.js:2626
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
+## I need some context...
 msgid "on"
-msgstr ""
+msgstr "の時に"
 
 #: js/basicblocks.js:2627
 #: js/basicblocks.js:2631
@@ -2682,15 +2697,15 @@ msgstr "行事" #ひらがな＝ぎょう\E3\81"
 #: js/basicblocks.js:2640
 #.TRANS: dispatch an event to trigger a listener
 msgid "broadcast"
-msgstr ""
+msgstr "放送します"
 
 #: js/basicblocks.js:2685
 msgid "load heap from App"
-msgstr ""
+msgstr "アプリからヒープをロード"
 
 #: js/basicblocks.js:2696
 msgid "save heap to App"
-msgstr ""
+msgstr "アプリにヒープを保存"
 
 #: js/basicblocks.js:2707
 #: plugins/heap.rtp:126
@@ -2699,8 +2714,9 @@ msgid "show heap"
 msgstr "ヒープを見せる"
 
 #: js/basicblocks.js:2714
+## Maybe heap in roman letters"
 msgid "heap length"
-msgstr "ヒープの長さ" #Maybe heap in roman letters"
+msgstr "ヒープの長さ"
 
 #: js/basicblocks.js:2722
 #: plugins/heap.rtp:134
@@ -2717,17 +2733,19 @@ msgstr "ヒープを確保"
 #: js/basicblocks.js:2745
 #: plugins/heap.rtp:160
 msgid "load heap"
-msgstr ""
+msgstr "ヒープをロード"
 
 #: js/basicblocks.js:2755
 #.TRANS: retrieve a value from the heap at index position in the heap
+## ひらがな＝さいば
 msgid "index heap"
-msgstr "ヒープを採番する"＃ひらがな＝さいば\E3\82"
+msgstr "ヒープを採番する"
 
 #: js/basicblocks.js:2765
 #.TRANS: set a value in the heap
+## 数値＝すうち；unsure if this is just a number value http://jisho.org/word/%E6%95%B0%E5%80%A4 
 msgid "set heap"
-msgstr ""
+msgstr "ヒープに数値を入れます"
 
 #: js/basicblocks.js:2765
 ## Double-check. Not sure. May be too literal.
