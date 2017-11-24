@@ -557,7 +557,7 @@ msgstr "一分割テンポは３０より必要があります"
 #: js/logo.js:2808
 #: js/logo.js:2829
 msgid "Maximum beats per minute is 1000."
-msgstr "一分割テンポの高原は１０００"
+msgstr "一分割テンポの最大値は１０００"
 
 #: js/logo.js:2980
 msgid "You must have at least one pitch block and one drum block in the matrix."
@@ -639,7 +639,7 @@ msgstr "リズムブロック：音楽グラフと一緒に使うつもりです
 #: js/logo.js:4338
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
-msgstr "音符の"
+msgstr "音価の数値は０よりの必要があります"
 
 #: js/logo.js:4606
 msgid "Vibrato intensity must be between 1 and 100."
@@ -1451,18 +1451,19 @@ msgstr ""
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 ## I doubt that this is correct.
 msgid "note value"
-msgstr "音符の長さ"
+msgstr "音価"
 
 #: js/pitchtimematrix.js:653
 #: js/pitchtimematrix.js:782
 msgid "tuplet value"
-msgstr ""
+msgstr "タプルの音価"
 
 #: js/turtledefs.js:21
 #: js/basicblocks.js:1064
 #.TRANS: musical meter (time signature)
+## 拍子記号＝ひょうしきごう；http://musical-grammar.com/time001.html
 msgid "meter"
-msgstr ""
+msgstr "拍子記号"
 
 #: js/turtledefs.js:21
 msgid "intervals"
@@ -1471,7 +1472,7 @@ msgstr ""
 #: js/turtledefs.js:21
 #: js/basicblocks.js:3472
 msgid "volume"
-msgstr ""
+msgstr "音の大きさ"
 
 #: js/turtledefs.js:21
 ## Maybe just leave in roman letters. Depends on what feels good for pedagogy...
@@ -1891,14 +1892,15 @@ msgstr "音階的の移し替え"
 
 #: js/basicblocks.js:381
 #.TRANS: flat is a half-step down in pitch
+## ♯は日本語で嬰（えい）、♭は変（へん）と言います|http://musical-grammar.com/scale003.html
 msgid "flat"
-msgstr "フラット"
+msgstr "フラット(変)"
 
 #: js/basicblocks.js:389
 #.TRANS: sharp is a half-step up in pitch
-## check this
+## ♯は日本語で嬰（えい）、♭は変（へん）と言います|http://musical-grammar.com/scale003.html
 msgid "sharp"
-msgstr "シャープ"
+msgstr "シャープ(嬰)"
 
 #: js/basicblocks.js:397
 #.TRANS: a measure of frequency: one cycle per second
@@ -2075,7 +2077,7 @@ msgstr "リズムの物指"
 
 #: js/basicblocks.js:750
 msgid "G major scale"
-msgstr "G メジャー音階"
+msgstr "G メジャー（ト長調）"
 
 #: js/basicblocks.js:758
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
@@ -2114,17 +2116,18 @@ msgstr "スイングの数値"
 #: js/basicblocks.js:858
 #.TRANS: master beats per minute controls BPM for all mice
 msgid "master beats per minute"
-msgstr ""
+msgstr "一分割のマスターテンポ"
 
 #: js/basicblocks.js:875
 #.TRANS: play music backward
 msgid "backward"
-msgstr ""
+msgstr "反対に"
 
 #: js/basicblocks.js:883
 #.TRANS: substitute rests on notes being skipped
+## 省略＝しょうりゃく
 msgid "skip notes"
-msgstr ""
+msgstr "音符の省略"
 
 #: js/basicblocks.js:892
 #.TRANS: play each note more than once
@@ -2135,49 +2138,53 @@ msgstr "音符を倍にする"
 #: js/basicblocks.js:901
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 msgid "multiply note value"
-msgstr ""
+msgstr "音階の倍"
 
 #: js/basicblocks.js:910
 #.TRANS: slow down note duration by some factor, e.g. convert 1/8 to 1/4 notes by using a factor of 2
 msgid "divide note value"
-msgstr ""
+msgstr "音価の割り"
 
 #: js/basicblocks.js:919
 #.TRANS: tie notes together into one longer note
+## http://musical-grammar.com/pause001.html
 msgid "tie"
-msgstr ""
+msgstr "タイ"
 
 #: js/basicblocks.js:927
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 ##　I need to look this up.
 msgid "dot"
-msgstr ""
+msgstr "ドット"
 
 #: js/basicblocks.js:934
 #: js/rhythmruler.js:327
+## http://musical-grammar.com/pause001.html
 msgid "silence"
-msgstr ""
+msgstr "休符"
 
 #: js/basicblocks.js:948
 msgid "392 hertz"
-msgstr ""
+msgstr "３９２ハーツ"
 
 #: js/basicblocks.js:1010
 #.TRANS: don't lock notes to master clock
 msgid "no clock"
-msgstr ""
+msgstr "クロックなし"
 
 #: js/basicblocks.js:1018
+## structure of grammar makes this awkward;http://musical-grammar.com/time005.html
 msgid "on offbeat do"
-msgstr ""
+msgstr "弱拍に何々を"
 
 #: js/basicblocks.js:1028
 msgid "on beat"
-msgstr ""
+msgstr "強拍"
 
 #: js/basicblocks.js:1028
+## http://musical-grammar.com/time004.html
 msgid "beat"
-msgstr ""
+msgstr "拍子"
 
 #: js/basicblocks.js:1028
 #: js/basicblocks.js:2522
@@ -2186,89 +2193,96 @@ msgstr ""
 #: js/basicblocks.js:2627
 #: js/basicblocks.js:2966
 #: js/basicblocks.js:2973
+## を is particle and する is "to do"; awkward grammar to make the object happen after
 msgid "do"
-msgstr "をする"＃を is particle and する is "to do"
+msgstr "をするのは"
 
 #: js/basicblocks.js:1040
 #.TRANS: count of current measure in meter
 msgid "measure count"
-msgstr ""
+msgstr "小節の数字"
 
 #: js/basicblocks.js:1048
 #.TRANS: count of current beat in meter
+## trying "what beat"
 msgid "beat count"
-msgstr ""
+msgstr "何ビート"
 
 #: js/basicblocks.js:1056
 #.TRANS: anacrusis
+## 弱起＝じゃっき；https://ja.wikipedia.org/wiki/%E5%BC%B1%E8%B5%B7
 msgid "pickup"
-msgstr ""
+msgstr "弱起"
 
 #: js/basicblocks.js:1065
+## https://ja.wikipedia.org/wiki/%E6%8B%8D%E5%AD%90
 msgid "number of beats"
-msgstr ""
+msgstr "拍子の数"
 
 #: js/basicblocks.js:1076
 #.TRANS: count the number of notes
 msgid "note counter"
-msgstr ""
+msgstr "音符の数"
 
 #: js/basicblocks.js:1084
 #.TRANS: number of whole notes that have been played
 msgid "whole notes played"
-msgstr ""
+msgstr "プレーした全音符の数"
 
 #: js/basicblocks.js:1092
 #.TRANS: number of notes that have been played
 msgid "notes played"
-msgstr ""
+msgstr "プレーした音符の数"
 
 #: js/basicblocks.js:1103
 #.TRANS: the duration of a note played as staccato
+## ジーニアス英和辞典
 msgid "staccato factor"
-msgstr ""
+msgstr "スタッカートの倍さ"
 
 #: js/basicblocks.js:1111
 #.TRANS: the degree of overlap of notes played as legato
 msgid "slur factor"
-msgstr ""
+msgstr "スラーの倍さ"
 
 #: js/basicblocks.js:1119
 #: js/timbre.js:880
 #.TRANS: AM (amplitude modulation) synthesizer
 msgid "AM synth"
-msgstr ""
+msgstr "AM シンセ"
 
 #: js/basicblocks.js:1130
 #: js/timbre.js:880
 #.TRANS: FM (frequency modulation) synthesizer
 msgid "FM synth"
-msgstr ""
+msgstr "FM シンセ"
 
 #: js/basicblocks.js:1142
 #: js/timbre.js:880
 #.TRANS: a duo synthesizer combines a synth with a sequencer
+## ジーニアス英和辞典
 msgid "duo synth"
-msgstr ""
+msgstr "シーケンサー込みシンセ"
 
 #: js/basicblocks.js:1143
 #: js/timbre.js:1041
 msgid "vibrato rate"
-msgstr ""
+msgstr "ビブラートエフェクトのレート"
 
 #: js/basicblocks.js:1143
 msgid "vibrato intensity"
-msgstr ""
+msgstr "ビブラートエフェクトの大きさ"
 
 #: js/basicblocks.js:1156
 #.TRANS: distortion is an alteration in the sound
+## https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1055887895
 msgid "distortion"
-msgstr ""
+msgstr "ディストーション"
 
 #: js/basicblocks.js:1166
 #.TRANS: a wavering effect in a musical tone
 msgid "tremolo"
-msgstr ""
+msgstr "トレモロエフェクト"
 
 #: js/basicblocks.js:1168
 #: js/basicblocks.js:1183
@@ -2276,82 +2290,85 @@ msgstr ""
 #: js/basicblocks.js:1214
 #.TRANS: rate at which tremolo wavers
 msgid "rate"
-msgstr ""
+msgstr "レート"
 
 #: js/basicblocks.js:1170
 #: js/basicblocks.js:1199
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
-msgstr ""
+msgstr "トレモロエフェクトの大きさ"
 
 #: js/basicblocks.js:1182
 #.TRANS: alter the phase of the sound
 msgid "phaser"
-msgstr ""
+msgstr "フェーザー"
 
 #: js/basicblocks.js:1183
 msgid "octaves"
-msgstr ""
+msgstr "オクターブ"
 
 #: js/basicblocks.js:1183
+## guessing...
 msgid "base frequency"
-msgstr ""
+msgstr "基本調子"
 
 #: js/basicblocks.js:1198
 #.TRANS: musical effect to simulate a choral sound
 msgid "chorus"
-msgstr ""
+msgstr "コーラスエフェクト"
 
 #: js/basicblocks.js:1199
 msgid "delay"
-msgstr ""
+msgstr "ディレイエフェクト"
 
 #: js/basicblocks.js:1213
 #.TRANS: a rapid, slight variation in pitch
 msgid "vibrato"
-msgstr ""
+msgstr "ビブラート"
 
 #: js/basicblocks.js:1214
+## just put "bigness"
 msgid "intensity"
-msgstr ""
+msgstr "大きさ"
 
 #: js/basicblocks.js:1225
 #.TRANS: select synthesizer
 msgid "set synth"
-msgstr ""
+msgstr "シンセを設定"
 
 #: js/basicblocks.js:1236
 #: js/basicblocks.js:1256
 #.TRANS: legato: overlap successive notes
 #.TRANS: legato: overlap successive notes
 msgid "slur"
-msgstr ""
+msgstr "スラー"
 
 #: js/basicblocks.js:1246
 #: js/basicblocks.js:1265
 #.TRANS: play each note sharply detached from the others
 #.TRANS: play each note sharply detached from the others
 msgid "staccato"
-msgstr ""
+msgstr "スタッカート"
 
 #: js/basicblocks.js:1280
 #.TRANS: set the characteristics of a custom instrument
 msgid "set timbre"
-msgstr ""
+msgstr "音色の設定"
 
 #: js/basicblocks.js:1293
 msgid "doubly"
-msgstr ""
+msgstr "倍に"
 
 #: js/basicblocks.js:1310
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr ""
+msgstr "半音の計り"
 
 #: js/basicblocks.js:1318
 #.TRANS: measure the distance between two pitches in scalar steps
+## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
-msgstr ""
+msgstr "音階の音程の計り"
 
 #: js/basicblocks.js:1397
 #: js/basicblocks.js:1480
@@ -2360,7 +2377,7 @@ msgstr ""
 #: js/basicblocks.js:1668
 #.TRANS: the number of half-steps between notes
 msgid "interval"
-msgstr ""
+msgstr "音程"
 
 #: js/basicblocks.js:1546
 #: js/basicblocks.js:1553
@@ -2633,11 +2650,11 @@ msgstr "でたらめな"
 
 #: js/basicblocks.js:2453
 msgid "min"
-msgstr "低減"
+msgstr "最低値"
 
 #: js/basicblocks.js:2453
 msgid "max"
-msgstr "高原"
+msgstr "最大値"
 
 #: js/basicblocks.js:2468
 ## check this
