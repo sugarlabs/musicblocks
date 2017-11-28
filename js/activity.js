@@ -128,6 +128,7 @@ define(MYDEFINES, function (compatibility) {
         var gridImages = [];
         var chartBitmap = null;
         var saveBox;
+        var merging = false;
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -933,19 +934,26 @@ define(MYDEFINES, function (compatibility) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
-				stage.removeAllEventListeners('trashsignal');
+				                stage.removeAllEventListeners('trashsignal');
 
-                                // Wait for the old blocks to be removed.
-				var __listener = function (event) {
+                                if (!merging){
+                                    // Wait for the old blocks to be removed.
+                                    var __listener = function (event) {
+                                        logo.playbackQueue = {};
+                                        blocks.loadNewBlocks(obj);
+                                        setPlaybackStatus();
+
+                                        stage.removeAllEventListeners('trashsignal');
+                                    };
+
+                                    stage.addEventListener('trashsignal', __listener, false);
+                                    sendAllToTrash(false, false);
+                                } else {
+                                    merging = false;
                                     logo.playbackQueue = {};
                                     blocks.loadNewBlocks(obj);
                                     setPlaybackStatus();
-
-				    stage.removeAllEventListeners('trashsignal');                                };
-
-				stage.addEventListener('trashsignal', __listener, false);
-
-                                sendAllToTrash(false, false);
+                                }
                                 refreshCanvas();
 
                             } catch (e) {
@@ -1968,7 +1976,13 @@ define(MYDEFINES, function (compatibility) {
             // add code for facebook share link
         };
 
-        function doLoad() {
+        function doLoad(merge=false) {
+            if (merge){
+                console.log("merge load");
+                merging = true;
+            } else {
+                merging = false;
+            }
             console.log('Loading .tb file');
             document.querySelector('#myOpenFile').focus();
             document.querySelector('#myOpenFile').click();
@@ -2771,6 +2785,11 @@ handleComplete);
             _setupRightMenu(turtleBlocksScale);
         };
 
+        function _doMergeLoad(){
+            console.log("merge load");
+            doLoad(true);
+        }
+
         function _setupRightMenu(turtleBlocksScale) {
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
@@ -2781,29 +2800,30 @@ handleComplete);
 
             // NOTE: see getAuxToolbarButtonNames in turtledefs.js
             // Misc. other buttons
+            // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var menuNames = [
-                    ['planet', _doOpenSamples, _('Load samples from server')],
-                    ['open', doLoad, _('Load project from files')],
-                    ['save', doSave, _('Save project')],
-                    ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.')],
-                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar')],
-                    ['compile', _doPlaybackBox, _('playback')],
-                    ['utility', _doUtilityBox, _('Settings')],
-                    ['empty-trash', _deleteBlocksBox, _('Delete all')],
-                    ['restore-trash', _restoreTrash, _('Undo')]
+                    ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
+                    ['open', doLoad, _('Load project from files'), _doMergeLoad, null, 'open-merge-button', null],
+                    ['save', doSave, _('Save project'), null, null, null, null],
+                    ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.'), null, null, null, null],
+                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+                    ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
+                    ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
+                    ['empty-trash', _deleteBlocksBox, _('Delete all'), null, null, null, null],
+                    ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
                 ];
             } else {
                 var menuNames = [
-                    ['planet', _doOpenSamples, _('Load samples from server')],
-                    ['open', doLoad, _('Load project from files')],
-                    ['save', doSave, _('Save project')],
-                    ['paste-disabled', pasteStack, _('Paste')],
-                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar')],
-                    ['compile', _doPlaybackBox, _('playback')],
-                    ['utility', _doUtilityBox, _('Settings')],
-                    ['empty-trash', _deleteBlocksBox, _('Delete all')],
-                    ['restore-trash', _restoreTrash, _('Undo')]
+                    ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
+                    ['open', doLoad, _('Load project from files'), null, null, null, null],
+                    ['save', doSave, _('Save project'), null, null, null, null],
+                    ['paste-disabled', pasteStack, _('Paste'), null, null, null, null],
+                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+                    ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
+                    ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
+                    ['empty-trash', _deleteBlocksBox, _('Delete all'), null, null, null, null],
+                    ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
                 ];
             }
 
@@ -2841,7 +2861,7 @@ handleComplete);
                     }
                 }
 
-                _loadButtonDragHandler(container, x, y, menuNames[i][1], null, null, null, null);
+                _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
                 onscreenMenu.push(container);
                 if (menuNames[i][0] === 'utility') {
                     utilityButton = container;
