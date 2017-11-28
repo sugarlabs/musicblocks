@@ -1,63 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="55.000001" height="55.000001" xmlns="http://www.w3.org/2000/svg">
 
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="55"
-   height="55"
-   viewBox="0 0 55.000001 55.000001"
-   id="svg2"
-   version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="upload-planet.svg">
-  <defs
-     id="defs4" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="6.4272727"
-     inkscape:cx="16.181921"
-     inkscape:cy="19.272827"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     units="px"
-     inkscape:window-width="1375"
-     inkscape:window-height="876"
-     inkscape:window-x="65"
-     inkscape:window-y="24"
-     inkscape:window-maximized="1" />
-  <metadata
-     id="metadata7">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0,-997.36216)">
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:#000000;fill-opacity:1"
-       d="m 27.266613,1004.1792 c -11.41695,0 -20.6828813,9.2661 -20.6828813,20.683 0,11.417 9.2659313,20.6829 20.6828813,20.6829 11.41695,0 20.68288,-9.2659 20.68288,-20.6829 0,-11.4169 -9.26593,-20.683 -20.68288,-20.683 z m -2.068289,37.0845 c -8.169737,-1.0134 -14.478016,-7.9629 -14.478016,-16.4015 0,-1.2823 0.165463,-2.5027 0.43434,-3.7022 l 9.9071,9.9071 0,2.0683 c 0,2.2751 1.86146,4.1365 4.136576,4.1365 l 0,3.9918 z m 14.271188,-5.2534 c -0.537754,-1.6753 -2.068287,-2.8749 -3.929747,-2.8749 l -2.068288,0 0,-6.2049 c 0,-1.1376 -0.93073,-2.0683 -2.068288,-2.0683 l -12.409728,0 0,-4.1366 4.136576,0 c 1.137559,0 2.068287,-0.9307 2.068287,-2.0683 l 0,-4.1365 4.136577,0 c 2.275116,0 4.136576,-1.8615 4.136576,-4.1367 l 0,-0.8479 c 6.060083,2.4613 10.341441,8.3973 10.341441,15.326 0,4.302 -1.654631,8.2111 -4.343406,11.1481 z"
-       id="path4214" />
+ <metadata id="metadata7">image/svg+xml</metadata>
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g id="layer1">
+   <path fill="#000000" id="path4214" d="m23.766615,3.567021c-11.002951,0 -19.93288,8.930108 -19.93288,19.932983c0,11.002991 8.92993,19.932861 19.93288,19.932861c11.002951,0 19.932882,-8.929871 19.932882,-19.932861c0,-11.002875 -8.929932,-19.932983 -19.932882,-19.932983zm-1.99329,35.739723c-7.873482,-0.976681 -13.953011,-7.674141 -13.953011,-15.80674c0,-1.23579 0.15946,-2.411934 0.418591,-3.567963l9.54785,9.547913l0,1.99324c0,2.192646 1.793961,3.986477 3.98657,3.986477l0,3.847073zm13.753691,-5.06292c-0.51825,-1.614544 -1.99329,-2.77063 -3.787251,-2.77063l-1.993279,0l0,-5.979836c0,-1.096439 -0.896982,-1.993355 -1.99329,-1.993355l-11.959732,0l0,-3.986599l3.98658,0c1.09631,0 1.99328,-0.896915 1.99328,-1.993298l0,-3.986478l3.98658,0c2.192621,0 3.986582,-1.794008 3.986582,-3.986714l0,-0.817154c5.840328,2.372054 9.966438,8.092779 9.966438,14.770243c0,4.146004 -1.594627,7.913311 -4.185909,10.74382z"/>
   </g>
+  <polyline fill="none" points="11.386,18.559 20.773,18.559 20.773,9.173    " id="polyline3009"/>
+  <line fill="none" stroke="#000000" stroke-width="2.9867" stroke-linecap="round" stroke-linejoin="round" x1="44.994993" x2="44.994993" y1="50.749995" y2="38.833995" id="line3011"/>
+  <polyline transform="rotate(180, 44.995, 39.2853)" fill="none" stroke="#000000" stroke-width="2.9867" stroke-linecap="round" stroke-linejoin="round" points="50.1249942779541,36.243345975875854 44.99499320983887,42.32734560966492 39.8649959564209,36.243345975875854 " id="polyline3013"/>
+ </g>
 </svg>
