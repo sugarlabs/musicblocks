@@ -1976,7 +1976,8 @@ define(MYDEFINES, function (compatibility) {
             // add code for facebook share link
         };
 
-        function doLoad(merge=false) {
+        function doLoad(merge) {
+            if (merge === undefined) merge=false;
             if (merge){
                 console.log("merge load");
                 merging = true;
