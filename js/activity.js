@@ -2805,7 +2805,7 @@ handleComplete);
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var menuNames = [
                     ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
-                    ['open', doLoad, _('Load project from files'), _doMergeLoad, null, 'open-merge-button', null],
+                    ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
                     ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.'), null, null, null, null],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
@@ -2817,7 +2817,7 @@ handleComplete);
             } else {
                 var menuNames = [
                     ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
-                    ['open', doLoad, _('Load project from files'), null, null, null, null],
+                    ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
                     ['paste-disabled', pasteStack, _('Paste'), null, null, null, null],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],

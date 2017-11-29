@@ -82,6 +82,7 @@ const LOCAL_PROJECT_TEMPLATE ='\
         </div> \
         </span> \
         <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
+        <img class="merge icon" title="' + _('Merge with Current Project') + '" alt="' + _('Merge with Current Project') + '" src="header-icons/download-merge.svg" /> \
     </div> \
 </li>'
 
@@ -98,6 +99,7 @@ const GLOBAL_PROJECT_TEMPLATE = '\
     </div> \
     </span> \
     <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
+    <img class="merge icon" title="' + _('Merge with Current Project') + '" alt="' + _('Merge with Current Project') + '" src="header-icons/download-merge.svg" /> \
 </div>';
 
 
@@ -287,9 +289,12 @@ function PlanetModel(controller) {
     };
 
     //Opens up projects in the "On my device" section
-    this.open = function (name, data) {
+    this.open = function (name, data, merge) {
+        if (merge === undefined) merge=false;
         localStorage.currentProject = name;
-        model.controller.sendAllToTrash(false, true);
+        if (!merge){
+            model.controller.sendAllToTrash(false, true);
+        }
         model.controller.loadRawProject(data);
         model.stop = true;
     };
@@ -304,9 +309,12 @@ function PlanetModel(controller) {
         localStorage.allProjects = JSON.stringify(l);
     };
 
-    this.load = function (name) {
+    this.load = function (name, merge) {
+        if (merge === undefined) merge=false;
         model.prepLoadingProject(name);
-        model.controller.sendAllToTrash(false, false);
+        if (!merge){
+            model.controller.sendAllToTrash(false, false);
+        }
 
         jQuery.ajax({
             url: SERVER + name + '.tb',
@@ -412,6 +420,8 @@ function PlanetView(model, controller) {
                     .addEventListener('click', planet.share(ele,i));
                 ele.querySelector('.download')
                    .addEventListener('click', planet.download(ele));
+                ele.querySelector('.merge')
+                   .addEventListener('click', planet.open(ele, true));
                 ele.querySelector('.delete')
                    .addEventListener('click', planet.delete(ele));
                 ele.querySelector('input')
@@ -437,14 +447,17 @@ function PlanetView(model, controller) {
             .addEventListener('click', planet.load(htmldata));
         htmldata.querySelector('.download')
             .addEventListener('click', planet.load(htmldata));
+        htmldata.querySelector('.merge')
+            .addEventListener('click', planet.load(htmldata, true));
         htmldata.querySelector('.share')
             .addEventListener('click', planet.planetshare(htmldata,i));
         document.querySelector('.planet .content.w').appendChild(htmldata);
     }
 
-    this.load = function (ele) {
+    this.load = function (ele, merge) {
         return function () {
-            planet.model.load(ele.attributes.title.value);
+            if (merge === undefined) merge=false;
+            planet.model.load(ele.attributes.title.value, merge);
             planet.controller.hide();
         }
     };
@@ -499,8 +512,9 @@ function PlanetView(model, controller) {
         }
     };
 
-    this.open = function (ele) {
+    this.open = function (ele, merge) {
         return function () {
+            if (merge === undefined) merge=false;
             docById('statusDiv').style.visibility = localStorage.getItem('isStatusHidden');
             docById('statusButtonsDiv').style.visibility = localStorage.getItem('isStatusHidden');
             docById('statusTableDiv').style.visibility = localStorage.getItem('isStatusHidden');
@@ -537,7 +551,7 @@ function PlanetView(model, controller) {
                 return;
             }
             
-            planet.model.open(ele.attributes.title.value, ele.attributes.data.value);
+            planet.model.open(ele.attributes.title.value, ele.attributes.data.value, merge);
             planet.controller.hide();
         }
     };
