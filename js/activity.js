@@ -934,9 +934,9 @@ define(MYDEFINES, function (compatibility) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
-				                stage.removeAllEventListeners('trashsignal');
+                                            stage.removeAllEventListeners('trashsignal');
 
-                                if (!merging){
+                                if (!merging) {
                                     // Wait for the old blocks to be removed.
                                     var __listener = function (event) {
                                         logo.playbackQueue = {};
@@ -1778,7 +1778,7 @@ define(MYDEFINES, function (compatibility) {
             // We really need to signal when each palette item is deleted
             setTimeout(function() {
                 stage.dispatchEvent('trashsignal');
-	    }, 1000 * actionBlockCounter);
+           }, 1000 * actionBlockCounter);
 
             update = true;
         };
@@ -1977,13 +1977,17 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doLoad(merge) {
-            if (merge === undefined) merge=false;
-            if (merge){
+            if (merge === undefined) {
+                merge = false;
+            }
+
+            if (merge) {
                 console.log("merge load");
                 merging = true;
             } else {
                 merging = false;
             }
+
             console.log('Loading .tb file');
             document.querySelector('#myOpenFile').focus();
             document.querySelector('#myOpenFile').click();
@@ -2256,7 +2260,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         // Hides the loading animation and unhides the background.
-        function showContents(){
+        function showContents() {
             docById('loading-image-container').style.display = 'none';
             // docById('canvas').style.display = 'none';
             docById('hideContents').style.display = 'block';
@@ -2591,7 +2595,7 @@ define(MYDEFINES, function (compatibility) {
                 } else if (myBlock.name === 'matrixData') {
                     var args = {
                         'notes': window.savedMatricesNotes,
-			'count': window.savedMatricesCount
+                        'count': window.savedMatricesCount
                     }
                     hasMatrixDataBlock = true;
                 } else {
@@ -2786,7 +2790,7 @@ handleComplete);
             _setupRightMenu(turtleBlocksScale);
         };
 
-        function _doMergeLoad(){
+        function _doMergeLoad() {
             console.log("merge load");
             doLoad(true);
         }

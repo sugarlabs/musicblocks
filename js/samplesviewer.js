@@ -82,7 +82,7 @@ const LOCAL_PROJECT_TEMPLATE ='\
         </div> \
         </span> \
         <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
-        <img class="merge icon" title="' + _('Merge with Current Project') + '" alt="' + _('Merge with Current Project') + '" src="header-icons/download-merge.svg" /> \
+        <img class="merge icon" title="' + _('Merge with Current Project') + '" alt="' + _('Merge with current project') + '" src="header-icons/download-merge.svg" /> \
     </div> \
 </li>'
 
@@ -99,7 +99,7 @@ const GLOBAL_PROJECT_TEMPLATE = '\
     </div> \
     </span> \
     <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
-    <img class="merge icon" title="' + _('Merge with Current Project') + '" alt="' + _('Merge with Current Project') + '" src="header-icons/download-merge.svg" /> \
+    <img class="merge icon" title="' + _('Merge with current project') + '" alt="' + _('Merge with Current Project') + '" src="header-icons/download-merge.svg" /> \
 </div>';
 
 
@@ -174,7 +174,7 @@ function PlanetModel(controller) {
 
         var mbcheck = false;
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            if (name.slice(0, MUSICBLOCKSPREFIX.length) === MUSICBLOCKSPREFIX){
+            if (name.slice(0, MUSICBLOCKSPREFIX.length) === MUSICBLOCKSPREFIX) {
                 name = name.substring(MUSICBLOCKSPREFIX.length);
                 mbcheck = true;
             }
@@ -290,11 +290,15 @@ function PlanetModel(controller) {
 
     //Opens up projects in the "On my device" section
     this.open = function (name, data, merge) {
-        if (merge === undefined) merge=false;
+        if (merge === undefined) {
+            merge = false;
+        }
+
         localStorage.currentProject = name;
-        if (!merge){
+        if (!merge) {
             model.controller.sendAllToTrash(false, true);
         }
+
         model.controller.loadRawProject(data);
         model.stop = true;
     };
@@ -310,9 +314,12 @@ function PlanetModel(controller) {
     };
 
     this.load = function (name, merge) {
-        if (merge === undefined) merge=false;
+        if (merge === undefined) {
+            merge = false;
+        }
+
         model.prepLoadingProject(name);
-        if (!merge){
+        if (!merge) {
             model.controller.sendAllToTrash(false, false);
         }
 
@@ -433,7 +440,7 @@ function PlanetView(model, controller) {
         }
     };
 
-    this.addGlobalElement = function (glob, i){
+    this.addGlobalElement = function (glob, i) {
         var d = document.createElement('li');
         d.setAttribute('url', glob.url);
         d.setAttribute('title', glob.title);
@@ -456,7 +463,10 @@ function PlanetView(model, controller) {
 
     this.load = function (ele, merge) {
         return function () {
-            if (merge === undefined) merge=false;
+            if (merge === undefined) {
+                merge = false;
+            }
+
             planet.model.load(ele.attributes.title.value, merge);
             planet.controller.hide();
         }
@@ -514,7 +524,10 @@ function PlanetView(model, controller) {
 
     this.open = function (ele, merge) {
         return function () {
-            if (merge === undefined) merge=false;
+            if (merge === undefined) {
+                merge = false;
+            }
+
             docById('statusDiv').style.visibility = localStorage.getItem('isStatusHidden');
             docById('statusButtonsDiv').style.visibility = localStorage.getItem('isStatusHidden');
             docById('statusTableDiv').style.visibility = localStorage.getItem('isStatusHidden');
@@ -660,11 +673,11 @@ function validateImageData(d) {
         return false;
     }
     
-    if(d.indexOf('data:image') !== 0){
+    if(d.indexOf('data:image') !== 0) {
         return false;
     } else {
         var data = d.split(',');
-        if(data[1].length == 0){
+        if(data[1].length == 0) {
             return false;
         }
     }
