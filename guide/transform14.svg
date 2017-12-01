@@ -36,17 +36,19 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="685"
-     inkscape:window-height="480"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
      id="namedview9332"
      showgrid="false"
-     inkscape:zoom="0.2079063"
-     inkscape:cx="413"
-     inkscape:cy="224.5"
-     inkscape:window-x="0"
-     inkscape:window-y="282"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg9330" />
+     inkscape:zoom="0.83162518"
+     inkscape:cx="554.03466"
+     inkscape:cy="353.76323"
+     inkscape:window-x="-8"
+     inkscape:window-y="274"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9330"
+     inkscape:measure-start="0,0"
+     inkscape:measure-end="0,0" />
   <g
      transform="translate(13.5,65)"
      id="g8752">
@@ -1274,4 +1276,24 @@
       </text>
     </g>
   </g>
-</svg>
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot10554"
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
+       id="flowRegion10556"><rect
+         id="rect10558"
+         width="132.27113"
+         height="22.84683"
+         x="292.19894"
+         y="9.5052814" /></flowRegion><flowPara
+       id="flowPara10560">augmented 5</flowPara></flowRoot>  <flowRoot
+     xml:space="preserve"
+     id="flowRoot10562"
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
+       id="flowRegion10564"><rect
+         id="rect10566"
+         width="129.8662"
+         height="21.644365"
+         x="770.77991"
+         y="7.1003518" /></flowRegion><flowPara
+       id="flowPara10568">minor 3</flowPara></flowRoot></svg>
