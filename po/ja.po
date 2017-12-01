@@ -1749,9 +1749,9 @@ msgstr "ツアーが終わりました。音楽ブロックスを楽しんでく
 
 #: js/basicblocks.js:137
 #.TRANS: musical transposition (adjustment of pitch up or down)
-##　Maybe 調子をトランスポーズ Non-musicians may understand first better (though I need to verify if understood)
+##　Maybe トランスポーズ Non-musicians may understand first better (though I need to verify if understood)；移調＝いちょう;https://ja.wikipedia.org/wiki/%E7%A7%BB%E8%AA%BF
 msgid "transposition"
-msgstr "調子の高さを設定"
+msgstr "移調"
 
 #: js/basicblocks.js:145
 #.TRANS: step down one note in current mode
@@ -1832,9 +1832,8 @@ msgstr "逆さに (偶数)"
 
 #: js/basicblocks.js:282
 #.TRANS: adjust the amount of shift (up or down) of a pitch
-## 移し替え＝うつしかえ http://jisho.org/word/%E7%A7%BB%E3%81%97%E5%A4%89%E3%81%88%E3%82%8B 
 msgid "semi-tone transpose"
-msgstr "半音で移し替え"
+msgstr "半音で移調"
 
 #: js/basicblocks.js:299
 #: js/basicblocks.js:1691
@@ -1895,7 +1894,7 @@ msgstr "音階で二度上"
 #: js/basicblocks.js:371
 #.TRANS: adjust the amount of shift (up or down) of a pitch by scalar steps
 msgid "scalar transpose"
-msgstr "音階的の移し替え"
+msgstr "音階的の移調"
 
 #: js/basicblocks.js:381
 #.TRANS: flat is a half-step down in pitch
