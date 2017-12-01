@@ -373,7 +373,7 @@ The *Set Relative Volume* block modifies the clamped note's volume according to 
 
 #### <a name= "ABSOLUTE-INTERVALS"></a>Absolute Intervals
 
-![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform14.svg "Using absolute intervals")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/transform14.svg "Using absolute intervals")
 
 The *Augmented* block calculates an absolute interval, e.g., an
 augmented fifth, and adds the additional pitches to a note. Similarly,
