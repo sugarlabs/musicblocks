@@ -276,7 +276,7 @@ right, both *Pitch* blocks are raised by one half step.
 
 #### <a name="SEMITONE-TRANSPOSE"></a>3.2.3 Semi-Tone Transpose
 
-![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform2.svg "Semi-tone transpose")
+![alt tag](https://raw.githubusercontent.com/pipix51/musicblocks/master/guide/transform2.svg "Semi-tone transpose")
 
 The *Semi-Tone Transpose* block can be used to make larger shifts in
 pitch in half step units. A positive number shifts the pitch up and a
