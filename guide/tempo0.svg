@@ -7,13 +7,26 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="119.66222mm"
-   height="42.086136mm"
-   viewBox="0 0 424 149.1241"
-   id="svg4167"
+   width="307.24072"
+   height="113.34308"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="tempo0.svg">
+   id="svg46"
+   sodipodi:docname="tempo0.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+  <metadata
+     id="metadata52">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs50" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -23,79 +36,86 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="640"
-     inkscape:window-height="480"
-     id="namedview16"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     id="namedview48"
      showgrid="false"
-     inkscape:zoom="0.73113211"
-     inkscape:cx="211.99999"
-     inkscape:cy="74.562052"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg4167" />
-  <defs
-     id="defs4169" />
-  <metadata
-     id="metadata4172">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <path
-     d="m 19,70.1241 0,-8 c 0,-4.418278 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 230,0 8,0 c 4.41828,0 6.92841,3.713641 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -230,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.581722 -8,-8 l 0,-8 0,0 z"
-     id="path3194"
-     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-  <text
-     y="33.1241"
-     x="188"
-     id="text3196"
-     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-    <tspan
-       x="282"
-       y="82.1241"
-       id="tspan3198">master beats per minutes</tspan>
-  </text>
+     inkscape:zoom="0.2079063"
+     inkscape:cx="301"
+     inkscape:cy="-57.078463"
+     inkscape:window-x="-8"
+     inkscape:window-y="274"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg46" />
   <g
-     id="g3710"
-     transform="translate(4.16364,107.94834)">
-    <path
-       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-       id="path21-6"
-       d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
-    <text
-       y="-52.824242"
-       x="325.83636"
-       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text23-9">
-      <tspan
-         id="tspan25-8"
-         y="-26.824242"
-         x="345.83636">90</tspan>
-    </text>
+     transform="translate(0,0.42153745)"
+     id="g20">
+    <g
+       transform="scale(1.5)"
+       id="g18">
+      <path
+         d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 40 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#9ddd5f;fill-opacity:1;stroke:#003e00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path12"
+         inkscape:connector-curvature="0" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text16">
+        <tspan
+           x="5.3333335"
+           y="21.5"
+           id="tspan14">tempo</tspan>
+      </text>
+    </g>
   </g>
   <g
-     id="g3990"
-     transform="translate(0,1.1240999)">
-    <path
-       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-       id="path3660"
-       d="m 1,28.43795 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 L 27,0.43795006 37,12.43795 l 18,0 60,0 8,0 c 4.18879,0 6.98407,3.936277 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.077731 -7.07107,2.928932 C 18.07773,57.218083 17,59.819956 17,62.43795 l 0,8 0,6 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.531247,3.56389 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.936277,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81121 -8,-8 l 0,-8 z" />
-    <text
-       y="-4"
-       x="1.1454468"
-       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text3662">
-      <tspan
-         id="tspan3664"
-         y="39"
-         x="9.1454468">tempo</tspan>
-    </text>
+     transform="translate(13.5,40.921537)"
+     id="g34">
+    <g
+       transform="scale(1.5)"
+       id="g32">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 107.82715 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path22"
+         inkscape:connector-curvature="0" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text26">
+        <tspan
+           x="124.16048"
+           y="13.5"
+           id="tspan24">master beats per minute</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text30">
+        <tspan
+           x="124.16048"
+           y="11.25"
+           id="tspan28" />
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(203.74072,40.921537)"
+     id="g44">
+    <g
+       transform="scale(1.5)"
+       id="g42">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path36"
+         inkscape:connector-curvature="0" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text40">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan38">90</tspan>
+      </text>
+    </g>
   </g>
 </svg>
