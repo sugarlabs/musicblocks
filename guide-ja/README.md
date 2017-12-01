@@ -1,10 +1,10 @@
-# Guide to Programming with Music Blocks
+# 音楽ブロックのプログラミング案内
   
-Music Blocks is a programming environment for children interested in music and graphics. It expands upon Turtle Blocks by adding a collection of features relating to pitch and rhythm.
+音楽ブロックは子供のための音楽とコードが合体されているプログラミング環境。子供さん達はこのツールで音楽、数学、またコードの基本な色々が楽しく発見することができます。音楽ブロックはタートルブロックから作られて、ピッチとリズムのツールもあります。
 
-The Turtle Blocks guide is a good place to start learning about the basics. In this guide, we illustrate the musical features by walking the reader through numerous examples.
+タートルブロックの案内は音楽ブロックより基本的なコンセプトがあります。この案内は音楽の基本があり、音楽ブロックの実例があります。
 
-## <a name="TOC"></a> Table of Contents
+## <a name="TOC"></a> 目次
 
 1. [Getting Started](#GETTING-STARTED)
 2. [Making a Sound](#NOTES)
