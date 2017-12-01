@@ -16,9 +16,9 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
 3. [Programming with Music](#PROGRAMMING-WITH-MUSIC)
    1. [Chunks](#CHUNKS)
    2. [Musical Transformation](#TRANSFORMATION)
-      1. [Step Pitch Block](#STEP-PITCH)
+      1. [Scalar Step Block](#SCALAR-STEP)
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
-      3. [Adjust-Transposition Block](#ADJUST-TRANSPOSITION)
+      3. [Semi-Tone Transpose Block](#SEMITONE-TRANSPOSE)
       4. [Dotted Notes](#DOTTED)
       5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       6. [Repeating Notes](#REPETITION)
@@ -245,12 +245,12 @@ song we created?)
 
 There are many ways to transform pitch, rhythm, and other sonic qualities.
 
-#### <a name="STEP-PITCH"></a>3.2.1 Step Pitch Block
+#### <a name="SCALAR-STEP"></a>3.2.1 Scalar Step Block
 
-![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform0.svg "Using the Step Pitch block")
+![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform0.svg "Using the Scalar Step block")
 
-The *Step Pitch* block will move up or down notes in a scale from the
-last played note. In the example above, *Step Pitch* blocks are used inside
+The *Scalar Step* block will move up or down notes in a scale from the
+last played note. In the example above, *Scalar Step* blocks are used inside
 of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
@@ -274,17 +274,17 @@ half step. A flat will lower by one half step. In the example, on the
 left, just the *Pitch* block `Mi` is lowered by one half step; on the
 right, both *Pitch* blocks are raised by one half step.
 
-#### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjust-Transposition
+#### <a name="SEMITONE-TRANSPOSE"></a>3.2.3 Semi-Tone Transpose
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "Adjust-transposition")
+![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform2.svg "Semi-tone transpose")
 
-The *Adjust-transposition* block can be used to make larger shifts in
+The *Semi-Tone Transpose* block can be used to make larger shifts in
 pitch in half step units. A positive number shifts the pitch up and a
 negative number shifts the pitch down. The input must be a whole
 number. To shift an entire octave, transpose by 12 half-steps up. -12
 will shift an octave down.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using Adjust-transposition")
+![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform3.svg "raising an octave using Semi-tone transpose")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
@@ -312,7 +312,7 @@ note.
 
 #### <a name="REPETITION"></a>3.2.6 Repeating Notes
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "repeating notes")
+![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform6.svg "repeating notes")
 
 There are several ways to repeat notes. The *Repeat* block will play a
 sequence of notes multiple times; the *Duplicate* block will repeat each
@@ -341,11 +341,11 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TiesChart.svg "using notes with ties")
 
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur
+#### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Master Volume, Crescendo, Staccato, and Slur
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "Set volume, Crescendo, Staccato, and Slur blocks")
+![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform8.svg "Set  master volume, Crescendo, Staccato, and Slur blocks")
 
-The *Set volume* block will change the volume of the notes. The
+The *Set master volume* block will change the volume of the notes. The
 default is 50; the range is 0 (silence) to 100 (full volume).
 
 The *Crescendo* block will increase (or decrease) the volume of the
@@ -373,7 +373,7 @@ The *Set Relative Volume* block modifies the clamped note's volume according to 
 
 #### <a name= "ABSOLUTE-INTERVALS"></a>Absolute Intervals
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg "Using absolute intervals")
+![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform14.svg "Using absolute intervals")
 
 The *Augmented* block calculates an absolute interval, e.g., an
 augmented fifth, and adds the additional pitches to a note. Similarly,
