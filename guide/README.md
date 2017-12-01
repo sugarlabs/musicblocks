@@ -417,12 +417,12 @@ notes.
 
 #### <a name= "SETTING"></a>3.2.13 Setting Voice and Keys
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg "setting voice and keys using Set Voice block")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/transform12.svg "setting voice and keys using Set Voice block")
 
 The *Set Voice* block selects a [voice](#VOICES) for the synthesizer for any
 contained blocks, e.g., violin or cello.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg "Set Key block")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/transform10.svg "Set Key block")
 
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
@@ -461,17 +461,17 @@ If we put our song into an action...
 
 ...we can run it from multiple *Start* blocks.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg "shifting the octaves up and down")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/voices3.svg "shifting the octaves up and down")
 
 It gets more interesting if we shift up and down octaves.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg "playing the various voices offset in time")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/voices4.svg "playing the various voices offset in time")
 
 And even more interesting if we bring the various voices offset in time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
 
 An alternative to use a preprogrammed delay is to use the *Broadcast*
 block to bring in multiple voices. In the example above, after each
@@ -489,7 +489,7 @@ drum.
 
 ### <a name="GRAPHICS"></a>3.4 Adding graphics
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg "adding graphics")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/graphics1.svg "adding graphics")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.svg "color range")
 
