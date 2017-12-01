@@ -6440,7 +6440,7 @@ function Logo () {
                 }, beatValue * 1000);
             };
 
-            if (this.noteDelay === 0 || this.suppressOutput[turtle]) {
+            if (this.noteDelay === 0 || !this.suppressOutput[turtle]) {
                 __playnote();
             } else {
                 setTimeout(function () {
