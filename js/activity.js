@@ -129,6 +129,14 @@ define(MYDEFINES, function (compatibility) {
         var chartBitmap = null;
         var saveBox;
         var merging = false;
+        var search = new createjs.DOMElement(document.getElementById('search'));
+        
+        var searchStyle = document.getElementById('search');
+        var searchX = document.getElementById('myCanvas').width;
+        var searchY = document.getElementById('myCanvas').height;
+ 
+        searchStyle.style.left = searchX/2 * turtleBlocksScale + 'px';
+        searchStyle.style.top = searchY/2 * turtleBlocksScale + 'px';
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -694,7 +702,6 @@ define(MYDEFINES, function (compatibility) {
             logo.compiling = true;
             logo.runLogoCommands();
         };
-
 
         // Do we need to update the stage?
         var update = true;
@@ -1345,7 +1352,7 @@ define(MYDEFINES, function (compatibility) {
 
             var img = new Image();
             img.onload = function () {
-                // console.log('creating error message artwork for ' + img.src);
+                console.log('creating error message artwork for ' + img.src);
                 var artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
                 var text = new createjs.Text('', '20px Sans', '#000000');
@@ -1374,6 +1381,27 @@ define(MYDEFINES, function (compatibility) {
             };
 
             img.src = 'images/' + name + '.svg';
+        };
+
+        function doSearch() {
+            var searchInput = document.getElementById("search").value.replace(/[\W_]/g, '');
+            var searchResult = blocks.protoBlockDict.hasOwnProperty(searchInput);
+
+            if (searchInput.length>0){
+                if (searchResult){
+                    var palettteName = palettes.blocks.protoBlockDict[searchInput].palette.name;
+                    palettes.dict[palettteName]._makeBlockFromPalette(blocks.protoBlockDict[searchInput], 
+                    searchInput, function (newBlock) { 
+                        blocks._moveBlock(newBlock, 100, 100); 
+                    });
+                    document.getElementById("search").value = ""; 
+                }
+                else{
+                    blocks.errorMsg("This block does not exist.");
+                    document.getElementById("search").value = ""; 
+                    stage.setUpdateStage();
+                }
+            }
         };
 
         function __keyPressed(event) {
@@ -1443,6 +1471,15 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                case SHIFT && SPACE:
+                    search.visible = true;
+                    stage.addChild(search);
+                    update = true;
+                    break;
+                case SHIFT && ESC:
+                    search.visible = false;
+                    update = true;
+                    break;
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
@@ -1508,6 +1545,7 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 case RETURN:
                     // toggle run
+                    doSearch();
                     logo.runLogoCommands();
                     break;
                 default:
