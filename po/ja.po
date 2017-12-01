@@ -1185,7 +1185,7 @@ msgstr ""
 #.TRANS: triangle wave
 #.TRANS: triangle wave
 msgid "triangle"
-msgstr "三角"
+msgstr ""
 
 #: js/musicutils.js:420
 #: js/basicblocks.js:1982
@@ -1194,8 +1194,9 @@ msgstr "三角"
 #: js/macros.js:158
 #: js/macros.js:182
 #.TRANS: musical instrument
+## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "snare drum"
-msgstr ""
+msgstr "スネア"
 
 #: js/musicutils.js:422
 #: js/basicblocks.js:1975
@@ -1203,22 +1204,25 @@ msgstr ""
 #: js/macros.js:157
 #: js/macros.js:158
 #.TRANS: musical instrument
+## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "kick drum"
-msgstr ""
+msgstr "バスドラム"
 
 #: js/musicutils.js:424
 #: js/basicblocks.js:1968
 #: js/macros.js:199
 #.TRANS: musical instrument
+## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "tom tom"
-msgstr ""
+msgstr "トムトム"
 
 #: js/musicutils.js:426
 #: js/basicblocks.js:1961
 #: js/macros.js:101
 #.TRANS: musical instrument
+## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "floor tom tom"
-msgstr ""
+msgstr "フロアタム"
 
 #: js/musicutils.js:428
 #: js/basicblocks.js:1954
@@ -1231,120 +1235,127 @@ msgstr ""
 #: js/basicblocks.js:1947
 #: js/macros.js:70
 #.TRANS: musical instrument
+## https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%A9%E3%83%96%E3%83%83%E3%82%AB
 msgid "darbuka drum"
-msgstr ""
+msgstr "ダラブッカ"
 
 #: js/musicutils.js:432
 #: js/basicblocks.js:1940
 #: js/macros.js:105
 #.TRANS: musical instrument
 msgid "hi hat"
-msgstr ""
+msgstr "ハイハット"
 
 #: js/musicutils.js:434
 #: js/basicblocks.js:1919
 #: js/macros.js:159
 #.TRANS: a small metal bell
 msgid "ride bell"
-msgstr ""
+msgstr "ライドのベル"
 
 #: js/musicutils.js:436
 #: js/basicblocks.js:1912
 #: js/macros.js:65
 #.TRANS: musical instrument
 msgid "cow bell"
-msgstr ""
+msgstr "カウベル"
 
 #: js/musicutils.js:438
 #: js/basicblocks.js:1933
 #: js/macros.js:201
 #.TRANS: musical instrument
 msgid "triangle bell"
-msgstr ""
+msgstr "トライアングルのベル"
 
 #: js/musicutils.js:440
 #: js/basicblocks.js:1926
 #: js/macros.js:99
 #.TRANS: musical instrument
+## https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%B3%E3%82%AC%E3%83%BC%E3%82%B7%E3%83%B3%E3%83%90%E3%83%AB
 msgid "finger cymbals"
-msgstr ""
+msgstr "フィンガーシンバル"
 
 #: js/musicutils.js:442
 #: js/basicblocks.js:1870
 #: js/macros.js:62
 #.TRANS: a musically tuned set of bells
+## https://ja.wikipedia.org/wiki/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%A0
 msgid "chime"
-msgstr ""
+msgstr "チャイム"
 
 #: js/musicutils.js:444
 #: js/basicblocks.js:1877
 #: js/macros.js:63
 #.TRANS: sound effect
+## http://jisho.org/word/%E3%81%8B%E3%81%A1%E3%82%83%E3%81%8B%E3%81%A1%E3%82%83 
 msgid "clang"
-msgstr ""
+msgstr "カチャカチャの音"
 
 #: js/musicutils.js:446
 #: js/basicblocks.js:1898
 #: js/macros.js:66
 #.TRANS: sound effect
 msgid "crash"
-msgstr ""
+msgstr "クラッシュ"
 
 #: js/musicutils.js:448
 #: js/basicblocks.js:1856
 #: js/macros.js:58
 #.TRANS: sound effect
 msgid "bottle"
-msgstr ""
+msgstr "空き瓶の音"
 
 #: js/musicutils.js:450
 #: js/basicblocks.js:1884
 #: js/macros.js:64
 #.TRANS: sound effect
 msgid "clap"
-msgstr ""
+msgstr "手を叩く音"
 
 #: js/musicutils.js:452
 #: js/basicblocks.js:1891
 #: js/macros.js:180
 #.TRANS: sound effect
+## http://jisho.org/word/%E5%B9%B3%E6%89%8B%E6%89%93%E3%81%A1 
 msgid "slap"
-msgstr ""
+msgstr "平手打ちの音"
 
 #: js/musicutils.js:454
 #: js/basicblocks.js:1905
 #: js/macros.js:183
 #.TRANS: sound effect
 msgid "splash"
-msgstr ""
+msgstr "スプラッシュ"
 
 #: js/musicutils.js:456
 #: js/basicblocks.js:1863
 #: js/macros.js:60
 #.TRANS: sound effect
+## http://jisho.org/word/%E3%81%97%E3%82%85%E3%82%8F%E3%81%97%E3%82%85%E3%82%8F 
 msgid "bubbles"
-msgstr ""
+msgstr "シュワシュワのおと"
 
 #: js/musicutils.js:458
 #: js/basicblocks.js:1835
 #: js/macros.js:61
 #.TRANS: animal sound effect
 msgid "cat"
-msgstr "猫"
+msgstr "猫のにゃあ"
 
 #: js/musicutils.js:460
 #: js/basicblocks.js:1842
 #: js/macros.js:68
 #.TRANS: animal sound effect
+## 絡糸嬢=らくしじょう；http://jisho.org/word/%E7%B5%A1%E7%B3%B8%E5%AC%A2 
 msgid "cricket"
-msgstr ""
+msgstr "絡糸嬢のおと"
 
 #: js/musicutils.js:462
 #: js/basicblocks.js:1849
 #: js/macros.js:81
 #.TRANS: animal sound effect
 msgid "dog"
-msgstr "犬"
+msgstr "犬のワン"
 
 #: js/musicutils.js:464
 #: js/basicblocks.js:1828
