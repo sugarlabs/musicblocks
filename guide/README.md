@@ -465,7 +465,7 @@ If we put our song into an action...
 
 It gets more interesting if we shift up and down octaves.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg playing the various voices offset in time")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg "playing the various voices offset in time")
 
 And even more interesting if we bring the various voices offset in time.
 
@@ -1037,7 +1037,7 @@ determines the speed at which the ball in the widget moves back and
 forth. If BPM is 60, then it will take one second for the ball to move
 across the widget. A round-trip would take two seconds.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg "changing tempo")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/tempo0.svg "changing tempo")
 
 The top row of the widget holds the *Play/pause* button, the *Speed
 up* and *Slow down* buttons, and an input field for updating the
@@ -1057,7 +1057,7 @@ Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools. One such tool is
 [Lilypond](http://lilypond.org), a music engraving program.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg "adding Save as Lilypond block")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/lilypond1.svg "adding Save as Lilypond block")
 
 The *Save as Lilypond* block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
