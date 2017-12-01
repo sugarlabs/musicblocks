@@ -2897,7 +2897,7 @@ msgstr "それか"
 #: js/basicblocks.js:2994
 ## I know 永遠but that may have different conotation
 msgid "forever"
-msgstr "ループ"
+msgstr "ずっと"
 
 #: js/basicblocks.js:3001
 msgid "repeat"
