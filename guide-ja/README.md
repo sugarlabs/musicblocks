@@ -53,7 +53,7 @@
 Many of the examples given in the guide have links to code you can
 run. Look for `RUN LIVE` links.
 
-## <a name="GETTING-STARTED"></a>1. Getting Started                                                     
+## <a name="初めに"></a>1. Getting Started                                                     
 [Back to Table of Contents](#TOC) | [Next Section (2. Making a sound)](#音符)
 
 Music Blocks is designed to run in a browser. Most of the development
