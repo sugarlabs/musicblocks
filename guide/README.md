@@ -276,7 +276,7 @@ right, both *Pitch* blocks are raised by one half step.
 
 #### <a name="SEMITONE-TRANSPOSE"></a>3.2.3 Semi-Tone Transpose
 
-![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform2.svg "Semi-tone transpose")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/transform2.svg "Semi-tone transpose")
 
 The *Semi-Tone Transpose* block can be used to make larger shifts in
 pitch in half step units. A positive number shifts the pitch up and a
@@ -284,7 +284,7 @@ negative number shifts the pitch down. The input must be a whole
 number. To shift an entire octave, transpose by 12 half-steps up. -12
 will shift an octave down.
 
-![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform3.svg "raising an octave using Semi-tone transpose")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/transform3.svg "raising an octave using Semi-tone transpose")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
@@ -312,7 +312,7 @@ note.
 
 #### <a name="REPETITION"></a>3.2.6 Repeating Notes
 
-![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform6.svg "repeating notes")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/transform6.svg "repeating notes")
 
 There are several ways to repeat notes. The *Repeat* block will play a
 sequence of notes multiple times; the *Duplicate* block will repeat each
@@ -343,7 +343,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Master Volume, Crescendo, Staccato, and Slur
 
-![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform8.svg "Set  master volume, Crescendo, Staccato, and Slur blocks")
+![alt tag](https://rawgit.com/pipix51/musicblocks/master/guide/transform8.svg "Set  master volume, Crescendo, Staccato, and Slur blocks")
 
 The *Set master volume* block will change the volume of the notes. The
 default is 50; the range is 0 (silence) to 100 (full volume).
