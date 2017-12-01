@@ -247,7 +247,7 @@ There are many ways to transform pitch, rhythm, and other sonic qualities.
 
 #### <a name="STEP-PITCH"></a>3.2.1 Step Pitch Block
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg "Using the Step Pitch block")
+![alt tag](https://rawgithub.com/pipix51/musicblocks/master/guide/transform0.svg "Using the Step Pitch block")
 
 The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used inside
