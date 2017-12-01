@@ -135,8 +135,8 @@ define(MYDEFINES, function (compatibility) {
         var searchX = document.getElementById('myCanvas').width;
         var searchY = document.getElementById('myCanvas').height;
  
-        searchStyle.style.left = searchX/2 * turtleBlocksScale + 'px';
-        searchStyle.style.top = searchY/2 * turtleBlocksScale + 'px';
+        searchStyle.style.left = searchX/2.5 * turtleBlocksScale + 'px';
+        searchStyle.style.top = searchY/3.5 * turtleBlocksScale + 'px';
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
