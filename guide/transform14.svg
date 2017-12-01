@@ -41,8 +41,8 @@
      id="namedview9332"
      showgrid="false"
      inkscape:zoom="0.83162518"
-     inkscape:cx="554.03466"
-     inkscape:cy="353.76323"
+     inkscape:cx="551.83928"
+     inkscape:cy="257.56604"
      inkscape:window-x="-8"
      inkscape:window-y="274"
      inkscape:window-maximized="1"
@@ -1276,24 +1276,30 @@
       </text>
     </g>
   </g>
-  <flowRoot
+  <text
      xml:space="preserve"
-     id="flowRoot10554"
-     style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
-       id="flowRegion10556"><rect
-         id="rect10558"
-         width="132.27113"
-         height="22.84683"
-         x="292.19894"
-         y="9.5052814" /></flowRegion><flowPara
-       id="flowPara10560">augmented 5</flowPara></flowRoot>  <flowRoot
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+     x="292.19922"
+     y="24.103144"
+     id="text10574"><tspan
+       sodipodi:role="line"
+       x="292.19922"
+       y="24.103144"
+       id="tspan10572"><tspan
+         x="292.19922"
+         y="24.103144"
+         id="tspan10570">augmented 5</tspan></tspan></text>
+  <text
      xml:space="preserve"
-     id="flowRoot10562"
-     style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
-       id="flowRegion10564"><rect
-         id="rect10566"
-         width="129.8662"
-         height="21.644365"
-         x="770.77991"
-         y="7.1003518" /></flowRegion><flowPara
-       id="flowPara10568">minor 3</flowPara></flowRoot></svg>
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+     x="770.7793"
+     y="21.696894"
+     id="text10580"><tspan
+       sodipodi:role="line"
+       x="770.7793"
+       y="21.696894"
+       id="tspan10578"><tspan
+         x="770.7793"
+         y="21.696894"
+         id="tspan10576">minor 3</tspan></tspan></text>
+</svg>
