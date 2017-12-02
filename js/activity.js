@@ -2723,7 +2723,7 @@ handleComplete);
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var buttonNames = [
-                    ['run', _doFastButton, _('Run fast / long press to run slowly / extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
@@ -2736,7 +2736,7 @@ handleComplete);
                 ];
             } else {
                 var buttonNames = [
-                    ['run', _doFastButton, _('Run fast / long press to run slowly'), _doSlowButton, null, 'slow-button', null],
+                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly'), _doSlowButton, null, 'slow-button', null],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
                     ['clear', _allClear, _('Clean'), null, null, null, null],
@@ -2819,7 +2819,7 @@ handleComplete);
                     ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
                     ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
-                    ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.'), null, null, null, null],
+                    ['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' ' + _('Click here to paste.'), null, null, null, null],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
