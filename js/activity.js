@@ -844,6 +844,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSaveTB(doSaveTB)
                 .setSaveSVG(doSaveSVG)
                 .setSavePNG(doSavePNG)
+                .setSaveWAV(doSaveWAV)
                 .setSavePlanet(doUploadToPlanet)
                 .setSaveBlockArtwork(doSaveBlockArtwork);
 
@@ -1964,6 +1965,13 @@ define(MYDEFINES, function (compatibility) {
             //    filename += '.png';
             //}
             //download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+        };
+
+        function doSaveWAV() {
+            document.body.style.cursor = 'wait';
+            console.log('Recording');
+            logo.recording = true;
+            logo.runLogoCommands();
         };
 
         function doUploadToPlanet() {

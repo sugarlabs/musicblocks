@@ -1654,6 +1654,16 @@ function Synth() {
         console.log('sample loaded');
     };
 
+    this.recorder = new Recorder(Tone.Master);
+
+    this.download = function (blob){
+        var filename = prompt('Filename:', 'untitled.wav');
+        if (fileExt(filename) !== 'wav') {
+            filename += '.wav';
+        }
+        download(filename, URL.createObjectURL(blob));
+    }
+
     // Function that provides default parameters for various synths
     this.getDefaultParamValues = function (sourceName) {
         // sourceName may need to be 'untranslated'

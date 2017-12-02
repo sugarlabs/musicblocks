@@ -258,6 +258,7 @@ function Logo () {
     this.runningLilypond = false;
     this.checkingCompletionState = false;
     this.compiling = false;
+    this.recording = false;
 
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
@@ -1148,6 +1149,11 @@ function Logo () {
                     // Launching status block would have hidden the
                     // Stop Button so show it again.
                     that.onRunTurtle();
+                }
+
+                if (that.recording){
+                    that.synth.recorder.clear();
+                    that.synth.recorder.record();
                 }
 
                 // If there are start blocks, run them all.
@@ -5722,6 +5728,13 @@ function Logo () {
 
                         // Reset the cursor...
                         document.body.style.cursor = 'default';
+
+                        if (that.recording){
+                            console.log('finishing recording');
+                            that.synth.recorder.stop();
+                            that.synth.recorder.exportWAV(that.synth.download);
+                            that.recording = false;
+                        }
 
                         // And save the session.
                         that.saveLocally();
