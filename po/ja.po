@@ -115,7 +115,7 @@ msgstr "ステータス"
 #: js/basicblocks.js:1998
 ## ドラム would also be acceptable ;  ひらあな＝たいこ
 msgid "drum"
-msgstr "太鼓"
+msgstr "ドラム"
 
 #: js/block.js:658
 ## ひらがな＝じょうぎ
@@ -562,7 +562,7 @@ msgstr "一分割テンポの最大値は１０００"
 
 #: js/logo.js:2980
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "音楽グラフは一つのピッチブロックと一つの太鼓ブロックを使う必要があります"
+msgstr "音楽グラフは一つのピッチブロックと一つのドラムブロックを使う必要があります"
 
 #: js/logo.js:3120
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
@@ -622,7 +622,7 @@ msgstr "ステップピッチブロックは音符ブロックの中に入られ
 
 #: js/logo.js:3645
 msgid "Drum Block: Did you mean to use a Note block?"
-msgstr "太鼓ブロック：音符ブロックと一緒に使うつもりですか"
+msgstr "ドラムブロック：音符ブロックと一緒に使うつもりですか"
 
 #: js/logo.js:4085
 msgid "Pitch Block: Did you mean to use a Note block?"
@@ -1441,7 +1441,7 @@ msgstr "現在の"
 #: js/lilypond.js:423
 #: js/lilypond.js:443
 msgid "start drum"
-msgstr "太鼓スタート"
+msgstr "ドラム・スタート"
 
 #: js/pitchtimematrix.js:184
 msgid "export"
@@ -2086,7 +2086,7 @@ msgstr "カスタム音階"
 #: js/basicblocks.js:710
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
-msgstr "ピッチ-太鼓マッパー"
+msgstr "ピッチ-ドラムマッパー"
 
 #: js/basicblocks.js:718
 #.TRANS: widget to generate pitches using a slider
@@ -2459,7 +2459,7 @@ msgstr "調の設定"
 #: js/basicblocks.js:1990
 #.TRANS: set the current drum sound for playback
 msgid "set drum"
-msgstr "太鼓を設定"
+msgstr "ドラムを設定"
 
 #: js/basicblocks.js:2009
 #.TRANS: orientation or compass direction
