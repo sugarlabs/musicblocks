@@ -351,7 +351,7 @@ msgstr "プロジェクトを確保する"
 #: js/activity.js:2789
 ## Double check this
 msgid "Long press on block(s) to copy. Click here to paste."
-msgstr "ブロックでマウスの長いクリック押しでコピー。ペースとをするためにここでクリック"
+msgstr "ブロックでネズミの長いクリック押しでコピー。ペースとをするためにここでクリック"
 
 #: js/activity.js:2791
 #: js/activity.js:2803
@@ -414,7 +414,7 @@ msgstr "音色"
 #: js/lilypond.js:16
 ## Assuming it is the animal "mouse"
 msgid "mouse"
-msgstr "鼠"
+msgstr "ネズミ"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
@@ -447,7 +447,7 @@ msgstr "メディア"
 #: js/turtledefs.js:21
 ## Literally means "mouse relations"
 msgid "mice"
-msgstr "鼠の関係"
+msgstr "ネズミの関係"
 
 #: js/status.js:58
 #: js/pitchdrummatrix.js:144
@@ -1530,22 +1530,22 @@ msgstr "Music Blocksへようこそ"
 #: js/turtledefs.js:73
 ## Need to refine this
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr "ミュージック・ブロックは音楽と数学とコードとの基本的な色々を発見するのツールです"
+msgstr "ミュージック・ブロックは音楽と数学とコードとの基本的な色々を発見するのツールです。"
 
 #: js/turtledefs.js:74
 ## Please verify
 msgid "Meet Mr. Mouse!"
-msgstr "マウスさんに商会"
+msgstr "ネズミさんに商会"
 
 #: js/turtledefs.js:74
 ## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "鼠さんは私たちのミュージック・ブロック指揮"
+msgstr "ネズミさんは私たちのミュージック・ブロック指揮"
 
 #: js/turtledefs.js:74
 ## I took some artistic liberty: Says "together with Mouse-san, discover music/math/coding
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr "鼠さんと一緒にミュージック・ブロックで音楽と数学とコードの色々発見しましょう"
+msgstr "ネズミさんと一緒にミュージック・ブロックで音楽と数学とコードの色々発見しましょう"
 
 #: js/turtledefs.js:74
 msgid "Let us start our tour!"
@@ -3049,7 +3049,7 @@ msgstr "キーボード"
 #: js/basicblocks.js:3269
 ## I assume the "mouse" is our glyph, not hardware; check "nezumi" for consistency
 msgid "stop mouse"
-msgstr "鼠を止める"
+msgstr "ネズミを止める"
 
 #: js/basicblocks.js:3273
 #: js/basicblocks.js:3282
@@ -3066,22 +3066,22 @@ msgstr "鼠を止める"
 #: js/basicblocks.js:3401
 ## "Nezumi-san" suggests neither male/female
 msgid "Mr. Mouse"
-msgstr "鼠さん"
+msgstr "ネズミさん"
 
 #: js/basicblocks.js:3278
 msgid "start mouse"
-msgstr "鼠をスタート"
+msgstr "ネズミをスタート"
 
 #: js/basicblocks.js:3288
 #.TRANS: pen color for this mouse
 msgid "mouse color"
-msgstr "鼠の色"
+msgstr "ネズミの色"
 
 #: js/basicblocks.js:3298
 #.TRANS: heading (compass direction) for this mouse
 ## http://jisho.org/word/%E6%96%B9%E4%BD%8D ; 方位＝ほうい
 msgid "mouse heading"
-msgstr "鼠の方位"
+msgstr "ネズミの方位"
 
 #: js/basicblocks.js:3308
 #.TRANS: y position for this mouse
@@ -3098,31 +3098,31 @@ msgstr "x座標"
 #.TRANS: notes played by this mouse
 ## To be verified
 msgid "mouse notes played"
-msgstr "鼠の弾いた音符"
+msgstr "ネズミの弾いた音符"
 
 #: js/basicblocks.js:3338
 #.TRANS: convert current note for this turtle to piano key (1-88)
 ## Is there a Japanese technical word for "pitch number"; below is literal
 msgid "mouse pitch number"
-msgstr "鼠のピッチ番号"
+msgstr "ネズミのピッチ番号"
 
 #: js/basicblocks.js:3347
 #: js/basicblocks.js:3357
 ## http://jisho.org/word/%E9%9F%B3%E4%BE%A1 
 msgid "mouse note value"
-msgstr "鼠の音価"
+msgstr "ネズミの音価"
 
 #: js/basicblocks.js:3366
 ## http://jisho.org/word/%E5%90%8C%E6%9C%9F 
 msgid "mouse sync"
-msgstr "鼠を動機"
+msgstr "ネズミを動機"
 
 #: js/basicblocks.js:3375
 #: js/basicblocks.js:3383
 #: js/basicblocks.js:3397
 ## To be verified
 msgid "mouse name"
-msgstr "鼠の名"
+msgstr "ネズミの名"
 
 #: js/basicblocks.js:3384
 #: plugins/translate.rtp:95
@@ -3874,7 +3874,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "数学"
 
 #~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
-#~msgstr "マウス先生が私たちのミュージック・ブロックの指揮者.マウス先生は音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
+#~msgstr "ネズミさんが私たちのミュージック・ブロックの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
 
 #~msgid "whole note 𝅝"
 #~msgstr "全音符"
