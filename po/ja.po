@@ -159,7 +159,7 @@ msgstr "スライダー"
 #.TRANS: the note names must be separated by single spaces
 ## The spaces must not be "Japanese" spaces
 msgid "ti la sol fa mi re do"
-msgstr "シ ラ ソル ファ ミ レ ド"
+msgstr "シ ラ ソ ファ ミ レ ド"
 
 #: js/block.js:1848
 #: js/block.js:1852
