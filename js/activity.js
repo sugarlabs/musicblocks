@@ -20,7 +20,6 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 
-
 if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
@@ -1383,23 +1382,64 @@ define(MYDEFINES, function (compatibility) {
             img.src = 'images/' + name + '.svg';
         };
 
+        var searchSuggestions = [];//Array of Search Suggestions
+
+        for (var i in blocks.protoBlockDict){
+            var searchCheck = blocks.protoBlockDict[i].staticLabels[0];
+            if (searchCheck && searchCheck!=_('rest') && searchCheck!=_('square') && searchCheck!=_('triangle') && searchCheck!=_('sine') && searchCheck!=_('sawtooth') && searchCheck!=_('rhythm') && searchCheck!=_('set voice') && searchCheck!=_('set key')){
+                searchSuggestions.push(blocks.protoBlockDict[i].staticLabels[0]);
+            }
+        }
+
+        function doSearchSuggestions() {
+            var $j = jQuery.noConflict();
+
+            $j('#search').autocomplete({
+                source: searchSuggestions
+            });
+
+            $j('#search').autocomplete("widget").addClass("scrollSearch");
+        };
+
+        document.getElementById("search").onclick = function(){
+            doSearchSuggestions();
+        }
+
         function doSearch() {
-            var searchInput = document.getElementById("search").value.replace(/[\W_]/g, '');
-            var searchResult = blocks.protoBlockDict.hasOwnProperty(searchInput);
+
+            var $j = jQuery.noConflict();
+
+            $j('#search').autocomplete({
+                source: searchSuggestions
+            });
+
+            $j('#search').autocomplete("widget").addClass("scrollSearch");
+
+            var searchInput = document.getElementById("search").value;
+            var obj = palettes.getProtoNameAndPalette(searchInput);
+            var protoblk = obj[0];
+            var paletteName = obj[1];
+
+            var searchResult = blocks.protoBlockDict.hasOwnProperty(obj[2]);
 
             if (searchInput.length>0){
                 if (searchResult){
-                    var palettteName = palettes.blocks.protoBlockDict[searchInput].palette.name;
-                    palettes.dict[palettteName]._makeBlockFromPalette(blocks.protoBlockDict[searchInput], 
-                    searchInput, function (newBlock) { 
-                        blocks._moveBlock(newBlock, 100, 100); 
-                    });
-                    document.getElementById("search").value = ""; 
+                    if (searchInput == _('rest') || searchInput == _('square') || searchInput == _('triangle') || searchInput ==_('sine') || searchInput ==_('sawtooth') || searchInput ==_('rhythm') || searchInput ==_('set voice') || searchInput ==_('set key')){
+                        blocks.errorMsg("This block is deprecated.");
+                        document.getElementById("search").value = ""; 
+                        stage.setUpdateStage(stage);
+                    }
+                    else{
+                        palettes.dict[obj[1]]._makeBlockFromPalette(protoblk, obj[2], function (newBlock) { 
+                            blocks._moveBlock(newBlock, 100, 100); 
+                        });
+                        document.getElementById("search").value = ""; 
+                    }
                 }
                 else{
                     blocks.errorMsg("This block does not exist.");
                     document.getElementById("search").value = ""; 
-                    stage.setUpdateStage();
+                    stage.setUpdateStage(stage);
                 }
             }
         };
