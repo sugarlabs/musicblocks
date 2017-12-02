@@ -1585,7 +1585,9 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 case RETURN:
                     // toggle run
-                    doSearch();
+                    if (document.getElementById("search").value.length>0){
+                        doSearch();
+                    }
                     logo.runLogoCommands();
                     break;
                 default:
