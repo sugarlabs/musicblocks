@@ -351,7 +351,7 @@ msgstr "プロジェクトを確保する"
 #: js/activity.js:2789
 ## Double check this
 msgid "Long press on block(s) to copy. Click here to paste."
-msgstr "ブロックでネズミの長いクリック押しでコピー。ペースとをするためにここでクリック"
+msgstr "ブロックでネズミの長いクリック押しでコピー。ペースとをするためにここでクリック。"
 
 #: js/activity.js:2791
 #: js/activity.js:2803
@@ -447,7 +447,7 @@ msgstr "メディア"
 #: js/turtledefs.js:21
 ## Literally means "mouse relations"
 msgid "mice"
-msgstr "ネズミの関係"
+msgstr "鼠の関係"
 
 #: js/status.js:58
 #: js/pitchdrummatrix.js:144
@@ -3040,7 +3040,7 @@ msgstr "マウスのボタン"
 #: js/basicblocks.js:3253
 ##  http://jisho.org/word/%EF%BC%A1%EF%BC%B3%EF%BC%A3%EF%BC%A9%EF%BC%A9 
 msgid "to ASCII"
-msgstr "ASCII (アスキー)に"
+msgstr "ASCII・アスキーに"
 
 #: js/basicblocks.js:3260
 msgid "keyboard"
