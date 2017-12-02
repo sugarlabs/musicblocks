@@ -1523,14 +1523,14 @@ msgid "extras"
 msgstr "その他"
 
 #: js/turtledefs.js:73
-## Maybe just have "Music Blocks" in roman. Otherwise, ミュージック・ブロックス
+## Maybe just have "Music Blocks" in roman. Otherwise, ミュージック・ブロック
 msgid "Welcome to Music Blocks"
 msgstr "Music Blocksへようこそ"
 
 #: js/turtledefs.js:73
 ## Need to refine this
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr "音楽ブロックは音楽と数学とコードとの基本的な色々を発見するのツールです"
+msgstr "ミュージック・ブロックは音楽と数学とコードとの基本的な色々を発見するのツールです"
 
 #: js/turtledefs.js:74
 ## Please verify
@@ -1540,12 +1540,12 @@ msgstr "マウスさんに商会"
 #: js/turtledefs.js:74
 ## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "鼠さんは私たちの音楽ブロック指揮"
+msgstr "鼠さんは私たちのミュージック・ブロック指揮"
 
 #: js/turtledefs.js:74
 ## I took some artistic liberty: Says "together with Mouse-san, discover music/math/coding
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr "鼠さんと一緒に音楽ブロックで音楽と数学とコードの色々発見しましょう"
+msgstr "鼠さんと一緒にミュージック・ブロックで音楽と数学とコードの色々発見しましょう"
 
 #: js/turtledefs.js:74
 msgid "Let us start our tour!"
@@ -1701,7 +1701,7 @@ msgstr "極座表敬グリッドを見せ隠し"
 #: js/turtledefs.js:100
 ## A little off, I think. Also, Maybe just "Music Blocks" in Roman letters.
 msgid "Open a panel for configuring Music Blocks."
-msgstr "音楽ブロックを設定するためパネルの開きクリック"
+msgstr "ミュージック・ブロックを設定するためパネルの開きクリック"
 
 #: js/turtledefs.js:101
 #: js/utilitybox.js:68
@@ -1768,7 +1768,7 @@ msgstr "おめでとうございます"
 
 #: js/turtledefs.js:108
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr "ツアーが終わりました。音楽ブロックスを楽しんでください"
+msgstr "ツアーが終わりました。ミュージック・ブロックを楽しんでください"
 
 #: js/basicblocks.js:137
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -2988,7 +2988,7 @@ msgstr "印刷" #This is like "print a piece of paper"
 
 #: js/basicblocks.js:3164
 msgid "Music Blocks"
-msgstr "音楽ブロック"
+msgstr "ミュージック・ブロック"
 
 #: js/basicblocks.js:3179
 ## This doesn't seem right to me. Maybe sensitivity.
@@ -3874,7 +3874,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "数学"
 
 #~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
-#~msgstr "マウス先生が私たちの音楽ブロックの指揮者.マウス先生は音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
+#~msgstr "マウス先生が私たちのミュージック・ブロックの指揮者.マウス先生は音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
 
 #~msgid "whole note 𝅝"
 #~msgstr "全音符"
