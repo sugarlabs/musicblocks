@@ -2432,9 +2432,9 @@ msgid "scalar interval"
 msgstr "音階の音程"
 
 #: js/basicblocks.js:1772
-## Literally "movable", but probably contextually wrong
+## 移動ド＝いどうド；https://ja.wikipedia.org/wiki/%E7%A7%BB%E5%8B%95%E3%83%89
 msgid "movable"
-msgstr "動ける"
+msgstr "移動ド？"
 
 #: js/basicblocks.js:1780
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
