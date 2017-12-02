@@ -15,16 +15,16 @@
    5. [Drums](#ドラム)
 3. [Programming with Music](#音楽でプログラミング)
    1. [Chunks](#チャンク)
-   2. [Musical Transformation](#TRANSFORMATION)
+   2. [Musical Transformation](#転化)
       1. [Step Pitch Block](#ステップピッチ)
       2. [Sharps and Flats](#シャープ(嬰)とフラット(変))
       3. [Adjust-Transposition Block](#移調をアジャスト)
       4. [Dotted Notes](#ドット)
-      5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
-      6. [Repeating Notes](#REPETITION)
-      7. [Swinging Notes and Tied Notes](#SWINGING)
-      8. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-      9. [Intervals and Set Relative Volume](#INTERVALS-AND-ARTICULATION)
+      5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#かけることと割ること)
+      6. [Repeating Notes](#繰り返し)
+      7. [Swinging Notes and Tied Notes](#スイング)
+      8. [Set Volume, Crescendo, Staccato, and Slur Blocks](#他の転化)
+      9. [Intervals and Set Relative Volume](#音程AND-ARTICULATION)
       10. [Absolute Intervals](#ABSOLUTE-INTERVALS)
       11. [Inversion](#INVERSION)
       12. [Backwards](#BACKWARDS)
@@ -74,7 +74,7 @@ Started)](#GETTING-STARTED) | [Back to Table of Contents](#TOC) |
 [Next Section (3. Programming with Music)](#音楽でプログラミング)
 
 Music Blocks incorporates many common elements of music, such as
-[pitch](#ピッチ), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
+[pitch](#ピッチ), [rhythm](#rhythms), [volume](#他の転化),
 and, to some degree, [timbre and texture](#VOICES).
 
 ### <a name="音価"></a>
@@ -223,7 +223,7 @@ sequentially.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg "usage of Repeat block")
 
-You can [repeat](#REPETITION) chunks either by using multiple *Chunk* blocks or using a
+You can [repeat](#繰り返し) chunks either by using multiple *Chunk* blocks or using a
 *Repeat* block.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg "multiple action stacks")
@@ -241,7 +241,7 @@ A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
 song we created?)
 
-### <a name="TRANSFORMATION"></a>3.2 Musical Transformations
+### <a name="転化"></a>3.2 Musical Transformations
 
 There are many ways to transform pitch, rhythm, and other sonic qualities.
 
@@ -300,7 +300,7 @@ beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
 You can also simply change the note value to mimic a dotted note, for example indicating 3/8 instead of 1/4, for a dotted quarter note.
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
+#### <a name="かけることと割ること"></a>3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Speeding up and slowing down the tempo")
 
@@ -310,7 +310,7 @@ or slowdown the notes. Multiplying the beat value of an `1/8` note by
 value of an `1/8` note by '2' is the equivalent of playing a `1/4`
 note.
 
-#### <a name="REPETITION"></a>3.2.6 Repeating Notes
+#### <a name="繰り返し"></a>3.2.6 Repeating Notes
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "repeating notes")
 
@@ -322,7 +322,7 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
-#### <a name="SWINGING"></a>3.2.7 Swinging Notes and Tied Notes
+#### <a name="スイング"></a>3.2.7 Swinging Notes and Tied Notes
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg "swinging notes and tied notes")
 
@@ -341,7 +341,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TiesChart.svg "using notes with ties")
 
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur
+#### <a name="他の転化"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "Set volume, Crescendo, Staccato, and Slur blocks")
 
@@ -361,7 +361,7 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="INTERVALS-AND-ARTICULATION"></a>3.2.9 Intervals and Set Relative Volume
+#### <a name="音程AND-ARTICULATION"></a>3.2.9 Intervals and Set Relative Volume
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Interval and Set Relative Volume block")
 
@@ -611,7 +611,7 @@ row per voice in the status table.
 
 Additional *Print* blocks can be added to the *Status* widget to
 display additional music factors, e.g., duplicate, transposition,
-skip, [staccato](#MORE-TRANSFORMATIONS), [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors, e.g., x, y, heading,
+skip, [staccato](#他の転化), [slur](#他の転化), and [graphics](#GRAPHICS) factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg "additional programming within the Status block")
@@ -844,7 +844,7 @@ play the rhythms as drum machines.
 
 ### <a name="modes"></a>4.4 Musical Modes
 
-Musical modes are used to specify the relationship between [intervals](#INTERVALS-AND-ARTICULATION)
+Musical modes are used to specify the relationship between [intervals](#音程AND-ARTICULATION)
 (or steps) in a scale. Since Western music is based on 12 half-steps
 per octave, modes speficy how many half steps there are between each
 note in a scale.
