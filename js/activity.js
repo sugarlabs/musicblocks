@@ -844,6 +844,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSaveTB(doSaveTB)
                 .setSaveSVG(doSaveSVG)
                 .setSavePNG(doSavePNG)
+                .setSaveWAV(doSaveWAV)
                 .setSavePlanet(doUploadToPlanet)
                 .setSaveBlockArtwork(doSaveBlockArtwork);
 
@@ -1959,6 +1960,26 @@ define(MYDEFINES, function (compatibility) {
 
         function doSavePNG() {
             alert("Unavailable at the moment");
+            //var filename = prompt('Filename:', 'untitled.png');
+            //if (fileExt(filename) !== 'png') {
+            //    filename += '.png';
+            //}
+            //download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+        };
+
+        function doSaveWAV() {
+            //alert("Unavailable at the moment");
+
+            //in logo.js: this.synth.recorder
+
+            // Show busy cursor.
+            document.body.style.cursor = 'wait';
+
+            console.log('Recording');
+
+            logo.recording = true;
+            logo.runLogoCommands();
+
             //var filename = prompt('Filename:', 'untitled.png');
             //if (fileExt(filename) !== 'png') {
             //    filename += '.png';
