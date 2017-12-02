@@ -2296,12 +2296,12 @@ msgstr "シーケンサー込みシンセ"
 #: js/basicblocks.js:1143
 #: js/timbre.js:1041
 msgid "vibrato rate"
-msgstr "ビブラートエフェクトのレート"
+msgstr "ビブラートエフェクタのレート"
 
 #: js/basicblocks.js:1143
 ## 強度=きょうど；http://jisho.org/word/%E5%BC%B7%E5%BA%A6 
 msgid "vibrato intensity"
-msgstr "ビブラートエフェクトの強度"
+msgstr "ビブラートエフェクタの強度"
 
 #: js/basicblocks.js:1156
 #.TRANS: distortion is an alteration in the sound
@@ -2312,7 +2312,7 @@ msgstr "ディストーション"
 #: js/basicblocks.js:1166
 #.TRANS: a wavering effect in a musical tone
 msgid "tremolo"
-msgstr "トレモロエフェクト"
+msgstr "トレモロエフェクタ"
 
 #: js/basicblocks.js:1168
 #: js/basicblocks.js:1183
@@ -2326,7 +2326,7 @@ msgstr "レート"
 #: js/basicblocks.js:1199
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
-msgstr "トレモロエフェクトの大きさ"
+msgstr "トレモロエフェクタの大きさ"
 
 #: js/basicblocks.js:1182
 #.TRANS: alter the phase of the sound
@@ -2345,11 +2345,11 @@ msgstr "基本調子"
 #: js/basicblocks.js:1198
 #.TRANS: musical effect to simulate a choral sound
 msgid "chorus"
-msgstr "コーラスエフェクト"
+msgstr "コーラスエフェクタ"
 
 #: js/basicblocks.js:1199
 msgid "delay"
-msgstr "ディレイエフェクト"
+msgstr "ディレイエフェクタ"
 
 #: js/basicblocks.js:1213
 #.TRANS: a rapid, slight variation in pitch
