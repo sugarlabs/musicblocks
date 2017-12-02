@@ -2086,7 +2086,7 @@ msgstr "カスタム音階"
 #: js/basicblocks.js:710
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
-msgstr "ピッチ-ドラムマッパー"
+msgstr "ピッチ-ドラム・マッパー"
 
 #: js/basicblocks.js:718
 #.TRANS: widget to generate pitches using a slider
@@ -2597,7 +2597,7 @@ msgstr "ペン上がり"
 #.TRANS: put down the pen so that it draws when it is moved
 ## Need to check on this verb
 msgid "pen down"
-msgstr "ぺん降り"
+msgstr "ペン降り"
 
 #: js/basicblocks.js:2236
 #.TRANS: set the width of the line drawn by the pen
