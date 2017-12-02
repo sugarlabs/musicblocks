@@ -17,6 +17,13 @@ input[type=text] {
   max-width: 200px;
 }
 
+.scrollSearch {
+    max-height: 150px;
+    margin-bottom: 10px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
 #popdown-palette {
     display: none;
     position: absolute;
