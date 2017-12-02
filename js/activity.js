@@ -1959,12 +1959,12 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSavePNG() {
-            alert("Unavailable at the moment");
-            //var filename = prompt('Filename:', 'untitled.png');
-            //if (fileExt(filename) !== 'png') {
-            //    filename += '.png';
-            //}
-            //download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+            var filename = prompt('Filename:', 'untitled.png');
+            if (fileExt(filename) !== 'png') {
+                filename += '.png';
+            }
+            var data = document.getElementById("overlayCanvas").toDataURL('image/png');
+            download(filename, data);
         };
 
         function doSaveWAV() {
