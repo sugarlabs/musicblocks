@@ -1731,7 +1731,7 @@ msgstr "統計情報を見せる"
 
 #: js/turtledefs.js:103
 msgid "Display statistics about your Music project."
-msgstr ""
+msgstr "音楽プロジェクトの統計情報を見せる"
 
 #: js/turtledefs.js:104
 #: js/utilitybox.js:92
@@ -1764,11 +1764,11 @@ msgstr "ブロックをゴミ箱から取り戻す"
 
 #: js/turtledefs.js:108
 msgid "Congratulations."
-msgstr "おめでとうございます"
+msgstr "おめでとうございます！"
 
 #: js/turtledefs.js:108
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr "ツアーが終わりました。ミュージック・ブロックを楽しんでください"
+msgstr "ツアーが終わりました。ミュージック・ブロックを楽しんでください。"
 
 #: js/basicblocks.js:137
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -2954,7 +2954,7 @@ msgstr "名"
 
 #: js/basicblocks.js:3089
 msgid "save as lilypond"
-msgstr "リリポンドのファイルフォーマットで確保"
+msgstr "Lilypondのファイルフォーマットで確保"
 
 #: js/basicblocks.js:3098
 msgid "save svg"
