@@ -1657,13 +1657,11 @@ function Synth() {
     this.recorder = new Recorder(Tone.Master);
 
     this.download = function (blob){
-        //console.log(blob);
         var filename = prompt('Filename:', 'untitled.wav');
         if (fileExt(filename) !== 'wav') {
             filename += '.wav';
         }
         download(filename, URL.createObjectURL(blob));
-        //Recorder.forceDownload(blob, filename)
     }
 
     // Function that provides default parameters for various synths

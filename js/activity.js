@@ -1968,23 +1968,10 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSaveWAV() {
-            //alert("Unavailable at the moment");
-
-            //in logo.js: this.synth.recorder
-
-            // Show busy cursor.
             document.body.style.cursor = 'wait';
-
             console.log('Recording');
-
             logo.recording = true;
             logo.runLogoCommands();
-
-            //var filename = prompt('Filename:', 'untitled.png');
-            //if (fileExt(filename) !== 'png') {
-            //    filename += '.png';
-            //}
-            //download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
         };
 
         function doUploadToPlanet() {
