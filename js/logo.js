@@ -8799,19 +8799,30 @@ function Logo () {
                 }
             }
 
-            // Reverse any i18n
-            // solfnotes_ is used in the interface for i18n
-            //.TRANS: the note names must be separated by single spaces
-            var solfnotes_ = _('ti la sol fa mi re do').split(' ');
-            if (solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
-                var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-            } else if (solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
-                var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
-            } else {
+            if (halfSteps.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+                var solfegePart = noteArg.substr(0, 1).toLowerCase();
+            } else if (halfSteps.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
                 var solfegePart = noteArg.substr(0, 2).toLowerCase();
+            } else if (halfSteps.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+                var solfegePart = noteArg.substr(0, 3).toLowerCase();
+            } else {
+                // The note should already be translated, but just in case...
+                // Reverse any i18n
+                // solfnotes_ is used in the interface for i18n
+                //.TRANS: the note names must be separated by single spaces
+                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+                if (solfnotes_.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
+                } else if (solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
+                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
+                } else if (solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
+                } else {
+                    var solfegePart = noteArg.substr(0, 2).toLowerCase();
+                }
             }
 
-            if (noteArg.toLowerCase().substr(0, 4) === 'rest') {
+            if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
                 return ['R', ''];
             } else if (halfSteps.indexOf(solfegePart) !== -1) {
                 var index = halfSteps.indexOf(solfegePart) + offset;
@@ -8822,7 +8833,9 @@ function Logo () {
 
                 var note = thisScale[index];
             } else {
-                console.log('WARNING: Note ' + noteArg + ' not found in ' + halfSteps + '. Returning REST');
+                console.log(solfegePart);
+                console.log(halfSteps.indexOf(noteArg));
+                console.log('WARNING: Note [' + noteArg + '] not found in ' + halfSteps + '. Returning REST');
                 // this.validNote = false;
                 this.errorMsg(INVALIDPITCH, null);
                 return ['R', ''];
