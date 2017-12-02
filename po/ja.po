@@ -220,11 +220,11 @@ msgstr "プラネット"
 
 #: js/samplesviewer.js:576
 msgid "On my device"
-msgstr "デバイスにあるファイル"
+msgstr "自分のデバイスにあるファイル"
 
 #: js/samplesviewer.js:577
 msgid "Worldwide"
-msgstr "世界中"
+msgstr "世界中のプロジェクト"
 
 #: js/activity.js:542
 #.TRANS: hide Polar coordinate overlay grid
