@@ -2502,8 +2502,9 @@ msgstr "ベジェ曲線"
 
 #: js/basicblocks.js:2080
 #.TRANS: draws a part of the circumference of a circle
+## ひらがな＝えん\E3\81"
 msgid "arc"
-msgstr "円弧"＃ひらがな＝えん\E3\81"
+msgstr "円弧"
 
 #: js/basicblocks.js:2081
 ## 角度＝かくど；ジーニアス英和辞典
@@ -2511,8 +2512,9 @@ msgid "angle"
 msgstr "角度"
 
 #: js/basicblocks.js:2081
+## ひらがな＝はんけ\E3\81"
 msgid "radius"
-msgstr "半径"＃ひらがな＝はんけ\E3\81"
+msgstr "半径"
 
 #: js/basicblocks.js:2092
 #.TRANS: set compass heading
@@ -2645,8 +2647,9 @@ msgid "and"
 msgstr "と一緒"
 
 #: js/basicblocks.js:2312
+## Need to see what others us"
 msgid "or"
-msgstr "それとも"＃Need to see what others us"
+msgstr "それとも"
 
 #: js/basicblocks.js:2352
 #.TRANS: evaluate some math functions, e.g., absolute value, sine, exponential, etc.
@@ -3439,8 +3442,9 @@ msgid "from"
 msgstr "から"
 
 #: plugins/finance.rtp:69
+## かぶ\E3\81"
 msgid "stock price"
-msgstr "株価"＃かぶ\E3\81"
+msgstr "株価"
 
 #: plugins/translate.rtp:73
 msgid "translate"
@@ -3576,8 +3580,9 @@ msgid "get protein"
 msgstr "たんぱくをとる"
 
 #: plugins/nutrition.rtp:110
+## たんすいかぶ\E3\81"
 msgid "get carbs"
-msgstr "炭水化物"＃たんすいかぶ\E3\81"
+msgstr "炭水化物"
 
 #: plugins/nutrition.rtp:113
 ##　Get is ambiguous English word. Translates to "Take Dietary Fiber"
@@ -3619,8 +3624,9 @@ msgid "eat"
 msgstr "食べる"
 
 #: plugins/nutrition.rtp:155
+## ひらがな＝こな\E3\81"
 msgid "digest meal"
-msgstr "食事を熟す"＃ひらがな＝こな\E3\81"
+msgstr "食事を熟す"
 
 #: plugins/nutrition.rtp:158
 msgid "apple"
