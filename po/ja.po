@@ -367,7 +367,7 @@ msgstr "プロジェクトを確保する"
 
 #: js/activity.js:2822
 msgid "Long press on blocks to copy."
-msgstr "ブロックでネズミの長いクリック押しでコピー。"
+msgstr "ブロックでマウスの長いクリック押しでコピー。"
 
 #: js/activity.js:2822
 msgid "Click here to paste."
@@ -3267,7 +3267,7 @@ msgstr "ヌートリア"
 
 #: js/lilypond.js:16
 msgid "black rat"
-msgstr "黒いドブネズミ"
+msgstr "黒い鼠"
 
 #: js/lilypond.js:16
 msgid "grey squirrel"
@@ -3890,7 +3890,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/activity.js:2789
 
 #~msgid "Long press on block(s) to copy. Click here to paste."
-#~msgstr "ブロックでネズミの長いクリック押しでコピー。ペーストをするためにここでクリック。"
+#~msgstr "ブロックでマウスの長いクリック押しでコピー。ペーストをするためにここでクリック。"
 
 #~msgid "numerator"
 #~msgstr "分子"
