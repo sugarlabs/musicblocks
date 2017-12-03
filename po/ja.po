@@ -367,7 +367,7 @@ msgstr "プロジェクトを確保する"
 
 #: js/activity.js:2822
 msgid "Long press on blocks to copy."
-msgstr ""ブロックでネズミの長いクリック押しでコピー。
+msgstr "ブロックでネズミの長いクリック押しでコピー。"
 
 #: js/activity.js:2822
 msgid "Click here to paste."
