@@ -128,11 +128,11 @@ define(MYDEFINES, function (compatibility) {
         var chartBitmap = null;
         var saveBox;
         var merging = false;
-        var search = new createjs.DOMElement(document.getElementById('search'));
+        var search = new createjs.DOMElement(docById('search'));
         
-        var searchStyle = document.getElementById('search');
-        var searchX = document.getElementById('myCanvas').width;
-        var searchY = document.getElementById('myCanvas').height;
+        var searchStyle = docById('search');
+        var searchX = docById('myCanvas').width;
+        var searchY = docById('myCanvas').height;
  
         searchStyle.style.left = searchX/2.5 * turtleBlocksScale + 'px';
         searchStyle.style.top = searchY/3.5 * turtleBlocksScale + 'px';
@@ -401,13 +401,13 @@ define(MYDEFINES, function (compatibility) {
                 }
             };
 
-            var table = document.getElementById("myTable");
+            var table = docById('myTable');
             if(table != null) {
                 table.remove();
             }
 
             /*
-            var canvas = document.getElementById("music");
+            var canvas = docById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
             */
@@ -1028,7 +1028,7 @@ define(MYDEFINES, function (compatibility) {
                 event.dataTransfer.dropEffect = 'copy';
             };
 
-            var dropZone = document.getElementById('canvasHolder');
+            var dropZone = docById('canvasHolder');
             dropZone.addEventListener('dragover', handleDragOver, false);
             dropZone.addEventListener('drop', handleFileSelect, false);
 
@@ -1149,7 +1149,7 @@ define(MYDEFINES, function (compatibility) {
                                 var url = args[1];
                                 break;
                             default:
-                                errorMsg("Invalid parameters");
+                                errorMsg('Invalid parameters');
                             }
                         }
                     }
@@ -1416,10 +1416,10 @@ define(MYDEFINES, function (compatibility) {
                 source: searchSuggestions
             });
 
-            $j('#search').autocomplete("widget").addClass("scrollSearch");
+            $j('#search').autocomplete('widget').addClass('scrollSearch');
         };
 
-        document.getElementById("search").onclick = function(){
+        docById('search').onclick = function(){
             doSearchSuggestions();
         }
 
@@ -1431,9 +1431,9 @@ define(MYDEFINES, function (compatibility) {
                 source: searchSuggestions
             });
 
-            $j('#search').autocomplete("widget").addClass("scrollSearch");
+            $j('#search').autocomplete('widget').addClass('scrollSearch');
 
-            var searchInput = document.getElementById("search").value;
+            var searchInput = docById('search').value;
             var obj = palettes.getProtoNameAndPalette(searchInput);
             var protoblk = obj[0];
             var paletteName = obj[1];
@@ -1443,20 +1443,20 @@ define(MYDEFINES, function (compatibility) {
             if (searchInput.length>0){
                 if (searchResult){
                     if (isInArray(searchInput, deprecatedNames)){
-                        blocks.errorMsg("This block is deprecated.");
-                        document.getElementById("search").value = ""; 
+                        blocks.errorMsg(_('This block is deprecated.'));
+                        docById('search').value = ''; 
                         stage.setUpdateStage(stage);
                     }
                     else{
                         palettes.dict[obj[1]]._makeBlockFromPalette(protoblk, obj[2], function (newBlock) { 
                             blocks._moveBlock(newBlock, 100, 100); 
                         });
-                        document.getElementById("search").value = ""; 
+                        docById('search').value = ''; 
                     }
                 }
                 else{
-                    blocks.errorMsg("This block does not exist.");
-                    document.getElementById("search").value = ""; 
+                    blocks.errorMsg(_('Block cannot be found.'));
+                    docById('search').value = ''; 
                     stage.setUpdateStage(stage);
                 }
             }
@@ -1531,8 +1531,12 @@ define(MYDEFINES, function (compatibility) {
                 switch (event.keyCode) {
                 case SHIFT && SPACE:
                     search.visible = true;
-                    document.getElementById("search").focus();
                     stage.addChild(search);
+                    // Give the stage time to add the element before
+                    // selecting focus.
+                    setTimeout(function () {
+                        docById('search').focus();
+                    }, 500);
                     update = true;
                     break;
                 case SHIFT && ESC:
@@ -1604,7 +1608,7 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 case RETURN:
                     // toggle run
-                    if (document.getElementById("search").value.length>0){
+                    if (docById('search').value.length>0){
                         doSearch();
                     }
                     else{
@@ -1704,7 +1708,7 @@ define(MYDEFINES, function (compatibility) {
                 turtles.turtleList[turtle].doClear(false, false, true);
             }
 
-            var artcanvas = document.getElementById("overlayCanvas");
+            var artcanvas = docById('overlayCanvas');
             // Workaround for #795
             if (mobileSize) {
                 artcanvas.width = w * 2;
@@ -2063,7 +2067,7 @@ define(MYDEFINES, function (compatibility) {
             if (fileExt(filename) !== 'png') {
                 filename += '.png';
             }
-            var data = document.getElementById("overlayCanvas").toDataURL('image/png');
+            var data = docById('overlayCanvas').toDataURL('image/png');
             download(filename, data);
         };
 
@@ -2080,7 +2084,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doShareOnFacebook() {
-            alert("Facebook Sharing : disabled");    // remove when add fb share link
+            alert('Facebook Sharing : disabled');    // remove when add fb share link
             // add code for facebook share link
         };
 
@@ -2090,7 +2094,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (merge) {
-                console.log("merge load");
+                console.log('merge load');
                 merging = true;
             } else {
                 merging = false;
@@ -2203,10 +2207,10 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function runProject (env) {
-            console.log("Running Project from Event");
-            document.removeEventListener("finishedLoading", runProject);
+            console.log('Running Project from Event');
+            document.removeEventListener('finishedLoading', runProject);
             setTimeout(function () {
-                console.log("Run");
+                console.log('Run');
                 _changeBlockVisibility();
                 _doFastButton(env);
             }, 5000);
@@ -2899,7 +2903,7 @@ handleComplete);
         };
 
         function _doMergeLoad() {
-            console.log("merge load");
+            console.log('merge load');
             doLoad(true);
         }
 
