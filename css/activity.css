@@ -2,9 +2,6 @@ input[type=text] {
     width: 400px;
     box-sizing: border-box;
     position: absolute;
-    border: 2px solid #ccc;
-    background-color: white;
-    background-repeat: no-repeat;
     padding: 12px 20px 12px 40px;
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
