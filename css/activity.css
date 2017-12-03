@@ -2,10 +2,16 @@ input[type=text] {
     width: 400px;
     box-sizing: border-box;
     position: absolute;
+    background-color: white;
+    background-repeat: no-repeat;
     padding: 12px 20px 12px 40px;
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
     visibility: hidden;
+}
+
+input:focus {
+    border: 2px solid #87CEFA;
 }
 
 .ui-menu {
