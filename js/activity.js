@@ -1387,7 +1387,7 @@ define(MYDEFINES, function (compatibility) {
 
         for (var i in blocks.protoBlockDict){
             var searchCheck = blocks.protoBlockDict[i].staticLabels[0];
-            if (searchCheck && searchCheck.indexOf(deprecatedNames[0] === -1)){
+            if (searchCheck){
                 searchSuggestions.push(blocks.protoBlockDict[i].staticLabels[0]);
             }
         }
@@ -1399,7 +1399,6 @@ define(MYDEFINES, function (compatibility) {
                 searchSuggestions.splice(index, 1);
             }
         }
-
 
         for (var j in deprecatedNames){
             remove(searchSuggestions, deprecatedNames[j]);
