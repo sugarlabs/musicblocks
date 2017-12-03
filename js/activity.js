@@ -1531,7 +1531,7 @@ define(MYDEFINES, function (compatibility) {
                 switch (event.keyCode) {
                 case SHIFT && SPACE:
                     search.visible = true;
-                    document.getElementById("search").focus()
+                    document.getElementById("search").focus();
                     stage.addChild(search);
                     update = true;
                     break;
