@@ -217,6 +217,14 @@ function Palettes () {
             this.background = shape;
 	}
 
+    this.getProtoNameAndPalette = function (name) { 
+        for (var b in this.blocks.protoBlockDict) { 
+            if (name === this.blocks.protoBlockDict[b].staticLabels[0]) { 
+                return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name]; 
+            } 
+        } return [null, null, null]; 
+    };
+
         function __processUpIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
@@ -2007,7 +2015,6 @@ function Palette(palettes, name) {
 
     return this;
 };
-
 
 function initPalettes (palettes) {
     // Instantiate the palettes object on first load.

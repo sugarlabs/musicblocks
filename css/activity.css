@@ -1,3 +1,26 @@
+input[type=text] {
+    width: 400px;
+    box-sizing: border-box;
+    position: absolute;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+    visibility: hidden;
+}
+
+.ui-menu {
+  position: relative;
+  background-color: rgba(255,255,255,0.5);
+  max-width: 200px;
+}
+
+.scrollSearch {
+    max-height: 150px;
+    margin-bottom: 10px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
 #popdown-palette {
     display: none;
     position: absolute;

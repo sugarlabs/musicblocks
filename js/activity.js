@@ -20,7 +20,6 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 
-
 if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
@@ -129,6 +128,14 @@ define(MYDEFINES, function (compatibility) {
         var chartBitmap = null;
         var saveBox;
         var merging = false;
+        var search = new createjs.DOMElement(document.getElementById('search'));
+        
+        var searchStyle = document.getElementById('search');
+        var searchX = document.getElementById('myCanvas').width;
+        var searchY = document.getElementById('myCanvas').height;
+ 
+        searchStyle.style.left = searchX/2.5 * turtleBlocksScale + 'px';
+        searchStyle.style.top = searchY/3.5 * turtleBlocksScale + 'px';
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -694,7 +701,6 @@ define(MYDEFINES, function (compatibility) {
             logo.compiling = true;
             logo.runLogoCommands();
         };
-
 
         // Do we need to update the stage?
         var update = true;
@@ -1346,7 +1352,7 @@ define(MYDEFINES, function (compatibility) {
 
             var img = new Image();
             img.onload = function () {
-                // console.log('creating error message artwork for ' + img.src);
+                console.log('creating error message artwork for ' + img.src);
                 var artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
                 var text = new createjs.Text('', '20px Sans', '#000000');
@@ -1375,6 +1381,85 @@ define(MYDEFINES, function (compatibility) {
             };
 
             img.src = 'images/' + name + '.svg';
+        };
+
+        var searchSuggestions = [];//Array of Search Suggestions
+        var deprecatedNames = [_('rest'), _('square'),_('triangle'), _('sine'), _('sawtooth'), _('rhythm'), _('set voice'), _('set key')];
+
+        for (var i in blocks.protoBlockDict){
+            var searchCheck = blocks.protoBlockDict[i].staticLabels[0];
+            if (searchCheck){
+                searchSuggestions.push(blocks.protoBlockDict[i].staticLabels[0]);
+            }
+        }
+
+        function remove(array, element) {
+            const index = searchSuggestions.indexOf(element);
+    
+            if (index !== -1) {
+                searchSuggestions.splice(index, 1);
+            }
+        }
+
+        for (var j in deprecatedNames){
+            remove(searchSuggestions, deprecatedNames[j]);
+        }
+
+        function isInArray(value, array) {
+            return deprecatedNames.indexOf(value) > -1;
+        }
+
+        function doSearchSuggestions() {
+            var $j = jQuery.noConflict();
+
+            $j('#search').autocomplete({
+                source: searchSuggestions
+            });
+
+            $j('#search').autocomplete("widget").addClass("scrollSearch");
+        };
+
+        document.getElementById("search").onclick = function(){
+            doSearchSuggestions();
+        }
+
+        function doSearch() {
+
+            var $j = jQuery.noConflict();
+
+            $j('#search').autocomplete({
+                source: searchSuggestions
+            });
+
+            $j('#search').autocomplete("widget").addClass("scrollSearch");
+
+            var searchInput = document.getElementById("search").value;
+            var obj = palettes.getProtoNameAndPalette(searchInput);
+            var protoblk = obj[0];
+            var paletteName = obj[1];
+
+            var searchResult = blocks.protoBlockDict.hasOwnProperty(obj[2]);
+
+            if (searchInput.length>0){
+                if (searchResult){
+                    if (isInArray(searchInput, deprecatedNames)){
+                        blocks.errorMsg("This block is deprecated.");
+                        document.getElementById("search").value = ""; 
+                        stage.setUpdateStage(stage);
+                    }
+                    else{
+                        palettes.dict[obj[1]]._makeBlockFromPalette(protoblk, obj[2], function (newBlock) { 
+                            blocks._moveBlock(newBlock, 100, 100); 
+                        });
+                        document.getElementById("search").value = ""; 
+                    }
+                }
+                else{
+                    blocks.errorMsg("This block does not exist.");
+                    document.getElementById("search").value = ""; 
+                    stage.setUpdateStage(stage);
+                }
+            }
         };
 
         function __keyPressed(event) {
@@ -1444,6 +1529,16 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                case SHIFT && SPACE:
+                    search.visible = true;
+                    document.getElementById("search").focus();
+                    stage.addChild(search);
+                    update = true;
+                    break;
+                case SHIFT && ESC:
+                    search.visible = false;
+                    update = true;
+                    break;
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
@@ -1509,7 +1604,12 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 case RETURN:
                     // toggle run
-                    logo.runLogoCommands();
+                    if (document.getElementById("search").value.length>0){
+                        doSearch();
+                    }
+                    else{
+                        logo.runLogoCommands();
+                    }
                     break;
                 default:
                     break;
