@@ -1136,7 +1136,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 	blocks.protoBlockDict['noise'] = noise;
 	noise.staticLabels.push(_('noise'));
 	noise.adjustWidthToLabel();
-	noise.defaults.push('brown');
+	noise.defaults.push('white');
 	noise.oneArgBlock();
 	noise.dockTypes[1] = 'textin';
     
