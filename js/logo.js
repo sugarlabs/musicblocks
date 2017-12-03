@@ -7904,7 +7904,7 @@ function Logo () {
                         var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
                         var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                         var obj = [pitch, octave];
-                    } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
+                    } else if (that.inNoteBlock[turtle] in that.notePitches[turtle] && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
                     } else {
                         console.log('Could not find a note ');
