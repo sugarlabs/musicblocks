@@ -283,11 +283,11 @@ msgstr "早く動く"
 #: js/activity.js:2726
 #: js/activity.js:2739
 msgid "long press to run slowly"
-msgstr ""
+msgstr "長く押すとゆっくりに動く"
 
 #: js/activity.js:2726
 msgid "extra-long press to run music slowly"
-msgstr ""
+msgstr "もと長く押すと音楽はゆっくりに動く"
 
 #: js/activity.js:2727
 #: js/activity.js:2740
@@ -367,11 +367,11 @@ msgstr "プロジェクトを確保する"
 
 #: js/activity.js:2822
 msgid "Long press on blocks to copy."
-msgstr ""
+msgstr ""ブロックでネズミの長いクリック押しでコピー。
 
 #: js/activity.js:2822
 msgid "Click here to paste."
-msgstr ""
+msgstr "ペーストをするためにここでクリック。"
 
 #: js/activity.js:2824
 #: js/activity.js:2836
@@ -3890,7 +3890,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/activity.js:2789
 
 #~msgid "Long press on block(s) to copy. Click here to paste."
-#~msgstr "ブロックでネズミの長いクリック押しでコピー。ペースとをするためにここでクリック。"
+#~msgstr "ブロックでネズミの長いクリック押しでコピー。ペーストをするためにここでクリック。"
 
 #~msgid "numerator"
 #~msgstr "分子"
