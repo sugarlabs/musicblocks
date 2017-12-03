@@ -4345,6 +4345,22 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
+		case 'noise':
+			if (args[0] == null) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                childFlow = args[1];
+                childFlowCount = 1;
+			} else if (args[0] == "white" || args[0] == "pink" || args[0] == "brown") {
+				var noiseSynth = new Tone.NoiseSynth().toMaster();
+				noiseSynth.set("noise.type", args[0]);
+				noiseSynth.triggerAttackRelease("2");
+				childFlow = args[1];
+				childFlowCount = 1;
+			} else {
+				that.errorMsg("Not A Valid Input");
+				that.stopTurtle = true;
+			}
+			break;
         case 'crescendo':
             if (args.length > 1 && args[0] !== 0) {
                 that.crescendoDelta[turtle].push(args[0]);
