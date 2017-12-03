@@ -1387,7 +1387,7 @@ define(MYDEFINES, function (compatibility) {
 
         for (var i in blocks.protoBlockDict){
             var searchCheck = blocks.protoBlockDict[i].staticLabels[0];
-            if (searchCheck && searchCheck.indexOf(deprecatedNames[0] == -1)){
+            if (searchCheck && searchCheck.indexOf(deprecatedNames[0] === -1)){
                 searchSuggestions.push(blocks.protoBlockDict[i].staticLabels[0]);
             }
         }
