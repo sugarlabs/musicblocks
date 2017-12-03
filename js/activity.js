@@ -1383,12 +1383,30 @@ define(MYDEFINES, function (compatibility) {
         };
 
         var searchSuggestions = [];//Array of Search Suggestions
+        var deprecatedNames = [_('rest'), _('square'),_('triangle'), _('sine'), _('sawtooth'), _('rhythm'), _('set voice'), _('set key')];
 
         for (var i in blocks.protoBlockDict){
             var searchCheck = blocks.protoBlockDict[i].staticLabels[0];
-            if (searchCheck && searchCheck!=_('rest') && searchCheck!=_('square') && searchCheck!=_('triangle') && searchCheck!=_('sine') && searchCheck!=_('sawtooth') && searchCheck!=_('rhythm') && searchCheck!=_('set voice') && searchCheck!=_('set key')){
+            if (searchCheck && searchCheck.indexOf(deprecatedNames[0] == -1)){
                 searchSuggestions.push(blocks.protoBlockDict[i].staticLabels[0]);
             }
+        }
+
+        function remove(array, element) {
+            const index = searchSuggestions.indexOf(element);
+    
+            if (index !== -1) {
+                searchSuggestions.splice(index, 1);
+            }
+        }
+
+
+        for (var j in deprecatedNames){
+            remove(searchSuggestions, deprecatedNames[j]);
+        }
+
+        function isInArray(value, array) {
+            return deprecatedNames.indexOf(value) > -1;
         }
 
         function doSearchSuggestions() {
@@ -1424,7 +1442,7 @@ define(MYDEFINES, function (compatibility) {
 
             if (searchInput.length>0){
                 if (searchResult){
-                    if (searchInput == _('rest') || searchInput == _('square') || searchInput == _('triangle') || searchInput ==_('sine') || searchInput ==_('sawtooth') || searchInput ==_('rhythm') || searchInput ==_('set voice') || searchInput ==_('set key')){
+                    if (isInArray(searchInput, deprecatedNames)){
                         blocks.errorMsg("This block is deprecated.");
                         document.getElementById("search").value = ""; 
                         stage.setUpdateStage(stage);
@@ -1513,6 +1531,7 @@ define(MYDEFINES, function (compatibility) {
                 switch (event.keyCode) {
                 case SHIFT && SPACE:
                     search.visible = true;
+                    document.getElementById("search").focus()
                     stage.addChild(search);
                     update = true;
                     break;
@@ -1588,7 +1607,9 @@ define(MYDEFINES, function (compatibility) {
                     if (document.getElementById("search").value.length>0){
                         doSearch();
                     }
-                    logo.runLogoCommands();
+                    else{
+                        logo.runLogoCommands();
+                    }
                     break;
                 default:
                     break;
