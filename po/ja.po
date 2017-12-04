@@ -2112,7 +2112,7 @@ msgstr "G メジャー（ト長調）"
 #: js/basicblocks.js:758
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "pitch-time matrix"
-msgstr "音楽グラフ"
+msgstr "ピッチ時刻グラフ"
 
 #: js/basicblocks.js:800
 #.TRANS: number of beats per minute
