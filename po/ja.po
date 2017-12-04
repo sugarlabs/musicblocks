@@ -369,7 +369,7 @@ msgstr "設定"
 #: js/turtledefs.js:106
 ## Maybe 全部を取り消す
 msgid "Delete all"
-msgstr "全部を消す"
+msgstr "全部を削除"
 
 #: js/activity.js:2794
 #: js/activity.js:2806
@@ -712,7 +712,7 @@ msgstr "私のプロジェクト"
 
 #: js/logo.js:6692
 msgid "synth cannot play chords."
-msgstr "シンセは和音ができません"
+msgstr "このシンセは和音ができません"
 
 #: js/logo.js:8540
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
@@ -3410,7 +3410,7 @@ msgstr "プレイバックをリスタート"
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 ## http://jisho.org/word/%E8%A8%AD%E3%81%91%E3%82%8B 設け＝もうけ
 msgid "prepare music for playback"
-msgstr "音楽をプレーバックの設け"
+msgstr "音楽のプレーバックを設け"
 
 #: js/modewidget.js:78
 ## http://jisho.org/word/%E6%99%82%E8%A8%88%E5%9B%9E%E3%82%8A 反時計回り＝はんとけいまわり
@@ -3423,11 +3423,11 @@ msgstr "時計回り"
 
 #: js/pitchstaircase.js:396
 msgid "play chord"
-msgstr "和音を鳴らす"
+msgstr "和音を再生"
 
 #: js/pitchstaircase.js:401
 msgid "play scale"
-msgstr "音階を鳴らす"
+msgstr "音階を再生"
 
 #: plugins/finance.rtp:28
 ## http://jisho.org/word/%E9%80%9A%E8%B2%A8 通貨＝つうか
