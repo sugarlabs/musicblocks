@@ -136,6 +136,8 @@ define(MYDEFINES, function (compatibility) {
  
         searchStyle.style.left = searchX/2.5 * turtleBlocksScale + 'px';
         searchStyle.style.top = searchY/3.5 * turtleBlocksScale + 'px';
+        searchStyle.style.visibility = "hidden";
+
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
