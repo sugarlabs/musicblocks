@@ -258,6 +258,7 @@ function Logo () {
     this.runningLilypond = false;
     this.checkingCompletionState = false;
     this.compiling = false;
+    this.recording = false;
 
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
@@ -1148,6 +1149,11 @@ function Logo () {
                     // Launching status block would have hidden the
                     // Stop Button so show it again.
                     that.onRunTurtle();
+                }
+
+                if (that.recording){
+                    that.synth.recorder.clear();
+                    that.synth.recorder.record();
                 }
 
                 // If there are start blocks, run them all.
@@ -5723,6 +5729,13 @@ function Logo () {
                         // Reset the cursor...
                         document.body.style.cursor = 'default';
 
+                        if (that.recording){
+                            console.log('finishing recording');
+                            that.synth.recorder.stop();
+                            that.synth.recorder.exportWAV(that.synth.download);
+                            that.recording = false;
+                        }
+
                         // And save the session.
                         that.saveLocally();
                     }, 1000);
@@ -6440,7 +6453,7 @@ function Logo () {
                 }, beatValue * 1000);
             };
 
-            if (this.noteDelay === 0 || this.suppressOutput[turtle]) {
+            if (this.noteDelay === 0 || !this.suppressOutput[turtle]) {
                 __playnote();
             } else {
                 setTimeout(function () {
@@ -7891,7 +7904,7 @@ function Logo () {
                         var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
                         var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                         var obj = [pitch, octave];
-                    } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
+                    } else if (that.inNoteBlock[turtle] in that.notePitches[turtle] && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
                     } else {
                         console.log('Could not find a note ');
@@ -8786,19 +8799,30 @@ function Logo () {
                 }
             }
 
-            // Reverse any i18n
-            // solfnotes_ is used in the interface for i18n
-            //.TRANS: the note names must be separated by single spaces
-            var solfnotes_ = _('ti la sol fa mi re do').split(' ');
-            if (solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
-                var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-            } else if (solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
-                var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
-            } else {
+            if (halfSteps.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+                var solfegePart = noteArg.substr(0, 1).toLowerCase();
+            } else if (halfSteps.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
                 var solfegePart = noteArg.substr(0, 2).toLowerCase();
+            } else if (halfSteps.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+                var solfegePart = noteArg.substr(0, 3).toLowerCase();
+            } else {
+                // The note should already be translated, but just in case...
+                // Reverse any i18n
+                // solfnotes_ is used in the interface for i18n
+                //.TRANS: the note names must be separated by single spaces
+                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+                if (solfnotes_.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
+                } else if (solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
+                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
+                } else if (solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
+                } else {
+                    var solfegePart = noteArg.substr(0, 2).toLowerCase();
+                }
             }
 
-            if (noteArg.toLowerCase().substr(0, 4) === 'rest') {
+            if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
                 return ['R', ''];
             } else if (halfSteps.indexOf(solfegePart) !== -1) {
                 var index = halfSteps.indexOf(solfegePart) + offset;
@@ -8809,7 +8833,9 @@ function Logo () {
 
                 var note = thisScale[index];
             } else {
-                console.log('WARNING: Note ' + noteArg + ' not found in ' + halfSteps + '. Returning REST');
+                console.log(solfegePart);
+                console.log(halfSteps.indexOf(noteArg));
+                console.log('WARNING: Note [' + noteArg + '] not found in ' + halfSteps + '. Returning REST');
                 // this.validNote = false;
                 this.errorMsg(INVALIDPITCH, null);
                 return ['R', ''];

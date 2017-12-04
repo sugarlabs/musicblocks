@@ -40,6 +40,9 @@
     <script src="lib/modernizr-2.6.2.min.js">
     </script>
 
+    <script src="lib/recorder.js">
+    </script>
+
     <link rel="prefetch" type="application/l10n" href="./localization.ini">
 
     <script data-main="js/loader" src="lib/require.js">
@@ -345,6 +348,17 @@
 
       <div id="helpElem">
       </div>
+
+      <div id="searchBar">
+
+         <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks">
+         <ul class="matches"></ul>
+        <input onkeypress="doSearch()" type="submit" value="">
+        
+      </div>
+
     </div> <!-- hideContents -->
+
   </body>
+
 </html>

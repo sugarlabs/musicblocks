@@ -20,7 +20,6 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 
-
 if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
@@ -129,6 +128,14 @@ define(MYDEFINES, function (compatibility) {
         var chartBitmap = null;
         var saveBox;
         var merging = false;
+        var search = new createjs.DOMElement(docById('search'));
+        
+        var searchStyle = docById('search');
+        var searchX = docById('myCanvas').width;
+        var searchY = docById('myCanvas').height;
+ 
+        searchStyle.style.left = searchX/2.5 * turtleBlocksScale + 'px';
+        searchStyle.style.top = searchY/3.5 * turtleBlocksScale + 'px';
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -394,13 +401,13 @@ define(MYDEFINES, function (compatibility) {
                 }
             };
 
-            var table = document.getElementById("myTable");
+            var table = docById('myTable');
             if(table != null) {
                 table.remove();
             }
 
             /*
-            var canvas = document.getElementById("music");
+            var canvas = docById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
             */
@@ -695,7 +702,6 @@ define(MYDEFINES, function (compatibility) {
             logo.runLogoCommands();
         };
 
-
         // Do we need to update the stage?
         var update = true;
 
@@ -844,6 +850,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSaveTB(doSaveTB)
                 .setSaveSVG(doSaveSVG)
                 .setSavePNG(doSavePNG)
+                .setSaveWAV(doSaveWAV)
                 .setSavePlanet(doUploadToPlanet)
                 .setSaveBlockArtwork(doSaveBlockArtwork);
 
@@ -1021,7 +1028,7 @@ define(MYDEFINES, function (compatibility) {
                 event.dataTransfer.dropEffect = 'copy';
             };
 
-            var dropZone = document.getElementById('canvasHolder');
+            var dropZone = docById('canvasHolder');
             dropZone.addEventListener('dragover', handleDragOver, false);
             dropZone.addEventListener('drop', handleFileSelect, false);
 
@@ -1142,7 +1149,7 @@ define(MYDEFINES, function (compatibility) {
                                 var url = args[1];
                                 break;
                             default:
-                                errorMsg("Invalid parameters");
+                                errorMsg('Invalid parameters');
                             }
                         }
                     }
@@ -1345,7 +1352,7 @@ define(MYDEFINES, function (compatibility) {
 
             var img = new Image();
             img.onload = function () {
-                // console.log('creating error message artwork for ' + img.src);
+                console.log('creating error message artwork for ' + img.src);
                 var artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
                 var text = new createjs.Text('', '20px Sans', '#000000');
@@ -1374,6 +1381,85 @@ define(MYDEFINES, function (compatibility) {
             };
 
             img.src = 'images/' + name + '.svg';
+        };
+
+        var searchSuggestions = [];//Array of Search Suggestions
+        var deprecatedNames = [_('rest'), _('square'),_('triangle'), _('sine'), _('sawtooth'), _('rhythm'), _('set voice'), _('set key')];
+
+        for (var i in blocks.protoBlockDict){
+            var searchCheck = blocks.protoBlockDict[i].staticLabels[0];
+            if (searchCheck){
+                searchSuggestions.push(blocks.protoBlockDict[i].staticLabels[0]);
+            }
+        }
+
+        function remove(array, element) {
+            const index = searchSuggestions.indexOf(element);
+    
+            if (index !== -1) {
+                searchSuggestions.splice(index, 1);
+            }
+        }
+
+        for (var j in deprecatedNames){
+            remove(searchSuggestions, deprecatedNames[j]);
+        }
+
+        function isInArray(value, array) {
+            return deprecatedNames.indexOf(value) > -1;
+        }
+
+        function doSearchSuggestions() {
+            var $j = jQuery.noConflict();
+
+            $j('#search').autocomplete({
+                source: searchSuggestions
+            });
+
+            $j('#search').autocomplete('widget').addClass('scrollSearch');
+        };
+
+        docById('search').onclick = function(){
+            doSearchSuggestions();
+        }
+
+        function doSearch() {
+
+            var $j = jQuery.noConflict();
+
+            $j('#search').autocomplete({
+                source: searchSuggestions
+            });
+
+            $j('#search').autocomplete('widget').addClass('scrollSearch');
+
+            var searchInput = docById('search').value;
+            var obj = palettes.getProtoNameAndPalette(searchInput);
+            var protoblk = obj[0];
+            var paletteName = obj[1];
+
+            var searchResult = blocks.protoBlockDict.hasOwnProperty(obj[2]);
+
+            if (searchInput.length>0){
+                if (searchResult){
+                    if (isInArray(searchInput, deprecatedNames)){
+                        blocks.errorMsg(_('This block is deprecated.'));
+                        docById('search').value = ''; 
+                        stage.setUpdateStage(stage);
+                    }
+                    else{
+                        palettes.dict[obj[1]]._makeBlockFromPalette(protoblk, obj[2], function (newBlock) { 
+                            blocks._moveBlock(newBlock, 100, 100); 
+                        });
+                        docById('search').value = ''; 
+                    }
+                }
+                else{
+                    blocks.errorMsg(_('Block cannot be found.'));
+                    docById('search').value = ''; 
+                    stage.setUpdateStage(stage);
+                }
+            }
         };
 
         function __keyPressed(event) {
@@ -1443,6 +1529,20 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                case SHIFT && SPACE:
+                    search.visible = true;
+                    stage.addChild(search);
+                    // Give the stage time to add the element before
+                    // selecting focus.
+                    setTimeout(function () {
+                        docById('search').focus();
+                    }, 500);
+                    update = true;
+                    break;
+                case SHIFT && ESC:
+                    search.visible = false;
+                    update = true;
+                    break;
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
@@ -1508,7 +1608,12 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 case RETURN:
                     // toggle run
-                    logo.runLogoCommands();
+                    if (docById('search').value.length>0){
+                        doSearch();
+                    }
+                    else{
+                        logo.runLogoCommands();
+                    }
                     break;
                 default:
                     break;
@@ -1603,7 +1708,7 @@ define(MYDEFINES, function (compatibility) {
                 turtles.turtleList[turtle].doClear(false, false, true);
             }
 
-            var artcanvas = document.getElementById("overlayCanvas");
+            var artcanvas = docById('overlayCanvas');
             // Workaround for #795
             if (mobileSize) {
                 artcanvas.width = w * 2;
@@ -1958,12 +2063,19 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSavePNG() {
-            alert("Unavailable at the moment");
-            //var filename = prompt('Filename:', 'untitled.png');
-            //if (fileExt(filename) !== 'png') {
-            //    filename += '.png';
-            //}
-            //download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+            var filename = prompt('Filename:', 'untitled.png');
+            if (fileExt(filename) !== 'png') {
+                filename += '.png';
+            }
+            var data = docById('overlayCanvas').toDataURL('image/png');
+            download(filename, data);
+        };
+
+        function doSaveWAV() {
+            document.body.style.cursor = 'wait';
+            console.log('Recording');
+            logo.recording = true;
+            logo.runLogoCommands();
         };
 
         function doUploadToPlanet() {
@@ -1972,7 +2084,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doShareOnFacebook() {
-            alert("Facebook Sharing : disabled");    // remove when add fb share link
+            alert('Facebook Sharing : disabled');    // remove when add fb share link
             // add code for facebook share link
         };
 
@@ -1982,7 +2094,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (merge) {
-                console.log("merge load");
+                console.log('merge load');
                 merging = true;
             } else {
                 merging = false;
@@ -2095,10 +2207,10 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function runProject (env) {
-            console.log("Running Project from Event");
-            document.removeEventListener("finishedLoading", runProject);
+            console.log('Running Project from Event');
+            document.removeEventListener('finishedLoading', runProject);
             setTimeout(function () {
-                console.log("Run");
+                console.log('Run');
                 _changeBlockVisibility();
                 _doFastButton(env);
             }, 5000);
@@ -2715,7 +2827,7 @@ handleComplete);
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var buttonNames = [
-                    ['run', _doFastButton, _('Run fast / long press to run slowly / extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
@@ -2728,7 +2840,7 @@ handleComplete);
                 ];
             } else {
                 var buttonNames = [
-                    ['run', _doFastButton, _('Run fast / long press to run slowly'), _doSlowButton, null, 'slow-button', null],
+                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly'), _doSlowButton, null, 'slow-button', null],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
                     ['clear', _allClear, _('Clean'), null, null, null, null],
@@ -2791,7 +2903,7 @@ handleComplete);
         };
 
         function _doMergeLoad() {
-            console.log("merge load");
+            console.log('merge load');
             doLoad(true);
         }
 
@@ -2811,7 +2923,7 @@ handleComplete);
                     ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
                     ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
-                    ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.'), null, null, null, null],
+                    ['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' ' + _('Click here to paste.'), null, null, null, null],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],

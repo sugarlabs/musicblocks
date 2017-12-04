@@ -99,7 +99,7 @@ const GLOBAL_PROJECT_TEMPLATE = '\
     </div> \
     </span> \
     <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
-    <img class="merge icon" title="' + _('Merge with current project') + '" alt="' + _('Merge with Current Project') + '" src="header-icons/download-merge.svg" /> \
+    <img class="merge icon" title="' + _('Merge with current project') + '" alt="' + _('Merge with current project') + '" src="header-icons/download-merge.svg" /> \
 </div>';
 
 
