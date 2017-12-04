@@ -870,6 +870,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSmaller(doSmallerFont)
                 .setPlugins(doOpenPlugin)
                 .setStats(doAnalytics)
+                .setSearch(showSearch)
                 .setScroller(toggleScroller);
 
             playbackBox = new PlaybackBox();
@@ -1423,10 +1424,20 @@ define(MYDEFINES, function (compatibility) {
 
         docById('search').onclick = function(){
             doSearchSuggestions();
-        }
+        };
+
+        function showSearch() {
+            search.visible = true;
+            stage.addChild(search);
+            // Give the stage time to add the element before
+            // selecting focus.
+            setTimeout(function () {
+                docById('search').focus();
+            }, 500);
+            update = true;
+	};
 
         function doSearch() {
-
             var $j = jQuery.noConflict();
 
             $j('#search').autocomplete({
@@ -1532,18 +1543,7 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 switch (event.keyCode) {
                 case SHIFT && SPACE:
-                    search.visible = true;
-                    stage.addChild(search);
-                    // Give the stage time to add the element before
-                    // selecting focus.
-                    setTimeout(function () {
-                        docById('search').focus();
-                    }, 500);
-                    update = true;
-                    break;
-                case SHIFT && ESC:
-                    search.visible = false;
-                    update = true;
+                    showSearch();
                     break;
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {
@@ -1605,8 +1605,13 @@ define(MYDEFINES, function (compatibility) {
                 case TAB:
                     break;
                 case ESC:
-                    // toggle full screen
-                    _toggleToolbar();
+                    if (search.visible) {
+                        search.visible = false;
+                        update = true;
+		    } else {
+			// toggle full screen
+			_toggleToolbar();
+		    }
                     break;
                 case RETURN:
                     // toggle run
