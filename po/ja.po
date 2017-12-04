@@ -40,10 +40,6 @@
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "rest"
 msgstr "休符"
 
@@ -283,11 +279,11 @@ msgstr "早く動く"
 #: js/activity.js:2726
 #: js/activity.js:2739
 msgid "long press to run slowly"
-msgstr ""
+msgstr "長く押すとゆっくりに動く"
 
 #: js/activity.js:2726
 msgid "extra-long press to run music slowly"
-msgstr ""
+msgstr "もと長く押すと音楽はゆっくりに動く"
 
 #: js/activity.js:2727
 #: js/activity.js:2740
@@ -324,7 +320,7 @@ msgstr "パレットを見せ隠し"
 #: js/turtledefs.js:86
 ## Not too sure on grammar.."
 msgid "Show/hide blocks"
-msgstr "ブロックを見せ隠し"
+msgstr "ブロックを表示し隠し"
 
 #: js/activity.js:2733
 #: js/activity.js:2744
@@ -367,11 +363,11 @@ msgstr "プロジェクトを確保する"
 
 #: js/activity.js:2822
 msgid "Long press on blocks to copy."
-msgstr ""
+msgstr "ブロックでマウスの長いクリック押しでコピー。"
 
 #: js/activity.js:2822
 msgid "Click here to paste."
-msgstr ""
+msgstr "ペーストをするためにここでクリック。"
 
 #: js/activity.js:2824
 #: js/activity.js:2836
@@ -389,14 +385,14 @@ msgstr "設定"
 #: js/turtledefs.js:106
 ## Maybe 全部を取り消す
 msgid "Delete all"
-msgstr "全部を消す"
+msgstr "全部を削除"
 
 #: js/activity.js:2827
 #: js/activity.js:2839
 #: js/turtledefs.js:107
-## Uncertain about this. Maybe 元へ戻す
+## Squeak Tools.po
 msgid "Undo"
-msgstr "取り戻す"
+msgstr "元にもどす"
 
 #: js/activity.js:2834
 #: js/turtledefs.js:96
@@ -678,12 +674,37 @@ msgstr "ディストーションの数価が０よりの必要あります。"
 msgid "Depth is out of range."
 msgstr ""
 
-#: js/logo.js:5229
-#: js/logo.js:5231
-#: js/musicutils.js:335
-#: js/basicblocks.js:2767
-#: js/macros.js:160
-#: js/macros.js:161
+#: js/logo.js:4851
+#: js/logo.js:4872
+msgid "Input to Perfect Block must be 1, 4, 5, or 8"
+msgstr "完全のブロックに 1, 4, 5, 8 からの数価の必要があります。"
+
+#: js/logo.js:4898
+#: js/logo.js:4919
+msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
+msgstr "減のブロックに 1, 2, 3, 4, 5, 6, 7, 8 からの数価の必要があります。"
+
+#: js/logo.js:4945
+#: js/logo.js:4966
+msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
+msgstr "増のブロックに 1, 2, 3, 4, 5, 6, 7, 8 からの数価の必要があります。"
+
+#: js/logo.js:4992
+#: js/logo.js:5014
+msgid "Input to Major Block must be 2, 3, 6, or 7"
+msgstr "長のブロックに 2, 3, 6, 7からの数価の必要があります。"
+
+#: js/logo.js:5040
+#: js/logo.js:5061
+msgid "Input to Minor Block must be 2, 3, 6, or 7"
+msgstr "短のブロックに 2, 3, 6, 7からの数価の必要があります。"
+
+#: js/logo.js:5577
+#: js/logo.js:5579
+#: js/musicutils.js:397
+#: js/basicblocks.js:2921
+#: js/macros.js:167
+#: js/macros.js:168
 #.TRANS: polytone synthesizer
 #.TRANS: the default case used in a switch statement in programming
 msgid "default"
@@ -704,7 +725,7 @@ msgstr "私のプロジェクト"
 
 #: js/logo.js:6305
 msgid "synth cannot play chords."
-msgstr "シンセは和音ができません"
+msgstr "このシンセは和音ができません"
 
 #: js/logo.js:8146
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
@@ -734,7 +755,7 @@ msgstr "音程を計るため、二つのピッチのブロックを使う必要
 #: js/pitchstaircase.js:83
 #: plugins/rodi.rtp:195
 msgid "play"
-msgstr "音を鳴らす"
+msgstr "再生"
 
 #: js/pitchdrummatrix.js:132
 #: js/pitchtimematrix.js:174
@@ -880,6 +901,7 @@ msgstr "増"
 #: js/basicblocks.js:1349
 #.TRANS: modal scale for music
 ## for scale, it would be ディミニッシュト・スケール
+#.TRANS: the "diminished" interval in music
 ## 減=げん
 msgid "diminished"
 msgstr "減"
@@ -1542,7 +1564,11 @@ msgstr "このツールバーは音楽グリッド、音符、音色、タート
 
 #: js/turtledefs.js:77
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "ブロックのパレットを見せるためにここでクリック｜ブロックはパレットにドラッグして使えます"
+msgstr "ブロックのパレットを表示するためにここでクリック｜ブロックはパレットにドラッグして使えます"
+
+#: js/turtledefs.js:78
+msgid "Run fast"
+msgstr "早く動く"
 
 #: js/turtledefs.js:78
 ## Need to check this again
@@ -1586,11 +1612,11 @@ msgstr "画面にあるものを全部消して最初のままに戻す"
 #: js/turtledefs.js:85
 ## Check grammar
 msgid "Hide or show the block palettes."
-msgstr "ブロックのパレットを隠し見せ"
+msgstr "ブロックのパレットを隠し表示"
 
 #: js/turtledefs.js:86
 msgid "Hide or show the blocks and the palettes."
-msgstr "パレットを隠し見せ"　#Uncertain about gramma"
+msgstr "パレットを隠し表示"　#Uncertain about gramma"
 
 #: js/turtledefs.js:87
 ##　りゃくし＝abbreviate ふくらみ＝expand ; I said "code" instead of "stack"
@@ -1603,7 +1629,7 @@ msgstr "全部のブロックを整理"
 
 #: js/turtledefs.js:89
 msgid "Show these messages."
-msgstr "メッセージを見せる"
+msgstr "メッセージを表示する"
 
 #: js/turtledefs.js:90
 msgid "Expand/collapse option toolbar"
@@ -1612,7 +1638,7 @@ msgstr "オプションのツールバーを膨らみ略し"
 #: js/turtledefs.js:90
 ## saying hide or show the right (etc) toolbar
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "右の色々ツールバーを見せ隠し"
+msgstr "右の色々ツールバーを表示隠し"
 
 #: js/turtledefs.js:91
 msgid "This button opens a viewer for loading example projects."
@@ -1666,12 +1692,12 @@ msgstr "スタックで長くクリックすると現れます"
 
 #: js/turtledefs.js:98
 msgid "Show or hide a coordinate grid."
-msgstr "グリッドを見せ隠し"
+msgstr "グリッドを表示隠し"
 
 #: js/turtledefs.js:99
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "極座表敬グリッドを見せ隠し"
+msgstr "極座表敬グリッドを表示隠し"
 
 #: js/turtledefs.js:100
 ## A little off, I think. Also, Maybe just "Music Blocks" in Roman letters.
@@ -1702,11 +1728,11 @@ msgstr "ブロックの大きさ"
 #: js/utilitybox.js:84
 ## ひらがな＝とうけいじょうほう|Display is literal, but maybe not best word choice
 msgid "Display statistics"
-msgstr "統計情報を見せる"
+msgstr "統計情報を表示する"
 
 #: js/turtledefs.js:103
 msgid "Display statistics about your Music project."
-msgstr "音楽プロジェクトの統計情報を見せる"
+msgstr "音楽プロジェクトの統計情報を表示する"
 
 #: js/turtledefs.js:104
 #: js/utilitybox.js:92
@@ -2008,7 +2034,7 @@ msgstr "四分音符"
 #: js/basicblocks.js:550
 ## 二分＝にぶ
 msgid "half note"
-msgstr "二分音符"
+msgstr "半音符"
 
 #: js/basicblocks.js:557
 msgid "whole note"
@@ -2081,7 +2107,7 @@ msgstr "G メジャー（ト長調）"
 #: js/basicblocks.js:740
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "pitch-time matrix"
-msgstr "音楽グラフ"
+msgstr "ピッチ時刻グラフ"
 
 #: js/basicblocks.js:782
 #.TRANS: number of beats per minute
@@ -2155,7 +2181,7 @@ msgstr "タイ"
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 ##　I need to look this up.
 msgid "dot"
-msgstr "ドット"
+msgstr "付点音符"
 
 #: js/basicblocks.js:916
 #: js/rhythmruler.js:327
@@ -2730,7 +2756,7 @@ msgstr "アプリにヒープを保存"
 #: plugins/heap.rtp:126
 ## https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%BC%E3%83%97
 msgid "show heap"
-msgstr "ヒープを見せる"
+msgstr "ヒープを表示する"
 
 #: js/basicblocks.js:2560
 ## Maybe heap in roman letters"
@@ -3182,7 +3208,7 @@ msgstr "フィルターを加える"
 #: js/pitchstaircase.js:455
 ## Uses the Katakana version for computer terminology according to http://jisho.org/word/%E3%82%A2%E3%83%B3%E3%83%89%E3%82%A5 
 msgid "undo"
-msgstr "アンドゥ"
+msgstr "元にもどす"
 
 #: js/timbre.js:927
 ## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
@@ -3267,7 +3293,7 @@ msgstr "ヌートリア"
 
 #: js/lilypond.js:16
 msgid "black rat"
-msgstr "黒いドブネズミ"
+msgstr "黒い鼠"
 
 #: js/lilypond.js:16
 msgid "grey squirrel"
@@ -3374,7 +3400,7 @@ msgstr "プレイバックをリスタート"
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 ## http://jisho.org/word/%E8%A8%AD%E3%81%91%E3%82%8B 設け＝もうけ
 msgid "prepare music for playback"
-msgstr "音楽をプレーバックの設け"
+msgstr "音楽のプレーバックを設け"
 
 #: js/modewidget.js:78
 ## http://jisho.org/word/%E6%99%82%E8%A8%88%E5%9B%9E%E3%82%8A 反時計回り＝はんとけいまわり
@@ -3387,11 +3413,11 @@ msgstr "時計回り"
 
 #: js/pitchstaircase.js:396
 msgid "play chord"
-msgstr "和音を鳴らす"
+msgstr "和音を再生"
 
 #: js/pitchstaircase.js:401
 msgid "play scale"
-msgstr "音階を鳴らす"
+msgstr "音階を再生"
 
 #: plugins/finance.rtp:28
 ## http://jisho.org/word/%E9%80%9A%E8%B2%A8 通貨＝つうか
@@ -3778,6 +3804,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "graphical notation matrix"
 #~msgstr "簡単なビジュアル・マトリックス"
 
+## what is this?
 #~msgid "mashape"
 #~msgstr ""
 
@@ -3826,7 +3853,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "サバーにプロジェクトを保存"
 
 #: js/musicutils.js:291
-
+## 五音音階=ごおんおんかい　http://jisho.org/word/%E4%BA%94%E9%9F%B3%E9%9F%B3%E9%9A%8E ；ペンタトニックalso okay
 #~msgid "pentatonic"
 #~msgstr "五音音階"
 
@@ -3875,22 +3902,24 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "タートル・ブロックへようこそ"
 
 #: js/basicblocks.js:282
-
+## 移調=いちょう;http://jisho.org/word/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%B9%E3%83%88 
 #~msgid "adjust transposition"
 #~msgstr "移調をアジャスト"
 
 #: js/basicblocks.js:145
-
+## http://jisho.org/word/%E3%82%B3%E3%83%B3%E3%82%BD%E3%83%8A%E3%83%B3%E3%83%88 ; totally unsure
 #~msgid "consonant step down"
 #~msgstr "下がりのコンソナントの音程動き"
 
+## what is this?
 #~msgid "hspace"
 #~msgstr ""
 
-#: js/activity.js:2789
+#~msgid "1/32 note 𝅘𝅥𝅰"
+#~msgstr "32分音符"
 
 #~msgid "Long press on block(s) to copy. Click here to paste."
-#~msgstr "ブロックでネズミの長いクリック押しでコピー。ペースとをするためにここでクリック。"
+#~msgstr "ブロックでマウスの長いクリック押しでコピー。ペーストをするためにここでクリック。"
 
 #~msgid "numerator"
 #~msgstr "分子"
@@ -3901,9 +3930,12 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "平調子"
 
 #: js/turtledefs.js:134
-
+## 直交座標=ちょっこうざひょうhttp://jisho.org/word/%E7%9B%B4%E4%BA%A4%E5%BA%A7%E6%A8%99 
 #~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "直交座標グリッドを隠し見せ"
+#~msgstr "直交座標グリッドを隠し表示"
+
+#~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを表示するため、パレットをクリックしてブロックをカンバースにドラッグしてください。"
 
 #: js/basicblocks.js:808
 
@@ -3978,9 +4010,12 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "時間前"
 
 #: js/basicblocks.js:1457
-
+## 相対的=そうたいてき
 #~msgid "relative interval"
 #~msgstr "相対的の音程"
+
+#~msgid "numerator"
+#~msgstr "分子"
 
 #~msgid "multiply beat"
 #~msgstr "ビートを倍に"
