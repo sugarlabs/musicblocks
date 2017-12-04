@@ -374,9 +374,9 @@ msgstr "全部を削除"
 #: js/activity.js:2794
 #: js/activity.js:2806
 #: js/turtledefs.js:107
-## Uncertain about this. Maybe 元へ戻す
+## Squeak Tools.po
 msgid "Undo"
-msgstr "取り戻す"
+msgstr "元にもどす"
 
 #: js/activity.js:2801
 #: js/turtledefs.js:96
@@ -3222,7 +3222,7 @@ msgstr "フィルターを加える"
 #: js/pitchstaircase.js:455
 ## Uses the Katakana version for computer terminology according to http://jisho.org/word/%E3%82%A2%E3%83%B3%E3%83%89%E3%82%A5 
 msgid "undo"
-msgstr "アンドゥ"
+msgstr "元にもどす"
 
 #: js/timbre.js:927
 ## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
