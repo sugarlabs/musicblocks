@@ -21,7 +21,8 @@ function maxPaletteHeight(menuSize, scale) {
     // block in a palette cannot start at the bottom of the screen,
     // hence - 2 * menuSize.
 
-    var h = (windowHeight() * canvasPixelRatio()) / scale - (2 * menuSize);
+    // var h = (windowHeight() * canvasPixelRatio()) / scale - (2 * menuSize);
+    var h = windowHeight() / scale - (2 * menuSize);
     return h - (h % STANDARDBLOCKHEIGHT) + (STANDARDBLOCKHEIGHT / 2);
 };
 
@@ -1469,6 +1470,7 @@ function Palette(palettes, name) {
                 this.protoContainers[i].visible = true;
             }
         }
+
         this._updateBlockMasks();
         var stage = this.palettes.stage;
         stage.setChildIndex(this.menuContainer, stage.getNumChildren() - 1);
