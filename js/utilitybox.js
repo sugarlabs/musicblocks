@@ -123,9 +123,19 @@ function UtilityBox () {
     this._positionHoverText = function (button) {
         for (var c = 0; c < button.children.length; c++) {
             if (button.children[c].text != undefined) {
+                var x = button.x - this._container.x;
+
                 button.children[c].textAlign = 'left';
                 button.children[c].x = -27;
                 button.children[c].y = 27;
+
+                // Tweak position of hover text for buttons on the right.
+                if (x > 300) {
+                    button.children[c].x += -55;
+                } else if (x > 240) {
+                    button.children[c].x += -27;
+                }
+
                 break;
             }
         }
