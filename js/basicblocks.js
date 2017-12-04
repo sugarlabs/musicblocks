@@ -762,7 +762,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     var duplicateFactor = new ProtoBlock('duplicatefactor');
     duplicateFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
-    duplicateFactor.staticLabels.push('duplicate factor');
+    //.TRANS: factor used in determining how many duplications to make
+    duplicateFactor.staticLabels.push(_('duplicate factor'));
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
     // duplicateFactor.hidden = true;
@@ -2375,6 +2376,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var returnBlock = new ProtoBlock('return');
     returnBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['return'] = returnBlock;
+    //.TRANS: return value from a function
     returnBlock.staticLabels.push(_('return'));
     returnBlock.extraWidth = 10;
     returnBlock.adjustWidthToLabel();
@@ -2385,6 +2387,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var returnToUrlBlock = new ProtoBlock('returnToUrl');
     returnToUrlBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['returnToUrl'] = returnToUrlBlock;
+    //.TRANS: return value from a function to a URL
     returnToUrlBlock.staticLabels.push(_('return to URL'));
     returnToUrlBlock.extraWidth = 10;
     returnToUrlBlock.adjustWidthToLabel();
@@ -2413,6 +2416,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var namedDoArgBlock = new ProtoBlock('nameddoArg');
     namedDoArgBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['nameddoArg'] = namedDoArgBlock;
+    //.TRANS: take (do) some action
     namedDoArgBlock.staticLabels.push(_('do'));
     namedDoArgBlock.adjustWidthToLabel();
     namedDoArgBlock.argClampBlock();
