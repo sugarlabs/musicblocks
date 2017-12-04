@@ -1447,7 +1447,7 @@ define(MYDEFINES, function (compatibility) {
                     if (isInArray(searchInput, deprecatedNames)){
                         blocks.errorMsg(_('This block is deprecated.'));
                         docById('search').value = ''; 
-                        stage.setUpdateStage(stage);
+                        update = true;
                     }
                     else{
                         palettes.dict[obj[1]]._makeBlockFromPalette(protoblk, obj[2], function (newBlock) { 
@@ -1459,7 +1459,7 @@ define(MYDEFINES, function (compatibility) {
                 else{
                     blocks.errorMsg(_('Block cannot be found.'));
                     docById('search').value = ''; 
-                    stage.setUpdateStage(stage);
+                    update = true;
                 }
             }
         };
