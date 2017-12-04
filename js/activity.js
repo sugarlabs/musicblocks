@@ -945,7 +945,7 @@ define(MYDEFINES, function (compatibility) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
-                                            stage.removeAllEventListeners('trashsignal');
+                                stage.removeAllEventListeners('trashsignal');
 
                                 if (!merging) {
                                     // Wait for the old blocks to be removed.
