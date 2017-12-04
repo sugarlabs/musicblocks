@@ -133,7 +133,8 @@ define(MYDEFINES, function (compatibility) {
         var searchStyle = docById('search');
         var searchX = docById('myCanvas').width;
         var searchY = docById('myCanvas').height;
- 
+        var searchBlockPosition = [100, 100];
+
         searchStyle.style.left = searchX/2.5 * turtleBlocksScale + 'px';
         searchStyle.style.top = searchY/3.5 * turtleBlocksScale + 'px';
         searchStyle.style.visibility = "hidden";
@@ -870,7 +871,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSmaller(doSmallerFont)
                 .setPlugins(doOpenPlugin)
                 .setStats(doAnalytics)
-                .setSearch(showSearch)
+                .setSearch(showSearchWidget)
                 .setScroller(toggleScroller);
 
             playbackBox = new PlaybackBox();
@@ -1386,31 +1387,21 @@ define(MYDEFINES, function (compatibility) {
             img.src = 'images/' + name + '.svg';
         };
 
-        var searchSuggestions = [];//Array of Search Suggestions
-        var deprecatedNames = [_('rest'), _('square'),_('triangle'), _('sine'), _('sawtooth'), _('rhythm'), _('set voice'), _('set key')];
+        var searchSuggestions = [];
+        var deprecatedBlockNames = [];
 
-        for (var i in blocks.protoBlockDict){
-            var searchCheck = blocks.protoBlockDict[i].staticLabels[0];
-            if (searchCheck){
-                searchSuggestions.push(blocks.protoBlockDict[i].staticLabels[0]);
+        for (var i in blocks.protoBlockDict) {
+            var blockLabel = blocks.protoBlockDict[i].staticLabels[0];
+            if (blockLabel) {
+                if (blocks.protoBlockDict[i].hidden) {
+                    deprecatedBlockNames.push(blockLabel);
+                } else {
+                    searchSuggestions.push(blockLabel);
+                }
             }
         }
 
-        function remove(array, element) {
-            const index = searchSuggestions.indexOf(element);
-    
-            if (index !== -1) {
-                searchSuggestions.splice(index, 1);
-            }
-        }
-
-        for (var j in deprecatedNames){
-            remove(searchSuggestions, deprecatedNames[j]);
-        }
-
-        function isInArray(value, array) {
-            return deprecatedNames.indexOf(value) > -1;
-        }
+        searchSuggestions = searchSuggestions.reverse();
 
         function doSearchSuggestions() {
             var $j = jQuery.noConflict();
@@ -1426,16 +1417,18 @@ define(MYDEFINES, function (compatibility) {
             doSearchSuggestions();
         };
 
-        function showSearch() {
+        function showSearchWidget() {
             search.visible = true;
+            searchBlockPosition = [100, 100];
+
             stage.addChild(search);
-            // Give the stage time to add the element before
-            // selecting focus.
+            // Give the stage time to add the element before selecting
+            // focus.
             setTimeout(function () {
                 docById('search').focus();
             }, 500);
             update = true;
-	};
+        };
 
         function doSearch() {
             var $j = jQuery.noConflict();
@@ -1450,24 +1443,26 @@ define(MYDEFINES, function (compatibility) {
             var obj = palettes.getProtoNameAndPalette(searchInput);
             var protoblk = obj[0];
             var paletteName = obj[1];
+            var protoName = obj[2];
 
-            var searchResult = blocks.protoBlockDict.hasOwnProperty(obj[2]);
+            var searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
 
-            if (searchInput.length>0){
-                if (searchResult){
-                    if (isInArray(searchInput, deprecatedNames)){
-                        blocks.errorMsg(_('This block is deprecated.'));
-                        docById('search').value = ''; 
-                        update = true;
-                    }
-                    else{
-                        palettes.dict[obj[1]]._makeBlockFromPalette(protoblk, obj[2], function (newBlock) { 
-                            blocks._moveBlock(newBlock, 100, 100); 
-                        });
-                        docById('search').value = ''; 
-                    }
-                }
-                else{
+            if (searchInput.length > 0) {
+                if (searchResult) {
+                    palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
+                        blocks._moveBlock(newBlock, searchBlockPosition[0], searchBlockPosition[1]);
+                    });
+
+                    // Move the position of the next newly created block.
+                    searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
+                    searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
+                        
+                    docById('search').value = ''; 
+                } else if (deprecatedBlockNames.indexOf(searchInput) > -1) {
+                    blocks.errorMsg(_('This block is deprecated.'));
+                    docById('search').value = ''; 
+                    update = true;
+                } else {
                     blocks.errorMsg(_('Block cannot be found.'));
                     docById('search').value = ''; 
                     update = true;
@@ -1543,7 +1538,7 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 switch (event.keyCode) {
                 case SHIFT && SPACE:
-                    showSearch();
+                    showSearchWidget();
                     break;
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {
@@ -1608,10 +1603,10 @@ define(MYDEFINES, function (compatibility) {
                     if (search.visible) {
                         search.visible = false;
                         update = true;
-		    } else {
-			// toggle full screen
-			_toggleToolbar();
-		    }
+                    } else {
+                        // toggle full screen
+                        _toggleToolbar();
+                    }
                     break;
                 case RETURN:
                     // toggle run

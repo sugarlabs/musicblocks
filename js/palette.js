@@ -208,6 +208,18 @@ function Palettes () {
         hideButtonHighlight(this.circles, this.stage);
     };
 
+    this.getProtoNameAndPalette = function (name) { 
+        var obj = [null, null, null]; 
+        for (var b in this.blocks.protoBlockDict) { 
+            // Don't return deprecated blocks.
+            if (name === this.blocks.protoBlockDict[b].staticLabels[0] && !this.blocks.protoBlockDict[b].hidden) { 
+                obj = [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
+            } 
+        }
+
+        return obj;
+    };
+
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
@@ -216,15 +228,7 @@ function Palettes () {
             shape.height = windowHeight();
             this.stage.addChild(shape);
             this.background = shape;
-	}
-
-    this.getProtoNameAndPalette = function (name) { 
-        for (var b in this.blocks.protoBlockDict) { 
-            if (name === this.blocks.protoBlockDict[b].staticLabels[0]) { 
-                return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name]; 
-            } 
-        } return [null, null, null]; 
-    };
+        }
 
         function __processUpIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
@@ -234,7 +238,7 @@ function Palettes () {
             bitmap.visible = false;
             palettes.upIndicator = bitmap;
 
-	    palettes.upIndicator.on('click', function (event) {
+            palettes.upIndicator.on('click', function (event) {
                 palettes.menuScrollEvent(1, 40);
                 palettes.hidePaletteIconCircles();
             });
@@ -246,10 +250,10 @@ function Palettes () {
             bitmap.x = 55;
             bitmap.y = (windowHeight() / palettes.scale) - 27;
 
-	    bitmap.visible = true;
+            bitmap.visible = true;
             palettes.downIndicator = bitmap;
 
-	    palettes.downIndicator.on('click', function (event) {
+            palettes.downIndicator.on('click', function (event) {
                 palettes.menuScrollEvent(-1, 40);
                 palettes.hidePaletteIconCircles();
             });
@@ -336,7 +340,7 @@ function Palettes () {
 
         if (this.background != null) {
             this.background.visible = true;
-	}
+        }
 
         // If the palette indicators were visible, restore them.
         if (this.upIndicatorStatus) {
@@ -345,7 +349,7 @@ function Palettes () {
 
         if (this.downIndicatorStatus && this.downIndicator != null) {
             this.downIndicator.visible = true;
-	}
+        }
 
         this.refreshCanvas();
     };
@@ -1064,7 +1068,7 @@ function Palette(palettes, name) {
 
     this._updateBlockMasks = function () {
         var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
-	var w = MENUWIDTH + this._getOverflowWidth();
+        var w = MENUWIDTH + this._getOverflowWidth();
         for (var i in this.protoContainers) {
             var s = new createjs.Shape();
             s.graphics.r(0, 0, w, h);
@@ -1815,11 +1819,16 @@ function Palette(palettes, name) {
         }
     };
 
+    this.makeBlockFromSearch = function (protoblk, blkname, callback) {
+        this._makeBlockFromPalette(protoblk, blkname, callback);
+    };
+
     this._makeBlockFromPalette = function (protoblk, blkname, callback) {
         if (protoblk == null) {
             console.log('null protoblk?');
             return;
         }
+
         switch (protoblk.name) {
         case 'do':
             blkname = 'do ' + protoblk.defaults[0];
@@ -1910,11 +1919,14 @@ function Palette(palettes, name) {
             break;
         }
 
+        var lastBlock = this.palettes.blocks.blockList.length;
+
         if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1 && blockIsMacro(blkname)) {
             moved = true;
             saveX = this.protoContainers[blkname].x;
             saveY = this.protoContainers[blkname].y;
             this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
+            callback(lastBlock);
         } else {
             var newBlock = paletteBlockButtonPush(this.palettes.blocks, newBlk, arg);
             callback(newBlock);
@@ -1946,9 +1958,9 @@ function Palette(palettes, name) {
             this.draggingProtoBlock = false;
 
             if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1) {
-		var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
+                var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
             } else {  // Don't apply macro expansion to named blocks.
-		var macroExpansion = null;
+                var macroExpansion = null;
             }
 
             if (macroExpansion != null) {
