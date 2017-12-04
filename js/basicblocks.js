@@ -762,7 +762,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     var duplicateFactor = new ProtoBlock('duplicatefactor');
     duplicateFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
-    duplicateFactor.staticLabels.push('duplicate factor');
+    //.TRANS: factor used in determining how many duplications to make
+    duplicateFactor.staticLabels.push(_('duplicate factor'));
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
     // duplicateFactor.hidden = true;
