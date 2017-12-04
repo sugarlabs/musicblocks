@@ -383,16 +383,16 @@ msgstr "設定"
 #: js/activity.js:2826
 #: js/activity.js:2838
 #: js/turtledefs.js:106
-## Maybe 全部を取り消す
+## Literally "throw away all blocks"; needed to differentiate between other "delete"
 msgid "Delete all"
-msgstr "全部を削除"
+msgstr "ブロックを全部捨てる"
 
 #: js/activity.js:2827
 #: js/activity.js:2839
 #: js/turtledefs.js:107
-## Squeak Tools.po
+## Squeak Tools.po; 戻す＝もどす
 msgid "Undo"
-msgstr "元にもどす"
+msgstr "元に戻す"
 
 #: js/activity.js:2834
 #: js/turtledefs.js:96
@@ -421,8 +421,9 @@ msgstr "ピッチ"
 #: js/analytics.js:380
 #: js/turtledefs.js:21
 #: js/basicblocks.js:2692
+## Note: this means "hertz sound"
 msgid "tone"
-msgstr "音色"
+msgstr "ハーツの音"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
@@ -1524,14 +1525,14 @@ msgid "extras"
 msgstr "その他"
 
 #: js/turtledefs.js:73
-## Maybe just have "Music Blocks" in roman. Otherwise, ミュージック・ブロック
+## Maybe just have "Music Blocks" in roman. Otherwise, ミュージック・ブロックス
 msgid "Welcome to Music Blocks"
-msgstr "Music Blocksへようこそ"
+msgstr "ミュージック・ブロックスへようこそ"
 
 #: js/turtledefs.js:73
 ## Need to refine this
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr "ミュージック・ブロックは音楽と数学とコードとの基本的な色々を発見するのツールです。"
+msgstr "ミュージック・ブロックスは音楽と数学とコードとの基本的な色々を発見するのスフト・ツールです。"
 
 #: js/turtledefs.js:74
 ## Please verify
@@ -1541,12 +1542,12 @@ msgstr "ネズミさんに商会"
 #: js/turtledefs.js:74
 ## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "ネズミさんは私たちのミュージック・ブロック指揮"
+msgstr "ネズミさんは私たちのミュージック・ブロックス指揮"
 
 #: js/turtledefs.js:74
 ## I took some artistic liberty: Says "together with Mouse-san, discover music/math/coding
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr "ネズミさんと一緒にミュージック・ブロックで音楽と数学とコードの色々発見しましょう"
+msgstr "ネズミさんと一緒にミュージック・ブロックスで音楽と数学とコードの色々発見しましょう。"
 
 #: js/turtledefs.js:74
 msgid "Let us start our tour!"
@@ -1560,7 +1561,7 @@ msgstr "パレットのボタン"
 
 #: js/turtledefs.js:77
 msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
-msgstr "このツールバーは音楽グリッド、音符、音色、タートル、その他のパレットボタンがあります"
+msgstr "このツールバーはリズム、ピッチ、音色、鼠動き、ウィジット、その他のパレットボタンがあります。"
 
 #: js/turtledefs.js:77
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
@@ -1568,81 +1569,82 @@ msgstr "ブロックのパレットを表示するためにここでクリック
 
 #: js/turtledefs.js:78
 msgid "Run fast"
-msgstr "早く動く"
+msgstr "早く再生"
 
 #: js/turtledefs.js:78
 ## Need to check this again
 msgid "Click to run the project in fast mode."
-msgstr "早く動かすためにここでクリック"
+msgstr "早く再生するためにここでクリック。"
 
 #: js/turtledefs.js:79
 ## to be checked.
 msgid "Run slow"
-msgstr "ゆっくりに音を鳴らすする"
+msgstr "ゆっくりに再生する。"
 
 #: js/turtledefs.js:79
 msgid "Click to run the project in slow mode."
-msgstr "プロジェクトをゆっくりなペースするため、ここでクリック"
+msgstr "プロジェクトをゆっくりなペースで再生するため、ここでクリック。"
 
 #: js/turtledefs.js:80
 msgid "Run music slow"
-msgstr "音楽をゆっくりに"
+msgstr "音楽をゆっくりなペースで演奏"
 
 #: js/turtledefs.js:80
 msgid "Click to run just the music in slow mode."
-msgstr "音楽をゆっくりに、ここでクリック"
+msgstr "音楽をゆっくりに、ここでクリック。"
 
 #: js/turtledefs.js:81
 ## Run "actions" one-by-one
 msgid "Click to run the project step by step."
-msgstr "行動を一つ一つ、ここでクリック"
+msgstr "再生を一つ一つ、ここでクリック。"
 
 #: js/turtledefs.js:82
 msgid "Click to run the music note by note."
-msgstr "音符ずつをランするため、ここでクリック"
+msgstr "音符ずつに演奏するため、ここでクリック。"
 
 #: js/turtledefs.js:83
 msgid "Stop the music (and the turtles)."
-msgstr "音楽とタートルを止める"
+msgstr "音楽とネズミの動きを止めるアイコンです。"
 
 #: js/turtledefs.js:84
 msgid "Clear the screen and return the turtles to their initial positions."
-msgstr "画面にあるものを全部消して最初のままに戻す"
+msgstr "画面にあるものを全部消して最初のままに戻すアイコンです。"
 
 #: js/turtledefs.js:85
 ## Check grammar
 msgid "Hide or show the block palettes."
-msgstr "ブロックのパレットを隠し表示"
+msgstr "ブロックのパレットを隠し表示のアイコンです。"
 
 #: js/turtledefs.js:86
 msgid "Hide or show the blocks and the palettes."
-msgstr "パレットを隠し表示"　#Uncertain about gramma"
+msgstr "パレットを隠し表示のアイコンです。"
 
 #: js/turtledefs.js:87
-##　りゃくし＝abbreviate ふくらみ＝expand ; I said "code" instead of "stack"
+##　りゃくし＝abbreviate ふくらみ＝expand 
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートとアクションのコードを膨らみ略し"
+msgstr "スタートとアクションのスタックを膨らみ略しのアイコンです。"
 
 #: js/turtledefs.js:88
+## 整理＝せいり; literally "organize"
 msgid "Return all blocks to the center of the screen."
-msgstr "全部のブロックを整理"
+msgstr "全部のブロックを整理のアイコンです。"
 
 #: js/turtledefs.js:89
 msgid "Show these messages."
-msgstr "メッセージを表示する"
+msgstr "このヘルプを表示するアイコンです。"
 
 #: js/turtledefs.js:90
 msgid "Expand/collapse option toolbar"
-msgstr "オプションのツールバーを膨らみ略し"
+msgstr "オプションのツールバーを膨らみ略しアイコンです。"
 
 #: js/turtledefs.js:90
 ## saying hide or show the right (etc) toolbar
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "右の色々ツールバーを表示隠し"
+msgstr "右の色々ツールバーを表示隠しアイコンです。"
 
 #: js/turtledefs.js:91
 msgid "This button opens a viewer for loading example projects."
-msgstr "プロジェクトをロードするためここでクリック"
+msgstr "プロジェクトをロードするためここでクリック。"
 
 #: js/turtledefs.js:92
 msgid "You can also load projects from the file system."
@@ -1650,7 +1652,7 @@ msgstr "ファイルシステムからプロジェクトをロードできます
 
 #: js/turtledefs.js:93
 msgid "Save your project to a file."
-msgstr "このプロジェクトをファイルに保存"
+msgstr "このプロジェクトをファイルに保存するアイコンです。"
 
 #: js/turtledefs.js:94
 #: js/savebox.js:136
@@ -1659,7 +1661,7 @@ msgstr "恩楽譜を保存"
 
 #: js/turtledefs.js:94
 msgid "Save your project to as a Lilypond file."
-msgstr "Lilypond恩楽譜のファイルで保存"
+msgstr "Lilypond恩楽譜のファイルで保存ができます。"
 
 #: js/turtledefs.js:95
 msgid "Copy"
@@ -1667,15 +1669,15 @@ msgstr "コピー"
 
 #: js/turtledefs.js:95
 msgid "To copy a stack to the clipboard, do a long press on the stack."
-msgstr "スタックをコピーするため、長く左クリックを"
+msgstr "スタックをコピーするため、長く左クリックをこのアイコでンします。"
 
 #: js/turtledefs.js:95
 msgid "The Paste Button will highlight."
-msgstr "ペーストのボタンがハイライトします"
+msgstr "ペーストのボタンがハイライトします。"
 
 #: js/turtledefs.js:96
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr "コピーしたブロックがある際にペーストのボタンがが使えます"
+msgstr "コピーしたブロックがある際に貼り付けることができます。"
 
 #: js/turtledefs.js:97
 #: js/blocks.js:249
@@ -1684,11 +1686,11 @@ msgstr "スタックを保存"
 
 #: js/turtledefs.js:97
 msgid "The save-stack button saves a stack onto a custom palette."
-msgstr "スタックの保存のボタンが自分のパレットに保存します"
+msgstr "スタックの保存のボタンが自分のパレットに保存します。"
 
 #: js/turtledefs.js:97
 msgid "It appears after a long press on a stack."
-msgstr "スタックで長くクリックすると現れます"
+msgstr "スタックで長くクリックすると現れます。"
 
 #: js/turtledefs.js:98
 msgid "Show or hide a coordinate grid."
@@ -1697,32 +1699,31 @@ msgstr "グリッドを表示隠し"
 #: js/turtledefs.js:99
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "極座表敬グリッドを表示隠し"
+msgstr "極座表敬グリッドを表示隠しのアイコンです。"
 
 #: js/turtledefs.js:100
-## A little off, I think. Also, Maybe just "Music Blocks" in Roman letters.
 msgid "Open a panel for configuring Music Blocks."
-msgstr "ミュージック・ブロックを設定するためパネルの開きクリック"
+msgstr "ミュージック・ブロックスのカスタム設定パネルはここでクリックします。"
 
 #: js/turtledefs.js:101
 #: js/utilitybox.js:68
 msgid "Decrease block size"
-msgstr "ブロックの大きさを小さくする"
+msgstr "ブロックの大きさを小さく"
 
 #: js/turtledefs.js:101
 ## Redundant??
 msgid "Decrease the size of the blocks."
-msgstr "ブロックの大きさを小さくする"
+msgstr "ブロックの大きさを小さく"
 
 #: js/turtledefs.js:102
 #: js/utilitybox.js:76
 msgid "Increase block size"
-msgstr "ブロックの大きさを大きくする"
+msgstr "ブロックの大きさを大きくします。"
 
 #: js/turtledefs.js:102
 ## Redundant??
 msgid "Increase the size of the blocks."
-msgstr "ブロックの大きさ"
+msgstr "ブロックの大きさくします。"
 
 #: js/turtledefs.js:103
 #: js/utilitybox.js:84
@@ -1732,7 +1733,7 @@ msgstr "統計情報を表示する"
 
 #: js/turtledefs.js:103
 msgid "Display statistics about your Music project."
-msgstr "音楽プロジェクトの統計情報を表示する"
+msgstr "ミュージック・プロジェクトの統計情報を表示します。"
 
 #: js/turtledefs.js:104
 #: js/utilitybox.js:92
@@ -1742,26 +1743,26 @@ msgstr "プラグインをロードする"
 
 #: js/turtledefs.js:104
 msgid "You can load new blocks from the file system."
-msgstr "新しいブロックをファイルシステムからロードできます"
+msgstr "新しいブロックをファイルシステムからロードできます。"
 
 #: js/turtledefs.js:105
 #: js/utilitybox.js:100
-## Need to fix. Says "start scrolling"...
+## Squeak just uses English "on"
 msgid "Enable scrolling"
-msgstr "スクロールをスターと"
+msgstr "スクロールをONに"
 
 #: js/turtledefs.js:105
 ## Is it the blocks that are scrolled or the canvas itself?
 msgid "You can scroll the blocks on the canvas."
-msgstr "カンバスにあるブロックをこれでスクロール"
+msgstr "表示にあるブロックのスクロールができます。"
 
 #: js/turtledefs.js:106
 msgid "Remove all content on the canvas, including the blocks."
-msgstr "カンバスにあるのを(ブロック入り）全部消す"
+msgstr "表示にあるのを全部(ブロック入り)消します。"
 
 #: js/turtledefs.js:107
 msgid "Restore blocks from the trash."
-msgstr "ブロックをゴミ箱から取り戻す"
+msgstr "ブロックをゴミ箱から取り戻します。"
 
 #: js/turtledefs.js:108
 msgid "Congratulations."
@@ -1769,7 +1770,7 @@ msgstr "おめでとうございます！"
 
 #: js/turtledefs.js:108
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr "ツアーが終わりました。ミュージック・ブロックを楽しんでください。"
+msgstr "ツアーが終わりました。ミュージック・ブロックスをどうぞ、楽しんでください。"
 
 #: js/basicblocks.js:119
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -2147,7 +2148,7 @@ msgstr "一分割のマスターテンポ"
 #: js/basicblocks.js:857
 #.TRANS: play music backward
 msgid "backward"
-msgstr "逆に"
+msgstr "逆に弾く"
 
 #: js/basicblocks.js:865
 #.TRANS: substitute rests on notes being skipped
@@ -2247,8 +2248,9 @@ msgstr "拍子の数"
 
 #: js/basicblocks.js:1058
 #.TRANS: count the number of notes
+## ^^Should say "calculate the total note value";http://jisho.org/word/%E5%85%A8%E9%A1%8D ;全額＝ぜんがく
 msgid "note counter"
-msgstr "音符の数"
+msgstr "音価の全額"
 
 #: js/basicblocks.js:1066
 #.TRANS: number of whole notes that have been played
@@ -2332,7 +2334,7 @@ msgstr "フェーザー"
 
 #: js/basicblocks.js:1165
 msgid "octaves"
-msgstr "オクターブ"
+msgstr "オクターヴ"
 
 #: js/basicblocks.js:1165
 ## guessing...
@@ -2644,7 +2646,7 @@ msgstr "評す"
 #: js/basicblocks.js:2211
 ## Based on Scratch po (L40) 
 msgid "mod"
-msgstr "で割った余り"
+msgstr "で割った余り(mod)"
 
 #: js/basicblocks.js:2228
 ## 平方根＝へいほうこん http://jisho.org/word/%E5%B9%B3%E6%96%B9%E6%A0%B9 
@@ -2657,9 +2659,9 @@ msgid "abs"
 msgstr "絶対値"
 
 #: js/basicblocks.js:2288
-## Literally "one from (inside) of"
+## Literally "this or that"
 msgid "one of"
-msgstr "の中の一つ"
+msgstr "これかそれ"
 
 #: js/basicblocks.js:2288
 ## need context
@@ -2708,8 +2710,9 @@ msgid "value"
 msgstr "価値"
 
 #: js/basicblocks.js:2378
+## I think this is return as in "return value"
 msgid "return"
-msgstr "帰ります"
+msgstr "出る数価は"
 
 #: js/basicblocks.js:2388
 msgid "return to URL"
@@ -2973,7 +2976,7 @@ msgstr "印刷" #This is like "print a piece of paper"
 
 #: js/basicblocks.js:3010
 msgid "Music Blocks"
-msgstr "ミュージック・ブロック"
+msgstr "ミュージック・ブロックス"
 
 #: js/basicblocks.js:3025
 ## 音量＝おんりょう
@@ -3025,7 +3028,7 @@ msgstr "マウスのボタン"
 #: js/basicblocks.js:3099
 ##  http://jisho.org/word/%EF%BC%A1%EF%BC%B3%EF%BC%A3%EF%BC%A9%EF%BC%A9 
 msgid "to ASCII"
-msgstr "ASCII・アスキーに"
+msgstr "ASCIIに"
 
 #: js/basicblocks.js:3106
 msgid "keyboard"
@@ -3413,11 +3416,11 @@ msgstr "時計回り"
 
 #: js/pitchstaircase.js:396
 msgid "play chord"
-msgstr "和音を再生"
+msgstr "和音を弾く"
 
 #: js/pitchstaircase.js:401
 msgid "play scale"
-msgstr "音階を再生"
+msgstr "音階を弾く"
 
 #: plugins/finance.rtp:28
 ## http://jisho.org/word/%E9%80%9A%E8%B2%A8 通貨＝つうか
@@ -3820,7 +3823,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "縦のスペース"
 
 #~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを見せるため、パレットをクリックしてブロックをカンバースにドラッグしてください。"
+#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを見せるため、パレットをクリックしてブロックを表示にドラッグしてください。"
 
 #: js/basicblocks.js:153
 
@@ -3893,7 +3896,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr ""
 
 #~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
-#~msgstr "ネズミさんが私たちのミュージック・ブロックの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
+#~msgstr "ネズミさんが私たちのミュージック・ブロックスの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
 
 #~msgid "whole note 𝅝"
 #~msgstr "全音符"
@@ -3935,15 +3938,15 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "直交座標グリッドを隠し表示"
 
 #~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを表示するため、パレットをクリックしてブロックをカンバースにドラッグしてください。"
+#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを表示するため、パレットをクリックしてブロックを表示にドラッグしてください。"
 
 #: js/basicblocks.js:808
 
 #~msgid "free time"
-#~msgstr "メートルなし"
+#~msgstr "クロックなし"
 
 #~msgid "current pitch octave"
-#~msgstr "このピッチのオクターブ"
+#~msgstr "このピッチのオクターヴ"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "ツールバーを開き隠し"
