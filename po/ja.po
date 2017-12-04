@@ -1579,7 +1579,7 @@ msgstr "ネズミさんに商会"
 #: js/turtledefs.js:74
 ## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "ネズミさんは私たちのミュージック・ブロックス指揮"
+msgstr "ネズミさんは私たちのミュージック・ブロックス指揮。"
 
 #: js/turtledefs.js:74
 ## I took some artistic liberty: Says "together with Mouse-san, discover music/math/coding
@@ -1588,7 +1588,7 @@ msgstr "ネズミさんと一緒にミュージック・ブロックスで音楽
 
 #: js/turtledefs.js:74
 msgid "Let us start our tour!"
-msgstr "ツアーを始まりましょう"
+msgstr "ツアーを始まりましょう。"
 
 #: js/turtledefs.js:77
 #.TRANS: Please add commas to list: Matrix, Notes, Tone, Turtle, and more.
@@ -1602,16 +1602,13 @@ msgstr "このツールバーはリズム、ピッチ、音色、鼠動き、ウ
 
 #: js/turtledefs.js:77
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "ブロックのパレットを表示するためにここでクリック｜ブロックはパレットにドラッグして使えます"
+msgstr "ブロックのパレットを表示するためにここでクリック｜ブロックはパレットにドラッグして使えます。"
 
 #: js/turtledefs.js:78
-<<<<<<< HEAD
 msgid "Run fast"
 msgstr "早く再生"
 
 #: js/turtledefs.js:78
-=======
->>>>>>> origin/master
 ## Need to check this again
 msgid "Click to run the project in fast mode."
 msgstr "早く再生するためにここでクリック。"
@@ -1748,22 +1745,22 @@ msgstr "ミュージック・ブロックスのカスタム設定パネルはこ
 #: js/turtledefs.js:101
 #: js/utilitybox.js:74
 msgid "Decrease block size"
-msgstr "ブロックの大きさを小さく"
+msgstr "ブロックを小さく"
 
 #: js/turtledefs.js:101
 ## Redundant??
 msgid "Decrease the size of the blocks."
-msgstr "ブロックの大きさを小さく"
+msgstr "ブロックの大きさを小さくします。"
 
 #: js/turtledefs.js:102
 #: js/utilitybox.js:82
 msgid "Increase block size"
-msgstr "ブロックの大きさを大きくします。"
+msgstr "ブロックを大きく。"
 
 #: js/turtledefs.js:102
 ## Redundant??
 msgid "Increase the size of the blocks."
-msgstr "ブロックの大きさくします。"
+msgstr "ブロックの大きを大きくします。"
 
 #: js/turtledefs.js:103
 #: js/utilitybox.js:90
