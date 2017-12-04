@@ -303,7 +303,7 @@ msgstr "パレットを見せ隠し"
 #: js/turtledefs.js:86
 ## Not too sure on grammar.."
 msgid "Show/hide blocks"
-msgstr "ブロックを見せ隠し"
+msgstr "ブロックを表示し隠し"
 
 #: js/activity.js:2706
 #: js/activity.js:2717
@@ -742,7 +742,7 @@ msgstr "音程を計るため、二つのピッチのブロックを使う必要
 #: js/pitchstaircase.js:83
 #: plugins/rodi.rtp:195
 msgid "play"
-msgstr "音を鳴らす"
+msgstr "再生"
 
 #: js/pitchdrummatrix.js:132
 #: js/pitchtimematrix.js:174
@@ -1564,7 +1564,7 @@ msgstr "このツールバーは音楽グリッド、音符、音色、タート
 
 #: js/turtledefs.js:77
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "ブロックのパレットを見せるためにここでクリック｜ブロックはパレットにドラッグして使えます"
+msgstr "ブロックのパレットを表示するためにここでクリック｜ブロックはパレットにドラッグして使えます"
 
 #: js/turtledefs.js:78
 msgid "Run fast"
@@ -1612,11 +1612,11 @@ msgstr "画面にあるものを全部消して最初のままに戻す"
 #: js/turtledefs.js:85
 ## Check grammar
 msgid "Hide or show the block palettes."
-msgstr "ブロックのパレットを隠し見せ"
+msgstr "ブロックのパレットを隠し表示"
 
 #: js/turtledefs.js:86
 msgid "Hide or show the blocks and the palettes."
-msgstr "パレットを隠し見せ"　#Uncertain about gramma"
+msgstr "パレットを隠し表示"　#Uncertain about gramma"
 
 #: js/turtledefs.js:87
 ##　りゃくし＝abbreviate ふくらみ＝expand ; I said "code" instead of "stack"
@@ -1629,7 +1629,7 @@ msgstr "全部のブロックを整理"
 
 #: js/turtledefs.js:89
 msgid "Show these messages."
-msgstr "メッセージを見せる"
+msgstr "メッセージを表示する"
 
 #: js/turtledefs.js:90
 msgid "Expand/collapse option toolbar"
@@ -1638,7 +1638,7 @@ msgstr "オプションのツールバーを膨らみ略し"
 #: js/turtledefs.js:90
 ## saying hide or show the right (etc) toolbar
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "右の色々ツールバーを見せ隠し"
+msgstr "右の色々ツールバーを表示隠し"
 
 #: js/turtledefs.js:91
 msgid "This button opens a viewer for loading example projects."
@@ -1692,12 +1692,12 @@ msgstr "スタックで長くクリックすると現れます"
 
 #: js/turtledefs.js:98
 msgid "Show or hide a coordinate grid."
-msgstr "グリッドを見せ隠し"
+msgstr "グリッドを表示隠し"
 
 #: js/turtledefs.js:99
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "極座表敬グリッドを見せ隠し"
+msgstr "極座表敬グリッドを表示隠し"
 
 #: js/turtledefs.js:100
 ## A little off, I think. Also, Maybe just "Music Blocks" in Roman letters.
@@ -1728,11 +1728,11 @@ msgstr "ブロックの大きさ"
 #: js/utilitybox.js:84
 ## ひらがな＝とうけいじょうほう|Display is literal, but maybe not best word choice
 msgid "Display statistics"
-msgstr "統計情報を見せる"
+msgstr "統計情報を表示する"
 
 #: js/turtledefs.js:103
 msgid "Display statistics about your Music project."
-msgstr "音楽プロジェクトの統計情報を見せる"
+msgstr "音楽プロジェクトの統計情報を表示する"
 
 #: js/turtledefs.js:104
 #: js/utilitybox.js:92
@@ -2039,7 +2039,7 @@ msgstr "四分音符"
 #: js/basicblocks.js:568
 ## 二分＝にぶ
 msgid "half note"
-msgstr "二分音符"
+msgstr "半音符"
 
 #: js/basicblocks.js:575
 msgid "whole note"
@@ -2185,7 +2185,7 @@ msgstr "タイ"
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 ##　I need to look this up.
 msgid "dot"
-msgstr "ドット"
+msgstr "付点音符"
 
 #: js/basicblocks.js:934
 #: js/rhythmruler.js:327
@@ -2770,7 +2770,7 @@ msgstr "アプリにヒープを保存"
 #: plugins/heap.rtp:126
 ## https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%BC%E3%83%97
 msgid "show heap"
-msgstr "ヒープを見せる"
+msgstr "ヒープを表示する"
 
 #: js/basicblocks.js:2714
 ## Maybe heap in roman letters"
@@ -3909,10 +3909,10 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:134
 ## 直交座標=ちょっこうざひょうhttp://jisho.org/word/%E7%9B%B4%E4%BA%A4%E5%BA%A7%E6%A8%99 
 #~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "直交座標グリッドを隠し見せ"
+#~msgstr "直交座標グリッドを隠し表示"
 
 #~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを見せるため、パレットをクリックしてブロックをカンバースにドラッグしてください。"
+#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを表示するため、パレットをクリックしてブロックをカンバースにドラッグしてください。"
 
 #: js/basicblocks.js:808
 ## I thought we changed the name to "no clock" or something similar? I literally translated "no meter" for now
