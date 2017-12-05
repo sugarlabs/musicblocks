@@ -2693,7 +2693,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var toneBlock = new ProtoBlock('tone');
     toneBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tone'] = toneBlock;
-    toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
+    toneBlock.staticLabels.push(_('hertz'),  _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
     toneBlock.defaults.push(392, 1000 / 3);
     toneBlock.twoArgBlock();
