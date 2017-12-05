@@ -2172,9 +2172,9 @@ function Logo () {
 
             if (!foundTargetTurtle) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    that.errorMsg(_('Could not find mouse') + ' ' + args[0], blk);
+                    that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk);
                 } else {
-                    that.errorMsg(_('Could not find turtle') + ' ' + args[0], blk);
+                    that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk);
                 }
 
                 that.turtles.turtleList[turtle].rename(args[1]);
@@ -7711,9 +7711,9 @@ function Logo () {
 
                 if (i === that.turtles.turtleList.length) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.errorMsg(_('Could not find mouse') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
-                        that.errorMsg(_('Could not find turtle') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
                     }
 
                     var thisTurtle = that.turtles.turtleList[turtle];
@@ -7846,9 +7846,9 @@ function Logo () {
 
                 if (value == null) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.errorMsg(_('Could not find mouse') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
-                        that.errorMsg(_('Could not find turtle') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
                     }
 
                     that.blocks.blockList[blk].value = that.notesPlayed[turtle];
@@ -7893,7 +7893,7 @@ function Logo () {
                         } else if (that.notePitches[i].length > 0) {
                             var obj = that.getNote(that.notePitches[i][0], that.noteOctaves[i][0], 0, that.keySignature[i], that.movable[turtle]);
                         } else {
-                            console.log('Could not find a note for mouse ' + turtle);
+                            console.log('Cannot find a note for mouse ' + turtle);
                             that.errorMsg(INVALIDPITCH, blk);
                             var obj = ['G', 4];
                         }
@@ -7906,9 +7906,9 @@ function Logo () {
 
                 if (value == null) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.errorMsg(_('Could not find mouse') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
-                        that.errorMsg(_('Could not find turtle') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
                     }
 
                     if (that.lastNotePlayed[turtle] !== null) {
@@ -7919,7 +7919,7 @@ function Logo () {
                     } else if (that.notePitches[turtle].length > 0) {
                         var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
                     } else {
-                        console.log('Could not find a note for mouse ' + turtle);
+                        console.log('Cannot find a note for mouse ' + turtle);
                         that.errorMsg(INVALIDPITCH, blk);
                         var obj = ['G', 4];
                     }
@@ -7941,7 +7941,7 @@ function Logo () {
                     } else if (that.inNoteBlock[turtle] in that.notePitches[turtle] && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
                     } else {
-                        console.log('Could not find a note ');
+                        console.log('Cannot find a note ');
                         that.errorMsg(INVALIDPITCH, blk);
                         var obj = ['G', 4];
                     }
@@ -7984,7 +7984,7 @@ function Logo () {
                     } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         value = that.noteBeat[turtle][last(that.inNoteBlock[turtle])];
                     } else {
-                        console.log('Could not find a note for turtle ' + turtle);
+                        console.log('Cannot find a note for turtle ' + turtle);
                         value = -1;
                     }
 
@@ -8026,9 +8026,9 @@ function Logo () {
 
                 if (value == null) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.errorMsg(_('Could not find mouse') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
-                        that.errorMsg(_('Could not find turtle') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
                     }
                     that.blocks.blockList[blk].value = -1;
                 }
@@ -8054,9 +8054,9 @@ function Logo () {
 
                 if (i === that.turtles.turtleList.length) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.errorMsg(_('Could not find mouse') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
-                        that.errorMsg(_('Could not find turtle') + ' ' + targetTurtle, blk);
+                        that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
                     }
 
                     var thisTurtle = that.turtles.turtleList[turtle];

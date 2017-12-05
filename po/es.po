@@ -287,11 +287,11 @@ msgstr "No se puede cargar el proyecto desde el archivo. Compruebe el tipo de ar
 
 #: js/activity.js:1462
 msgid "This block is deprecated."
-msgstr ""
+msgstr "Este bloque está en desuso."
 
 #: js/activity.js:1466
 msgid "Block cannot be found."
-msgstr ""
+msgstr "Este bloque no se puede encontrar."
 
 #: js/activity.js:2832
 #: js/activity.js:2845
@@ -512,7 +512,7 @@ msgstr "nota"
 
 #: js/logo.js:31
 msgid "Not a valid pitch name"
-msgstr ""
+msgstr "No es un nombre de tono válido."
 
 #: js/logo.js:925
 #: js/musicutils.js:128
@@ -539,8 +539,11 @@ msgstr "Bloque no soporta incremento."
 #: js/logo.js:7909
 #: js/logo.js:8029
 #: js/logo.js:8057
-msgid "Could not find mouse"
-msgstr ""
+#: js/logo.js:2192
+#: js/logo.js:2225
+#: js/logo.js:2242
+msgid "Cannot find mouse"
+msgstr "No se puede encontrar raton."
 
 #: js/logo.js:2177
 #: js/logo.js:7716
@@ -548,32 +551,23 @@ msgstr ""
 #: js/logo.js:7911
 #: js/logo.js:8031
 #: js/logo.js:8059
-msgid "Could not find turtle"
-msgstr ""
-
-#: js/logo.js:2192
-#: js/logo.js:2225
-#: js/logo.js:2242
-msgid "Cannot find mouse"
-msgstr ""
-
 #: js/logo.js:2194
 #: js/logo.js:2227
 #: js/logo.js:2244
 msgid "Cannot find turtle"
-msgstr ""
+msgstr "No se puede encontrar tortuga."
 
 #: js/logo.js:2198
 msgid "Turtle is already running."
-msgstr ""
+msgstr "Tortuga ya ha comenzado."
 
 #: js/logo.js:2217
 msgid "Cannot find start block"
-msgstr ""
+msgstr "No se puede encontrar el bloque de inicar."
 
 #: js/logo.js:2535
 msgid "Please enter a valid URL."
-msgstr ""
+msgstr "Por favor introduzca un URL válido."
 
 #: js/logo.js:2630
 #: js/logo.js:7220
