@@ -2763,6 +2763,25 @@ function Logo () {
                 that.timbre.FMSynthParams.push(modulationIndex);
             }
             break;
+        case 'noisesynth':
+            var noiseType;
+            that.timbre.NoiseSynthParams = []
+            if (args[0] == null) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+            } else if (args[0] == 'white' || args[0] == 'pink' || args[0] == 'brown' || args[0] == '_("white")' || args[0] == '_("pink")' || args[0] == '_("brown")' && that.inTimbre) {
+                noiseType = args[0];
+                that.timbre.noiseSynthParamvals['noise.type'] = noiseType;
+                that.synth.createSynth(that.timbre.instrumentName, 'noisesynth', that.timbre.noiseSynthParamvals);
+                that.timbre.NoiseSynthesizer.push(blk);
+                that.timbre.NoiseSynthParams.push(noiseType);
+            } else if (typeof(args[1] !== 'number') {
+                that.errorMsg(NANERRORMSG, blk);
+                that.stopTurtle = true;
+            } else {
+                that.errorMsg(NOSTRINGERRORMSG, blk);
+                that.stopTurtle = true;
+            }
+            break;
         case 'duosynth':
             var synthVibratoRate;
             var synthVibratoAmount;
