@@ -1397,18 +1397,8 @@ define(MYDEFINES, function (compatibility) {
 
         searchSuggestions = searchSuggestions.reverse();
 
-        function doSearchSuggestions() {
-            var $j = jQuery.noConflict();
-
-            $j('#search').autocomplete({
-                source: searchSuggestions
-            });
-
-            $j('#search').autocomplete('widget').addClass('scrollSearch');
-        };
-
-        docById('search').onclick = function(){
-            doSearchSuggestions();
+        searchWidget.onclick = function(){
+            doSearch();
         };
 
         function showSearchWidget() {
@@ -1424,7 +1414,7 @@ define(MYDEFINES, function (compatibility) {
                 // Give the browser time to update before selecting
                 // focus.
                 setTimeout(function () {
-                    docById('search').focus();
+                    searchWidget.focus();
                     doSearch();
                 }, 500);
             }
@@ -1439,7 +1429,7 @@ define(MYDEFINES, function (compatibility) {
 
             $j('#search').autocomplete('widget').addClass('scrollSearch');
 
-            var searchInput = docById('search').value;
+            var searchInput = searchWidget.value;
             var obj = palettes.getProtoNameAndPalette(searchInput);
             var protoblk = obj[0];
             var paletteName = obj[1];
@@ -1450,7 +1440,7 @@ define(MYDEFINES, function (compatibility) {
             if (searchInput.length > 0) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
-                        blocks._moveBlock(newBlock, searchBlockPosition[0], searchBlockPosition[1]);
+                        blocks._moveBlock(newBlock, searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
                     });
 
                     // Move the position of the next newly created block.
@@ -1462,7 +1452,7 @@ define(MYDEFINES, function (compatibility) {
                     blocks.errorMsg(_('Block cannot be found.'));
                 }
 
-                docById('search').value = ''; 
+                searchWidget.value = ''; 
                 update = true;
             }
         };
