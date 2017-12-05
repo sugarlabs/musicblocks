@@ -1644,6 +1644,7 @@ function Synth() {
     const CUSTOM_SYNTHS = {
         'amsynth': 1,
         'fmsynth': 1,
+        'noisesynth': 1,
         'duosynth': 1,
     };
 
@@ -1713,6 +1714,18 @@ function Synth() {
                     'decay': 0.0,
                     'sustain': 1,
                     'release': 0.5
+                }
+            };
+            break;
+        case 'noisesynth':
+            var synthOptions = {
+                'noise': {
+                    'type': 'white'
+                },
+                'envelope': {
+                    'attack': 0.005 ,
+                    'decay': 0.1 ,
+                    'sustain': 1
                 }
             };
             break;
@@ -1902,6 +1915,8 @@ function Synth() {
             var tempSynth = new Tone.AMSynth(synthOptions);
         } else if (sourceName.toLowerCase() === 'fmsynth') {
             var tempSynth = new Tone.FMSynth(synthOptions);
+        } else if (sourceName.toLowerCase() === 'noisesynth') {
+            var tempSynth = new Tone.NoiseSynth(synthOptions);
         } else if (sourceName.toLowerCase() === 'duosynth') {
             var tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
