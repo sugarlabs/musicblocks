@@ -2713,10 +2713,11 @@ function Logo () {
             break;
         case 'amsynth':
             var harmonicity;
-            that.timbre.AMSynthParams = [];
-            if (that.timbre.osc.length != 0) {
-                that.errorMsg(_('Unable to use synth due to existing oscillator'));
-                //that.stopTurtle = true;
+            if (that.inTimbre) {
+                that.timbre.AMSynthParams = [];
+                if (that.timbre.osc.length != 0) {
+                    that.errorMsg(_('Unable to use synth due to existing oscillator'));
+                }
             }
 
             if (args.length === 1 && typeof(args[0]) === 'number') {
@@ -2736,17 +2737,20 @@ function Logo () {
             break;
         case 'fmsynth':
             var modulationIndex;
-            that.timbre.FMSynthParams = [];
-            if (that.timbre.osc.length != 0) {
-                that.errorMsg(_('Unable to use synth due to existing oscillator'));
-                //that.stopTurtle = true;
+            if (that.inTimbre) {
+                that.timbre.FMSynthParams = [];
+                if (that.timbre.osc.length != 0) {
+                    that.errorMsg(_('Unable to use synth due to existing oscillator'));
+                }
             }
+
             if (args.length === 1 && typeof(args[0]) === 'number') {
                 if (args[0] < 0) {
                     that.errorMsg(_('The input cannot be negative.'));
                 }
                 modulationIndex = args[0];
             }
+
             if (that.inTimbre) {
                 that.timbre.fmSynthParamvals['modulationIndex'] = modulationIndex;
                 that.synth.createSynth(that.timbre.instrumentName, 'fmsynth', that.timbre.fmSynthParamvals);
@@ -2758,11 +2762,14 @@ function Logo () {
         case 'duosynth':
             var synthVibratoRate;
             var synthVibratoAmount;
-            if (that.timbre.osc.length != 0) {
-                that.errorMsg(_('Unable to use synth due to existing oscillator'));
+            if (that.inTimbre) {
+                if (that.timbre.osc.length != 0) {
+                    that.errorMsg(_('Unable to use synth due to existing oscillator'));
+                }
+
+                that.timbre.duoSynthParams = [];
             }
 
-            that.timbre.duoSynthParams = [];
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 synthVibratoRate = args[0];
                 synthVibratoAmount = args[1];
