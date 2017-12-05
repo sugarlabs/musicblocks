@@ -1531,7 +1531,7 @@ function Palette(palettes, name) {
         this.background.removeAllEventListeners('mousedown');
 
         this.background.on('mouseover', function (event) {
-            that.palettes.activePalette = palette;
+            that.palettes.activePalette = that;
         });
 
         this.background.on('mouseout', function (event) {
