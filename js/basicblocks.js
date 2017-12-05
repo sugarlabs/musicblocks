@@ -1135,13 +1135,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     noise.palette = palettes.dict['tone'];
     blocks.protoBlockDict['noise'] = noise;
     noise.staticLabels.push(_('noise'));
-    noise.staticLabels.push(_('type'),_('value'));
+    noise.staticLabels.push(_('type'));
     noise.adjustWidthToLabel();
-    noise.defaults.push(_('brown'));
-    noise.defaults.push(1);
-    noise.twoArgBlock();
+    noise.defaults.push(_('white'));
+    noise.oneArgBlock();
     noise.dockTypes[1] = 'textin';
-    noise.dockTypes[2] = 'numberin';
     
     var distortionBlock = new ProtoBlock('dis');
     distortionBlock.palette = palettes.dict['tone'];
