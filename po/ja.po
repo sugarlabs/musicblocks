@@ -40,10 +40,6 @@
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "rest"
 msgstr "休符"
 
@@ -433,12 +429,8 @@ msgstr "ピッチ"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
-<<<<<<< HEAD
-#: js/basicblocks.js:2692
-## Note: this means "hertz sound"
-=======
 #: js/basicblocks.js:2696
->>>>>>> origin/master
+## Note: this means "hertz sound"
 msgid "tone"
 msgstr "ハーツの音"
 
@@ -1783,13 +1775,8 @@ msgid "You can load new blocks from the file system."
 msgstr "新しいブロックをファイルシステムからロードできます。"
 
 #: js/turtledefs.js:105
-<<<<<<< HEAD
-#: js/utilitybox.js:100
-## Squeak just uses English "on"
-=======
 #: js/utilitybox.js:106
-## Need to fix. Says "start scrolling"...
->>>>>>> origin/master
+## Squeak just uses English "on"
 msgid "Enable scrolling"
 msgstr "スクロールをONに"
 
@@ -2706,13 +2693,8 @@ msgstr "平方根"
 msgid "abs"
 msgstr "絶対値"
 
-<<<<<<< HEAD
-#: js/basicblocks.js:2288
-## Literally "this or that"
-=======
 #: js/basicblocks.js:2289
-## Literally "one from (inside) of"
->>>>>>> origin/master
+## Literally "this or that"
 msgid "one of"
 msgstr "これかそれ"
 
@@ -2762,13 +2744,10 @@ msgstr "最終の状態"
 msgid "value"
 msgstr "価値"
 
-<<<<<<< HEAD
-#: js/basicblocks.js:2378
-## I think this is return as in "return value"
-=======
+#: js/basicblocks.js:2380
 #: js/basicblocks.js:2380
 #.TRANS: return value from a function
->>>>>>> origin/master
+## I think this is return as in "return value"
 msgid "return"
 msgstr "出る数価は"
 
@@ -3885,11 +3864,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "縦のスペース"
 
 #~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-<<<<<<< HEAD
-#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを見せるため、パレットをクリックしてブロックを表示にドラッグしてください。"
-=======
 #~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを表示するため、パレットをクリックしてブロックをカンバースにドラッグしてください。"
->>>>>>> origin/master
 
 #: js/basicblocks.js:153
 
@@ -3999,23 +3974,16 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Show or hide a Cartesian-coordinate grid."
 #~msgstr "直交座標グリッドを隠し表示"
 
-<<<<<<< HEAD
 #~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 #~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを表示するため、パレットをクリックしてブロックを表示にドラッグしてください。"
 
-=======
->>>>>>> origin/master
 #: js/basicblocks.js:808
-
 #~msgid "free time"
 #~msgstr "クロックなし"
 
-<<<<<<< HEAD
 #~msgid "current pitch octave"
 #~msgstr "このピッチのオクターヴ"
 
-=======
->>>>>>> origin/master
 #~msgid "Expand/collapse toolbar"
 #~msgstr "ツールバーを開き隠し"
 
@@ -4026,9 +3994,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "６４部音符"
 
 #: js/logo.js:4851
-
 #: js/logo.js:4872
-
 #~msgid "Input to Perfect Block must be 1, 4, 5, or 8"
 #~msgstr "完全のブロックに 1, 4, 5, 8 からの数価の必要があります。"
 
