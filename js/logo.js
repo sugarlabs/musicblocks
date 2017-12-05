@@ -2743,7 +2743,7 @@ function Logo () {
             that.timbre.NoiseSynthParams = []
             if (args[0] == null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-            } else if (args[0] == "white" || args[0] == "pink" || args[0] == "brown" && that.inTimbre) {
+            } else if (args[0] == 'white' || args[0] == 'pink' || args[0] == 'brown' || args[0] == '_("white")' || args[0] == '_("pink")' || args[0] == '_("brown")' && that.inTimbre) {
                 noiseType = args[0];
                 that.timbre.noiseSynthParamvals['noise.type'] = noiseType;
                 that.synth.createSynth(that.timbre.instrumentName, 'noisesynth', that.timbre.noiseSynthParamvals);
@@ -4362,23 +4362,6 @@ function Logo () {
                 };
 
                 that._setListener(turtle, listenerName, __listener);
-            }
-            break;
-        case 'noise':
-            if (args[0] == null || args[1] == null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                that.stopTurtle = true;
-            } else if (args[0] == 'white' || args[0] == 'pink' || args[0] == 'brown' || args[0] == '_("white")' || args[0] == '_("pink")' || args[0] == '_("brown")' ) {
-                var noiseSynth = new Tone.NoiseSynth().toMaster();
-                noiseSynth.set("noise.type", args[0]);
-                noiseSynth.set("envelope.sustain", args[1])
-                noiseSynth.triggerAttackRelease(args[1]);
-            } else if (typeof(args[1] !== 'number') {
-                that.errorMsg(NANERRORMSG, blk);
-                that.stopTurtle = true;
-            } else {
-                that.errorMsg(NOSTRINGERRORMSG, blk);
-                that.stopTurtle = true;
             }
             break;
         case 'crescendo':
