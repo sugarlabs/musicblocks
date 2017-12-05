@@ -593,7 +593,7 @@ msgid "404: Page not found"
 msgstr "404: Página no encontrada."
 
 #: js/logo.js:2688
-msgid "turtleHeaps does not contain a valid heap for"
+msgid "Cannot find a valid heap for"
 msgstr "Pilas tortuga no contiene un montón válida para"
 
 #: js/logo.js:2698

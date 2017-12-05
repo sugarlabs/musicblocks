@@ -600,7 +600,7 @@ msgstr "404: このページが見つかれません"
 
 #: js/logo.js:2688
 ## If the word is suppose to follow this clause, it is difficult to choose a good Japanese grammar. Need to think about it.
-msgid "turtleHeaps does not contain a valid heap for"
+msgid "Cannot find a valid heap for"
 msgstr "タートルヒープすはvalidなヒープ含まれません："
 
 #: js/logo.js:2698

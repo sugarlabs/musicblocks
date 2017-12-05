@@ -2195,7 +2195,11 @@ function Logo () {
                 }
             } else {
                 if (that.turtles.turtleList[targetTurtle].running) {
-                    that.errorMsg(_('Turtle is already running.'), blk);
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        that.errorMsg(_('Mouse is already running.'), blk);
+                    } else {
+                        that.errorMsg(_('Turtle is already running.'), blk);
+                    }
                     break;
                 }
                 that.turtles.turtleList[targetTurtle].queue = [];
@@ -2685,7 +2689,7 @@ function Logo () {
                 xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xmlHttp.send(data);
             } else {
-                that.errorMsg(_('turtleHeaps does not contain a valid heap for') + ' ' + name);
+                that.errorMsg(_('Cannot find a valid heap for') + ' ' + name);
             }
             break;
         case 'setHeapEntry':
