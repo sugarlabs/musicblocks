@@ -128,17 +128,7 @@ define(MYDEFINES, function (compatibility) {
         var chartBitmap = null;
         var saveBox;
         var merging = false;
-        var search = new createjs.DOMElement(docById('search'));
-        
-        var searchStyle = docById('search');
-        var searchX = docById('myCanvas').width;
-        var searchY = docById('myCanvas').height;
-        var searchBlockPosition = [100, 100];
-
-        searchStyle.style.left = searchX/2.5 * turtleBlocksScale + 'px';
-        searchStyle.style.top = searchY/3.5 * turtleBlocksScale + 'px';
-        searchStyle.style.visibility = "hidden";
-
+        var searchWidget = docById('search');
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -1387,6 +1377,10 @@ define(MYDEFINES, function (compatibility) {
             img.src = 'images/' + name + '.svg';
         };
 
+        // Prepare the search widget
+        searchWidget.style.visibility = "hidden";
+        var searchBlockPosition = [100, 100];
+
         var searchSuggestions = [];
         var deprecatedBlockNames = [];
 
@@ -1418,16 +1412,22 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function showSearchWidget() {
-            search.visible = true;
-            searchBlockPosition = [100, 100];
+            if (searchWidget.style.visibility === 'visible') {
+                searchWidget.style.visibility = 'hidden';
+            } else {
+                searchWidget.style.visibility = 'visible';
+		searchWidget.style.left = docById('myCanvas').width / 3.5 * turtleBlocksScale + 'px';
+		searchWidget.style.top = docById('myCanvas').height / 4.5 * turtleBlocksScale + 'px';
 
-            stage.addChild(search);
-            // Give the stage time to add the element before selecting
-            // focus.
-            setTimeout(function () {
-                docById('search').focus();
-            }, 500);
-            update = true;
+                searchBlockPosition = [100, 100];
+
+                // Give the browser time to update before selecting
+                // focus.
+                setTimeout(function () {
+                    docById('search').focus();
+                    doSearch();
+                }, 500);
+            }
         };
 
         function doSearch() {
@@ -1456,17 +1456,14 @@ define(MYDEFINES, function (compatibility) {
                     // Move the position of the next newly created block.
                     searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
                     searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
-                        
-                    docById('search').value = ''; 
                 } else if (deprecatedBlockNames.indexOf(searchInput) > -1) {
                     blocks.errorMsg(_('This block is deprecated.'));
-                    docById('search').value = ''; 
-                    update = true;
                 } else {
                     blocks.errorMsg(_('Block cannot be found.'));
-                    docById('search').value = ''; 
-                    update = true;
                 }
+
+                docById('search').value = ''; 
+                update = true;
             }
         };
 
@@ -1537,9 +1534,6 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
-                case SHIFT && SPACE:
-                    showSearchWidget();
-                    break;
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
@@ -1600,9 +1594,8 @@ define(MYDEFINES, function (compatibility) {
                 case TAB:
                     break;
                 case ESC:
-                    if (search.visible) {
-                        search.visible = false;
-                        update = true;
+                    if (searchWidget.style.visibility === 'visible') {
+                        searchWidget.style.visibility = 'hidden';
                     } else {
                         // toggle full screen
                         _toggleToolbar();
@@ -1610,7 +1603,7 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 case RETURN:
                     // toggle run
-                    if (docById('search').value.length>0){
+                    if (docById('search').value.length > 0){
                         doSearch();
                     }
                     else{
