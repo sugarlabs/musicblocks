@@ -1723,7 +1723,7 @@ msgstr "スタックで長くクリックすると現れます。"
 
 #: js/turtledefs.js:98
 msgid "Show or hide a coordinate grid."
-msgstr "グリッドを表示隠し"
+msgstr "グリッドを表示隠し。"
 
 #: js/turtledefs.js:99
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
@@ -2141,8 +2141,9 @@ msgstr "ピッチ時刻グラフ"
 
 #: js/basicblocks.js:766
 #.TRANS: factor used in determining how many duplications to make
+## Probably incorrect/misleading. PLEASE CHECK!
 msgid "duplicate factor"
-msgstr ""
+msgstr "音符の副の倍"
 
 #: js/basicblocks.js:783
 #.TRANS: number of beats per minute
@@ -3206,7 +3207,7 @@ msgstr "スクローリングを無効する"
 
 #: js/utilitybox.js:124
 msgid "Search"
-msgstr ""
+msgstr "検査"
 
 #: js/playback.js:28
 #: js/playback.js:28
