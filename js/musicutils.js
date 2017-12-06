@@ -342,7 +342,7 @@ var VOICENAMES = [
     //.TRANS: simple monotone synthesizer
     [_('simple 4'), 'mono4', 'images/synth.svg'],
     //.TRANS: white noise synthesizer
-    [_('noise'), 'noise', 'images/synth.svg'],
+    [_('white noise'), 'noise', 'images/synth.svg'],
     //.TRANS: brown noise synthesizer
     [_('brown noise'), 'noise2', 'images/synth.svg'],
     //.TRANS: pink noise synthesizer
