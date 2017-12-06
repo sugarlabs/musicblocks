@@ -2,7 +2,7 @@
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-05 00:30-0500\n"
 "PO-Revision-Date: 2013-12-10 17:42+0200\n"
-"Last-Translator: lite <litekok@gmail.com>\n"
+"Last-Translator: Emily Ong Hui Qi <ong.huiqi.emily@dhs.sg>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
