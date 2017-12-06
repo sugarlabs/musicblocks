@@ -344,9 +344,9 @@ var VOICENAMES = [
     //.TRANS: white noise synthesizer
     [_('noise'), 'noise', 'images/synth.svg'],
     //.TRANS: brown noise synthesizer
-	[_('brown noise'), 'noise2', 'images/synth.svg']
+    [_('brown noise'), 'noise2', 'images/synth.svg'],
     //.TRANS: pink noise synthesizer
-    [_('pink noise'), 'noise3', 'images/synth.svg']
+    [_('pink noise'), 'noise3', 'images/synth.svg'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg'],
     //.TRANS: square wave
@@ -1900,7 +1900,7 @@ function Synth() {
             var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
             break;
         case 'noise':
-            instrumentsSource[instrumentName] = [3, sourceName];
+            instrumentsSource[instrumentName] = [4, sourceName];
             console.log(sourceName);
             var builtin_synth = new Tone.NoiseSynth(synthOptions);
             break;
