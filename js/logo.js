@@ -2749,7 +2749,7 @@ function Logo () {
                  that.synth.createSynth(that.timbre.instrumentName, 'noisesynth', that.timbre.noiseSynthParamvals);
                  that.timbre.NoiseSynthesizer.push(blk);
                  that.timbre.NoiseSynthParams.push(noiseType);
-             } else if (typeof(args[1] !== 'number') {
+             } else if (typeof(args[1] !== 'number')) {
                  that.errorMsg(NANERRORMSG, blk);
                  that.stopTurtle = true;
              } else {
