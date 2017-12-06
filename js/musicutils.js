@@ -1635,7 +1635,7 @@ function Synth() {
         'sawtooth': 1,
         'square': 1,
         'pluck': 1,
-        'noise': 1
+        'noise': 1,
         'poly': 1,
         'mono1': 1,
         'mono2': 1,
