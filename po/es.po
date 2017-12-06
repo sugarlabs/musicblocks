@@ -545,7 +545,7 @@ msgstr "Bloque no soporta incremento."
 #: js/logo.js:8040
 #: js/logo.js:8068
 msgid "Cannot find mouse"
-msgstr "No se puede encontrar raton."
+msgstr "No se puede encontrar ratón"
 
 #: js/logo.js:2177
 #: js/logo.js:2194
@@ -561,7 +561,7 @@ msgstr "No se puede encontrar tortuga."
 
 #: js/logo.js:2199
 msgid "Mouse is already running."
-msgstr ""
+msgstr "Ratón ya ha comenzado."
 
 #: js/logo.js:2201
 msgid "Turtle is already running."
