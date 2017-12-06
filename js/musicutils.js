@@ -1640,6 +1640,8 @@ function Synth() {
         'square': 1,
         'pluck': 1,
         'noise': 1,
+        'noise2': 1,
+        'noise3': 1,
         'poly': 1,
         'mono1': 1,
         'mono2': 1,
@@ -1727,6 +1729,30 @@ function Synth() {
             var synthOptions = {
                 'noise': {
                     'type': 'white'
+                },
+                'envelope': {
+                    'attack': 0.005 ,
+                    'decay': 0.1 ,
+                    'sustain': 1
+                }
+            };
+            break;
+        case 'noise2':
+            var synthOptions = {
+                'noise': {
+                    'type': 'brown'
+                },
+                'envelope': {
+                    'attack': 0.005 ,
+                    'decay': 0.1 ,
+                    'sustain': 1
+                }
+            };
+            break;
+        case 'noise3':
+            var synthOptions = {
+                'noise': {
+                    'type': 'pink'
                 },
                 'envelope': {
                     'attack': 0.005 ,
@@ -1900,6 +1926,8 @@ function Synth() {
             var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
             break;
         case 'noise':
+        case 'noise2':
+        case 'noise3':
             instrumentsSource[instrumentName] = [4, sourceName];
             console.log(sourceName);
             var builtin_synth = new Tone.NoiseSynth(synthOptions);
