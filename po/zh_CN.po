@@ -49,7 +49,7 @@
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
 msgid "rest"
-msgstr ""
+msgstr "休止符"
 
 #: js/block.js:643
 #: js/block.js:2072
@@ -120,17 +120,17 @@ msgstr ""
 #: js/basicblocks.js:924
 #: js/basicblocks.js:1845
 msgid "drum"
-msgstr ""
+msgstr "鼓"
 
 #: js/block.js:658
 msgid "ruler"
-msgstr ""
+msgstr "尺"
 
 #: js/block.js:661
 #: js/basicblocks.js:665
 #.TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
-msgstr ""
+msgstr "音色"
 
 #: js/block.js:664
 msgid "stair"
@@ -140,13 +140,13 @@ msgstr ""
 #: js/basicblocks.js:683
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr ""
+msgstr "速度"
 
 #: js/block.js:670
 #: js/basicblocks.js:1659
 #.TRANS: mode, e.g., Major in C Major
 msgid "mode"
-msgstr ""
+msgstr "调式"
 
 #: js/block.js:673
 msgid "slider"
@@ -189,7 +189,7 @@ msgstr ""
 #: js/samplesviewer.js:74
 #: js/samplesviewer.js:74
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: js/samplesviewer.js:75
 #: js/samplesviewer.js:75
@@ -201,14 +201,14 @@ msgstr ""
 #: js/samplesviewer.js:94
 #: js/samplesviewer.js:94
 msgid "Share"
-msgstr ""
+msgstr "分享"
 
 #: js/samplesviewer.js:84
 #: js/samplesviewer.js:84
 #: js/samplesviewer.js:101
 #: js/samplesviewer.js:101
 msgid "Download"
-msgstr ""
+msgstr "下载"
 
 #: js/samplesviewer.js:85
 #: js/samplesviewer.js:85
@@ -255,14 +255,14 @@ msgstr ""
 
 #: js/activity.js:580
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: js/activity.js:927
 #: js/activity.js:961
 #: js/activity.js:985
 #: js/activity.js:1002
 msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
+msgstr "无法从文件加载项目。请检查文件类型。"
 
 #: js/activity.js:1450
 msgid "This block is deprecated."
@@ -375,13 +375,13 @@ msgstr ""
 #: js/activity.js:2926
 #: js/turtledefs.js:100
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #: js/activity.js:2915
 #: js/activity.js:2927
 #: js/turtledefs.js:106
 msgid "Delete all"
-msgstr ""
+msgstr "全部删除"
 
 #: js/activity.js:2916
 #: js/activity.js:2928
@@ -402,7 +402,7 @@ msgstr ""
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr ""
+msgstr "节奏"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
@@ -410,12 +410,12 @@ msgstr ""
 #: js/basicblocks.js:3021
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
-msgstr ""
+msgstr "音高"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
 msgid "tone"
-msgstr ""
+msgstr "音"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
@@ -486,7 +486,7 @@ msgstr ""
 #: js/basicblocks.js:250
 #: plugins/rodi.rtp:196
 msgid "note"
-msgstr ""
+msgstr "音符"
 
 #: js/logo.js:31
 msgid "Not a valid pitch name"
@@ -505,7 +505,7 @@ msgstr ""
 #: js/macros.js:158
 #.TRANS: major scales in music
 msgid "major"
-msgstr ""
+msgstr "大调音阶"
 
 #: js/logo.js:1319
 msgid "Block does not support incrementing."
@@ -554,7 +554,7 @@ msgstr ""
 #: js/logo.js:2634
 #: js/logo.js:7231
 msgid "You must select a file."
-msgstr ""
+msgstr "你必须选择一个文件"
 
 #: js/logo.js:2643
 #: plugins/heap.rtp:96
@@ -572,7 +572,7 @@ msgstr ""
 
 #: js/logo.js:2668
 msgid "404: Page not found"
-msgstr ""
+msgstr "找不到网页"
 
 #: js/logo.js:2692
 msgid "Cannot find a valid heap for"
@@ -780,15 +780,15 @@ msgstr "清屏"
 
 #: js/clearbox.js:66
 msgid "confirm"
-msgstr ""
+msgstr "确认"
 
 #: js/pitchslider.js:373
 msgid "move up"
-msgstr ""
+msgstr "移上"
 
 #: js/pitchslider.js:387
 msgid "move down"
-msgstr ""
+msgstr "移下"
 
 #: js/palette.js:628
 #: js/palette.js:726
@@ -824,7 +824,7 @@ msgstr "放入"
 #: js/palette.js:735
 #: js/blocks.js:1515
 msgid "open file"
-msgstr ""
+msgstr "打开文件"
 
 #: js/palette.js:829
 #: js/basicblocks.js:1978
@@ -877,7 +877,7 @@ msgstr ""
 #: js/basicblocks.js:1399
 #: js/basicblocks.js:1406
 msgid "augmented"
-msgstr ""
+msgstr "增大"
 
 #: js/musicutils.js:126
 #: js/musicutils.js:130
@@ -907,7 +907,7 @@ msgstr ""
 #: js/basicblocks.js:1471
 #: js/basicblocks.js:1478
 msgid "minor"
-msgstr ""
+msgstr "小调音阶"
 
 #: js/musicutils.js:135
 #: js/musicutils.js:138
@@ -923,7 +923,7 @@ msgstr ""
 #: js/musicutils.js:259
 #.TRANS: twelve semi-tone scale for music
 msgid "chromatic"
-msgstr ""
+msgstr "半音阶的"
 
 #: js/musicutils.js:260
 msgid "algerian"
