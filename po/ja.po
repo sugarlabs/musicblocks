@@ -223,7 +223,7 @@ msgstr "ダウンロード"
 #: js/samplesviewer.js:102
 #: js/samplesviewer.js:102
 msgid "Merge with current project"
-msgstr ""
+msgstr "現在のプロジェクトに組み合わせます。"
 
 #: js/samplesviewer.js:602
 msgid "Planet"
@@ -277,11 +277,11 @@ msgstr "ファイルからプロジェクトをロードすることができま
 
 #: js/activity.js:1450
 msgid "This block is deprecated."
-msgstr ""
+msgstr "このブロックはもうありません。"
 
 #: js/activity.js:1452
 msgid "Block cannot be found."
-msgstr ""
+msgstr "ブロックが見つかれません。"
 
 #: js/activity.js:2815
 #: js/activity.js:2828
@@ -358,8 +358,9 @@ msgstr "ヘルプ"
 #: js/activity.js:2908
 #: js/activity.js:2920
 #: js/turtledefs.js:91
+## Calling it "planet server" here
 msgid "Load samples from server"
-msgstr "サーバから見本をダウンロードする"
+msgstr "プラネット・サーバから見本をダウンロードする"
 
 #: js/activity.js:2909
 #: js/activity.js:2921
@@ -433,9 +434,8 @@ msgstr "ピッチ"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
-## Note: this means "hertz sound"
 msgid "tone"
-msgstr "ハーツの音"
+msgstr "音色"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
@@ -513,8 +513,9 @@ msgid "note"
 msgstr "音符"
 
 #: js/logo.js:31
+## http://jisho.org/word/%E5%A6%A5%E5%BD%93 ; 妥当=だとう; maybe just ヴァリッド(http://jisho.org/word/%E3%83%B4%E3%82%A1%E3%83%AA%E3%83%83%E3%83%89 )
 msgid "Not a valid pitch name"
-msgstr ""
+msgstr "選ばれたピッチが妥当ではありません。"
 
 #: js/logo.js:925
 #: js/musicutils.js:128
@@ -546,7 +547,7 @@ msgstr "このブロックでIncrementingができません"
 #: js/logo.js:8040
 #: js/logo.js:8068
 msgid "Cannot find mouse"
-msgstr ""
+msgstr "ネズミが見つかれません。"
 
 #: js/logo.js:2177
 #: js/logo.js:2194
@@ -558,23 +559,23 @@ msgstr ""
 #: js/logo.js:8042
 #: js/logo.js:8070
 msgid "Cannot find turtle"
-msgstr ""
+msgstr "タートルが見つかれません。"
 
 #: js/logo.js:2199
 msgid "Mouse is already running."
-msgstr ""
+msgstr "ネズミがもう動いていますよ。"
 
 #: js/logo.js:2201
 msgid "Turtle is already running."
-msgstr ""
+msgstr "タートルはもう動いていますよ。"
 
 #: js/logo.js:2221
 msgid "Cannot find start block"
-msgstr ""
+msgstr "スターとのブロックが見つかれません。"
 
 #: js/logo.js:2539
 msgid "Please enter a valid URL."
-msgstr ""
+msgstr "妥当なURLを打ってください。"
 
 #: js/logo.js:2634
 #: js/logo.js:7231
@@ -728,8 +729,9 @@ msgstr "ディストーションの数価が０よりの必要あります。"
 #: js/logo.js:4657
 #.TRANS: Depth is the intesity of the tremolo effect.
 #.TRANS: Depth is the intesity of the chorus effect.
+## http://jisho.org/word/%E5%A4%89%E5%9F%9F ; 変域＝へんいき
 msgid "Depth is out of range."
-msgstr ""
+msgstr "大きさが変域外です。"
 
 #: js/logo.js:5257
 #: js/logo.js:5259
@@ -967,7 +969,7 @@ msgstr "クロマティック・スケール"
 
 #: js/musicutils.js:260
 msgid "algerian"
-msgstr ""
+msgstr "アルジェリアの"
 
 #: js/musicutils.js:263
 msgid "spanish"
@@ -975,14 +977,15 @@ msgstr "スペインの"
 
 #: js/musicutils.js:265
 #.TRANS: modal scale for music
-## there are two "octotonics" and they also share the "diminished" name as well...
+## there are two "octotonics" and they also share the "diminished" name as well... ; https://en.wikipedia.org/wiki/Octatonic_scale
 msgid "octatonic"
-msgstr ""
+msgstr "オクトトニック・スケール"
 
 #: js/musicutils.js:269
 #.TRANS: harmonic major scale in music
+## https://en.wikipedia.org/wiki/Harmonic_major_scale
 msgid "harmonic major"
-msgstr ""
+msgstr "ハーモニック・メジャー"
 
 #: js/musicutils.js:271
 #.TRANS: natural minor scales in music
@@ -1062,16 +1065,18 @@ msgstr ""
 
 #: js/musicutils.js:298
 msgid "ethiopian"
-msgstr ""
+msgstr "エチオピアの"
 
 #: js/musicutils.js:300
 #.TRANS: Ethiopic scale for music
+## https://en.wikipedia.org/wiki/Ge%27ez_language ; I only see ge'ez as a language on wikipedia...
 msgid "geez"
-msgstr ""
+msgstr "ゲエズ・スケール"
 
 #: js/musicutils.js:301
+## http://jisho.org/word/%E3%83%92%E3%83%B3%E3%82%BA%E3%83%BC 
 msgid "hindu"
-msgstr ""
+msgstr "ヒンドゥーの"
 
 #: js/musicutils.js:302
 msgid "hungarian"
@@ -1080,16 +1085,17 @@ msgstr "ハンガリーの"
 #: js/musicutils.js:304
 #.TRANS: minor Romanian scale for music
 msgid "romanian minor"
-msgstr ""
+msgstr "ルーマニアのマイナー・スケール"
 
 #: js/musicutils.js:305
 msgid "spanish gypsy"
-msgstr ""
+msgstr "スパニッシュ・ジプシー"
 
 #: js/musicutils.js:307
 #.TRANS: musical scale for Mid-Eastern music
+## https://en.wikipedia.org/wiki/Arabic_maqam;looks like there are many... oh well, we need to split them up, I guess...
 msgid "maqam"
-msgstr ""
+msgstr "マカーム"
 
 #: js/musicutils.js:309
 #.TRANS: minor blues scale for music
@@ -1272,8 +1278,9 @@ msgstr "フロアタム"
 #: js/basicblocks.js:1801
 #: js/macros.js:68
 #.TRANS: a drum made from an inverted cup
+## Guessing
 msgid "cup drum"
-msgstr ""
+msgstr "コップ・ドラム"
 
 #: js/musicutils.js:368
 #: js/basicblocks.js:1794
@@ -1412,43 +1419,48 @@ msgstr "あひる"
 #: js/basicblocks.js:503
 #.TRANS: highpass filter
 #.TRANS: highpass filter
+## https://info.shimamura.co.jp/digital/knowledge/2014/11/36725
 msgid "highpass"
-msgstr ""
+msgstr "ハイパス・フィルター"
 
 #: js/musicutils.js:409
 #.TRANS: lowpass filter
 msgid "lowpass"
-msgstr ""
+msgstr "ローパス・フィルター"
 
 #: js/musicutils.js:411
 #.TRANS: bandpass filter
 msgid "bandpass"
-msgstr ""
+msgstr "バンドパス・フィルター"
 
 #: js/musicutils.js:413
 #.TRANS: highshelf filter
+## http://d.hatena.ne.jp/y_takeuchi/20130407/p1
 msgid "highshelf"
-msgstr ""
+msgstr "ハイシェルフ・フィルター"
 
 #: js/musicutils.js:415
 #.TRANS: lowshelf filter
 msgid "lowshelf"
-msgstr ""
+msgstr "ローシェルフ・フィルター"
 
 #: js/musicutils.js:417
 #.TRANS: notch filter
+## https://synth-voice.sakura.ne.jp/synth-voice/html5/synth-basic02.html
 msgid "notch"
-msgstr ""
+msgstr "ノッチ・フィルター"
 
 #: js/musicutils.js:419
 #.TRANS: allpass filter
+## http://www7b.biglobe.ne.jp/~kochan/workshop/analog/allpass.htm
 msgid "allpass"
-msgstr ""
+msgstr "オールパスフィルター"
 
 #: js/musicutils.js:421
 #.TRANS: peaking filter
+## http://www.geocities.jp/meimei_8/filt/peek/af_peek.html
 msgid "peaking"
-msgstr ""
+msgstr "ピーク・フィルタ"
 
 #: js/musicutils.js:1517
 #: js/musicutils.js:1537
@@ -1744,7 +1756,7 @@ msgstr "ブロックの大きさを小さくします。"
 #: js/turtledefs.js:102
 #: js/utilitybox.js:82
 msgid "Increase block size"
-msgstr "ブロックを大きく。"
+msgstr "ブロックを大きく"
 
 #: js/turtledefs.js:102
 ## Redundant??
@@ -2511,7 +2523,7 @@ msgstr "向き"
 #: js/basicblocks.js:1949
 #.TRANS: y coordinate
 msgid "y"
-msgstr ""
+msgstr "y座標"
 
 #: js/basicblocks.js:1872
 #: js/basicblocks.js:1889
@@ -2520,7 +2532,7 @@ msgstr ""
 #: js/basicblocks.js:1949
 #.TRANS: x coordinate
 msgid "x"
-msgstr ""
+msgstr "x座標"
 
 #: js/basicblocks.js:1888
 #.TRANS: control point in a bezier curve
@@ -3283,12 +3295,13 @@ msgid "vibrato amount"
 msgstr "ビブラートのレベル"
 
 #: js/timbre.js:1601
+## https://effector-hakase.com/delay/
 msgid "delay (MS)"
-msgstr ""
+msgstr "ディレイ・エフェクター(ms)"
 
 #: js/timbre.js:1745
 msgid "distortion amount"
-msgstr ""
+msgstr "ディストーションの大きさ"
 
 #: js/savebox.js:95
 msgid "Save as .tb"
@@ -3304,7 +3317,7 @@ msgstr ".pngを保存"
 
 #: js/savebox.js:119
 msgid "Save as .wav"
-msgstr ""
+msgstr ".wavを保存"
 
 #: js/savebox.js:127
 msgid "Upload to Planet"
@@ -3917,7 +3930,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/logo.js:8059
 
 #~msgid "Could not find turtle"
-#~msgstr ""
+#~msgstr "タートルが見つかれませんでした。"
 
 #~msgid "cloud"
 #~msgstr "クロード"
@@ -3976,7 +3989,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "数学"
 
 #~msgid "UID"
-#~msgstr ""
+#~msgstr "ユーザの名前"
 
 #~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
 #~msgstr "ネズミさんが私たちのミュージック・ブロックスの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
