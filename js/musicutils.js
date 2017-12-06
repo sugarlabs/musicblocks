@@ -341,8 +341,12 @@ var VOICENAMES = [
     [_('simple 3'), 'mono3', 'images/synth.svg'],
     //.TRANS: simple monotone synthesizer
     [_('simple 4'), 'mono4', 'images/synth.svg'],
-    //.TRANS: simple noise synthesizer
+    //.TRANS: white noise synthesizer
     [_('noise'), 'noise', 'images/synth.svg'],
+    //.TRANS: brown noise synthesizer
+	[_('brown noise'), 'noise2', 'images/synth.svg']
+    //.TRANS: pink noise synthesizer
+    [_('pink noise'), 'noise3', 'images/synth.svg']
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg'],
     //.TRANS: square wave
@@ -1885,11 +1889,6 @@ function Synth() {
             console.log(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
             break;
-        case 'noise':
-            instrumentsSource[instrumentName] = [3, sourceName];
-            console.log(sourceName);
-            var builtin_synth = new Tone.NoiseSynth(synthOptions);
-            break;
         case 'pluck':
             instrumentsSource[instrumentName] = [3, sourceName];
             console.log(sourceName);
@@ -1899,6 +1898,11 @@ function Synth() {
             instrumentsSource[instrumentName] = [0, 'poly'];
             console.log('poly');
             var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
+            break;
+        case 'noise':
+            instrumentsSource[instrumentName] = [3, sourceName];
+            console.log(sourceName);
+            var builtin_synth = new Tone.NoiseSynth(synthOptions);
             break;
         default:
             instrumentsSource[instrumentName] = [0, 'poly'];
@@ -2117,6 +2121,9 @@ function Synth() {
             }
 
             this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            break;
+        case 4:
+            tempSynth.triggerAttackPelease(beatValue);
             break;
         case 0:  // default synth
         default:
