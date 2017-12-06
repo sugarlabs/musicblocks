@@ -93,6 +93,8 @@ define(MYDEFINES, function (compatibility) {
             console.log(e);
         }
 
+        document.title = TITLESTRING;
+
         var canvas = docById('myCanvas');
 
         // Set up a file chooser for the doOpen function.

@@ -14,6 +14,8 @@ const NUMBERBLOCKDEFAULT = 4;
 
 const DEFAULTPALETTE = 'rhythm';
 
+const TITLESTRING = _('Music Blocks is a collection of tools for exploring musical concepts.');
+
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
 BUILTINPALETTES = ['rhythm', 'pitch', 'meter', 'tone', 'intervals', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
