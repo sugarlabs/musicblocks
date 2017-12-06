@@ -2123,7 +2123,7 @@ function Synth() {
             this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
             break;
         case 4:
-            tempSynth.triggerAttackPelease(beatValue);
+            tempSynth.triggerAttackRelease(beatValue);
             break;
         case 0:  // default synth
         default:
