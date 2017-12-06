@@ -1134,7 +1134,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var noise = new ProtoBlock('noise');
     noise.palette = palettes.dict['tone'];
     blocks.protoBlockDict['noise'] = noise;
-    noise.synthstaticLabels.push(_('noise'));
+    noise.staticLabels.push(_('noise'));
     noise.staticLabels.push(_('type'));
     noise.adjustWidthToLabel();
     noise.defaults.push(_('white'));
