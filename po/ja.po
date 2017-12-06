@@ -2359,7 +2359,7 @@ msgstr "ディストーション"
 #: js/timbre.js:1435
 #.TRANS: a wavering effect in a musical tone
 msgid "tremolo"
-msgstr "トレモロエフェクタ"
+msgstr "トレモロ・エフェクタ"
 
 #: js/basicblocks.js:1151
 #: js/basicblocks.js:1166
@@ -2379,7 +2379,7 @@ msgstr "レート"
 #: js/timbre.js:1604
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
-msgstr "トレモロエフェクタの大きさ"
+msgstr "トレモロ・エフェクタの大きさ"
 
 #: js/basicblocks.js:1165
 #: js/timbre.js:1435
