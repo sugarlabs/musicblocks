@@ -5424,7 +5424,6 @@ function Logo () {
         case 'sine':
         case 'square':
         case 'sawtooth':
-        case 'noise':
             if (args.length === 1) {
                 var obj = frequencyToPitch(args[0]);
                 // obj[2] is cents
