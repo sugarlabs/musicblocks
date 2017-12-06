@@ -2,7 +2,7 @@
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-05 00:30-0500\n"
 "PO-Revision-Date: 2013-12-10 17:42+0200\n"
-"Last-Translator: lite <litekok@gmail.com>\n"
+"Last-Translator: Emily Ong Hui Qi <ong.huiqi.emily@dhs.sg>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -49,7 +49,7 @@
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
 msgid "rest"
-msgstr ""
+msgstr "休止符"
 
 #: js/block.js:643
 #: js/block.js:2072
@@ -120,17 +120,17 @@ msgstr ""
 #: js/basicblocks.js:924
 #: js/basicblocks.js:1845
 msgid "drum"
-msgstr ""
+msgstr "鼓"
 
 #: js/block.js:658
 msgid "ruler"
-msgstr ""
+msgstr "尺"
 
 #: js/block.js:661
 #: js/basicblocks.js:665
 #.TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
-msgstr ""
+msgstr "音色"
 
 #: js/block.js:664
 msgid "stair"
@@ -140,13 +140,13 @@ msgstr ""
 #: js/basicblocks.js:683
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr ""
+msgstr "速度"
 
 #: js/block.js:670
 #: js/basicblocks.js:1659
 #.TRANS: mode, e.g., Major in C Major
 msgid "mode"
-msgstr ""
+msgstr "调式"
 
 #: js/block.js:673
 msgid "slider"
@@ -189,7 +189,7 @@ msgstr ""
 #: js/samplesviewer.js:74
 #: js/samplesviewer.js:74
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: js/samplesviewer.js:75
 #: js/samplesviewer.js:75
@@ -201,14 +201,14 @@ msgstr ""
 #: js/samplesviewer.js:94
 #: js/samplesviewer.js:94
 msgid "Share"
-msgstr ""
+msgstr "分享"
 
 #: js/samplesviewer.js:84
 #: js/samplesviewer.js:84
 #: js/samplesviewer.js:101
 #: js/samplesviewer.js:101
 msgid "Download"
-msgstr ""
+msgstr "下载"
 
 #: js/samplesviewer.js:85
 #: js/samplesviewer.js:85
@@ -262,7 +262,7 @@ msgstr ""
 #: js/activity.js:985
 #: js/activity.js:1002
 msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
+msgstr "无法从文件加载项目。请检查文件类型。"
 
 #: js/activity.js:1450
 msgid "This block is deprecated."
@@ -375,13 +375,13 @@ msgstr ""
 #: js/activity.js:2926
 #: js/turtledefs.js:100
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #: js/activity.js:2915
 #: js/activity.js:2927
 #: js/turtledefs.js:106
 msgid "Delete all"
-msgstr ""
+msgstr "全部删除"
 
 #: js/activity.js:2916
 #: js/activity.js:2928
@@ -402,7 +402,7 @@ msgstr ""
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr ""
+msgstr "节奏"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
@@ -410,12 +410,12 @@ msgstr ""
 #: js/basicblocks.js:3021
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
-msgstr ""
+msgstr "音高"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
 msgid "tone"
-msgstr ""
+msgstr "音"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:21
@@ -486,7 +486,7 @@ msgstr ""
 #: js/basicblocks.js:250
 #: plugins/rodi.rtp:196
 msgid "note"
-msgstr ""
+msgstr "音符"
 
 #: js/logo.js:31
 msgid "Not a valid pitch name"
@@ -505,7 +505,7 @@ msgstr ""
 #: js/macros.js:158
 #.TRANS: major scales in music
 msgid "major"
-msgstr ""
+msgstr "大调音阶"
 
 #: js/logo.js:1319
 msgid "Block does not support incrementing."
@@ -554,7 +554,7 @@ msgstr ""
 #: js/logo.js:2634
 #: js/logo.js:7231
 msgid "You must select a file."
-msgstr ""
+msgstr "你必须选择一个文件"
 
 #: js/logo.js:2643
 #: plugins/heap.rtp:96
@@ -568,11 +568,11 @@ msgstr ""
 
 #: js/logo.js:2663
 msgid "Error parsing JSON data:"
-msgstr ""
+msgstr "解析JSON数据时出错"
 
 #: js/logo.js:2668
 msgid "404: Page not found"
-msgstr ""
+msgstr "找不到网页"
 
 #: js/logo.js:2692
 msgid "Cannot find a valid heap for"
@@ -685,11 +685,11 @@ msgstr ""
 
 #: js/logo.js:4522
 msgid "Vibrato intensity must be between 1 and 100."
-msgstr ""
+msgstr "震音强度必须在1和100之间"
 
 #: js/logo.js:4527
 msgid "Vibrato rate must be greater than 0."
-msgstr ""
+msgstr "震音率必须大于0"
 
 #: js/logo.js:4559
 msgid "Distortion must be from 0 to 100."
@@ -780,15 +780,15 @@ msgstr "清屏"
 
 #: js/clearbox.js:66
 msgid "confirm"
-msgstr ""
+msgstr "确认"
 
 #: js/pitchslider.js:373
 msgid "move up"
-msgstr ""
+msgstr "移上"
 
 #: js/pitchslider.js:387
 msgid "move down"
-msgstr ""
+msgstr "移下"
 
 #: js/palette.js:628
 #: js/palette.js:726
@@ -824,7 +824,7 @@ msgstr "放入"
 #: js/palette.js:735
 #: js/blocks.js:1515
 msgid "open file"
-msgstr ""
+msgstr "打开文件"
 
 #: js/palette.js:829
 #: js/basicblocks.js:1978
@@ -838,7 +838,7 @@ msgstr "后退"
 #: js/palette.js:838
 #.TRANS: popout: to detach as a separate window
 msgid "hide"
-msgstr ""
+msgstr "隐藏"
 
 #: js/palette.js:840
 #: js/palette.js:841
@@ -855,7 +855,6 @@ msgstr ""
 #: js/musicutils.js:124
 #: js/basicblocks.js:345
 #: js/basicblocks.js:1602
-#.TRANS: unison means the note is the same as the current note
 #.TRANS: unison means the note is the same as the current note
 msgid "unison"
 msgstr ""
@@ -877,7 +876,7 @@ msgstr ""
 #: js/basicblocks.js:1399
 #: js/basicblocks.js:1406
 msgid "augmented"
-msgstr ""
+msgstr "增大"
 
 #: js/musicutils.js:126
 #: js/musicutils.js:130
@@ -907,7 +906,7 @@ msgstr ""
 #: js/basicblocks.js:1471
 #: js/basicblocks.js:1478
 msgid "minor"
-msgstr ""
+msgstr "小调音阶"
 
 #: js/musicutils.js:135
 #: js/musicutils.js:138
@@ -923,15 +922,15 @@ msgstr ""
 #: js/musicutils.js:259
 #.TRANS: twelve semi-tone scale for music
 msgid "chromatic"
-msgstr ""
+msgstr "半音阶的"
 
 #: js/musicutils.js:260
 msgid "algerian"
-msgstr ""
+msgstr "阿尔及利亚"
 
 #: js/musicutils.js:263
 msgid "spanish"
-msgstr ""
+msgstr "西班牙"
 
 #: js/musicutils.js:265
 #.TRANS: modal scale for music
@@ -961,32 +960,32 @@ msgstr ""
 #: js/musicutils.js:277
 #.TRANS: modal scale for music
 msgid "ionian"
-msgstr ""
+msgstr "艾奥尼安调式"
 
 #: js/musicutils.js:279
 #.TRANS: modal scale for music
 msgid "dorian"
-msgstr ""
+msgstr "多里安调式"
 
 #: js/musicutils.js:281
 #.TRANS: modal scale for music
 msgid "phrygian"
-msgstr ""
+msgstr "费里吉安调式"
 
 #: js/musicutils.js:283
 #.TRANS: modal scale for music
 msgid "lydian"
-msgstr ""
+msgstr "利地安调式"
 
 #: js/musicutils.js:285
 #.TRANS: modal scale for music
 msgid "mixolydian"
-msgstr ""
+msgstr "米索利地安调式"
 
 #: js/musicutils.js:287
 #.TRANS: modal scale for music
 msgid "aeolian"
-msgstr ""
+msgstr "伊奥利安调式"
 
 #: js/musicutils.js:289
 #.TRANS: modal scale for music
@@ -1001,11 +1000,11 @@ msgstr ""
 #: js/musicutils.js:293
 #.TRANS: bebop scale for music
 msgid "bebop"
-msgstr ""
+msgstr "博普爵士乐"
 
 #: js/musicutils.js:294
 msgid "arabic"
-msgstr ""
+msgstr "阿拉伯语"
 
 #: js/musicutils.js:295
 msgid "byzantine"
@@ -1018,7 +1017,7 @@ msgstr ""
 
 #: js/musicutils.js:298
 msgid "ethiopian"
-msgstr ""
+msgstr "埃塞俄比亚"
 
 #: js/musicutils.js:300
 #.TRANS: Ethiopic scale for music
@@ -1027,11 +1026,11 @@ msgstr ""
 
 #: js/musicutils.js:301
 msgid "hindu"
-msgstr ""
+msgstr "印度教"
 
 #: js/musicutils.js:302
 msgid "hungarian"
-msgstr ""
+msgstr "匈牙利"
 
 #: js/musicutils.js:304
 #.TRANS: minor Romanian scale for music
@@ -1068,7 +1067,7 @@ msgstr ""
 
 #: js/musicutils.js:315
 msgid "chinese"
-msgstr ""
+msgstr "中文"
 
 #: js/musicutils.js:316
 msgid "egyptian"
@@ -1094,7 +1093,7 @@ msgstr ""
 #: js/musicutils.js:323
 #.TRANS: Italian mathematician
 msgid "fibonacci"
-msgstr ""
+msgstr "斐波那契"
 
 #: js/musicutils.js:324
 #: js/musicutils.js:353
@@ -1112,17 +1111,17 @@ msgstr ""
 #: js/macros.js:163
 #.TRANS: musical instrument
 msgid "violin"
-msgstr ""
+msgstr "小提琴"
 
 #: js/musicutils.js:331
 #.TRANS: musical instrument
 msgid "cello"
-msgstr ""
+msgstr "大提琴"
 
 #: js/musicutils.js:333
 #.TRANS: musical instrument
 msgid "bass"
-msgstr ""
+msgstr "低音"
 
 #: js/musicutils.js:337
 #.TRANS: simple monotone synthesizer
@@ -1190,7 +1189,7 @@ msgstr ""
 #: js/macros.js:175
 #.TRANS: musical instrument
 msgid "snare drum"
-msgstr ""
+msgstr "小鼓"
 
 #: js/musicutils.js:360
 #: js/basicblocks.js:1822
@@ -1206,7 +1205,7 @@ msgstr ""
 #: js/macros.js:192
 #.TRANS: musical instrument
 msgid "tom tom"
-msgstr ""
+msgstr "桶子鼓"
 
 #: js/musicutils.js:364
 #: js/basicblocks.js:1808
@@ -1297,7 +1296,7 @@ msgstr ""
 #: js/macros.js:63
 #.TRANS: sound effect
 msgid "clap"
-msgstr ""
+msgstr "拍手"
 
 #: js/musicutils.js:390
 #: js/basicblocks.js:1738
@@ -1318,14 +1317,14 @@ msgstr ""
 #: js/macros.js:59
 #.TRANS: sound effect
 msgid "bubbles"
-msgstr ""
+msgstr "泡泡"
 
 #: js/musicutils.js:396
 #: js/basicblocks.js:1682
 #: js/macros.js:60
 #.TRANS: animal sound effect
 msgid "cat"
-msgstr ""
+msgstr "猫咪"
 
 #: js/musicutils.js:398
 #: js/basicblocks.js:1689
@@ -1339,14 +1338,14 @@ msgstr ""
 #: js/macros.js:78
 #.TRANS: animal sound effect
 msgid "dog"
-msgstr ""
+msgstr "狗"
 
 #: js/musicutils.js:402
 #: js/basicblocks.js:1675
 #: js/macros.js:89
 #.TRANS: animal sound effect
 msgid "duck"
-msgstr ""
+msgstr "鸭"
 
 #: js/musicutils.js:407
 #: js/basicblocks.js:503
@@ -1393,17 +1392,17 @@ msgstr ""
 #: js/musicutils.js:1517
 #: js/musicutils.js:1537
 msgid "next"
-msgstr ""
+msgstr "下一个"
 
 #: js/musicutils.js:1520
 #: js/musicutils.js:1542
 msgid "previous"
-msgstr ""
+msgstr "上一个"
 
 #: js/musicutils.js:1523
 #: js/musicutils.js:1546
 msgid "current"
-msgstr ""
+msgstr "现在"
 
 #: js/turtle.js:405
 #: js/turtle.js:560
@@ -1421,7 +1420,7 @@ msgstr ""
 
 #: js/pitchtimematrix.js:189
 msgid "sort"
-msgstr ""
+msgstr "分类"
 
 #: js/pitchtimematrix.js:401
 #: js/pitchtimematrix.js:632
@@ -1457,16 +1456,16 @@ msgstr ""
 #: js/basicblocks.js:1047
 #.TRANS: musical meter (time signature)
 msgid "meter"
-msgstr ""
+msgstr "拍子"
 
 #: js/turtledefs.js:21
 msgid "intervals"
-msgstr ""
+msgstr "音程"
 
 #: js/turtledefs.js:21
 #: js/basicblocks.js:3322
 msgid "volume"
-msgstr ""
+msgstr "音量"
 
 #: js/turtledefs.js:21
 msgid "boxes"
@@ -1600,16 +1599,16 @@ msgstr ""
 
 #: js/turtledefs.js:93
 msgid "Save your project to a file."
-msgstr ""
+msgstr "将您的项目保存到一个文件"
 
 #: js/turtledefs.js:94
 #: js/savebox.js:136
 msgid "Save sheet music"
-msgstr ""
+msgstr "保存乐谱"
 
 #: js/turtledefs.js:94
 msgid "Save your project to as a Lilypond file."
-msgstr ""
+msgstr "将您的项目保存到一个Lilypond文件"
 
 #: js/turtledefs.js:95
 msgid "Copy"
@@ -1682,7 +1681,7 @@ msgstr ""
 #: js/turtledefs.js:104
 #: js/utilitybox.js:98
 msgid "Load plugin from file"
-msgstr ""
+msgstr "从文件加载插件"
 
 #: js/turtledefs.js:104
 msgid "You can load new blocks from the file system."
@@ -1707,7 +1706,7 @@ msgstr ""
 
 #: js/turtledefs.js:108
 msgid "Congratulations."
-msgstr ""
+msgstr "恭喜"
 
 #: js/turtledefs.js:108
 msgid "You have finished the tour. Please enjoy Music Blocks!"
@@ -1716,7 +1715,7 @@ msgstr ""
 #: js/basicblocks.js:119
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
-msgstr ""
+msgstr "移调法"
 
 #: js/basicblocks.js:127
 #.TRANS: step down one note in current mode
@@ -1760,7 +1759,7 @@ msgstr "名"
 #: js/basicblocks.js:2707
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr ""
+msgstr "八度"
 
 #: js/basicblocks.js:172
 #.TRANS: convert piano key number (1-88) to pitch
@@ -1857,12 +1856,12 @@ msgstr ""
 #: js/basicblocks.js:363
 #.TRANS: flat is a half-step down in pitch
 msgid "flat"
-msgstr ""
+msgstr "降号"
 
 #: js/basicblocks.js:371
 #.TRANS: sharp is a half-step up in pitch
 msgid "sharp"
-msgstr ""
+msgstr "升号"
 
 #: js/basicblocks.js:379
 #: js/basicblocks.js:2696
@@ -1946,38 +1945,38 @@ msgstr ""
 
 #: js/basicblocks.js:515
 msgid "1/64 note"
-msgstr ""
+msgstr "六十四分音符"
 
 #: js/basicblocks.js:522
 msgid "1/32 note"
-msgstr ""
+msgstr "三十二分音符"
 
 #: js/basicblocks.js:529
 msgid "1/16 note"
-msgstr ""
+msgstr "十六分音符"
 
 #: js/basicblocks.js:536
 msgid "eighth note"
-msgstr ""
+msgstr "八分音符"
 
 #: js/basicblocks.js:543
 msgid "quarter note"
-msgstr ""
+msgstr "四分音符"
 
 #: js/basicblocks.js:550
 msgid "half note"
-msgstr ""
+msgstr "二分音符"
 
 #: js/basicblocks.js:557
 msgid "whole note"
-msgstr ""
+msgstr "全音符"
 
 #: js/basicblocks.js:565
 #: js/basicblocks.js:578
 #: js/basicblocks.js:590
 #.TRANS: A tuplet is a note value divided into irregular time values.
 msgid "tuplet"
-msgstr ""
+msgstr "连音"
 
 #: js/basicblocks.js:566
 #: js/basicblocks.js:579
@@ -1990,17 +1989,17 @@ msgstr ""
 #: js/basicblocks.js:601
 #.TRANS: A tuplet divided into 7 time values.
 msgid "septuplet"
-msgstr ""
+msgstr "七连音"
 
 #: js/basicblocks.js:609
 #.TRANS: A tuplet divided into 5 time values.
 msgid "quintuplet"
-msgstr ""
+msgstr "五连音"
 
 #: js/basicblocks.js:617
 #.TRANS: A tuplet divided into 3 time values.
 msgid "triplet"
-msgstr ""
+msgstr "三连音"
 
 #: js/basicblocks.js:624
 msgid "simple tuplet"
@@ -2108,12 +2107,12 @@ msgstr ""
 #: js/basicblocks.js:902
 #.TRANS: tie notes together into one longer note
 msgid "tie"
-msgstr ""
+msgstr "连结线"
 
 #: js/basicblocks.js:910
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 msgid "dot"
-msgstr ""
+msgstr "附点音符"
 
 #: js/basicblocks.js:917
 #: js/rhythmruler.js:327
@@ -2139,7 +2138,7 @@ msgstr ""
 
 #: js/basicblocks.js:1011
 msgid "beat"
-msgstr ""
+msgstr "节拍"
 
 #: js/basicblocks.js:1011
 #: js/basicblocks.js:2369
@@ -2217,11 +2216,11 @@ msgstr ""
 #: js/basicblocks.js:1126
 #: js/timbre.js:1041
 msgid "vibrato rate"
-msgstr ""
+msgstr "震音率"
 
 #: js/basicblocks.js:1126
 msgid "vibrato intensity"
-msgstr ""
+msgstr "震音强度"
 
 #: js/basicblocks.js:1139
 #: js/timbre.js:1435
@@ -2233,7 +2232,7 @@ msgstr ""
 #: js/timbre.js:1435
 #.TRANS: a wavering effect in a musical tone
 msgid "tremolo"
-msgstr ""
+msgstr "颤音"
 
 #: js/basicblocks.js:1151
 #: js/basicblocks.js:1166
@@ -2264,7 +2263,7 @@ msgstr ""
 #: js/basicblocks.js:1166
 #: js/timbre.js:1675
 msgid "octaves"
-msgstr ""
+msgstr "八度"
 
 #: js/basicblocks.js:1166
 #: js/timbre.js:1678
@@ -2275,7 +2274,7 @@ msgstr ""
 #: js/timbre.js:1435
 #.TRANS: musical effect to simulate a choral sound
 msgid "chorus"
-msgstr ""
+msgstr "合唱"
 
 #: js/basicblocks.js:1182
 msgid "delay"
@@ -2285,12 +2284,12 @@ msgstr ""
 #: js/timbre.js:1435
 #.TRANS: a rapid, slight variation in pitch
 msgid "vibrato"
-msgstr ""
+msgstr "震音"
 
 #: js/basicblocks.js:1197
 #: js/timbre.js:1524
 msgid "intensity"
-msgstr ""
+msgstr "强度"
 
 #: js/basicblocks.js:1208
 #.TRANS: select synthesizer
@@ -2302,14 +2301,14 @@ msgstr ""
 #.TRANS: legato: overlap successive notes
 #.TRANS: legato: overlap successive notes
 msgid "slur"
-msgstr ""
+msgstr "圆滑线"
 
 #: js/basicblocks.js:1229
 #: js/basicblocks.js:1248
 #.TRANS: play each note sharply detached from the others
 #.TRANS: play each note sharply detached from the others
 msgid "staccato"
-msgstr ""
+msgstr "断奏"
 
 #: js/basicblocks.js:1263
 #.TRANS: set the characteristics of a custom instrument
@@ -2486,12 +2485,12 @@ msgstr "笔的粗细"
 
 #: js/basicblocks.js:2034
 msgid "set font"
-msgstr ""
+msgstr "设置字形"
 
 #: js/basicblocks.js:2051
 #.TRANS: draw a line that has a hollow space down its center
 msgid "hollow line"
-msgstr ""
+msgstr "空心线"
 
 #: js/basicblocks.js:2059
 #.TRANS: fill in as a solid color
@@ -2516,11 +2515,11 @@ msgstr "设置笔的粗细"
 #: js/basicblocks.js:2092
 #.TRANS: set degree of translucence of the pen color
 msgid "set translucency"
-msgstr ""
+msgstr "设置透明度"
 
 #: js/basicblocks.js:2100
 msgid "set hue"
-msgstr ""
+msgstr 设置色调""
 
 #: js/basicblocks.js:2108
 msgid "set shade"
@@ -2632,7 +2631,7 @@ msgstr ""
 #: js/basicblocks.js:2428
 #: js/basicblocks.js:2447
 msgid "calculate"
-msgstr ""
+msgstr "计算"
 
 #: js/basicblocks.js:2476
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
@@ -2825,7 +2824,7 @@ msgstr "标题"
 
 #: js/basicblocks.js:2939
 msgid "save as lilypond"
-msgstr ""
+msgstr "储存为lilypond文件"
 
 #: js/basicblocks.js:2948
 msgid "save svg"
@@ -2845,7 +2844,7 @@ msgstr "隐藏积木块"
 
 #: js/basicblocks.js:2978
 msgid "open project"
-msgstr ""
+msgstr "打开项目"
 
 #: js/basicblocks.js:3002
 msgid "wait"
@@ -2865,22 +2864,22 @@ msgstr "音量"
 
 #: js/basicblocks.js:3037
 msgid "click"
-msgstr ""
+msgstr "点击"
 
 #: js/basicblocks.js:3045
 #: plugins/rodi.rtp:223
 msgid "blue"
-msgstr ""
+msgstr "蓝色"
 
 #: js/basicblocks.js:3052
 #: plugins/rodi.rtp:222
 msgid "green"
-msgstr ""
+msgstr "绿色"
 
 #: js/basicblocks.js:3059
 #: plugins/rodi.rtp:221
 msgid "red"
-msgstr ""
+msgstr "红色"
 
 #: js/basicblocks.js:3066
 #: plugins/rodi.rtp:220
@@ -3021,7 +3020,7 @@ msgstr ""
 #: js/basicblocks.js:3361
 #.TRANS: a gradual increase in loudness
 msgid "crescendo"
-msgstr ""
+msgstr "渐强"
 
 #: js/utilitybox.js:115
 msgid "Disable scrolling"
@@ -3029,7 +3028,7 @@ msgstr ""
 
 #: js/utilitybox.js:124
 msgid "Search"
-msgstr ""
+msgstr "搜索"
 
 #: js/playback.js:28
 #: js/playback.js:28
@@ -3041,7 +3040,7 @@ msgstr ""
 #: js/rhythmruler.js:1318
 #: js/rhythmruler.js:1318
 msgid "pause"
-msgstr ""
+msgstr "暂停"
 
 #: js/playback.js:31
 #: js/playback.js:31
@@ -3055,7 +3054,7 @@ msgstr ""
 
 #: js/timbre.js:510
 msgid "synthesizer"
-msgstr ""
+msgstr "电子合成器"
 
 #: js/timbre.js:597
 msgid "effects"
@@ -3094,19 +3093,19 @@ msgstr ""
 
 #: js/savebox.js:95
 msgid "Save as .tb"
-msgstr ""
+msgstr "储存为.tb文件"
 
 #: js/savebox.js:103
 msgid "Save as .svg"
-msgstr ""
+msgstr "储存为.svg文件"
 
 #: js/savebox.js:111
 msgid "Save as .png"
-msgstr ""
+msgstr "储存为.png文件"
 
 #: js/savebox.js:119
 msgid "Save as .wav"
-msgstr ""
+msgstr "储存为.wav文件"
 
 #: js/savebox.js:127
 msgid "Upload to Planet"
@@ -3233,7 +3232,7 @@ msgstr ""
 
 #: js/rhythmruler.js:1102
 msgid "save rhythms"
-msgstr ""
+msgstr "储存节奏"
 
 #: js/rhythmruler.js:1107
 msgid "save drum machine"
@@ -3293,7 +3292,7 @@ msgstr ""
 
 #: plugins/translate.rtp:73
 msgid "translate"
-msgstr ""
+msgstr "翻译"
 
 #: plugins/translate.rtp:78
 #: plugins/translate.rtp:89
@@ -3302,11 +3301,11 @@ msgstr "你好"
 
 #: plugins/translate.rtp:84
 msgid "detect lang"
-msgstr ""
+msgstr "检测语言"
 
 #: plugins/translate.rtp:95
 msgid "set lang"
-msgstr ""
+msgstr "设定语言"
 
 #: plugins/gmap.rtp:30
 msgid "city latitude"
@@ -3325,12 +3324,12 @@ msgstr ""
 
 #: plugins/gmap.rtp:116
 msgid "Google map"
-msgstr "Mapa de Google"
+msgstr "谷歌地图"
 
 #: plugins/gmap.rtp:116
 #: plugins/gmap.rtp:160
 msgid "coordinates"
-msgstr ""
+msgstr "坐标"
 
 #: plugins/gmap.rtp:116
 msgid "zoom factor"
@@ -3338,15 +3337,15 @@ msgstr ""
 
 #: plugins/gmap.rtp:144
 msgid "zoom"
-msgstr ""
+msgstr "放大"
 
 #: plugins/gmap.rtp:160
 msgid "latitude"
-msgstr ""
+msgstr "纬度"
 
 #: plugins/gmap.rtp:160
 msgid "longitude"
-msgstr ""
+msgstr "经度"
 
 #: plugins/maths.rtp:47
 msgid "power"
@@ -3454,39 +3453,39 @@ msgstr ""
 
 #: plugins/nutrition.rtp:158
 msgid "apple"
-msgstr ""
+msgstr "苹果"
 
 #: plugins/nutrition.rtp:161
 msgid "banana"
-msgstr ""
+msgstr "香蕉"
 
 #: plugins/nutrition.rtp:164
 msgid "orange"
-msgstr ""
+msgstr "橙子"
 
 #: plugins/nutrition.rtp:167
 msgid "wheat bread"
-msgstr ""
+msgstr "小麦面包"
 
 #: plugins/nutrition.rtp:170
 msgid "corn"
-msgstr ""
+msgstr "玉米"
 
 #: plugins/nutrition.rtp:173
 msgid "potato"
-msgstr ""
+msgstr "马铃薯"
 
 #: plugins/nutrition.rtp:176
 msgid "sweet potato"
-msgstr ""
+msgstr "甘薯"
 
 #: plugins/nutrition.rtp:179
 msgid "tomato"
-msgstr ""
+msgstr "番茄"
 
 #: plugins/nutrition.rtp:182
 msgid "broccoli"
-msgstr ""
+msgstr "西兰花"
 
 #: plugins/nutrition.rtp:185
 msgid "rice and beans"
@@ -3498,35 +3497,35 @@ msgstr ""
 
 #: plugins/nutrition.rtp:191
 msgid "cheese"
-msgstr ""
+msgstr "乳酪"
 
 #: plugins/nutrition.rtp:194
 msgid "chicken"
-msgstr ""
+msgstr "鸡肉"
 
 #: plugins/nutrition.rtp:197
 msgid "fish"
-msgstr ""
+msgstr "鱼肉"
 
 #: plugins/nutrition.rtp:200
 msgid "beef"
-msgstr ""
+msgstr "牛肉"
 
 #: plugins/nutrition.rtp:203
 msgid "cake"
-msgstr ""
+msgstr "蛋糕"
 
 #: plugins/nutrition.rtp:206
 msgid "cookie"
-msgstr ""
+msgstr "曲奇饼"
 
 #: plugins/nutrition.rtp:209
 msgid "water"
-msgstr ""
+msgstr "水"
 
 #: plugins/bitcoin.rtp:27
 msgid "bitcoin"
-msgstr ""
+msgstr 比特币""
 
 #: plugins/facebook.rtp:27
 msgid "publish"
@@ -3599,7 +3598,7 @@ msgstr ""
 
 #: plugins/rodi.rtp:269
 msgid "light intensity"
-msgstr ""
+msgstr "光强度"
 
 #: plugins/rodi.rtp:286
 msgid "infrared light (left)"
@@ -3620,7 +3619,7 @@ msgstr ""
 #: plugins/heap.rtp:81
 #: plugins/heap.rtp:85
 msgid "You need to select a file."
-msgstr ""
+msgstr "你必须选择文件"
 
 #~msgid "crescendo factor"
 #~msgstr ""
@@ -3635,12 +3634,12 @@ msgstr ""
 #: js/musicutils.js:217
 
 #~msgid "Minor"
-#~msgstr ""
+#~msgstr "小调音阶"
 
 #: js/musicutils.js:215
 
 #~msgid "Mixolydian"
-#~msgstr ""
+#~msgstr "米索利地安调式"
 
 #: js/basicblocks.js:298
 
@@ -3683,7 +3682,7 @@ msgstr ""
 #: plugins/rodi.rtp:169
 
 #~msgid "sing"
-#~msgstr ""
+#~msgstr "唱"
 
 #: js/musicutils.js:203
 
@@ -3710,7 +3709,7 @@ msgstr ""
 #: js/basicblocks.js:3151
 
 #~msgid "set volume"
-#~msgstr ""
+#~msgstr "设至音量"
 
 #: plugins/rodi.rtp:91
 
@@ -3794,7 +3793,7 @@ msgstr ""
 #: js/musicutils.js:291
 
 #~msgid "pentatonic"
-#~msgstr ""
+#~msgstr "五声音阶"
 
 #: js/musicutils.js:244
 
@@ -3810,7 +3809,7 @@ msgstr ""
 #: js/musicutils.js:251
 
 #~msgid "Japanese"
-#~msgstr ""
+#~msgstr "日本"
 
 #: js/logo.js:4945
 
