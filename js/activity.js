@@ -685,7 +685,10 @@ define(MYDEFINES, function (compatibility) {
             }, 500);
         };
 
-        function doCompile() {
+        function doCompile(recording) {
+            if (recording === undefined) {
+                recording = false;
+            }
             // Show busy cursor.
             document.body.style.cursor = 'wait';
 
@@ -693,7 +696,9 @@ define(MYDEFINES, function (compatibility) {
             // Suppress music and turtle output when generating
             // compiled output.
             logo.playbackQueue = {};
+            logo.playbackTime = 0;
             logo.compiling = true;
+            logo.recording = recording;
             logo.runLogoCommands();
         };
 
@@ -2059,10 +2064,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSaveWAV() {
-            document.body.style.cursor = 'wait';
+            //document.body.style.cursor = 'wait';
             console.log('Recording');
-            logo.recording = true;
-            logo.runLogoCommands();
+            //logo.recording = true;
+            //logo.runLogoCommands();
+            doCompile(true);
         };
 
         function doUploadToPlanet() {

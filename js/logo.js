@@ -1151,11 +1151,6 @@ function Logo () {
                     that.onRunTurtle();
                 }
 
-                if (that.recording){
-                    that.synth.recorder.clear();
-                    that.synth.recorder.record();
-                }
-
                 // If there are start blocks, run them all.
                 for (var b = 0; b < startBlocks.length; b++) {
                     if (that.blocks.blockList[startBlocks[b]].name !== 'status') {
@@ -5751,21 +5746,22 @@ function Logo () {
 
                     // Give the last note time to play.
                     setTimeout(function () {
-                        that.suppressOutput[turtle] = false;
-                        that.checkingCompletionState = false;
-
-                        // Reset the cursor...
-                        document.body.style.cursor = 'default';
-
-                        if (that.recording){
-                            console.log('finishing recording');
-                            that.synth.recorder.stop();
-                            that.synth.recorder.exportWAV(that.synth.download);
+                        if (that.suppressOutput[turtle]&&that.recording) {
+                            that.suppressOutput[turtle] = false;
+                            that.checkingCompletionState = false;
+                            that.saveLocally();
+                            that.playback(-1,true);
                             that.recording = false;
-                        }
+                        } else {
+                            that.suppressOutput[turtle] = false;
+                            that.checkingCompletionState = false;
 
-                        // And save the session.
-                        that.saveLocally();
+                            // Reset the cursor...
+                            document.body.style.cursor = 'default';
+
+                            // And save the session.
+                            that.saveLocally();
+                        }
                     }, 1000);
                 } else if (that.suppressOutput[turtle]) {
                     setTimeout(function () {
@@ -6493,7 +6489,13 @@ function Logo () {
         this.pushedNote[turtle] = false;
     };
 
-    this.playback = function (whichMouse) {
+    this.playback = function (whichMouse, recording) {
+        if (recording === undefined) {
+            recording = false;
+        }
+        if (recording){
+            this.playbackTime = 0;
+        }
         if (this.turtles.running()) {
             if (this.playbackTime === 0) {
                 return;
@@ -6662,6 +6664,14 @@ function Logo () {
                     if (!that.turtles.running()) {
                         that.onStopTurtle();
                         that.playbackTime = 0;
+                        if (recording){
+                            setTimeout(function(){
+                                console.log('finishing recording');
+                                that.synth.recorder.stop();
+                                that.synth.recorder.exportWAV(that.synth.download);
+                                that.recording = false;
+                            },2000);
+                        }
                     }
                 }
             } else {
@@ -6692,14 +6702,21 @@ function Logo () {
         this.onRunTurtle();
         this.stopTurtle = false;
 
+        if (recording){
+            this.synth.recorder.clear();
+            this.synth.recorder.record();
+        }
+
         if (whichMouse < 0) {
             for (var turtle in this.playbackQueue) {
                 if (this.playbackQueue[turtle].length > 0) {
                     if (turtle < this.turtles.turtleList.length) {
                         this.turtles.turtleList[turtle].running = true;
                     }
-
-                    if (this.playbackTime > 0) {
+                    if (recording){
+                        console.log('recording');
+                        __playback(turtle);
+                    } else if (this.playbackTime > 0) {
                         console.log('resuming play at ' + this.playbackTime);
                         __resumePlayback(turtle);
                     } else {
