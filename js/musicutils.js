@@ -342,7 +342,7 @@ var VOICENAMES = [
     //.TRANS: simple monotone synthesizer
     [_('simple 4'), 'mono4', 'images/synth.svg'],
     //.TRANS: white noise synthesizer
-    [_('white noise'), 'noise', 'images/synth.svg'],
+    [_('white noise'), 'noise1', 'images/synth.svg'],
     //.TRANS: brown noise synthesizer
     [_('brown noise'), 'noise2', 'images/synth.svg'],
     //.TRANS: pink noise synthesizer
@@ -1639,7 +1639,7 @@ function Synth() {
         'sawtooth': 1,
         'square': 1,
         'pluck': 1,
-        'noise': 1,
+        'noise1': 1,
         'noise2': 1,
         'noise3': 1,
         'poly': 1,
@@ -1725,7 +1725,7 @@ function Synth() {
                 }
             };
             break;
-        case 'noise':
+        case 'noise1':
             var synthOptions = {
                 'noise': {
                     'type': 'white'
@@ -1925,7 +1925,7 @@ function Synth() {
             console.log('poly');
             var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
             break;
-        case 'noise':
+        case 'noise1':
         case 'noise2':
         case 'noise3':
             instrumentsSource[instrumentName] = [4, sourceName];
