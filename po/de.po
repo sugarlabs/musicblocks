@@ -47,6 +47,12 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr "Zurücksetzen"
 
@@ -54,7 +60,7 @@ msgstr "Zurücksetzen"
 #: js/block.js:2072
 #: js/block.js:2081
 #: js/block.js:2093
-#: js/activity.js:1798
+#: js/activity.js:1800
 #: js/analytics.js:380
 #: js/palette.js:646
 #: js/palette.js:655
@@ -64,7 +70,7 @@ msgstr "Zurücksetzen"
 #: js/palette.js:1898
 #: js/palette.js:1909
 #: js/palette.js:1920
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:1003
 #: js/basicblocks.js:1014
 #: js/basicblocks.js:2373
@@ -115,7 +121,7 @@ msgstr "Status"
 #: js/block.js:676
 #: js/palette.js:694
 #: js/turtle.js:406
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:924
 #: js/basicblocks.js:1845
 msgid "drum"
@@ -228,173 +234,173 @@ msgstr "Auf meinem Gerät"
 msgid "Worldwide"
 msgstr "Weltweit"
 
-#: js/activity.js:543
+#: js/activity.js:545
 #.TRANS: hide Polar coordinate overlay grid
 msgid "hide grid"
 msgstr ""
 
-#: js/activity.js:550
-#: js/activity.js:556
-#: js/activity.js:2912
-#: js/activity.js:2924
-#: js/turtledefs.js:98
+#: js/activity.js:552
+#: js/activity.js:558
+#: js/activity.js:2914
+#: js/activity.js:2926
+#: js/turtledefs.js:100
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
 msgstr "Kartesisch"
 
-#: js/activity.js:556
-#: js/activity.js:563
-#: js/activity.js:2912
-#: js/activity.js:2924
-#: js/turtledefs.js:98
-#: js/turtledefs.js:99
+#: js/activity.js:558
+#: js/activity.js:565
+#: js/activity.js:2914
+#: js/activity.js:2926
+#: js/turtledefs.js:100
+#: js/turtledefs.js:101
 #.TRANS: show Polar coordinate overlay grid
 msgid "Polar"
 msgstr "Polar"
 
-#: js/activity.js:580
+#: js/activity.js:582
 msgid "Close"
 msgstr "Schließen"
 
-#: js/activity.js:927
-#: js/activity.js:961
-#: js/activity.js:985
-#: js/activity.js:1002
+#: js/activity.js:929
+#: js/activity.js:963
+#: js/activity.js:987
+#: js/activity.js:1004
 msgid "Cannot load project from the file. Please check the file type."
 msgstr ""
 
-#: js/activity.js:1450
+#: js/activity.js:1452
 msgid "This block is deprecated."
 msgstr ""
 
-#: js/activity.js:1452
+#: js/activity.js:1454
 msgid "Block cannot be found."
 msgstr ""
 
-#: js/activity.js:2815
-#: js/activity.js:2828
-#: js/turtledefs.js:78
+#: js/activity.js:2817
+#: js/activity.js:2830
+#: js/turtledefs.js:80
 msgid "Run fast"
 msgstr "Schnell abspielen"
 
-#: js/activity.js:2815
-#: js/activity.js:2828
+#: js/activity.js:2817
+#: js/activity.js:2830
 msgid "long press to run slowly"
 msgstr ""
 
-#: js/activity.js:2815
+#: js/activity.js:2817
 msgid "extra-long press to run music slowly"
 msgstr ""
 
-#: js/activity.js:2816
-#: js/activity.js:2829
-#: js/turtledefs.js:81
+#: js/activity.js:2818
+#: js/activity.js:2831
+#: js/turtledefs.js:83
 msgid "Run step by step"
 msgstr "Schritt für Schritt abspielen"
 
-#: js/activity.js:2817
-#: js/turtledefs.js:82
+#: js/activity.js:2819
+#: js/turtledefs.js:84
 msgid "Run note by note"
 msgstr "Note für Note abspielen"
 
-#: js/activity.js:2818
-#: js/activity.js:2830
-#: js/turtledefs.js:83
+#: js/activity.js:2820
+#: js/activity.js:2832
+#: js/turtledefs.js:85
 msgid "Stop"
 msgstr "Anhalten"
 
-#: js/activity.js:2819
-#: js/activity.js:2831
-#: js/turtledefs.js:84
+#: js/activity.js:2821
+#: js/activity.js:2833
+#: js/turtledefs.js:86
 msgid "Clean"
 msgstr "Alles löschen"
 
-#: js/activity.js:2820
-#: js/turtledefs.js:85
+#: js/activity.js:2822
+#: js/turtledefs.js:87
 msgid "Show/hide palettes"
 msgstr "Paletten zeigen/verbergen"
 
-#: js/activity.js:2821
-#: js/activity.js:2832
-#: js/turtledefs.js:86
-msgid "Show/hide blocks"
-msgstr "Blöcke zeigen/verbergen"
-
-#: js/activity.js:2822
-#: js/activity.js:2833
-#: js/turtledefs.js:87
-msgid "Expand/collapse collapsable blocks"
-msgstr "Klappbare Blöcke ausklappen/einklappen "
-
 #: js/activity.js:2823
 #: js/activity.js:2834
-#: js/activity.js:2873
 #: js/turtledefs.js:88
-msgid "Home"
-msgstr "Home"
+msgid "Show/hide blocks"
+msgstr "Blöcke zeigen/verbergen"
 
 #: js/activity.js:2824
 #: js/activity.js:2835
 #: js/turtledefs.js:89
+msgid "Expand/collapse collapsable blocks"
+msgstr "Klappbare Blöcke ausklappen/einklappen "
+
+#: js/activity.js:2825
+#: js/activity.js:2836
+#: js/activity.js:2875
+#: js/turtledefs.js:90
+msgid "Home"
+msgstr "Home"
+
+#: js/activity.js:2826
+#: js/activity.js:2837
+#: js/turtledefs.js:91
 msgid "Help"
 msgstr "Hilfe"
-
-#: js/activity.js:2908
-#: js/activity.js:2920
-#: js/turtledefs.js:91
-msgid "Load samples from server"
-msgstr "Lade Beispiele vom Server"
-
-#: js/activity.js:2909
-#: js/activity.js:2921
-#: js/turtledefs.js:92
-msgid "Load project from files"
-msgstr "Projet aus Dateien laden"
 
 #: js/activity.js:2910
 #: js/activity.js:2922
 #: js/turtledefs.js:93
+msgid "Load samples from server"
+msgstr "Lade Beispiele vom Server"
+
+#: js/activity.js:2911
+#: js/activity.js:2923
+#: js/turtledefs.js:94
+msgid "Load project from files"
+msgstr "Projet aus Dateien laden"
+
+#: js/activity.js:2912
+#: js/activity.js:2924
+#: js/turtledefs.js:95
 msgid "Save project"
 msgstr "Projekt speichern"
 
-#: js/activity.js:2911
+#: js/activity.js:2913
 msgid "Long press on blocks to copy."
 msgstr ""
 
-#: js/activity.js:2911
+#: js/activity.js:2913
 msgid "Click here to paste."
 msgstr ""
 
-#: js/activity.js:2913
-#: js/activity.js:2925
+#: js/activity.js:2915
+#: js/activity.js:2927
 msgid "playback"
 msgstr ""
 
-#: js/activity.js:2914
-#: js/activity.js:2926
-#: js/turtledefs.js:100
+#: js/activity.js:2916
+#: js/activity.js:2928
+#: js/turtledefs.js:102
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: js/activity.js:2915
-#: js/activity.js:2927
-#: js/turtledefs.js:106
+#: js/activity.js:2917
+#: js/activity.js:2929
+#: js/turtledefs.js:108
 msgid "Delete all"
 msgstr "Alles löschen"
 
-#: js/activity.js:2916
-#: js/activity.js:2928
-#: js/turtledefs.js:107
+#: js/activity.js:2918
+#: js/activity.js:2930
+#: js/turtledefs.js:109
 msgid "Undo"
 msgstr "Rückgängig machen"
 
-#: js/activity.js:2923
-#: js/turtledefs.js:96
+#: js/activity.js:2925
+#: js/turtledefs.js:98
 msgid "Paste"
 msgstr "Einfügen"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:636
 #: js/basicblocks.js:651
 #: js/rhythmruler.js:911
@@ -404,7 +410,7 @@ msgid "rhythm"
 msgstr "Rhythmus"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:421
 #: js/basicblocks.js:3021
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
@@ -412,45 +418,45 @@ msgid "pitch"
 msgstr "Tonlage"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "tone"
 msgstr "Ton"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/playback.js:191
 #: js/lilypond.js:16
 msgid "mouse"
 msgstr "Maus"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "pen"
 msgstr "Stift"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:399
 msgid "number"
 msgstr "Zahl"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "flow"
 msgstr "Programmfluss"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "sensors"
 msgstr "Sensoren"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "media"
 msgstr "Medien"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "mice"
 msgstr ""
 
@@ -1452,263 +1458,267 @@ msgstr "Notenwert"
 msgid "tuplet value"
 msgstr "Triolenwert"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:17
+msgid "Music Blocks is a collection of tools for exploring musical concepts."
+msgstr ""
+
+#: js/turtledefs.js:23
 #: js/basicblocks.js:1047
 #.TRANS: musical meter (time signature)
 msgid "meter"
 msgstr "Meter"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "intervals"
 msgstr "Intervalle"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:3322
 msgid "volume"
 msgstr ""
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "boxes"
 msgstr "Kästen"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "widgets"
 msgstr "Widgets"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "boolean"
 msgstr "logisch"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "heap"
 msgstr "Stapel"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "extras"
 msgstr "Extras"
 
-#: js/turtledefs.js:73
+#: js/turtledefs.js:75
 msgid "Welcome to Music Blocks"
 msgstr "Willkommen bei „Music Blocks“ "
 
-#: js/turtledefs.js:73
+#: js/turtledefs.js:75
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
 msgstr "“Music Blocks ist eine Sammlung von Tools um die grundlegenden Konzepte der Musik mit Spaß zu entdecken"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Meet Mr. Mouse!"
 msgstr "Lerne Herr Maus kennen"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Mr Mouse is our Music Blocks conductor."
 msgstr "Herr Maus ist der Dirigent bei „Music Blocks“"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Mr Mouse encourages you to explore Music Blocks."
 msgstr "Herr Maus will, dass du „Music Blocks“ kennenlernst"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Let us start our tour!"
 msgstr "Lass uns die Tour beginnen"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 #.TRANS: Please add commas to list: Matrix, Notes, Tone, Turtle, and more.
 #.TRANS: the buttons used to open various palettes of blocks
 msgid "Palette buttons"
 msgstr "Mehrere Blöcke öffnen"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
 msgstr "Diese Toolbar enthält die Paletten Matrix, Notenschildkröte and more"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr "Klicke hier um die Paletten von Blöcken anzuzeigen und ziehe de Blöcke von der Palette auf die Arbeitsfläche, um sie zu benutzen"
 
-#: js/turtledefs.js:78
+#: js/turtledefs.js:80
 msgid "Click to run the project in fast mode."
 msgstr "Klicke hier um dein Projekt abzuspielen"
 
-#: js/turtledefs.js:79
+#: js/turtledefs.js:81
 msgid "Run slow"
 msgstr "Langsam abspielen"
 
-#: js/turtledefs.js:79
+#: js/turtledefs.js:81
 msgid "Click to run the project in slow mode."
 msgstr "Klicke hier um dein Projekt langsam abzuspielen"
 
-#: js/turtledefs.js:80
+#: js/turtledefs.js:82
 msgid "Run music slow"
 msgstr "Musik langsam abspielen"
 
-#: js/turtledefs.js:80
+#: js/turtledefs.js:82
 msgid "Click to run just the music in slow mode."
 msgstr "Klicke hier um die Musik langsam abzuspielen"
 
-#: js/turtledefs.js:81
+#: js/turtledefs.js:83
 msgid "Click to run the project step by step."
 msgstr "Klicke hier um dein Projekt Schritt für Schritt abzuspielen"
 
-#: js/turtledefs.js:82
+#: js/turtledefs.js:84
 msgid "Click to run the music note by note."
 msgstr "Klicke hier um deine Musik Note für Note abzuspielen"
 
-#: js/turtledefs.js:83
+#: js/turtledefs.js:85
 msgid "Stop the music (and the turtles)."
 msgstr "Musik anhalten (auch die Schildkröten)"
 
-#: js/turtledefs.js:84
+#: js/turtledefs.js:86
 msgid "Clear the screen and return the turtles to their initial positions."
 msgstr "Lösche den Bildschirm und bring die Schildkröten in ihre Ausgangsposition zurück"
 
-#: js/turtledefs.js:85
+#: js/turtledefs.js:87
 msgid "Hide or show the block palettes."
 msgstr "Verberge/zeige die Block-Paletten"
 
-#: js/turtledefs.js:86
+#: js/turtledefs.js:88
 msgid "Hide or show the blocks and the palettes."
 msgstr "Verberge/Zeige die Blöcke und die Paletten"
 
-#: js/turtledefs.js:87
+#: js/turtledefs.js:89
 msgid "Expand or collapse start and action stacks."
 msgstr "Klape die Start- und Aktionsstapel aus/ein"
 
-#: js/turtledefs.js:88
+#: js/turtledefs.js:90
 msgid "Return all blocks to the center of the screen."
 msgstr "Zeige alle Blocks in der Mitte der Arbeitsfläche"
 
-#: js/turtledefs.js:89
+#: js/turtledefs.js:91
 msgid "Show these messages."
 msgstr "Diese Meldungen anzeigen"
 
-#: js/turtledefs.js:90
+#: js/turtledefs.js:92
 msgid "Expand/collapse option toolbar"
 msgstr "Optionen-Toolbar aus-/einklappen"
 
-#: js/turtledefs.js:90
+#: js/turtledefs.js:92
 msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "Klicke hier um die Hilfeleiste aus- oder einzuklappen"
 
-#: js/turtledefs.js:91
+#: js/turtledefs.js:93
 msgid "This button opens a viewer for loading example projects."
 msgstr "Klicke hier um eine Vorschau mit Beispielen zu laden"
 
-#: js/turtledefs.js:92
+#: js/turtledefs.js:94
 msgid "You can also load projects from the file system."
 msgstr "Du kannst auch Projekte aus deinen Dateien laden"
 
-#: js/turtledefs.js:93
+#: js/turtledefs.js:95
 msgid "Save your project to a file."
 msgstr "Speichere dein Projekt als Datei"
 
-#: js/turtledefs.js:94
+#: js/turtledefs.js:96
 #: js/savebox.js:136
 msgid "Save sheet music"
 msgstr "Notenblätter speichern"
 
-#: js/turtledefs.js:94
+#: js/turtledefs.js:96
 msgid "Save your project to as a Lilypond file."
 msgstr "Speichere dein Projekt als Lilypond Datei"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 msgid "Copy"
 msgstr "Kopieren"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 msgid "To copy a stack to the clipboard, do a long press on the stack."
 msgstr "Um einen Stapel in die Zwischenablage zu kopieren, halte ihn gedrückt"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 msgid "The Paste Button will highlight."
 msgstr "Einfügen wird aufzeigen"
 
-#: js/turtledefs.js:96
+#: js/turtledefs.js:98
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
 msgstr "Einfügen ist möglich, wenn du Blöcke in die Zwischenablage kopiert hast"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 #: js/blocks.js:249
 msgid "Save stack"
 msgstr "Stapel speichern"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 msgid "The save-stack button saves a stack onto a custom palette."
 msgstr "Stapel speichern speichert Stapel in der benutzerdefinierten Palette"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 msgid "It appears after a long press on a stack."
 msgstr "Stapel speichern wird nach einem langen Klick auf einen Stapel angezeigt"
 
-#: js/turtledefs.js:98
+#: js/turtledefs.js:100
 msgid "Show or hide a coordinate grid."
 msgstr ""
 
-#: js/turtledefs.js:99
+#: js/turtledefs.js:101
 msgid "Show or hide a polar-coordinate grid."
 msgstr "Zeige oder verberge das Polarkoordinartensystem"
 
-#: js/turtledefs.js:100
+#: js/turtledefs.js:102
 msgid "Open a panel for configuring Music Blocks."
 msgstr "Öffne ein … um „Music Blocks“ zu konfigurieren"
 
-#: js/turtledefs.js:101
+#: js/turtledefs.js:103
 #: js/utilitybox.js:74
 msgid "Decrease block size"
 msgstr "Blockgröße verringern"
 
-#: js/turtledefs.js:101
+#: js/turtledefs.js:103
 msgid "Decrease the size of the blocks."
 msgstr "Verringere die Blockgröße"
 
-#: js/turtledefs.js:102
+#: js/turtledefs.js:104
 #: js/utilitybox.js:82
 msgid "Increase block size"
 msgstr "Blockgröße vergrößern"
 
-#: js/turtledefs.js:102
+#: js/turtledefs.js:104
 msgid "Increase the size of the blocks."
 msgstr "Vergrößere die Blockgröße"
 
-#: js/turtledefs.js:103
+#: js/turtledefs.js:105
 #: js/utilitybox.js:90
 msgid "Display statistics"
 msgstr "Statistiken anzeigen"
 
-#: js/turtledefs.js:103
+#: js/turtledefs.js:105
 msgid "Display statistics about your Music project."
 msgstr "Zeige Statistiken über dein Music Project"
 
-#: js/turtledefs.js:104
+#: js/turtledefs.js:106
 #: js/utilitybox.js:98
 msgid "Load plugin from file"
 msgstr "Plug-In aus Datei laden"
 
-#: js/turtledefs.js:104
+#: js/turtledefs.js:106
 msgid "You can load new blocks from the file system."
 msgstr "Du kannst neue Blocks aus den Dateien laden"
 
-#: js/turtledefs.js:105
+#: js/turtledefs.js:107
 #: js/utilitybox.js:106
 msgid "Enable scrolling"
 msgstr "Scrollen aktivieren"
 
-#: js/turtledefs.js:105
+#: js/turtledefs.js:107
 msgid "You can scroll the blocks on the canvas."
 msgstr "Du kannst die Blocke auf der Arbeitsfläche bewegen"
 
-#: js/turtledefs.js:106
+#: js/turtledefs.js:108
 msgid "Remove all content on the canvas, including the blocks."
 msgstr "Inhalt der Arbeitsfläche löschen, das beinhaltet auch alle Blöcke"
 
-#: js/turtledefs.js:107
+#: js/turtledefs.js:109
 msgid "Restore blocks from the trash."
 msgstr "Blöcke wiederherstellen"
 
-#: js/turtledefs.js:108
+#: js/turtledefs.js:110
 msgid "Congratulations."
 msgstr "Herzlichen Glückwunsch!"
 
-#: js/turtledefs.js:108
+#: js/turtledefs.js:110
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "Du hast die Tour abgeschlossen. Jetzt kannst du mit „Music Blocks“ anfangen"
 
@@ -3719,6 +3729,11 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Hindu"
 #~msgstr "Hinduistisch"
 
+#: js/musicutils.js:226
+
+#~msgid "Arabic"
+#~msgstr "Arabisch"
+
 #: js/logo.js:2177
 
 #: js/logo.js:7716
@@ -4142,11 +4157,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Chromatic"
 #~msgstr "farbig"
-
-#: js/musicutils.js:226
-
-#~msgid "Arabic"
-#~msgstr "Arabisch"
 
 #: js/logo.js:4851
 

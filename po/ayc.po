@@ -52,6 +52,12 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 #.TRANS: descanso
 msgid "rest"
 msgstr "samart'a"
@@ -60,7 +66,7 @@ msgstr "samart'a"
 #: js/block.js:2072
 #: js/block.js:2081
 #: js/block.js:2093
-#: js/activity.js:1798
+#: js/activity.js:1800
 #: js/analytics.js:380
 #: js/palette.js:646
 #: js/palette.js:655
@@ -70,7 +76,7 @@ msgstr "samart'a"
 #: js/palette.js:1898
 #: js/palette.js:1909
 #: js/palette.js:1920
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:1003
 #: js/basicblocks.js:1014
 #: js/basicblocks.js:2373
@@ -125,7 +131,7 @@ msgstr "kasta"
 #: js/block.js:676
 #: js/palette.js:694
 #: js/turtle.js:406
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:924
 #: js/basicblocks.js:1845
 #.TRANS: tambor
@@ -257,202 +263,202 @@ msgstr "wakichatanaka machaqa imaña"
 msgid "Worldwide"
 msgstr "Aka pachana"
 
-#: js/activity.js:543
+#: js/activity.js:545
 #.TRANS: hide Polar coordinate overlay grid
 #.TRANS: ocultar las rejillas de coordenadas
 msgid "hide grid"
 msgstr ""
 
-#: js/activity.js:550
-#: js/activity.js:556
-#: js/activity.js:2912
-#: js/activity.js:2924
-#: js/turtledefs.js:98
+#: js/activity.js:552
+#: js/activity.js:558
+#: js/activity.js:2914
+#: js/activity.js:2926
+#: js/turtledefs.js:100
 #.TRANS: show Cartesian coordinate overlay grid
 #.TRANS: Cartesiano
 msgid "Cartesian"
 msgstr "Cartesiano wakichata"
 
-#: js/activity.js:556
-#: js/activity.js:563
-#: js/activity.js:2912
-#: js/activity.js:2924
-#: js/turtledefs.js:98
-#: js/turtledefs.js:99
+#: js/activity.js:558
+#: js/activity.js:565
+#: js/activity.js:2914
+#: js/activity.js:2926
+#: js/turtledefs.js:100
+#: js/turtledefs.js:101
 #.TRANS: show Polar coordinate overlay grid
 #.TRANS: Polar
 msgid "Polar"
 msgstr "Polar wakichata"
 
-#: js/activity.js:580
+#: js/activity.js:582
 #.TRANS: Cerrar
 msgid "Close"
 msgstr "Jist'aña"
 
-#: js/activity.js:927
-#: js/activity.js:961
-#: js/activity.js:985
-#: js/activity.js:1002
+#: js/activity.js:929
+#: js/activity.js:963
+#: js/activity.js:987
+#: js/activity.js:1004
 #.TRANS: No se puede cargar el proyecto desde el archivo. Compruebe el tipo de archivo.
 msgid "Cannot load project from the file. Please check the file type."
 msgstr ""
 
-#: js/activity.js:1450
+#: js/activity.js:1452
 #.TRANS: Este bloque está en desuso.
 msgid "This block is deprecated."
 msgstr ""
 
-#: js/activity.js:1452
+#: js/activity.js:1454
 #.TRANS: Este bloque no se puede encontrar.
 msgid "Block cannot be found."
 msgstr ""
 
-#: js/activity.js:2815
-#: js/activity.js:2828
-#: js/turtledefs.js:78
+#: js/activity.js:2817
+#: js/activity.js:2830
+#: js/turtledefs.js:80
 #.TRANS: Ejecutar rápidamente
 msgid "Run fast"
 msgstr "k’ataki qhantayaña"
 
-#: js/activity.js:2815
-#: js/activity.js:2828
+#: js/activity.js:2817
+#: js/activity.js:2830
 #.TRANS: largo presione para ejecutar lento
 msgid "long press to run slowly"
 msgstr ""
 
-#: js/activity.js:2815
+#: js/activity.js:2817
 #.TRANS: extra-largo presione para ejecutar música lenta
 msgid "extra-long press to run music slowly"
 msgstr ""
 
-#: js/activity.js:2816
-#: js/activity.js:2829
-#: js/turtledefs.js:81
+#: js/activity.js:2818
+#: js/activity.js:2831
+#: js/turtledefs.js:83
 #.TRANS: Ejecutar paso a paso
 msgid "Run step by step"
 msgstr "mayata mayata qhantayaña"
 
-#: js/activity.js:2817
-#: js/turtledefs.js:82
+#: js/activity.js:2819
+#: js/turtledefs.js:84
 #.TRANS: Ejecutar nota a nota
 msgid "Run note by note"
 msgstr "Run sapa chimputa chimpuru"
 
-#: js/activity.js:2818
-#: js/activity.js:2830
-#: js/turtledefs.js:83
+#: js/activity.js:2820
+#: js/activity.js:2832
+#: js/turtledefs.js:85
 #.TRANS: Detener
 msgid "Stop"
 msgstr "Sayt’ayaña"
 
-#: js/activity.js:2819
-#: js/activity.js:2831
-#: js/turtledefs.js:84
+#: js/activity.js:2821
+#: js/activity.js:2833
+#: js/turtledefs.js:86
 #.TRANS: Limpiar
 msgid "Clean"
 msgstr "Mayampi qalltañataki wakichaña"
 
-#: js/activity.js:2820
-#: js/turtledefs.js:85
+#: js/activity.js:2822
+#: js/turtledefs.js:87
 #.TRANS: Mostrar u ocultar las paletas
 msgid "Show/hide palettes"
 msgstr "wakichaña apanaqañanaka uñachayaña jani ukaxa chhaqtayaña"
 
-#: js/activity.js:2821
-#: js/activity.js:2832
-#: js/turtledefs.js:86
+#: js/activity.js:2823
+#: js/activity.js:2834
+#: js/turtledefs.js:88
 #.TRANS: Mostrar u ocultar los bloques.
 msgid "Show/hide blocks"
 msgstr "wakichata siqinaka uñstayaña imantaña"
 
-#: js/activity.js:2822
-#: js/activity.js:2833
-#: js/turtledefs.js:87
+#: js/activity.js:2824
+#: js/activity.js:2835
+#: js/turtledefs.js:89
 #.TRANS: Expandir o colapsar los bloques colapsables\t
 msgid "Expand/collapse collapsable blocks"
 msgstr "japhalla wakichata siqinaka jach’aptayaña jani uka chhaqtayaña"
 
-#: js/activity.js:2823
-#: js/activity.js:2834
-#: js/activity.js:2873
-#: js/turtledefs.js:88
+#: js/activity.js:2825
+#: js/activity.js:2836
+#: js/activity.js:2875
+#: js/turtledefs.js:90
 #.TRANS: Casa
 msgid "Home"
 msgstr "Uta"
 
-#: js/activity.js:2824
-#: js/activity.js:2835
-#: js/turtledefs.js:89
+#: js/activity.js:2826
+#: js/activity.js:2837
+#: js/turtledefs.js:91
 #.TRANS: Ayuda
 msgid "Help"
 msgstr "Yanapa"
 
-#: js/activity.js:2908
-#: js/activity.js:2920
-#: js/turtledefs.js:91
+#: js/activity.js:2910
+#: js/activity.js:2922
+#: js/turtledefs.js:93
 #.TRANS: Cargar ejemplos desde el servidor
 msgid "Load samples from server"
 msgstr "wakichata apanaqañata yant'äwinaka qhantayaña"
 
-#: js/activity.js:2909
-#: js/activity.js:2921
-#: js/turtledefs.js:92
+#: js/activity.js:2911
+#: js/activity.js:2923
+#: js/turtledefs.js:94
 #.TRANS: Cargar proyecto de archivos
 msgid "Load project from files"
 msgstr "Wakichäwi taypina imata wakichatanaka qhantayaña"
 
-#: js/activity.js:2910
-#: js/activity.js:2922
-#: js/turtledefs.js:93
+#: js/activity.js:2912
+#: js/activity.js:2924
+#: js/turtledefs.js:95
 #.TRANS: Guardar proyecto
 msgid "Save project"
 msgstr "Wakichata imaña"
 
-#: js/activity.js:2911
+#: js/activity.js:2913
 #.TRANS: Presión prolongada en el los bloques para copiar.
 msgid "Long press on blocks to copy."
 msgstr ""
 
-#: js/activity.js:2911
+#: js/activity.js:2913
 #.TRANS: Haga clic aquí para pegar.
 msgid "Click here to paste."
 msgstr ""
 
-#: js/activity.js:2913
-#: js/activity.js:2925
+#: js/activity.js:2915
+#: js/activity.js:2927
 #.TRANS: reproducir
 msgid "playback"
 msgstr ""
 
-#: js/activity.js:2914
-#: js/activity.js:2926
-#: js/turtledefs.js:100
+#: js/activity.js:2916
+#: js/activity.js:2928
+#: js/turtledefs.js:102
 #.TRANS: Configuración
 msgid "Settings"
 msgstr "Chiqachatanaka"
 
-#: js/activity.js:2915
-#: js/activity.js:2927
-#: js/turtledefs.js:106
+#: js/activity.js:2917
+#: js/activity.js:2929
+#: js/turtledefs.js:108
 #.TRANS: Borrar todo
 msgid "Delete all"
 msgstr "Qawayata apsuña"
 
-#: js/activity.js:2916
-#: js/activity.js:2928
-#: js/turtledefs.js:107
+#: js/activity.js:2918
+#: js/activity.js:2930
+#: js/turtledefs.js:109
 #.TRANS: Deshacer
 msgid "Undo"
 msgstr "Kutjayaña"
 
-#: js/activity.js:2923
-#: js/turtledefs.js:96
+#: js/activity.js:2925
+#: js/turtledefs.js:98
 #.TRANS: Pegar
 msgid "Paste"
 msgstr "Apxataña"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:636
 #: js/basicblocks.js:651
 #: js/rhythmruler.js:911
@@ -463,7 +469,7 @@ msgid "rhythm"
 msgstr "Warurt'äwi ira"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:421
 #: js/basicblocks.js:3021
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
@@ -472,13 +478,13 @@ msgid "pitch"
 msgstr "ira"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: tono
 msgid "tone"
 msgstr "ist’äwi"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/playback.js:191
 #: js/lilypond.js:16
 #.TRANS: ratón
@@ -486,38 +492,38 @@ msgid "mouse"
 msgstr "achaku"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: pluma
 msgid "pen"
 msgstr "phuyu"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:399
 #.TRANS: número
 msgid "number"
 msgstr "jakhu"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: flujo
 msgid "flow"
 msgstr "siqi"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: sensores
 msgid "sensors"
 msgstr "katjiri"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: medios
 msgid "media"
 msgstr "wakisirinaka"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: ratón
 msgid "mice"
 msgstr ""
@@ -593,7 +599,7 @@ msgstr "Siqixa janiwa janiwa yapa katuqiti"
 #: js/logo.js:7920
 #: js/logo.js:8040
 #: js/logo.js:8068
-#.TRANS: No se puede encontrar raton.
+#.TRANS: No se puede encontrar ratón
 msgid "Cannot find mouse"
 msgstr ""
 
@@ -611,6 +617,7 @@ msgid "Cannot find turtle"
 msgstr ""
 
 #: js/logo.js:2199
+#.TRANS: Ratón ya ha comenzado.
 msgid "Mouse is already running."
 msgstr ""
 
@@ -1681,324 +1688,329 @@ msgstr "warurt'äwi chimpu chani"
 msgid "tuplet value"
 msgstr "tupla chimpu chani"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:17
+#.TRANS: Bloques de Música es una colección de herramientas para explorar conceptos musicales.
+msgid "Music Blocks is a collection of tools for exploring musical concepts."
+msgstr ""
+
+#: js/turtledefs.js:23
 #: js/basicblocks.js:1047
 #.TRANS: musical meter (time signature)
 #.TRANS: metro
 msgid "meter"
 msgstr "warurt'äwi qhatu"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: intervalos
 msgid "intervals"
 msgstr "jaljanaka"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:3322
 #.TRANS: volumen
 msgid "volume"
 msgstr ""
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: cajas
 msgid "boxes"
 msgstr "kajunanaka"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: aparatos
 msgid "widgets"
 msgstr "apanaqañanaka"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: booleano
 msgid "boolean"
 msgstr "booleano wakichata"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: pila
 msgid "heap"
 msgstr "qutu"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #.TRANS: extras
 msgid "extras"
 msgstr "yaqhanaka"
 
-#: js/turtledefs.js:73
+#: js/turtledefs.js:75
 #.TRANS: Bienvenido a Bloques de Música
 msgid "Welcome to Music Blocks"
 msgstr "Warurt'äwinaka wakichata waliki qhantaytaxa"
 
-#: js/turtledefs.js:73
+#: js/turtledefs.js:75
 #.TRANS: Bloques de Música es una colección de herramientas de manipulación para explorar conceptos musicales fundamentales de una manera integradora y divertido.
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
 msgstr "Warurt'äwinaka wakichata pankaxa warurt'äwinaka tuqita suma qawayata wali k'uchi yatxatañataki wakichatawa"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 #.TRANS: Conoce Sr. Ratón
 msgid "Meet Mr. Mouse!"
 msgstr "Tata Achakuru uñt'tati!"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 #.TRANS: Sr. Ratón es nuestro conductor de bloques de música.
 msgid "Mr Mouse is our Music Blocks conductor."
 msgstr "Achaku wiraxuchawa kusisïwinaka siqiru irpirisaxa"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 #.TRANS: Sr. Ratón le anima a explorar los Bloques Musicales.
 msgid "Mr Mouse encourages you to explore Music Blocks."
 msgstr "Achaku wiraxuchawa kusisïwinaka siqi thaqakipañaru apchitu"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 #.TRANS: Vamos a empezar nuestro recorrido!
 msgid "Let us start our tour!"
 msgstr "Uñakipäwinakasampi qalltañäni"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 #.TRANS: Please add commas to list: Matrix, Notes, Tone, Turtle, and more.
 #.TRANS: the buttons used to open various palettes of blocks
 #.TRANS: Botones de paleta
 msgid "Palette buttons"
 msgstr "wakichatanaka apanaqaña limt’añanaka"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 #.TRANS: Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y más.
 msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
 msgstr "Aka wakichatanaka qhantayaña limt'añanakaxa Matrix, Chunk, ejecutar, Tono, tortuga, ukata juk'ampi wakichatanaka qhantayañatakiwa."
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 #.TRANS: Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos.
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr "Limt'ma uka wakichatanaka apanaqañaru ukata samichaña wakichatanaka wayt'añataki samichañaru limt'ma."
 
-#: js/turtledefs.js:78
+#: js/turtledefs.js:80
 #.TRANS: Haga clic para ejecutar el proyecto en modo rápido.
 msgid "Click to run the project in fast mode."
 msgstr "K’ataki qhantayaña amtäwi wakichata qhantayañataki limt’ma"
 
-#: js/turtledefs.js:79
+#: js/turtledefs.js:81
 #.TRANS: Ejecutar lentamente
 msgid "Run slow"
 msgstr "K’achata qhantayaña"
 
-#: js/turtledefs.js:79
+#: js/turtledefs.js:81
 #.TRANS: Haz click para ejecutar el proyecto en modo lento.
 msgid "Click to run the project in slow mode."
 msgstr "Clikc limt'ma wakichata k'achata uñjañataki"
 
-#: js/turtledefs.js:80
+#: js/turtledefs.js:82
 #.TRANS: Música ejecute lentamente
 msgid "Run music slow"
 msgstr "K'achata t'ijuña warurt'äwi"
 
-#: js/turtledefs.js:80
+#: js/turtledefs.js:82
 #.TRANS: Haga clic para ejecutar sólo la música en modo lento.
 msgid "Click to run just the music in slow mode."
 msgstr "Warurt'äwi k'achata warurt'ayañataki limt'ma"
 
-#: js/turtledefs.js:81
+#: js/turtledefs.js:83
 #.TRANS: Haz click para ejecutar el proyecto en modo paso a paso.
 msgid "Click to run the project step by step."
 msgstr "sapa mayata mayata amtäwi wakichata qalltañataki limt’aña"
 
-#: js/turtledefs.js:82
+#: js/turtledefs.js:84
 #.TRANS: Haga clic para reproducir nota a nota.
 msgid "Click to run the music note by note."
 msgstr "Warurt'äwi chimpupatjama warurt'ayañataki akaru limt'ma"
 
-#: js/turtledefs.js:83
+#: js/turtledefs.js:85
 #.TRANS: Detener la música (y las tortugas).
 msgid "Stop the music (and the turtles)."
 msgstr "warurt'äwi ch'ujtayaña (ukata khirkhisti"
 
-#: js/turtledefs.js:84
+#: js/turtledefs.js:86
 #.TRANS: Borrar la pantalla y volver a las tortugas a sus posiciones iniciales.
 msgid "Clear the screen and return the turtles to their initial positions."
 msgstr "Uñtaña wakichata apsusa Tortuga wakichata qalltaparu kuttayma"
 
-#: js/turtledefs.js:85
+#: js/turtledefs.js:87
 #.TRANS: Ocultar o mostrar las paletas de bloques.
 msgid "Hide or show the block palettes."
 msgstr "siqinaka wakichaña imantaña unstayaña"
 
-#: js/turtledefs.js:86
+#: js/turtledefs.js:88
 #.TRANS: Ocultar o mostrar los bloques y las paletas.
 msgid "Hide or show the blocks and the palettes."
 msgstr "wakichaña siqinaka chhaqtayaña uñachayaña"
 
-#: js/turtledefs.js:87
+#: js/turtledefs.js:89
 #.TRANS: Expandir o colapsar los bloques colapsables, cómo por ejemplo los bloques de empezar y los de acción.
 msgid "Expand or collapse start and action stacks."
 msgstr "siqinaka wakichaña qallta jithitatayaña jiththapiyaña"
 
-#: js/turtledefs.js:88
+#: js/turtledefs.js:90
 #.TRANS: Devolver todos los bloques para el centro de la pantalla.
 msgid "Return all blocks to the center of the screen."
 msgstr "taqi wakichatanaka uñtaña taypiwjaru waythapiña"
 
-#: js/turtledefs.js:89
+#: js/turtledefs.js:91
 #.TRANS: Mostrar estos mensajes.
 msgid "Show these messages."
 msgstr "Uka qillqatanaka uñachayaña"
 
-#: js/turtledefs.js:90
+#: js/turtledefs.js:92
 #.TRANS: Expandir/colapsar la barra de opciones.
 msgid "Expand/collapse option toolbar"
 msgstr "wakichatanaka apanaqaña jach’aptayaña/jiwthapiyaña"
 
-#: js/turtledefs.js:90
+#: js/turtledefs.js:92
 #.TRANS: Haz click en este botón para expandir o colapsar la barra de herramientas auxiliar.
 msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "Yanapiri apanaqaña wakichatanaka jach’aptayañataki jani ukaxa chhaqtayañataki click limt’ma"
 
-#: js/turtledefs.js:91
+#: js/turtledefs.js:93
 #.TRANS: Este botón abre la pantalla de carga de proyectos de ejemplo.
 msgid "This button opens a viewer for loading example projects."
 msgstr "akïri limt'añaxa yant'aña wakichatanaka qhantayañatakiwa"
 
-#: js/turtledefs.js:92
+#: js/turtledefs.js:94
 #.TRANS: También puede cargar proyectos desde el sistema de archivos.
 msgid "You can also load projects from the file system."
 msgstr "Imata wakichatanaka amtäwinaka qhantayarakikismawa"
 
-#: js/turtledefs.js:93
+#: js/turtledefs.js:95
 #.TRANS: Guarde proyecto en archivo
 msgid "Save your project to a file."
 msgstr "Wakichäwi maya wakichata taypiru imma"
 
-#: js/turtledefs.js:94
+#: js/turtledefs.js:96
 #: js/savebox.js:136
 #.TRANS: Ahorre partituras
 msgid "Save sheet music"
 msgstr "Warurt'äwi qillqatanaka imaña"
 
-#: js/turtledefs.js:94
+#: js/turtledefs.js:96
 #.TRANS: Guarde el proyecto como un archivo de LilyPond.
 msgid "Save your project to as a Lilypond file."
 msgstr "LilyPond imata wakichata amtäwi imaña"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 #.TRANS: Copiar
 msgid "Copy"
 msgstr "Apaqata"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 #.TRANS: Para copiar una pila en el portapapeles, hacer un \"pulsación larga \" en la pila.
 msgid "To copy a stack to the clipboard, do a long press on the stack."
 msgstr "Maya siqi wakichata apaqañataki limt'ma \"jaya limt'aña \" wakichataru"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 #.TRANS: El botón de pegar destacará.
 msgid "The Paste Button will highlight."
 msgstr "Apxataña limt'aña qhanstaniwa"
 
-#: js/turtledefs.js:96
+#: js/turtledefs.js:98
 #.TRANS: El botón de pegar está activo, por lo tanto hay bloques copiados en el portapapeles.
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
 msgstr "Lip'katayañataki wakichata qhantatawa, ukata wakichatanaka siqinaka apaqata utjiwa"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 #: js/blocks.js:249
 #.TRANS: Guardar pila
 msgid "Save stack"
 msgstr "siqi imaña"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 #.TRANS: El bot�n de guardar-pila guarda una pila sobre una paleta personalizada.
 msgid "The save-stack button saves a stack onto a custom palette."
 msgstr "Siqi wakichata imaña limt'añaxa maya sapachjata siqiru uñtayi"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 #.TRANS: Aparece después de una larga pulsación en una pila.
 msgid "It appears after a long press on a stack."
 msgstr "Uka wakichata \"jaya limt'aña\" siqina uñasi"
 
-#: js/turtledefs.js:98
+#: js/turtledefs.js:100
 #.TRANS: Mostrar u ocultar las rejillas de coordenadas.
 msgid "Show or hide a coordinate grid."
 msgstr ""
 
-#: js/turtledefs.js:99
+#: js/turtledefs.js:101
 #.TRANS: Mostrar u ocultar la rejilla de coordenadas polares.
 msgid "Show or hide a polar-coordinate grid."
 msgstr "coordenadas polares sayt’unakapa uñachayaña chhaqtayaña"
 
-#: js/turtledefs.js:100
+#: js/turtledefs.js:102
 #.TRANS: Abre el panel para configurar Bloques de Música.
 msgid "Open a panel for configuring Music Blocks."
 msgstr "Tortuga wakichata siqinaka wakichañataki wakisiri wakichaña qhantayma"
 
-#: js/turtledefs.js:101
+#: js/turtledefs.js:103
 #: js/utilitybox.js:74
 #.TRANS: Disminuir el tamaño de los bloques
 msgid "Decrease block size"
 msgstr "Wakichata siqi taña jisk’aptayma"
 
-#: js/turtledefs.js:101
+#: js/turtledefs.js:103
 #.TRANS: Disminuye el tamaño de los bloques
 msgid "Decrease the size of the blocks."
 msgstr "wakichata siqinaka tañapa jisk’aptayaña"
 
-#: js/turtledefs.js:102
+#: js/turtledefs.js:104
 #: js/utilitybox.js:82
 #.TRANS: Incrementar tamaño de bloques
 msgid "Increase block size"
 msgstr "wakichata siqinaka tañapa yapxataña"
 
-#: js/turtledefs.js:102
+#: js/turtledefs.js:104
 #.TRANS: Incrementa el tamaño de los bloques.
 msgid "Increase the size of the blocks."
 msgstr "wakichata siqinaka tañapa jach’aptayaña"
 
-#: js/turtledefs.js:103
+#: js/turtledefs.js:105
 #: js/utilitybox.js:90
 #.TRANS: Analizar
 msgid "Display statistics"
 msgstr "Jakhuthapitanaka uñachayaña"
 
-#: js/turtledefs.js:103
+#: js/turtledefs.js:105
 #.TRANS: Analizar los tipos de bloques usados.
 msgid "Display statistics about your Music project."
 msgstr "Tortuga amtäwi wakichatama jakhuthapinakapa uñachayaña"
 
-#: js/turtledefs.js:104
+#: js/turtledefs.js:106
 #: js/utilitybox.js:98
 #.TRANS: Cargar plugin desde archivo
 msgid "Load plugin from file"
 msgstr "plugin wakichata qhantayaña"
 
-#: js/turtledefs.js:104
+#: js/turtledefs.js:106
 #.TRANS: Tu puedes cargar nuevos bloques desde un archivo.
 msgid "You can load new blocks from the file system."
 msgstr "Imata wakichatanakata machaqa siqinaka apxatma"
 
-#: js/turtledefs.js:105
+#: js/turtledefs.js:107
 #: js/utilitybox.js:106
 #.TRANS: Activar scroll
 msgid "Enable scrolling"
 msgstr "apanaqaña wakichata qhantayaña"
 
-#: js/turtledefs.js:105
+#: js/turtledefs.js:107
 #.TRANS: Puedes mover los bloques por el área de trabajo
 msgid "You can scroll the blocks on the canvas."
 msgstr "lienzo wakichataru siqinaka apanukuña"
 
-#: js/turtledefs.js:106
+#: js/turtledefs.js:108
 #.TRANS: Eliminar todo el contenido del canvas, incluyendo los bloques.
 msgid "Remove all content on the canvas, including the blocks."
 msgstr "carnavas taypina wakichatanakapa qawayata apsuña, siqinakamppacha"
 
-#: js/turtledefs.js:107
+#: js/turtledefs.js:109
 #.TRANS: Restaurar bloques de la papelera.
 msgid "Restore blocks from the trash."
 msgstr "apsuta wakichata siqinaka jaktayaña"
 
-#: js/turtledefs.js:108
+#: js/turtledefs.js:110
 #.TRANS: Felicitaciones.
 msgid "Congratulations."
 msgstr "Jallalla"
 
-#: js/turtledefs.js:108
+#: js/turtledefs.js:110
 #.TRANS: Ha terminado la gira. Por favor, disfrutar de Bloques de Música!
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "Warurt'awimpi muyuñaxa tukusxiwa. Yaqha siqi warurt'äwi ist'ma"
@@ -3638,10 +3650,12 @@ msgid "vibrato amount"
 msgstr "putuqïwi chani jakhu"
 
 #: js/timbre.js:1601
+#.TRANS: 
 msgid "delay (MS)"
 msgstr ""
 
 #: js/timbre.js:1745
+#.TRANS: 
 msgid "distortion amount"
 msgstr ""
 
@@ -4413,6 +4427,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Hindu"
 #~msgstr "Hindú wakichata"
 
+#: js/musicutils.js:226
+
+#~msgid "Arabic"
+#~msgstr "Arábica wakichata"
+
 #: js/logo.js:2177
 
 #: js/logo.js:7716
@@ -4793,11 +4812,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "Chromatic"
 #~msgstr "Cromático wakichata"
-
-#: js/musicutils.js:226
-
-#~msgid "Arabic"
-#~msgstr "Arábica wakichata"
 
 #: js/logo.js:4851
 

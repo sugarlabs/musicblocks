@@ -48,6 +48,12 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr "พัก"
 
@@ -55,7 +61,7 @@ msgstr "พัก"
 #: js/block.js:2072
 #: js/block.js:2081
 #: js/block.js:2093
-#: js/activity.js:1798
+#: js/activity.js:1800
 #: js/analytics.js:380
 #: js/palette.js:646
 #: js/palette.js:655
@@ -65,7 +71,7 @@ msgstr "พัก"
 #: js/palette.js:1898
 #: js/palette.js:1909
 #: js/palette.js:1920
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:1003
 #: js/basicblocks.js:1014
 #: js/basicblocks.js:2373
@@ -116,7 +122,7 @@ msgstr ""
 #: js/block.js:676
 #: js/palette.js:694
 #: js/turtle.js:406
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:924
 #: js/basicblocks.js:1845
 msgid "drum"
@@ -229,173 +235,173 @@ msgstr "บนเครื่องของฉัน"
 msgid "Worldwide"
 msgstr "ทั่วโลก"
 
-#: js/activity.js:543
+#: js/activity.js:545
 #.TRANS: hide Polar coordinate overlay grid
 msgid "hide grid"
 msgstr ""
 
-#: js/activity.js:550
-#: js/activity.js:556
-#: js/activity.js:2912
-#: js/activity.js:2924
-#: js/turtledefs.js:98
+#: js/activity.js:552
+#: js/activity.js:558
+#: js/activity.js:2914
+#: js/activity.js:2926
+#: js/turtledefs.js:100
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
 msgstr "คาร์ทีเซียน"
 
-#: js/activity.js:556
-#: js/activity.js:563
-#: js/activity.js:2912
-#: js/activity.js:2924
-#: js/turtledefs.js:98
-#: js/turtledefs.js:99
+#: js/activity.js:558
+#: js/activity.js:565
+#: js/activity.js:2914
+#: js/activity.js:2926
+#: js/turtledefs.js:100
+#: js/turtledefs.js:101
 #.TRANS: show Polar coordinate overlay grid
 msgid "Polar"
 msgstr "ขั้ว"
 
-#: js/activity.js:580
+#: js/activity.js:582
 msgid "Close"
 msgstr ""
 
-#: js/activity.js:927
-#: js/activity.js:961
-#: js/activity.js:985
-#: js/activity.js:1002
+#: js/activity.js:929
+#: js/activity.js:963
+#: js/activity.js:987
+#: js/activity.js:1004
 msgid "Cannot load project from the file. Please check the file type."
 msgstr ""
 
-#: js/activity.js:1450
+#: js/activity.js:1452
 msgid "This block is deprecated."
 msgstr ""
 
-#: js/activity.js:1452
+#: js/activity.js:1454
 msgid "Block cannot be found."
 msgstr ""
 
-#: js/activity.js:2815
-#: js/activity.js:2828
-#: js/turtledefs.js:78
+#: js/activity.js:2817
+#: js/activity.js:2830
+#: js/turtledefs.js:80
 msgid "Run fast"
 msgstr "วิ่งเร็ว"
 
-#: js/activity.js:2815
-#: js/activity.js:2828
+#: js/activity.js:2817
+#: js/activity.js:2830
 msgid "long press to run slowly"
 msgstr ""
 
-#: js/activity.js:2815
+#: js/activity.js:2817
 msgid "extra-long press to run music slowly"
 msgstr ""
 
-#: js/activity.js:2816
-#: js/activity.js:2829
-#: js/turtledefs.js:81
+#: js/activity.js:2818
+#: js/activity.js:2831
+#: js/turtledefs.js:83
 msgid "Run step by step"
 msgstr "เล่นที่ละขั้นตอน"
 
-#: js/activity.js:2817
-#: js/turtledefs.js:82
+#: js/activity.js:2819
+#: js/turtledefs.js:84
 msgid "Run note by note"
 msgstr "เล่นโน้ตต่อโน้ต"
 
-#: js/activity.js:2818
-#: js/activity.js:2830
-#: js/turtledefs.js:83
+#: js/activity.js:2820
+#: js/activity.js:2832
+#: js/turtledefs.js:85
 msgid "Stop"
 msgstr "หยุด"
 
-#: js/activity.js:2819
-#: js/activity.js:2831
-#: js/turtledefs.js:84
+#: js/activity.js:2821
+#: js/activity.js:2833
+#: js/turtledefs.js:86
 msgid "Clean"
 msgstr "ล้าง"
 
-#: js/activity.js:2820
-#: js/turtledefs.js:85
+#: js/activity.js:2822
+#: js/turtledefs.js:87
 msgid "Show/hide palettes"
 msgstr "แสดง/ซ่อนเมนูสี"
 
-#: js/activity.js:2821
-#: js/activity.js:2832
-#: js/turtledefs.js:86
-msgid "Show/hide blocks"
-msgstr "แสดง/ซ่อน บล๊อก"
-
-#: js/activity.js:2822
-#: js/activity.js:2833
-#: js/turtledefs.js:87
-msgid "Expand/collapse collapsable blocks"
-msgstr "เพิ่ม/พัง บล๊อกที่สามารถพังได้"
-
 #: js/activity.js:2823
 #: js/activity.js:2834
-#: js/activity.js:2873
 #: js/turtledefs.js:88
-msgid "Home"
-msgstr ""
+msgid "Show/hide blocks"
+msgstr "แสดง/ซ่อน บล๊อก"
 
 #: js/activity.js:2824
 #: js/activity.js:2835
 #: js/turtledefs.js:89
+msgid "Expand/collapse collapsable blocks"
+msgstr "เพิ่ม/พัง บล๊อกที่สามารถพังได้"
+
+#: js/activity.js:2825
+#: js/activity.js:2836
+#: js/activity.js:2875
+#: js/turtledefs.js:90
+msgid "Home"
+msgstr ""
+
+#: js/activity.js:2826
+#: js/activity.js:2837
+#: js/turtledefs.js:91
 msgid "Help"
 msgstr "ช่วยเหลือ"
-
-#: js/activity.js:2908
-#: js/activity.js:2920
-#: js/turtledefs.js:91
-msgid "Load samples from server"
-msgstr "โหลดตัวอย่างจากเซอเว่อร์"
-
-#: js/activity.js:2909
-#: js/activity.js:2921
-#: js/turtledefs.js:92
-msgid "Load project from files"
-msgstr ""
 
 #: js/activity.js:2910
 #: js/activity.js:2922
 #: js/turtledefs.js:93
+msgid "Load samples from server"
+msgstr "โหลดตัวอย่างจากเซอเว่อร์"
+
+#: js/activity.js:2911
+#: js/activity.js:2923
+#: js/turtledefs.js:94
+msgid "Load project from files"
+msgstr ""
+
+#: js/activity.js:2912
+#: js/activity.js:2924
+#: js/turtledefs.js:95
 msgid "Save project"
 msgstr "บันทึกงาน"
 
-#: js/activity.js:2911
+#: js/activity.js:2913
 msgid "Long press on blocks to copy."
 msgstr ""
 
-#: js/activity.js:2911
+#: js/activity.js:2913
 msgid "Click here to paste."
 msgstr ""
 
-#: js/activity.js:2913
-#: js/activity.js:2925
+#: js/activity.js:2915
+#: js/activity.js:2927
 msgid "playback"
 msgstr ""
 
-#: js/activity.js:2914
-#: js/activity.js:2926
-#: js/turtledefs.js:100
+#: js/activity.js:2916
+#: js/activity.js:2928
+#: js/turtledefs.js:102
 msgid "Settings"
 msgstr "ตั้งค่า"
 
-#: js/activity.js:2915
-#: js/activity.js:2927
-#: js/turtledefs.js:106
+#: js/activity.js:2917
+#: js/activity.js:2929
+#: js/turtledefs.js:108
 msgid "Delete all"
 msgstr "ลบทั้งหมด"
 
-#: js/activity.js:2916
-#: js/activity.js:2928
-#: js/turtledefs.js:107
+#: js/activity.js:2918
+#: js/activity.js:2930
+#: js/turtledefs.js:109
 msgid "Undo"
 msgstr "ยกเลิกคำสั่งเก่า"
 
-#: js/activity.js:2923
-#: js/turtledefs.js:96
+#: js/activity.js:2925
+#: js/turtledefs.js:98
 msgid "Paste"
 msgstr "วาง"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:636
 #: js/basicblocks.js:651
 #: js/rhythmruler.js:911
@@ -405,7 +411,7 @@ msgid "rhythm"
 msgstr "จังหวะ"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:421
 #: js/basicblocks.js:3021
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
@@ -413,45 +419,45 @@ msgid "pitch"
 msgstr "ระดับเสียง"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "tone"
 msgstr "โทน"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/playback.js:191
 #: js/lilypond.js:16
 msgid "mouse"
 msgstr ""
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "pen"
 msgstr "ปากกา"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:399
 msgid "number"
 msgstr "ตัวเลข"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "flow"
 msgstr "ความคล่องตัว"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "sensors"
 msgstr "เซนเซอร์"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "media"
 msgstr "สื่อ"
 
 #: js/analytics.js:380
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "mice"
 msgstr ""
 
@@ -1453,263 +1459,267 @@ msgstr "ค่าของโน้ต"
 msgid "tuplet value"
 msgstr "ค่าทูเปรท"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:17
+msgid "Music Blocks is a collection of tools for exploring musical concepts."
+msgstr ""
+
+#: js/turtledefs.js:23
 #: js/basicblocks.js:1047
 #.TRANS: musical meter (time signature)
 msgid "meter"
 msgstr "อัตราจังหวะ"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "intervals"
 msgstr ""
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 #: js/basicblocks.js:3322
 msgid "volume"
 msgstr ""
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "boxes"
 msgstr "กล่อง"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "widgets"
 msgstr ""
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "boolean"
 msgstr "บูลีน"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "heap"
 msgstr "ฮีป"
 
-#: js/turtledefs.js:21
+#: js/turtledefs.js:23
 msgid "extras"
 msgstr "เพิ่มเติม"
 
-#: js/turtledefs.js:73
+#: js/turtledefs.js:75
 msgid "Welcome to Music Blocks"
 msgstr "ยินดีต้อนรับสู่Music Blocks"
 
-#: js/turtledefs.js:73
+#: js/turtledefs.js:75
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
 msgstr "Music Blocksคือศูนย์ร่วมอุปกรณ์ต่างๆเพื่อสำรวจแนวคิดเรื่องดนตรีด้วยวิธีที่สนุกและครบถ้วน"
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Meet Mr. Mouse!"
 msgstr ""
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Mr Mouse is our Music Blocks conductor."
 msgstr ""
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Mr Mouse encourages you to explore Music Blocks."
 msgstr ""
 
-#: js/turtledefs.js:74
+#: js/turtledefs.js:76
 msgid "Let us start our tour!"
 msgstr "Music Blocks เริ่มทัวร์กันได้เลย"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 #.TRANS: Please add commas to list: Matrix, Notes, Tone, Turtle, and more.
 #.TRANS: the buttons used to open various palettes of blocks
 msgid "Palette buttons"
 msgstr "ปุ่มเมนูสี"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
 msgstr "กล่องเครื่องมีนี้มีปุ่มพิกัด โน้ต โทนเต่า และอีกมากมาย"
 
-#: js/turtledefs.js:77
+#: js/turtledefs.js:79
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr "คลิ๊กเพื่อแสดงแถบสีของบล๊อกและลากบล๊อกจากแถบสีไปยังแสดงแสดงผล"
 
-#: js/turtledefs.js:78
+#: js/turtledefs.js:80
 msgid "Click to run the project in fast mode."
 msgstr "คลิ๊กเพื่อเล่นโปรเจคในโหมดเร็ว"
 
-#: js/turtledefs.js:79
+#: js/turtledefs.js:81
 msgid "Run slow"
 msgstr "วิ่งช้า"
 
-#: js/turtledefs.js:79
+#: js/turtledefs.js:81
 msgid "Click to run the project in slow mode."
 msgstr "คลิ๊กเพื่อเล่นโปรเจคอย่างช้า"
 
-#: js/turtledefs.js:80
+#: js/turtledefs.js:82
 msgid "Run music slow"
 msgstr "เล่นเสียงดนตรี (ช้า)"
 
-#: js/turtledefs.js:80
+#: js/turtledefs.js:82
 msgid "Click to run just the music in slow mode."
 msgstr "คลิ๊กเพื่อเล่นดนตรีในโหมดช้า"
 
-#: js/turtledefs.js:81
+#: js/turtledefs.js:83
 msgid "Click to run the project step by step."
 msgstr "คลิ๊กเพื่อให้โปรเจคเล่นทีละขั้นตอน"
 
-#: js/turtledefs.js:82
+#: js/turtledefs.js:84
 msgid "Click to run the music note by note."
 msgstr "คลิ๊กที่นี่เพื่อเล่นดนตรีโน้ตต่อโน้ต"
 
-#: js/turtledefs.js:83
+#: js/turtledefs.js:85
 msgid "Stop the music (and the turtles)."
 msgstr "หยุดเพลง (และเต่า)"
 
-#: js/turtledefs.js:84
+#: js/turtledefs.js:86
 msgid "Clear the screen and return the turtles to their initial positions."
 msgstr "ลบจอทั้งหมด และให้เต่าไปอยู่ที่จุดตั้งต้น"
 
-#: js/turtledefs.js:85
+#: js/turtledefs.js:87
 msgid "Hide or show the block palettes."
 msgstr "ซ้อนหรือแสดงบล๊อก"
 
-#: js/turtledefs.js:86
+#: js/turtledefs.js:88
 msgid "Hide or show the blocks and the palettes."
 msgstr "ซ่อนหรือแสดงบล๊อกและเมนูสี"
 
-#: js/turtledefs.js:87
+#: js/turtledefs.js:89
 msgid "Expand or collapse start and action stacks."
 msgstr "ขยายหรือล้ม เริ่มและเรียงทับกัน"
 
-#: js/turtledefs.js:88
+#: js/turtledefs.js:90
 msgid "Return all blocks to the center of the screen."
 msgstr ""
 
-#: js/turtledefs.js:89
+#: js/turtledefs.js:91
 msgid "Show these messages."
 msgstr "แสดงข้อความ"
 
-#: js/turtledefs.js:90
+#: js/turtledefs.js:92
 msgid "Expand/collapse option toolbar"
 msgstr "เพิ่ม/ลด แถบเครื่องมือตัวเลือก"
 
-#: js/turtledefs.js:90
+#: js/turtledefs.js:92
 msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "กดปุ่มนี้เพื่อขยายหรือลดกล่องเครื่องมือเพิ่มเติม"
 
-#: js/turtledefs.js:91
+#: js/turtledefs.js:93
 msgid "This button opens a viewer for loading example projects."
 msgstr "ปุ่มนี้เปิดหน้าต่างเพื่อโหลดโปรเจคตัวอย่าง"
 
-#: js/turtledefs.js:92
+#: js/turtledefs.js:94
 msgid "You can also load projects from the file system."
 msgstr "คุณสามารถโหลดโปรเจคได้จากไฟล์ในโปรแกรม"
 
-#: js/turtledefs.js:93
+#: js/turtledefs.js:95
 msgid "Save your project to a file."
 msgstr "บันทึกโปรเจคของคุณเป็นไฟล์"
 
-#: js/turtledefs.js:94
+#: js/turtledefs.js:96
 #: js/savebox.js:136
 msgid "Save sheet music"
 msgstr "บันทึกโน้ตเพลง"
 
-#: js/turtledefs.js:94
+#: js/turtledefs.js:96
 msgid "Save your project to as a Lilypond file."
 msgstr "บันทึกไฟล์เป็นไฟล์Lilypond"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 msgid "Copy"
 msgstr "คัดลอก"
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 msgid "To copy a stack to the clipboard, do a long press on the stack."
 msgstr ""
 
-#: js/turtledefs.js:95
+#: js/turtledefs.js:97
 msgid "The Paste Button will highlight."
 msgstr ""
 
-#: js/turtledefs.js:96
+#: js/turtledefs.js:98
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
 msgstr "จะใช้ปุ่มวางได้ต่อเมื่อ คุณคัดลอกบล๊อกไว้บนคลิปบอร์ด"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 #: js/blocks.js:249
 msgid "Save stack"
 msgstr "บันทึก"
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 msgid "The save-stack button saves a stack onto a custom palette."
 msgstr ""
 
-#: js/turtledefs.js:97
+#: js/turtledefs.js:99
 msgid "It appears after a long press on a stack."
 msgstr ""
 
-#: js/turtledefs.js:98
+#: js/turtledefs.js:100
 msgid "Show or hide a coordinate grid."
 msgstr ""
 
-#: js/turtledefs.js:99
+#: js/turtledefs.js:101
 msgid "Show or hide a polar-coordinate grid."
 msgstr "แสดง หรือซ่อนกราฟ พิกัดเชิงขั้ว"
 
-#: js/turtledefs.js:100
+#: js/turtledefs.js:102
 msgid "Open a panel for configuring Music Blocks."
 msgstr "เปิดแผงสำหรับปรับแต่ง Music Blocks"
 
-#: js/turtledefs.js:101
+#: js/turtledefs.js:103
 #: js/utilitybox.js:74
 msgid "Decrease block size"
 msgstr "ลดขนาดของบล๊อก"
 
-#: js/turtledefs.js:101
+#: js/turtledefs.js:103
 msgid "Decrease the size of the blocks."
 msgstr "ลดขนาดของบล๊อก"
 
-#: js/turtledefs.js:102
+#: js/turtledefs.js:104
 #: js/utilitybox.js:82
 msgid "Increase block size"
 msgstr "ลดขนาดบล๊อก"
 
-#: js/turtledefs.js:102
+#: js/turtledefs.js:104
 msgid "Increase the size of the blocks."
 msgstr "เพิ่มขนาดของบล๊อก"
 
-#: js/turtledefs.js:103
+#: js/turtledefs.js:105
 #: js/utilitybox.js:90
 msgid "Display statistics"
 msgstr "แสดงสถิติ"
 
-#: js/turtledefs.js:103
+#: js/turtledefs.js:105
 msgid "Display statistics about your Music project."
 msgstr "แสดงสถิตของโปรเจคคุณ"
 
-#: js/turtledefs.js:104
+#: js/turtledefs.js:106
 #: js/utilitybox.js:98
 msgid "Load plugin from file"
 msgstr "โหลดปลั๊กอินจากไฟล์"
 
-#: js/turtledefs.js:104
+#: js/turtledefs.js:106
 msgid "You can load new blocks from the file system."
 msgstr "คุณสามารถโหลดบล๊อกใหม่จากไฟล์ในเครือข่าย"
 
-#: js/turtledefs.js:105
+#: js/turtledefs.js:107
 #: js/utilitybox.js:106
 msgid "Enable scrolling"
 msgstr "ทำให้เลื่อนได้"
 
-#: js/turtledefs.js:105
+#: js/turtledefs.js:107
 msgid "You can scroll the blocks on the canvas."
 msgstr "คุณสามารถเลื่อนบล๊อกสู่แคนวาส"
 
-#: js/turtledefs.js:106
+#: js/turtledefs.js:108
 msgid "Remove all content on the canvas, including the blocks."
 msgstr "ลบทุกอย่าง รวมทั้งบล๊อก"
 
-#: js/turtledefs.js:107
+#: js/turtledefs.js:109
 msgid "Restore blocks from the trash."
 msgstr "กู้บล๊อกจากถังขยะ"
 
-#: js/turtledefs.js:108
+#: js/turtledefs.js:110
 msgid "Congratulations."
 msgstr "ยินดีด้วย"
 
-#: js/turtledefs.js:108
+#: js/turtledefs.js:110
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "ทัวร์จบแล้ว เริ่มเล่น Music Blockกัน"
 
@@ -3727,6 +3737,11 @@ msgstr ""
 #~msgid "Hindu"
 #~msgstr ""
 
+#: js/musicutils.js:226
+
+#~msgid "Arabic"
+#~msgstr ""
+
 #: js/logo.js:2177
 
 #: js/logo.js:7716
@@ -4134,11 +4149,6 @@ msgstr ""
 #: js/musicutils.js:197
 
 #~msgid "Chromatic"
-#~msgstr ""
-
-#: js/musicutils.js:226
-
-#~msgid "Arabic"
 #~msgstr ""
 
 #: js/logo.js:4851
