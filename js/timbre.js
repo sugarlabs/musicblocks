@@ -45,6 +45,12 @@ function TimbreWidget () {
         'modulationIndex': 10
     };
 
+    this.noiseSynthParamvals = {
+        'noise': {
+            'type': 'white'
+        },
+    };
+    
     this.duoSynthParamVals = {
         'vibratoAmount': 0.5,
         'vibratoRate': 5
@@ -68,9 +74,11 @@ function TimbreWidget () {
     this.AMSynthParams = [];
     this.FMSynthesizer = [];
     this.FMSynthParams = [];
+    this.NoiseSynthesizer = [];
+    this.NoiseSynthParams = [];
     this.duoSynthesizer = [];
     this.duoSynthParams = [];
-    this.activeParams = ['synth', 'amsynth', 'fmsynth', 'duosynth', 'envelope', 'oscillator', 'filter', 'effects', 'chorus', 'vibrato', 'phaser', 'distortion', 'tremolo'];
+    this.activeParams = ['synth', 'amsynth', 'fmsynth', 'noisesynth', 'duosynth', 'envelope', 'oscillator', 'filter', 'effects', 'chorus', 'vibrato', 'phaser', 'distortion', 'tremolo'];
     this.isActive = {};
 
     for (var i = 0; i < this.activeParams.length; i++) {
@@ -137,7 +145,11 @@ function TimbreWidget () {
         if (this.isActive['fmsynth'] === true && this.FMSynthesizer[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.FMSynthesizer[i]].connections[1];
         }
-
+        
+        if (this.isActive['noisesynth'] === true && this.NoiseSynthesizer[i] != null) {
+            updateParams[0] = this._logo.blocks.blockList[this.NoiseSynthesizer[i]].connections[1];
+        }
+        
         if (this.isActive['duosynth'] === true && this.duoSynthesizer[i] != null) {
             for (j = 0; j < 2; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.duoSynthesizer[i]].connections[j + 1];
@@ -343,6 +355,17 @@ function TimbreWidget () {
             this.fmSynthParamvals['modulationIndex'] = parseFloat(this.FMSynthParams[0]);
             this._update(blockValue, this.FMSynthParams[0], 0);
             this._logo.synth.createSynth(this.instrumentName, 'fmsynth', this.fmSynthParamvals);
+        } else if (this.isActive['noisesynth'] === true) {
+            docById('synthButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR
+            if (this.NoiseSynthesizer.length > 1) {
+                blockValue = this.NoiseSynthesizer.length - 1;
+            }
+
+            docById('myRangeS0').value = this.NoiseSynthParams[0];
+            docById('myspanS0').textContent = this.NoiseSynthParams[0];
+            this.noiseSynthParamvals['noise.type'] = this.NoiseSynthParams[0];
+            this._update(blockValue, this.NoiseSynthParams[0], 0);
+            this._logo.synth.createSynth(this.instrumentName, 'noisesynth', this.noiseSynthParamvals);
         } else if (this.isActive['duosynth'] === true) {
             docById('synthButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR
             if (this.duoSynthesizer.length > 1) {
@@ -1002,6 +1025,66 @@ function TimbreWidget () {
                             that._update(blockValue, elem.value, 0);
                             that._logo.synth.createSynth(that.instrumentName, 'fmsynth', that.fmSynthParamvals);
                             that._playNote('G4', 1 / 8);
+                        });
+                    } else if (synthChosen === 'NoiseSynth') {
+                        that.isActive['amsynth'] = false;
+                        that.isActive['fmsynth'] = false;
+                        that.isActive['noisesynth'] = true;
+                        that.isActive['duosynth'] = false;
+
+                        if (that.NoiseSynthesizer.length === 0) {
+
+                            var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                            var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+
+                            const NOISESYNTHOBJ = [[0, ['noisesynth', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 10}], 0, 0, [0]]];
+                            that._logo.blocks.loadNewBlocks(NOISESYNTHOBJ);
+
+                            var n = that._logo.blocks.blockList.length - 2;
+                            that.NoiseSynthesizer.push(n);
+                            that.NoiseSynthParams.push("white");
+
+                            setTimeout(function () {
+                                if (that.AMSynthesizer.length !== 0) {
+                                    that._blockReplace(last(that.AMSynthesizer), last(that.NoiseSynthesizer));
+                                    that.AMSynthesizer.pop();
+							    } else if (that.FMSynthesizer.length !== 0) {
+                                    that._blockReplace(last(that.FMSynthesizer), last(that.NoiseSynthesizer));
+                                    that.FMSynthesizer.pop();
+                                } else if (that.duoSynthesizer.length !== 0) {
+                                    that._blockReplace(last(that.duoSynthesizer), last(that.NoiseSynthesizer));
+                                    that.duoSynthesizer.pop();
+                                } else {
+                                    that.blockConnection(2, bottomOfClamp);
+                                }
+                            }, 500);
+
+                            console.log('CREATING NOISE SYNTH!!!');
+                            that.noiseSynthParamvals['noise.type'] = that.NoiseSynthParams[0];
+                            that._logo.synth.createSynth(that.instrumentName, 'noisesynth', that.noiseSynthParamvals);
+                        }
+
+                        subHtmlElements += '<div id="wrapperS0"><div id="sS0"><span>' + _('modulation index') + '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' + that.NoiseSynthParams[0] + '"><span id="myspanS0" class="rangeslidervalue">' + that.NoiseSynthParams[0] + '</span></div></div>';
+                        subDiv.innerHTML = subHtmlElements;
+
+                        // docById('myRangeS0').value = parseFloat(that.FMSynthParams[0]);
+                        // docById('myspanS0').textContent = that.FMSynthParams[0];
+
+                        that.noiseSynthParamvals['noise.type'] = that.NoiseSynthParams[0];
+
+                        if (that.NoiseSynthesizer.length !== 1) {
+                            blockValue = that.NoiseSynthesizer.length - 1;
+                        }
+
+                        document.getElementById('wrapperS0').addEventListener('change', function (event) {
+                            docById('synthButtonCell').style.backgroundColor = '#C8C8C8';
+                            var elem = event.target;
+                            docById('myRangeS0').value = parseFloat(elem.value);
+                            docById('myspanS0').textContent = elem.value;
+                            that.noiseSynthParamvals['noise.type'] = parseFloat(elem.value);
+                            that._update(blockValue, elem.value, 0);
+                            that._logo.synth.createSynth(that.instrumentName, 'noisesynth', that.noiseSynthParamvals);
+                            that._playNote( 1 / 8);
                         });
                     } else if (synthChosen === 'DuoSynth') {
                         that.isActive['amsynth'] = false;

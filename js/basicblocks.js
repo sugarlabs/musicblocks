@@ -1131,7 +1131,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     duoSynthBlock.twoArgBlock();
     duoSynthBlock.dockTypes[1] = 'numberin';
     duoSynthBlock.dockTypes[2] = 'numberin';
-
+    
     var distortionBlock = new ProtoBlock('dis');
     distortionBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['dis'] = distortionBlock;

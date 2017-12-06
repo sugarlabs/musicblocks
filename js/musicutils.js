@@ -341,6 +341,12 @@ var VOICENAMES = [
     [_('simple 3'), 'mono3', 'images/synth.svg'],
     //.TRANS: simple monotone synthesizer
     [_('simple 4'), 'mono4', 'images/synth.svg'],
+    //.TRANS: white noise synthesizer
+    [_('white noise'), 'noise1', 'images/synth.svg'],
+    //.TRANS: brown noise synthesizer
+    [_('brown noise'), 'noise2', 'images/synth.svg'],
+    //.TRANS: pink noise synthesizer
+    [_('pink noise'), 'noise3', 'images/synth.svg'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg'],
     //.TRANS: square wave
@@ -1633,6 +1639,9 @@ function Synth() {
         'sawtooth': 1,
         'square': 1,
         'pluck': 1,
+        'noise1': 1,
+        'noise2': 1,
+        'noise3': 1,
         'poly': 1,
         'mono1': 1,
         'mono2': 1,
@@ -1713,6 +1722,42 @@ function Synth() {
                     'decay': 0.0,
                     'sustain': 1,
                     'release': 0.5
+                }
+            };
+            break;
+        case 'noise1':
+            var synthOptions = {
+                'noise': {
+                    'type': 'white'
+                },
+                'envelope': {
+                    'attack': 0.005 ,
+                    'decay': 0.1 ,
+                    'sustain': 1
+                }
+            };
+            break;
+        case 'noise2':
+            var synthOptions = {
+                'noise': {
+                    'type': 'brown'
+                },
+                'envelope': {
+                    'attack': 0.005 ,
+                    'decay': 0.1 ,
+                    'sustain': 1
+                }
+            };
+            break;
+        case 'noise3':
+            var synthOptions = {
+                'noise': {
+                    'type': 'pink'
+                },
+                'envelope': {
+                    'attack': 0.005 ,
+                    'decay': 0.1 ,
+                    'sustain': 1
                 }
             };
             break;
@@ -1879,6 +1924,13 @@ function Synth() {
             instrumentsSource[instrumentName] = [0, 'poly'];
             console.log('poly');
             var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
+            break;
+        case 'noise1':
+        case 'noise2':
+        case 'noise3':
+            instrumentsSource[instrumentName] = [4, sourceName];
+            console.log(sourceName);
+            var builtin_synth = new Tone.NoiseSynth(synthOptions);
             break;
         default:
             instrumentsSource[instrumentName] = [0, 'poly'];
@@ -2097,6 +2149,9 @@ function Synth() {
             }
 
             this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            break;
+        case 4:
+            tempSynth.triggerAttackRelease(beatValue);
             break;
         case 0:  // default synth
         default:
