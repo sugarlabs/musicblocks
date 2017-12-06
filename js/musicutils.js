@@ -341,6 +341,8 @@ var VOICENAMES = [
     [_('simple 3'), 'mono3', 'images/synth.svg'],
     //.TRANS: simple monotone synthesizer
     [_('simple 4'), 'mono4', 'images/synth.svg'],
+    //.TRANS: simple noise synthesizer
+    [_('noise'), 'noise', 'images/synth.svg'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg'],
     //.TRANS: square wave
@@ -1633,6 +1635,7 @@ function Synth() {
         'sawtooth': 1,
         'square': 1,
         'pluck': 1,
+        'noise': 1
         'poly': 1,
         'mono1': 1,
         'mono2': 1,
@@ -1644,7 +1647,6 @@ function Synth() {
     const CUSTOM_SYNTHS = {
         'amsynth': 1,
         'fmsynth': 1,
-        'noisesynth': 1,
         'duosynth': 1,
     };
 
@@ -1717,7 +1719,7 @@ function Synth() {
                 }
             };
             break;
-        case 'noisesynth':
+        case 'noise':
             var synthOptions = {
                 'noise': {
                     'type': 'white'
@@ -1883,6 +1885,11 @@ function Synth() {
             console.log(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
             break;
+        case 'noise':
+            instrumentsSource[instrumentName] = [3, sourceName];
+            console.log(sourceName);
+            var builtin_synth = new Tone.NoiseSynth(synthOptions);
+            break;
         case 'pluck':
             instrumentsSource[instrumentName] = [3, sourceName];
             console.log(sourceName);
@@ -1915,8 +1922,6 @@ function Synth() {
             var tempSynth = new Tone.AMSynth(synthOptions);
         } else if (sourceName.toLowerCase() === 'fmsynth') {
             var tempSynth = new Tone.FMSynth(synthOptions);
-        } else if (sourceName.toLowerCase() === 'noisesynth') {
-            var tempSynth = new Tone.NoiseSynth(synthOptions);
         } else if (sourceName.toLowerCase() === 'duosynth') {
             var tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
