@@ -1432,7 +1432,7 @@ function TimbreWidget () {
         env.append(envAppend);
 
         var mainDiv = docById('effect0');
-        mainDiv.innerHTML= '<p><input type="radio" name="effectsName" value="Tremolo"/>Tremolo</br><input type="radio" name="effectsName" value="Vibrato"/>Vibrato</br><input type="radio" name="effectsName" value="Chorus"/>Chorus</br><input type="radio" name="effectsName" value="Phaser"/>Phaser</br><input type="radio" name="effectsName" value="Distortion"/>Distortion</br></p>';
+        mainDiv.innerHTML= '<p><input type="radio" name="effectsName" value="Tremolo"/>' + _('tremolo') + '</br><input type="radio" name="effectsName" value="Vibrato"/>' + _('vibrato') + '</br><input type="radio" name="effectsName" value="Chorus"/>' + _('chorus') + '</br><input type="radio" name="effectsName" value="Phaser"/>' + _('phaser') + '</br><input type="radio" name="effectsName" value="Distortion"/>' + _('distortion') + '</br></p>';
 
         var subDiv = docById('effect1');
         var effectsName = docByName('effectsName');
@@ -1456,10 +1456,10 @@ function TimbreWidget () {
                     }
 
                     subDiv.innerHTML = subHtmlElements;
-                    docById('sFx0').textContent = 'Rate';
+                    docById('sFx0').textContent = _('rate');
                     docById('myRangeFx0').value = 10;
                     docById('myspanFx0').textContent = '10';
-                    docById('sFx1').textContent = 'Depth';
+                    docById('sFx1').textContent = _('depth');
                     docById('myRangeFx1').value = 50;
                     docById('myspanFx1').textContent = '50';
 
@@ -1521,8 +1521,8 @@ function TimbreWidget () {
 
                     // Set slider values
                     subDiv.innerHTML = subHtmlElements;
-                    docById('sFx0').textContent = 'Intensity';
-                    docById('sFx1').textContent = 'Rate';
+                    docById('sFx0').textContent = _('intensity');
+                    docById('sFx1').textContent = _('rate');
 
                     if (that.vibratoEffect.length > 0) {
                         var vibratroBlock = last(that.vibratoEffect);
@@ -1595,13 +1595,13 @@ function TimbreWidget () {
                     }
 
                     subDiv.innerHTML = subHtmlElements;
-                    docById('sFx0').textContent = 'Rate';
+                    docById('sFx0').textContent = _('rate');
                     docById('myRangeFx0').value = 2;
                     docById('myspanFx0').textContent = '2';
-                    docById('sFx1').textContent = 'Delay(MS)';
+                    docById('sFx1').textContent = _('delay (MS)');
                     docById('myRangeFx1').value = 4;
                     docById('myspanFx1').textContent = '4';
-                    docById('sFx2').textContent = 'Depth';
+                    docById('sFx2').textContent = _('depth');
                     docById('myRangeFx2').value = 70;
                     docById('myspanFx2').textContent = '70';
 
@@ -1669,13 +1669,13 @@ function TimbreWidget () {
                     }
 
                     subDiv.innerHTML = subHtmlElements;
-                    docById('sFx0').textContent = 'Rate';
+                    docById('sFx0').textContent = _('rate');
                     docById('myRangeFx0').value = 5;
                     docById('myspanFx0').textContent = '5';
-                    docById('sFx1').textContent = 'Octaves';
+                    docById('sFx1').textContent = _('octaves');
                     docById('myRangeFx1').value = 3;
                     docById('myspanFx1').textContent = '3';
-                    docById('sFx2').textContent = 'Base Frequency';
+                    docById('sFx2').textContent = _('base frequency');
                     docById('myRangeFx2').value = 350;
                     docById('myspanFx2').textContent = '350';
 
@@ -1742,7 +1742,7 @@ function TimbreWidget () {
 
                     subDiv.innerHTML = subHtmlElements;
 
-                    docById('sFx0').textContent = 'Distortion Amount';
+                    docById('sFx0').textContent = _('distortion amount');
                     docById('myRangeFx0').value = 40;
                     docById('myspanFx0').textContent = '40';
 
