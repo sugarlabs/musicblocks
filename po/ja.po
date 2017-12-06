@@ -1539,8 +1539,9 @@ msgid "tuplet value"
 msgstr "タプルの音価"
 
 #: js/turtledefs.js:17
+## I took some liberties
 msgid "Music Blocks is a collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "ミュージック・ブロックス：音楽と数学とコードの色々を発見するソフト・ツール"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:1047
@@ -1890,19 +1891,19 @@ msgstr "数字をオクターヴに"
 #: js/basicblocks.js:216
 #: js/modewidget.js:90
 #.TRANS: pitch inversion rotates a pitch around another pitch
-## 逆さ＝さかさ
+## 転回＝てんかい
 msgid "invert"
-msgstr "逆さに"
+msgstr "転回に"
 
 #: js/basicblocks.js:234
 #.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
-msgstr "逆さに (奇数)"
+msgstr "転回を (奇数)"
 
 #: js/basicblocks.js:249
 #.TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
-msgstr "逆さに (偶数)"
+msgstr "転回を (偶数)"
 
 #: js/basicblocks.js:264
 #.TRANS: adjust the amount of shift (up or down) of a pitch
