@@ -1,4 +1,4 @@
-input[type=text] {
+#search[type=text] {
     width: 400px;
     box-sizing: border-box;
     position: absolute;
@@ -9,7 +9,7 @@ input[type=text] {
     transition: width 0.4s ease-in-out;
 }
 
-input:focus {
+#search:focus {
     border: 2px solid #87CEFA;
 }
 
