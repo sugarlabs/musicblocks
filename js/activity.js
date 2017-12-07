@@ -3040,9 +3040,18 @@ handleComplete);
                             helpContainer.visible = false;
                             docById('helpElem').style.visibility = 'hidden';
                         } else {
-                            helpIdx += 1;
-                            if (helpIdx >= HELPCONTENT.length) {
+                            if(event.stageX < helpContainer.x + bounds.width / 2) {
+                                if(helpIdx == 0) {
+                                    helpIdx = 0;
+                                } else {
+                                     helpIdx -= 1;
+                                }
+                            } else {
+                            
+                                 helpIdx += 1;
+                                if (helpIdx >= HELPCONTENT.length) {
                                 helpIdx = 0;
+                            }
                             }
                             var imageScale = 55 * turtleBlocksScale;
                             helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
