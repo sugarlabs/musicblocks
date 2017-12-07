@@ -1413,8 +1413,8 @@ define(MYDEFINES, function (compatibility) {
                 searchWidget.style.visibility = 'hidden';
             } else {
                 searchWidget.style.visibility = 'visible';
-		searchWidget.style.left = docById('myCanvas').width / 3.5 * turtleBlocksScale + 'px';
-		searchWidget.style.top = docById('myCanvas').height / 4.5 * turtleBlocksScale + 'px';
+                searchWidget.style.left = docById('myCanvas').width / 3.5 * turtleBlocksScale + 'px';
+                searchWidget.style.top = docById('myCanvas').height / 4.5 * turtleBlocksScale + 'px';
 
                 searchBlockPosition = [100, 100];
 
@@ -3040,22 +3040,23 @@ handleComplete);
                             helpContainer.visible = false;
                             docById('helpElem').style.visibility = 'hidden';
                         } else {
-                            if(event.stageX < helpContainer.x + bounds.width / 2) {
-                                if(helpIdx == 0) {
+                            if (event.stageX < helpContainer.x + bounds.width / 2) {
+                                if (helpIdx === 0) {
                                     helpIdx = 0;
                                 } else {
-                                     helpIdx -= 1;
+                                    helpIdx -= 1;
                                 }
                             } else {
-                            
-                                 helpIdx += 1;
+                                helpIdx += 1;
                                 if (helpIdx >= HELPCONTENT.length) {
-                                helpIdx = 0;
+                                    helpIdx = 0;
+                                }
                             }
-                            }
+
                             var imageScale = 55 * turtleBlocksScale;
                             helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                         }
+
                         update = true;
                     });
 
@@ -3063,17 +3064,11 @@ handleComplete);
                     img.onload = function () {
                         console.log(turtleBlocksScale);
                         var bitmap = new createjs.Bitmap(img);
-                        /*
-                        if (turtleBlocksScale > 1) {
-                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = turtleBlocksScale;
-                        } else {
-                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1.125;
-                        }
-                        */
                         if (helpContainer.children.length > 0) {
                             console.log('delete old help container');
                             helpContainer.removeChild(helpContainer.children[0]);
                         }
+
                         helpContainer.addChild(bitmap)
 
                         var bounds = helpContainer.getBounds();
@@ -3087,6 +3082,7 @@ handleComplete);
                         if (!doneTour) {
                             docById('helpElem').style.visibility = 'visible';
                         }
+
                         update = true;
                     };
 
@@ -3115,7 +3111,6 @@ handleComplete);
                         // bitmap.scaleX = bitmap.scaleY = bitmap.scale = turtleBlocksScale;
                     }
                 }
-
             }
 
             doneTour = storage.doneTour === 'true';
@@ -3129,6 +3124,7 @@ handleComplete);
                 } else {
                     storage.doneTour = 'true';
                 }
+
                 docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                 docById('helpElem').style.visibility = 'visible';
                 helpContainer.visible = true;
