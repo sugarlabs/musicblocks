@@ -466,7 +466,7 @@ msgstr "ペン"
 #: js/turtledefs.js:23
 #: js/basicblocks.js:399
 msgid "number"
-msgstr "数字"
+msgstr "数字・算数"
 
 #: js/analytics.js:380
 #: js/turtledefs.js:23
@@ -1848,13 +1848,14 @@ msgstr "音階の音符を上る"
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr "ピッチ番号"
+msgstr "ピッチ数字"
 
 #: js/basicblocks.js:159
 #.TRANS: MIDI is a technical standard for electronic music
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
+## To be verified
 msgid "set pitch number offset"
-msgstr "ピッチ番号のゼロを設定"
+msgstr "ピッチ数字のゼロを設定"
 
 #: js/basicblocks.js:160
 #: js/basicblocks.js:217
@@ -1992,7 +1993,7 @@ msgstr "ハーツ"
 #: js/basicblocks.js:398
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
-msgstr "温度"
+msgstr "音度"
 
 #: js/basicblocks.js:411
 #.TRANS: step some number of notes in current mode
@@ -3171,7 +3172,7 @@ msgstr "ネズミの演奏した音符"
 #.TRANS: convert current note for this turtle to piano key (1-88)
 ## Is there a Japanese technical word for "pitch number"; below is literal
 msgid "mouse pitch number"
-msgstr "ネズミのピッチ番号"
+msgstr "ネズミのピッチ数字"
 
 #: js/basicblocks.js:3197
 #: js/basicblocks.js:3207

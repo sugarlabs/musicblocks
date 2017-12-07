@@ -74,71 +74,50 @@
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg
- "A single 音価 block (top) and two consecutive 音価
- blocks (bottom)")
+ "一つの音価ブロック（上）と二つの連続的な音価ブロック（下）")
 
-At the top of the example above, a single (detached) *音価*
-block is shown. The `1/8` is value of the note, which is, in this
-case, an eighth note.
+上の例に、一つの（分離した）*音価*ブロックがあります。そのブロックに1/8の数値の数字ブロックがつながっています。1/8の数値は音符の音価です。その1/8の音価と言うのは八分音符とも言います。
 
-At the bottom, two notes that are played consecutively are shown. They
-are both `1/8` notes, making the duration of the entire sequence
-`1/4`.
+その下に、二つの分理的に鳴らされる音符があります。両方とも'1/8'音符で、全部で音価の合計が'1/4'音符の同じ長さです。
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg
- "A quarter note, a sixteenth note, and a half note 音価
- blocks")
+ "八分音符、四分音符、十六分音符、半音符のも, 音価ブロックがあります。")
 
-In this example, different note values are shown. From top to bottom,
-they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
-`1/2` for a half note.
+この例に、違う音価があります。上から、四分音符の'1/4'、十六音付の'1/16'、半音符の'1/2'です。
 
-Note that any mathematical operations can be used as input to the
-*音価*.
+*音価*ブロックの数値を数字・計算のブロックでいろいろな算数ができますよ。
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg
- "A chart of note values and their corresponding note value blocks")
+ "音価とその音価の音価ブロックの図表です。")
 
-Please refer to the above picture for a visual representation of note
-values.
+上の図表を使って音価とその音価のブロックを閲覧してください。
 
 ### <a name="ピッチ"></a>
-2.2 ピッチのブロック As we have seen, *ピッチ* blocks are used inside the
-[*音価*](#音価) blocks. The *ピッチ* block specifies the
-ピッチ name and ピッチ octave of a note that in combination determines
-the frequency (and therefore ピッチ) at which the note is played.
+2.2 ピッチのブロック
+
+*ピッチ*ブロックは[*音価*](#音価)ブロックの中に使われています。*ピッチ*ブロックはピッチの名前とピッチのオクターヴを決めます。ピッチの名前とオクターヴの数値を組み合わせて、音符の振動（音波の振動）を決めます。
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg
- "Specifying a ピッチ block's name and octave")
+ "ピッチブロックの名前とオクターヴを決める方法")
 
-There are many systems you can use to specify a *ピッチ* block's name
-and octave. Some examples are shown above.
+*ピッチ*の名前の選ばれるブロックが色々あります。次に例えが説明してあります。
 
-The top *ピッチ* block is specified using a *Solfege* block (`Sol` in
-`Octave 4`), which contains the notes `Do Re Me Fa Sol La Ti `.
+上の*ピッチ*ブロックが*ソルフェージュ*ブロックで決められています。そのピッチ・ブロックは'ソル'と'4オクターヴ'のインプットがあります。ソルフェージュの名前が「ド、レ、ミ、ファ、ソ、ラ、シ」から選ぶことができます。
 
-The ピッチ of the next block is specified using a *ピッチ-name* block
-(`G` in `Octave 4`), which contains the notes `C D E F G A B`.
+その次のピッチ・ブロックの選ばれているピッチが*ピッチ・アルファベット*ブロックで決められています。そのピッチ・ブロックのインプットは'G'と'4オクターヴ'です。ピッチ・アルファベットの名前が「C D E F G A B」から選ぶことができます。
 
-The next block is specified using a *Scale-degree* block (the `5th note`
-in the scale, 'G', also in 'Octave 4'), `C == 1, D == 2, ...`
+その次のブロックが*音度*ブロックで例の選ばれている数値が音階(スケールかモード)の五度でオクターヴが４の意味です。`C == 1, D == 2, ...` (<<=== is this still correct for our newer method of scale degree??? Please check!)
 
-The next block is specified using a *ピッチ-number* block (the `7th
-semi-tone` above `C` in `Octave 4`). The offset for the ピッチ number
-can be modified using the *Set-ピッチ-number-offset* block.
+その次のブロックは*ピッチ数字*ブロックでピッチが選ばれています。７のインプットで４オクターヴのC音符から７半音のピッチの意味です。ピッチ数字のゼロはどの絶対ピッチか*ピッチ数字のゼロを設定*ブロックで決めることができます。
 
-The ピッチ of the last block is specified using the *Hertz* block in
-conjunction with a *Number* block (`392` Hertz) , which corresponds to
-the frequency of the sound made.
+一番下にあるブロックのピッチは*ハーツ*ブロックで決められています。ハーツ・ブロックは*数字・算数*の色々のブロックと一緒に使います。例のハーツ・ブロックの数値は`392`で音符が392ハーツのピッチで鳴らします。
 
-The octave is specified using a number block and is restricted to
-whole numbers. In the case where the ピッチ name is specified by
-frequency, the octave is ignored.
+ハーツを使うとオクターヴのインプットがむしして、整数だけの数値がインプットできます。(Why is it restricted to whole numbers???)
 
-Note that the ピッチ name can also be specified using a *Text* block. 
+ピッチの名前は*文事*ブロックでもインプットができますよ。 
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg "Note layout chart for keyboard")
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg "Note layout chart for mallet")
@@ -251,7 +230,7 @@ Another way to move up and down notes in a scale is to use the
 *Consonant Step Up* and *Consonant Step Down* blocks. These blocks
 calculate the number of half-steps to the next note in the current
 mode. (You can read more about [音楽の音階とモード](#音階とモード) below.) Note
-that the *Mouse ピッチ Number* block returns the ピッチ number of the
+that the *Mouse,ピッチ,数字・算数* block returns the ピッチ number of the
 most recent note played.
 
 #### <a name="シャープ(嬰)とフラット(変)"></a>3.2.2 シャープ(嬰)とフラット(変)
