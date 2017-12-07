@@ -1930,6 +1930,7 @@ function Synth() {
         case 'noise3':
             instrumentsSource[instrumentName] = [4, sourceName];
             console.log(sourceName);
+            console.log("pitches are ignored when noise feature is used");
             var builtin_synth = new Tone.NoiseSynth(synthOptions);
             break;
         default:
