@@ -2175,12 +2175,19 @@ function Synth() {
     this.setVolume = function (instrumentName, volume) {
         // volume in decibals
         var db = this.tone.gainToDb(volume / 100);
-        instruments[instrumentName].volume.value = db;
+        if (instrumentName in instruments) {
+            instruments[instrumentName].volume.value = db;
+        }
     };
 
     this.getVolume = function (instrumentName) {
         // volume in decibals
-        return instruments[instrumentName].volume.value;
+        if (instrumentName in instruments) {
+            return instruments[instrumentName].volume.value;
+        } else {
+            console.log('instrument not found');
+            return 50;
+        }
     };
 
     this.setMasterVolume = function (volume) {

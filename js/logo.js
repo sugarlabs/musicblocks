@@ -11,6 +11,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 const DEFAULTVOLUME = 50;
+const DEFAULTNOISEVOLUME = 10;
 const TONEBPM = 240;  // Seems to be the default.
 const TARGETBPM = 90;  // What we'd like to use for beats per minute
 const DEFAULTDELAY = 500;  // milleseconds
@@ -962,7 +963,10 @@ function Logo () {
             this.chorusDepth[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.pickup[turtle] = 0;
-            this.synthVolume[turtle] = {'default': [DEFAULTVOLUME]};
+            this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
+                                        'noise1': [DEFAULTNOISEVOLUME],
+                                        'noise2': [DEFAULTNOISEVOLUME],
+                                        'noise3': [DEFAULTNOISEVOLUME]};
             this.beatsPerMeasure[turtle] = 4;  // Default is 4/4 time.
             this.noteValuePerBeat[turtle] = 4;
             this.currentBeat[turtle] = 0;
@@ -993,7 +997,17 @@ function Logo () {
             this._setMasterVolume(DEFAULTVOLUME);
             for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (var synth in this.synthVolume[turtle]) {
-                    this._setSynthVolume(synth, DEFAULTVOLUME);
+                    switch (synth) {
+                    case 'noise1':
+                    case 'noise2':
+                    case 'noise3':
+                        this._setSynthVolume(synth, DEFAULTNOISEVOLUME);
+                        break;
+                    default:
+                        console.log('default 50');
+                        this._setSynthVolume(synth, DEFAULTVOLUME);
+                        break;
+                    }
                 }
             }
         }
@@ -4350,8 +4364,18 @@ function Logo () {
                 that.synth.loadSynth(synth);
 
                 if (that.synthVolume[turtle][synth] == undefined) {
-                    that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
-                    that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                    switch (synth) {
+                    case 'noise1':
+                    case 'noise2':
+                    case 'noise3':
+                        that.synthVolume[turtle][synth] = [DEFAULTNOISEVOLUME];
+                        that.crescendoInitialVolume[turtle][synth] = [DEFAULTNOISEVOLUME];
+                        break;
+                    default:
+                        that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
+                        that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                        break;
+                    }
                 }
 
                 childFlow = args[1];
@@ -5833,6 +5857,7 @@ function Logo () {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
+            console.log(synth + ' ' + volume);
             this.synth.setVolume(synth, volume);
         }
     };
