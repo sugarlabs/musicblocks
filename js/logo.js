@@ -1004,7 +1004,6 @@ function Logo () {
                         this._setSynthVolume(synth, DEFAULTNOISEVOLUME);
                         break;
                     default:
-                        console.log('default 50');
                         this._setSynthVolume(synth, DEFAULTVOLUME);
                         break;
                     }
@@ -4398,7 +4397,11 @@ function Logo () {
                 for (var synth in that.synthVolume[turtle]) {
                     var vol = last(that.synthVolume[turtle][synth]);
                     that.synthVolume[turtle][synth].push(vol);
-                    that.crescendoInitialVolume[turtle][synth].push(vol);
+                    if (that.crescendoInitialVolume[turtle][synth] == undefined) {
+                        that.crescendoInitialVolume[turtle][synth] = [vol];
+                    } else {
+                        that.crescendoInitialVolume[turtle][synth].push(vol);
+                    }
                 }
 
                 that.inCrescendo[turtle].push(true);
@@ -5179,12 +5182,15 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'articulation':
-            if (args.length === 2 && typeof(args[0]) === 'number' && args[0] > 0) {
+            if (args.length === 2 && typeof(args[0]) === 'number') { // && args[0] > 0) {
                 for (var synth in that.synthVolume[turtle]) {
                     var newVolume = last(that.synthVolume[turtle][synth]) * (100 + args[0]) / 100;
                     if (newVolume > 100) {
                         console.log('articulated volume exceeds 100%. clipping');
                         newVolume = 100;
+                    } else if (newVolume < -100) {
+                        console.log('articulated volume exceeds 100%. clipping');
+                        newVolume = -100;
                     }
 
                     that.synthVolume[turtle][synth].push(newVolume);
@@ -5857,7 +5863,6 @@ function Logo () {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            console.log(synth + ' ' + volume);
             this.synth.setVolume(synth, volume);
         }
     };
