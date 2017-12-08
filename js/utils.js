@@ -209,22 +209,15 @@ function fileBasename (file) {
 };
 
 
-// Needed to generate new data for localization.ini
-// var translated = "";
 function _ (text) {
     var replaced = text;
-    var replace = [",", "(", ")", "?", "¿", "<", ">", ".", '"\n', '"', ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"];
+    var replace = [',', '(', ')', '?', '¿', '<', '>', '.', '\n', '"', ':', '%s', '%d', '/', "'", ';', '×', '!', '¡'];
     for (var p = 0; p < replace.length; p++) {
-        replaced = replaced.replace(replace[p], "");
+        replaced = replaced.replace(replace[p], '');
     }
 
     replaced = replaced.replace(/ /g, '-');
-    // Needed to generate new data for localization.ini
-    // txt = "\n" + replaced + " = " + text;
-    // if (translated.lastIndexOf(txt) === -1) {
-    //     translated = translated + txt;
-    //  }
-    // You can log translated in console.log(translated)
+
     try {
         var translation = document.webL10n.get(replaced);
         if (translation === '') {
