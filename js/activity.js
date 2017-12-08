@@ -1094,7 +1094,7 @@ define(MYDEFINES, function (compatibility) {
 
             var URL = window.location.href;
             var projectName = null;
-            var runProjectOnLoad = false;
+            var flags = {run:false,show:false,collapse:false};
 
             // This happens in the resize code.
             // _setupAndroidToolbar();
@@ -1118,7 +1118,15 @@ define(MYDEFINES, function (compatibility) {
                                 break;
                             case 'run':
                                 if (args[1].toLowerCase() === 'true')
-                                    runProjectOnLoad = true;
+                                    flags.run = true;
+                                break;
+                            case 'show':
+                                if (args[1].toLowerCase() === 'true')
+                                    flags.show = true;
+                                break;
+                            case 'collapse':
+                                if (args[1].toLowerCase() === 'true')
+                                    flags.collapse = true;
                                 break;
                             case 'inurl':
                                 var url = args[1];
@@ -1167,7 +1175,7 @@ define(MYDEFINES, function (compatibility) {
             if (projectName != null) {
                 setTimeout(function () {
                     console.log('loading ' + projectName);
-                    loadStartWrapper(loadProject, projectName, runProjectOnLoad, env);
+                    loadStartWrapper(loadProject, projectName, flags, env);
                 }, 2000);
             } else {
                 setTimeout(function () {
@@ -2209,9 +2217,9 @@ define(MYDEFINES, function (compatibility) {
             }, 5000);
         }
 
-        function loadProject (projectName, run, env) {
+        function loadProject (projectName, flags, env) {
             //set default value of run
-            run = typeof run !== 'undefined' ? run : false;
+            flags = typeof flags !== 'undefined' ? flags : {run:false,show:false,collapse:false};
             // Show busy cursor.
             document.body.style.cursor = 'wait';
             // palettes.updatePalettes();
@@ -2258,29 +2266,40 @@ define(MYDEFINES, function (compatibility) {
                 update = true;
             }, 200);
 
-            if (run && firstRun) {
-                if (document.addEventListener) {
-                    document.addEventListener('finishedLoading', function () {
-                        setTimeout(function () {
-                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                                turtles.turtleList[turtle].doClear(true, true, false);
-                            }
-                            runProject(env);
-                        }, 1000);
-                    }, false);
-                } else {
-                    document.attachEvent('finishedLoading', function () {
-                        setTimeout(function () {
-                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                                turtles.turtleList[turtle].doClear(true, true, false);
-                            }
-                            runProject(env);
-                        }, 1000);
-                    });
-                }
+            var run = flags.run;
+            var show = flags.show;
+            var collapse = flags.collapse;
+            console.log(run);
+            console.log(show);
+            console.log(collapse);
+            var functionload = function () {
+                setTimeout(function () {
+                    if (!collapse){
+                        _toggleCollapsibleStacks();
+                    }
+                    if (run && firstRun){
+                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                            turtles.turtleList[turtle].doClear(true, true, false);
+                        }
+                        runProject(env);
+                        if (show){
+                            _changeBlockVisibility();
+                        }
+                        if (!collapse){
+                            _toggleCollapsibleStacks();
+                        }
+                    } else if (!show){
+                        _changeBlockVisibility();
+                    }
+                    firstRun = false;
+                }, 1000);
             }
 
-            firstRun = false;
+            if (document.addEventListener) {
+                document.addEventListener('finishedLoading', functionload, false);
+            } else {
+                document.attachEvent('finishedLoading', functionload);
+            }
         };
 
         function loadRawProject(data) {
