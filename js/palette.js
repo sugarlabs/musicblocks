@@ -1676,7 +1676,7 @@ function Palette(palettes, name) {
         var bgScrolling = false;
 
         this.protoContainers[blkname].on('mouseover', function (event) {
-            that.palettes.activePalette = palette;
+            that.palettes.activePalette = that;
         });
 
         this.protoContainers[blkname].on('mousedown', function (event) {
