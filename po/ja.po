@@ -304,7 +304,7 @@ msgstr "早く実行"
 #: js/activity.js:2817
 #: js/activity.js:2830
 msgid "long press to run slowly"
-msgstr "長く押すとゆっくりに動く"
+msgstr "長く押すとゆっくりなペースで実行"
 
 #: js/activity.js:2817
 msgid "extra-long press to run music slowly"
@@ -315,7 +315,7 @@ msgstr "もと長く押すと音楽はゆっくりに動く"
 #: js/turtledefs.js:83
 ## Check this
 msgid "Run step by step"
-msgstr "一方一方動き"
+msgstr "一方一方実行"
 
 #: js/activity.js:2819
 #: js/turtledefs.js:84
@@ -1268,7 +1268,7 @@ msgstr "スネア"
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "kick drum"
-msgstr "バスドラム"
+msgstr "バス・ドラム"
 
 #: js/musicutils.js:362
 #: js/basicblocks.js:1815
@@ -3909,7 +3909,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/activity.js:2712
 
 #~msgid "Run fast / long press to run slowly"
-#~msgstr "早く動き・長く押すとゆっくりに動く"
+#~msgstr "早く実行・長く押すとゆっくりなペースで実行"
 
 #~msgid "vspace"
 #~msgstr "縦のスペース"
@@ -3986,7 +3986,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/activity.js:2699
 
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
-#~msgstr "早く動き・長く押すとゆっくりに動く・もと長く押すと音楽はゆっくりに動く"
+#~msgstr "早く実行・長く押すとゆっくりに実行・もと長く押すと音楽はゆっくりなペースで実行"
 
 #: js/logo.js:4992
 

@@ -119,108 +119,83 @@
 
 ピッチの名前は*文事*ブロックでもインプットができますよ。 
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg "Note layout chart for keyboard")
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg "Note layout chart for mallet")
-Please refer to the above charts for a visual representation of where notes are located on a keyboard or staff.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg "音符のピッチとピアノ・キーボード図")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg "音符のピッチとマレット・パーカッション（打楽器）図")
+ピッチブロックはピアノ・キーボード、マレット・パーカッション、音楽譜とどういう関係あるか上の図を使ってください。
 
 ### <a name="和音"></a>2.3 和音
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg "Forming a chord")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg "和音の作る方法")
 
-A chord (multiple, simultaneous ピッチ) can be specified by adding
-multiple *ピッチ* blocks into a single *音価* block, like the above example.
+和音(一つよりの一緒に鳴らされているピッチ)は一つの*音価*ブロックの中に*ピッチ*ブロックを、上の例のように、一つ以上入れます。
 
 ### <a name="休符"></a>2.4 休符
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg "Silence blocks create rests")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg "休符ブロックの使い方")
 
-A rest of the specified note value duration can be constructed using a *Silence* block in place of a *ピッチ* block.
+休符ブロックは*音価*ブロックの中に入れるとその音価の長さで入れられているネズミが音鳴らしを休みます。
+
+*ピッチ*ブロックを出すと自動的に休符が現れます。
 
 ### <a name="ドラム"></a>2.5 ドラム
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg "Using Drum Sample block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg "ドラム・ブロックの使える例")
 
-Anywhere  a *ピッチ* block can be used&mdash;e.g., inside of the matrix or a
-*音価* block&mdash;a *Drum Sample* block can also be used instead. Currently there
-about two dozen different samples from which to choose. The default
-drum is a kick drum.
+*ピッチ*ブロックのも使える場合と同じでドラム・ブロックがピッチ時刻グラフか*音価*ブロックの中にも使えます。今、24個ぐらいのドラムの音の中から選ぶことができます。デフォルトのドラムがバス・ドラムです。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg "Multiple Drum Sample blocks in combinations")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg "一つよりのドラムの音を同時に")
 
-Just as in the [chord](#CHORD) example above, you can use multiple *Drum* blocks
-within a single *音価* blocks, and combine them with *ピッチ*
-blocks as well.
+この上の例のように[和音](#和音)一つよりの*ドラム*ブロックが一緒に使えます。一つの*音価*ブロックの中に一つよりのドラム・ブロックと*ピッチ*ブロックとお好み組み合わせて音の楽しみができます。
 
 ## <a name="音楽でプログラミング"></a>3. 音楽でプログラミング
 
 [前のトピック (2. 音の関係)](#音符) | [目次に戻す](#目次) | [次のトピック (4. ウィジェット)](#ウィジェット)
 
-This section of the 案内 discusses how to use chunks of notes to
-program music. Note that you can program with chunks you create by
-hand or use the [*ピッチ時刻グラフ*](#ピッチ時刻グラフ) widget to help you get started.
+このセクションのトピックはチャンクで*動作*ブロックを使って音楽とプログラミングができます。チャンクが自分で動作ブロックを使って作ることも、[*ピッチ時刻グラフ*](#ピッチ時刻グラフ)を使って作ることもできます。
 
 ### <a name="チャンク"></a>3.1 チャンク
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "working of action stack")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "動作ブロックの使われる例")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg "using chunk inside Start block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg "チャンクがスタート・ブロックの中に使われる例")
 
-Every time you create a new *Action* stack, ミュージック・ブロックス creates a new
-block specific to, and linked with, that stack. (The new block is
-found at the top of the *Block* palette, found on the left edge of the
-screen.) Clicking on and running this block is the same as clicking on
-your stack. By default, the new blocks are named `chunk`, `chunk1`,
-`chunk2`... but you can rename them by editing the labels on the
-*Action* blocks.
+新しい*動作*ブロックをパレットから引く時、自動的に新しいブロックが作られます。その新しいブロックが*動作*パレットの一番上に現れます。新しいブロックがパレットから引かれたブロックのコードを絶対的に読んで実行します。ですから新しいブロックのコード・スタックをクリックしても引かれたブロックをクリックしても効果が同じです。パレットから引かれるデフォールトの名前が`チャンク`,`チャンク1`,`チャンク2`…です。そのデフォールトの名前が好きに変えることができます。いくつもパレットからお好み引いて使えます。
 
-An *Action* block contains a sequence of actions that will only be executed
-when the block is referred to by something else, such as a start block. This is useful
-in orchestrating more complex programs of music.
+*動作*の色々のブロックが入れられているブロックを読んで実行するためです。*動作*ブロックはいつも呼ばれた時にしか実行しません。例えば、スタート・ブロックの中にあるのが実行のボタンが押された時にしか実行しません。自分のコードと音楽を整理するためにすごく便利で約に立ちます。
 
-A *Start* Block is a *chunk* that will automatically be executed once the start button is pressed.
-This is where most of your programs will begin at.  There are many ways to *Run* a program: you can click
-on the *Run* button at the upper-left corner of the screen (the "rabbit") to run the music at a fast speed; click on the
-*Run Slow* button (the "turtle") to run it slower; and the *Step* button (the "snail"),
-to step  through the program one block per button press. 
+*スタート*ブロックは*動作*ブロックの一つの特別な種類です。実行のボタンをクリックするとすべてのスタート・ブロックの中に入っているコードが実行されます。スタート・ブロックはプロジェクトの初めでしょうか。
 
-In the example above, the *Chunk* block is inside of a *Start* block, which means
-that when any of the start buttons is pressed, the code inside the *Start* block (the *Chunk* block) will
-be executed. You can add more chunks after this one inside the *Start* block to execute them
-sequentially.
+自分のプロジェクトを*実行*するために、いろんな方法がありまして画面の上左の*実行*ボタンを押すと三つの実行の早さのオプションがあります。一般押すと早く実行、少し長く押すとゆっくりなペースで実行、もと長く押すと音楽はゆっくりに動く。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg "usage of multiple Chunk blocks")
+上の例に*チャンク*ブロックは*スタート*ブロックの中で実行のボタンを押すと*スタート*ブロックの中に入ってるコード（この例で*チャンク*ブロック）が読まれて実行します。この例のブロックを変えたかったら、*スタート*ブロックにあるものを変えるだけです。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg "usage of Repeat block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg "一つ以上のチャンク・ブロックを使う例")
 
-You can [repeat](#繰り返し) chunks either by using multiple *Chunk* blocks or using a
-*Repeat* block.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg "回繰り返すブロックを使う例")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg "multiple action stacks")
+[回繰り返す](#繰り返し)チャンクを作る方法が色々あります。一つ以上の*チャンク*ブロックを一つ一つ使うか*回繰り返す*ブロックを使う方法もあります。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg "mixing and matching chunks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg "一つ以上の動作ブロック")
 
-You can also mix and match chunks. Here we play the action block with
-name "chunk", followed by "chunk1" twice, and then "chunk" again.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg "チャンクを一緒で順を変える例")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg "creating a song using chunks")
+チャンクの順も変えて効果が変えます。上の例で最初に"チャンク"を弾いて、次に"チャンク1"二回で、最後に"チャンク"をまた弾きます。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg "usage of Repeat block in a song")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg "チャンクで音楽を作る例")
 
-A few more chunks and we can make a song. (Can you read the block
-notation well enough to guess the outcome? Are you familiar with the
-song we created?)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg "回繰り返すブロックを使って音楽を作る例")
+
+チャンクを組み合わせて音楽が作れます！上のメロディーご存知ですか？（ミュージック・ブロックのコードを読んでチャレンジしてみてください）
 
 ### <a name="転化"></a>3.2 音楽的の転化
 
-There are many ways to transform ピッチ, リズム, and other sonic qualities.
+ピッチとリズムを転化する方法がいっぱいあります。次に読んで、やってみましょう。
 
 #### <a name="音符動き"></a>3.2.1 音符動きのブロック
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg "Using the Step ピッチ block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg " 音程動きブロックの使える例")
 
-The *Step ピッチ* block will move up or down notes in a scale from the
-last played note. In the example above, *Step ピッチ* blocks are used inside
-of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
+*音程動き*ブロックはメロディーの音符を音階的に上/下に動かすことができます。上の例に*音程動き*ブロックが*回繰り返す*ブロックの中でその入ってるコードが7回繰り返して、音階の音程で音符が上に上がって、下に下ろし動きます。
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
@@ -235,25 +210,22 @@ most recent note played.
 
 #### <a name="シャープ(嬰)とフラット(変)"></a>3.2.2 シャープ(嬰)とフラット(変)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "Using Sharp and Flat blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "シャープ（嬰）とフラット（変）の使える例")
 
-The *Sharp* and *Flat* blocks can be wrapped around *ピッチ* blocks,
-*音価* blocks, or [chunks](#チャンク). A sharp will raise the ピッチ by one
-half step. A flat will lower by one half step. In the example, on the
-left, just the *ピッチ* block `Mi` is lowered by one half step; on the
-right, both *ピッチ* blocks are raised by one half step.
+♯は日本語で嬰（えい）、♭は変（へん）
+*シャープ（嬰）*と*フラット（変）*のブロックは*ピッチ*ブロックか*音価*ブロックか[チャンク](#チャンク)を巻いてピッチを転化することができます。一つの*シャープ（嬰）*ブロックを使ってピッチが半音上で変えます。一つの*フラット（変）*ブロックを使ってピッチが半音下で変えます。左の例*ピッチ*ブロックが'ミ'で*フラット（変）*の訳でピッチが半音下変えます(ミ♭になります)。右の例、二つの*ピッチ*ブロックも（和音）が両方のピッチも半音上変えます。
 
 #### <a name="移調をアジャスト"></a>3.2.3 移調をアジャスト
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "Adjust-transposition")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "移調をアジャスト")
 
-The *Adjust-transposition* block can be used to make larger shifts in
+The *移調をアジャスト* block can be used to make larger shifts in
 ピッチ in half step units. A positive number shifts the ピッチ up and a
 negative number shifts the ピッチ down. The input must be a whole
 number. To shift an entire octave, transpose by 12 half-steps up. -12
 will shift an octave down.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using Adjust-transposition")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using 移調をアジャスト")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
@@ -281,10 +253,10 @@ note.
 
 #### <a name="繰り返し"></a>3.2.6 回繰り返し音符
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "repeating notes")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "回繰り返すing notes")
 
-There are several ways to repeat notes. The *Repeat* block will play a
-sequence of notes multiple times; the *Duplicate* block will repeat each
+There are several ways to 回繰り返す notes. The *回繰り返す* block will play a
+sequence of notes multiple times; the *Duplicate* block will 回繰り返す each
 note in a sequence.
 
 In the example, on the left, the result would be `Sol, Re, Sol, Sol,
@@ -350,10 +322,10 @@ the *Minor* block calculates an absolute interval, e.g., a minor
 third. Other absolute intervals include *Perfect*, *Diminished*, and
 *Major*.
 
-In the augmented fifth example above, a chord of D5 and A5 are played,
-followed by a chord of E5 and C5. In the minor third example, which
-includes a shift of one octave, first a chord of D5 and F5 is played,
-followed by chord of E5 and G6.
+In the augmented fifth example above, a 和音 of D5 and A5 are played,
+followed by a 和音 of E5 and C5. In the minor third example, which
+includes a shift of one octave, first a 和音 of D5 and F5 is played,
+followed by 和音 of E5 and G6.
 
 #### <a name= "転回"></a>3.2.11 音符転回
 
@@ -373,7 +345,7 @@ around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg "Backward block")
 
 The *Backward* block will play the contained notes in reverse order
-(retrograde). In the example above, the notes in *Chunk* are played as
+(retrograde). In the example above, the notes in *チャンク* are played as
 `Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
 stack.
 
@@ -418,17 +390,17 @@ the rate of the variation.
 
 ### <a name="声部"></a>3.3 声部
 
-Each *Start* block runs as a separate voice in ミュージック・ブロックス. (When
-you click on the Run button, all of the *Start* blocks are run
+Each *スタート* block runs as a separate voice in ミュージック・ブロックス. (When
+you click on the 実行 button, all of the *スタート* blocks are run
 concurrently.)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg "use of voices")
 
 If we put our song into an action...
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg "running the song using multiple Start blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg "running the song using multiple スタート blocks")
 
-...we can run it from multiple *Start* blocks.
+...we can run it from multiple *スタート* blocks.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg "shifting the octaves up and down")
 
@@ -450,10 +422,10 @@ the multiple voices are synced to the same master clock.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick drum")
 
-A special "drum" version of the *Start* block is available for laying
+A special "drum" version of the *スタート* block is available for laying
 down a drum track. Any *ピッチ* blocks encounted while starting from a
 drum will be played as `C2` with the default drum sample. In the
-example above, all of the notes in `chunk` will be played with a kick
+example above, all of the notes in `チャンク` will be played with a kick
 drum.
 
 ### <a name="グラフィックス"></a>3.4 Adding graphics
@@ -468,7 +440,7 @@ blocks, the graphics stay in sync with the music. In this example, the
 turtle moves forward each time a quarter note is played. It turns
 right during the eighth note. The ピッチ is raised by one half step,
 the pen size decreases, and the pen color increases at each step in
-the inner repeat loop.
+the inner 回繰り返す loop.
 
 [ライブで再生](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_graphicsexample.tb)
 
@@ -537,10 +509,10 @@ tracking the mouse position to impact some aspect of the music.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg "interactions")
 
-For example, we can launch the phrases (chunks) interactively. When
-the mouse is in the lower-left quadrant, `chunk` is played;
-lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
-upper-right quadrant, `chunk3`.
+For example, we can launch the phrases (チャンク) interactively. When
+the mouse is in the lower-left quadrant, `チャンク` is played;
+lower-right quadrant, `チャンク1`; upper-left quadrant, `チャンク2`; and
+upper-right quadrant, `チャンク3`.
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb)
 
@@ -557,8 +529,8 @@ make an 8-key piano?
 You can also add a bit of randomness to your music. In the top example
 above, the *One-of* block is used to randomly assign either `Do` or
 `Re` each time the *音価* block is played. In the bottom example
-above, the *One-of* block is used to randomly select between `chunk1`
-and `chunk2`.
+above, the *One-of* block is used to randomly select between `チャンク1`
+and `チャンク2`.
 
 ## <a name="ウィジェット"></a>ウィジェット
 
@@ -590,7 +562,7 @@ example above, the 音量 is divided by 10 before being displayed.
 
 ### <a name="GENERATION"></a>4.2 Generating チャンク of Notes 
 
-Using the ピッチ時刻グラフ, it is possible to generate chunks of notes at a much faster speed.
+Using the ピッチ時刻グラフ, it is possible to generate チャンク of notes at a much faster speed.
 
 #### <a name="ピッチ時刻グラフ"></a>4.2.1 The ピッチ時刻グラフ
 
@@ -601,7 +573,7 @@ for getting started.
 
 Once you've launched ミュージック・ブロックス in your browser, start by clicking
 on the *ピッチ時刻グラフ* stack that appears in the middle of the
-screen. (For the moment, ignore the *Start* block.) You'll see a grid
+screen. (For the moment, ignore the *スタート* block.) You'll see a grid
 organized vertically by ピッチ and horizontally by リズム.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg "ピッチ and リズム block matrix")
@@ -615,13 +587,13 @@ see five rows, one for each ピッチ. (A sixth row at the bottom is used
 for specifying the リズム・ブロック associated with each note.) Also by
 default, there are two *リズム* blocks, which specifies six quarter
 notes followed by one half note. Since the *リズム* blocks are inside
-of a *Repeat* block, there are fourteen (2 x 7) columns for selecting
+of a *回繰り返す* block, there are fourteen (2 x 7) columns for selecting
 notes.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg "matrix")
 
 By clicking on individual cells in the grid, you should hear
-individual notes (or chords if you click on more than one cell in a
+individual notes (or 和音s if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
@@ -634,12 +606,12 @@ you will hear a sequence of notes played (from left to right): `Re 4`,
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg "save button")
 
 
-Once you have a group of notes (a "chunk") that you like, click on the
+Once you have a group of notes (a "チャンク") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
 create a stack of blocks that can used to play these same notes
 programmatically. (More on that below.)
 
-You can rearrange the selected notes in the grid and save other chunks
+You can rearrange the selected notes in the grid and save other チャンク
 as well.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/sort.svg "sort button")
@@ -660,22 +632,22 @@ button in the top row of the grid.)
 There is also an Erase button that will clear the grid.
 
 Don't worry. You can reopen the matrix at anytime (it will remember
-its previous state) and since you can define as many chunks as you
+its previous state) and since you can define as many チャンク as you
 want, feel free to experiment.
 
-Tip: You can put a chunk inside a *ピッチ時刻グラフ* block to generate
-the matrix to corresponds to that chunk.
+Tip: You can put a チャンク inside a *ピッチ時刻グラフ* block to generate
+the matrix to corresponds to that チャンク.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "usage of octave for a ピッチ")
 
-The chunk created when you click on the matrix is a stack of
-blocks. The blocks are nested: an *Action* block contains three *Note
-value* blocks, each of which contains a *ピッチ* block. The *Action*
+The チャンク created when you click on the matrix is a stack of
+blocks. The blocks are nested: an *動作* block contains three *Note
+value* blocks, each of which contains a *ピッチ* block. The *動作*
 block has a name automatically generated by the matrix, in this case,
-chunk. (You can rename the action by clicking on the name.). Each note
+チャンク. (You can rename the action by clicking on the name.). Each note
 has a duration (in this case 4, which represents a quarter note). Try
 putting different numbers in and see (hear) what happens. Each note
-block also has a ピッチ block (if it were a chord, there would be
+block also has a ピッチ block (if it were a 和音, there would be
 multiple *ピッチ* blocks nested inside the Note block's clamp). Each
 ピッチ block has a ピッチ name (`Re`, `Mi`, and `Sol`), and a ピッチ
 octave; in this example, the octave is 4 for each ピッチ. (Try changing
@@ -764,7 +736,7 @@ The argument to the *Rhythm Ruler* block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
 / 1, e.g., a whole note.
 
-The *Set Drum* blocks contained in the clamp of the *Rhythm Ruler*
+The *Set ドラム* blocks contained in the clamp of the *Rhythm Ruler*
 block indicates the number of リズム・ブロック to be defined simultaneously. By
 default, two リズム・ブロック are defined. The embedded *リズム* blocks define
 the initial subdivision of each rhythm ruler.
@@ -808,7 +780,7 @@ with the *ピッチ時刻グラフ* block.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg "save drum machine button")
 
-The *Save drum machine* button will export *Start* stacks that will
+The *Save drum machine* button will export *スタート* stacks that will
 play the リズム・ブロック as drum machines.
 
 ### <a name="音階とモード"></a>4.4 音楽の音階とモード
@@ -900,8 +872,8 @@ can be used inside the *ピッチ時刻グラフ* block.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg "ピッチ・ドラム・グラフ")
 
-The *Set Drum* block is used to map the enclosed pitches into drum
-sounds. Drum sounds are played in a monopitch using the specified drum
+The *Set ドラム* block is used to map the enclosed pitches into drum
+sounds. ドラム sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substitued for
 each occurance of a `Re` `4`.
 
@@ -913,7 +885,7 @@ each occurance of a `Re` `4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg "ピッチ・ドラム・グラフ 1")
 
-As an experience for creating mapping with the *Set Drum* block, we
+As an experience for creating mapping with the *Set ドラム* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
