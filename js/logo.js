@@ -11,7 +11,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 const DEFAULTVOLUME = 50;
-const DEFAULTNOISEVOLUME = 10;
+const DEFAULTNOISEVOLUME = 2;
 const TONEBPM = 240;  // Seems to be the default.
 const TARGETBPM = 90;  // What we'd like to use for beats per minute
 const DEFAULTDELAY = 500;  // milleseconds
