@@ -1094,7 +1094,7 @@ define(MYDEFINES, function (compatibility) {
 
             var URL = window.location.href;
             var projectName = null;
-            var flags = {run:false,show:false,collapse:false};
+            var flags = {run: false, show: false, collapse: false};
 
             // This happens in the resize code.
             // _setupAndroidToolbar();
@@ -2219,7 +2219,7 @@ define(MYDEFINES, function (compatibility) {
 
         function loadProject (projectName, flags, env) {
             //set default value of run
-            flags = typeof flags !== 'undefined' ? flags : {run:false,show:false,collapse:false};
+            flags = typeof flags !== 'undefined' ? flags : {run: false, show: false, collapse: false};
             // Show busy cursor.
             document.body.style.cursor = 'wait';
             // palettes.updatePalettes();
@@ -2269,9 +2269,7 @@ define(MYDEFINES, function (compatibility) {
             var run = flags.run;
             var show = flags.show;
             var collapse = flags.collapse;
-            console.log(run);
-            console.log(show);
-            console.log(collapse);
+
             var functionload = function () {
                 setTimeout(function () {
                     if (!collapse){

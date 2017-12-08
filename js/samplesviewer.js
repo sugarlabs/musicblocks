@@ -82,9 +82,9 @@ const LOCAL_PROJECT_TEMPLATE ='\
             <input type="text" name="shareurl" id="shareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;"/> \
             <div id="checkboxdiv_NUM_" style="display:none;"> \
                 <h4 style="margin-top: 10px;margin-bottom: 5px;">Set Options</h4> \
-                <div><input type="checkbox" name="run" id="checkbox_NUM_run" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_run">Run project on startup</label></div> \
-                <div><input type="checkbox" name="show" id="checkbox_NUM_show" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_show">Show code blocks on startup</label></div> \
-                <div><input type="checkbox" name="collapse" id="checkbox_NUM_collapse" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_collapse">Collapse code blocks on startup</label></div> \
+                <div><input type="checkbox" name="run" id="checkbox_NUM_run" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_run">' + _('Run project on startup.') + '</label></div> \
+                <div><input type="checkbox" name="show" id="checkbox_NUM_show" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_show">' + _('Show code blocks on startup.') + '</label></div> \
+                <div><input type="checkbox" name="collapse" id="checkbox_NUM_collapse" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_collapse">' + _('Collapse code blocks on startup.') + '</label></div> \
             </div> \
         </div> \
         </span> \
@@ -547,55 +547,59 @@ function PlanetView(model, controller) {
             } else {
                 var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
             }
+
             var n = i.toString();
-            var box = document.getElementById('shareurldiv'+n);
+            var box = document.getElementById('shareurldiv' + n);
             var rect = box.getBoundingClientRect();
             if (rect.left + window.pageXOffset < 0){
-                box.style.left = "auto";
+                box.style.left = 'auto';
             }
             if (rect.right + window.pageXOffset > window.innerWidth){
-                box.style.left = "-255px";
+                box.style.left = '-255px';
             }
-            hideOnClickOutside('#shareurldiv'+n,false);
-            docById('shareurldiv'+n).style.visibility = 'visible';
-            docById('shareurlbox'+n).style.visibility = 'visible';
-            docById('shareurltri'+n).style.visibility = 'visible';
-            docById('shareurlbox'+n).value = url;
-            docById('shareurlbox'+n).setAttribute("data-originalurl",url);
-            document.getElementById("checkbox"+n+"run").checked = true;
-            document.getElementById("checkbox"+n+"show").checked = false;
-            document.getElementById("checkbox"+n+"collapse").checked = false;
-            updateCheckboxes('shareurldiv'+n);
-            docById('shareurlbox'+n).focus();
-            docById('shareurlbox'+n).select();
+            hideOnClickOutside('#shareurldiv' + n, false);
+            docById('shareurldiv' + n).style.visibility = 'visible';
+            docById('shareurlbox' + n).style.visibility = 'visible';
+            docById('shareurltri' + n).style.visibility = 'visible';
+            docById('shareurlbox' + n).value = url;
+            docById('shareurlbox' + n).setAttribute('data-originalurl', url);
+            document.getElementById('checkbox' + n + 'run').checked = true;
+            document.getElementById('checkbox' + n + 'show').checked = false;
+            document.getElementById('checkbox' + n + 'collapse').checked = false;
+            updateCheckboxes('shareurldiv' + n);
+            docById('shareurlbox' + n).focus();
+            docById('shareurlbox' + n).select();
         };
     };
 
     this.planetshare = function (ele, i) {
         return function () {
-            if (_THIS_IS_MUSIC_BLOCKS_&&ele.attributes["data-ismb"].value=="true") {
+            if (_THIS_IS_MUSIC_BLOCKS_&&ele.attributes['data-ismb'].value=='true') {
                 var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
             } else {
                 var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
             }
+
             var n = i.toString();
-            var box = document.getElementById('plshareurldiv'+n);
+            var box = document.getElementById('plshareurldiv' + n);
             var rect = box.getBoundingClientRect();
             if (rect.left + window.pageXOffset < 0){
-                box.style.left = "auto";
+                box.style.left = 'auto';
             }
-            if (rect.right + window.pageXOffset > window.innerWidth){
-                box.style.left = "-255px";
+
+            if (rect.right + window.pageXOffset > window.innerWidth) {
+                box.style.left = '-255px';
             }
-            hideOnClickOutside('#plshareurldiv'+n,true);
+
+            hideOnClickOutside('#plshareurldiv' + n, true);
             docById('plshareurldiv'+n).style.visibility = 'visible';
             docById('plshareurlbox'+n).style.visibility = 'visible';
             docById('plshareurltri'+n).style.visibility = 'visible';
             docById('plshareurlbox'+n).value = url;
-            docById('plshareurlbox'+n).setAttribute("data-originalurl",url);
-            document.getElementById("plcheckbox"+n+"run").checked = true;
-            document.getElementById("plcheckbox"+n+"show").checked = false;
-            document.getElementById("plcheckbox"+n+"collapse").checked = false;
+            docById('plshareurlbox'+n).setAttribute('data-originalurl', url);
+            document.getElementById('plcheckbox' + n + 'run').checked = true;
+            document.getElementById('plcheckbox' + n + 'show').checked = false;
+            document.getElementById('plcheckbox' + n + 'collapse').checked = false;
             updateCheckboxes('plshareurldiv'+n);
             docById('plshareurlbox'+n).focus();
             docById('plshareurlbox'+n).select();
