@@ -22,9 +22,9 @@ window.server = SERVER; 'https://turtle.sugarlabs.org/server/'; // '/server/';
 
 //{NAME} will be replaced with project name
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    var SHAREURL = 'https://walterbender.github.io/musicblocks/index.html?file={name}&run=True';
+    var SHAREURL = 'https://walterbender.github.io/musicblocks/index.html?file={name}';
 } else {
-    var SHAREURL = 'https://walterbender.github.io/turtleblocksjs/index.html?file={name}&run=True';
+    var SHAREURL = 'https://walterbender.github.io/turtleblocksjs/index.html?file={name}';
 }
 
 const NAMESUBTEXT = '{name}';
@@ -73,12 +73,19 @@ const LOCAL_PROJECT_TEMPLATE ='\
         <img class="open icon" title="' + _('Open') + '" alt="' + _('Open') + '" src="header-icons/edit.svg" /> \
         <img class="delete icon" title="' + _('Delete') + '" alt="' + _('Delete') + '" src="header-icons/delete.svg" /> \
         <img class="publish icon" title="' + _('Publish') + '" alt="' + _('Publish') + '" src="header-icons/publish.svg" /> \
-        <span class="shareurlspan"> \
+        <span class="shareurlspan" id="shareurlspan_NUM_"> \
         <img class="share icon" title="' + _('Share') + '" alt="' + _('Share') + '" src="header-icons/share.svg" /> \
         <div class="tooltiptriangle" id="shareurltri_NUM_"></div> \
         <div class="shareurltext" id="shareurldiv_NUM_"> \
-            Copy the link to share your project:\
-            <input type="text" name="shareurl" id="shareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;" onblur="document.getElementById(\'shareurldiv_NUM_\').style.visibility = \'hidden\';document.getElementById(\'shareurlbox_NUM_\').style.visibility = \'hidden\';document.getElementById(\'shareurltri_NUM_\').style.visibility = \'hidden\';"/> \
+            <div style="float:left">Copy the link to share your project:</div> \
+            <button style="float:right" onclick="toggle(\'checkboxdiv_NUM_\');">Advanced</button> \
+            <input type="text" name="shareurl" id="shareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;"/> \
+            <div id="checkboxdiv_NUM_" style="display:none;"> \
+                <h4 style="margin-top: 10px;margin-bottom: 5px;">Set Options</h4> \
+                <div><input type="checkbox" name="run" id="checkbox_NUM_run" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_run">' + _('Run project on startup.') + '</label></div> \
+                <div><input type="checkbox" name="show" id="checkbox_NUM_show" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_show">' + _('Show code blocks on startup.') + '</label></div> \
+                <div><input type="checkbox" name="collapse" id="checkbox_NUM_collapse" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_collapse">' + _('Collapse code blocks on startup.') + '</label></div> \
+            </div> \
         </div> \
         </span> \
         <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
@@ -90,18 +97,40 @@ const GLOBAL_PROJECT_TEMPLATE = '\
 <img class="thumbnail" src="{img}" /> \
 <div class="options"> \
     <span class="projectname">{title}</span><br/> \
-    <span class="shareurlspan"> \
+    <span class="shareurlspan" id="plshareurlspan_NUM_"> \
     <img class="share icon" title="' + _('Share') + '" alt="' + _('Share') + '" src="header-icons/share.svg" /> \
     <div class="tooltiptriangle" id="plshareurltri_NUM_"></div> \
     <div class="shareurltext" id="plshareurldiv_NUM_"> \
-        Copy the link to share your project:\
-        <input type="text" name="shareurl" id="plshareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;" onblur="document.getElementById(\'plshareurldiv_NUM_\').style.visibility = \'hidden\';document.getElementById(\'plshareurlbox_NUM_\').style.visibility = \'hidden\';document.getElementById(\'plshareurltri_NUM_\').style.visibility = \'hidden\';"/> \
+        <div style="float:left">Copy the link to share your project:</div> \
+        <button style="float:right" onclick="toggle(\'plcheckboxdiv_NUM_\');">Advanced</button> \
+        <input type="text" name="shareurl" id="plshareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;"/> \
+        <div id="plcheckboxdiv_NUM_" style="display:none;"> \
+            <h4 style="margin-top: 10px;margin-bottom: 5px;">Set Options</h4> \
+            <div><input type="checkbox" name="run" id="plcheckbox_NUM_run" onchange="updateCheckboxes(\'plshareurldiv_NUM_\');"><label for="checkbox_NUM_run">Run project on startup</label></div> \
+            <div><input type="checkbox" name="show" id="plcheckbox_NUM_show" onchange="updateCheckboxes(\'plshareurldiv_NUM_\');"><label for="checkbox_NUM_show">Show code blocks on startup</label></div> \
+            <div><input type="checkbox" name="collapse" id="plcheckbox_NUM_collapse" onchange="updateCheckboxes(\'plshareurldiv_NUM_\');"><label for="checkbox_NUM_collapse">Collapse code blocks on startup</label></div> \
+        </div> \
     </div> \
     </span> \
     <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
     <img class="merge icon" title="' + _('Merge with current project') + '" alt="' + _('Merge with current project') + '" src="header-icons/download-merge.svg" /> \
 </div>';
 
+//Helper functions for share box
+function toggle(id){
+    var d = document.getElementById(id);
+    d.style.display = d.style.display == "none" ? "block" : "none";
+}
+
+function updateCheckboxes(id){
+    var elements = document.getElementById(id).querySelectorAll('input:checked');
+    var urlel = document.getElementById(id).querySelectorAll('input[type=text]')[0];
+    var url = urlel.getAttribute("data-originalurl");
+    for (var i = 0; i<elements.length; i++){
+        url+="&"+elements[i].name+"=True";
+    }
+    urlel.value = url;
+}
 
 function PlanetModel(controller) {
     this.controller = controller;
@@ -480,6 +509,36 @@ function PlanetView(model, controller) {
         }
     };
 
+    //https://stackoverflow.com/a/3028037/3575587
+    function hideOnClickOutside(selector,planet) {
+        var append="";
+        if (planet){
+            append="pl";
+        }
+        const outsideClickListener = (event) => {
+            var id;
+            if (planet){
+                id = selector.substring(14);
+            } else {
+                id = selector.substring(12);
+            }
+            if (!jQuery(event.target).closest(selector).length&&!jQuery(event.target).closest("#"+append+"shareurlspan"+id).length) {
+                if (jQuery(selector).is(':visible')) {
+                    docById(append+'shareurldiv'+id).style.visibility = 'hidden';
+                    docById(append+'shareurlbox'+id).style.visibility = 'hidden';
+                    docById(append+'shareurltri'+id).style.visibility = 'hidden';
+                    removeClickListener();
+                }
+            }
+        }
+
+        const removeClickListener = () => {
+            document.removeEventListener('click', outsideClickListener);
+        }
+
+        document.addEventListener('click', outsideClickListener);
+    }
+
     this.share = function (ele, i) {
         return function () {
             planet.model.publish(ele.attributes.title.value, ele.attributes.data.value, ele.querySelector('img').src);
@@ -488,28 +547,60 @@ function PlanetView(model, controller) {
             } else {
                 var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
             }
+
             var n = i.toString();
-            docById('shareurldiv'+n).style.visibility = 'visible';
-            docById('shareurlbox'+n).style.visibility = 'visible';
-            docById('shareurltri'+n).style.visibility = 'visible';
-            docById('shareurlbox'+n).value = url;
-            docById('shareurlbox'+n).focus();
-            docById('shareurlbox'+n).select();
+            var box = document.getElementById('shareurldiv' + n);
+            var rect = box.getBoundingClientRect();
+            if (rect.left + window.pageXOffset < 0){
+                box.style.left = 'auto';
+            }
+            if (rect.right + window.pageXOffset > window.innerWidth){
+                box.style.left = '-255px';
+            }
+            hideOnClickOutside('#shareurldiv' + n, false);
+            docById('shareurldiv' + n).style.visibility = 'visible';
+            docById('shareurlbox' + n).style.visibility = 'visible';
+            docById('shareurltri' + n).style.visibility = 'visible';
+            docById('shareurlbox' + n).value = url;
+            docById('shareurlbox' + n).setAttribute('data-originalurl', url);
+            document.getElementById('checkbox' + n + 'run').checked = true;
+            document.getElementById('checkbox' + n + 'show').checked = false;
+            document.getElementById('checkbox' + n + 'collapse').checked = false;
+            updateCheckboxes('shareurldiv' + n);
+            docById('shareurlbox' + n).focus();
+            docById('shareurlbox' + n).select();
         };
     };
 
     this.planetshare = function (ele, i) {
         return function () {
-            if (_THIS_IS_MUSIC_BLOCKS_&&ele.attributes["data-ismb"].value=="true") {
+            if (_THIS_IS_MUSIC_BLOCKS_&&ele.attributes['data-ismb'].value=='true') {
                 var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
             } else {
                 var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
             }
+
             var n = i.toString();
+            var box = document.getElementById('plshareurldiv' + n);
+            var rect = box.getBoundingClientRect();
+            if (rect.left + window.pageXOffset < 0){
+                box.style.left = 'auto';
+            }
+
+            if (rect.right + window.pageXOffset > window.innerWidth) {
+                box.style.left = '-255px';
+            }
+
+            hideOnClickOutside('#plshareurldiv' + n, true);
             docById('plshareurldiv'+n).style.visibility = 'visible';
             docById('plshareurlbox'+n).style.visibility = 'visible';
             docById('plshareurltri'+n).style.visibility = 'visible';
             docById('plshareurlbox'+n).value = url;
+            docById('plshareurlbox'+n).setAttribute('data-originalurl', url);
+            document.getElementById('plcheckbox' + n + 'run').checked = true;
+            document.getElementById('plcheckbox' + n + 'show').checked = false;
+            document.getElementById('plcheckbox' + n + 'collapse').checked = false;
+            updateCheckboxes('plshareurldiv'+n);
             docById('plshareurlbox'+n).focus();
             docById('plshareurlbox'+n).select();
         };
