@@ -737,10 +737,10 @@ function Logo () {
                 value = toFixed2(-1*(this.turtles._canvas.height / (2.0 * this.turtles.scale)));
                 break;
             case 'width':
-                value = toFixed2(this.canvas.width);
+                value = toFixed2(that.turtles._canvas.width / (that.turtles.scale));
                 break;
             case 'height':
-                value = toFixed2(this.canvas.height);
+                value = toFixed2(that.turtles._canvas.height / (that.turtles.scale));
                 break;
             case 'keyboard':
                 value = this.lastKeyCode;
@@ -8208,10 +8208,10 @@ function Logo () {
                 that.blocks.blockList[blk].value = -1*(that.turtles._canvas.height / (2.0 * that.turtles.scale));
                 break;
             case 'width':
-                that.blocks.blockList[blk].value = that.canvas.width;
+                that.blocks.blockList[blk].value = (that.turtles._canvas.width / (that.turtles.scale));
                 break;
             case 'height':
-                that.blocks.blockList[blk].value = that.canvas.height;
+                that.blocks.blockList[blk].value = (that.turtles._canvas.height / (that.turtles.scale));
                 break;
             case 'mousebutton':
                 that.blocks.blockList[blk].value = that.getStageMouseDown();
