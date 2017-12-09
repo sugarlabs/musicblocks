@@ -4281,16 +4281,16 @@ function Logo () {
             that.embeddedGraphics[turtle][blk] = [];
 
             // Ensure that note duration is positive.
-            if (args[0] < 0) {
-                //.TRANS: Note value is the note duration.
-                that.errorMsg(_('Note value must be greater than 0.'), blk);
-                var noteBeatValue = 0;
-            } else {
+            if (args[0] > 0) {
                 if (that.blocks.blockList[blk].name === 'newnote') {
                     var noteBeatValue = 1 / args[0];
                 } else {
                     var noteBeatValue = args[0];
                 }
+            } else {
+                //.TRANS: Note value is the note duration.
+                that.errorMsg(_('Note value must be greater than 0.'), blk);
+                var noteBeatValue = 0;
             }
 
             that.inNoteBlock[turtle].push(blk);
