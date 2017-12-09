@@ -3786,55 +3786,6 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
-            case 'leftpos':
-                postProcess = function (thisBlock) {
-                    that.blockList[thisBlock].value = -(canvas.width / 2);
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                break;
-            case 'rightpos':
-                postProcess = function (thisBlock) {
-                    that.blockList[thisBlock].value = (canvas.width / 2);
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                break;
-            case 'toppos':
-                postProcess = function (thisBlock) {
-                    that.blockList[thisBlock].value = (canvas.height / 2);
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                break;
-            case 'botpos':
-            case 'bottompos':
-                postProcess = function (thisBlock) {
-                    that.blockList[thisBlock].value = -(canvas.height / 2);
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                break;
-            case 'width':
-                postProcess = function (thisBlock) {
-                    that.blockList[thisBlock].value = canvas.width;
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                break;
-            case 'height':
-                postProcess = function (thisBlock) {
-                    that.blockList[thisBlock].value = canvas.height;
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                break;
             case 'loadFile':
                 postProcess = function (args) {
                     that.blockList[args[0]].value = args[1];

@@ -608,6 +608,12 @@ function Logo () {
             case 'time':
             case 'mousex':
             case 'mousey':
+            case 'toppos':
+            case 'rightpos':
+            case 'leftpos':
+            case 'bottompos':
+            case 'width':
+            case 'height':
             case 'keyboard':
             case 'loudness':
             case 'consonantstepsizeup':
@@ -717,6 +723,24 @@ function Logo () {
                 break;
             case 'mousey':
                 value = toFixed2(this.getStageY());
+                break;
+            case 'toppos':
+                value = toFixed2((this.turtles._canvas.height / (2.0 * this.turtles.scale)));
+                break;
+            case 'rightpos':
+                value = toFixed2((this.turtles._canvas.width / (2.0 * this.turtles.scale)));
+                break;
+            case 'leftpos':
+                value = toFixed2(-1*(this.turtles._canvas.width / (2.0 * this.turtles.scale)));
+                break;
+            case 'bottompos':
+                value = toFixed2(-1*(this.turtles._canvas.height / (2.0 * this.turtles.scale)));
+                break;
+            case 'width':
+                value = toFixed2(that.turtles._canvas.width / (that.turtles.scale));
+                break;
+            case 'height':
+                value = toFixed2(that.turtles._canvas.height / (that.turtles.scale));
                 break;
             case 'keyboard':
                 value = this.lastKeyCode;
@@ -8170,6 +8194,24 @@ function Logo () {
                 break;
             case 'mousey':
                 that.blocks.blockList[blk].value = that.getStageY();
+                break;
+            case 'toppos':
+                that.blocks.blockList[blk].value = (that.turtles._canvas.height / (2.0 * that.turtles.scale));
+                break;
+            case 'rightpos':
+                that.blocks.blockList[blk].value = (that.turtles._canvas.width / (2.0 * that.turtles.scale));
+                break;
+            case 'leftpos':
+                that.blocks.blockList[blk].value = -1*(that.turtles._canvas.width / (2.0 * that.turtles.scale));
+                break;
+            case 'bottompos':
+                that.blocks.blockList[blk].value = -1*(that.turtles._canvas.height / (2.0 * that.turtles.scale));
+                break;
+            case 'width':
+                that.blocks.blockList[blk].value = (that.turtles._canvas.width / (that.turtles.scale));
+                break;
+            case 'height':
+                that.blocks.blockList[blk].value = (that.turtles._canvas.height / (that.turtles.scale));
                 break;
             case 'mousebutton':
                 that.blocks.blockList[blk].value = that.getStageMouseDown();
