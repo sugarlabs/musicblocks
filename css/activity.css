@@ -218,11 +218,11 @@ nav ul li {
     width: 48.5%;
     padding-left: 1%;
     }
-    
+
     .canvasHolder.hide {
     transform: scale(0.485);
     }
-    
+
     nav h1 {
     display: none;
     }
@@ -233,7 +233,7 @@ nav ul li {
     width: 32%;
     padding-left: 1%;
     }
-    
+
     .canvasHolder.hide {
     transform: scale(0.32);
     }
@@ -980,7 +980,7 @@ table {
   text-align: center;
   margin-left: 60px;
   margin-top: 20px;
-  
+
 }
 
 #sS0, #sS1{

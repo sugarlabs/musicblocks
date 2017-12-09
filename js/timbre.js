@@ -50,7 +50,7 @@ function TimbreWidget () {
             'type': 'white'
         },
     };
-    
+
     this.duoSynthParamVals = {
         'vibratoAmount': 0.5,
         'vibratoRate': 5
@@ -145,11 +145,11 @@ function TimbreWidget () {
         if (this.isActive['fmsynth'] === true && this.FMSynthesizer[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.FMSynthesizer[i]].connections[1];
         }
-        
+
         if (this.isActive['noisesynth'] === true && this.NoiseSynthesizer[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.NoiseSynthesizer[i]].connections[1];
         }
-        
+
         if (this.isActive['duosynth'] === true && this.duoSynthesizer[i] != null) {
             for (j = 0; j < 2; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.duoSynthesizer[i]].connections[j + 1];

@@ -30,7 +30,7 @@ function PitchSlider() {
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width; 
+        cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -340,7 +340,7 @@ function PitchSlider() {
 
             sliderCell.onmousemove = function(event) {
                 var cellDiv = this.childNodes[0];
-                
+
                 // Using event.offsetY was too noisy. This is more robust.
                 var offset = event.pageY - this.getBoundingClientRect().top;
                 if (offset > SLIDERHEIGHT) {

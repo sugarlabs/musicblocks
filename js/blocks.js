@@ -1533,11 +1533,11 @@ function Blocks () {
             }
         } else {
             if (myBlock.value == null) {
-               var label = ''; 
+               var label = '';
             } else if (typeof myBlock.value !== 'string'){
-               var label = myBlock.value.toString(); 
+               var label = myBlock.value.toString();
             } else {
-                var label = myBlock.value;  
+                var label = myBlock.value;
             }
         }
 
@@ -1987,7 +1987,7 @@ function Blocks () {
                 that.blockList[thisBlock].container.updateCache();
             };
 
-            postProcessArg = [thisBlock, 'highpass'];    
+            postProcessArg = [thisBlock, 'highpass'];
         } else if (name === 'oscillatortype') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1997,7 +1997,7 @@ function Blocks () {
                 that.blockList[thisBlock].container.updateCache();
             };
 
-            postProcessArg = [thisBlock, 'sine']; 
+            postProcessArg = [thisBlock, 'sine'];
         } else if (name === 'voicename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -3677,7 +3677,7 @@ function Blocks () {
                     that.updateBlockText(thisBlock);
                 };
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break; 
+                break;
             case 'oscillatortype':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -3686,7 +3686,7 @@ function Blocks () {
                     that.updateBlockText(thisBlock);
                 };
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;        
+                break;
             case 'voicename':
                 postProcess = function (args) {
                     var thisBlock = args[0];

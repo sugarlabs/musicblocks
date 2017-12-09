@@ -417,7 +417,7 @@ function PitchTimeMatrix () {
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width; 
+        cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -980,7 +980,7 @@ function PitchTimeMatrix () {
                     this._setNotes(j, i, false);
                 }
             }
-        }            
+        }
 
         for (var i = 0; i < rowCount; i++) {
             // The buttons get added to the embedded table.
@@ -1005,7 +1005,7 @@ function PitchTimeMatrix () {
                     }
                 }
             }
-        }            
+        }
 
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
@@ -1288,7 +1288,7 @@ function PitchTimeMatrix () {
             }
             var obj = note.split(':');
         }
-            
+
         var row = docById('ptm' + j);
         var cell = row.cells[colIndex];
         // Using the alt attribute to store the note value
@@ -1513,8 +1513,8 @@ function PitchTimeMatrix () {
             }
         }
 
-        
-        
+
+
         // Create a new stack for the chunk.
         console.log(newStack);
         this._logo.blocks.loadNewBlocks(newStack);

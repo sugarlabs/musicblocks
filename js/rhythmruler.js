@@ -138,7 +138,7 @@ function RhythmRuler () {
 
                 // Play a count off before starting tapping.
                 var interval = this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
-                
+
                 var drumBlockNo = this._logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
                 var drum = this._logo.blocks.blockList[drumBlockNo].value;
 
@@ -184,7 +184,7 @@ function RhythmRuler () {
 
         // Display a progress bar.
         function __move(tick, stepSize) {
-            var elem = docById("progressBar");   
+            var elem = docById("progressBar");
             var width = 1;
             var id = setInterval(frame, tick);
 
@@ -193,7 +193,7 @@ function RhythmRuler () {
                     clearInterval(id);
                 } else {
                     width += stepSize;
-                    elem.style.width = width + '%'; 
+                    elem.style.width = width + '%';
                 }
             };
         };
@@ -1434,7 +1434,7 @@ function RhythmRuler () {
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width; 
+        cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;

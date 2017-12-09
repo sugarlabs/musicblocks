@@ -90,7 +90,7 @@ function hideButtonHighlight(circles, stage) {
 }
 
 function hidePaletteNameDisplay(palette_text, stage){
-    
+
     setTimeout(function(){
         stage.removeChild(palette_text);
     }, 150);
