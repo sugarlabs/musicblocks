@@ -255,6 +255,12 @@ const TACAT = {
     'speak': 'media',
     'sinewave': 'media',
     'description': 'media',
+    'leftpos': 'media',
+    'rightpos': 'media',
+    'toppos': 'media',
+    'bottompos': 'media',
+    'width': 'media',
+    'height': 'media',
 
     'savepix': 'ignore',
     'savesvg': 'ignore',
