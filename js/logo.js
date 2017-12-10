@@ -11,7 +11,6 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 const DEFAULTVOLUME = 50;
-const DEFAULTNOISEVOLUME = 10;
 const TONEBPM = 240;  // Seems to be the default.
 const TARGETBPM = 90;  // What we'd like to use for beats per minute
 const DEFAULTDELAY = 500;  // milleseconds
@@ -988,9 +987,9 @@ function Logo () {
             this.dispatchFactor[turtle] = 1;
             this.pickup[turtle] = 0;
             this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
-                                        'noise1': [DEFAULTNOISEVOLUME],
-                                        'noise2': [DEFAULTNOISEVOLUME],
-                                        'noise3': [DEFAULTNOISEVOLUME]};
+                                        'noise1': [DEFAULTVOLUME],
+                                        'noise2': [DEFAULTVOLUME],
+                                        'noise3': [DEFAULTVOLUME]};
             this.beatsPerMeasure[turtle] = 4;  // Default is 4/4 time.
             this.noteValuePerBeat[turtle] = 4;
             this.currentBeat[turtle] = 0;
@@ -1021,16 +1020,7 @@ function Logo () {
             this._setMasterVolume(DEFAULTVOLUME);
             for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (var synth in this.synthVolume[turtle]) {
-                    switch (synth) {
-                    case 'noise1':
-                    case 'noise2':
-                    case 'noise3':
-                        this._setSynthVolume(synth, DEFAULTNOISEVOLUME);
-                        break;
-                    default:
-                        this._setSynthVolume(synth, DEFAULTVOLUME);
-                        break;
-                    }
+                    this._setSynthVolume(synth, DEFAULTVOLUME);
                 }
             }
         }
@@ -4387,18 +4377,8 @@ function Logo () {
                 that.synth.loadSynth(synth);
 
                 if (that.synthVolume[turtle][synth] == undefined) {
-                    switch (synth) {
-                    case 'noise1':
-                    case 'noise2':
-                    case 'noise3':
-                        that.synthVolume[turtle][synth] = [DEFAULTNOISEVOLUME];
-                        that.crescendoInitialVolume[turtle][synth] = [DEFAULTNOISEVOLUME];
-                        break;
-                    default:
-                        that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
-                        that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
-                        break;
-                    }
+                    that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
+                    that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
                 }
 
                 childFlow = args[1];
@@ -5217,7 +5197,12 @@ function Logo () {
                         newVolume = -100;
                     }
 
-                    that.synthVolume[turtle][synth].push(newVolume);
+                    if (that.synthVolume[turtle][synth] == undefined) {
+                        that.synthVolume[turtle][synth] = [newVolume];
+                    } else {
+                        that.synthVolume[turtle][synth].push(newVolume);
+                    }
+
                     if (!this.suppressOutput[turtle]) {
                         that._setSynthVolume(synth, newVolume);
                     }
@@ -5339,7 +5324,7 @@ function Logo () {
                     }
 
                     if (!this.suppressOutput[turtle]) {
-                        that.synthVolume[turtle][synth] = args[1];
+                        that.synthVolume[turtle][synth] = [args[1]];
                         that._setSynthVolume(synth, args[1]);
                     }
 
@@ -5887,7 +5872,17 @@ function Logo () {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.synth.setVolume(synth, volume);
+            switch (synth) {
+            case 'noise1':
+            case 'noise2':
+            case 'noise3':
+                // Noise is very very loud.
+                this.synth.setVolume(synth, volume / 25);
+                break;
+            default:
+                this.synth.setVolume(synth, volume);
+                break;
+            }
         }
     };
 
