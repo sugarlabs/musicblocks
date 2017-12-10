@@ -3420,11 +3420,7 @@ function Logo () {
             that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(0);
             that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
             if (that.inNoteBlock[turtle].length > 0) {
-                if (turtle in that.beatFactor) {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-                } else {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
-                }
+                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
             }
 
             that.pushedNote[turtle] = true;
@@ -3559,11 +3555,7 @@ function Logo () {
             }
 
             if (that.inNoteBlock[turtle].length > 0) {
-                if (turtle in that.beatFactor) {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-                } else {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
-                }
+                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
             }
 
             that.pushedNote[turtle] = true;
@@ -3627,11 +3619,7 @@ function Logo () {
             }
 
             if (that.inNoteBlock[turtle].length > 0) {
-                if (turtle in that.beatFactor) {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-                } else {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
-                }
+                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
             }
 
             that.pushedNote[turtle] = true;
@@ -3989,11 +3977,7 @@ function Logo () {
                 }
 
                 if (that.inNoteBlock[turtle].length > 0) {
-                    if (turtle in that.beatFactor) {
-                        that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-                    } else {
-                        that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
-                    }
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
                 }
 
                 that.pushedNote[turtle] = true;
@@ -4288,11 +4272,8 @@ function Logo () {
                 that.multipleVoices[turtle] = true;
             }
 
-            if (turtle in that.dotCount) {
-                that.noteValue[turtle][last(that.inNoteBlock[turtle])] = (1 / noteBeatValue) * (2 - (1 / Math.pow(2, that.dotCount[turtle])));
-            } else {
-                that.noteValue[turtle][last(that.inNoteBlock[turtle])] = 1 / noteBeatValue;
-            }
+            // Adjust the note value based on the beatFactor.
+            that.noteValue[turtle][last(that.inNoteBlock[turtle])] = 1 / (noteBeatValue * that.beatFactor[turtle]);
 
             var listenerName = '_playnote_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
@@ -5427,12 +5408,7 @@ function Logo () {
                     }
                 }
 
-                if (turtle in that.beatFactor) {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-                } else {
-                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
-                }
-
+                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
                 that.pushedNote[turtle] = true;
             } else if (that.inPitchStaircase) {
                 var frequency = args[0];
@@ -5491,12 +5467,7 @@ function Logo () {
                         that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
                     }
 
-                    if (turtle in that.beatFactor) {
-                        that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-                    } else {
-                        that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(1);
-                    }
-
+                    that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
                     that.pushedNote[turtle] = true;
                 }
             }
@@ -6178,7 +6149,7 @@ function Logo () {
             // Duration is the duration of the note to be
             // played. doWait sets the wait time for the turtle before
             // the next block is executed.
-            var duration = noteBeatValue * this.beatFactor[turtle];
+            var duration = noteBeatValue;
             // For the outermost note (when nesting), calculate the
             // time for the next note.
             if (duration > 0) {
@@ -6207,7 +6178,7 @@ function Logo () {
                 }
 
                 if (that.inNoteBlock[turtle].length === that.whichNoteToCount[turtle]) {
-                    that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
+                    that.notesPlayed[turtle] += (1 / noteValue);
                 }
 
                 var notes = [];
@@ -6235,15 +6206,13 @@ function Logo () {
                     var staccatoBeatValue = last(that.staccato[turtle]);
                     if (staccatoBeatValue < 0) {
                         // slur
-                        var beatValue = bpmFactor / ((noteBeatValue) * that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])][0]) + bpmFactor / (-staccatoBeatValue * that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])][0]);
+                        var beatValue = bpmFactor / (noteBeatValue + (bpmFactor / -staccatoBeatValue));
                     } else if (staccatoBeatValue > noteBeatValue) {
                         // staccato
-                        var beatValue = bpmFactor / (staccatoBeatValue * that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])][0]);
+                        var beatValue = bpmFactor / staccatoBeatValue;
                     } else {
-                        var beatValue = bpmFactor / (noteBeatValue * that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])][0]);
+                        var beatValue = bpmFactor / noteBeatValue;
                     }
-                } else if (that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].length > 0) {
-                    var beatValue = bpmFactor / (noteBeatValue * that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])][0]);
                 } else {
                     var beatValue = bpmFactor / noteBeatValue;
                 }
@@ -6283,10 +6252,12 @@ function Logo () {
                                 if (i === 0 && that.justCounting[turtle].length === 0) {
                                     that.notationInsertTie(turtle);
                                 }
-                                originalDuration = 1 / ((1 / duration) - (1 / carry));
+
+                                var originalDuration = 1 / ((1 / duration) - (1 / carry));
                             } else {
-                                originalDuration = duration;
+                                var originalDuration = duration;
                             }
+
                             if (that.justCounting[turtle].length === 0) {
                                 that.updateNotation(note, originalDuration, turtle, insideChord);
                             }
@@ -6298,9 +6269,9 @@ function Logo () {
                     }
 
                     if (that.justCounting[turtle].length === 0) {
-                        console.log('notes to play ' + notes + ' ' + noteBeatValue);
+                        console.log('notes to play ' + notes + ' 1/' + noteBeatValue);
                     } else {
-                        console.log('notes to count ' + notes + ' ' + noteBeatValue);
+                        console.log('notes to count ' + notes + ' 1/' + noteBeatValue);
                     }
 
                     if (!that.suppressOutput[turtle]) {
@@ -6453,9 +6424,9 @@ function Logo () {
                     // (e.g. pitch & drum combination).
                     if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length === 0) {
                         if (that.justCounting[turtle].length === 0) {
-                            console.log('notes to play ' + notes + ' ' + noteBeatValue);
+                            console.log('notes to play ' + notes + ' 1/' + noteBeatValue);
                         } else {
-                            console.log('notes to count ' + notes + ' ' + noteBeatValue);
+                            console.log('notes to count ' + notes + ' 1/' + noteBeatValue);
                         }
 
                         if (!that.suppressOutput[turtle]) {
