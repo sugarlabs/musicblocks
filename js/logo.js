@@ -6268,10 +6268,11 @@ function Logo () {
                         }
                     }
 
+                    var obj = rationalToFraction(1 / noteBeatValue);
                     if (that.justCounting[turtle].length === 0) {
-                        console.log('notes to play ' + notes + ' 1/' + noteBeatValue);
+                        console.log('notes to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
                     } else {
-                        console.log('notes to count ' + notes + ' 1/' + noteBeatValue);
+                        console.log('notes to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
                     }
 
                     if (!that.suppressOutput[turtle]) {
@@ -6423,10 +6424,11 @@ function Logo () {
                     // If it is > 0, we already counted this note
                     // (e.g. pitch & drum combination).
                     if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length === 0) {
+                        var obj = rationalToFraction(1 / noteBeatValue);
                         if (that.justCounting[turtle].length === 0) {
-                            console.log('notes to play ' + notes + ' 1/' + noteBeatValue);
+                            console.log('notes to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
                         } else {
-                            console.log('notes to count ' + notes + ' 1/' + noteBeatValue);
+                            console.log('notes to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
                         }
 
                         if (!that.suppressOutput[turtle]) {
