@@ -115,7 +115,7 @@
 
 一番下にあるブロックのピッチは*ハーツ*ブロックで決められています。ハーツ・ブロックは*数字・算数*の色々のブロックと一緒に使います。例のハーツ・ブロックの数値は`392`で音符が392ハーツのピッチで鳴らします。
 
-ハーツを使うとオクターヴのインプットがむしして、整数だけの数値がインプットできます。(Why is it restricted to whole numbers???)
+ハーツを使うとオクターヴのインプットがむしします。オクターヴの数値のインプットは全数の必要があります。
 
 ピッチの名前は*文事*ブロックでもインプットができますよ。 
 
@@ -212,38 +212,31 @@ most recent note played.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "シャープ（嬰）とフラット（変）の使える例")
 
-♯は日本語で嬰（えい）、♭は変（へん）
+♯は日本語で嬰（えい）、♭は変（へん）です。
 *シャープ（嬰）*と*フラット（変）*のブロックは*ピッチ*ブロックか*音価*ブロックか[チャンク](#チャンク)を巻いてピッチを転化することができます。一つの*シャープ（嬰）*ブロックを使ってピッチが半音上で変えます。一つの*フラット（変）*ブロックを使ってピッチが半音下で変えます。左の例*ピッチ*ブロックが'ミ'で*フラット（変）*の訳でピッチが半音下変えます(ミ♭になります)。右の例、二つの*ピッチ*ブロックも（和音）が両方のピッチも半音上変えます。
 
 #### <a name="移調をアジャスト"></a>3.2.3 移調をアジャスト
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "移調をアジャスト")
 
-The *移調をアジャスト* block can be used to make larger shifts in
-ピッチ in half step units. A positive number shifts the ピッチ up and a
-negative number shifts the ピッチ down. The input must be a whole
-number. To shift an entire octave, transpose by 12 half-steps up. -12
-will shift an octave down.
+*移調をアジャスト*ブロックは巻かされているピッチ・ブロックで選ばれているピッチを半音の数値で変えることができます。整数のインプットはピッチを高く転調し、陰性のインプットはピッチを低く転調します。インプットイは全数の必要があります。オクターヴを転調するために、12のインプットは1オクターヴ上に転調し、-12のインプットは１オクターヴ下に転調します。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using 移調をアジャスト")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "移調をアジャスト・ブロックで1オクターヴ上に転調する方法")
 
-In the example above, we take the song we programmed previously and
-raise it by one octave.
+上の例にこの前の例のメロディーを転調をアジャスト・ブロックで1オクターヴに転化します。
 
 #### <a name="付点音符（ドット）"></a>3.2.4 付点音符（ドット）
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg "Creating dotted notes using the Dot block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg "付点音符（ドット）のリズムを付点音符ブロックで作る方法")
 
-You can "dot" notes using the *Dot* block. A dotted note extends the rhythmic duration of a note by
-50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a
-beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
+"付点音符"のリズムの音符が*付点音符*ブロックでできます。付点音符の音符はその入っている音価を50%で増します(50%で増します)。例えば、付点音符の4分音符が三つの8分音符の長さで鳴らします。計算は1/4 + 1/8＝「3/4」。付点音符の8分音符が3/16の音価で (1/8 + 1/16)鳴らします。
 
-You can also simply change the note value to mimic a dotted note, for example indicating 3/8 instead of 1/4, for a dotted quarter note.
-![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
+付点音符を使う代わりに音価の数値を変えて付点音符と同じ長さもできますよ。例えば、4分音符の符点音符の長さが欲しかったら、1/4の代わりに3/8のインプットをして4分音符の付点音符と同じ長さで鳴らします。
+![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "4分音符の付点音符の使い方です。")
 
 #### <a name="かけることと割ること"></a>3.2.5 演算で音価をかけ割ること
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Speeding up and slowing down the テンポ")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "テンポの早さを変える方法")
 
 You can also multiply (or divide) the beat value, which will speed up
 or slowdown the notes. Multiplying the beat value of an `1/8` note by
@@ -253,62 +246,58 @@ note.
 
 #### <a name="繰り返し"></a>3.2.6 回繰り返し音符
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "回繰り返すing notes")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "回繰り返すブロックで回数を決めます")
 
-There are several ways to 回繰り返す notes. The *回繰り返す* block will play a
-sequence of notes multiple times; the *Duplicate* block will 回繰り返す each
-note in a sequence.
+音符を回繰り返す方法が色々あります。*回繰り返す*ブロックははっている音符をインプットの数値で繰り返します。
 
-In the example, on the left, the result would be `Sol, Re, Sol, Sol,
-Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
-`Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
+*重に*ブロックは入っている音符をすべてインプットの数値で重します。
+
+左の例に結果が`ソ, レ, ソ, ソ,レ, ソ, ソ, レ, ソ, ソ, レ, ソ`で;右の例の結果が`ソ, ソ, ソ, ソ, レ, レ, レ, レ, ソ, ソ, ソ, ソ`です。
 
 #### <a name="スイング"></a>3.2.7 スイング・リズムとタイの音符
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg "swinging notes and tied notes")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg "スイング・リズムとタイ音符の方法")
 
-The *Swing* block works on pairs of notes (specified by note value),
-adding some duration (specified by swing value) to the first note and
-taking the same amount from the second note. Notes that do not match
-note value are unchanged.
+*スイング*ブロック音符対ずつで使えます。その音符の対の先が音価をスイングのインプット数値で増して、対の次の音符の数値からスイング・ブロックの数値を引きます。
 
-In the example, `re5` would be played as a `1/6` note and `mi5` would
-be played as a `1/12` note (`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===
-1/12`). Observe that the total duration of the pair of notes is
-unchanged.
+対の音符の音価は同じじゃないのスイング・ブロックは効果がありません。
 
-Tie also works on pairs of notes, combining them into one note. (The
-notes must be identical in ピッチ, but can vary in リズム.)
+上の例で`レ 5`は`1/6`の音価で鳴らして、`ミ 5`は`1/12`の音価で鳴らします。(`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===　1/12`)。 
 
-![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TiesChart.svg "using notes with ties")
+対の音符の音価の合計は変わっていませんよ。
+
+タイも音符対ずつで使えます。タイはそのタイ・ブロックの中に入っている音符の音価をすべて組み合わせてタイされている音価の合計で鳴らします。
+
+タイ・ブロックに入っている音符のピッチは同じじゃないと効果がありません。タイ・ブロックに入っている音符の音価は違ってもOKです。
+
+![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TiesChart.svg "タイ・ブロックの使う方法")
 
 #### <a name="他の転化"></a>3.2.8 音量、クレシェンド、スタッカート、スラーのブロックの関係
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "Set 音量, Crescendo, Staccato, and Slur blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "音量を設定, クレッシェンド, スタッカート, またスラーのブロック")
 
-The *Set 音量* block will change the 音量 of the notes. The
-default is 50; the range is 0 (silence) to 100 (full 音量).
+*音量を設定*ブロックは音符の鳴らす音量を変えます。デフォールトが50で最低限が0(絶対静か)で最大限が100(一番大きい音量)です.
 
-The *Crescendo* block will increase (or decrease) the 音量 of the
+The *クレッシェンド* block will increase (or decrease) the 音量 of the
 contained notes by a specified amount for every note played. For
-example, if you have 3 notes in sequence contained in a *Crescendo*
+example, if you have 3 notes in sequence contained in a *クレッシェンド*
 block with a value of 5, the final note will be at 15% more 
 than the original value for 音量.
 
-The *Staccato* block shortens the length of the actual note&mdash;making them tighter
+The *スタッカート* block shortens the length of the actual note&mdash;making them tighter
 bursts&mdash;while maintaining the specified rhythmic value of the notes.
 
-The *Slur* block lengthens the sustain of notes&mdash;running longer than
+The *スラー* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
 #### <a name="音程と相対的な音量"></a>3.2.9 音程と相対的な音量の関係
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Interval and Set Relative 音量 block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Interval and Set レlative 音量 block")
 
 The *Interval* block calculates a relative interval, e.g., a fifth,
 and adds the additional ピッチ to a note's playback. In the figure,
-we add `La` to `Re` and `Ti` to `Mi`.
+we add `La` to `レ` and `Ti` to `Mi`.
 
 The *Set Relative Volume* block modifies the clamped note's 音量 according to the input value of the block in an added (or subtracted when negative) percentage with respect to the original 音量.For example,100 would mean doubling the current 音量.
 
@@ -346,7 +335,7 @@ around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 
 The *Backward* block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in *チャンク* are played as
-`Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
+`ソ`, `Ti`, `La`, `ソ`, i.e., from the bottom to the top of the
 stack.
 
 [RUN
@@ -366,7 +355,7 @@ contained blocks, e.g., violin or cello.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg "Set Key block")
 
 The *Set Key* block will change the key and mode of the mapping
-between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
+between solfege, e.g., `Do`, `レ`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. 音階とモード include Major and Minor, Chromatic,
 and a number of more exotic 音階とモード, such as Bebop, Geez, Maqam, etc. 
 This block allows users to access "movable Do" within Music
@@ -528,7 +517,7 @@ make an 8-key piano?
 
 You can also add a bit of randomness to your music. In the top example
 above, the *One-of* block is used to randomly assign either `Do` or
-`Re` each time the *音価* block is played. In the bottom example
+`レ` each time the *音価* block is played. In the bottom example
 above, the *One-of* block is used to randomly select between `チャンク1`
 and `チャンク2`.
 
@@ -551,8 +540,8 @@ displayed. Also, each note is displayed as it is played. There is one
 row per voice in the ステータス table.
 
 Additional *Print* blocks can be added to the *ステータス* widget to
-display additional music factors, e.g., duplicate, transposition,
-skip, [staccato](#他の転化), [slur](#他の転化), and [グラフィックス](#グラフィックス) factors, e.g., x, y, heading,
+display additional music factors, e.g., 重に, transposition,
+skip, [スタッカート](#他の転化), [スラー](#他の転化), and [グラフィックス](#グラフィックス) factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg "additional programming within the ステータス block")
@@ -595,13 +584,13 @@ notes.
 By clicking on individual cells in the grid, you should hear
 individual notes (or 和音s if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
-cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
+cells). First `レ 4`, followed by `Mi 4`, followed by `ソ 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg "play button")
 
 If you click on the *Play* button (found in the top row of the grid),
-you will hear a sequence of notes played (from left to right): `Re 4`,
-`Mi 4`, `Sol 4`.
+you will hear a sequence of notes played (from left to right): `レ 4`,
+`Mi 4`, `ソ 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg "save button")
 
@@ -618,7 +607,7 @@ as well.
 
 
 The *Sort* button will reorder the ピッチ in the matrix from highest
-to lowest and eliminate any duplicate *ピッチ* blocks.
+to lowest and eliminate any 重に *ピッチ* blocks.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg "close button")
 
@@ -649,7 +638,7 @@ has a duration (in this case 4, which represents a quarter note). Try
 putting different numbers in and see (hear) what happens. Each note
 block also has a ピッチ block (if it were a 和音, there would be
 multiple *ピッチ* blocks nested inside the Note block's clamp). Each
-ピッチ block has a ピッチ name (`Re`, `Mi`, and `Sol`), and a ピッチ
+ピッチ block has a ピッチ name (`レ`, `Mi`, and `ソ`), and a ピッチ
 octave; in this example, the octave is 4 for each ピッチ. (Try changing
 the ピッチ names and the ピッチ octaves.)
 
@@ -764,10 +753,10 @@ The リズム can be further subdivided by clicking in individual
 cells. In the example above, two quarter-notes have been created by
 clicking on one of the half-notes.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "tie cells in rhythm ruler")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "タイ cells in rhythm ruler")
 
-By dragging across multiple cells, they become tied. In the example
-above, two third-notes have been tied into one two-thirds-note.
+By dragging across multiple cells, they become タイd. In the example
+above, two third-notes have been タイd into one two-thirds-note.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg "save stack button")
 
@@ -875,7 +864,7 @@ can be used inside the *ピッチ時刻グラフ* block.
 The *Set ドラム* block is used to map the enclosed pitches into drum
 sounds. ドラム sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substitued for
-each occurance of a `Re` `4`.
+each occurance of a `レ` `4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg "ピッチ・ドラム・グラフ 1")
 

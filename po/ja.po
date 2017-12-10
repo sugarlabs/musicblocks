@@ -631,7 +631,7 @@ msgstr "オシレーターの訳でシンセが使えません"
 #: js/logo.js:2729
 #: js/logo.js:2753
 msgid "The input cannot be negative."
-msgstr "マイナスのインプットはできません"
+msgstr "陰性のインプットはできません"
 
 #: js/logo.js:2800
 #: js/logo.js:2821
@@ -2171,7 +2171,7 @@ msgstr "ピッチ時刻グラフ"
 #.TRANS: factor used in determining how many duplications to make
 ## Probably incorrect/misleading. PLEASE CHECK!
 msgid "duplicate factor"
-msgstr "音符の副の倍"
+msgstr "重の倍さ"
 
 #: js/basicblocks.js:783
 #.TRANS: number of beats per minute
@@ -2221,9 +2221,8 @@ msgstr "音符の省略"
 
 #: js/basicblocks.js:875
 #.TRANS: play each note more than once
-## This makes sense, I think, but only if 1=1 time, 2=2 times, etc
 msgid "duplicate"
-msgstr "音符を副"
+msgstr "重に"
 
 #: js/basicblocks.js:884
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
