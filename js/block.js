@@ -1046,6 +1046,7 @@ function Block(protoblock, blocks, overrideName) {
         this._calculateCollapseHitArea();
 
         this.collapseContainer.on('mouseover', function (event) {
+            document.body.style.cursor = 'pointer';
             that.blocks.highlight(thisBlock, true);
             that.blocks.activeBlock = thisBlock;
             that.blocks.refreshCanvas();
@@ -1174,6 +1175,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._collapseOut = function (event, moved, haveClick) {
         var thisBlock = this.blocks.blockList.indexOf(this);
+        document.body.style.cursor = 'default';
 
         // Always hide the trash when there is no block selected.
         trashcan.hide();
@@ -1232,6 +1234,7 @@ function Block(protoblock, blocks, overrideName) {
         this._calculateBlockHitArea();
 
         this.container.on('mouseover', function (event) {
+            document.body.style.cursor = 'pointer';
             that.blocks.highlight(thisBlock, true);
             that.blocks.activeBlock = thisBlock;
             that.blocks.refreshCanvas();
@@ -1325,6 +1328,7 @@ function Block(protoblock, blocks, overrideName) {
 
             that.container.removeAllEventListeners('mouseout');
             that.container.on('mouseout', function (event) {
+		document.body.style.cursor = 'default';
                 if (!that.blocks.inLongPress) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
@@ -1435,6 +1439,8 @@ function Block(protoblock, blocks, overrideName) {
 
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
+
+	document.body.style.cursor = 'default';
 
         // Always hide the trash when there is no block selected.
         trashcan.hide();

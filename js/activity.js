@@ -3317,6 +3317,14 @@ handleComplete);
 
             var formerContainer = container;
 
+            container.on('mouseover', function (event) {
+                document.body.style.cursor = 'pointer';
+            });
+
+            container.on('mouseout', function (event) {
+                document.body.style.cursor = 'default';
+            });
+		 
             container.on('mousedown', function (event) {
                 if (locked) {
                     return;

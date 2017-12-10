@@ -509,6 +509,7 @@ function Palettes () {
 
         // A palette button opens or closes a palette.
         this.buttons[name].on('mouseover', function (event) {
+            document.body.style.cursor = 'pointer';
             that.mouseOver = true;
             var r = that.cellSize / 2;
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
@@ -521,12 +522,14 @@ function Palettes () {
         });
 
         this.buttons[name].on('pressup', function (event) {
+            document.body.style.cursor = 'default';
             that.mouseOver = false;
             hidePaletteNameDisplay(that.palette_text, that.stage);
             hideButtonHighlight(that.circles, that.stage);
         });
 
         this.buttons[name].on('mouseout', function (event) {
+            document.body.style.cursor = 'default';
             that.mouseOver = false;
             hidePaletteNameDisplay(that.palette_text, that.stage);
             hideButtonHighlight(that.circles, that.stage);
@@ -1676,6 +1679,7 @@ function Palette(palettes, name) {
         var bgScrolling = false;
 
         this.protoContainers[blkname].on('mouseover', function (event) {
+            document.body.style.cursor = 'pointer';
             that.palettes.activePalette = that;
         });
 
@@ -1735,6 +1739,7 @@ function Palette(palettes, name) {
         this.protoContainers[blkname].on('mouseout', function (event) {
             // Catch case when pressup event is missed.
             // Put the protoblock back on the palette...
+            document.body.style.cursor = 'default';
             that.palettes.activePalette = null;
 
             if (pressed && moved) {
@@ -1745,6 +1750,7 @@ function Palette(palettes, name) {
         });
 
         this.protoContainers[blkname].on('pressup', function (event) {
+            document.body.style.cursor = 'default';
             that.palettes.activePalette = null;
 
             if (pressupLock) {
