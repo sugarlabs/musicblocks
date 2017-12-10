@@ -77,8 +77,8 @@ const LOCAL_PROJECT_TEMPLATE ='\
         <img class="share icon" title="' + _('Share') + '" alt="' + _('Share') + '" src="header-icons/share.svg" /> \
         <div class="tooltiptriangle" id="shareurltri_NUM_"></div> \
         <div class="shareurltext" id="shareurldiv_NUM_"> \
-            <div style="float:left">Copy the link to share your project:</div> \
-            <button style="float:right" onclick="toggle(\'checkboxdiv_NUM_\');">Advanced</button> \
+            <div style="float:left">' + _('Copy this link to share your project.') + '</div> \
+            <button style="float:right" onclick="toggle(\'checkboxdiv_NUM_\');">' + _('Advanced options') + '</button> \
             <input type="text" name="shareurl" id="shareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;"/> \
             <div id="checkboxdiv_NUM_" style="display:none;"> \
                 <h4 style="margin-top: 10px;margin-bottom: 5px;">Set Options</h4> \
