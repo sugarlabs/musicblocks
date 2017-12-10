@@ -411,7 +411,7 @@ function Turtle (name, turtles, drum) {
             this.startBlock.value = this.turtles.turtleList.indexOf(this);
         }
     };
-    
+
     this.arc = function(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
         if (invert) {
             cx = this.turtles.turtleX2screenX(cx);

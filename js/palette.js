@@ -208,13 +208,13 @@ function Palettes () {
         hideButtonHighlight(this.circles, this.stage);
     };
 
-    this.getProtoNameAndPalette = function (name) { 
-        var obj = [null, null, null]; 
-        for (var b in this.blocks.protoBlockDict) { 
+    this.getProtoNameAndPalette = function (name) {
+        var obj = [null, null, null];
+        for (var b in this.blocks.protoBlockDict) {
             // Don't return deprecated blocks.
-            if (name === this.blocks.protoBlockDict[b].staticLabels[0] && !this.blocks.protoBlockDict[b].hidden) { 
+            if (name === this.blocks.protoBlockDict[b].staticLabels[0] && !this.blocks.protoBlockDict[b].hidden) {
                 obj = [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
-            } 
+            }
         }
 
         return obj;

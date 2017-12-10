@@ -157,7 +157,7 @@ function PlanetModel(controller) {
         var myNode = document.querySelector('.planet .content.w');
         while (myNode.firstChild) {
             myNode.removeChild(myNode.firstChild);
-        } 
+        }
         this.redoLocalStorageData();
         model.updated();
         this.downloadWorldWideProjects();
@@ -332,7 +332,7 @@ function PlanetModel(controller) {
         model.stop = true;
     };
 
-    //Adds the project from "Worldwide" to the "On my deivce" 
+    //Adds the project from "Worldwide" to the "On my deivce"
     //section when download button is clicked
     this.prepLoadingProject = function (name) {
         localStorage.currentProject = name;
@@ -625,23 +625,23 @@ function PlanetView(model, controller) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 docById('ptmDiv').style.visibility = localStorage.getItem('isMatrixHidden');
-                docById('ptmButtonsDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
-                docById('ptmTableDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
+                docById('ptmButtonsDiv').style.visibility = localStorage.getItem('isMatrixHidden');
+                docById('ptmTableDiv').style.visibility = localStorage.getItem('isMatrixHidden');
                 docById('pscDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
-                docById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
-                docById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
+                docById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
+                docById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
                 docById('timbreDiv').style.visibility = localStorage.getItem('isTimbreHidden');
-                docById('timbreButtonsDiv').style.visibility = localStorage.getItem('isTimbreHidden'); 
-                docById('timbreTableDiv').style.visibility = localStorage.getItem('isTimbreHidden'); 
+                docById('timbreButtonsDiv').style.visibility = localStorage.getItem('isTimbreHidden');
+                docById('timbreTableDiv').style.visibility = localStorage.getItem('isTimbreHidden');
                 docById('sliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
                 docById('sliderButtonsDiv').style.visibility = localStorage.getItem('isSliderHidden');
                 docById('sliderTableDiv').style.visibility = localStorage.getItem('isSliderHidden');
                 docById('pdmDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
                 docById('pdmButtonsDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
                 docById('pdmTableDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
-                docById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-                docById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-                docById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+                docById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden');
+                docById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden');
+                docById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden');
                 docById('modeDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
                 docById('modeButtonsDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
                 docById('modeTableDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
@@ -654,7 +654,7 @@ function PlanetView(model, controller) {
                 planet.controller.hide();
                 return;
             }
-            
+
             planet.model.open(ele.attributes.title.value, ele.attributes.data.value, merge);
             planet.controller.hide();
         }
@@ -763,7 +763,7 @@ function validateImageData(d) {
     if(d === undefined) {
         return false;
     }
-    
+
     if(d.indexOf('data:image') !== 0) {
         return false;
     } else {

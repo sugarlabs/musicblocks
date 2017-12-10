@@ -554,10 +554,10 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'filtertype':
                     this.value = getFilterTypes(DEFAULTFILTERTYPE);
-                    break; 
+                    break;
                 case 'oscillatortype':
                     this.value = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
-                    break;        
+                    break;
                 }
             }
 
@@ -659,7 +659,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'timbre':
                     that.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', '#000000');
-                    break;    
+                    break;
                 case 'pitchstaircase':
                     that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', '#000000');
                     break;
@@ -1786,7 +1786,7 @@ function Block(protoblock, blocks, overrideName) {
 
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
-            this.label = docById('filtertypeLabel');    
+            this.label = docById('filtertypeLabel');
         } else if (this.name === 'oscillatortype') {
             var type = 'oscillatortype';
             if (this.value != null) {
@@ -1811,7 +1811,7 @@ function Block(protoblock, blocks, overrideName) {
 
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
-            this.label = docById('oscillatortypeLabel');    
+            this.label = docById('oscillatortypeLabel');
         } else if (this.name === 'voicename') {
             var type = 'voicename';
             if (this.value != null) {

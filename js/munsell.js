@@ -11,7 +11,7 @@
 //
 // Munsell data derived from CPAN Color::Model::Munsell
 // http://search.cpan.org/~tonodera/Color-Model-Munsell-0.02/
-// which is a vast improvement over the Munsell Perl module 
+// which is a vast improvement over the Munsell Perl module
 // written by Walter Bender and Jon Orwant back in the day.
 
 function getMunsellColor(hue, value, chroma) {

@@ -652,7 +652,7 @@ define(MYDEFINES, function (compatibility) {
         function getPlaybackQueueStatus () {
             return Object.keys(logo.playbackQueue).length > 0;
         };
-        
+
         function setPlaybackStatus () {
             if (playbackBox != null) {
                 playbackBox.setPlaybackStatus();
@@ -975,7 +975,7 @@ define(MYDEFINES, function (compatibility) {
 
                 reader.readAsText(fileChooser.files[0]);
             }, false);
-        
+
             function handleFileSelect (event) {
                 event.stopPropagation();
                 event.preventDefault();
@@ -998,19 +998,19 @@ define(MYDEFINES, function (compatibility) {
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
-   
+
                                 sendAllToTrash(false, false);
                                 refreshCanvas();
-    
+
                                 logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
                                 setPlaybackStatus();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             }
-                     
+
                         }
-                        
+
                         document.body.style.cursor = 'default';
                     }, 200);
                 });
@@ -1467,7 +1467,7 @@ define(MYDEFINES, function (compatibility) {
                     blocks.errorMsg(_('Block cannot be found.'));
                 }
 
-                searchWidget.value = ''; 
+                searchWidget.value = '';
                 update = true;
             }
         };
@@ -1861,7 +1861,7 @@ define(MYDEFINES, function (compatibility) {
                 } else if (blocks.blockList[blk].name === 'action') {
                     if (!blocks.blockList[blk].trash) {
                         blocks.deleteActionBlock(blocks.blockList[blk]);
-                        actionBlockCounter += 1;                    
+                        actionBlockCounter += 1;
                     }
                 }
 

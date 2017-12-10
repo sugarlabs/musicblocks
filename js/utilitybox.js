@@ -233,7 +233,7 @@ function UtilityBox () {
             setTimeout(function () {
                 locked = false;
             }, 500);
-            
+
             var x = (event.stageX / that._scale) - that._container.x;
             var y = (event.stageY / that._scale) - that._container.y;
 

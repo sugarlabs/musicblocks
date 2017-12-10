@@ -29,7 +29,7 @@ function PitchStaircase () {
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width; 
+        cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -69,7 +69,7 @@ function PitchStaircase () {
             var pscTableCell = pscTableRow.insertCell();
             pscTableCell.innerHTML = '<table cellpadding="0px" id="stepTable' + i + '"></table>';
 
-            var stepTable = docById('stepTable' + i); 
+            var stepTable = docById('stepTable' + i);
             var stepTableRow = stepTable.insertRow();
 
             // The stairstep for this row.
@@ -572,7 +572,7 @@ function PitchStaircase () {
         innerDiv.style.width = w + 'px';
         innerDiv.style.marginLeft = (BUTTONSIZE * this._cellScale) + 'px';
     };
-    
+
     this._refresh = function() {
         this._makeStairs(-1, true);
         this._resizeWidget();
