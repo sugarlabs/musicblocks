@@ -86,6 +86,239 @@
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "rest"
 msgstr "休符"
 
@@ -252,6 +485,14 @@ msgstr "サーバにアップロードして発表する"
 #: js/samplesviewer.js:101
 msgid "Share"
 msgstr "シェア"
+
+#: js/samplesviewer.js:80
+msgid "Copy this link to share your project."
+msgstr ""
+
+#: js/samplesviewer.js:81
+msgid "Advanced options"
+msgstr ""
 
 #: js/samplesviewer.js:85
 msgid "Run project on startup."
@@ -4114,6 +4355,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "hspace"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "ツールバーを開くためにここでクリック"
+
 #~msgid "numerator"
 #~msgstr "分子"
 
@@ -4129,9 +4373,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "free time"
 #~msgstr "クロックなし"
-
-#~msgid "current pitch octave"
-#~msgstr "このピッチのオクターブ"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "ツールバーを開き隠し"
@@ -4201,8 +4442,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "note volume"
 #~msgstr "音符の音量"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "ツールバーを開くためにここでクリック"
+#~msgid "current pitch octave"
+#~msgstr "このピッチのオクターブ"
 
 #~msgid "hours ago"
 #~msgstr "時間前"

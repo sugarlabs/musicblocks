@@ -63,6 +63,15 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr ""
 
@@ -216,6 +225,14 @@ msgstr ""
 #: js/samplesviewer.js:101
 #: js/samplesviewer.js:101
 msgid "Share"
+msgstr ""
+
+#: js/samplesviewer.js:80
+msgid "Copy this link to share your project."
+msgstr ""
+
+#: js/samplesviewer.js:81
+msgid "Advanced options"
 msgstr ""
 
 #: js/samplesviewer.js:85
@@ -3703,9 +3720,9 @@ msgstr ""
 #~msgid "Jazz Minor"
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
+#~msgid "fifths"
 #~msgstr ""
 
 #: js/basicblocks.js:893
@@ -3836,9 +3853,9 @@ msgstr ""
 #~msgid "Enigmatic"
 #~msgstr ""
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
+#~msgid "fourths"
 #~msgstr ""
 
 #: plugins/impact.rtp:32
@@ -4035,6 +4052,9 @@ msgstr ""
 #~msgid "hspace"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr ""
+
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -4053,11 +4073,6 @@ msgstr ""
 #: js/musicutils.js:198
 
 #~msgid "Algerian"
-#~msgstr ""
-
-#: js/musicutils.js:207
-
-#~msgid "Ionian"
 #~msgstr ""
 
 #~msgid "set beats per minute"
@@ -4093,11 +4108,6 @@ msgstr ""
 #: js/turtledefs.js:21
 
 #~msgid "actions"
-#~msgstr ""
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
 #~msgstr ""
 
 #~msgid "Expand/collapse toolbar"
@@ -4174,6 +4184,11 @@ msgstr ""
 #~msgid "sense right"
 #~msgstr ""
 
+#: js/musicutils.js:211
+
+#~msgid "Phrygian"
+#~msgstr ""
+
 #: js/musicutils.js:253
 
 #~msgid "Fibonacci"
@@ -4227,9 +4242,9 @@ msgstr ""
 #~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 #~msgstr ""
 
-#: js/musicutils.js:211
+#: js/musicutils.js:207
 
-#~msgid "Phrygian"
+#~msgid "Ionian"
 #~msgstr ""
 
 #: js/basicblocks.js:347
@@ -4271,7 +4286,9 @@ msgstr ""
 #~msgid "turtle pitch number"
 #~msgstr ""
 
-#~msgid "This button opens and closes the primary toolbar."
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
 #~msgstr ""
 
 #: plugins/impact.rtp:32

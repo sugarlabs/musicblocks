@@ -59,6 +59,15 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr "Zurücksetzen"
 
@@ -212,6 +221,14 @@ msgstr "Veröffentlichen"
 #: js/samplesviewer.js:101
 #: js/samplesviewer.js:101
 msgid "Share"
+msgstr ""
+
+#: js/samplesviewer.js:80
+msgid "Copy this link to share your project."
+msgstr ""
+
+#: js/samplesviewer.js:81
+msgid "Advanced options"
 msgstr ""
 
 #: js/samplesviewer.js:85
@@ -3699,10 +3716,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Jazz Minor"
 #~msgstr "melodisch Moll aufwärts"
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "Viertel"
+#~msgid "fifths"
+#~msgstr "Fünftel"
 
 #: js/basicblocks.js:893
 
@@ -3830,10 +3847,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Enigmatic"
 #~msgstr "rätselhaft"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "Fünftel"
+#~msgid "fourths"
+#~msgstr "Viertel"
 
 #: plugins/impact.rtp:32
 
@@ -4026,9 +4043,6 @@ msgstr "Wähle eine Datei aus"
 #~msgid "hspace"
 #~msgstr ""
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Hier kannst du die Haupt-Toolbar öffnen und schließen"
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -4048,11 +4062,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Algerian"
 #~msgstr "Algerisch"
-
-#: js/musicutils.js:207
-
-#~msgid "Ionian"
-#~msgstr "Ionisch"
 
 #~msgid "set beats per minute"
 #~msgstr "Bestimme die Schläge pro Minute (BPM)"
@@ -4083,6 +4092,11 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "actions"
 #~msgstr "Aktionen"
+
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "Oktave der aktuellen Tonlage"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "Toolbar aus-/einklappen"
@@ -4158,6 +4172,11 @@ msgstr "Wähle eine Datei aus"
 #~msgid "sense right"
 #~msgstr "Rechter Sensor"
 
+#: js/musicutils.js:211
+
+#~msgid "Phrygian"
+#~msgstr "Phrygisch"
+
 #: js/musicutils.js:253
 
 #~msgid "Fibonacci"
@@ -4206,10 +4225,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 #~msgstr "Eingabe im verminderten Block muss 1, 2, 3, 4, 5, 6, 7 oder 8 sein"
 
-#: js/musicutils.js:211
+#: js/musicutils.js:207
 
-#~msgid "Phrygian"
-#~msgstr "Phrygisch"
+#~msgid "Ionian"
+#~msgstr "Ionisch"
 
 #: js/basicblocks.js:347
 
@@ -4250,10 +4269,8 @@ msgstr "Wähle eine Datei aus"
 #~msgid "turtle pitch number"
 #~msgstr "Nummer für Tonlage der Schildkröte festlegen"
 
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "Oktave der aktuellen Tonlage"
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Hier kannst du die Haupt-Toolbar öffnen und schließen"
 
 #: plugins/impact.rtp:32
 

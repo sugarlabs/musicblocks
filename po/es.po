@@ -84,6 +84,15 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr "descanso"
 
@@ -238,6 +247,14 @@ msgstr "Publicar"
 #: js/samplesviewer.js:101
 msgid "Share"
 msgstr "Compartir"
+
+#: js/samplesviewer.js:80
+msgid "Copy this link to share your project."
+msgstr "Copia este enlace para compartir tu proyecto."
+
+#: js/samplesviewer.js:81
+msgid "Advanced options"
+msgstr "Opciones avanzadas"
 
 #: js/samplesviewer.js:85
 msgid "Run project on startup."
@@ -2755,19 +2772,19 @@ msgstr "apilar"
 
 #: js/basicblocks.js:2648
 msgid "top"
-msgstr ""
+msgstr "superior"
 
 #: js/basicblocks.js:2655
 msgid "bottom"
-msgstr ""
+msgstr "inferior"
 
 #: js/basicblocks.js:2662
 msgid "width"
-msgstr ""
+msgstr "anchura"
 
 #: js/basicblocks.js:2669
 msgid "height"
-msgstr ""
+msgstr "altura"
 
 #: js/basicblocks.js:2677
 #.TRANS: stops playback of an audio recording
@@ -3714,10 +3731,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "turtle note"
 #~msgstr "nota de tortugas"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "quintos"
+#~msgid "fourths"
+#~msgstr "cuartas"
 
 #: js/basicblocks.js:893
 
@@ -3787,10 +3804,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Impact UID not found."
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "cuartas"
+#~msgid "fifths"
+#~msgstr "quintos"
 
 #: plugins/impact.rtp:32
 
@@ -3918,6 +3935,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "adjust transposition"
 #~msgstr "ajustar transposición"
 
+#~msgid "legato factor"
+#~msgstr "factor de legato"
+
 #: js/basicblocks.js:145
 
 #~msgid "consonant step down"
@@ -3925,6 +3945,9 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "hspace"
 #~msgstr "espacio horizontal"
+
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Este botón abre y cierra la barra de herramientas principal."
 
 #: js/logo.js:2317
 
@@ -3966,11 +3989,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "actions"
 #~msgstr ""
 
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "octava actual"
-
 #~msgid "Expand/collapse toolbar"
 #~msgstr "Expandir o colapsar barra"
 
@@ -3986,9 +4004,6 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "logic"
 #~msgstr "lógica"
-
-#~msgid "legato factor"
-#~msgstr "factor de legato"
 
 #: js/turtledefs.js:99
 
@@ -4065,8 +4080,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "note volume"
 #~msgstr "volumen nota"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Este botón abre y cierra la barra de herramientas principal."
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "octava actual"
 
 #: plugins/impact.rtp:32
 

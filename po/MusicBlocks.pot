@@ -175,6 +175,14 @@ msgstr ""
 msgid "Share"
 msgstr ""
 
+#: js/samplesviewer.js:80
+msgid "Copy this link to share your project."
+msgstr ""
+
+#: js/samplesviewer.js:81
+msgid "Advanced options"
+msgstr ""
+
 #: js/samplesviewer.js:85
 msgid "Run project on startup."
 msgstr ""
@@ -3626,38 +3634,5 @@ msgid "You need to select a file."
 msgstr ""
 
 #~msgid ""
-#~msgstr ""
-
-#: js/turtledefs.js:79
-#~msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
-#~msgstr ""
-
-#: js/turtledefs.js:80
-#~msgid "Click to run the project in fast mode."
-#~msgstr ""
-
-#: js/turtledefs.js:81
-#~msgid "Click to run the project in slow mode."
-#~msgstr ""
-
-#: js/turtledefs.js:82
-#~msgid "Click to run just the music in slow mode."
-#~msgstr ""
-
-#: js/turtledefs.js:87
-#~msgid "Hide or show the block palettes."
-#~msgstr ""
-
-#: js/turtledefs.js:99
-#~msgid "The save-stack button saves a stack onto a custom palette."
-#~msgstr ""
-
-#: js/turtledefs.js:99
-#~msgid "It appears after a long press on a stack."
-#~msgstr ""
-
-#: js/basicblocks.js:893
-#.TRANS: slow down note duration by some factor, e.g. convert 1/8 to 1/4 notes by using a factor of 2
-#~msgid "divide note value"
 #~msgstr ""
 

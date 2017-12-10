@@ -64,6 +64,15 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 #.TRANS: descanso
 msgid "rest"
 msgstr "samart'a"
@@ -237,6 +246,16 @@ msgstr "wakichata uñachayaña"
 #.TRANS: Compartir
 msgid "Share"
 msgstr "Apakipaña"
+
+#: js/samplesviewer.js:80
+#.TRANS: Copia este enlace para compartir tu proyecto.
+msgid "Copy this link to share your project."
+msgstr ""
+
+#: js/samplesviewer.js:81
+#.TRANS: Opciones avanzadas
+msgid "Advanced options"
+msgstr ""
 
 #: js/samplesviewer.js:85
 #.TRANS: Ejecutar código al inicio.
@@ -3210,22 +3229,22 @@ msgid "push"
 msgstr "nukht'aña"
 
 #: js/basicblocks.js:2648
-#.TRANS: 
+#.TRANS: superior
 msgid "top"
 msgstr ""
 
 #: js/basicblocks.js:2655
-#.TRANS: 
+#.TRANS: inferior
 msgid "bottom"
 msgstr ""
 
 #: js/basicblocks.js:2662
-#.TRANS: 
+#.TRANS: anchura
 msgid "width"
 msgstr ""
 
 #: js/basicblocks.js:2669
-#.TRANS: 
+#.TRANS: altura
 msgid "height"
 msgstr ""
 
@@ -4397,10 +4416,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Jazz Minor"
 #~msgstr "Sullka Jazz wakichata"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "phisqïrinaka wakichäwi"
+#~msgid "fourths"
+#~msgstr "pusïrinaka wakichata"
 
 #: js/basicblocks.js:893
 
@@ -4531,10 +4550,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Enigmatic"
 #~msgstr "Enigmático wakichata"
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "pusïrinaka wakichata"
+#~msgid "fifths"
+#~msgstr "phisqïrinaka wakichäwi"
 
 #: plugins/impact.rtp:32
 
@@ -4706,9 +4725,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "hspace"
 #~msgstr "ampsta sara"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Aka limt’añaxa wakichatanaka wakisiri apanaqañanaka qhantayi jiwayi"
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -4728,11 +4744,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "Algerian"
 #~msgstr "Argelino wakichata"
-
-#: js/musicutils.js:207
-
-#~msgid "Ionian"
-#~msgstr "jónico wakichata"
 
 #~msgid "set beats per minute"
 #~msgstr "t'ijtäwi pacha chani putuqi"
@@ -4758,6 +4769,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "actions"
 #~msgstr "saranaqäwinaka"
+
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "Akïri q'ucht'awi chimpu kimsaqallqu chimpu"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "wakichatanaka apanaqaña jithitatayaña chhaqtayaña"
@@ -4819,6 +4835,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "sense right"
 #~msgstr "kupïxaru uñtani"
 
+#: js/musicutils.js:211
+
+#~msgid "Phrygian"
+#~msgstr "Frigio wakichata"
+
 #: js/musicutils.js:253
 
 #~msgid "Fibonacci"
@@ -4867,10 +4888,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 #~msgstr "1, 2, 3, 4, 5, 6, 7, o 8 siqi wakichataru mantañaxa jithiqayatañapawa"
 
-#: js/musicutils.js:211
+#: js/musicutils.js:207
 
-#~msgid "Phrygian"
-#~msgstr "Frigio wakichata"
+#~msgid "Ionian"
+#~msgstr "jónico wakichata"
 
 #: js/basicblocks.js:347
 
@@ -4911,10 +4932,8 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "turtle pitch number"
 #~msgstr "khirkhinchunaka jakhu chimpu"
 
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "Akïri q'ucht'awi chimpu kimsaqallqu chimpu"
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Aka limt’añaxa wakichatanaka wakisiri apanaqañanaka qhantayi jiwayi"
 
 #: plugins/impact.rtp:32
 
