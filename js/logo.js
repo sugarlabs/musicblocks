@@ -7669,27 +7669,41 @@ function Logo () {
                 }
                 break;
             case 'doubly':
-                // FIXME: doubly doubly interval will not work.
                 var cblk = that.blocks.blockList[blk].connections[1];
+                //find block at end of chain
                 if (cblk == null) {
                     that.blocks.blockList[blk].value = 0;
-                } else if (that.blocks.blockList[cblk].name !== 'intervalname') {
-                    var value = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    if (typeof(value) === 'number') {
-                        that.blocks.blockList[blk].value = value * 2;
-                    } else if (typeof(value) === 'string') {
-                        that.blocks.blockList[blk].value = value + value;
-                    } else {
-                        that.blocks.blockList[blk].value = value;
-                    }
                 } else {
-                    // Augmented or diminished only
-                    if (that.blocks.blockList[cblk].value[0] === 'a') {
-                        that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) + 1;
-                    } else if (that.blocks.blockList[cblk].value[0] === 'd') {
-                        that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) - 1;
-                    } else {
-                        that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                    var currentblock = cblk;
+                    while (true) {
+                        var blockToCheck = that.blocks.blockList[currentblock];
+                        if (blockToCheck.name === 'intervalname') {
+                            // Augmented or diminished only
+                            if (blockToCheck.value[0] === 'a') {
+                                that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) + 1;
+                            } else if (blockToCheck.value[0] === 'd') {
+                                that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) - 1;
+                            } else {
+                                that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                            }
+                            break;
+                        } else if (blockToCheck.name !== 'doubly') {
+                            var value = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                            if (typeof(value) === 'number') {
+                                that.blocks.blockList[blk].value = value * 2;
+                            } else if (typeof(value) === 'string') {
+                                that.blocks.blockList[blk].value = value + value;
+                            } else {
+                                that.blocks.blockList[blk].value = value;
+                            }
+                            break;
+                        }
+
+                        currentblock=that.blocks.blockList[currentblock].connections[1];
+                        if (currentblock == null) {
+                            that.blocks.blockList[blk].value = 0;
+                            break;
+                        } 
                     }
                 }
                 break;
