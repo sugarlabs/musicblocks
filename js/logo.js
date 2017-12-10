@@ -7675,9 +7675,9 @@ function Logo () {
                     that.blocks.blockList[blk].value = 0;
                 } else {
                     var currentblock = cblk;
-                    while (true){
+                    while (true) {
                         var blockToCheck = that.blocks.blockList[currentblock];
-                        if (blockToCheck.name=="intervalname"){
+                        if (blockToCheck.name === 'intervalname') {
                             // Augmented or diminished only
                             if (blockToCheck.value[0] === 'a') {
                                 that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg) + 1;
@@ -7687,7 +7687,7 @@ function Logo () {
                                 that.blocks.blockList[blk].value = that.parseArg(that, turtle, cblk, blk, receivedArg);
                             }
                             break;
-                        } else if (blockToCheck.name!="doubly"){
+                        } else if (blockToCheck.name !== 'doubly') {
                             var value = that.parseArg(that, turtle, cblk, blk, receivedArg);
                             if (typeof(value) === 'number') {
                                 that.blocks.blockList[blk].value = value * 2;
@@ -7698,6 +7698,7 @@ function Logo () {
                             }
                             break;
                         }
+
                         currentblock=that.blocks.blockList[currentblock].connections[1];
                         if (currentblock == null) {
                             that.blocks.blockList[blk].value = 0;
