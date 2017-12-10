@@ -5051,31 +5051,11 @@ function Logo () {
                 that.errorMsg(ZERODIVIDEERRORMSG, blk);
                 that.stopTurtle = true;
             } else {
-                that.beatFactor[turtle] *= factor;
-                childFlow = args[1];
-                childFlowCount = 1;
-
-                var listenerName = '_multiplybeat_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __listener = function (event) {
-                    that.beatFactor[turtle] /= factor;
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-            }
-            break;
-        case 'dividebeatfactor':
-            var factor = args[0];
-            if (factor === 0) {
-                that.errorMsg(ZERODIVIDEERRORMSG, blk);
-                that.stopTurtle = true;
-            } else {
                 that.beatFactor[turtle] /= factor;
                 childFlow = args[1];
                 childFlowCount = 1;
 
-                var listenerName = '_dividebeat_' + turtle;
+                var listenerName = '_multiplybeat_' + turtle;
                 that._setDispatchBlock(blk, turtle, listenerName);
 
                 var __listener = function (event) {

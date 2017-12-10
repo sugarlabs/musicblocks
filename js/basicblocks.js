@@ -886,15 +886,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatFactorBlock.flowClampOneArgBlock();
     beatFactorBlock.defaults.push(2);
 
-    var beatFactorBlock2 = new ProtoBlock('dividebeatfactor');
-    beatFactorBlock2.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['dividebeatfactor'] = beatFactorBlock2;
-    //.TRANS: slow down note duration by some factor, e.g. convert 1/8 to 1/4 notes by using a factor of 2
-    beatFactorBlock2.staticLabels.push(_('divide note value'));
-    beatFactorBlock2.adjustWidthToLabel();
-    beatFactorBlock2.flowClampOneArgBlock();
-    beatFactorBlock2.defaults.push(2);
-
     var tieBlock = new ProtoBlock('tie');
     tieBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['tie'] = tieBlock;
