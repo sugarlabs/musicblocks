@@ -3211,7 +3211,6 @@ function Blocks () {
             case 'articulation':
             case 'backward':
             case 'crescendo':
-            case 'dividebeatfactor':
             case 'drift':
             case 'duplicatenotes':
             case 'interval':
