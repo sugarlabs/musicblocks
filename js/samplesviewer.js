@@ -81,7 +81,7 @@ const LOCAL_PROJECT_TEMPLATE ='\
             <button style="float:right" onclick="toggle(\'checkboxdiv_NUM_\');">' + _('Advanced options') + '</button> \
             <input type="text" name="shareurl" id="shareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;"/> \
             <div id="checkboxdiv_NUM_" style="display:none;"> \
-                <h4 style="margin-top: 10px;margin-bottom: 5px;">Set Options</h4> \
+                <h4 style="margin-top: 10px;margin-bottom: 5px;">' + _('Advanced options') + '</h4> \
                 <div><input type="checkbox" name="run" id="checkbox_NUM_run" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_run">' + _('Run project on startup.') + '</label></div> \
                 <div><input type="checkbox" name="show" id="checkbox_NUM_show" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_show">' + _('Show code blocks on startup.') + '</label></div> \
                 <div><input type="checkbox" name="collapse" id="checkbox_NUM_collapse" onchange="updateCheckboxes(\'shareurldiv_NUM_\');"><label for="checkbox_NUM_collapse">' + _('Collapse code blocks on startup.') + '</label></div> \

@@ -203,7 +203,9 @@ function Palettes () {
 
     this.hidePaletteIconCircles = function () {
         // palette_text might not be defined yet.
-        hidePaletteNameDisplay(this.palette_text, this.stage);
+        if (!sugarizerCompatibility.isInsideSugarizer()) {
+            hidePaletteNameDisplay(this.palette_text, this.stage);
+        }
 
         hideButtonHighlight(this.circles, this.stage);
     };
@@ -524,14 +526,20 @@ function Palettes () {
         this.buttons[name].on('pressup', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
-            hidePaletteNameDisplay(that.palette_text, that.stage);
+            if (!sugarizerCompatibility.isInsideSugarizer()) {
+                hidePaletteNameDisplay(that.palette_text, that.stage);
+            }
+
             hideButtonHighlight(that.circles, that.stage);
         });
 
         this.buttons[name].on('mouseout', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
-            hidePaletteNameDisplay(that.palette_text, that.stage);
+            if (!sugarizerCompatibility.isInsideSugarizer()) {
+                hidePaletteNameDisplay(that.palette_text, that.stage);
+            }
+
             hideButtonHighlight(that.circles, that.stage);
         });
 
