@@ -193,9 +193,9 @@
 
 #### <a name="音符動き"></a>3.2.1 音符動きのブロック
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg " 音程動きブロックの使える例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg " ステップピッチブロックの使える例")
 
-*音程動き*ブロックはメロディーの音符を音階的に上/下に動かすことができます。上の例に*音程動き*ブロックが*回繰り返す*ブロックの中でその入ってるコードが7回繰り返して、音階の音程で音符が上に上がって、下に下ろし動きます。
+*ステップピッチ*ブロックはメロディーの音符を音階的に上/下に動かすことができます。上の例に*ステップピッチ*ブロックが*回繰り返す*ブロックの中でその入ってるコードが7回繰り返して、音階の音程で音符が上に上がって、下に下ろし動きます。
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
@@ -278,28 +278,19 @@ note.
 
 *音量を設定*ブロックは音符の鳴らす音量を変えます。デフォールトが50で最低限が0(絶対静か)で最大限が100(一番大きい音量)です.
 
-The *クレッシェンド* block will increase (or decrease) the 音量 of the
-contained notes by a specified amount for every note played. For
-example, if you have 3 notes in sequence contained in a *クレッシェンド*
-block with a value of 5, the final note will be at 15% more 
-than the original value for 音量.
+*クレッシェンド*ブロックは巻かされている音符の音量を小さく大きくします。例えば、5の数値の*クレッシェンド*ブロックに三つの音符ブロックが入っていたら、最後の音符の音量が最小の音符の音量より15%大きいです。
 
-The *スタッカート* block shortens the length of the actual note&mdash;making them tighter
-bursts&mdash;while maintaining the specified rhythmic value of the notes.
+*スタッカート*ブロックは音符の音価を変えなく音符の鳴らす長さをスタッカートの数値で短くします。
 
-The *スラー* block lengthens the sustain of notes&mdash;running longer than
-the noted duration and blending it into the next note&mdash;while
-maintaining the specified rhythmic value of the notes.
+*スラー*ブロックは音符の音価を変えなく音符の鳴らす長さをスラーの数値で長くします。音楽でレガートとも言います。
 
 #### <a name="音程と相対的な音量"></a>3.2.9 音程と相対的な音量の関係
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Interval and Set レlative 音量 block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "相対的な音程ブロックと相対的な音量を設定ブロック")
 
-The *Interval* block calculates a relative interval, e.g., a fifth,
-and adds the additional ピッチ to a note's playback. In the figure,
-we add `La` to `レ` and `Ti` to `Mi`.
+*相対的な音程*は入っている音符から音程を計算してそのピッチも同時に鳴らします。例えば、音符から五度上の音も欲しかったら、このブロックを使います。上の例には、`レ`に'ラ'を`ミ`に'シ'を同時に鳴らします。
 
-The *Set Relative Volume* block modifies the clamped note's 音量 according to the input value of the block in an added (or subtracted when negative) percentage with respect to the original 音量.For example,100 would mean doubling the current 音量.
+*相対的な音量を設定*ブロックは入っている音符の音量をブロックの数値で足すことか引くことをします。例えば、100の数値は現在の音量を倍にします。
 
 #### <a name= "絶対音程"></a>絶対音程
 
