@@ -1750,12 +1750,12 @@ msgstr "スタックで長くクリックすると現れます。"
 
 #: js/turtledefs.js:100
 msgid "Show or hide a coordinate grid."
-msgstr "グリッドを表示隠し。"
+msgstr "グリッドを表示する　/隠す。"
 
 #: js/turtledefs.js:101
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "極座表敬グリッドを表示隠しのアイコンです。"
+msgstr "極座表敬グリッドを表示する　/隠すのアイコンです。"
 
 #: js/turtledefs.js:102
 msgid "Open a panel for configuring Music Blocks."
