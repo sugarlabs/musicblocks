@@ -5205,8 +5205,9 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
-            // Deprecated
-        case 'setnotevolume2':  // master volume
+        case 'setnotevolume2':
+            // master volume in clamp form
+            // Used by fff ff f p pp ppp blocks
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 that.masterVolume.push(args[0]);
                 if (!this.suppressOutput[turtle]) {
@@ -5225,6 +5226,10 @@ function Logo () {
 
                 var __listener = function (event) {
                     that.masterVolume.pop();
+                    // Restore previous volume.
+                    if (that.masterVolume.length > 0) {
+                        that._setMasterVolume(last(that.masterVolume));
+                    }
                 };
 
                 that._setListener(turtle, listenerName, __listener);
