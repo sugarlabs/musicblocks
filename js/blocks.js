@@ -329,7 +329,7 @@ function Blocks () {
     // are inserted into (or removed from) the child flow. This is a
     // common operation for start and action blocks, but also for
     // repeat, forever, if, etc.
-    this._adjustExpandableClampBlock = function () {
+    this.adjustExpandableClampBlock = function () {
         if (this.clampBlocksToCheck.length === 0) {
             return;
         }
@@ -380,7 +380,7 @@ function Blocks () {
             // Recurse through the list.
             setTimeout(function () {
                 if (blocks.clampBlocksToCheck.length > 0) {
-                    blocks._adjustExpandableClampBlock();
+                    blocks.adjustExpandableClampBlock();
                 }
             }, 250);
         };
@@ -1325,7 +1325,7 @@ function Blocks () {
                 blk = that._insideExpandableBlock(blk);
             }
 
-            that._adjustExpandableClampBlock();
+            that.adjustExpandableClampBlock();
             that.refreshCanvas();
         }, 250);
     };
@@ -1756,7 +1756,7 @@ function Blocks () {
             }
         }
 
-        this._adjustExpandableClampBlock();
+        this.adjustExpandableClampBlock();
         this.refreshCanvas();
     };
 
