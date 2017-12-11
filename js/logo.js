@@ -2880,7 +2880,14 @@ function Logo () {
                         break;
                     }
                 }
-                that.keySignature[turtle] = args[0] + ' ' + modename;
+
+                // Check to see if there are any transpositions on the key.
+                if (turtle in that.transposition) {
+                    var noteObj = that.getNote(args[0], 4, that.transposition[turtle], that.keySignature[turtle], false, null);
+                    that.keySignature[turtle] = noteObj[0] + ' ' + modename;
+                } else {
+                    that.keySignature[turtle] = args[0] + ' ' + modename;
+                }
             }
             break;
         case 'rhythmruler2':
