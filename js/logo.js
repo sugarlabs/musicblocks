@@ -824,6 +824,9 @@ function Logo () {
             case 'beatvalue':
                 value = this.currentBeat[turtle];
                 break;
+            case 'synthname':
+                value = last(this.instrumentNames[turtle]);
+                break;
             case 'measurevalue':
                 value = this.currentMeasure[turtle];
                 break;
@@ -951,7 +954,7 @@ function Logo () {
             this.oscList[turtle] = {};
             this.bpm[turtle] = [];
             this.inSetTimbre[turtle] = false;
-            this.instrumentNames[turtle] = [];
+            this.instrumentNames[turtle] = ['default'];
             this.inCrescendo[turtle] = [];
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = {'default': [DEFAULTVOLUME]};
@@ -7780,6 +7783,13 @@ function Logo () {
                     } else {
                         that.blocks.blockList[blk].value = thisTurtle.orientation;
                     }
+                }
+                break;
+            case 'synthname':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'synthname']);
+                } else {
+                    that.blocks.blockList[blk].value = last(that.instrumentNames[turtle]);
                 }
                 break;
             case 'bpmfactor':

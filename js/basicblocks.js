@@ -1241,6 +1241,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     newstaccatoBlock.flowClampOneArgBlock();
     newstaccatoBlock.defaults.push(1 / 32);
 
+    var synthnameBlock = new ProtoBlock('synthname');
+    synthnameBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['synthname'] = synthnameBlock;
+    synthnameBlock.staticLabels.push(_('synth name'));
+    synthnameBlock.adjustWidthToLabel();
+    synthnameBlock.dockTypes[0] = 'textout';
+    synthnameBlock.parameterBlock();
+
     var voicenameBlock = new ProtoBlock('voicename');
     voicenameBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['voicename'] = voicenameBlock;
