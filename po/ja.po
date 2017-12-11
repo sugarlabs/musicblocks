@@ -12,312 +12,13 @@
 "X-Generator: Pootle 2.0.1\n"
 
 #: js/activity.js:443
-#: js/activity.js:443
 #: js/activity.js:445
 #: js/activity.js:453
-#: js/activity.js:472
 #: js/activity.js:472
 #: js/activity.js:475
 #: js/block.js:632
 #: js/pitchdrummatrix.js:178
 #: js/musicutils.js:37
-#: js/block.js:531
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:532
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:534
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:534
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:534
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "rest"
 msgstr "休符"
@@ -376,7 +77,7 @@ msgstr "スタート"
 #: js/block.js:649
 ## ひらがな＝ぎょうれつ;　http://jisho.org/word/%E8%A1%8C%E5%88%97 ; changed to "music graph"
 msgid "matrix"
-msgstr "音楽グラフ"
+msgstr "ピッチ時刻行列"
 
 #: js/block.js:652
 #: js/basicblocks.js:747
@@ -448,9 +149,9 @@ msgstr "シ ラ ソ ファ ミ レ ド"
 #: js/logo.js:658
 #: js/logo.js:7368
 #: js/palette.js:712
-## this should be checked. Technical (Logic/Comptuers)
+## http://jisho.org/word/%E7%9C%9F 
 msgid "true"
-msgstr "実"
+msgstr "真"
 
 #: js/block.js:1854
 #: js/block.js:1859
@@ -458,9 +159,9 @@ msgstr "実"
 #: js/block.js:1862
 #: js/block.js:1862
 #: js/logo.js:660
-## this should be checked. Technical (Logic/Computers); http://jisho.org/word/%E7%84%A1%E5%AE%9F
+## https://ja.wikipedia.org/wiki/If%E6%96%87#.E7.9C.9F.E5.81.BD.E5.80.A4
 msgid "false"
-msgstr "無実"
+msgstr "偽"
 
 #: js/samplesviewer.js:73
 #: js/samplesviewer.js:73
@@ -576,35 +277,33 @@ msgstr "このブロックはもうありません。"
 
 #: js/activity.js:1467
 msgid "Block cannot be found."
-msgstr "ブロックが見つかれません。"
+msgstr "ブロックが見つかりません。"
 
 #: js/activity.js:2840
 #: js/activity.js:2853
 #: js/turtledefs.js:80
 msgid "Run fast"
-msgstr "早く再生"
+msgstr "速いスピードで再生します"
 
 #: js/activity.js:2840
 #: js/activity.js:2853
 msgid "long press to run slowly"
-msgstr "長く押すとゆっくりに動く"
+msgstr "長く押すとゆっくり再生されます"
 
 #: js/activity.js:2840
 msgid "extra-long press to run music slowly"
-msgstr "もと長く押すと音楽はゆっくりに動く"
+msgstr "もっと長く押すと、音楽はさらにゆっくりになります"
 
 #: js/activity.js:2841
 #: js/activity.js:2854
 #: js/turtledefs.js:83
-## Check this
 msgid "Run step by step"
-msgstr "一方一方動き"
+msgstr "ステップごとに再生されます"
 
 #: js/activity.js:2842
 #: js/turtledefs.js:84
-## check
 msgid "Run note by note"
-msgstr "音符を一つずつに"
+msgstr "音符が一つずつ再生されます"
 
 #: js/activity.js:2843
 #: js/activity.js:2855
@@ -620,21 +319,19 @@ msgstr "消去"
 
 #: js/activity.js:2845
 msgid "Show/hide palettes"
-msgstr "パレットを見せ隠し"
+msgstr "パレットを表示する / 隠す"
 
 #: js/activity.js:2846
 #: js/activity.js:2857
 #: js/turtledefs.js:87
-## Not too sure on grammar.."
 msgid "Show/hide blocks"
-msgstr "ブロックを表示し隠し"
+msgstr "ブロックを表示する / 隠す"
 
 #: js/activity.js:2847
 #: js/activity.js:2858
 #: js/turtledefs.js:88
-## Check this
 msgid "Expand/collapse collapsable blocks"
-msgstr "略せるブロックを膨らみ略し"
+msgstr "つぶせるブロックを増やす / つぶす"
 
 #: js/activity.js:2848
 #: js/activity.js:2859
@@ -654,33 +351,33 @@ msgstr "ヘルプ"
 #: js/turtledefs.js:92
 ## Calling it "planet server" here
 msgid "Load samples from server"
-msgstr "プラネット・サーバから見本をダウンロードする"
+msgstr "「プラネット」のサーバからサンプルをダウンロードする"
 
 #: js/activity.js:2934
 #: js/activity.js:2946
 #: js/turtledefs.js:93
 msgid "Load project from files"
-msgstr "プロジェクトのファイルをロードする"
+msgstr "プロジェクトをファイルからダウンロードする"
 
 #: js/activity.js:2935
 #: js/activity.js:2947
 #: js/turtledefs.js:94
 ## to check on computer
 msgid "Save project"
-msgstr "プロジェクトを確保する"
+msgstr "プロジェクトを保存する"
 
 #: js/activity.js:2936
 msgid "Long press on blocks to copy."
-msgstr "ブロックでマウスの長いクリック押しでコピー。"
+msgstr "ブロックでマウスの長いクリック押しでコピー"
 
 #: js/activity.js:2936
 msgid "Click here to paste."
-msgstr "ペーストをするためにここでクリック。"
+msgstr "ペーストをするためにここでクリック"
 
 #: js/activity.js:2938
 #: js/activity.js:2950
 msgid "playback"
-msgstr "プレイバック"
+msgstr "コンパイルされているコードを再生"
 
 #: js/activity.js:2939
 #: js/activity.js:2951
@@ -748,7 +445,7 @@ msgstr "ペン"
 #: js/turtledefs.js:23
 #: js/basicblocks.js:399
 msgid "number"
-msgstr "数字"
+msgstr "数字・算数"
 
 #: js/analytics.js:385
 #: js/turtledefs.js:23
@@ -827,9 +524,8 @@ msgid "major"
 msgstr "メジャー"
 
 #: js/logo.js:1341
-## Incomplete
 msgid "Block does not support incrementing."
-msgstr "このブロックでIncrementingができません"
+msgstr "ブロックは、増殖をサポートできません"
 
 #: js/logo.js:2197
 #: js/logo.js:2214
@@ -841,7 +537,7 @@ msgstr "このブロックでIncrementingができません"
 #: js/logo.js:8073
 #: js/logo.js:8101
 msgid "Cannot find mouse"
-msgstr "ネズミが見つかれません。"
+msgstr "ネズミが見つかりません。"
 
 #: js/logo.js:2199
 #: js/logo.js:2216
@@ -853,77 +549,77 @@ msgstr "ネズミが見つかれません。"
 #: js/logo.js:8075
 #: js/logo.js:8103
 msgid "Cannot find turtle"
-msgstr "タートルが見つかれません。"
+msgstr "タートルが見つかりません。"
 
 #: js/logo.js:2221
 msgid "Mouse is already running."
-msgstr "ネズミがもう動いていますよ。"
+msgstr "ネズミは既に動いています。"
 
 #: js/logo.js:2223
 msgid "Turtle is already running."
-msgstr "タートルはもう動いていますよ。"
+msgstr "タートルは既に動いています。"
 
 #: js/logo.js:2243
 msgid "Cannot find start block"
-msgstr "スターとのブロックが見つかれません。"
+msgstr "スタート用のブロックが見つかりません。"
 
 #: js/logo.js:2561
 msgid "Please enter a valid URL."
-msgstr "妥当なURLを打ってください。"
+msgstr "正しい URL をいれて下さい。"
 
 #: js/logo.js:2656
 #: js/logo.js:7250
 msgid "You must select a file."
-msgstr "ファイルを選ぶ必要があります"
+msgstr "ファイルを選ぶ必要があります。"
 
 #: js/logo.js:2665
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
-msgstr "選んだファイルはvalidなヒープが含まれません"
+msgstr "選んだファイルには、正しいヒープが含まれません。"
 
 #: js/logo.js:2669
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
-msgstr "ロードヒープのブロックはロードファイルブロックといっしょうの必要があります"
+msgstr  "ロードヒープのブロックには、ロードファイルブロックが必要です。"
 
 #: js/logo.js:2685
 msgid "Error parsing JSON data:"
-msgstr "JSONのパーシングのエラーです"
+msgstr "JSON データの構文エラーです。"
 
 #: js/logo.js:2690
 msgid "404: Page not found"
-msgstr "404: このページが見つかれません"
+msgstr "404: このページが見つかりません"
 
 #: js/logo.js:2714
-## If the word is suppose to follow this clause, it is difficult to choose a good Japanese grammar. Need to think about it.
+## To be verified
 msgid "Cannot find a valid heap for"
-msgstr "タートルヒープすはvalidなヒープ含まれません："
+msgstr "正しいヒープが見つかりません。"
 
 #: js/logo.js:2724
 msgid "Index must be > 0."
-msgstr "インデクスは0よりの必要があります"
+msgstr "インデクス番号は 0 より大きい必要があります。"
 
 #: js/logo.js:2745
 #: js/logo.js:2769
 #: js/logo.js:2793
 #: js/timbre.js:547
 msgid "Unable to use synth due to existing oscillator"
-msgstr "オシレーターの訳でシンセが使えません"
+msgstr  "オシレーターがあるため、シンセが使えません。"
 
 #: js/logo.js:2751
 #: js/logo.js:2775
 msgid "The input cannot be negative."
-msgstr "マイナスのインプットはできません"
+msgstr "マイナスの数値をいれることはできません。"
 
 #: js/logo.js:2822
 #: js/logo.js:2843
 msgid "Beats per minute must be > 30."
-msgstr "一分割テンポは３０より必要があります"
+msgstr "BPM(一分当たりの拍数)は３０より大きい必要があります。"
 
 #: js/logo.js:2825
 #: js/logo.js:2846
 msgid "Maximum beats per minute is 1000."
-msgstr "一分割テンポの最大値は１０００"
+msgstr "BPM(一分当たりの泊数)は最大　１０００　とします。"
 
 #: js/logo.js:2997
 msgid "You must have at least one pitch block and one drum block in the matrix."
@@ -931,36 +627,37 @@ msgstr "音楽グラフは一つのピッチブロックと一つのドラムブ
 
 #: js/logo.js:3137
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "音楽グラフは一つのピッチブロックと一つのリズムブロックを使う必要があります"
+msgstr "「ピッチ時刻行列」には、一つ以上のピッチブロックと一つ以上のドラムブロックが必要です。"
 
 #: js/logo.js:3173
+## Using Sachiko's recommendation, but it is inconsistent with our other grammar style.
 msgid "Attack value should be from 0 to 100."
-msgstr "Attack value は0から１００までの必要があります"
+msgstr "アタック値には 0 以上100以下の数字をいれて下さい。"
 
 #: js/logo.js:3176
 msgid "Decay value should be from 0 to 100."
-msgstr "Decay value　は０から１００までの必要があります"
+msgstr "減衰値には 0 以上100以下の数字をいれて下さい。"
 
 #: js/logo.js:3179
 msgid "Sustain value should be from 0 to 100."
-msgstr "Sustain value は０から１００までの必要があります"
+msgstr "サステイン値には 0 以上100以下の数字をいれて下さい。"
 
 #: js/logo.js:3182
 msgid "Release value should be from 0-100."
-msgstr "release value は０から１００までの必要があります"
+msgstr  "リリース値には 0 以上100以下の数字をいれて下さい。"
 
 #: js/logo.js:3198
 msgid "You are adding multiple envelope blocks."
-msgstr "一つ以上のenvelopeブロックを増しています"
+msgstr  "封筒ブロックを複数追加しています。"
 
 #: js/logo.js:3227
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
-msgstr "Rolloffの数字が-12, -24, -48, また -98 decibels/octaveの必要があります"
+msgstr "ロールオフ値は -12, -24, -48, -98 デシベル / オクターブである必要があります。"
 
 #: js/logo.js:3265
 msgid "You are adding multiple oscillator blocks."
-msgstr "一つよりのoscillatorブロックを入れていますよ"
+msgstr "複数のオシレーターブロックを追加しています。"
 
 #: js/logo.js:3285
 #: js/basicblocks.js:219
@@ -979,19 +676,19 @@ msgstr "奇数"
 
 #: js/logo.js:3360
 msgid "The Case Block must be used inside of a Switch Block."
-msgstr "ケースブロックはスイッチブロックの中に入られている必要があります"
+msgstr "ケースブロックはスイッチブロックの中にある必要があります。"
 
 #: js/logo.js:3431
 msgid "The Step Pitch Block must be used inside of a Note Block."
-msgstr "音程動きピッチブロックは音符ブロックの中に入られている必要があります"
+msgstr "ステップピッチブロックは音符ブロックの中にある必要があります。"
 
 #: js/logo.js:3617
 msgid "Drum Block: Did you mean to use a Note block?"
-msgstr "ドラムブロック：音符ブロックと一緒に使うつもりですか"
+msgstr "ドラムブロック：音符ブロックと一緒に使うつもりですか。"
 
 #: js/logo.js:4012
 msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr "ピッチブロック：音符ブロックと一緒に使うつもりですか"
+msgstr "ピッチブロック：音符ブロックと一緒に使うつもりですか。"
 
 #: js/logo.js:4040
 ## Shouldn't this be "polyrhythm"?
@@ -1000,7 +697,7 @@ msgstr "ポリリズム"
 
 #: js/logo.js:4063
 msgid "Rhythm Block: Did you mean to use a Matrix block?"
-msgstr "リズムブロック：音楽グラフと一緒に使うつもりですか"
+msgstr "リズムブロック：ピッチ時刻行列と一緒に使うつもりですか"
 
 #: js/logo.js:4266
 #.TRANS: Note value is the note duration.
@@ -1045,7 +742,7 @@ msgstr "ハーツ・ブロック：音符ブロックを使うつもりですか
 #: js/logo.js:5519
 #: js/logo.js:5543
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
-msgstr "タプル・ブロック：音楽グラフのブロックを使うつもりですか？"
+msgstr  "タプル・ブロック：ピッチ時刻行列のブロックを使うつもりですか？"
 
 #: js/logo.js:5718
 msgid "My Project"
@@ -1138,7 +835,7 @@ msgid "text"
 msgstr "文事"
 
 #: js/palette.js:709
-## 明確＝めいかく；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
+## 明確＝めいかく；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B 
 msgid "interval name"
 msgstr "明確な音程"
 
@@ -1565,7 +1262,7 @@ msgstr "スネア"
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "kick drum"
-msgstr "バスドラム"
+msgstr "バス・ドラム"
 
 #: js/musicutils.js:368
 #: js/basicblocks.js:1806
@@ -1836,8 +1533,9 @@ msgid "tuplet value"
 msgstr "タプルの音価"
 
 #: js/turtledefs.js:17
+## I took some liberties
 msgid "Music Blocks is a collection of tools for exploring musical concepts."
-msgstr ""
+msgstr  "ミュージック・ブロックス：音楽と数学とコードの色々を発見するソフト・ツール"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:1038
@@ -1924,16 +1622,16 @@ msgstr "ブロックのパレットを表示するためにここでクリック
 
 #: js/turtledefs.js:80
 msgid "Click the run button to run the project in fast mode."
-msgstr ""
+msgstr "速いスピードで再生するためにここでクリック。"
 
 #: js/turtledefs.js:81
 ## to be checked.
 msgid "Run slow"
-msgstr "ゆっくりに再生する。"
+msgstr "ゆっくり再生されます。"
 
 #: js/turtledefs.js:81
 msgid "Long press the run button to run the project in slow mode."
-msgstr ""
+msgstr "長く押すとゆっくりに再生"
 
 #: js/turtledefs.js:82
 msgid "Run music slow"
@@ -1941,7 +1639,7 @@ msgstr "音楽をゆっくりなペースで演奏"
 
 #: js/turtledefs.js:82
 msgid "Extra-long press the run button to run the music in slow mode."
-msgstr ""
+msgstr "もと長く押すと音楽はゆっくりなペースで再生"
 
 #: js/turtledefs.js:83
 ## Run "actions" one-by-one
@@ -1962,12 +1660,12 @@ msgstr "画面にあるものを全部消して最初のままに戻すアイコ
 
 #: js/turtledefs.js:87
 msgid "Hide or show the blocks and the palettes."
-msgstr "パレットを隠し表示のアイコンです。"
+msgstr "パレットを表示する / 隠す アイコンです。"
 
 #: js/turtledefs.js:88
 ##　りゃくし＝abbreviate ふくらみ＝expand 
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートとアクションのスタックを膨らみ略しのアイコンです。"
+msgstr "スタートとアクションのスタックを増やす / つぶす アイコンです。"
 
 #: js/turtledefs.js:89
 ## 整理＝せいり; literally "organize"
@@ -1980,12 +1678,12 @@ msgstr "このヘルプを表示するアイコンです。"
 
 #: js/turtledefs.js:91
 msgid "Expand/collapse option toolbar"
-msgstr "オプションのツールバーを膨らみ略しアイコンです。"
+msgstr "スタートとアクションのスタックを増やす / つぶす アイコンです。"
 
 #: js/turtledefs.js:91
 ## saying hide or show the right (etc) toolbar
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "右の色々ツールバーを表示隠しアイコンです。"
+msgstr "右の色々ツールバーを表示する　/隠す アイコンです。"
 
 #: js/turtledefs.js:92
 msgid "This button opens a viewer for loading example projects."
@@ -2002,7 +1700,7 @@ msgstr "このプロジェクトをファイルに保存するアイコンです
 #: js/turtledefs.js:95
 #: js/savebox.js:136
 msgid "Save sheet music"
-msgstr "恩楽譜を保存"
+msgstr "恩楽譜(Lilypond)を保存"
 
 #: js/turtledefs.js:95
 msgid "Save your project to as a Lilypond file."
@@ -2026,12 +1724,12 @@ msgstr "コピーしたブロックがある際に貼り付けることができ
 
 #: js/turtledefs.js:98
 msgid "Show or hide a coordinate grid."
-msgstr "グリッドを表示隠し。"
+msgstr  "グリッドを表示する　/隠す。"
 
 #: js/turtledefs.js:99
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "極座表敬グリッドを表示隠しのアイコンです。"
+msgstr "極座表敬グリッドを表示する　/隠すのアイコンです。"
 
 #: js/turtledefs.js:100
 msgid "Open a panel for configuring Music Blocks."
@@ -2125,13 +1823,13 @@ msgstr "音階の音符を上る"
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr "ピッチ番号"
+msgstr "ピッチ数字"
 
 #: js/basicblocks.js:159
 #.TRANS: MIDI is a technical standard for electronic music
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
-msgstr "ピッチ番号のゼロを設定"
+msgstr  "ピッチ数字のゼロを設定"
 
 #: js/basicblocks.js:160
 #: js/basicblocks.js:217
@@ -2168,19 +1866,19 @@ msgstr "数字をオクターヴに"
 #: js/basicblocks.js:216
 #: js/modewidget.js:90
 #.TRANS: pitch inversion rotates a pitch around another pitch
-## 逆さ＝さかさ
+## 転回＝てんかい
 msgid "invert"
-msgstr "逆さに"
+msgstr "転回に"
 
 #: js/basicblocks.js:234
 #.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
-msgstr "逆さに (奇数)"
+msgstr  "転回を (奇数)"
 
 #: js/basicblocks.js:249
 #.TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
-msgstr "逆さに (偶数)"
+msgstr "転回を (偶数)"
 
 #: js/basicblocks.js:264
 #.TRANS: adjust the amount of shift (up or down) of a pitch
@@ -2269,12 +1967,12 @@ msgstr "ハーツ"
 #: js/basicblocks.js:398
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
-msgstr "温度"
+msgstr "音度"
 
 #: js/basicblocks.js:411
 #.TRANS: step some number of notes in current mode
 msgid "scalar step"
-msgstr "音階的の音程動き"
+msgstr "音階的のステップピッチ"
 
 #: js/basicblocks.js:436
 #: js/timbre.js:551
@@ -2441,25 +2139,25 @@ msgstr "G メジャー（ト長調）"
 #: js/basicblocks.js:740
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "pitch-time matrix"
-msgstr "ピッチ時刻グラフ"
+msgstr "ピッチ時刻行列"
 
 #: js/basicblocks.js:766
 #.TRANS: factor used in determining how many duplications to make
 ## Probably incorrect/misleading. PLEASE CHECK!
 msgid "duplicate factor"
-msgstr "音符の副の倍"
+msgstr "重の倍さ"
 
 #: js/basicblocks.js:783
 #.TRANS: number of beats per minute
 ## probably a little wrong. This is just multiply, I think...
 msgid "beat factor"
-msgstr "リズムの倍"
+msgstr "泊の倍"
 
 #: js/basicblocks.js:791
 #: js/basicblocks.js:849
 #.TRANS: number of beats played per minute
 msgid "beats per minute"
-msgstr "テンポ"
+msgstr "BPM(一分当たりの泊数)"
 
 #: js/basicblocks.js:799
 #.TRANS: oscillator time (in micro seconds)
@@ -2482,7 +2180,7 @@ msgstr "スイングの数値"
 #: js/basicblocks.js:841
 #.TRANS: master beats per minute controls BPM for all mice
 msgid "master beats per minute"
-msgstr "一分割のマスターテンポ"
+msgstr "BPM(一分当たりの拍数)のマスター・テンポ"
 
 #: js/basicblocks.js:858
 #.TRANS: play music backward
@@ -2499,7 +2197,7 @@ msgstr "音符の省略"
 #.TRANS: play each note more than once
 ## This makes sense, I think, but only if 1=1 time, 2=2 times, etc
 msgid "duplicate"
-msgstr "音符を副"
+msgstr "重に"
 
 #: js/basicblocks.js:884
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
@@ -2568,7 +2266,7 @@ msgstr "小節の数字"
 #.TRANS: count of current beat in meter
 ## trying "what beat"
 msgid "beat count"
-msgstr "何ビート"
+msgstr "何泊"
 
 #: js/basicblocks.js:1030
 #.TRANS: anacrusis
@@ -2579,7 +2277,7 @@ msgstr "弱起"
 #: js/basicblocks.js:1039
 ## https://ja.wikipedia.org/wiki/%E6%8B%8D%E5%AD%90
 msgid "number of beats"
-msgstr "拍子の数"
+msgstr "拍の数"
 
 #: js/basicblocks.js:1050
 #.TRANS: count the number of notes
@@ -3129,7 +2827,7 @@ msgstr "ヒープを捨てる"
 #: js/basicblocks.js:2577
 #: plugins/heap.rtp:150
 msgid "save heap"
-msgstr "ヒープを確保"
+msgstr "ヒープを保存"
 
 #: js/basicblocks.js:2586
 #: plugins/heap.rtp:160
@@ -3311,7 +3009,7 @@ msgstr "名"
 
 #: js/basicblocks.js:2972
 msgid "save as lilypond"
-msgstr "Lilypondのファイルフォーマットで確保"
+msgstr "Lilypondのファイルフォーマットで保存"
 
 #: js/basicblocks.js:2981
 msgid "save svg"
@@ -3461,7 +3159,7 @@ msgstr "ネズミの演奏した音符"
 #.TRANS: convert current note for this turtle to piano key (1-88)
 ## Is there a Japanese technical word for "pitch number"; below is literal
 msgid "mouse pitch number"
-msgstr "ネズミのピッチ番号"
+msgstr "ネズミのピッチ数字"
 
 #: js/basicblocks.js:3230
 #: js/basicblocks.js:3240
@@ -3772,25 +3470,25 @@ msgstr "スタックを保存"
 #: js/playbackbox.js:78
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "playback music"
-msgstr "音楽をプレーバック"
+msgstr "コンパイルされているコードを再生"
 
 #: js/playbackbox.js:83
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "pause playback"
-msgstr "プレイバックを停止"
+msgstr "コンパイルされているコードを再生を停止"
 
 #: js/playbackbox.js:92
 #: js/playbackbox.js:101
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "restart playback"
-msgstr "プレイバックをリスタート"
+msgstr "コンパイルされているコードの再生をリスタート"
 
 #: js/playbackbox.js:106
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 ## http://jisho.org/word/%E8%A8%AD%E3%81%91%E3%82%8B 設け＝もうけ
 msgid "prepare music for playback"
-msgstr "音楽のプレーバックを設け"
+msgstr "コードをすべてコンパイルします"
 
 #: js/modewidget.js:78
 ## http://jisho.org/word/%E6%99%82%E8%A8%88%E5%9B%9E%E3%82%8A 反時計回り＝はんとけいまわり
@@ -4210,12 +3908,12 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:87
 
 #~msgid "Hide or show the block palettes."
-#~msgstr "ブロックのパレットを隠し表示のアイコンです。"
+#~msgstr  "ブロックのパレットを表示する / 隠す アイコンです。"
 
 #: js/activity.js:2712
 
 #~msgid "Run fast / long press to run slowly"
-#~msgstr "早く動き・長く押すとゆっくりに動く"
+#~msgstr "速いスピードで再生します・長く押すとゆっくりなペースで再生"
 
 #~msgid "vspace"
 #~msgstr "縦のスペース"
@@ -4226,7 +3924,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:153
 
 #~msgid "consonant step up"
-#~msgstr "上がりのコンソナントの音程動き"
+#~msgstr "上がりのコンソナントのステップピッチ"
 
 #~msgid "sing"
 #~msgstr "歌う"
@@ -4254,7 +3952,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/logo.js:8059
 
 #~msgid "Could not find turtle"
-#~msgstr "タートルが見つかれませんでした。"
+#~msgstr "タートルが見つかりませんでした。"
 
 #~msgid "cloud"
 #~msgstr "クロード"
@@ -4297,7 +3995,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/activity.js:2699
 
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
-#~msgstr "早く動き・長く押すとゆっくりに動く・もと長く押すと音楽はゆっくりに動く"
+#~msgstr "速いスピードで再生します・長く押すとゆっくりに再生・もと長く押すと音楽はゆっくりなペースで再生"
 
 #: js/logo.js:4992
 
@@ -4323,7 +4021,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:80
 
 #~msgid "Click to run the project in fast mode."
-#~msgstr "早く再生するためにここでクリック。"
+#~msgstr "速いスピードで再生するためにここでクリック。"
 
 #~msgid "UID"
 #~msgstr "ユーザの名前"
@@ -4350,7 +4048,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:145
 
 #~msgid "consonant step down"
-#~msgstr "下がりのコンソナントの音程動き"
+#~msgstr "下がりのコンソナントのステップピッチ"
 
 #~msgid "hspace"
 #~msgstr ""
@@ -4362,7 +4060,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "分子"
 
 #~msgid "set beats per minute"
-#~msgstr "テンポ"
+#~msgstr "BPM(一分当たりの拍数)を設定"
 
 #: js/musicutils.js:295
 
@@ -4415,7 +4113,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:347
 
 #~msgid "step pitch"
-#~msgstr "音程動き"
+#~msgstr  "ステップピッチ"
 
 #~msgid "Long press on block(s) to copy. Click here to paste."
 #~msgstr "ブロックでマウスの長いクリック押しでコピー。ペーストをするためにここでクリック。"
@@ -4469,7 +4167,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr ""
 
 #~msgid "multiply beat"
-#~msgstr "ビートを倍に"
+#~msgstr "泊を倍に"
 
 #~msgid "turtle"
 #~msgstr "タートル"
