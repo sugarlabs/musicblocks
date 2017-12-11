@@ -156,7 +156,7 @@ function getMacroExpansion (blkname, x, y) {
     const SETDRUMOBJ = [[0, 'setdrum', x, y, [null, 1, null, 2]], [1, ['drumname', {'value': _(DEFAULTDRUM)}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SETKEYOBJ = [[0, 'setkey2', x, y, [null, 1, 2, null]],  [1, ['notename', {'value': 'C'}], 0, 0, [0]], [2, ['modename', {'value': _('major')}], 0, 0, [0]]];
     const SETSCALARTRANSPOBJ = [[0, 'setscalartransposition', x, y, [null, 1, null, 2]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const SETSYNTHVOLUMEOBJ = [[0, 'setsynthvolume', x, y, [null, 1, 2, null]], [1, ['voicename', {'value': _('default')}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0, null]]];
+    const SETSYNTHVOLUMEOBJ = [[0, 'setsynthvolume', x, y, [null, 1, 2, null]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0, null]]];
     const SETTIMBREOBJ = [[0, 'settimbre', x, y, [null, 1, null, 2]], [1, ['voicename', {'value': _('default')}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SETTRANSPOSITIONOBJ = [[0, 'settransposition', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const SETVOICEOBJ = [[0, 'setvoice', x, y, [null, 1, null, 2]], [1, ['voicename', {'value': _('violin')}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
@@ -197,15 +197,15 @@ function getMacroExpansion (blkname, x, y) {
     const UNISONOBJ = [[0, 'setscalartransposition', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 0}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, 'modelength', 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const UNISONINTERVALOBJ = [[0, 'interval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 0}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, 'modelength', 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const VIBRATOOBJ = [[0, 'vibrato', x, y, [null, 1, 3, 2, 6]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, 'vspace', 0, 0, [0, null]], [3, 'divide', 0, 0, [0, 4, 5]], [4, ['number', {'value': 1}], 0, 0, [3]], [5, ['number', {'value': 16}], 0, 0, [3]], [6, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 50}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ15 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 15}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ25 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 25}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ35 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 35}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ45 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 45}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ55 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 55}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ65 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 65}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ75 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 75}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ85 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 85}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ15 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 15}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ25 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 25}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ35 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 35}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ45 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 45}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ55 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 55}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ65 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 65}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ75 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 75}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ85 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 85}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const WHOLEOBJ = [[0, 'rhythm2', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 1}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
 
     const BUILTINMACROS = {

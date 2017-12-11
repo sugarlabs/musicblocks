@@ -5208,6 +5208,23 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
+        case 'setnotevolume':  // master volume
+            if (args.length === 1) {
+                if (typeof(args[0]) !== 'number') {
+                    that.errorMsg(NANERRORMSG, blk);
+                    that.stopTurtle = true;
+                } else {
+                    that.masterVolume.push(args[0]);
+                    if (!this.suppressOutput[turtle]) {
+                        that._setMasterVolume(args[0]);
+                    }
+
+                    if (that.justCounting[turtle].length === 0) {
+                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', args[0]]);
+                    }
+                }
+            }
+            break;
         case 'setnotevolume2':
             // master volume in clamp form
             // Used by fff ff f p pp ppp blocks
@@ -5230,29 +5247,12 @@ function Logo () {
                 var __listener = function (event) {
                     that.masterVolume.pop();
                     // Restore previous volume.
-                    if (that.masterVolume.length > 0) {
+                    if (that.justCounting[turtle].length === 0 && that.masterVolume.length > 0) {
                         that._setMasterVolume(last(that.masterVolume));
                     }
                 };
 
                 that._setListener(turtle, listenerName, __listener);
-            }
-            break;
-        case 'setnotevolume':  // master volume
-            if (args.length === 1) {
-                if (typeof(args[0]) !== 'number') {
-                    that.errorMsg(NANERRORMSG, blk);
-                    that.stopTurtle = true;
-                } else {
-                    that.masterVolume.push(args[0]);
-                    if (!this.suppressOutput[turtle]) {
-                        that._setMasterVolume(args[0]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', args[0]]);
-                    }
-                }
             }
             break;
         case 'setsynthvolume':
@@ -5299,16 +5299,86 @@ function Logo () {
                         synth = 'default';
                     }
 
+                    that.synthVolume[turtle][synth].push(args[1]);
                     if (!this.suppressOutput[turtle]) {
-                        that.synthVolume[turtle][synth] = [args[1]];
                         that._setSynthVolume(synth, args[1]);
                     }
 
                     if (that.justCounting[turtle].length === 0) {
-                        // fixme: not yet implemented in playback
                         that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', synth, args[1]]);
                     }
                 }
+            }
+            break;
+        case 'setsynthvolume2':
+            // set synth volume in clamp form
+            // Used by fff ff f p pp ppp blocks
+            if (typeof(args[1]) !== 'number') {
+                that.errorMsg(NANERRORMSG, blk);
+                that.stopTurtle = true;
+            } else if (args.length === 3) {
+                var synth = null;
+
+                if (args[0] === 'default' || args[0] ===  _('default')) {
+                    synth = 'default';
+                } else if (args[0] === 'default' || args[0] ===  _('default')) {
+                    synth = 'custom';
+                }
+
+                if (synth == null) {
+                    for (var voice in VOICENAMES) {
+                        if (VOICENAMES[voice][0] === args[0]) {
+                            synth = VOICENAMES[voice][1];
+                            break;
+                        } else if (VOICENAMES[voice][1] === args[0]) {
+                            synth = args[0];
+                            break;
+                        }
+                    }
+                }
+
+                if (synth == null) {
+                    for (var drum in DRUMNAMES) {
+                        if (DRUMNAMES[drum][0] === args[0]) {
+                            synth = DRUMNAMES[drum][1];
+                            break;
+                        } else if (DRUMNAMES[drum][1] === args[0]) {
+                            synth = args[0];
+                            break;
+                        }
+                    }
+                }
+
+                if (synth == null) {
+                    that.errorMsg(synth + 'not found', blk);
+                    synth = 'default';
+                }
+
+                that.synthVolume[turtle][synth].push(args[1]);
+                if (!this.suppressOutput[turtle]) {
+                    that._setSynthVolume(synth, args[1]);
+                }
+
+                if (that.justCounting[turtle].length === 0) {
+                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', synth, args[1]]);
+                }
+
+                childFlow = args[2];
+                childFlowCount = 1;
+
+                var listenerName = '_synthvolume_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.synthVolume[turtle][synth].pop();
+                    // Restore previous volume.
+                    if (that.justCounting[turtle].length === 0 && that.synthVolume[turtle][synth].length > 0) {
+                        that._setSynthVolume(synth, last(that.synthVolume[turtle][synth]));
+                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', synth, last(that.synthVolume[turtle][synth])]);
+                    }
+                };
+
+                that._setListener(turtle, listenerName, __listener);
             }
             break;
             // Deprecated P5 tone generator replaced by macro.
@@ -7691,7 +7761,7 @@ function Logo () {
                         if (currentblock == null) {
                             that.blocks.blockList[blk].value = 0;
                             break;
-                        } 
+                        }
                     }
                 }
                 break;
