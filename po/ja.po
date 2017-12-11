@@ -1635,7 +1635,7 @@ msgstr "速いスピードで再生するためにここでクリック。"
 #: js/turtledefs.js:81
 ## to be checked.
 msgid "Run slow"
-msgstr "ゆっくりに再生する。"
+msgstr "ゆっくり再生されます。"
 
 #: js/turtledefs.js:81
 msgid "Click to run the project in slow mode."
@@ -1669,16 +1669,16 @@ msgstr "画面にあるものを全部消して最初のままに戻すアイコ
 #: js/turtledefs.js:87
 ## Check grammar
 msgid "Hide or show the block palettes."
-msgstr "ブロックのパレットを隠し表示のアイコンです。"
+msgstr "ブロックのパレットを表示する / 隠す アイコンです。"
 
 #: js/turtledefs.js:88
 msgid "Hide or show the blocks and the palettes."
-msgstr "パレットを隠し表示のアイコンです。"
+msgstr "パレットを表示する / 隠す アイコンです。"
 
 #: js/turtledefs.js:89
 ##　りゃくし＝abbreviate ふくらみ＝expand 
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートとアクションのスタックを膨らみ略しのアイコンです。"
+msgstr "スタートとアクションのスタックを増やす / つぶす アイコンです。"
 
 #: js/turtledefs.js:90
 ## 整理＝せいり; literally "organize"
@@ -1691,12 +1691,12 @@ msgstr "このヘルプを表示するアイコンです。"
 
 #: js/turtledefs.js:92
 msgid "Expand/collapse option toolbar"
-msgstr "オプションのツールバーを膨らみ略しアイコンです。"
+msgstr "オプションのツールバーを増やす / つぶす アイコンです。"
 
 #: js/turtledefs.js:92
 ## saying hide or show the right (etc) toolbar
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "右の色々ツールバーを表示隠しアイコンです。"
+msgstr "右の色々ツールバーを表示する　/隠す アイコンです。"
 
 #: js/turtledefs.js:93
 msgid "This button opens a viewer for loading example projects."
@@ -1713,7 +1713,7 @@ msgstr "このプロジェクトをファイルに保存するアイコンです
 #: js/turtledefs.js:96
 #: js/savebox.js:136
 msgid "Save sheet music"
-msgstr "恩楽譜を保存"
+msgstr "恩楽譜(Lilypond)を保存"
 
 #: js/turtledefs.js:96
 msgid "Save your project to as a Lilypond file."
