@@ -20,6 +20,14 @@ var VOICENAMES = [
     [_('guitar'), 'guitar', 'images/voices.svg'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('clarinet'), 'clarinet', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('saxophone'), 'saxophone', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('tuba'), 'tuba', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('trumpet'), 'trumpet', 'images/voices.svg'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg'],
     //.TRANS: simple monotone synthesizer
@@ -100,6 +108,7 @@ var DRUMNAMES = [
 
 var SOUNDSAMPLESDEFINES = [
     "samples/violin", "samples/cello", "samples/flute", "samples/guitar",
+    "samples/clarinet", "samples/saxophone", "samples/tuba", "samples/trumpet",
     "samples/basse", "samples/bottle", "samples/clap", "samples/darbuka",
     "samples/hihat", "samples/splash", "samples/bubbles", "samples/cowbell",
     "samples/dog", "samples/kick", "samples/tom", "samples/cat",
@@ -116,7 +125,11 @@ const SAMPLECENTERNO = {
   'cello': 39,
   'basse': 15,
   'guitar': 39,
-  'flute': 57
+  'flute': 57,
+  'saxophone': 51,
+  'clarinet': 39,
+  'tuba': 49,
+  'trumpet': 27
 };
 
 
@@ -194,36 +207,40 @@ function Synth() {
     this.loadSamples = function (){
         var SAMPLES_MANIFEST = {
             "voice": [
-                {"name": "violin", "data_name": "violin", "data": VIOLIN_SAMPLE},
-                {"name": "cello", "data_name": "cello", "data": CELLO_SAMPLE},
-                {"name": "flute", "data_name": "flute", "data": FLUTE_SAMPLE},
-                {"name": "guitar", "data_name": "guitar", "data": GUITAR_SAMPLE},
-                {"name": "basse", "data_name": "basse", "data": BASSE_SAMPLE}
+                {"name": "violin", "data": VIOLIN_SAMPLE},
+                {"name": "cello", "data": CELLO_SAMPLE},
+                {"name": "flute", "data": FLUTE_SAMPLE},
+                {"name": "clarinet", "data": CLARINET_SAMPLE},
+                {"name": "saxophone", "data": SAXOPHONE_SAMPLE},
+                {"name": "trumpet", "data": TRUMPET_SAMPLE},
+                {"name": "tuba", "data": TUBA_SAMPLE},
+                {"name": "guitar", "data": GUITAR_SAMPLE},
+                {"name": "basse", "data": BASSE_SAMPLE}
             ],
             "drum": [
-                {"name": "bottle", "data_name": "bottle", "data": BOTTLE_SAMPLE},
-                {"name": "clap", "data_name": "clap", "data": CLAP_SAMPLE},
-                {"name": "darbuka drum", "data_name": "darbuka", "data": DARBUKA_SAMPLE},
-                {"name": "hi hat", "data_name": "hihat", "data": HIHAT_SAMPLE},
-                {"name": "splash", "data_name": "splash", "data": SPLASH_SAMPLE},
-                {"name": "bubbles", "data_name": "bubbles", "data": BUBBLES_SAMPLE},
-                {"name": "cow bell", "data_name": "cowbell", "data": COWBELL_SAMPLE},
-                {"name": "dog", "data_name": "dog", "data": DOG_SAMPLE},
-                {"name": "kick drum", "data_name": "kick", "data": KICK_SAMPLE},
-                {"name": "tom tom", "data_name": "tom", "data": TOM_SAMPLE},
-                {"name": "cat", "data_name": "cat", "data": CAT_SAMPLE},
-                {"name": "crash", "data_name": "crash", "data": CRASH_SAMPLE},
-                {"name": "duck", "data_name": "duck", "data": DUCK_SAMPLE},
-                {"name": "ride bell", "data_name": "ridebell", "data": RIDEBELL_SAMPLE},
-                {"name": "triangle bell", "data_name": "triangle", "data": TRIANGLE_SAMPLE},
-                {"name": "chine", "data_name": "chine", "data": CHINE_SAMPLE},,
-                {"name": "cricket", "data_name": "cricket", "data": CRICKET_SAMPLE},
-                {"name": "finger cymbals", "data_name": "fingercymbal", "data": FINGERCYMBAL_SAMPLE},
-                {"name": "slap", "data_name": "slap", "data": SLAP_SAMPLE},
-                {"name": "clang", "data_name": "clang", "data": CLANG_SAMPLE},
-                {"name": "cup drum", "data_name": "cup", "data": CUP_SAMPLE},
-                {"name": "floor tom tom", "data_name": "floortom", "data": FLOORTOM_SAMPLE},
-                {"name": "snare drum", "data_name": "snare", "data": SNARE_SAMPLE}
+                {"name": "bottle", "data": BOTTLE_SAMPLE},
+                {"name": "clap", "data": CLAP_SAMPLE},
+                {"name": "darbuka drum", "data": DARBUKA_SAMPLE},
+                {"name": "hi hat", "data": HIHAT_SAMPLE},
+                {"name": "splash", "data": SPLASH_SAMPLE},
+                {"name": "bubbles", "data": BUBBLES_SAMPLE},
+                {"name": "cow bell", "data": COWBELL_SAMPLE},
+                {"name": "dog", "data": DOG_SAMPLE},
+                {"name": "kick drum", "data": KICK_SAMPLE},
+                {"name": "tom tom", "data": TOM_SAMPLE},
+                {"name": "cat", "data": CAT_SAMPLE},
+                {"name": "crash", "data": CRASH_SAMPLE},
+                {"name": "duck", "data": DUCK_SAMPLE},
+                {"name": "ride bell", "data": RIDEBELL_SAMPLE},
+                {"name": "triangle bell", "data": TRIANGLE_SAMPLE},
+                {"name": "chine", "data": CHINE_SAMPLE},,
+                {"name": "cricket", "data": CRICKET_SAMPLE},
+                {"name": "finger cymbals", "data": FINGERCYMBAL_SAMPLE},
+                {"name": "slap", "data": SLAP_SAMPLE},
+                {"name": "clang", "data": CLANG_SAMPLE},
+                {"name": "cup drum", "data": CUP_SAMPLE},
+                {"name": "floor tom tom", "data": FLOORTOM_SAMPLE},
+                {"name": "snare drum", "data": SNARE_SAMPLE}
             ]
         }
         this.samples = {};
