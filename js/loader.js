@@ -6,6 +6,8 @@ requirejs.config({
         }
     },
     paths: {
+        utils: "../js/utils",
+        widgets: "../js/widgets",
         activity: "../js",
         easel: "../lib/easeljs",
         twewn: "../lib/tweenjs",
