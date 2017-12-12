@@ -544,7 +544,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doHardStopButton() {
-            console.log("hard stop");
             logo.doStopTurtle();
             logo._setMasterVolume(0);
         };
@@ -2903,7 +2902,7 @@ handleComplete);
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop'), doHardStopButton, null, 'stop-turtle-button', null],
-                    ['hard-stop-turtle', doMuteButton, _('Emergency Stop'), null, null, null, null],
+                    ['hard-stop-turtle', doMuteButton, _('Hard stop'), null, null, null, null],
                     ['clear', _allClear, _('Clean'), null, null, null, null],
                     // ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
                     ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
@@ -2916,7 +2915,7 @@ handleComplete);
                     ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly'), _doSlowButton, null, 'slow-button', null],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
-                    ['hard-stop-turtle', doMuteButton, _('Emergency Stop'), null, null, null, null],
+                    ['hard-stop-turtle', doMuteButton, _('Hard stop'), null, null, null, null],
                     ['clear', _allClear, _('Clean'), null, null, null, null],
                     ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                     ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
@@ -2971,7 +2970,7 @@ handleComplete);
                     boundary.hide();
                     blocks.setHomeContainers(homeButtonContainers, boundary);
                 }
-                if (!(buttonNames[i][0]==='stop-turtle'&&buttonNames[i+1][0]==='hard-stop-turtle')){
+                if (!(buttonNames[i][0] === 'stop-turtle' && buttonNames[i+1][0] === 'hard-stop-turtle')){
                     x += dx;
                     y += dy;
                 }
