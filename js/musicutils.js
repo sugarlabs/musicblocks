@@ -454,7 +454,7 @@ var customMode = MUSICALMODES['custom'];
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
 const SAMPLECENTERNO = {
-  'violin': 63,
+  'violin': 51,
   'cello': 39,
   'basse': 15,
   'guitar': 39,
