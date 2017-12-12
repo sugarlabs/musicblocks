@@ -138,7 +138,7 @@ msgstr "スライダー"
 
 #: js/block.js:1584
 #: js/logo.js:9011
-#: js/musicutils.js:1420
+#: js/musicutils.js:1430
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
@@ -739,7 +739,7 @@ msgstr "大きさが変域外です。"
 #: js/logo.js:5269
 #: js/logo.js:5322
 #: js/logo.js:5324
-#: js/musicutils.js:335
+#: js/musicutils.js:339
 #: js/basicblocks.js:2812
 #: js/macros.js:160
 #.TRANS: polytone synthesizer
@@ -957,7 +957,7 @@ msgstr "短"
 #: js/musicutils.js:135
 #: js/musicutils.js:138
 #: js/musicutils.js:149
-#: js/musicutils.js:441
+#: js/musicutils.js:445
 #: js/basicblocks.js:1412
 #: js/basicblocks.js:1419
 #: js/basicblocks.js:1426
@@ -1152,7 +1152,7 @@ msgid "fibonacci"
 msgstr "フィボナッチ"
 
 #: js/musicutils.js:324
-#: js/musicutils.js:359
+#: js/musicutils.js:363
 #: js/basicblocks.js:669
 #: js/basicblocks.js:1267
 #: js/macros.js:190
@@ -1180,43 +1180,53 @@ msgstr "チェロ"
 msgid "bass"
 msgstr "コントラベース"
 
+#: js/musicutils.js:335
+#.TRANS: musical instrument
+msgid "guitar"
+msgstr ""
+
 #: js/musicutils.js:337
+#.TRANS: musical instrument
+msgid "flute"
+msgstr ""
+
+#: js/musicutils.js:341
 #.TRANS: simple monotone synthesizer
 msgid "simple 1"
 msgstr "シンプル・シンセ１"
 
-#: js/musicutils.js:339
+#: js/musicutils.js:343
 #.TRANS: simple monotone synthesizer
 msgid "simple 2"
 msgstr "シンプル・シンセ２"
 
-#: js/musicutils.js:341
+#: js/musicutils.js:345
 #.TRANS: simple monotone synthesizer
 msgid "simple 3"
 msgstr "シンプル・シンセ３"
 
-#: js/musicutils.js:343
+#: js/musicutils.js:347
 #.TRANS: simple monotone synthesizer
 msgid "simple 4"
 msgstr "シンプル・シンセ４"
 
-#: js/musicutils.js:345
+#: js/musicutils.js:349
 #.TRANS: white noise synthesizer
 msgid "white noise"
 msgstr ""
 
-#: js/musicutils.js:347
+#: js/musicutils.js:351
 #.TRANS: brown noise synthesizer
 msgid "brown noise"
 msgstr ""
 
-#: js/musicutils.js:349
+#: js/musicutils.js:353
 #.TRANS: pink noise synthesizer
 msgid "pink noise"
 msgstr ""
 
-#: js/musicutils.js:351
-#: js/musicutils.js:432
+#: js/musicutils.js:355
+#: js/musicutils.js:436
 #: js/basicblocks.js:98
 #.TRANS: sine wave
 #.TRANS: sine wave
@@ -1225,8 +1235,8 @@ msgstr ""
 msgid "sine"
 msgstr "サイン波"
 
-#: js/musicutils.js:353
-#: js/musicutils.js:434
+#: js/musicutils.js:357
+#: js/musicutils.js:438
 #: js/basicblocks.js:76
 #.TRANS: square wave
 #.TRANS: square wave
@@ -1235,8 +1245,8 @@ msgstr "サイン波"
 msgid "square"
 msgstr "矩形波（スクエア）"
 
-#: js/musicutils.js:355
-#: js/musicutils.js:438
+#: js/musicutils.js:359
+#: js/musicutils.js:442
 #: js/basicblocks.js:109
 #.TRANS: sawtooth wave
 #.TRANS: sawtooth wave
@@ -1244,8 +1254,8 @@ msgstr "矩形波（スクエア）"
 msgid "sawtooth"
 msgstr "ノコギリ波(サー）"
 
-#: js/musicutils.js:357
-#: js/musicutils.js:436
+#: js/musicutils.js:361
+#: js/musicutils.js:440
 #: js/basicblocks.js:87
 #: js/basicblocks.js:443
 #.TRANS: triangle wave
@@ -1255,7 +1265,7 @@ msgstr "ノコギリ波(サー）"
 msgid "triangle"
 msgstr "三角波"
 
-#: js/musicutils.js:364
+#: js/musicutils.js:368
 #: js/basicblocks.js:1828
 #: js/macros.js:111
 #: js/macros.js:149
@@ -1266,7 +1276,7 @@ msgstr "三角波"
 msgid "snare drum"
 msgstr "スネア"
 
-#: js/musicutils.js:366
+#: js/musicutils.js:370
 #: js/basicblocks.js:1821
 #: js/macros.js:106
 #: js/macros.js:149
@@ -1276,7 +1286,7 @@ msgstr "スネア"
 msgid "kick drum"
 msgstr "バス・ドラム"
 
-#: js/musicutils.js:368
+#: js/musicutils.js:372
 #: js/basicblocks.js:1814
 #: js/macros.js:191
 #.TRANS: musical instrument
@@ -1284,7 +1294,7 @@ msgstr "バス・ドラム"
 msgid "tom tom"
 msgstr "トムトム"
 
-#: js/musicutils.js:370
+#: js/musicutils.js:374
 #: js/basicblocks.js:1807
 #: js/macros.js:97
 #.TRANS: musical instrument
@@ -1292,7 +1302,7 @@ msgstr "トムトム"
 msgid "floor tom tom"
 msgstr "フロアタム"
 
-#: js/musicutils.js:372
+#: js/musicutils.js:376
 #: js/basicblocks.js:1800
 #: js/macros.js:68
 #.TRANS: a drum made from an inverted cup
@@ -1300,7 +1310,7 @@ msgstr "フロアタム"
 msgid "cup drum"
 msgstr "コップ・ドラム"
 
-#: js/musicutils.js:374
+#: js/musicutils.js:378
 #: js/basicblocks.js:1793
 #: js/macros.js:69
 #.TRANS: musical instrument
@@ -1308,35 +1318,35 @@ msgstr "コップ・ドラム"
 msgid "darbuka drum"
 msgstr "ダラブッカ"
 
-#: js/musicutils.js:376
+#: js/musicutils.js:380
 #: js/basicblocks.js:1786
 #: js/macros.js:101
 #.TRANS: musical instrument
 msgid "hi hat"
 msgstr "ハイハット"
 
-#: js/musicutils.js:378
+#: js/musicutils.js:382
 #: js/basicblocks.js:1765
 #: js/macros.js:151
 #.TRANS: a small metal bell
 msgid "ride bell"
 msgstr "ライドのベル"
 
-#: js/musicutils.js:380
+#: js/musicutils.js:384
 #: js/basicblocks.js:1758
 #: js/macros.js:64
 #.TRANS: musical instrument
 msgid "cow bell"
 msgstr "カウベル"
 
-#: js/musicutils.js:382
+#: js/musicutils.js:386
 #: js/basicblocks.js:1779
 #: js/macros.js:193
 #.TRANS: musical instrument
 msgid "triangle bell"
 msgstr "トライアングルのベル"
 
-#: js/musicutils.js:384
+#: js/musicutils.js:388
 #: js/basicblocks.js:1772
 #: js/macros.js:95
 #.TRANS: musical instrument
@@ -1344,7 +1354,7 @@ msgstr "トライアングルのベル"
 msgid "finger cymbals"
 msgstr "フィンガーシンバル"
 
-#: js/musicutils.js:386
+#: js/musicutils.js:390
 #: js/basicblocks.js:1716
 #: js/macros.js:61
 #.TRANS: a musically tuned set of bells
@@ -1352,7 +1362,7 @@ msgstr "フィンガーシンバル"
 msgid "chime"
 msgstr "チャイム"
 
-#: js/musicutils.js:388
+#: js/musicutils.js:392
 #: js/basicblocks.js:1723
 #: js/macros.js:62
 #.TRANS: sound effect
@@ -1360,28 +1370,28 @@ msgstr "チャイム"
 msgid "clang"
 msgstr "カチャカチャの音"
 
-#: js/musicutils.js:390
+#: js/musicutils.js:394
 #: js/basicblocks.js:1744
 #: js/macros.js:65
 #.TRANS: sound effect
 msgid "crash"
 msgstr "クラッシュ"
 
-#: js/musicutils.js:392
+#: js/musicutils.js:396
 #: js/basicblocks.js:1702
 #: js/macros.js:57
 #.TRANS: sound effect
 msgid "bottle"
 msgstr "空き瓶の音"
 
-#: js/musicutils.js:394
+#: js/musicutils.js:398
 #: js/basicblocks.js:1730
 #: js/macros.js:63
 #.TRANS: sound effect
 msgid "clap"
 msgstr "手を叩く音"
 
-#: js/musicutils.js:396
+#: js/musicutils.js:400
 #: js/basicblocks.js:1737
 #: js/macros.js:172
 #.TRANS: sound effect
@@ -1389,14 +1399,14 @@ msgstr "手を叩く音"
 msgid "slap"
 msgstr "平手打ちの音"
 
-#: js/musicutils.js:398
+#: js/musicutils.js:402
 #: js/basicblocks.js:1751
 #: js/macros.js:175
 #.TRANS: sound effect
 msgid "splash"
 msgstr "スプラッシュ"
 
-#: js/musicutils.js:400
+#: js/musicutils.js:404
 #: js/basicblocks.js:1709
 #: js/macros.js:59
 #.TRANS: sound effect
@@ -1404,14 +1414,14 @@ msgstr "スプラッシュ"
 msgid "bubbles"
 msgstr "シュワシュワのおと"
 
-#: js/musicutils.js:402
+#: js/musicutils.js:406
 #: js/basicblocks.js:1681
 #: js/macros.js:60
 #.TRANS: animal sound effect
 msgid "cat"
 msgstr "猫のにゃあ"
 
-#: js/musicutils.js:404
+#: js/musicutils.js:408
 #: js/basicblocks.js:1688
 #: js/macros.js:67
 #.TRANS: animal sound effect
@@ -1419,21 +1429,21 @@ msgstr "猫のにゃあ"
 msgid "cricket"
 msgstr "絡糸嬢のおと"
 
-#: js/musicutils.js:406
+#: js/musicutils.js:410
 #: js/basicblocks.js:1695
 #: js/macros.js:77
 #.TRANS: animal sound effect
 msgid "dog"
 msgstr "犬のワン"
 
-#: js/musicutils.js:408
+#: js/musicutils.js:412
 #: js/basicblocks.js:1674
 #: js/macros.js:88
 #.TRANS: animal sound effect
 msgid "duck"
 msgstr "あひる"
 
-#: js/musicutils.js:413
+#: js/musicutils.js:417
 #: js/basicblocks.js:503
 #.TRANS: highpass filter
 #.TRANS: highpass filter
@@ -1441,57 +1451,57 @@ msgstr "あひる"
 msgid "highpass"
 msgstr "ハイパス・フィルター"
 
-#: js/musicutils.js:415
+#: js/musicutils.js:419
 #.TRANS: lowpass filter
 msgid "lowpass"
 msgstr "ローパス・フィルター"
 
-#: js/musicutils.js:417
+#: js/musicutils.js:421
 #.TRANS: bandpass filter
 msgid "bandpass"
 msgstr "バンドパス・フィルター"
 
-#: js/musicutils.js:419
+#: js/musicutils.js:423
 #.TRANS: highshelf filter
 ## http://d.hatena.ne.jp/y_takeuchi/20130407/p1
 msgid "highshelf"
 msgstr "ハイシェルフ・フィルター"
 
-#: js/musicutils.js:421
+#: js/musicutils.js:425
 #.TRANS: lowshelf filter
 msgid "lowshelf"
 msgstr "ローシェルフ・フィルター"
 
-#: js/musicutils.js:423
+#: js/musicutils.js:427
 #.TRANS: notch filter
 ## https://synth-voice.sakura.ne.jp/synth-voice/html5/synth-basic02.html
 msgid "notch"
 msgstr "ノッチ・フィルター"
 
-#: js/musicutils.js:425
+#: js/musicutils.js:429
 #.TRANS: allpass filter
 ## http://www7b.biglobe.ne.jp/~kochan/workshop/analog/allpass.htm
 msgid "allpass"
 msgstr "オールパスフィルター"
 
-#: js/musicutils.js:427
+#: js/musicutils.js:431
 #.TRANS: peaking filter
 ## http://www.geocities.jp/meimei_8/filt/peek/af_peek.html
 msgid "peaking"
 msgstr "ピーク・フィルタ"
 
-#: js/musicutils.js:1523
-#: js/musicutils.js:1543
+#: js/musicutils.js:1533
+#: js/musicutils.js:1553
 msgid "next"
 msgstr "この次の"
 
-#: js/musicutils.js:1526
-#: js/musicutils.js:1548
+#: js/musicutils.js:1536
+#: js/musicutils.js:1558
 msgid "previous"
 msgstr "この前の"
 
-#: js/musicutils.js:1529
-#: js/musicutils.js:1552
+#: js/musicutils.js:1539
+#: js/musicutils.js:1562
 msgid "current"
 msgstr "現在の"
 
@@ -1620,7 +1630,7 @@ msgid "Let us start our tour!"
 msgstr "では、ツアーを始まりましょう。"
 
 #: js/turtledefs.js:79
-#.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Turtle, and more.
+#.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 #.TRANS: the buttons used to open various palettes of blocks
 msgid "Palette buttons"
 msgstr "パレット・ボタン"
@@ -3915,6 +3925,11 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Click to run the project in slow mode."
 #~msgstr "プロジェクトをゆっくりなペースで再生するため、ここでクリック。"
 
+#: js/turtledefs.js:79
+
+#~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
+#~msgstr ""
+
 #: js/basicblocks.js:893
 
 #~msgid "divide note value"
@@ -4074,6 +4089,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "hspace"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "ツールバーを開くためにここでクリック"
+
 #~msgid "numerator"
 #~msgstr "分子"
 
@@ -4089,9 +4107,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "free time"
 #~msgstr "クロックなし"
-
-#~msgid "current pitch octave"
-#~msgstr "このピッチのオクターブ"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "ツールバーを開き隠し"
@@ -4161,8 +4176,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "note volume"
 #~msgstr "音符の音量"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "ツールバーを開くためにここでクリック"
+#~msgid "current pitch octave"
+#~msgstr "このピッチのオクターブ"
 
 #~msgid "hours ago"
 #~msgstr "時間前"

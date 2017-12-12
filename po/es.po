@@ -96,6 +96,9 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr "descanso"
 
@@ -202,7 +205,7 @@ msgstr "deslizador"
 
 #: js/block.js:1584
 #: js/logo.js:9011
-#: js/musicutils.js:1420
+#: js/musicutils.js:1430
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
@@ -779,7 +782,7 @@ msgstr "El valor de profundidad está fuera de rango."
 #: js/logo.js:5269
 #: js/logo.js:5322
 #: js/logo.js:5324
-#: js/musicutils.js:335
+#: js/musicutils.js:339
 #: js/basicblocks.js:2812
 #: js/macros.js:160
 #.TRANS: polytone synthesizer
@@ -986,7 +989,7 @@ msgstr "menor"
 #: js/musicutils.js:135
 #: js/musicutils.js:138
 #: js/musicutils.js:149
-#: js/musicutils.js:441
+#: js/musicutils.js:445
 #: js/basicblocks.js:1412
 #: js/basicblocks.js:1419
 #: js/basicblocks.js:1426
@@ -1171,7 +1174,7 @@ msgid "fibonacci"
 msgstr ""
 
 #: js/musicutils.js:324
-#: js/musicutils.js:359
+#: js/musicutils.js:363
 #: js/basicblocks.js:669
 #: js/basicblocks.js:1267
 #: js/macros.js:190
@@ -1198,43 +1201,53 @@ msgstr "violonchelo"
 msgid "bass"
 msgstr ""
 
+#: js/musicutils.js:335
+#.TRANS: musical instrument
+msgid "guitar"
+msgstr "guitarra"
+
 #: js/musicutils.js:337
+#.TRANS: musical instrument
+msgid "flute"
+msgstr "flauta"
+
+#: js/musicutils.js:341
 #.TRANS: simple monotone synthesizer
 msgid "simple 1"
 msgstr ""
 
-#: js/musicutils.js:339
+#: js/musicutils.js:343
 #.TRANS: simple monotone synthesizer
 msgid "simple 2"
 msgstr ""
 
-#: js/musicutils.js:341
+#: js/musicutils.js:345
 #.TRANS: simple monotone synthesizer
 msgid "simple 3"
 msgstr ""
 
-#: js/musicutils.js:343
+#: js/musicutils.js:347
 #.TRANS: simple monotone synthesizer
 msgid "simple 4"
 msgstr ""
 
-#: js/musicutils.js:345
+#: js/musicutils.js:349
 #.TRANS: white noise synthesizer
 msgid "white noise"
 msgstr ""
 
-#: js/musicutils.js:347
+#: js/musicutils.js:351
 #.TRANS: brown noise synthesizer
 msgid "brown noise"
 msgstr ""
 
-#: js/musicutils.js:349
+#: js/musicutils.js:353
 #.TRANS: pink noise synthesizer
 msgid "pink noise"
 msgstr ""
 
-#: js/musicutils.js:351
-#: js/musicutils.js:432
+#: js/musicutils.js:355
+#: js/musicutils.js:436
 #: js/basicblocks.js:98
 #.TRANS: sine wave
 #.TRANS: sine wave
@@ -1242,8 +1255,8 @@ msgstr ""
 msgid "sine"
 msgstr ""
 
-#: js/musicutils.js:353
-#: js/musicutils.js:434
+#: js/musicutils.js:357
+#: js/musicutils.js:438
 #: js/basicblocks.js:76
 #.TRANS: square wave
 #.TRANS: square wave
@@ -1251,8 +1264,8 @@ msgstr ""
 msgid "square"
 msgstr "cuadrado"
 
-#: js/musicutils.js:355
-#: js/musicutils.js:438
+#: js/musicutils.js:359
+#: js/musicutils.js:442
 #: js/basicblocks.js:109
 #.TRANS: sawtooth wave
 #.TRANS: sawtooth wave
@@ -1260,8 +1273,8 @@ msgstr "cuadrado"
 msgid "sawtooth"
 msgstr ""
 
-#: js/musicutils.js:357
-#: js/musicutils.js:436
+#: js/musicutils.js:361
+#: js/musicutils.js:440
 #: js/basicblocks.js:87
 #: js/basicblocks.js:443
 #.TRANS: triangle wave
@@ -1271,7 +1284,7 @@ msgstr ""
 msgid "triangle"
 msgstr "triángulo"
 
-#: js/musicutils.js:364
+#: js/musicutils.js:368
 #: js/basicblocks.js:1828
 #: js/macros.js:111
 #: js/macros.js:149
@@ -1281,7 +1294,7 @@ msgstr "triángulo"
 msgid "snare drum"
 msgstr "tambor militar pequeño"
 
-#: js/musicutils.js:366
+#: js/musicutils.js:370
 #: js/basicblocks.js:1821
 #: js/macros.js:106
 #: js/macros.js:149
@@ -1290,207 +1303,207 @@ msgstr "tambor militar pequeño"
 msgid "kick drum"
 msgstr "bombo"
 
-#: js/musicutils.js:368
+#: js/musicutils.js:372
 #: js/basicblocks.js:1814
 #: js/macros.js:191
 #.TRANS: musical instrument
 msgid "tom tom"
 msgstr ""
 
-#: js/musicutils.js:370
+#: js/musicutils.js:374
 #: js/basicblocks.js:1807
 #: js/macros.js:97
 #.TRANS: musical instrument
 msgid "floor tom tom"
 msgstr "tom tom de piso"
 
-#: js/musicutils.js:372
+#: js/musicutils.js:376
 #: js/basicblocks.js:1800
 #: js/macros.js:68
 #.TRANS: a drum made from an inverted cup
 msgid "cup drum"
 msgstr "tambor taza"
 
-#: js/musicutils.js:374
+#: js/musicutils.js:378
 #: js/basicblocks.js:1793
 #: js/macros.js:69
 #.TRANS: musical instrument
 msgid "darbuka drum"
 msgstr "darbuka"
 
-#: js/musicutils.js:376
+#: js/musicutils.js:380
 #: js/basicblocks.js:1786
 #: js/macros.js:101
 #.TRANS: musical instrument
 msgid "hi hat"
 msgstr ""
 
-#: js/musicutils.js:378
+#: js/musicutils.js:382
 #: js/basicblocks.js:1765
 #: js/macros.js:151
 #.TRANS: a small metal bell
 msgid "ride bell"
 msgstr ""
 
-#: js/musicutils.js:380
+#: js/musicutils.js:384
 #: js/basicblocks.js:1758
 #: js/macros.js:64
 #.TRANS: musical instrument
 msgid "cow bell"
 msgstr "cencerro"
 
-#: js/musicutils.js:382
+#: js/musicutils.js:386
 #: js/basicblocks.js:1779
 #: js/macros.js:193
 #.TRANS: musical instrument
 msgid "triangle bell"
 msgstr "campana triángulo"
 
-#: js/musicutils.js:384
+#: js/musicutils.js:388
 #: js/basicblocks.js:1772
 #: js/macros.js:95
 #.TRANS: musical instrument
 msgid "finger cymbals"
 msgstr "castañuelas"
 
-#: js/musicutils.js:386
+#: js/musicutils.js:390
 #: js/basicblocks.js:1716
 #: js/macros.js:61
 #.TRANS: a musically tuned set of bells
 msgid "chime"
 msgstr ""
 
-#: js/musicutils.js:388
+#: js/musicutils.js:392
 #: js/basicblocks.js:1723
 #: js/macros.js:62
 #.TRANS: sound effect
 msgid "clang"
 msgstr "estruendo"
 
-#: js/musicutils.js:390
+#: js/musicutils.js:394
 #: js/basicblocks.js:1744
 #: js/macros.js:65
 #.TRANS: sound effect
 msgid "crash"
 msgstr "choque"
 
-#: js/musicutils.js:392
+#: js/musicutils.js:396
 #: js/basicblocks.js:1702
 #: js/macros.js:57
 #.TRANS: sound effect
 msgid "bottle"
 msgstr "botella"
 
-#: js/musicutils.js:394
+#: js/musicutils.js:398
 #: js/basicblocks.js:1730
 #: js/macros.js:63
 #.TRANS: sound effect
 msgid "clap"
 msgstr "palmada"
 
-#: js/musicutils.js:396
+#: js/musicutils.js:400
 #: js/basicblocks.js:1737
 #: js/macros.js:172
 #.TRANS: sound effect
 msgid "slap"
 msgstr "bofetada"
 
-#: js/musicutils.js:398
+#: js/musicutils.js:402
 #: js/basicblocks.js:1751
 #: js/macros.js:175
 #.TRANS: sound effect
 msgid "splash"
 msgstr "salpicadura"
 
-#: js/musicutils.js:400
+#: js/musicutils.js:404
 #: js/basicblocks.js:1709
 #: js/macros.js:59
 #.TRANS: sound effect
 msgid "bubbles"
 msgstr "burbujas"
 
-#: js/musicutils.js:402
+#: js/musicutils.js:406
 #: js/basicblocks.js:1681
 #: js/macros.js:60
 #.TRANS: animal sound effect
 msgid "cat"
 msgstr "gato"
 
-#: js/musicutils.js:404
+#: js/musicutils.js:408
 #: js/basicblocks.js:1688
 #: js/macros.js:67
 #.TRANS: animal sound effect
 msgid "cricket"
 msgstr "grillo"
 
-#: js/musicutils.js:406
+#: js/musicutils.js:410
 #: js/basicblocks.js:1695
 #: js/macros.js:77
 #.TRANS: animal sound effect
 msgid "dog"
 msgstr "perro"
 
-#: js/musicutils.js:408
+#: js/musicutils.js:412
 #: js/basicblocks.js:1674
 #: js/macros.js:88
 #.TRANS: animal sound effect
 msgid "duck"
 msgstr "pato"
 
-#: js/musicutils.js:413
+#: js/musicutils.js:417
 #: js/basicblocks.js:503
 #.TRANS: highpass filter
 #.TRANS: highpass filter
 msgid "highpass"
 msgstr ""
 
-#: js/musicutils.js:415
+#: js/musicutils.js:419
 #.TRANS: lowpass filter
 msgid "lowpass"
 msgstr ""
 
-#: js/musicutils.js:417
+#: js/musicutils.js:421
 #.TRANS: bandpass filter
 msgid "bandpass"
 msgstr ""
 
-#: js/musicutils.js:419
+#: js/musicutils.js:423
 #.TRANS: highshelf filter
 msgid "highshelf"
 msgstr ""
 
-#: js/musicutils.js:421
+#: js/musicutils.js:425
 #.TRANS: lowshelf filter
 msgid "lowshelf"
 msgstr ""
 
-#: js/musicutils.js:423
+#: js/musicutils.js:427
 #.TRANS: notch filter
 msgid "notch"
 msgstr ""
 
-#: js/musicutils.js:425
+#: js/musicutils.js:429
 #.TRANS: allpass filter
 msgid "allpass"
 msgstr ""
 
-#: js/musicutils.js:427
+#: js/musicutils.js:431
 #.TRANS: peaking filter
 msgid "peaking"
 msgstr ""
 
-#: js/musicutils.js:1523
-#: js/musicutils.js:1543
+#: js/musicutils.js:1533
+#: js/musicutils.js:1553
 msgid "next"
 msgstr "próximo"
 
-#: js/musicutils.js:1526
-#: js/musicutils.js:1548
+#: js/musicutils.js:1536
+#: js/musicutils.js:1558
 msgid "previous"
 msgstr "anterior"
 
-#: js/musicutils.js:1529
-#: js/musicutils.js:1552
+#: js/musicutils.js:1539
+#: js/musicutils.js:1562
 msgid "current"
 msgstr "actuales"
 
@@ -1607,14 +1620,14 @@ msgid "Let us start our tour!"
 msgstr "Vamos a empezar nuestro recorrido!"
 
 #: js/turtledefs.js:79
-#.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Turtle, and more.
 #.TRANS: the buttons used to open various palettes of blocks
 msgid "Palette buttons"
 msgstr "Botones de paleta"
 
 #: js/turtledefs.js:79
-msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
-msgstr "Esta barra de herramientas contiene los botones de la paleta de Ritmo, Tono, Tortuga, y más."
+#.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
+msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
+msgstr "Esta barra de herramientas contiene los botones de la paleta de Ritmo, Tono, Acción, y más."
 
 #: js/turtledefs.js:79
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
@@ -3749,10 +3762,15 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "turtle note"
 #~msgstr "nota de tortugas"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "quintos"
+#~msgid "fourths"
+#~msgstr "cuartas"
+
+#: js/turtledefs.js:79
+
+#~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
+#~msgstr "Esta barra de herramientas contiene los botones de la paleta de Ritmo, Tono, Tortuga, y más."
 
 #: js/basicblocks.js:893
 
@@ -3822,10 +3840,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Impact UID not found."
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "cuartas"
+#~msgid "fifths"
+#~msgstr "quintos"
 
 #: plugins/impact.rtp:32
 
@@ -3964,6 +3982,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "hspace"
 #~msgstr "espacio horizontal"
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Este botón abre y cierra la barra de herramientas principal."
+
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -4003,11 +4024,6 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "actions"
 #~msgstr ""
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "octava actual"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "Expandir o colapsar barra"
@@ -4100,8 +4116,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "note volume"
 #~msgstr "volumen nota"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Este botón abre y cierra la barra de herramientas principal."
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "octava actual"
 
 #: plugins/impact.rtp:32
 
