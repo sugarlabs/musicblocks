@@ -221,6 +221,7 @@ var urlsToCache = [
     'js/clearbox.js',
     'js/palette.js',
     'js/playbackbox.js',
+    'js/sugarizer-compatibility.js',
 
     'js/widgets/pitchdrummatrix.js',
     'js/widgets/pitchslider.js',
@@ -233,7 +234,6 @@ var urlsToCache = [
     'js/widgets/rhythmruler.js',
 
     'js/utils/detectIE.js',
-    'js/utils/sugarizer-compatibility.js',
     'js/utils/platformstyle.js',
     'js/utils/munsell.js',
     'js/utils/musicutils.js',

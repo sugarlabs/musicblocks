@@ -10,7 +10,6 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 // All things related to palettes
-require(['activity/utils']);
 
 const PROTOBLOCKSCALE = 1.0;
 const PALETTELEFTMARGIN = 10;

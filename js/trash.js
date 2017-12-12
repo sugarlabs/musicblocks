@@ -13,7 +13,6 @@
 // blocks can be dragged. Once in the trash area, they are marked as
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
-require(['activity/utils']);
 
 var TRASHWIDTH = 120;
 var TRASHHEIGHT = 120;
