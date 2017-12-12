@@ -1558,6 +1558,14 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                case PAGE_UP:
+                    blocksContainer.y += logo.canvas.height / 2;
+                    update = true;
+                    break;
+                case PAGE_DOWN:
+                    blocksContainer.y -= logo.canvas.height / 2;
+                    update = true;
+                    break;
                 case DEL:
                     // Remove a single block from within a stack.
                     if (blocks.activeBlock != null) {
