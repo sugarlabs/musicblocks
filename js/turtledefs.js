@@ -74,9 +74,10 @@ function createHelpContent() {
     HELPCONTENT = [
         [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
         [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'activity/activity-icon-mouse-color.svg'],
-        //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 	//.TRANS: the buttons used to open various palettes of blocks
-        [_('Palette buttons'), _('This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+        [_('Palette buttons'),
+        //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
+	 _('This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
         [_('Run fast'), _('Click the run button to run the project in fast mode.'), 'header-icons/run-button.svg'],
         [_('Run slow'), _('Long press the run button to run the project in slow mode.'), 'header-icons/slow-button.svg'],
         [_('Run music slow'), _('Extra-long press the run button to run the music in slow mode.'), 'header-icons/slow-music-button.svg'],
