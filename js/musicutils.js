@@ -331,6 +331,10 @@ var VOICENAMES = [
     [_('cello'), 'cello', 'images/voices.svg'],
     //.TRANS: musical instrument
     // [_('bass'), 'basse', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('guitar'), 'guitar', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('flute'), 'flute', 'images/voices.svg'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg'],
     //.TRANS: simple monotone synthesizer
@@ -447,9 +451,15 @@ const DEFAULTOSCILLATORTYPE = 'sine';
 
 var customMode = MUSICALMODES['custom'];
 
-// The sample has a pitch which is subsequently transposed. This
-// number is that starting pitch.
-const SAMPLECENTERNO = {'violin': 63, 'cello': 39, 'basse': 15};
+// The sample has a pitch which is subsequently transposed.
+// This number is that starting pitch number. Reference function pitchToNumber
+const SAMPLECENTERNO = {
+  'violin': 63,
+  'cello': 39,
+  'basse': 15,
+  'guitar': 39,
+  'flute': 57
+};
 
 
 function getIntervalName(name) {
@@ -1630,6 +1640,8 @@ function Synth() {
     const VOICE_SAMPLES = {
         'violin': VIOLINSOUNDSAMPLE,
         'cello': CELLOSOUNDSAMPLE,
+        'flute': FLUTESOUNDSAMPLE,
+        'guitar': GUITARSOUNDSAMPLE,
         'basse': BASSESOUNDSAMPLE
     };
 
