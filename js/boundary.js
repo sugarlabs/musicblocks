@@ -14,9 +14,6 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-const BOUNDARYWIDTH = 1200;
-const BOUNDARYHEIGHT = 900;
-
 function Boundary () {
     this._stage = null;
     this._container = null;
