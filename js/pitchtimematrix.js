@@ -371,7 +371,7 @@ function PitchTimeMatrix () {
             } else {
                 if (noteIsSolfege(this.rowLabels[i])) {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                    var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false);
+                    var noteObj = getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false, null, this._logo.errorMsg);
                 } else {
                     cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
@@ -742,7 +742,7 @@ function PitchTimeMatrix () {
         var colCount = firstRow.cells.length;
 
         var noteValue = param[0][1] / param[0][0];
-        var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
+        var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0], this._cellScale);
 
         // Set the cells to "rest"
         for (var i = 0; i < numberOfNotes; i++) {
@@ -897,7 +897,7 @@ function PitchTimeMatrix () {
 
     this.addNotes = function(numBeats, noteValue) {
         var ptmTable = docById('ptmTable');
-        var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
+        var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1, this._cellScale);
 
         for (var i = 0; i < numBeats; i++) {
             this._notesToPlay.push([['R'], noteValue]);

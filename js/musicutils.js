@@ -1175,9 +1175,14 @@ function getInterval (interval, keySignature, pitch) {
 };
 
 
-function calcNoteValueToDisplay(a, b) {
+function calcNoteValueToDisplay(a, b, scale) {
     var noteValue = a / b;
     var noteValueToDisplay = null;
+    if (scale == undefined) {
+        var cellScale = 1.0;
+    } else {
+        var cellScale = scale;
+    }
 
     if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
         noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) + '>';
@@ -1188,16 +1193,17 @@ function calcNoteValueToDisplay(a, b) {
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt((noteValue * 1.5))
         if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> .';
+            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * cellScale + '> .';
         } else {
             noteValueToDisplay = parseInt((noteValue * 1.75))
             if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> ..';
+                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * cellScale + '> ..';
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
             }
         }
     }
+
     return noteValueToDisplay;
 };
 
@@ -1595,6 +1601,283 @@ function reducedFraction(a, b) {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
     } else {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
+    }
+};
+
+
+getNote = function (noteArg, octave, transposition, keySignature, movable, direction, errorMsg) {
+    var sharpFlat = false;
+
+    octave = Math.round(octave);
+
+    if (transposition == undefined) {
+        transposition = 0;
+    }
+
+    transposition = Math.round(transposition);
+    if (typeof(noteArg) === 'number') {
+        noteArg = noteArg.toString();
+    }
+
+    // Check for double flat or double sharp.
+    var len = noteArg.length;
+    if (len > 2) {
+        var lastTwo = noteArg.slice(len - 2);
+        if (lastTwo === 'bb' || lastTwo === '♭♭') {
+            noteArg = noteArg.slice(0, len - 1);
+            transposition -= 1;
+        } else if (lastTwo === '##' || lastTwo === '♯♯') {
+            noteArg = noteArg.slice(0, len - 1);
+            transposition += 1;
+        } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
+            // Not sure this could occur... but just in case.
+            noteArg = noteArg.slice(0, len - 2);
+        }
+    }
+
+    // Already a note? No need to convert from solfege.
+    if (noteArg in BTOFLAT) {
+        noteArg = BTOFLAT[noteArg];
+    } else if (noteArg in STOSHARP) {
+        noteArg = STOSHARP[noteArg];
+    }
+
+    if (noteArg in EXTRATRANSPOSITIONS) {
+        octave += EXTRATRANSPOSITIONS[noteArg][1];
+        var note = EXTRATRANSPOSITIONS[noteArg][0];
+    } else if (NOTESSHARP.indexOf(noteArg.toUpperCase()) !== -1) {
+        var note = noteArg.toUpperCase();
+    } else if (NOTESFLAT.indexOf(noteArg) !== -1) {
+        var note = noteArg;
+    } else if (NOTESFLAT2.indexOf(noteArg) !== -1) {
+        // Convert to uppercase, e.g., d♭ -> D♭.
+        var note = NOTESFLAT[notesFlat2.indexOf(noteArg)];
+    } else {
+        // Not a letter note, so convert from Solfege.
+        // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
+        if (noteArg.substr(-1) === '>') {
+            // Read octave and solfege from HTML
+            octave = parseInt(noteArg.slice(noteArg.indexOf('>') + 1, noteArg.indexOf('/') - 1));
+            noteArg = noteArg.substr(0, noteArg.indexOf('<'));
+        }
+
+        if (['#', '♯', '♭', 'b'].indexOf(noteArg.substr(-1)) !== -1) {
+            sharpFlat = true;
+        }
+
+        if (!keySignature) {
+            keySignature = 'C major';
+        }
+
+        if (movable) {
+            var obj = getScaleAndHalfSteps(keySignature);
+        } else {
+            var obj = getScaleAndHalfSteps('C major');
+        }
+
+        var thisScale = obj[0];
+        var halfSteps = obj[1];
+        var myKeySignature = obj[2];
+        var mode = obj[3];
+
+        if (movable) {
+            // Ensure it is a valid key signature.
+            var offset = thisScale.indexOf(myKeySignature);
+            if (offset === -1) {
+                console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
+                offset = 0;
+                thisScale = NOTESSHARP;
+            }
+
+            // We need to set the octave relative to the tonic.
+            // Starting from C_4 (note_octave)
+            // All keys C# -- F# would remain in octave four
+            // All keys Gb -- B would be in octave three (since
+            // going down is closer than going up)
+            if (offset > 5) {
+                transposition -= 12;  // go down one octave
+            }
+        } else {
+            var offset = 0;
+        }
+
+        if (sharpFlat) {
+            if (noteArg.substr(-1) === '#') {
+                offset += 1;
+            } else if (noteArg.substr(-1) === '♯') {
+                offset += 1;
+            } else if (noteArg.substr(-1) === '♭') {
+                offset -= 1;
+            } else if (noteArg.substr(-1) === 'b') {
+                offset -= 1;
+            }
+        }
+
+        if (halfSteps.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+            var solfegePart = noteArg.substr(0, 1).toLowerCase();
+        } else if (halfSteps.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
+            var solfegePart = noteArg.substr(0, 2).toLowerCase();
+        } else if (halfSteps.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+            var solfegePart = noteArg.substr(0, 3).toLowerCase();
+        } else {
+            // The note should already be translated, but just in case...
+            // Reverse any i18n
+            // solfnotes_ is used in the interface for i18n
+            //.TRANS: the note names must be separated by single spaces
+            var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+            if (solfnotes_.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+                var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
+            } else if (solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
+                var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
+            } else if (solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+                var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
+            } else {
+                var solfegePart = noteArg.substr(0, 2).toLowerCase();
+            }
+        }
+
+        if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
+            return ['R', ''];
+        } else if (halfSteps.indexOf(solfegePart) !== -1) {
+            var index = halfSteps.indexOf(solfegePart) + offset;
+            if (index > 11) {
+                index -= 12;
+                octave += 1;
+            }
+
+            var note = thisScale[index];
+        } else {
+            console.log(solfegePart);
+            console.log(halfSteps.indexOf(noteArg));
+            console.log('WARNING: Note [' + noteArg + '] not found in ' + halfSteps + '. Returning REST');
+            if (errorMsg != undefined) {
+                errorMsg(INVALIDPITCH, null);
+            }
+
+            return ['R', ''];
+        }
+
+        if (note in EXTRATRANSPOSITIONS) {
+            octave += EXTRATRANSPOSITIONS[note][1];
+            note = EXTRATRANSPOSITIONS[note][0];
+        }
+    }
+
+    if (transposition && transposition !== 0) {
+        if (transposition < 0) {
+            var deltaOctave = -Math.floor(-transposition / 12);
+            var deltaNote = -(-transposition % 12);
+        } else {
+            var deltaOctave = Math.floor(transposition / 12);
+            var deltaNote = transposition % 12;
+        }
+
+        octave += deltaOctave;
+
+        if (deltaNote > 0) {
+            if (NOTESSHARP.indexOf(note) !== -1) {
+                i = NOTESSHARP.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+
+                note = NOTESSHARP[i];
+            } else if (NOTESFLAT.indexOf(note) !== -1) {
+                i = NOTESFLAT.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+
+                note = NOTESFLAT[i];
+            } else {
+                console.log('note not found? ' + note);
+            }
+        } else if (deltaNote < 0) {
+            if (NOTESFLAT.indexOf(note) !== -1) {
+                i = NOTESFLAT.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+
+                note = NOTESFLAT[i];
+            } else if (NOTESSHARP.indexOf(note) !== -1) {
+                i = NOTESSHARP.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+
+                note = NOTESSHARP[i];
+            } else {
+                console.log('note not found? ' + note);
+            }
+        }
+    }
+
+    // Try to find a note in the current keySignature
+    switch (getSharpFlatPreference(keySignature)) {
+    case 'flat':
+        if (note in EQUIVALENTFLATS) {
+            note = EQUIVALENTFLATS[note];
+        }
+        break;
+    case 'sharp':
+        if (note in EQUIVALENTSHARPS) {
+            note = EQUIVALENTSHARPS[note];
+        }
+        break;
+    case 'natural':
+        if (note in EQUIVALENTNATURALS) {
+            note = EQUIVALENTNATURALS[note];
+        }
+        break;
+    default:
+        break;
+    }
+
+    // Finally consider the note direction (in the case of intervals)
+    if (direction != undefined) {
+        switch(direction) {
+        case -1:
+            if (note in EQUIVALENTFLATS) {
+                note = EQUIVALENTFLATS[note];
+            }
+            break;
+        case 1:
+            if (note in EQUIVALENTSHARPS) {
+                note = EQUIVALENTSHARPS[note];
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (octave < 1) {
+        return [note, 1];
+    } else if (octave > 10) {
+        return [note, 10];
+    } else {
+        return [note, octave];
     }
 };
 

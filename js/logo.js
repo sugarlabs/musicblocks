@@ -2886,7 +2886,7 @@ function Logo () {
 
                 // Check to see if there are any transpositions on the key.
                 if (turtle in that.transposition) {
-                    var noteObj = that.getNote(args[0], 4, that.transposition[turtle], that.keySignature[turtle], false, null);
+                    var noteObj = getNote(args[0], 4, that.transposition[turtle], that.keySignature[turtle], false, null, that.errorMsg);
                     that.keySignature[turtle] = noteObj[0] + ' ' + modename;
                 } else {
                     that.keySignature[turtle] = args[0] + ' ' + modename;
@@ -3462,7 +3462,7 @@ function Logo () {
             }
 
             function addPitch(note, octave, cents, direction) {
-                var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], true, direction); // that.movable[turtle]);
+                var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], true, direction, that.errorMsg);
 
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
@@ -3490,10 +3490,10 @@ function Logo () {
                 n += that.scalarTransposition[turtle];
 
                 var value = getStepSizeUp(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
-                var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj = getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 for (var i = 1; i < n; i++) {
                     var value = getStepSizeUp(that.keySignature[turtle], noteObj[0]);
-                    noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
+                    noteObj = getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 }
             } else if (args[0] <= -1) {
                 var n = -Math.ceil(args[0]);
@@ -3501,22 +3501,22 @@ function Logo () {
                 n += that.scalarTransposition[turtle];
 
                 value = getStepSizeDown(that.keySignature[turtle], that.lastNotePlayed[turtle][0].slice(0, len - 1));
-                var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj = getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), value, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 for (var i = 1; i < n; i++) {
                     var value = getStepSizeDown(that.keySignature[turtle], noteObj[0]);
-                    noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
+                    noteObj = getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 }
             } else {  // Repeat last pitch played.
-                var noteObj = that.getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), 0, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj = getNote(that.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(that.lastNotePlayed[turtle][0].slice(len - 1)), 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
             }
 
             var delta = 0;
             if (!(that.invertList[turtle].length === 0)) {
                 var len = that.invertList[turtle].length;
-                var note1 = that.getNote(noteObj[0], noteObj[1], 0, that.keySignature[turtle], that.movable[turtle]);
+                var note1 = getNote(noteObj[0], noteObj[1], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 var num1 = getNumber(note1[0], note1[1]);
                 for (var i = len - 1; i > -1; i--) {
-                    var note2 = that.getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle]);
+                    var note2 = getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     var num2 = getNumber(note2[0], note2[1]);
                     // var a = getNumNote(num1, 0);
                     if (that.invertList[turtle][i][2] === 'even') {
@@ -3552,14 +3552,14 @@ function Logo () {
             if (turtle in that.intervals && that.intervals[turtle].length > 0) {
                 for (var i = 0; i < that.intervals[turtle].length; i++) {
                     var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], noteObj1[0]);
-                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle]);
+                    var noteObj2 = getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     addPitch(noteObj2[0], noteObj2[1], 0);
                 }
             }
 
             if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                 for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                    var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle]);
+                    var noteObj2 = getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     addPitch(noteObj2[0], noteObj2[1], 0, that.semitoneIntervals[turtle][i][1]);
                 }
             }
@@ -3761,22 +3761,22 @@ function Logo () {
             // Add scalar transposition
             if (that.scalarTransposition[turtle] > 0) {
                 var n = that.scalarTransposition[turtle];
-                var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                 for (var i = 0; i < n; i++) {
                     var value = getStepSizeUp(that.keySignature[turtle], noteObj[0]);
-                    noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
+                    noteObj = getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 }
 
                 note = noteObj[0];
                 octave = noteObj[1];
             } else if (that.scalarTransposition[turtle] < 0) {
                 var n = that.scalarTransposition[turtle];
-                var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                 for (var i = 0; i < -n; i++) {
                     var value = getStepSizeDown(that.keySignature[turtle], noteObj[0]);
-                    noteObj = that.getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle]);
+                    noteObj = getNote(noteObj[0], noteObj[1], value, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 }
                 note = noteObj[0];
                 octave = noteObj[1];
@@ -3790,7 +3790,7 @@ function Logo () {
                     transposition += that.transposition[turtle];
                 }
 
-                var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 if (!that.validNote) {
                     that.errorMsg(INVALIDPITCH, blk);
                     that.stopTurtle = true;
@@ -3817,12 +3817,12 @@ function Logo () {
                     var len = that.invertList[turtle].length;
                     // Get an anchor note and its corresponding
                     // number, which is used to calculate delta.
-                    var note1 = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                    var note1 = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                     var num1 = that.getNumber(note1[0], note1[1]);
                     for (var i = len - 1; i > -1; i--) {
                         // Note from which delta is calculated.
-                        var note2 = that.getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle]);
+                        var note2 = getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         var num2 = getNumber(note2[0], note2[1]);
                         // var a = getNumNote(num1, 0);
                         if (that.invertList[turtle][i][2] === 'even') {
@@ -3848,7 +3848,7 @@ function Logo () {
                         transposition += that.transposition[turtle];
                     }
 
-                    var nnote = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                    var nnote = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     if (noteIsSolfege(note)) {
                         nnote[0] = getSolfege(nnote[0]);
                     }
@@ -3873,12 +3873,12 @@ function Logo () {
                     var len = that.invertList[turtle].length;
                     // Get an anchor note and its corresponding
                     // number, which is used to calculate delta.
-                    var note1 = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                    var note1 = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                     var num1 = that.getNumber(note1[0], note1[1]);
                     for (var i = len - 1; i > -1; i--) {
                         // Note from which delta is calculated.
-                        var note2 = that.getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle]);
+                        var note2 = getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         var num2 = getNumber(note2[0], note2[1]);
                         // var a = getNumNote(num1, 0);
                         if (that.invertList[turtle][i][2] === 'even') {
@@ -3902,7 +3902,7 @@ function Logo () {
                         transposition += that.transposition[turtle];
                     }
 
-                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                    var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     that.lastNotePlayed[turtle] = [noteObj[0] + noteObj[1], 4];
 
                     if (that.keySignature[turtle][0] === 'C' && that.keySignature[turtle][1].toLowerCase() === 'major' && noteIsSolfege(note)) {
@@ -3922,7 +3922,7 @@ function Logo () {
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, direction) {
-                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction);
+                    var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction, that.errorMsg);
                     if (!that.validNote) {
                         that.errorMsg(INVALIDPITCH, blk);
                         that.stopTurtle = true;
@@ -3947,10 +3947,10 @@ function Logo () {
 
                 if (!(that.invertList[turtle].length === 0)) {
                     var len = that.invertList[turtle].length;
-                    var note1 = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                    var note1 = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     var num1 = getNumber(note1[0], note1[1]);
                     for (var i = len - 1; i > -1; i--) {
-                        var note2 = that.getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle]);
+                        var note2 = getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         var num2 = getNumber(note2[0], note2[1]);
                         // var a = getNumNote(num1, 0);
                         if (that.invertList[turtle][i][2] === 'even') {
@@ -3974,14 +3974,14 @@ function Logo () {
                 if (turtle in that.intervals && that.intervals[turtle].length > 0) {
                     for (var i = 0; i < that.intervals[turtle].length; i++) {
                         var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], noteObj1[0]);
-                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle]);
+                        var noteObj2 = getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         addPitch(noteObj2[0], noteObj2[1], cents);
                     }
                 }
 
                 if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle]);
+                        var noteObj2 = getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         addPitch(noteObj2[0], noteObj2[1], cents, that.semitoneIntervals[turtle][i][1]);
                     }
                 }
@@ -3993,11 +3993,11 @@ function Logo () {
                 that.pushedNote[turtle] = true;
             } else if (that.drumStyle[turtle].length > 0) {
                 var drumname = last(that.drumStyle[turtle]);
-                var noteObj1 = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj1 = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 that.pitchDrumTable[turtle][noteObj1[0] + noteObj1[1]] = drumname;
             } else if (that.inPitchStaircase) {
                 var frequency = pitchToFrequency(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle]);
-                var noteObj1 = that.getNote(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj1 = getNote(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                 var flag = 0;
 
                 for (var i = 0 ; i < that.pitchStaircase.Stairs.length; i++) {
@@ -5427,7 +5427,7 @@ function Logo () {
                 that.stopTurtle = true;
             } else if (that.justMeasuring[turtle].length > 0) {
                 // TODO: account for cents
-                var noteObj = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                var noteObj = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                 var n = that.justMeasuring[turtle].length;
                 var pitchNumber = pitchToNumber(noteObj[0], noteObj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
@@ -5447,7 +5447,7 @@ function Logo () {
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, frequency, direction) {
-                    var noteObj = that.getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction);
+                    var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction, that.errorMsg);
                     if (that.drumStyle[turtle].length > 0) {
                         var drumname = last(that.drumStyle[turtle]);
                         that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
@@ -5461,10 +5461,10 @@ function Logo () {
 
                 if (!(that.invertList[turtle].length === 0)) {
                     var len = that.invertList[turtle].length;
-                    var noteObj1 = that.getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle]);
+                    var noteObj1 = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     var num1 = getNumber(noteObj1[0], noteObj1[1]);
                     for (var i = len - 1; i > -1; i--) {
-                        var noteObj2 = that.getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle]);
+                        var noteObj2 = getNote(that.invertList[turtle][i][0], that.invertList[turtle][i][1], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         var num2 = getNumber(noteObj2[0], noteObj2[1]);
                         // var a = getNumNote(num1, 0);
                         if (that.invertList[turtle][i][2] === 'even') {
@@ -5481,14 +5481,14 @@ function Logo () {
                 if (turtle in that.intervals && that.intervals[turtle].length > 0) {
                     for (var i = 0; i < that.intervals[turtle].length; i++) {
                         var ii = getInterval(that.intervals[turtle][i], that.keySignature[turtle], noteObj1[0]);
-                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle]);
+                        var noteObj2 = getNote(noteObj1[0], noteObj1[1], ii, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         addPitch(noteObj2[0], noteObj2[1], cents, 0);
                     }
                 }
 
                 if (turtle in that.semitoneIntervals && that.semitoneIntervals[turtle].length > 0) {
                     for (var i = 0; i < that.semitoneIntervals[turtle].length; i++) {
-                        var noteObj2 = that.getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle]);
+                        var noteObj2 = getNote(noteObj1[0], noteObj1[1], that.semitoneIntervals[turtle][i][0], that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                         addPitch(noteObj2[0], noteObj2[1], cents, 0, that.semitoneIntervals[turtle][i][1]);
                     }
                 }
@@ -6060,7 +6060,7 @@ function Logo () {
         }
 
         if (this.inTimbre) {
-            var noteObj = this.getNote(this.notePitches[turtle][last(this.inNoteBlock[turtle])][0], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][0], 0, this.keySignature[turtle], that.movable[turtle]);
+            var noteObj = getNote(this.notePitches[turtle][last(this.inNoteBlock[turtle])][0], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][0], 0, this.keySignature[turtle], that.movable[turtle], null, this.errorMsg);
             this.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle].length > 0) {
@@ -6312,7 +6312,7 @@ function Logo () {
                         if (that.notePitches[turtle][last(that.inNoteBlock[turtle])][i] === 'rest' || forceSilence) {
                             note = 'R';
                         } else {
-                            var noteObj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][i], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][i], 0, that.keySignature[turtle], that.movable[turtle]);
+                            var noteObj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][i], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][i], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                             // If the cents for this note != 0, then
                             // we need to convert to frequency and add
@@ -8027,7 +8027,7 @@ function Logo () {
 
                             var obj = [pitch, octave];
                         } else if (that.notePitches[i].length > 0) {
-                            var obj = that.getNote(that.notePitches[i][0], that.noteOctaves[i][0], 0, that.keySignature[i], that.movable[turtle]);
+                            var obj = getNote(that.notePitches[i][0], that.noteOctaves[i][0], 0, that.keySignature[i], that.movable[turtle], null, that.errorMsg);
                         } else {
                             console.log('Cannot find a note for mouse ' + turtle);
                             that.errorMsg(INVALIDPITCH, blk);
@@ -8053,7 +8053,7 @@ function Logo () {
                         var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                         var obj = [pitch, octave];
                     } else if (that.notePitches[turtle].length > 0) {
-                        var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
+                        var obj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     } else {
                         console.log('Cannot find a note for mouse ' + turtle);
                         that.errorMsg(INVALIDPITCH, blk);
@@ -8075,7 +8075,7 @@ function Logo () {
                         var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                         var obj = [pitch, octave];
                     } else if (that.inNoteBlock[turtle] in that.notePitches[turtle] && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
-                        var obj = that.getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle]);
+                        var obj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
                     } else {
                         console.log('Cannot find a note ');
                         that.errorMsg(INVALIDPITCH, blk);
@@ -8886,281 +8886,6 @@ function Logo () {
         this.blocks.show();
         this.blocks.bringToTop();
         this.refreshCanvas();
-    };
-
-    this.getNote = function (noteArg, octave, transposition, keySignature, movable, direction) {
-        this.validNote = true;
-        var sharpFlat = false;
-
-        octave = Math.round(octave);
-
-        if (transposition == undefined) {
-            transposition = 0;
-        }
-
-        transposition = Math.round(transposition);
-        if (typeof(noteArg) === 'number') {
-            noteArg = noteArg.toString();
-        }
-
-        // Check for double flat or double sharp.
-        var len = noteArg.length;
-        if (len > 2) {
-            var lastTwo = noteArg.slice(len - 2);
-            if (lastTwo === 'bb' || lastTwo === '♭♭') {
-                noteArg = noteArg.slice(0, len - 1);
-                transposition -= 1;
-            } else if (lastTwo === '##' || lastTwo === '♯♯') {
-                noteArg = noteArg.slice(0, len - 1);
-                transposition += 1;
-            } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
-                // Not sure this could occur... but just in case.
-                noteArg = noteArg.slice(0, len - 2);
-            }
-        }
-
-        // Already a note? No need to convert from solfege.
-        if (noteArg in BTOFLAT) {
-            noteArg = BTOFLAT[noteArg];
-        } else if (noteArg in STOSHARP) {
-            noteArg = STOSHARP[noteArg];
-        }
-
-        if (noteArg in EXTRATRANSPOSITIONS) {
-            octave += EXTRATRANSPOSITIONS[noteArg][1];
-            var note = EXTRATRANSPOSITIONS[noteArg][0];
-        } else if (NOTESSHARP.indexOf(noteArg.toUpperCase()) !== -1) {
-            var note = noteArg.toUpperCase();
-        } else if (NOTESFLAT.indexOf(noteArg) !== -1) {
-            var note = noteArg;
-        } else if (NOTESFLAT2.indexOf(noteArg) !== -1) {
-            // Convert to uppercase, e.g., d♭ -> D♭.
-            var note = NOTESFLAT[notesFlat2.indexOf(noteArg)];
-        } else {
-            // Not a letter note, so convert from Solfege.
-            // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
-            if (noteArg.substr(-1) === '>') {
-                // Read octave and solfege from HTML
-                octave = parseInt(noteArg.slice(noteArg.indexOf('>') + 1, noteArg.indexOf('/') - 1));
-                noteArg = noteArg.substr(0, noteArg.indexOf('<'));
-            }
-
-            if (['#', '♯', '♭', 'b'].indexOf(noteArg.substr(-1)) !== -1) {
-                sharpFlat = true;
-            }
-
-            if (!keySignature) {
-                keySignature = 'C major';
-            }
-
-            if (movable) {
-                var obj = getScaleAndHalfSteps(keySignature);
-            } else {
-                var obj = getScaleAndHalfSteps('C major');
-            }
-
-            var thisScale = obj[0];
-            var halfSteps = obj[1];
-            var myKeySignature = obj[2];
-            var mode = obj[3];
-
-            if (movable) {
-                // Ensure it is a valid key signature.
-                var offset = thisScale.indexOf(myKeySignature);
-                if (offset === -1) {
-                    console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
-                    offset = 0;
-                    thisScale = NOTESSHARP;
-                }
-
-                // We need to set the octave relative to the tonic.
-                // Starting from C_4 (note_octave)
-                // All keys C# -- F# would remain in octave four
-                // All keys Gb -- B would be in octave three (since
-                // going down is closer than going up)
-                if (offset > 5) {
-                    transposition -= 12;  // go down one octave
-                }
-            } else {
-                var offset = 0;
-            }
-
-            if (sharpFlat) {
-                if (noteArg.substr(-1) === '#') {
-                    offset += 1;
-                } else if (noteArg.substr(-1) === '♯') {
-                    offset += 1;
-                } else if (noteArg.substr(-1) === '♭') {
-                    offset -= 1;
-                } else if (noteArg.substr(-1) === 'b') {
-                    offset -= 1;
-                }
-            }
-
-            if (halfSteps.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
-                var solfegePart = noteArg.substr(0, 1).toLowerCase();
-            } else if (halfSteps.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
-                var solfegePart = noteArg.substr(0, 2).toLowerCase();
-            } else if (halfSteps.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
-                var solfegePart = noteArg.substr(0, 3).toLowerCase();
-            } else {
-                // The note should already be translated, but just in case...
-                // Reverse any i18n
-                // solfnotes_ is used in the interface for i18n
-                //.TRANS: the note names must be separated by single spaces
-                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
-                if (solfnotes_.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
-                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
-                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
-                    var solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
-                } else {
-                    var solfegePart = noteArg.substr(0, 2).toLowerCase();
-                }
-            }
-
-            if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
-                return ['R', ''];
-            } else if (halfSteps.indexOf(solfegePart) !== -1) {
-                var index = halfSteps.indexOf(solfegePart) + offset;
-                if (index > 11) {
-                    index -= 12;
-                    octave += 1;
-                }
-
-                var note = thisScale[index];
-            } else {
-                console.log(solfegePart);
-                console.log(halfSteps.indexOf(noteArg));
-                console.log('WARNING: Note [' + noteArg + '] not found in ' + halfSteps + '. Returning REST');
-                // this.validNote = false;
-                this.errorMsg(INVALIDPITCH, null);
-                return ['R', ''];
-            }
-
-            if (note in EXTRATRANSPOSITIONS) {
-                octave += EXTRATRANSPOSITIONS[note][1];
-                note = EXTRATRANSPOSITIONS[note][0];
-            }
-        }
-
-        if (transposition && transposition !== 0) {
-            if (transposition < 0) {
-                var deltaOctave = -Math.floor(-transposition / 12);
-                var deltaNote = -(-transposition % 12);
-            } else {
-                var deltaOctave = Math.floor(transposition / 12);
-                var deltaNote = transposition % 12;
-            }
-
-            octave += deltaOctave;
-
-            if (deltaNote > 0) {
-                if (NOTESSHARP.indexOf(note) !== -1) {
-                    i = NOTESSHARP.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
-                    }
-
-                    note = NOTESSHARP[i];
-                } else if (NOTESFLAT.indexOf(note) !== -1) {
-                    i = NOTESFLAT.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
-                    }
-
-                    note = NOTESFLAT[i];
-                } else {
-                    console.log('note not found? ' + note);
-                }
-            } else if (deltaNote < 0) {
-                if (NOTESFLAT.indexOf(note) !== -1) {
-                    i = NOTESFLAT.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
-                    }
-
-                    note = NOTESFLAT[i];
-                } else if (NOTESSHARP.indexOf(note) !== -1) {
-                    i = NOTESSHARP.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
-                    }
-
-                    note = NOTESSHARP[i];
-                } else {
-                    console.log('note not found? ' + note);
-                }
-            }
-        }
-
-        // Try to find a note in the current keySignature
-        switch (getSharpFlatPreference(keySignature)) {
-        case 'flat':
-            if (note in EQUIVALENTFLATS) {
-                note = EQUIVALENTFLATS[note];
-            }
-            break;
-        case 'sharp':
-            if (note in EQUIVALENTSHARPS) {
-                note = EQUIVALENTSHARPS[note];
-            }
-            break;
-        case 'natural':
-            if (note in EQUIVALENTNATURALS) {
-                note = EQUIVALENTNATURALS[note];
-            }
-            break;
-        default:
-            break;
-        }
-
-        // Finally consider the note direction (in the case of intervals)
-        if (direction != undefined) {
-            switch(direction) {
-            case -1:
-                if (note in EQUIVALENTFLATS) {
-                    note = EQUIVALENTFLATS[note];
-                }
-                break;
-            case 1:
-                if (note in EQUIVALENTSHARPS) {
-                    note = EQUIVALENTSHARPS[note];
-                }
-                break;
-            default:
-                break;
-            }
-        }
-
-        if (octave < 1) {
-            return [note, 1];
-        } else if (octave > 10) {
-            return [note, 10];
-        } else {
-            return [note, octave];
-        }
     };
 
     this.updateNotation = function (note, duration, turtle, insideChord) {
