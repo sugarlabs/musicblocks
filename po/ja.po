@@ -194,24 +194,24 @@ msgstr "シェア"
 
 #: js/samplesviewer.js:80
 msgid "Copy this link to share your project."
-msgstr ""
+msgstr "シェアするため、このリンクをコピーしてください。"
 
 #: js/samplesviewer.js:81
 #: js/samplesviewer.js:84
 msgid "Advanced options"
-msgstr ""
+msgstr "上級オプション"
 
 #: js/samplesviewer.js:85
 msgid "Run project on startup."
-msgstr ""
+msgstr "アプリがロードした際、プロジェクトをすぐ再生"
 
 #: js/samplesviewer.js:86
 msgid "Show code blocks on startup."
-msgstr ""
+msgstr "アプリがロードした際、ブロックをすぐ表示"
 
 #: js/samplesviewer.js:87
 msgid "Collapse code blocks on startup."
-msgstr ""
+msgstr "アプリがロードした際、ブロックをつぶす"
 
 #: js/samplesviewer.js:91
 #: js/samplesviewer.js:91
@@ -319,8 +319,9 @@ msgstr "止めます"
 
 #: js/activity.js:2905
 #: js/activity.js:2918
+## "Stop soon" for now
 msgid "Hard stop"
-msgstr ""
+msgstr "すぐ止めます"
 
 #: js/activity.js:2906
 #: js/activity.js:2919
@@ -591,7 +592,7 @@ msgstr "選んだファイルには、正しいヒープが含まれません。
 #: js/logo.js:2672
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
-msgstr ""ロードヒープのブロックには、ロードファイルブロックが必要です。"
+msgstr "ロードヒープのブロックには、ロードファイルブロックが必要です。"
 
 #: js/logo.js:2688
 msgid "Error parsing JSON data:"
@@ -615,7 +616,7 @@ msgstr "インデクス番号は 0 より大きい必要があります。"
 #: js/logo.js:2796
 #: js/timbre.js:547
 msgid "Unable to use synth due to existing oscillator"
-msgstr ""オシレーターがあるため、シンセが使えません。"
+msgstr "オシレーターがあるため、シンセが使えません。"
 
 #: js/logo.js:2754
 #: js/logo.js:2778
@@ -655,11 +656,11 @@ msgstr "サステイン値には 0 以上100以下の数字をいれて下さい
 
 #: js/logo.js:3192
 msgid "Release value should be from 0-100."
-msgstr ""リリース値には 0 以上100以下の数字をいれて下さい。"
+msgstr "リリース値には 0 以上100以下の数字をいれて下さい。"
 
 #: js/logo.js:3208
 msgid "You are adding multiple envelope blocks."
-msgstr ""封筒ブロックを複数追加しています。"
+msgstr "封筒ブロックを複数追加しています。"
 
 #: js/logo.js:3237
 #.TRANS: rolloff is the steepness of a change in frequency.
@@ -754,7 +755,7 @@ msgstr "ハーツ・ブロック：音符ブロックを使うつもりですか
 #: js/logo.js:5604
 #: js/logo.js:5628
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
-msgstr ""タプル・ブロック：ピッチ時刻行列のブロックを使うつもりですか？"
+msgstr "タプル・ブロック：ピッチ時刻行列のブロックを使うつもりですか？"
 
 #: js/logo.js:5803
 msgid "My Project"
@@ -1183,12 +1184,12 @@ msgstr "コントラベース"
 #: js/musicutils.js:335
 #.TRANS: musical instrument
 msgid "guitar"
-msgstr ""
+msgstr "ギター"
 
 #: js/musicutils.js:337
 #.TRANS: musical instrument
 msgid "flute"
-msgstr ""
+msgstr "フルート"
 
 #: js/musicutils.js:341
 #.TRANS: simple monotone synthesizer
@@ -1212,18 +1213,20 @@ msgstr "シンプル・シンセ４"
 
 #: js/musicutils.js:349
 #.TRANS: white noise synthesizer
+## guessing -- to be verified
 msgid "white noise"
-msgstr ""
+msgstr "ホワイトノイズ"
 
 #: js/musicutils.js:351
 #.TRANS: brown noise synthesizer
+## https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%A9%E3%82%A6%E3%83%8B%E3%82%A2%E3%83%B3%E3%83%8E%E3%82%A4%E3%82%BA
 msgid "brown noise"
-msgstr ""
+msgstr "ブラウニアンノイズ"
 
 #: js/musicutils.js:353
 #.TRANS: pink noise synthesizer
 msgid "pink noise"
-msgstr ""
+msgstr "ピンクノイズ"
 
 #: js/musicutils.js:355
 #: js/musicutils.js:436
@@ -1557,7 +1560,7 @@ msgstr "タプルの音価"
 #: js/turtledefs.js:17
 ## I took some liberties
 msgid "Music Blocks is a collection of tools for exploring musical concepts."
-msgstr ""ミュージック・ブロックス：音楽と数学とコードの色々を発見するソフト・ツール"
+msgstr "ミュージック・ブロックス：音楽と数学とコードの色々を発見するソフト・ツール"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:1038
@@ -1747,7 +1750,7 @@ msgstr "ブロックスがクリップボードにされると、ペーストボ
 
 #: js/turtledefs.js:98
 msgid "Show or hide a coordinate grid."
-msgstr ""グリッドを表示する　/隠す。"
+msgstr "グリッドを表示する　/隠す。"
 
 #: js/turtledefs.js:99
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
@@ -1852,7 +1855,7 @@ msgstr "ピッチ数字"
 #.TRANS: MIDI is a technical standard for electronic music
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
-msgstr ""ピッチ数字のゼロを設定"
+msgstr "ピッチ数字のゼロを設定"
 
 #: js/basicblocks.js:160
 #: js/basicblocks.js:217
@@ -1896,7 +1899,7 @@ msgstr "転回に"
 #: js/basicblocks.js:234
 #.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
-msgstr ""転回を (奇数)"
+msgstr "転回を (奇数)"
 
 #: js/basicblocks.js:249
 #.TRANS: pitch inversion rotates a pitch around another pitch (even number)
@@ -2452,7 +2455,7 @@ msgstr "スタッカート"
 
 #: js/basicblocks.js:1247
 msgid "synth name"
-msgstr ""
+msgstr "シンセの名前"
 
 #: js/basicblocks.js:1262
 #.TRANS: set the characteristics of a custom instrument
@@ -2892,20 +2895,24 @@ msgid "push"
 msgstr "プッシュ"
 
 #: js/basicblocks.js:2656
+## 上端＝じょうたん;http://jisho.org/search/%E4%B8%8A%E7%AB%AF 
 msgid "top"
-msgstr ""
+msgstr "上端"
 
 #: js/basicblocks.js:2663
+## 下端＝かたん；http://jisho.org/word/%E4%B8%8B%E7%AB%AF 
 msgid "bottom"
-msgstr ""
+msgstr "下端"
 
 #: js/basicblocks.js:2670
+## 幅=はば；http://jisho.org/word/%E5%B9%85 
 msgid "width"
-msgstr ""
+msgstr "幅(横)"
 
 #: js/basicblocks.js:2677
+## 縦;http://jisho.org/word/%E7%B8%A6 and https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q119659291 
 msgid "height"
-msgstr ""
+msgstr "高さ(縦)"
 
 #: js/basicblocks.js:2685
 #.TRANS: stops playback of an audio recording
@@ -3944,7 +3951,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:87
 
 #~msgid "Hide or show the block palettes."
-#~msgstr ""ブロックのパレットを表示する / 隠す アイコンです。"
+#~msgstr "ブロックのパレットを表示する / 隠す アイコンです。"
 
 #: js/activity.js:2712
 
@@ -4062,7 +4069,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "UID"
 #~msgstr "ユーザの名前"
 
-#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
+#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
 #~msgstr "ネズミさんが私たちのミュージック・ブロックスの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
 
 #~msgid "whole note 𝅝"
@@ -4149,7 +4156,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:347
 
 #~msgid "step pitch"
-#~msgstr ""ステップピッチ"
+#~msgstr "ステップピッチ"
 
 #~msgid "Long press on block(s) to copy. Click here to paste."
 #~msgstr "ブロックでマウスの長いクリック押しでコピー。ペーストをするためにここでクリック。"
@@ -4200,7 +4207,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/logo.js:8057
 
 #~msgid "Could not find mouse"
-#~msgstr ""
+#~msgstr "ネズミが見つかりません"
 
 #~msgid "multiply beat"
 #~msgstr "泊を倍に"
