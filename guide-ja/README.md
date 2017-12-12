@@ -1,8 +1,8 @@
-# ミュージック・ブロックのプログラミング案内
+# ミュージック・ブロックスのプログラミング案内
   
-ミュージック・ブロックは子供のための音楽とコードが合体されているプログラミング環境。子供さん達はこのツールで音楽、数学、またコードの基本な色々が楽しく発見することができます。ミュージック・ブロックはタートルブロックから作られて、ピッチとリズムのツールもあります。
+ミュージック・ブロックスは子供のための音楽とコードが合体されているプログラミング環境。子供さん達はこのツールで音楽、数学、またコードの基本な色々が楽しく発見することができます。ミュージック・ブロックスはタートルブロックから作られて、ピッチとリズムのツールもあります。
 
-タートルブロックの案内はミュージック・ブロックより基本的なコンセプトがあります。この案内は音楽の基本があり、ミュージック・ブロックの実例があります。
+タートルブロックの案内はミュージック・ブロックスより基本的なコンセプトがあります。この案内は音楽の基本があり、ミュージック・ブロックスの実例があります。
 
 ## <a name="目次"></a> 目次
 
@@ -36,8 +36,8 @@
    6. [相互作用](#相互作用)
  4. [ウィジェット](#ウィジェット)
     1. [ステータス・モニター](#ステータス)
-    2. [音符のチャンクを作ること](#ピッチ時刻グラフ)
-       1. [ピッチ時刻グラフ](#ピッチ時刻グラフ) 
+    2. [音符のチャンクを作ること](#ピッチ・タイム行列)
+       1. [ピッチ・タイム行列](#ピッチ・タイム行列) 
        2. [リズムのブロック](#リズムのブロック) 
        3. [タプルのこと](#タプルのこと)
        4. [「タプル」というのは？](#タプルとは)
@@ -141,7 +141,7 @@
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg "ドラム・ブロックの使える例")
 
-*ピッチ*ブロックのも使える場合と同じでドラム・ブロックがピッチ時刻グラフか*音価*ブロックの中にも使えます。今、24個ぐらいのドラムの音の中から選ぶことができます。デフォルトのドラムがバス・ドラムです。
+*ピッチ*ブロックのも使える場合と同じでドラム・ブロックがピッチ・タイム行列か*音価*ブロックの中にも使えます。今、24個ぐらいのドラムの音の中から選ぶことができます。デフォルトのドラムがバス・ドラムです。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg "一つよりのドラムの音を同時に")
 
@@ -151,7 +151,7 @@
 
 [前のトピック (2. 音の関係)](#音符) | [目次に戻す](#目次) | [次のトピック (4. ウィジェット)](#ウィジェット)
 
-このセクションのトピックはチャンクで*動作*ブロックを使って音楽とプログラミングができます。チャンクが自分で動作ブロックを使って作ることも、[*ピッチ時刻グラフ*](#ピッチ時刻グラフ)を使って作ることもできます。
+このセクションのトピックはチャンクで*動作*ブロックを使って音楽とプログラミングができます。チャンクが自分で動作ブロックを使って作ることも、[*ピッチ・タイム行列*](#ピッチ・タイム行列)を使って作ることもできます。
 
 ### <a name="チャンク"></a>3.1 チャンク
 
@@ -542,17 +542,17 @@ example above, the 音量 is divided by 10 before being displayed.
 
 ### <a name="GENERATION"></a>4.2 Generating チャンク of Notes 
 
-Using the ピッチ時刻グラフ, it is possible to generate チャンク of notes at a much faster speed.
+Using the ピッチ・タイム行列, it is possible to generate チャンク of notes at a much faster speed.
 
-#### <a name="ピッチ時刻グラフ"></a>4.2.1 The ピッチ時刻グラフ
+#### <a name="ピッチ・タイム行列"></a>4.2.1 The ピッチ・タイム行列
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg "ピッチ時刻グラフ")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg "ピッチ・タイム行列")
 
-ミュージック・ブロックス provides a widget, the *ピッチ時刻グラフ*, as a scaffold
+ミュージック・ブロックス provides a widget, the *ピッチ・タイム行列*, as a scaffold
 for getting started.
 
 Once you've launched ミュージック・ブロックス in your browser, start by clicking
-on the *ピッチ時刻グラフ* stack that appears in the middle of the
+on the *ピッチ・タイム行列* stack that appears in the middle of the
 screen. (For the moment, ignore the *スタート* block.) You'll see a grid
 organized vertically by ピッチ and horizontally by リズム.
 
@@ -615,7 +615,7 @@ Don't worry. You can reopen the matrix at anytime (it will remember
 its previous state) and since you can define as many チャンク as you
 want, feel free to experiment.
 
-Tip: You can put a チャンク inside a *ピッチ時刻グラフ* block to generate
+Tip: You can put a チャンク inside a *ピッチ・タイム行列* block to generate
 the matrix to corresponds to that チャンク.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "usage of octave for a ピッチ")
@@ -641,7 +641,7 @@ action). You should hear the notes play, ordered from top to bottom.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg "the リズム block")
 
 *リズム* blocks are used to generate リズム patterns in the
-*ピッチ時刻グラフ* block. The top argument to the *リズム* block
+*ピッチ・タイム行列* block. The top argument to the *リズム* block
 is the number of notes. The bottom argument is the duration of the
 note. In the top example above, three columns for quarter notes
 would be generated in the matrix. In the middle example, one column
@@ -653,7 +653,7 @@ columns for 16th notes would be generated.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix8.svg "resulting notes in tabular format")
 
 You can use as many *リズム* blocks as you'd like inside the
-*ピッチ時刻グラフ* block. In the above example, two *リズム*
+*ピッチ・タイム行列* block. In the above example, two *リズム*
 blocks are used, resulting in three quarter notes and six eighth
 notes.
 
@@ -707,7 +707,7 @@ will expand into *リズム* blocks with the corresponding values.
 ### <a name="リズム・ブロック"></a>4.3 リズム・ブロックでリズムを
 
 The *Rhythm Ruler* block is used to launch a widget similar to the
-*ピッチ時刻グラフ* block. The widget can be used to generate rhythmic
+*ピッチ・タイム行列* block. The widget can be used to generate rhythmic
 patterns.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg "generating リズム・ブロック")
@@ -756,7 +756,7 @@ The *Save stack* button will export リズム stacks.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg "stacks of リズム・ブロック" )
 
 These stacks of リズム・ブロック can be used to define rhythmic patterns used
-with the *ピッチ時刻グラフ* block.
+with the *ピッチ・タイム行列* block.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg "save drum machine button")
 
@@ -843,10 +843,10 @@ it into *Phrygian*.
 
 Note: The build-in 音階とモード in ミュージック・ブロックス can be found in [musicutils.js](https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg "ピッチ時刻グラフ block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg "ピッチ・タイム行列 block")
 
 The *Save* button exports a stack of blocks representing the mode that
-can be used inside the *ピッチ時刻グラフ* block.
+can be used inside the *ピッチ・タイム行列* block.
 
 ### <a name="ピッチ・ドラム"></a>4.5 ピッチ・ドラム・グラフ
 
@@ -872,7 +872,7 @@ drums. The output is a stack of *Set Dum* blocks.
 ### <a name="ピッチの階段"></a>4.6 音程の関係のことをピッチの階段ーで発見
 
 The *Pitch Staircase* block is used to launch a widget similar to the
-*ピッチ時刻グラフ*, which can be used to generate different pitches
+*ピッチ・タイム行列*, which can be used to generate different pitches
 using a given pitch and musical proportion.
 
 The *ピッチ* blocks contained in the clamp of the *Pitch Staircase*
@@ -907,7 +907,7 @@ configuration, the output  from pressing the *Save stack* button is shown below:
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg "Pitch Stair block")
 
-These stacks can be used with the *ピッチ時刻グラフ* block to define
+These stacks can be used with the *ピッチ・タイム行列* block to define
 the rows in the matrix.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg "Pitch Stair block")
