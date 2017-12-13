@@ -76,7 +76,7 @@ function PlaybackBox () {
             var dx = BOXBUTTONOFFSET;
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.playButton = makeButton('media-playback-start', _('playback music'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.playButton = makeButton('media-playback-start', _('playback music') + ' [Alt-P]', this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.playButton.visible = true;
             this._positionHoverText(this.playButton);
 
