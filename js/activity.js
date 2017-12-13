@@ -1547,8 +1547,14 @@ define(MYDEFINES, function (compatibility) {
                 case 66: // 'B'
                     _printBlockSVG();
                     break;
+                case 67: // 'C'
+                    blocks.triggerLongPress(blocks.activeBlock);
+                    break;
                 case 69: // 'E'
                     _allClear();
+                    break;
+                case 80: // 'P'
+                    logo.playback(-1);
                     break;
                 case 82: // 'R'
                     _doFastButton();
@@ -1556,8 +1562,8 @@ define(MYDEFINES, function (compatibility) {
                 case 83: // 'S'
                     logo.doStopTurtle();
                     break;
-                case 80: // 'P'
-                    logo.playback(-1);  // play all
+                case 86: // 'V'
+		    blocks.pasteStack();
                     break;
                 }
             } else if (event.ctrlKey) {
@@ -2985,7 +2991,7 @@ handleComplete);
                     ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
                     ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
-                    ['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' ' + _('Click here to paste.'), null, null, null, null],
+                    ['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
