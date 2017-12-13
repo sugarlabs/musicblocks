@@ -1929,7 +1929,7 @@ function Block(protoblock, blocks, overrideName) {
         // There may be a second select used for # and b.
         if (this.labelattr != null) {
             this.label.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 60) * this.blocks.blockScale + canvasLeft) + 'px';
+            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 50) * this.blocks.blockScale + canvasLeft) + 'px';
             this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.blockScale + canvasTop) + 'px';
             this.labelattr.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
             this.labelattr.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
