@@ -10,10 +10,18 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-const PLAYBACKBOXSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="133" width="230" version="1.1"> <rect style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" y="0" x="0" height="133" width="230" /> <g style="fill:#000000;display:block" transform="translate(176.943,-1.053)"> <path style="fill:#000000;display:inline" d="m 27.557,5.053 c -12.43,0 -22.5,10.076 -22.5,22.497 0,12.432 10.07,22.503 22.5,22.503 12.431,0 22.5,-10.071 22.5,-22.503 0,-12.421 -10.07,-22.497 -22.5,-22.497 z m 10.199,28.159 c 1.254,1.256 1.257,3.291 0,4.545 -0.628,0.629 -1.451,0.943 -2.274,0.943 -0.822,0 -1.644,-0.314 -2.27,-0.94 l -5.76,-5.761 -5.76,5.761 c -0.627,0.626 -1.449,0.94 -2.271,0.94 -0.823,0 -1.647,-0.314 -2.275,-0.943 -1.254,-1.254 -1.254,-3.289 0.004,-4.545 l 5.758,-5.758 -5.758,-5.758 c -1.258,-1.254 -1.258,-3.292 -0.004,-4.546 1.255,-1.254 3.292,-1.259 4.546,0 l 5.76,5.759 5.76,-5.759 c 1.252,-1.259 3.288,-1.254 4.544,0 1.257,1.254 1.254,3.292 0,4.546 l -5.758,5.758 5.758,5.758 z" /> </g> <rect style="fill:#92b5c8;fill-opacity:1;stroke:none" y="51" x="0" height="82" width="360" /> <rect y="0.76763773" x="0.76764059" height="131.46472" width="228.46472" style="display:inline;visibility:visible;opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;" /></svg>';
-
 // A pop up for playback functions, e.g., compile, play, pause, etc.
 function PlaybackBox () {
+    const BOXBUTTONOFFSET = 55;
+    const BOXBUTTONSPACING = 65;
+
+    // 3 buttons, 2 intrabuttons spaces, 2 extrabutton spaces
+    var boxwidth = 3 * 55 + 2 * 10 + 2 * 20;
+    var boxwidth2 = boxwidth - 1.5;
+    var boxclose = boxwidth - 55;
+
+    const PLAYBACKBOXSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="133" width="' + boxwidth + '" version="1.1"> <rect style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" y="0" x="0" height="133" width="' + boxwidth + '" /> <g style="fill:#000000;display:block" transform="translate(' + boxclose + ',-1)"> <path style="fill:#000000;display:inline" d="m 27.5,5.0 c -12.43,0 -22.5,10.0 -22.5,22.5 0,12.5 10.0,22.5 22.5,22.5 12.5,0 22.5,-10.0 22.5,-22.5 0,-12.5 -10.0,-22.5 -22.5,-22.5 z m 10.0,28.0 c 1.25,1.25 1.25,3.25 0,4.5 -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 l -5.75,-5.75 -5.75,5.75 c -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 -1.25,-1.25 -1.25,-3.25 0.0,-4.5 l 5.75,-5.75 -5.75,-5.75 c -1.25,-1.25 -1.25,-3.25 -0.0,-4.5 1.25,-1.25 3.25,-1.25 4.5,0 l 5.75,5.75 5.75,-5.75 c 1.25,-1.25 3.25,-1.25 4.5,0 1.25,1.25 1.25,3.25 0,4.5 l -5.75,5.75 5.75,5.75 z" /> </g> <rect style="fill:#92b5c8;fill-opacity:1;stroke:none" y="51" x="0" height="82" width="' + boxwidth + '" /> <rect y="0.75" x="0.75" height="131.5" width="' + boxwidth2 + '" style="display:inline;visibility:visible;opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;" /></svg>';
+
     this._stage = null;
     this._refreshCanvas = null;
     this._doCompile = null;
@@ -65,9 +73,10 @@ function PlaybackBox () {
         if (this._container === null) {
             this._createBox(scale, x, y);
             var that = this;
+            var dx = BOXBUTTONOFFSET;
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.playButton = makeButton('media-playback-start', _('playback music'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
+            this.playButton = makeButton('media-playback-start', _('playback music'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.playButton.visible = true;
             this._positionHoverText(this.playButton);
 
@@ -75,12 +84,12 @@ function PlaybackBox () {
                 that._doPlay();
             });
 
-            this.noplayButton = makeButton('media-playback-start-insensitive', _('playback music'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
+            this.noplayButton = makeButton('media-playback-start-insensitive', _('playback music'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.noplayButton.visible = true;
             this._positionHoverText(this.playButton);
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.pauseButton = makeButton('media-playback-pause', _('pause playback'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
+            this.pauseButton = makeButton('media-playback-pause', _('pause playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.pauseButton.visible = false;
             this._positionHoverText(this.pauseButton);
 
@@ -88,8 +97,10 @@ function PlaybackBox () {
                 that._doPause();
             });
 
+            dx += BOXBUTTONSPACING;
+
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.rewindButton = makeButton('media-playlist-repeat', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
+            this.rewindButton = makeButton('media-playlist-repeat', _('restart playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.rewindButton.visible = false;
             this._positionHoverText(this.rewindButton);
 
@@ -98,17 +109,19 @@ function PlaybackBox () {
             });
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.norewindButton = makeButton('media-playlist-repeat-insensitive', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
+            this.norewindButton = makeButton('media-playlist-repeat-insensitive', _('restart playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.norewindButton.visible = true;
             this._positionHoverText(this.norewindButton);
 
+            dx += BOXBUTTONSPACING;
+
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this._compileButton = makeButton('compile-button', _('prepare music for playback'), this._container.x + 185, this._container.y + 85, 55, 0, this._stage);
+            this._compileButton = makeButton('compile-button', _('prepare music for playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._compileButton.visible = true;
             this._positionHoverText(this._compileButton);
             for (var c = 0; c < this._compileButton.children.length; c++) {
                 if (this._compileButton.children[c].text != undefined) {
-                    this._compileButton.children[c].x = -180;
+                    this._compileButton.children[c].x = -dx + 10;
                     break;
                 }
             }
@@ -218,8 +231,8 @@ function PlaybackBox () {
         if (this._container == null) {
             this._container = new createjs.Container();
             this._stage.addChild(this._container);
-            this._container.x = x - 230;
-            this._container.y = y - 133;
+            this._container.x = x - boxwidth;
+            this._container.y = y - 55;
 
             var PLAYBACKBOX = PLAYBACKBOXSVG;
             this._makeBoxBitmap(PLAYBACKBOX, 'pbox', __processBackground, null);
