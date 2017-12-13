@@ -1598,6 +1598,7 @@ function Block(protoblock, blocks, overrideName) {
             if (selectedattr === '') {
                 selectedattr = '♮';
             }
+
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
             for (var i = 0; i < SOLFATTRS.length; i++) {
                 if (selectedattr === SOLFATTRS[i]) {
@@ -1635,6 +1636,7 @@ function Block(protoblock, blocks, overrideName) {
             if (selectedattr === '') {
                 selectedattr = '♮';
             }
+
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
             for (var i = 0; i < SOLFATTRS.length; i++) {
                 if (selectedattr === SOLFATTRS[i]) {
@@ -1679,6 +1681,7 @@ function Block(protoblock, blocks, overrideName) {
             if (selectedattr === '') {
                 selectedattr = '♮';
             }
+
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
 
             for (var i = 0; i < NOTEATTRS.length; i++) {
@@ -1937,12 +1940,18 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
         this.label.focus();
+        if (this.labelattr != null) {
+            this.labelattr.style.display = '';
+        }
 
         // Firefox fix
         setTimeout(function () {
             that.label.style.display = '';
             that.label.focus();
             focused = true;
+            if (that.labelattr != null) {
+                that.labelattr.style.display = '';
+            }
         }, 100);
     };
 
