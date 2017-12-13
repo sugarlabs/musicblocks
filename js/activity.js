@@ -2878,16 +2878,16 @@ handleComplete);
             // on-long-press icon, on-extra-long-press icon
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var buttonNames = [
-                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly') + ' [ENTER]', _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
-                    ['hard-stop-turtle', doHardStopButton, _('Hard stop'), null, null, null, null],
-                    ['stop-turtle', doStopButton, _('Stop'), doHardStopButton, null, 'stop-turtle-button', null],
+                    ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
+                    ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
                     ['clear', _allClear, _('Clean'), null, null, null, null],
                     // ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
                     ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                     ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                    ['go-home', _findBlocks, _('Home'), null, null, null, null],
+                    ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
                     ['help', _showHelp, _('Help'), null, null, null, null]
                 ];
             } else {
@@ -2941,7 +2941,7 @@ handleComplete);
                 } else if (buttonNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
                     homeButtonContainers.push(container);
-                    var container2 = _makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
+                    var container2 = _makeButton('go-home-faded-button', _('Home' + ' [HOME]'), x, y, btnSize, 0);
                     _loadButtonDragHandler(container2, x, y, buttonNames[i][1], null, null, null, null);
                     homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
