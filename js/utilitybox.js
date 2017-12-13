@@ -21,7 +21,8 @@ function UtilityBox () {
     this._doPlugins = null;
     this._doStats = null;
     this._doScroller = null;
-    this._doSearch = null;
+    this._toggleSearch = null;
+    this._hideSearch = null;
     this._scrollStatus = false;
     this._container = null;
     this._scale = 1;
@@ -61,9 +62,14 @@ function UtilityBox () {
         return this;
     };
 
-    this.setSearch = function (search) {
-        this._doSearch = search;
+    this.setSearch = function (toggleSearch, hideSearch) {
+        this._toggleSearch = toggleSearch;
+        this._hideSearch = hideSearch;
         return this;
+    };
+
+    this.getPos = function () {
+        return [this._container.x, this._container.y];
     };
 
     this.init = function (scale, x, y, makeButton) {
@@ -116,7 +122,7 @@ function UtilityBox () {
             this._scrollButton2.visible = false;
             this._positionHoverText(this._scrollButton2);
             this._scrollButton2.on('click', function (event) {
-                that._doScroller();
+                that._toggleScroller();
                 that._hide();
                 that._scrollStatus = !that._scrollStatus;
             });
@@ -125,7 +131,7 @@ function UtilityBox () {
             this._searchButton.visible = true;
             this._positionHoverText(this._searchButton);
             this._searchButton.on('click', function (event) {
-                that._doSearch();
+                that._toggleSearch();
             });
         } else {
             this._show();
@@ -156,6 +162,7 @@ function UtilityBox () {
             this._scrollButton.visible = false;
             this._scrollButton2.visible = false;
             this._searchButton.visible = false;
+            this._hideSearch();
             this._container.visible = false;
             this._refreshCanvas();
         }

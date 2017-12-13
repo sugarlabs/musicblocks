@@ -886,7 +886,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSmaller(doSmallerFont)
                 .setPlugins(doOpenPlugin)
                 .setStats(doAnalytics)
-                .setSearch(showSearchWidget)
+                .setSearch(showSearchWidget, hideSearchWidget)
                 .setScroller(toggleScroller);
 
             playbackBox = new PlaybackBox();
@@ -1434,13 +1434,17 @@ define(MYDEFINES, function (compatibility) {
             doSearch();
         };
 
+        function hideSearchWidget() {
+            searchWidget.style.visibility = 'hidden';
+        };
+
         function showSearchWidget() {
             if (searchWidget.style.visibility === 'visible') {
                 searchWidget.style.visibility = 'hidden';
             } else {
                 searchWidget.style.visibility = 'visible';
-                searchWidget.style.left = docById('myCanvas').width / 3.5 * turtleBlocksScale + 'px';
-                searchWidget.style.top = docById('myCanvas').height / 4.5 * turtleBlocksScale + 'px';
+                searchWidget.style.left = (utilityBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
+                searchWidget.style.top = (utilityBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
 
                 searchBlockPosition = [100, 100];
 
