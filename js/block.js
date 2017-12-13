@@ -1505,7 +1505,7 @@ function Block(protoblock, blocks, overrideName) {
                 // this.blocks.refreshCanvas();
             }
 
-            this.blocks.activeBlock = null;
+            // this.blocks.activeBlock = null;
         }
     };
 

@@ -1646,9 +1646,10 @@ define(MYDEFINES, function (compatibility) {
                     // toggle run
                     if (docById('search').value.length > 0){
                         doSearch();
-                    }
-                    else{
-                        logo.runLogoCommands();
+                    } else {
+                        if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
+                            logo.runLogoCommands();
+                        }
                     }
                     break;
                 default:
