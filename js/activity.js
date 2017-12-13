@@ -1529,6 +1529,7 @@ define(MYDEFINES, function (compatibility) {
             const RETURN = 13;
             const SPACE = 32;
             const HOME = 36;
+            const END = 35;
             const PAGE_UP = 33;
             const PAGE_DOWN = 34;
             const KEYCODE_LEFT = 37;
@@ -1558,53 +1559,17 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                case END:
+                    blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
+                    break;
                 case PAGE_UP:
                     blocksContainer.y += logo.canvas.height / 2;
-                    update = true;
                     break;
                 case PAGE_DOWN:
                     blocksContainer.y -= logo.canvas.height / 2;
-                    update = true;
                     break;
                 case DEL:
-                    // Remove a single block from within a stack.
-                    if (blocks.activeBlock != null) {
-                        var blkObj = blocks.blockList[blocks.activeBlock];
-
-                        if (blkObj.name !== 'number' && blkObj.name !== 'text') {
-                            var firstConnection = blkObj.connections[0];
-                            var lastConnection = last(blkObj.connections);
-
-                            if (firstConnection != null) {
-                                var connectionIdx = blocks.blockList[firstConnection].connections.indexOf(blocks.activeBlock);
-                            } else {
-                                var connectionIdx = null;
-                            }
-
-                            blkObj.connections[0] = null;
-                            blkObj.connections[blkObj.connections.length - 1] = null;
-                            if (firstConnection != null) {
-                                blocks.blockList[firstConnection].connections[connectionIdx] = lastConnection;
-                            }
-
-                            if (lastConnection != null) {
-                                blocks.blockList[lastConnection].connections[0] = firstConnection;
-                            }
-
-                            blocks.moveStackRelative(blocks.activeBlock, 4 * STANDARDBLOCKHEIGHT, 0);
-                            blocks.blockMoved(blocks.activeBlock);
-
-                            if (firstConnection != null) {
-                                blocks.blockMoved(firstConnection);
-                                blocks.adjustDocks(firstConnection, true);
-                                if (connectionIdx !== blocks.blockList[firstConnection].connections.length - 1) {
-                                    blocks.clampBlocksToCheck = [[firstConnection, 0]];
-                                    blocks.adjustExpandableClampBlock();
-                                }
-
-                            }
-                        }
-                    }
+                    blocks.extract();
                     break;
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {

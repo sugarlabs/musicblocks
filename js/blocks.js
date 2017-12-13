@@ -221,6 +221,57 @@ function Blocks () {
         return this;
     };
 
+    this.extract = function () {
+        // Remove a single block from within a stack.
+        if (this.activeBlock != null) {
+            var blkObj = this.blockList[this.activeBlock];
+
+            if (blkObj.name !== 'number' && blkObj.name !== 'text') {
+                var firstConnection = blkObj.connections[0];
+                var lastConnection = last(blkObj.connections);
+
+                if (firstConnection != null) {
+                    var connectionIdx = this.blockList[firstConnection].connections.indexOf(this.activeBlock);
+                } else {
+                    var connectionIdx = null;
+                }
+
+                blkObj.connections[0] = null;
+                blkObj.connections[blkObj.connections.length - 1] = null;
+                if (firstConnection != null) {
+                    this.blockList[firstConnection].connections[connectionIdx] = lastConnection;
+                }
+
+                if (lastConnection != null) {
+                    this.blockList[lastConnection].connections[0] = firstConnection;
+                }
+
+                this.moveStackRelative(this.activeBlock, 4 * STANDARDBLOCKHEIGHT, 0);
+                this.blockMoved(this.activeBlock);
+
+                if (firstConnection != null) {
+                    this.blockMoved(firstConnection);
+                    this.adjustDocks(firstConnection, true);
+                    if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
+                        this.clampThisToCheck = [[firstConnection, 0]];
+                        this.adjustExpandableClampBlock();
+                    }
+                }
+            }
+        }
+    };
+
+    this.bottomMostBlock = function () {
+        var maxy = -1000;
+        for (var blk in this.blockList) {
+            if (this.blockList[blk].container.y > maxy) {
+                var maxy = this.blockList[blk].container.y;
+            }
+        }
+
+        return maxy;
+    };
+
     // Toggle state of collapsible blocks.
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
