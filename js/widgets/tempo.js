@@ -31,7 +31,7 @@ function Tempo () {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
         if (this.BPMBlocks[i] != null) {
-            var blockNumber = blocks.blockList[this.BPMBlocks[i]].connections[1];
+            var blockNumber = this._logo.blocks.blockList[this.BPMBlocks[i]].connections[1];
             if (blockNumber != null) {
                 this._logo.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
                 this._logo.blocks.blockList[blockNumber].text.text = this.BPMs[i];
