@@ -198,6 +198,7 @@ define(MYDEFINES, function (compatibility) {
         var utilityButton = null;
         var playbackButton = null;
         var saveButton = null;
+        var deleteAllButton = null;
 
         var helpContainer = null;
         var helpIdx = 0;
@@ -1864,7 +1865,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _deleteBlocksBox() {
-            clearBox.show(turtleBlocksScale);
+	    clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
+            clearBox.show();
         };
 
         function _doUtilityBox() {
@@ -3054,7 +3056,9 @@ handleComplete);
                     saveButton = container;
                 } else if (menuNames[i][0] === 'compile') {
                     playbackButton = container;
-                }
+                } else if (menuNames[i][0] === 'empty-trash') {
+                    deleteAllButton = container;
+		}
 
                 container.visible = false;
             }
