@@ -179,12 +179,16 @@ function Synth() {
     this.samples = null;
 
     this.fetchSample = function(type, name, directory){
+        var xhr;
+        if (window.XMLHttpRequest) {
+            xhr = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            xhr = new ActiveXObject("Microsoft.XMLHTTP");
+        }
         var t = this;
-        fetch(directory).then(function(response){
-            return response.text();
-        }).then(function(data){
-            t.samples[type][name] = data;
-        });
+        xhr.onreadystatechange = function(){t.samples[type][name] = xhr.responseText;};
+        xhr.open("GET",directory); //assuming kgr.bss is plaintext
+        xhr.send();
     }
 
     this.loadSamples = function (){
