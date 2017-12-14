@@ -2903,7 +2903,7 @@ function Logo () {
             }
 
             that.inTempo = true;
-            that.tempo.BPMblocks = [];
+            that.tempo.BPMBlocks = [];
             that.tempo.BPMs = [];
 
             var listenerName = '_tempo_' + turtle;
