@@ -35,7 +35,7 @@
 
 function blockIsMacro (blkname) {
 
-    const BLOCKISMACRO = ['action', 'articulation', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dog', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fourth', 'fourthinterval', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major2', 'major3', 'major6', 'major7', 'matrix', 'matrixgmajor', 'meter', 'mf', 'midi', 'minor2', 'minor3', 'minor6', 'minor7', 'movable', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'octave', 'oneOf', 'osctime', 'p', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'settimbre', 'setscalartransposition', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'third', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'unison', 'unisoninterval', 'vibrato', 'wholeNote'];
+    const BLOCKISMACRO = ['action', 'articulation', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dog', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fourth', 'fourthinterval', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major2', 'major3', 'major6', 'major7', 'matrix', 'matrixgmajor', 'meter', 'mf', 'midi', 'minor2', 'minor3', 'minor6', 'minor7', 'movable', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'octave', 'oneOf', 'osctime', 'p', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setbpm2', 'setdrum', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'setmasterbpm', 'setmasterbpm2', 'settimbre', 'setscalartransposition', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'third', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'unison', 'unisoninterval', 'vibrato', 'wholeNote'];
 
     return BLOCKISMACRO.indexOf(blkname) > -1;
 
@@ -56,6 +56,7 @@ function getMacroExpansion (blkname, x, y) {
     const BACKWARDOBJ = [[0, 'backward', x, y, [null, 1, null]], [1, 'hidden', 0, 0, [0, null]]];
     const BOTTLEOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('bottle')}], 0, 0, [0]]];
     const BPMOBJ = [[0, 'setbpm', x, y, [null, 1, null, 2]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+    const BPMOBJ2 = [[0, 'setbpm2', x, y, [null, 1, 3, 2, 6]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, 'vspace', 0, 0, [0, null]], [3, 'divide', 0, 0, [0, 4, 5]], [4, ['number', {'value': 1}], 0, 0, [3]], [5, ['number', {'value': 4}], 0, 0, [3]], [6, 'hidden', 0, 0, [0, null]]];
     const BUBBLESOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('bubbles')}], 0, 0, [0]]];
     const CATOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('cat')}], 0, 0, [0]]];
     const CHINEOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('chime')}], 0, 0, [0]]];
@@ -182,13 +183,14 @@ function getMacroExpansion (blkname, x, y) {
     const STUPLET7OBJ = [[0, 'stuplet', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 7}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 2}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const SWINGOBJ = [[0, 'swing', x, y, [null, 1, null, 2]], [1, ['number', {'value': 32}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SWITCHOBJ = [[0, 'switch', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'case', 0, 0, [0, 3, null, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, 'defaultcase', 0, 0, [2, null, null]], [5, 'hidden', 0, 0, [0, null]]];
-    const TEMPOOBJ = [[0, 'tempo', x, y, [null, 1, 3]], [1, 'setmasterbpm', 0, 0, [0, 2, null]], [2, ['number', {'value': 90}], 0, 0, [1]], [3, 'hiddennoflow', 0, 0, [0, null]]];
+    const TEMPOOBJ = [[0, 'tempo', x, y, [null, 1, 6]], [1, 'setmasterbpm2', 0, 0, [0, 2, 3, null]], [2, ['number', {'value': 90}], 0, 0, [1]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1}], 0, 0, [3]], [5, ['number', {'value': 4}], 0, 0, [3]], [6, 'hiddennoflow', 0, 0, [0, null]]];
+    const TEMPOOBJ2 = [[0, 'setmasterbpm2', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const THIRDOBJ = [[0, 'setscalartransposition', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 2}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, 'modelength', 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const THIRDINTERVALOBJ = [[0, 'interval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 2}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, 'modelength', 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const THIRTYSECONDOBJ = [[0, 'rhythm2', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 32}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const TIEOBJ = [[0, 'tie', x, y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
     const TIMBREOBJ = [[0, ['timbre', {'collapsed': false}], x, y, [null, 1, null, 2]], [1, ['text', {'value': _('custom')}], 0, 0, [0]], [2, 'hiddennoflow', 0, 0, [0, null]]];
-        const TOMOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('tom tom')}], 0, 0, [0]]];
+    const TOMOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('tom tom')}], 0, 0, [0]]];
     const TONEOBJ = [[0, 'drift', x, y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'hertz', 0, 0, [2, 7, null]], [7, ['number', {'value': 392}], 0, 0, [6]]];
     const TRIANGLE1OBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('triangle bell')}], 0, 0, [0]]];
     const TRIANGLEOBJ = [[0, 'newnote', x, y, [null, 1, 4, 7]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'triangle', 0, 0, [4, 6, null]], [6, ['number', {'value': 392}], 0, 0, [5]], [7, 'hidden', 0, 0, [0, null]]];
@@ -327,6 +329,7 @@ function getMacroExpansion (blkname, x, y) {
         'secondinterval': SECONDINTERVALOBJ,
         'semitoneinterval': SEMITONEINTERVALOBJ,
         'setbpm': BPMOBJ,
+        'setbpm2': BPMOBJ2,
         'setdrum': SETDRUMOBJ,
         'setkey2': SETKEYOBJ,
         'setnotevolume2': VOLOBJ,
@@ -357,6 +360,7 @@ function getMacroExpansion (blkname, x, y) {
         'stuplet7': STUPLET7OBJ,
         'swing': SWINGOBJ,
         'switch': SWITCHOBJ,
+        'setmasterbpm2': TEMPOOBJ2,
         'tempo': TEMPOOBJ,
         'third': THIRDOBJ,
         'thirdinterval': THIRDINTERVALOBJ,

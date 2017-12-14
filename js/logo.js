@@ -2819,54 +2819,7 @@ function Logo () {
                 saveAbcOutput(that, args[0]);
             }
             break;
-        case 'setmasterbpm':
-            if (args.length === 1 && typeof(args[0] === 'number')) {
-                if (args[0] < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'))
-                    that._masterBPM = 30;
-                } else if (args[0] > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'))
-                    that._masterBPM = 1000;
-                } else {
-                    that._masterBPM = args[0];
-                }
 
-                that.defaultBPMFactor = TONEBPM / that._masterBPM;
-            }
-
-            if (that.inTempo) {
-                that.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
-                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
-            }
-            break;
-        case 'setbpm':
-            if (args.length === 2 && typeof(args[0] === 'number')) {
-                if (args[0] < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'))
-                    var bpm = 30;
-                } else if (args[0] > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'))
-                    var bpm = 1000;
-                } else {
-                    var bpm = args[0];
-                }
-
-                that.bpm[turtle].push(bpm);
-
-                childFlow = args[1];
-                childFlowCount = 1;
-
-                var listenerName = '_bpm_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __listener = function (event) {
-                    that.bpm[turtle].pop();
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-            }
-            break;
         // Deprecated
         case 'setkey':
             if (args.length === 1) {
@@ -2950,7 +2903,7 @@ function Logo () {
             }
 
             that.inTempo = true;
-            that.tempo.BPMblocks = [];
+            that.tempo.BPMBlocks = [];
             that.tempo.BPMs = [];
 
             var listenerName = '_tempo_' + turtle;
@@ -3093,6 +3046,104 @@ function Logo () {
             }
 
             that._setListener(turtle, listenerName, __listener);
+            break;
+        // Deprecated
+        case 'setmasterbpm':
+          if (args.length === 1 && typeof(args[0] === 'number')) {
+              if (args[0] < 30) {
+                  that.errorMsg(_('Beats per minute must be > 30.'))
+                  that._masterBPM = 30;
+              } else if (args[0] > 1000) {
+                  that.errorMsg(_('Maximum beats per minute is 1000.'))
+                  that._masterBPM = 1000;
+              } else {
+                  that._masterBPM = args[0];
+              }
+
+              that.defaultBPMFactor = TONEBPM / that._masterBPM;
+          }
+
+          if (that.inTempo) {
+              that.tempo.BPMBlocks.push(blk);
+              var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+              that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
+          }
+          break;
+        // Deprecated
+        case 'setbpm':
+            if (args.length === 2 && typeof(args[0] === 'number')) {
+                if (args[0] < 30) {
+                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    var bpm = 30;
+                } else if (args[0] > 1000) {
+                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    var bpm = 1000;
+                } else {
+                    var bpm = args[0];
+                }
+
+                that.bpm[turtle].push(bpm);
+
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_bpm_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.bpm[turtle].pop();
+                };
+
+                that._setListener(turtle, listenerName, __listener);
+            }
+            break;
+        case 'setmasterbpm2':
+            if (args.length === 2 && typeof(args[0] === 'number') && typeof(args[1] === 'number')) {
+                var bpm  = args[0] * args[1] / 0.25
+                if (bpm < 30) {
+                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    that._masterBPM = 30;
+                } else if (bpm > 1000) {
+                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    that._masterBPM = 1000;
+                } else {
+                    that._masterBPM = bpm;
+                }
+
+                that.defaultBPMFactor = TONEBPM / that._masterBPM;
+            }
+
+            if (that.inTempo) {
+                that.tempo.BPMBlocks.push(blk);
+                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
+            }
+            break;
+        case 'setbpm2':
+            if (args.length === 3 && typeof(args[0] === 'number' && typeof(args[1] == 'number'))) {
+                var bpm  = args[0] * args[1] / 0.25
+                if (args[0] < 30) {
+                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    var bpm = 30;
+                } else if (args[0] > 1000) {
+                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    bpm = 1000;
+                }
+
+                that.bpm[turtle].push(bpm);
+
+                childFlow = args[2];
+                childFlowCount = 1;
+
+                var listenerName = '_bpm_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.bpm[turtle].pop();
+                };
+
+                that._setListener(turtle, listenerName, __listener);
+            }
             break;
         case 'status':
             if (that.statusMatrix == null) {

@@ -834,22 +834,48 @@ function initBasicProtoBlocks(palettes, blocks) {
     newswingBlock.defaults.push(1 / 24);
     newswingBlock.defaults.push(1 / 8);
 
+    var setMasterBPMBlock2 = new ProtoBlock('setmasterbpm2');
+    setMasterBPMBlock2.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['setmasterbpm2'] = setMasterBPMBlock2;
+    //.TRANS: sets tempo by defniing a beat and beats per minute
+    setMasterBPMBlock2.staticLabels.push(_('master beats per minute'));
+    setMasterBPMBlock2.staticLabels.push(_('bpm'), _('beat value'));
+    setMasterBPMBlock2.extraWidth = 15;
+    setMasterBPMBlock2.adjustWidthToLabel();
+    setMasterBPMBlock2.defaults.push(90);
+    setMasterBPMBlock2.defaults.push(1 / 4);
+    setMasterBPMBlock2.twoArgBlock();
+
     var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
     setMasterBPMBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['setmasterbpm'] = setMasterBPMBlock;
-    //.TRANS: master beats per minute controls BPM for all mice
+    //.TRANS: old block to set master tempo which doesn't set value of beat
     setMasterBPMBlock.staticLabels.push(_('master beats per minute'));
     setMasterBPMBlock.adjustWidthToLabel();
     setMasterBPMBlock.oneArgBlock();
     setMasterBPMBlock.defaults.push(90);
+    setMasterBPMBlock.hidden = true;
+
+    var setbpmBlock2 = new ProtoBlock('setbpm2');
+    setbpmBlock2.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['setbpm2'] = setbpmBlock2;
+    // .TRANS: sets tempo for notes contained in block
+    setbpmBlock2.staticLabels.push(_('beats per minute'));
+    setbpmBlock2.staticLabels.push(_('bpm'), _('beat value'));
+    setbpmBlock2.adjustWidthToLabel();
+    setbpmBlock2.flowClampTwoArgBlock();
+    setbpmBlock2.defaults.push(90);
+    setbpmBlock2.defaults.push(1 / 4);
 
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
+    // .TRANS: old block to set tempo using only bpm for notes contained in block
     setbpmBlock.staticLabels.push(_('beats per minute'));
     setbpmBlock.adjustWidthToLabel();
     setbpmBlock.flowClampOneArgBlock();
     setbpmBlock.defaults.push(90);
+    setbpmBlock.hidden = true;
 
     var backwardBlock = new ProtoBlock('backward');
     backwardBlock.palette = palettes.dict['rhythm'];
