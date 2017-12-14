@@ -1997,6 +1997,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doOpenSamples() {
+	    hideSearchWidget();
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 localStorage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
                 localStorage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
