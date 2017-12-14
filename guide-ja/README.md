@@ -294,31 +294,23 @@ note.
 
 #### <a name= "絶対音程"></a>絶対音程
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg "Using absolute intervals")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg "Using 絶対音程")
 
-The *Augmented* block calculates an absolute interval, e.g., an
-augmented fifth, and adds the additional ピッチ to a note. Similarly,
-the *Minor* block calculates an absolute interval, e.g., a minor
-third. Other absolute intervals include *Perfect*, *Diminished*, and
-*Major*.
+*増*ブロックが絶対音程を計算します。例えば、「像5程度」(<===check this!!) はインプットのピッチふぁら像5程度のピッチの音符をインプットのピッチと一緒に鳴らします。 同様に、*短*のブロックはインプットのピッチから絶対の音程を計算して一緒に鳴らします。例えば、*短*のブロックを使えばインプットのピッチから*短*のピッチも一緒に鳴らします。他の絶対音程のブロックは*完全*のも、*減*のも、*長*のもあります。
 
-In the augmented fifth example above, a 和音 of D5 and A5 are played,
-followed by a 和音 of E5 and C5. In the minor third example, which
-includes a shift of one octave, first a 和音 of D5 and F5 is played,
-followed by 和音 of E5 and G6.
+上の像５音程の例で二つの音符のインプットから四つの音符が鳴らして、D_55とA_5和音の音符も一緒に鳴らします。その後、E_5とC_5のピッチの音符も和音として鳴らします。短3音程の例にはオクターヴの転化ともまず、D_5とF_5の音符が鳴らして、次にE_5とG_6の和音が鳴らします。
+
+(how to say double stop?? Also correct in English. A chord is usually 3 notes or more)
 
 #### <a name= "転回"></a>3.2.11 音符転回
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "転回")
 
-The *Invert* block will invert a series of notes around a target
-note. There are two different 音階とモード of the *Invert* block: *odd*
-and *even*, the latter shifts the point of rotation up by a `1/4`
-step, enabling rotation around a point between two notes.
+*転回*のブロックはmelodyの音程的にそのインプットの音符のピッチを転回します。*転回*ブロックで二つの種類があります。*奇数*が選ばれていると転回ブロックのピッチのインプットの回りで転回します。*偶数*が選ばれていると転回ブロックのピッチのインプットから半音の半分上のピッチからを回して転回します。
 
-In the *invert (even)* example, `D4` is inverted around `G4`,
-resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
-around a point midway between `G4` and `G♯4` resulting in a `C♯5`
+(take another look at English as well -- we should have a picture/chart for this as well)
+
+上の*転回 (偶数)*の例で、`G_4`を回して転回して`D4`のピッチのインプットが入っていて`G_4`のピッチが結果で鳴らします。 上の*転回 (奇数)*の例で`D_4`のピッチが`G4`と`G♯4`の真ん中のピッチの回りで転回されて`C♯_5`のピッチの結果が出ます。
 
 #### <a name="逆に"></a>3.2.12 逆に
 
@@ -347,7 +339,7 @@ contained blocks, e.g., violin or cello.
 
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `レ`, `Mi`, to note names, e.g., `C`,
-`D`, `E`, when in C Major. 音階とモード include Major and Minor, Chromatic,
+`D`, `E`, when in C Major. 音階とモード include 長 and 短, Chromatic,
 and a number of more exotic 音階とモード, such as Bebop, Geez, Maqam, etc. 
 This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular ピッチ changes
@@ -770,10 +762,10 @@ Musical 音階とモード are used to specify the relationship between [interva
 per octave, 音階とモード speficy how many half steps there are between each
 note in a scale.
 
-By default, ミュージック・ブロックス uses the *Major* mode, which, in the [Key](#音色と調の設定) of
-C, maps to the white keys on a piano. The intervals in the *Major*
+By default, ミュージック・ブロックス uses the *長* mode, which, in the [Key](#音色と調の設定) of
+C, maps to the white keys on a piano. The intervals in the *長*
 mode are `2, 2, 1, 2, 2, 2, 1`. Many other common 音階とモード are
-built into ミュージック・ブロックス, including, of course, *Minor* mode, which
+built into ミュージック・ブロックス, including, of course, *短音階* (<===check this) mode, which
 uses `2, 1, 2, 2, 1, 2, 2` as its intervals.
 
 Note that not every mode uses 7 intervals per octave. For example, the
@@ -815,7 +807,7 @@ right are:
 *Rotate clockwise*, which will rotate the mode clockwise (See the
  example below);
 
-*Invert*, which will invert the mode (See the example below);
+*転回*, which will 転回 the mode (See the example below);
 
 *Undo*, which will restore the mode to the previous version; and
 
@@ -838,7 +830,7 @@ counter-clockwise, transforming it into *Locrian*.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode5.svg "creating Phrygian mode")
 
-In the above example, the *Major* mode has been inverted, transforming
+In the above example, the *Major* mode has been 転回ed, transforming
 it into *Phrygian*.
 
 Note: The build-in 音階とモード in ミュージック・ブロックス can be found in [musicutils.js](https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
