@@ -11,7 +11,8 @@ requirejs.config({
         activity: "../js",
         easel: "../lib/easeljs",
         twewn: "../lib/tweenjs",
-        prefixfree: "../bower_components/prefixfree/prefixfree.min"
+        prefixfree: "../bower_components/prefixfree/prefixfree.min",
+        samples: "../sounds/samples"
     },
     packages: []
 });
