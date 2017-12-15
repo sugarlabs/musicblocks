@@ -445,37 +445,38 @@ In the above example, the sequence of [ドラム](#ドラム) beats is increased
 *拍子に何々をする動作*ブロックと*弱拍に何々をする動作*ブロックでそれぞれの拍子に行う動作を指定することができます。(Note that the action is run before any blocks
 inside the note block associated with the 拍子 are run.)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "using 拍子 to synchronize グラフィックス")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "拍子ブロックでグラフィックスを音楽と合わせる方法")
 
-Another approach to グラフィックス is to use modulate them based on the
-拍子. In the exxample above, we call the same グラフィックス action for each
+Another approach to グラフィックスとのもう一つの使い方が拍子でそのグラフィックスを転化(Modulate)することです。. In the exxample above, we call the same グラフィックス action for each
 note, but the parameters associated with the action, such as pen
 width, are dependent upon which 拍子 we are on. On 泊 1, the pen
 size is set to 50 and the 音量 to 75. On 泊 3, the pen size is set
 to 25 and the 音量 to 50. On off 拍子s, the pen size is set to 5 and
 the volumne to 5. The resultant graphic is shown below.
 
+(spelling error in English--"exxample")
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "グラフィックス modulated by 拍子")
 
 ### <a name="相互作用"></a>3.6 相互作用
 
-There are many ways to interactive with ミュージック・ブロックス, including
-tracking the mouse position to impact some aspect of the music.
+ミュージック・ブロックスでいろんな相互のコードの仕方があります。例えば他のネズミの動作を聞いて反応することもできます。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg "interactions")
+(grammar error in English)
 
-For example, we can launch the phrases (チャンク) interactively. When
-the mouse is in the lower-left quadrant, `チャンク` is played;
-lower-right quadrant, `チャンク1`; upper-left quadrant, `チャンク2`; and
-upper-right quadrant, `チャンク3`.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg "相互のコード")
+
+上の例の用にチャンクに入っているmelodyが相互的に再生できます。マウスのカーソルが左下の四分円に入ると`チャンク`が再生し、右下の四分円に入ると`チャンク1`が再生し、左上に入ると`チャンク2`が再生し、右上の四分円に入ると`チャンク3`が再生します。
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg "creation of a two-key piano")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg "二つのキーのピアノの創作")
 
-In the example above, a simple two-key piano is created by associating
-*click* events on two different turtles with individual notes. Can you
+上の例で二つのキーのピアノが創作されています。In the example above, a simple two-key piano is created by associating
+それぞれの音符が*クリック*イベントを二つのネズミスプライトに分けます。 events on two different turtles with individual notes. Can you
 make an 8-key piano?
+
+("Turtles" again)
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb)
 
@@ -526,7 +527,7 @@ Using the ピッチ・タイム行列, it is possible to generate チャンク o
 ミュージック・ブロックス provides a widget, the *ピッチ・タイム行列*, as a scaffold
 for getting started.
 
-Once you've launched ミュージック・ブロックス in your browser, start by clicking
+Once you've launched ミュージック・ブロックス in your browser, start by クリックing
 on the *ピッチ・タイム行列* stack that appears in the middle of the
 screen. (For the moment, ignore the *スタート* block.) You'll see a grid
 organized vertically by ピッチ and horizontally by リズム.
@@ -547,21 +548,21 @@ notes.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg "matrix")
 
-By clicking on individual cells in the grid, you should hear
-individual notes (or 和音s if you click on more than one cell in a
+By クリックing on individual cells in the grid, you should hear
+individual notes (or 和音s if you クリック on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `レ 4`, followed by `ミ 4`, followed by `ソ 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg "play button")
 
-If you click on the *Play* button (found in the top row of the grid),
+If you クリック on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `レ 4`,
 `ミ 4`, `ソ 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg "save button")
 
 
-Once you have a group of notes (a "チャンク") that you like, click on the
+Once you have a group of notes (a "チャンク") that you like, クリック on the
 *Save* button (just to the right of the *Play* button). This will
 create a stack of blocks that can used to play these same notes
 programmatically. (More on that below.)
@@ -578,7 +579,7 @@ to lowest and eliminate any 重に *ピッチ* blocks.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg "close button")
 
 
-You can hide the matrix by clicking on the *Close* button (the right-most
+You can hide the matrix by クリックing on the *Close* button (the right-most
 button in the top row of the grid.)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg "erase button")
@@ -595,11 +596,11 @@ the matrix to corresponds to that チャンク.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "usage of octave for a ピッチ")
 
-The チャンク created when you click on the matrix is a stack of
+The チャンク created when you クリック on the matrix is a stack of
 blocks. The blocks are nested: an *動作* block contains three *Note
 value* blocks, each of which contains a *ピッチ* block. The *動作*
 block has a name automatically generated by the matrix, in this case,
-チャンク. (You can rename the action by clicking on the name.). Each note
+チャンク. (You can rename the action by クリックing on the name.). Each note
 has a duration (in this case 4, which represents a quarter note). Try
 putting different numbers in and see (hear) what happens. Each note
 block also has a ピッチ block (if it were a 和音, there would be
@@ -608,7 +609,7 @@ multiple *ピッチ* blocks nested inside the Note block's clamp). Each
 octave; in this example, the octave is 4 for each ピッチ. (Try changing
 the ピッチ names and the ピッチ octaves.)
 
-To play the chuck, simply click on the action block (on the word
+To play the chuck, simply クリック on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.
 
 #### <a name="リズムのブロック"></a>4.2.2 リズムのブロック
@@ -698,26 +699,26 @@ the initial subdivision of each rhythm ruler.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg "rhythm ruler")
 
-When the *Rhythm Ruler* block is clicked, the *Rhythm Ruler* widget is
+When the *Rhythm Ruler* block is クリックed, the *Rhythm Ruler* widget is
 opened. It contains a row for each リズム ruler. An input in the top
 row of the widget is used to specify how many subdivisions will be
-created within a cell when it is clicked. By default, 2 subdivisions
+created within a cell when it is クリックed. By default, 2 subdivisions
 are created.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg "usage of rhythm ruler")
 
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
-three third-notes. Clicking on the *Play* button to the left of each row
+three third-notes. クリックing on the *Play* button to the left of each row
 will playback the リズム using a ドラム for each 拍子. The *Play-all*
 button on the upper-left of the widget will play back all リズム・ブロック
 simultaneously.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg "divide cells in rhythm ruler")
 
-The リズム can be further subdivided by clicking in individual
+The リズム can be further subdivided by クリックing in individual
 cells. In the example above, two quarter-notes have been created by
-clicking on one of the half-notes.
+クリックing on one of the half-notes.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "タイ cells in rhythm ruler")
 
@@ -796,7 +797,7 @@ right are:
 
 *Close*, which will close the widget.
 
-You can also click on individual notes to activate or deactivate them.
+You can also クリック on individual notes to activate or deactivate them.
 
 Note that the mode inside the *Custom mode* block is updated whenever
 the mode is changed inside the widget.
@@ -856,7 +857,7 @@ one pitch is defined and it have default note "la" and octave "3".
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg "ピッチ・スライダーで何のピッチでも発見")
 
-When *Pitch Staircase* block is clicked, the *Pitch Staircase* widget is
+When *Pitch Staircase* block is クリックed, the *Pitch Staircase* widget is
 initialized. The widget contains row for every *ピッチ* block contained
 in the clamp of the *Pitch Staircase* block. The input fields in the top
 row of the widget specify the musical proportions used to create new
@@ -870,7 +871,7 @@ is 3:2.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase3.svg "notes associated with the step in the ピッチの階段")
 
-Clicking on the *Play* button to the left of each row will playback
+クリックing on the *Play* button to the left of each row will playback
 the notes associated with that step in the ピッチの階段. The *Play-all*
 button on the upper-left of the widget will play back all the pitch
 steps simultaneously. A second *Play-all* button to the right of the
@@ -901,7 +902,7 @@ for an ocatve.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg "ピッチ・スライダー")
 
-When the *ピッチ・スライダー* block is clicked, the *ピッチ・スライダー* widget is
+When the *ピッチ・スライダー* block is クリックed, the *ピッチ・スライダー* widget is
 initialized. The widget will have one column for each *Sine* block in
 the clamp. Every column has a slider that can be used to move up or
 down in frequency, continuously or in intervals of 1/12th of the
@@ -913,7 +914,7 @@ or between columns.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg "ピッチ・スライダー")
 
-Clicking in a column will extact the corresponding *Note* blocks, for example:
+クリックing in a column will extact the corresponding *Note* blocks, for example:
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg "ピッチ・スライダー")
 
@@ -925,7 +926,7 @@ Clicking in a column will extact the corresponding *Note* blocks, for example:
 
 The *テンポ* block is used to launch a widget that enables the user to
 visualize テンポ, defined in 拍子s per minute (BPM). When the *テンポ* block
-is clicked, the *テンポ* widget is initialized.
+is クリックed, the *テンポ* widget is initialized.
 
 The *Master 泊s per Minute* block contained in the clamp of the
 *テンポ* block sets the initial テンポ used by the widget. This
@@ -941,9 +942,9 @@ up* and *Slow down* buttons, and an input field for updating the
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg "テンポを変えること")
 
-You can also update the テンポ by clicking twice in spaced succession in the
-widget: the new BPM is determined as the time between the two clicks. For
-example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.
+You can also update the テンポ by クリックing twice in spaced succession in the
+widget: the new BPM is determined as the time between the two クリックs. For
+example, if there is 1/2 seconds between クリックs, the new BPM will be set as 120.
 
 ## <a name="ミュージック・ブロックスから以遠"></a>ミュージック・ブロックスから以遠
 
