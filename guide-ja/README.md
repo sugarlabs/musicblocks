@@ -32,7 +32,7 @@
       14. [ビブラート](#ビブラート)
    3. [声部](#声部)
    4. [グラフィックス](#グラフィックス)
-   5. [泊](#泊)
+   5. [拍子](#拍子)
    6. [相互作用](#相互作用)
  4. [ウィジェット](#ウィジェット)
     1. [ステータス・モニター](#ステータス)
@@ -318,7 +318,7 @@ note.
 
 *逆に再生*ブロックは入られている音符ブロックをすべて逆に再生します。上の例に In the example above, the notes in *チャンク*に入っている音符が`ソ`, `シ`, `ラ`, `ソ`の順番で再生します(下から上のように逆に再生します)。
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
+[ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
 
 *逆に再生*ブロックの中に入っているのすべてのブロックが逆に再生するので、論理のブロック(「もし」、「なら」、「でなければ」のそれぞれのブロック)を使う場合は注意！には気をつけってください。
 
@@ -390,85 +390,72 @@ In the above example, the sequence of [ドラム](#ドラム) beats is increased
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "バス・ドラムの使う方法")
 
-A special "ドラム" version of the *スタート* block is available for laying
-down a ドラム track. Any *ピッチ* blocks encounted while starting from a
-ドラム will be played as `C2` with the default ドラム sample. In the
-example above, all of the notes in `チャンク` will be played with a kick
-ドラム.
+ドラムのトラックを作るため、"ドラム"の特別な*スタート*ブロックがあります。ドラム・スタートに入っている、せべての*ピッチ*ブロックが、ドラムに変えて打ち鳴らします・`C2`がドラムのデフォルトです。(<== I do not understand what is meant by default sample.)上の例に`チャンク`の中に入ってるピッチがバス・ドラムの音として打ち鳴らします。
 
-### <a name="グラフィックス"></a>3.4 Adding graphics
+### <a name="グラフィックス"></a>3.4 グラフィックスと一緒に
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg "adding graphics")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg "adding グラフィックス")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.svg "color range")
 
-Turtle graphics can be combined with the music blocks. By placing
-graphics blocks, e.g., *Forward* and *Right*, inside of *音価*
-blocks, the graphics stay in sync with the music. In this example, the
-turtle moves forward each time a quarter note is played. It turns
-right during the eighth note. The ピッチ is raised by one half step,
-the pen size decreases, and the pen color increases at each step in
-the inner 回繰り返す loop.
+ネズミ・グラフィックス(もともとタートル・グラフィックス)は音楽と一緒に組み合わせることができます。 ネズミのパレットからのグラフィックスブロックス(*前*と*後ろ*のブロック)を*音価*ブロックの間に入れるとグラフィックスの動きが音楽と同時にします。
+
+この例でネズミのスプライトが4分音価ずつ、音符が鳴らすと同時に前に動きます。それから8分音価の音符と一緒、右に向かって回ります。
+
+*回繰り返す*の回数で、ピッチが半音で高く転化して、ペンの大きさが少し大きくなります。
 
 [ライブで再生](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_graphicsexample.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg "synchronizing graphics and music")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg "グラフィックスと音楽の合わせる方法")
 
-Another example of graphics synchronized to the music by placing the
-graphics commands inside of *音価* blocks
+グラフィックスと音楽が一緒に合わせるため、もう一つのやり方がグラフィックスのコードを*音価*ブロックに入れるとその音価の期間で動作が行います。
+
+ネズミのスプライトがダンスのように動くんでしょう。(added a comment that it is "dance-like"; need to change instances of turtle to mouse in English version) 
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg "usage of No-clock block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg "「クロックなし」ブロックの使い方")
 
-In this example, because the computation and graphics are more
-complex, a *No-clock* block is used to decouple the graphics from the
-master clock. The "No-clock* block prioritizes the sequence of
-actions over the specified rhythm.
+上の例に、グラフィックスとと音楽のコンピュータの操作がもと複雑の訳で音楽のタイミングをずらさないため、*クロックなし*ブロックがグラフィックスと音楽の動きを区別します。"クロックなし*ブロックはそれぞれの動作の順番をリズムより優先します。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "リズム sequence")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "リズムの連続")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree-example.svg "another example of the No-clock block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree-example.svg "「クロックなし」ブロックともう一つの例")
 
-Another example of embedding graphics into notes: in case, a recursive
-tree drawing, where the ピッチ goes up as the branches assend.
+グラフィックスを音符に入れるのもう一つの例です。木の形をリズムに合わせてグラフィックスをネズミさんが書きます。木の枝、上ほど、ネズミが動くとピッチの高音も高くなります。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree.svg "tree graphic")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree.svg "木のグラフィック")
 
 [ライブで再生](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_musicaltree.tb)
 
-### <a name="泊"></a>3.5 泊
+### <a name="拍子"></a>3.5 拍子
 
-The beat of the music is determined by the *Meter* block (by default,
-it is set to 4:4).
+拍子ブロックで音楽のビートを決めます。拍子ブロックは*拍子記号*ブロックと一緒に使ってデフォルトが4/4です。
 
-The *Pickup* block can be used to accommodate any notes that come in
-before the beat.
+*弱起*ブロックが初めの全拍子記号の前の拍子音価を決めるためです。弱起と言うのは「ピッカップ」とも読んでいます。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat1.svg "meter and pickup")
+(Need better definition for pickup in English version)
 
-Specifying beat is useful in that you can have the character of a note
-vary depending upon the beat. In the example below, the 音量 of
-notes on 泊 1 and 泊 3 are increased, while the 音量 of off
-beats is decreased.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat1.svg "拍子記号と弱起のブロックの使い方")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat2.svg "on-beat-do")
+拍子を指定するの役に立つ時があります。例えば、下の例で音符の音量が1と3の拍子に増して、それぞれ残りの(弱)拍子の音量が小さくします。
 
-The *On-泊-Do* and *Off-泊-Do* blocks let you specify actions to
-take on specific beats. (Note that the action is run before any blocks
-inside the note block associated with the beat are run.)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat2.svg "on-拍子-do")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "using beat to synchronize graphics")
+*拍子に何々をする動作*ブロックと*弱拍に何々をする動作*ブロックでそれぞれの拍子に行う動作を指定することができます。(Note that the action is run before any blocks
+inside the note block associated with the 拍子 are run.)
 
-Another approach to graphics is to use modulate them based on the
-beat. In the exxample above, we call the same graphics action for each
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "using 拍子 to synchronize グラフィックス")
+
+Another approach to グラフィックス is to use modulate them based on the
+拍子. In the exxample above, we call the same グラフィックス action for each
 note, but the parameters associated with the action, such as pen
-width, are dependent upon which beat we are on. On 泊 1, the pen
+width, are dependent upon which 拍子 we are on. On 泊 1, the pen
 size is set to 50 and the 音量 to 75. On 泊 3, the pen size is set
-to 25 and the 音量 to 50. On off beats, the pen size is set to 5 and
+to 25 and the 音量 to 50. On off 拍子s, the pen size is set to 5 and
 the volumne to 5. The resultant graphic is shown below.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "graphics modulated by beat")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "グラフィックス modulated by 拍子")
 
 ### <a name="相互作用"></a>3.6 相互作用
 
@@ -722,7 +709,7 @@ are created.
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
 three third-notes. Clicking on the *Play* button to the left of each row
-will playback the リズム using a ドラム for each beat. The *Play-all*
+will playback the リズム using a ドラム for each 拍子. The *Play-all*
 button on the upper-left of the widget will play back all リズム・ブロック
 simultaneously.
 
@@ -937,10 +924,10 @@ Clicking in a column will extact the corresponding *Note* blocks, for example:
 ### <a name="テンポ"></a>4.8 テンポを変えること
 
 The *テンポ* block is used to launch a widget that enables the user to
-visualize テンポ, defined in beats per minute (BPM). When the *テンポ* block
+visualize テンポ, defined in 拍子s per minute (BPM). When the *テンポ* block
 is clicked, the *テンポ* widget is initialized.
 
-The *Master Beats per Minute* block contained in the clamp of the
+The *Master 泊s per Minute* block contained in the clamp of the
 *テンポ* block sets the initial テンポ used by the widget. This
 determines the speed at which the ball in the widget moves back and
 forth. If BPM is 60, then it will take one second for the ball to move

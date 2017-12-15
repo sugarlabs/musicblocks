@@ -2264,8 +2264,9 @@ msgid "on offbeat do"
 msgstr "弱拍に何々を"
 
 #: js/basicblocks.js:1002
+## Need a little context, but I am guessing this is "on *this* beat (do...)
 msgid "on beat"
-msgstr "強拍"
+msgstr "強拍に何々を"
 
 #: js/basicblocks.js:1002
 ## http://musical-grammar.com/time004.html
@@ -2280,9 +2281,9 @@ msgstr "拍子"
 #: js/basicblocks.js:2857
 #: js/basicblocks.js:2864
 #.TRANS: take (do) some action
-## を is particle and する is "to do"; awkward grammar to make the object happen after
+## 動作is action and する is "to do"; taking liberties based on context
 msgid "do"
-msgstr "をするのは"
+msgstr "する動作"
 
 #: js/basicblocks.js:1014
 #.TRANS: count of current measure in meter
