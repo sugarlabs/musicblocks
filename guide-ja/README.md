@@ -350,43 +350,45 @@ In the above example, the sequence of [ドラム](#ドラム) beats is increased
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "ビブラート block")
 
-*ビブラート*ブロックは入られているピッチの高音を早く小さく上げたり下げたりします。The intensity of the variation ranges from 1 to 100 (cents),
-e.g. plus or minus up to one half step. The rate argument determines
-the rate of the variation.
+*ビブラート*ブロックは入られているピッチの高音を早く小さく上げたり下げたりします。「強度」のインプットの数値は1から100(セント)までです。100セントは半音と同じですよ。レートのインプットがそのビブラートされている音符の音価でどのレートで行われます。
+
+(I need to fix the Japanese, but we also need to fix the English as well)
 
 ### <a name="声部"></a>3.3 声部
 
-Each *スタート* block runs as a separate voice in ミュージック・ブロックス. (When
-you click on the 実行 button, all of the *スタート* blocks are run
-concurrently.)
+ミュージック・ブロックスで「再生」のボタンを押すとそれぞれの*スタート*ブロックは格声部のように再生します。(「再生」のボタンを押す時、すべての*スタート*ブロックのコードが同時に再生します。)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg "use of voices")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg "声部の使う方法")
 
-If we put our song into an action...
+この前の例のmelodyをもし、新しい声部とするため別のスタートブロックに入れて…
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg "running the song using multiple スタート blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg "複合的なスタートブロックとしてmelodyを再生")
 
-...we can run it from multiple *スタート* blocks.
+...複合的な*スタート*ブロックで再生ができますよ！
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg "shifting the octaves up and down")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg "オクターヴを上に、下に転化する方法")
 
-It gets more interesting if we shift up and down octaves.
+もしオクターヴを上にか、下にか転化すればもともとおもしろくなりますよ！
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg playing the various voices offset in time")
+(Add to English and Japanese -- It is interesting b/c of the differentiation in sound)
 
-And even more interesting if we bring the various voices offset in time.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg "それぞれの声部を時刻的にずれる方法")
+
+時刻的にそのそれぞれの声部をずれれば最高におもしろいではありませんか？
+
+(mention "round", which I guess in Japanese is "canon")
+
+格声部を同じmelodyをこんな風に時刻的にずれるのは「ラウンド」、また「カノン」と言います。
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices5.svg "イベントで声部の最小時刻を決めるのもう一つのやりかた")
 
-An alternative to use a preprogrammed delay is to use the *Broadcast*
-block to bring in multiple voices. In the example above, after each
-section of the song is played, a new event is broadcasted, bringing in
-a new voice. Note the use of the *Mouse Sync* block. This ensures that
-the multiple voices are synced to the same master clock.
+(what is meant by "preprogrammed delay"? ...oh, I see. Grammar needs improvement.)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick ドラム")
+声部の時刻をずれるためもう一つのやりかたが、*送る*ブロックを使って声部の「最小時刻」をそのブロックが送ります。上の例には、melodyの決められた部分が再生されたら、イベントがそのブロックから送られて格声部ができます。*ネズミを動機*ブロックを使ってすべての声部が同じクロックに合わせって再生します。
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "バス・ドラムの使う方法")
 
 A special "ドラム" version of the *スタート* block is available for laying
 down a ドラム track. Any *ピッチ* blocks encounted while starting from a
