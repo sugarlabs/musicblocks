@@ -2212,7 +2212,7 @@ msgstr "BPM(一分当たりの拍数)のマスター・テンポ"
 #: js/basicblocks.js:858
 #.TRANS: play music backward
 msgid "backward"
-msgstr "逆に弾く"
+msgstr "逆に再生"
 
 #: js/basicblocks.js:866
 #.TRANS: substitute rests on notes being skipped
@@ -3946,7 +3946,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr ""
 
 #~msgid "play backward"
-#~msgstr "逆に演奏"
+#~msgstr "逆に再生"
 
 #: js/turtledefs.js:87
 

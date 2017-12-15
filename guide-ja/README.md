@@ -65,7 +65,7 @@
 2. 音の関係 [前のトピック (1. 初めに)](#初めに) | [目次に戻す](#目次) |
 [次のトピック (3. 音楽でプログラミング)](#音楽でプログラミング)
 
-ミュージック・ブロックスは音楽の基本の色々があります。例えば、[ピッチ](#ピッチ), [リズム](#リズム・ブロック), [音量](#他の転化),[音色と声部](#声部)のツールもあります。
+ミュージック・ブロックスは音楽の基本の色々があります。例えば、[ピッチ](#ピッチ), [リズム](#リズム・ブロック), [音量](#他の転化),[音色とシンセ](#シンセ)のツールもあります。
 
 ### <a name="音価"></a>
 2.1 音価のブロック
@@ -314,40 +314,35 @@ note.
 
 #### <a name="逆に"></a>3.2.12 逆に
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg "Backward block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg "逆に再生 block")
 
-The *Backward* block will play the contained notes in reverse order
-(retrograde). In the example above, the notes in *チャンク* are played as
-`ソ`, `Ti`, `La`, `ソ`, i.e., from the bottom to the top of the
-stack.
+*逆に再生*ブロックは入られている音符ブロックをすべて逆に再生します。上の例に In the example above, the notes in *チャンク*に入っている音符が`ソ`, `シ`, `ラ`, `ソ`の順番で再生します(下から上のように逆に再生します)。
 
-[RUN
-LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
 
-Note that all of the blocks inside a *Backward* block are reverse, so
-use this feature with caution if you include logic intermixed with
-notes.
+*逆に再生*ブロックの中に入っているのすべてのブロックが逆に再生するので、論理のブロック(「もし」、「なら」、「でなければ」のそれぞれのブロック)を使う場合は注意！には気をつけってください。
 
 #### <a name= "音色と調の設定"></a>3.2.13 音色と調の設定
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg "setting voice and keys using Set Voice block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg "シンセと音階/モードを設定するツールが「シンセを設定」パレットにあります")
 
-The *Set Voice* block selects a [voice](#声部) for the synthesizer for any
-contained blocks, e.g., violin or cello.
+(needs to be changed in English version as well: Set synth and set keys has been moved, right???)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg "Set Key block")
+*シンセを設定*ブロックで入られているスタート(声部)の[シンセ](#シンセ)を決めます。例えばバイオリンとチェロの音色のシンセを選ぶことができます。
 
-The *Set Key* block will change the key and mode of the mapping
-between solfege, e.g., `Do`, `レ`, `Mi`, to note names, e.g., `C`,
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg "音階/モードを設定")
+
+The *音階/モードを設定*ブロックは block will change the key and mode of the mapping
+between solfege, e.g., `ド`, `レ`, `ミ`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. 音階とモード include 長 and 短, Chromatic,
 and a number of more exotic 音階とモード, such as Bebop, Geez, Maqam, etc. 
-This block allows users to access "movable Do" within Music
+This block allows users to access "movable ド" within Music
 Blocks, where the mapping of solfege to particular ピッチ changes
 depending on the user's specified tonality.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
 
-In the above example, the sequence of [drum](#ドラム) beats is increased over time.
+In the above example, the sequence of [ドラム](#ドラム) beats is increased over time.
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
 
@@ -355,8 +350,7 @@ In the above example, the sequence of [drum](#ドラム) beats is increased over
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "ビブラート block")
 
-The *ビブラート* Block adds a rapid variation in ピッチ to any contained
-notes. The intensity of the variation ranges from 1 to 100 (cents),
+*ビブラート*ブロックは入られているピッチの高音を早く小さく上げたり下げたりします。The intensity of the variation ranges from 1 to 100 (cents),
 e.g. plus or minus up to one half step. The rate argument determines
 the rate of the variation.
 
@@ -392,13 +386,13 @@ section of the song is played, a new event is broadcasted, bringing in
 a new voice. Note the use of the *Mouse Sync* block. This ensures that
 the multiple voices are synced to the same master clock.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick drum")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick ドラム")
 
-A special "drum" version of the *スタート* block is available for laying
-down a drum track. Any *ピッチ* blocks encounted while starting from a
-drum will be played as `C2` with the default drum sample. In the
+A special "ドラム" version of the *スタート* block is available for laying
+down a ドラム track. Any *ピッチ* blocks encounted while starting from a
+ドラム will be played as `C2` with the default ドラム sample. In the
 example above, all of the notes in `チャンク` will be played with a kick
-drum.
+ドラム.
 
 ### <a name="グラフィックス"></a>3.4 Adding graphics
 
@@ -499,7 +493,7 @@ make an 8-key piano?
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg "adding randomness to your music")
 
 You can also add a bit of randomness to your music. In the top example
-above, the *One-of* block is used to randomly assign either `Do` or
+above, the *One-of* block is used to randomly assign either `ド` or
 `レ` each time the *音価* block is played. In the bottom example
 above, the *One-of* block is used to randomly select between `チャンク1`
 and `チャンク2`.
@@ -567,13 +561,13 @@ notes.
 By clicking on individual cells in the grid, you should hear
 individual notes (or 和音s if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
-cells). First `レ 4`, followed by `Mi 4`, followed by `ソ 4`.
+cells). First `レ 4`, followed by `ミ 4`, followed by `ソ 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg "play button")
 
 If you click on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `レ 4`,
-`Mi 4`, `ソ 4`.
+`ミ 4`, `ソ 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg "save button")
 
@@ -621,7 +615,7 @@ has a duration (in this case 4, which represents a quarter note). Try
 putting different numbers in and see (hear) what happens. Each note
 block also has a ピッチ block (if it were a 和音, there would be
 multiple *ピッチ* blocks nested inside the Note block's clamp). Each
-ピッチ block has a ピッチ name (`レ`, `Mi`, and `ソ`), and a ピッチ
+ピッチ block has a ピッチ name (`レ`, `ミ`, and `ソ`), and a ピッチ
 octave; in this example, the octave is 4 for each ピッチ. (Try changing
 the ピッチ names and the ピッチ octaves.)
 
@@ -726,7 +720,7 @@ are created.
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
 three third-notes. Clicking on the *Play* button to the left of each row
-will playback the リズム using a drum for each beat. The *Play-all*
+will playback the リズム using a ドラム for each beat. The *Play-all*
 button on the upper-left of the widget will play back all リズム・ブロック
 simultaneously.
 
@@ -750,10 +744,10 @@ The *Save stack* button will export リズム stacks.
 These stacks of リズム・ブロック can be used to define rhythmic patterns used
 with the *ピッチ・タイム行列* block.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg "save drum machine button")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg "ドラムループを保存のボタン")
 
-The *Save drum machine* button will export *スタート* stacks that will
-play the リズム・ブロック as drum machines.
+The *ドラムループを保存* button will export *スタート* stacks that will
+play the リズム・ブロック as ドラムループ(既に再生 <=== check this!) machines.
 
 ### <a name="音階とモード"></a>4.4 音楽の音階とモード
 
@@ -844,9 +838,9 @@ can be used inside the *ピッチ・タイム行列* block.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg "ピッチ・ドラム・グラフ")
 
-The *Set ドラム* block is used to map the enclosed pitches into drum
-sounds. ドラム sounds are played in a monopitch using the specified drum
-sample. In the example above, a `kick drum` will be substitued for
+The *Set ドラム* block is used to map the enclosed pitches into ドラム
+sounds. ドラム sounds are played in a monopitch using the specified ドラム
+sample. In the example above, a `kick ドラム` will be substitued for
 each occurance of a `レ` `4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg "ピッチ・ドラム・グラフ 1")
