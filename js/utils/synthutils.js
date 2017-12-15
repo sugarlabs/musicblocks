@@ -68,7 +68,7 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('cow bell'), 'cow bell', 'images/cowbell.svg'],
     //.TRANS: musical instrument
-    [_('triangle bell'), 'trianglebell', 'images/trianglebell.svg'],
+    [_('triangle bell'), 'triangle bell', 'images/trianglebell.svg'],
     //.TRANS: musical instrument
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg'],
     //.TRANS: a musically tuned set of bells
@@ -177,37 +177,27 @@ function Synth() {
     };
 
     this.samples = null;
-
-    this.fetchSample = function(type, name, directory){
-        var xhr;
-        if (window.XMLHttpRequest) {
-            xhr = new XMLHttpRequest();
-        } else if (window.ActiveXObject) {
-            xhr = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        var t = this;
-        xhr.onreadystatechange = function(){t.samples[type][name] = xhr.responseText;};
-        xhr.open("GET",directory); //assuming kgr.bss is plaintext
-        xhr.send();
-    }
+    this.samplesuffix = "_SAMPLE";
 
     this.loadSamples = function (){
         this.samples = {};
         for (var type in SAMPLES_MANIFEST) {
             if (SAMPLES_MANIFEST.hasOwnProperty(type)) {
-                console.log(type);
                 this.samples[type] = {};
                 for (var sample in SAMPLES_MANIFEST[type]){
                     if (SAMPLES_MANIFEST[type].hasOwnProperty(sample)){
-                        var directory = SAMPLES_MANIFEST[type][sample].directory;
+                        var data = eval(SAMPLES_MANIFEST[type][sample].data_name.toUpperCase()+this.samplesuffix);
                         var name = SAMPLES_MANIFEST[type][sample].name;
-                        this.fetchSample(type,name,directory);
+                        this.samples[type][name] = data;
                     }
                 }
             }
         }
     }
-    this.loadSamples();
+    var t = this;
+    require(SOUNDSAMPLESDEFINES, function(){
+        t.loadSamples();
+    });
 
     this.recorder = new Recorder(Tone.Master);
 
