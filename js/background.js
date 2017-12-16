@@ -1,22 +1,23 @@
-chrome.browserAction.onClicked.addListener(function(tab) {
-  window.open(chrome.runtime.getURL("index.html"));
-});
+if (navigator.userAgent.search("Firefox")) {
 
-// Firefox
-browser.browserAction.onClicked.addListener(function(tab) {
-    browser.tabs.update({
+  browser.browserAction.onClicked.addListener(function(tab) {
+      browser.tabs.create({
+          url: "index.html"
+      });
+  });
+
+  browser.runtime.onInstalled.addListener(function (tab) {
+    browser.tabs.create({
         url: "index.html"
     });
-});
-
-
-chrome.runtime.onInstalled.addListener(function (tab) {
-  window.open(chrome.runtime.getURL("index.html"));
-});
-
-//Firefox
-browser.runtime.onInstalled.addListener(function (tab) {
-  browser.tabs.update({
-      url: "index.html"
   });
-});
+}
+else {
+  chrome.browserAction.onClicked.addListener(function(tab) {
+      window.open(chrome.runtime.getURL("index.html"));
+  });
+
+  chrome.runtime.onInstalled.addListener(function (tab) {
+      window.open(chrome.runtime.getURL("index.html"));
+  });
+}
