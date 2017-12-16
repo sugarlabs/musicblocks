@@ -5,18 +5,20 @@
     "author": "Sugar Labs",
     "description": "Learn to program music with snap-together blocks.",
     "icons": {
-	"512": "/activity/activity-icon-color-512.png",
-	"128": "/activity/activity-icon-color-128.png"
+        "512": "/activity/activity-icon-color-512.png",
+      	"128": "/activity/activity-icon-color-128.png"
     },
-    "app": {
-	"background": {
-	    "scripts": ["js/launch.js"]
-	}
+    "background": {
+       "scripts": ["js/background.js"]
     },
+    "web_accessible_resources": [
+        "index.html"
+    ],
     "permissions": [
-	"storage",
-	"unlimitedStorage",
-	"audioCapture",
-	"videoCapture"
-    ]
+      	"storage",
+      	"unlimitedStorage"
+    ],
+    "browser_action": {
+        "default_icon": "/activity/activity-icon-color-128.png"
+    }
 }
