@@ -1,4 +1,4 @@
-if (navigator.userAgent.search("Firefox")) {
+if (navigator.userAgent.search("Firefox") !== -1) {
 
   browser.browserAction.onClicked.addListener(function(tab) {
       browser.tabs.create({
@@ -11,8 +11,9 @@ if (navigator.userAgent.search("Firefox")) {
         url: "index.html"
     });
   });
-}
-else {
+
+} else {
+
   chrome.browserAction.onClicked.addListener(function(tab) {
       window.open(chrome.runtime.getURL("index.html"));
   });
@@ -20,4 +21,5 @@ else {
   chrome.runtime.onInstalled.addListener(function (tab) {
       window.open(chrome.runtime.getURL("index.html"));
   });
+
 }
