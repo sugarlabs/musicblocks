@@ -1496,6 +1496,21 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
+        function __makeNewNote(octave, solf){
+            var newNote = [
+                [0, 'newnote', 300, 300, [null, 1, 4, 8]],
+                [1, 'divide', 0, 0, [0, 2, 3]],
+                [2, ['number', {'value': 1}], 0, 0, [1]],
+                [3, ['number', {'value': 4}], 0, 0, [1]],
+                [4, 'vspace', 0, 0, [0, 5]],
+                [5, 'pitch', 0, 0, [4, 6, 7, null]],
+                [6, ['solfege', {'value': solf}], 0, 0, [5]],
+                [7, ['number', {'value': octave}], 0, 0, [5]],
+                [8, 'hidden', 0, 0, [0, null]]
+            ];
+            blocks.loadNewBlocks(newNote);
+        }
+
         function __keyPressed(event) {
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
                 return;
@@ -1544,6 +1559,15 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
 
+            // Shortcuts for creating new notes
+            const KEYCODE_D = 68; // do
+            const KEYCODE_R = 82; // re
+            const KEYCODE_M = 77; // mi
+            const KEYCODE_F = 70; // fa
+            const KEYCODE_S = 83; // so
+            const KEYCODE_L = 76; // la
+            const KEYCODE_T = 84; // ti
+
             if (event.altKey) {
                 switch (event.keyCode) {
                 case 66: // 'B'
@@ -1569,6 +1593,30 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 }
             } else if (event.ctrlKey) {
+            } else if (event.shiftKey){
+                switch (event.keyCode) {
+                    case KEYCODE_D:
+                        __makeNewNote(5, "do");
+                        break
+                    case KEYCODE_R:
+                        __makeNewNote(5, "re");
+                        break
+                    case KEYCODE_M:
+                        __makeNewNote(5, "mi");
+                        break
+                    case KEYCODE_F:
+                        __makeNewNote(5, "fa");
+                        break
+                    case KEYCODE_S:
+                        __makeNewNote(5, "sol");
+                        break
+                    case KEYCODE_L:
+                        __makeNewNote(5, "la");
+                        break
+                    case KEYCODE_T:
+                        __makeNewNote(5, "ti");
+                        break
+                }
             } else {
                 switch (event.keyCode) {
                 case END:
@@ -1665,6 +1713,28 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }
                     break;
+
+                case KEYCODE_D:
+                    __makeNewNote(4, "do");
+                    break
+                case KEYCODE_R:
+                    __makeNewNote(4, "re");
+                    break
+                case KEYCODE_M:
+                    __makeNewNote(4, "mi");
+                    break
+                case KEYCODE_F:
+                    __makeNewNote(4, "fa");
+                    break
+                case KEYCODE_S:
+                    __makeNewNote(4, "sol");
+                    break
+                case KEYCODE_L:
+                    __makeNewNote(4, "la");
+                    break
+                case KEYCODE_T:
+                    __makeNewNote(4, "ti");
+                    break
                 default:
                     break;
                 }
