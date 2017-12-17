@@ -1565,7 +1565,7 @@ define(MYDEFINES, function (compatibility) {
                     logo.doStopTurtle();
                     break;
                 case 86: // 'V'
-		    blocks.pasteStack();
+                    blocks.pasteStack();
                     break;
                 }
             } else if (event.ctrlKey) {
@@ -1584,7 +1584,8 @@ define(MYDEFINES, function (compatibility) {
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
-                    if (blocks.activeBlock != null) {
+                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
@@ -1598,7 +1599,8 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_DOWN:
-                    if (blocks.activeBlock != null) {
+                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
@@ -1612,7 +1614,8 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_LEFT:
-                    if (blocks.activeBlock != null) {
+                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
@@ -1621,7 +1624,8 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_RIGHT:
-                    if (blocks.activeBlock != null) {
+                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
@@ -1652,7 +1656,8 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 case RETURN:
                     // toggle run
-                    if (docById('search').value.length > 0){
+                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    } else if (docById('search').value.length > 0){
                         doSearch();
                     } else {
                         if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
@@ -1866,7 +1871,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _deleteBlocksBox() {
-	    clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
+            clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
             clearBox.show();
         };
 
@@ -1998,7 +2003,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doOpenSamples() {
-	    hideSearchWidget();
+            hideSearchWidget();
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 localStorage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
@@ -3061,7 +3066,7 @@ handleComplete);
                     playbackButton = container;
                 } else if (menuNames[i][0] === 'empty-trash') {
                     deleteAllButton = container;
-		}
+                }
 
                 container.visible = false;
             }
