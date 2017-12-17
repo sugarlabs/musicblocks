@@ -1437,13 +1437,20 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function hideSearchWidget() {
+            // Hide the jQuery search results widget
+            var obj = docByClass('ui-helper-hidden-accessible');
+            if (obj.length > 0) {
+                obj[0].style.visibility = 'hidden';
+            }
+
             searchWidget.style.visibility = 'hidden';
         };
 
         function showSearchWidget() {
             if (searchWidget.style.visibility === 'visible') {
-                searchWidget.style.visibility = 'hidden';
+                hideSearchWidget();
             } else {
+		docById('searchResults').style.visibility = 'visible';
                 searchWidget.style.visibility = 'visible';
                 searchWidget.style.left = (utilityBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
                 searchWidget.style.top = (utilityBox.getPos()[1] + 10) * turtleBlocksScale + 'px';

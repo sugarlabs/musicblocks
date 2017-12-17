@@ -123,6 +123,11 @@ function HttpRequest (url, loadCallback, userCallback) {
 };
 
 
+function docByClass (classname) {
+    return document.getElementsByClassName(classname);
+};
+
+
 function docByTagName (tag) {
     document.getElementsByTagName(tag);
 };
