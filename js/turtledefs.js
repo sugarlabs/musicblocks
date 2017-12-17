@@ -78,6 +78,7 @@ function createHelpContent() {
         [_('Palette buttons'),
         //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 	 _('This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+        [_('Play music'), _('Click to run the music note by note. Alternatively, you can hit the ENTER or RETURN key.'), 'header-icons/play-button.svg'],
         [_('Run fast'), _('Click the run button to run the project in fast mode.'), 'header-icons/run-button.svg'],
         [_('Run slow'), _('Long press the run button to run the project in slow mode.'), 'header-icons/slow-button.svg'],
         [_('Run music slow'), _('Extra-long press the run button to run the music in slow mode.'), 'header-icons/slow-music-button.svg'],
@@ -94,8 +95,8 @@ function createHelpContent() {
         [_('Load project from files'), _('You can also load projects from the file system.'), 'header-icons/open-button.svg'],
         [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
         [_('Save sheet music'), _('Save your project to as a Lilypond file.'), 'header-icons/lilypond-button.svg'],
-        [_('Copy'), _('To copy a stack to the clipboard, do a long press on the stack.') + ' ' + _('The Paste Button will highlight.'), 'header-icons/paste-button.svg'],
-        [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
+        [_('Copy'), _('To copy a stack to the clipboard, do a long press on the stack. You can also use Alt+C to copy a stack of blocks. ') + ' ' + _('The Paste Button will highlight.'), 'header-icons/paste-button.svg'],
+        [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard. You can also use Alt+P to paste a stack of blocks. '), 'header-icons/paste-disabled-button.svg'],
         [_('Cartesian') + '/' + _('Polar'), _('Show or hide a coordinate grid.'), 'header-icons/Cartesian-polar-button.svg'],
         // [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
         [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
