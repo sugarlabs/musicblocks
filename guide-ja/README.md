@@ -501,12 +501,12 @@ to enhance your experience.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg "ステータス in tabular form")
 
-The *ステータス widget* is a tool for inspecting the ステータス of Music
+*ステータス・ウィジェット*はミュージック・ブロックスの音符と計算との色々の再生されていることの is a tool for inspecting the ステータスを印刷 of Music
 Blocks as it is running. By default, the key, BPM, and 音量 are
 displayed. Also, each note is displayed as it is played. There is one
 row per voice in the ステータス table.
 
-Additional *Print* blocks can be added to the *ステータス* widget to
+Additional *Print* blocks can be added to the *ステータス* ウィジェット to
 display additional music factors, e.g., 重に, transposition,
 skip, [スタッカート](#他の転化), [スラー](#他の転化), and [グラフィックス](#グラフィックス) factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
@@ -524,7 +524,7 @@ Using the ピッチ・タイム行列, it is possible to generate チャンク o
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg "ピッチ・タイム行列")
 
-ミュージック・ブロックス provides a widget, the *ピッチ・タイム行列*, as a scaffold
+ミュージック・ブロックス provides a ウィジェット, the *ピッチ・タイム行列*, as a scaffold
 for getting started.
 
 Once you've launched ミュージック・ブロックス in your browser, start by クリックing
@@ -682,8 +682,8 @@ will expand into *リズム* blocks with the corresponding values.
 
 ### <a name="リズム・ブロック"></a>4.3 リズム・ブロックでリズムを
 
-The *Rhythm Ruler* block is used to launch a widget similar to the
-*ピッチ・タイム行列* block. The widget can be used to generate rhythmic
+The *Rhythm Ruler* block is used to launch a ウィジェット similar to the
+*ピッチ・タイム行列* block. The ウィジェット can be used to generate rhythmic
 patterns.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg "generating リズム・ブロック")
@@ -699,9 +699,9 @@ the initial subdivision of each rhythm ruler.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg "rhythm ruler")
 
-When the *Rhythm Ruler* block is クリックed, the *Rhythm Ruler* widget is
+When the *Rhythm Ruler* block is クリックed, the *Rhythm Ruler* ウィジェット is
 opened. It contains a row for each リズム ruler. An input in the top
-row of the widget is used to specify how many subdivisions will be
+row of the ウィジェット is used to specify how many subdivisions will be
 created within a cell when it is クリックed. By default, 2 subdivisions
 are created.
 
@@ -711,7 +711,7 @@ As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
 three third-notes. クリックing on the *Play* button to the left of each row
 will playback the リズム using a ドラム for each 拍子. The *Play-all*
-button on the upper-left of the widget will play back all リズム・ブロック
+button on the upper-left of the ウィジェット will play back all リズム・ブロック
 simultaneously.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg "divide cells in rhythm ruler")
@@ -758,16 +758,16 @@ Note that not every mode uses 7 intervals per octave. For example, the
 2, 3, 2],`. What is important is that the sum of the intervals
 in an octave is 12 half-steps.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg "mode widget")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg "mode ウィジェット")
 
-The *Mode* widget lets you explore 音階とモード and generate custom
-音階とモード. You invoke the widget with the *Custom mode* block. The mode
+The *Mode* ウィジェット lets you explore 音階とモード and generate custom
+音階とモード. You invoke the ウィジェット with the *Custom mode* block. The mode
 specified in the *Set key* block will be the default mode when the
-widget launches.
+ウィジェット launches.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode2.svg "launching widget with Major mode")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode2.svg "launching ウィジェット with Major mode")
 
-In the above example, the widget has been launched with *Major* mode
+In the above example, the ウィジェット has been launched with *Major* mode
 (the default). Note that the notes included in the mode are indicated by
 the black boxes, which are arrayed in a circular pattern of tweleve
 half-steps to complete the octave.
@@ -776,7 +776,7 @@ Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
 notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
 above `0`).
 
-The widget controls run along the toolbar at the top. From left to
+The ウィジェット controls run along the toolbar at the top. From left to
 right are:
 
 *Play all*, which will play a scale using the current mode;
@@ -795,12 +795,12 @@ right are:
 
 *Undo*, which will restore the mode to the previous version; and
 
-*Close*, which will close the widget.
+*Close*, which will close the ウィジェット.
 
 You can also クリック on individual notes to activate or deactivate them.
 
 Note that the mode inside the *Custom mode* block is updated whenever
-the mode is changed inside the widget.
+the mode is changed inside the ウィジェット.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode3.svg "creating Dorian mode")
 
@@ -847,7 +847,7 @@ drums. The output is a stack of *Set Dum* blocks.
 
 ### <a name="ピッチの階段"></a>4.6 音程の関係のことをピッチの階段ーで発見
 
-The *Pitch Staircase* block is used to launch a widget similar to the
+The *Pitch Staircase* block is used to launch a ウィジェット similar to the
 *ピッチ・タイム行列*, which can be used to generate different pitches
 using a given pitch and musical proportion.
 
@@ -857,10 +857,10 @@ one pitch is defined and it have default note "la" and octave "3".
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg "ピッチ・スライダーで何のピッチでも発見")
 
-When *Pitch Staircase* block is クリックed, the *Pitch Staircase* widget is
-initialized. The widget contains row for every *ピッチ* block contained
+When *Pitch Staircase* block is クリックed, the *Pitch Staircase* ウィジェット is
+initialized. The ウィジェット contains row for every *ピッチ* block contained
 in the clamp of the *Pitch Staircase* block. The input fields in the top
-row of the widget specify the musical proportions used to create new
+row of the ウィジェット specify the musical proportions used to create new
 pitches in the staircase. The inputs correspond to the numerator and
 denominator in the proportion resectively. By default the proportion
 is 3:2.
@@ -873,7 +873,7 @@ is 3:2.
 
 クリックing on the *Play* button to the left of each row will playback
 the notes associated with that step in the ピッチの階段. The *Play-all*
-button on the upper-left of the widget will play back all the pitch
+button on the upper-left of the ウィジェット will play back all the pitch
 steps simultaneously. A second *Play-all* button to the right of the
 stair plays in increasing order of frequency first, then in 
 decreasing order of frequency as well, completing a scale.
@@ -890,8 +890,8 @@ the rows in the matrix.
 
 ### <a name="ピッチ・スライダー"></a>4.7 ピッチ・スライダーで何のピッチでも発見
 
-The *ピッチ・スライダー* block is used to launch a widget that is used to
-generate arbitray pitches. It differs from the *Pitch Staircase* widget in
+The *ピッチ・スライダー* block is used to launch a ウィジェット that is used to
+generate arbitray pitches. It differs from the *Pitch Staircase* ウィジェット in
 that it is used to create frequencies that vary continuously within
 the range of a specified octave.
 
@@ -902,8 +902,8 @@ for an ocatve.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg "ピッチ・スライダー")
 
-When the *ピッチ・スライダー* block is クリックed, the *ピッチ・スライダー* widget is
-initialized. The widget will have one column for each *Sine* block in
+When the *ピッチ・スライダー* block is クリックed, the *ピッチ・スライダー* ウィジェット is
+initialized. The ウィジェット will have one column for each *Sine* block in
 the clamp. Every column has a slider that can be used to move up or
 down in frequency, continuously or in intervals of 1/12th of the
 starting frequency. The mouse is used to move the frequency up and down continuously. Buttons are
@@ -924,26 +924,26 @@ or between columns.
 
 ### <a name="テンポ"></a>4.8 テンポを変えること
 
-The *テンポ* block is used to launch a widget that enables the user to
+The *テンポ* block is used to launch a ウィジェット that enables the user to
 visualize テンポ, defined in 拍子s per minute (BPM). When the *テンポ* block
-is クリックed, the *テンポ* widget is initialized.
+is クリックed, the *テンポ* ウィジェット is initialized.
 
 The *Master 泊s per Minute* block contained in the clamp of the
-*テンポ* block sets the initial テンポ used by the widget. This
-determines the speed at which the ball in the widget moves back and
+*テンポ* block sets the initial テンポ used by the ウィジェット. This
+determines the speed at which the ball in the ウィジェット moves back and
 forth. If BPM is 60, then it will take one second for the ball to move
-across the widget. A round-trip would take two seconds.
+across the ウィジェット. A round-trip would take two seconds.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg "テンポを変えること")
 
-The top row of the widget holds the *Play/pause* button, the *Speed
+The top row of the ウィジェット holds the *Play/pause* button, the *Speed
 up* and *Slow down* buttons, and an input field for updating the
 テンポ.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg "テンポを変えること")
 
 You can also update the テンポ by クリックing twice in spaced succession in the
-widget: the new BPM is determined as the time between the two クリックs. For
+ウィジェット: the new BPM is determined as the time between the two クリックs. For
 example, if there is 1/2 seconds between クリックs, the new BPM will be set as 120.
 
 ## <a name="ミュージック・ブロックスから以遠"></a>ミュージック・ブロックスから以遠
