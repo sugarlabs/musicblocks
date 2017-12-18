@@ -1013,6 +1013,9 @@ function Palette(palettes, name) {
             bitmap.y = that._getDownButtonY();
             __calculateHitArea(bitmap);
             that.fadedDownButton = bitmap;
+
+            that.fadedDownButton.on('click', function (event) {
+            });
         };
 
         function __makeFadedUpIcon(palette, name, bitmap, args) {
@@ -1022,6 +1025,9 @@ function Palette(palettes, name) {
             bitmap.y = that.menuContainer.y + STANDARDBLOCKHEIGHT;
             __calculateHitArea(bitmap);
             that.fadedUpButton = bitmap;
+
+            that.fadedUpButton.on('click', function (event) {
+            });
         };
 
         function __calculateHitArea(bitmap) {
