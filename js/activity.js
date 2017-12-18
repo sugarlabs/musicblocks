@@ -1516,6 +1516,23 @@ define(MYDEFINES, function (compatibility) {
                 [8, 'hidden', 0, 0, [0, null]]
             ];
             blocks.loadNewBlocks(newNote);
+            if (blocks.activeBlock !== null){
+                if (blocks.blockList[blocks.blockList[blocks.activeBlock].connections[0]].name === "newnote"){
+
+                    // Connect the newly created block to the active block
+                    var createdBlock = blocks.blockList.length - 9; // Note block makes nine blocks
+
+                    // Set last connection of active block to the created block
+                    var last = blocks.blockList[blocks.activeBlock].connections.length - 1
+                    blocks.blockList[blocks.activeBlock].connections[last] = createdBlock;
+
+                    // Set first connection of the created block to the active block
+                    blocks.blockList[createdBlock].connections[0] = blocks.activeBlock;
+                    blocks.adjustDocks(blocks.activeBlock, true); // Move docks
+                }
+            }
+            blocks.activeBlock = blocks.blockList.length - 1; // Set new block to active
+
         }
 
         function __keyPressed(event) {
