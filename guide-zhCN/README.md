@@ -68,9 +68,8 @@ For more details on how to use Turtle Blocks, see [Using Turtle
 Blocks
 JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
-## <a name="NOTES"></a>
-2. 发出声音 [上一章 (1. 开始)](#GETTING-STARTED) | [回去目录](#TOC) |
-[下一章 (3. 使用音乐设计程序)](#PROGRAMMING-WITH-MUSIC)
+## <a name="NOTES"></a>2. 发出声音 
+[上一章 (1. 开始)](#GETTING-STARTED) | [回去目录](#TOC) |[下一章 (3. 使用音乐设计程序)](#PROGRAMMING-WITH-MUSIC)
 
 Music Blocks incorporates many common elements of music, such as
 [pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
