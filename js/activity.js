@@ -1505,7 +1505,7 @@ define(MYDEFINES, function (compatibility) {
 
         function __makeNewNote(octave, solf){
             var newNote = [
-                [0, 'newnote', 300, 300, [null, 1, 4, 8]],
+                [0, 'newnote', 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
                 [1, 'divide', 0, 0, [0, 2, 3]],
                 [2, ['number', {'value': 1}], 0, 0, [1]],
                 [3, ['number', {'value': 4}], 0, 0, [1]],
@@ -1515,7 +1515,35 @@ define(MYDEFINES, function (compatibility) {
                 [7, ['number', {'value': octave}], 0, 0, [5]],
                 [8, 'hidden', 0, 0, [0, null]]
             ];
+
             blocks.loadNewBlocks(newNote);
+            if (blocks.activeBlock !== null){
+                // Connect the newly created block to the active block
+                // (if it is a hidden block at the end of a new note
+                // block).
+                var bottom = blocks.findBottomBlock(blocks.activeBlock);
+                console.log(blocks.activeBlock + ' ' + bottom);
+                if (blocks.blockList[bottom].name === 'hidden' && blocks.blockList[blocks.blockList[bottom].connections[0]].name === 'newnote'){
+
+                    // The note block macro creates nine blocks.
+                    var newlyCreatedBlock = blocks.blockList.length - 9;
+
+                    // Set last connection of active block to the
+                    // newly created block.
+                    var lastConnection = blocks.blockList[bottom].connections.length - 1
+                    blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
+
+                    // Set first connection of the newly created block to
+                    // the active block.
+                    blocks.blockList[newlyCreatedBlock].connections[0] = bottom;
+                    // Adjust the dock positions to realign the stack.
+                    blocks.adjustDocks(bottom, true);
+                }
+            }
+
+            // Set new hidden block at the end of the newly created
+            // note block to the active block.
+            blocks.activeBlock = blocks.blockList.length - 1;
         }
 
         function __keyPressed(event) {
