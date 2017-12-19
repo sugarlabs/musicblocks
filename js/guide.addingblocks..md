@@ -10,25 +10,34 @@ All blocks are present in a simple format.
 
 1) define the type of block
   
-  var aBlock = new protoBlock('a');
-  here 'a' can be square,trianglemodename,etc.
-
-  This decides what the block will represent 
-2) define the charcateristic of the block
+   var aBlock = new protoBlock('a');
   
-  aBlock.pallete = palletes.dict['character'];
-  here character can be pitch,tone,rythm,etc.
+   here 'a' can be square,trianglemodename,etc.
 
-3) to use general propeties use the protoblock.js file
-  blocks.protoBlockDict['a'] = aBlock;
-
-4) decide wheteher the block is an internal property or not. If you do not have to display the block use-
+   This decides what the block will represent
    
-  aBlocks.hidden = true;
-  if the block is supposed to be visible , there is no need for this line.
+   
+2)  define the charcateristic of the block
   
-5) define the required properties of the block in the format-
-   aBlock.propety();  
+    aBlock.pallete = palletes.dict['character'];
+    here character can be pitch,tone,rythm,etc.
+
+
+3)  to use general propeties use the protoblock.js file
+    
+    blocks.protoBlockDict['a'] = aBlock;
+
+
+4)  decide wheteher the block is an internal property or not. If you do not have to display the block use-
+   
+     aBlocks.hidden = true;
+     
+     if the block is supposed to be visible , there is no need for this line.
+  
+  
+5)   define the required properties of the block in the format-
+     
+     aBlock.propety();  
 
   
   check the available properties on  [protoblock.js](https://github.com/walterbender/turtleblocksjs/blob/master/js/protoblocks.js)
