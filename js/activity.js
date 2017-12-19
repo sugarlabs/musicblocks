@@ -1609,7 +1609,7 @@ define(MYDEFINES, function (compatibility) {
                     _printBlockSVG();
                     break;
                 case 67: // 'C'
-                    blocks.triggerLongPress(blocks.activeBlock);
+                    blocks.prepareStackForCopy();
                     break;
                 case 69: // 'E'
                     _allClear();
@@ -2947,7 +2947,7 @@ handleComplete);
 
         function updatePasteButton() {
             if (pasteImage === null) {
-
+                console.log('Updating paste button');
                 var img = new Image();
 
                 img.onload = function () {
@@ -2970,6 +2970,7 @@ handleComplete);
 
                 img.src = 'header-icons/paste-button.svg';
             } else {
+                console.log('Blinking paste button');
                 blinkPasteButton(pasteImage);
             }
         };

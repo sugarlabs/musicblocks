@@ -120,6 +120,16 @@ function Blocks () {
     // as to avoid palette refresh race conditions.
     this.deleteActionTimeout = 0;
 
+    this.getLongPressStatus = function () {
+        return this.inLongPress;
+    };
+
+    this.clearLongPressButtons = function () {
+        this.saveStackButton.visible = false;
+        this.dismissButton.visible = false;
+        this.inLongPress = false;
+    };
+
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
         this.setPlaybackStatus = setPlaybackStatus;
         return this;
@@ -1518,9 +1528,7 @@ function Blocks () {
     this.moveBlockRelative = function (blk, dx, dy) {
         // Move a block (and its label) by dx, dy.
         if (this.inLongPress) {
-            this.saveStackButton.visible = false;
-            this.dismissButton.visible = false;
-            this.inLongPress = false;
+            this.clearLongPressButtons();
         }
 
         var myBlock = this.blockList[blk];
@@ -2822,14 +2830,12 @@ function Blocks () {
         }
     };
 
-    this.triggerLongPress = function (myBlock) {
-        this.longPressTimeout = null;
-        this.inLongPress = true;
-
+    this.prepareStackForCopy = function () {
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
         if (this.activeBlock == null) {
-            console.log('null block passed to triggerLongPress');
+            this.errorMsg(_('There is no block is selected.'));
+            console.log('No active block to copy.');
             return;
         }
 
@@ -2838,14 +2844,36 @@ function Blocks () {
 
         // Copy the selectedStack.
         this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj()));
+        console.log(this.selectedBlocksObj);
 
-        // Update the paster button to indicate a block is selected.
+        // Update the paste button to indicate a block is selected.
         this.updatePasteButton();
-        // Reset paste offset
+        // ...and reset paste offset.
         this._pasteDX = 0;
         this._pasteDY = 0;
+    };
+
+    this.triggerLongPress = function () {
+        if (this.longPressTimeout != null) {
+            clearTimeout(this.longPressTimeout);
+            this.longPressTimeout = null;
+        }
+
+        if (this.activeBlock == null) {
+            this.errorMsg(_('There is no block is selected.'));
+            console.log('No block associated with long press.');
+            return;
+        }
+
+        this.prepareStackForCopy();
+
+        // We need to set a flag to ensure:
+	// (1) we don't trigger a click and
+	// (2) we later remove the additional buttons for the action stack.
+        this.inLongPress = true;
 
         // We display some extra buttons when we long-press an action block.
+        var myBlock = this.blockList[this.activeBlock];
         if (myBlock.name === 'action') {
             var z = this.stage.getNumChildren() - 1;
             this.dismissButton.visible = true;
@@ -2952,6 +2980,7 @@ function Blocks () {
             blockMap[this.dragGroup[b]] = b;
             blockObjs.push(blockItem);
         }
+
         for (var b = 0; b < this.dragGroup.length; b++) {
             myBlock = this.blockList[this.dragGroup[b]];
             for (var c = 0; c < myBlock.connections.length; c++) {
@@ -3295,6 +3324,7 @@ function Blocks () {
                 if (last(blockObjs[b][4]) == null) {
                     // If there is no next block, add a hidden block;
                     console.log('last connection of ' + name + ' is null: adding hidden block');
+                    console.log(blockObjs[b][4]);
                     blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
                     blockObjs.push([blockObjsLength + extraBlocksLength, 'hidden', 0, 0, [b, null]]);
                     extraBlocksLength += 1;

@@ -1143,6 +1143,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (that.blocks.longPressTimeout != null) {
                     clearTimeout(that.blocks.longPressTimeout);
                     that.blocks.longPressTimeout = null;
+                    that.blocks.clearLongPressButtons();
                 }
 
                 that.blocks.moveBlockRelative(thisBlock, dx, dy);
@@ -1271,7 +1272,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 } else {
 
-                    if (!that.blocks.inLongPress) {
+                    if (!that.blocks.getLongPressStatus()) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
                         if (that.blocks.turtles.running()) {
@@ -1296,7 +1297,7 @@ function Block(protoblock, blocks, overrideName) {
 
                 that.blocks.longPressTimeout = setTimeout(function () {
                     that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
-                    that.blocks.triggerLongPress(that);
+                    that.blocks.triggerLongPress();
                 }, LONGPRESSTIME);
             }
 
@@ -1324,8 +1325,8 @@ function Block(protoblock, blocks, overrideName) {
 
             that.container.removeAllEventListeners('mouseout');
             that.container.on('mouseout', function (event) {
-		document.body.style.cursor = 'default';
-                if (!that.blocks.inLongPress) {
+                document.body.style.cursor = 'default';
+                if (!that.blocks.getLongPressStatus()) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
 
@@ -1334,7 +1335,7 @@ function Block(protoblock, blocks, overrideName) {
 
             that.container.removeAllEventListeners('pressup');
             that.container.on('pressup', function (event) {
-                if (!that.blocks.inLongPress) {
+                if (!that.blocks.getLongPressStatus()) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
 
@@ -1373,6 +1374,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (that.blocks.longPressTimeout != null) {
                     clearTimeout(that.blocks.longPressTimeout);
                     that.blocks.longPressTimeout = null;
+                    that.blocks.clearLongPressButtons();
                 }
 
                 if (!moved && that.label != null) {
@@ -1417,16 +1419,20 @@ function Block(protoblock, blocks, overrideName) {
         });
 
         this.container.on('mouseout', function (event) {
-            if (!that.blocks.inLongPress) {
+            if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, true);
+            } else {
+                that.blocks.clearLongPressButtons();
             }
 
             moved = false;
         });
 
         this.container.on('pressup', function (event) {
-            if (!that.blocks.inLongPress) {
+            if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
+            } else {
+                that.blocks.clearLongPressButtons();
             }
 
             moved = false;
@@ -1436,7 +1442,7 @@ function Block(protoblock, blocks, overrideName) {
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-	document.body.style.cursor = 'default';
+        document.body.style.cursor = 'default';
 
         // Always hide the trash when there is no block selected.
         trashcan.hide();
@@ -1444,6 +1450,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
+            that.blocks.clearLongPressButtons();
         }
 
         if (moved) {
