@@ -1,13 +1,11 @@
+#__How To Add BLocks__
 
-Adding blocks
-====================
 
 This allows developers to add new palettes and blocks to support
 additional functionality after making changes to the
 core code of Turtle Blocks. 
 
-How to make blocks
--------------
+##how to make blocks
 All blocks are present in a simple format.
 
 1) define the type of block
@@ -21,10 +19,8 @@ All blocks are present in a simple format.
   aBlock.pallete = palletes.dict['character'];
   here character can be pitch,tone,rythm,etc.
 
-3) define
-
+3) to use general propeties use the protoblock.js file
   blocks.protoBlockDict['a'] = aBlock;
-
 
 4) decide wheteher the block is an internal property or not. If you do not have to display the block use-
    
@@ -32,16 +28,14 @@ All blocks are present in a simple format.
   if the block is supposed to be visible , there is no need for this line.
   
 5) define the required properties of the block in the format-
-
-  aBlock.propety();  
+   aBlock.propety();  
 
   
   check the available properties on  [protoblock.js](https://github.com/walterbender/turtleblocksjs/blob/master/js/protoblocks.js)
-   
   and depending on your needs you can add more features and properties.
 
-Example
----------------------
+#Example
+
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['square'] = squareBlock;
@@ -52,15 +46,14 @@ Example
     squareBlock.oneArgBlock();
     squareBlock.defaults.push(440);
   
-How to add block
----------------------
+#How to add block
 
  Make your own copy by cloning the official [respository](https://github.com/walterbender/musicblocks.git) 
  add your block and make a pull request.
 
 
-References
-----------
+#References
+																													
 Valid blocks styles in turtleblocksjs:
 * `zeroArgBlock`: E.g., penup, pendown
 * `basicBlockNoFlow`: E.g., break
