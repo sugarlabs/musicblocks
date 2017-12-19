@@ -50,21 +50,19 @@
     8. [改换节奏](#tempo)
 5. [《音乐拼块》以外](#BEYOND-MUSIC-BLOCKS)
 
-Many of the examples given in the guide have links to code you can
-run. Look for `RUN LIVE` links.
+许多说明里给的例子可以链接到可以执行的程序，只需注意 `RUN LIVE` 链接.
 
 ## <a name="GETTING-STARTED"></a>1. 开始                                                     
 [回去目录](#TOC) | [下一章 (2. 发出声音)](#NOTES)
 
-Music Blocks is designed to run in a browser. Most of the development
-has been done in Chrome, but it should also work in Firefox. You can
-run it from [github io](http://walterbender.github.io/musicblocks) or
-by downloading a copy of the code and running a local copy directly
-from the file system of your computer.
+《音乐拼块》是设计在游览器上使用。大多数的程序发展是在 Google Chrome 上做的，
+可是程序也应该在 Mozilla Firefox 上使用。你可以从
+[github.io](http://walterbender.github.io/musicblocks) 执行程序，
+或下载一个程序的复制，直接在自己的电脑上，使用文件系统执行下载的复制程序。
 
-For more details on how to use Music Blocks, see [Using Music
+想知道更多关于《音乐拼块》的详情，你可以看 [Using Music
 Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
-For more details on how to use Turtle Blocks, see [Using Turtle
+想知道更多关于《乌龟拼块》的详情，你可以看 [Using Turtle
 Blocks
 JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
@@ -184,9 +182,9 @@ blocks as well.
 
 [上一章 (2. 发出声音)](#NOTES) | [回去目录](#TOC) | [下一章 (4. 部件)](#WIDGETS)
 
-This section of the guide discusses how to use chunks of notes to
-program music. Note that you can program with chunks you create by
-hand or use the [*Pitch-time Matrix*](#pitch-time) widget to help you get started.
+这一章将会说明怎么使用音乐砖块来产生音乐。 
+一件必须注意的事是你可以使用自己做出来的音乐砖块来做出你的程序，
+或使用 [*音调-时间矩阵*](#pitch-time) 开始做出你的程序.
 
 ### <a name="CHUNKS"></a>3.1 砖块
 
@@ -194,23 +192,21 @@ hand or use the [*Pitch-time Matrix*](#pitch-time) widget to help you get starte
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg "using chunk inside Start block")
 
-Every time you create a new *Action* stack, Music Blocks creates a new
-block specific to, and linked with, that stack. (The new block is
-found at the top of the *Block* palette, found on the left edge of the
-screen.) Clicking on and running this block is the same as clicking on
-your stack. By default, the new blocks are named `chunk`, `chunk1`,
-`chunk2`... but you can rename them by editing the labels on the
-*Action* blocks.
+每当你做出一个新的 *Action* 程序堆，《音乐拼块》会产生一个新的拼块。
+这个拼块会是独特的，也会链接程序堆。
+（这个新的拼块可以在屏幕的左角， *Block* 的部分里找的)
+按上和执行这个拼块和执行以上的程序堆是一样的。
+这些新的拼块创造时的名字是 `chunk`, `chunk1`,
+`chunk2`... 可是你可以编改 *Action* 拼块的标签来换拼块的名字。
 
-An *Action* block contains a sequence of actions that will only be executed
-when the block is referred to by something else, such as a start block. This is useful
-in orchestrating more complex programs of music.
+一个 *Action* 拼块包含了一系列的行动，这些行动只有当拼块被其他拼块提名才会执行, 
+例如一个*Start*拼块。 这个特性有用于产生更复杂的音乐程序。
 
-A *Start* Block is a *chunk* that will automatically be executed once the start button is pressed.
-This is where most of your programs will begin at.  There are many ways to *Run* a program: you can click
-on the *Run* button at the upper-left corner of the screen (the "rabbit") to run the music at a fast speed; click on the
-*Run Slow* button (the "turtle") to run it slower; and the *Step* button (the "snail"),
-to step  through the program one block per button press. 
+一个 *Start* 拼块 是一个在按下开始按钮后，直接执行的 *chunk*。
+这个拼块是大多数程序开始的地方。《音乐拼块》包含着很多可以 *Run* 一个程序的方式: 
+你可以按下在屏幕左上角的 *Run* 按钮("兔子" 图标) 快速播放音乐; 
+按下 *Run Slow* 按钮 ("乌龟" 图标) 慢速播放音乐; 
+和按下 *Step* 按钮 ("蜗牛" 图标) 每按下按钮播放程序的一个拼块。 
 
 In the example above, the *Chunk* block is inside of a *Start* block, which means
 that when any of the start buttons is pressed, the code inside the *Start* block (the *Chunk* block) will
