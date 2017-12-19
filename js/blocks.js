@@ -52,9 +52,7 @@ function Blocks () {
     this._pasteDX = 0;
     this._pasteDY = 0;
 
-    // "Copy stack" selects a stack for pasting. Are we selecting?
-    this.selectingStack = false;
-    // and what did we select?
+    // What did we select?
     this.selectedStack = null;
     // and a copy of the selected stack for pasting.
     this.selectedBlocksObj = null;

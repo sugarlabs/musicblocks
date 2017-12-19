@@ -1261,11 +1261,7 @@ function Block(protoblock, blocks, overrideName) {
             hideDOMLabel();
 
             if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
-                if (that.blocks.selectingStack) {
-                    var topBlock = that.blocks.findTopBlock(thisBlock);
-                    that.blocks.selectedStack = topBlock;
-                    that.blocks.selectingStack = false;
-                } else if (that.name === 'media') {
+                if (that.name === 'media') {
                     that._doOpenMedia(thisBlock);
                 } else if (that.name === 'loadFile') {
                     that._doOpenMedia(thisBlock);
