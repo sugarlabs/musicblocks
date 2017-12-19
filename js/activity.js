@@ -222,7 +222,7 @@ define(MYDEFINES, function (compatibility) {
 
         window.onblur = function () {
             if (!logo.runningLilypond) {
-                logo.doStopTurtle();
+                doHardStopButton();
             }
         };
 
