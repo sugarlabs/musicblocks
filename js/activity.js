@@ -3063,7 +3063,7 @@ handleComplete);
                 } else if (buttonNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
                     homeButtonContainers.push(container);
-                    var container2 = _makeButton('go-home-faded-button', _('Home') + ' [HOME]'), x, y, btnSize, 0);
+                    var container2 = _makeButton('go-home-faded-button', _('Home') + ' [HOME]', x, y, btnSize, 0);
                     _loadButtonDragHandler(container2, x, y, buttonNames[i][1], null, null, null, null);
                     homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
