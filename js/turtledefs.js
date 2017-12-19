@@ -100,14 +100,15 @@ function createHelpContent() {
         [_('Cartesian') + '/' + _('Polar'), _('Show or hide a coordinate grid.'), 'header-icons/Cartesian-polar-button.svg'],
         // [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
         [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
+        [_('Search'), _('You can search for blocks by name.'), 'header-icons/search-button.svg'],
+        [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-unlock-button.svg'],
         [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
         [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
         [_('Display statistics'), _('Display statistics about your Music project.'), 'header-icons/stats-button.svg'],
         [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugins-button.svg'],
-        [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-unlock-button.svg'],
         [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
         [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
-        [_('Shortcuts'), _('Dragging note blocks can be difficult! Try using the "d" key to make do, "r" to make re and so on.'), ''],
+        [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
         [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
     ];
 };
