@@ -20,34 +20,13 @@
 #: js/block.js:632
 #: js/pitchdrummatrix.js:178
 #: js/musicutils.js:37
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 #: js/synthutils.js:14
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "rest"
 msgstr "休符"
@@ -110,7 +89,8 @@ msgstr "ピッチ時刻行列"
 #: js/block.js:652
 #: js/basicblocks.js:747
 #: plugins/rodi.rtp:328
-## is this for "status widget"? Maybe ステータスモニター; Also 現状 http://jisho.org/word/%E7%8F%BE%E7%8A%B6
+## is this for "status widget"? Maybe ステータスモニター;
+## Also 現状 http://jisho.org/word/%E7%8F%BE%E7%8A%B6
 msgid "status"
 msgstr "ステータス"
 
@@ -158,8 +138,6 @@ msgstr "スライダー"
 #: js/musicutils.js:1338
 #: js/musicutils.js:1629
 #.TRANS: the note names must be separated by single spaces
-#.TRANS: the note names must be separated by single spaces
-#.TRANS: the note names must be separated by single spaces
 ## The spaces must not be "Japanese" spaces
 msgid "ti la sol fa mi re do"
 msgstr "シ ラ ソ ファ ミ レ ド"
@@ -190,18 +168,14 @@ msgid "Open"
 msgstr "開く"
 
 #: js/samplesviewer.js:74
-#: js/samplesviewer.js:74
 msgid "Delete"
 msgstr "消す"
 
-#: js/samplesviewer.js:75
 #: js/samplesviewer.js:75
 msgid "Publish"
 msgstr "サーバにアップロードして発表する"
 
 #: js/samplesviewer.js:77
-#: js/samplesviewer.js:77
-#: js/samplesviewer.js:101
 #: js/samplesviewer.js:101
 msgid "Share"
 msgstr "シェア"
@@ -228,15 +202,11 @@ msgid "Collapse code blocks on startup."
 msgstr "アプリがロードした際、ブロックをつぶす"
 
 #: js/samplesviewer.js:91
-#: js/samplesviewer.js:91
-#: js/samplesviewer.js:115
 #: js/samplesviewer.js:115
 msgid "Download"
 msgstr "ダウンロード"
 
 #: js/samplesviewer.js:92
-#: js/samplesviewer.js:92
-#: js/samplesviewer.js:116
 #: js/samplesviewer.js:116
 msgid "Merge with current project"
 msgstr "現在のプロジェクトに組み合わせます。"
@@ -436,7 +406,9 @@ msgstr "リズム"
 #: js/turtledefs.js:23
 #: js/basicblocks.js:421
 #: js/basicblocks.js:3088
-#.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
+#.TRANS: we specify pitch in terms of a name and an octave.
+#.TRANS: The name can be CDEFGAB or Do Re Mi Fa Sol La Ti.
+#.TRANS: Octave is a number between 1 and 8.
 msgid "pitch"
 msgstr "ピッチ"
 
@@ -1242,13 +1214,11 @@ msgstr "半音で移調"
 #: js/basicblocks.js:281
 #: js/basicblocks.js:1563
 #.TRANS: down sixth means the note is five scale degrees below current note
-#.TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
 msgstr "音階で六度下"
 
 #: js/basicblocks.js:289
 #: js/basicblocks.js:1571
-#.TRANS: down third means the note is two scale degrees below current note
 #.TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
 msgstr "音階で三度下"
@@ -1256,13 +1226,11 @@ msgstr "音階で三度下"
 #: js/basicblocks.js:297
 #: js/basicblocks.js:1579
 #.TRANS: seventh means the note is the six scale degrees above current note
-#.TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
 msgstr "音階で七度上"
 
 #: js/basicblocks.js:305
 #: js/basicblocks.js:1587
-#.TRANS: sixth means the note is the five scale degrees above current note
 #.TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
 msgstr "音階で六度上"
@@ -1270,13 +1238,11 @@ msgstr "音階で六度上"
 #: js/basicblocks.js:313
 #: js/basicblocks.js:1595
 #.TRANS: fifth means the note is the four scale degrees above current note
-#.TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
 msgstr "音階で五度上"
 
 #: js/basicblocks.js:321
 #: js/basicblocks.js:1603
-#.TRANS: fourth means the note is three scale degrees above current note
 #.TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
 msgstr "音階で四度上"
@@ -1284,13 +1250,11 @@ msgstr "音階で四度上"
 #: js/basicblocks.js:329
 #: js/basicblocks.js:1611
 #.TRANS: third means the note is two scale degrees above current note
-#.TRANS: third means the note is two scale degrees above current note
 msgid "third"
 msgstr "音階で三度上"
 
 #: js/basicblocks.js:337
 #: js/basicblocks.js:1619
-#.TRANS: second means the note is one scale degree above current note
 #.TRANS: second means the note is one scale degree above current note
 msgid "second"
 msgstr "音階で二度上"
@@ -1298,7 +1262,6 @@ msgstr "音階で二度上"
 #: js/basicblocks.js:345
 #: js/basicblocks.js:1627
 #: js/musicutils.js:124
-#.TRANS: unison means the note is the same as the current note
 #.TRANS: unison means the note is the same as the current note
 msgid "unison"
 msgstr "同度"
@@ -1566,7 +1529,6 @@ msgstr "発振機の千割秒の数値"
 #: js/basicblocks.js:818
 #: js/basicblocks.js:827
 #.TRANS: swing is a rhythmic variation that emphasises the offbeat
-#.TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
 msgstr "スイング"
 
@@ -1810,20 +1772,17 @@ msgstr "シンセを設定"
 #: js/synthutils.js:14
 #.TRANS: musical instrument
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
-## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "violin"
 msgstr "バイオリン"
 
 #: js/basicblocks.js:1236
 #: js/basicblocks.js:1256
 #.TRANS: legato: overlap successive notes
-#.TRANS: legato: overlap successive notes
 msgid "slur"
 msgstr "スラー"
 
 #: js/basicblocks.js:1246
 #: js/basicblocks.js:1265
-#.TRANS: play each note sharply detached from the others
 #.TRANS: play each note sharply detached from the others
 msgid "staccato"
 msgstr "スタッカート"
