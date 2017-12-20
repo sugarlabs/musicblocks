@@ -1441,7 +1441,6 @@ function Block(protoblock, blocks, overrideName) {
 
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
-
         document.body.style.cursor = 'default';
 
         // Always hide the trash when there is no block selected.

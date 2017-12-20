@@ -140,6 +140,7 @@ define(MYDEFINES, function (compatibility) {
         var chartBitmap = null;
         var saveBox;
         var merging = false;
+        var loading = false;
         var searchWidget = docById('search');
 
         // Calculate the palette colors.
@@ -625,6 +626,7 @@ define(MYDEFINES, function (compatibility) {
              }
 
             var ctx = myChart.getContext('2d');
+            loading = true;
             document.body.style.cursor = 'wait';
             var myRadarChart = null;
             var scores = analyzeProject(blocks);
@@ -645,6 +647,7 @@ define(MYDEFINES, function (compatibility) {
                     logo.hideBlocks();
                     update = true;
                     document.body.style.cursor = 'default';
+                    loading = false;
                     Analytics.close(chartBitmap, ctx);
                 };
                 img.src = imageData;
@@ -709,10 +712,10 @@ define(MYDEFINES, function (compatibility) {
             if (recording === undefined) {
                 recording = false;
             }
-            // Show busy cursor.
-            document.body.style.cursor = 'wait';
 
+            document.body.style.cursor = 'wait';
             console.log('Compiling music for playback');
+
             // Suppress music and turtle output when generating
             // compiled output.
             logo.playbackQueue = {};
@@ -945,7 +948,7 @@ define(MYDEFINES, function (compatibility) {
                 var reader = new FileReader();
 
                 reader.onload = (function (theFile) {
-                    // Show busy cursor.
+                    loading = true;
                     document.body.style.cursor = 'wait';
 
                     setTimeout(function () {
@@ -970,7 +973,6 @@ define(MYDEFINES, function (compatibility) {
                                         logo.playbackQueue = {};
                                         blocks.loadNewBlocks(obj);
                                         setPlaybackStatus();
-
                                         stage.removeAllEventListeners('trashsignal');
                                     };
 
@@ -982,14 +984,15 @@ define(MYDEFINES, function (compatibility) {
                                     blocks.loadNewBlocks(obj);
                                     setPlaybackStatus();
                                 }
-                                refreshCanvas();
 
+                                loading = false;
+                                refreshCanvas();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                                document.body.style.cursor = 'default';
+                                loading = false;
                             }
                         }
-
-                        document.body.style.cursor = 'default';
                     }, 200);
                 });
 
@@ -1004,6 +1007,7 @@ define(MYDEFINES, function (compatibility) {
                 var reader = new FileReader();
 
                 reader.onload = (function (theFile) {
+                    loading = true;
                     document.body.style.cursor = 'wait';
 
                     setTimeout(function () {
@@ -1019,19 +1023,24 @@ define(MYDEFINES, function (compatibility) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
+                                console.log('sending to trash');
                                 sendAllToTrash(false, false);
                                 refreshCanvas();
 
                                 logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
+                                console.log('loading blocks');
+                                document.body.style.cursor = 'default';
+                                loading = false;
                                 setPlaybackStatus();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                                document.body.style.cursor = 'default';
+                                loading = false;
                             }
 
                         }
 
-                        document.body.style.cursor = 'default';
                     }, 200);
                 });
 
@@ -1069,8 +1078,9 @@ define(MYDEFINES, function (compatibility) {
                 var reader = new FileReader();
 
                 reader.onload = (function (theFile) {
-                    // Show busy cursor.
+                    loading = true;
                     document.body.style.cursor = 'wait';
+
                     setTimeout(function () {
                         obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList);
                         // Save plugins to local storage.
@@ -1089,8 +1099,8 @@ define(MYDEFINES, function (compatibility) {
                             palettes.bringToTop();
                         }, 1000);
 
-                        // Restore default cursor.
                         document.body.style.cursor = 'default';
+                        loading = false;
                     }, 200);
                 });
 
@@ -1450,7 +1460,7 @@ define(MYDEFINES, function (compatibility) {
             if (searchWidget.style.visibility === 'visible') {
                 hideSearchWidget();
             } else {
-		docById('searchResults').style.visibility = 'visible';
+                docById('searchResults').style.visibility = 'visible';
                 searchWidget.style.visibility = 'visible';
                 searchWidget.style.left = (utilityBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
                 searchWidget.style.top = (utilityBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
@@ -2230,10 +2240,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSaveWAV() {
-            //document.body.style.cursor = 'wait';
             console.log('Recording');
-            //logo.recording = true;
-            //logo.runLogoCommands();
             doCompile(true);
         };
 
@@ -2270,9 +2277,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doLilypond() {
-            // Show busy cursor.
             document.body.style.cursor = 'wait';
-
             console.log('Saving .ly file');
             // Suppress music and turtle output when generating
             // Lilypond output.
@@ -2292,10 +2297,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doAbc() {
-            // Show busy cursor.
             document.body.style.cursor = 'wait';
-
-            console.log('Saving .ly file');
+            console.log('Saving .abc file');
             // Suppress music and turtle output when generating
             // Abc output.
             logo.runningLilypond = true;
@@ -2378,8 +2381,9 @@ define(MYDEFINES, function (compatibility) {
         function loadProject (projectName, flags, env) {
             //set default value of run
             flags = typeof flags !== 'undefined' ? flags : {run: false, show: false, collapse: false};
-            // Show busy cursor.
+            loading = true;
             document.body.style.cursor = 'wait';
+
             // palettes.updatePalettes();
             setTimeout(function () {
                 if (fileExt(projectName) !== 'tb')
@@ -2420,6 +2424,7 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 // Restore default cursor
+                loading = false;
                 document.body.style.cursor = 'default';
                 update = true;
             }, 200);
@@ -2466,6 +2471,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             console.log('loadRawProject ' + data);
+            loading = true;
             document.body.style.cursor = 'wait';
             _allClear();
 
@@ -2484,13 +2490,15 @@ define(MYDEFINES, function (compatibility) {
                 errorMsg(e);
             }
 
+            loading = false;
             document.body.style.cursor = 'default';
         };
 
         function saveProject(projectName) {
-           // palettes.updatePalettes();
-            // Show busy cursor.
+            // palettes.updatePalettes();
+            loading = true;
             document.body.style.cursor = 'wait';
+
             setTimeout(function () {
                 var punctuationless = projectName.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g, '');
                 projectName = punctuationless.replace(/ /g, '_');
@@ -2514,12 +2522,13 @@ define(MYDEFINES, function (compatibility) {
 
                     img.src = 'data:image/svg+xml;base64,' + window.btoa(
                         unescape(encodeURIComponent(svgData)));
-                    // Restore default cursor
+
+                    loading = false;
                     document.body.style.cursor = 'default';
                     return returnValue;
                 } catch (e) {
                     console.log(e);
-                    // Restore default cursor
+                    loading = false;
                     document.body.style.cursor = 'default';
                     return;
                 }
@@ -3498,7 +3507,9 @@ handleComplete);
             });
 
             container.on('mouseout', function (event) {
-                document.body.style.cursor = 'default';
+                if (!loading) {
+                    document.body.style.cursor = 'default';
+                }
             });
 
             container.on('mousedown', function (event) {

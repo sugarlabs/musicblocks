@@ -4033,6 +4033,7 @@ function Blocks () {
             }, 1500);
         }
         console.log("Finished block loading");
+	document.body.style.cursor = 'default';
 
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);
