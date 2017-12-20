@@ -1,8 +1,10 @@
 # 《音乐拼块》程序设计说明
 
-《音乐拼块》是一个培养青少年对音乐和图像的兴趣的程序环境。《音乐拼块》扩展另一个程序，《乌龟拼块》，加上了一集关于音调和韵律的功能。
+《音乐拼块》是一个培养青少年对音乐和图像的兴趣的程序环境。
+《音乐拼块》扩展另一个程序，《乌龟拼块》，加上了一集关于音调和韵律的功能。
 
-《音乐拼块》程序设计说明是一个开始学程序基础的好地方。在这个说明书里，我们会让读者看看了解几个程序例子，来展示《音乐拼块》的音乐功能。
+《音乐拼块》程序设计说明是一个开始学程序基础的好地方。
+在这个说明书里，我们会让读者看看了解几个程序例子，来展示《音乐拼块》的音乐功能。
 
 ## <a name="TOC"></a> 目录
 
@@ -55,63 +57,50 @@
 ## <a name="GETTING-STARTED"></a>1. 开始                                                     
 [回去目录](#TOC) | [下一章 (2. 发出声音)](#NOTES)
 
-《音乐拼块》是设计在游览器上使用。大多数的程序发展是在 Google Chrome 上做的，
-可是程序也应该在 Mozilla Firefox 上使用。你可以从
-[github.io](http://walterbender.github.io/musicblocks) 执行程序，
-或下载一个程序的复制，直接在自己的电脑上，使用文件系统执行下载的复制程序。
+《音乐拼块》是设计在游览器上使用。大多数的程序发展是在 Google Chrome 上做的，可是程序也应该在 Mozilla Firefox 上使用。
+你可以从 [github.io](http://walterbender.github.io/musicblocks) 执行程序， 或下载一个程序的复制，直接在自己的电脑上，使用文件系统执行下载的复制程序。
 
-想知道更多关于《音乐拼块》的详情，你可以看 [Using Music
-Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
-想知道更多关于《乌龟拼块》的详情，你可以看 [Using Turtle
-Blocks
-JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
+想知道更多关于《音乐拼块》的详情，你可以看 [Using MusicBlocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
+想知道更多关于《乌龟拼块》的详情，你可以看 [Using TurtleBlocksJS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
 ## <a name="NOTES"></a>2. 发出声音
 [上一章 (1. 开始)](#GETTING-STARTED) | [回去目录](#TOC) |[下一章 (3. 使用音乐设计程序)](#PROGRAMMING-WITH-MUSIC)
 
-《音乐拼块》使用很多常见的音乐元素，相似
-[音调](#PITCH), [音律](#rhythms),[声音](#MORE-TRANSFORMATIONS),
-和一点 [乐器的选择](#VOICES)。
+《音乐拼块》使用很多常见的音乐元素，相似[音调](#PITCH), [音律](#rhythms),[声音](#MORE-TRANSFORMATIONS),和一点 [乐器的选择](#VOICES)。
 
 ### <a name="NOTE-VALUE"></a>
 2.1 《音乐拼块》最有用的拼块是《音符长度》。《音符长度》里面有一个[音调拼块](#PITCH)和音符的长度。
 
-![alt
- tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg
- "一个《音符长度拼块》(在上面) 和两个连接的拼块(在下面)")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg
+"一个《音符长度拼块》(在上面) 和两个连接的拼块(在下面)")
 
- 上面的例子有一个“音符拼块”。“1/8”是价值或长度，在这种情况下是一个八分音符
+上面的例子有一个“音符拼块”。“1/8”是价值或长度，在这种情况下是一个八分音符
 
- 下面有两个连接的音符。这些音符是八分音符，一起做一个四分序列。
+下面有两个连接的音符。这些音符是八分音符，一起做一个四分序列。
 
-![alt
- tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg
- "一个四分音符，一个十六分音符，和一个半音音符的拼块")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg
+"一个四分音符，一个十六分音符，和一个半音音符的拼块")
 
 这个例子有不同的音符。从上到下有:`1/4`为一个四分音符，`1/16`为一个十六分音符，和
 `1/2`为一个半音音符。
 
-
 《音符长度拼块》可以使用任何数学运算。
 
-![alt
- tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg
- "一个音符长度图和他们的《音符长度拼块》。
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg
+"一个音符长度图和他们的《音符长度拼块》。
 
 请使用上面的图片作为表示值。
 
 ### <a name="PITCH"></a>
-2.2 音调。我们已经看到了音调拼块在[音符长度拼块](#NOTE-VALUE)里面.
+2.2 音调。我们已经看到了音调拼块在[音符长度拼块](#NOTE-VALUE)里面。
 音调拼块指定音调的名字和音高八度。
 
-![alt
- tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg
- "指定一个音调块的名称和八度")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg
+"指定一个音调块的名称和八度")
 
-有很多方法来指定一个音调拼块音高八度和音名。上面有例子
+有很多方法来指定一个音调拼块音高八度和音名。上面有例子－
 
-上面的音调拼块是使用唱名指定(`Sol` 在 `八度-四`)，
-里面有音符 `Do Re Me Fa Sol La Ti `。
+上面的音调拼块是使用唱名指定(`Sol` 在 `八度-四`)，里面有音符 `Do Re Me Fa Sol La Ti `。
 
 下一个拼块有用音高名称指定的音高。(`G` 在 `八度-四`)，里面有音符 `C D E F G A B`。
 
@@ -171,142 +160,120 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 这个拼块会是独特的，也会链接程序堆。
 （这个新的拼块可以在屏幕的左角， *Block* 的部分里找的)
 按上和执行这个拼块和执行以上的程序堆是一样的。
-这些新的拼块创造时的名字是 `chunk`, `chunk1`,
-`chunk2`... 可是你可以编改 *Action* 拼块的标签来换拼块的名字。
+这些新的拼块创造时的名字是 `chunk`, `chunk1`,`chunk2`... 可是你可以编改 *Action* 拼块的标签来换拼块的名字。
 
-一个 *Action* 拼块包含了一系列的行动，这些行动只有当拼块被其他拼块提名才会执行,
+一个 *Action* 拼块包含了一系列的行动，这些行动只有当拼块被其他拼块提名才会执行。
 例如一个*Start*拼块。 这个特性有用于产生更复杂的音乐程序。
 
 一个 *Start* 拼块 是一个在按下开始按钮后，直接执行的 *chunk*。
-这个拼块是大多数程序开始的地方。《音乐拼块》包含着很多可以 *Run* 一个程序的方式:
-你可以按下在屏幕左上角的 *Run* 按钮("兔子" 图标) 快速播放音乐;
-按下 *Run Slow* 按钮 ("乌龟" 图标) 慢速播放音乐;
-和按下 *Step* 按钮 ("蜗牛" 图标) 每按下按钮播放程序的一个拼块。
+这个拼块是大多数程序开始的地方。
+《音乐拼块》包含着很多可以 *Run* 一个程序的方式: 你可以按下在屏幕左上角的 *Run* 按钮("兔子" 图标) 快速播放音乐; 按下 *Run Slow* 按钮 ("乌龟" 图标) 慢速播放音乐; 和按下 *Step* 按钮 ("蜗牛" 图标) 每按下按钮播放程序的一个拼块。
 
-In the example above, the *Chunk* block is inside of a *Start* block, which means
-that when any of the start buttons is pressed, the code inside the *Start* block (the *Chunk* block) will
-be executed. You can add more chunks after this one inside the *Start* block to execute them
-sequentially.
+在上面的程序例子， *Chunk* 拼块在 *Start* 拼块里面。
+这代表每当其中一个开始按钮按下之后，*Start* 拼块里面的程序 (*Chunk* 拼块) 会被执行。
+之后，你可以在 *Start* 加更多拼块, 顺序的执行拼块里的程序。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg "usage of multiple Chunk blocks")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg "usage of Repeat block")
 
-You can [repeat](#REPETITION) chunks either by using multiple *Chunk* blocks or using a
-*Repeat* block.
+你可以使用更多 *Chunk* 拼块或使用 *Repeat* 拼块 [重复](#REPETITION) 程序。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg "multiple action stacks")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg "mixing and matching chunks")
 
-You can also mix and match chunks. Here we play the action block with
-name "chunk", followed by "chunk1" twice, and then "chunk" again.
+你也可以混合不同的拼块。
+在上面的程序例子， 我们执行 "chunk" 的行动拼块, 接着我们两次执行 "chunk1" , 然后又执行 "chunk".
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg "creating a song using chunks")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg "usage of Repeat block in a song")
 
-A few more chunks and we can make a song. (Can you read the block
-notation well enough to guess the outcome? Are you familiar with the
-song we created?)
+假如我们有更多拼块，我们就可以创造一个歌曲. 
+(你可以猜猜程序的后果吗? 你对我们制造的歌曲熟悉吗?)
 
 ### <a name="TRANSFORMATION"></a>3.2 音乐转变
 
-There are many ways to transform pitch, rhythm, and other sonic qualities.
+《音乐拼块》拥有不同的方式改变音调，节奏和其他声音的特征.
 
 #### <a name="STEP-PITCH"></a>3.2.1 转变音调
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg "Using the Step Pitch block")
 
-The *Step Pitch* block will move up or down notes in a scale from the
-last played note. In the example above, *Step Pitch* blocks are used inside
-of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
+*Step Pitch* 拼块从上一个音符提高或降低下一个音符。
+在上面的例子里， *Step Pitch* 拼块在 *Repeat* 拼块里使用，七次重复里面的程序, 发出一个音阶的不同声音.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform16.svg "Using the Consonant Step Up and Down blocks")
 
-Another way to move up and down notes in a scale is to use the
-*Consonant Step Up* and *Consonant Step Down* blocks. These blocks
-calculate the number of half-steps to the next note in the current
-mode. (You can read more about [Musical Modes](#modes) below.) Note
-that the *Mouse Pitch Number* block returns the pitch number of the
-most recent note played.
+另外一个提高或降低音阶里的音符就是使用*Consonant Step Up* 和 *Consonant Step Down* 拼块。
+这两个拼块会在现在的模式计算到下一个音符有几个半步。
+(想知道更多关于 [音乐模式](#modes) 可以看下面。)
+注意 *Mouse Pitch Number* 拼块会给回上一个音符的音调号码。
 
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 升号和降号
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "Using Sharp and Flat blocks")
 
-The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
-*Note value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by one
-half step. A flat will lower by one half step. In the example, on the
-left, just the *Pitch* block `Mi` is lowered by one half step; on the
-right, both *Pitch* blocks are raised by one half step.
+*Sharp* 和 *Flat* 拼块可以包住 *Pitch* 拼块, *Note value* 拼块, 或 [行动拼块](#CHUNKS). 
+一个 “sharp” 会把音调提高半步， 而一个 ”flat“ 会把音调降低半步。
+在上面左边的例子里， 只有 ”Ｍi“ 的 *Pitch* 拼块音调降低半步; 在上面右边的例子里, 两个 *Pitch* 拼块音调提高半步。
 
 #### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 移调法
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "Adjust-transposition")
 
-The *Adjust-transposition* block can be used to make larger shifts in
-pitch in half step units. A positive number shifts the pitch up and a
-negative number shifts the pitch down. The input must be a whole
-number. To shift an entire octave, transpose by 12 half-steps up. -12
-will shift an octave down.
+*Adjust-transposition* 拼块可以用来做出更大音调的改变。
+一个正整数会把音调提高，而一个反整数会把音调降低。
+如果要改变一个八度， 提高 12 个半步. -12 会降低一个八度。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using Adjust-transposition")
 
-In the example above, we take the song we programmed previously and
-raise it by one octave.
+在上面的例子，我们把上次设计的歌曲程序提高一个八度。
 
 #### <a name="DOTTED"></a>3.2.4 附点音符
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg "Creating dotted notes using the Dot block")
 
-You can "dot" notes using the *Dot* block. A dotted note extends the rhythmic duration of a note by
-50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a
-beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
+你可以使用 *Dot* 拼块来 ”dot" 音符. 
+一个被点到的音符把音符的时间加长50%。
+例如，一个被点到的四分音符会播放一个拍的 3/8(1/4 + 1/8)， 而一个被点到的音符会播放一个拍的 3/16 (1/8 + 1/16).
 
-You can also simply change the note value to mimic a dotted note, for example indicating 3/8 instead of 1/4, for a dotted quarter note.
+你也可以换音符播放的时间来代替一个被点到的音符，例如把音符播放时间定为 3/8 (一个被点到的四分音符).
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
 #### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 使用数学加快放慢音符
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Speeding up and slowing down the tempo")
 
-You can also multiply (or divide) the beat value, which will speed up
-or slowdown the notes. Multiplying the beat value of an `1/8` note by
-`2` is the equivalent of playing a `1/16` note. Dividing the beat
-value of an `1/8` note by '2' is the equivalent of playing a `1/4`
-note.
+你也可以乘除音符播放的时间，这就会加快或放慢音符。
+把一个 `1/8` 音符的播放时间乘 `2` 等于播放一个 `1/16` 音符。
+把一个 `1/8` 音符的播放时间除 `2` 等于播放一个 `1/4` 音符。
 
 #### <a name="REPETITION"></a>3.2.6 重复音符
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "repeating notes")
 
-There are several ways to repeat notes. The *Repeat* block will play a
-sequence of notes multiple times; the *Duplicate* block will repeat each
-note in a sequence.
+《音乐拼块》有几个重复拼块的方法。
+*Repeat* 拼块会重复播放一整个系列的音符， 而 *Duplicate* 拼块会重复那个系列中的每一个音符。
 
-In the example, on the left, the result would be `Sol, Re, Sol, Sol,
-Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
-`Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
+在左边的例子，后果就会变成`Sol, Re, Sol, Sol, Re, Sol, Sol, Re, Sol, Sol, Re, Sol`。
+在右边的例子，后果就会变成`Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
 #### <a name="SWINGING"></a>3.2.7 摆动音符和合并音符
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg "swinging notes and tied notes")
 
-The *Swing* block works on pairs of notes (specified by note value),
-adding some duration (specified by swing value) to the first note and
-taking the same amount from the second note. Notes that do not match
-note value are unchanged.
+*Swing* 拼块改变两个音符 (定位音值), 加长第一个音符播放的时段 (定位 “swing” 号码) 和减少第二个音符播放的时间。
+不搭配的音符不会被影响。
 
-In the example, `re5` would be played as a `1/6` note and `mi5` would
-be played as a `1/12` note (`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===
-1/12`). Observe that the total duration of the pair of notes is
-unchanged.
+在例子里， `re5` 就会变成一个 `1/6` 音符，而 `mi5` 就会变成一个 `1/12` 音符 (`1/8 + 1/24 === 1/6` and `1/8 - 1/24 === 1／12`)。
+注意这两个音符播放的总共时间还是一样的。
 
-Tie also works on pairs of notes, combining them into one note. (The
-notes must be identical in pitch, but can vary in rhythm.)
+“Tie” 拼块改变两个音符,把音符组合起来. 
+(这两个音符音调可以一样，但是节奏可以不同。)
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TiesChart.svg "using notes with ties")
 
@@ -314,90 +281,70 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "Set volume, Crescendo, Staccato, and Slur blocks")
 
-The *Set volume* block will change the volume of the notes. The
-default is 50; the range is 0 (silence) to 100 (full volume).
+*Set volume* 拼块可以改变音符的声量.
+声量开始定位 50; 范围是 0 (无声) 至 100 (最大声量).
 
-The *Crescendo* block will increase (or decrease) the volume of the
-contained notes by a specified amount for every note played. For
-example, if you have 3 notes in sequence contained in a *Crescendo*
-block with a value of 5, the final note will be at 15% more
-than the original value for volume.
+*Crescendo* 拼块可以增加 (或减少) 里面每一个音符的声量. 
+例如， 一个有 3 个音符的系列在一个定位 “5” 价值的 *Crescendo* 拼块，最后的音符的声量就会比开始的声量多 15％ 。
 
-The *Staccato* block shortens the length of the actual note&mdash;making them tighter
-bursts&mdash;while maintaining the specified rhythmic value of the notes.
+*Staccato* 拼块会减少音符的播放时间;在保持音符的节奏价值，使它们更尖锐.
 
-The *Slur* block lengthens the sustain of notes&mdash;running longer than
-the noted duration and blending it into the next note&mdash;while
-maintaining the specified rhythmic value of the notes.
+*Slur* 拼块增加音符的播放时间，让它播放比定位更长的时间，保持音符的节奏价值，把它和下一个音符稍微混合在一起。
 
 #### <a name="INTERVALS-AND-ARTICULATION"></a>3.2.9 间隔和定住相对声音
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Interval and Set Relative Volume block")
 
-The *Interval* block calculates a relative interval, e.g., a fifth,
-and adds the additional pitches to a note's playback. In the figure,
-we add `La` to `Re` and `Ti` to `Mi`.
+*Interval* 拼块计算一个相对的间隔，例如一个 "fifth"， 然后在音符播放时加上间隔的音调。
+在图示里，我们在 `La` 上加 `Re` 和在 `Ti` 上加 `Mi`。
 
-The *Set Relative Volume* block modifies the clamped note's volume according to the input value of the block in an added (or subtracted when negative) percentage with respect to the original volume.For example,100 would mean doubling the current volume.
+*Set Relative Volume* 拼块根据输入的号码，改变包住的音符的声量，根据原本的声量进行加减。
+例如， 输入 1００ 等于把原本的声量乘二。
 
 #### <a name= "ABSOLUTE-INTERVALS"></a>绝对间隔
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg "Using absolute intervals")
 
-The *Augmented* block calculates an absolute interval, e.g., an
-augmented fifth, and adds the additional pitches to a note. Similarly,
-the *Minor* block calculates an absolute interval, e.g., a minor
-third. Other absolute intervals include *Perfect*, *Diminished*, and
-*Major*.
+*Augmented* 拼块计算一个绝对的间隔， 如一个 “augmented fifth”， 然后在音符播放时加上间隔的音调。
+同样的， Minor* 拼块计算一个绝对的间隔, 如一个 "minor third".
+其他绝对的间隔包括 *Perfect*, *Diminished* 和 *Major*.
 
-In the augmented fifth example above, a chord of D5 and A5 are played,
-followed by a chord of E5 and C5. In the minor third example, which
-includes a shift of one octave, first a chord of D5 and F5 is played,
-followed by chord of E5 and G6.
+在上面 “augmented fifth” 的例子, 一个 D5 和 Ａ5 的和音被播放, 接着播放一个 E5 和 C5 的和音。
+在上面 “minor third” 的例子 （这包括一个八度的提升）, 首先一个 Ｄ5 和 Ｆ5 的和音被播放, 然后一个 Ｅ5 和 G6 的和音被播放。
 
 #### <a name= "INVERSION"></a>3.2.11 倒位
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
 
-The *Invert* block will invert a series of notes around a target
-note. There are two different modes of the *Invert* block: *odd*
-and *even*, the latter shifts the point of rotation up by a `1/4`
-step, enabling rotation around a point between two notes.
+*Invert* 拼块会绕着一个被定住的音符，倒立另一系列的音符。
+*Invert* 拼块包含两个方式 － *odd* 和 *even*. 
+*Even* 把回转点的定位加 `1/4` 半步，允许两个音符之间有一个可以回转的点。
 
-In the *invert (even)* example, `D4` is inverted around `G4`,
-resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
-around a point midway between `G4` and `G♯4` resulting in a `C♯5`
+在 *invert (even)* 的例子, `D4` 绕着 `G4` 倒位，结果产生一个 `C5`. 
+在 *invert (odd)* 的例子, `D4` 绕着 `G4` 和 `G♯4` 中间的一个点，结果产生一个 `C♯5`。
 
 #### <a name="BACKWARDS"></a>3.2.12 反向播放音乐
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg "Backward block")
 
-The *Backward* block will play the contained notes in reverse order
-(retrograde). In the example above, the notes in *Chunk* are played as
-`Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
-stack.
+*Backward* 拼块会倒叙的播放里面包住的音符。
+在上面的例子，*Chunk* 里面的音符播放的顺序是 `Sol`, `Ti`, `La`, `Sol`, 明确的来说从程序堆的下面到上面。
 
-[RUN
-LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
 
-Note that all of the blocks inside a *Backward* block are reverse, so
-use this feature with caution if you include logic intermixed with
-notes.
+注意所有在 *Backward*  拼块里面的音符是倒叙的， 所以如果你的程序有逻辑和音符混合在一起，记得注意这个拼块。
 
 #### <a name= "SETTING"></a>3.2.13 定住音色和音调
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg "setting voice and keys using Set Voice block")
 
-The *Set Voice* block selects a [voice](#VOICES) for the synthesizer for any
-contained blocks, e.g., violin or cello.
+*Set Voice* 拼块为里面的拼块的发声器选择一个 [音色](#VOICES)，如小提琴或大提琴。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg "Set Key block")
 
-The *Set Key* block will change the key and mode of the mapping
-between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
-`D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
-and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
-This block allows users to access "movable Do" within Music
-Blocks, where the mapping of solfege to particular pitch changes
+*Set Key* 拼块可以改换音乐音符的模式, 如把 `Do`, `Re`, `Mi`, 变成音符名字如在 C Major 里的， `C`, `D`, `E`. 
+模式包括 Ｍajor,Minor,Chromatic 和一群比较罕见的模式，如 Bebop, Geez, Maqam, 等.
+这个拼块能让使用者得到 〈音乐拼块〉 的 "movable Do",
+ng of solfege to particular pitch changes
 depending on the user's specified tonality.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
