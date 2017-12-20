@@ -37,8 +37,8 @@
 4. [部件](#WIDGETS)
     1. [观察状况](#status)
     2. [产生音乐砖块](#pitch-time)
-        1. [音调-时间矩阵](#pitch-time) 
-        2. [音律拼块](#THE-RHYTHM-BLOCK) 
+        1. [音调-时间矩阵](#pitch-time)
+        2. [音律拼块](#THE-RHYTHM-BLOCK)
         3. [创造连音](#CREATING-TUPLETS)
         4. [连音是什么?](#WHAT-IS-TUPLET)
         5. [在矩阵里使用独自音符](#INDIVIDUAL-NOTES)
@@ -66,123 +66,98 @@ Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
 Blocks
 JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
-## <a name="NOTES"></a>2. 发出声音 
+## <a name="NOTES"></a>2. 发出声音
 [上一章 (1. 开始)](#GETTING-STARTED) | [回去目录](#TOC) |[下一章 (3. 使用音乐设计程序)](#PROGRAMMING-WITH-MUSIC)
 
-Music Blocks incorporates many common elements of music, such as
-[pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
-and, to some degree, [timbre and texture](#VOICES).
+《音乐拼块》使用很多常见的音乐元素，相似
+[音调](#PITCH), [音律](#rhythms),[声音](#MORE-TRANSFORMATIONS),
+和一点 [乐器的选择](#VOICES)。
 
 ### <a name="NOTE-VALUE"></a>
-2.1 音符长度 At the heart of Music Blocks is the *Note value*
-block. The *Note value* block is a container for a [*Pitch*
-block](#PITCH) that specifies the duration (note value) of the pitch.
+2.1 《音乐拼块》最有用的拼块是《音符长度》。《音符长度》里面有一个[音调拼块](#PITCH)和音符的长度。
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg
- "A single Note value block (top) and two consecutive Note value
- blocks (bottom)")
+ "一个《音符长度拼块》(在上面) 和两个连接的拼块(在下面)")
 
-At the top of the example above, a single (detached) *Note value*
-block is shown. The `1/8` is value of the note, which is, in this
-case, an eighth note.
+ 上面的例子有一个“音符拼块”。“1/8”是价值或长度，在这种情况下是一个八分音符
 
-At the bottom, two notes that are played consecutively are shown. They
-are both `1/8` notes, making the duration of the entire sequence
-`1/4`.
+ 下面有两个连接的音符。这些音符是八分音符，一起做一个四分序列。
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg
- "A quarter note, a sixteenth note, and a half note Note value
- blocks")
+ "一个四分音符，一个十六分音符，和一个半音音符的拼块")
 
-In this example, different note values are shown. From top to bottom,
-they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
-`1/2` for a half note.
+这个例子有不同的音符。从上到下有:`1/4`为一个四分音符，`1/16`为一个十六分音符，和
+`1/2`为一个半音音符。
 
-Note that any mathematical operations can be used as input to the
-*Note value*.
+
+《音符长度拼块》可以使用任何数学运算。
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg
- "A chart of note values and their corresponding note value blocks")
+ "一个音符长度图和他们的《音符长度拼块》。
 
-Please refer to the above picture for a visual representation of note
-values.
+请使用上面的图片作为表示值。
 
 ### <a name="PITCH"></a>
-2.2 音调 As we have seen, *Pitch* blocks are used inside the
-[*Note value*](#NOTE-VALUE) blocks. The *Pitch* block specifies the
-pitch name and pitch octave of a note that in combination determines
-the frequency (and therefore pitch) at which the note is played.
+2.2 音调。我们已经看到了音调拼块在[音符长度拼块](#NOTE-VALUE)里面.
+音调拼块指定音调的名字和音高八度。
 
 ![alt
  tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg
- "Specifying a pitch block's name and octave")
+ "指定一个音调块的名称和八度")
 
-There are many systems you can use to specify a *pitch* block's name
-and octave. Some examples are shown above.
+有很多方法来指定一个音调拼块音高八度和音名。上面有例子
 
-The top *Pitch* block is specified using a *Solfege* block (`Sol` in
-`Octave 4`), which contains the notes `Do Re Me Fa Sol La Ti `.
+上面的音调拼块是使用唱名指定(`Sol` 在 `八度-四`)，
+里面有音符 `Do Re Me Fa Sol La Ti `。
 
-The pitch of the next block is specified using a *Pitch-name* block
-(`G` in `Octave 4`), which contains the notes `C D E F G A B`.
+下一个拼块有用音高名称指定的音高。(`G` 在 `八度-四`)，里面有音符 `C D E F G A B`。
 
-The next block is specified using a *Scale-degree* block (the `5th note`
-in the scale, 'G', also in 'Octave 4'), `C == 1, D == 2, ...`
+下一个拼块有用音阶程度拼块(音阶中的第五个音符，'G'，也在 `八度-四`), `C == 1, D == 2, ...`
 
-The next block is specified using a *Pitch-number* block (the `7th
-semi-tone` above `C` in `Octave 4`). The offset for the pitch number
-can be modified using the *Set-pitch-number-offset* block.
+下一个拼块有用音音调编号拼块。(`C` 上面的第七个半音，也在 `八度-四`)。音高数字偏移可以用《设置音高数字偏移拼块》固定。
 
-The pitch of the last block is specified using the *Hertz* block in
-conjunction with a *Number* block (`392` Hertz) , which corresponds to
-the frequency of the sound made.
+最后一个拼块的音调用赫兹和一个《数字拼块》指定。赫兹是频率的度量。
 
-The octave is specified using a number block and is restricted to
-whole numbers. In the case where the pitch name is specified by
-frequency, the octave is ignored.
+八度是用《数字拼块》指定的。这个数字不能有小数。
+如果音高由赫兹指定，八度将不会被使用。
 
-Note that the pitch name can also be specified using a *Text* block. 
+最后，音高名称可以用一个文字拼块指定。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg "Note layout chart for keyboard")
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg "Note layout chart for mallet")
-Please refer to the above charts for a visual representation of where notes are located on a keyboard or staff.
+请参考上面的图表，了解音符在键盘或五线谱上的位置。
 
 ### <a name="CHORDS"></a>2.3 和弦
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg "Forming a chord")
 
-A chord (multiple, simultaneous pitches) can be specified by adding
-multiple *Pitch* blocks into a single *Note value* block, like the above example.
+一个和弦可以通过将多个音调拼块放在一个音长度拼块里面。
 
 ### <a name="RESTS"></a>2.4 休止
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg "Silence blocks create rests")
 
-A rest of the specified note value duration can be constructed using a *Silence* block in place of a *pitch* block.
+休息可以使用一个音符长度拼块。在这个拼块应该有一个《安静拼块》而不是一个音调拼块。
 
 ### <a name="DRUMS"></a>2.5 鼓声
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg "Using Drum Sample block")
 
-Anywhere  a *Pitch* block can be used&mdash;e.g., inside of the matrix or a
-*Note value* block&mdash;a *Drum Sample* block can also be used instead. Currently there
-about two dozen different samples from which to choose. The default
-drum is a kick drum.
+一个音调拼块可以在任何地方使用&mdash;例如，在音符长度里面&mdash;一个鼓样品可以用来代替。
+现在大概有二十多个不同的样本可选择。默认鼓是踢鼓。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg "Multiple Drum Sample blocks in combinations")
 
-Just as in the [chord](#CHORD) example above, you can use multiple *Drum* blocks
-within a single *Note value* blocks, and combine them with *Pitch*
-blocks as well.
+上面有一个和弦的例子。这个例子的和弦使用鼓拼块。
 
 ## <a name="PROGRAMMING-WITH-MUSIC"></a>3. 使用音乐设计程序
 
 [上一章 (2. 发出声音)](#NOTES) | [回去目录](#TOC) | [下一章 (4. 部件)](#WIDGETS)
 
-这一章将会说明怎么使用音乐砖块来产生音乐。 
+这一章将会说明怎么使用音乐砖块来产生音乐。
 一件必须注意的事是你可以使用自己做出来的音乐砖块来做出你的程序，
 或使用 [*音调-时间矩阵*](#pitch-time) 开始做出你的程序.
 
@@ -199,14 +174,14 @@ blocks as well.
 这些新的拼块创造时的名字是 `chunk`, `chunk1`,
 `chunk2`... 可是你可以编改 *Action* 拼块的标签来换拼块的名字。
 
-一个 *Action* 拼块包含了一系列的行动，这些行动只有当拼块被其他拼块提名才会执行, 
+一个 *Action* 拼块包含了一系列的行动，这些行动只有当拼块被其他拼块提名才会执行,
 例如一个*Start*拼块。 这个特性有用于产生更复杂的音乐程序。
 
 一个 *Start* 拼块 是一个在按下开始按钮后，直接执行的 *chunk*。
-这个拼块是大多数程序开始的地方。《音乐拼块》包含着很多可以 *Run* 一个程序的方式: 
-你可以按下在屏幕左上角的 *Run* 按钮("兔子" 图标) 快速播放音乐; 
-按下 *Run Slow* 按钮 ("乌龟" 图标) 慢速播放音乐; 
-和按下 *Step* 按钮 ("蜗牛" 图标) 每按下按钮播放程序的一个拼块。 
+这个拼块是大多数程序开始的地方。《音乐拼块》包含着很多可以 *Run* 一个程序的方式:
+你可以按下在屏幕左上角的 *Run* 按钮("兔子" 图标) 快速播放音乐;
+按下 *Run Slow* 按钮 ("乌龟" 图标) 慢速播放音乐;
+和按下 *Step* 按钮 ("蜗牛" 图标) 每按下按钮播放程序的一个拼块。
 
 In the example above, the *Chunk* block is inside of a *Start* block, which means
 that when any of the start buttons is pressed, the code inside the *Start* block (the *Chunk* block) will
@@ -345,7 +320,7 @@ default is 50; the range is 0 (silence) to 100 (full volume).
 The *Crescendo* block will increase (or decrease) the volume of the
 contained notes by a specified amount for every note played. For
 example, if you have 3 notes in sequence contained in a *Crescendo*
-block with a value of 5, the final note will be at 15% more 
+block with a value of 5, the final note will be at 15% more
 than the original value for volume.
 
 The *Staccato* block shortens the length of the actual note&mdash;making them tighter
@@ -420,7 +395,7 @@ contained blocks, e.g., violin or cello.
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
-and a number of more exotic modes, such as Bebop, Geez, Maqam, etc. 
+and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
 This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
@@ -612,7 +587,7 @@ color, shade, grey, and pensize.
 You can do additional programming within the status block. In the
 example above, the volume is divided by 10 before being displayed.
 
-### <a name="GENERATION"></a>4.2 产生音乐砖块 
+### <a name="GENERATION"></a>4.2 产生音乐砖块
 
 Using the Pitch-Time Matrix, it is possible to generate chunks of notes at a much faster speed.
 
@@ -971,10 +946,10 @@ Clicking on the *Play* button to the left of each row will playback
 the notes associated with that step in the stairs. The *Play-all*
 button on the upper-left of the widget will play back all the pitch
 steps simultaneously. A second *Play-all* button to the right of the
-stair plays in increasing order of frequency first, then in 
+stair plays in increasing order of frequency first, then in
 decreasing order of frequency as well, completing a scale.
 
-The *Save stack* button will export pitch stacks. For example, in the above 
+The *Save stack* button will export pitch stacks. For example, in the above
 configuration, the output  from pressing the *Save stack* button is shown below:
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg "Pitch Stair block")
