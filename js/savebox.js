@@ -214,12 +214,16 @@ function SaveBox () {
             this.saveTB.visible = false;
             this.saveSVG.visible = false;
             this.savePNG.visible = false;
-            this.saveWAV.visible = false;
             this.uploadToPlanet.visible = false;
-            // this.shareOnFb.visible = false;
             this.saveBlockArtwork.visible = false;
-            this.saveLilypond.visible = false;
-            this._container.visible = false;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.saveWAV.visible = false;
+                this.saveLilypond.visible = false;
+            } else {
+		this.shareOnFb.visible = false;
+            }
+
+	    this._container.visible = false;
             this._refreshCanvas();
         }
     };
@@ -229,11 +233,14 @@ function SaveBox () {
             this.saveTB.visible = true;
             this.saveSVG.visible = true;
             this.savePNG.visible = true;
-            this.saveWAV.visible = true;
             this.uploadToPlanet.visible = true;
-            // this.shareOnFb.visible = true;
             this.saveBlockArtwork.visible = true;
-            this.saveLilypond.visible = true;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.saveWAV.visible = true;
+                this.saveLilypond.visible = true;
+            } else {
+                this.shareOnFb.visible = true;
+            }
             this._container.visible = true;
             this._refreshCanvas();
         }
