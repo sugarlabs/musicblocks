@@ -86,7 +86,7 @@
     <tspan
        id="tspan3664-5-20"
        y="43.56205"
-       x="7.9999695">start</tspan>
+       x="7.9999695">スタート</tspan>
   </text>
   <path
      style="fill:#e37a00;fill-opacity:1;stroke:#a34600;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -100,7 +100,7 @@
     <tspan
        id="tspan25"
        y="84.703728"
-       x="25.999941">forever</tspan>
+       x="25.999941">ずっと</tspan>
   </text>
   <path
      style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -114,7 +114,7 @@
     <tspan
        id="tspan3055"
        y="626.20374"
-       x="129.99994">do</tspan>
+       x="129.99994">をするのは</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -138,7 +138,7 @@
     <tspan
        id="tspan3039"
        y="424.06207"
-       x="43.999943">if</tspan>
+       x="43.999943">もし</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -148,7 +148,7 @@
     <tspan
        id="tspan3043"
        y="466.56207"
-       x="99.999939">then</tspan>
+       x="99.999939">なら</tspan>
   </text>
   <path
      style="fill:#e37a00;fill-opacity:1;stroke:#a34600;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -162,7 +162,7 @@
     <tspan
        id="tspan3039-9"
        y="214.06206"
-       x="43.999969">if</tspan>
+       x="43.999969">もし</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -172,7 +172,7 @@
     <tspan
        id="tspan3043-7"
        y="256.56207"
-       x="99.999969">then</tspan>
+       x="99.999969">なら</tspan>
   </text>
   <path
      style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -200,7 +200,7 @@
     <tspan
        id="tspan3056"
        y="204.56206"
-       x="197.99997">mouse x</tspan>
+       x="197.99997">x座標</tspan>
   </text>
   <path
      d="m 92.999968,229.06206 c 0,-7.33038 6.669617,-13.5 14.000002,-13.5 l 2,0 0,-20 c 0,-8.37758 7.62242,-16 16,-16 l 68,0 0,16 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,16 -60,0 -22,0 -2,0 0,-2 0,-16 -2,0 c -7.330385,0 -14.000002,-5.16962 -14.000002,-12.5 z"
@@ -277,7 +277,7 @@
     <tspan
        id="tspan3176"
        y="666.56207"
-       x="267.99997">box</tspan>
+       x="267.99997">ボックス</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -291,7 +291,7 @@
     <tspan
        id="tspan3176-8"
        y="120.56206"
-       x="169.99997">box</tspan>
+       x="169.99997">ボックス</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -305,7 +305,7 @@
     <tspan
        id="tspan25-8"
        y="143.56206"
-       x="145.99997">store in</tspan>
+       x="145.99997">方存</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -315,7 +315,7 @@
     <tspan
        id="tspan29"
        y="119.06206"
-       x="145.99997">name</tspan>
+       x="145.99997">名前</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -325,7 +325,7 @@
     <tspan
        id="tspan33"
        y="163.06206"
-       x="145.99997">value</tspan>
+       x="145.99997">価値</tspan>
   </text>
   <path
      style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -353,7 +353,7 @@
     <tspan
        id="tspan3176-6"
        y="498.56207"
-       x="171.99997">box</tspan>
+       x="171.99997">ボックス</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -367,7 +367,7 @@
     <tspan
        id="tspan3128"
        y="521.56207"
-       x="147.99997">add</tspan>
+       x="147.99997">足し算をする</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -377,7 +377,7 @@
     <tspan
        id="tspan3132"
        y="497.06207"
-       x="147.99997">to</tspan>
+       x="147.99997">最終の状態</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -387,7 +387,7 @@
     <tspan
        id="tspan3136"
        y="541.06207"
-       x="147.99997">value</tspan>
+       x="147.99997">価値</tspan>
   </text>
   <path
      style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -415,7 +415,7 @@
     <tspan
        id="tspan3176-1"
        y="288.56207"
-       x="171.99997">box</tspan>
+       x="171.99997">ボックス</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -429,7 +429,7 @@
     <tspan
        id="tspan3128-0"
        y="311.56207"
-       x="147.99997">add</tspan>
+       x="147.99997">足し算をする</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -439,7 +439,7 @@
     <tspan
        id="tspan3132-1"
        y="287.06207"
-       x="147.99997">to</tspan>
+       x="147.99997">最終の状態</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -449,7 +449,7 @@
     <tspan
        id="tspan3136-9"
        y="331.06207"
-       x="147.99997">value</tspan>
+       x="147.99997">価値</tspan>
   </text>
   <path
      style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -463,7 +463,7 @@
     <tspan
        id="tspan3087"
        y="414.56207"
-       x="197.99997">mouse y</tspan>
+       x="197.99997">y座標</tspan>
   </text>
   <path
      d="m 92.999968,439.06206 c 0,-7.33038 6.669617,-13.5 14.000002,-13.5 l 2,0 0,-20 c 0,-8.37758 7.62242,-16 16,-16 l 68,0 0,16 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,16 -60,0 -22,0 -2,0 0,-2 0,-16 -2,0 c -7.330385,0 -14.000002,-5.16962 -14.000002,-12.5 z"

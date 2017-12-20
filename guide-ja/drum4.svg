@@ -36,7 +36,7 @@
     <tspan
        x="7.944603"
        y="41.273296"
-       id="tspan3031-5">action</tspan>
+       id="tspan3031-5">動作</tspan>
   </text>
   <path
      d="m 143,13.56205 h 120 v 40 H 143 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -74,7 +74,7 @@
     <tspan
        id="tspan25-8-5-1-3-7-2-3"
        y="504.07721"
-       x="162.52283">kick drum</tspan>
+       x="162.52283">バス・ドラム</tspan>
   </text>
   <path
      d="m 37,492.12415 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 z"
@@ -88,7 +88,7 @@
     <tspan
        x="130"
        y="503.12415"
-       id="tspan3055">drum</tspan>
+       id="tspan3055">ドラム</tspan>
   </text>
   <text
      id="text3057"
@@ -573,7 +573,7 @@
     <tspan
        x="428"
        y="43.562096"
-       id="tspan3664">start</tspan>
+       id="tspan3664">スタート</tspan>
   </text>
   <path
      style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -601,7 +601,7 @@
     <tspan
        id="tspan3176"
        y="205.12418"
-       x="684">box</tspan>
+       x="684">ボックス</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -615,7 +615,7 @@
     <tspan
        id="tspan3176-0"
        y="499.12418"
-       x="704">box</tspan>
+       x="704">ボックス</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -629,7 +629,7 @@
     <tspan
        id="tspan25"
        y="102.12415"
-       x="548">store in</tspan>
+       x="548">方存</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -639,7 +639,7 @@
     <tspan
        id="tspan29"
        y="77.624146"
-       x="548">name</tspan>
+       x="548">名前</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -649,7 +649,7 @@
     <tspan
        id="tspan33"
        y="121.62415"
-       x="548">value</tspan>
+       x="548">価値</tspan>
   </text>
   <path
      d="m 569,54.124155 h 120 v 39.99999 H 569 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -663,7 +663,7 @@
     <tspan
        x="595.21783"
        y="78.206192"
-       id="tspan25-1-8">box</tspan>
+       id="tspan25-1-8">ボックス</tspan>
   </text>
   <path
      d="M 569,96.124145 H 689 V 136.12414 H 569 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -691,7 +691,7 @@
     <tspan
        id="tspan3039-21"
        y="167.62415"
-       x="446">repeat</tspan>
+       x="446">回繰り返す</tspan>
   </text>
   <path
      d="m 551,138.12416 h 120 v 40 H 551 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -733,7 +733,7 @@
     <tspan
        id="tspan3039-21-4"
        y="251.62415"
-       x="482">repeat</tspan>
+       x="482">回繰り返す</tspan>
   </text>
   <path
      d="m 587,222.12416 h 120 v 40 H 587 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -761,7 +761,7 @@
     <tspan
        id="tspan25-12"
        y="438.12415"
-       x="566">store in</tspan>
+       x="566">方存</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -771,7 +771,7 @@
     <tspan
        id="tspan29-6"
        y="413.62415"
-       x="566">name</tspan>
+       x="566">名前</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -781,7 +781,7 @@
     <tspan
        id="tspan33-6"
        y="457.62415"
-       x="566">value</tspan>
+       x="566">価値</tspan>
   </text>
   <path
      d="m 587,390.12416 h 120 v 39.99999 H 587 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -795,7 +795,7 @@
     <tspan
        x="613.21783"
        y="414.20621"
-       id="tspan25-1-8-6">box</tspan>
+       id="tspan25-1-8-6">ボックス</tspan>
   </text>
   <path
      d="m 701,432.12415 h 120 v 40 H 701 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -823,7 +823,7 @@
     <tspan
        x="672"
        y="480.12415"
-       id="tspan3802-6-2-5">x</tspan>
+       id="tspan3802-6-2-5">x座標</tspan>
   </text>
   <text
      id="text3804-3-3-6"
@@ -857,7 +857,7 @@
     <tspan
        id="tspan3039-2"
        y="419.62418"
-       x="24">note value</tspan>
+       x="24">音価</tspan>
   </text>
   <g
      id="g5152-6"
@@ -939,7 +939,7 @@
     <tspan
        id="tspan25-8-5-1-3-7-2-3-3"
        y="336.07721"
-       x="162.52283">kick drum</tspan>
+       x="162.52283">バス・ドラム</tspan>
   </text>
   <path
      d="m 37,324.12415 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 z"
@@ -953,7 +953,7 @@
     <tspan
        x="130"
        y="335.12415"
-       id="tspan3055-9">drum</tspan>
+       id="tspan3055-9">ドラム</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -967,7 +967,7 @@
     <tspan
        id="tspan3039-2-7"
        y="251.62418"
-       x="24">note value</tspan>
+       x="24">音価</tspan>
   </text>
   <g
      id="g5152-6-0"
@@ -1063,7 +1063,7 @@
     <tspan
        x="130"
        y="167.12413"
-       id="tspan3055-2">drum</tspan>
+       id="tspan3055-2">ドラム</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -1077,7 +1077,7 @@
     <tspan
        id="tspan3039-2-73"
        y="83.624168"
-       x="24">note value</tspan>
+       x="24">音価</tspan>
   </text>
   <g
      id="g5152-6-6"
@@ -1159,7 +1159,7 @@
     <tspan
        id="tspan25-8-5-1-3-7-2-3-2"
        y="672.07721"
-       x="162.52283">cow bell</tspan>
+       x="162.52283">カウベル</tspan>
   </text>
   <path
      d="m 37,660.12415 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 z"
@@ -1173,7 +1173,7 @@
     <tspan
        x="130"
        y="671.12415"
-       id="tspan3055-5">drum</tspan>
+       id="tspan3055-5">ドラム</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -1187,7 +1187,7 @@
     <tspan
        id="tspan3039-2-76"
        y="587.62415"
-       x="24">note value</tspan>
+       x="24">音価</tspan>
   </text>
   <g
      id="g5152-6-5"

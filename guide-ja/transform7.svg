@@ -36,7 +36,7 @@
     <tspan
        id="tspan3039"
        y="122.21683"
-       x="428.89648">tie</tspan>
+       x="428.89648">タイ</tspan>
   </text>
   <path
      d="m 457,234.99999 0,-8.00002 a 8.0000007,8.0000006 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8.00001,0 a 8.0000007,8.0000006 0 0 1 8,8 l 0,8.00002 -8,0 0,-6.00002 -8.00001,0 0,20.00002 8.00001,0 0,-6 8,0 0,34 -8,0 0,-5.99999 -8.00001,0 0,19.99999 8.00001,0 0,-6 8,0 0,8 a 8.0000007,8.0000006 0 0 1 -8,8 l -8.00001,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8.0000007,8.0000006 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
@@ -50,7 +50,7 @@
     <tspan
        x="550"
        y="267"
-       id="tspan3198-2">pitch</tspan>
+       id="tspan3198-2">ピッチ</tspan>
   </text>
   <text
      id="text3200-7"
@@ -60,7 +60,7 @@
     <tspan
        x="550"
        y="242.49995"
-       id="tspan3202-0">name</tspan>
+       id="tspan3202-0">名前</tspan>
   </text>
   <text
      id="text3204-93"
@@ -70,7 +70,7 @@
     <tspan
        x="550"
        y="286.49997"
-       id="tspan3206-6">octave</tspan>
+       id="tspan3206-6">オクターヴ</tspan>
   </text>
   <path
      style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -112,7 +112,7 @@
     <tspan
        x="444"
        y="162.5"
-       id="tspan3039-5">note value</tspan>
+       id="tspan3039-5">音価</tspan>
   </text>
   <path
      d="m 685.00002,177 120.00001,0 0,39.99999 -120.00001,0 0,-16 0,-2 -12,0 0,6 -4.00001,0 0,-15.99999 4.00001,0 0,5.99999 12,0 0,-2 z"
@@ -182,7 +182,7 @@
     <tspan
        x="550"
        y="477"
-       id="tspan3198-2-5">pitch</tspan>
+       id="tspan3198-2-5">ピッチ</tspan>
   </text>
   <text
      id="text3200-7-4"
@@ -192,7 +192,7 @@
     <tspan
        x="550"
        y="452.49997"
-       id="tspan3202-0-7">name</tspan>
+       id="tspan3202-0-7">名前</tspan>
   </text>
   <text
      id="text3204-93-6"
@@ -202,7 +202,7 @@
     <tspan
        x="550"
        y="496.49997"
-       id="tspan3206-6-5">octave</tspan>
+       id="tspan3206-6-5">オクターヴ</tspan>
   </text>
   <path
      style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -244,7 +244,7 @@
     <tspan
        x="444"
        y="372.5"
-       id="tspan3039-5-4">note value</tspan>
+       id="tspan3039-5-4">音価</tspan>
   </text>
   <path
      d="m 685.00004,386.99998 120.00002,0 0,40.00001 -120.00002,0 0,-16.00001 0,-2 -12,0 0,6 -4.00002,0 0,-16 4.00002,0 0,6 12,0 0,-2 z"
@@ -365,7 +365,7 @@
     <tspan
        x="130.00003"
        y="259"
-       id="tspan3198-2-8">pitch</tspan>
+       id="tspan3198-2-8">ピッチ</tspan>
   </text>
   <text
      id="text3200-7-0"
@@ -375,7 +375,7 @@
     <tspan
        x="130.00003"
        y="234.49997"
-       id="tspan3202-0-5">name</tspan>
+       id="tspan3202-0-5">名前</tspan>
   </text>
   <text
      id="text3204-93-66"
@@ -385,7 +385,7 @@
     <tspan
        x="130.00003"
        y="278.49997"
-       id="tspan3206-6-4">octave</tspan>
+       id="tspan3206-6-4">オクターヴ</tspan>
   </text>
   <path
      style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -427,7 +427,7 @@
     <tspan
        x="24.000027"
        y="154.5"
-       id="tspan3039-5-9">note value</tspan>
+       id="tspan3039-5-9">音価</tspan>
   </text>
   <path
      d="m 265.0001,169.00001 120,0 0,39.99999 -120,0 0,-16 0,-2 -12,0 0,6 -4.0001,0 0,-15.99999 4.0001,0 0,5.99999 12,0 0,-2 z"
@@ -497,7 +497,7 @@
     <tspan
        x="130.00003"
        y="469"
-       id="tspan3198-2-5-5">pitch</tspan>
+       id="tspan3198-2-5-5">ピッチ</tspan>
   </text>
   <text
      id="text3200-7-4-9"
@@ -507,7 +507,7 @@
     <tspan
        x="130.00003"
        y="444.5"
-       id="tspan3202-0-7-9">name</tspan>
+       id="tspan3202-0-7-9">名前</tspan>
   </text>
   <text
      id="text3204-93-6-1"
@@ -517,7 +517,7 @@
     <tspan
        x="130.00003"
        y="488.5"
-       id="tspan3206-6-5-4">octave</tspan>
+       id="tspan3206-6-5-4">オクターヴ</tspan>
   </text>
   <path
      style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -559,7 +559,7 @@
     <tspan
        x="24.000027"
        y="364.5"
-       id="tspan3039-5-4-4">note value</tspan>
+       id="tspan3039-5-4-4">音価</tspan>
   </text>
   <path
      d="m 265.0001,378.99998 120,0 0,40.00001 -120,0 0,-16.00001 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -631,7 +631,7 @@
        x="10.827461"
        y="44.511208"
        id="tspan25-5"
-       style="fill:#000000;fill-opacity:1">swing</tspan>
+       style="fill:#000000;fill-opacity:1">スイング</tspan>
   </text>
   <text
      id="text27"
@@ -643,7 +643,7 @@
        x="92.052986"
        y="22.851149"
        id="tspan29"
-       style="fill:#000000;fill-opacity:1">swing value</tspan>
+       style="fill:#000000;fill-opacity:1">スイングの数値</tspan>
   </text>
   <text
      id="text31"
@@ -655,7 +655,7 @@
        x="92.052986"
        y="65.4944"
        id="tspan33"
-       style="fill:#000000;fill-opacity:1">note value</tspan>
+       style="fill:#000000;fill-opacity:1">音価</tspan>
   </text>
   <text
      x="1238.6616"

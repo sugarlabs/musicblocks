@@ -35,7 +35,7 @@
     <tspan
        id="tspan3664"
        y="39.624084"
-       x="9.1454468">status</tspan>
+       x="9.1454468">ステータス</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -102,7 +102,7 @@
       <tspan
          x="135.08859"
          y="624.53705"
-         id="tspan3055">print</tspan>
+         id="tspan3055">印刷" #This is like "print a piece of paper</tspan>
     </text>
   </g>
   <text
@@ -147,7 +147,7 @@
     <tspan
        id="tspan25-4"
        y="81.728683"
-       x="147.75529">key</tspan>
+       x="147.75529">調</tspan>
   </text>
   <path
      style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -161,7 +161,7 @@
     <tspan
        id="tspan3176"
        y="127.06206"
-       x="147.08862">beats per minute</tspan>
+       x="147.08862">BPM(一分当たりの泊数)</tspan>
   </text>
   <g
      id="g4726-2"
@@ -178,7 +178,7 @@
       <tspan
          x="135.08859"
          y="624.53705"
-         id="tspan3055-9">print</tspan>
+         id="tspan3055-9">印刷" #This is like "print a piece of paper</tspan>
     </text>
   </g>
   <g
@@ -196,7 +196,7 @@
       <tspan
          x="135.08859"
          y="624.53705"
-         id="tspan3055-2">print</tspan>
+         id="tspan3055-2">印刷" #This is like "print a piece of paper</tspan>
     </text>
   </g>
   <path

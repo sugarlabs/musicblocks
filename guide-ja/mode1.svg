@@ -50,7 +50,7 @@
     <tspan
        id="tspan3198-0-1-1"
        y="103.40286"
-       x="112.89638">set key</tspan>
+       x="112.89638">調の設定</tspan>
   </text>
   <text
      y="56.402863"
@@ -60,7 +60,7 @@
     <tspan
        id="tspan3202-5-0-1"
        y="78.902863"
-       x="113.40907">key</tspan>
+       x="113.40907">調</tspan>
   </text>
   <text
      y="58.402863"
@@ -70,7 +70,7 @@
     <tspan
        id="tspan3206-0-8-6"
        y="122.90288"
-       x="112.89638">mode</tspan>
+       x="112.89638">モード(旋法)</tspan>
   </text>
   <g
      id="g4225"
@@ -102,7 +102,7 @@
     <tspan
        x="7.9999852"
        y="43.562065"
-       id="tspan3664">custom mode</tspan>
+       id="tspan3664">カスタム音階</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"

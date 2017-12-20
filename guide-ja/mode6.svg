@@ -38,7 +38,7 @@
       <tspan
          x="130"
          y="144.12408"
-         id="tspan3198">pitch</tspan>
+         id="tspan3198">ピッチ</tspan>
     </text>
     <text
        id="text3200"
@@ -48,7 +48,7 @@
       <tspan
          x="130"
          y="119.62408"
-         id="tspan3202">name</tspan>
+         id="tspan3202">名前</tspan>
     </text>
     <text
        id="text3204"
@@ -58,7 +58,7 @@
       <tspan
          x="130"
          y="163.62408"
-         id="tspan3206">octave</tspan>
+         id="tspan3206">オクターヴ</tspan>
     </text>
     <path
        style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -101,7 +101,7 @@
     <tspan
        id="tspan3031-5"
        y="41.467842"
-       x="7.944603">action</tspan>
+       x="7.944603">動作</tspan>
   </text>
   <path
      style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -132,7 +132,7 @@
       <tspan
          x="130"
          y="144.12408"
-         id="tspan3198-5">pitch</tspan>
+         id="tspan3198-5">ピッチ</tspan>
     </text>
     <text
        id="text3200-3"
@@ -142,7 +142,7 @@
       <tspan
          x="130"
          y="119.62408"
-         id="tspan3202-5">name</tspan>
+         id="tspan3202-5">名前</tspan>
     </text>
     <text
        id="text3204-6"
@@ -152,7 +152,7 @@
       <tspan
          x="130"
          y="163.62408"
-         id="tspan3206-2">octave</tspan>
+         id="tspan3206-2">オクターヴ</tspan>
     </text>
     <path
        style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -198,7 +198,7 @@
       <tspan
          x="130"
          y="144.12408"
-         id="tspan3198-2">pitch</tspan>
+         id="tspan3198-2">ピッチ</tspan>
     </text>
     <text
        id="text3200-6"
@@ -208,7 +208,7 @@
       <tspan
          x="130"
          y="119.62408"
-         id="tspan3202-1">name</tspan>
+         id="tspan3202-1">名前</tspan>
     </text>
     <text
        id="text3204-8"
@@ -218,7 +218,7 @@
       <tspan
          x="130"
          y="163.62408"
-         id="tspan3206-7">octave</tspan>
+         id="tspan3206-7">オクターヴ</tspan>
     </text>
     <path
        style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -264,7 +264,7 @@
       <tspan
          x="130"
          y="144.12408"
-         id="tspan3198-7">pitch</tspan>
+         id="tspan3198-7">ピッチ</tspan>
     </text>
     <text
        id="text3200-36"
@@ -274,7 +274,7 @@
       <tspan
          x="130"
          y="119.62408"
-         id="tspan3202-12">name</tspan>
+         id="tspan3202-12">名前</tspan>
     </text>
     <text
        id="text3204-9"
@@ -284,7 +284,7 @@
       <tspan
          x="130"
          y="163.62408"
-         id="tspan3206-3">octave</tspan>
+         id="tspan3206-3">オクターヴ</tspan>
     </text>
     <path
        style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -330,7 +330,7 @@
       <tspan
          x="130"
          y="144.12408"
-         id="tspan3198-0">pitch</tspan>
+         id="tspan3198-0">ピッチ</tspan>
     </text>
     <text
        id="text3200-63"
@@ -340,7 +340,7 @@
       <tspan
          x="130"
          y="119.62408"
-         id="tspan3202-2">name</tspan>
+         id="tspan3202-2">名前</tspan>
     </text>
     <text
        id="text3204-0"
@@ -350,7 +350,7 @@
       <tspan
          x="130"
          y="163.62408"
-         id="tspan3206-6">octave</tspan>
+         id="tspan3206-6">オクターヴ</tspan>
     </text>
     <path
        style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -396,7 +396,7 @@
       <tspan
          x="130"
          y="144.12408"
-         id="tspan3198-52">pitch</tspan>
+         id="tspan3198-52">ピッチ</tspan>
     </text>
     <text
        id="text3200-5"
@@ -406,7 +406,7 @@
       <tspan
          x="130"
          y="119.62408"
-         id="tspan3202-4">name</tspan>
+         id="tspan3202-4">名前</tspan>
     </text>
     <text
        id="text3204-7"
@@ -416,7 +416,7 @@
       <tspan
          x="130"
          y="163.62408"
-         id="tspan3206-4">octave</tspan>
+         id="tspan3206-4">オクターヴ</tspan>
     </text>
     <path
        style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -462,7 +462,7 @@
       <tspan
          x="130"
          y="144.12408"
-         id="tspan3198-1">pitch</tspan>
+         id="tspan3198-1">ピッチ</tspan>
     </text>
     <text
        id="text3200-4"
@@ -472,7 +472,7 @@
       <tspan
          x="130"
          y="119.62408"
-         id="tspan3202-9">name</tspan>
+         id="tspan3202-9">名前</tspan>
     </text>
     <text
        id="text3204-2"
@@ -482,7 +482,7 @@
       <tspan
          x="130"
          y="163.62408"
-         id="tspan3206-0">octave</tspan>
+         id="tspan3206-0">オクターヴ</tspan>
     </text>
     <path
        style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -496,7 +496,7 @@
       <tspan
          id="tspan25-6"
          y="121.12408"
-         x="204">do</tspan>
+         x="204">をするのは</tspan>
     </text>
     <path
        d="m 151,138.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -528,7 +528,7 @@
       <tspan
          id="tspan3198-7-3"
          y="178.12411"
-         x="598">rhythm</tspan>
+         x="598">リズム</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -548,7 +548,7 @@
       <tspan
          id="tspan3206-3-6"
          y="197.62411"
-         x="598">note value</tspan>
+         x="598">音価</tspan>
     </text>
     <path
        style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -590,7 +590,7 @@
       <tspan
          id="tspan3664"
          y="74.124084"
-         x="495.14545">pitch-time matrix</tspan>
+         x="495.14545">ピッチ・タイム行列</tspan>
     </text>
     <g
        id="g3918-9"

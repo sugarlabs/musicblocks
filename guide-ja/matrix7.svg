@@ -37,7 +37,7 @@
       <tspan
          id="tspan3198"
          y="49"
-         x="94">pitch</tspan>
+         x="94">ピッチ</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -45,7 +45,7 @@
       <tspan
          id="tspan3202"
          y="22.5"
-         x="94">name</tspan>
+         x="94">名前</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -53,7 +53,7 @@
       <tspan
          id="tspan3206"
          y="64.5"
-         x="94">octave</tspan>
+         x="94">オクターヴ</tspan>
     </text>
   </g>
   <g
@@ -261,7 +261,7 @@
       <tspan
          id="tspan3198-7"
          y="49"
-         x="94">rhythm</tspan>
+         x="94">リズム</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -269,7 +269,7 @@
       <tspan
          id="tspan3202-8"
          y="22.5"
-         x="94">number of notes</tspan>
+         x="94">音符の数</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -277,7 +277,7 @@
       <tspan
          id="tspan3206-3"
          y="64.5"
-         x="94">note value</tspan>
+         x="94">音価</tspan>
     </text>
   </g>
   <g
@@ -311,7 +311,7 @@
       <tspan
          id="tspan3198-1"
          y="49"
-         x="94">pitch</tspan>
+         x="94">ピッチ</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -319,7 +319,7 @@
       <tspan
          id="tspan3202-3"
          y="22.5"
-         x="94">name</tspan>
+         x="94">名前</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -327,7 +327,7 @@
       <tspan
          id="tspan3206-6"
          y="64.5"
-         x="94">octave</tspan>
+         x="94">オクターヴ</tspan>
     </text>
   </g>
   <g
@@ -343,7 +343,7 @@
       <tspan
          id="tspan3198-0"
          y="49"
-         x="94">pitch</tspan>
+         x="94">ピッチ</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -351,7 +351,7 @@
       <tspan
          id="tspan3202-5"
          y="22.5"
-         x="94">name</tspan>
+         x="94">名前</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -359,7 +359,7 @@
       <tspan
          id="tspan3206-0"
          y="64.5"
-         x="94">octave</tspan>
+         x="94">オクターヴ</tspan>
     </text>
   </g>
   <g
@@ -377,7 +377,7 @@
       <tspan
          id="tspan3664"
          y="39"
-         x="9.1454468">pitch-time matrix</tspan>
+         x="9.1454468">ピッチ・タイム行列</tspan>
     </text>
   </g>
   <g
@@ -393,7 +393,7 @@
       <tspan
          id="tspan3198-7-2"
          y="49"
-         x="94">rhythm</tspan>
+         x="94">リズム</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -401,7 +401,7 @@
       <tspan
          id="tspan3202-8-0"
          y="22.5"
-         x="94">number of notes</tspan>
+         x="94">音符の数</tspan>
     </text>
     <text
        style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -409,7 +409,7 @@
       <tspan
          id="tspan3206-3-3"
          y="64.5"
-         x="94">note value</tspan>
+         x="94">音価</tspan>
     </text>
   </g>
   <g

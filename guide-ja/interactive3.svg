@@ -136,7 +136,7 @@
     <tspan
        x="112"
        y="150.99998"
-       id="tspan3198-01-0">pitch</tspan>
+       id="tspan3198-01-0">ピッチ</tspan>
   </text>
   <text
      id="text3200-4-7"
@@ -146,7 +146,7 @@
     <tspan
        x="112"
        y="108.49999"
-       id="tspan3202-55-0">name</tspan>
+       id="tspan3202-55-0">名前</tspan>
   </text>
   <text
      id="text3204-8-2"
@@ -156,7 +156,7 @@
     <tspan
        x="112"
        y="192.49998"
-       id="tspan3206-1-7">octave</tspan>
+       id="tspan3206-1-7">オクターヴ</tspan>
   </text>
   <g
      id="g3710-7-2"
@@ -566,7 +566,7 @@
       <tspan
          x="32"
          y="13"
-         id="tspan25-85-4">do</tspan>
+         id="tspan25-85-4">をするのは</tspan>
     </text>
   </g>
   <g
@@ -583,7 +583,7 @@
          x="110"
          y="49"
          id="tspan3802-6-9-8"
-         style="font-size:20px">one of</tspan>
+         style="font-size:20px">これかそれ</tspan>
     </text>
     <text
        id="text3804-3-5-3"
@@ -610,7 +610,7 @@
     <tspan
        x="223.46014"
        y="110.5"
-       id="tspan3202-55-08-0">this</tspan>
+       id="tspan3202-55-08-0">この</tspan>
   </text>
   <text
      y="128.70001"
@@ -620,7 +620,7 @@
     <tspan
        x="223.12811"
        y="151.20001"
-       id="tspan3202-55-08-0-3">that</tspan>
+       id="tspan3202-55-08-0-3">その</tspan>
   </text>
   <text
      x="853.37421"
@@ -688,7 +688,7 @@
         <tspan
            x="94"
            y="28"
-           id="tspan3055">do</tspan>
+           id="tspan3055">をするのは</tspan>
       </text>
       <text
          id="text3057"
@@ -730,7 +730,7 @@
            style="font-size:20px"
            id="tspan3802-6-9-8-2"
            y="49"
-           x="110">one of</tspan>
+           x="110">これかそれ</tspan>
       </text>
       <text
          style="font-size:18.66666603px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -757,7 +757,7 @@
       <tspan
          id="tspan3202-55-08-0-2"
          y="362.40442"
-         x="267.29456">this</tspan>
+         x="267.29456">この</tspan>
     </text>
     <text
        x="172.96252"
@@ -767,7 +767,7 @@
       <tspan
          id="tspan3202-55-08-0-3-6"
          y="403.10443"
-         x="266.96252">that</tspan>
+         x="266.96252">その</tspan>
     </text>
     <g
        id="g4447-7"
@@ -799,7 +799,7 @@
     <tspan
        id="tspan3039-5"
        y="28.499968"
-       x="6.00002">note value</tspan>
+       x="6.00002">音価</tspan>
   </text>
   <path
      style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"

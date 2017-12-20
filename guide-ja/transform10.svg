@@ -64,7 +64,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan2264">start</tspan>
+           id="tspan2264">スタート</tspan>
       </text>
     </g>
   </g>
@@ -85,7 +85,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan2274">note value</tspan>
+           id="tspan2274">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -214,7 +214,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan2336">note value</tspan>
+           id="tspan2336">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -343,7 +343,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan2398">pitch</tspan>
+           id="tspan2398">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -351,7 +351,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan2402">name</tspan>
+           id="tspan2402">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -359,7 +359,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan2406">octave</tspan>
+           id="tspan2406">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -380,7 +380,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan2416">do</tspan>
+           id="tspan2416">をするのは</tspan>
       </text>
     </g>
   </g>
@@ -422,7 +422,7 @@
         <tspan
            x="48.01302"
            y="24"
-           id="tspan2436">set key</tspan>
+           id="tspan2436">調の設定</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -430,7 +430,7 @@
         <tspan
            x="48.01302"
            y="11.25"
-           id="tspan2440">key</tspan>
+           id="tspan2440">調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -438,7 +438,7 @@
         <tspan
            x="48.01302"
            y="32.25"
-           id="tspan2444">mode</tspan>
+           id="tspan2444">モード(旋法)</tspan>
       </text>
     </g>
   </g>
@@ -480,7 +480,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan2464">major</tspan>
+           id="tspan2464">メジャー</tspan>
       </text>
     </g>
   </g>
@@ -501,7 +501,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan2474">repeat</tspan>
+           id="tspan2474">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -601,7 +601,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan2522">repeat</tspan>
+           id="tspan2522">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -651,7 +651,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan2546">note value</tspan>
+           id="tspan2546">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"

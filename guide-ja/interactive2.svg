@@ -36,7 +36,7 @@
     <tspan
        id="tspan3031-5-3"
        y="41.273296"
-       x="407.94461">action</tspan>
+       x="407.94461">動作</tspan>
   </text>
   <path
      style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -164,7 +164,7 @@
     <tspan
        id="tspan3031-5-3-4"
        y="41.273308"
-       x="7.944603">action</tspan>
+       x="7.944603">動作</tspan>
   </text>
   <path
      style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -178,7 +178,7 @@
     <tspan
        id="tspan25-1-1-4"
        y="38.018044"
-       x="185.21786">do</tspan>
+       x="185.21786">をするのは</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -483,7 +483,7 @@
     <tspan
        x="8.633606"
        y="363.47491"
-       id="tspan3664-5-6">start</tspan>
+       id="tspan3664-5-6">スタート</tspan>
   </text>
   <path
      style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -497,7 +497,7 @@
     <tspan
        id="tspan3198-01-4-0"
        y="440.12411"
-       x="112">on</tspan>
+       x="112">の時に</tspan>
   </text>
   <text
      x="18.000004"
@@ -507,7 +507,7 @@
     <tspan
        id="tspan3202-55-08-0"
        y="401.62411"
-       x="112">event</tspan>
+       x="112">イベント</tspan>
   </text>
   <text
      x="18.000004"
@@ -517,7 +517,7 @@
     <tspan
        id="tspan3206-1-3-1"
        y="483.62411"
-       x="112">do</tspan>
+       x="112">をするのは</tspan>
   </text>
   <path
      d="m 246.61716,417.95402 150,0 0,40 -150,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -531,7 +531,7 @@
     <tspan
        x="258.11716"
        y="442.95401"
-       id="tspan25-85-7-0">mouse name</tspan>
+       id="tspan25-85-7-0">ネズミの名前</tspan>
   </text>
   <path
      style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -545,7 +545,7 @@
     <tspan
        id="tspan25-1-1-8-9"
        y="400.41"
-       x="280.83502">click</tspan>
+       x="280.83502">クリック</tspan>
   </text>
   <path
      style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -559,7 +559,7 @@
     <tspan
        id="tspan25-1-1-9-2"
        y="484.41"
-       x="176.83502">do</tspan>
+       x="176.83502">をするのは</tspan>
   </text>
   <path
      d="m 132.61716,391.95402 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -631,7 +631,7 @@
     <tspan
        x="408"
        y="364.06204"
-       id="tspan3664-5">start</tspan>
+       id="tspan3664-5">スタート</tspan>
   </text>
   <path
      style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -645,7 +645,7 @@
     <tspan
        id="tspan3198-01-4"
        y="568.12408"
-       x="512">on</tspan>
+       x="512">の時に</tspan>
   </text>
   <text
      x="418"
@@ -655,7 +655,7 @@
     <tspan
        id="tspan3202-55-08"
        y="527.62408"
-       x="512">event</tspan>
+       x="512">イベント</tspan>
   </text>
   <text
      x="418"
@@ -665,7 +665,7 @@
     <tspan
        id="tspan3206-1-3"
        y="609.62408"
-       x="512">do</tspan>
+       x="512">をするのは</tspan>
   </text>
   <path
      d="m 647,544.12412 150,0 0,40 -150,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -679,7 +679,7 @@
     <tspan
        x="658.11719"
        y="568.95398"
-       id="tspan25-85-7">mouse name</tspan>
+       id="tspan25-85-7">ネズミの名前</tspan>
   </text>
   <path
      style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -693,7 +693,7 @@
     <tspan
        id="tspan25-1-1-8"
        y="526.40997"
-       x="680.83502">click</tspan>
+       x="680.83502">クリック</tspan>
   </text>
   <path
      style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -755,7 +755,7 @@
     <tspan
        id="tspan3385"
        y="466.12411"
-       x="512">set xy</tspan>
+       x="512">xyの設定</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -765,7 +765,7 @@
     <tspan
        id="tspan3389"
        y="441.62411"
-       x="512">x</tspan>
+       x="512">x座標</tspan>
   </text>
   <text
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -775,7 +775,7 @@
     <tspan
        id="tspan3393"
        y="485.62411"
-       x="512">y</tspan>
+       x="512">y座標</tspan>
   </text>
   <path
      d="m 419,392.12411 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 0,8 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 z"
@@ -789,7 +789,7 @@
     <tspan
        x="512"
        y="403.12411"
-       id="tspan3062">pen up</tspan>
+       id="tspan3062">ペン上げる</tspan>
   </text>
   <path
      d="m 533,458.1241 120,0 0,-40 -120,0 0,16 0,2 -12,0 0,-6 -4,0 0,16 4,0 0,-6 12,0 0,2 z"
@@ -803,7 +803,7 @@
     <tspan
        x="573"
        y="445.12408"
-       id="tspan25-7-0-6">100</tspan>
+       id="tspan25-7-0-6">百</tspan>
   </text>
   <path
      d="m 37,154.62411 0,-7.99999 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.99999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,34 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
@@ -817,7 +817,7 @@
     <tspan
        x="129.99998"
        y="186.62413"
-       id="tspan3198">pitch</tspan>
+       id="tspan3198">ピッチ</tspan>
   </text>
   <text
      id="text3200"
@@ -827,7 +827,7 @@
     <tspan
        x="129.99998"
        y="162.12411"
-       id="tspan3202">name</tspan>
+       id="tspan3202">名前</tspan>
   </text>
   <text
      id="text3204"
@@ -837,7 +837,7 @@
     <tspan
        x="129.99998"
        y="206.12413"
-       id="tspan3206">octave</tspan>
+       id="tspan3206">オクターヴ</tspan>
   </text>
   <path
      style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -851,7 +851,7 @@
     <tspan
        id="tspan25"
        y="163.62411"
-       x="199.99998">do</tspan>
+       x="199.99998">をするのは</tspan>
   </text>
   <path
      d="m 151,180.62411 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -879,7 +879,7 @@
     <tspan
        x="24.000044"
        y="82.12413"
-       id="tspan3039">note value</tspan>
+       id="tspan3039">音価</tspan>
   </text>
   <g
      transform="translate(18,95.624133)"
@@ -961,7 +961,7 @@
     <tspan
        x="530"
        y="186.62413"
-       id="tspan3198-7">pitch</tspan>
+       id="tspan3198-7">ピッチ</tspan>
   </text>
   <text
      id="text3200-5"
@@ -971,7 +971,7 @@
     <tspan
        x="530"
        y="162.12411"
-       id="tspan3202-3">name</tspan>
+       id="tspan3202-3">名前</tspan>
   </text>
   <text
      id="text3204-5"
@@ -981,7 +981,7 @@
     <tspan
        x="530"
        y="206.12413"
-       id="tspan3206-6">octave</tspan>
+       id="tspan3206-6">オクターヴ</tspan>
   </text>
   <path
      style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -1023,7 +1023,7 @@
     <tspan
        x="424.00003"
        y="82.124123"
-       id="tspan3039-0">note value</tspan>
+       id="tspan3039-0">音価</tspan>
   </text>
   <g
      transform="translate(418,95.624131)"

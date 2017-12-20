@@ -61,7 +61,7 @@
        style="font-weight:bold"
        y="22.964867"
        x="92.96875"
-       id="tspan4474">key</tspan></text>
+       id="tspan4474">調</tspan></text>
   <text
      id="text4500"
      y="58.393806"
@@ -126,7 +126,7 @@
        style="font-weight:bold"
        y="22.96484"
        x="272.96875"
-       id="tspan4474-2">volume</tspan></text>
+       id="tspan4474-2">音量</tspan></text>
   <rect
      y="-3.8146954e-06"
      x="282"
@@ -143,7 +143,7 @@
        style="font-weight:bold"
        y="22.96484"
        x="338.96875"
-       id="tspan4474-3">note</tspan></text>
+       id="tspan4474-3">音符</tspan></text>
   <rect
      y="71.999992"
      x="36"

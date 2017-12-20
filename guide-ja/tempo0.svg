@@ -64,7 +64,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan14">tempo</tspan>
+           id="tspan14">テンポ</tspan>
       </text>
     </g>
   </g>
@@ -85,7 +85,7 @@
         <tspan
            x="124.16048"
            y="13.5"
-           id="tspan24">master beats per minute</tspan>
+           id="tspan24">BPM(一分当たりの拍数)のマスター・テンポ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"

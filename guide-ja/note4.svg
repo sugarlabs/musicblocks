@@ -67,7 +67,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan3523">note value</tspan>
+           id="tspan3523">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -196,7 +196,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan3585">pitch</tspan>
+           id="tspan3585">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -204,7 +204,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan3589">name</tspan>
+           id="tspan3589">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -212,7 +212,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan3593">octave</tspan>
+           id="tspan3593">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -275,7 +275,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan3623">pitch</tspan>
+           id="tspan3623">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -283,7 +283,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan3627">name</tspan>
+           id="tspan3627">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -291,7 +291,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan3631">octave</tspan>
+           id="tspan3631">オクターヴ</tspan>
       </text>
     </g>
   </g>

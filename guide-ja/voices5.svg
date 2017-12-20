@@ -64,7 +64,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan5260">start</tspan>
+           id="tspan5260">スタート</tspan>
       </text>
     </g>
   </g>
@@ -85,7 +85,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan5270">start</tspan>
+           id="tspan5270">スタート</tspan>
       </text>
     </g>
   </g>
@@ -106,7 +106,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan5280">start</tspan>
+           id="tspan5280">スタート</tspan>
       </text>
     </g>
   </g>
@@ -127,7 +127,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan5290">start</tspan>
+           id="tspan5290">スタート</tspan>
       </text>
     </g>
   </g>
@@ -148,7 +148,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan5300">repeat</tspan>
+           id="tspan5300">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -198,7 +198,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan5324">semi-tone transpose</tspan>
+           id="tspan5324">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -364,7 +364,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan5404">semi-tone transpose</tspan>
+           id="tspan5404">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -530,7 +530,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan5484">semi-tone transpose</tspan>
+           id="tspan5484">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -696,7 +696,7 @@
         <tspan
            x="74.140953"
            y="13.5"
-           id="tspan5564">mouse name</tspan>
+           id="tspan5564">ネズミの名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -725,7 +725,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan5578">Mr. Mouse</tspan>
+           id="tspan5578">ネズミさん</tspan>
       </text>
     </g>
   </g>
@@ -746,7 +746,7 @@
         <tspan
            x="69.687828"
            y="13.5"
-           id="tspan5588">mouse sync</tspan>
+           id="tspan5588">ネズミを動機</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -775,7 +775,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan5602">Mr. Mouse</tspan>
+           id="tspan5602">ネズミさん</tspan>
       </text>
     </g>
   </g>
@@ -796,7 +796,7 @@
         <tspan
            x="69.687828"
            y="13.5"
-           id="tspan5612">mouse sync</tspan>
+           id="tspan5612">ネズミを動機</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -825,7 +825,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan5626">Mr. Mouse</tspan>
+           id="tspan5626">ネズミさん</tspan>
       </text>
     </g>
   </g>
@@ -846,7 +846,7 @@
         <tspan
            x="69.687828"
            y="13.5"
-           id="tspan5636">mouse sync</tspan>
+           id="tspan5636">ネズミを動機</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -875,7 +875,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan5650">Mr. Mouse</tspan>
+           id="tspan5650">ネズミさん</tspan>
       </text>
     </g>
   </g>
@@ -896,7 +896,7 @@
         <tspan
            x="60.249348"
            y="13.5"
-           id="tspan5660">broadcast</tspan>
+           id="tspan5660">送る</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -946,7 +946,7 @@
         <tspan
            x="60.249348"
            y="13.5"
-           id="tspan5684">broadcast</tspan>
+           id="tspan5684">送る</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -996,7 +996,7 @@
         <tspan
            x="60.249348"
            y="13.5"
-           id="tspan5708">broadcast</tspan>
+           id="tspan5708">送る</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1046,7 +1046,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan5732">repeat</tspan>
+           id="tspan5732">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1096,7 +1096,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan5756">repeat</tspan>
+           id="tspan5756">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1146,7 +1146,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan5780">repeat</tspan>
+           id="tspan5780">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1196,7 +1196,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan5804">on</tspan>
+           id="tspan5804">の時に</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1204,7 +1204,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan5808">event</tspan>
+           id="tspan5808">イベント</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1212,7 +1212,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan5812">do</tspan>
+           id="tspan5812">をするのは</tspan>
       </text>
     </g>
   </g>
@@ -1275,7 +1275,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan5842">on</tspan>
+           id="tspan5842">の時に</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1283,7 +1283,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan5846">event</tspan>
+           id="tspan5846">イベント</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1291,7 +1291,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan5850">do</tspan>
+           id="tspan5850">をするのは</tspan>
       </text>
     </g>
   </g>
@@ -1354,7 +1354,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan5880">on</tspan>
+           id="tspan5880">の時に</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1362,7 +1362,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan5884">event</tspan>
+           id="tspan5884">イベント</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1370,7 +1370,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan5888">do</tspan>
+           id="tspan5888">をするのは</tspan>
       </text>
     </g>
   </g>
@@ -1433,7 +1433,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan5918">action</tspan>
+           id="tspan5918">動作</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1483,7 +1483,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan5942">action</tspan>
+           id="tspan5942">動作</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1533,7 +1533,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan5966">action</tspan>
+           id="tspan5966">動作</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"

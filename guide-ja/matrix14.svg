@@ -40,7 +40,7 @@
         <tspan
            id="tspan25-1"
            y="28"
-           x="132">quarter note</tspan>
+           x="132">四分音符</tspan>
       </text>
       <text
          style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -77,7 +77,7 @@
         <tspan
            id="tspan25-95-2"
            y="28"
-           x="124">eighth note</tspan>
+           x="124">八分音符</tspan>
       </text>
       <text
          style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -114,7 +114,7 @@
         <tspan
            id="tspan25-84"
            y="28"
-           x="108">half note</tspan>
+           x="108">半音符</tspan>
       </text>
       <text
          style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -147,7 +147,7 @@
       <tspan
          x="94"
          y="49"
-         id="tspan3198-7">rhythm</tspan>
+         id="tspan3198-7">リズム</tspan>
     </text>
     <text
        id="text3200-4"
@@ -155,7 +155,7 @@
       <tspan
          x="94"
          y="22.5"
-         id="tspan3202-8">number of notes</tspan>
+         id="tspan3202-8">音符の数</tspan>
     </text>
     <text
        id="text3204-2"
@@ -163,7 +163,7 @@
       <tspan
          x="94"
          y="64.5"
-         id="tspan3206-3">note value</tspan>
+         id="tspan3206-3">音価</tspan>
     </text>
   </g>
   <path
@@ -192,7 +192,7 @@
     <tspan
        id="tspan3198-7-9"
        y="457"
-       x="116.15245">rhythm</tspan>
+       x="116.15245">リズム</tspan>
   </text>
   <text
      x="22.152454"
@@ -202,7 +202,7 @@
     <tspan
        id="tspan3202-8-8"
        y="430.5"
-       x="116.15245">number of notes</tspan>
+       x="116.15245">音符の数</tspan>
   </text>
   <text
      x="22.152454"
@@ -212,7 +212,7 @@
     <tspan
        id="tspan3206-3-1"
        y="472.5"
-       x="116.15245">note value</tspan>
+       x="116.15245">音価</tspan>
   </text>
   <path
      d="m 137.15245,409 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -241,7 +241,7 @@
       <tspan
          x="94"
          y="49"
-         id="tspan3198-7-3">rhythm</tspan>
+         id="tspan3198-7-3">リズム</tspan>
     </text>
     <text
        id="text3200-4-1"
@@ -249,7 +249,7 @@
       <tspan
          x="94"
          y="22.5"
-         id="tspan3202-8-3">number of notes</tspan>
+         id="tspan3202-8-3">音符の数</tspan>
     </text>
     <text
        id="text3204-2-9"
@@ -257,7 +257,7 @@
       <tspan
          x="94"
          y="64.5"
-         id="tspan3206-3-2">note value</tspan>
+         id="tspan3206-3-2">音価</tspan>
     </text>
   </g>
   <path
