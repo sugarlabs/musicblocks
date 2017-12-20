@@ -1650,27 +1650,41 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
             } else if (event.shiftKey){
                 switch (event.keyCode) {
-                    case KEYCODE_D:
-                        __makeNewNote(5, "do");
-                        break
-                    case KEYCODE_R:
-                        __makeNewNote(5, "re");
-                        break
-                    case KEYCODE_M:
-                        __makeNewNote(5, "mi");
-                        break
-                    case KEYCODE_F:
-                        __makeNewNote(5, "fa");
-                        break
-                    case KEYCODE_S:
-                        __makeNewNote(5, "sol");
-                        break
-                    case KEYCODE_L:
-                        __makeNewNote(5, "la");
-                        break
-                    case KEYCODE_T:
-                        __makeNewNote(5, "ti");
-                        break
+                case KEYCODE_D:
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(5, 'do');
+                    }
+                    break;
+                case KEYCODE_R:
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(5, 're');
+                    }
+                    break;
+                case KEYCODE_M:
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(5, 'mi');
+                    }
+                    break;
+                case KEYCODE_F:
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(5, 'fa');
+                    }
+                    break;
+                case KEYCODE_S:
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(5, 'sol');
+                    }
+                    break;
+                case KEYCODE_L:
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(5, 'la');
+                    }
+                    break;
+                case KEYCODE_T:
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(5, 'ti');
+                    }
+                    break;
                 }
             } else {
                 switch (event.keyCode) {
@@ -1687,7 +1701,7 @@ define(MYDEFINES, function (compatibility) {
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
-                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1702,7 +1716,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_DOWN:
-                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1717,7 +1731,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_LEFT:
-                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1727,7 +1741,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_RIGHT:
-                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1758,8 +1772,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case RETURN:
-                    // toggle run
-                    if (docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
                     } else if (docById('search').value.length > 0){
                         doSearch();
                     } else {
@@ -1768,28 +1781,41 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }
                     break;
-
                 case KEYCODE_D:
-                    __makeNewNote(4, "do");
-                    break
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(4, 'do');
+                    }
+                    break;
                 case KEYCODE_R:
-                    __makeNewNote(4, "re");
-                    break
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(4, 're');
+                    }
+                    break;
                 case KEYCODE_M:
-                    __makeNewNote(4, "mi");
-                    break
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(4, 'mi');
+                    }
+                    break;
                 case KEYCODE_F:
-                    __makeNewNote(4, "fa");
-                    break
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(4, 'fa');
+                    }
+                    break;
                 case KEYCODE_S:
-                    __makeNewNote(4, "sol");
-                    break
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(4, 'sol');
+                    }
+                    break;
                 case KEYCODE_L:
-                    __makeNewNote(4, "la");
-                    break
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(4, 'la');
+                    }
+                    break;
                 case KEYCODE_T:
-                    __makeNewNote(4, "ti");
-                    break
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        __makeNewNote(4, 'ti');
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -3035,7 +3061,7 @@ handleComplete);
                 var buttonNames = [
                     ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' [ENTER]', _doSlowButton, null, 'slow-button', null],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
-                    ['hard-stop-turtle', doMuteButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
+                    ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
                     ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
                     ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
