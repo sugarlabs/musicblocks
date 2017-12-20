@@ -3035,8 +3035,8 @@ handleComplete);
                 var buttonNames = [
                     ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' [ENTER]', _doSlowButton, null, 'slow-button', null],
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
-                    ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
                     ['hard-stop-turtle', doMuteButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
+                    ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
                     ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
                     ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                     ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
