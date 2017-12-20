@@ -1327,7 +1327,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.on('mouseout', function (event) {
                 document.body.style.cursor = 'default';
                 if (!that.blocks.getLongPressStatus()) {
-                    that._mouseoutCallback(event, moved, haveClick, true);
+                    that._mouseoutCallback(event, moved, haveClick, false);
                 }
 
                 moved = false;
@@ -1420,7 +1420,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.container.on('mouseout', function (event) {
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, true);
+                that._mouseoutCallback(event, moved, haveClick, false);
             } else {
                 that.blocks.clearLongPressButtons();
             }
