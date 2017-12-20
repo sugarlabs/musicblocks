@@ -134,29 +134,24 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg "Forming a chord")
 
-A chord (multiple, simultaneous pitches) can be specified by adding
-multiple *Pitch* blocks into a single *Note value* block, like the above example.
+一个和弦可以通过将多个音调拼块放在一个音长度拼块里面。
 
 ### <a name="RESTS"></a>2.4 休止
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg "Silence blocks create rests")
 
-A rest of the specified note value duration can be constructed using a *Silence* block in place of a *pitch* block.
+休息可以使用一个音符长度拼块。在这个拼块应该有一个《安静拼块》而不是一个音调拼块。
 
 ### <a name="DRUMS"></a>2.5 鼓声
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg "Using Drum Sample block")
 
-Anywhere  a *Pitch* block can be used&mdash;e.g., inside of the matrix or a
-*Note value* block&mdash;a *Drum Sample* block can also be used instead. Currently there
-about two dozen different samples from which to choose. The default
-drum is a kick drum.
+一个音调拼块可以在任何地方使用&mdash;例如，在音符长度里面&mdash;一个鼓样品可以用来代替。
+现在大概有二十多个不同的样本可选择。默认鼓是踢鼓。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg "Multiple Drum Sample blocks in combinations")
 
-Just as in the [chord](#CHORD) example above, you can use multiple *Drum* blocks
-within a single *Note value* blocks, and combine them with *Pitch*
-blocks as well.
+上面有一个和弦的例子。这个例子的和弦使用鼓拼块。
 
 ## <a name="PROGRAMMING-WITH-MUSIC"></a>3. 使用音乐设计程序
 
