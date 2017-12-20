@@ -253,7 +253,11 @@ function Logo () {
 
     // parameters used by notations
     this.notationStaging = {};
-    this.notationOutput = getLilypondHeader();
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        this.notationOutput = getLilypondHeader();
+    } else {
+        this.notationOutput = '';
+    }
     this.notationNotes = {};
     this.runningLilypond = false;
     this.checkingCompletionState = false;
