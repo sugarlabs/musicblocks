@@ -1449,7 +1449,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
-            that.blocks.clearLongPressButtons();
+            this.blocks.clearLongPressButtons();
         }
 
         if (moved) {
