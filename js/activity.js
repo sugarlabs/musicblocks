@@ -1247,6 +1247,8 @@ define(MYDEFINES, function (compatibility) {
                     y: event.stageY
                 };
 
+                hideDOMLabel();
+
                 stage.removeAllEventListeners('stagemousemove');
                 stage.on('stagemousemove', function (event) {
                     if (!moving) {
