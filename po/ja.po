@@ -760,7 +760,7 @@ msgstr "ファイルを開く"
 
 #: js/palette.js:839
 msgid "Click to select a block."
-msgstr ""
+msgstr "ブロックを選ぶため、一回クリックをしてください"
 
 #: js/palette.js:839
 #: js/basicblocks.js:2003
@@ -870,7 +870,7 @@ msgstr "パレット・ボタン"
 #: js/turtledefs.js:80
 #.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
-msgstr ""
+msgstr "このツールバーはリズム、ピッチ、音色、動作、ネズミ、またその他のパレットボタンがあります。"
 
 #: js/turtledefs.js:80
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
@@ -878,7 +878,7 @@ msgstr "ここをクリックすると、ブロックスのパレットが表示
 
 #: js/turtledefs.js:81
 msgid "Play music"
-msgstr ""
+msgstr "音楽を再生"
 
 #: js/turtledefs.js:81
 #: js/turtledefs.js:86
@@ -887,7 +887,7 @@ msgstr "音符を一つずつ再生するにはここをクリック。"
 
 #: js/turtledefs.js:81
 msgid "Alternatively, you can hit the ENTER or RETURN key."
-msgstr ""
+msgstr "それとも、ENTERまたRETURNを打つことができます。"
 
 #: js/turtledefs.js:82
 msgid "Click the run button to run the project in fast mode."
@@ -919,7 +919,7 @@ msgstr "音楽とネズミの動きを止めます。"
 
 #: js/turtledefs.js:87
 msgid "You can also type Alt-S to stop."
-msgstr ""
+msgstr "それとも、Alt+Sを打つと止めることができます"
 
 #: js/turtledefs.js:88
 msgid "Clear the screen and return the turtles to their initial positions."
@@ -931,7 +931,7 @@ msgstr "ブロックとパレットを表示する / 隠す アイコンです�
 
 #: js/turtledefs.js:90
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートとアクションのスタックを増やす / つぶす アイコンです。"
+msgstr "スタートと動作のスタックを増やす / つぶす アイコンです。"
 
 #: js/turtledefs.js:91
 msgid "Return all blocks to the center of the screen."
@@ -980,7 +980,7 @@ msgstr "スタック上で長押しすると、スタックをクリップボー
 
 #: js/turtledefs.js:98
 msgid "You can also use Alt+C to copy a stack of blocks."
-msgstr ""
+msgstr "それとも、Alt+Cを打つとブロックをコピーができます"
 
 #: js/turtledefs.js:98
 msgid "The Paste Button will highlight."
@@ -992,7 +992,7 @@ msgstr "ブロックスがクリップボードにされると、ペーストボ
 
 #: js/turtledefs.js:99
 msgid "You can also use Alt+V to paste a stack of blocks. "
-msgstr ""
+msgstr "それとも、Alt+Vを打つと貼り付けることができます"
 
 #: js/turtledefs.js:100
 msgid "Show or hide a coordinate grid."
@@ -1013,7 +1013,7 @@ msgstr "検査"
 
 #: js/turtledefs.js:103
 msgid "You can search for blocks by name."
-msgstr ""
+msgstr "ブロックの名前で検査することができます"
 
 #: js/turtledefs.js:104
 #: js/utilitybox.js:130
@@ -1070,11 +1070,11 @@ msgstr "ブロックをゴミ箱から取り戻します。"
 
 #: js/turtledefs.js:111
 msgid "Keyboard shortcuts"
-msgstr ""
+msgstr "ショートカット・キー"
 
 #: js/turtledefs.js:111
 msgid "You can type \"d\" to create a \"do\" block, \"r\" to create a \"re\" block, etc."
-msgstr ""
+msgstr "「d」を打つと「ド」のブロックが作られ、「r」を打つと「レ」のブロックが作られのようにそれぞれのピッチが出ます"
 
 #: js/turtledefs.js:112
 msgid "Congratulations."
@@ -1547,12 +1547,12 @@ msgstr "BPM(一分当たりの拍数)のマスター・テンポ"
 #: js/basicblocks.js:842
 #: js/basicblocks.js:864
 msgid "bpm"
-msgstr ""
+msgstr "BPM"
 
 #: js/basicblocks.js:842
 #: js/basicblocks.js:864
 msgid "beat value"
-msgstr ""
+msgstr "拍子の数値"
 
 #: js/basicblocks.js:884
 #.TRANS: play music backward
@@ -3800,7 +3800,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:79
 
 #~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
-#~msgstr ""
+#~msgstr "このツールバーはリズム、ピッチ、音色、動作、ネズミ、その他のパレットボタンがあります。"
 
 #: js/basicblocks.js:893
 
@@ -3860,16 +3860,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "cloud"
 #~msgstr "クロード"
 
-#: js/turtledefs.js:98
-
-#~msgid "You can also use Alt+C to copy a stack of blocks. "
-#~msgstr ""
-
-#: js/activity.js:3066
-
-#~msgid "Home' + ' [HOME]"
-#~msgstr ""
-
 #~msgid "fetch"
 #~msgstr "フェッチ"
 
@@ -3882,13 +3872,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Save your project to a server."
 #~msgstr "サバーにプロジェクトを保存"
 
-#: js/turtledefs.js:99
-
-#~msgid "You can also use Alt+P to paste a stack of blocks. "
-#~msgstr ""
-
-#: js/musicutils.js:291
-
 #~msgid "pentatonic"
 #~msgstr "五音音階"
 
@@ -3898,29 +3881,17 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "eatme"
 #~msgstr "私を食べろ"
 
-#: js/turtledefs.js:82
-
 #~msgid "Click to run just the music in slow mode."
 #~msgstr "音楽をゆっくりに、ここでクリック。"
 
 #~msgid "1/16 note ♬"
 #~msgstr "16部音符"
 
-#: js/logo.js:4945
-
-#: js/logo.js:4966
-
 #~msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 #~msgstr "増のブロックに 1, 2, 3, 4, 5, 6, 7, 8 からの数価の必要があります。"
 
-#: js/activity.js:2699
-
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 #~msgstr "速いスピードで再生します・長く押すとゆっくりに再生・もと長く押すと音楽はゆっくりなペースで再生"
-
-#: js/logo.js:4992
-
-#: js/logo.js:5014
 
 #~msgid "Input to Major Block must be 2, 3, 6, or 7"
 #~msgstr "長のブロックに 2, 3, 6, 7からの数価の必要があります。"
@@ -3928,15 +3899,11 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "food"
 #~msgstr "食べ物"
 
-#: js/musicutils.js:286
-
 #~msgid "blues"
 #~msgstr "ブルース"
 
 #~msgid "maths"
 #~msgstr "数学"
-
-#: js/turtledefs.js:80
 
 #~msgid "Click to run the project in fast mode."
 #~msgstr "速いスピードで再生するためにここでクリック。"
@@ -3944,10 +3911,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "whole note 𝅝"
 #~msgstr "全音符"
 
-#: js/turtledefs.js:79
-
 #~msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
-#~msgstr "このツールバーはリズム、ピッチ、音色、鼠動き、ウィジット、その他のパレットボタンがあります。"
+#~msgstr "このツールバーはリズム、ピッチ、音色、鼠動き、ウィジット、ネズミ、またその他のパレットボタンがあります。"
 
 #~msgid "Welcome to Turtle Blocks"
 #~msgstr "タートル・ブロックへようこそ"
