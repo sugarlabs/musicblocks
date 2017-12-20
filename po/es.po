@@ -3045,7 +3045,7 @@ msgstr "Guardar pila"
 
 #: js/blocks.js:2837
 #: js/blocks.js:2863
-msgid "There is no block is selected."
+msgid "There is no block selected."
 msgstr "No hay bloque seleccionado."
 
 #: js/playbackbox.js:79

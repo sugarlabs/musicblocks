@@ -2834,7 +2834,7 @@ function Blocks () {
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
         if (this.activeBlock == null) {
-            this.errorMsg(_('There is no block is selected.'));
+            this.errorMsg(_('There is no block selected.'));
             console.log('No active block to copy.');
             return;
         }
@@ -2860,7 +2860,7 @@ function Blocks () {
         }
 
         if (this.activeBlock == null) {
-            this.errorMsg(_('There is no block is selected.'));
+            this.errorMsg(_('There is no block selected.'));
             console.log('No block associated with long press.');
             return;
         }
