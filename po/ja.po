@@ -2976,7 +2976,7 @@ msgstr "スタックを保存"
 #: js/blocks.js:2837
 #: js/blocks.js:2863
 msgid "There is no block selected."
-msgstr ""
+msgstr "ブロックが選ばれていません"
 
 #: js/playbackbox.js:79
 #: js/playbackbox.js:87
