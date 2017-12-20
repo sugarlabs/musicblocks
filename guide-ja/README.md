@@ -73,7 +73,7 @@
 ミュージック・ブロックスの一番基本なブロックは*音価*ブロックです。*音価*ブロックの中に[*ピッチ*ブロック](#ピッチ)が入られることができます。音価ブロックはピッチの長さがどのぐらいか決めます。
 
 ![alt
- tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg
+ tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/note1.svg
  "一つの音価ブロック（上）と二つの連続的な音価ブロック（下）")
 
 上の例に、一つの（分離した）*音価*ブロックがあります。そのブロックに1/8の数値の数字ブロックがつながっています。1/8の数値は音符の音価です。その1/8の音価と言うのは八分音符とも言います。
@@ -81,7 +81,7 @@
 その下に、二つの分理的に鳴らされる音符があります。両方とも'1/8'音符で、全部で音価の合計が'1/4'音符の同じ長さです。
 
 ![alt
- tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg
+ tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/note2.svg
  "八分音符、四分音符、十六分音符、半音符のも, 音価ブロックがあります。")
 
 この例に、違う音価があります。上から、四分音符の'1/4'、十六音付の'1/16'、半音符の'1/2'です。
@@ -100,7 +100,7 @@
 *ピッチ*ブロックは[*音価*](#音価)ブロックの中に使われています。*ピッチ*ブロックはピッチの名前とピッチのオクターヴを決めます。ピッチの名前とオクターヴの数値を組み合わせて、音符の振動（音波の振動）を決めます。
 
 ![alt
- tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg
+ tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/note3.svg
  "ピッチブロックの名前とオクターヴを決める方法")
 
 *ピッチ*の名前の選ばれるブロックが色々あります。次に例えが説明してあります。
@@ -125,13 +125,13 @@
 
 ### <a name="和音"></a>2.3 和音
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg "和音の作る方法")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/note4.svg "和音の作る方法")
 
 和音(一つよりの一緒に鳴らされているピッチ)は一つの*音価*ブロックの中に*ピッチ*ブロックを、上の例のように、一つ以上入れます。
 
 ### <a name="休符"></a>2.4 休符
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg "休符ブロックの使い方")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/silence.svg "休符ブロックの使い方")
 
 休符ブロックは*音価*ブロックの中に入れるとその音価の長さで入れられているネズミが音鳴らしを休みます。
 
@@ -139,11 +139,11 @@
 
 ### <a name="ドラム"></a>2.5 ドラム
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg "ドラム・ブロックの使える例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum1.svg "ドラム・ブロックの使える例")
 
 *ピッチ*ブロックのも使える場合と同じでドラム・ブロックがピッチ・タイム行列か*音価*ブロックの中にも使えます。今、24個ぐらいのドラムの音の中から選ぶことができます。デフォルトのドラムがバス・ドラムです。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg "一つよりのドラムの音を同時に")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/note5.svg "一つよりのドラムの音を同時に")
 
 この上の例のように[和音](#和音)一つよりの*ドラム*ブロックが一緒に使えます。一つの*音価*ブロックの中に一つよりのドラム・ブロックと*ピッチ*ブロックとお好み組み合わせて音の楽しみができます。
 
@@ -155,9 +155,9 @@
 
 ### <a name="チャンク"></a>3.1 チャンク
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "動作ブロックの使われる例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix4.svg "動作ブロックの使われる例")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg "チャンクがスタート・ブロックの中に使われる例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/chunk1.svg "チャンクがスタート・ブロックの中に使われる例")
 
 新しい*動作*ブロックをパレットから引く時、自動的に新しいブロックが作られます。その新しいブロックが*動作*パレットの一番上に現れます。新しいブロックがパレットから引かれたブロックのコードを絶対的に読んで実行します。ですから新しいブロックのコード・スタックをクリックしても引かれたブロックをクリックしても効果が同じです。パレットから引かれるデフォールトの名前が`チャンク`,`チャンク1`,`チャンク2`…です。そのデフォールトの名前が好きに変えることができます。いくつもパレットからお好み引いて使えます。
 
@@ -169,21 +169,21 @@
 
 上の例に*チャンク*ブロックは*スタート*ブロックの中で実行のボタンを押すと*スタート*ブロックの中に入ってるコード（この例で*チャンク*ブロック）が読まれて実行します。この例のブロックを変えたかったら、*スタート*ブロックにあるものを変えるだけです。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg "一つ以上のチャンク・ブロックを使う例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/chunk2.svg "一つ以上のチャンク・ブロックを使う例")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg "回繰り返すブロックを使う例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/chunk3.svg "回繰り返すブロックを使う例")
 
 [回繰り返す](#繰り返し)チャンクを作る方法が色々あります。一つ以上の*チャンク*ブロックを一つ一つ使うか*回繰り返す*ブロックを使う方法もあります。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg "一つ以上の動作ブロック")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/chunk4.svg "一つ以上の動作ブロック")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg "チャンクを一緒で順を変える例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/chunk5.svg "チャンクを一緒で順を変える例")
 
 チャンクの順も変えて効果が変えます。上の例で最初に"チャンク"を弾いて、次に"チャンク1"二回で、最後に"チャンク"をまた弾きます。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg "チャンクで音楽を作る例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/chunk6.svg "チャンクで音楽を作る例")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg "回繰り返すブロックを使って音楽を作る例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/chunk7.svg "回繰り返すブロックを使って音楽を作る例")
 
 チャンクを組み合わせて音楽が作れます！上のメロディーご存知ですか？（ミュージック・ブロックのコードを読んでチャレンジしてみてください）
 
@@ -193,13 +193,13 @@
 
 #### <a name="音符動き"></a>3.2.1 音符動きのブロック
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg " ステップピッチブロックの使える例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform0.svg " ステップピッチブロックの使える例")
 
 *ステップピッチ*ブロックはメロディーの音符を音階的に上/下に動かすことができます。上の例に*ステップピッチ*ブロックが*回繰り返す*ブロックの中でその入ってるコードが7回繰り返して、音階の音程で音符が上に上がって、下に下ろし動きます。
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform16.svg "Using the Consonant Step Up and Down blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform16.svg "Using the Consonant Step Up and Down blocks")
 
 Another way to move up and down notes in a scale is to use the
 *Consonant Step Up* and *Consonant Step Down* blocks. These blocks
@@ -210,24 +210,24 @@ most recent note played.
 
 #### <a name="シャープ(嬰)とフラット(変)"></a>3.2.2 シャープ(嬰)とフラット(変)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "シャープ（嬰）とフラット（変）の使える例")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform1.svg "シャープ（嬰）とフラット（変）の使える例")
 
 ♯は日本語で嬰（えい）、♭は変（へん）です。
 *シャープ（嬰）*と*フラット（変）*のブロックは*ピッチ*ブロックか*音価*ブロックか[チャンク](#チャンク)を巻いてピッチを転化することができます。一つの*シャープ（嬰）*ブロックを使ってピッチが半音上で変えます。一つの*フラット（変）*ブロックを使ってピッチが半音下で変えます。左の例*ピッチ*ブロックが'ミ'で*フラット（変）*の訳でピッチが半音下変えます(ミ♭になります)。右の例、二つの*ピッチ*ブロックも（和音）が両方のピッチも半音上変えます。
 
 #### <a name="移調をアジャスト"></a>3.2.3 移調をアジャスト
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "移調をアジャスト")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform2.svg "移調をアジャスト")
 
 *移調をアジャスト*ブロックは巻かされているピッチ・ブロックで選ばれているピッチを半音の数値で変えることができます。整数のインプットはピッチを高く転調し、陰性のインプットはピッチを低く転調します。インプットイは全数の必要があります。オクターヴを転調するために、12のインプットは1オクターヴ上に転調し、-12のインプットは１オクターヴ下に転調します。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "移調をアジャスト・ブロックで1オクターヴ上に転調する方法")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform3.svg "移調をアジャスト・ブロックで1オクターヴ上に転調する方法")
 
 上の例にこの前の例のメロディーを転調をアジャスト・ブロックで1オクターヴに転化します。
 
 #### <a name="付点音符（ドット）"></a>3.2.4 付点音符（ドット）
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg "付点音符（ドット）のリズムを付点音符ブロックで作る方法")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform4.svg "付点音符（ドット）のリズムを付点音符ブロックで作る方法")
 
 "付点音符"のリズムの音符が*付点音符*ブロックでできます。付点音符の音符はその入っている音価を50%で増します(50%で増します)。例えば、付点音符の4分音符が三つの8分音符の長さで鳴らします。計算は1/4 + 1/8＝「3/4」。付点音符の8分音符が3/16の音価で (1/8 + 1/16)鳴らします。
 
@@ -236,7 +236,7 @@ most recent note played.
 
 #### <a name="かけることと割ること"></a>3.2.5 演算で音価をかけ割ること
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "テンポの早さを変える方法")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform5.svg "テンポの早さを変える方法")
 
 You can also multiply (or divide) the beat value, which will speed up
 or slowdown the notes. Multiplying the beat value of an `1/8` note by
@@ -246,7 +246,7 @@ note.
 
 #### <a name="繰り返し"></a>3.2.6 回繰り返し音符
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "回繰り返すブロックで回数を決めます")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform6.svg "回繰り返すブロックで回数を決めます")
 
 音符を回繰り返す方法が色々あります。*回繰り返す*ブロックははっている音符をインプットの数値で繰り返します。
 
@@ -256,7 +256,7 @@ note.
 
 #### <a name="スイング"></a>3.2.7 スイング・リズムとタイの音符
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg "スイング・リズムとタイ音符の方法")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform7.svg "スイング・リズムとタイ音符の方法")
 
 *スイング*ブロック音符対ずつで使えます。その音符の対の先が音価をスイングのインプット数値で増して、対の次の音符の数値からスイング・ブロックの数値を引きます。
 
@@ -274,7 +274,7 @@ note.
 
 #### <a name="他の転化"></a>3.2.8 音量、クレシェンド、スタッカート、スラーのブロックの関係
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "音量を設定, クレッシェンド, スタッカート, またスラーのブロック")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform8.svg "音量を設定, クレッシェンド, スタッカート, またスラーのブロック")
 
 *音量を設定*ブロックは音符の鳴らす音量を変えます。デフォールトが50で最低限が0(絶対静か)で最大限が100(一番大きい音量)です.
 
@@ -286,7 +286,7 @@ note.
 
 #### <a name="音程と相対的な音量"></a>3.2.9 音程と相対的な音量の関係
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "相対的な音程ブロックと相対的な音量を設定ブロック")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform9.svg "相対的な音程ブロックと相対的な音量を設定ブロック")
 
 *相対的な音程*は入っている音符から音程を計算してそのピッチも同時に鳴らします。例えば、音符から五度上の音も欲しかったら、このブロックを使います。上の例には、`レ`に'ラ'を`ミ`に'シ'を同時に鳴らします。
 
@@ -294,7 +294,7 @@ note.
 
 #### <a name= "絶対音程"></a>絶対音程
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg "Using absolute intervals")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform14.svg "Using absolute intervals")
 
 The *Augmented* block calculates an absolute interval, e.g., an
 augmented fifth, and adds the additional ピッチ to a note. Similarly,
@@ -309,7 +309,7 @@ followed by 和音 of E5 and G6.
 
 #### <a name= "転回"></a>3.2.11 音符転回
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform13.svg "inversion")
 
 The *Invert* block will invert a series of notes around a target
 note. There are two different 音階とモード of the *Invert* block: *odd*
@@ -322,7 +322,7 @@ around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 
 #### <a name="逆に"></a>3.2.12 逆に
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg "Backward block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform11.svg "Backward block")
 
 The *Backward* block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in *チャンク* are played as
@@ -338,12 +338,12 @@ notes.
 
 #### <a name= "音色と調の設定"></a>3.2.13 音色と調の設定
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg "setting voice and keys using Set Voice block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform12.svg "setting voice and keys using Set Voice block")
 
 The *Set Voice* block selects a [voice](#声部) for the synthesizer for any
 contained blocks, e.g., violin or cello.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg "Set Key block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform10.svg "Set Key block")
 
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `レ`, `Mi`, to note names, e.g., `C`,
@@ -353,7 +353,7 @@ This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular ピッチ changes
 depending on the user's specified tonality.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum4.svg "increasing sequence of drum beats over time")
 
 In the above example, the sequence of [drum](#ドラム) beats is increased over time.
 
@@ -361,7 +361,7 @@ In the above example, the sequence of [drum](#ドラム) beats is increased over
 
 #### <a name="ビブラート"></a>3.2.14 ビブラート
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "ビブラート block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform15.svg "ビブラート block")
 
 The *ビブラート* Block adds a rapid variation in ピッチ to any contained
 notes. The intensity of the variation ranges from 1 to 100 (cents),
@@ -374,25 +374,25 @@ Each *スタート* block runs as a separate voice in ミュージック・ブ�
 you click on the 実行 button, all of the *スタート* blocks are run
 concurrently.)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg "use of voices")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/voices1.svg "use of voices")
 
 If we put our song into an action...
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg "running the song using multiple スタート blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/voices2.svg "running the song using multiple スタート blocks")
 
 ...we can run it from multiple *スタート* blocks.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg "shifting the octaves up and down")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/voices3.svg "shifting the octaves up and down")
 
 It gets more interesting if we shift up and down octaves.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg playing the various voices offset in time")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/voices4.svg playing the various voices offset in time")
 
 And even more interesting if we bring the various voices offset in time.
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/voices5.svg "queuing the various voices using events")
 
 An alternative to use a preprogrammed delay is to use the *Broadcast*
 block to bring in multiple voices. In the example above, after each
@@ -400,7 +400,7 @@ section of the song is played, a new event is broadcasted, bringing in
 a new voice. Note the use of the *Mouse Sync* block. This ensures that
 the multiple voices are synced to the same master clock.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick drum")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum3.svg "usage of kick drum")
 
 A special "drum" version of the *スタート* block is available for laying
 down a drum track. Any *ピッチ* blocks encounted while starting from a
@@ -410,9 +410,9 @@ drum.
 
 ### <a name="グラフィックス"></a>3.4 Adding graphics
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg "adding graphics")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/graphics1.svg "adding graphics")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.svg "color range")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/graphics2.svg "color range")
 
 Turtle graphics can be combined with the music blocks. By placing
 graphics blocks, e.g., *Forward* and *Right*, inside of *音価*
@@ -424,28 +424,28 @@ the inner 回繰り返す loop.
 
 [ライブで再生](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_graphicsexample.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg "synchronizing graphics and music")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/graphics3.svg "synchronizing graphics and music")
 
 Another example of graphics synchronized to the music by placing the
 graphics commands inside of *音価* blocks
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg "usage of No-clock block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/fibonacci3.svg "usage of No-clock block")
 
 In this example, because the computation and graphics are more
 complex, a *No-clock* block is used to decouple the graphics from the
 master clock. The "No-clock* block prioritizes the sequence of
 actions over the specified rhythm.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "リズム sequence")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/graphics4.png "リズム sequence")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree-example.svg "another example of the No-clock block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/tree-example.svg "another example of the No-clock block")
 
 Another example of embedding graphics into notes: in case, a recursive
 tree drawing, where the ピッチ goes up as the branches assend.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree.svg "tree graphic")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/tree.svg "tree graphic")
 
 [ライブで再生](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_musicaltree.tb)
 
@@ -457,20 +457,20 @@ it is set to 4:4).
 The *Pickup* block can be used to accommodate any notes that come in
 before the beat.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat1.svg "meter and pickup")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/beat1.svg "meter and pickup")
 
 Specifying beat is useful in that you can have the character of a note
 vary depending upon the beat. In the example below, the 音量 of
 notes on 泊 1 and 泊 3 are increased, while the 音量 of off
 beats is decreased.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat2.svg "on-beat-do")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/beat2.svg "on-beat-do")
 
 The *On-泊-Do* and *Off-泊-Do* blocks let you specify actions to
 take on specific beats. (Note that the action is run before any blocks
 inside the note block associated with the beat are run.)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "using beat to synchronize graphics")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/graphics5.svg "using beat to synchronize graphics")
 
 Another approach to graphics is to use modulate them based on the
 beat. In the exxample above, we call the same graphics action for each
@@ -480,14 +480,14 @@ size is set to 50 and the 音量 to 75. On 泊 3, the pen size is set
 to 25 and the 音量 to 50. On off beats, the pen size is set to 5 and
 the volumne to 5. The resultant graphic is shown below.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "graphics modulated by beat")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/graphics6.svg "graphics modulated by beat")
 
 ### <a name="相互作用"></a>3.6 相互作用
 
 There are many ways to interactive with ミュージック・ブロックス, including
 tracking the mouse position to impact some aspect of the music.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg "interactions")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/interactive.svg "interactions")
 
 For example, we can launch the phrases (チャンク) interactively. When
 the mouse is in the lower-left quadrant, `チャンク` is played;
@@ -496,7 +496,7 @@ upper-right quadrant, `チャンク3`.
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg "creation of a two-key piano")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/interactive2.svg "creation of a two-key piano")
 
 In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
@@ -504,7 +504,7 @@ make an 8-key piano?
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg "adding randomness to your music")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/interactive3.svg "adding randomness to your music")
 
 You can also add a bit of randomness to your music. In the top example
 above, the *One-of* block is used to randomly assign either `Do` or
@@ -521,9 +521,9 @@ to enhance your experience.
 
 ### <a name="ステータス"></a>4.1 ステータス
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg "given Music block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/status1.svg "given Music block")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg "ステータス in tabular form")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/status2.svg "ステータス in tabular form")
 
 The *ステータス widget* is a tool for inspecting the ステータス of Music
 Blocks as it is running. By default, the key, BPM, and 音量 are
@@ -535,7 +535,7 @@ display additional music factors, e.g., 重に, transposition,
 skip, [スタッカート](#他の転化), [スラー](#他の転化), and [グラフィックス](#グラフィックス) factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg "additional programming within the ステータス block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/status3.svg "additional programming within the ステータス block")
 
 You can do additional programming within the ステータス block. In the
 example above, the 音量 is divided by 10 before being displayed.
@@ -546,7 +546,7 @@ Using the ピッチ・タイム行列, it is possible to generate チャンク o
 
 #### <a name="ピッチ・タイム行列"></a>4.2.1 The ピッチ・タイム行列
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg "ピッチ・タイム行列")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix1.svg "ピッチ・タイム行列")
 
 ミュージック・ブロックス provides a widget, the *ピッチ・タイム行列*, as a scaffold
 for getting started.
@@ -556,7 +556,7 @@ on the *ピッチ・タイム行列* stack that appears in the middle of the
 screen. (For the moment, ignore the *スタート* block.) You'll see a grid
 organized vertically by ピッチ and horizontally by リズム.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg "ピッチ and リズム block matrix")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix2.svg "ピッチ and リズム block matrix")
 
 The matrix in the figure above has three *ピッチ* blocks and one
 *リズム* block, which is used to create a 3 x 3 grid of ピッチ and
@@ -570,7 +570,7 @@ notes followed by one half note. Since the *リズム* blocks are inside
 of a *回繰り返す* block, there are fourteen (2 x 7) columns for selecting
 notes.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg "matrix")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix3.svg "matrix")
 
 By clicking on individual cells in the grid, you should hear
 individual notes (or 和音s if you click on more than one cell in a
@@ -618,7 +618,7 @@ want, feel free to experiment.
 Tip: You can put a チャンク inside a *ピッチ・タイム行列* block to generate
 the matrix to corresponds to that チャンク.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "usage of octave for a ピッチ")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix4.svg "usage of octave for a ピッチ")
 
 The チャンク created when you click on the matrix is a stack of
 blocks. The blocks are nested: an *動作* block contains three *Note
@@ -638,7 +638,7 @@ action). You should hear the notes play, ordered from top to bottom.
 
 #### <a name="リズムのブロック"></a>4.2.2 リズムのブロック
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg "the リズム block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix6.svg "the リズム block")
 
 *リズム* blocks are used to generate リズム patterns in the
 *ピッチ・タイム行列* block. The top argument to the *リズム* block
@@ -648,9 +648,9 @@ would be generated in the matrix. In the middle example, one column
 for an eighth note would be generated. In the bottom example, seven
 columns for 16th notes would be generated.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg "usage of リズム block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix7.svg "usage of リズム block")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix8.svg "resulting notes in tabular format")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix8.svg "resulting notes in tabular format")
 
 You can use as many *リズム* blocks as you'd like inside the
 *ピッチ・タイム行列* block. In the above example, two *リズム*
@@ -659,9 +659,9 @@ notes.
 
 #### <a name="タプルのこと"></a>4.2.3 タプルのこと
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg "simple tuplet")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix9.svg "simple tuplet")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix10.svg "tuplet and rhythmic note values")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix10.svg "tuplet and rhythmic note values")
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
@@ -673,7 +673,7 @@ note. The result is three twelfth notes. (This form, which is quite
 common in music, is called a *triplet*. Other common tuplets include a
 *quintuplet* and a *septuplet*.)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg "usage of tuplet")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix11.svg "usage of tuplet")
 
 In the example above, the three quarter notes are defined in the
 *リズム* block embedded in the *Tuplet* block. As with the *Simple
@@ -681,9 +681,9 @@ Tuplet* example, they are played in the time of a single quarter
 note. The result is three twelfth notes. This more complex form allows
 for intermixing multiple リズム・ブロック within single tuplet.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix12.svg "embedding リズム and Tuplet block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix12.svg "embedding リズム and Tuplet block")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix13.svg "tuplet and rhythmic note values")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix13.svg "tuplet and rhythmic note values")
 
 In the example above, the two *リズム* blocks are embedded in the
 *Tuplet* block, resulting in a more complex リズム.
@@ -699,7 +699,7 @@ defining your matrix.
 
 #### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using individual notes in the matrix
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix14.svg)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *リズム* blocks with the corresponding values.
@@ -710,7 +710,7 @@ The *Rhythm Ruler* block is used to launch a widget similar to the
 *ピッチ・タイム行列* block. The widget can be used to generate rhythmic
 patterns.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg "generating リズム・ブロック")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm1.svg "generating リズム・ブロック")
 
 The argument to the *Rhythm Ruler* block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
@@ -721,7 +721,7 @@ block indicates the number of リズム・ブロック to be defined simultaneou
 default, two リズム・ブロック are defined. The embedded *リズム* blocks define
 the initial subdivision of each rhythm ruler.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg "rhythm ruler")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm2.svg "rhythm ruler")
 
 When the *Rhythm Ruler* block is clicked, the *Rhythm Ruler* widget is
 opened. It contains a row for each リズム ruler. An input in the top
@@ -729,7 +729,7 @@ row of the widget is used to specify how many subdivisions will be
 created within a cell when it is clicked. By default, 2 subdivisions
 are created.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg "usage of rhythm ruler")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm3.svg "usage of rhythm ruler")
 
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
@@ -738,27 +738,27 @@ will playback the リズム using a drum for each beat. The *Play-all*
 button on the upper-left of the widget will play back all リズム・ブロック
 simultaneously.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg "divide cells in rhythm ruler")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm4.svg "divide cells in rhythm ruler")
 
 The リズム can be further subdivided by clicking in individual
 cells. In the example above, two quarter-notes have been created by
 clicking on one of the half-notes.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "タイ cells in rhythm ruler")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm8.svg "タイ cells in rhythm ruler")
 
 By dragging across multiple cells, they become タイd. In the example
 above, two third-notes have been タイd into one two-thirds-note.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg "save stack button")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm5.svg "save stack button")
 
 The *Save stack* button will export リズム stacks.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg "stacks of リズム・ブロック" )
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm6.svg "stacks of リズム・ブロック" )
 
 These stacks of リズム・ブロック can be used to define rhythmic patterns used
 with the *ピッチ・タイム行列* block.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg "save drum machine button")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/rhythm7.svg "save drum machine button")
 
 The *Save drum machine* button will export *スタート* stacks that will
 play the リズム・ブロック as drum machines.
@@ -782,14 +782,14 @@ Note that not every mode uses 7 intervals per octave. For example, the
 2, 3, 2],`. What is important is that the sum of the intervals
 in an octave is 12 half-steps.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg "mode widget")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/mode1.svg "mode widget")
 
 The *Mode* widget lets you explore 音階とモード and generate custom
 音階とモード. You invoke the widget with the *Custom mode* block. The mode
 specified in the *Set key* block will be the default mode when the
 widget launches.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode2.svg "launching widget with Major mode")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/mode2.svg "launching widget with Major mode")
 
 In the above example, the widget has been launched with *Major* mode
 (the default). Note that the notes included in the mode are indicated by
@@ -826,44 +826,44 @@ You can also click on individual notes to activate or deactivate them.
 Note that the mode inside the *Custom mode* block is updated whenever
 the mode is changed inside the widget.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode3.svg "creating Dorian mode")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/mode3.svg "creating Dorian mode")
 
 In the above example, the *Major* mode has been rotated clockwise,
 transforming it into *Dorian*.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode4.svg "creating Locrian mode")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/mode4.svg "creating Locrian mode")
 
 In the above example, the *Major* mode has been rotated
 counter-clockwise, transforming it into *Locrian*.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode5.svg "creating Phrygian mode")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/mode5.svg "creating Phrygian mode")
 
 In the above example, the *Major* mode has been inverted, transforming
 it into *Phrygian*.
 
 Note: The build-in 音階とモード in ミュージック・ブロックス can be found in [musicutils.js](https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg "ピッチ・タイム行列 block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/mode6.svg "ピッチ・タイム行列 block")
 
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *ピッチ・タイム行列* block.
 
 ### <a name="ピッチ・ドラム"></a>4.5 ピッチ・ドラム・グラフ
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg "ピッチ・ドラム・グラフ")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum2.svg "ピッチ・ドラム・グラフ")
 
 The *Set ドラム* block is used to map the enclosed pitches into drum
 sounds. ドラム sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substitued for
 each occurance of a `レ` `4`.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg "ピッチ・ドラム・グラフ 1")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum8.svg "ピッチ・ドラム・グラフ 1")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg "table for ピッチ・ドラム・グラフ")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum5.svg "table for ピッチ・ドラム・グラフ")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum6.svg "table for ピッチ・ドラム・グラフ")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum6.svg "table for ピッチ・ドラム・グラフ")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg "ピッチ・ドラム・グラフ 1")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/drum7.svg "ピッチ・ドラム・グラフ 1")
 
 As an experience for creating mapping with the *Set ドラム* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
@@ -879,7 +879,7 @@ The *ピッチ* blocks contained in the clamp of the *Pitch Staircase*
 block define the pitches to be initialized simultaneously. By default,
 one pitch is defined and it have default note "la" and octave "3".
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg "ピッチ・スライダーで何のピッチでも発見")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchstaircase0.svg "ピッチ・スライダーで何のピッチでも発見")
 
 When *Pitch Staircase* block is clicked, the *Pitch Staircase* widget is
 initialized. The widget contains row for every *ピッチ* block contained
@@ -889,11 +889,11 @@ pitches in the staircase. The inputs correspond to the numerator and
 denominator in the proportion resectively. By default the proportion
 is 3:2.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase1.svg "notes associated with the step in the ピッチの階段")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchstaircase1.svg "notes associated with the step in the ピッチの階段")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase2.svg "notes associated with the step in the ピッチの階段")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchstaircase2.svg "notes associated with the step in the ピッチの階段")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase3.svg "notes associated with the step in the ピッチの階段")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchstaircase3.svg "notes associated with the step in the ピッチの階段")
 
 Clicking on the *Play* button to the left of each row will playback
 the notes associated with that step in the ピッチの階段. The *Play-all*
@@ -905,12 +905,12 @@ decreasing order of frequency as well, completing a scale.
 The *Save stack* button will export pitch stacks. For example, in the above 
 configuration, the output  from pressing the *Save stack* button is shown below:
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg "Pitch Stair block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchstaircase4.svg "Pitch Stair block")
 
 These stacks can be used with the *ピッチ・タイム行列* block to define
 the rows in the matrix.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg "Pitch Stair block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchstaircase5.svg "Pitch Stair block")
 
 ### <a name="ピッチ・スライダー"></a>4.7 ピッチ・スライダーで何のピッチでも発見
 
@@ -922,9 +922,9 @@ the range of a specified octave.
 Each *Sine* block contained within the clamp of the *ピッチ・スライダー* block defines the initial pitch
 for an ocatve.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg "ピッチ・スライダー")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchslider0.svg "ピッチ・スライダー")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg "ピッチ・スライダー")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchslider1.svg "ピッチ・スライダー")
 
 When the *ピッチ・スライダー* block is clicked, the *ピッチ・スライダー* widget is
 initialized. The widget will have one column for each *Sine* block in
@@ -934,17 +934,17 @@ starting frequency. The mouse is used to move the frequency up and down continuo
 used for intervals. Arrow keys can also be used to move up and down,
 or between columns.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg "ピッチ・スライダー block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchslider0a.svg "ピッチ・スライダー block")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg "ピッチ・スライダー")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchslider2.svg "ピッチ・スライダー")
 
 Clicking in a column will extact the corresponding *Note* blocks, for example:
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg "ピッチ・スライダー")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchslider3.svg "ピッチ・スライダー")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg " ピッチ・スライダー block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchslider4.svg " ピッチ・スライダー block")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider5.svg " ピッチ・スライダー block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/pitchslider5.svg " ピッチ・スライダー block")
 
 ### <a name="テンポ"></a>4.8 テンポを変えること
 
@@ -958,13 +958,13 @@ determines the speed at which the ball in the widget moves back and
 forth. If BPM is 60, then it will take one second for the ball to move
 across the widget. A round-trip would take two seconds.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg "テンポを変えること")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/tempo0.svg "テンポを変えること")
 
 The top row of the widget holds the *Play/pause* button, the *Speed
 up* and *Slow down* buttons, and an input field for updating the
 テンポ.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg "テンポを変えること")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/tempo1.svg "テンポを変えること")
 
 You can also update the テンポ by clicking twice in spaced succession in the
 widget: the new BPM is determined as the time between the two clicks. For
@@ -978,13 +978,13 @@ example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.
 point the learner towards other powerful tools. One such tool is
 [Lilypond](http://lilypond.org), a music engraving program.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg "adding Save as Lilypond block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/lilypond1.svg "adding Save as Lilypond block")
 
 The *Save as Lilypond* block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
 also a *Save as Lilypond* button on the secondary toolbar.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg "Save as Lilypond icon")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/lilypond2.svg "Save as Lilypond icon")
 
 ```
 \version "2.18.2"
@@ -1006,6 +1006,6 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 }
 ```
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/hotdog.png "sheet music")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/hotdog.png "sheet music")
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb)
