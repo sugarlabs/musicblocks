@@ -566,7 +566,14 @@ function Turtle (name, turtles, drum) {
             }
 
             if (this.skinChanged) {
-                this.doTurtleShell(55, TURTLEBASEPATH + 'turtle-' + i.toString() + '.svg');
+                var artwork = TURTLESVG;
+                if (sugarizerCompatibility.isInsideSugarizer()) {
+                    artwork = artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke);
+                } else {
+                    artwork = artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]);
+                }
+
+                this.doTurtleShell(55, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))));
                 this.skinChanged = false;
             }
         }
