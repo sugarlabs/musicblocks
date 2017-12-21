@@ -343,13 +343,11 @@
 
 *Set Key* 拼块可以改换音乐音符的模式, 如把 `Do`, `Re`, `Mi`, 变成音符名字如在 C Major 里的， `C`, `D`, `E`. 
 模式包括 Ｍajor,Minor,Chromatic 和一群比较罕见的模式，如 Bebop, Geez, Maqam, 等.
-这个拼块能让使用者得到 〈音乐拼块〉 的 "movable Do",
-ng of solfege to particular pitch changes
-depending on the user's specified tonality.
+这个拼块能根据使用者选择的音乐模式，让使用者得到 《音乐拼块》 的 "movable Do"。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
 
-In the above example, the sequence of [drum](#DRUMS) beats is increased over time.
+在上面的例子, [鼓声](#DRUMS) 拍的次数跟着时间增加。
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
 
@@ -357,50 +355,43 @@ In the above example, the sequence of [drum](#DRUMS) beats is increased over tim
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "Vibrato block")
 
-The *Vibrato* Block adds a rapid variation in pitch to any contained
-notes. The intensity of the variation ranges from 1 to 100 (cents),
-e.g. plus or minus up to one half step. The rate argument determines
-the rate of the variation.
+*Vibrato* 拼块在里面包住的拼块上加上一个音调的快转变。
+转变的强度的范围从 1 至 100 （加或减一个半步）。
+频率的定值会影响转变的速度。
 
 ### <a name="VOICES"></a>3.3 音色
 
-Each *Start* block runs as a separate voice in Music Blocks. (When
-you click on the Run button, all of the *Start* blocks are run
-concurrently.)
+每一个 *Start*  拼块在《音乐拼块》执行一个不同的音色。
+(每当你按下 "Run" 按钮，全部的 *Start* 拼块在一样时间执行.)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg "use of voices")
 
-If we put our song into an action...
+如果我们执行我们的程序和歌曲。。。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg "running the song using multiple Start blocks")
 
-...we can run it from multiple *Start* blocks.
+...我们可以从不同的 *Start* 拼块开始.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg "shifting the octaves up and down")
 
-It gets more interesting if we shift up and down octaves.
+如果我们增加或降低音乐的八度，这会使我们的歌曲更有趣。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg playing the various voices offset in time")
 
-And even more interesting if we bring the various voices offset in time.
-
+如果我们再把不同的音色在不同的时间播放，我们也可以使歌曲变有趣。
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
 
-An alternative to use a preprogrammed delay is to use the *Broadcast*
-block to bring in multiple voices. In the example above, after each
-section of the song is played, a new event is broadcasted, bringing in
-a new voice. Note the use of the *Mouse Sync* block. This ensures that
-the multiple voices are synced to the same master clock.
+另外一个使用以计算好的延迟的方式是使用 *Broadcast* 拼块，带出不同的音色。
+在上面的例子每当歌曲的一部分播放完之后，一个新的事件会被执行，带出一个新的音色。
+注意我们在例子里使用 *Mouse Sync* 拼块，这能确保不同的音色和主时钟（master clock）同步。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick drum")
 
-A special "drum" version of the *Start* block is available for laying
-down a drum track. Any *Pitch* blocks encounted while starting from a
-drum will be played as `C2` with the default drum sample. In the
-example above, all of the notes in `chunk` will be played with a kick
-drum.
+《音乐拼块》拥有一个特别 "鼓声" 模式的 *Start* 拼块，这个拼块适合设计鼓声歌曲。
+在使用这个拼块时，里面的 *Pitch* 拼块就会使用原本的鼓声，播放成 `C2`。
+在上面的例子里，全部 `chunk` 里面的拼块会播放为踢鼓（kick drum）。
 
 ### <a name="GRAPHICS"></a>3.4 图像
 
@@ -408,18 +399,16 @@ drum.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.svg "color range")
 
-Turtle graphics can be combined with the music blocks. By placing
-graphics blocks, e.g., *Forward* and *Right*, inside of *Note value*
-blocks, the graphics stay in sync with the music. In this example, the
-turtle moves forward each time a quarter note is played. It turns
-right during the eighth note. The pitch is raised by one half step,
-the pen size decreases, and the pen color increases at each step in
-the inner repeat loop.
+《乌龟》图像可以和音乐拼块融合在一起。
+当我们使用图像拼块，如在 *Note Value* 拼块里面，使用 *Forward* 和 *Right* 拼块,图像可以和音乐同步。
+在例子里，每当一个四分之一音符被播放后，乌龟就会往前方向走一步。
+在第八个音符，乌龟就会转向右边，音符上升半步，笔的尺度被减少，笔的颜色也在里面 “重复” 的程序每一步增加。
 
 [RUN LIVE](https://walterbender.github.io/musicblocks/index.html?file=MusicBlocks_graphicsexample.tb)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg "synchronizing graphics and music")
 
+另外一个图像和音乐的程序例子就是把
 Another example of graphics synchronized to the music by placing the
 graphics commands inside of *Note value* blocks
 
