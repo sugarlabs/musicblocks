@@ -1995,6 +1995,16 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, _('text')];
+        } else if (name === 'boolean') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, _('true')];
         } else if (name === 'solfege') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2868,8 +2878,8 @@ function Blocks () {
         this.prepareStackForCopy();
 
         // We need to set a flag to ensure:
-	// (1) we don't trigger a click and
-	// (2) we later remove the additional buttons for the action stack.
+        // (1) we don't trigger a click and
+        // (2) we later remove the additional buttons for the action stack.
         this.inLongPress = true;
 
         // We display some extra buttons when we long-press an action block.
@@ -3685,6 +3695,16 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
+            case 'boolean':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
             case 'solfege':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -4033,7 +4053,7 @@ function Blocks () {
             }, 1500);
         }
         console.log("Finished block loading");
-	document.body.style.cursor = 'default';
+        document.body.style.cursor = 'default';
 
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);

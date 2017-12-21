@@ -327,6 +327,7 @@ define(MYDEFINES, function (compatibility) {
                 svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
                 switch(blocks.blockList[i].name) {
                 case 'text':
+                case 'boolean':
                 case 'solfege':
                 case 'eastindiansolfege':
                 case 'notename':
@@ -2846,7 +2847,7 @@ define(MYDEFINES, function (compatibility) {
                     continue;
                 }
 
-                if (myBlock.isValueBlock() || myBlock.name === 'loadFile') {
+                if (myBlock.isValueBlock() || myBlock.name === 'loadFile' || myBlock.name === 'boolean') {
                     // FIX ME: scale image if it exceeds a maximum size.
                     var args = {
                         'value': myBlock.value

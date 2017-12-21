@@ -668,6 +668,11 @@ function hideDOMLabel () {
         numberLabel.style.display = 'none';
     }
 
+    var booleanLabel = docById('booleanLabel');
+    if (booleanLabel !== null) {
+        booleanLabel.style.display = 'none';
+    }
+
     var solfegeLabel = docById('solfegeLabel');
     if (solfegeLabel !== null) {
         solfegeLabel.style.display = 'none';
