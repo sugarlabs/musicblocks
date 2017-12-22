@@ -1652,7 +1652,7 @@ msgstr "クロックなし"
 msgid "on offbeat do"
 msgstr "弱拍に何々を"
 
-#: js/basicblocks.js:1002
+#: js/basicblocks.js:1028
 ## Need a little context, but I am guessing this is "on *this* beat (do...)
 msgid "on beat"
 msgstr "強拍に何々を"

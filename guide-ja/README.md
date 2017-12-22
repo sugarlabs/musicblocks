@@ -294,7 +294,7 @@ note.
 
 #### <a name= "絶対音程"></a>絶対音程
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg "Using 絶対音程")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide-ja/transform14.svg "Using 絶対音程")
 
 *増*ブロックが絶対音程を計算します。例えば、「像5程度」(<===check this!!) はインプットのピッチふぁら像5程度のピッチの音符をインプットのピッチと一緒に鳴らします。 同様に、*短*のブロックはインプットのピッチから絶対の音程を計算して一緒に鳴らします。例えば、*短*のブロックを使えばインプットのピッチから*短*のピッチも一緒に鳴らします。他の絶対音程のブロックは*完全*のも、*減*のも、*長*のもあります。
 
