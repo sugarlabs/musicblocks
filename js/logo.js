@@ -7571,6 +7571,7 @@ function Logo () {
                     }
                 }
                 break;
+            /*
             case 'eval':
                 var cblk1 = that.blocks.blockList[blk].connections[1];
                 var cblk2 = that.blocks.blockList[blk].connections[2];
@@ -7579,6 +7580,7 @@ function Logo () {
                 // Restricted to math methods
                 that.blocks.blockList[blk].value = Number(eval('Math.' + a.replace(/x/g, b.toString())));
                 break;
+            */
             case 'arg':
                 var cblk = that.blocks.blockList[blk].connections[1];
                 var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
