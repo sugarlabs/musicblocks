@@ -35,7 +35,7 @@
     <tspan
        id="tspan3664"
        y="43.56205"
-       x="8">start</tspan>
+       x="8">スタート</tspan>
   </text>
   <text
      y="475.12411"
@@ -99,7 +99,7 @@
     <tspan
        x="26"
        y="544.62408"
-       id="tspan3039">repeat</tspan>
+       id="tspan3039">回繰り返す</tspan>
   </text>
   <path
      style="fill:#ee97a8;fill-opacity:1;stroke:#a75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -127,7 +127,7 @@
     <tspan
        x="26"
        y="294.62408"
-       id="tspan3039-26">repeat</tspan>
+       id="tspan3039-26">回繰り返す</tspan>
   </text>
   <path
      style="fill:#ee97a8;fill-opacity:1;stroke:#a75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -155,7 +155,7 @@
     <tspan
        x="130"
        y="187.68616"
-       id="tspan3198">pitch</tspan>
+       id="tspan3198">ピッチ</tspan>
   </text>
   <text
      id="text3200"
@@ -165,7 +165,7 @@
     <tspan
        x="130"
        y="163.18614"
-       id="tspan3202">note</tspan>
+       id="tspan3202">音符</tspan>
   </text>
   <text
      id="text3204"
@@ -175,7 +175,7 @@
     <tspan
        x="130"
        y="207.18616"
-       id="tspan3206">octave</tspan>
+       id="tspan3206">オクターヴ</tspan>
   </text>
   <g
      id="g4681">
@@ -191,7 +191,7 @@
       <tspan
          x="200"
          y="164.68614"
-         id="tspan25">do</tspan>
+         id="tspan25">をするのは</tspan>
     </text>
   </g>
   <path
@@ -220,7 +220,7 @@
     <tspan
        x="24"
        y="83.186157"
-       id="tspan3039-5">note value</tspan>
+       id="tspan3039-5">音価</tspan>
   </text>
   <path
      d="M 265,97.686163 H 385 V 137.68616 H 265 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
@@ -294,7 +294,7 @@
     <tspan
        x="42"
        y="583.18616"
-       id="tspan3039-2">note value</tspan>
+       id="tspan3039-2">音価</tspan>
   </text>
   <g
      transform="translate(36,596.68617)"
@@ -376,7 +376,7 @@
     <tspan
        x="42"
        y="333.18616"
-       id="tspan3039-0">note value</tspan>
+       id="tspan3039-0">音価</tspan>
   </text>
   <g
      transform="translate(36,346.68617)"
@@ -544,7 +544,7 @@
         <tspan
            x="196"
            y="416.68616"
-           id="tspan3105">pitch number</tspan>
+           id="tspan3105">ピッチ数字</tspan>
       </text>
       <g
          id="g4717">
@@ -599,7 +599,7 @@
           <tspan
              x="450.58215"
              y="304.86273"
-             id="tspan25-0-6">mouse pitch number</tspan>
+             id="tspan25-0-6">ネズミのピッチ数字</tspan>
         </text>
       </g>
     </g>
@@ -618,7 +618,7 @@
         <tspan
            id="tspan25-9"
            y="162.72855"
-           x="462.12927">mouse name</tspan>
+           x="462.12927">ネズミの名前</tspan>
       </text>
     </g>
   </g>
@@ -639,7 +639,7 @@
         <tspan
            x="196"
            y="416.68616"
-           id="tspan3105-4">pitch number</tspan>
+           id="tspan3105-4">ピッチ数字</tspan>
       </text>
       <g
          id="g4717-5">
@@ -694,7 +694,7 @@
           <tspan
              x="450.58215"
              y="304.86273"
-             id="tspan25-0-6-7">mouse pitch number</tspan>
+             id="tspan25-0-6-7">ネズミのピッチ数字</tspan>
         </text>
       </g>
     </g>
@@ -713,7 +713,7 @@
         <tspan
            id="tspan25-9-9"
            y="162.72855"
-           x="462.12927">mouse name</tspan>
+           x="462.12927">ネズミの名前</tspan>
       </text>
     </g>
   </g>

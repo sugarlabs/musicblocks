@@ -64,7 +64,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan9452">action</tspan>
+           id="tspan9452">動作</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -114,7 +114,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan9476">start</tspan>
+           id="tspan9476">スタート</tspan>
       </text>
     </g>
   </g>
@@ -135,7 +135,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan9486">repeat</tspan>
+           id="tspan9486">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -185,7 +185,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan9510">semi-tone transpose</tspan>
+           id="tspan9510">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -214,7 +214,7 @@
         <tspan
            x="49.126301"
            y="24"
-           id="tspan9672">store in</tspan>
+           id="tspan9672">方存</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -222,7 +222,7 @@
         <tspan
            x="49.126301"
            y="11.25"
-           id="tspan9676">name</tspan>
+           id="tspan9676">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -230,7 +230,7 @@
         <tspan
            x="49.126301"
            y="32.25"
-           id="tspan9680">value</tspan>
+           id="tspan9680">価値</tspan>
       </text>
     </g>
   </g>
@@ -251,7 +251,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan9690">box</tspan>
+           id="tspan9690">ボックス</tspan>
       </text>
     </g>
   </g>
@@ -314,7 +314,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan9720">action</tspan>
+           id="tspan9720">動作</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -343,7 +343,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan9734">square</tspan>
+           id="tspan9734">矩形波（スクエア）</tspan>
       </text>
     </g>
   </g>
@@ -364,7 +364,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan9744">repeat</tspan>
+           id="tspan9744">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -414,7 +414,7 @@
         <tspan
            x="49.678059"
            y="13.5"
-           id="tspan9768">forward</tspan>
+           id="tspan9768">前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -464,7 +464,7 @@
         <tspan
            x="46.333332"
            y="13.5"
-           id="tspan9792">right</tspan>
+           id="tspan9792">右</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -514,7 +514,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan9816">arc</tspan>
+           id="tspan9816">円弧</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -522,7 +522,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan9820">angle</tspan>
+           id="tspan9820">角度</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -530,7 +530,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan9824">radius</tspan>
+           id="tspan9824">半径</tspan>
       </text>
     </g>
   </g>
@@ -672,7 +672,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan9892">no clock</tspan>
+           id="tspan9892">クロックなし</tspan>
       </text>
     </g>
   </g>
@@ -693,7 +693,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan9902">note value</tspan>
+           id="tspan9902">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -822,7 +822,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan9964">pitch</tspan>
+           id="tspan9964">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -830,7 +830,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan9968">name</tspan>
+           id="tspan9968">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -838,7 +838,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan9972">octave</tspan>
+           id="tspan9972">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -859,7 +859,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan9982">re</tspan>
+           id="tspan9982">レ</tspan>
       </text>
     </g>
   </g>
@@ -901,7 +901,7 @@
         <tspan
            x="5.3333335"
            y="18.583334"
-           id="tspan10002">if</tspan>
+           id="tspan10002">もし</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -909,7 +909,7 @@
         <tspan
            x="30.666666"
            y="37.833332"
-           id="tspan10006">then</tspan>
+           id="tspan10006">なら</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -917,7 +917,7 @@
         <tspan
            x="30.666666"
            y="79.833336"
-           id="tspan10010">else</tspan>
+           id="tspan10010">でなければ</tspan>
       </text>
     </g>
   </g>
@@ -984,7 +984,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan10042">return</tspan>
+           id="tspan10042">出る数価は</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1034,7 +1034,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan10066">return</tspan>
+           id="tspan10066">出る数価は</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1121,7 +1121,7 @@
         <tspan
            x="12"
            y="15.25"
-           id="tspan10108">calculate</tspan>
+           id="tspan10108">経産</tspan>
       </text>
     </g>
   </g>
@@ -1242,7 +1242,7 @@
         <tspan
            x="12"
            y="15.25"
-           id="tspan10166">calculate</tspan>
+           id="tspan10166">経産</tspan>
       </text>
     </g>
   </g>
@@ -1363,7 +1363,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan10224">do</tspan>
+           id="tspan10224">をするのは</tspan>
       </text>
     </g>
   </g>
@@ -1384,7 +1384,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan10234">square</tspan>
+           id="tspan10234">矩形波（スクエア）</tspan>
       </text>
     </g>
   </g>
@@ -1463,7 +1463,7 @@
         <tspan
            x="12"
            y="15.25"
-           id="tspan10272">calculate</tspan>
+           id="tspan10272">経産</tspan>
       </text>
     </g>
   </g>
@@ -1505,7 +1505,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan10292">box</tspan>
+           id="tspan10292">ボックス</tspan>
       </text>
     </g>
   </g>
@@ -1526,7 +1526,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan10302">add</tspan>
+           id="tspan10302">足し算をする</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1534,7 +1534,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan10306">to</tspan>
+           id="tspan10306">最終の状態</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1542,7 +1542,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan10310">value</tspan>
+           id="tspan10310">価値</tspan>
       </text>
     </g>
   </g>
@@ -1563,7 +1563,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan10320">box</tspan>
+           id="tspan10320">ボックス</tspan>
       </text>
     </g>
   </g>

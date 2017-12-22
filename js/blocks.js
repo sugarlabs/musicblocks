@@ -52,9 +52,7 @@ function Blocks () {
     this._pasteDX = 0;
     this._pasteDY = 0;
 
-    // "Copy stack" selects a stack for pasting. Are we selecting?
-    this.selectingStack = false;
-    // and what did we select?
+    // What did we select?
     this.selectedStack = null;
     // and a copy of the selected stack for pasting.
     this.selectedBlocksObj = null;
@@ -121,6 +119,16 @@ function Blocks () {
     // We stage deletion of prototype action blocks on the palette so
     // as to avoid palette refresh race conditions.
     this.deleteActionTimeout = 0;
+
+    this.getLongPressStatus = function () {
+        return this.inLongPress;
+    };
+
+    this.clearLongPressButtons = function () {
+        this.saveStackButton.visible = false;
+        this.dismissButton.visible = false;
+        this.inLongPress = false;
+    };
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
         this.setPlaybackStatus = setPlaybackStatus;
@@ -1520,9 +1528,7 @@ function Blocks () {
     this.moveBlockRelative = function (blk, dx, dy) {
         // Move a block (and its label) by dx, dy.
         if (this.inLongPress) {
-            this.saveStackButton.visible = false;
-            this.dismissButton.visible = false;
-            this.inLongPress = false;
+            this.clearLongPressButtons();
         }
 
         var myBlock = this.blockList[blk];
@@ -1989,6 +1995,16 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, _('text')];
+        } else if (name === 'boolean') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, _('true')];
         } else if (name === 'solfege') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2824,14 +2840,12 @@ function Blocks () {
         }
     };
 
-    this.triggerLongPress = function (myBlock) {
-        this.longPressTimeout = null;
-        this.inLongPress = true;
-
+    this.prepareStackForCopy = function () {
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
         if (this.activeBlock == null) {
-            console.log('null block passed to triggerLongPress');
+            this.errorMsg(_('There is no block selected.'));
+            console.log('No active block to copy.');
             return;
         }
 
@@ -2840,14 +2854,36 @@ function Blocks () {
 
         // Copy the selectedStack.
         this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj()));
+        console.log(this.selectedBlocksObj);
 
-        // Update the paster button to indicate a block is selected.
+        // Update the paste button to indicate a block is selected.
         this.updatePasteButton();
-        // Reset paste offset
+        // ...and reset paste offset.
         this._pasteDX = 0;
         this._pasteDY = 0;
+    };
+
+    this.triggerLongPress = function () {
+        if (this.longPressTimeout != null) {
+            clearTimeout(this.longPressTimeout);
+            this.longPressTimeout = null;
+        }
+
+        if (this.activeBlock == null) {
+            this.errorMsg(_('There is no block selected.'));
+            console.log('No block associated with long press.');
+            return;
+        }
+
+        this.prepareStackForCopy();
+
+        // We need to set a flag to ensure:
+        // (1) we don't trigger a click and
+        // (2) we later remove the additional buttons for the action stack.
+        this.inLongPress = true;
 
         // We display some extra buttons when we long-press an action block.
+        var myBlock = this.blockList[this.activeBlock];
         if (myBlock.name === 'action') {
             var z = this.stage.getNumChildren() - 1;
             this.dismissButton.visible = true;
@@ -2954,6 +2990,7 @@ function Blocks () {
             blockMap[this.dragGroup[b]] = b;
             blockObjs.push(blockItem);
         }
+
         for (var b = 0; b < this.dragGroup.length; b++) {
             myBlock = this.blockList[this.dragGroup[b]];
             for (var c = 0; c < myBlock.connections.length; c++) {
@@ -3297,6 +3334,7 @@ function Blocks () {
                 if (last(blockObjs[b][4]) == null) {
                     // If there is no next block, add a hidden block;
                     console.log('last connection of ' + name + ' is null: adding hidden block');
+                    console.log(blockObjs[b][4]);
                     blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
                     blockObjs.push([blockObjsLength + extraBlocksLength, 'hidden', 0, 0, [b, null]]);
                     extraBlocksLength += 1;
@@ -3657,6 +3695,16 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
+            case 'boolean':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
             case 'solfege':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -4005,6 +4053,7 @@ function Blocks () {
             }, 1500);
         }
         console.log("Finished block loading");
+        document.body.style.cursor = 'default';
 
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);

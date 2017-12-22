@@ -42,7 +42,7 @@
         <tspan
            id="tspan25-8-5-1-3-7-2-3"
            y="28.953075"
-           x="140.5228">kick drum</tspan>
+           x="140.5228">バス・ドラム</tspan>
       </text>
     </g>
     <g
@@ -60,7 +60,7 @@
         <tspan
            x="-103.33134"
            y="264.90689"
-           id="tspan3055">drum</tspan>
+           id="tspan3055">ドラム</tspan>
       </text>
     </g>
   </g>
@@ -86,7 +86,7 @@
     <tspan
        x="6.0000005"
        y="28.499983"
-       id="tspan3039-2">note value</tspan>
+       id="tspan3039-2">音価</tspan>
   </text>
   <g
      transform="translate(0,41.999992)"

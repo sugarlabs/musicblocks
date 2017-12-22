@@ -40,7 +40,7 @@
            style="font-family:sans-serif"
            x="94"
            y="49"
-           id="tspan3198">pitch</tspan>
+           id="tspan3198">ピッチ</tspan>
       </text>
       <text
          id="text3200"
@@ -49,7 +49,7 @@
            style="font-family:sans-serif"
            x="94"
            y="22.5"
-           id="tspan3202">name</tspan>
+           id="tspan3202">名前</tspan>
       </text>
       <text
          id="text3204"
@@ -58,7 +58,7 @@
            style="font-family:sans-serif"
            x="94"
            y="64.5"
-           id="tspan3206">octave</tspan>
+           id="tspan3206">オクターヴ</tspan>
       </text>
     </g>
     <g
@@ -105,7 +105,7 @@
            style="font-family:sans-serif"
            id="tspan25"
            y="13"
-           x="35">re</tspan>
+           x="35">レ</tspan>
       </text>
     </g>
     <g
@@ -171,7 +171,7 @@
            style="font-family:sans-serif"
            id="tspan25-7"
            y="13"
-           x="35">mi</tspan>
+           x="35">ミ</tspan>
       </text>
     </g>
     <g
@@ -218,7 +218,7 @@
            style="font-family:sans-serif"
            id="tspan25-9"
            y="13"
-           x="35">sol</tspan>
+           x="35">ソ</tspan>
       </text>
     </g>
     <g
@@ -273,7 +273,7 @@
            style="font-family:sans-serif"
            x="94"
            y="49"
-           id="tspan3198-7">rhythm</tspan>
+           id="tspan3198-7">リズム</tspan>
       </text>
       <text
          id="text3200-4"
@@ -282,7 +282,7 @@
            style="font-family:sans-serif"
            x="94"
            y="22.5"
-           id="tspan3202-8">number of notes</tspan>
+           id="tspan3202-8">音符の数</tspan>
       </text>
       <text
          id="text3204-2"
@@ -291,7 +291,7 @@
            style="font-family:sans-serif"
            x="94"
            y="64.5"
-           id="tspan3206-3">note value</tspan>
+           id="tspan3206-3">音価</tspan>
       </text>
     </g>
     <g
@@ -327,7 +327,7 @@
            style="font-family:sans-serif"
            x="94"
            y="49"
-           id="tspan3198-1">pitch</tspan>
+           id="tspan3198-1">ピッチ</tspan>
       </text>
       <text
          id="text3200-46"
@@ -336,7 +336,7 @@
            style="font-family:sans-serif"
            x="94"
            y="22.5"
-           id="tspan3202-3">name</tspan>
+           id="tspan3202-3">名前</tspan>
       </text>
       <text
          id="text3204-4"
@@ -345,7 +345,7 @@
            style="font-family:sans-serif"
            x="94"
            y="64.5"
-           id="tspan3206-6">octave</tspan>
+           id="tspan3206-6">オクターヴ</tspan>
       </text>
     </g>
     <g
@@ -362,7 +362,7 @@
            style="font-family:sans-serif"
            x="94"
            y="49"
-           id="tspan3198-0">pitch</tspan>
+           id="tspan3198-0">ピッチ</tspan>
       </text>
       <text
          id="text3200-6"
@@ -371,7 +371,7 @@
            style="font-family:sans-serif"
            x="94"
            y="22.5"
-           id="tspan3202-5">name</tspan>
+           id="tspan3202-5">名前</tspan>
       </text>
       <text
          id="text3204-9"
@@ -380,7 +380,7 @@
            style="font-family:sans-serif"
            x="94"
            y="64.5"
-           id="tspan3206-0">octave</tspan>
+           id="tspan3206-0">オクターヴ</tspan>
       </text>
     </g>
     <path
@@ -396,7 +396,7 @@
          style="font-family:sans-serif"
          id="tspan3664"
          y="40.1241"
-         x="9.1454468">pitch-time matrix</tspan>
+         x="9.1454468">ピッチ・タイム行列</tspan>
     </text>
     <g
        transform="translate(-77.467316,243.2064)"

@@ -15,6 +15,9 @@
     <script src="js/utils/detectIE.js">
     </script>
 
+    <script src="sounds/samples/manifest.js">
+    </script>
+
     <script src="lib/mespeak.js">
     </script>
 
@@ -350,8 +353,7 @@
 
       <div id="searchBar">
          <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks">
-         <ul class="matches"></ul>
-         <input onkeypress="doSearch()" type="submit" value="">
+         <ul class="matches" id="searchResults"></ul>
       </div>
 
     </div> <!-- hideContents -->

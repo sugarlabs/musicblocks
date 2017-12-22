@@ -70,7 +70,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4019">semi-tone transpose</tspan>
+           id="tspan4019">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -257,7 +257,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4109">note value</tspan>
+           id="tspan4109">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -386,7 +386,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan4171">pitch</tspan>
+           id="tspan4171">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -394,7 +394,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan4175">name</tspan>
+           id="tspan4175">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -402,7 +402,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan4179">octave</tspan>
+           id="tspan4179">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -423,7 +423,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan4189">re</tspan>
+           id="tspan4189">レ</tspan>
       </text>
     </g>
   </g>
@@ -465,7 +465,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4209">note value</tspan>
+           id="tspan4209">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -594,7 +594,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan4271">pitch</tspan>
+           id="tspan4271">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -602,7 +602,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan4275">name</tspan>
+           id="tspan4275">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -610,7 +610,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan4279">octave</tspan>
+           id="tspan4279">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -631,7 +631,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan4289">mi</tspan>
+           id="tspan4289">ミ</tspan>
       </text>
     </g>
   </g>

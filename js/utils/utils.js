@@ -123,6 +123,11 @@ function HttpRequest (url, loadCallback, userCallback) {
 };
 
 
+function docByClass (classname) {
+    return document.getElementsByClassName(classname);
+};
+
+
 function docByTagName (tag) {
     document.getElementsByTagName(tag);
 };
@@ -661,6 +666,11 @@ function hideDOMLabel () {
     var numberLabel = docById('numberLabel');
     if (numberLabel !== null) {
         numberLabel.style.display = 'none';
+    }
+
+    var booleanLabel = docById('booleanLabel');
+    if (booleanLabel !== null) {
+        booleanLabel.style.display = 'none';
     }
 
     var solfegeLabel = docById('solfegeLabel');

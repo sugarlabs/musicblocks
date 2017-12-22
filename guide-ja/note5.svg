@@ -67,7 +67,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4309">note value</tspan>
+           id="tspan4309">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -196,7 +196,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan4371">pitch</tspan>
+           id="tspan4371">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -204,7 +204,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan4375">name</tspan>
+           id="tspan4375">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -212,7 +212,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan4379">octave</tspan>
+           id="tspan4379">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -233,7 +233,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan4389">re</tspan>
+           id="tspan4389">レ</tspan>
       </text>
     </g>
   </g>
@@ -275,7 +275,7 @@
         <tspan
            x="46.333332"
            y="13.5"
-           id="tspan4409">drum</tspan>
+           id="tspan4409">ドラム</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -304,7 +304,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan4423">snare drum</tspan>
+           id="tspan4423">スネア</tspan>
       </text>
     </g>
   </g>
@@ -325,7 +325,7 @@
         <tspan
            x="46.333332"
            y="13.5"
-           id="tspan4433">drum</tspan>
+           id="tspan4433">ドラム</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -354,7 +354,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan4447">triangle bell</tspan>
+           id="tspan4447">トライアングルのベル</tspan>
       </text>
     </g>
   </g>

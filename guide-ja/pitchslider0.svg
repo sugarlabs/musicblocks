@@ -39,7 +39,7 @@
       <tspan
          id="tspan3198"
          y="59.924255"
-         x="-275">hertz</tspan>
+         x="-275">ハーツ</tspan>
     </text>
     <g
        transform="translate(-552.83636,85.748495)"
@@ -74,7 +74,7 @@
         <tspan
            x="9.1454468"
            y="39"
-           id="tspan3664">pitch slider</tspan>
+           id="tspan3664">調子スライダー</tspan>
       </text>
     </g>
   </g>

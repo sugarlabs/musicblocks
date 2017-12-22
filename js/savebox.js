@@ -14,8 +14,14 @@ function SaveBox () {
     const BOXBUTTONOFFSET = 40;
     const BOXBUTTONSPACING = 65;
 
-    // 7 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
-    var boxwidth = 7 * 55 + 6 * 10 + 2 * 20;
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        // 7 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
+        var boxwidth = 7 * 55 + 6 * 10 + 2 * 20;
+    } else {
+        // 6 buttons, 5 intrabuttons spaces, 2 extrabutton spaces
+        var boxwidth = 6 * 55 + 5 * 10 + 2 * 20;
+    }
+
     var boxwidth2 = boxwidth - 1.5;
     var boxclose = boxwidth - 55;
 
@@ -131,15 +137,18 @@ function SaveBox () {
 
             dx += BOXBUTTONSPACING;
 
-            this.saveWAV = makeButton('save-wav', _('Save as .wav'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.saveWAV.visible = true;
-            this.positionHoverText(this.saveWAV);
-            this.saveWAV.on('click', function(event) {
-                that.hide();
-                that._doSaveWAV();
-            });
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.saveWAV = makeButton('save-wav', _('Save as .wav'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this.saveWAV.visible = true;
+                this.positionHoverText(this.saveWAV);
+                this.saveWAV.on('click', function(event) {
+                    that.hide();
+                    that._doSaveWAV();
+                });
 
-            dx += BOXBUTTONSPACING;
+                dx += BOXBUTTONSPACING;
+            }
+
 
             this.uploadToPlanet = makeButton('upload-planet', _('Upload to Planet'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.uploadToPlanet.visible = true;
@@ -205,12 +214,16 @@ function SaveBox () {
             this.saveTB.visible = false;
             this.saveSVG.visible = false;
             this.savePNG.visible = false;
-            this.saveWAV.visible = false;
             this.uploadToPlanet.visible = false;
-            // this.shareOnFb.visible = false;
             this.saveBlockArtwork.visible = false;
-            this.saveLilypond.visible = false;
-            this._container.visible = false;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.saveWAV.visible = false;
+                this.saveLilypond.visible = false;
+            } else {
+		this.shareOnFb.visible = false;
+            }
+
+	    this._container.visible = false;
             this._refreshCanvas();
         }
     };
@@ -220,11 +233,14 @@ function SaveBox () {
             this.saveTB.visible = true;
             this.saveSVG.visible = true;
             this.savePNG.visible = true;
-            this.saveWAV.visible = true;
             this.uploadToPlanet.visible = true;
-            // this.shareOnFb.visible = true;
             this.saveBlockArtwork.visible = true;
-            this.saveLilypond.visible = true;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.saveWAV.visible = true;
+                this.saveLilypond.visible = true;
+            } else {
+                this.shareOnFb.visible = true;
+            }
             this._container.visible = true;
             this._refreshCanvas();
         }
@@ -250,7 +266,7 @@ function SaveBox () {
             this._container = new createjs.Container();
             this._stage.addChild(this._container);
             this._container.x = x - boxwidth;
-            this._container.y = y - 55;
+            this._container.y = y;
             this._makeBoxBitmap(SAVEBOXSVG, 'box', __processBackground, null);
         }
     };

@@ -836,7 +836,7 @@ function PopdownPalette(palettes) {
     };
 
     this.update = function () {
-        var html = '<div class="back"><h2>' + _('back') + '</h2></div>';
+        var html = '<div>' + _('Click to select a block.') + '</div><div class="back"><h2>' + _('back') + '</h2></div>';
         for (var name in this.models) {
             html += '<div class="palette">';
             var icon = PALETTEICONS[name].replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
@@ -904,14 +904,13 @@ function PopdownPalette(palettes) {
 
                 // console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = palette._makeBlockFromPalette(palette.protoList[e.dataset.blk], e.dataset.modname, function (newBlock) {
-                    // Move the drag group under the cursor.
+                    // Move the block and the drag group.
+		    that.palettes.blocks._moveBlock(newBlock, 75 - that.palettes.blocks.stage.x, 75 - that.palettes.blocks.stage.y);
                     that.palettes.blocks.findDragGroup(newBlock);
                     for (var i in that.palettes.blocks.dragGroup) {
-                        that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], Math.round(event.clientX / that.palettes.scale) - that.palettes.blocks.stage.x, Math.round(event.clientY / that.palettes.scale) - that.palettes.blocks.stage.y);
-                    }
+                        that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], 0, 0);
 
-                    // Dock with other blocks if needed
-                    that.palettes.blocks.blockMoved(newBlock);
+                    }
                 });
             });
         });
@@ -1013,6 +1012,9 @@ function Palette(palettes, name) {
             bitmap.y = that._getDownButtonY();
             __calculateHitArea(bitmap);
             that.fadedDownButton = bitmap;
+
+            that.fadedDownButton.on('click', function (event) {
+            });
         };
 
         function __makeFadedUpIcon(palette, name, bitmap, args) {
@@ -1022,6 +1024,9 @@ function Palette(palettes, name) {
             bitmap.y = that.menuContainer.y + STANDARDBLOCKHEIGHT;
             __calculateHitArea(bitmap);
             that.fadedUpButton = bitmap;
+
+            that.fadedUpButton.on('click', function (event) {
+            });
         };
 
         function __calculateHitArea(bitmap) {

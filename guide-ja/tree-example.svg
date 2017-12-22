@@ -39,7 +39,7 @@
         <tspan
            id="tspan4"
            y="18.583334"
-           x="5.3333335">if</tspan>
+           x="5.3333335">もし</tspan>
       </text>
       <text
          id="text10"
@@ -47,7 +47,7 @@
         <tspan
            id="tspan8"
            y="37.833332"
-           x="30.666666">then</tspan>
+           x="30.666666">なら</tspan>
       </text>
     </g>
   </g>
@@ -111,7 +111,7 @@
         <tspan
            id="tspan40"
            y="13.5"
-           x="49.678059">forward</tspan>
+           x="49.678059">前</tspan>
       </text>
       <text
          id="text46"
@@ -139,7 +139,7 @@
         <tspan
            id="tspan54"
            y="13.5"
-           x="46.333332">right</tspan>
+           x="46.333332">右</tspan>
       </text>
       <text
          id="text60"
@@ -187,7 +187,7 @@
         <tspan
            id="tspan78"
            y="13.5"
-           x="46.333332">left</tspan>
+           x="46.333332">左</tspan>
       </text>
       <text
          id="text84"
@@ -235,7 +235,7 @@
         <tspan
            id="tspan102"
            y="13.5"
-           x="46.333332">right</tspan>
+           x="46.333332">右</tspan>
       </text>
       <text
          id="text108"
@@ -283,7 +283,7 @@
         <tspan
            id="tspan126"
            y="13.5"
-           x="46.333332">back</tspan>
+           x="46.333332">後ろ</tspan>
       </text>
       <text
          id="text132"
@@ -311,7 +311,7 @@
         <tspan
            id="tspan140"
            y="13.5"
-           x="46.333332">clear</tspan>
+           x="46.333332">消し</tspan>
       </text>
     </g>
   </g>
@@ -351,7 +351,7 @@
         <tspan
            id="tspan160"
            y="21.5"
-           x="5.3333335">start</tspan>
+           x="5.3333335">スタート</tspan>
       </text>
     </g>
   </g>
@@ -503,7 +503,7 @@
         <tspan
            id="tspan236"
            y="21.5"
-           x="5.3333335">action</tspan>
+           x="5.3333335">動作</tspan>
       </text>
       <text
          id="text242"
@@ -551,7 +551,7 @@
         <tspan
            id="tspan260"
            y="24"
-           x="49.126301">store in</tspan>
+           x="49.126301">方存</tspan>
       </text>
       <text
          id="text266"
@@ -559,7 +559,7 @@
         <tspan
            id="tspan264"
            y="11.25"
-           x="49.126301">name</tspan>
+           x="49.126301">名前</tspan>
       </text>
       <text
          id="text270"
@@ -567,7 +567,7 @@
         <tspan
            id="tspan268"
            y="32.25"
-           x="49.126301">value</tspan>
+           x="49.126301">価値</tspan>
       </text>
     </g>
   </g>
@@ -607,7 +607,7 @@
         <tspan
            id="tspan288"
            y="24"
-           x="49.126301">store in</tspan>
+           x="49.126301">方存</tspan>
       </text>
       <text
          id="text294"
@@ -615,7 +615,7 @@
         <tspan
            id="tspan292"
            y="11.25"
-           x="49.126301">name</tspan>
+           x="49.126301">名前</tspan>
       </text>
       <text
          id="text298"
@@ -623,7 +623,7 @@
         <tspan
            id="tspan296"
            y="32.25"
-           x="49.126301">value</tspan>
+           x="49.126301">価値</tspan>
       </text>
     </g>
   </g>
@@ -663,7 +663,7 @@
         <tspan
            id="tspan316"
            y="24"
-           x="49.126301">store in</tspan>
+           x="49.126301">方存</tspan>
       </text>
       <text
          id="text322"
@@ -671,7 +671,7 @@
         <tspan
            id="tspan320"
            y="11.25"
-           x="49.126301">name</tspan>
+           x="49.126301">名前</tspan>
       </text>
       <text
          id="text326"
@@ -679,7 +679,7 @@
         <tspan
            id="tspan324"
            y="32.25"
-           x="49.126301">value</tspan>
+           x="49.126301">価値</tspan>
       </text>
     </g>
   </g>
@@ -879,7 +879,7 @@
         <tspan
            id="tspan424"
            y="15.25"
-           x="5.3333335">note value</tspan>
+           x="5.3333335">音価</tspan>
       </text>
       <text
          id="text430"
@@ -1003,7 +1003,7 @@
         <tspan
            id="tspan486"
            y="24"
-           x="46.333332">pitch</tspan>
+           x="46.333332">ピッチ</tspan>
       </text>
       <text
          id="text492"
@@ -1011,7 +1011,7 @@
         <tspan
            id="tspan490"
            y="11.25"
-           x="46.333332">name</tspan>
+           x="46.333332">名前</tspan>
       </text>
       <text
          id="text496"
@@ -1019,7 +1019,7 @@
         <tspan
            id="tspan494"
            y="32.25"
-           x="46.333332">octave</tspan>
+           x="46.333332">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -1039,7 +1039,7 @@
         <tspan
            id="tspan504"
            y="13.833333"
-           x="13.333333">sol</tspan>
+           x="13.333333">ソ</tspan>
       </text>
     </g>
   </g>
@@ -1079,7 +1079,7 @@
         <tspan
            id="tspan524"
            y="15.25"
-           x="5.3333335">note value</tspan>
+           x="5.3333335">音価</tspan>
       </text>
       <text
          id="text530"
@@ -1251,7 +1251,7 @@
         <tspan
            id="tspan610"
            y="15.25"
-           x="5.3333335">note value</tspan>
+           x="5.3333335">音価</tspan>
       </text>
       <text
          id="text616"
@@ -1423,7 +1423,7 @@
         <tspan
            id="tspan696"
            y="15.25"
-           x="5.3333335">no clock</tspan>
+           x="5.3333335">クロックなし</tspan>
       </text>
     </g>
   </g>
@@ -1463,7 +1463,7 @@
         <tspan
            id="tspan716"
            y="13.5"
-           x="46.333332">back</tspan>
+           x="46.333332">後ろ</tspan>
       </text>
       <text
          id="text722"
@@ -1511,7 +1511,7 @@
         <tspan
            id="tspan740"
            y="13.5"
-           x="69.697594">set pen size</tspan>
+           x="69.697594">ペンの大きさの設定</tspan>
       </text>
       <text
          id="text746"
@@ -1559,7 +1559,7 @@
         <tspan
            id="tspan764"
            y="13.5"
-           x="59.69759">set shade</tspan>
+           x="59.69759">濃淡を設定</tspan>
       </text>
       <text
          id="text770"
@@ -1607,7 +1607,7 @@
         <tspan
            id="tspan788"
            y="13.5"
-           x="59.69759">set shade</tspan>
+           x="59.69759">濃淡を設定</tspan>
       </text>
       <text
          id="text794"
@@ -1655,7 +1655,7 @@
         <tspan
            id="tspan812"
            y="13.5"
-           x="69.697594">set pen size</tspan>
+           x="69.697594">ペンの大きさの設定</tspan>
       </text>
       <text
          id="text818"
@@ -1703,7 +1703,7 @@
         <tspan
            id="tspan836"
            y="15.25"
-           x="5.3333335">note value</tspan>
+           x="5.3333335">音価</tspan>
       </text>
       <text
          id="text842"
@@ -1827,7 +1827,7 @@
         <tspan
            id="tspan898"
            y="15.25"
-           x="5.3333335">note value</tspan>
+           x="5.3333335">音価</tspan>
       </text>
       <text
          id="text904"
@@ -1951,7 +1951,7 @@
         <tspan
            id="tspan960"
            y="15.25"
-           x="5.3333335">note value</tspan>
+           x="5.3333335">音価</tspan>
       </text>
       <text
          id="text966"

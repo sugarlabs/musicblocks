@@ -24,7 +24,7 @@
     <tspan
        x="9.1454525"
        y="40.123981"
-       id="tspan3664-4">pitch-time matrix</tspan>
+       id="tspan3664-4">ピッチ・タイム行列</tspan>
   </text>
   <g
      transform="translate(18,53.123966)"
@@ -39,7 +39,7 @@
       <tspan
          id="tspan3062-0-5"
          y="28"
-         x="114">stair</tspan>
+         x="114">階段</tspan>
     </text>
     <flowRoot
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
@@ -86,7 +86,7 @@
     <tspan
        id="tspan3198-7-9"
        y="144.12386"
-       x="134">rhythm</tspan>
+       x="134">リズム</tspan>
   </text>
   <text
      y="95.123856"
@@ -96,7 +96,7 @@
     <tspan
        id="tspan3202-8-3"
        y="117.62386"
-       x="134">number of notes</tspan>
+       x="134">音符の数</tspan>
   </text>
   <text
      y="95.123856"
@@ -106,7 +106,7 @@
     <tspan
        id="tspan3206-3-1"
        y="159.62386"
-       x="134">note value</tspan>
+       x="134">音価</tspan>
   </text>
   <g
      transform="translate(-143.83636,149.9481)"

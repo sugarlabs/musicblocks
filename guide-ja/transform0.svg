@@ -63,7 +63,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan4039">start</tspan>
+           id="tspan4039">スタート</tspan>
       </text>
     </g>
   </g>
@@ -84,7 +84,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4049">note value</tspan>
+           id="tspan4049">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -213,7 +213,7 @@
         <tspan
            x="46.333332"
            y="24"
-           id="tspan4111">pitch</tspan>
+           id="tspan4111">ピッチ</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -221,7 +221,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan4115">name</tspan>
+           id="tspan4115">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -229,7 +229,7 @@
         <tspan
            x="46.333332"
            y="32.25"
-           id="tspan4119">octave</tspan>
+           id="tspan4119">オクターヴ</tspan>
       </text>
     </g>
   </g>
@@ -250,7 +250,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan4129">do</tspan>
+           id="tspan4129">をするのは</tspan>
       </text>
     </g>
   </g>
@@ -292,7 +292,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4149">note value</tspan>
+           id="tspan4149">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -471,7 +471,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4235">repeat</tspan>
+           id="tspan4235">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -521,7 +521,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4259">repeat</tspan>
+           id="tspan4259">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -571,7 +571,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan4283">note value</tspan>
+           id="tspan4283">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"

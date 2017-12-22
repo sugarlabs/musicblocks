@@ -163,9 +163,7 @@ function Turtle (name, turtles, drum) {
             var cx2Scaled = (cx2 + dxf) * this.turtles.scale;
             var cy2Scaled = (cy2 + dyf) * this.turtles.scale;
 
-            ctx.moveTo(ax, ay);
             this.svgPath = true;
-            this.svgOutput += '<path d="M ' + axScaled + ',' + ayScaled + ' ';
 
             // Initial arc
             var oAngleRadians = ((180 + degreesInitial) / 180) * Math.PI;
@@ -176,12 +174,6 @@ function Turtle (name, turtles, drum) {
             ctx.arc(arccx, arccy, step, sa, ea, false);
             this._svgArc(steps, arccx * this.turtles.scale, arccy * this.turtles.scale, step * this.turtles.scale, sa, ea);
 
-            // Initial bezier curve
-            ctx.bezierCurveTo(cx1 + dxi, cy1 + dyi , cx2 + dxf, cy2 + dyf, cx, cy);
-            this.svgOutput += 'C ' + cx1Scaled + ',' + cy1Scaled + ' ' + cx2Scaled + ',' + cy2Scaled + ' ' + cxScaled + ',' + cyScaled + ' ';
-
-            this.svgOutput += 'M ' + cxScaled + ',' + cyScaled + ' ';
-
             // Final arc
             var oAngleRadians = (degreesFinal / 180) * Math.PI;
             var arccx = fx;
@@ -191,10 +183,10 @@ function Turtle (name, turtles, drum) {
             ctx.arc(arccx, arccy, step, sa, ea, false);
             this._svgArc(steps, arccx * this.turtles.scale, arccy * this.turtles.scale, step * this.turtles.scale, sa, ea);
 
-            // Final bezier curve
-            ctx.bezierCurveTo(cx2 - dxf, cy2 - dyf, cx1 - dxi, cy1 - dyi, ax, ay);
-            this.svgOutput += 'C ' + cx2Scaled + ',' + cy2Scaled + ' ' + cx1Scaled + ',' + cy1Scaled + ' ' + axScaled + ',' + ayScaled + ' ';
-            this.closeSVG();
+            var fx = this.turtles.turtleX2screenX(x2);
+            var fy = this.turtles.turtleY2screenY(y2);
+            var fxScaled = fx * this.turtles.scale;
+            var fyScaled = fy * this.turtles.scale;
 
             ctx.stroke();
             ctx.closePath();
@@ -203,6 +195,7 @@ function Turtle (name, turtles, drum) {
             ctx.lineWidth = this.stroke;
             ctx.lineCap = 'round';
             ctx.moveTo(fx,fy);
+            this.svgOutput += 'M ' + fxScaled + ',' + fyScaled + ' ';
             this.x = x2;
             this.y = y2;
         } else if (this.penState) {
@@ -220,6 +213,8 @@ function Turtle (name, turtles, drum) {
             var cx2 = this.turtles.turtleX2screenX(cp2x);
             var cy2 = this.turtles.turtleY2screenY(cp2y);
 
+            ctx.bezierCurveTo(cx1 + dxi, cy1 + dyi , cx2 + dxf, cy2 + dyf, cx, cy);
+            ctx.bezierCurveTo(cx2 - dxf, cy2 - dyf, cx1 - dxi, cy1 - dyi, ax, ay);
             ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
 
             if (!this.svgPath) {
@@ -237,7 +232,11 @@ function Turtle (name, turtles, drum) {
             var cy2Scaled = cy2 * this.turtles.scale;
             var fxScaled = fx * this.turtles.scale;
             var fyScaled = fy * this.turtles.scale;
+
+            //Curve to: ControlPointX1, ControlPointY1 >> ControlPointX2, ControlPointY2 >> X, Y
             this.svgOutput += 'C ' + cx1Scaled + ',' + cy1Scaled + ' ' + cx2Scaled + ',' + cy2Scaled + ' ' + fxScaled + ',' + fyScaled;
+            this.closeSVG();
+
             this.x = x2;
             this.y = y2;
             ctx.stroke();
@@ -567,16 +566,19 @@ function Turtle (name, turtles, drum) {
             }
 
             if (this.skinChanged) {
-                this.doTurtleShell(55, TURTLEBASEPATH + 'turtle-' + i.toString() + '.svg');
+                var artwork = TURTLESVG;
+                if (sugarizerCompatibility.isInsideSugarizer()) {
+                    artwork = artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke);
+                } else {
+                    artwork = artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]);
+                }
+
+                this.doTurtleShell(55, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))));
                 this.skinChanged = false;
             }
         }
 
-        // Could be a race condition on startup
-        if (this.bitmap != null) {
-            this.bitmap.rotation = this.orientation;
-        }
-
+        this.bitmap.rotation = this.orientation;
         this.updateCache();
 
         // Clear all media.

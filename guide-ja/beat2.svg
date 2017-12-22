@@ -42,7 +42,7 @@
           <tspan
              x="5.3333335"
              y="21.5"
-             id="tspan5676">action</tspan>
+             id="tspan5676">動作</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -142,7 +142,7 @@
           <tspan
              x="5.3333335"
              y="21.5"
-             id="tspan5700">action</tspan>
+             id="tspan5700">動作</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -242,7 +242,7 @@
           <tspan
              x="5.3333335"
              y="21.5"
-             id="tspan5810">action</tspan>
+             id="tspan5810">動作</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -341,7 +341,7 @@
           <tspan
              x="49.69759"
              y="24"
-             id="tspan5638">on beat</tspan>
+             id="tspan5638">強拍</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -349,7 +349,7 @@
           <tspan
              x="49.69759"
              y="11.25"
-             id="tspan5642">beat</tspan>
+             id="tspan5642">拍子</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -357,7 +357,7 @@
           <tspan
              x="49.69759"
              y="32.25"
-             id="tspan5646">do</tspan>
+             id="tspan5646">をするのは</tspan>
         </text>
       </g>
     </g>
@@ -421,7 +421,7 @@
           <tspan
              x="49.69759"
              y="24"
-             id="tspan5772">on beat</tspan>
+             id="tspan5772">強拍</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -429,7 +429,7 @@
           <tspan
              x="49.69759"
              y="11.25"
-             id="tspan5776">beat</tspan>
+             id="tspan5776">拍子</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -437,7 +437,7 @@
           <tspan
              x="49.69759"
              y="32.25"
-             id="tspan5780">do</tspan>
+             id="tspan5780">をするのは</tspan>
         </text>
       </g>
     </g>
@@ -498,7 +498,7 @@
         <tspan
            id="tspan5858"
            y="13.5"
-           x="74.536461">on offbeat do</tspan>
+           x="74.536461">弱拍に何々を</tspan>
       </text>
       <text
          id="text5864"

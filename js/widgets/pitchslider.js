@@ -86,6 +86,7 @@ function PitchSlider() {
     };
 
     this._save = function (cell) {
+        console.log(cell);
         var that = this;
         var cellIndex = cell.cellIndex;
         var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
@@ -113,12 +114,20 @@ function PitchSlider() {
     }
 
     this._addKeyboardInput = function (cell) {
+        const KEYCODE_LEFT = 37;
+        const KEYCODE_RIGHT = 39;
+        const KEYCODE_UP = 38;
+        const KEYCODE_DOWN = 40;
+        const RETURN = 13;
+
         var that = this;
         cell.focus();
 
         cell.addEventListener('keydown', function(event) {
             that._isKeyPressed = 0;
-            if (event.keyCode >= 37 && event.keyCode <= 40) {
+            if (event.keyCode >= KEYCODE_LEFT && event.keyCode <= KEYCODE_DOWN) {
+                that._isKeyPressed = 1;
+            } else if (event.keyCode === RETURN) {
                 that._isKeyPressed = 1;
             }
         });
@@ -127,20 +136,25 @@ function PitchSlider() {
             if (that._isKeyPressed === 1) {
                 that._isKeyPressed = 0;
 
-                if (event.keyCode === 38) {
+                if (event.keyCode === KEYCODE_UP) {
                     that._moveSlider(cell, 1);
                 }
 
-                if (event.keyCode === 40) {
+                if (event.keyCode === KEYCODE_DOWN) {
                     that._moveSlider(cell, -1);
                 }
 
-                if (event.keyCode === 37) {
+                if (event.keyCode === KEYCODE_LEFT) {
                     that._focusCell(cell, -1);
                 }
 
-                if (event.keyCode === 39) {
+                if (event.keyCode === KEYCODE_RIGHT) {
                     that._focusCell(cell, 1);
+                }
+
+                if (event.keyCode === RETURN) {
+                    console.log('RETURN');
+                    that._save(cell);
                 }
             }
         });

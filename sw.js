@@ -197,7 +197,6 @@ var urlsToCache = [
 
     'css/activity.css',
 
-    'js/soundsamples.js',
     'js/activity.js',
     'js/launch.js',
     'js/analytics.js',
@@ -242,6 +241,8 @@ var urlsToCache = [
 
     'lib/sugar-web/env.js',
     'lib/sugar-web/activity/activity.js',
+
+    'sounds/samples/manifest.js'
 ];
 
 self.addEventListener('install', function(event) {

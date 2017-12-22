@@ -64,7 +64,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan6816">start</tspan>
+           id="tspan6816">スタート</tspan>
       </text>
     </g>
   </g>
@@ -85,7 +85,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan6826">note value</tspan>
+           id="tspan6826">音価</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -214,7 +214,7 @@
         <tspan
            x="47.461262"
            y="13.5"
-           id="tspan6888">silence</tspan>
+           id="tspan6888">休符</tspan>
       </text>
     </g>
   </g>
@@ -235,7 +235,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan6898">action</tspan>
+           id="tspan6898">動作</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -264,7 +264,7 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan6912">delay</tspan>
+           id="tspan6912">ディレイエフェクタ</tspan>
       </text>
     </g>
   </g>
@@ -285,7 +285,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan6922">repeat</tspan>
+           id="tspan6922">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -335,7 +335,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan6946">action</tspan>
+           id="tspan6946">動作</tspan>
       </text>
     </g>
   </g>
@@ -356,7 +356,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan6956">start</tspan>
+           id="tspan6956">スタート</tspan>
       </text>
     </g>
   </g>
@@ -377,7 +377,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan6966">repeat</tspan>
+           id="tspan6966">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -427,7 +427,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan6990">delay</tspan>
+           id="tspan6990">ディレイエフェクタ</tspan>
       </text>
     </g>
   </g>
@@ -448,7 +448,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7000">semi-tone transpose</tspan>
+           id="tspan7000">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -635,7 +635,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7090">repeat</tspan>
+           id="tspan7090">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -685,7 +685,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan7114">action</tspan>
+           id="tspan7114">動作</tspan>
       </text>
     </g>
   </g>
@@ -706,7 +706,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan7124">start</tspan>
+           id="tspan7124">スタート</tspan>
       </text>
     </g>
   </g>
@@ -727,7 +727,7 @@
         <tspan
            x="5.3333335"
            y="21.5"
-           id="tspan7134">start</tspan>
+           id="tspan7134">スタート</tspan>
       </text>
     </g>
   </g>
@@ -748,7 +748,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7144">repeat</tspan>
+           id="tspan7144">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -798,7 +798,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan7168">delay</tspan>
+           id="tspan7168">ディレイエフェクタ</tspan>
       </text>
     </g>
   </g>
@@ -819,7 +819,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7178">semi-tone transpose</tspan>
+           id="tspan7178">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1006,7 +1006,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7268">repeat</tspan>
+           id="tspan7268">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1056,7 +1056,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan7292">action</tspan>
+           id="tspan7292">動作</tspan>
       </text>
     </g>
   </g>
@@ -1077,7 +1077,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7302">repeat</tspan>
+           id="tspan7302">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1127,7 +1127,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan7326">delay</tspan>
+           id="tspan7326">ディレイエフェクタ</tspan>
       </text>
     </g>
   </g>
@@ -1148,7 +1148,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7336">semi-tone transpose</tspan>
+           id="tspan7336">半音で移調</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1335,7 +1335,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan7426">repeat</tspan>
+           id="tspan7426">回繰り返す</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -1385,7 +1385,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan7450">action</tspan>
+           id="tspan7450">動作</tspan>
       </text>
     </g>
   </g>

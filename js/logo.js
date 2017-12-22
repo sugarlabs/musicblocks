@@ -253,7 +253,11 @@ function Logo () {
 
     // parameters used by notations
     this.notationStaging = {};
-    this.notationOutput = getLilypondHeader();
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        this.notationOutput = getLilypondHeader();
+    } else {
+        this.notationOutput = '';
+    }
     this.notationNotes = {};
     this.runningLilypond = false;
     this.checkingCompletionState = false;
@@ -7365,9 +7369,9 @@ function Logo () {
         if (typeof(arg1) === 'string') {
             var len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
-                doUseCamera(args, this.turtles, turtle, false, this.cameraID, this.setCameraID, this.errorMsg);
+                doUseCamera([arg0], this.turtles, turtle, false, this.cameraID, this.setCameraID, this.errorMsg);
             } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
-                doUseCamera(args, this.turtles, turtle, true, this.cameraID, this.setCameraID, this.errorMsg);
+                doUseCamera([arg0], this.turtles, turtle, true, this.cameraID, this.setCameraID, this.errorMsg);
             } else if (len > 10 && arg1.substr(0, 10) === 'data:image') {
                 this.turtles.turtleList[turtle].doShowImage(arg0, arg1);
             } else if (len > 8 && arg1.substr(0, 8) === 'https://') {

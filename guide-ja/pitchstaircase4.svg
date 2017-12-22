@@ -50,7 +50,7 @@
     <tspan
        x="142.86987"
        y="188.41867"
-       id="tspan3198-0-1-1-6">pitch</tspan>
+       id="tspan3198-0-1-1-6">ピッチ</tspan>
   </text>
   <text
      id="text3200-6-0-5-9"
@@ -60,7 +60,7 @@
     <tspan
        x="142.86987"
        y="163.91867"
-       id="tspan3202-5-0-5-3">name</tspan>
+       id="tspan3202-5-0-5-3">名前</tspan>
   </text>
   <text
      id="text3204-9-5-3-7"
@@ -70,7 +70,7 @@
     <tspan
        x="142.86987"
        y="207.9187"
-       id="tspan3206-0-8-3-4">octave</tspan>
+       id="tspan3206-0-8-3-4">オクターヴ</tspan>
   </text>
   <g
      transform="matrix(2,0,0,2,148,138.62412)"
@@ -133,7 +133,7 @@
       <tspan
          id="tspan3031-5"
          y="207.27332"
-         x="-10.055397">action</tspan>
+         x="-10.055397">動作</tspan>
     </text>
   </g>
   <g
@@ -151,7 +151,7 @@
       <tspan
          id="tspan25-1"
          y="534.93439"
-         x="734.31952">stair</tspan>
+         x="734.31952">階段</tspan>
     </text>
   </g>
   <path
@@ -166,7 +166,7 @@
     <tspan
        id="tspan3105"
        y="124.81644"
-       x="111.43839">hertz</tspan>
+       x="111.43839">ハーツ</tspan>
   </text>
   <path
      style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -194,7 +194,7 @@
     <tspan
        id="tspan3105-3"
        y="82.624275"
-       x="112.04111">hertz</tspan>
+       x="112.04111">ハーツ</tspan>
   </text>
   <path
      style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
