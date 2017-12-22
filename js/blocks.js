@@ -884,7 +884,7 @@ function Blocks () {
             var lastc = thisBlockobj.connections.length - 1;
             var i = thisBlockobj.connections[lastc];
             if (this.blockList[i].name === 'rest2') {
-                var silenceBlock = i;  // thisBlockobj.connections[i];
+                var silenceBlock = i;
                 var silenceBlockobj = this.blockList[silenceBlock];
                 silenceBlockobj.hide();
                 silenceBlockobj.trash = true;
@@ -898,23 +898,31 @@ function Blocks () {
 
     this.deletePreviousDefault = function (thisBlock) {
         // Remove the Silence block from a Note block if another block
-        // is inserted just after the Silence block.
+        // is inserted anywhere after the Silence block.
         var thisBlockobj = this.blockList[thisBlock];
-        if (thisBlockobj && this.blockList[thisBlockobj.connections[0]] && this.blockList[thisBlockobj.connections[0]].name === 'rest2') {
-            var silenceBlock = thisBlockobj.connections[0];
-            var silenceBlockobj = this.blockList[silenceBlock];
-            silenceBlockobj.hide();
-            silenceBlockobj.trash = true;
+        while (thisBlockobj.connections[0] != null) {
+            var i = thisBlockobj.connections[0];
+            if (['newnote', 'osctime'].indexOf(this.blockList[i].name) !== -1) {
+                break;
+            } else if (this.blockList[i].name === 'rest2') {
+                var silenceBlock = i;
+                var silenceBlockobj = this.blockList[silenceBlock];
+                silenceBlockobj.hide();
+                silenceBlockobj.trash = true;
 
-            for (var i = 0; i < this.blockList[silenceBlockobj.connections[0]].connections.length; i++) {
-                if (this.blockList[silenceBlockobj.connections[0]].connections[i] === silenceBlock) {
-                    this.blockList[silenceBlockobj.connections[0]].connections[i] = thisBlock;
-                    break;
-                }
-            }
+                for (var c = 0; c < this.blockList[silenceBlockobj.connections[0]].connections.length; c++) {
+                    if (this.blockList[silenceBlockobj.connections[0]].connections[c] === silenceBlock) {
+			this.blockList[silenceBlockobj.connections[0]].connections[c] = this.blockList.indexOf(thisBlockobj);
+			break;
+                    }
+		}
 
-        thisBlockobj.connections[0] = silenceBlockobj.connections[0];
-        }
+		thisBlockobj.connections[0] = silenceBlockobj.connections[0];
+                break;
+	    } else {
+                thisBlockobj = this.blockList[i];
+	    }
+	}
 
         return thisBlockobj.connections[0];
     };
