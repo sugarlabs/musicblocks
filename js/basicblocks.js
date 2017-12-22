@@ -2217,6 +2217,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     trueFalseBlock.booleanZeroArgBlock();
 
     // Only used to excute methods in the Math library
+    /*
     var evalBlock = new ProtoBlock('eval');
     evalBlock.palette = palettes.dict['number'];
     blocks.protoBlockDict['eval'] = evalBlock;
@@ -2230,6 +2231,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     evalBlock.defaults.push('abs(x)');
     evalBlock.hidden = true;  // security hole
     evalBlock.defaults.push(-100);
+    */
 
     var modBlock = new ProtoBlock('mod');
     modBlock.palette = palettes.dict['number'];
