@@ -3,10 +3,16 @@ This document describes for developers how to add new blocks in support
 of additional functionality by changes to the
 core code of Turtle Blocks. 
 
+
+A complete block is made in two steps.
+Defining the new block in basicblocks.js  and the corresponding code to be run when the block is run in logo.js.
+
+
 ## How to make your block a part of the main repository
 
  Make your own copy by cloning the official [respository](https://github.com/walterbender/musicblocks.git) 
  Create your block and make a pull request.
+
 
 ## How to create new blocks
 All blocks are present in a simple format.
@@ -61,7 +67,8 @@ For most blocks, there are two files that need to be edited in order to add a bl
  the macro expands to, where the position is specified as x, y); and
  (4) add an entry to the BUILTINMACROS dictionary.  
 
-## Example
+
+#### Example
   ```
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['pitch'];
@@ -74,6 +81,68 @@ For most blocks, there are two files that need to be edited in order to add a bl
     squareBlock.defaults.push(440);
   ```
 
+## Functioning of the block in [logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)
+     
+      
+    Now here you expalin how your block works.
+    First decide which way your block goes , horizontally or vertically; foe ex: the 'setcolor' block joins the code vertically wand the the no. which represents a color goes horizontally.
+    Now find a switch statement which is appropriate for your block then add the case statement .In the case add the code realted to your block.
+     `case 'uniquename':`
+     Here the uniquename is the same as the one in basicblocks.js.
+
+#### Example
+       
+       A flow block is 'status' , it is mentioned in the (that.blocks.blockList[blk].name) switch statement
+
+       Its code-
+        ```
+       case 'status':
+      if (that.statusMatrix == null) {
+        that.statusMatrix = new StatusMatrix();
+      }
+      that.statusMatrix.init(that);
+      that.statusFields = [];
+      if (args.length === 1) {
+        childFlow = args[0];
+        childFlowCount = 1;
+      }
+      that.inStatusMatrix = true;
+      var listenerName = '_status_' + turtle;
+      that._setDispatchBlock(blk, turtle, listenerName);
+      var __listener = function (event) {
+        that.statusMatrix.init(that);
+        that.inStatusMatrix = false;
+      }
+      that._setListener(turtle, listenerName, __listener);
+      break;
+        ```
+
+
+       An arg block is 'key' , it is mentioned in the  (that.blocks.blockList[blk].name) switch statement.
+
+        Its code -
+         ```
+          case 'key':
+        if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+          that.statusFields.push([blk, 'key']);
+        } else {
+          that.blocks.blockList[blk].value = that.keySignature[turtle];
+        } 
+        break;
+        ```
+
+
+## Assigning your block in [analytics.js](https://github.com/walterbender/musicblocks/blob/master/js/analytics.js)
+
+    Here you assign a block according to its bin.
+    Check which bin belongs to which pallete, and then according to assign your block to the bin
+    Example  
+            ```
+              'forward': 'forward',
+              'back': 'forward','
+            ``` 
+    Here both forward and backward blocks are mentioned together,they are both responsible for movement;sos 
+     
 
 ## References
 Sample block artwork
@@ -108,3 +177,4 @@ Valid blocks styles in turtleblocksjs:
 * `parameterBlock`: E.g., color, shade, pensize
 
 Information about new block and protoblock types will be added soon.
+
