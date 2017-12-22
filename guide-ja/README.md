@@ -472,28 +472,24 @@ the volumne to 5. The resultant graphic is shown below.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg "二つのキーのピアノの創作")
 
-上の例で二つのキーのピアノが創作されています。In the example above, a simple two-key piano is created by associating
-それぞれの音符が*クリック*イベントを二つのネズミスプライトに分けます。 events on two different turtles with individual notes. Can you
-make an 8-key piano?
+上の例で二つのキーのあるピアノが創作されています。
+それぞれの音符が*クリック*イベントを二つのネズミスプライトに分けます。
+
+この例をよく勉強して8キーのピアノがミュージック・ブロックスで作れるんでしょうか？
 
 ("Turtles" again)
 
 [ライブで再生](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg "adding randomness to your music")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg "乱数的なものが音楽に入れる方法")
 
-You can also add a bit of randomness to your music. In the top example
-above, the *One-of* block is used to randomly assign either `ド` or
-`レ` each time the *音価* block is played. In the bottom example
-above, the *One-of* block is used to randomly select between `チャンク1`
-and `チャンク2`.
+乱数的なものが音楽と一緒に入れることができます。上の例に*これかそれ*ブロックは乱数的に`ド`、それとも`レ`を、*音価*ブロックが毎回鳴る時その音符のピッチにします。その下の例について、*これかそれ*のブロックが乱数的に`チャンク1`を、それとも`チャンク2`を選べます。
 
 ## <a name="ウィジェット"></a>ウィジェット
 
 [前のトピック (3. 音楽でプログラミング)](#音楽でプログラミング) | [目次に戻す](#目次) | [次のトピック (5. ミュージック・ブロックスから以遠)](#ミュージック・ブロックスから以遠)
 
-This section of the 案内 will talk about the various ウィジェット that can be added to ミュージック・ブロックス
-to enhance your experience.
+案内のこれからがミュージック・ブロックスの色々なウィジェットを紹介して使い方を案内します。ミュージック・ブロックスにあるウィジェットがコードと音楽をもともと分かりやすくするためです。
 
 ### <a name="ステータス"></a>4.1 ステータス
 
@@ -501,38 +497,35 @@ to enhance your experience.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg "ステータス in tabular form")
 
-*ステータス・ウィジェット*はミュージック・ブロックスの音符と計算との色々の再生されていることの is a tool for inspecting the ステータスを印刷 of Music
-Blocks as it is running. By default, the key, BPM, and 音量 are
-displayed. Also, each note is displayed as it is played. There is one
-row per voice in the ステータス table.
+(Needs to see these pictures... later)
 
-Additional *Print* blocks can be added to the *ステータス* ウィジェット to
-display additional music factors, e.g., 重に, transposition,
-skip, [スタッカート](#他の転化), [スラー](#他の転化), and [グラフィックス](#グラフィックス) factors, e.g., x, y, heading,
-color, shade, grey, and pensize.
+*ステータス・ウィジェット*はミュージック・ブロックスの音符と計算との色々の再生されているものをどうなっているかのステータスの印刷ができるツールです。ステータスのデフォールトで出るのが音階(またモード)、BPM、また音量です。そのうえに鳴られている音符がみんな鳴るうちに放送します。一つの一列に一つの音声の鳴らされている音符のピッチ、また音価の数値がステータスで出ます。
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg "additional programming within the ステータス block")
+デフォルトの*印刷*だけじゃなくて、そのより自分の見たいブロックも*ステータス* ウィジェットに入れることができます。例えば、音楽に対する音量、転化、音符の省略、[スタッカート](#他の転化)、[スラー](#他の転化)、など入れることができ、[グラフィックス](#グラフィックス)に対するx、y、 向き、色、暗がり、灰色、ペンの大きさ、などを入れてそのそれぞれのブロックに関係ある放送の見ることができます。
 
-You can do additional programming within the ステータス block. In the
-example above, the 音量 is divided by 10 before being displayed.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg "ステータス・ブロックでその他にできるプログラムできる方法")
 
-### <a name="GENERATION"></a>4.2 Generating チャンク of Notes 
+ステータス・ブロックでその他にプログラムできます。上の例でステータス・ブロックに入っているのは今の鳴らされている音量が放送する前、10割の計算がされています。
 
-Using the ピッチ・タイム行列, it is possible to generate チャンク of notes at a much faster speed.
+### <a name="GENERATION"></a>4.2 音符のチャンクの作り方 
+
+Using the ピッチ・タイム行列を使って、音符のチャンク(メロデイ)を簡単に作ることができます。
+
+(Do we really want to say, "at a much faster speed"? Maybe "in a more convenient and intuitive manner"? or something else)
 
 #### <a name="ピッチ・タイム行列"></a>4.2.1 The ピッチ・タイム行列
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg "ピッチ・タイム行列")
 
-ミュージック・ブロックス provides a ウィジェット, the *ピッチ・タイム行列*, as a scaffold
-for getting started.
+ミュージック・ブロックスの一つのウィジェットが*ピッチ・タイム行列*で、ピッチと時期が行列となっているから音符の流れ方がもと簡単に想像できます。
 
-Once you've launched ミュージック・ブロックス in your browser, start by クリックing
-on the *ピッチ・タイム行列* stack that appears in the middle of the
-screen. (For the moment, ignore the *スタート* block.) You'll see a grid
-organized vertically by ピッチ and horizontally by リズム.
+(It is easier because you can see pitch over time; you can see the movement of the notes. Please take another look at English as well)
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg "ピッチ and リズム block matrix")
+*ピッチ・タイム行列*を使いたい際はパレットで「ウィジット」をクリックして「ピッチ・タイム行列」をそのパレットから引きます。そのブロックをクリックすると行列が現れるべきです。ピッチが横でリズム(時期)が縦です.
+
+(This in the English version is dated as we do not have the pitch-time matrix at the start) 
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg "ピッチ・タイム行列にピッチとリズムのそれぞれのブロックの使い方")
 
 The matrix in the figure above has three *ピッチ* blocks and one
 *リズム* block, which is used to create a 3 x 3 grid of ピッチ and

@@ -714,7 +714,7 @@ msgstr "リズムブロック：ピッチ時刻行列と一緒に使うつもり
 #: js/logo.js:4276
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
-msgstr "音価の数値は０よりの必要があります"
+msgstr "音価の数値は０より大きい必要があります"
 
 #: js/logo.js:4539
 msgid "Vibrato intensity must be between 1 and 100."
@@ -722,7 +722,7 @@ msgstr "ビブラートの強度の数価が０より100までの必要ありま
 
 #: js/logo.js:4544
 msgid "Vibrato rate must be greater than 0."
-msgstr "ビブラートのレートの数価が０よりの必要あります。"
+msgstr "ビブラートのレートの数価が０より大きい必要あります。"
 
 #: js/logo.js:4576
 msgid "Distortion must be from 0 to 100."
