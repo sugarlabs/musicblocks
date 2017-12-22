@@ -878,16 +878,20 @@ function Blocks () {
 
     this.deleteNextDefault = function (thisBlock) {
         // Remove the Silence block from a Note block if another block
-        // is inserted above the silence block.
+        // is inserted anywhere above the silence block.
         var thisBlockobj = this.blockList[thisBlock];
-        for (var i = 1; i < thisBlockobj.connections.length; i++) {
-            if (thisBlockobj.connections[i] && this.blockList[thisBlockobj.connections[i]].name === 'rest2') {
-                var silenceBlock = thisBlockobj.connections[i];
+        while (last(thisBlockobj.connections) != null) {
+            var lastc = thisBlockobj.connections.length - 1;
+            var i = thisBlockobj.connections[lastc];
+            if (this.blockList[i].name === 'rest2') {
+                var silenceBlock = i;  // thisBlockobj.connections[i];
                 var silenceBlockobj = this.blockList[silenceBlock];
                 silenceBlockobj.hide();
                 silenceBlockobj.trash = true;
-                this.blockList[thisBlock].connections[i] = silenceBlockobj.connections[1];
+                thisBlockobj.connections[lastc] = silenceBlockobj.connections[1];
                 break;
+            } else {
+                thisBlockobj = this.blockList[i];
             }
         }
     };
