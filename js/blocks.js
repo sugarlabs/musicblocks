@@ -17,6 +17,9 @@ const MINIMUMDOCKDISTANCE = 400;
 const CAMERAVALUE = '##__CAMERA__##';
 const VIDEOVALUE = '##__VIDEO__##';
 
+const NOTEBLOCKS = ['newnote', 'osctime'];
+const PITCHBLOCKS = ['pitch', 'steppitch', 'hertz', 'pitchnumber', 'scaledegree', 'playdrum'];
+
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
@@ -230,40 +233,44 @@ function Blocks () {
     };
 
     this.extract = function () {
-        // Remove a single block from within a stack.
         if (this.activeBlock != null) {
-            var blkObj = this.blockList[this.activeBlock];
+            this._extractBlock(this.activeBlock, true);
+        }
+    };
 
-            if (blkObj.name !== 'number' && blkObj.name !== 'text') {
-                var firstConnection = blkObj.connections[0];
-                var lastConnection = last(blkObj.connections);
+    this._extractBlock = function (blk, adjustDock) {
+        // Remove a single block from within a stack.
+        var blkObj = this.blockList[blk];
 
-                if (firstConnection != null) {
-                    var connectionIdx = this.blockList[firstConnection].connections.indexOf(this.activeBlock);
-                } else {
-                    var connectionIdx = null;
-                }
+        if (blkObj.name !== 'number' && blkObj.name !== 'text') {
+            var firstConnection = blkObj.connections[0];
+            var lastConnection = last(blkObj.connections);
 
-                blkObj.connections[0] = null;
-                blkObj.connections[blkObj.connections.length - 1] = null;
-                if (firstConnection != null) {
-                    this.blockList[firstConnection].connections[connectionIdx] = lastConnection;
-                }
+            if (firstConnection != null) {
+                var connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
+            } else {
+                var connectionIdx = null;
+            }
 
-                if (lastConnection != null) {
-                    this.blockList[lastConnection].connections[0] = firstConnection;
-                }
+            blkObj.connections[0] = null;
+            blkObj.connections[blkObj.connections.length - 1] = null;
+            if (firstConnection != null) {
+                this.blockList[firstConnection].connections[connectionIdx] = lastConnection;
+            }
 
-                this.moveStackRelative(this.activeBlock, 4 * STANDARDBLOCKHEIGHT, 0);
-                this.blockMoved(this.activeBlock);
+            if (lastConnection != null) {
+                this.blockList[lastConnection].connections[0] = firstConnection;
+            }
 
-                if (firstConnection != null) {
-                    this.blockMoved(firstConnection);
-                    this.adjustDocks(firstConnection, true);
-                    if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
-                        this.clampThisToCheck = [[firstConnection, 0]];
-                        this.adjustExpandableClampBlock();
-                    }
+            this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
+            this.blockMoved(blk);
+
+            if (adjustDock && firstConnection != null) {
+                this.blockMoved(firstConnection);
+                this.adjustDocks(firstConnection, true);
+                if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
+                    this.clampThisToCheck = [[firstConnection, 0]];
+                    this.adjustExpandableClampBlock();
                 }
             }
         }
@@ -854,7 +861,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock], false);
             }
-        } else if (['newnote', 'osctime'].indexOf(this.blockList[parentblk].name) !== -1) {
+        } else if (NOTEBLOCKS.indexOf(this.blockList[parentblk].name) !== -1) {
             var cblk = this.blockList[parentblk].connections[2];
             if (cblk == null) {
                 var blkname = 'vspace';
@@ -876,22 +883,59 @@ function Blocks () {
         }
     };
 
-    this.deleteNextDefault = function (thisBlock) {
-        // Remove the Silence block from a Note block if another block
-        // is inserted anywhere above the silence block.
-        var thisBlockobj = this.blockList[thisBlock];
-        while (last(thisBlockobj.connections) != null) {
-            var lastc = thisBlockobj.connections.length - 1;
-            var i = thisBlockobj.connections[lastc];
-            if (this.blockList[i].name === 'rest2') {
-                var silenceBlock = i;
-                var silenceBlockobj = this.blockList[silenceBlock];
-                silenceBlockobj.hide();
-                silenceBlockobj.trash = true;
-                thisBlockobj.connections[lastc] = silenceBlockobj.connections[1];
+    this._deletePitchBlocks = function (thisBlock) {
+        // Remove any pitch blocks from a Note block if silent
+        // block is inserted.
+
+        // Find the top of the stack
+        var c = this.blockList[thisBlock].connections[0];
+        if (c === null) {
+            console.log('Silence block was not inside a note block');
+	}
+
+        while (true) {
+            if (NOTEBLOCKS.indexOf(this.blockList[c].name) !== -1) {
                 break;
-            } else {
-                thisBlockobj = this.blockList[i];
+            }
+
+            thisBlock = c;
+            var c = this.blockList[c].connections[0];
+            if (c === null) {
+		console.log('Silence block was not inside a note block');
+                break;
+	    }
+        }
+
+        while (thisBlock != null) {
+            var nextBlock = last(this.blockList[thisBlock].connections);
+            if (PITCHBLOCKS.indexOf(this.blockList[thisBlock].name) !== -1) {
+                this._extractBlock(thisBlock, false);
+	    }
+
+            thisBlock = nextBlock;
+	}
+    };
+
+    this.deleteNextDefault = function (thisBlock) {
+        var thisBlockobj = this.blockList[thisBlock];
+        if (thisBlockobj.name === 'rest2') {
+            this._deletePitchBlocks(thisBlock);
+        } else {
+            // Remove the Silence block from a Note block if another
+            // block is inserted anywhere above the silence block.
+            while (last(thisBlockobj.connections) != null) {
+                var lastc = thisBlockobj.connections.length - 1;
+                var i = thisBlockobj.connections[lastc];
+                if (this.blockList[i].name === 'rest2') {
+                    var silenceBlock = i;
+                    var silenceBlockobj = this.blockList[silenceBlock];
+                    silenceBlockobj.hide();
+                    silenceBlockobj.trash = true;
+                    thisBlockobj.connections[lastc] = silenceBlockobj.connections[1];
+                    break;
+                } else {
+                    thisBlockobj = this.blockList[i];
+                }
             }
         }
     };
@@ -899,32 +943,37 @@ function Blocks () {
     this.deletePreviousDefault = function (thisBlock) {
         // Remove the Silence block from a Note block if another block
         // is inserted anywhere after the Silence block.
-        var thisBlockobj = this.blockList[thisBlock];
-        while (thisBlockobj.connections[0] != null) {
-            var i = thisBlockobj.connections[0];
-            if (['newnote', 'osctime'].indexOf(this.blockList[i].name) !== -1) {
-                break;
-            } else if (this.blockList[i].name === 'rest2') {
-                var silenceBlock = i;
-                var silenceBlockobj = this.blockList[silenceBlock];
-                silenceBlockobj.hide();
-                silenceBlockobj.trash = true;
+        if (this.blockList[thisBlock].name === 'rest2') {
+            this._deletePitchBlocks(thisBlock);
+            return this.blockList[thisBlock].connections[0];
+        } else {
+            var thisBlockobj = this.blockList[thisBlock];
+            while (thisBlockobj.connections[0] != null) {
+		var i = thisBlockobj.connections[0];
+		if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
+                    break;
+		} else if (this.blockList[i].name === 'rest2') {
+                    var silenceBlock = i;
+                    var silenceBlockobj = this.blockList[silenceBlock];
+                    silenceBlockobj.hide();
+                    silenceBlockobj.trash = true;
 
-                for (var c = 0; c < this.blockList[silenceBlockobj.connections[0]].connections.length; c++) {
-                    if (this.blockList[silenceBlockobj.connections[0]].connections[c] === silenceBlock) {
-			this.blockList[silenceBlockobj.connections[0]].connections[c] = this.blockList.indexOf(thisBlockobj);
-			break;
+                    for (var c = 0; c < this.blockList[silenceBlockobj.connections[0]].connections.length; c++) {
+			if (this.blockList[silenceBlockobj.connections[0]].connections[c] === silenceBlock) {
+                            this.blockList[silenceBlockobj.connections[0]].connections[c] = this.blockList.indexOf(thisBlockobj);
+                            break;
+			}
                     }
+
+                    thisBlockobj.connections[0] = silenceBlockobj.connections[0];
+                    break;
+		} else {
+                    thisBlockobj = this.blockList[i];
 		}
+            }
 
-		thisBlockobj.connections[0] = silenceBlockobj.connections[0];
-                break;
-	    } else {
-                thisBlockobj = this.blockList[i];
-	    }
+            return thisBlockobj.connections[0];
 	}
-
-        return thisBlockobj.connections[0];
     };
 
     this.blockMoved = function (thisBlock) {
@@ -1025,7 +1074,7 @@ function Blocks () {
         var min = (MINIMUMDOCKDISTANCE/DEFAULTBLOCKSCALE) * this.blockScale;
         var blkType = myBlock.docks[0][2];
 
-        // Is the added block above the silence block or below?
+        // Is the added block above or below?
         var insertAfterDefault = true;
 
         for (var b = 0; b < this.blockList.length; b++) {
@@ -2840,7 +2889,7 @@ function Blocks () {
                     // Connection 1 of a note block is not inside the clamp.
                     return null;
                 } else {
-                    if (['newnote', 'osctime'].indexOf(this.blockList[cblk].name) !== -1) {
+                    if (NOTEBLOCKS.indexOf(this.blockList[cblk].name) !== -1) {
                         return cblk;
                     } else {
                         return null;
