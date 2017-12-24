@@ -918,6 +918,7 @@ function Blocks () {
 
     this.deleteNextDefault = function (thisBlock) {
         var thisBlockobj = this.blockList[thisBlock];
+        console.log(thisBlockobj.name);
         if (thisBlockobj.name === 'rest2') {
             this._deletePitchBlocks(thisBlock);
         } else {
@@ -943,11 +944,11 @@ function Blocks () {
     this.deletePreviousDefault = function (thisBlock) {
         // Remove the Silence block from a Note block if another block
         // is inserted anywhere after the Silence block.
-        if (this.blockList[thisBlock].name === 'rest2') {
+        var thisBlockobj = this.blockList[thisBlock];
+        if (this._blockInStack(thisBlock, ['rest2'])) {
             this._deletePitchBlocks(thisBlock);
             return this.blockList[thisBlock].connections[0];
         } else {
-            var thisBlockobj = this.blockList[thisBlock];
             while (thisBlockobj.connections[0] != null) {
 		var i = thisBlockobj.connections[0];
 		if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
@@ -1746,6 +1747,20 @@ function Blocks () {
         }
         return false;
     }
+
+
+    this._blockInStack = function (thisBlock, names) {
+        // Is there a block of any of these names in this stack?
+        while (thisBlock != null) {
+            if (names.indexOf(this.blockList[thisBlock].name) !== -1) {
+                return true;
+            }
+
+            thisBlock = last(this.blockList[thisBlock].connections);
+        }
+
+        return false;
+    };
 
     this.findBottomBlock = function (blk) {
         // Find the bottom block in a stack.
