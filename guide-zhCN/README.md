@@ -408,25 +408,20 @@
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg "synchronizing graphics and music")
 
-另外一个图像和音乐的程序例子就是把
-Another example of graphics synchronized to the music by placing the
-graphics commands inside of *Note value* blocks
+另外一个图像和音乐合步的程序例子就是把图像程序放进 *Note Value* 拼块。
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg "usage of No-clock block")
 
-In this example, because the computation and graphics are more
-complex, a *No-clock* block is used to decouple the graphics from the
-master clock. The "No-clock* block prioritizes the sequence of
-actions over the specified rhythm.
+在上面的程序例子，因为图像和音乐比较复杂，我们使用一个 *No-clock* 拼块，使图像和音乐分开执行。
+"No-clock* 拼块会优先执行图像，然后执行音乐的节奏。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "rhythm sequence")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree-example.svg "another example of the No-clock block")
 
-Another example of embedding graphics into notes: in case, a recursive
-tree drawing, where the pitch goes up as the branches assend.
+另外一个把图像和音乐混合在一起的例子是一个递归树；在树枝往上移的时候，音调也往上调高。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tree.svg "tree graphic")
 
@@ -434,73 +429,59 @@ tree drawing, where the pitch goes up as the branches assend.
 
 ### <a name="BEAT"></a>3.5 节奏
 
-The beat of the music is determined by the *Meter* block (by default,
-it is set to 4:4).
-
-The *Pickup* block can be used to accommodate any notes that come in
-before the beat.
+音乐的节奏是被 *Meter* 拼块定住 (音乐的节奏开始定为 4:4)。
+我们可以使用 *Pickup* 拼块来播放在节奏开始之前的任何音符。 
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat1.svg "meter and pickup")
 
-Specifying beat is useful in that you can have the character of a note
-vary depending upon the beat. In the example below, the volume of
-notes on Beat 1 and Beat 3 are increased, while the volume of off
-beats is decreased.
+定住节奏可以帮助我们调一个音符的素质。
+在下面的例子，在第 1 拍和第 3 拍的音符的声量调高，而在其他的拍时声量调低。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat2.svg "on-beat-do")
 
-The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
-take on specific beats. (Note that the action is run before any blocks
-inside the note block associated with the beat are run.)
+*On-Beat-Do* 和 *Off-Beat-Do* 拼块让我们指定在某一个拍时做出一个行动。
+(注意行动会在任何一个在节奏拼块里的音符先执行。)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "using beat to synchronize graphics")
 
-Another approach to graphics is to use modulate them based on the
-beat. In the exxample above, we call the same graphics action for each
-note, but the parameters associated with the action, such as pen
-width, are dependent upon which beat we are on. On Beat 1, the pen
-size is set to 50 and the volume to 75. On Beat 3, the pen size is set
-to 25 and the volume to 50. On off beats, the pen size is set to 5 and
-the volumne to 5. The resultant graphic is shown below.
+另外一个显示图像的方法就是靠节奏执行它们。
+在上面的例子，我们在每一个音符执行同样的行动，但是行动的参数，如笔的宽度，依赖着现在执行的音符。
+在第 1 拍，我们把笔的宽度定为 50 和把声量定为 75。
+在第 3 拍，我们把笔的宽度定为 25 和把声量定为 50。
+在其他的拍子上，我们把笔的宽度定为 5 和把声量定为 5。
+我们创造的图像在下面。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "graphics modulated by beat")
 
 ### <a name="INTERACTIONS"></a>3.6 相互作用
 
-There are many ways to interactive with Music Blocks, including
-tracking the mouse position to impact some aspect of the music.
+《音乐拼块》拥有很多可以和自己引起相互作用的拼块，如记载鼠标的地位影响音乐的某一个方面。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg "interactions")
 
-For example, we can launch the phrases (chunks) interactively. When
-the mouse is in the lower-left quadrant, `chunk` is played;
-lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
-upper-right quadrant, `chunk3`.
+例如，我们可以交互的执行上面的拼块。
+当鼠标在左下角时，`chunk` 的拼块被执行; 而鼠标在右下角时, `chunk1` 的拼块被执行；鼠标在左上角时，`chunk2` 的拼块被执行; 和右上角时, `chunk3`拼块被执行。
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg "creation of a two-key piano")
 
-In the example above, a simple two-key piano is created by associating
-*click* events on two different turtles with individual notes. Can you
-make an 8-key piano?
+在上面的例子，我们使用两个不同 “乌龟” ，定下两个不同的 *click* 行动，一个简单的两个音符的钢琴被做出。
+你可以做出一个八个音符的钢琴吗？
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg "adding randomness to your music")
 
-You can also add a bit of randomness to your music. In the top example
-above, the *One-of* block is used to randomly assign either `Do` or
-`Re` each time the *Note value* block is played. In the bottom example
-above, the *One-of* block is used to randomly select between `chunk1`
-and `chunk2`.
+你也可以在你的程序上加上一点随机。
+在上面的例子里，我们使用 *One-of* 拼块，每次执行 *Note Value* 拼块时，来随机定住 `Do` 或 `Re`。
+在下面的例子里，我们使用 *One-of* 拼块随机选择 `chunk1`或 `chunk2`。
 
 ## <a name="WIDGETS"></a>部件
 
 [上一章 (3. 使用音乐设计程序)](#PROGRAMMING-WITH-MUSIC) | [回去目录](#TOC) | [下一章 (5. 《音乐拼块》之外)](#BEYOND-MUSIC-BLOCKS)
 
-This section of the guide will talk about the various Widgets that can be added to Music Blocks
-to enhance your experience.
+说明书里的这一章将会解释《音乐拼块》的不同部件，你可以使用这些不同部件来提高你使用《音乐拼块》的经验。
 
 ### <a name="status"></a>4.1 观察状况
 
@@ -508,12 +489,12 @@ to enhance your experience.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg "status in tabular form")
 
-The *Status widget* is a tool for inspecting the status of Music
-Blocks as it is running. By default, the key, BPM, and volume are
-displayed. Also, each note is displayed as it is played. There is one
-row per voice in the status table.
+*Status Widget* 是一个可以观察《音乐拼块》执行时状态的部件。
+这个部件开始会显示音乐的节奏，声量和音调。
+每一个音符也会在播放时被显示。
+状态表格上的每一行代表着一个音色。
 
-Additional *Print* blocks can be added to the *Status* widget to
+你也可以在 *Status* 部件上加上其他 *Print* 拼块，来显示其他的音乐因素blocks can be added to the  widget to
 display additional music factors, e.g., duplicate, transposition,
 skip, [staccato](#MORE-TRANSFORMATIONS), [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
