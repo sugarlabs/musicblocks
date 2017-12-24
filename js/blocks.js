@@ -891,7 +891,7 @@ function Blocks () {
         var c = this.blockList[thisBlock].connections[0];
         if (c === null) {
             console.log('Silence block was not inside a note block');
-	}
+        }
 
         while (true) {
             if (NOTEBLOCKS.indexOf(this.blockList[c].name) !== -1) {
@@ -901,19 +901,25 @@ function Blocks () {
             thisBlock = c;
             var c = this.blockList[c].connections[0];
             if (c === null) {
-		console.log('Silence block was not inside a note block');
+                console.log('Silence block was not inside a note block');
                 break;
-	    }
+            }
         }
 
         while (thisBlock != null) {
             var nextBlock = last(this.blockList[thisBlock].connections);
             if (PITCHBLOCKS.indexOf(this.blockList[thisBlock].name) !== -1) {
                 this._extractBlock(thisBlock, false);
-	    }
+            } else if (['flat', 'sharp'].indexOf(this.blockList[thisBlock].name) !== -1) {
+                // The pitch block might be inside a sharp or flat block.
+                var b = this.blockList[thisBlock].connections[1];
+                if (this._blockInStack(b, PITCHBLOCKS)) {
+                    this._extractBlock(thisBlock, false);
+                }
+            }
 
             thisBlock = nextBlock;
-	}
+        }
     };
 
     this.deleteNextDefault = function (thisBlock) {
@@ -950,31 +956,31 @@ function Blocks () {
             return this.blockList[thisBlock].connections[0];
         } else {
             while (thisBlockobj.connections[0] != null) {
-		var i = thisBlockobj.connections[0];
-		if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
+                var i = thisBlockobj.connections[0];
+                if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
                     break;
-		} else if (this.blockList[i].name === 'rest2') {
+                } else if (this.blockList[i].name === 'rest2') {
                     var silenceBlock = i;
                     var silenceBlockobj = this.blockList[silenceBlock];
                     silenceBlockobj.hide();
                     silenceBlockobj.trash = true;
 
                     for (var c = 0; c < this.blockList[silenceBlockobj.connections[0]].connections.length; c++) {
-			if (this.blockList[silenceBlockobj.connections[0]].connections[c] === silenceBlock) {
+                        if (this.blockList[silenceBlockobj.connections[0]].connections[c] === silenceBlock) {
                             this.blockList[silenceBlockobj.connections[0]].connections[c] = this.blockList.indexOf(thisBlockobj);
                             break;
-			}
+                        }
                     }
 
                     thisBlockobj.connections[0] = silenceBlockobj.connections[0];
                     break;
-		} else {
+                } else {
                     thisBlockobj = this.blockList[i];
-		}
+                }
             }
 
             return thisBlockobj.connections[0];
-	}
+        }
     };
 
     this.blockMoved = function (thisBlock) {
