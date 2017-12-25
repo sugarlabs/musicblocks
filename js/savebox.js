@@ -34,10 +34,10 @@ function SaveBox () {
     this._doSaveSVG = null;
     this._doSavePNG = null;
     this._doSaveWAV = null;
-    this._doSaveAbc = null;
     this._doUploadToPlanet = null;
     this._doShareOnFacebook = null;
     this._doSaveBlockArtwork = null;
+    this._doSaveAbc = null;
     this._doSaveLilyPond = null;
 
     this._container = null;
@@ -76,11 +76,6 @@ function SaveBox () {
         return this;
     };
 
-    this.setSaveAbc = function (doSaveAbc) {
-        this._doSaveAbc = doSaveAbc;
-        return this;
-    }
-
     this.setSaveFB = function (doSaveFB) {
         this._doShareOnFacebook = doSaveFB;
         return this;
@@ -95,6 +90,11 @@ function SaveBox () {
         this._doSaveLilypond = doSaveLilypond;
         return this;
     };
+
+    this.setSaveAbc = function (doSaveAbc) {
+        this._doSaveAbc = doSaveAbc;
+        return this;
+    }
 
     this.setSavePlanet = function (doSavePlanet) {
         this._doUploadToPlanet = doSavePlanet;
@@ -155,18 +155,6 @@ function SaveBox () {
                 dx += BOXBUTTONSPACING;
             }
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.saveAbc = makeButton('save-abc', _('Save as .abc'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-                this.saveAbc.visible = true;
-                this.positionHoverText(this.saveAbc);
-                this.saveAbc.on('click', function(event) {
-                    that.hide();
-                    that._doSaveAbc();
-                });
-
-                dx += BOXBUTTONSPACING;
-            }
-
             this.uploadToPlanet = makeButton('upload-planet', _('Upload to Planet'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.uploadToPlanet.visible = true;
             this.positionHoverText(this.uploadToPlanet);
@@ -197,6 +185,18 @@ function SaveBox () {
             }
 
             dx += BOXBUTTONSPACING;
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.saveAbc = makeButton('save-abc', _('Save as .abc'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this.saveAbc.visible = true;
+                this.positionHoverText(this.saveAbc);
+                this.saveAbc.on('click', function(event) {
+                    that.hide();
+                    that._doSaveAbc();
+                });
+
+                dx += BOXBUTTONSPACING;
+            }
 
             this.saveBlockArtwork = makeButton('save-block-artwork', _('Save block artwork'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.saveBlockArtwork.visible = true;
@@ -235,8 +235,8 @@ function SaveBox () {
             this.saveBlockArtwork.visible = false;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.saveWAV.visible = false;
-                this.saveAbc.visible = false;
                 this.saveLilypond.visible = false;
+                this.saveAbc.visible = false;
             } else {
 		this.shareOnFb.visible = false;
             }
@@ -255,8 +255,8 @@ function SaveBox () {
             this.saveBlockArtwork.visible = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.saveWAV.visible = true;
-                this.saveAbc.visible = true;
                 this.saveLilypond.visible = true;
+                this.saveAbc.visible = true;
             } else {
                 this.shareOnFb.visible = true;
             }
