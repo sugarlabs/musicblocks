@@ -15,8 +15,8 @@ function SaveBox () {
     const BOXBUTTONSPACING = 65;
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        // 7 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
-        var boxwidth = 7 * 55 + 6 * 10 + 2 * 20;
+        // 8 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
+        var boxwidth = 8 * 55 + 6 * 10 + 2 * 20;
     } else {
         // 6 buttons, 5 intrabuttons spaces, 2 extrabutton spaces
         var boxwidth = 6 * 55 + 5 * 10 + 2 * 20;
@@ -34,6 +34,7 @@ function SaveBox () {
     this._doSaveSVG = null;
     this._doSavePNG = null;
     this._doSaveWAV = null;
+    this._doSaveAbc = null;
     this._doUploadToPlanet = null;
     this._doShareOnFacebook = null;
     this._doSaveBlockArtwork = null;
@@ -74,6 +75,11 @@ function SaveBox () {
         this._doSaveWAV = doSaveWAV;
         return this;
     };
+
+    this.setSaveAbc = function (doSaveAbc) {
+        this._doSaveAbc = doSaveAbc;
+        return this;
+    }
 
     this.setSaveFB = function (doSaveFB) {
         this._doShareOnFacebook = doSaveFB;
@@ -149,6 +155,17 @@ function SaveBox () {
                 dx += BOXBUTTONSPACING;
             }
 
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.saveAbc = makeButton('save-abc', _('Save as .abc'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this.saveAbc.visible = true;
+                this.positionHoverText(this.saveAbc);
+                this.saveAbc.on('click', function(event) {
+                    that.hide();
+                    that._doSaveAbc();
+                });
+
+                dx += BOXBUTTONSPACING;
+            }
 
             this.uploadToPlanet = makeButton('upload-planet', _('Upload to Planet'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.uploadToPlanet.visible = true;
@@ -218,6 +235,7 @@ function SaveBox () {
             this.saveBlockArtwork.visible = false;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.saveWAV.visible = false;
+                this.saveAbc.visible = false;
                 this.saveLilypond.visible = false;
             } else {
 		this.shareOnFb.visible = false;
@@ -237,6 +255,7 @@ function SaveBox () {
             this.saveBlockArtwork.visible = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.saveWAV.visible = true;
+                this.saveAbc.visible = true;
                 this.saveLilypond.visible = true;
             } else {
                 this.shareOnFb.visible = true;

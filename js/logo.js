@@ -255,11 +255,13 @@ function Logo () {
     this.notationStaging = {};
     if (_THIS_IS_MUSIC_BLOCKS_) {
         this.notationOutput = getLilypondHeader();
+        this.notationOutput = getABCHeader();
     } else {
         this.notationOutput = '';
     }
     this.notationNotes = {};
     this.runningLilypond = false;
+    this.runningAbc = false;
     this.checkingCompletionState = false;
     this.compiling = false;
     this.recording = false;
@@ -1005,7 +1007,7 @@ function Logo () {
             this.justMeasuring[turtle] = [];
             this.firstPitch[turtle] = [];
             this.lastPitch[turtle] = [];
-            this.suppressOutput[turtle] = this.runningLilypond || this.compiling;
+            this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
             this.movable[turtle] = false;
 
             if (this.compiling) {
@@ -5857,6 +5859,11 @@ function Logo () {
                         console.log(that.notationStaging);
                         saveLilypondOutput(that, _('My Project') + '.ly');
                         that.runningLilypond = false;
+                    } else if (that.runningAbc) {
+                        console.log('saving abc output:');
+                        console.log(that.notationStaging);
+                        saveAbcOutput(that, _('My Project') + '.abc');
+                        that.runningAbc = false;
                     } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
                         that.setPlaybackStatus();
