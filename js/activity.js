@@ -883,11 +883,11 @@ define(MYDEFINES, function (compatibility) {
                 .setSaveSVG(doSaveSVG)
                 .setSavePNG(doSavePNG)
                 .setSaveWAV(doSaveWAV)
-                .setSaveAbc(doSaveAbc)
                 .setSavePlanet(doUploadToPlanet)
                 .setSaveBlockArtwork(doSaveBlockArtwork);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveBox.setSaveAbc(doSaveAbc);
                 saveBox.setSaveLilypond(doSaveLilypond);
             } else {
                 saveBox.setSaveFB(doShareOnFacebook);
