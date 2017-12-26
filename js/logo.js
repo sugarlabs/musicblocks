@@ -6319,6 +6319,10 @@ function Logo () {
 
             var that = this;
             __playnote = function () {
+                if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length === 0) {
+                    that.notePitches[turtle][that.inNoteBlock[turtle][that.inNoteBlock[turtle].length - 1]].push('rest');
+                }
+
                 // Stop playing notes if the stop button is pressed.
                 if (that.stopTurtle) {
                     return;
