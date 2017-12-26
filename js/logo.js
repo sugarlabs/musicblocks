@@ -6319,6 +6319,14 @@ function Logo () {
 
             var that = this;
             __playnote = function () {
+                // If there are multiple notes, remove the rests.
+                if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 1) {
+                    while (that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest') !== -1) {
+			that.notePitches[turtle][last(that.inNoteBlock[turtle])].splice(that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest'), 1);
+                    }
+                }
+
+                // If there is no note, add a rest.
                 if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length === 0) {
                     that.notePitches[turtle][that.inNoteBlock[turtle][that.inNoteBlock[turtle].length - 1]].push('rest');
                 }
