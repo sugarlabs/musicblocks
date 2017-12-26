@@ -19,7 +19,7 @@ function StatusMatrix() {
     const ICONSIZE = 32;
     const OUTERWINDOWWIDTH = 620;
     const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
-    var x,y; //Drop coordinates of statusDiv
+    var x, y;  //Drop coordinates of statusDiv
 
     docById('statusDiv').style.visibility = 'hidden';
 
@@ -92,9 +92,9 @@ function StatusMatrix() {
         canvas.ondrop = function(e) {
             if (that._dragging) {
                 that._dragging = false;
-                 x = e.clientX - that._dx;
+                x = e.clientX - that._dx;
                 statusDiv.style.left = x + 'px';
-                 y = e.clientY - that._dy;
+                y = e.clientY - that._dy;
                 statusDiv.style.top = y + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
@@ -107,9 +107,9 @@ function StatusMatrix() {
         statusDiv.ondrop = function(e) {
             if (that._dragging) {
                 that._dragging = false;
-                 x = e.clientX - that._dx;
+                x = e.clientX - that._dx;
                 statusDiv.style.left = x + 'px';
-                 y = e.clientY - that._dy;
+                y = e.clientY - that._dy;
                 statusDiv.style.top = y + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
