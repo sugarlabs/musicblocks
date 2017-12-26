@@ -6417,9 +6417,17 @@ function Logo () {
 
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (that.justCounting[turtle].length === 0) {
-                        console.log('notes to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                        if (notes.length === 0) {
+                            console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
+                        } else {
+                            console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                        }
                     } else {
-                        console.log('notes to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                        if (notes.length === 0) {
+                            console.log('notes to count: R ' + obj[0] + '/' + obj[1]);
+                        } else {
+                            console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                        }
                     }
 
                     if (!that.suppressOutput[turtle]) {
