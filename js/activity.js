@@ -887,6 +887,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSaveBlockArtwork(doSaveBlockArtwork);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveBox.setSaveAbc(doSaveAbc);
                 saveBox.setSaveLilypond(doSaveLilypond);
             } else {
                 saveBox.setSaveFB(doShareOnFacebook);
@@ -2336,16 +2337,15 @@ define(MYDEFINES, function (compatibility) {
         function _doAbc() {
             document.body.style.cursor = 'wait';
             console.log('Saving .abc file');
-            // Suppress music and turtle output when generating
+            //Suppress music and turtle output when generating
             // Abc output.
-            logo.runningLilypond = true;
+            logo.runningAbc = true;
             logo.notationOutput = ABCHEADER;
             logo.notationNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.notationStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true, true);
             }
-
             logo.runLogoCommands();
         };
 
