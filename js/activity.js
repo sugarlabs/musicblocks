@@ -2363,6 +2363,12 @@ define(MYDEFINES, function (compatibility) {
               MIDICheck = document.getElementById("MIDICheck").checked;
               guitarCheck = document.getElementById("guitarCheck").checked;
 
+              if (fileName != null) {
+                  if (fileExt(fileName) !== 'ly') {
+                      filename += '.ly';
+                  }
+              }
+
               var mapLilypondObj = {
                  "My Music Blocks Creation": projectTitle,
                  "Mr. Mouse": projectAuthor
