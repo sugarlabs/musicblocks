@@ -6317,7 +6317,7 @@ function Logo () {
                 // If there are multiple notes, remove the rests.
                 if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 1) {
                     while (that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest') !== -1) {
-			that.notePitches[turtle][last(that.inNoteBlock[turtle])].splice(that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest'), 1);
+                        that.notePitches[turtle][last(that.inNoteBlock[turtle])].splice(that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest'), 1);
                     }
                 }
 

@@ -395,9 +395,7 @@ define(MYDEFINES, function (compatibility) {
             logo.time = 0;
             hideMsgs();
             logo.setBackgroundColor(-1);
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                logo.notationOutput = LILYPONDHEADER;
-            }
+            logo.notationOutput = '';
 
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
@@ -2249,7 +2247,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSaveTB() {
-            var filename = prompt('Filename:', 'untitled.tb');  // default filename = untitled
+           var filename = prompt('Filename:', 'untitled.tb');  // default filename = untitled
             if (filename != null) {
                 if (fileExt(filename) !== 'tb') {
                     filename += '.tb';
@@ -2322,92 +2320,93 @@ define(MYDEFINES, function (compatibility) {
         function _doLilypond() {
             disableKeys = true;
             console.log('Saving .ly file');
-            document.getElementById('lilypondModal').style.display = "block";
+            docById('lilypondModal').style.display = 'block';
             var projectTitle, projectAuthor, MIDICheck, guitarCheck;
 
-            //.TRANS: File name prompt for lilypond download
-            document.getElementById("fileNameText").textContent = _('File Name');
-            //.TRANS: Project title prompt for lilypond download
-            document.getElementById("titleText").textContent = _('Project Title');
-            //.TRANS: Project title prompt for lilypond download
-            document.getElementById("authorText").textContent = _('Project Author');
-            //.TRANS: MIDI prompt for lilypond download
-            document.getElementById("MIDIText").textContent = _('Include MIDI output?');
-            //.TRANS: Guitar prompt for lilypond download
-            document.getElementById("guitarText").textContent = _('Include guitar tablature output?');
-            //.TRANS: Download for lilypond file
-            document.getElementById("submitLilypond").textContent = _('Download Lilypond file');
+            //.TRANS: File name prompt for save as Lilypond
+            docById('fileNameText').textContent = _('File name');
+            //.TRANS: Project title prompt for save as Lilypond
+            docById('titleText').textContent = _('Project title');
+            //.TRANS: Project title prompt for save as Lilypond
+            docById('authorText').textContent = _('Project author');
+            //.TRANS: MIDI prompt for save as Lilypond
+            docById('MIDIText').textContent = _('Include MIDI output?');
+            //.TRANS: Guitar prompt for save as Lilypond
+            docById('guitarText').textContent = _('Include guitar tablature output?');
+            //.TRANS: Lilypond is a scripting language for generating sheet music
+            docById('submitLilypond').textContent = _('Save as Lilypond file');
 
-            document.getElementById("fileName").value = _('My Project.ly');
-            document.getElementById("title").value = _('My Music Blocks Creation');
-
-            customAuthor = document.getElementById("author").value;
-            storage.customAuthor = JSON.stringify(customAuthor);
+            //TRANS: default file name when saving as Lilypond
+            docById('fileName').value = _('My Project') + '.ly';
+            //TRANS: default project title when saving as Lilypond
+            docById('title').value = _('My Music Blocks Creation');
 
             // Load custom author saved in local storage.
-            var customAuthorData = storage.customAuthor;
-            if (customAuthorData != undefined && document.getElementById("author").value.length!=0) {
-               customAuthor = JSON.parse(customAuthorData);
-               console.log('restoring custom author: ' + customAuthor);
-               projectAuthor = customAuthor;
-             }
-             else {
-               //.TRANS: Project author for lilypond file
-               document.getElementById("author").value = _("Mr. Mouse");
-             }
-
-            document.getElementById("submitLilypond").onclick = function () {
-              fileName = document.getElementById("fileName").value;
-              projectTitle = document.getElementById("title").value;
-              projectAuthor = document.getElementById("author").value;
-              MIDICheck = document.getElementById("MIDICheck").checked;
-              guitarCheck = document.getElementById("guitarCheck").checked;
-
-              if (fileName != null) {
-                  if (fileExt(fileName) !== 'ly') {
-                      fileName += '.ly';
-                  }
-              }
-
-              var mapLilypondObj = {
-                 "My Music Blocks Creation": projectTitle,
-                 "Mr. Mouse": projectAuthor
-              };
-              LILYPONDHEADER = LILYPONDHEADER.replace(/My Music Blocks Creation|Mr. Mouse/gi, function(matched){
-                return mapLilypondObj[matched];
-              });
-
-              if (MIDICheck) {
-                MIDIOutput = '% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n';
-              }
-              else {
-                MIDIOutput = '% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n';
-              }
-
-              if (guitarCheck) {
-                guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                guitarOutputEnd = '      >>\n\n';
-              }
-              else {
-                guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                guitarOutputEnd = '      >>\n%}\n';
-              }
-              // Suppress music and turtle output when generating
-              // Lilypond output.
-              logo.runningLilypond = true;
-              logo.notationOutput = LILYPONDHEADER;
-              logo.notationNotes = {};
-              for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                  logo.notationStaging[turtle] = [];
-                  turtles.turtleList[turtle].doClear(true, true, true);
-              }
-
-              logo.runLogoCommands();
+            var customAuthorData = storage.getItem('customAuthor');
+            if (customAuthorData != undefined) {
+                docById('author').value = JSON.parse(customAuthorData);
+            } else {
+                //.TRANS: default project author when saving as Lilypond
+                docById('author').value = _('Mr. Mouse');
             }
-            document.getElementsByClassName("close")[0].onclick = function () {
-              logo.runningLilypond = false;
-              disableKeys = false;
-              document.getElementById("lilypondModal").style.display = "none";
+
+            docById('submitLilypond').onclick = function () {
+                fileName = docById('fileName').value;
+                projectTitle = docById('title').value;
+                projectAuthor = docById('author').value;
+
+                // Save the author in local storage.
+                storage.setItem('customAuthor', JSON.stringify(projectAuthor));
+
+                MIDICheck = docById('MIDICheck').checked;
+                guitarCheck = docById('guitarCheck').checked;
+
+                if (fileName != null) {
+                    if (fileExt(fileName) !== 'ly') {
+                        fileName += '.ly';
+                    }
+                }
+
+                var mapLilypondObj = {
+                    'My Music Blocks Creation': projectTitle,
+                    'Mr. Mouse': projectAuthor
+                };
+
+                LILYPONDHEADER = LILYPONDHEADER.replace(/My Music Blocks Creation|Mr. Mouse/gi, function(matched){
+                    return mapLilypondObj[matched];
+                });
+
+                if (MIDICheck) {
+                    MIDIOutput = '% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n';
+                } else {
+                    MIDIOutput = '% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n';
+                }
+
+                if (guitarCheck) {
+                    guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+                    guitarOutputEnd = '      >>\n\n';
+                } else {
+                    guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+                    guitarOutputEnd = '      >>\n%}\n';
+                }
+
+                // Suppress music and turtle output when generating
+                // Lilypond output.
+                logo.runningLilypond = true;
+                logo.notationOutput = LILYPONDHEADER;
+                logo.notationNotes = {};
+                for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                    logo.notationStaging[turtle] = [];
+                    turtles.turtleList[turtle].doClear(true, true, true);
+                }
+
+                logo.runLogoCommands();
+            }
+
+            docByClass('close')[0].onclick = function () {
+                logo.runningLilypond = false;
+                disableKeys = false;
+                docById('lilypondModal').style.display = 'none';
             }
         };
 

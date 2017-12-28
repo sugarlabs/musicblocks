@@ -107,7 +107,7 @@ processLilypondNotes = function (logo, turtle) {
                 } else {
                     logo.notationNotes[turtle] += '<< { \\voiceOne ';
                     multivoice = true;
-		}
+                }
                 break;
             case 'voice two':
                 if (multivoice) {
@@ -115,7 +115,7 @@ processLilypondNotes = function (logo, turtle) {
                 } else {
                     logo.notationNotes[turtle] += '<< { \\voiceTwo ';
                     multivoice = true;
-		}
+                }
                 break;
             case 'voice three':
                 if (multivoice) {
@@ -123,7 +123,7 @@ processLilypondNotes = function (logo, turtle) {
                 } else {
                     logo.notationNotes[turtle] += '<< { \\voiceThree ';
                     multivoice = true;
-		}
+                }
                 break;
             case 'voice four':
                 if (multivoice) {
@@ -131,7 +131,7 @@ processLilypondNotes = function (logo, turtle) {
                 } else {
                     logo.notationNotes[turtle] += '<< { \\voiceFour ';
                     multivoice = true;
-		}
+                }
                 break;
             case 'one voice':
                 logo.notationNotes[turtle] += '}\n>> \\oneVoice\n';
