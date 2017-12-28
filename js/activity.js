@@ -2332,7 +2332,7 @@ define(MYDEFINES, function (compatibility) {
             //.TRANS: Guitar prompt for save as Lilypond
             docById('guitarText').textContent = _('Include guitar tablature output?');
             //.TRANS: Lilypond is a scripting language for generating sheet music
-            docById('submitLilypond').textContent = _('Save as Lilypond file');
+            docById('submitLilypond').textContent = _('Save as Lilypond');
 
             //TRANS: default file name when saving as Lilypond
             docById('fileName').value = _('My Project') + '.ly';
