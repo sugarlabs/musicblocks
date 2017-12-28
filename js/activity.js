@@ -2365,7 +2365,7 @@ define(MYDEFINES, function (compatibility) {
 
               if (fileName != null) {
                   if (fileExt(fileName) !== 'ly') {
-                      filename += '.ly';
+                      fileName += '.ly';
                   }
               }
 
