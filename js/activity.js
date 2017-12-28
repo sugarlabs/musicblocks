@@ -20,6 +20,9 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 
+var fileName;
+var disableKeys = false;
+
 if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
@@ -1625,7 +1628,7 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
 
-            if (event.altKey) {
+            if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
                 case 66: // 'B'
                     _printBlockSVG();
@@ -1649,8 +1652,8 @@ define(MYDEFINES, function (compatibility) {
                     blocks.pasteStack();
                     break;
                 }
-            } else if (event.ctrlKey) {
-            } else if (event.shiftKey){
+            } else if (event.ctrlKey && !disableKeys) {
+            } else if (event.shiftKey && !disableKeys){
                 switch (event.keyCode) {
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -1689,6 +1692,7 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 }
             } else {
+              if (!disableKeys){
                 switch (event.keyCode) {
                 case END:
                     blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
@@ -1824,6 +1828,7 @@ define(MYDEFINES, function (compatibility) {
                 // Always store current key so as not to mask it from
                 // the keyboard block.
                 currentKeyCode = event.keyCode;
+              }
             }
         };
 
@@ -2315,19 +2320,89 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doLilypond() {
-            document.body.style.cursor = 'wait';
+            disableKeys = true;
             console.log('Saving .ly file');
-            // Suppress music and turtle output when generating
-            // Lilypond output.
-            logo.runningLilypond = true;
-            logo.notationOutput = LILYPONDHEADER;
-            logo.notationNotes = {};
-            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                logo.notationStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true, true);
-            }
+            document.getElementById('lilypondModal').style.display = "block";
+            var projectTitle, projectAuthor, MIDICheck, guitarCheck;
 
-            logo.runLogoCommands();
+            //.TRANS: File name prompt for lilypond download
+            document.getElementById("fileNameText").textContent = _('File Name');
+            //.TRANS: Project title prompt for lilypond download
+            document.getElementById("titleText").textContent = _('Project Title');
+            //.TRANS: Project title prompt for lilypond download
+            document.getElementById("authorText").textContent = _('Project Author');
+            //.TRANS: MIDI prompt for lilypond download
+            document.getElementById("MIDIText").textContent = _('Include MIDI output?');
+            //.TRANS: Guitar prompt for lilypond download
+            document.getElementById("guitarText").textContent = _('Include guitar tablature output?');
+            //.TRANS: Download for lilypond file
+            document.getElementById("submitLilypond").textContent = _('Download Lilypond file');
+
+            document.getElementById("fileName").value = _('My Project.ly');
+            document.getElementById("title").value = _('My Music Blocks Creation');
+
+            customAuthor = document.getElementById("author").value;
+            storage.customAuthor = JSON.stringify(customAuthor);
+
+            // Load custom author saved in local storage.
+            var customAuthorData = storage.customAuthor;
+            if (customAuthorData != undefined && document.getElementById("author").value.length!=0) {
+               customAuthor = JSON.parse(customAuthorData);
+               console.log('restoring custom author: ' + customAuthor);
+               projectAuthor = customAuthor;
+             }
+             else {
+               //.TRANS: Project author for lilypond file
+               document.getElementById("author").value = _("Mr. Mouse");
+             }
+
+            document.getElementById("submitLilypond").onclick = function () {
+              fileName = document.getElementById("fileName").value;
+              projectTitle = document.getElementById("title").value;
+              projectAuthor = document.getElementById("author").value;
+              MIDICheck = document.getElementById("MIDICheck").checked;
+              guitarCheck = document.getElementById("guitarCheck").checked;
+
+              var mapLilypondObj = {
+                 "My Music Blocks Creation": projectTitle,
+                 "Mr. Mouse": projectAuthor
+              };
+              LILYPONDHEADER = LILYPONDHEADER.replace(/My Music Blocks Creation|Mr. Mouse/gi, function(matched){
+                return mapLilypondObj[matched];
+              });
+
+              if (MIDICheck) {
+                MIDIOutput = '% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n';
+              }
+              else {
+                MIDIOutput = '% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n';
+              }
+
+              if (guitarCheck) {
+                guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+                guitarOutputEnd = '      >>\n\n';
+              }
+              else {
+                guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+                guitarOutputEnd = '      >>\n%}\n';
+              }
+              // Suppress music and turtle output when generating
+              // Lilypond output.
+              logo.runningLilypond = true;
+              logo.notationOutput = LILYPONDHEADER;
+              logo.notationNotes = {};
+              for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                  logo.notationStaging[turtle] = [];
+                  turtles.turtleList[turtle].doClear(true, true, true);
+              }
+
+              logo.runLogoCommands();
+            }
+            document.getElementsByClassName("close")[0].onclick = function () {
+              logo.runningLilypond = false;
+              disableKeys = false;
+              document.getElementById("lilypondModal").style.display = "none";
+            }
         };
 
         function doSaveAbc() {

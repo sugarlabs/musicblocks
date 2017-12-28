@@ -5852,7 +5852,7 @@ function Logo () {
                     if (that.runningLilypond) {
                         console.log('saving lilypond output:');
                         console.log(that.notationStaging);
-                        saveLilypondOutput(that, _('My Project') + '.ly');
+                        saveLilypondOutput(that, fileName);
                         that.runningLilypond = false;
                     } else if (that.runningAbc) {
                         console.log('saving abc output:');
