@@ -5852,7 +5852,12 @@ function Logo () {
                     if (that.runningLilypond) {
                         console.log('saving lilypond output:');
                         console.log(that.notationStaging);
-                        saveLilypondOutput(that, _('My Project') + '.ly');
+                        var filename = docById('fileName').value;
+                        if (filename == undefined || filename.length === 0) {
+                            filename = _('My Project') + '.ly';
+                        }
+
+                        saveLilypondOutput(that, filename);
                         that.runningLilypond = false;
                     } else if (that.runningAbc) {
                         console.log('saving abc output:');
@@ -6317,7 +6322,7 @@ function Logo () {
                 // If there are multiple notes, remove the rests.
                 if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 1) {
                     while (that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest') !== -1) {
-			that.notePitches[turtle][last(that.inNoteBlock[turtle])].splice(that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest'), 1);
+                        that.notePitches[turtle][last(that.inNoteBlock[turtle])].splice(that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest'), 1);
                     }
                 }
 
