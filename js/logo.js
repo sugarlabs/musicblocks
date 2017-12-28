@@ -5852,7 +5852,12 @@ function Logo () {
                     if (that.runningLilypond) {
                         console.log('saving lilypond output:');
                         console.log(that.notationStaging);
-                        saveLilypondOutput(that, fileName);
+                        var filename = docById('fileName').value;
+                        if (filename == undefined || filename.length === 0) {
+                            filename = _('My Project') + '.ly';
+                        }
+
+                        saveLilypondOutput(that, filename);
                         that.runningLilypond = false;
                     } else if (that.runningAbc) {
                         console.log('saving abc output:');

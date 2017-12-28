@@ -20,9 +20,6 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 
-var fileName;
-var disableKeys = false;
-
 if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
@@ -1626,6 +1623,8 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
 
+	    var disableKeys = docById('lilypondModal').style.display === 'block';
+
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
                 case 66: // 'B'
@@ -2318,7 +2317,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doLilypond() {
-            disableKeys = true;
             console.log('Saving .ly file');
             docById('lilypondModal').style.display = 'block';
             var projectTitle, projectAuthor, MIDICheck, guitarCheck;
@@ -2351,7 +2349,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             docById('submitLilypond').onclick = function () {
-                fileName = docById('fileName').value;
+                var filename = docById('fileName').value;
                 projectTitle = docById('title').value;
                 projectAuthor = docById('author').value;
 
@@ -2361,9 +2359,9 @@ define(MYDEFINES, function (compatibility) {
                 MIDICheck = docById('MIDICheck').checked;
                 guitarCheck = docById('guitarCheck').checked;
 
-                if (fileName != null) {
-                    if (fileExt(fileName) !== 'ly') {
-                        fileName += '.ly';
+                if (filename != null) {
+                    if (fileExt(filename) !== 'ly') {
+                        filename += '.ly';
                     }
                 }
 
@@ -2405,7 +2403,6 @@ define(MYDEFINES, function (compatibility) {
 
             docByClass('close')[0].onclick = function () {
                 logo.runningLilypond = false;
-                disableKeys = false;
                 docById('lilypondModal').style.display = 'none';
             }
         };
