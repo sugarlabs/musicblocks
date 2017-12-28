@@ -2399,6 +2399,9 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 logo.runLogoCommands();
+
+                // Close the dialog box after hitting button.
+                docById('lilypondModal').style.display = 'none';
             }
 
             docByClass('close')[0].onclick = function () {
