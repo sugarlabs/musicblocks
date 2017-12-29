@@ -1464,7 +1464,6 @@ define(MYDEFINES, function (compatibility) {
             }
 
             searchWidget.style.visibility = 'hidden';
-            searchWidget.value = null;
         };
 
         function showSearchWidget() {
