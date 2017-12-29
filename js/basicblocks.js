@@ -136,6 +136,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     consonantStepUpBlock.adjustWidthToLabel();
     consonantStepUpBlock.parameterBlock();
 
+    var myDeltaPitchBlock = new ProtoBlock('deltapitch');
+    myDeltaPitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['deltapitch'] = myDeltaPitchBlock;
+    //.TRANS: the change meaused in half-steps between the current pitch and the previous pitch
+    myDeltaPitchBlock.staticLabels.push(_('change in pitch'));
+    myDeltaPitchBlock.parameterBlock();
+    myDeltaPitchBlock.adjustWidthToLabel();
+
     var myPitchBlock = new ProtoBlock('mypitch');
     myPitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['mypitch'] = myPitchBlock;
