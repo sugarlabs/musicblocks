@@ -1458,18 +1458,24 @@ define(MYDEFINES, function (compatibility) {
 
         function hideSearchWidget() {
             // Hide the jQuery search results widget
-            var obj = docByClass('ui-helper-hidden-accessible');
+            var obj = docByClass('ui-menu');
             if (obj.length > 0) {
                 obj[0].style.visibility = 'hidden';
             }
 
             searchWidget.style.visibility = 'hidden';
+            searchWidget.value = null;
         };
 
         function showSearchWidget() {
             if (searchWidget.style.visibility === 'visible') {
                 hideSearchWidget();
             } else {
+                var obj = docByClass('ui-menu');
+                if (obj.length > 0) {
+                    obj[0].style.visibility = 'visible';
+                }
+                searchWidget.value = null;
                 docById('searchResults').style.visibility = 'visible';
                 searchWidget.style.visibility = 'visible';
                 searchWidget.style.left = (utilityBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
@@ -1623,8 +1629,7 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
 
-	    var disableKeys = docById('lilypondModal').style.display === 'block';
-
+	    var disableKeys = docById('lilypondModal').style.display === 'block' || docById('searchWidget').style.visibility === 'visible';
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
                 case 66: // 'B'
