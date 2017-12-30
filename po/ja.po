@@ -321,7 +321,7 @@ msgstr "ギターのTABも楽譜にまとめましょうか？"
 #: js/activity.js:2335
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr ""
+msgstr "Lilypond楽譜のフォーマットで保存"
 
 #: js/activity.js:2338
 #: js/logo.js:5857
@@ -331,7 +331,7 @@ msgstr "私のプロジェクト"
 
 #: js/activity.js:2340
 msgid "My Music Blocks Creation"
-msgstr ""
+msgstr "私のミュージック・ブロックスの開発"
 
 #: js/activity.js:2348
 #: js/basicblocks.js:3192
@@ -1062,7 +1062,7 @@ msgstr "このプロジェクトをファイルに保存するアイコンです
 #: js/turtledefs.js:97
 #: js/savebox.js:169
 msgid "Save sheet music"
-msgstr "音楽譜(Lilypondコード)を保存"
+msgstr "楽譜(Lilypondのフォーマット)で保存"
 
 #: js/turtledefs.js:97
 msgid "Save your project to as a Lilypond file."
@@ -3048,7 +3048,7 @@ msgstr "フェースブックでシェア"
 
 #: js/savebox.js:190
 msgid "Save as .abc"
-msgstr ""
+msgstr ".abcのフォーマットで保存"
 
 #: js/savebox.js:201
 msgid "Save block artwork"
