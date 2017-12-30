@@ -1628,7 +1628,7 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
 
-	    var disableKeys = docById('lilypondModal').style.display === 'block' || docById('searchWidget').style.visibility === 'visible';
+	    var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible';
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
                 case 66: // 'B'
