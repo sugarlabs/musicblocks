@@ -302,32 +302,32 @@ msgstr "ブロックが見つかりません。"
 #: js/activity.js:2325
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "ファイル名"
 
 #: js/activity.js:2327
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "プロジェクトの曲名"
 
 #: js/activity.js:2329
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
-msgstr ""
+msgstr "作曲家"
 
 #: js/activity.js:2331
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr ""
+msgstr "MIDIのアウトプット楽譜にもまとめましょうか？"
 
 #: js/activity.js:2333
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr ""
+msgstr "ギターのTABも楽譜にまとめましょうか？"
 
 #: js/activity.js:2335
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr ""
+msgstr "Lilypond楽譜のフォーマットで保存"
 
 #: js/activity.js:2338
 #: js/logo.js:5882
@@ -337,7 +337,7 @@ msgstr "私のプロジェクト"
 
 #: js/activity.js:2340
 msgid "My Music Blocks Creation"
-msgstr ""
+msgstr "私のミュージック・ブロックスの開発"
 
 #: js/activity.js:2348
 #: js/basicblocks.js:3200
@@ -1068,7 +1068,7 @@ msgstr "このプロジェクトをファイルに保存するアイコンです
 #: js/turtledefs.js:97
 #: js/savebox.js:169
 msgid "Save sheet music"
-msgstr "音楽譜(Lilypondコード)を保存"
+msgstr "楽譜(Lilypondのフォーマット)で保存"
 
 #: js/turtledefs.js:97
 msgid "Save your project to as a Lilypond file."
@@ -3059,7 +3059,7 @@ msgstr "フェースブックでシェア"
 
 #: js/savebox.js:190
 msgid "Save as .abc"
-msgstr ""
+msgstr ".abcのフォーマットで保存"
 
 #: js/savebox.js:201
 msgid "Save block artwork"
