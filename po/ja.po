@@ -296,27 +296,27 @@ msgstr "ブロックが見つかりません。"
 #: js/activity.js:2325
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "ファイル名"
 
 #: js/activity.js:2327
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "プロジェクトの曲名"
 
 #: js/activity.js:2329
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
-msgstr ""
+msgstr "作曲家"
 
 #: js/activity.js:2331
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr ""
+msgstr "MIDIのアウトプット楽譜にもまとめましょうか？"
 
 #: js/activity.js:2333
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr ""
+msgstr "ギターのTABも楽譜にまとめましょうか？"
 
 #: js/activity.js:2335
 #.TRANS: Lilypond is a scripting language for generating sheet music
