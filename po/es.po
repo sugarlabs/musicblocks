@@ -121,6 +121,12 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr "descanso"
 
@@ -240,7 +246,7 @@ msgstr "si la sol fa mi re do"
 #: js/block.js:1866
 #: js/block.js:1866
 #: js/logo.js:661
-#: js/logo.js:7561
+#: js/logo.js:7562
 #: js/palette.js:719
 #: js/blocks.js:2089
 msgid "true"
@@ -366,6 +372,12 @@ msgstr "Este bloque está en desuso."
 #: js/activity.js:1518
 msgid "Block cannot be found."
 msgstr "Este bloque no se puede encontrar."
+
+#: js/activity.js:2249
+#: js/activity.js:2259
+#: js/activity.js:2274
+msgid "untitled"
+msgstr "intitulado"
 
 #: js/activity.js:2325
 #.TRANS: File name prompt for save as Lilypond
@@ -639,11 +651,11 @@ msgstr "Bloque no soporta incremento."
 #: js/logo.js:2240
 #: js/logo.js:2277
 #: js/logo.js:2294
-#: js/logo.js:7953
-#: js/logo.js:8095
-#: js/logo.js:8155
-#: js/logo.js:8293
-#: js/logo.js:8321
+#: js/logo.js:7954
+#: js/logo.js:8096
+#: js/logo.js:8156
+#: js/logo.js:8294
+#: js/logo.js:8322
 msgid "Cannot find mouse"
 msgstr "No se puede encontrar ratón"
 
@@ -651,11 +663,11 @@ msgstr "No se puede encontrar ratón"
 #: js/logo.js:2242
 #: js/logo.js:2279
 #: js/logo.js:2296
-#: js/logo.js:7955
-#: js/logo.js:8097
-#: js/logo.js:8157
-#: js/logo.js:8295
-#: js/logo.js:8323
+#: js/logo.js:7956
+#: js/logo.js:8098
+#: js/logo.js:8158
+#: js/logo.js:8296
+#: js/logo.js:8324
 msgid "Cannot find turtle"
 msgstr "No se puede encontrar tortuga."
 
@@ -676,7 +688,7 @@ msgid "Please enter a valid URL."
 msgstr "Por favor introduzca un URL válido."
 
 #: js/logo.js:2682
-#: js/logo.js:7443
+#: js/logo.js:7444
 msgid "You must select a file."
 msgstr "Debe seleccionar un archivo."
 
@@ -851,23 +863,23 @@ msgstr "Bloque de Hertz: Quizás quiso decir utilizar un bloque de nota?"
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
 msgstr "Bloque de tuplet: Quizás quiso decir utilizar un bloque de matrix?"
 
-#: js/logo.js:6522
+#: js/logo.js:6523
 msgid "synth cannot play chords."
 msgstr "Synth no puede tocar acordes."
 
-#: js/logo.js:8472
+#: js/logo.js:8473
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
 msgstr "El nombre de la nota debe ser A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ o A♭."
 
-#: js/logo.js:8498
+#: js/logo.js:8499
 #: js/basicblocks.js:2614
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 msgid "empty heap"
 msgstr "vaciar pila"
 
-#: js/logo.js:8646
-#: js/logo.js:8756
+#: js/logo.js:8647
+#: js/logo.js:8757
 msgid "You must use two pitch blocks when measuring an interval."
 msgstr "Debe usar dos bloques de tono cuando mida un intervalo."
 

@@ -97,6 +97,12 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr ""
 
@@ -216,7 +222,7 @@ msgstr ""
 #: js/block.js:1866
 #: js/block.js:1866
 #: js/logo.js:661
-#: js/logo.js:7561
+#: js/logo.js:7562
 #: js/palette.js:719
 #: js/blocks.js:2089
 msgid "true"
@@ -341,6 +347,12 @@ msgstr ""
 
 #: js/activity.js:1518
 msgid "Block cannot be found."
+msgstr ""
+
+#: js/activity.js:2249
+#: js/activity.js:2259
+#: js/activity.js:2274
+msgid "untitled"
 msgstr ""
 
 #: js/activity.js:2325
@@ -615,11 +627,11 @@ msgstr ""
 #: js/logo.js:2240
 #: js/logo.js:2277
 #: js/logo.js:2294
-#: js/logo.js:7953
-#: js/logo.js:8095
-#: js/logo.js:8155
-#: js/logo.js:8293
-#: js/logo.js:8321
+#: js/logo.js:7954
+#: js/logo.js:8096
+#: js/logo.js:8156
+#: js/logo.js:8294
+#: js/logo.js:8322
 msgid "Cannot find mouse"
 msgstr ""
 
@@ -627,11 +639,11 @@ msgstr ""
 #: js/logo.js:2242
 #: js/logo.js:2279
 #: js/logo.js:2296
-#: js/logo.js:7955
-#: js/logo.js:8097
-#: js/logo.js:8157
-#: js/logo.js:8295
-#: js/logo.js:8323
+#: js/logo.js:7956
+#: js/logo.js:8098
+#: js/logo.js:8158
+#: js/logo.js:8296
+#: js/logo.js:8324
 msgid "Cannot find turtle"
 msgstr ""
 
@@ -652,7 +664,7 @@ msgid "Please enter a valid URL."
 msgstr ""
 
 #: js/logo.js:2682
-#: js/logo.js:7443
+#: js/logo.js:7444
 msgid "You must select a file."
 msgstr ""
 
@@ -827,23 +839,23 @@ msgstr ""
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:6522
+#: js/logo.js:6523
 msgid "synth cannot play chords."
 msgstr ""
 
-#: js/logo.js:8472
+#: js/logo.js:8473
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
 msgstr ""
 
-#: js/logo.js:8498
+#: js/logo.js:8499
 #: js/basicblocks.js:2614
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 msgid "empty heap"
 msgstr "रिक्त ढीग"
 
-#: js/logo.js:8646
-#: js/logo.js:8756
+#: js/logo.js:8647
+#: js/logo.js:8757
 msgid "You must use two pitch blocks when measuring an interval."
 msgstr ""
 
@@ -4304,6 +4316,11 @@ msgstr ""
 #~msgid "Note value must be greater than 0"
 #~msgstr ""
 
+#: js/basicblocks.js:883
+
+#~msgid "duplicate notes"
+#~msgstr ""
+
 #: js/basicblocks.js:505
 
 #~msgid "pitchslider"
@@ -4576,11 +4593,6 @@ msgstr ""
 #: js/palette.js:1682
 
 #~msgid "la"
-#~msgstr ""
-
-#: js/basicblocks.js:883
-
-#~msgid "duplicate notes"
 #~msgstr ""
 
 #: js/logo.js:3606

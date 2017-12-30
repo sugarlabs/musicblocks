@@ -2246,7 +2246,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSaveTB() {
-           var filename = prompt('Filename:', 'untitled.tb');  // default filename = untitled
+            var filename = prompt('Filename:', _('untitled') + '.tb');  // default filename = untitled
             if (filename != null) {
                 if (fileExt(filename) !== 'tb') {
                     filename += '.tb';
@@ -2256,7 +2256,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSaveSVG() {
-            var filename = prompt('Filename:', 'untitled.svg');
+            var filename = prompt('Filename:', _('untitled') + '.svg');
             if (filename != null) {
                 if (fileExt(filename) !== 'svg') {
                     filename += '.svg';
@@ -2271,7 +2271,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSavePNG() {
-            var filename = prompt('Filename:', 'untitled.png');
+            var filename = prompt('Filename:', _('untitled') + '.png');
             if (fileExt(filename) !== 'png') {
                 filename += '.png';
             }
