@@ -1264,10 +1264,10 @@ function Logo () {
 
         switch (this.blocks.blockList[blk].name) {
         case 'x':
-            turtleObj.doSetXY(value, turtleObj.x);
+            turtleObj.doSetXY(value, turtleObj.y);
             break;
         case 'y':
-            turtleObj.doSetXY(turtleObj.y, value);
+            turtleObj.doSetXY(turtleObj.x, value);
             break;
         case 'heading':
             turtleObj.doSetHeading(value);
