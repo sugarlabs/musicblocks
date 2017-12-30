@@ -143,7 +143,7 @@ function UtilityBox () {
             this._scrollButton2.visible = false;
             this._positionHoverText(this._scrollButton2);
             this._scrollButton2.on('click', function (event) {
-                that._toggleScroller();
+                that._doScroller();
                 that._hide();
                 that._scrollStatus = !that._scrollStatus;
             });
