@@ -901,7 +901,7 @@ table {
 .rangeslidervalue {
   display: inline-block;
   position: relative;
-  width: $range-label-width;
+  / * width: $range-label-width; */
   color: blue;
   background-color: #c8C8C8;
   line-height: 20px;
@@ -911,7 +911,7 @@ table {
   padding: 5px 10px;
   margin-left: 8px;
 
-  &:after {
+  ::after {
     position: absolute;
     top: 8px;
     left: -7px;
