@@ -154,7 +154,7 @@ function last (myList) {
 
 
 function doSVG (canvas, logo, turtles, width, height, scale) {
-    // Aggregate SVG output from each turtle. If there is none, return null.
+    // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
     var turtleSVG = '';
     for (var turtle in turtles.turtleList) {
