@@ -11,7 +11,8 @@
 
 function ProjectViewer(Planet) {
 	this.ProjectCache = Planet.GlobalPlanet.cache;
-	this.PlaceholderImage = "images/planetgraphic.png";
+	this.PlaceholderMBImage = "images/mbgraphic.png";
+	this.PlaceholderTBImage = "images/tbgraphic.png";
 	this.id = null;
 
 	this.open = function(id){
@@ -24,7 +25,11 @@ function ProjectViewer(Planet) {
 		document.getElementById("projectviewer-likes").textContent = proj.ProjectLikes;
 		var img = proj.ProjectImage;
 		if (img==""||img==null){
-			img=this.PlaceholderImage;
+			if (proj.ProjectIsMusicBlocks==1){
+				img=this.PlaceholderMBImage;
+			} else {
+				img=this.PlaceholderTBImage;
+			}
 		}
 		document.getElementById("projectviewer-image").src=img;
 		document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;

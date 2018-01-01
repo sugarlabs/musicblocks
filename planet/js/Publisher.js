@@ -11,7 +11,8 @@
 
 function Publisher(Planet){
 	this.ChipTags = null;
-	this.placeholderImage = "images/planetgraphic.png";
+	this.PlaceholderMBImage = "images/mbgraphic.png";
+	this.PlaceholderTBImage = "images/tbgraphic.png";
 	this.PublisherOfflineHTML = '<div>'+_('Feature unavailable - cannot connect to server. Reload Music Blocks to try again.')+'</div>';
 	this.TitleLowerBound = 1;
 	this.TitleUpperBound = 50;
@@ -125,7 +126,11 @@ function Publisher(Planet){
 			document.getElementById("publish-title").value = name;
 			document.getElementById("publish-title-label").setAttribute("data-error","");
 			if (image==null){
-				image = this.placeholderImage;
+				if (Planet.IsMusicBlocks){
+					image = this.PlaceholderMBImage;
+				} else {
+					image = this.PlaceholderTBImage;
+				}
 			}
 			document.getElementById("publish-image").src = image;
 			document.getElementById("publisher-error").textContent = "";
