@@ -12,7 +12,8 @@
 function GlobalCard(Planet) {
 	this.ProjectData = null;
 	this.id = null;
-	this.PlaceholderImage = "images/planetgraphic.png";
+	this.PlaceholderMBImage = "images/mbgraphic.png";
+	this.PlaceholderTBImage = "images/tbgraphic.png";
 	this.renderData = '\
 <div class="col no-margin-left s12 m6 l4"> \
     <div class="card"> \
@@ -59,8 +60,10 @@ function GlobalCard(Planet) {
 		//set image
 		if (this.ProjectData.ProjectImage!=null&&this.ProjectData.ProjectImage!=""){
 			frag.getElementById("global-project-image-"+this.id).src = this.ProjectData.ProjectImage;
+		} else if (this.ProjectData.ProjectIsMusicBlocks==1){
+			frag.getElementById("global-project-image-"+this.id).src = this.PlaceholderMBImage;
 		} else {
-			frag.getElementById("global-project-image-"+this.id).src = this.PlaceholderImage;
+			frag.getElementById("global-project-image-"+this.id).src = this.PlaceholderTBImage;
 		}
 
 		//set tags

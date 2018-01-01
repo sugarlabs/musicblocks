@@ -95,7 +95,7 @@ function toggleExpandable(id, c){
 };
 
 function hideOnClickOutside(id, other) {
-	const outsideClickListener = (event) => {
+	const outsideClickListener = function(event) {
 		if (event.path.indexOf(id)!=-1) {
 		} else {
 			document.getElementById(other).style.display = "none";
@@ -103,7 +103,7 @@ function hideOnClickOutside(id, other) {
 		}
 	};
 
-	const removeClickListener = () => {
+	const removeClickListener = function() {
 		document.removeEventListener('click', outsideClickListener);
 	};
 	document.addEventListener('click', outsideClickListener);
