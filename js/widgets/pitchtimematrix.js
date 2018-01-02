@@ -991,7 +991,9 @@ function PitchTimeMatrix () {
                 cell.setAttribute('id', i + ':' + j);
 
                 var that = this;
-                cell.onclick = function() {
+                var isMouseDown = false;
+                cell.onmousedown = function() {
+                    isMouseDown = true;
                     var obj = this.id.split(':');
                     var i = Number(obj[0]);
                     var j = Number(obj[1]);
@@ -1003,6 +1005,24 @@ function PitchTimeMatrix () {
                         this.style.backgroundColor = 'black';
                         that._setNotes(j, i, true);
                     }
+                }
+                cell.onmouseover = function() {
+                    var obj = this.id.split(':');
+                    var i = Number(obj[0]);
+                    var j = Number(obj[1]);
+                    if (isMouseDown) {
+                        if (this.style.backgroundColor === 'black') {
+                            this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                            that._notesToPlay[j][0] = ['R'];
+                            that._setNotes(j, i, false);
+                        } else {
+                            this.style.backgroundColor = 'black';
+                            that._setNotes(j, i, true);
+                        }
+                    }
+                }
+                cell.onmouseup = function() {
+                     isMouseDown = false;
                 }
             }
         }
