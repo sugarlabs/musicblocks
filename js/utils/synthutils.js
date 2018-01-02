@@ -498,7 +498,7 @@ function Synth() {
 
         return tempSynth;
     };
-
+    
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrumentName, sourceName, params) {
         if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum)) {
