@@ -103,6 +103,12 @@
 #: js/block.js:535
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
+#: js/block.js:535
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:43
 msgid "rest"
 msgstr ""
 
@@ -110,7 +116,7 @@ msgstr ""
 #: js/block.js:2089
 #: js/block.js:2098
 #: js/block.js:2110
-#: js/activity.js:2018
+#: js/activity.js:2022
 #: js/analytics.js:385
 #: js/palette.js:656
 #: js/palette.js:665
@@ -123,15 +129,15 @@ msgstr ""
 #: js/turtledefs.js:23
 #: js/basicblocks.js:1028
 #: js/basicblocks.js:1039
-#: js/basicblocks.js:2408
-#: js/basicblocks.js:2439
-#: js/basicblocks.js:2446
-#: js/basicblocks.js:2475
-#: js/basicblocks.js:2485
-#: js/basicblocks.js:2517
-#: js/basicblocks.js:2550
-#: js/basicblocks.js:2554
-#: js/basicblocks.js:2560
+#: js/basicblocks.js:2472
+#: js/basicblocks.js:2503
+#: js/basicblocks.js:2510
+#: js/basicblocks.js:2539
+#: js/basicblocks.js:2549
+#: js/basicblocks.js:2581
+#: js/basicblocks.js:2614
+#: js/basicblocks.js:2618
+#: js/basicblocks.js:2624
 #: js/macros.js:46
 #: js/blocks.js:801
 #: js/blocks.js:2283
@@ -150,7 +156,7 @@ msgstr "hành vi"
 #: js/logo.js:1224
 #: js/turtle.js:563
 #: js/turtle.js:564
-#: js/basicblocks.js:2542
+#: js/basicblocks.js:2606
 #: js/lilypond.js:368
 #: js/lilypond.js:425
 #: js/lilypond.js:445
@@ -222,7 +228,7 @@ msgstr ""
 #: js/block.js:1866
 #: js/block.js:1866
 #: js/logo.js:661
-#: js/logo.js:7562
+#: js/logo.js:7574
 #: js/palette.js:719
 #: js/blocks.js:2089
 msgid "true"
@@ -313,8 +319,8 @@ msgstr ""
 
 #: js/activity.js:580
 #: js/activity.js:586
-#: js/activity.js:3237
-#: js/activity.js:3249
+#: js/activity.js:3241
+#: js/activity.js:3253
 #: js/turtledefs.js:100
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
@@ -322,8 +328,8 @@ msgstr "thuyết Đê-các-tơ"
 
 #: js/activity.js:586
 #: js/activity.js:593
-#: js/activity.js:3237
-#: js/activity.js:3249
+#: js/activity.js:3241
+#: js/activity.js:3253
 #: js/turtledefs.js:100
 #: js/turtledefs.js:101
 #.TRANS: show Polar coordinate overlay grid
@@ -341,200 +347,200 @@ msgstr ""
 msgid "Cannot load project from the file. Please check the file type."
 msgstr ""
 
-#: js/activity.js:1516
+#: js/activity.js:1521
 msgid "This block is deprecated."
 msgstr ""
 
-#: js/activity.js:1518
+#: js/activity.js:1523
 msgid "Block cannot be found."
 msgstr ""
 
-#: js/activity.js:2249
-#: js/activity.js:2259
-#: js/activity.js:2274
+#: js/activity.js:2253
+#: js/activity.js:2263
+#: js/activity.js:2278
 msgid "untitled"
 msgstr ""
 
-#: js/activity.js:2325
+#: js/activity.js:2329
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
 msgstr ""
 
-#: js/activity.js:2327
+#: js/activity.js:2331
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
 msgstr ""
 
-#: js/activity.js:2329
+#: js/activity.js:2333
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
 msgstr ""
 
-#: js/activity.js:2331
+#: js/activity.js:2335
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
 msgstr ""
 
-#: js/activity.js:2333
+#: js/activity.js:2337
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
 msgstr ""
 
-#: js/activity.js:2335
+#: js/activity.js:2339
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
 msgstr ""
 
-#: js/activity.js:2338
-#: js/logo.js:5882
-#: js/logo.js:5890
+#: js/activity.js:2342
+#: js/logo.js:5894
+#: js/logo.js:5902
 msgid "My Project"
 msgstr ""
 
-#: js/activity.js:2340
+#: js/activity.js:2344
 msgid "My Music Blocks Creation"
 msgstr ""
 
-#: js/activity.js:2348
-#: js/basicblocks.js:3200
-#: js/basicblocks.js:3209
-#: js/basicblocks.js:3219
-#: js/basicblocks.js:3229
-#: js/basicblocks.js:3239
-#: js/basicblocks.js:3249
-#: js/basicblocks.js:3259
-#: js/basicblocks.js:3269
-#: js/basicblocks.js:3279
-#: js/basicblocks.js:3288
-#: js/basicblocks.js:3297
-#: js/basicblocks.js:3318
-#: js/basicblocks.js:3328
+#: js/activity.js:2352
+#: js/basicblocks.js:3264
+#: js/basicblocks.js:3273
+#: js/basicblocks.js:3283
+#: js/basicblocks.js:3293
+#: js/basicblocks.js:3303
+#: js/basicblocks.js:3313
+#: js/basicblocks.js:3323
+#: js/basicblocks.js:3333
+#: js/basicblocks.js:3343
+#: js/basicblocks.js:3352
+#: js/basicblocks.js:3361
+#: js/basicblocks.js:3382
+#: js/basicblocks.js:3392
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
 msgstr ""
 
-#: js/activity.js:3129
-#: js/activity.js:3143
+#: js/activity.js:3133
+#: js/activity.js:3147
 #: js/turtledefs.js:82
 msgid "Run fast"
 msgstr ""
 
-#: js/activity.js:3129
-#: js/activity.js:3143
+#: js/activity.js:3133
+#: js/activity.js:3147
 msgid "long press to run slowly"
 msgstr ""
 
-#: js/activity.js:3129
+#: js/activity.js:3133
 msgid "extra-long press to run music slowly"
 msgstr ""
 
-#: js/activity.js:3130
-#: js/activity.js:3144
+#: js/activity.js:3134
+#: js/activity.js:3148
 #: js/turtledefs.js:85
 msgid "Run step by step"
 msgstr ""
 
-#: js/activity.js:3131
+#: js/activity.js:3135
 #: js/turtledefs.js:86
 msgid "Run note by note"
 msgstr ""
 
-#: js/activity.js:3132
-#: js/activity.js:3145
+#: js/activity.js:3136
+#: js/activity.js:3149
 msgid "Hard stop"
 msgstr ""
 
-#: js/activity.js:3133
-#: js/activity.js:3146
+#: js/activity.js:3137
+#: js/activity.js:3150
 #: js/turtledefs.js:87
 msgid "Stop"
 msgstr "Dừng"
 
-#: js/activity.js:3134
-#: js/activity.js:3147
+#: js/activity.js:3138
+#: js/activity.js:3151
 #: js/turtledefs.js:88
 msgid "Clean"
 msgstr "Làm sạch"
 
-#: js/activity.js:3135
+#: js/activity.js:3139
 msgid "Show/hide palettes"
 msgstr ""
 
-#: js/activity.js:3136
-#: js/activity.js:3148
+#: js/activity.js:3140
+#: js/activity.js:3152
 #: js/turtledefs.js:89
 msgid "Show/hide blocks"
 msgstr "Hiện/ẩn khối"
 
-#: js/activity.js:3137
-#: js/activity.js:3149
+#: js/activity.js:3141
+#: js/activity.js:3153
 #: js/turtledefs.js:90
 msgid "Expand/collapse collapsable blocks"
 msgstr ""
 
-#: js/activity.js:3138
-#: js/activity.js:3150
-#: js/activity.js:3192
+#: js/activity.js:3142
+#: js/activity.js:3154
+#: js/activity.js:3196
 #: js/turtledefs.js:91
 msgid "Home"
 msgstr ""
 
-#: js/activity.js:3139
-#: js/activity.js:3151
+#: js/activity.js:3143
+#: js/activity.js:3155
 #: js/turtledefs.js:92
 msgid "Help"
 msgstr "Trợ giúp"
 
-#: js/activity.js:3233
-#: js/activity.js:3245
+#: js/activity.js:3237
+#: js/activity.js:3249
 #: js/turtledefs.js:94
 msgid "Load samples from server"
 msgstr ""
 
-#: js/activity.js:3234
-#: js/activity.js:3246
+#: js/activity.js:3238
+#: js/activity.js:3250
 #: js/turtledefs.js:95
 msgid "Load project from files"
 msgstr ""
 
-#: js/activity.js:3235
-#: js/activity.js:3247
+#: js/activity.js:3239
+#: js/activity.js:3251
 #: js/turtledefs.js:96
 msgid "Save project"
 msgstr ""
 
-#: js/activity.js:3236
+#: js/activity.js:3240
 msgid "Long press on blocks to copy."
 msgstr ""
 
-#: js/activity.js:3236
+#: js/activity.js:3240
 msgid "Click here to paste."
 msgstr ""
 
-#: js/activity.js:3238
-#: js/activity.js:3250
+#: js/activity.js:3242
+#: js/activity.js:3254
 msgid "playback"
 msgstr ""
 
-#: js/activity.js:3239
-#: js/activity.js:3251
+#: js/activity.js:3243
+#: js/activity.js:3255
 #: js/turtledefs.js:102
 msgid "Settings"
 msgstr ""
 
-#: js/activity.js:3240
-#: js/activity.js:3252
+#: js/activity.js:3244
+#: js/activity.js:3256
 #: js/turtledefs.js:109
 msgid "Delete all"
 msgstr ""
 
-#: js/activity.js:3241
-#: js/activity.js:3253
+#: js/activity.js:3245
+#: js/activity.js:3257
 #: js/turtledefs.js:110
 msgid "Undo"
 msgstr ""
 
-#: js/activity.js:3248
+#: js/activity.js:3252
 #: js/turtledefs.js:99
 msgid "Paste"
 msgstr "Dán"
@@ -552,7 +558,7 @@ msgstr ""
 #: js/analytics.js:385
 #: js/turtledefs.js:23
 #: js/basicblocks.js:429
-#: js/basicblocks.js:3098
+#: js/basicblocks.js:3162
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
 msgstr ""
@@ -623,141 +629,141 @@ msgstr ""
 msgid "Block does not support incrementing."
 msgstr ""
 
-#: js/logo.js:2223
-#: js/logo.js:2240
-#: js/logo.js:2277
-#: js/logo.js:2294
-#: js/logo.js:7954
-#: js/logo.js:8096
-#: js/logo.js:8156
-#: js/logo.js:8294
-#: js/logo.js:8322
+#: js/logo.js:2235
+#: js/logo.js:2252
+#: js/logo.js:2289
+#: js/logo.js:2306
+#: js/logo.js:7966
+#: js/logo.js:8108
+#: js/logo.js:8168
+#: js/logo.js:8306
+#: js/logo.js:8334
 msgid "Cannot find mouse"
 msgstr ""
 
-#: js/logo.js:2225
-#: js/logo.js:2242
-#: js/logo.js:2279
-#: js/logo.js:2296
-#: js/logo.js:7956
-#: js/logo.js:8098
-#: js/logo.js:8158
-#: js/logo.js:8296
-#: js/logo.js:8324
+#: js/logo.js:2237
+#: js/logo.js:2254
+#: js/logo.js:2291
+#: js/logo.js:2308
+#: js/logo.js:7968
+#: js/logo.js:8110
+#: js/logo.js:8170
+#: js/logo.js:8308
+#: js/logo.js:8336
 msgid "Cannot find turtle"
 msgstr ""
 
-#: js/logo.js:2247
+#: js/logo.js:2259
 msgid "Mouse is already running."
 msgstr ""
 
-#: js/logo.js:2249
+#: js/logo.js:2261
 msgid "Turtle is already running."
 msgstr ""
 
-#: js/logo.js:2269
+#: js/logo.js:2281
 msgid "Cannot find start block"
 msgstr ""
 
-#: js/logo.js:2587
+#: js/logo.js:2599
 msgid "Please enter a valid URL."
 msgstr ""
 
-#: js/logo.js:2682
-#: js/logo.js:7444
+#: js/logo.js:2694
+#: js/logo.js:7456
 msgid "You must select a file."
 msgstr ""
 
-#: js/logo.js:2691
+#: js/logo.js:2703
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
 msgstr ""
 
-#: js/logo.js:2695
+#: js/logo.js:2707
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
 msgstr ""
 
-#: js/logo.js:2711
+#: js/logo.js:2723
 msgid "Error parsing JSON data:"
 msgstr ""
 
-#: js/logo.js:2716
+#: js/logo.js:2728
 msgid "404: Page not found"
 msgstr ""
 
-#: js/logo.js:2740
+#: js/logo.js:2752
 msgid "Cannot find a valid heap for"
 msgstr ""
 
-#: js/logo.js:2750
+#: js/logo.js:2762
 msgid "Index must be > 0."
 msgstr ""
 
-#: js/logo.js:2771
-#: js/logo.js:2795
-#: js/logo.js:2819
+#: js/logo.js:2783
+#: js/logo.js:2807
+#: js/logo.js:2831
 #: js/timbre.js:547
 msgid "Unable to use synth due to existing oscillator"
 msgstr ""
 
-#: js/logo.js:2777
-#: js/logo.js:2801
+#: js/logo.js:2789
+#: js/logo.js:2813
 msgid "The input cannot be negative."
 msgstr ""
 
-#: js/logo.js:2983
+#: js/logo.js:2995
 msgid "You must have at least one pitch block and one drum block in the matrix."
 msgstr ""
 
-#: js/logo.js:3077
-#: js/logo.js:3099
-#: js/logo.js:3127
-#: js/logo.js:3149
+#: js/logo.js:3089
+#: js/logo.js:3111
+#: js/logo.js:3139
+#: js/logo.js:3161
 msgid "Beats per minute must be > 30."
 msgstr ""
 
-#: js/logo.js:3080
-#: js/logo.js:3102
-#: js/logo.js:3130
-#: js/logo.js:3152
+#: js/logo.js:3092
+#: js/logo.js:3114
+#: js/logo.js:3142
+#: js/logo.js:3164
 msgid "Maximum beats per minute is 1000."
 msgstr ""
 
-#: js/logo.js:3221
+#: js/logo.js:3233
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
 msgstr ""
 
-#: js/logo.js:3257
+#: js/logo.js:3269
 msgid "Attack value should be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:3260
+#: js/logo.js:3272
 msgid "Decay value should be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:3263
+#: js/logo.js:3275
 msgid "Sustain value should be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:3266
+#: js/logo.js:3278
 msgid "Release value should be from 0-100."
 msgstr ""
 
-#: js/logo.js:3282
+#: js/logo.js:3294
 msgid "You are adding multiple envelope blocks."
 msgstr ""
 
-#: js/logo.js:3311
+#: js/logo.js:3323
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
 msgstr ""
 
-#: js/logo.js:3349
+#: js/logo.js:3361
 msgid "You are adding multiple oscillator blocks."
 msgstr ""
 
-#: js/logo.js:3369
+#: js/logo.js:3381
 #: js/basicblocks.js:227
 #: js/basicblocks.js:233
 #: js/macros.js:106
@@ -765,64 +771,64 @@ msgstr ""
 msgid "even"
 msgstr ""
 
-#: js/logo.js:3373
+#: js/logo.js:3385
 #: js/basicblocks.js:227
 msgid "odd"
 msgstr ""
 
-#: js/logo.js:3444
+#: js/logo.js:3456
 msgid "The Case Block must be used inside of a Switch Block."
 msgstr ""
 
-#: js/logo.js:3515
+#: js/logo.js:3527
 msgid "The Step Pitch Block must be used inside of a Note Block."
 msgstr ""
 
-#: js/logo.js:3703
+#: js/logo.js:3715
 msgid "Drum Block: Did you mean to use a Note block?"
 msgstr ""
 
-#: js/logo.js:4099
+#: js/logo.js:4111
 msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr ""
 
-#: js/logo.js:4127
+#: js/logo.js:4139
 msgid "polyphonic rhythm"
 msgstr ""
 
-#: js/logo.js:4150
+#: js/logo.js:4162
 msgid "Rhythm Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:4353
+#: js/logo.js:4365
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
 msgstr ""
 
-#: js/logo.js:4616
+#: js/logo.js:4628
 msgid "Vibrato intensity must be between 1 and 100."
 msgstr ""
 
-#: js/logo.js:4621
+#: js/logo.js:4633
 msgid "Vibrato rate must be greater than 0."
 msgstr ""
 
-#: js/logo.js:4653
+#: js/logo.js:4665
 msgid "Distortion must be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:4683
-#: js/logo.js:4751
+#: js/logo.js:4695
+#: js/logo.js:4763
 #.TRANS: Depth is the intesity of the tremolo effect.
 #.TRANS: Depth is the intesity of the chorus effect.
 msgid "Depth is out of range."
 msgstr ""
 
-#: js/logo.js:5344
-#: js/logo.js:5346
-#: js/logo.js:5399
-#: js/logo.js:5401
-#: js/basicblocks.js:2848
+#: js/logo.js:5356
+#: js/logo.js:5358
+#: js/logo.js:5411
+#: js/logo.js:5413
+#: js/basicblocks.js:2912
 #: js/macros.js:161
 #: js/synthutils.js:24
 #.TRANS: the default case used in a switch statement in programming
@@ -830,32 +836,32 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: js/logo.js:5599
+#: js/logo.js:5611
 msgid "Hertz Block: Did you mean to use a Note block?"
 msgstr ""
 
-#: js/logo.js:5681
-#: js/logo.js:5705
+#: js/logo.js:5693
+#: js/logo.js:5717
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:6523
+#: js/logo.js:6535
 msgid "synth cannot play chords."
 msgstr ""
 
-#: js/logo.js:8473
+#: js/logo.js:8485
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
 msgstr ""
 
-#: js/logo.js:8499
-#: js/basicblocks.js:2614
+#: js/logo.js:8511
+#: js/basicblocks.js:2678
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 msgid "empty heap"
 msgstr "miền nhớ trống"
 
-#: js/logo.js:8647
-#: js/logo.js:8757
+#: js/logo.js:8659
+#: js/logo.js:8769
 msgid "You must use two pitch blocks when measuring an interval."
 msgstr ""
 
@@ -866,10 +872,10 @@ msgstr ""
 #: js/palette.js:638
 #: js/palette.js:736
 #: js/palette.js:1883
-#: js/basicblocks.js:2367
-#: js/basicblocks.js:2371
-#: js/basicblocks.js:2385
-#: js/basicblocks.js:2393
+#: js/basicblocks.js:2431
+#: js/basicblocks.js:2435
+#: js/basicblocks.js:2449
+#: js/basicblocks.js:2457
 #: js/blocks.js:851
 #: js/blocks.js:2564
 #: js/blocks.js:4113
@@ -878,7 +884,7 @@ msgid "box"
 msgstr "hộp"
 
 #: js/palette.js:701
-#: js/basicblocks.js:2812
+#: js/basicblocks.js:2876
 #: js/blocks.js:2079
 msgid "text"
 msgstr "văn bản"
@@ -888,7 +894,7 @@ msgid "interval name"
 msgstr ""
 
 #: js/palette.js:737
-#: js/basicblocks.js:2381
+#: js/basicblocks.js:2445
 #: js/blocks.js:2678
 #.TRANS: put something into a container for later reference
 msgid "store in"
@@ -919,7 +925,7 @@ msgstr ""
 
 #: js/palette.js:850
 #: js/palette.js:851
-#: js/basicblocks.js:2808
+#: js/basicblocks.js:2872
 #.TRANS: a media object
 msgid "show"
 msgstr "hiển thị"
@@ -932,7 +938,7 @@ msgstr ""
 #: js/turtle.js:404
 #: js/turtle.js:559
 #: js/turtle.js:560
-#: js/basicblocks.js:2534
+#: js/basicblocks.js:2598
 #: js/lilypond.js:368
 #: js/lilypond.js:425
 #: js/lilypond.js:445
@@ -954,8 +960,8 @@ msgid "intervals"
 msgstr ""
 
 #: js/turtledefs.js:23
-#: js/basicblocks.js:3399
-#: js/basicblocks.js:3411
+#: js/basicblocks.js:3463
+#: js/basicblocks.js:3475
 msgid "volume"
 msgstr ""
 
@@ -1299,8 +1305,8 @@ msgstr ""
 #: js/basicblocks.js:168
 #: js/basicblocks.js:225
 #: js/basicblocks.js:430
-#: js/basicblocks.js:2382
-#: js/basicblocks.js:2784
+#: js/basicblocks.js:2446
+#: js/basicblocks.js:2848
 #: js/blocks.js:2678
 msgid "name"
 msgstr ""
@@ -1312,7 +1318,7 @@ msgstr ""
 #: js/basicblocks.js:281
 #: js/basicblocks.js:407
 #: js/basicblocks.js:430
-#: js/basicblocks.js:2784
+#: js/basicblocks.js:2848
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
 msgstr ""
@@ -1435,7 +1441,7 @@ msgid "sharp"
 msgstr ""
 
 #: js/basicblocks.js:387
-#: js/basicblocks.js:2773
+#: js/basicblocks.js:2837
 #.TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
 msgstr ""
@@ -1509,7 +1515,7 @@ msgid "rolloff"
 msgstr ""
 
 #: js/basicblocks.js:507
-#: js/basicblocks.js:2773
+#: js/basicblocks.js:2837
 #: js/timbre.js:1354
 msgid "frequency"
 msgstr ""
@@ -1764,12 +1770,12 @@ msgid "beat"
 msgstr ""
 
 #: js/basicblocks.js:1036
-#: js/basicblocks.js:2404
-#: js/basicblocks.js:2455
-#: js/basicblocks.js:2472
-#: js/basicblocks.js:2512
-#: js/basicblocks.js:2893
-#: js/basicblocks.js:2900
+#: js/basicblocks.js:2468
+#: js/basicblocks.js:2519
+#: js/basicblocks.js:2536
+#: js/basicblocks.js:2576
+#: js/basicblocks.js:2957
+#: js/basicblocks.js:2964
 #.TRANS: take (do) some action
 msgid "do"
 msgstr ""
@@ -2309,7 +2315,7 @@ msgid "set xy"
 msgstr "đặt xy"
 
 #: js/basicblocks.js:1993
-#: js/basicblocks.js:2685
+#: js/basicblocks.js:2749
 #: plugins/rodi.rtp:79
 #: plugins/rodi.rtp:344
 #: plugins/rodi.rtp:379
@@ -2318,7 +2324,7 @@ msgid "right"
 msgstr "phải"
 
 #: js/basicblocks.js:2002
-#: js/basicblocks.js:2678
+#: js/basicblocks.js:2742
 #: plugins/rodi.rtp:81
 #: plugins/rodi.rtp:343
 #: plugins/rodi.rtp:366
@@ -2333,566 +2339,598 @@ msgstr "trái"
 msgid "forward"
 msgstr "tiếp"
 
-#: js/basicblocks.js:2032
-#: js/basicblocks.js:2076
+#: js/basicblocks.js:2030
+msgid "purple"
+msgstr ""
+
+#: js/basicblocks.js:2036
+#: js/basicblocks.js:3186
+#: plugins/rodi.rtp:223
+msgid "blue"
+msgstr ""
+
+#: js/basicblocks.js:2042
+#: js/basicblocks.js:3193
+#: plugins/rodi.rtp:222
+msgid "green"
+msgstr ""
+
+#: js/basicblocks.js:2048
+msgid "yellow"
+msgstr ""
+
+#: js/basicblocks.js:2054
+#: plugins/nutrition.rtp:164
+msgid "orange"
+msgstr "cam"
+
+#: js/basicblocks.js:2060
+#: js/basicblocks.js:3200
+#: plugins/rodi.rtp:221
+msgid "red"
+msgstr ""
+
+#: js/basicblocks.js:2066
+msgid "white"
+msgstr ""
+
+#: js/basicblocks.js:2072
+msgid "black"
+msgstr ""
+
+#: js/basicblocks.js:2079
+msgid "begin fill"
+msgstr ""
+
+#: js/basicblocks.js:2087
+msgid "end fill"
+msgstr ""
+
+#: js/basicblocks.js:2096
+#: js/basicblocks.js:2140
 #.TRANS: set the background color
 msgid "background"
 msgstr ""
 
-#: js/basicblocks.js:2039
+#: js/basicblocks.js:2103
 msgid "grey"
 msgstr ""
 
-#: js/basicblocks.js:2046
+#: js/basicblocks.js:2110
 msgid "shade"
 msgstr "sắc màu"
 
-#: js/basicblocks.js:2053
+#: js/basicblocks.js:2117
 msgid "color"
 msgstr "màu"
 
-#: js/basicblocks.js:2060
+#: js/basicblocks.js:2124
 msgid "pen size"
 msgstr "kích cỡ bút"
 
-#: js/basicblocks.js:2067
+#: js/basicblocks.js:2131
 msgid "set font"
 msgstr ""
 
-#: js/basicblocks.js:2084
+#: js/basicblocks.js:2148
 #.TRANS: draw a line that has a hollow space down its center
 msgid "hollow line"
 msgstr ""
 
-#: js/basicblocks.js:2092
+#: js/basicblocks.js:2156
 #.TRANS: fill in as a solid color
 msgid "fill"
 msgstr ""
 
-#: js/basicblocks.js:2100
+#: js/basicblocks.js:2164
 #.TRANS: riase up the pen so that it does not draw when it is moved
 msgid "pen up"
 msgstr "bút lên"
 
-#: js/basicblocks.js:2108
+#: js/basicblocks.js:2172
 #.TRANS: put down the pen so that it draws when it is moved
 msgid "pen down"
 msgstr "bút xuống"
 
-#: js/basicblocks.js:2116
+#: js/basicblocks.js:2180
 #.TRANS: set the width of the line drawn by the pen
 msgid "set pen size"
 msgstr "đặt kích cỡ bút"
 
-#: js/basicblocks.js:2125
+#: js/basicblocks.js:2189
 #.TRANS: set degree of translucence of the pen color
 msgid "set translucency"
 msgstr ""
 
-#: js/basicblocks.js:2133
+#: js/basicblocks.js:2197
 msgid "set hue"
 msgstr ""
 
-#: js/basicblocks.js:2141
+#: js/basicblocks.js:2205
 msgid "set shade"
 msgstr "Tô bóng"
 
-#: js/basicblocks.js:2150
+#: js/basicblocks.js:2214
 #.TRANS: set the level of vividness of the pen color
 msgid "set grey"
 msgstr ""
 
-#: js/basicblocks.js:2158
+#: js/basicblocks.js:2222
 msgid "set color"
 msgstr "đặt màu"
 
-#: js/basicblocks.js:2169
+#: js/basicblocks.js:2233
 #.TRANS: convert a real number to an integer
 msgid "int"
 msgstr ""
 
-#: js/basicblocks.js:2178
+#: js/basicblocks.js:2242
 msgid "not"
 msgstr "không phải"
 
-#: js/basicblocks.js:2185
+#: js/basicblocks.js:2249
 msgid "and"
 msgstr "và"
 
-#: js/basicblocks.js:2192
+#: js/basicblocks.js:2256
 msgid "or"
 msgstr "hoặc"
 
-#: js/basicblocks.js:2233
+#: js/basicblocks.js:2297
 #.TRANS: evaluate some math functions, e.g., absolute value, sine, exponential, etc.
 msgid "eval"
 msgstr ""
 
-#: js/basicblocks.js:2247
+#: js/basicblocks.js:2311
 msgid "mod"
 msgstr "sửa"
 
-#: js/basicblocks.js:2264
+#: js/basicblocks.js:2328
 msgid "sqrt"
 msgstr ""
 
-#: js/basicblocks.js:2273
+#: js/basicblocks.js:2337
 msgid "abs"
 msgstr ""
 
-#: js/basicblocks.js:2324
+#: js/basicblocks.js:2388
 msgid "one of"
 msgstr ""
 
-#: js/basicblocks.js:2324
+#: js/basicblocks.js:2388
 msgid "this"
 msgstr ""
 
-#: js/basicblocks.js:2324
+#: js/basicblocks.js:2388
 msgid "that"
 msgstr ""
 
-#: js/basicblocks.js:2335
+#: js/basicblocks.js:2399
 msgid "random"
 msgstr "ngẫu nhiên"
 
-#: js/basicblocks.js:2335
+#: js/basicblocks.js:2399
 msgid "min"
 msgstr "tiểu"
 
-#: js/basicblocks.js:2335
+#: js/basicblocks.js:2399
 msgid "max"
 msgstr "đại"
 
-#: js/basicblocks.js:2350
+#: js/basicblocks.js:2414
 msgid "add 1 to"
 msgstr ""
 
-#: js/basicblocks.js:2357
+#: js/basicblocks.js:2421
 msgid "add"
 msgstr ""
 
-#: js/basicblocks.js:2357
+#: js/basicblocks.js:2421
 #: plugins/finance.rtp:28
 msgid "to"
 msgstr ""
 
-#: js/basicblocks.js:2357
-#: js/basicblocks.js:2382
-#: js/basicblocks.js:2650
+#: js/basicblocks.js:2421
+#: js/basicblocks.js:2446
+#: js/basicblocks.js:2714
 #: js/blocks.js:2678
 #: plugins/bitcoin.rtp:27
 msgid "value"
 msgstr "giá trị"
 
-#: js/basicblocks.js:2415
+#: js/basicblocks.js:2479
 #.TRANS: return value from a function
 msgid "return"
 msgstr ""
 
-#: js/basicblocks.js:2426
+#: js/basicblocks.js:2490
 #.TRANS: return value from a function to a URL
 msgid "return to URL"
 msgstr ""
 
-#: js/basicblocks.js:2430
+#: js/basicblocks.js:2494
 msgid "100"
 msgstr ""
 
-#: js/basicblocks.js:2436
-#: js/basicblocks.js:2463
-#: js/basicblocks.js:2482
+#: js/basicblocks.js:2500
+#: js/basicblocks.js:2527
+#: js/basicblocks.js:2546
 msgid "calculate"
 msgstr ""
 
-#: js/basicblocks.js:2511
+#: js/basicblocks.js:2575
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
 msgid "on"
 msgstr ""
 
-#: js/basicblocks.js:2512
-#: js/basicblocks.js:2516
-#: js/basicblocks.js:2528
+#: js/basicblocks.js:2576
+#: js/basicblocks.js:2580
+#: js/basicblocks.js:2592
 #.TRANS: a condition that is broadcast in order to trigger a listener to take an action
 msgid "event"
 msgstr ""
 
-#: js/basicblocks.js:2525
+#: js/basicblocks.js:2589
 #.TRANS: dispatch an event to trigger a listener
 msgid "broadcast"
 msgstr ""
 
-#: js/basicblocks.js:2570
+#: js/basicblocks.js:2634
 msgid "load heap from App"
 msgstr ""
 
-#: js/basicblocks.js:2581
+#: js/basicblocks.js:2645
 msgid "save heap to App"
 msgstr ""
 
-#: js/basicblocks.js:2592
+#: js/basicblocks.js:2656
 #: plugins/heap.rtp:126
 msgid "show heap"
 msgstr "hiện miền nhớ"
 
-#: js/basicblocks.js:2599
+#: js/basicblocks.js:2663
 msgid "heap length"
 msgstr ""
 
-#: js/basicblocks.js:2607
+#: js/basicblocks.js:2671
 #: plugins/heap.rtp:134
 msgid "heap empty?"
 msgstr ""
 
-#: js/basicblocks.js:2621
+#: js/basicblocks.js:2685
 #: plugins/heap.rtp:150
 msgid "save heap"
 msgstr ""
 
-#: js/basicblocks.js:2630
+#: js/basicblocks.js:2694
 #: plugins/heap.rtp:160
 msgid "load heap"
 msgstr ""
 
-#: js/basicblocks.js:2640
+#: js/basicblocks.js:2704
 #.TRANS: retrieve a value from the heap at index position in the heap
 msgid "index heap"
 msgstr ""
 
-#: js/basicblocks.js:2650
+#: js/basicblocks.js:2714
 #.TRANS: set a value in the heap
 msgid "set heap"
 msgstr ""
 
-#: js/basicblocks.js:2650
+#: js/basicblocks.js:2714
 msgid "index"
 msgstr ""
 
-#: js/basicblocks.js:2661
+#: js/basicblocks.js:2725
 #: plugins/heap.rtp:118
 msgid "pop"
 msgstr "Đẩy"
 
-#: js/basicblocks.js:2668
+#: js/basicblocks.js:2732
 #: plugins/heap.rtp:109
 msgid "push"
 msgstr "đẩy"
 
-#: js/basicblocks.js:2692
+#: js/basicblocks.js:2756
 msgid "top"
 msgstr ""
 
-#: js/basicblocks.js:2699
+#: js/basicblocks.js:2763
 msgid "bottom"
 msgstr ""
 
-#: js/basicblocks.js:2706
+#: js/basicblocks.js:2770
 msgid "width"
 msgstr ""
 
-#: js/basicblocks.js:2713
+#: js/basicblocks.js:2777
 msgid "height"
 msgstr ""
 
-#: js/basicblocks.js:2721
+#: js/basicblocks.js:2785
 #.TRANS: stops playback of an audio recording
 msgid "stop play"
 msgstr ""
 
-#: js/basicblocks.js:2730
+#: js/basicblocks.js:2794
 #.TRANS: play an audio recording
 msgid "play back"
 msgstr ""
 
-#: js/basicblocks.js:2738
+#: js/basicblocks.js:2802
 msgid "speak"
 msgstr "Nói"
 
-#: js/basicblocks.js:2766
+#: js/basicblocks.js:2830
 msgid "stop media"
 msgstr ""
 
-#: js/basicblocks.js:2773
+#: js/basicblocks.js:2837
 msgid "duration (ms)"
 msgstr ""
 
-#: js/basicblocks.js:2784
+#: js/basicblocks.js:2848
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 msgid "note to frequency"
 msgstr ""
 
-#: js/basicblocks.js:2796
+#: js/basicblocks.js:2860
 #.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
 msgid "shell"
 msgstr ""
 
-#: js/basicblocks.js:2796
-#: js/basicblocks.js:2808
+#: js/basicblocks.js:2860
+#: js/basicblocks.js:2872
 msgid "size"
 msgstr ""
 
-#: js/basicblocks.js:2796
+#: js/basicblocks.js:2860
 msgid "image"
 msgstr "ảnh"
 
-#: js/basicblocks.js:2808
+#: js/basicblocks.js:2872
 msgid "obj"
 msgstr ""
 
-#: js/basicblocks.js:2856
+#: js/basicblocks.js:2920
 #.TRANS: the case statement used in a switch statement in programming
 msgid "case"
 msgstr ""
 
-#: js/basicblocks.js:2865
+#: js/basicblocks.js:2929
 #.TRANS: the switch statement used in programming
 msgid "switch"
 msgstr ""
 
-#: js/basicblocks.js:2879
+#: js/basicblocks.js:2943
 #: plugins/rodi.rtp:31
 #: plugins/rodi.rtp:75
 #: plugins/rodi.rtp:417
 msgid "stop"
 msgstr "dừng"
 
-#: js/basicblocks.js:2886
+#: js/basicblocks.js:2950
 msgid "wait for"
 msgstr ""
 
-#: js/basicblocks.js:2893
+#: js/basicblocks.js:2957
 msgid "until"
 msgstr "đến khi"
 
-#: js/basicblocks.js:2900
+#: js/basicblocks.js:2964
 msgid "while"
 msgstr "trong khi"
 
-#: js/basicblocks.js:2907
-#: js/basicblocks.js:2914
+#: js/basicblocks.js:2971
+#: js/basicblocks.js:2978
 msgid "if"
 msgstr "nếu"
 
-#: js/basicblocks.js:2907
-#: js/basicblocks.js:2914
+#: js/basicblocks.js:2971
+#: js/basicblocks.js:2978
 msgid "then"
 msgstr "thì"
 
-#: js/basicblocks.js:2907
+#: js/basicblocks.js:2971
 msgid "else"
 msgstr "không thì"
 
-#: js/basicblocks.js:2921
+#: js/basicblocks.js:2985
 msgid "forever"
 msgstr "hẳn"
 
-#: js/basicblocks.js:2928
+#: js/basicblocks.js:2992
 msgid "repeat"
 msgstr "lặp lại"
 
-#: js/basicblocks.js:2940
-#: js/basicblocks.js:2951
-#: js/basicblocks.js:2960
-#: js/basicblocks.js:2970
-#: js/basicblocks.js:2978
-#: js/basicblocks.js:2987
-#: js/basicblocks.js:2997
+#: js/basicblocks.js:3004
+#: js/basicblocks.js:3015
+#: js/basicblocks.js:3024
+#: js/basicblocks.js:3034
+#: js/basicblocks.js:3042
+#: js/basicblocks.js:3051
+#: js/basicblocks.js:3061
 msgid "unknown"
 msgstr ""
 
-#: js/basicblocks.js:3007
+#: js/basicblocks.js:3071
 msgid "save as ABC"
 msgstr ""
 
-#: js/basicblocks.js:3010
-#: js/basicblocks.js:3019
-#: js/basicblocks.js:3028
+#: js/basicblocks.js:3074
+#: js/basicblocks.js:3083
+#: js/basicblocks.js:3092
 msgid "title"
 msgstr ""
 
-#: js/basicblocks.js:3016
+#: js/basicblocks.js:3080
 msgid "save as lilypond"
 msgstr ""
 
-#: js/basicblocks.js:3025
+#: js/basicblocks.js:3089
 msgid "save svg"
 msgstr ""
 
-#: js/basicblocks.js:3034
+#: js/basicblocks.js:3098
 msgid "no background"
 msgstr ""
 
-#: js/basicblocks.js:3041
+#: js/basicblocks.js:3105
 msgid "show blocks"
 msgstr "hiện khối"
 
-#: js/basicblocks.js:3048
+#: js/basicblocks.js:3112
 msgid "hide blocks"
 msgstr "ẩn khối"
 
-#: js/basicblocks.js:3055
+#: js/basicblocks.js:3119
 msgid "open project"
 msgstr ""
 
-#: js/basicblocks.js:3079
+#: js/basicblocks.js:3143
 msgid "wait"
 msgstr "đợi"
 
-#: js/basicblocks.js:3087
+#: js/basicblocks.js:3151
 msgid "print"
 msgstr "in"
 
-#: js/basicblocks.js:3091
+#: js/basicblocks.js:3155
 msgid "Music Blocks"
 msgstr ""
 
-#: js/basicblocks.js:3106
+#: js/basicblocks.js:3170
 msgid "loudness"
 msgstr "độ lớn"
 
-#: js/basicblocks.js:3114
+#: js/basicblocks.js:3178
 msgid "click"
 msgstr ""
 
-#: js/basicblocks.js:3122
-#: plugins/rodi.rtp:223
-msgid "blue"
-msgstr ""
-
-#: js/basicblocks.js:3129
-#: plugins/rodi.rtp:222
-msgid "green"
-msgstr ""
-
-#: js/basicblocks.js:3136
-#: plugins/rodi.rtp:221
-msgid "red"
-msgstr ""
-
-#: js/basicblocks.js:3143
+#: js/basicblocks.js:3207
 #: plugins/rodi.rtp:220
 msgid "pixel color"
 msgstr ""
 
-#: js/basicblocks.js:3150
+#: js/basicblocks.js:3214
 msgid "time"
 msgstr "Thời gian"
 
-#: js/basicblocks.js:3157
+#: js/basicblocks.js:3221
 msgid "cursor y"
 msgstr ""
 
-#: js/basicblocks.js:3165
+#: js/basicblocks.js:3229
 msgid "cursor x"
 msgstr ""
 
-#: js/basicblocks.js:3173
+#: js/basicblocks.js:3237
 msgid "mouse button"
 msgstr ""
 
-#: js/basicblocks.js:3180
+#: js/basicblocks.js:3244
 msgid "to ASCII"
 msgstr ""
 
-#: js/basicblocks.js:3187
+#: js/basicblocks.js:3251
 msgid "keyboard"
 msgstr "bàn phím"
 
-#: js/basicblocks.js:3196
+#: js/basicblocks.js:3260
 msgid "stop mouse"
 msgstr ""
 
-#: js/basicblocks.js:3205
+#: js/basicblocks.js:3269
 msgid "start mouse"
 msgstr ""
 
-#: js/basicblocks.js:3215
+#: js/basicblocks.js:3279
 #.TRANS: pen color for this mouse
 msgid "mouse color"
 msgstr ""
 
-#: js/basicblocks.js:3225
+#: js/basicblocks.js:3289
 #.TRANS: heading (compass direction) for this mouse
 msgid "mouse heading"
 msgstr ""
 
-#: js/basicblocks.js:3235
+#: js/basicblocks.js:3299
 #.TRANS: y position for this mouse
 msgid "mouse y"
 msgstr "Tọa độ y của chuột(vói y là tọa độ của trục hoành)"
 
-#: js/basicblocks.js:3245
+#: js/basicblocks.js:3309
 #.TRANS: x position for this mouse
 msgid "mouse x"
 msgstr "Tọa độ x của chuột(vói x là tọa độ của trục hoành)"
 
-#: js/basicblocks.js:3255
+#: js/basicblocks.js:3319
 #.TRANS: notes played by this mouse
 msgid "mouse notes played"
 msgstr ""
 
-#: js/basicblocks.js:3265
+#: js/basicblocks.js:3329
 #.TRANS: convert current note for this turtle to piano key (1-88)
 msgid "mouse pitch number"
 msgstr ""
 
-#: js/basicblocks.js:3274
-#: js/basicblocks.js:3284
+#: js/basicblocks.js:3338
+#: js/basicblocks.js:3348
 msgid "mouse note value"
 msgstr ""
 
-#: js/basicblocks.js:3293
+#: js/basicblocks.js:3357
 msgid "mouse sync"
 msgstr ""
 
-#: js/basicblocks.js:3302
-#: js/basicblocks.js:3310
-#: js/basicblocks.js:3324
+#: js/basicblocks.js:3366
+#: js/basicblocks.js:3374
+#: js/basicblocks.js:3388
 msgid "mouse name"
 msgstr ""
 
-#: js/basicblocks.js:3311
+#: js/basicblocks.js:3375
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:83
 msgid "source"
 msgstr ""
 
-#: js/basicblocks.js:3312
+#: js/basicblocks.js:3376
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:84
 msgid "target"
 msgstr ""
 
-#: js/basicblocks.js:3335
+#: js/basicblocks.js:3399
 #.TRANS: the volume at which notes are played
 msgid "master volume"
 msgstr ""
 
-#: js/basicblocks.js:3399
-#: js/basicblocks.js:3411
+#: js/basicblocks.js:3463
+#: js/basicblocks.js:3475
 #.TRANS: a rapid, slight variation in pitch
 #.TRANS: set the loudness level
 msgid "set synth volume"
 msgstr ""
 
-#: js/basicblocks.js:3399
-#: js/basicblocks.js:3411
+#: js/basicblocks.js:3463
+#: js/basicblocks.js:3475
 msgid "synth"
 msgstr ""
 
-#: js/basicblocks.js:3422
-#: js/basicblocks.js:3431
+#: js/basicblocks.js:3486
+#: js/basicblocks.js:3495
 #.TRANS: set the loudness level
 #.TRANS: set the loudness level
 msgid "set master volume"
 msgstr ""
 
-#: js/basicblocks.js:3441
+#: js/basicblocks.js:3505
 #.TRANS: set an articulation (change in volume)
 msgid "set relative volume"
 msgstr ""
 
-#: js/basicblocks.js:3450
+#: js/basicblocks.js:3514
 #.TRANS: a gradual increase in loudness
 msgid "crescendo"
 msgstr ""
@@ -3694,10 +3732,6 @@ msgstr ""
 msgid "banana"
 msgstr ""
 
-#: plugins/nutrition.rtp:164
-msgid "orange"
-msgstr "cam"
-
 #: plugins/nutrition.rtp:167
 msgid "wheat bread"
 msgstr ""
@@ -4407,9 +4441,6 @@ msgstr ""
 #~msgid "The Step Pitch Block must be used insdie of a Note Block."
 #~msgstr ""
 
-#~msgid "end fill"
-#~msgstr ""
-
 #: js/turtledefs.js:99
 
 #~msgid "The save-stack button saves a stack onto a custom palette."
@@ -4580,9 +4611,6 @@ msgstr ""
 #: js/musicutils.js:221
 
 #~msgid "Locrian"
-#~msgstr ""
-
-#~msgid "begin fill"
 #~msgstr ""
 
 #: js/activity.js:2166
