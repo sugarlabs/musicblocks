@@ -35,7 +35,7 @@
 
 function blockIsMacro (blkname) {
 
-    const BLOCKISMACRO = ['action', 'articulation', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dog', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fourth', 'fourthinterval', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major2', 'major3', 'major6', 'major7', 'matrix', 'matrixgmajor', 'meter', 'mf', 'midi', 'minor2', 'minor3', 'minor6', 'minor7', 'movable', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'octave', 'oneOf', 'osctime', 'p', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setbpm2', 'setdrum', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'setmasterbpm', 'setmasterbpm2', 'settimbre', 'setscalartransposition', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'third', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'unison', 'unisoninterval', 'vibrato', 'wholeNote'];
+    const BLOCKISMACRO = ['action', 'articulation', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dog', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'elapsednotes2', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fourth', 'fourthinterval', 'halfNote', 'hihat', 'hollowline', 'interval', 'invert', 'invert1', 'kick', 'major2', 'major3', 'major6', 'major7', 'matrix', 'matrixgmajor', 'meter', 'mf', 'midi', 'minor2', 'minor3', 'minor6', 'minor7', 'movable', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'octave', 'oneOf', 'osctime', 'p', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'rhythmruler2', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setbpm2', 'setdrum', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'setmasterbpm', 'setmasterbpm2', 'settimbre', 'setscalartransposition', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'third', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'unison', 'unisoninterval', 'vibrato', 'wholeNote', 'black', 'white', 'red', 'orange', 'yellow', 'green', 'blue', 'purple'];
 
     return BLOCKISMACRO.indexOf(blkname) > -1;
 
@@ -209,6 +209,14 @@ function getMacroExpansion (blkname, x, y) {
     const VOLOBJ75 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 75}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const VOLOBJ85 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, 'synthname', 0, 0, [0]], [2, ['number', {'value': 85}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const WHOLEOBJ = [[0, 'rhythm2', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 1}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
+    const BLACKOBJ = [[0, 'setshade', x, y, [null, 1, null]], [1, ['number', {'value': 0}], 0, 0, [0]]];
+    const WHITEOBJ = [[0, 'setshade', x, y, [null, 1, null]], [1, ['number', {'value': 100}], 0, 0, [0]]];
+    const REDOBJ = [[0, 'setcolor', x, y, [null, 1, null]], [1, ['number', {'value': 0}], 0, 0, [0]]];
+    const ORANGEOBJ = [[0, 'setcolor', x, y, [null, 1, null]], [1, ['number', {'value': 10}], 0, 0, [0]]];
+    const YELLOWOBJ = [[0, 'setcolor', x, y, [null, 1, null]], [1, ['number', {'value': 20}], 0, 0, [0]]];
+    const GREENOBJ = [[0, 'setcolor', x, y, [null, 1, null]], [1, ['number', {'value': 40}], 0, 0, [0]]];
+    const BLUEOBJ = [[0, 'setcolor', x, y, [null, 1, null]], [1, ['number', {'value': 70}], 0, 0, [0]]];
+    const PURPLEOBJ = [[0, 'setcolor', x, y, [null, 1, null]], [1, ['number', {'value': 90}], 0, 0, [0]]];
 
     const BUILTINMACROS = {
         'action': ACTIONOBJ,
@@ -377,6 +385,15 @@ function getMacroExpansion (blkname, x, y) {
         'unisoninterval': UNISONINTERVALOBJ,
         'vibrato': VIBRATOOBJ,
         'wholeNote': WHOLEOBJ,
+
+        'black': BLACKOBJ,
+        'white': WHITEOBJ,
+        'red': REDOBJ,
+        'orange': ORANGEOBJ,
+        'yellow': YELLOWOBJ,
+        'green': GREENOBJ,
+        'blue': BLUEOBJ,
+        'purple': PURPLEOBJ,
     };
 
         if (['namedbox', 'nameddo', 'namedcalc', 'namedarg', 'nameddoArg'].indexOf(blkname) === -1 && blkname in BUILTINMACROS) {
