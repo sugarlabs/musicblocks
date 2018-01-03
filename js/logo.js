@@ -1556,12 +1556,18 @@ function Logo () {
             while(actionArgs.length > 0) {
                 actionArgs.pop();
             }
+
             if (that.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
-                    var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
-                    actionArgs.push(t);
+                    if (that.blocks.blockList[blk].connections[i + 1] != null) {
+                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
+                        actionArgs.push(t);
+                    } else {
+                        actionArgs.push(null);
+                    }
                 }
             }
+
             if (name in that.actions) {
                 if (that.justCounting[turtle].length === 0) {
                     that.notationLineBreak(turtle);
@@ -1598,19 +1604,25 @@ function Logo () {
                 childFlowCount = 1;
             } else{
                 that.errorMsg(NOACTIONERRORMSG, blk, name);
-                that.stopTurtle = true;
+                // that.stopTurtle = true;
             }
             break;
         case 'doArg':
             while(actionArgs.length > 0) {
                 actionArgs.pop();
             }
+
             if (that.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
-                    var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
-                    actionArgs.push(t);
+                    if (that.blocks.blockList[blk].connections[i + 2] != null) {
+                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
+                        actionArgs.push(t);
+                    } else {
+                        actionArgs.push(null);
+                    }
                 }
             }
+
             if (args.length >= 1) {
                 if (args[0] in that.actions) {
                     if (that.justCounting[turtle].length === 0) {
@@ -1621,7 +1633,7 @@ function Logo () {
                     childFlowCount = 1;
                 } else {
                     that.errorMsg(NOACTIONERRORMSG, blk, args[0]);
-                    that.stopTurtle = true;
+                    // that.stopTurtle = true;
                 }
             }
             break;
@@ -7527,7 +7539,7 @@ function Logo () {
         if (blk == null) {
             console.log('NO INPUT');
             that.errorMsg(NOINPUTERRORMSG, parentBlk);
-            that.stopTurtle = true;
+            // that.stopTurtle = true;
             return null
         }
 
