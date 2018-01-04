@@ -2314,6 +2314,8 @@ define(MYDEFINES, function (compatibility) {
             document.querySelector('#myOpenFile').focus();
             document.querySelector('#myOpenFile').click();
             window.scroll(0, 0);
+            doStopButton();
+            _allClear();
         };
 
         function doSaveLilypond() {
