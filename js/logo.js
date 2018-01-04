@@ -7918,7 +7918,6 @@ function Logo () {
                 }
                 break;
             case 'myclick':
-                console.log('[click' + that.turtles.turtleList[turtle].name + ']');
                 that.blocks.blockList[blk].value = 'click' + that.turtles.turtleList[turtle].name;
                 break;
             case 'heading':
