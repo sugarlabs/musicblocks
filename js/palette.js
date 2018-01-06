@@ -79,6 +79,8 @@ function Palettes () {
     this.y = null;
     this.container = null;
 
+    this.pluginMacros = {};  // some macros are defined in plugins
+
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
@@ -154,6 +156,17 @@ function Palettes () {
         this.macroDict = obj;
 
         return this;
+    };
+
+    this.getPluginMacroExpansion = function (blkname, x, y) {
+        console.log(this.pluginMacros[blkname]);
+        var obj = this.pluginMacros[blkname];
+        if (obj != null) {
+            obj[0][2] = x;
+            obj[0][3] = y;
+        }
+
+        return (obj);
     };
 
     this.menuScrollEvent = function (direction, scrollSpeed) {
@@ -491,7 +504,7 @@ function Palettes () {
             scrolling = true;
             var lastY = event.stageY;
 
-	    that.buttons[name].removeAllEventListeners('pressmove');
+            that.buttons[name].removeAllEventListeners('pressmove');
             that.buttons[name].on('pressmove', function (event) {
                 if (!scrolling) {
                     return;
@@ -502,7 +515,7 @@ function Palettes () {
                 lastY = event.stageY;
             });
 
-	    that.buttons[name].removeAllEventListeners('pressup');
+            that.buttons[name].removeAllEventListeners('pressup');
             that.buttons[name].on('pressup', function (event) {
                 scrolling = false;
             }, null, true);  // once = true
@@ -905,7 +918,7 @@ function PopdownPalette(palettes) {
                 // console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = palette._makeBlockFromPalette(palette.protoList[e.dataset.blk], e.dataset.modname, function (newBlock) {
                     // Move the block and the drag group.
-		    that.palettes.blocks._moveBlock(newBlock, 75 - that.palettes.blocks.stage.x, 75 - that.palettes.blocks.stage.y);
+                    that.palettes.blocks._moveBlock(newBlock, 75 - that.palettes.blocks.stage.x, 75 - that.palettes.blocks.stage.y);
                     that.palettes.blocks.findDragGroup(newBlock);
                     for (var i in that.palettes.blocks.dragGroup) {
                         that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], 0, 0);
@@ -1802,15 +1815,19 @@ function Palette(palettes, name) {
         if ('GLOBALS' in pluginObjs) {
             delete pluginObjs['GLOBALS'][this.name];
         }
+
         if ('IMAGES' in pluginObjs) {
             delete pluginObjs['IMAGES'][this.name];
         }
+
         if ('ONLOAD' in pluginObjs) {
             delete pluginObjs['ONLOAD'][this.name];
         }
+
         if ('ONSTART' in pluginObjs) {
             delete pluginObjs['ONSTART'][this.name];
         }
+
         if ('ONSTOP' in pluginObjs) {
             delete pluginObjs['ONSTOP'][this.name];
         }
@@ -1821,6 +1838,14 @@ function Palette(palettes, name) {
             delete pluginObjs['ARGPLUGINS'][name];
             delete pluginObjs['BLOCKPLUGINS'][name];
         }
+
+        // FIXME: We really only want to remove macros associated with
+        // this palette.
+        if ('MACROPLUGINS' in pluginObjs) {
+            for (name in pluginObjs['MACROPLUGINS']) {
+		delete pluginObjs['MACROPLUGINS'][name];
+            }
+	}
 
         storage.plugins = preparePluginExports({});
         if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -1956,6 +1981,13 @@ function Palette(palettes, name) {
             saveY = this.protoContainers[blkname].y;
             this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
             callback(lastBlock);
+        } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1 && blkname in this.palettes.pluginMacros) {
+            moved = true;
+            saveX = this.protoContainers[blkname].x;
+            saveY = this.protoContainers[blkname].y;
+            this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
+            callback(lastBlock);
+
         } else {
             var newBlock = paletteBlockButtonPush(this.palettes.blocks, newBlk, arg);
             callback(newBlock);
@@ -1986,10 +2018,15 @@ function Palette(palettes, name) {
             moved = false;
             this.draggingProtoBlock = false;
 
+            var macroExpansion = null;
             if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1) {
                 var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
-            } else {  // Don't apply macro expansion to named blocks.
-                var macroExpansion = null;
+                if (macroExpansion == null) {
+                    // Maybe it is a plugin macro?
+                    if (blkname in this.palettes.pluginMacros) {
+                        var macroExpansion = this.palettes.getPluginMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
+                    }
+                }
             }
 
             if (macroExpansion != null) {

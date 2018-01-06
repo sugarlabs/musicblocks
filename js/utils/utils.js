@@ -11,20 +11,20 @@
 
 function format (str, data) {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, function (match, name) {
-	x = data;
-	name.split('.').forEach(function (v) {
-	    if (x === undefined) {
-		console.log('Undefined value in template string', str, name, x, v);
-	    }
+        x = data;
+        name.split('.').forEach(function (v) {
+            if (x === undefined) {
+                console.log('Undefined value in template string', str, name, x, v);
+            }
 
-	    x = x[v];
-	});
+            x = x[v];
+        });
 
-	return x;
+        return x;
     });
 
     return str.replace(/{_([a-zA-Z0-9]+)}/g, function (match, item) {
-	return _(item);
+        return _(item);
     });
 };
 
@@ -105,18 +105,18 @@ function HttpRequest (url, loadCallback, userCallback) {
         req.open('GET', url);
 
         req.onreadystatechange = function () {
-	    objref.handler();
-	};
+            objref.handler();
+        };
 
         req.send('');
     } catch(e) {
         if (self.console) {
-	    console.log('Failed to load resource from ' + url + ': Network error.');
-	}
+            console.log('Failed to load resource from ' + url + ': Network error.');
+        }
 
         if (typeof userCallback === 'function') {
-	    userCallback(false, 'network error');
-	}
+            userCallback(false, 'network error');
+        }
 
         this.request = this.handler = this.userCallback = null;
     }
@@ -246,7 +246,7 @@ function toTitleCase (str) {
 };
 
 
-function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
+function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict) {
     // console.log(rawData);
     var lineData = rawData.split('\n');
     var cleanData = '';
@@ -268,7 +268,7 @@ function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
     try {
-        var obj = processPluginData(cleanData.replace(/\n/g,''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList);
+        var obj = processPluginData(cleanData.replace(/\n/g,''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict);
     } catch (e) {
         var obj = null;
         errorMsg('Error loading plugin: ' + e);
@@ -278,7 +278,7 @@ function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict
 };
 
 
-function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
+function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict) {
     // Plugins are JSON-encoded dictionaries.
     // console.log(pluginData);
     var obj = JSON.parse(pluginData);
@@ -366,6 +366,19 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
     if ('ARGPLUGINS' in obj) {
         for (var arg in obj['ARGPLUGINS']) {
             evalArgDict[arg] = obj['ARGPLUGINS'][arg];
+        }
+    }
+
+    // Populate the macro dictionary, i.e., the code that is
+    // eval'd by this block.
+    if ('MACROPLUGINS' in obj) {
+        for (var macro in obj['MACROPLUGINS']) {
+            try {
+                evalMacroDict[macro] = JSON.parse(obj['MACROPLUGINS'][macro]);
+            } catch (e) {
+                console.log('could not parse macro ' + macro);
+                console.log(obj['MACROPLUGINS'][macro]);
+            }
         }
     }
 
@@ -467,6 +480,12 @@ function updatePluginObj (obj) {
 
     for (var block in obj['BLOCKPLUGINS']) {
         pluginObjs['BLOCKPLUGINS'][block] = obj['BLOCKPLUGINS'][block];
+    }
+
+    if ('MACROPLUGINS' in obj) {
+        for (var macro in obj['MACROPLUGINS']) {
+            pluginObjs['MACROPLUGINS'][macro] = obj['MACROPLUGINS'][macro];
+        }
     }
 
     if ('GLOBALS' in obj) {
@@ -666,11 +685,6 @@ function hideDOMLabel () {
     var numberLabel = docById('numberLabel');
     if (numberLabel !== null) {
         numberLabel.style.display = 'none';
-    }
-
-    var booleanLabel = docById('booleanLabel');
-    if (booleanLabel !== null) {
-        booleanLabel.style.display = 'none';
     }
 
     var solfegeLabel = docById('solfegeLabel');
@@ -989,7 +1003,7 @@ function oneHundredToFraction (d) {
     case 72:
     case 73:
     case 74:
-		return [23, 32];
+        return [23, 32];
         break;
     case 75:
     case 76:

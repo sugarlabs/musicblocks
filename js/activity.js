@@ -160,6 +160,7 @@ define(MYDEFINES, function (compatibility) {
             'FLOWPLUGINS': {},
             'ARGPLUGINS': {},
             'BLOCKPLUGINS': {},
+            'MACROPLUGINS': {},
             'ONLOAD': {},
             'ONSTART': {},
             'ONSTOP': {}
@@ -936,7 +937,7 @@ define(MYDEFINES, function (compatibility) {
             // Load any plugins saved in local storage.
             pluginData = storage.plugins;
             if (pluginData != null) {
-                var obj = processPluginData(pluginData, palettes, blocks, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList);
+                var obj = processPluginData(pluginData, palettes, blocks, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList, palettes.pluginMacros);
                 updatePluginObj(obj);
             }
 
@@ -1090,11 +1091,11 @@ define(MYDEFINES, function (compatibility) {
                     document.body.style.cursor = 'wait';
 
                     setTimeout(function () {
-                        obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList);
+                        obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList, palettes.pluginMacros);
                         // Save plugins to local storage.
                         if (obj != null) {
                             var pluginObj = preparePluginExports(obj);
-                            console.log(pluginObj);
+                            // console.log(pluginObj);
                             storage.plugins = pluginObj; // preparePluginExports(obj));
                         }
 
@@ -1474,6 +1475,7 @@ define(MYDEFINES, function (compatibility) {
                 if (obj.length > 0) {
                     obj[0].style.visibility = 'visible';
                 }
+
                 searchWidget.value = null;
                 docById('searchResults').style.visibility = 'visible';
                 searchWidget.style.visibility = 'visible';
@@ -1628,7 +1630,12 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
 
-	    var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible';
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible';
+            } else {
+                var disableKeys = searchWidget.style.visibility === 'visible';
+            }
+
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
                 case 66: // 'B'
@@ -2250,11 +2257,12 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSaveTB() {
-            var filename = prompt('Filename:', _('untitled') + '.tb');  // default filename = untitled
+            var filename = prompt('Filename:', _('untitled') + '.tb');
             if (filename != null) {
                 if (fileExt(filename) !== 'tb') {
                     filename += '.tb';
                 }
+
                 download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
             }
         };
@@ -2556,33 +2564,38 @@ define(MYDEFINES, function (compatibility) {
             var show = flags.show;
             var collapse = flags.collapse;
 
-            var functionload = function () {
+            var __functionload = function () {
                 setTimeout(function () {
-                    if (!collapse){
+                    if (!collapse && firstRun){
                         _toggleCollapsibleStacks();
                     }
                     if (run && firstRun){
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             turtles.turtleList[turtle].doClear(true, true, false);
                         }
+
                         runProject(env);
+
                         if (show){
                             _changeBlockVisibility();
                         }
+
                         if (!collapse){
                             _toggleCollapsibleStacks();
                         }
                     } else if (!show){
                         _changeBlockVisibility();
                     }
+
+                    document.removeEventListener('finishedLoading', __functionload);
                     firstRun = false;
                 }, 1000);
             }
 
             if (document.addEventListener) {
-                document.addEventListener('finishedLoading', functionload, false);
+                document.addEventListener('finishedLoading', __functionload, false);
             } else {
-                document.attachEvent('finishedLoading', functionload);
+                document.attachEvent('finishedLoading', __functionload);
             }
         };
 
