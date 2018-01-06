@@ -48,6 +48,7 @@ var VOICENAMES = [
     [_('custom'), 'custom', 'images/synth.svg'],
 ];
 
+
 var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('snare drum'), 'snare drum', 'images/snaredrum.svg'],
@@ -96,6 +97,17 @@ var DRUMNAMES = [
     //.TRANS: animal sound effect
     [_('duck'), 'duck', 'images/duck.svg'],
 ];
+
+var SOUNDSAMPLESDEFINES = [
+    "samples/violin", "samples/cello", "samples/flute", "samples/guitar",
+    "samples/basse", "samples/bottle", "samples/clap", "samples/darbuka",
+    "samples/hihat", "samples/splash", "samples/bubbles", "samples/cowbell",
+    "samples/dog", "samples/kick", "samples/tom", "samples/cat",
+    "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
+    "samples/chine", "samples/cricket", "samples/fingercymbal",
+    "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
+    "samples/snare"
+]
 
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
@@ -180,13 +192,47 @@ function Synth() {
     this.samplesuffix = "_SAMPLE";
 
     this.loadSamples = function (){
+        var SAMPLES_MANIFEST = {
+            "voice": [
+                {"name": "violin", "data_name": "violin", "data": VIOLIN_SAMPLE},
+                {"name": "cello", "data_name": "cello", "data": CELLO_SAMPLE},
+                {"name": "flute", "data_name": "flute", "data": FLUTE_SAMPLE},
+                {"name": "guitar", "data_name": "guitar", "data": GUITAR_SAMPLE},
+                {"name": "basse", "data_name": "basse", "data": BASSE_SAMPLE}
+            ],
+            "drum": [
+                {"name": "bottle", "data_name": "bottle", "data": BOTTLE_SAMPLE},
+                {"name": "clap", "data_name": "clap", "data": CLAP_SAMPLE},
+                {"name": "darbuka drum", "data_name": "darbuka", "data": DARBUKA_SAMPLE},
+                {"name": "hi hat", "data_name": "hihat", "data": HIHAT_SAMPLE},
+                {"name": "splash", "data_name": "splash", "data": SPLASH_SAMPLE},
+                {"name": "bubbles", "data_name": "bubbles", "data": BUBBLES_SAMPLE},
+                {"name": "cow bell", "data_name": "cowbell", "data": COWBELL_SAMPLE},
+                {"name": "dog", "data_name": "dog", "data": DOG_SAMPLE},
+                {"name": "kick drum", "data_name": "kick", "data": KICK_SAMPLE},
+                {"name": "tom tom", "data_name": "tom", "data": TOM_SAMPLE},
+                {"name": "cat", "data_name": "cat", "data": CAT_SAMPLE},
+                {"name": "crash", "data_name": "crash", "data": CRASH_SAMPLE},
+                {"name": "duck", "data_name": "duck", "data": DUCK_SAMPLE},
+                {"name": "ride bell", "data_name": "ridebell", "data": RIDEBELL_SAMPLE},
+                {"name": "triangle bell", "data_name": "triangle", "data": TRIANGLE_SAMPLE},
+                {"name": "chine", "data_name": "chine", "data": CHINE_SAMPLE},,
+                {"name": "cricket", "data_name": "cricket", "data": CRICKET_SAMPLE},
+                {"name": "finger cymbals", "data_name": "fingercymbal", "data": FINGERCYMBAL_SAMPLE},
+                {"name": "slap", "data_name": "slap", "data": SLAP_SAMPLE},
+                {"name": "clang", "data_name": "clang", "data": CLANG_SAMPLE},
+                {"name": "cup drum", "data_name": "cup", "data": CUP_SAMPLE},
+                {"name": "floor tom tom", "data_name": "floortom", "data": FLOORTOM_SAMPLE},
+                {"name": "snare drum", "data_name": "snare", "data": SNARE_SAMPLE}
+            ]
+        }
         this.samples = {};
         for (var type in SAMPLES_MANIFEST) {
             if (SAMPLES_MANIFEST.hasOwnProperty(type)) {
                 this.samples[type] = {};
                 for (var sample in SAMPLES_MANIFEST[type]){
                     if (SAMPLES_MANIFEST[type].hasOwnProperty(sample)){
-                        var data = eval(SAMPLES_MANIFEST[type][sample].data_name.toUpperCase()+this.samplesuffix);
+                        var data = SAMPLES_MANIFEST[type][sample].data;
                         var name = SAMPLES_MANIFEST[type][sample].name;
                         this.samples[type][name] = data;
                     }
@@ -195,6 +241,7 @@ function Synth() {
         }
     }
     var t = this;
+
     require(SOUNDSAMPLESDEFINES, function(){
         t.loadSamples();
     });
@@ -498,7 +545,7 @@ function Synth() {
 
         return tempSynth;
     };
-    
+
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrumentName, sourceName, params) {
         if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum)) {
