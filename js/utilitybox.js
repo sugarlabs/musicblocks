@@ -33,6 +33,8 @@ function UtilityBox () {
     this._toggleSearch = null;
     this._hideSearch = null;
     this._scrollStatus = false;
+    this._increaseStatus = true;
+    this._decreaseStatus = true;
     this._container = null;
     this._scale = 1;
 
@@ -95,12 +97,28 @@ function UtilityBox () {
                 that._hide();
             });
 
+            this._smallerButton2 = makeButton('smaller-disable-button', _('Cannot be further decreased'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._smallerButton2.visible = false;
+            this._positionHoverText(this._smallerButton2);
+            this._smallerButton2.on('click', function (event) {
+                that._doSmaller();
+                that._hide();
+            });
+
             dx += BOXBUTTONSPACING;
 
             this._biggerButton = makeButton('bigger-button', _('Increase block size'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._biggerButton.visible = true;
             this._positionHoverText(this._biggerButton);
             this._biggerButton.on('click', function (event) {
+                that._doBigger();
+                that._hide();
+            });
+
+            this._biggerButton2 = makeButton('bigger-disable-button', _('Cannot be further increased'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._biggerButton2.visible = false;
+            this._positionHoverText(this._biggerButton2);
+            this._biggerButton2.on('click', function (event) {
                 that._doBigger();
                 that._hide();
             });
@@ -179,7 +197,9 @@ function UtilityBox () {
     this._hide = function () {
         if (this._container !== null) {
             this._smallerButton.visible = false;
+            this._smallerButton2.visible = false;
             this._biggerButton.visible = false;
+            this._biggerButton2.visible = false;
             this._statsButton.visible = false;
             this.pluginsButton.visible = false;
             this._scrollButton.visible = false;
@@ -193,8 +213,10 @@ function UtilityBox () {
 
     this._show = function () {
         if (this._container !== null) {
-            this._smallerButton.visible = true;
-            this._biggerButton.visible = true;
+            this._smallerButton.visible = this._decreaseStatus;
+            this._smallerButton2.visible = !this._decreaseStatus;
+            this._biggerButton.visible = this._increaseStatus;
+            this._biggerButton2.visible = !this._increaseStatus;
             this._statsButton.visible = true;
             this.pluginsButton.visible = true;
             this._scrollButton.visible = !this._scrollStatus;
