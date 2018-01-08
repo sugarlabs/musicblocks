@@ -13,24 +13,28 @@ fundamental musical concepts in an integrative and fun way.
 Using Music Blocks
 ------------------
 
-Music Blocks is designed to run in the browser. It is derived from
-Turtle Blocks JS which can be found
-[here](https://github.com/walterbender/turtleblocksjs). You can run
-the software locally from the index.html file, from the
-[github](http://walterbender.github.io/musicblocks/) repo, or by setting up a
-local server.
+Music Blocks is designed to run in the browser.
 
-If you want to run Music Blocks offline, download this repo and point
-your browser to the index.html file found in the musicblocks directory
-on your local file system.
+The easiest way to run Music Blocks is to open [Music Blocks](http://walterbender.github.io/musicblocks/) in your browser (Firefox, Chrome, and  Opera work best).
+
+If you want to run Music Blocks offline, download (or git clone) this
+repo and point your browser to the index.html file found in the
+musicblocks directory on your local file system.
+
+You can also run Music Blocks by setting up a local server.
 
 Sugar users can run Music Blocks as an app embedded in the Browse
 activity (See [Music Blocks
-Embedded](http://github.com/sugarlabs/music-blocks-embedded-activity))
-or simply open Music Blocks in Browse.
+Embedded](http://activities.sugarlabs.org/en-US/sugar/addon/4804)) or
+simply open Music Blocks in Browse.
 
 See [Using Music
-Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation) and [Music Blocks Guide](http://github.com/walterbender/musicblocks/tree/master/guide)
+Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation)
+and [Music Blocks
+Guide](http://github.com/walterbender/musicblocks/tree/master/guide)
+
+Music Blocks is derived from Turtle Blocks JS which can be found
+[here](https://github.com/walterbender/turtleblocksjs).
 
 Credits
 -------
