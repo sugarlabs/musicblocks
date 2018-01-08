@@ -671,6 +671,12 @@ define(MYDEFINES, function (compatibility) {
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
+            if (BLOCKSCALES[blockscale] > 1) {
+                utilityBox._decreaseStatus = true;
+            }
+            if (BLOCKSCALES[blockscale] == 4) {
+                utilityBox._increaseStatus = false;
+            }
         };
 
         function doSmallerFont() {
@@ -678,6 +684,12 @@ define(MYDEFINES, function (compatibility) {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
+            if (BLOCKSCALES[blockscale] == 1) {
+                utilityBox._decreaseStatus = false;
+            }
+            if (BLOCKSCALES[blockscale] < 4) {
+                utilityBox._increaseStatus = true;
+            } 
         };
 
         function getPlaybackQueueStatus () {
