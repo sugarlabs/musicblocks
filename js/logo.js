@@ -4481,6 +4481,7 @@ function Logo () {
                           that.neighborArgCurrentBeat[turtle].pop();
                       }
                     }
+                    that._processNote(1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])], last(that.inNoteBlock[turtle]), turtle);
                   }
 
                 delete that.oscList[turtle][last(that.inNoteBlock[turtle])];
