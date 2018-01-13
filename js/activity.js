@@ -234,7 +234,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _findBlocks() {
-            logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
             palettes.initial_x = 55;
