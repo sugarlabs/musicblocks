@@ -136,6 +136,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     consonantStepUpBlock.adjustWidthToLabel();
     consonantStepUpBlock.parameterBlock();
 
+    var myDeltaPitchBlock = new ProtoBlock('deltapitch');
+    myDeltaPitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['deltapitch'] = myDeltaPitchBlock;
+    //.TRANS: the change meaused in half-steps between the current pitch and the previous pitch
+    myDeltaPitchBlock.staticLabels.push(_('change in pitch'));
+    myDeltaPitchBlock.parameterBlock();
+    myDeltaPitchBlock.adjustWidthToLabel();
+
     var myPitchBlock = new ProtoBlock('mypitch');
     myPitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['mypitch'] = myPitchBlock;
@@ -667,6 +675,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     timbreBlock.adjustWidthToLabel();
     timbreBlock.stackClampOneArgBlock();
     timbreBlock.defaults.push(_('custom'));
+
+    var neighborBlock = new ProtoBlock('neighbor');
+    neighborBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['neighbor'] = neighborBlock;
+    //.TRANS 
+    neighborBlock.staticLabels.push(_('neighbor' + ' (+/–)'));
+    neighborBlock.staticLabels.push(_('step pitch'), _('note value'));
+    neighborBlock.extraWidth = 15;
+    neighborBlock.adjustWidthToLabel();
+    neighborBlock.flowClampTwoArgBlock();
+    neighborBlock.dockTypes[1] = 'numberin';
+    neighborBlock.dockTypes[2] = 'numberin';
+    neighborBlock.defaults.push(1);
+    neighborBlock.defaults.push(1 / 16);
 
     var modewidgetBlock = new ProtoBlock('modewidget');
     modewidgetBlock.palette = palettes.dict['widgets'];
@@ -2015,6 +2037,70 @@ function initBasicProtoBlocks(palettes, blocks) {
     forwardBlock.defaults.push(100);
 
     // PEN PALETTE
+
+    var purpleBlock = new ProtoBlock('purple');
+    purpleBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['purple'] = purpleBlock;
+    purpleBlock.staticLabels.push(_('purple'));
+    purpleBlock.zeroArgBlock();
+
+    var blueBlock = new ProtoBlock('blue');
+    blueBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['blue'] = blueBlock;
+    blueBlock.staticLabels.push(_('blue'));
+    blueBlock.zeroArgBlock();
+
+    var greenBlock = new ProtoBlock('green');
+    greenBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['green'] = greenBlock;
+    greenBlock.staticLabels.push(_('green'));
+    greenBlock.zeroArgBlock();
+
+    var yellowBlock = new ProtoBlock('yellow');
+    yellowBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['yellow'] = yellowBlock;
+    yellowBlock.staticLabels.push(_('yellow'));
+    yellowBlock.zeroArgBlock();
+
+    var orangeBlock = new ProtoBlock('orange');
+    orangeBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['orange'] = orangeBlock;
+    orangeBlock.staticLabels.push(_('orange'));
+    orangeBlock.zeroArgBlock();
+
+    var redBlock = new ProtoBlock('red');
+    redBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['red'] = redBlock;
+    redBlock.staticLabels.push(_('red'));
+    redBlock.zeroArgBlock();
+
+    var whiteBlock = new ProtoBlock('white');
+    whiteBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['white'] = whiteBlock;
+    whiteBlock.staticLabels.push(_('white'));
+    whiteBlock.zeroArgBlock();
+
+    var blackBlock = new ProtoBlock('black');
+    blackBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['black'] = blackBlock;
+    blackBlock.staticLabels.push(_('black'));
+    blackBlock.zeroArgBlock();
+
+    var beginFillBlock = new ProtoBlock('beginfill');
+    beginFillBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['beginfill'] = beginFillBlock;
+    beginFillBlock.hidden = true;
+    beginFillBlock.staticLabels.push(_('begin fill'));
+    beginFillBlock.adjustWidthToLabel();
+    beginFillBlock.zeroArgBlock();
+
+    var endFillBlock = new ProtoBlock('endfill');
+    endFillBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['endfill'] = endFillBlock;
+    endFillBlock.hidden = true;
+    endFillBlock.staticLabels.push(_('end fill'));
+    endFillBlock.adjustWidthToLabel();
+    endFillBlock.zeroArgBlock();
 
     var fillscreenBlock = new ProtoBlock('fillscreen');
     fillscreenBlock.palette = palettes.dict['pen'];

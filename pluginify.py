@@ -104,6 +104,14 @@ You can do this using the setter setion:
 myValue = value;
 updateDisplayOfMyValue();
 
+Macros are defined in in //* macro:(blockname) *//
+
+Example:
+//* macro: black *//
+[[0, "setshade", 0, 0, [null, 1, null]], [1, ["number", {"value": 0}], 0, 0, [0]]]
+
+Note the use of double quotes in the JSON-encoded object.
+
 Graphical elements (icons, colors) are defined in the own sections:
 
 Palette icons are defined as //* palette-icon:(palette name) *//
@@ -136,6 +144,7 @@ def clear():
         'flow': 'FLOWPLUGINS',
         'arg': 'ARGPLUGINS',
         'block': 'BLOCKPLUGINS',
+        'macro': 'MACROPLUGINS',
         'parameter': 'PARAMETERPLUGINS',
         'setter': 'SETTERPLUGINS',
         'onload': 'ONLOAD',
@@ -146,7 +155,7 @@ def clear():
         'palette-stroke': 'PALETTESTROKECOLORS',
         'palette-highlight': 'PALETTEHIGHLIGHTCOLORS',
         'palette-stroke-highlight': 'HIGHLIGHTSTROKECOLORS'}
-    JS_TYPES = ('flow', 'arg', 'block', 'parameter', 'setter', 'onload', 'onstart', 'onstop')
+    JS_TYPES = ('flow', 'arg', 'block', 'macro', 'parameter', 'setter', 'onload', 'onstart', 'onstop')
     # 'blkName': 'imageData',
     IMAGES = {}
 

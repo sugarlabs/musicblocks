@@ -39,6 +39,7 @@ function Turtle (name, turtles, drum) {
     this.y = 0;
     this.bitmap = null;
     this.skinChanged = false;  // Should we reskin the turtle on clear?
+    this.shellSize = 55;
     this.blinkFinished = true;
     this.beforeBlinkSize = null;
 
@@ -753,21 +754,21 @@ function Turtle (name, turtles, drum) {
         }
 
         var image = new Image();
-        var turtle = this;
+        var that = this;
 
         image.onload = function() {
             var bitmap = new createjs.Bitmap(image);
-            turtle.imageContainer.addChild(bitmap);
-            turtle.media.push(bitmap);
+            that.imageContainer.addChild(bitmap);
+            that.media.push(bitmap);
             bitmap.scaleX = Number(size) / image.width;
             bitmap.scaleY = bitmap.scaleX;
             bitmap.scale = bitmap.scaleX;
-            bitmap.x = turtle.container.x;
-            bitmap.y = turtle.container.y;
+            bitmap.x = that.container.x;
+            bitmap.y = that.container.y;
             bitmap.regX = image.width / 2;
             bitmap.regY = image.height / 2;
-            bitmap.rotation = turtle.orientation;
-            turtle.turtles.refreshCanvas();
+            bitmap.rotation = that.orientation;
+            that.turtles.refreshCanvas();
         };
 
         image.src = myImage;
@@ -803,52 +804,54 @@ function Turtle (name, turtles, drum) {
         if (myImage === null) {
             return;
         }
+
         var image = new Image();
         image.src = myImage;
-        var turtle = this;
+        var that = this;
+        this.shellSize = Number(size);
 
         image.onload = function() {
-            turtle.container.removeChild(turtle.bitmap);
-            turtle.bitmap = new createjs.Bitmap(image);
-            turtle.container.addChild(turtle.bitmap);
-            turtle.bitmap.scaleX = Number(size) / image.width;
-            turtle.bitmap.scaleY = turtle.bitmap.scaleX;
-            turtle.bitmap.scale = turtle.bitmap.scaleX;
-            turtle.bitmap.x = 0;
-            turtle.bitmap.y = 0;
-            turtle.bitmap.regX = image.width / 2;
-            turtle.bitmap.regY = image.height / 2;
-            turtle.bitmap.rotation = turtle.orientation;
-            turtle.skinChanged = true;
+            that.container.removeChild(that.bitmap);
+            that.bitmap = new createjs.Bitmap(image);
+            that.container.addChild(that.bitmap);
+            that.bitmap.scaleX = that.shellSize / image.width;
+            that.bitmap.scaleY = that.bitmap.scaleX;
+            that.bitmap.scale = that.bitmap.scaleX;
+            that.bitmap.x = 0;
+            that.bitmap.y = 0;
+            that.bitmap.regX = image.width / 2;
+            that.bitmap.regY = image.height / 2;
+            that.bitmap.rotation = that.orientation;
+            that.skinChanged = true;
 
-            turtle.container.uncache();
-            var bounds = turtle.container.getBounds();
-            turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            that.container.uncache();
+            var bounds = that.container.getBounds();
+            that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
             // Recalculate the hit area as well.
             var hitArea = new createjs.Shape();
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height);
             hitArea.x = -bounds.width / 2;
             hitArea.y = -bounds.height / 2;
-            turtle.container.hitArea = hitArea;
+            that.container.hitArea = hitArea;
 
-            if (turtle.startBlock != null) {
-                turtle.startBlock.container.removeChild(turtle.decorationBitmap);
-                turtle.decorationBitmap = new createjs.Bitmap(myImage);
-                turtle.startBlock.container.addChild(turtle.decorationBitmap);
-                turtle.decorationBitmap.name = 'decoration';
+            if (that.startBlock != null) {
+                that.startBlock.container.removeChild(that.decorationBitmap);
+                that.decorationBitmap = new createjs.Bitmap(myImage);
+                that.startBlock.container.addChild(that.decorationBitmap);
+                that.decorationBitmap.name = 'decoration';
 
-                var bounds = turtle.startBlock.container.getBounds();
+                var bounds = that.startBlock.container.getBounds();
                 // FIXME: Why is the position off? Does it need a scale factor?
-                turtle.decorationBitmap.x = bounds.width - 50 * turtle.startBlock.protoblock.scale / 2;
-                turtle.decorationBitmap.y = 20 * turtle.startBlock.protoblock.scale / 2;
-                turtle.decorationBitmap.scaleX = (27.5 / image.width) * turtle.startBlock.protoblock.scale / 2;
-                turtle.decorationBitmap.scaleY = (27.5 / image.height) * turtle.startBlock.protoblock.scale / 2;
-                turtle.decorationBitmap.scale = (27.5 / image.width) * turtle.startBlock.protoblock.scale / 2;
-                turtle.startBlock.updateCache();
+                that.decorationBitmap.x = bounds.width - 50 * that.startBlock.protoblock.scale / 2;
+                that.decorationBitmap.y = 20 * that.startBlock.protoblock.scale / 2;
+                that.decorationBitmap.scaleX = (27.5 / image.width) * that.startBlock.protoblock.scale / 2;
+                that.decorationBitmap.scaleY = (27.5 / image.height) * that.startBlock.protoblock.scale / 2;
+                that.decorationBitmap.scale = (27.5 / image.width) * that.startBlock.protoblock.scale / 2;
+                that.startBlock.updateCache();
             }
 
-            turtle.turtles.refreshCanvas();
+            that.turtles.refreshCanvas();
         };
     };
 
@@ -1013,45 +1016,45 @@ function Turtle (name, turtles, drum) {
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this.createCache = function() {
-        var myTurtle = this;
-        myTurtle.bounds = myTurtle.container.getBounds();
+        var that = this;
+        that.bounds = that.container.getBounds();
 
-        if (myTurtle.bounds == null) {
+        if (that.bounds == null) {
             setTimeout(function() {
-                myTurtle.createCache();
+                that.createCache();
             }, 200);
         } else {
-            myTurtle.container.cache(myTurtle.bounds.x, myTurtle.bounds.y, myTurtle.bounds.width, myTurtle.bounds.height);
+            that.container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
         }
     };
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this.updateCache = function() {
-        var myTurtle = this;
+        var that = this;
 
-        if (myTurtle.bounds == null) {
-            console.log('Block container for ' + myTurtle.name + ' not yet ready.');
+        if (that.bounds == null) {
+            console.log('Block container for ' + that.name + ' not yet ready.');
             setTimeout(function() {
-                myTurtle.updateCache();
+                that.updateCache();
             }, 300);
         } else {
-            myTurtle.container.updateCache();
-            myTurtle.turtles.refreshCanvas();
+            that.container.updateCache();
+            that.turtles.refreshCanvas();
         }
     };
 
     this.blink = function(duration, volume) {
-        var turtle = this;
+        var that = this;
         var sizeInUse;
         this._blinkTimeout = null;
 
         if (this.beforeBlinkSize == null) {
-            this.beforeBlinkSize = turtle.bitmap.scaleX;
+            this.beforeBlinkSize = that.bitmap.scaleX;
         }
 
         if (this.blinkFinished){
-            sizeInUse = turtle.bitmap.scaleX;
+            sizeInUse = that.bitmap.scaleX;
         } else {
             sizeInUse = this.beforeBlinkSize;
         }
@@ -1060,40 +1063,40 @@ function Turtle (name, turtles, drum) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
 
-            turtle.bitmap.alpha = 1.0;
-            turtle.bitmap.scaleX = sizeInUse;
-            turtle.bitmap.scaleY = turtle.bitmap.scaleX;
-            turtle.bitmap.scale = turtle.bitmap.scaleX;
-            turtle.bitmap.rotation = turtle.orientation;
-            turtle.skinChanged = isSkinChanged;
-            var bounds = turtle.container.getBounds();
-            turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            turtle.blinkFinished = true;
+            that.bitmap.alpha = 1.0;
+            that.bitmap.scaleX = sizeInUse;
+            that.bitmap.scaleY = that.bitmap.scaleX;
+            that.bitmap.scale = that.bitmap.scaleX;
+            that.bitmap.rotation = that.orientation;
+            that.skinChanged = isSkinChanged;
+            var bounds = that.container.getBounds();
+            that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            that.blinkFinished = true;
         }
 
         this.blinkFinished = false;
-        turtle.container.uncache();
+        that.container.uncache();
         var scalefactor = 60 / 55;
         var volumescalefactor = 4 * (volume + 200) / 1000;
         // Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
-        turtle.bitmap.alpha = 0.5;
-        turtle.bitmap.scaleX = sizeInUse * scalefactor * volumescalefactor;
-        turtle.bitmap.scaleY = turtle.bitmap.scaleX;
-        turtle.bitmap.scale = turtle.bitmap.scaleX;
-        var isSkinChanged = turtle.skinChanged;
-        turtle.skinChanged = true;
-        createjs.Tween.get(turtle.bitmap).to({alpha: 1, scaleX: sizeInUse, scaleY: sizeInUse, scale: sizeInUse}, 500 / duration);
+        that.bitmap.alpha = 0.5;
+        that.bitmap.scaleX *= scalefactor * volumescalefactor;  // sizeInUse * scalefactor * volumescalefactor;
+        that.bitmap.scaleY = that.bitmap.scaleX;
+        that.bitmap.scale = that.bitmap.scaleX;
+        var isSkinChanged = that.skinChanged;
+        that.skinChanged = true;
+        createjs.Tween.get(that.bitmap).to({alpha: 1, scaleX: sizeInUse, scaleY: sizeInUse, scale: sizeInUse}, 500 / duration);
 
         this._blinkTimeout = setTimeout(function () {
-            turtle.bitmap.alpha = 1.0;
-            turtle.bitmap.scaleX = sizeInUse;
-            turtle.bitmap.scaleY = turtle.bitmap.scaleX;
-            turtle.bitmap.scale = turtle.bitmap.scaleX;
-            turtle.bitmap.rotation = turtle.orientation;
-            turtle.skinChanged = isSkinChanged;
-            var bounds = turtle.container.getBounds();
-            turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            turtle.blinkFinished = true;
+            that.bitmap.alpha = 1.0;
+            that.bitmap.scaleX = sizeInUse;
+            that.bitmap.scaleY = that.bitmap.scaleX;
+            that.bitmap.scale = that.bitmap.scaleX;
+            that.bitmap.rotation = that.orientation;
+            that.skinChanged = isSkinChanged;
+            var bounds = that.container.getBounds();
+            that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            that.blinkFinished = true;
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
     };
 };
@@ -1167,49 +1170,48 @@ function Turtles () {
 
         var i = this.turtleList.length;
         var turtleName = i.toString();
-        var myTurtle = new Turtle(turtleName, this, this._drum);
+        var newTurtle = new Turtle(turtleName, this, this._drum);
 
         if (blkInfoAvailable) {
-            myTurtle.x = infoDict['xcor'];
-            myTurtle.y = infoDict['ycor'];
+            newTurtle.x = infoDict['xcor'];
+            newTurtle.y = infoDict['ycor'];
         }
 
-        this.turtleList.push(myTurtle);
+        this.turtleList.push(newTurtle);
 
         // Each turtle needs its own canvas.
-        myTurtle.imageContainer = new createjs.Container();
-        this.stage.addChild(myTurtle.imageContainer);
-        myTurtle.penstrokes = new createjs.Bitmap();
-        this.stage.addChild(myTurtle.penstrokes);
+        newTurtle.imageContainer = new createjs.Container();
+        this.stage.addChild(newTurtle.imageContainer);
+        newTurtle.penstrokes = new createjs.Bitmap();
+        this.stage.addChild(newTurtle.penstrokes);
 
         var turtleImage = new Image();
         i %= 10;
-        myTurtle.container = new createjs.Container();
-        this.stage.addChild(myTurtle.container);
-        myTurtle.container.x = this.turtleX2screenX(myTurtle.x);
-        myTurtle.container.y = this.turtleY2screenY(myTurtle.y);
+        newTurtle.container = new createjs.Container();
+        this.stage.addChild(newTurtle.container);
+        newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
+        newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
 
         var hitArea = new createjs.Shape();
         hitArea.graphics.beginFill('#FFF').drawEllipse(-27, -27, 55, 55);
         hitArea.x = 0;
         hitArea.y = 0;
-        myTurtle.container.hitArea = hitArea;
+        newTurtle.container.hitArea = hitArea;
 
         function __processTurtleBitmap(that, name, bitmap, startBlock) {
-            myTurtle.bitmap = bitmap;
-            myTurtle.bitmap.regX = 27 | 0;
-            myTurtle.bitmap.regY = 27 | 0;
-            myTurtle.bitmap.cursor = 'pointer';
-            myTurtle.container.addChild(myTurtle.bitmap);
+            newTurtle.bitmap = bitmap;
+            newTurtle.bitmap.regX = 27 | 0;
+            newTurtle.bitmap.regY = 27 | 0;
+            newTurtle.bitmap.cursor = 'pointer';
+            newTurtle.container.addChild(newTurtle.bitmap);
+            newTurtle.createCache();
 
-            myTurtle.createCache();
-
-            myTurtle.startBlock = startBlock;
+            newTurtle.startBlock = startBlock;
             if (startBlock != null) {
                 startBlock.updateCache();
-                myTurtle.decorationBitmap = myTurtle.bitmap.clone();
-                startBlock.container.addChild(myTurtle.decorationBitmap);
-                myTurtle.decorationBitmap.name = 'decoration';
+                newTurtle.decorationBitmap = newTurtle.bitmap.clone();
+                startBlock.container.addChild(newTurtle.decorationBitmap);
+                newTurtle.decorationBitmap.name = 'decoration';
                 var bounds = startBlock.container.getBounds();
 
                 // Race condition with collapse/expand bitmap generation.
@@ -1219,10 +1221,10 @@ function Turtles () {
                     var offset = 40;
                 }
 
-                myTurtle.decorationBitmap.x = bounds.width - offset * startBlock.protoblock.scale / 2;
+                newTurtle.decorationBitmap.x = bounds.width - offset * startBlock.protoblock.scale / 2;
 
-                myTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
-                myTurtle.decorationBitmap.scaleX = myTurtle.decorationBitmap.scaleY = myTurtle.decorationBitmap.scale = 0.5 * startBlock.protoblock.scale / 2
+                newTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
+                newTurtle.decorationBitmap.scaleX = newTurtle.decorationBitmap.scaleY = newTurtle.decorationBitmap.scale = 0.5 * startBlock.protoblock.scale / 2
                 startBlock.updateCache();
             }
 
@@ -1241,60 +1243,62 @@ function Turtles () {
             this._makeTurtleBitmap(artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', __processTurtleBitmap, startBlock);
         }
 
-        myTurtle.color = i * 10;
-        myTurtle.canvasColor = getMunsellColor(myTurtle.color, DEFAULTVALUE, DEFAULTCHROMA);
+        newTurtle.color = i * 10;
+        newTurtle.canvasColor = getMunsellColor(newTurtle.color, DEFAULTVALUE, DEFAULTCHROMA);
         var that = this;
 
-        myTurtle.container.on('mousedown', function (event) {
+        newTurtle.container.on('mousedown', function (event) {
             if (that._rotating) {
                 return;
             }
 
             var offset = {
-                x: myTurtle.container.x - (event.stageX / that.scale),
-                y: myTurtle.container.y - (event.stageY / that.scale)
+                x: newTurtle.container.x - (event.stageX / that.scale),
+                y: newTurtle.container.y - (event.stageY / that.scale)
             }
 
-            myTurtle.container.on('pressmove', function (event) {
-                if (myTurtle.running) {
+	    newTurtle.container.removeAllEventListeners('pressmove');
+            newTurtle.container.on('pressmove', function (event) {
+                if (newTurtle.running) {
                     return;
                 }
-                myTurtle.container.x = (event.stageX / that.scale) + offset.x;
-                myTurtle.container.y = (event.stageY / that.scale) + offset.y;
-                myTurtle.x = that.screenX2turtleX(myTurtle.container.x);
-                myTurtle.y = that.screenY2turtleY(myTurtle.container.y);
+
+                newTurtle.container.x = (event.stageX / that.scale) + offset.x;
+                newTurtle.container.y = (event.stageY / that.scale) + offset.y;
+                newTurtle.x = that.screenX2turtleX(newTurtle.container.x);
+                newTurtle.y = that.screenY2turtleY(newTurtle.container.y);
                 that.refreshCanvas();
             });
         });
 
-        myTurtle.container.on('click', function (event) {
+        newTurtle.container.on('click', function (event) {
             // If turtles listen for clicks then they can be used as buttons.
-            console.log('--> [click' + myTurtle.name + ']');
-            that.stage.dispatchEvent('click' + myTurtle.name);
+            console.log('--> [click' + newTurtle.name + ']');
+            that.stage.dispatchEvent('click' + newTurtle.name);
         });
 
-        myTurtle.container.on('mouseover', function (event) {
-            myTurtle.bitmap.scaleX = 1.2;
-            myTurtle.bitmap.scaleY = 1.2;
-            myTurtle.bitmap.scale = 1.2;
+        newTurtle.container.on('mouseover', function (event) {
+            newTurtle.bitmap.scaleX *= 1.2;
+            newTurtle.bitmap.scaleY = newTurtle.bitmap.scaleX;
+            newTurtle.bitmap.scale = newTurtle.bitmap.scaleX;
             that.refreshCanvas();
         });
 
-        myTurtle.container.on('mouseout', function (event) {
-            myTurtle.bitmap.scaleX = 1;
-            myTurtle.bitmap.scaleY = 1;
-            myTurtle.bitmap.scale = 1;
+        newTurtle.container.on('mouseout', function (event) {
+            newTurtle.bitmap.scaleX /= 1.2;
+            newTurtle.bitmap.scaleY = newTurtle.bitmap.scaleX;
+            newTurtle.bitmap.scale = newTurtle.bitmap.scaleX;
             that.refreshCanvas();
         });
 
         document.getElementById('loader').className = '';
         setTimeout(function () {
             if (blkInfoAvailable) {
-                myTurtle.doSetHeading(infoDict['heading']);
-                myTurtle.doSetPensize(infoDict['pensize']);
-                myTurtle.doSetChroma(infoDict['grey']);
-                myTurtle.doSetValue(infoDict['shade']);
-                myTurtle.doSetColor(infoDict['color']);
+                newTurtle.doSetHeading(infoDict['heading']);
+                newTurtle.doSetPensize(infoDict['pensize']);
+                newTurtle.doSetChroma(infoDict['grey']);
+                newTurtle.doSetValue(infoDict['shade']);
+                newTurtle.doSetColor(infoDict['color']);
             }
         }, 1000);
         this.refreshCanvas();

@@ -20,6 +20,14 @@ var VOICENAMES = [
     [_('guitar'), 'guitar', 'images/voices.svg'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('clarinet'), 'clarinet', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('saxophone'), 'saxophone', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('tuba'), 'tuba', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('trumpet'), 'trumpet', 'images/voices.svg'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg'],
     //.TRANS: simple monotone synthesizer
@@ -47,6 +55,7 @@ var VOICENAMES = [
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg'],
 ];
+
 
 var DRUMNAMES = [
     //.TRANS: musical instrument
@@ -97,6 +106,18 @@ var DRUMNAMES = [
     [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
+var SOUNDSAMPLESDEFINES = [
+    "samples/violin", "samples/cello", "samples/flute", "samples/guitar",
+    "samples/clarinet", "samples/saxophone", "samples/tuba", "samples/trumpet",
+    "samples/basse", "samples/bottle", "samples/clap", "samples/darbuka",
+    "samples/hihat", "samples/splash", "samples/bubbles", "samples/cowbell",
+    "samples/dog", "samples/kick", "samples/tom", "samples/cat",
+    "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
+    "samples/chine", "samples/cricket", "samples/fingercymbal",
+    "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
+    "samples/snare"
+]
+
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
 const SAMPLECENTERNO = {
@@ -104,7 +125,11 @@ const SAMPLECENTERNO = {
   'cello': 39,
   'basse': 15,
   'guitar': 39,
-  'flute': 57
+  'flute': 57,
+  'saxophone': 51,
+  'clarinet': 39,
+  'tuba': 49,
+  'trumpet': 27
 };
 
 
@@ -180,13 +205,51 @@ function Synth() {
     this.samplesuffix = "_SAMPLE";
 
     this.loadSamples = function (){
+        var SAMPLES_MANIFEST = {
+            "voice": [
+                {"name": "violin", "data": VIOLIN_SAMPLE},
+                {"name": "cello", "data": CELLO_SAMPLE},
+                {"name": "flute", "data": FLUTE_SAMPLE},
+                {"name": "clarinet", "data": CLARINET_SAMPLE},
+                {"name": "saxophone", "data": SAXOPHONE_SAMPLE},
+                {"name": "trumpet", "data": TRUMPET_SAMPLE},
+                {"name": "tuba", "data": TUBA_SAMPLE},
+                {"name": "guitar", "data": GUITAR_SAMPLE},
+                {"name": "basse", "data": BASSE_SAMPLE}
+            ],
+            "drum": [
+                {"name": "bottle", "data": BOTTLE_SAMPLE},
+                {"name": "clap", "data": CLAP_SAMPLE},
+                {"name": "darbuka drum", "data": DARBUKA_SAMPLE},
+                {"name": "hi hat", "data": HIHAT_SAMPLE},
+                {"name": "splash", "data": SPLASH_SAMPLE},
+                {"name": "bubbles", "data": BUBBLES_SAMPLE},
+                {"name": "cow bell", "data": COWBELL_SAMPLE},
+                {"name": "dog", "data": DOG_SAMPLE},
+                {"name": "kick drum", "data": KICK_SAMPLE},
+                {"name": "tom tom", "data": TOM_SAMPLE},
+                {"name": "cat", "data": CAT_SAMPLE},
+                {"name": "crash", "data": CRASH_SAMPLE},
+                {"name": "duck", "data": DUCK_SAMPLE},
+                {"name": "ride bell", "data": RIDEBELL_SAMPLE},
+                {"name": "triangle bell", "data": TRIANGLE_SAMPLE},
+                {"name": "chine", "data": CHINE_SAMPLE},,
+                {"name": "cricket", "data": CRICKET_SAMPLE},
+                {"name": "finger cymbals", "data": FINGERCYMBAL_SAMPLE},
+                {"name": "slap", "data": SLAP_SAMPLE},
+                {"name": "clang", "data": CLANG_SAMPLE},
+                {"name": "cup drum", "data": CUP_SAMPLE},
+                {"name": "floor tom tom", "data": FLOORTOM_SAMPLE},
+                {"name": "snare drum", "data": SNARE_SAMPLE}
+            ]
+        }
         this.samples = {};
         for (var type in SAMPLES_MANIFEST) {
             if (SAMPLES_MANIFEST.hasOwnProperty(type)) {
                 this.samples[type] = {};
                 for (var sample in SAMPLES_MANIFEST[type]){
                     if (SAMPLES_MANIFEST[type].hasOwnProperty(sample)){
-                        var data = eval(SAMPLES_MANIFEST[type][sample].data_name.toUpperCase()+this.samplesuffix);
+                        var data = SAMPLES_MANIFEST[type][sample].data;
                         var name = SAMPLES_MANIFEST[type][sample].name;
                         this.samples[type][name] = data;
                     }
@@ -195,6 +258,7 @@ function Synth() {
         }
     }
     var t = this;
+
     require(SOUNDSAMPLESDEFINES, function(){
         t.loadSamples();
     });
@@ -590,9 +654,22 @@ function Synth() {
                     }).toMaster();
                     synth.chain(chorusEffect, Tone.Master);
                 }
+                if (paramsEffects.doNeighbor) {
+                  var firstTwoBeats = paramsEffects['neighborArgBeat'];
+                  var finalBeat = paramsEffects['neighborArgCurrentBeat'];
+                  var neighborEffect = new Tone.Part(function(time, value){
+                  	synth.triggerAttackRelease(value.note, value.duration, time);
+                    console.log(value.duration);
+                    }, [{"time" : 0, "note" : paramsEffects['neighborArgNote'].replace('♯', '#').replace('♭', 'b'), "duration": firstTwoBeats},
+                    {"time" : +firstTwoBeats, "note" : paramsEffects['neighborArgNote2'].replace('♯', '#').replace('♭', 'b'), "duration": firstTwoBeats},
+                    {"time" : +(firstTwoBeats*2), "note" : paramsEffects['neighborArgNote'].replace('♯', '#').replace('♭', 'b'), "duration": finalBeat}
+                  ]).start();
+                }
             }
 
-            synth.triggerAttackRelease(notes, beatValue);
+            if (!paramsEffects.doNeighbor) {
+              synth.triggerAttackRelease(notes, beatValue);
+            }
 
             setTimeout(function () {
                 if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
@@ -614,6 +691,9 @@ function Synth() {
 
                     if (paramsEffects.doChorus) {
                         chorusEffect.dispose();
+                    }
+                    if (paramsEffects.doNeighbor) {
+                        neighborEffect.dispose();
                     }
                 }
 
@@ -648,6 +728,11 @@ function Synth() {
             if (paramsEffects['chorusRate'] != 0) {
                 paramsEffects.doChorus = true;
             }
+
+            if (paramsEffects['neighborSynth']) {
+                paramsEffects.doNeighbor = true;
+            }
+
         }
 
         var tempNotes = notes;

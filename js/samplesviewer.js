@@ -510,29 +510,29 @@ function PlanetView(model, controller) {
     };
 
     //https://stackoverflow.com/a/3028037/3575587
-    function hideOnClickOutside(selector,planet) {
+    function hideOnClickOutside(selector, planet) {
         var append="";
         if (planet){
             append="pl";
         }
-        const outsideClickListener = (event) => {
+        const outsideClickListener = function(event) {
             var id;
             if (planet){
                 id = selector.substring(14);
             } else {
                 id = selector.substring(12);
             }
-            if (!jQuery(event.target).closest(selector).length&&!jQuery(event.target).closest("#"+append+"shareurlspan"+id).length) {
+            if (!jQuery(event.target).closest(selector).length && !jQuery(event.target).closest('#' + append + 'shareurlspan' + id).length) {
                 if (jQuery(selector).is(':visible')) {
-                    docById(append+'shareurldiv'+id).style.visibility = 'hidden';
-                    docById(append+'shareurlbox'+id).style.visibility = 'hidden';
-                    docById(append+'shareurltri'+id).style.visibility = 'hidden';
+                    docById(append+'shareurldiv' + id).style.visibility = 'hidden';
+                    docById(append+'shareurlbox' + id).style.visibility = 'hidden';
+                    docById(append+'shareurltri' + id).style.visibility = 'hidden';
                     removeClickListener();
                 }
             }
         }
 
-        const removeClickListener = () => {
+        const removeClickListener = function () {
             document.removeEventListener('click', outsideClickListener);
         }
 

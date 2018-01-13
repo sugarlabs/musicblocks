@@ -1,3 +1,37 @@
+.modal {
+   display: none;
+   position: fixed;
+   z-index: 1;
+   left: 0;
+   top: 0;
+   width: 100%;
+   height: 100%;
+   overflow: auto;
+   background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+   background-color: #fefefe;
+   margin: 15% auto;
+   padding: 20px;
+   border: 1px solid #888;
+   width: 50%;
+}
+
+.close {
+   color: #aaa;
+   float: right;
+   font-size: 28px;
+   font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+   color: black;
+   text-decoration: none;
+   cursor: pointer;
+}
+
 #search[type=text] {
     width: 400px;
     box-sizing: border-box;
@@ -867,7 +901,7 @@ table {
 .rangeslidervalue {
   display: inline-block;
   position: relative;
-  width: $range-label-width;
+  / * width: $range-label-width; */
   color: blue;
   background-color: #c8C8C8;
   line-height: 20px;
@@ -877,7 +911,7 @@ table {
   padding: 5px 10px;
   margin-left: 8px;
 
-  &:after {
+  ::after {
     position: absolute;
     top: 8px;
     left: -7px;

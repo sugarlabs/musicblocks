@@ -1645,7 +1645,10 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
             if (index > 11) {
                 index -= 12;
                 octave += 1;
-            }
+            } else if (index < 0) {
+                index += 12;
+                octave -= 1;
+	    }
 
             var note = thisScale[index];
         } else {

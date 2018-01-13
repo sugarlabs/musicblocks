@@ -1206,8 +1206,12 @@ function Block(protoblock, blocks, overrideName) {
         var bounds = this.container.getBounds()
 
         if (bounds === null) {
+            console.log('block cache for ' + this.name + ' not ready... waiting.');
             this._createCache();
-            bounds = this.bounds;
+            var that = this;
+            setTimeout(that._calculateBlockHitArea(), 250);
+            // bounds = this.bounds;
+            return;
         }
 
         // Since hitarea is concave, we only detect hits on top

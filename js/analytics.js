@@ -34,6 +34,7 @@ const TACAT = {
     'onbeatdo': 'beat',
     'pickup': 'rhythm',
     'meter': 'rhythm',
+    'neighbor': 'rhythm',
 
     'matrix': 'ignore',
     'tuplet2': 'ignore',
