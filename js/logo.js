@@ -4433,6 +4433,40 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'rhythmicdot2':
+            // Dotting a note will increase its play time by
+            // a(2 - 1/2^n)
+            var currentDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
+            that.beatFactor[turtle] *= currentDotFactor;
+            if (args[0] >= 0) {
+              that.dotCount[turtle] += args[0];
+            }
+            else {
+              that.dotCount[turtle] += 1 / args[0];
+            }
+            var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
+            that.beatFactor[turtle] /= newDotFactor;
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_dot_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                var currentDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
+                that.beatFactor[turtle] *= currentDotFactor;
+                if (args[0] >= 0) {
+                  that.dotCount[turtle] += args[0];
+                }
+                else {
+                  that.dotCount[turtle] += 1 / args[0];
+                }
+                var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
+                that.beatFactor[turtle] /= newDotFactor;
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
         case 'settimbre':
             if (args[0] == null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
