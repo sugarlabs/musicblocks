@@ -20,7 +20,7 @@ function Converter(Planet) {
 	//Conversion Functions
 
 	this.ly2pdf = function(data, callback){
-		this.ServerInterface.convertFile("ly","pdf",window.btoa(data),function(result){this.afterly2pdf(result,callback);}.bind(this));
+		this.ServerInterface.convertFile("ly","pdf",data,function(result){this.afterly2pdf(result,callback);}.bind(this));
 	}
 
 	this.afterly2pdf = function(data, callback){
