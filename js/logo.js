@@ -4439,10 +4439,14 @@ function Logo () {
             var currentDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
             that.beatFactor[turtle] *= currentDotFactor;
             if (args[0] >= 0) {
-              that.dotCount[turtle] += args[0];
+                that.dotCount[turtle] += args[0];
+            }
+            else if (args[0] === -1) {
+                that.errorMsg(_('Beat value is 0'), blk);
+                that.dotCount[turtle] += 1 / args[0];
             }
             else {
-              that.dotCount[turtle] += 1 / args[0];
+                that.dotCount[turtle] += 1 / args[0];
             }
             var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
             that.beatFactor[turtle] /= newDotFactor;
@@ -4456,10 +4460,14 @@ function Logo () {
                 var currentDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
                 that.beatFactor[turtle] *= currentDotFactor;
                 if (args[0] >= 0) {
-                  that.dotCount[turtle] += args[0];
+                    that.dotCount[turtle] += args[0];
+                }
+                else if (args[0] === -1) {
+                    that.errorMsg(_('Beat value is 0'), blk);
+                    that.dotCount[turtle] += 1 / args[0];
                 }
                 else {
-                  that.dotCount[turtle] += 1 / args[0];
+                    that.dotCount[turtle] += 1 / args[0];
                 }
                 var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
                 that.beatFactor[turtle] /= newDotFactor;
