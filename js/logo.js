@@ -7570,7 +7570,7 @@ function Logo () {
 
             if (that.blocks.blockList[blk].name in that.evalArgDict) {
                 eval(that.evalArgDict[that.blocks.blockList[blk].name]);
-	    }
+            }
 
             return that.blocks.blockList[blk].value;
         } else if (that.blocks.blockList[blk].name === 'boolean') {
