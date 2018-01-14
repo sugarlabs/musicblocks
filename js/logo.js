@@ -177,7 +177,7 @@ function Logo () {
     this.previousNotePlayed = {};
     this.noteStatus = {};
     this.noteDirection = {};
-    this.pitchNumberOffset = 39;  // C4
+    this.pitchNumberOffset = [];  // 39, C4
     this.currentOctave = {};
 
     // parameters used in time signature
@@ -1023,7 +1023,7 @@ function Logo () {
             this.justMeasuring[turtle] = [];
             this.firstPitch[turtle] = [];
             this.lastPitch[turtle] = [];
-            this.pitchNumberOffset[turtle] = [];
+            this.pitchNumberOffset[turtle] = 39; // C4
             this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
             this.movable[turtle] = false;
 
@@ -1039,8 +1039,6 @@ function Logo () {
                 this._savePenState[turtle] = this.turtles.turtleList[turtle].penState;
             }
         }
-
-        this.pitchNumberOffset[turtle] = 39;  // C4
 
         if (!this.suppressOutput[turtle]) {
             this._setMasterVolume(DEFAULTVOLUME);
