@@ -363,9 +363,14 @@ In order to set up a new synth effect:
   to add them in this format: `_('string')` This allows the string to
   be set up for translation into other languages.
   
- * Before processing the notes, you need to check if the argument is present
-   of if the type of argument is correct, else, set `stopTurtle` to true.
+* Before processing the notes, you need to check if the argument is present
+  of if the type of argument is correct, else, set `stopTurtle` to true.
   
+* If you are changing the functionality of an existing block (adding a
+  new arg, etc.) then you probably should mark the existing block as
+  hidden and add a new block instead so as to not break existing
+  projects that use the old block.
+
 ## Protoblock types
 
 * `zeroArgBlock`: E.g., penup, pendown
