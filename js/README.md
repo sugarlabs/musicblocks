@@ -29,7 +29,7 @@ Button boxes
 
 Export utilities
 * `abc.js` -- save in ABC format
-* `lilypond.js` -- save in Lilypond formar
+* `lilypond.js` -- save in Lilypond format
 
 Other utilities
 * `analytics.js` -- analyse blocks in project
@@ -37,25 +37,42 @@ Other utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
 * `samplesviewer.js` -- planet interface
-* sugarizer-`compatibility.js` -- datastore utilities used by sugarizer
-* `trash.js` -- trash can manager
+* `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
+* `trash.js` -- trash-can manager
 * `turtledefs.js` -- strings and palettes unique to Music Blocks
 
 Subdirectories with additional utilities
 * utils -- additional general-purpose utilities
+	* `detectIE.js`: check if Music Blocks is being run in Internet Explorer
+	* `munsell.js`: Munsell color system used for mice and widgets
+	* `musicutils.js`: related to musical notations
+	* `platformstyle.js`: checking platform that Music Blocks is run in
+	* `synthutils.js`: related to defining synths in tone.js for Music Blocks
+	* `utils.js`: general functionality 
 * widgets -- widget code
+	* `modewidget.js`
+	* `pitchdrummatrix.js`
+	* `pitchslider.js`
+	* `pitchstaircase.js`
+	* `pitchtimematrix.js`
+	* `rhythmruler.js`
+	* `status.js`
+	* `tempo.js`
+	* `timbre.js`
 
 # __How to add new blocks__
 
 This document describes how to add new blocks in support of additional
 functionality. The two files that are most significant are
-`basicblocks.js` and `logo.js`. (Note that you may want to write a
-[plugin](http://github.com/walterbender/musicblocks/tree/master/plugins)
-instead.)
+`basicblocks.js` and `logo.js`. 
 
-(As with any change, please make your own copy by cloning this
+If you would like to write a plugin, please see: 
+[plugin](http://github.com/walterbender/musicblocks/tree/master/plugins)
+instead.
+
+Note: As with any change, please make your own copy by cloning this
 [respository](https://github.com/walterbender/musicblocks.git). Make
-your changes, test them, and then make a pull request.)
+your changes, test them, and then make a pull request.
 
 ## How to define a new block in basicblocks.js
 
@@ -63,28 +80,28 @@ your changes, test them, and then make a pull request.)
 is where each block is defined, its palette assigned, its shape and
 label defined, and any default arguments assigned.
 
-[logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)`. `basicblocks.js
+[logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)
 is where the code associated with running each block is defined.
 
-Define the type of block
+1. Define the type of block
 
 `var uniquenameBlock = new protoBlock('uniquename');`
 
 This creates a new instance of the class protoBlock which is used to
 create a new block.
 
-Assign a palette to the block
+2. Assign a palette to the block
 
 `uniquenameBlock.palette = palettes.dict['yourpalettename'];`
 
 The palette can be any of the palettes listed in `turtledef.js`. The
 color of the block is defined by the palette used.
 
-To add block to the protoblock dictionary
+3. To add block to the protoblock dictionary
 
 `blocks.protoBlockDict['uniquename'] = uniquenameBlock;`
 
-Define additional block properties, e.g.,
+4. Define additional block properties, e.g.,
 
 * Define the block prototype
 
@@ -93,14 +110,27 @@ Define additional block properties, e.g.,
 * Add a label to the block
 
   `uniquenameBlock.staticLabels.push(_('label'));`
+  
+  * Adding more labels:
+  
+  `uniquenameBlock.staticLabels.push(_('label'), _('label'));`
 
 * Add any default arguments
 
-  `uniquenameBlock.defaults.push(100);`
+  Number: `uniquenameBlock.defaults.push(100);`
+  
+  Fraction: `uniquenameBlock.defaults.push(1 / 4);`
+  
+  Text: `uniquenameBlock.defaults.push(_('label'));`
 
 * Override the default docktype if necessary
 
-  `uniquenameBlock.dockTypes[1] = 'anyin';
+  Any input: `uniquenameBlock.dockTypes[1] = 'anyin'`;
+  
+  Text Input: `uniquenameBlock.dockTypes[1] = 'textin'`;
+  
+  Number Input: `uniquenameBlock.dockTypes[1] = 'numberin'`;
+  
 
 Check
 [protoblock.js](https://github.com/walterbender/turtleblocksjs/blob/master/js/protoblocks.js) for additional block properties.
@@ -114,19 +144,19 @@ To add a macro:
 
 1. be sure that there is a block defined in `basicblocks.js`;
 
-2. add an entry in BLOCKISMACRO array `macros.js` in the blockIsMacro
-function below with the block name from basicblocks.js;
+2. add an entry in `BLOCKISMACRO` array `macros.js` in the `blockIsMacro`
+function below with the block name from `basicblocks.js`;
 
-3. define the macro (the JSON representation of the blocks that
+3. define the macro (the `JSON` representation of the blocks that
 the macro expands to, where the position is specified as x, y); and
 
-4. add an entry to the BUILTINMACROS dictionary.
+4. add an entry to the `BUILTINMACROS` dictionary.
 
 More details can be found in the comment at the top of `macros.js`.
 
 ## Examples
 
-A flow block:
+### A flow block:
 
   ```
     var pitch = new ProtoBlock('pitch');
@@ -144,7 +174,7 @@ A flow block:
     pitch.dockTypes[2] = 'anyin';
   ```
 
-An arg block:
+### An arg block:
 
   ```
     var colorBlock = new ProtoBlock('color');
@@ -155,7 +185,7 @@ An arg block:
     colorBlock.parameterBlock();
   ```
 
-A macro as seen in `basicblocks.js`:
+* A macro as seen in `basicblocks.js`:
 
   ```
     var newnoteBlock = new ProtoBlock('newnote');
@@ -167,7 +197,7 @@ A macro as seen in `basicblocks.js`:
     newnoteBlock.defaults.push(1 / 4);
   ```
 
-And it definition in `macros.js`:
+* And it definition in `macros.js`:
 
   ```
     const NEWNOTEOBJ = [[0, 'newnote', x, y, [null, 1, 4, 8]],
@@ -183,21 +213,21 @@ And it definition in `macros.js`:
 
 ## How to define block function in [logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)
 
-There are two basic types of blocks: *flow* blocks, the connect vertically, and *arg* blocks, that connect horizontally into *flow* blocks.
+There are two basic types of blocks: *flow* blocks, that connect vertically, and *arg* blocks, that connect horizontally, into *flow* blocks.
 
 There are switch statements in `logo.js` where the function of *flow* blocks and *arg* blocks are defined. 
 
   ```
         case 'uniquename':
 
-        Your code here...
+            Your code here...
 
             break;
   ```
 
 ## Examples
 
-A *flow* block:
+### A *flow* block:
 
   ```
         case 'setturtlename2':
@@ -207,7 +237,7 @@ A *flow* block:
             break;
   ```
 
-An *arg* block:
+### An *arg* block:
 
   ```
             case 'random':
@@ -234,15 +264,81 @@ display their values on their labels and be used with a
             turtleObj.doSetColor(value);
             break;
   ```
+  
+### Setting up listeners in clamp blocks
+
+1. ChildFlow and ChildFlowCount
+
+`childFlow = args[n+1]`, where n is the number of arguments
+If there are no arguments, `childFlow = args[0]`
+
+2. Set a unique listener name
+
+`var listenerName = '_listenername_' + turtle + '_' + blk;`
+
+3. Set up block for listener
+
+`that._setDispatchBlock(blk, turtle, listenerName);`
+
+4. Get endOfClampSignals
+
+```
+var nextBlock = that.blocks.blockList[blk].connections[2];
+    if (nextBlock == null) {
+        that.backward[turtle].pop();
+    } else {
+    if (nextBlock in that.endOfClampSignals[turtle]) {
+        that.endOfClampSignals[turtle][nextBlock].push(listenerName);
+    } else {
+        that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+    }
+}
+```
+
+5. Create a listener event
+
+```
+var __listener = function (event) {
+
+};
+
+```
+
+## Using tone.js
+
+[Tone.js](https://github.com/Tonejs/Tone.js) is  "a framework for creating 
+interactive music in the browser. It provides advanced scheduling capabilities, 
+synths and effects, and intuitive musical abstractions built on top of the Web Audio API."
+
+Music Blocks uses the Tone.js API for many of the synths, such as chorus, vibrato and tremolo.
+
+In order to set up a synth for a block:
+1. Add necessary parameters into `paramsEffects` object in `logo.js`
+2. Add a boolean variable that triggers the param effects in `__hasParamEffect` function in `logo.js`
+3. Add effects by defining parameters values in `logo.js`
+4. Modify synth in `synthutils.js` and make sure to `dispose` synth
+
+* Having a synth doesn't necessarily mean using the effects, such as `chorus` or `phaser`, 
+a block can be treated as a synth in order to have more versatile functionalities. 
+For example, the `neighborBlock` is treated as a synth and uses `Tone.Part()` to 
+play a collection of note events.
+
 
 ## Odds and ends
 
 * You should add your new block to the analytics found in
   [analytics.js](https://github.com/walterbender/musicblocks/blob/master/js/analytics.js)
 
-* clamp blocks are a bit complicated since they have interior flows
+* Clamp blocks are a bit complicated since they have interior flows
   and need to trigger a listener when that flow completes its
   execution.
+  
+* If you are adding strings, be sure to add them in this format: `_('string')`
+  This allows the string to be set up for translation into other languages.
+  
+ * Before processing the notes, you need to check if the argument is present
+   of if the type of argument is correct, else, set `stopTurtle` to true.
+  
 
 ## Protoblock types
 
@@ -267,3 +363,29 @@ display their values on their labels and be used with a
 * `booleanOneArgBlock`: E.g.,
 * `booleanTwoArgBlock`: E.g., greater, less, equal.
 * `parameterBlock`: E.g., color, shade, pensize
+
+## FAQ
+
+1. I want to take in a fraction as a single argument but it appears in decimal with only one input field!
+* You are probably missing the relevant parameters in `macro.js`. Take a look at other block examples and modify `macro.js` accordingly.
+
+2. How do I get the information for the next note?
+
+`var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction, that.errorMsg);`
+
+3. How do I modify the pitch parameters, such as the octave or scalar transposition?
+* To modify octave: `that.transposition[turtle] += transValue`
+* To modify pitch: Take a look at the `addPitch` function
+* To modify scalar transposition: `that.scalarTransposition[turtle] += transValue`
+* To modify beat factor: `that.beatFactor[turtle] *= beatFactor`
+	* In some cases, you need to modify the beat factor accordingly with `bpm`
+
+4. What are some useful functions?
+
+There are many, but here are a few:
+* `rationalToFraction`
+* `addPitch`
+* `lastNotePlayed`
+* `pitchToFrequency`
+* `pitchToNumber`
+* `errorMsg`
