@@ -2863,7 +2863,12 @@ define(MYDEFINES, function (compatibility) {
             }
 
             docById('submitLilypond').onclick = function(){saveLYFile(false)}.bind(this);
-            docById('submitPDF').onclick = function(){saveLYFile(true)}.bind(this);
+            if (window.Converter.isConnected()){
+                docById('submitPDF').onclick = function(){saveLYFile(true)}.bind(this);
+                docById('submitPDF').disabled = false;
+            } else {
+                docById('submitPDF').disabled = true;
+            }
 
             docByClass('close')[0].onclick = function () {
                 logo.runningLilypond = false;
