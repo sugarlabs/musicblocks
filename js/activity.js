@@ -198,6 +198,7 @@ define(MYDEFINES, function (compatibility) {
         var languageBox = null;
         var playbackBox = null;
         var planet;
+        var converter;
         var storage;
         var buttonsVisible = true;
         var headerContainer = null;
@@ -1337,6 +1338,7 @@ define(MYDEFINES, function (compatibility) {
 
             planet = new PlanetInterface(storage);
             planet.init();
+            converter = planet.planet.Converter;
 
             saveLocally = planet.saveLocally.bind(planet);
 
