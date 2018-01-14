@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundatioff; either
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
 //
 // You should have received a copy of the GNU Affero General Public
@@ -179,6 +179,10 @@ function Logo () {
     this.noteDirection = {};
     this.pitchNumberOffset = [];  // 39, C4
     this.currentOctave = {};
+    this.isNeighbor = false;
+    this.neighborStepPitch = {};
+    this.neighborNoteValue = {};
+    this.neighborClamp = {};
 
     // parameters used in time signature
     this.pickup = {};
@@ -234,6 +238,12 @@ function Logo () {
     this.chorusRate = {};
     this.delayTime = {};
     this.chorusDepth = {};
+    this.neighborSynth = {};
+    this.neighborArgPitch = {};
+    this.neighborArgNote = {};
+    this.neighborArgNote2 = {};
+    this.neighborArgBeat = {};
+    this.neighborArgCurrentBeat = {};
 
     // When counting notes, measuring intervals, or generating lilypond output
     this.justCounting = {};
@@ -1009,6 +1019,12 @@ function Logo () {
             this.chorusRate[turtle] = [];
             this.delayTime[turtle] = [];
             this.chorusDepth[turtle] = [];
+            this.neighborSynth[turtle] = [];
+            this.neighborArgPitch[turtle] = [];
+            this.neighborArgNote[turtle] = [];
+            this.neighborArgNote2[turtle] = [];
+            this.neighborArgBeat[turtle] = [];
+            this.neighborArgCurrentBeat[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.pickup[turtle] = 0;
             this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
@@ -1026,6 +1042,9 @@ function Logo () {
             this.pitchNumberOffset[turtle] = 39; // C4
             this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
             this.movable[turtle] = false;
+            this.neighborStepPitch[turtle] = [];
+            this.neighborNoteValue[turtle] = [];
+            this.neighborClamp[turtle] = [];
 
             if (this.compiling) {
                 this._saveX[turtle] = this.turtles.turtleList[turtle].x;
@@ -3017,6 +3036,7 @@ function Logo () {
                 instrumentsEffects[that.timbre.instrumentName]['tremoloActive'] = false;
                 instrumentsEffects[that.timbre.instrumentName]['phaserActive'] = false;
                 instrumentsEffects[that.timbre.instrumentName]['chorusActive'] = false;
+                instrumentsEffects[that.timbre.instrumentName]['neighborActive'] = false;
                 instrumentsFilters[that.timbre.instrumentName] = [];
             } else {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -3549,7 +3569,6 @@ function Logo () {
 
             function addPitch(note, octave, cents, direction) {
                 var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], true, direction, that.errorMsg);
-
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
                     that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
@@ -3656,6 +3675,55 @@ function Logo () {
             }
 
             that.pushedNote[turtle] = true;
+            break;
+        case 'neighbor':
+            if (typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
+                that.errorMsg(NANERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            that.isNeighbor = true;
+            that.neighborSynth[turtle].push(that.isNeighbor);
+
+            that.neighborArgPitch[turtle].push(args[0]);
+
+            if (turtle in that.neighborStepPitch) {
+              that.neighborStepPitch[turtle].push(args[0]);
+            }
+            else {
+              that.neighborStepPitch[turtle] = args[0];
+            }
+
+            if (turtle in that.neighborNoteValue) {
+              that.neighborNoteValue[turtle].push(args[1]);
+            }
+            else {
+              that.neighborNoteValue[turtle] = args[1];
+            }
+            // Set child to bottom block inside clamp
+            childFlow = that.blocks.findBottomBlock(args[2]);
+            childFlowCount = 1;
+
+            var listenerName = '_neighbor_' + turtle + '_' + blk;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var nextBlock = that.blocks.blockList[blk].connections[2];
+            if (nextBlock == null) {
+              that.neighborClamp[turtle].pop();
+            } else {
+                if (nextBlock in that.endOfClampSignals[turtle]) {
+                    that.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                } else {
+                    that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                }
+            }
+
+            var __listener = function (event) {
+              that.neighborClamp[turtle].pop();
+            };
+
+            that._setListener(turtle, listenerName, __listener);
             break;
         case 'playdrum':
             if (args.length !== 1 || args[0] == null) {
@@ -3843,6 +3911,21 @@ function Logo () {
                         var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1]));
                     }
                 }
+            }
+
+            if (that.isNeighbor) {
+              var noteObj = getNote(note, octave, that.scalarTransposition[turtle], that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
+              that.neighborArgNote[turtle].push(noteObj[0] + noteObj[1]);
+              var transValue = that.scalarTransposition[turtle] + parseInt(that.neighborStepPitch[turtle]);
+              var noteObj2 = getNote(note, octave, transValue, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
+              that.scalarTransposition[turtle] += that.neighborStepPitch[turtle];
+              that.neighborArgNote2[turtle].push(noteObj2[0] + noteObj2[1]);
+            }
+            else {
+              that.scalarTransposition[turtle] -= that.neighborStepPitch[turtle];
+              that.neighborStepPitch[turtle].pop();
+              that.neighborArgNote[turtle].pop();
+              that.neighborArgNote2[turtle].pop();
             }
 
             // Add scalar transposition
@@ -4373,7 +4456,7 @@ function Logo () {
             // Adjust the note value based on the beatFactor.
             that.noteValue[turtle][last(that.inNoteBlock[turtle])] = 1 / (noteBeatValue * that.beatFactor[turtle]);
 
-            var listenerName = '_playnote_' + turtle;
+	     var listenerName = '_playnote_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
@@ -4382,8 +4465,23 @@ function Logo () {
                 }
 
                 if (that.inNoteBlock[turtle].length > 0) {
+                  if (that.isNeighbor) {
+                      var neighborNoteValue = that.neighborNoteValue[turtle];
+                      that.neighborArgBeat[turtle].push(that.beatFactor[turtle] * (1 / neighborNoteValue));
+
+                      var nextBeat = (1 / noteBeatValue) - (2 * (that.neighborNoteValue[turtle]));
+                      that.neighborArgCurrentBeat[turtle].push(that.beatFactor[turtle] * (1 / nextBeat));
+
+                      if (that.neighborClamp[turtle].length === 0) {
+                          that.isNeighbor = false;
+                      } else {
+                          that.neighborNoteValue[turtle].pop();
+                          that.neighborArgBeat[turtle].pop();
+                          that.neighborArgCurrentBeat[turtle].pop();
+                      }
+                    }
                     that._processNote(1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])], last(that.inNoteBlock[turtle]), turtle);
-                }
+                  }
 
                 delete that.oscList[turtle][last(that.inNoteBlock[turtle])];
                 delete that.noteBeat[turtle][last(that.inNoteBlock[turtle])];
@@ -4400,7 +4498,7 @@ function Logo () {
                 if (that.multipleVoices[turtle] && that.inNoteBlock[turtle].length === 0) {
                     that.notationVoices(turtle, that.inNoteBlock[turtle].length);
                     that.multipleVoices[turtle] = false;
-               }
+                }
 
                 // FIXME: broken when nesting
                 that.pitchBlocks = [];
@@ -6050,11 +6148,18 @@ function Logo () {
         var chorusRate = 0;
         var delayTime = 0;
         var chorusDepth = 0;
+        var neighborArgPitch = 0;
+        var neighborArgNote = 0;
+        var neighborArgNote2 = 0;
+        var neighborArgBeat = 0;
+        var neighborArgCurrentBeat = 0;
+        var neighborSynth = false;
         var doVibrato = false;
         var doDistortion = false;
         var doTremolo = false;
         var doPhaser = false;
         var doChorus = false;
+        var doNeighbor = false;
         var filters = null;
 
         // Apply any effects and filters associated with a custom timbre.
@@ -6131,6 +6236,21 @@ function Logo () {
             delayTime = last(this.delayTime[turtle]);
             chorusDepth = last(this.chorusDepth[turtle]);
             doChorus = true;
+        }
+
+        if (this.neighborSynth[turtle].length > 0) {
+            neighborSynth = last(this.neighborSynth[turtle]);
+            neighborArgPitch = last(this.neighborArgPitch[turtle]);
+            neighborArgNote = last(this.neighborArgNote[turtle]);
+            neighborArgNote2 = last(this.neighborArgNote2[turtle]);
+            neighborArgBeat = bpmFactor / last(this.neighborArgBeat[turtle])
+            neighborArgCurrentBeat = bpmFactor / last(this.neighborArgCurrentBeat[turtle]);
+            doNeighbor = true;
+            this.neighborSynth[turtle].pop();
+        }
+        else {
+          neighborSynth = false;
+          doNeighbor = false;
         }
 
         var carry = 0;
@@ -6512,6 +6632,7 @@ function Logo () {
                                     'doTremolo': false,
                                     'doPhaser': false,
                                     'doChorus': false,
+                                    'doNeighbor': false,
                                     'vibratoIntensity': vibratoIntensity,
                                     'vibratoFrequency': vibratoValue,
                                     'distortionAmount': distortionAmount,
@@ -6522,11 +6643,17 @@ function Logo () {
                                     'baseFrequency': baseFrequency,
                                     'chorusRate': chorusRate,
                                     'delayTime': delayTime,
-                                    'chorusDepth': chorusDepth
+                                    'chorusDepth': chorusDepth,
+                                    'neighborSynth': neighborSynth,
+                                    'neighborArgPitch': neighborArgPitch,
+                                    'neighborArgNote': neighborArgNote,
+                                    'neighborArgNote2': neighborArgNote2,
+                                    'neighborArgBeat': neighborArgBeat,
+                                    'neighborArgCurrentBeat': neighborArgCurrentBeat
                                 };
 
                                 __hasParamEffect = function () {
-                                    return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous;
+                                    return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChorus ||paramsEffects.doNeighbor;
                                 }
 
                                 if (that.oscList[turtle][last(that.inNoteBlock[turtle])].length > 0) {

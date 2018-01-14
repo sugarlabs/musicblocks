@@ -654,9 +654,22 @@ function Synth() {
                     }).toMaster();
                     synth.chain(chorusEffect, Tone.Master);
                 }
+                if (paramsEffects.doNeighbor) {
+                  var firstTwoBeats = paramsEffects['neighborArgBeat'];
+                  var finalBeat = paramsEffects['neighborArgCurrentBeat'];
+                  var neighborEffect = new Tone.Part(function(time, value){
+                  	synth.triggerAttackRelease(value.note, value.duration, time);
+                    console.log(value.duration);
+                    }, [{"time" : 0, "note" : paramsEffects['neighborArgNote'].replace('♯', '#').replace('♭', 'b'), "duration": firstTwoBeats},
+                    {"time" : +firstTwoBeats, "note" : paramsEffects['neighborArgNote2'].replace('♯', '#').replace('♭', 'b'), "duration": firstTwoBeats},
+                    {"time" : +(firstTwoBeats*2), "note" : paramsEffects['neighborArgNote'].replace('♯', '#').replace('♭', 'b'), "duration": finalBeat}
+                  ]).start();
+                }
             }
 
-            synth.triggerAttackRelease(notes, beatValue);
+            if (!paramsEffects.doNeighbor) {
+              synth.triggerAttackRelease(notes, beatValue);
+            }
 
             setTimeout(function () {
                 if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
@@ -678,6 +691,9 @@ function Synth() {
 
                     if (paramsEffects.doChorus) {
                         chorusEffect.dispose();
+                    }
+                    if (paramsEffects.doNeighbor) {
+                        neighborEffect.dispose();
                     }
                 }
 
@@ -712,6 +728,11 @@ function Synth() {
             if (paramsEffects['chorusRate'] != 0) {
                 paramsEffects.doChorus = true;
             }
+
+            if (paramsEffects['neighborSynth']) {
+                paramsEffects.doNeighbor = true;
+            }
+
         }
 
         var tempNotes = notes;

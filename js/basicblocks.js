@@ -676,6 +676,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     timbreBlock.stackClampOneArgBlock();
     timbreBlock.defaults.push(_('custom'));
 
+    var neighborBlock = new ProtoBlock('neighbor');
+    neighborBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['neighbor'] = neighborBlock;
+    //.TRANS 
+    neighborBlock.staticLabels.push(_('neighbor' + ' (+/–)'));
+    neighborBlock.staticLabels.push(_('step pitch'), _('note value'));
+    neighborBlock.extraWidth = 15;
+    neighborBlock.adjustWidthToLabel();
+    neighborBlock.flowClampTwoArgBlock();
+    neighborBlock.dockTypes[1] = 'numberin';
+    neighborBlock.dockTypes[2] = 'numberin';
+    neighborBlock.defaults.push(1);
+    neighborBlock.defaults.push(1 / 16);
+
     var modewidgetBlock = new ProtoBlock('modewidget');
     modewidgetBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['modewidget'] = modewidgetBlock;
