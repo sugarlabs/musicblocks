@@ -928,6 +928,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     tieBlock.adjustWidthToLabel();
     tieBlock.flowClampZeroArgBlock();
 
+    // Deprecated
     var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
     rhythmicdotBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
@@ -935,6 +936,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmicdotBlock.staticLabels.push(_('dot'));
     rhythmicdotBlock.adjustWidthToLabel();
     rhythmicdotBlock.flowClampZeroArgBlock();
+    rhythmicdotBlock.hidden = true;
+
+    var rhythmicdotBlock2 = new ProtoBlock('rhythmicdot2');
+    rhythmicdotBlock2.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['rhythmicdot2'] = rhythmicdotBlock2;
+    //.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
+    rhythmicdotBlock2.staticLabels.push(_('dot'));
+    rhythmicdotBlock2.adjustWidthToLabel();
+    rhythmicdotBlock2.flowClampOneArgBlock();
+    rhythmicdotBlock2.defaults.push(1);
+    rhythmicdotBlock2.dockTypes[1] = 'numberin';
 
     var rest2Block = new ProtoBlock('rest2');
     rest2Block.palette = palettes.dict['rhythm'];

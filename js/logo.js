@@ -4410,14 +4410,34 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'rhythmicdot':
+        case 'rhythmicdot2':
             // Dotting a note will increase its play time by
             // a(2 - 1/2^n)
+            if (that.blocks.blockList[blk].name === 'rhythmicdot') {
+                var arg = 1;
+            } else {
+                if (args[0] == null) {
+                    that.errorMsg(NOINPUTERRORMSG, blk);
+                    var arg = 0;
+                } else {
+                    var arg = args[0];
+                }
+            }
+
             var currentDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
             that.beatFactor[turtle] *= currentDotFactor;
-            that.dotCount[turtle] += 1;
+            if (arg >= 0) {
+                that.dotCount[turtle] += arg;
+            } else if (arg === -1) {
+                that.errorMsg(_('An argument of -1 results in a note value of 0.'), blk);
+                that.dotCount[turtle] += 1 / arg;
+            } else {
+                that.dotCount[turtle] += 1 / arg;
+            }
+
             var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
             that.beatFactor[turtle] /= newDotFactor;
-            childFlow = args[0];
+            childFlow = args[1];
             childFlowCount = 1;
 
             var listenerName = '_dot_' + turtle;
@@ -4426,7 +4446,13 @@ function Logo () {
             var __listener = function (event) {
                 var currentDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
                 that.beatFactor[turtle] *= currentDotFactor;
-                that.dotCount[turtle] -= 1;
+                if (arg >= 0) {
+                    that.dotCount[turtle] += arg;
+                } else if (arg === -1) {
+                    that.dotCount[turtle] += 1 / arg;
+                } else {
+                    that.dotCount[turtle] += 1 / arg;
+                }
                 var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
                 that.beatFactor[turtle] /= newDotFactor;
             };
