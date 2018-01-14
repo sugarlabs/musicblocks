@@ -825,7 +825,7 @@ function Logo () {
             case 'mypitch':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)), this.keySignature[turtle]) - this.pitchNumberOffset;
+                    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)), this.keySignature[turtle]) - this.pitchNumberOffset[turtle];
                 } else {
                     value = pitchToNumber('G', 4, this.keySignature[turtle])  - this.pitchNumberOffset;
                 }
@@ -1023,6 +1023,7 @@ function Logo () {
             this.justMeasuring[turtle] = [];
             this.firstPitch[turtle] = [];
             this.lastPitch[turtle] = [];
+            this.pitchNumberOffset[turtle] = [];
             this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
             this.movable[turtle] = false;
 
@@ -1039,7 +1040,7 @@ function Logo () {
             }
         }
 
-        this.pitchNumberOffset = 39;  // C4
+        this.pitchNumberOffset[turtle] = 39;  // C4
 
         if (!this.suppressOutput[turtle]) {
             this._setMasterVolume(DEFAULTVOLUME);
@@ -1345,7 +1346,7 @@ function Logo () {
             break;
         case 'mypitch':
             this.previousNotePlayed[turtle] = this.lastNotePlayed[turtle];
-            var obj = numberToPitch(value + this.pitchNumberOffset);
+            var obj = numberToPitch(value + this.pitchNumberOffset[turtle]);
             this.lastNotePlayed[turtle] = [obj[0] + obj[1], this.lastNotePlayed[turtle][1]];
             break;
         case 'notevolumefactor':  // master volume
@@ -3730,7 +3731,7 @@ function Logo () {
             }
 
             var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1]));
-            that.pitchNumberOffset = pitchToNumber(args[0], octave, that.keySignature[turtle]);
+            that.pitchNumberOffset[turtle] = pitchToNumber(args[0], octave, that.keySignature[turtle]);
             break;
         case 'pitchnumber':
         case 'scaledegree':
@@ -3750,7 +3751,7 @@ function Logo () {
 
                 // In number to pitch we assume A0 == 0. Here we
                 // assume that C4 == 0, so we need an offset of 39.
-                var obj = numberToPitch(Math.floor(args[0] + that.pitchNumberOffset));
+                var obj = numberToPitch(Math.floor(args[0] + that.pitchNumberOffset[turtle]));
                 note = obj[0];
                 octave = obj[1];
                 cents = 0;
@@ -3886,7 +3887,7 @@ function Logo () {
                 }
 
                 var n = that.justMeasuring[turtle].length;
-                var pitchNumber = pitchToNumber(noteObj[0], noteObj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
+                var pitchNumber = pitchToNumber(noteObj[0], noteObj[1], that.keySignature[turtle]) - that.pitchNumberOffset[turtle];
                 if (that.firstPitch[turtle].length < n) {
                     that.firstPitch[turtle].push(pitchNumber);
                 } else if (that.lastPitch[turtle].length < n) {
@@ -5519,7 +5520,7 @@ function Logo () {
                 var noteObj = getNote(note, octave, 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                 var n = that.justMeasuring[turtle].length;
-                var pitchNumber = pitchToNumber(noteObj[0], noteObj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
+                var pitchNumber = pitchToNumber(noteObj[0], noteObj[1], that.keySignature[turtle]) - that.pitchNumberOffset[turtle];
                 if (that.firstPitch[turtle].length < n) {
                     that.firstPitch[turtle].push(pitchNumber);
                 } else if (that.lastPitch[turtle].length < n) {
@@ -8129,7 +8130,7 @@ function Logo () {
                 var cblk = that.blocks.blockList[blk].connections[1];
                 var num = that.parseArg(that, turtle, cblk, blk, receivedArg);
                 if (num != null && typeof(num) === 'number') {
-                    var obj = numberToPitch(num + that.pitchNumberOffset);
+                    var obj = numberToPitch(num + that.pitchNumberOffset[turtle]);
                     if (that.blocks.blockList[blk].name === 'number2pitch') {
                         that.blocks.blockList[blk].value = obj[0];
                     } else {
@@ -8161,7 +8162,7 @@ function Logo () {
                             var obj = ['G', 4];
                         }
 
-                        value = pitchToNumber(obj[0], obj[1], that.keySignature[i]) - that.pitchNumberOffset;
+                        value = pitchToNumber(obj[0], obj[1], that.keySignature[i]) - that.pitchNumberOffset[turtle];
                         that.blocks.blockList[blk].value = value;
                         break;
                     }
@@ -8187,7 +8188,7 @@ function Logo () {
                         var obj = ['G', 4];
                     }
 
-                    value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
+                    value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset[turtle];
                     that.blocks.blockList[blk].value = value;
                 }
                 break;
@@ -8227,7 +8228,7 @@ function Logo () {
                         var obj = ['G', 4];
                     }
 
-                    value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
+                    value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset[turtle];
                     that.blocks.blockList[blk].value = value;
                 }
                 break;
@@ -8735,13 +8736,13 @@ function Logo () {
                         if (last(that.lastPitch[turtle]) === last(that.firstPitch[turtle])) {
                             that.blocks.blockList[blk].value = 0;
                         } else if (last(that.lastPitch[turtle]) > last(that.firstPitch[turtle])) {
-                            var noteObj = numberToPitch(last(that.firstPitch[turtle]) + that.pitchNumberOffset);
+                            var noteObj = numberToPitch(last(that.firstPitch[turtle]) + that.pitchNumberOffset[turtle]);
                             var i = 0;
-                            var n = last(that.firstPitch[turtle]) + that.pitchNumberOffset;
+                            var n = last(that.firstPitch[turtle]) + that.pitchNumberOffset[turtle];
                             while (i < 100) {
                                 n += getStepSizeUp(that.keySignature[turtle], noteObj[0]);
                                 i += 1;
-                                if (n >= last(that.lastPitch[turtle]) + that.pitchNumberOffset) {
+                                if (n >= last(that.lastPitch[turtle]) + that.pitchNumberOffset[turtle]) {
                                     break;
                                 }
 
@@ -8750,13 +8751,13 @@ function Logo () {
 
                             that.blocks.blockList[blk].value = i;
                         } else {
-                            var noteObj = numberToPitch(last(that.lastPitch[turtle]) + that.pitchNumberOffset);
+                            var noteObj = numberToPitch(last(that.lastPitch[turtle]) + that.pitchNumberOffset[turtle]);
                             var i = 0;
-                            var n = last(that.lastPitch[turtle]) + that.pitchNumberOffset;
+                            var n = last(that.lastPitch[turtle]) + that.pitchNumberOffset[turtle];
                             while (i < 100) {
                                 n += getStepSizeUp(that.keySignature[turtle], noteObj[0]);
                                 i += 1;
-                                if (n >= last(that.firstPitch[turtle]) + that.pitchNumberOffset) {
+                                if (n >= last(that.firstPitch[turtle]) + that.pitchNumberOffset[turtle]) {
                                     break;
                                 }
 
