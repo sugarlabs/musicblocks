@@ -104,6 +104,8 @@ function Planet(isMusicBlocks,storage){
 			this.ConnectedToServer = true;
 			this.TagsManifest = tags.data;
 		}
+		this.Converter = new Converter(this);
+		this.Converter.init();
 		this.LocalPlanet = new LocalPlanet(this);
 		this.LocalPlanet.init();
 		this.GlobalPlanet = new GlobalPlanet(this);
