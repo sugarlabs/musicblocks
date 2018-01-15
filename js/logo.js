@@ -5913,7 +5913,6 @@ function Logo () {
                 if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
                     if (that.runningLilypond) {
                         console.log('saving lilypond output:');
-                        console.log(that.notationStaging);
                         var filename = docById('fileName').value;
                         if (filename == undefined || filename.length === 0) {
                             filename = _('My Project') + '.ly';
@@ -5923,7 +5922,6 @@ function Logo () {
                         that.runningLilypond = false;
                     } else if (that.runningAbc) {
                         console.log('saving abc output:');
-                        console.log(that.notationStaging);
                         saveAbcOutput(that, _('My Project') + '.abc');
                         that.runningAbc = false;
                     } else if (that.suppressOutput[turtle]) {
