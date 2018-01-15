@@ -21,6 +21,7 @@ const TACAT = {
     'turtlenote': 'notefactor',
 
     'rhythmicdot': 'rhythm',
+    'rhythmicdot2': 'rhythm',
     'tie': 'rhythm',
     'multiplybeatfactor': 'rhythm',
     'skipnotes': 'rhythm',
