@@ -1134,8 +1134,9 @@ function durationToNoteValue(duration) {
 
     if (POWER2.indexOf(roundDown) === -1) {
         roundDown = 128;
-   }
+    }
 
+    /*
     // Next, see if the note has a factor of 2.
     var factorOfTwo = 1;
     var tupletValue = duration;
@@ -1148,6 +1149,7 @@ function durationToNoteValue(duration) {
         // We have a tuplet of sorts
         return [duration, 0, tupletValue, roundDown];
     }
+    */
 
     // Next, generate a fauve tuplet for a singleton.
     return [1, 0, duration, roundDown];

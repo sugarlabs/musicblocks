@@ -243,7 +243,16 @@ processLilypondNotes = function (logo, turtle) {
 
                 if (incompleteTuplet === 0) {
                     var tupletFraction = toFraction(tupletDuration / targetDuration);
-                    logo.notationNotes[turtle] += '\\tuplet ' + tupletFraction[0] + '/' + tupletFraction[1] + ' { ';
+                    var a = tupletFraction[0] * targetDuration;
+                    var b = tupletFraction[0] * tupletFraction[1];
+
+                    if (Math.floor(a) !== a) {
+			var c = toFraction(a / 1);
+			a = c[0];
+			b = c[1];
+		    }
+
+                    logo.notationNotes[turtle] += '\\tuplet ' + a + '/' + b + ' { ';
 
                     i += __processTuplet(logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
                 } else {
