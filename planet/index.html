@@ -247,6 +247,39 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <div class="report-project-div">
+                        <a class="btn-flat left modal-action waves-effect waves-red" id="projectviewer-report-project">Report Project</a>
+                        <div class="card report-card" id="projectviewer-report-card" style="display: none;">
+                            <div id="projectviewer-report-content" style="display: none;">
+                                <div class="card-content">
+                                    <div class="reporttitle">Report Project</div>
+                                    <div class="progress" id="projectviewer-report-progress" style="display: none;">
+                                        <div class="indeterminate"></div>
+                                    </div>
+                                    <p>
+                                        Report projects which violate the <a href="https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md" target="_blank">Sugar Labs Code of Conduct</a>.
+                                    </p>
+                                    <div class="error-message" id="report-error" style="display: none;"></div>
+                                    <div class="input-field">
+                                        <textarea id="reportdescription" class="materialize-textarea" data-length="1000"></textarea>
+                                        <label for="reportdescription">Reason for reporting project</label>
+                                    </div>
+                                </div>
+                                <div class="card-action">
+                                    <a id="projectviewer-report-submit">Submit</a>
+                                </div>
+                            </div>
+                            <div id="projectviewer-reportsubmit-content" style="display: none;">
+                                <div class="card-content">
+                                    <div class="reporttitle">Report Project</div>
+                                    <p id="submittext"></p>
+                                </div>
+                                <div class="card-action">
+                                    <a id="projectviewer-report-close">Close</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <a class="modal-action waves-effect waves-green btn-flat" id="projectviewer-download-file">Download as File</a>
                     <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" id="projectviewer-open-mb">Open in Music Blocks</a>
                 </div>

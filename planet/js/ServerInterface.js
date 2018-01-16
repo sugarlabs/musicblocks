@@ -61,6 +61,11 @@ function ServerInterface(Planet){
 		this.request(obj,callback);
 	};
 
+	this.reportProject = function(ProjectID, Description, callback){
+		var obj = {"action":"reportProject","ProjectID":ProjectID,"Description":Description};
+		this.request(obj,callback);
+	};
+
 	this.convertFile = function(From, To, Data, callback){
 		var obj = {"action":"convertData","From":From,"To":To,"Data":Data};
 		this.request(obj,callback);

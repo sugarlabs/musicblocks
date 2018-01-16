@@ -243,3 +243,31 @@ a {
 	width: 100%;
     padding-bottom: 75%;
 }
+.report-project-div{
+	position: absolute;
+}
+.report-card{
+    position: absolute;
+    left: 0;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(10%);
+    min-width: 350px;
+    bottom: 40px;
+    text-align: left;
+}
+.reporttitle{
+	font-size: 1.2rem;
+	font-weight: 500;
+}
+.reportinput{
+	margin-top: 5px;
+	width: 350px;
+	text-align: left;
+	visibility: visible;
+}
+.reportprogress{
+	width: calc(100% + 48px);
+    left: -24px;
+}
+}

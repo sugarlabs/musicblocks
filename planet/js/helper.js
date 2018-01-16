@@ -94,10 +94,16 @@ function toggleExpandable(id, c){
 	}
 };
 
-function hideOnClickOutside(id, other) {
+function hideOnClickOutside(eles, other) {
+	//if click not in id, hide
 	const outsideClickListener = function(event) {
-		if (event.path.indexOf(id)!=-1) {
-		} else {
+		var ok=false;
+		for (var i = 0; i<eles.length; i++){
+			if (event.path.indexOf(eles[i])!=-1){
+				ok = true;
+			}
+		}
+		if (ok==false){
 			document.getElementById(other).style.display = "none";
 			removeClickListener();
 		}

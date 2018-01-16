@@ -13,6 +13,12 @@ function ProjectViewer(Planet) {
 	this.ProjectCache = Planet.GlobalPlanet.cache;
 	this.PlaceholderMBImage = "images/mbgraphic.png";
 	this.PlaceholderTBImage = "images/tbgraphic.png";
+	this.ReportError = "Error: Report could not be submitted. Try again later.";
+	this.ReportSuccess = "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct.";
+	this.ReportEnabledButton = "Report Project";
+	this.ReportDisabledButton = "Project Reported";
+	this.ReportDescriptionError = _("Report description required");
+	this.ReportDescriptionTooLongError = _("Report description too long");
 	this.id = null;
 
 	this.open = function(id){
@@ -41,6 +47,13 @@ function ProjectViewer(Planet) {
 			chip.textContent = Planet.TagsManifest[proj.ProjectTags[i]].TagName;
 			tagcontainer.appendChild(chip);
 		}
+		if (Planet.ProjectStorage.isReported(this.id)){
+			document.getElementById("projectviewer-report-project").classList.add("disabled");
+			document.getElementById("projectviewer-report-project").textContent = this.ReportDisabledButton;
+		} else {
+			document.getElementById("projectviewer-report-project").classList.remove("disabled");
+			document.getElementById("projectviewer-report-project").textContent = this.ReportEnabledButton;
+		}
 		jQuery('#projectviewer').modal('open');
 	};
 
@@ -53,6 +66,51 @@ function ProjectViewer(Planet) {
 		Planet.GlobalPlanet.openGlobalProject(this.id);
 	}
 
+	this.openReporter = function(){
+		console.log("load");
+		document.getElementById("reportdescription").value = "";
+		document.getElementById("projectviewer-report-content").style.display = "block";
+		document.getElementById("projectviewer-reportsubmit-content").style.display = "none";
+		document.getElementById("projectviewer-report-progress").style.display = "none";
+		document.getElementById("report-error").style.display = "none";
+		document.getElementById("projectviewer-report-card").style.display = "block";
+		hideOnClickOutside([document.getElementById("projectviewer-report-card"),document.getElementById("projectviewer-report-project")], "projectviewer-report-card");
+	}
+
+	this.submitReporter = function(){
+		var text = document.getElementById("reportdescription").value;
+		if (text==""){
+			document.getElementById("report-error").textContent = this.ReportDescriptionError;
+			document.getElementById("report-error").style.display = "block";
+			return;
+		} else if (text.length>1000){
+			document.getElementById("report-error").textContent = this.ReportDescriptionTooLongError;
+			document.getElementById("report-error").style.display = "block";
+			return;
+		} else {
+			document.getElementById("projectviewer-report-progress").style.display = "block";
+			Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
+		}
+	}
+
+	this.afterReport = function(data){
+		if (data.success){
+			document.getElementById("submittext").textContent = this.ReportSuccess;
+			Planet.ProjectStorage.report(this.id,true);
+			document.getElementById("projectviewer-report-project").classList.add("disabled");
+			document.getElementById("projectviewer-report-project").value = this.ReportDisabledButton;
+		} else {
+			document.getElementById("submittext").textContent = this.ReportError;
+		}
+		document.getElementById("projectviewer-report-content").style.display = "none";
+		document.getElementById("projectviewer-report-progress").style.display = "none";
+		document.getElementById("projectviewer-reportsubmit-content").style.display = "block";
+	}
+
+	this.closeReporter = function(){
+		document.getElementById("projectviewer-report-card").style.display = "none";
+	}
+
 	this.init = function(){
 		var t = this;
 		document.getElementById("projectviewer-download-file").addEventListener('click', function (evt) {
@@ -60,6 +118,15 @@ function ProjectViewer(Planet) {
 		});
 		document.getElementById("projectviewer-open-mb").addEventListener('click', function (evt) {
 			t.openProject();
+		});
+		document.getElementById("projectviewer-report-project").addEventListener('click', function (evt) {
+			t.openReporter();
+		});
+		document.getElementById("projectviewer-report-submit").addEventListener('click', function (evt) {
+			t.submitReporter();
+		});
+		document.getElementById("projectviewer-report-close").addEventListener('click', function (evt) {
+			t.closeReporter();
 		});
 	};
 };
