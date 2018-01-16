@@ -422,6 +422,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchStepBlock.dockTypes[1] = 'anyin';
     pitchStepBlock.defaults.push(1);
 
+    var pitch2Block = new ProtoBlock('pitch2');
+    pitch2Block.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['pitch2'] = pitch2Block;
+    pitch2Block.staticLabels.push(_('pitch') + ' ' + 'G4');
+    pitch2Block.adjustWidthToLabel();
+    pitch2Block.zeroArgBlock();
+
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['pitch'] = pitch;
