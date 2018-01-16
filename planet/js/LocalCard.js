@@ -130,7 +130,7 @@ function LocalCard(Planet){
 			if (s.style.display=="none"){
 				if (t.ProjectData.PublishedData!=null){
 					s.style.display = "initial";
-					hideOnClickOutside(document.getElementById("share-"+t.id), "sharebox-"+t.id);
+					hideOnClickOutside([document.getElementById("share-"+t.id)], "sharebox-"+t.id);
 				} else {
 					Planet.LocalPlanet.Publisher.open(t.id,true);
 				}

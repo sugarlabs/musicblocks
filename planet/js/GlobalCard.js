@@ -97,7 +97,7 @@ function GlobalCard(Planet) {
 			var s = document.getElementById("global-sharebox-"+t.id);
 			if (s.style.display=="none"){
 				s.style.display = "initial";
-				hideOnClickOutside(document.getElementById("global-share-"+t.id), "global-sharebox-"+t.id);
+				hideOnClickOutside([document.getElementById("global-share-"+t.id)], "global-sharebox-"+t.id);
 			} else {
 				s.style.display = "none";
 			}

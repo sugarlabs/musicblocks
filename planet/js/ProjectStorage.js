@@ -118,6 +118,18 @@ function ProjectStorage(Planet){
 		this.save();
 	};
 
+	this.isReported = function(id){
+		if (this.data.ReportedProjects[id]==true){
+			return true;
+		}
+		return false;
+	};
+
+	this.report = function(id,report){
+		this.data.ReportedProjects[id]=report;
+		this.save();
+	};
+
 	//Ancillary Functions
 
 	this.set = function(key, obj){
@@ -147,10 +159,21 @@ function ProjectStorage(Planet){
 	};
 
 	this.initialiseStorage = function(){
-		this.data = {};
-		this.data.Projects = {};
-		this.data.LikedProjects = {};
-		this.data.DefaultCreatorName = _("anonymous");
+		if (this.data===null||this.data===undefined){
+			this.data = {};
+		}
+		if (this.data.Projects===null||this.data.Projects===undefined){
+			this.data.Projects = {};
+		}
+		if (this.data.LikedProjects===null||this.data.LikedProjects===undefined){
+			this.data.LikedProjects = {};
+		}
+		if (this.data.ReportedProjects===null||this.data.ReportedProjects===undefined){
+			this.data.ReportedProjects = {};
+		}
+		if (this.data.DefaultCreatorName===null||this.data.DefaultCreatorName===undefined){
+			this.data.DefaultCreatorName = _("anonymous");
+		}
 		this.save();
 	};
 
@@ -161,8 +184,6 @@ function ProjectStorage(Planet){
 	this.init = function(){
 		this.LocalStorage = Planet.LocalStorage;
 		this.restore();
-		if (this.data===null){
-			this.initialiseStorage();
-		}
+		this.initialiseStorage();
 	};
 };
