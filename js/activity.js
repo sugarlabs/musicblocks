@@ -134,6 +134,7 @@ define(MYDEFINES, function (compatibility) {
         var currentKeyCode = 0;
         var pasteContainer = null;
         var pasteImage = null;
+        var bitmapActivePaste, bitmapDisablePaste; // For UpdatePasteButton Function
         var gridContainer = null;
         var gridButtonLabel = null;
         var gridImages = [];
@@ -3103,6 +3104,30 @@ handleComplete);
         };
 
         function updatePasteButton() {
+            if (blocks.selectedBlocksObj == null) {
+                pasteContainer.removeAllChildren();
+                var img = new Image();
+
+                img.onload = function () {
+                    var originalSize = 55; // this is the original svg size
+                    var halfSize = Math.floor(cellSize / 2);
+
+                    bitmapDisablePaste = new createjs.Bitmap(img);
+                    if (cellSize !== originalSize) {
+                        bitmapDisablePaste.scaleX = cellSize / originalSize;
+                        bitmapDisablePaste.scaleY = cellSize / originalSize;
+                    }
+
+                    bitmapDisablePaste.regX = halfSize / bitmapDisablePaste.scaleX;
+                    bitmapDisablePaste.regY = halfSize / bitmapDisablePaste.scaleY;
+                    pasteContainer.addChild(bitmapDisablePaste);
+
+                    update = true;
+                };
+
+                img.src = 'header-icons/paste-disabled-button.svg';
+                return;
+            }
             if (pasteImage === null) {
                 console.log('Updating paste button');
                 var img = new Image();
@@ -3111,22 +3136,23 @@ handleComplete);
                     var originalSize = 55; // this is the original svg size
                     var halfSize = Math.floor(cellSize / 2);
 
-                    var bitmap = new createjs.Bitmap(img);
+                    bitmapActivePaste = new createjs.Bitmap(img);
                     if (cellSize !== originalSize) {
-                        bitmap.scaleX = cellSize / originalSize;
-                        bitmap.scaleY = cellSize / originalSize;
+                        bitmapActivePaste.scaleX = cellSize / originalSize;
+                        bitmapActivePaste.scaleY = cellSize / originalSize;
                     }
 
-                    bitmap.regX = halfSize / bitmap.scaleX;
-                    bitmap.regY = halfSize / bitmap.scaleY;
-                    pasteContainer.addChild(bitmap);
-                    pasteImage = bitmap;
+                    bitmapActivePaste.regX = halfSize / bitmapActivePaste.scaleX;
+                    bitmapActivePaste.regY = halfSize / bitmapActivePaste.scaleY;
+                    pasteContainer.addChild(bitmapActivePaste);
+                    pasteImage = bitmapActivePaste;
 
                     update = true;
                 };
 
                 img.src = 'header-icons/paste-button.svg';
             } else {
+                pasteContainer.addChild(bitmapActivePaste);
                 console.log('Blinking paste button');
                 blinkPasteButton(pasteImage);
             }
