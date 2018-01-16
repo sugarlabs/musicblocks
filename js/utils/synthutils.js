@@ -206,61 +206,67 @@ function Synth() {
 
     this.loadSamples = function (){
         var SAMPLES_MANIFEST = {
-            "voice": [
-                {"name": "violin", "data": VIOLIN_SAMPLE},
-                {"name": "cello", "data": CELLO_SAMPLE},
-                {"name": "flute", "data": FLUTE_SAMPLE},
-                {"name": "clarinet", "data": CLARINET_SAMPLE},
-                {"name": "saxophone", "data": SAXOPHONE_SAMPLE},
-                {"name": "trumpet", "data": TRUMPET_SAMPLE},
-                {"name": "tuba", "data": TUBA_SAMPLE},
-                {"name": "guitar", "data": GUITAR_SAMPLE},
-                {"name": "basse", "data": BASSE_SAMPLE}
+            'voice': [
+                {'name': 'violin', 'data': VIOLIN_SAMPLE},
+                {'name': 'cello', 'data': CELLO_SAMPLE},
+                {'name': 'flute', 'data': FLUTE_SAMPLE},
+                {'name': 'clarinet', 'data': CLARINET_SAMPLE},
+                {'name': 'saxophone', 'data': SAXOPHONE_SAMPLE},
+                {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
+                {'name': 'tuba', 'data': TUBA_SAMPLE},
+                {'name': 'guitar', 'data': GUITAR_SAMPLE},
+                {'name': 'basse', 'data': BASSE_SAMPLE}
             ],
-            "drum": [
-                {"name": "bottle", "data": BOTTLE_SAMPLE},
-                {"name": "clap", "data": CLAP_SAMPLE},
-                {"name": "darbuka drum", "data": DARBUKA_SAMPLE},
-                {"name": "hi hat", "data": HIHAT_SAMPLE},
-                {"name": "splash", "data": SPLASH_SAMPLE},
-                {"name": "bubbles", "data": BUBBLES_SAMPLE},
-                {"name": "cow bell", "data": COWBELL_SAMPLE},
-                {"name": "dog", "data": DOG_SAMPLE},
-                {"name": "kick drum", "data": KICK_SAMPLE},
-                {"name": "tom tom", "data": TOM_SAMPLE},
-                {"name": "cat", "data": CAT_SAMPLE},
-                {"name": "crash", "data": CRASH_SAMPLE},
-                {"name": "duck", "data": DUCK_SAMPLE},
-                {"name": "ride bell", "data": RIDEBELL_SAMPLE},
-                {"name": "triangle bell", "data": TRIANGLE_SAMPLE},
-                {"name": "chine", "data": CHINE_SAMPLE},,
-                {"name": "cricket", "data": CRICKET_SAMPLE},
-                {"name": "finger cymbals", "data": FINGERCYMBAL_SAMPLE},
-                {"name": "slap", "data": SLAP_SAMPLE},
-                {"name": "clang", "data": CLANG_SAMPLE},
-                {"name": "cup drum", "data": CUP_SAMPLE},
-                {"name": "floor tom tom", "data": FLOORTOM_SAMPLE},
-                {"name": "snare drum", "data": SNARE_SAMPLE}
-            ]
+            'drum': [
+                {'name': 'bottle', 'data': BOTTLE_SAMPLE},
+                {'name': 'clap', 'data': CLAP_SAMPLE},
+                {'name': 'darbuka drum', 'data': DARBUKA_SAMPLE},
+                {'name': 'hi hat', 'data': HIHAT_SAMPLE},
+                {'name': 'splash', 'data': SPLASH_SAMPLE},
+                {'name': 'bubbles', 'data': BUBBLES_SAMPLE},
+                {'name': 'cow bell', 'data': COWBELL_SAMPLE},
+                {'name': 'dog', 'data': DOG_SAMPLE},
+                {'name': 'kick drum', 'data': KICK_SAMPLE},
+                {'name': 'tom tom', 'data': TOM_SAMPLE},
+                {'name': 'cat', 'data': CAT_SAMPLE},
+                {'name': 'crash', 'data': CRASH_SAMPLE},
+                {'name': 'duck', 'data': DUCK_SAMPLE},
+                {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
+                {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
+                {'name': 'chine', 'data': CHINE_SAMPLE},
+                {'name': 'cricket', 'data': CRICKET_SAMPLE},
+                {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
+                {'name': 'slap', 'data': SLAP_SAMPLE},
+                {'name': 'clang', 'data': CLANG_SAMPLE},
+                {'name': 'cup drum', 'data': CUP_SAMPLE},
+                {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
+                {'name': 'snare drum', 'data': SNARE_SAMPLE}
+	    ]
         }
-        this.samples = {};
-        for (var type in SAMPLES_MANIFEST) {
-            if (SAMPLES_MANIFEST.hasOwnProperty(type)) {
-                this.samples[type] = {};
-                for (var sample in SAMPLES_MANIFEST[type]){
-                    if (SAMPLES_MANIFEST[type].hasOwnProperty(sample)){
-                        var data = SAMPLES_MANIFEST[type][sample].data;
-                        var name = SAMPLES_MANIFEST[type][sample].name;
-                        this.samples[type][name] = data;
+
+	if (this.samples == null) {
+            console.log('inititializing samples');
+            this.samples = {};
+            for (var type in SAMPLES_MANIFEST) {
+                if (SAMPLES_MANIFEST.hasOwnProperty(type)) {
+                    this.samples[type] = {};
+                    for (var sample in SAMPLES_MANIFEST[type]){
+                        if (SAMPLES_MANIFEST[type].hasOwnProperty(sample)){
+                            var data = SAMPLES_MANIFEST[type][sample].data;
+                            var name = SAMPLES_MANIFEST[type][sample].name;
+                            this.samples[type][name] = data;
+                        }
                     }
                 }
             }
         }
-    }
-    var t = this;
+    };
 
-    require(SOUNDSAMPLESDEFINES, function(){
-        t.loadSamples();
+    var that = this;
+
+    require(SOUNDSAMPLESDEFINES, function() {
+        console.log('REQUIRE SOUNDSAMPLESDEFINES');
+        that.loadSamples();
     });
 
     this.recorder = new Recorder(Tone.Master);
@@ -271,7 +277,7 @@ function Synth() {
             filename += '.wav';
         }
         download(filename, URL.createObjectURL(blob));
-    }
+    };
 
     // Function that provides default parameters for various synths
     this.getDefaultParamValues = function (sourceName) {
@@ -475,13 +481,11 @@ function Synth() {
             instrumentsSource[instrumentName] = [2, sourceName];
             console.log(sourceName);
             var tempSynth = new Tone.Sampler(this.samples.voice[sourceName]);
-        }
-        else if (sourceName in this.samples.drum) {
+        } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
             var tempSynth = new Tone.Sampler(this.samples.drum[sourceName]);
-        }
-        else {
+        } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, 'drum'];
             console.log(DEFAULTDRUM);
@@ -565,27 +569,41 @@ function Synth() {
 
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrumentName, sourceName, params) {
-        if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum)) {
-            instruments[instrumentName] = this._createSampleSynth(instrumentName, sourceName, null).toMaster();
-        } else if (sourceName in BUILTIN_SYNTHS) {
-            instruments[instrumentName] = this._createBuiltinSynth(instrumentName, sourceName, params).toMaster();
-        } else if (sourceName in CUSTOM_SYNTHS) {
-            instruments[instrumentName] = this._createCustomSynth(sourceName, params).toMaster();
-            instrumentsSource[instrumentName] = [0, 'poly'];
+	if (this.samples == null) {
+            var that = this;
+	    require(SOUNDSAMPLESDEFINES, function(){
+		that.loadSamples();
+	    });
+
+            var timeoutValue = 10000;
         } else {
-            if (sourceName.length >= 4) {
-                if (sourceName.slice(0, 4) === 'http') {
-                    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
-                    instrumentsSource[instrumentName] = [1, 'drum'];
-                } else if (sourceName.slice(0, 4) === 'file') {
-                    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
-                    instrumentsSource[instrumentName] = [1, 'drum'];
-                } else if (sourceName === 'drum') {
-                    instruments[sourceName] = this._createSampleSynth(sourceName, sourceName, null).toMaster();
-                    instrumentsSource[instrumentName] = [1, 'drum'];
-                }
-            }
+            var timeoutValue = 0;
         }
+
+        var that = this;
+        setTimeout(function () {
+            if ((sourceName in that.samples.voice) || (sourceName in that.samples.drum)) {
+		instruments[instrumentName] = that._createSampleSynth(instrumentName, sourceName, null).toMaster();
+            } else if (sourceName in BUILTIN_SYNTHS) {
+		instruments[instrumentName] = that._createBuiltinSynth(instrumentName, sourceName, params).toMaster();
+            } else if (sourceName in CUSTOM_SYNTHS) {
+		instruments[instrumentName] = that._createCustomSynth(sourceName, params).toMaster();
+		instrumentsSource[instrumentName] = [0, 'poly'];
+            } else {
+		if (sourceName.length >= 4) {
+                    if (sourceName.slice(0, 4) === 'http') {
+			instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+			instrumentsSource[instrumentName] = [1, 'drum'];
+                    } else if (sourceName.slice(0, 4) === 'file') {
+			instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+			instrumentsSource[instrumentName] = [1, 'drum'];
+                    } else if (sourceName === 'drum') {
+			instruments[sourceName] = that._createSampleSynth(sourceName, sourceName, null).toMaster();
+			instrumentsSource[instrumentName] = [1, 'drum'];
+                    }
+		}
+            }
+	}, timeoutValue);
     };
 
     this.loadSynth = function (sourceName) {

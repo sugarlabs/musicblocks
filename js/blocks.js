@@ -3884,7 +3884,11 @@ function Blocks () {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this voice
-                    this.logo.synth.loadSynth(getVoiceSynthName(value));
+                    try {
+                        this.logo.synth.loadSynth(getVoiceSynthName(value));
+                    } catch (e) {
+                        console.log(e)
+                    }
                 }
                 break;
             case 'media':
