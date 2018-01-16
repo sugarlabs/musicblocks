@@ -179,6 +179,9 @@ function Logo () {
     this.noteDirection = {};
     this.pitchNumberOffset = [];  // 39, C4
     this.currentOctave = {};
+    this.inNeighbor = [];
+    this.neighborStepPitch = {};
+    this.neighborNoteValue = {};
 
     // parameters used in time signature
     this.pickup = {};
@@ -234,6 +237,10 @@ function Logo () {
     this.chorusRate = {};
     this.delayTime = {};
     this.chorusDepth = {};
+    this.neighborArgNote1 = {};
+    this.neighborArgNote2 = {};
+    this.neighborArgBeat = {};
+    this.neighborArgCurrentBeat = {};
 
     // When counting notes, measuring intervals, or generating lilypond output
     this.justCounting = {};
@@ -1009,6 +1016,10 @@ function Logo () {
             this.chorusRate[turtle] = [];
             this.delayTime[turtle] = [];
             this.chorusDepth[turtle] = [];
+            this.neighborArgNote1[turtle] = [];
+            this.neighborArgNote2[turtle] = [];
+            this.neighborArgBeat[turtle] = [];
+            this.neighborArgCurrentBeat[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.pickup[turtle] = 0;
             this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
@@ -1026,6 +1037,9 @@ function Logo () {
             this.pitchNumberOffset[turtle] = 39; // C4
             this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
             this.movable[turtle] = false;
+            this.inNeighbor[turtle] = [];
+            this.neighborStepPitch[turtle] = [];
+            this.neighborNoteValue[turtle] = [];
 
             if (this.compiling) {
                 this._saveX[turtle] = this.turtles.turtleList[turtle].x;
@@ -3845,6 +3859,14 @@ function Logo () {
                 }
             }
 
+            if (that.inNeighbor[turtle].length > 0) {
+                var noteObj = getNote(note, octave, that.scalarTransposition[turtle], that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
+                that.neighborArgNote1[turtle].push(noteObj[0] + noteObj[1]);
+                var transValue = that.scalarTransposition[turtle] + parseInt(that.neighborStepPitch[turtle]);
+                var noteObj2 = getNote(note, octave, transValue, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
+                that.neighborArgNote2[turtle].push(noteObj2[0] + noteObj2[1]);
+            }
+
             // Add scalar transposition
             if (that.scalarTransposition[turtle] > 0) {
                 var n = that.scalarTransposition[turtle];
@@ -4382,6 +4404,14 @@ function Logo () {
                 }
 
                 if (that.inNoteBlock[turtle].length > 0) {
+                    if (that.inNeighbor[turtle].length > 0) {
+                        var neighborNoteValue = that.neighborNoteValue[turtle];
+                        that.neighborArgBeat[turtle].push(that.beatFactor[turtle] * (1 / neighborNoteValue));
+
+                        var nextBeat = (1 / noteBeatValue) - (2 * (that.neighborNoteValue[turtle]));
+                        that.neighborArgCurrentBeat[turtle].push(that.beatFactor[turtle] * (1 / nextBeat));
+                    }
+
                     that._processNote(1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])], last(that.inNoteBlock[turtle]), turtle);
                 }
 
@@ -4817,6 +4847,31 @@ function Logo () {
                 that.timbre.chorusParams.push(last(that.chorusDepth[turtle]) * 100);
                 instrumentsEffects[that.timbre.instrumentName]['chorusDepth'] = chorusDepth;
             }
+            break;
+        case 'neighbor':
+            if (typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
+                that.errorMsg(NANERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            that.inNeighbor[turtle].push(blk);
+            that.neighborStepPitch[turtle].push(args[0]);
+            that.neighborNoteValue[turtle].push(args[1]);
+
+            childFlow = args[2];
+            childFlowCount = 1;
+
+            var listenerName = '_neighbor_' + turtle + '_' + blk;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.inNeighbor[turtle].pop();
+                that.neighborStepPitch[turtle].pop();
+                that.neighborNoteValue[turtle].pop();
+            };
+
+            that._setListener(turtle, listenerName, __listener);
             break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
@@ -6074,11 +6129,16 @@ function Logo () {
         var chorusRate = 0;
         var delayTime = 0;
         var chorusDepth = 0;
+        var neighborArgNote1 = [];
+        var neighborArgNote2 = [];
+        var neighborArgBeat = 0;
+        var neighborArgCurrentBeat = 0;
         var doVibrato = false;
         var doDistortion = false;
         var doTremolo = false;
         var doPhaser = false;
         var doChorus = false;
+        var doNeighbor = false;
         var filters = null;
 
         // Apply any effects and filters associated with a custom timbre.
@@ -6155,6 +6215,18 @@ function Logo () {
             delayTime = last(this.delayTime[turtle]);
             chorusDepth = last(this.chorusDepth[turtle]);
             doChorus = true;
+        }
+
+        if (this.inNeighbor[turtle].length > 0) {
+            var len = this.neighborArgNote1[turtle].length;
+            for (var i = 0; i < len; i++) {
+                neighborArgNote1.push(this.neighborArgNote1[turtle].pop());
+                neighborArgNote2.push(this.neighborArgNote2[turtle].pop());
+            }
+
+            neighborArgBeat = bpmFactor / last(this.neighborArgBeat[turtle]);
+            neighborArgCurrentBeat = bpmFactor / last(this.neighborArgCurrentBeat[turtle]);
+            doNeighbor = true;
         }
 
         var carry = 0;
@@ -6531,11 +6603,12 @@ function Logo () {
                             if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                                 // Parameters related to effects
                                 var paramsEffects = {
-                                    'doVibrato': false,
-                                    'doDistortion': false,
-                                    'doTremolo': false,
-                                    'doPhaser': false,
-                                    'doChorus': false,
+                                    'doVibrato': doVibrato,
+                                    'doDistortion': doDistortion,
+                                    'doTremolo': doTremolo,
+                                    'doPhaser': doPhaser,
+                                    'doChorus': doChorus,
+                                    'doNeighbor': doNeighbor,
                                     'vibratoIntensity': vibratoIntensity,
                                     'vibratoFrequency': vibratoValue,
                                     'distortionAmount': distortionAmount,
@@ -6546,7 +6619,11 @@ function Logo () {
                                     'baseFrequency': baseFrequency,
                                     'chorusRate': chorusRate,
                                     'delayTime': delayTime,
-                                    'chorusDepth': chorusDepth
+                                    'chorusDepth': chorusDepth,
+                                    'neighborArgNote1': neighborArgNote1,
+                                    'neighborArgNote2': neighborArgNote2,
+                                    'neighborArgBeat': neighborArgBeat,
+                                    'neighborArgCurrentBeat': neighborArgCurrentBeat
                                 };
 
                                 __hasParamEffect = function () {

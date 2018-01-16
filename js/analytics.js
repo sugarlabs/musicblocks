@@ -129,6 +129,7 @@ const TACAT = {
     'chorus': 'tone',
     'phaser': 'tone',
     'vibrato': 'tone',
+    'neighbor': 'tone',
 
     'clear': 'forward',
     'forward': 'forward',

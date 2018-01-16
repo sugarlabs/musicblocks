@@ -654,9 +654,31 @@ function Synth() {
                     }).toMaster();
                     synth.chain(chorusEffect, Tone.Master);
                 }
+
+                if (paramsEffects.doNeighbor) {
+                    var firstTwoBeats = paramsEffects['neighborArgBeat'];
+                    var finalBeat = paramsEffects['neighborArgCurrentBeat'];
+
+                    // Create an array of start times and durations
+                    // for each note.
+                    var obj = [];
+                    for (var i = 0; i < paramsEffects['neighborArgNote1'].length; i++) {
+                        var note1 = paramsEffects['neighborArgNote1'][i].replace('♯', '#').replace('♭', 'b');
+                        var note2 = paramsEffects['neighborArgNote2'][i].replace('♯', '#').replace('♭', 'b');
+                        obj.push({'time' : 0, 'note' : note1, 'duration': firstTwoBeats},
+                                 {'time' : firstTwoBeats, 'note' : note2, 'duration': firstTwoBeats},
+                                 {'time' : firstTwoBeats * 2, 'note' : note1, 'duration': finalBeat});
+                    }
+
+                    var neighborEffect = new Tone.Part(function(time, value){
+                        synth.triggerAttackRelease(value.note, value.duration, time);
+                    }, obj).start();
+                }
             }
 
-            synth.triggerAttackRelease(notes, beatValue);
+            if (!paramsEffects.doNeighbor) {
+                synth.triggerAttackRelease(notes, beatValue);
+            }
 
             setTimeout(function () {
                 if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
@@ -678,6 +700,10 @@ function Synth() {
 
                     if (paramsEffects.doChorus) {
                         chorusEffect.dispose();
+                    }
+
+                    if (paramsEffects.doNeighbor) {
+                        neighborEffect.dispose();
                     }
                 }
 
@@ -712,6 +738,11 @@ function Synth() {
             if (paramsEffects['chorusRate'] != 0) {
                 paramsEffects.doChorus = true;
             }
+
+            if (paramsEffects['neighborSynth']) {
+                paramsEffects.doNeighbor = true;
+            }
+
         }
 
         var tempNotes = notes;
