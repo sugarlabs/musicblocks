@@ -1030,7 +1030,11 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
