@@ -1001,9 +1001,9 @@ the range of a specified octave.
 Each *Sine* block contained within the clamp of the *Pitch Slider* block defines the initial pitch
 for an ocatve.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg "Pitch Slider")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg "Pitch Slider") 
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg "Pitch Slider")
+<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg" alt="Pitch Slider-One Column" width="100">
 
 When the *Pitch Slider* block is clicked, the *Pitch Slider* widget is
 initialized. The widget will have one column for each *Sine* block in
@@ -1013,13 +1013,13 @@ starting frequency. The mouse is used to move the frequency up and down continuo
 used for intervals. Arrow keys can also be used to move up and down,
 or between columns.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg "Pitch Slider block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg "Pitch Slider Block")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg "pitch slider")
+<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg" alt="Pitch Slider-Two Column" width="100">
 
 Clicking in a column will extact the corresponding *Note* blocks, for example:
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg "pitch slider")
+<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg" alt="Pitch Slider-Two Columns Adjusting" width="100">
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg " Pitch Slider block")
 
