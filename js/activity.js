@@ -955,7 +955,6 @@ define(MYDEFINES, function (compatibility) {
             fileChooser.addEventListener('change', function (event) {
                 // Read file here.
                 var reader = new FileReader();
-
                 reader.onload = (function (theFile) {
                     loading = true;
                     document.body.style.cursor = 'wait';
@@ -968,7 +967,11 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 // First, hide the palettes as they will need updating.
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
