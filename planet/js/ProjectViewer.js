@@ -71,7 +71,7 @@ function ProjectViewer(Planet) {
 		document.getElementById("reportdescription").value = "";
 		document.getElementById("projectviewer-report-content").style.display = "block";
 		document.getElementById("projectviewer-reportsubmit-content").style.display = "none";
-		document.getElementById("projectviewer-report-progress").style.display = "none";
+		document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
 		document.getElementById("report-error").style.display = "none";
 		document.getElementById("projectviewer-report-card").style.display = "block";
 		hideOnClickOutside([document.getElementById("projectviewer-report-card"),document.getElementById("projectviewer-report-project")], "projectviewer-report-card");
@@ -88,7 +88,7 @@ function ProjectViewer(Planet) {
 			document.getElementById("report-error").style.display = "block";
 			return;
 		} else {
-			document.getElementById("projectviewer-report-progress").style.display = "block";
+			document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
 			Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
 		}
 	}
@@ -103,7 +103,7 @@ function ProjectViewer(Planet) {
 			document.getElementById("submittext").textContent = this.ReportError;
 		}
 		document.getElementById("projectviewer-report-content").style.display = "none";
-		document.getElementById("projectviewer-report-progress").style.display = "none";
+		document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
 		document.getElementById("projectviewer-reportsubmit-content").style.display = "block";
 	}
 
