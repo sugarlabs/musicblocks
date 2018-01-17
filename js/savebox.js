@@ -30,7 +30,6 @@ function SaveBox () {
     this._canvas = null;
     this._stage = null;
     this._refreshCanvas = null;
-    this._doSaveHTML = null;
     this._doSaveSVG = null;
     this._doSavePNG = null;
     this._doSaveWAV = null;
@@ -39,6 +38,7 @@ function SaveBox () {
     this._doSaveBlockArtwork = null;
     this._doSaveAbc = null;
     this._doSaveLilyPond = null;
+    this._doSaveHTML = null;
 
     this._container = null;
     this._bounds = null;
@@ -112,16 +112,6 @@ function SaveBox () {
             var that = this;
 
             var dx = BOXBUTTONOFFSET;
-
-            this.saveHTML = makeButton('save-html', _('Save to .html'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.saveHTML.visible = true;
-            this.positionHoverText(this.saveHTML);
-            this.saveHTML.on('click', function(event) {
-                that.hide();
-                that._doSaveHTML();
-            });
-
-            dx += BOXBUTTONSPACING;
 
             this.saveSVG = makeButton('save-svg', _('Save as .svg'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.saveSVG.visible = true;
@@ -204,6 +194,16 @@ function SaveBox () {
             this.saveBlockArtwork.on('click', function(event) {
                 that.hide();
                 that._doSaveBlockArtwork();
+            });
+            
+            dx += BOXBUTTONSPACING;
+
+            this.saveHTML = makeButton('save-button-dark', _('Save project'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.saveHTML.visible = true;
+            this.positionHoverText(this.saveHTML);
+            this.saveHTML.on('click', function(event) {
+                that.hide();
+                that._doSaveHTML();
             });
 
         } else {
