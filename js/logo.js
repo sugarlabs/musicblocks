@@ -5011,9 +5011,12 @@ function Logo () {
                 // play.
                 if (that.tieCarryOver[turtle] > 0) {
                     if (that.justCounting[turtle].length === 0) {
-                        // Remove the note from the Lilypond list.
-                        for (var i = 0; i < that.notePitches[turtle][last(that.inNoteBlock[turtle])].length; i++) {
-                            that.notationRemoveTie(turtle);
+                        var lastNote = last(that.inNoteBlock[turtle]);
+                        if (lastNote != null && lastNote in that.notePitches[turtle]) {
+                            // Remove the note from the Lilypond list.
+                            for (var i = 0; i < that.notePitches[turtle][last(that.inNoteBlock[turtle])].length; i++) {
+                                that.notationRemoveTie(turtle);
+                            }
                         }
                     }
                     var noteValue = that.tieCarryOver[turtle];
@@ -6785,12 +6788,14 @@ function Logo () {
                 }, beatValue * 1000);
             };
 
-            if (this.noteDelay === 0 || !this.suppressOutput[turtle]) {
-                __playnote();
-            } else {
-                setTimeout(function () {
+            if (last(that.inNoteBlock[turtle]) != null) {
+                if (this.noteDelay === 0 || !this.suppressOutput[turtle]) {
                     __playnote();
-                }, this.noteDelay);
+                } else {
+                    setTimeout(function () {
+                       __playnote();
+                    }, this.noteDelay);
+                }
             }
         }
 
