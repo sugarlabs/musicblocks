@@ -30,7 +30,7 @@ function SaveBox () {
     this._canvas = null;
     this._stage = null;
     this._refreshCanvas = null;
-    this._doSaveTB = null;
+    this._doSaveHTML = null;
     this._doSaveSVG = null;
     this._doSavePNG = null;
     this._doSaveWAV = null;
@@ -56,8 +56,8 @@ function SaveBox () {
         return this;
     };
 
-    this.setSaveTB = function (doSaveTB) {
-        this._doSaveTB = doSaveTB;
+    this.setSaveHTML = function (doSaveHTML) {
+        this._doSaveHTML = doSaveHTML;
         return this;
     };
 
@@ -113,12 +113,12 @@ function SaveBox () {
 
             var dx = BOXBUTTONOFFSET;
 
-            this.saveTB = makeButton('save-tb', _('Save as .tb'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.saveTB.visible = true;
-            this.positionHoverText(this.saveTB);
-            this.saveTB.on('click', function(event) {
+            this.saveHTML = makeButton('save-html', _('Save to .html'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.saveHTML.visible = true;
+            this.positionHoverText(this.saveHTML);
+            this.saveHTML.on('click', function(event) {
                 that.hide();
-                that._doSaveTB();
+                that._doSaveHTML();
             });
 
             dx += BOXBUTTONSPACING;
@@ -228,7 +228,7 @@ function SaveBox () {
 
     this.hide = function() {
         if (this._container !== null) {
-            this.saveTB.visible = false;
+            this.saveHTML.visible = false;
             this.saveSVG.visible = false;
             this.savePNG.visible = false;
             this.uploadToPlanet.visible = false;
@@ -248,7 +248,7 @@ function SaveBox () {
 
     this.show = function() {
         if (this._container !== null) {
-            this.saveTB.visible = true;
+            this.saveHTML.visible = true;
             this.saveSVG.visible = true;
             this.savePNG.visible = true;
             this.uploadToPlanet.visible = true;
@@ -328,3 +328,90 @@ function SaveBox () {
 
     };
 };
+var htmlSaveTemplate = `
+<!-- {{ data }} -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="{{ project_description }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>{{ project_name }}</title>
+
+    <meta property="og:site_name" content="Music Blocks" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Music Blocks - {{ project_name }}" />
+    <meta property="og:description" content="{{ project_description }}" />
+
+    <style>
+        body {
+            background-color: #dbf0fb;
+        }
+        #main {
+            background-color: white;
+            padding: 5%;
+            position: fixed;
+            width: 80vw;
+            max-height: 60vh;
+            margin: auto;
+            top: 0; left: 0; bottom: 0; right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align:  center;
+            color: #424242;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+            font-family: "Roboto", "Helvetica","Arial",sans-serif;
+        }
+        h3 {
+            font-weight: 400;
+            font-size: 36px;
+            margin-top: 10px;
+        }
+
+        hr {
+            border-top: 0px solid #ccc;
+            margin: 1em;
+        }
+
+        .btn {
+            border: solid;
+            border-color: #96D3F3;
+            padding: 5px 10px;
+            line-height: 50px;
+            color: #0a3e58;
+        }
+
+        .btn:hover {
+            transition: 0.4s;
+            -webkit-transition: 0.3s;
+            -moz-transition: 0.3s;
+            background-color: #96D3F3;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div style="color: #9E9E9E">
+            {{ project_author }}
+        </div>
+        <h3>Music Blocks Project - {{ project_name }}</h3>
+        <p>
+            {{ project_description }}
+        </p>
+        <hr>
+        <div>
+            <a class="btn">
+                Open in Musicblocks
+            </a>
+
+            <div style="color: #9E9E9E">
+                Internet required to open this project in Musicblocks from here. <br>
+                If you want to open this project in a local version of Musicblocks, open it from the application.
+            </div>
+    </div>
+    </div>
+</body>
+</html>
+`

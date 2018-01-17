@@ -878,7 +878,7 @@ define(MYDEFINES, function (compatibility) {
                 .setCanvas(canvas)
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
-                .setSaveTB(doSaveTB)
+                .setSaveHTML(doSaveHTML)
                 .setSaveSVG(doSaveSVG)
                 .setSavePNG(doSavePNG)
                 .setSaveWAV(doSaveWAV)
@@ -2256,14 +2256,20 @@ define(MYDEFINES, function (compatibility) {
             // }
         };
 
-        function doSaveTB() {
-            var filename = prompt('Filename:', _('untitled') + '.tb');
+        function doSaveHTML() {
+            var filename = prompt('Filename:', _('untitled') + '.html');
             if (filename != null) {
-                if (fileExt(filename) !== 'tb') {
-                    filename += '.tb';
-                }
+                var fileContents = htmlSaveTemplate;
+                fileContents = fileContents.split("{{ project_name }}").join(filename);
 
-                download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+                // Remove name and description, assume data doesn't exist
+                fileContents = fileContents.replace("{{ project_description }}", "");
+                fileContents = fileContents.replace("{{ project_author }}", "");
+                if (fileExt(filename) !== 'html') {
+                    filename += '.html';
+                }
+                fileContents = fileContents.replace("{{ data }}", prepareExport());
+                download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContents));
             }
         };
 
