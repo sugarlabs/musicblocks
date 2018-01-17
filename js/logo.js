@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017 Walter Bender
+// Copyright (c) 2014-2018 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 //
 // This program is free software; you can redistribute it and/or
@@ -1278,24 +1278,43 @@ function Logo () {
         switch (this.blocks.blockList[blk].name) {
         case 'x':
             turtleObj.doSetXY(value, turtleObj.y);
+            if (this.justCounting[turtle].length === 0) {
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setxy', value, turtleObj.y]);
+            }
             break;
         case 'y':
             turtleObj.doSetXY(turtleObj.x, value);
+            if (this.justCounting[turtle].length === 0) {
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setxy', turtleObj.x, value]);
+            }
             break;
         case 'heading':
             turtleObj.doSetHeading(value);
+            this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'setheading', value]);
             break;
         case 'color':
             turtleObj.doSetColor(value);
+            if (this.justCounting[turtle].length === 0) {
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setcolor', value]);
+            }
             break;
         case 'shade':
             turtleObj.doSetValue(value);
+            if (this.justCounting[turtle].length === 0) {
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setshade', value]);
+            }
             break;
         case 'grey':
             turtleObj.doSetChroma(value);
+            if (this.justCounting[turtle].length === 0) {
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setgrey', value]);
+            }
             break;
         case 'pensize':
             turtleObj.doSetPensize(value);
+            if (this.justCounting[turtle].length === 0) {
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setpensize', value]);
+            }
             break;
         case 'namedbox':
             var name = this.blocks.blockList[blk].privateData;
