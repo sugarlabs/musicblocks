@@ -923,8 +923,11 @@ function Blocks () {
     };
 
     this.deleteNextDefault = function (thisBlock) {
+        if (thisBlock == undefined) {
+            return;
+        };
+
         var thisBlockobj = this.blockList[thisBlock];
-        console.log(thisBlockobj.name);
         if (thisBlockobj.name === 'rest2') {
             this._deletePitchBlocks(thisBlock);
         } else {
@@ -1339,7 +1342,7 @@ function Blocks () {
                 // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
-                } else {
+                } else if (bottom) {
                     this.deleteNextDefault(bottom);
                 }
             }
