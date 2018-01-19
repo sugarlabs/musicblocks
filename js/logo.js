@@ -215,7 +215,8 @@ function Logo () {
     this.swingTarget = {};
     this.swingCarryOver = {};
     this.tie = {};
-    this.tieNote = {};
+    this.tieNotePitches = {};
+    this.tieNoteExtras = {};
     this.tieCarryOver = {};
     this.masterVolume = [];
     this.synthVolume = {};
@@ -994,7 +995,8 @@ function Logo () {
             this.swingTarget[turtle] = [];
             this.swingCarryOver[turtle] = 0;
             this.tie[turtle] = false;
-            this.tieNote[turtle] = [];
+            this.tieNotePitches[turtle] = [];
+            this.tieNoteExtras[turtle] = [];
             this.tieCarryOver[turtle] = 0;
             this.drift[turtle] = 0;
             this.drumStyle[turtle] = [];
@@ -5016,7 +5018,8 @@ function Logo () {
         case 'tie':
             // Tie notes together in pairs.
             that.tie[turtle] = true;
-            that.tieNote[turtle] = [];
+            that.tieNotePitches[turtle] = [];
+            that.tieNoteExtras[turtle] = [];
             that.tieCarryOver[turtle] = 0;
             childFlow = args[0];
             childFlowCount = 1;
@@ -5026,8 +5029,10 @@ function Logo () {
 
             var __listener = function (event) {
                 that.tie[turtle] = false;
+
                 // If tieCarryOver > 0, we have one more note to
                 // play.
+
                 if (that.tieCarryOver[turtle] > 0) {
                     if (that.justCounting[turtle].length === 0) {
                         var lastNote = last(that.inNoteBlock[turtle]);
@@ -5038,11 +5043,49 @@ function Logo () {
                             }
                         }
                     }
+
+                    // Restore the extra note and play it
+                    var saveBlk = that.tieNoteExtras[turtle][0];
                     var noteValue = that.tieCarryOver[turtle];
-                    that.tieCarryOver[turtle] = 0;
-                    that._processNote(noteValue, blk, turtle);
+
+                    that.inNoteBlock[turtle].push(saveBlk);
+
+                    that.notePitches[turtle][saveBlk] = [];
+                    that.noteOctaves[turtle][saveBlk] = [];
+                    that.noteCents[turtle][saveBlk] = [];
+                    that.noteHertz[turtle][saveBlk] = [];
+                    for (var i = 0; i < that.tieNotePitches[turtle].length; i++) {
+                        that.notePitches[turtle][saveBlk].push(that.tieNotePitches[turtle][i][0]);
+                        that.noteOctaves[turtle][saveBlk].push(that.tieNotePitches[turtle][i][1]);
+                        that.noteCents[turtle][saveBlk].push(that.tieNotePitches[turtle][i][2]);
+                        that.noteHertz[turtle][saveBlk].push(that.tieNotePitches[turtle][i][3]);
+                    }
+
+                    that.oscList[turtle][saveBlk] = that.tieNoteExtras[turtle][1];
+                    that.noteBeat[turtle][saveBlk] = that.tieNoteExtras[turtle][2];
+                    that.noteBeatValues[turtle][saveBlk] = that.tieNoteExtras[turtle][3];
+                    that.noteDrums[turtle][saveBlk] = that.tieNoteExtras[turtle][4];
+                    // Graphics will have already been rendered.
+                    that.embeddedGraphics[turtle][saveBlk] = []; // that.tieNoteExtras[turtle][5];
+
+                    that._processNote(noteValue, saveBlk, turtle);
+
+                    that.inNoteBlock[turtle].pop();
+
+                    delete that.notePitches[turtle][saveBlk];
+                    delete that.noteOctaves[turtle][saveBlk];
+                    delete that.noteCents[turtle][saveBlk];
+                    delete that.noteHertz[turtle][saveBlk];
+                    delete that.oscList[turtle][saveBlk];
+                    delete that.noteBeat[turtle][saveBlk];
+                    delete that.noteBeatValues[turtle][saveBlk];
+                    delete that.noteDrums[turtle][saveBlk];
+                    delete that.embeddedGraphics[turtle][saveBlk];
                 }
-                that.tieNote[turtle] = [];
+
+                that.tieCarryOver[turtle] = 0;
+                that.tieNotePitches[turtle] = [];
+                that.tieNoteExtras[turtle] = [];
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -6323,84 +6366,125 @@ function Logo () {
             }
 
             // If we are in a tie, depending upon parity, we either
-            // add the duration from the previous note to the current
+            // add the duration from the prvious note to the current
             // note, or we cache the duration and set the wait to
             // zero. FIXME: Will not work when using dup and skip.
             if (this.tie[turtle]) {
-                // We need to check to see if we are tying together
-                // similar notes.
+                var saveBlk = last(this.inNoteBlock[turtle]);
+
                 if (this.tieCarryOver[turtle] > 0) {
+                    // We need to check to see if we are tying together
+                    // similar notes.
+
                     var match = true;
-                    if (this.tieNote[turtle].length !== this.notePitches[turtle][last(this.inNoteBlock[turtle])].length) {
+                    if (this.tieNotePitches[turtle].length !== this.notePitches[turtle][last(this.inNoteBlock[turtle])].length) {
                         match = false;
                     } else {
-                        for (var i = 0; i < this.tieNote[turtle].length; i++) {
-                            if (this.tieNote[turtle][i][0] != this.notePitches[turtle][last(this.inNoteBlock[turtle])][i]) {
+                        // FIXME: This check assumes that the order of
+                        // the pitch blocks in a chord are the same.
+                        for (var i = 0; i < this.tieNotePitches[turtle].length; i++) {
+                            if (this.tieNotePitches[turtle][i][0] != this.notePitches[turtle][last(this.inNoteBlock[turtle])][i]) {
                                 match = false;
                                 break;
                             }
 
-                            if (this.tieNote[turtle][i][1] != this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][i]) {
+                            if (this.tieNotePitches[turtle][i][1] != this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][i]) {
                                 match = false;
                                 break;
                             }
                         }
                     }
+
                     if (!match) {
-                        var tmpBeatValue = this.tieCarryOver[turtle];
-                        this.tieCarryOver[turtle] = 0;
-                        this.tie[turtle] = false;
+                        // If we don't have a match, then we need to
+                        // play the previous note.
+                        console.log(_('You can only tie notes of the same pitch.'));
+                        this.errorMsg(_('You can only tie notes of the same pitch.'), saveBlk);
 
                         // Save the current note.
-                        var saveNote = [];
-                        for (var i = 0; i < this.notePitches[turtle][last(this.inNoteBlock[turtle])].length; i++) {
-                            saveNote.push([this.notePitches[turtle][last(this.inNoteBlock[turtle])][i], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][i], this.noteCents[turtle][last(this.inNoteBlock[turtle])][i], this.noteHertz[turtle][last(this.inNoteBlock[turtle])][i]]);
+                        var saveCurrentNote = [];
+                        var saveCurrentExtras = [];
+                        for (var i = 0; i < this.notePitches[turtle][last(this.inNoteBlock[turtle])].length; i++)
+                        {
+                            saveCurrentNote.push([this.notePitches[turtle][saveBlk][i], this.noteOctaves[turtle][saveBlk][i], this.noteCents[turtle][saveBlk][i], this.noteHertz[turtle][saveBlk][i], saveBlk]);
                         }
+
+                        saveCurrentExtras = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], this.noteDrums[turtle][saveBlk], this.embeddedGraphics[turtle][saveBlk]];
 
                         // Swap in the previous note.
-                        this.notePitches[turtle][last(this.inNoteBlock[turtle])] = [];
-                        this.noteOctaves[turtle][last(this.inNoteBlock[turtle])] = [];
-                        this.noteCents[turtle][last(this.inNoteBlock[turtle])] = [];
-                        this.noteHertz[turtle][last(this.inNoteBlock[turtle])] = [];
-                        for (var i = 0; i < this.tieNote[turtle].length; i++) {
-                            this.notePitches[turtle][last(this.inNoteBlock[turtle])].push(this.tieNote[turtle][i][0]);
-                            this.noteOctaves[turtle][last(this.inNoteBlock[turtle])].push(this.tieNote[turtle][i][1]);
-                            this.noteCents[turtle][last(this.inNoteBlock[turtle])].push(this.tieNote[turtle][i][2]);
-                            this.noteHertz[turtle][last(this.inNoteBlock[turtle])].push(this.tieNote[turtle][i][3]);
+                        saveBlk = this.tieNoteExtras[turtle][0];
+                        this.inNoteBlock[turtle].push(saveBlk);
+
+                        this.notePitches[turtle][saveBlk] = [];
+                        this.noteOctaves[turtle][saveBlk] = [];
+                        this.noteCents[turtle][saveBlk] = [];
+                        this.noteHertz[turtle][saveBlk] = [];
+                        for (var i = 0; i < this.tieNotePitches[turtle].length; i++) {
+                            this.notePitches[turtle][saveBlk].push(this.tieNotePitches[turtle][i][0]);
+                            this.noteOctaves[turtle][saveBlk].push(this.tieNotePitches[turtle][i][1]);
+                            this.noteCents[turtle][saveBlk].push(this.tieNotePitches[turtle][i][2]);
+                            this.noteHertz[turtle][saveBlk].push(this.tieNotePitches[turtle][i][3]);
                         }
 
-                        this.tieNote[turtle] = [];
+                        this.oscList[turtle][saveBlk] = this.tieNoteExtras[turtle][1];
+                        this.noteBeat[turtle][saveBlk] = this.tieNoteExtras[turtle][2];
+                        this.noteBeatValues[turtle][saveBlk] = this.tieNoteExtras[turtle][3];
+                        this.noteDrums[turtle][saveBlk] = this.tieNoteExtras[turtle][4];
+                        this.embeddedGraphics[turtle][saveBlk] = this.tieNoteExtras[turtle][5];
 
-                        if (this.justCounting[turtle].length === 0) {
+                         if (this.justCounting[turtle].length === 0) {
                             // Remove the note from the Lilypond list.
-                            for (var i = 0; i < this.notePitches[turtle][last(this.inNoteBlock[turtle])].length; i++) {
+                            for (var i = 0; i < this.notePitches[turtle][saveBlk].length; i++) {
                                 this.notationRemoveTie(turtle);
                             }
                         }
 
-                        this._processNote(tmpBeatValue, blk, turtle);
+                        // Play previous note.
+                        // TODO: add a slur
+                        this.tie[turtle] = false;
+                        this._processNote(this.tieCarryOver[turtle], saveBlk, turtle);
+
+                        this.inNoteBlock[turtle].pop();
+
+                        if (!this.suppressOutput[turtle]) {
+                            this._doWait(turtle, Math.max(((bpmFactor / this.tieCarryOver[turtle]) + (this.noteDelay / 1000)) - turtleLag, 0));
+                        }
+
+                        this.tieCarryOver[turtle] = 0;
+                        this.tie[turtle] = true;
 
                         // Restore the current note.
-                        this.tie[turtle] = true;
-                        this.notePitches[turtle][last(this.inNoteBlock[turtle])] = [];
-                        this.noteOctaves[turtle][last(this.inNoteBlock[turtle])] = [];
-                        this.noteCents[turtle][last(this.inNoteBlock[turtle])] = [];
-                        this.noteHertz[turtle][last(this.inNoteBlock[turtle])] = [];
-                        for (var i = 0; i < saveNote.length; i++) {
-                            this.notePitches[turtle][last(this.inNoteBlock[turtle])].push(saveNote[i][0]);
-                            this.noteOctaves[turtle][last(this.inNoteBlock[turtle])].push(saveNote[i][1]);
-                            this.noteCents[turtle][last(this.inNoteBlock[turtle])].push(saveNote[i][2]);
-                            this.noteHertz[turtle][last(this.inNoteBlock[turtle])].push(saveNote[i][3]);
+                        saveBlk = saveCurrentExtras[0];
+                        this.notePitches[turtle][saveBlk] = [];
+                        this.noteOctaves[turtle][saveBlk] = [];
+                        this.noteCents[turtle][saveBlk] = [];
+                        this.noteHertz[turtle][saveBlk] = [];
+                        for (var i = 0; i < saveCurrentNote.length; i++) {
+                            this.notePitches[turtle][saveBlk].push(saveCurrentNote[i][0]);
+                            this.noteOctaves[turtle][saveBlk].push(saveCurrentNote[i][1]);
+                            this.noteCents[turtle][saveBlk].push(saveCurrentNote[i][2]);
+                            this.noteHertz[turtle][saveBlk].push(saveCurrentNote[i][3]);
                         }
+
+                        this.oscList[turtle][saveBlk] = saveCurrentExtras[1];
+                        this.noteBeat[turtle][saveBlk] = saveCurrentExtras[2];
+                        this.noteBeatValues[turtle][saveBlk] = saveCurrentExtras[3];
+                        this.noteDrums[turtle][saveBlk] = saveCurrentExtras[4];
+                        this.embeddedGraphics[turtle][saveBlk] = saveCurrentExtras[5];
                     }
                 }
 
                 if (this.tieCarryOver[turtle] === 0) {
-                    this.tieNote[turtle] = [];
+                    // We need to save the first note in the pair.
+                    this.tieNotePitches[turtle] = [];
                     this.tieCarryOver[turtle] = noteBeatValue;
-                    for (var i = 0; i < this.notePitches[turtle][last(this.inNoteBlock[turtle])].length; i++) {
-                        this.tieNote[turtle].push([this.notePitches[turtle][last(this.inNoteBlock[turtle])][i], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][i], this.noteCents[turtle][last(this.inNoteBlock[turtle])][i], this.noteHertz[turtle][last(this.inNoteBlock[turtle])][i]]);
+
+                    for (var i = 0; i < this.notePitches[turtle][saveBlk].length; i++) {
+                        this.tieNotePitches[turtle].push([this.notePitches[turtle][saveBlk][i], this.noteOctaves[turtle][saveBlk][i], this.noteCents[turtle][saveBlk][i], this.noteHertz[turtle][saveBlk][i]]);
                     }
+
+                    this.tieNoteExtras[turtle] = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], this.noteDrums[turtle][saveBlk], this.embeddedGraphics[turtle][saveBlk]];
+
                     noteBeatValue = 0;
                 } else {
                     carry = this.tieCarryOver[turtle];
@@ -6473,15 +6557,17 @@ function Logo () {
 
             var that = this;
             __playnote = function () {
+                var thisBlk = last(that.inNoteBlock[turtle]);
+
                 // If there are multiple notes, remove the rests.
-                if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 1) {
-                    while (that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest') !== -1) {
-                        that.notePitches[turtle][last(that.inNoteBlock[turtle])].splice(that.notePitches[turtle][last(that.inNoteBlock[turtle])].indexOf('rest'), 1);
+                if (that.notePitches[turtle][thisBlk].length > 1) {
+                    while (that.notePitches[turtle][thisBlk].indexOf('rest') !== -1) {
+                        that.notePitches[turtle][thisBlk].splice(that.notePitches[turtle][thisBlk].indexOf('rest'), 1);
                     }
                 }
 
                 // If there is no note, add a rest.
-                if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length === 0) {
+                if (that.notePitches[turtle][thisBlk].length === 0) {
                     that.notePitches[turtle][that.inNoteBlock[turtle][that.inNoteBlock[turtle].length - 1]].push('rest');
                 }
 
@@ -6497,7 +6583,7 @@ function Logo () {
                 var notes = [];
                 var drums = [];
                 var insideChord = -1;
-                if ((that.notePitches[turtle][last(that.inNoteBlock[turtle])].length + that.oscList[turtle][last(that.inNoteBlock[turtle])].length) > 1) {
+                if ((that.notePitches[turtle][thisBlk].length + that.oscList[turtle][thisBlk].length) > 1) {
                     if (turtle in that.notationStaging && that.justCounting[turtle].length === 0) {
                         var insideChord = that.notationStaging[turtle].length + 1;
                     } else {
@@ -6535,22 +6621,22 @@ function Logo () {
                 }
 
                 // Process pitches
-                if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
-                    for (var i = 0; i < that.notePitches[turtle][last(that.inNoteBlock[turtle])].length; i++) {
-                        if (that.notePitches[turtle][last(that.inNoteBlock[turtle])][i] === 'rest' || forceSilence) {
+                if (that.notePitches[turtle][thisBlk].length > 0) {
+                    for (var i = 0; i < that.notePitches[turtle][thisBlk].length; i++) {
+                        if (that.notePitches[turtle][thisBlk][i] === 'rest' || forceSilence) {
                             note = 'R';
                             that.previousNotePlayed[turtle] = that.lastNotePlayed[turtle];
                         } else {
-                            var noteObj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][i], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][i], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
+                            var noteObj = getNote(that.notePitches[turtle][thisBlk][i], that.noteOctaves[turtle][thisBlk][i], 0, that.keySignature[turtle], that.movable[turtle], null, that.errorMsg);
 
                             // If the cents for this note != 0, then
                             // we need to convert to frequency and add
                             // in the cents.
-                            if (that.noteCents[turtle][last(that.inNoteBlock[turtle])][i] !== 0) {
-                                if (that.noteHertz[turtle][last(that.inNoteBlock[turtle])][i] !== 0) {
-                                    var note = that.noteHertz[turtle][last(that.inNoteBlock[turtle])][i];
+                            if (that.noteCents[turtle][thisBlk][i] !== 0) {
+                                if (that.noteHertz[turtle][thisBlk][i] !== 0) {
+                                    var note = that.noteHertz[turtle][thisBlk][i];
                                 } else {
-                                    var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], that.noteCents[turtle][last(that.inNoteBlock[turtle])][i], that.keySignature[turtle]));
+                                    var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], that.noteCents[turtle][thisBlk][i], that.keySignature[turtle]));
                                 }
                             } else {
                                 var note = noteObj[0] + noteObj[1];
@@ -6652,20 +6738,20 @@ function Logo () {
                                     return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous;
                                 }
 
-                                if (that.oscList[turtle][last(that.inNoteBlock[turtle])].length > 0) {
+                                if (that.oscList[turtle][thisBlk].length > 0) {
                                     if (notes.length > 1) {
-                                        that.errorMsg(last(that.oscList[turtle][last(that.inNoteBlock[turtle])]) + ': ' +  _('synth cannot play chords.'), blk);
+                                        that.errorMsg(last(that.oscList[turtle][thisBlk]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
 
                                     if (!that.suppressOutput[turtle]) {
-                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle][last(that.inNoteBlock[turtle])]), paramsEffects, null);
+                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null);
                                     }
 
                                     if (that.justCounting[turtle].length === 0) {
                                         if (__hasParamEffect()) {
-                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle][last(that.inNoteBlock[turtle])]), paramsEffects, null]);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null]);
                                         } else {
-                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle][last(that.inNoteBlock[turtle])]), null, null]);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle][thisBlk]), null, null]);
                                         }
                                     }
                                 } else if (that.drumStyle[turtle].length > 0) {
@@ -6744,14 +6830,14 @@ function Logo () {
                 }
 
                 // Process drums
-                if (that.noteDrums[turtle][last(that.inNoteBlock[turtle])].length > 0) {
-                    for (var i = 0; i < that.noteDrums[turtle][last(that.inNoteBlock[turtle])].length; i++) {
-                        drums.push(that.noteDrums[turtle][last(that.inNoteBlock[turtle])][i]);
+                if (that.noteDrums[turtle][thisBlk].length > 0) {
+                    for (var i = 0; i < that.noteDrums[turtle][thisBlk].length; i++) {
+                        drums.push(that.noteDrums[turtle][thisBlk][i]);
                     }
 
                     // If it is > 0, we already counted this note
                     // (e.g. pitch & drum combination).
-                    if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length === 0) {
+                    if (that.notePitches[turtle][thisBlk].length === 0) {
                         var obj = rationalToFraction(1 / noteBeatValue);
                         if (that.justCounting[turtle].length === 0) {
                             console.log('notes to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
