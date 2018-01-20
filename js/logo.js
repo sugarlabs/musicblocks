@@ -5036,7 +5036,7 @@ function Logo () {
                 if (that.tieCarryOver[turtle] > 0) {
                     if (that.justCounting[turtle].length === 0) {
                         var lastNote = last(that.inNoteBlock[turtle]);
-                        if (lastNote != null && lastNote in that.notePitches[turtle]) {
+			if (lastNote != null && lastNote in that.notePitches[turtle]) {
                             // Remove the note from the Lilypond list.
                             for (var i = 0; i < that.notePitches[turtle][last(that.inNoteBlock[turtle])].length; i++) {
                                 that.notationRemoveTie(turtle);
@@ -5081,6 +5081,9 @@ function Logo () {
                     delete that.noteBeatValues[turtle][saveBlk];
                     delete that.noteDrums[turtle][saveBlk];
                     delete that.embeddedGraphics[turtle][saveBlk];
+
+                    // Remove duplicate note
+                    that.notationStaging[turtle].pop();
                 }
 
                 that.tieCarryOver[turtle] = 0;
