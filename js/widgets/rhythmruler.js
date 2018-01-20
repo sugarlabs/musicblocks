@@ -24,7 +24,7 @@ function RhythmRuler () {
     const RULERHEIGHT = 70;
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
-    const BACKSPACE = 8;
+    const DEL = 46;
 
     // There is one ruler per drum.
     this.Drums = [];
@@ -1142,11 +1142,9 @@ function RhythmRuler () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        // FIXME: rough workaround for #508, investigate reasons why
-        // the backspace press doesn't work by default
         var numberInput = docById('dissectNumber');
         numberInput.onkeydown =  function (event) {
-            if (event.keyCode == 46) {
+            if (event.keyCode == DEL) {
                 numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
             }   
         };
@@ -1156,11 +1154,11 @@ function RhythmRuler () {
                 if (numberInput.value < 2) {
                     numberInput.value = 2;
                 } 
-            }
+            };
             if (numberInput.value > 128) {
                 numberInput.value = 128;
             }
-        }
+        };
 
         var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'), '');
         cell.onclick = function () {
