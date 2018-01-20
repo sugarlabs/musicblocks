@@ -6884,7 +6884,7 @@ function Logo () {
                     }
                 }
 
-                that._dispatchTurtleSignals(turtle, beatValue, blk, noteBeatValue);
+                that._dispatchTurtleSignals(turtle, beatValue, blk, 0);
                 // After the note plays, clear the embedded graphics queue.
                 that.embeddedGraphics[turtle][blk] = [];
 
@@ -7152,7 +7152,7 @@ function Logo () {
         }
     };
 
-    this._dispatchTurtleSignals = function (turtle, beatValue, blk, noteBeatValue) {
+    this._dispatchTurtleSignals = function (turtle, beatValue, blk, delay) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
         if (this.embeddedGraphics[turtle][blk].length === 0) {
@@ -7414,7 +7414,7 @@ function Logo () {
             }
         }
 
-        var stepTime = beatValue * 1000 / NOTEDIV;
+        var stepTime = (beatValue - delay) * 1000 / NOTEDIV;
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
@@ -7423,7 +7423,7 @@ function Logo () {
             var stepTime = stepTime / extendedGraphicsCounter;
         }
 
-        var waitTime = 0;
+        var waitTime = delay * 1000;
 
         // We want to update the turtle graphics every 50ms within a note.
         if (stepTime > 200) {
