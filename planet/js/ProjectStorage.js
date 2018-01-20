@@ -14,6 +14,7 @@ function ProjectStorage(Planet){
 	this.LocalStorage = null;
 	this.data = null;
 	this.LocalStorageKey = "ProjectData";
+	this.TimeLastSaved = -1;
 
 	this.generateID = function(){
 		var n = Date.now();
@@ -160,6 +161,7 @@ function ProjectStorage(Planet){
 	};
 
 	this.save = function(){
+		this.TimeLastSaved = Date.now();
 		this.set(this.LocalStorageKey,this.data);
 	};
 

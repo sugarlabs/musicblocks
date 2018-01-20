@@ -1272,6 +1272,10 @@ define(MYDEFINES, function (compatibility) {
                     return this.planet.ProjectStorage.getCurrentProjectName();
                 }
 
+                this.getTimeLastSaved = function(){
+                    return this.planet.ProjectStorage.TimeLastSaved;
+                }
+
                 this.init = function(){
                     this.iframe = document.getElementById("planet-iframe");
                     this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_,storage);
