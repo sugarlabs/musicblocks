@@ -18,6 +18,7 @@ function SaveInterface(PlanetInterface) {
 
     this.filename = null;
     this.notationConvert = "";
+    this.timeLastSaved = -100;
 
     this.download = function(extension, dataurl, defaultfilename){
         var filename = null;
@@ -58,6 +59,11 @@ function SaveInterface(PlanetInterface) {
     this.saveTB = function(filename){
         var tb = 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport());
         this.download("tb", tb, filename);
+    }
+
+    this.saveTBNoPrompt = function(){
+        var tb = 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport());
+        this.downloadURL(this.PlanetInterface.getCurrentProjectName()+".tb", tb);
     }
 
     this.saveSVG = function(filename){
@@ -263,6 +269,17 @@ function SaveInterface(PlanetInterface) {
     }
 
     this.init = function(){
-
+        var unloadTimer;
+        this.timeLastSaved = -100;
+        window.onbeforeunload = function() {
+            if (this.PlanetInterface.getTimeLastSaved()!=this.timeLastSaved){
+                this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
+                unloadTimer = window.setTimeout(this.saveTBNoPrompt.bind(this),100);
+                return "Do you want to save your project?";
+            }
+        }.bind(this);
+        window.onunload = function(){
+            clearTimeout(unloadTimer);
+        }
     }
 }
