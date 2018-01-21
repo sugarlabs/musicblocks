@@ -20,6 +20,86 @@ function SaveInterface(PlanetInterface) {
     this.notationConvert = "";
     this.timeLastSaved = -100;
 
+    this.htmlSaveTemplate = `
+<!-- {{ data }} -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="{{ project_description }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>{{ project_name }}</title>
+    <meta property="og:site_name" content="Music Blocks" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Music Blocks - {{ project_name }}" />
+    <meta property="og:description" content="{{ project_description }}" />
+    <style>
+        body {
+            background-color: #dbf0fb;
+        }
+        #main {
+            background-color: white;
+            padding: 5%;
+            position: fixed;
+            width: 80vw;
+            max-height: 60vh;
+            margin: auto;
+            top: 0; left: 0; bottom: 0; right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align:  center;
+            color: #424242;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+            font-family: "Roboto", "Helvetica","Arial",sans-serif;
+        }
+        h3 {
+            font-weight: 400;
+            font-size: 36px;
+            margin-top: 10px;
+        }
+        hr {
+            border-top: 0px solid #ccc;
+            margin: 1em;
+        }
+        .btn {
+            border: solid;
+            border-color: #96D3F3;
+            padding: 5px 10px;
+            line-height: 50px;
+            color: #0a3e58;
+        }
+        .btn:hover {
+            transition: 0.4s;
+            -webkit-transition: 0.3s;
+            -moz-transition: 0.3s;
+            background-color: #96D3F3;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div style="color: #9E9E9E">
+            {{ project_author }}
+        </div>
+        <h3>Music Blocks Project - {{ project_name }}</h3>
+        <p>
+            {{ project_description }}
+        </p>
+        <hr>
+        <div>
+            {{ project_link }}
+            <div style="color: #9E9E9E">
+                Internet required to open this project in Music Blocks from here. <br>
+                If you want to open this project in a local version of Music Blocks, open this file in the application.
+            </div>
+    </div>
+    </div>
+</body>
+</html>
+`;
+
     this.download = function(extension, dataurl, defaultfilename){
         var filename = null;
         if (defaultfilename===undefined){
@@ -56,14 +136,30 @@ function SaveInterface(PlanetInterface) {
     }
 
     //Save Functions - n.b. include filename parameter - can be left blank / undefined
-    this.saveTB = function(filename){
-        var tb = 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport());
-        this.download("tb", tb, filename);
+    this.prepareHTML = function(){
+        var file = this.htmlSaveTemplate;
+        var description = this.PlanetInterface.getCurrentProjectDescription();
+        if (description==null){
+            description = "No description provided";
+        }
+        var author = ""; //currently we're using anonymous for authors - not storing names
+        var name = this.PlanetInterface.getCurrentProjectName();
+        var data = prepareExport();
+        file = file.replace(new RegExp("{{ project_description }}", "g"), description)
+                   .replace(new RegExp("{{ project_author }}", "g"), author)
+                   .replace(new RegExp("{{ project_name }}", "g"), name)
+                   .replace(new RegExp("{{ data }}", "g"), data);
+        return file;
     }
 
-    this.saveTBNoPrompt = function(){
-        var tb = 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport());
-        this.downloadURL(this.PlanetInterface.getCurrentProjectName()+".tb", tb);
+    this.saveHTML = function(filename){
+        var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
+        this.download("html", html, filename);
+    }
+
+    this.saveHTMLNoPrompt = function(){
+        var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
+        this.downloadURL(this.PlanetInterface.getCurrentProjectName()+".html", html);
     }
 
     this.saveSVG = function(filename){
@@ -274,7 +370,7 @@ function SaveInterface(PlanetInterface) {
         window.onbeforeunload = function() {
             if (this.PlanetInterface.getTimeLastSaved()!=this.timeLastSaved){
                 this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
-                unloadTimer = window.setTimeout(this.saveTBNoPrompt.bind(this),100);
+                unloadTimer = window.setTimeout(this.saveHTMLNoPrompt.bind(this),100);
                 return "Do you want to save your project?";
             }
         }.bind(this);

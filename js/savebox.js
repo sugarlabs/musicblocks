@@ -30,7 +30,7 @@ function SaveBox () {
     this._canvas = null;
     this._stage = null;
     this._refreshCanvas = null;
-    this._doSaveTB = null;
+    this._doSaveHTML = null;
     this._doSaveSVG = null;
     this._doSavePNG = null;
     this._doSaveWAV = null;
@@ -59,12 +59,12 @@ function SaveBox () {
 
             var dx = BOXBUTTONOFFSET;
 
-            this.saveTB = makeButton('save-tb', _('Save as .tb'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.saveTB.visible = true;
-            this.positionHoverText(this.saveTB);
-            this.saveTB.on('click', function(event) {
+            this.saveHTML = makeButton('save-button-dark', _('Save project'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.saveHTML.visible = true;
+            this.positionHoverText(this.saveHTML);
+            this.saveHTML.on('click', function(event) {
                 that.hide();
-                that._doSaveTB();
+                that._doSaveHTML();
             });
 
             dx += BOXBUTTONSPACING;
@@ -174,7 +174,7 @@ function SaveBox () {
 
     this.hide = function() {
         if (this._container !== null) {
-            this.saveTB.visible = false;
+            this.saveHTML.visible = false;
             this.saveSVG.visible = false;
             this.savePNG.visible = false;
             this.uploadToPlanet.visible = false;
@@ -194,7 +194,7 @@ function SaveBox () {
 
     this.show = function() {
         if (this._container !== null) {
-            this.saveTB.visible = true;
+            this.saveHTML.visible = true;
             this.saveSVG.visible = true;
             this.savePNG.visible = true;
             this.uploadToPlanet.visible = true;
