@@ -731,25 +731,24 @@ notes.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode3.svg "creating Dorian mode")
 
-In the above example, the *Major* mode has been rotated clockwise,
-transforming it into *Dorian*.
+
+在上面的例子中，*Major* 模式已经顺时针旋转，把它变成 *Dorian* 。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode4.svg "creating Locrian mode")
 
-In the above example, the *Major* mode has been rotated
-counter-clockwise, transforming it into *Locrian*.
+在上面的例子中，*Major* 模式已被旋转逆时针，将其转换成 *Locrian*。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode5.svg "creating Phrygian mode")
 
-In the above example, the *Major* mode has been inverted, transforming
-it into *Phrygian*.
+在上面的例子中，*Major* 模式已经被反转，转换它成 *Phrygian*。
 
-Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
+
+注意：《音乐拼块》中的内建模式可以在 [musicutils.js] 中找到
+(https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg "Pitch-time Matrix block")
 
-The *Save* button exports a stack of blocks representing the mode that
-can be used inside the *Pitch-time Matrix* block.
+*Save* 按钮导出一堆代表模式的块，可以在 *Pitch-Time Matrix* 块中使用。
 
 ### <a name="pitch-drum"></a>4.5 音调-鼓声矩阵
 
@@ -760,6 +759,10 @@ sounds. Drum sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substitued for
 each occurance of a `Re` `4`.
 
+*Set Drum* 块用于将封闭的音高映射到鼓中声音。
+鼓声使用指定的鼓在单声道中播放。
+在上面的例子中，一个 `kick drum` 将被代替每个 `Re 4` 的发生。
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg "pitch-drum matrix 1")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg "table for pitch-drum matrix")
@@ -768,9 +771,9 @@ each occurance of a `Re` `4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg "pitch-drum matrix 1")
 
-As an experience for creating mapping with the *Set Drum* block, we
-provide the *Drum-Pitch* Matrix. You use it to map between pitches and
-drums. The output is a stack of *Set Dum* blocks.
+作为用 *Set Drum* 块创建映射的经验，我们提供 *Drum-Pitch* 矩阵。
+你用它来映射间距和鼓。
+输出是一个* Set Drum *块的堆栈。
 
 ### <a name="stairs"></a>4.6 探索音调比例
 
@@ -782,15 +785,18 @@ The *Pitch* blocks contained in the clamp of the *Pitch Staircase*
 block define the pitches to be initialized simultaneously. By default,
 one pitch is defined and it have default note "la" and octave "3".
 
+*Pitch Staircase* 块是用来启动一个类似于 *Pitch-Time Matrix*，可以用来产生不同的音高使用给定的音调和音乐比例的拼块。
+
+包含在 *Pitch Staircase* 的夹子中的 *Pitch* 块同时定义音高初始化。
+一个音高开始被定义并且具有默认音符 “la” 和八度音阶 “3”。
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg "generating arbitrary pitches")
 
-When *Pitch Staircase* block is clicked, the *Pitch Staircase* widget is
-initialized. The widget contains row for every *Pitch* block contained
-in the clamp of the *Pitch Staircase* block. The input fields in the top
-row of the widget specify the musical proportions used to create new
-pitches in the staircase. The inputs correspond to the numerator and
-denominator in the proportion resectively. By default the proportion
-is 3:2.
+当 *Pitch Staircase* 块被点击时，*Pitch Staircase* 部件是初始化。
+该小部件包含每个 *Pitch* 块包含的行在 *Pitch Staircase* 块的夹子中。
+小部件顶部的输入字段指定用于创建新的音乐比例在楼梯间。
+输入对应于分子和分母的比例。
+开始的比例是 3：2。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase1.svg "notes associated with the step in the stairs")
 
@@ -808,22 +814,25 @@ decreasing order of frequency as well, completing a scale.
 The *Save stack* button will export pitch stacks. For example, in the above
 configuration, the output  from pressing the *Save stack* button is shown below:
 
+点击每行左边的 *Play* 按钮将会播放与在楼梯的那个步骤相关的音符。 
+*Play-all* 小部件左上角的按钮将同时播放所有音高步骤。
+第二个 *Play-all* 按钮按照频率的先后顺序播放，然后进入频率下降的顺序，完成一个规模。
+
+*Save Stack* 按钮将导出音高堆栈。
+例如，在上面配置，按下 *Save Stack* 按钮的输出如下所示：
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg "Pitch Stair block")
 
-These stacks can be used with the *Pitch-time Matrix* block to define
-the rows in the matrix.
+这些堆栈可以与 *Pitch-Time Matrix* 块一起使用来定义矩阵中的行。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg "Pitch Stair block")
 
 ### <a name="slider"></a>4.7 产生音调
 
-The *Pitch Slider* block is used to launch a widget that is used to
-generate arbitray pitches. It differs from the *Pitch Staircase* widget in
-that it is used to create frequencies that vary continuously within
-the range of a specified octave.
+*Pitch Slider* 块用于启动一个已经习惯的小部件生成任意球。
+它不同于 *Pitch Staircase* 部件,它被用来创建频率在不断变化指定八度的范围。
 
-Each *Sine* block contained within the clamp of the *Pitch Slider* block defines the initial pitch
-for an ocatve.
+包含在 *Pitch Slider* 块的夹子中的每个 *Sine* 块定义了初始音调的一个八度。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg "Pitch Slider")
 
@@ -837,11 +846,18 @@ starting frequency. The mouse is used to move the frequency up and down continuo
 used for intervals. Arrow keys can also be used to move up and down,
 or between columns.
 
+当 *Pitch Slider* 块被点击时，*Pitch Slider* 部件被初始化。
+小部件每个 *Sine*块将有一列夹子。
+每列都有一个滑块，可用于向上或向上移动频率，连续或间隔的1/12开始频率。
+鼠标用于连续上下移动频率。
+按钮是用于间隔。
+箭头键也可以用来上下移动，或列之间。
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg "Pitch Slider block")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg "pitch slider")
 
-Clicking in a column will extact the corresponding *Note* blocks, for example:
+点击一列将会提取相应的 *Note* 块，例如：
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg "pitch slider")
 
@@ -851,41 +867,39 @@ Clicking in a column will extact the corresponding *Note* blocks, for example:
 
 ### <a name="tempo"></a>4.8 改换节奏
 
-The *Tempo* block is used to launch a widget that enables the user to
-visualize Tempo, defined in beats per minute (BPM). When the *Tempo* block
-is clicked, the *Tempo* widget is initialized.
+*Tempo* 块用于启动一个小部件，使用户能够可视化速度，定义为每分钟节拍（BPM）。
+当 *Tempo* 块被点击，*Tempo* 小部件被初始化。
 
-The *Master Beats per Minute* block contained in the clamp of the
-*Tempo* block sets the initial tempo used by the widget. This
-determines the speed at which the ball in the widget moves back and
-forth. If BPM is 60, then it will take one second for the ball to move
-across the widget. A round-trip would take two seconds.
+The *Master Beats Per Minute* 块包含在夹子里 *Tempo* 块设置小部件使用的初始速度。
+这个确定微件中球的向前移动速度。
+如果 BPM 是 60，那么球会移动一秒钟整个小部件，往返需要两秒钟。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg "changing tempo")
 
-The top row of the widget holds the *Play/pause* button, the *Speed
-up* and *Slow down* buttons, and an input field for updating the
-Tempo.
+小部件的第一行包含 *Play/Pause* 按钮和 *Speed Up* 和 *Slow Down* 按钮，以及一个输入栏用于更新音符播放速度。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg "changing tempo")
 
-You can also update the tempo by clicking twice in spaced succession in the
-widget: the new BPM is determined as the time between the two clicks. For
-example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.
+您也可以通过点击小部件间隔连续两次来更新音乐速度：新的BPM被确定为两次点击之间的时间。
+例如，如果点击之间有1/2秒，新的BPM将被设置为120。
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>《音乐拼块》之外
 
 [上一章 (4. 部件)](#WIDGETS) | [回去目录](#TOC)
 
-Music Blocks is a waypoint, not a destination. One of the goals is to
-point the learner towards other powerful tools. One such tool is
-[Lilypond](http://lilypond.org), a music engraving program.
+《音乐拼块》 是一个航点，而不是目的地。
+其中一个目标是把学习者指向其他强大的工具。
+一个这样的工具是 [Lilypond](http://lilypond.org), 一个音乐雕刻程序。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg "adding Save as Lilypond block")
 
 The *Save as Lilypond* block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
-also a *Save as Lilypond* button on the secondary toolbar.
+also a  button on the secondary toolbar.
+
+*Save As Lilypond* 块将转录您的作文。
+该上面程序的输出保存到 `Downloads / hotdog.ly`。
+你还可以在辅助工具栏上 *Save As Lilypond* 按钮。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg "Save as Lilypond icon")
 
