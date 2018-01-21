@@ -57,7 +57,15 @@ function LocalCard(Planet){
 </div>';
 
 	this.download = function(){
-		downloadTB(this.ProjectData.ProjectName, this.ProjectData.ProjectData);
+		var image = Planet.ProjectStorage.ImageDataURL;
+		if (this.ProjectData.ProjectImage!=null){
+			image = this.ProjectData.ProjectImage;
+		}
+		var description = null;
+		if (this.ProjectData.PublishedData!=null){
+			description = this.ProjectData.PublishedData.ProjectDescription;
+		}
+		Planet.SaveInterface.saveHTML(this.ProjectData.ProjectName, this.ProjectData.ProjectData, image, description);
 	};
 
 	this.duplicate = function(){

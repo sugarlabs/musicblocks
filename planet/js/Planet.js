@@ -15,6 +15,7 @@ function Planet(isMusicBlocks,storage){
 	this.ProjectStorage = null;
 	this.ServerInterface = null;
 	this.Converter = null;
+	this.SaveInterface = null;
 	this.LocalStorage = storage;
 	this.ConnectedToServer = null;
 	this.TagsManifest = null;
@@ -112,6 +113,8 @@ function Planet(isMusicBlocks,storage){
 		this.Converter = new Converter(this);
 		this.Converter.init();
 		this.onConverterLoad();
+		this.SaveInterface = new SaveInterface(this);
+		this.SaveInterface.init();
 		this.LocalPlanet = new LocalPlanet(this);
 		this.LocalPlanet.init();
 		this.GlobalPlanet = new GlobalPlanet(this);

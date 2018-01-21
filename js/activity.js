@@ -851,7 +851,6 @@ define(MYDEFINES, function (compatibility) {
             logo.playbackQueue = {};
             logo.playbackTime = 0;
             logo.compiling = true;
-            logo.recording = recording;
             logo.runLogoCommands();
         };
 
@@ -1221,8 +1220,8 @@ define(MYDEFINES, function (compatibility) {
                     this.initialiseNewProject();
                 }
 
-                this.initialiseNewProject = function(){
-                    this.planet.ProjectStorage.initialiseNewProject();
+                this.initialiseNewProject = function(name){
+                    this.planet.ProjectStorage.initialiseNewProject(name);
                     sendAllToTrash(true,false);
                     blocks.trashStacks = [];
                     this.saveLocally();
@@ -1274,6 +1273,10 @@ define(MYDEFINES, function (compatibility) {
 
                 this.getCurrentProjectDescription = function(){
                     return this.planet.ProjectStorage.getCurrentProjectDescription();
+                }
+
+                this.getCurrentProjectImage = function(){
+                    return this.planet.ProjectStorage.getCurrentProjectImage();
                 }
 
                 this.getTimeLastSaved = function(){
@@ -1389,7 +1392,7 @@ define(MYDEFINES, function (compatibility) {
 
                             try {
                                 if (cleanData.includes('html')){
-                                    var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                                    var obj = JSON.parse(cleanData.match('<div class="code">(.+?)<\/div>')[1]);
                                 } else {
                                     var obj = JSON.parse(cleanData);
                                 }
@@ -1411,7 +1414,7 @@ define(MYDEFINES, function (compatibility) {
 
                                     stage.addEventListener('trashsignal', __listener, false);
                                     sendAllToTrash(false, false);
-                                    planet.initialiseNewProject();
+                                    planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf(".")));
                                 } else {
                                     merging = false;
                                     logo.playbackQueue = {};
@@ -1449,29 +1452,35 @@ define(MYDEFINES, function (compatibility) {
                         if (rawData == null || rawData === '') {
                             errorMsg(_('Cannot load project from the file. Please check the file type.'));
                         } else {
-                            if (cleanData.includes('html')){
-                                var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
-                            } else {
-                                var obj = JSON.parse(cleanData);
-                            }
+                            var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    dat = cleanData.match('<div class="code">(.+?)<\/div>');
+                                    var obj = JSON.parse(dat[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
-                                console.log('sending to trash');
-                                sendAllToTrash(false, false);
-                                refreshCanvas();
+                                stage.removeAllEventListeners('trashsignal');
 
-                                logo.playbackQueue = {};
-                                blocks.loadNewBlocks(obj);
-                                console.log('loading blocks');
-                                document.body.style.cursor = 'default';
+                                // Wait for the old blocks to be removed.
+                                var __listener = function (event) {
+                                    logo.playbackQueue = {};
+                                    blocks.loadNewBlocks(obj);
+                                    setPlaybackStatus();
+                                    stage.removeAllEventListeners('trashsignal');
+                                };
+
+                                stage.addEventListener('trashsignal', __listener, false);
+                                sendAllToTrash(false, false);
+                                planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf(".")));
+
                                 loading = false;
-                                setPlaybackStatus();
-                                planet.initialiseNewProject();
+                                refreshCanvas();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
                                 document.body.style.cursor = 'default';
