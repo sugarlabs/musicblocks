@@ -1272,6 +1272,10 @@ define(MYDEFINES, function (compatibility) {
                     return this.planet.ProjectStorage.getCurrentProjectName();
                 }
 
+                this.getCurrentProjectDescription = function(){
+                    return this.planet.ProjectStorage.getCurrentProjectDescription();
+                }
+
                 this.getTimeLastSaved = function(){
                     return this.planet.ProjectStorage.TimeLastSaved;
                 }
@@ -1312,7 +1316,7 @@ define(MYDEFINES, function (compatibility) {
                 ['_canvas',canvas],
                 ['_stage',stage],
                 ['_refreshCanvas',refreshCanvas],
-                ['_doSaveTB',save.saveTB.bind(save)],
+                ['_doSaveHTML',save.saveHTML.bind(save)],
                 ['_doSaveSVG',save.saveSVG.bind(save)],
                 ['_doSavePNG',save.savePNG.bind(save)],
                 ['_doSavePlanet',doUploadToPlanet],
@@ -1384,7 +1388,11 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 // First, hide the palettes as they will need updating.
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
@@ -1441,7 +1449,11 @@ define(MYDEFINES, function (compatibility) {
                         if (rawData == null || rawData === '') {
                             errorMsg(_('Cannot load project from the file. Please check the file type.'));
                         } else {
-                            var cleanData = rawData.replace('\n', ' ');
+                            if (cleanData.includes('html')){
+                                var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                            } else {
+                                var obj = JSON.parse(cleanData);
+                            }
 
                             try {
                                 var obj = JSON.parse(cleanData);

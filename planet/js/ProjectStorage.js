@@ -63,6 +63,16 @@ function ProjectStorage(Planet){
 		}
 	}
 
+	this.getCurrentProjectDescription = function(){
+		var c = this.data.CurrentProject;
+		if (this.data.Projects[c]!=undefined){
+			if (this.data.Projects[c].PublishedData!=null){
+				return this.data.Projects[c].PublishedData.ProjectDescription;
+			}
+		}
+		return null;
+	}
+
 	this.initialiseNewProject = function(name,data,image){
 		if (name===undefined){
 			name=this.defaultProjectName;
