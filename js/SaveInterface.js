@@ -89,7 +89,9 @@ function SaveInterface(PlanetInterface) {
         </p>
         <hr>
         <div>
-            {{ project_link }}
+            <a class="btn">
+                Open in Music Blocks
+            </a>
             <div style="color: #9E9E9E">
                 Internet required to open this project in Music Blocks from here. <br>
                 If you want to open this project in a local version of Music Blocks, open this file in the application.
