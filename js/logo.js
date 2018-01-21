@@ -5032,11 +5032,10 @@ function Logo () {
 
                 // If tieCarryOver > 0, we have one more note to
                 // play.
-
                 if (that.tieCarryOver[turtle] > 0) {
                     if (that.justCounting[turtle].length === 0) {
                         var lastNote = last(that.inNoteBlock[turtle]);
-			if (lastNote != null && lastNote in that.notePitches[turtle]) {
+                        if (lastNote != null && lastNote in that.notePitches[turtle]) {
                             // Remove the note from the Lilypond list.
                             for (var i = 0; i < that.notePitches[turtle][last(that.inNoteBlock[turtle])].length; i++) {
                                 that.notationRemoveTie(turtle);
@@ -5047,6 +5046,7 @@ function Logo () {
                     // Restore the extra note and play it
                     var saveBlk = that.tieNoteExtras[turtle][0];
                     var noteValue = that.tieCarryOver[turtle];
+                    that.tieCarryOver[turtle] = 0;
 
                     that.inNoteBlock[turtle].push(saveBlk);
 
@@ -5086,7 +5086,6 @@ function Logo () {
                     that.notationStaging[turtle].pop();
                 }
 
-                that.tieCarryOver[turtle] = 0;
                 that.tieNotePitches[turtle] = [];
                 that.tieNoteExtras[turtle] = [];
             };
@@ -6368,6 +6367,13 @@ function Logo () {
                 var turtleLag = 0;
             }
 
+            // Delay running graphics from second note in tie.
+            if (this.tie[turtle]) {
+                var tieDelay = this.tieCarryOver[turtle];
+            } else {
+                var tieDelay = 0;
+            }
+
             // If we are in a tie, depending upon parity, we either
             // add the duration from the prvious note to the current
             // note, or we cache the duration and set the wait to
@@ -6401,7 +6407,6 @@ function Logo () {
                     if (!match) {
                         // If we don't have a match, then we need to
                         // play the previous note.
-                        console.log(_('You can only tie notes of the same pitch.'));
                         this.errorMsg(_('You can only tie notes of the same pitch.'), saveBlk);
 
                         // Save the current note.
@@ -6445,6 +6450,8 @@ function Logo () {
                         // Play previous note.
                         // TODO: add a slur
                         this.tie[turtle] = false;
+                        tieDelay = 0;
+
                         this._processNote(this.tieCarryOver[turtle], saveBlk, turtle);
 
                         this.inNoteBlock[turtle].pop();
@@ -6453,6 +6460,7 @@ function Logo () {
                             this._doWait(turtle, Math.max(((bpmFactor / this.tieCarryOver[turtle]) + (this.noteDelay / 1000)) - turtleLag, 0));
                         }
 
+                        tieDelay = this.tieCarryOver[turtle];
                         this.tieCarryOver[turtle] = 0;
                         this.tie[turtle] = true;
 
@@ -6486,7 +6494,7 @@ function Logo () {
                         this.tieNotePitches[turtle].push([this.notePitches[turtle][saveBlk][i], this.noteOctaves[turtle][saveBlk][i], this.noteCents[turtle][saveBlk][i], this.noteHertz[turtle][saveBlk][i]]);
                     }
 
-                    this.tieNoteExtras[turtle] = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], this.noteDrums[turtle][saveBlk], this.embeddedGraphics[turtle][saveBlk]];
+                    this.tieNoteExtras[turtle] = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], this.noteDrums[turtle][saveBlk], []]; // this.embeddedGraphics[turtle][saveBlk]];
 
                     noteBeatValue = 0;
                 } else {
@@ -6884,7 +6892,20 @@ function Logo () {
                     }
                 }
 
-                that._dispatchTurtleSignals(turtle, beatValue, blk, 0);
+                if (that.tie[turtle] && noteBeatValue === 0) {
+                    if (tieDelay > 0) {
+                        that._dispatchTurtleSignals(turtle, bpmFactor / that.tieCarryOver[turtle], blk, bpmFactor / tieDelay);
+                    } else {
+                        that._dispatchTurtleSignals(turtle, bpmFactor / that.tieCarryOver[turtle], blk, 0);
+                    }
+                } else {
+                    if (tieDelay > 0) {
+                        that._dispatchTurtleSignals(turtle, beatValue - bpmFactor / tieDelay, blk, bpmFactor / tieDelay);
+                    } else {
+                        that._dispatchTurtleSignals(turtle, beatValue, blk, 0);
+                    }
+                }
+
                 // After the note plays, clear the embedded graphics queue.
                 that.embeddedGraphics[turtle][blk] = [];
 
@@ -7414,7 +7435,7 @@ function Logo () {
             }
         }
 
-        var stepTime = (beatValue - delay) * 1000 / NOTEDIV;
+        var stepTime = beatValue * 1000 / NOTEDIV;
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
