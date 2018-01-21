@@ -494,132 +494,102 @@
 每一个音符也会在播放时被显示。
 状态表格上的每一行代表着一个音色。
 
-你也可以在 *Status* 部件上加上其他 *Print* 拼块，来显示其他的音乐因素blocks can be added to the  widget to
-display additional music factors, e.g., duplicate, transposition,
-skip, [staccato](#MORE-TRANSFORMATIONS), [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors, e.g., x, y, heading,
-color, shade, grey, and pensize.
+你也可以在 *Status* 部件上加上其他 *Print* 拼块，来显示其他的音乐因素,例如重复，移调，跳步, [断奏](#MORE-TRANSFORMATIONS), [浑浊音符](#MORE-TRANSFORMATIONS), 和 [图像](#GRAPHICS) 因素, 如, x, y, 标题，颜色，色彩深浅和笔的宽度。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg "additional programming within the Status block")
 
-You can do additional programming within the status block. In the
-example above, the volume is divided by 10 before being displayed.
+您可以在 *Status* 拼块中进行其他编程。
+在上面的例子中，音量在被显示之前被除以10。
 
 ### <a name="GENERATION"></a>4.2 产生音乐砖块
 
-Using the Pitch-Time Matrix, it is possible to generate chunks of notes at a much faster speed.
+使用 *Pitch-Time Matrix*, 可以以更快的速度产生大块的音符。
 
 #### <a name="pitch-time"></a>4.2.1 音调-时间矩阵
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg "Pitch-time Matrix")
 
-Music Blocks provides a widget, the *Pitch-time Matrix*, as a scaffold
-for getting started.
+《音乐拼块》拥有一个拼块 *Pitch-time Matrix*, 作为开始写程序的蓝图。
 
-Once you've launched Music Blocks in your browser, start by clicking
-on the *Pitch-time Matrix* stack that appears in the middle of the
-screen. (For the moment, ignore the *Start* block.) You'll see a grid
-organized vertically by pitch and horizontally by rhythm.
+在浏览器中启动《音乐拼块》后，点击开始在屏幕中间出现的 *Pitch-time Matrix* 堆栈。(暂时忽视 *Start* 拼块) 
+你会看到一个网格按节奏纵向组织，和按节奏横向组织。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg "Pitch and Rhythm block matrix")
 
-The matrix in the figure above has three *Pitch* blocks and one
-*Rhythm* block, which is used to create a 3 x 3 grid of pitch and
-time.
+上图中的矩阵有三个 * Pitch * 块和一个 *Rhythm* 块，用于创建一个3 x 3 音高和时间的网格。
 
-Note that the default matrix has five *Pitch* blocks, hence, you will
-see five rows, one for each pitch. (A sixth row at the bottom is used
-for specifying the rhythms associated with each note.) Also by
-default, there are two *Rhythm* blocks, which specifies six quarter
-notes followed by one half note. Since the *Rhythm* blocks are inside
-of a *Repeat* block, there are fourteen (2 x 7) columns for selecting
-notes.
+请注意，原本矩阵有五个 * Pitch * 块，因此，你会看见五行，每个音调一行。 
+（底部第六行用于指定与每个音符关联的节奏）。
+也在原本情况下，有两个 *Rhythm* 块，它指定了六分之四音符之后是一半音符。
+由于 *Rhythm* 块在 *Repeat* 块里面，有14（2 x 7）列供选择音符。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg "matrix")
 
-By clicking on individual cells in the grid, you should hear
-individual notes (or chords if you click on more than one cell in a
-column). In the figure, three quarter notes are selected (black
-cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
+通过点击网格中的单元格，您应该可以听到几个单个音符（或和弦，如果你点击一个以上的单元格。
+在这个图中，三个四分之一的音符被选中（黑色格子），`Re 4`, 接着`Mi 4`,最后 `Sol 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg "play button")
 
-If you click on the *Play* button (found in the top row of the grid),
-you will hear a sequence of notes played (from left to right): `Re 4`,
-`Mi 4`, `Sol 4`.
+如果你点击 *Play* 按钮 (在格子中的第一行),你会听到一系类的音符被播放 (从左到右): `Re 4`, `Mi 4`, `Sol 4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg "save button")
 
+如果你有一系列你喜欢的的音符 (一个 "chunk"), 点击 *Save* 按钮(在 *Play* 按钮的右边)。
+《音乐拼块》会用程序产生同样一系列的拼块来播放这些音符。 (以下有更多详情.)
 
-Once you have a group of notes (a "chunk") that you like, click on the
-*Save* button (just to the right of the *Play* button). This will
-create a stack of blocks that can used to play these same notes
-programmatically. (More on that below.)
-
-You can rearrange the selected notes in the grid and save other chunks
-as well.
+你也可以使用格子从新安排锁定的音符，保存其他的拼块。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/sort.svg "sort button")
 
-
-The *Sort* button will reorder the pitches in the matrix from highest
-to lowest and eliminate any duplicate *Pitch* blocks.
+*Sort* 按钮将把所有格子里的音调根据高低从新安排，出掉多余的 *Pitch* 拼块.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg "close button")
 
-
-You can hide the matrix by clicking on the *Close* button (the right-most
-button in the top row of the grid.)
+你可以把格子藏起来，只需要按 *Close* 按钮 (在最上面的一排，最右手边的按钮)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg "erase button")
 
+还有一个删除按钮，将清除网格。
+你可以随时重新打开矩阵（它会记住的它以前的状态）。
+因为你可以定义你想要多少拼块，你可以放心随时试验。
 
-There is also an Erase button that will clear the grid.
-
-Don't worry. You can reopen the matrix at anytime (it will remember
-its previous state) and since you can define as many chunks as you
-want, feel free to experiment.
-
-Tip: You can put a chunk inside a *Pitch-time Matrix* block to generate
-the matrix to corresponds to that chunk.
+提示：您可以在* Pitch-time Matrix * 拼块中放置一个拼块来生成该矩阵对应于该块。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg "usage of octave for a pitch")
 
-The chunk created when you click on the matrix is a stack of
-blocks. The blocks are nested: an *Action* block contains three *Note
-value* blocks, each of which contains a *Pitch* block. The *Action*
-block has a name automatically generated by the matrix, in this case,
-chunk. (You can rename the action by clicking on the name.). Each note
-has a duration (in this case 4, which represents a quarter note). Try
-putting different numbers in and see (hear) what happens. Each note
-block also has a pitch block (if it were a chord, there would be
-multiple *Pitch* blocks nested inside the Note block's clamp). Each
-pitch block has a pitch name (`Re`, `Mi`, and `Sol`), and a pitch
-octave; in this example, the octave is 4 for each pitch. (Try changing
-the pitch names and the pitch octaves.)
+单击矩阵时创建的块是一堆拼块。
+这些块是嵌套的：一个* Action * 拼块包含三个 *Note Value* 拼块，每块包含一个* Pitch * 拼块。
+那个 *Action* 拼块有一个由矩阵自动生成的名字（您可以通过单击名称来重命名该操作）。
+每个音符有一个持续时间（在这种情况下是4，代表四分音符）。
+你可以尝试把不同的数字放进去，看看（听到）会发生什么。
+每个音符块也有一个音调块（如果它是一个和弦，就会有多个 *Pitch* 块嵌套在音符块的夹子内）。
+每音调块有一个音调名称（`Re`，`Mi`和`Sol`）和一个音调八度; 在这个例子中，每个音高的八度是4。 
+（尝试改变音高名称和音高八度）。
 
-To play the chuck, simply click on the action block (on the word
-action). You should hear the notes play, ordered from top to bottom.
+播放拼块，只需点击动作拼块（在单词上行动）。
+你应该听到从上到下排列的音符演奏。
 
 #### <a name="THE-RHYTHM-BLOCK"></a>4.2.2 音律拼块
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg "the Rhythm block")
 
-*Rhythm* blocks are used to generate rhythm patterns in the
-*Pitch-time Matrix* block. The top argument to the *Rhythm* block
-is the number of notes. The bottom argument is the duration of the
-note. In the top example above, three columns for quarter notes
-would be generated in the matrix. In the middle example, one column
-for an eighth note would be generated. In the bottom example, seven
-columns for 16th notes would be generated.
+*Rhythm* 块用于生成节奏模式 *Pitch-Time Matrix* 块。 
+*Rhythm* 块的最高参数是音符的数量，底部的参数是的持续时间。
+注意：在上面的例子中，三个四分音符列将在矩阵中生成。
+在中间的例子中，一列八分音符会被产生。
+在底部的例子中，七个列将生成16个音符。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg "usage of Rhythm block")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix8.svg "resulting notes in tabular format")
 
 You can use as many *Rhythm* blocks as you'd like inside the
-*Pitch-time Matrix* block. In the above example, two *Rhythm*
+* block. In the above example, two 
 blocks are used, resulting in three quarter notes and six eighth
 notes.
+
+你可以在 *Pitch-time Matrix* 拼块里面使用尽可能多的 *Rhythm* 拼块。
+在上面的例子中，两个 *Rhythm* 块被使用，产生三个四分音符和六个八分之一音符。
 
 #### <a name="CREATING-TUPLETS"></a>4.2.3 创造连音
 
@@ -627,33 +597,28 @@ notes.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix10.svg "tuplet and rhythmic note values")
 
-Tuplets are a collection of notes that get scaled to a specific
-duration. Using tuplets makes it easy to create groups of notes that
-are not based on a power of 2.
+连音符是可以缩放到特定的音符集合持续时间。
+使用连音符可以很容易地创建一组不是基于 2 的音符。
 
-In the example above, three quarter notes&mdash;defined in the *Simple
-Tuplet* block&mdash;are played in the time of a single quarter
-note. The result is three twelfth notes. (This form, which is quite
-common in music, is called a *triplet*. Other common tuplets include a
-*quintuplet* and a *septuplet*.)
+在上面的例子中，三个四分音符（定义在 *Simple Tuplet* 拼块）在四分之一时间播放。
+注意：结果是三个十二分音符。 
+（这个形式，这是在音乐中相当的常见，被称为 *triplet* 。
+其他常见的连音符包括 *quintuplet* 和 *septuplet*。）
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg "usage of tuplet")
 
-In the example above, the three quarter notes are defined in the
-*Rhythm* block embedded in the *Tuplet* block. As with the *Simple
-Tuplet* example, they are played in the time of a single quarter
-note. The result is three twelfth notes. This more complex form allows
-for intermixing multiple rhythms within single tuplet.
+在上面的例子中，三个四分音符是在中定义的*Rhythm* 块嵌入 *Tuplet* 块。
+与 *Simple Tuplet* 例如，他们是在一个季度的时间播放.
+注意。结果是三个十二分音符。
+这个更复杂的形式允许用于混合单个连音符中的多个节奏。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix12.svg "embedding rhythm and Tuplet block")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix13.svg "tuplet and rhythmic note values")
 
-In the example above, the two *Rhythm* blocks are embedded in the
-*Tuplet* block, resulting in a more complex rhythm.
+在上面的例子中，两个 *Rhythm* 块被嵌入到 *Tuplet* 拼块，导致更复杂的节奏。
 
-Note: You can mix and match *Rhythm* blocks and *Tuplet* blocks when
-defining your matrix.
+注意：您可以混合搭配 *Rhythm* 块和 *Tuplet* 拼块定义你的矩阵。
 
 #### <a name="WHAT-IS-TUPLET"></a>4.2.4 连音是什么?
 
@@ -665,152 +630,125 @@ defining your matrix.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix14.svg)
 
-You can also use individual notes when defining the grid. These blocks
-will expand into *Rhythm* blocks with the corresponding values.
+定义网格时，您还可以使用单个的音符。这些块将会扩展到具有相应值的 *Rhythm* 拼块。
 
 ### <a name="rhythms"></a>4.3 产生音律
 
-The *Rhythm Ruler* block is used to launch a widget similar to the
-*Pitch-time Matrix* block. The widget can be used to generate rhythmic
-patterns.
+*Rhythm Ruler* 拼块可以用来启动一个类似的小部件 - *Pitch-Time Matrix* 拼块。
+小部件可以用来生成有节奏的图案。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg "generating rhythms")
 
-The argument to the *Rhythm Ruler* block specifies the duration that
-will be subdivided to generate a rhythmic pattern. By default, it is 1
-/ 1, e.g., a whole note.
+*Rhythm Ruler* 拼块的参数指定的持续时间将被细分以产生节奏模式。
+原本情况下，它是1/1（整个音符）。
 
-The *Set Drum* blocks contained in the clamp of the *Rhythm Ruler*
-block indicates the number of rhythms to be defined simultaneously. By
-default, two rhythms are defined. The embedded *Rhythm* blocks define
-the initial subdivision of each rhythm ruler.
+包含在 *Rhythm Ruler* 的夹子中的 *Set Drum* 拼块表示要同时定义的节奏数量。
+在原本情况下，定义两个节奏。
+嵌入的 *Pitch* 块定义每个节奏标尺的初始细分。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg "rhythm ruler")
 
-When the *Rhythm Ruler* block is clicked, the *Rhythm Ruler* widget is
-opened. It contains a row for each rhythm ruler. An input in the top
-row of the widget is used to specify how many subdivisions will be
-created within a cell when it is clicked. By default, 2 subdivisions
-are created.
+当 *Rhythm Ruler* 拼块被点击时，*Rhythm Ruler* 部件会被打开。
+它包含每个节奏标尺的一行。
+顶部的输入小部件来指定将有多少个细分点击时在单元格内创建。
+原本情况下，2个细分被创建。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg "usage of rhythm ruler")
 
-As shown in the above figure, the top rhythm ruler has been divided
-into two half-notes and the bottom rhythm ruler has been divided into
-three third-notes. Clicking on the *Play* button to the left of each row
-will playback the rhythm using a drum for each beat. The *Play-all*
-button on the upper-left of the widget will play back all rhythms
-simultaneously.
+如上图所示，顶级节奏标尺已被分割分成两个半音和底部的节奏尺被分成了三个三分音符。
+点击每一行左边的 *Play* 按钮将使用鼓为每个节拍播放节奏。
+*Play-all* 小部件左上角的按钮将同时播放所有的节奏。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg "divide cells in rhythm ruler")
 
-The rhythm can be further subdivided by clicking in individual
-cells. In the example above, two quarter-notes have been created by
-clicking on one of the half-notes.
+节奏可以通过单击进一步细分格子。
+在上面的例子中，创建了两个四分音符点击其中一个半音。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "tie cells in rhythm ruler")
 
-By dragging across multiple cells, they become tied. In the example
-above, two third-notes have been tied into one two-thirds-note.
+通过拖曳多个单元格，它们会被绑在一起。
+在这个上面的例子，两个三分音符已经被并入三分之二音符。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg "save stack button")
 
-The *Save stack* button will export rhythm stacks.
+*Save Stack* 按钮将导出节奏堆栈。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg "stacks of rhythms" )
 
-These stacks of rhythms can be used to define rhythmic patterns used
-with the *Pitch-time Matrix* block.
+这些节奏叠加可以用来定义使用的节奏模式与 *Pitch-time Matrix* 拼块。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg "save drum machine button")
 
-The *Save drum machine* button will export *Start* stacks that will
-play the rhythms as drum machines.
+*Save Drum Machine* 按钮将导出 *Start* 堆栈会像鼓机一样播放节奏。
 
 ### <a name="modes"></a>4.4 音乐模式
 
-Musical modes are used to specify the relationship between [intervals](#INTERVALS-AND-ARTICULATION)
-(or steps) in a scale. Since Western music is based on 12 half-steps
-per octave, modes speficy how many half steps there are between each
-note in a scale.
+音乐模式被用来指定 [间隔]（#INTERVALS-AND-ARTICULATION）（或步骤）。
+因为西方音乐基于12个半步每个八度，模式指定了每个规模之间有多少个半步。
 
-By default, Music Blocks uses the *Major* mode, which, in the [Key](#SETTING) of
-C, maps to the white keys on a piano. The intervals in the *Major*
-mode are `2, 2, 1, 2, 2, 2, 1`. Many other common modes are
-built into Music Blocks, including, of course, *Minor* mode, which
-uses `2, 1, 2, 2, 1, 2, 2` as its intervals.
+原本情况下，音乐块使用 *Major* 模式，在 [Key]（#SETTING）中C，映射到钢琴上的白键。 
+*Major* 模式是 “2,2,1,2,2,2,1”。
+其他许多常见的模式是内置《音乐拼块》，当然包括 *Minor* 模式，使用 '2，1，2，2，1，2，2' 作为它的区间。
 
-Note that not every mode uses 7 intervals per octave. For example, the
-*Chromatic* mode uses 11 intervals: `1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1`. The *Japanese* mode uses only 5 intervals: `1, 4,
-2, 3, 2],`. What is important is that the sum of the intervals
-in an octave is 12 half-steps.
+请注意，并非每个模式都使用每个八度的7个音程。
+例如，*Chromatic* 模式使用11个区间：“1,1,1,1,1,1,1,1,1,1,1,1'。 
+*Japanese* 模式只使用5个间隔：`1，4，2，3，2]，`。
+重要的是间隔的总和在一个八度是12个半步.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg "mode widget")
 
-The *Mode* widget lets you explore modes and generate custom
-modes. You invoke the widget with the *Custom mode* block. The mode
-specified in the *Set key* block will be the default mode when the
-widget launches.
+
+*Mode* 小部件可以让你探索模式和生成自定义模式。
+使用 *Custom Mode* 拼块调用小部件，模式在 *Set Key* 指定的块将是小部件启动的时候的原本模式。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode2.svg "launching widget with Major mode")
 
-In the above example, the widget has been launched with *Major* mode
-(the default). Note that the notes included in the mode are indicated by
-the black boxes, which are arrayed in a circular pattern of tweleve
-half-steps to complete the octave.
+在上面的例子中，小部件已经以 *Major* 模式启动（原本设定）。
+请注意，该模式中包含的音符由标示黑色的盒子，它们排列成圆形的tweleve图案半步完成八度。
 
-Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
-notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
-above `0`).
+由于 *Major* 模式的时间间隔是 “2,2,1,2,2,2,1” ，因此，音符是 “0”，“2”，“4”，“5”，“7”，“9”，“11” 和 “12”。（高一个八度）
 
-The widget controls run along the toolbar at the top. From left to
-right are:
+小部件控件沿顶部的工具栏运行。从左到右-
 
-*Play all*, which will play a scale using the current mode;
+*Play all*, 这将使用当前模式进行播放;
 
-*Save*, which will save the current mode as the *Custom* mode and save
- a stack of *Pitch* blocks that can be used with the *Pitch-time
- Matrix* block;
+*Save* ，将当前模式保存为 *Custom* 模式并保存一堆 *Pitch* 拼块可以和 *Pitch-Time Matrix*拼块一起使用。
 
-*Rotate counter-clockwise*, which will rotate the mode
- counter-clockwise (See the example below);
+*Rotate counter-clockwise*, 这将旋转模式逆时针（见下面的例子）;
 
-*Rotate clockwise*, which will rotate the mode clockwise (See the
- example below);
+*Rotate clockwise*, 这将顺时针旋转模式（请参阅下面的例子）;
 
-*Invert*, which will invert the mode (See the example below);
+*Invert*, 这将反转模式（见下面的例子）;
 
-*Undo*, which will restore the mode to the previous version; and
+*Undo*, 这会将模式恢复到以前的版本;和
 
-*Close*, which will close the widget.
+*Close*, 这将关闭小部件。
 
-You can also click on individual notes to activate or deactivate them.
+您也可以单击单个笔记来激活或停用它们。
 
-Note that the mode inside the *Custom mode* block is updated whenever
-the mode is changed inside the widget.
+请注意，*Custom Mode* 拼块内的模式会随时更新
+小部件内部的模式被改变
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode3.svg "creating Dorian mode")
 
-In the above example, the *Major* mode has been rotated clockwise,
-transforming it into *Dorian*.
+
+在上面的例子中，*Major* 模式已经顺时针旋转，把它变成 *Dorian* 。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode4.svg "creating Locrian mode")
 
-In the above example, the *Major* mode has been rotated
-counter-clockwise, transforming it into *Locrian*.
+在上面的例子中，*Major* 模式已被旋转逆时针，将其转换成 *Locrian*。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode5.svg "creating Phrygian mode")
 
-In the above example, the *Major* mode has been inverted, transforming
-it into *Phrygian*.
+在上面的例子中，*Major* 模式已经被反转，转换它成 *Phrygian*。
 
-Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
+
+注意：《音乐拼块》中的内建模式可以在 [musicutils.js] 中找到
+(https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg "Pitch-time Matrix block")
 
-The *Save* button exports a stack of blocks representing the mode that
-can be used inside the *Pitch-time Matrix* block.
+*Save* 按钮导出一堆代表模式的块，可以在 *Pitch-Time Matrix* 块中使用。
 
 ### <a name="pitch-drum"></a>4.5 音调-鼓声矩阵
 
@@ -821,6 +759,10 @@ sounds. Drum sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substitued for
 each occurance of a `Re` `4`.
 
+*Set Drum* 块用于将封闭的音高映射到鼓中声音。
+鼓声使用指定的鼓在单声道中播放。
+在上面的例子中，一个 `kick drum` 将被代替每个 `Re 4` 的发生。
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg "pitch-drum matrix 1")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg "table for pitch-drum matrix")
@@ -829,9 +771,9 @@ each occurance of a `Re` `4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg "pitch-drum matrix 1")
 
-As an experience for creating mapping with the *Set Drum* block, we
-provide the *Drum-Pitch* Matrix. You use it to map between pitches and
-drums. The output is a stack of *Set Dum* blocks.
+作为用 *Set Drum* 块创建映射的经验，我们提供 *Drum-Pitch* 矩阵。
+你用它来映射间距和鼓。
+输出是一个* Set Drum *块的堆栈。
 
 ### <a name="stairs"></a>4.6 探索音调比例
 
@@ -843,15 +785,18 @@ The *Pitch* blocks contained in the clamp of the *Pitch Staircase*
 block define the pitches to be initialized simultaneously. By default,
 one pitch is defined and it have default note "la" and octave "3".
 
+*Pitch Staircase* 块是用来启动一个类似于 *Pitch-Time Matrix*，可以用来产生不同的音高使用给定的音调和音乐比例的拼块。
+
+包含在 *Pitch Staircase* 的夹子中的 *Pitch* 块同时定义音高初始化。
+一个音高开始被定义并且具有默认音符 “la” 和八度音阶 “3”。
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg "generating arbitrary pitches")
 
-When *Pitch Staircase* block is clicked, the *Pitch Staircase* widget is
-initialized. The widget contains row for every *Pitch* block contained
-in the clamp of the *Pitch Staircase* block. The input fields in the top
-row of the widget specify the musical proportions used to create new
-pitches in the staircase. The inputs correspond to the numerator and
-denominator in the proportion resectively. By default the proportion
-is 3:2.
+当 *Pitch Staircase* 块被点击时，*Pitch Staircase* 部件是初始化。
+该小部件包含每个 *Pitch* 块包含的行在 *Pitch Staircase* 块的夹子中。
+小部件顶部的输入字段指定用于创建新的音乐比例在楼梯间。
+输入对应于分子和分母的比例。
+开始的比例是 3：2。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase1.svg "notes associated with the step in the stairs")
 
@@ -869,22 +814,25 @@ decreasing order of frequency as well, completing a scale.
 The *Save stack* button will export pitch stacks. For example, in the above
 configuration, the output  from pressing the *Save stack* button is shown below:
 
+点击每行左边的 *Play* 按钮将会播放与在楼梯的那个步骤相关的音符。 
+*Play-all* 小部件左上角的按钮将同时播放所有音高步骤。
+第二个 *Play-all* 按钮按照频率的先后顺序播放，然后进入频率下降的顺序，完成一个规模。
+
+*Save Stack* 按钮将导出音高堆栈。
+例如，在上面配置，按下 *Save Stack* 按钮的输出如下所示：
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg "Pitch Stair block")
 
-These stacks can be used with the *Pitch-time Matrix* block to define
-the rows in the matrix.
+这些堆栈可以与 *Pitch-Time Matrix* 块一起使用来定义矩阵中的行。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg "Pitch Stair block")
 
 ### <a name="slider"></a>4.7 产生音调
 
-The *Pitch Slider* block is used to launch a widget that is used to
-generate arbitray pitches. It differs from the *Pitch Staircase* widget in
-that it is used to create frequencies that vary continuously within
-the range of a specified octave.
+*Pitch Slider* 块用于启动一个已经习惯的小部件生成任意球。
+它不同于 *Pitch Staircase* 部件,它被用来创建频率在不断变化指定八度的范围。
 
-Each *Sine* block contained within the clamp of the *Pitch Slider* block defines the initial pitch
-for an ocatve.
+包含在 *Pitch Slider* 块的夹子中的每个 *Sine* 块定义了初始音调的一个八度。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg "Pitch Slider")
 
@@ -898,11 +846,18 @@ starting frequency. The mouse is used to move the frequency up and down continuo
 used for intervals. Arrow keys can also be used to move up and down,
 or between columns.
 
+当 *Pitch Slider* 块被点击时，*Pitch Slider* 部件被初始化。
+小部件每个 *Sine*块将有一列夹子。
+每列都有一个滑块，可用于向上或向上移动频率，连续或间隔的1/12开始频率。
+鼠标用于连续上下移动频率。
+按钮是用于间隔。
+箭头键也可以用来上下移动，或列之间。
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg "Pitch Slider block")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg "pitch slider")
 
-Clicking in a column will extact the corresponding *Note* blocks, for example:
+点击一列将会提取相应的 *Note* 块，例如：
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg "pitch slider")
 
@@ -912,41 +867,39 @@ Clicking in a column will extact the corresponding *Note* blocks, for example:
 
 ### <a name="tempo"></a>4.8 改换节奏
 
-The *Tempo* block is used to launch a widget that enables the user to
-visualize Tempo, defined in beats per minute (BPM). When the *Tempo* block
-is clicked, the *Tempo* widget is initialized.
+*Tempo* 块用于启动一个小部件，使用户能够可视化速度，定义为每分钟节拍（BPM）。
+当 *Tempo* 块被点击，*Tempo* 小部件被初始化。
 
-The *Master Beats per Minute* block contained in the clamp of the
-*Tempo* block sets the initial tempo used by the widget. This
-determines the speed at which the ball in the widget moves back and
-forth. If BPM is 60, then it will take one second for the ball to move
-across the widget. A round-trip would take two seconds.
+The *Master Beats Per Minute* 块包含在夹子里 *Tempo* 块设置小部件使用的初始速度。
+这个确定微件中球的向前移动速度。
+如果 BPM 是 60，那么球会移动一秒钟整个小部件，往返需要两秒钟。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg "changing tempo")
 
-The top row of the widget holds the *Play/pause* button, the *Speed
-up* and *Slow down* buttons, and an input field for updating the
-Tempo.
+小部件的第一行包含 *Play/Pause* 按钮和 *Speed Up* 和 *Slow Down* 按钮，以及一个输入栏用于更新音符播放速度。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg "changing tempo")
 
-You can also update the tempo by clicking twice in spaced succession in the
-widget: the new BPM is determined as the time between the two clicks. For
-example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.
+您也可以通过点击小部件间隔连续两次来更新音乐速度：新的BPM被确定为两次点击之间的时间。
+例如，如果点击之间有1/2秒，新的BPM将被设置为120。
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>《音乐拼块》之外
 
 [上一章 (4. 部件)](#WIDGETS) | [回去目录](#TOC)
 
-Music Blocks is a waypoint, not a destination. One of the goals is to
-point the learner towards other powerful tools. One such tool is
-[Lilypond](http://lilypond.org), a music engraving program.
+《音乐拼块》 是一个航点，而不是目的地。
+其中一个目标是把学习者指向其他强大的工具。
+一个这样的工具是 [Lilypond](http://lilypond.org), 一个音乐雕刻程序。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg "adding Save as Lilypond block")
 
 The *Save as Lilypond* block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
-also a *Save as Lilypond* button on the secondary toolbar.
+also a  button on the secondary toolbar.
+
+*Save As Lilypond* 块将转录您的作文。
+该上面程序的输出保存到 `Downloads / hotdog.ly`。
+你还可以在辅助工具栏上 *Save As Lilypond* 按钮。
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg "Save as Lilypond icon")
 
