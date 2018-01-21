@@ -9,22 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-//https://stackoverflow.com/a/14588166/3575587
-function cleanName(name) {
-    name = name.replace(/\s+/gi, '-'); // Replace white space with dash
-    return name.replace(/[^a-zA-Z0-9\-]/gi, ''); // Strip any special charactere
-};
-
-function downloadTB(name,data) {
-	var element = document.createElement('a');
-	element.setAttribute('href', 'data:text/plain;charset=utf-8,'+encodeURIComponent(data));
-	element.setAttribute('download', cleanName(name)+".tb");
-	element.style.display = 'none';
-	document.body.appendChild(element);
-	element.click();
-	document.body.removeChild(element);
-};
-
 // https://davidwalsh.name/javascript-debounce-function
 // Returns a function, that, as long as it continues to be invoked, will not
 // be triggered. The function will be called after it stops being called for

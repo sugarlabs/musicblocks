@@ -58,9 +58,17 @@ function ProjectViewer(Planet) {
 	};
 
 	this.download = function(){
-		var t= this;
-		Planet.GlobalPlanet.getData(this.id,function(data){downloadTB(t.ProjectCache[t.id].ProjectName,data)});
+		Planet.GlobalPlanet.getData(this.id,this.afterDownload.bind(this));
 	};
+
+	this.afterDownload = function(data){
+		var proj = this.ProjectCache[this.id];
+		var image = Planet.ProjectStorage.ImageDataURL;
+		if (proj.ProjectImage!=""){
+			image = proj.ProjectImage;
+		}
+		Planet.SaveInterface.saveHTML(proj.ProjectName, data, image, proj.ProjectDescription);
+	}
 
 	this.openProject = function(){
 		Planet.GlobalPlanet.openGlobalProject(this.id);
