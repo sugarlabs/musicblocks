@@ -6494,7 +6494,7 @@ function Logo () {
                         this.tieNotePitches[turtle].push([this.notePitches[turtle][saveBlk][i], this.noteOctaves[turtle][saveBlk][i], this.noteCents[turtle][saveBlk][i], this.noteHertz[turtle][saveBlk][i]]);
                     }
 
-                    this.tieNoteExtras[turtle] = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], this.noteDrums[turtle][saveBlk], []]; // this.embeddedGraphics[turtle][saveBlk]];
+                    this.tieNoteExtras[turtle] = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], [], []]; // this.noteDrums[turtle][saveBlk], []]; // this.embeddedGraphics[turtle][saveBlk]];
 
                     noteBeatValue = 0;
                 } else {
@@ -6851,9 +6851,9 @@ function Logo () {
                     if (that.notePitches[turtle][thisBlk].length === 0) {
                         var obj = rationalToFraction(1 / noteBeatValue);
                         if (that.justCounting[turtle].length === 0) {
-                            console.log('notes to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                            console.log('drums to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
                         } else {
-                            console.log('notes to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                            console.log('drums to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
                         }
 
                         if (!that.suppressOutput[turtle]) {
@@ -6861,28 +6861,51 @@ function Logo () {
                         }
                     }
 
-                    if (duration > 0) {
-                        if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
-                            for (var i = 0; i < drums.length; i++) {
-                                if (that.drumStyle[turtle].length > 0) {
-                                    if (!that.suppressOutput[turtle]) {
-                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null, null);
-                                    }
+                    if ((that.tie[turtle] && that.tieCarryOver[turtle] > 0) || duration > 0) {
+			// If we are in a tie, play the drum as if we
+			// were not. Delay the drum if we are in the
+			// second note of a tie.
+			if (that.tie[turtle] && noteBeatValue === 0) {
+			    if (tieDelay > 0) {
+                                var timeout = (bpmFactor / tieDelay) * 1000;
+				var newBeatValue = bpmFactor / that.tieCarryOver[turtle];
+			    } else {
+				var newBeatValue = bpmFactor / that.tieCarryOver[turtle];
+                                var timeout = 0;
+			    }
+			} else {
+			    if (tieDelay > 0) {
+				var newBeatValue = beatValue - bpmFactor / tieDelay;
+                                var timeout = (bpmFactor / tieDelay) * 1000;
+			    } else {
+				var newBeatValue = beatValue;
+                                var timeout = 0;
+			    }
+			}
 
-                                    if (that.justCounting[turtle].length === 0) {
-                                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', ['C2'], beatValue, last(that.drumStyle[turtle]), null, null]);
-                                    }
-                                } else {
-                                    if (!that.suppressOutput[turtle]) {
-                                        that.synth.trigger(['C2'], beatValue, drums[i], null, null);
-                                    }
+                        setTimeout(function () {
+                            if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                                for (var i = 0; i < drums.length; i++) {
+                                    if (that.drumStyle[turtle].length > 0) {
+                                        if (!that.suppressOutput[turtle]) {
+                                            that.synth.trigger(['C2'], newBeatValue, last(that.drumStyle[turtle]), null, null);
+                                        }
 
-                                    if (that.justCounting[turtle].length === 0) {
-                                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', ['C2'], beatValue, drums[i], null, null]);
+                                        if (that.justCounting[turtle].length === 0) {
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', ['C2'], newBeatValue, last(that.drumStyle[turtle]), null, null]);
+                                        }
+                                    } else {
+                                        if (!that.suppressOutput[turtle]) {
+                                            that.synth.trigger(['C2'], newBeatValue, drums[i], null, null);
+                                        }
+
+                                        if (that.justCounting[turtle].length === 0) {
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', ['C2'], newBeatValue, drums[i], null, null]);
+                                        }
                                     }
                                 }
                             }
-                        }
+                        }, timeout);
                     }
                 }
 
@@ -6892,6 +6915,8 @@ function Logo () {
                     }
                 }
 
+                // While we tie notes together, we don't want to tie
+                // the corresponding graphics.
                 if (that.tie[turtle] && noteBeatValue === 0) {
                     if (tieDelay > 0) {
                         that._dispatchTurtleSignals(turtle, bpmFactor / that.tieCarryOver[turtle], blk, bpmFactor / tieDelay);
