@@ -67,7 +67,7 @@ function ProjectViewer(Planet) {
 		if (proj.ProjectImage!=""){
 			image = proj.ProjectImage;
 		}
-		Planet.SaveInterface.saveHTML(proj.ProjectName, data, image, proj.ProjectDescription);
+		Planet.SaveInterface.saveHTML(proj.ProjectName, data, image, proj.ProjectDescription, this.id);
 	}
 
 	this.openProject = function(){
