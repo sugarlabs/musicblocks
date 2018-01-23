@@ -7464,7 +7464,9 @@ function Logo () {
             }
         }
 
-        var stepTime = beatValue * 1000 / NOTEDIV;
+        // Cheat by 15% so that the mouse has time to complete its work.
+        // var stepTime = beatValue * 1000 / NOTEDIV;
+	var stepTime = beatValue * 850 / NOTEDIV;
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
