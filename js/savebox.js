@@ -195,7 +195,7 @@ function SaveBox () {
                 that.hide();
                 that._doSaveBlockArtwork();
             });
-            
+
             dx += BOXBUTTONSPACING;
 
             this.saveHTML = makeButton('save-button-dark', _('Save project'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
@@ -329,7 +329,6 @@ function SaveBox () {
     };
 };
 var htmlSaveTemplate = `
-<!-- {{ data }} -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -351,14 +350,12 @@ var htmlSaveTemplate = `
         #main {
             background-color: white;
             padding: 5%;
-            position: fixed;
             width: 80vw;
-            max-height: 60vh;
+            min-height: 60vh;
             margin: auto;
-            top: 0; left: 0; bottom: 0; right: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            position: absolute;
+            top: 10vh;
+            left: 5vw;
             text-align:  center;
             color: #424242;
             box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
@@ -381,6 +378,7 @@ var htmlSaveTemplate = `
             padding: 5px 10px;
             line-height: 50px;
             color: #0a3e58;
+            text-decoration: none;
         }
 
         .btn:hover {
@@ -396,22 +394,35 @@ var htmlSaveTemplate = `
         <div style="color: #9E9E9E">
             {{ project_author }}
         </div>
-        <h3>Music Blocks Project - {{ project_name }}</h3>
+        <h4>Music Blocks Project - {{ project_name }}</h4>
         <p>
             {{ project_description }}
         </p>
         <hr>
         <div>
-            <a class="btn">
-                Open in Musicblocks
+            <div style="color: #9E9E9E">
+                <h4>
+                    To Open
+                </h4>
+
+                <h3>
+                    1. Open Musicblocks
+                </h3>
+                <h3>
+                    2. Load project from file (button on the right) or drag the file onto the canvas
+                </h3>
+            </div>
+
+            <a class="btn" id="open">
+                Open in Musicblocks (for Firefox users)
             </a>
 
-            <div style="color: #9E9E9E">
-                Internet required to open this project in Musicblocks from here. <br>
-                If you want to open this project in a local version of Musicblocks, open it from the application.
-            </div>
+        </div>
     </div>
-    </div>
+    <script>
+        var a = document.getElementById('open'); //or grab it by tagname etc
+        a.href = "https://walterbender.github.io/musicblocks/" + window.location;
+    </script>
 </body>
 </html>
 `
