@@ -442,21 +442,22 @@ define(MYDEFINES, function (compatibility) {
 
                 if (docById('pscDiv').style.visibility === 'visible') {
                     playingWidget = true;
-                    pitchstaircase.playUpAndDown();
+                    logo.pitchStaircase.playUpAndDown();
                 }
 
                 if (docById('rulerDiv').style.visibility === 'visible') {
                     // If the tempo widget is open, sync it up with the
                     // rhythm ruler.
                     if (docById('tempoDiv').style.visibility === 'visible') {
-                        if (tempo.isMoving) {
-                            tempo.pause();
+                        if (logo.tempo.isMoving) {
+                            logo.tempo.pause();
                         }
-                        tempo.resume();
+
+                        logo.tempo.resume();
                     }
 
                     playingWidget = true;
-                    rhythmruler.playAll();
+                    logo.rhythmRuler.playAll();
                 }
 
                 // We were using the run button to play a widget, not
@@ -467,11 +468,11 @@ define(MYDEFINES, function (compatibility) {
 
                 // Restart tempo widget and run blocks.
                 if (docById('tempoDiv').style.visibility === 'visible') {
-                    if (tempo.isMoving) {
-                        tempo.pause();
+                    if (logo.tempo.isMoving) {
+                        logo.tempo.pause();
                     }
 
-                    tempo.resume();
+                    logo.tempo.resume();
                 }
             }
 
