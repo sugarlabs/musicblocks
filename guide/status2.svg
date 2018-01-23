@@ -55,7 +55,7 @@
          id="text4472"><text
            x="-28.827999"
            y="0"
-           style="font-size:16px;font-family:Sans-Bold;fill:#000000"
+           style="font-size:16px;font-family:Sans;fill:#000000"
            id="text14">key</text>
 </g></g><g
        transform="translate(104.366,107.394)"
@@ -165,7 +165,7 @@
          id="text4472-3"><text
            x="-36.719002"
            y="0"
-           style="font-size:16px;font-family:Sans-Bold;fill:#000000"
+           style="font-size:16px;font-family:Sans;fill:#000000"
            id="text64">bpm</text>
 </g></g><g
        id="rect3453-4-59"
@@ -181,7 +181,7 @@
          id="text4472-2"><text
            x="-60.313"
            y="0"
-           style="font-size:16px;font-family:Sans-Bold;fill:#000000"
+           style="font-size:16px;font-family:Sans;fill:#000000"
            id="text72">volume</text>
 </g></g><g
        id="rect3453-4-89"
@@ -197,7 +197,7 @@
          id="text4472-7"><text
            x="-36.585999"
            y="0"
-           style="font-size:16px;font-family:Sans-Bold;fill:#000000"
+           style="font-size:16px;font-family:Sans;fill:#000000"
            id="text80">note</text>
 </g></g><g
        id="rect3453-5-61"
