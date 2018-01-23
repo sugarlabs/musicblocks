@@ -852,13 +852,13 @@ function Logo () {
                 }
                 break;
             case 'beatvalue':
-                value = this.currentBeat[turtle];
+                value = this.currentBeat[turtle].toString();
                 break;
             case 'synthname':
                 value = last(this.instrumentNames[turtle]);
                 break;
             case 'measurevalue':
-                value = this.currentMeasure[turtle];
+                value = this.currentMeasure[turtle].toString();
                 break;
             case 'mynotevalue':
                 value = null;
