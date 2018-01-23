@@ -4358,10 +4358,10 @@ function Logo () {
             // And only trigger from the outer most note when nesting.
             if (that.inNoteBlock[turtle].length === 0) {
                 // Queue any beat actions.
+                // Put the childFlow into the queue before the beat action
+                // so that the beat action is at the end of the FILO.
+                // Note: The offbeat cannot be Beat 1.
                 if (that.beatList[turtle].indexOf(beatValue) !== -1) {
-                    // Put the childFlow into the queue before the beat
-                    // action so that the beat action is at the end of the
-                    // FILO.
                     var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
                     that.parentFlowQueue[turtle].push(blk);
                     that.turtles.turtleList[turtle].queue.push(queueBlock);
@@ -4369,10 +4369,7 @@ function Logo () {
 
                     var eventName = '__beat_' + beatValue + '_' + turtle + '__';
                     that.stage.dispatchEvent(eventName);
-                } else if (that.beatList[turtle].indexOf('offbeat') !== -1) {
-                    // Put the childFlow into the queue before the beat
-                    // action so that the beat action is at the end of the
-                    // FILO.
+                } else if (beatValue > 1 && that.beatList[turtle].indexOf('offbeat') !== -1) {
                     var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
                     that.parentFlowQueue[turtle].push(blk);
                     that.turtles.turtleList[turtle].queue.push(queueBlock);
