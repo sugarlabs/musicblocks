@@ -137,7 +137,7 @@ function Logo () {
     this.inPitchStaircase = false;
     this.inTempo = false;
     this.inPitchSlider = false;
-    this._currentDrumBlock = null;
+    this._currentDrumlock = null;
     this.inTimbre = false;
     this.inSetTimbre = {};
 
@@ -218,6 +218,7 @@ function Logo () {
     this.tieNotePitches = {};
     this.tieNoteExtras = {};
     this.tieCarryOver = {};
+    this.tieFirstDrums = {};
     this.masterVolume = [];
     this.synthVolume = {};
     this.validNote = true;
@@ -998,6 +999,7 @@ function Logo () {
             this.tieNotePitches[turtle] = [];
             this.tieNoteExtras[turtle] = [];
             this.tieCarryOver[turtle] = 0;
+            this.tieFirstDrums[turtle] = [];
             this.drift[turtle] = 0;
             this.drumStyle[turtle] = [];
             this.voices[turtle] = [];
@@ -5021,6 +5023,7 @@ function Logo () {
             that.tieNotePitches[turtle] = [];
             that.tieNoteExtras[turtle] = [];
             that.tieCarryOver[turtle] = 0;
+            that.tieFirstDrums[turtle] = [];
             childFlow = args[0];
             childFlowCount = 1;
 
@@ -6377,7 +6380,7 @@ function Logo () {
             // If we are in a tie, depending upon parity, we either
             // add the duration from the prvious note to the current
             // note, or we cache the duration and set the wait to
-            // zero. FIXME: Will not work when using dup and skip.
+            // zero. TESTME: May not work when using dup and skip.
             if (this.tie[turtle]) {
                 var saveBlk = last(this.inNoteBlock[turtle]);
 
@@ -6448,10 +6451,8 @@ function Logo () {
                         }
 
                         // Play previous note.
-                        // TODO: add a slur
                         this.tie[turtle] = false;
                         tieDelay = 0;
-
                         this._processNote(this.tieCarryOver[turtle], saveBlk, turtle);
 
                         this.inNoteBlock[turtle].pop();
@@ -6494,8 +6495,11 @@ function Logo () {
                         this.tieNotePitches[turtle].push([this.notePitches[turtle][saveBlk][i], this.noteOctaves[turtle][saveBlk][i], this.noteCents[turtle][saveBlk][i], this.noteHertz[turtle][saveBlk][i]]);
                     }
 
-                    this.tieNoteExtras[turtle] = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], [], []]; // this.noteDrums[turtle][saveBlk], []]; // this.embeddedGraphics[turtle][saveBlk]];
+                    this.tieNoteExtras[turtle] = [saveBlk, this.oscList[turtle][saveBlk], this.noteBeat[turtle][saveBlk], this.noteBeatValues[turtle][saveBlk], this.noteDrums[turtle][saveBlk], []];
 
+                    // We play any drums in the first tied note along
+                    // with the drums in the second tied note.
+                    this.tieFirstDrums[turtle] = this.noteDrums[turtle][saveBlk];
                     noteBeatValue = 0;
                 } else {
                     carry = this.tieCarryOver[turtle];
@@ -6510,7 +6514,7 @@ function Logo () {
             // initial notevalue. When that notevalue is encountered
             // again, the swing terminates, e.g., 8->4->4->4->8
             // 8->4->4->4->8
-            // FIXME: Could behave weirdly with tie.
+            // TESTME: Could behave weirdly with tie.
             if (this.swing[turtle].length > 0) {
                 // Deprecated
                 // newswing2 takes the target as an argument
@@ -6680,17 +6684,19 @@ function Logo () {
                     }
 
                     var obj = rationalToFraction(1 / noteBeatValue);
-                    if (that.justCounting[turtle].length === 0) {
-                        if (notes.length === 0) {
-                            console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
+                    if (obj[0] > 0) {
+                        if (that.justCounting[turtle].length === 0) {
+                            if (notes.length === 0) {
+                                console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
+                            } else {
+                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                            }
                         } else {
-                            console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);
-                        }
-                    } else {
-                        if (notes.length === 0) {
-                            console.log('notes to count: R ' + obj[0] + '/' + obj[1]);
-                        } else {
-                            console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                            if (notes.length === 0) {
+                                console.log('notes to count: R ' + obj[0] + '/' + obj[1]);
+                            } else {
+                                console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                            }
                         }
                     }
 
@@ -6846,14 +6852,22 @@ function Logo () {
                         drums.push(that.noteDrums[turtle][thisBlk][i]);
                     }
 
+                    for (var i = 0; i < that.tieFirstDrums[turtle].length; i++) {
+                        if (drums.indexOf(that.tieFirstDrums[turtle][i]) === -1) {
+                            drums.push(that.tieFirstDrums[turtle][i]);
+                        }
+                    }
+
                     // If it is > 0, we already counted this note
                     // (e.g. pitch & drum combination).
                     if (that.notePitches[turtle][thisBlk].length === 0) {
                         var obj = rationalToFraction(1 / noteBeatValue);
-                        if (that.justCounting[turtle].length === 0) {
-                            console.log('drums to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
-                        } else {
-                            console.log('drums to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                        if (obj[0] > 0) {
+                            if (that.justCounting[turtle].length === 0) {
+                                console.log('drums to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                            } else {
+                                console.log('drums to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                            }
                         }
 
                         if (!that.suppressOutput[turtle]) {
@@ -6862,28 +6876,18 @@ function Logo () {
                     }
 
                     if ((that.tie[turtle] && that.tieCarryOver[turtle] > 0) || duration > 0) {
-			// If we are in a tie, play the drum as if we
-			// were not. Delay the drum if we are in the
-			// second note of a tie.
-			if (that.tie[turtle] && noteBeatValue === 0) {
-			    if (tieDelay > 0) {
-                                var timeout = (bpmFactor / tieDelay) * 1000;
-				var newBeatValue = bpmFactor / that.tieCarryOver[turtle];
-			    } else {
-				var newBeatValue = bpmFactor / that.tieCarryOver[turtle];
-                                var timeout = 0;
-			    }
-			} else {
-			    if (tieDelay > 0) {
-				var newBeatValue = beatValue - bpmFactor / tieDelay;
-                                var timeout = (bpmFactor / tieDelay) * 1000;
-			    } else {
-				var newBeatValue = beatValue;
-                                var timeout = 0;
-			    }
-			}
+                        // If we are in a tie, play the drum as if it
+                        // were tied.
+                        if (that.tie[turtle] && noteBeatValue === 0) {
+                            var newBeatValue = 0;
+                        } else {
+                            var newBeatValue = beatValue;
+                            if (tieDelay > 0) {
+                                that.tieFirstDrums[turtle] = [];
+                            }
+                        }
 
-                        setTimeout(function () {
+                        if (newBeatValue > 0) {
                             if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                                 for (var i = 0; i < drums.length; i++) {
                                     if (that.drumStyle[turtle].length > 0) {
@@ -6905,7 +6909,7 @@ function Logo () {
                                     }
                                 }
                             }
-                        }, timeout);
+                        }
                     }
                 }
 
