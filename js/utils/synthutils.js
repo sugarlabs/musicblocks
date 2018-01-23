@@ -262,11 +262,16 @@ function Synth() {
         }
     };
 
+    this.samplesQueue = [];
+
     var that = this;
 
     require(SOUNDSAMPLESDEFINES, function() {
-        console.log('REQUIRE SOUNDSAMPLESDEFINES');
         that.loadSamples();
+
+        for (var i = 0; i < that.samplesQueue.length; i++) {
+            that.__createSynth(that.samplesQueue[i][0], that.samplesQueue[i][1], that.samplesQueue[i][2]);
+        }
     });
 
     this.recorder = new Recorder(Tone.Master);
@@ -567,43 +572,43 @@ function Synth() {
         return tempSynth;
     };
 
+    this.__createSynth = function (instrumentName, sourceName, params) {
+        if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum)) {
+	    instruments[instrumentName] = this._createSampleSynth(instrumentName, sourceName, null).toMaster();
+        } else if (sourceName in BUILTIN_SYNTHS) {
+	    instruments[instrumentName] = this._createBuiltinSynth(instrumentName, sourceName, params).toMaster();
+        } else if (sourceName in CUSTOM_SYNTHS) {
+	    instruments[instrumentName] = this._createCustomSynth(sourceName, params).toMaster();
+	    instrumentsSource[instrumentName] = [0, 'poly'];
+        } else {
+	    if (sourceName.length >= 4) {
+                if (sourceName.slice(0, 4) === 'http') {
+		    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+		    instrumentsSource[instrumentName] = [1, 'drum'];
+                } else if (sourceName.slice(0, 4) === 'file') {
+		    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+		    instrumentsSource[instrumentName] = [1, 'drum'];
+                } else if (sourceName === 'drum') {
+		    instruments[sourceName] = this._createSampleSynth(sourceName, sourceName, null).toMaster();
+		    instrumentsSource[instrumentName] = [1, 'drum'];
+                }
+	    }
+        }
+    };
+
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrumentName, sourceName, params) {
+        // We may have a race condition with the samples loader.
 	if (this.samples == null) {
+            this.samplesQueue.push([instrumentName, sourceName, params]);
+
             var that = this;
 	    require(SOUNDSAMPLESDEFINES, function(){
 		that.loadSamples();
 	    });
-
-            var timeoutValue = 10000;
         } else {
-            var timeoutValue = 0;
+            this.__createSynth(instrumentName, sourceName, params);
         }
-
-        var that = this;
-        setTimeout(function () {
-            if ((sourceName in that.samples.voice) || (sourceName in that.samples.drum)) {
-		instruments[instrumentName] = that._createSampleSynth(instrumentName, sourceName, null).toMaster();
-            } else if (sourceName in BUILTIN_SYNTHS) {
-		instruments[instrumentName] = that._createBuiltinSynth(instrumentName, sourceName, params).toMaster();
-            } else if (sourceName in CUSTOM_SYNTHS) {
-		instruments[instrumentName] = that._createCustomSynth(sourceName, params).toMaster();
-		instrumentsSource[instrumentName] = [0, 'poly'];
-            } else {
-		if (sourceName.length >= 4) {
-                    if (sourceName.slice(0, 4) === 'http') {
-			instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
-			instrumentsSource[instrumentName] = [1, 'drum'];
-                    } else if (sourceName.slice(0, 4) === 'file') {
-			instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
-			instrumentsSource[instrumentName] = [1, 'drum'];
-                    } else if (sourceName === 'drum') {
-			instruments[sourceName] = that._createSampleSynth(sourceName, sourceName, null).toMaster();
-			instrumentsSource[instrumentName] = [1, 'drum'];
-                    }
-		}
-            }
-	}, timeoutValue);
     };
 
     this.loadSynth = function (sourceName) {
