@@ -1644,7 +1644,7 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_T = 84; // ti
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible';
+                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planetdiv').style.display === '';
             } else {
                 var disableKeys = searchWidget.style.visibility === 'visible';
             }
