@@ -203,9 +203,10 @@ function Synth() {
 
     this.samples = null;
     this.samplesuffix = "_SAMPLE";
+    this.samplesManifest = null;
 
     this.loadSamples = function (){
-        var SAMPLES_MANIFEST = {
+        this.samplesManifest = {
             'voice': [
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
@@ -241,20 +242,28 @@ function Synth() {
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
                 {'name': 'snare drum', 'data': SNARE_SAMPLE}
-	    ]
+            ]
         }
 
-	if (this.samples == null) {
-            console.log('inititializing samples');
+        if (this.samples == null) {
             this.samples = {};
-            for (var type in SAMPLES_MANIFEST) {
-                if (SAMPLES_MANIFEST.hasOwnProperty(type)) {
+            for (var type in this.samplesManifest) {
+                if (this.samplesManifest.hasOwnProperty(type)) {
                     this.samples[type] = {};
-                    for (var sample in SAMPLES_MANIFEST[type]){
-                        if (SAMPLES_MANIFEST[type].hasOwnProperty(sample)){
-                            var data = SAMPLES_MANIFEST[type][sample].data;
-                            var name = SAMPLES_MANIFEST[type][sample].name;
-                            this.samples[type][name] = data;
+                }
+            }
+        }
+    };
+
+    this._loadSample = function (sampleName) {
+        for (var type in this.samplesManifest) {
+            if (this.samplesManifest.hasOwnProperty(type)) {
+                for (var sample in this.samplesManifest[type]){
+                    if (this.samplesManifest[type].hasOwnProperty(sample)){
+                        var name = this.samplesManifest[type][sample].name;
+                        if (sampleName === name) {
+                            // Load data returned from samples function.
+                            this.samples[type][name] = this.samplesManifest[type][sample].data();
                         }
                     }
                 }
@@ -262,10 +271,9 @@ function Synth() {
         }
     };
 
-    this.samplesQueue = [];
+    this.samplesQueue = [];  // Samples that need to be loaded at start.
 
     var that = this;
-
     require(SOUNDSAMPLESDEFINES, function() {
         that.loadSamples();
 
@@ -281,6 +289,7 @@ function Synth() {
         if (fileExt(filename) !== 'wav') {
             filename += '.wav';
         }
+
         download(filename, URL.createObjectURL(blob));
     };
 
@@ -573,39 +582,40 @@ function Synth() {
     };
 
     this.__createSynth = function (instrumentName, sourceName, params) {
+        this._loadSample(sourceName);
         if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum)) {
-	    instruments[instrumentName] = this._createSampleSynth(instrumentName, sourceName, null).toMaster();
+            instruments[instrumentName] = this._createSampleSynth(instrumentName, sourceName, null).toMaster();
         } else if (sourceName in BUILTIN_SYNTHS) {
-	    instruments[instrumentName] = this._createBuiltinSynth(instrumentName, sourceName, params).toMaster();
+            instruments[instrumentName] = this._createBuiltinSynth(instrumentName, sourceName, params).toMaster();
         } else if (sourceName in CUSTOM_SYNTHS) {
-	    instruments[instrumentName] = this._createCustomSynth(sourceName, params).toMaster();
-	    instrumentsSource[instrumentName] = [0, 'poly'];
+            instruments[instrumentName] = this._createCustomSynth(sourceName, params).toMaster();
+            instrumentsSource[instrumentName] = [0, 'poly'];
         } else {
-	    if (sourceName.length >= 4) {
+            if (sourceName.length >= 4) {
                 if (sourceName.slice(0, 4) === 'http') {
-		    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
-		    instrumentsSource[instrumentName] = [1, 'drum'];
+                    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+                    instrumentsSource[instrumentName] = [1, 'drum'];
                 } else if (sourceName.slice(0, 4) === 'file') {
-		    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
-		    instrumentsSource[instrumentName] = [1, 'drum'];
+                    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+                    instrumentsSource[instrumentName] = [1, 'drum'];
                 } else if (sourceName === 'drum') {
-		    instruments[sourceName] = this._createSampleSynth(sourceName, sourceName, null).toMaster();
-		    instrumentsSource[instrumentName] = [1, 'drum'];
+                    instruments[sourceName] = this._createSampleSynth(sourceName, sourceName, null).toMaster();
+                    instrumentsSource[instrumentName] = [1, 'drum'];
                 }
-	    }
+            }
         }
     };
 
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrumentName, sourceName, params) {
         // We may have a race condition with the samples loader.
-	if (this.samples == null) {
+        if (this.samples == null) {
             this.samplesQueue.push([instrumentName, sourceName, params]);
 
             var that = this;
-	    require(SOUNDSAMPLESDEFINES, function(){
-		that.loadSamples();
-	    });
+            require(SOUNDSAMPLESDEFINES, function(){
+                that.loadSamples();
+            });
         } else {
             this.__createSynth(instrumentName, sourceName, params);
         }
