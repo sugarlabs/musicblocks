@@ -42,7 +42,7 @@
     </g>
     <g transform="matrix(1,0,0,1,58.9688,22.9649)">
         <g id="text4472">
-            <text x="-45.711px" y="0px" style="font-family:'LucidaGrande-Bold';font-size:16px;fill:black;">mode</text>
+            <text x="-45.711px" y="0px" style="font-family:'Sans';font-size:16px;fill:black;">mode</text>
         </g>
     </g>
     <g id="g4437" transform="matrix(0.692216,0,0,0.692216,337.964,-2.03592)">
@@ -210,67 +210,67 @@
     </g>
     <g transform="matrix(1,0,0,1,177.223,263.406)">
         <g id="text4650">
-            <text x="-33.523px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:black;">Phrygian</text>
+            <text x="-33.523px" y="0px" style="font-family:'Sans';font-size:16px;fill:black;">Phrygian</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,177.008,58.8242)">
         <g id="text4654">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">0</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">0</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,212.863,76.8321)">
         <g id="text4654-0">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">1</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">1</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,249.219,112.937)">
         <g id="text4654-2">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">2</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">2</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,267.035,148.824)">
         <g id="text4654-8">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">3</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">3</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,249.062,184.832)">
         <g id="text4654-9">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">4</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">4</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,213.086,220.719)">
         <g id="text4654-02">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">5</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">5</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,176.949,236.824)">
         <g id="text4654-7">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">6</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">6</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,141.031,218.832)">
         <g id="text4654-92">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">7</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">7</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,105.008,182.824)">
         <g id="text4654-97">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">8</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">8</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,87.0625,146.824)">
         <g id="text4654-1">
-            <text x="-5.059px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">9</text>
+            <text x="-5.059px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">9</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,104.656,110.824)">
         <g id="text4654-3">
-            <text x="-10.117px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">10</text>
+            <text x="-10.117px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">10</text>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,140.863,74.8321)">
         <g id="text4654-94">
-            <text x="-10.117px" y="0px" style="font-family:'LucidaGrande';font-size:16px;fill:white;">11</text>
+            <text x="-10.117px" y="0px" style="font-family:'Sans';font-size:16px;fill:white;">11</text>
         </g>
     </g>
 </svg>
