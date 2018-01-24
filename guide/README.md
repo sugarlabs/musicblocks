@@ -29,7 +29,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
       11. [Inversion](#INVERSION)
       12. [Backwards](#BACKWARDS)
       13. [Setting Voice and Keys](#SETTING)
-      14. [Vibrato](#VIBRATO)
+      14. [Vibrato, tremelo, et al.](#VIBRATO)
    3. [Voices](#VOICES)
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
@@ -455,14 +455,16 @@ This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
 
-#### <a name="VIBRATO"></a>3.2.14 Vibrato
+#### <a name="VIBRATO"></a>3.2.14 Vibrato, tremelo, et al.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "Vibrato block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
 
 The *Vibrato* Block adds a rapid variation in pitch to any contained
-notes. The intensity of the variation ranges from 1 to 100 (cents),
+notes. The intensity of the variation ranges from `1` to `100` (cents),
 e.g. plus or minus up to one half step. The rate argument determines
 the rate of the variation.
+
+The other effects blocks also modulate pitch over time. Give them a try.
 
 ### <a name="VOICES"></a>3.3 Voices
 
