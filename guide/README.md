@@ -24,7 +24,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
       6. [Repeating Notes](#REPETITION)
       7. [Swinging Notes and Tied Notes](#SWINGING)
       8. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-      9. [Intervals and Set Relative Volume](#INTERVALS-AND-ARTICULATION)
+      9. [Intervals](#INTERVALS)
       10. [Absolute Intervals](#ABSOLUTE-INTERVALS)
       11. [Inversion](#INVERSION)
       12. [Backwards](#BACKWARDS)
@@ -379,23 +379,23 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="INTERVALS-AND-ARTICULATION"></a>3.2.9 Intervals and Set Relative Volume
+#### <a name="INTERVALS"></a>3.2.9 Intervals
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Interval and Set Relative Volume block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Scalar interval block")
 
-The *Interval* block calculates a relative interval, e.g., a fifth,
-and adds the additional pitches to a note's playback. In the figure,
-we add `La` to `Re` and `Ti` to `Mi`.
+The *Scalar interval* block calculates a relative interval based on
+the current mode, e.g., a *fifth*, and adds the additional pitches to a
+note's playback. In the figure, we add `La` to `Re` and `Ti` to `Mi`.
 
 #### <a name= "ABSOLUTE-INTERVALS"></a>Absolute Intervals
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg "Using absolute intervals")
 
-The *Augmented* block calculates an absolute interval, e.g., an
-augmented fifth, and adds the additional pitches to a note. Similarly,
-the *Minor* block calculates an absolute interval, e.g., a minor
-third. Other absolute intervals include *Perfect*, *Diminished*, and
-*Major*.
+The *Augmented* block calculates an absolute interval (in half-steps),
+e.g., an augmented fifth, and adds the additional pitches to a
+note. Similarly, the *Minor* block calculates an absolute interval,
+e.g., a minor third. Other absolute intervals include *Perfect*,
+*Diminished*, and *Major*.
 
 In the augmented fifth example above, a chord of `D5` and `A5` are played,
 followed by a chord of `E5` and `C5`. In the minor third example, which
