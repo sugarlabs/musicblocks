@@ -348,10 +348,20 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "Set volume, Crescendo, Staccato, and Slur blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
 
-The *Set volume* block will change the volume of the notes. The
-default is 50; the range is 0 (silence) to 100 (full volume).
+The *Set master volume* block will change the master volume. The
+default is `50`; the range is `0` (silence) to `100` (full volume).
+
+The *Set snth volume* block will change the volume of a particular
+synth, e.g., `violin`, `snare drum`, etc. The default volume is `50`;
+the range is `0` (silence) to `100` (full volume). In the example, the
+*synth name* block is used to select the current synth.
+
+The *Set Relative Volume* block modifies the clamped note's volume
+according to the input value of the block in an added (or subtracted
+when negative) percentage with respect to the original volume. For
+example, `100` would mean doubling the current volume.
 
 The *Crescendo* block will increase (or decrease) the volume of the
 contained notes by a specified amount for every note played. For
@@ -359,8 +369,11 @@ example, if you have 3 notes in sequence contained in a *Crescendo*
 block with a value of 5, the final note will be at 15% more 
 than the original value for volume.
 
-The *Staccato* block shortens the length of the actual note&mdash;making them tighter
-bursts&mdash;while maintaining the specified rhythmic value of the notes.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform17.svg "Staccato, and Slur blocks")
+
+The *Staccato* block shortens the length of the actual
+note&mdash;making them tighter bursts&mdash;while maintaining the
+specified rhythmic value of the notes.
 
 The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
@@ -373,8 +386,6 @@ maintaining the specified rhythmic value of the notes.
 The *Interval* block calculates a relative interval, e.g., a fifth,
 and adds the additional pitches to a note's playback. In the figure,
 we add `La` to `Re` and `Ti` to `Mi`.
-
-The *Set Relative Volume* block modifies the clamped note's volume according to the input value of the block in an added (or subtracted when negative) percentage with respect to the original volume.For example,100 would mean doubling the current volume.
 
 #### <a name= "ABSOLUTE-INTERVALS"></a>Absolute Intervals
 
