@@ -484,7 +484,7 @@ If we put our song into an action...
 
 It gets more interesting if we shift up and down octaves.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg playing the various voices offset in time")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg "playing the various voices offset in time")
 
 And even more interesting if we bring the various voices offset in time.
 
