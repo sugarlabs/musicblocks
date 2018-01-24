@@ -1003,7 +1003,7 @@ for an ocatve.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg "Pitch Slider") 
 
-<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg" alt="Pitch Slider-One Column" width="100">
+<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg" alt="Pitch Slider-One Column">
 
 When the *Pitch Slider* block is clicked, the *Pitch Slider* widget is
 initialized. The widget will have one column for each *Sine* block in
@@ -1015,11 +1015,11 @@ or between columns.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg "Pitch Slider Block")
 
-<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg" alt="Pitch Slider-Two Column" width="100">
+<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg" alt="Pitch Slider-Two Column">
 
 Clicking in a column will extact the corresponding *Note* blocks, for example:
 
-<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg" alt="Pitch Slider-Two Columns Adjusting" width="100">
+<img src="https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg" alt="Pitch Slider-Two Columns Adjusting">
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg " Pitch Slider block")
 
