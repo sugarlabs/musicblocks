@@ -309,11 +309,11 @@ example indicating 3/8 instead of 1/4, for a dotted quarter note.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Speeding up and slowing down the tempo")
 
-You can also multiply (or divide) the beat value, which will speed up
-or slowdown the notes. Multiplying the beat value of an `1/8` note by
-`2` is the equivalent of playing a `1/16` note. Dividing the beat
-value of an `1/8` note by '2' is the equivalent of playing a `1/4`
-note.
+You can also multiply (or divide) the note value, which will speed up
+or slowdown the notes. Multiplying the note value of an `1/8` note by
+`1/2` is the equivalent of playing a `1/16` note. Multiplying the note
+value of an `1/8` note by `2/1' (or dividing by '1/2') is the
+equivalent of playing a `1/4` note.
 
 #### <a name="REPETITION"></a>3.2.6 Repeating Notes
 
