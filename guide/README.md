@@ -293,11 +293,16 @@ raise it by one octave.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg "Creating dotted notes using the Dot block")
 
-You can "dot" notes using the *Dot* block. A dotted note extends the rhythmic duration of a note by
-50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a
-beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
+You can "dot" notes using the *Dot* block. A dotted note extends the
+rhythmic duration of a note by 50%. E.g., a dotted quarter note will
+play for 3/8 (1/4 + 1/8) of a beat. A dotted eighth note will play for
+3/16 (1/8 + 1/16) of a beat. A double dot extends the duration by 75%
+(50% + 50% of 50%). E.g., a double-dotted quarter note will play for
+7/16 (1/4 + 1/8 + 1/16) of a beat.
 
-You can also simply change the note value to mimic a dotted note, for example indicating 3/8 instead of 1/4, for a dotted quarter note.
+You can also simply change the note value to mimic a dotted note, for
+example indicating 3/8 instead of 1/4, for a dotted quarter note.
+
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
 #### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
