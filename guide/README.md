@@ -315,6 +315,13 @@ or slowdown the notes. Multiplying the note value of an `1/8` note by
 value of an `1/8` note by `2/1` (or dividing by `1/2`) is the
 equivalent of playing a `1/4` note.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
+
+In the above example, the sequence of [drum](#DRUMS) note values is
+decreased over time.
+
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
+
 #### <a name="REPETITION"></a>3.2.6 Repeating Notes
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg "repeating notes")
@@ -447,12 +454,6 @@ and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
 This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
-
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
-
-In the above example, the sequence of [drum](#DRUMS) beats is increased over time.
-
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
 
 #### <a name="VIBRATO"></a>3.2.14 Vibrato
 
