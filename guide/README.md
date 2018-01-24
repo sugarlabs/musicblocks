@@ -386,10 +386,10 @@ the *Minor* block calculates an absolute interval, e.g., a minor
 third. Other absolute intervals include *Perfect*, *Diminished*, and
 *Major*.
 
-In the augmented fifth example above, a chord of D5 and A5 are played,
-followed by a chord of E5 and C5. In the minor third example, which
-includes a shift of one octave, first a chord of D5 and F5 is played,
-followed by chord of E5 and G6.
+In the augmented fifth example above, a chord of `D5` and `A5` are played,
+followed by a chord of `E5` and `C5`. In the minor third example, which
+includes a shift of one octave, first a chord of `D5` and `F5` is played,
+followed by chord of `E5` and `G6`.
 
 #### <a name= "INVERSION"></a>3.2.11 Inversion
 
