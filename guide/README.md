@@ -878,14 +878,14 @@ with the *Pitch-time Matrix* block.
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
 
-One other feature of the *Rhythm Ruler* wigdet is the ability to tap
-out a rhythm.  By clicking on the *Tap* button and then clicking on a
-cell inside one of the rhythm rulers, you will be prompted to begin
-tapping the mouse button to divide the cell into sub-cells. The prompt
-is four tones. Once the fourth tone has sounded, a progress bar runs
+Another feature of the *Rhythm Ruler* wigdet is the ability to tap out
+a rhythm. By clicking on the *Tap* button and then clicking on a cell
+inside one of the rhythm rulers, you will be prompted (by four tones)
+to begin tapping the mouse button to divide the cell into
+sub-cells. Once the fourth tone has sounded, a progress bar will run
 from left to right across the screen. Each click of the mouse will
-define another beat in the rhythm. If you don't like your rhythm, use
-the *Undo* button and try again.
+define another beat within the cell. If you don't like your rhythm,
+use the *Undo* button and try again.
 
 ### <a name="modes"></a>4.4 Musical Modes
 
