@@ -627,8 +627,18 @@ and `chunk2`.
 
 [Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TOC) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
 
-This section of the guide will talk about the various Widgets that can be added to Music Blocks
-to enhance your experience.
+This section of the guide will talk about the various Widgets that can
+be used within Music Blocks to enhance your experience.
+
+Every widget has a menu with at least two buttons.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg "close button")
+
+You can hide the widget by clicking on the *Close* button.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/grab-handle.svg "drag handle")
+
+You can move the widget by dragging it by the *Drag* handle.
 
 ### <a name="status"></a>4.1 Status
 
@@ -711,11 +721,6 @@ as well.
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
-
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg "close button")
-
-You can hide the matrix by clicking on the *Close* button (the right-most
-button in the top row of the grid.)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg "erase button")
 
