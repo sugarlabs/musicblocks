@@ -982,7 +982,7 @@ As an experience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
-### <a name="stairs"></a>4.6 Generating Arbitrary Pitches
+### <a name="stairs"></a>4.6 Exploring Musical Proportions
 
 The *Pitch Staircase* block is used to launch a widget similar to the
 *Pitch-time Matrix*, which can be used to generate different pitches
