@@ -365,20 +365,20 @@ blocks, individual note blocks, or the *Tuplet* block.
 
 The *Rhythm* block is used to specify a series of notes of the same
 duration (e.g., three quarter notes or seven eighth notes). The number
-of notes is the top argument; the bottom argument is the inverse of
-the note duration, e.g., 1 for a whole note, 2 for a half note, 4 for
-a quarter note, etc. (Recall that in traditional Western notation all
-note values are (1) in powers of two, and are (2) in relation to the
-"whole note", which is in turn (3) defined by tempo, or beats --
-usually quarter notes&mdash;per minute) Each note is represented by a
-column in the matrix.
+of notes is the top argument; the bottom argument is the the note
+duration, e.g., `1/1` for a whole note, `1/2` for a half note, `1/4`
+for a quarter note, etc. (Recall that in traditional Western notation
+all note values are (1) in powers of two, and are (2) in relation to
+the "whole note", which is in turn (3) defined by tempo, or
+beats&mdash;usually quarter notes&mdash;per minute) Each note is
+represented by a column in the matrix.
 
 Special ratios of the whole note can be created very easily with the
 *Rhythm* block by choosing an integer other than the traditional
 "powers of two" that standard Western music notation affords us. For
-example, putting a "5" into the argument for "note value" will create
-a note value equal to "one fifth the durational length of a whole
-note". This gives the user endless rhythmic possibilities.
+example, putting a `1/5` into the argument for "note value" will
+create a note value equal to "one fifth the durational length of a
+whole note". This gives the user endless rhythmic possibilities.
 
 As a convenience, blocks for the most common note values are also
 provided (whole note through 64th note). They are automatically
@@ -415,3 +415,6 @@ try to make a corresponding change in the matrix.
 
 Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the *Pitch-time Marix* block.
+
+More details about all of the widgets are available in the
+[Turtle Blocks Programming Guide](http://github.com/walterbender/turtleblocksjs/tree/master/guide).
