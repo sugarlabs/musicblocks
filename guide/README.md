@@ -218,7 +218,10 @@ begin at.  There are many ways to *Run* a program: you can click on
 the *Run* button at the upper-left corner of the screen to run the
 music at a fast speed; a long press on the *Run* button will run it
 slower (useful for debugging); and the *Step* button can be used to
-step through the program one block per button press.
+step through the program one block per button press. (An extra-long
+press of the *Run* button will play back the music slowly. A long
+press of the *Step* button will step through the program note by
+note.)
 
 In the example above, the *Chunk* block is inside of a *Start* block,
 which means that when any of the start buttons is pressed, the code
@@ -258,7 +261,7 @@ There are many ways to transform pitch, rhythm, and other sonic qualities.
 
 The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used inside
-of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
+of *Repeat* blocks to repeat the code `7` times, playing up and down a scale.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
@@ -269,7 +272,8 @@ Step Up* and *Scalar Step Down* blocks. These blocks calculate the
 number of half-steps to the next note in the current mode. (You can
 read more about [Musical Modes](#modes) below.) Note that the *Mouse
 Pitch Number* block returns the pitch number of the most recent note
-played.
+played. (Note that here we are using the *Mode length* block, which
+returns the number of scalar steps in the current mode.)
 
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
 
@@ -289,7 +293,7 @@ step.
 The *Adjust-transposition* block can be used to make larger shifts in
 pitch in half step units. A positive number shifts the pitch up and a
 negative number shifts the pitch down. The input must be a whole
-number. To shift an entire octave, transpose by 12 half-steps up. -12
+number. To shift an entire octave, transpose by `12` half-steps up. `-12`
 will shift an octave down.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using Adjust-transposition")
@@ -303,13 +307,13 @@ raise it by one octave.
 
 You can "dot" notes using the *Dot* block. A dotted note extends the
 rhythmic duration of a note by 50%. E.g., a dotted quarter note will
-play for 3/8 (1/4 + 1/8) of a beat. A dotted eighth note will play for
-3/16 (1/8 + 1/16) of a beat. A double dot extends the duration by 75%
-(50% + 50% of 50%). E.g., a double-dotted quarter note will play for
-7/16 (1/4 + 1/8 + 1/16) of a beat.
+play for `3/8` `(1/4 + 1/8)` of a beat. A dotted eighth note will play for
+`3/16` `(1/8 + 1/16)` of a beat. A double dot extends the duration by `75%`
+`(50% + 50% of 50%)`. E.g., a double-dotted quarter note will play for
+`7/16` `(1/4 + 1/8 + 1/16)` of a beat.
 
 You can also simply change the note value to mimic a dotted note, for
-example indicating 3/8 instead of 1/4, for a dotted quarter note.
+example indicating `3/8` instead of `1/4`, for a dotted quarter note.
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
@@ -381,7 +385,7 @@ example, `100` would mean doubling the current volume.
 The *Crescendo* block will increase (or decrease) the volume of the
 contained notes by a specified amount for every note played. For
 example, if you have 3 notes in sequence contained in a *Crescendo*
-block with a value of 5, the final note will be at 15% more 
+block with a value of `5`, the final note will be at 15% more 
 than the original value for volume.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform17.svg "Staccato, and Slur blocks")
@@ -508,7 +512,7 @@ the multiple voices are synced to the same master clock.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick drum")
 
-A special "drum" version of the *Start* block is available for laying
+A special *Start drum* version of the *Start* block is available for laying
 down a drum track. Any *Pitch* blocks encounted while starting from a
 drum will be played as `C2` with the default drum sample. In the
 example above, all of the notes in `chunk` will be played with a kick
@@ -567,7 +571,7 @@ before the beat.
 
 Specifying beat is useful in that you can have the character of a note
 vary depending upon the beat. In the example below, the volume of
-notes on Beat 1 and Beat 3 are increased, while the volume of off
+notes on Beat `1` and Beat `3` are increased, while the volume of off
 beats is decreased.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat2.svg "on-beat-do")
@@ -582,9 +586,9 @@ Another approach to graphics is to use modulate them based on the
 beat. In the exxample above, we call the same graphics action for each
 note, but the parameters associated with the action, such as pen
 width, are dependent upon which beat we are on. On Beat 1, the pen
-size is set to 50 and the volume to 75. On Beat 3, the pen size is set
-to 25 and the volume to 50. On off beats, the pen size is set to 5 and
-the volumne to 5. The resultant graphic is shown below.
+size is set to `50` and the volume to `75`. On Beat `3`, the pen size is set
+to `25` and the volume to `50`. On off beats, the pen size is set to `5` and
+the volumne to `5`. The resultant graphic is shown below.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "graphics modulated by beat")
 
@@ -888,6 +892,9 @@ Note that not every mode uses 7 intervals per octave. For example, the
 2, 3, 2],`. What is important is that the sum of the intervals
 in an octave is 12 half-steps.
 
+The *Mode length* block will return the number of intervals (scalar
+steps) in the current mode.
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg "mode widget")
 
 The *Mode* widget lets you explore modes and generate custom
@@ -912,14 +919,14 @@ right are:
 *Play all*, which will play a scale using the current mode;
 
 *Save*, which will save the current mode as the *Custom* mode and save
- a stack of *Pitch* blocks that can be used with the *Pitch-time
- Matrix* block;
+a stack of *Pitch* blocks that can be used with the *Pitch-time
+Matrix* block;
 
 *Rotate counter-clockwise*, which will rotate the mode
- counter-clockwise (See the example below);
+counter-clockwise (See the example below);
 
 *Rotate clockwise*, which will rotate the mode clockwise (See the
- example below);
+example below);
 
 *Invert*, which will invert the mode (See the example below);
 
@@ -1037,9 +1044,9 @@ When the *Pitch Slider* block is clicked, the *Pitch Slider* widget is
 initialized. The widget will have one column for each *Sine* block in
 the clamp. Every column has a slider that can be used to move up or
 down in frequency, continuously or in intervals of 1/12th of the
-starting frequency. The mouse is used to move the frequency up and down continuously. Buttons are
-used for intervals. Arrow keys can also be used to move up and down,
-or between columns.
+starting frequency. The mouse is used to move the frequency up and
+down continuously. Buttons are used for intervals. Arrow keys can also
+be used to move up and down, or between columns.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg "Pitch Slider Block")
 
@@ -1062,7 +1069,7 @@ is clicked, the *Tempo* widget is initialized.
 The *Master Beats per Minute* block contained in the clamp of the
 *Tempo* block sets the initial tempo used by the widget. This
 determines the speed at which the ball in the widget moves back and
-forth. If BPM is 60, then it will take one second for the ball to move
+forth. If BPM is `60`, then it will take one second for the ball to move
 across the widget. A round-trip would take two seconds.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg "changing tempo")
