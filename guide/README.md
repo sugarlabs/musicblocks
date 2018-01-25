@@ -859,7 +859,7 @@ The rhythm can be further subdivided by clicking in individual
 cells. In the example above, two quarter-notes have been created by
 clicking on one of the half-notes.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "tie cells in rhythm ruler")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "tie cells in Rhythm Ruler")
 
 By dragging across multiple cells, they become tied. In the example
 above, two third-notes have been tied into one two-thirds-note.
@@ -877,6 +877,15 @@ with the *Pitch-time Matrix* block.
 
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
+
+One other feature of the *Rhythm Ruler* wigdet is the ability to tap
+out a rhythm.  By clicking on the *Tap* button and then clicking on a
+cell inside one of the rhythm rulers, you will be prompted to begin
+tapping the mouse button to divide the cell into sub-cells. The prompt
+is four tones. Once the fourth tone has sounded, a progress bar runs
+from left to right across the screen. Each click of the mouse will
+define another beat in the rhythm. If you don't like your rhythm, use
+the *Undo* button and try again.
 
 ### <a name="modes"></a>4.4 Musical Modes
 
