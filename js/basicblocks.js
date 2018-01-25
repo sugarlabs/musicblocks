@@ -2790,7 +2790,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // Deprecated
     var drumBlock = new ProtoBlock('drum');
-    drumBlock.palette = palettes.dict['action'];
+    drumBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['drum'] = drumBlock;
     drumBlock.staticLabels.push(_('start drum'));
     drumBlock.extraWidth = 10;
