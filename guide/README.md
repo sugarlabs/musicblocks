@@ -215,9 +215,9 @@ music.
 A *Start* Block is a *chunk* that will automatically be executed once
 the start button is pressed.  This is where most of your programs will
 begin at.  There are many ways to *Run* a program: you can click on
-the *Run* button at the upper-left corner of the screen (the "rabbit")
-to run the music at a fast speed; click on the *Run Slow* button (the
-"turtle") to run it slower; and the *Step* button (the "snail"), to
+the *Run* button at the upper-left corner of the screen to run the
+music at a fast speed; a long press on the *Run* button will run it
+slower (useful for debugging); and the *Step* button can be used to
 step through the program one block per button press.
 
 In the example above, the *Chunk* block is inside of a *Start* block,
@@ -238,7 +238,7 @@ You can [repeat](#REPETITION) chunks either by using multiple *Chunk* blocks or 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg "mixing and matching chunks")
 
 You can also mix and match chunks. Here we play the action block with
-name "chunk", followed by "chunk1" twice, and then "chunk" again.
+name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg "creating a song using chunks")
 
@@ -435,7 +435,7 @@ around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg "Backward block")
 
 The *Backward* block will play the contained notes in reverse order
-(retrograde). In the example above, the notes in *Chunk* are played as
+(retrograde). In the example above, the notes in `chunk` are played as
 `Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
 stack.
 
@@ -695,7 +695,6 @@ you will hear a sequence of notes played (from left to right): `Re 4`,
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg "save button")
 
-
 Once you have a group of notes (a "chunk") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
 create a stack of blocks that can used to play these same notes
@@ -706,18 +705,15 @@ as well.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/sort.svg "sort button")
 
-
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg "close button")
 
-
 You can hide the matrix by clicking on the *Close* button (the right-most
 button in the top row of the grid.)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg "erase button")
-
 
 There is also an Erase button that will clear the grid.
 
