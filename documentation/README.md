@@ -1,4 +1,4 @@
-Using Music Blocks
+﻿Using Music Blocks
 ==================
 
 Music Blocks is a fork of Turtle Blocks. It has extensions for
@@ -23,7 +23,7 @@ from `index.html` or from [GitHub](http://walterbender.github.io/musicblocks).
 Getting Started
 ---------------
 
-![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/documentation/default.svg "default blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/default.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing three notes: `Sol 4`, `Mi 4`, and `Sol 4`. The
@@ -35,16 +35,16 @@ Try clicking on the *Start* block or click on the *Play* button. You should hear
 
 To write your own programs, drag blocks from their respective palettes
 on the left side of the screen. Use multiple blocks in stack(s) to
-create music and drawings; as the moouse moves under your control,
+create music and drawings; as the mouse moves under your control,
 colorful lines are drawn and music of your creation is played.
 
-Note that blocks either snap together verically or
+Note that blocks either snap together vertically or
 horizontally. Vertical connections indicate program (and temporal)
 flow. Code is executed from the top to bottom of a stack of
 blocks. Horizontal connections are used for parameters and arguments,
 e.g., the name of a pitch, the duration of a note, the numerator and
 denominator of a division. From the shape of the block, it should be
-apparenet whether they connect verically or horizontally.
+apparent whether they connect vertically or horizontally.
 
 Some blocks, referred to as "clamp" blocks have an
 interior&mdash;child&mdash;flow. This might be code that is run *if* a
@@ -52,7 +52,7 @@ condition is true, or, more common, the code that is run over the
 duration of a note.
 
 For the most part, any combination of blocks will run (although there
-is no guarrantee that they will produce music). Illegal combinations
+is no guarantee that they will produce music). Illegal combinations
 of blocks will be flag by a warning on the screen as the program runs.
 
 You can delete a block by dragging it back into the trash area that
@@ -96,7 +96,7 @@ remove an individual block from a stack.
 *Enter* is the equivalent of clicking the *Run* button.
 
 *Alt-C* is copy and *Alt-V* is paste. Be sure that the cursor is
- highlighing the block(s) you want to copy.
+highlighting the block(s) you want to copy.
 
 You can directly type notes using *d* for `Do`, *r* for `Re`, *m* for
 `Mi`, *f* for `Fa`, *s* for `Sol`, *l* for `La`, and *t* for `Ti`.
@@ -127,7 +127,7 @@ Defining a note
 At the heart of Music Blocks is the concept of a note. A note, defined
 by the *Note value* block defines a length of time and a set of
 actions to occur in that time. Typically the action is to play a
-pitch, or series of pitchs (e.g., a chord). Whatever blocks are placed
+pitch, or series of pitches (e.g., a chord). Whatever blocks are placed
 inside the "clamp" of a *Note value* block are played over the
 duration of the note.
 
@@ -138,7 +138,7 @@ the note duration. (There are some practical limitations, which you
 can discover through experimentation.) The relative length of a
 quarter note is half as long as a half note. By default, Music Blocks
 will play 90 quarter notes per second, so each quarter note is `2/3`
-seconds (`666` microseconds) in duraction.
+seconds (`666` microseconds) in duration.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/pitch.svg "Pitch block")
 
@@ -164,7 +164,7 @@ Two special blocks can be used with a *Pitch* block to specify the
 name of the pitch: the *Solfege* block and the *Pitch-Name* block. The
 *Solfege* block uses selectors to scroll through `Do`, `Re`, `Mi`,
 `Fa`, `Sol`, `La`, and `Ti`. A second selector is used for sharps and
-flats: `##`, `#`, `♮`, `♭` and `♭♭`. The *Pitch-Name* block is similar
+flats: `##`, `#`, `` and ``. The *Pitch-Name* block is similar
 in that it lets you scroll through `C`, `D`, `E`, `F`, `G`, `A`,
 `B`. It also uses a second selector for sharps and flats.
 
@@ -176,16 +176,6 @@ inside a note in order to create sound-sync animations.
 
 A quick tour of selected blocks
 -------------------------------
-
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/duplicate-notes.svg "Duplicate Notes block")
-
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/duplicate-factor.svg "duplicate factor")
-
-The *Duplicate Notes* block, found on the *Rhythms* palette, is used
-to repeat any contained notes. Similar to using a *Repeat* block, but
-rather than repeating a sequence of notes multiple times, each note is
-repeated in turn, e.g. duplicate x2 of `4 4 8` would result in `4 4 4
-4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4 8`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/settimbre.svg "Set timbre block")
 
@@ -213,6 +203,14 @@ loops. Whatever stack of blocks are placed inside its clamp will be
 repeated. It can be used to repeat individual notes, or entire phrases
 of music.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/duplicate-notes.svg "Duplicate block")
+
+The *Duplicate* block, found on the *Rhythms* palette, is used to
+repeat any contained notes. Similar to using a *Repeat* block, but
+rather than repeating a sequence of notes multiple times, each note is
+repeated in turn, e.g. duplicate x2 of `4 4 8` would result in `4 4 4
+4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4 8`.
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/start.svg "Start")
 
 The *Start* block, found on the *Action* palette, is tied to the *Run*
@@ -223,7 +221,7 @@ Note that you can have multiple mice and that each mouse is
 equivalent to a "voice" in music. It can play notes of various pitches
 in sequence, and can even play multiple notes of the same "note
 value", but no one mouse can do counterpoint by itself&mdash;just like
-one moouse cannot draw two lines at the same time. If you want
+one mouse cannot draw two lines at the same time. If you want
 counterpoint, pull out an additional *Start* block, which will create
 a new mouse that can now perform a new voice.
 
@@ -244,6 +242,18 @@ be used in many powerful ways, e.g., an action can be associated with
 an event, such as an on beat or off beat or mouse click. See
 [Turtle Blocks Programming Guide](http://github.com/walterbender/turtleblocksjs/tree/master/guide),
 for further details and examples.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/storein.svg "storein")
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/box.svg "box")
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/add1.svg "add one")
+
+The *Store in* block, found on the *Boxes* palette, is used to store a
+value. That value can be retrieved using the *Box* block. The value
+can be modified using the *Add one* block. These blocks are the
+typical way in which variables are stored and retrieved in Music
+Blocks.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/forward.svg "forward")
 
@@ -342,14 +352,14 @@ removed as desired. The "note value" representation acts as a
 with the concepts of rhythm in music and those unfamiliar (but
 familiar with math).
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/matrix.svg "Pitch-time Matrix blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg "Pitch-time Matrix blocks")
 
 *Pitch-time Matrix* blocks clamp is used to define the matrix:
 A row in the matrix is created for each *Pitch* block and columns are
 created for individual notes, which are created by using *Rhythm*
 blocks, individual note blocks, or the *Tuplet* block.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/rhythm.svg "Rhythm block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg "Rhythm block")
 
 The *Rhythm* block is used to specify a series of notes of the same
 duration (e.g., three quarter notes or seven eighth notes). The number
@@ -376,10 +386,12 @@ create columns in the matrix.
 If you would like multiple note values in a row, simply use the
 *Repeat* block clamp or *Duplicate* block clamp.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/tuplet.svg "Tuplet block clamp")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg "simple Tuplet block")
 
-The *Tuplet* block clamp is how we create rhythms that do not fit into
-a simple "power of two" rhythmic space. A tuplet, mathematically, is a
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg "Tuplet clamp")
+
+The *Tuplet* block is how we create rhythms that do not fit into a
+simple "power of two" rhythmic space. A tuplet, mathematically, is a
 collection of notes that are scaled to map into a specified
 duration. For example, if you would like to script/perform three
 unique notes into the duration of a single quarter note you would use
@@ -399,5 +411,5 @@ marked from the previous matrix. If you modify the *Pitch* and
 *Rhythm* blocks in the *Pitch-time Matrix* clamp, Music Blocks will
 try to make a corresponding change in the matrix.
 
-Note: You can constuct a matrix from a chuck of blocks by including
+Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the *Pitch-time Marix* block.
