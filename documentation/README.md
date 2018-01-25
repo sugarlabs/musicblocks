@@ -18,7 +18,7 @@ Internet Explorer| Not Supported
 You can run it directly
 from `index.html` or from [GitHub](http://walterbender.github.io/musicblocks).
 
-![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/documentation/chords.png "preview of Music Blocks in a browser")
+![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/documentation/getting-started.png "Music Blocks in a browser")
 
 Getting Started
 ---------------
@@ -340,6 +340,8 @@ Widget Palette
 
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
+
+![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/documentation/chords.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
