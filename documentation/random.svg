@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1521"
+   version="1.1"
+   viewBox="0 0 51.556542 16.668751"
+   height="63"
+   width="194.85938">
+  <defs
+     id="defs1515" />
+  <metadata
+     id="metadata1518">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(3.1769766,-206.04921)"
+     id="layer1">
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-3.1769766,206.04921)"
+       id="g1239">
+      <g
+         id="g1237"
+         transform="scale(1.5)">
+        <path
+           id="path1223"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 33.90625 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 26.5 h -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+        <text
+           id="text1227"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
+          <tspan
+             id="tspan1225"
+             y="23"
+             x="58.239582">random</tspan>
+        </text>
+        <text
+           id="text1231"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+          <tspan
+             id="tspan1229"
+             y="11.25"
+             x="58.239582">min</tspan>
+        </text>
+        <text
+           id="text1235"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+          <tspan
+             id="tspan1233"
+             y="32.25"
+             x="58.239582">max</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1249"
+       transform="matrix(0.26458333,0,0,0.26458333,20.99519,206.04921)">
+      <g
+         id="g1247"
+         transform="scale(1.5)">
+        <path
+           id="path1241"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1245"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+          <tspan
+             id="tspan1243"
+             y="13.833333"
+             x="13.333333">0</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1259"
+       transform="matrix(0.26458333,0,0,0.26458333,20.99519,214.38358)">
+      <g
+         id="g1257"
+         transform="scale(1.5)">
+        <path
+           id="path1251"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1255"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+          <tspan
+             id="tspan1253"
+             y="13.833333"
+             x="13.333333">12</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

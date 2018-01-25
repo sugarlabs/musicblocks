@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1521"
+   version="1.1"
+   viewBox="0 0 76.886003 34.131252"
+   height="129"
+   width="290.59277">
+  <defs
+     id="defs1515" />
+  <metadata
+     id="metadata1518">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-41.159832,-274.86154)"
+     id="layer1">
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,41.159832,274.86154)"
+       id="g1003">
+      <g
+         id="g1001"
+         transform="scale(1.5)">
+        <path
+           id="path987"
+           style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 65.03418 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+        <text
+           id="text991"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+          <tspan
+             id="tspan989"
+             y="21.916666"
+             x="5.3333335">set synth volume</tspan>
+        </text>
+        <text
+           id="text995"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+          <tspan
+             id="tspan993"
+             y="11.25"
+             x="90.367516">synth</tspan>
+        </text>
+        <text
+           id="text999"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+          <tspan
+             id="tspan997"
+             y="32.25"
+             x="90.367516">volume</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1013"
+       transform="matrix(0.26458333,0,0,0.26458333,78.082772,274.86154)">
+      <g
+         id="g1011"
+         transform="scale(1.5)">
+        <path
+           id="path1005"
+           style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 91.69434 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1009"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+          <tspan
+             id="tspan1007"
+             y="13.833333"
+             x="13.333333">synth name</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1023"
+       transform="matrix(0.26458333,0,0,0.26458333,78.082772,283.19592)">
+      <g
+         id="g1021"
+         transform="scale(1.5)">
+        <path
+           id="path1015"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1019"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+          <tspan
+             id="tspan1017"
+             y="13.833333"
+             x="13.333333">85</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

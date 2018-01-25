@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1282"
+   version="1.1"
+   viewBox="0 0 35.321874 8.334375"
+   height="31.5"
+   width="133.5">
+  <defs
+     id="defs1276" />
+  <metadata
+     id="metadata1279">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-122.96511,-281.15334)"
+     id="layer1">
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,122.96511,281.15334)"
+       id="g1201">
+      <g
+         id="g1199"
+         transform="scale(1.5)">
+        <path
+           id="path1193"
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1197"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+          <tspan
+             id="tspan1195"
+             y="13.833333"
+             x="13.333333">box</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

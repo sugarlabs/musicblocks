@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1521"
+   version="1.1"
+   viewBox="0 0 48.158683 9.1281253"
+   height="34.5"
+   width="182.01707">
+  <defs
+     id="defs1515" />
+  <metadata
+     id="metadata1518">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(176.02577,-44.483557)"
+     id="layer1">
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-176.02577,44.483557)"
+       id="g1119">
+      <g
+         id="g1117"
+         transform="scale(1.5)">
+        <path
+           id="path1107"
+           style="fill:#9ddd5f;fill-opacity:1;stroke:#003e00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 33.344727 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+        <text
+           id="text1111"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
+          <tspan
+             id="tspan1109"
+             y="13.5"
+             x="49.678059">forward</tspan>
+        </text>
+        <text
+           id="text1115"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+          <tspan
+             id="tspan1113"
+             y="11.25"
+             x="49.678059" />
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1129"
+       transform="matrix(0.26458333,0,0,0.26458333,-155.25146,44.483557)">
+      <g
+         id="g1127"
+         transform="scale(1.5)">
+        <path
+           id="path1121"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1125"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+          <tspan
+             id="tspan1123"
+             y="13.833333"
+             x="13.333333">100</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
