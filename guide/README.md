@@ -42,6 +42,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
        3. [Creating Tuplets](#CREATING-TUPLETS)
        4. [What is a Tuplet?](#WHAT-IS-TUPLET)
        5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
+       6. [Using a scale of pitches in the Matrix](#USING-A-SCALE)
     3. [Generating rhythms](#rhythms)
     4. [Musical Modes](#modes)
     5. [The Pitch-Drum Matrix](#pitch-drum)
@@ -838,18 +839,30 @@ In the example above, the two *Rhythm* blocks are embedded in the
 Note: You can mix and match *Rhythm* blocks and *Tuplet* blocks when
 defining your matrix.
 
-#### <a name="WHAT-IS-TUPLET"></a>4.2.4 What is a tuplet?
+#### <a name="WHAT-IS-TUPLET"></a>4.2.4 What is a Tuplet?
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TupletChart.svg "tuplet chart")
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TripletChart.svg "triplet chart")
 
-#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using individual notes in the matrix
+#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using individual notes in the Matrix
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
+
+#### <a name="USING-A-SCALE"></a>4.2.6 Using a scale of pitches in the Matrix
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix15.svg)
+
+You can use the *Scalar step* block to generate a scale of pitches in
+the matrix. In the example above, the pitches comprising the G major
+scale in the 4th octave are added to the grid. Note that in order to
+put the highest note on top, the first pitch is the `Sol` in octave
+`5`. From there, we use `-1` as the argument to the *Scalar step*
+block inside the *Repeat*. Another detail to note is the use of the
+*Mode length* block.
 
 ### <a name="rhythms"></a>4.3 Generating Rhythms
 
