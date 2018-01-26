@@ -169,7 +169,7 @@ in that it lets you scroll through `C`, `D`, `E`, `F`, `G`, `A`,
 `B`. It also uses a second selector for sharps and flats.
 
 As noted, and described in more detail in the
-[Turtle Blocks Programming Guide](http://github.com/walterbender/turtleblocksjs/tree/master/guide),
+[Music Blocks Programming Guide](http://github.com/walterbender/musicblocks/tree/master/guide),
 you can put as many *Pitch* blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
@@ -240,7 +240,7 @@ modified.)
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
 an event, such as an on beat or off beat or mouse click. See
-[Turtle Blocks Programming Guide](http://github.com/walterbender/turtleblocksjs/tree/master/guide),
+[Music Blocks Programming Guide](http://github.com/walterbender/musicblocks/tree/master/guide),
 for further details and examples.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/storein.svg "storein")
@@ -417,4 +417,4 @@ Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the *Pitch-time Marix* block.
 
 More details about all of the widgets are available in the
-[Turtle Blocks Programming Guide](http://github.com/walterbender/turtleblocksjs/tree/master/guide).
+[Music Blocks Programming Guide](http://github.com/walterbender/musicblocks/tree/master/guide).
