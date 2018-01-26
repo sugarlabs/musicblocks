@@ -442,8 +442,8 @@ As a convenience, a number of standard absolute intervals are
 provided, e.g. *Major 2*, *Minor 3*, *Perfect 4*, *Augmented 6*,
 *Diminished 8*, et al.
 
-The *Doubly* block can be used to apply an augmentation or
-diminishment twice.
+The *Doubly* block can be used to create a double augmentation or
+double diminishment.
 
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
