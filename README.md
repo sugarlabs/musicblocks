@@ -28,10 +28,10 @@ activity (See [Music Blocks
 Embedded](http://activities.sugarlabs.org/en-US/sugar/addon/4804)) or
 simply open Music Blocks in Browse.
 
-See [Using Music
-Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation)
-and [Music Blocks
-Guide](http://github.com/walterbender/musicblocks/tree/master/guide)
+See
+[Using Music Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation/README.md)
+and
+[Music Blocks Guide](http://github.com/walterbender/musicblocks/tree/master/guide/README.md)
 
 Credits
 -------
