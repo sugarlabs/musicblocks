@@ -9345,7 +9345,47 @@ function Logo () {
             this.notationStaging[turtle] = [];
         }
 
-        this.notationStaging[turtle].push('pickup', 1 / factor);
+        if (factor === 0) {
+            console.log('ignoring partial of 0');
+            return;
+        }
+
+        // partial must be an integer or a dotted integer
+        var partial =  1 / factor;
+        if (Math.floor(partial) !== partial) {
+            switch(factor) {
+            case 0.75:
+                this.notationStaging[turtle].push('pickup', '2.');
+                console.log('partial 2.');
+                break;
+            case 0.875:
+                this.notationStaging[turtle].push('pickup', '2..');
+                console.log('partial 2..');
+                break;
+            case 0.375:
+                this.notationStaging[turtle].push('pickup', '4.');
+                console.log('partial 4.');
+                break;
+            case 0.4375:
+                this.notationStaging[turtle].push('pickup', '4..');
+                console.log('partial 4..');
+                break;
+            case 0.1875:
+                this.notationStaging[turtle].push('pickup', '8.');
+                console.log('partial 8.');
+                break;
+            case 0.21875:
+                this.notationStaging[turtle].push('pickup', '8..');
+                console.log('partial 8..');
+                break;
+            default:
+                console.log('cannot process pickup of ' + factor + ' for Lilypond output');
+                break;
+            }
+        } else {
+            this.notationStaging[turtle].push('pickup', partial);
+            console.log('partial ' + partial);
+        }
     };
 
     this.notationLineBreak = function (turtle) {
