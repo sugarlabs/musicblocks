@@ -59,6 +59,10 @@ processLilypondNotes = function (logo, turtle) {
         obj = logo.notationStaging[turtle][i];
         if (typeof(obj) === 'string') {
             switch (obj) {
+            case 'markup':
+                logo.notationNotes[turtle] += '_\\markup {' + logo.notationStaging[turtle][i + 1] + '} ';
+                i += 1;
+                break;
             case 'break':
                 if (i > 0) {
                     logo.notationNotes[turtle] += '\n';

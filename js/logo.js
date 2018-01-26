@@ -210,6 +210,7 @@ function Logo () {
     this.crescendoInitialVolume = {};
     this.intervals = {};  // relative interval (based on scale degree)
     this.semitoneIntervals = {};  // absolute interval (based on semitones)
+    this.markup = {};
     this.staccato = {};
     this.swing = {};
     this.swingTarget = {};
@@ -991,6 +992,7 @@ function Logo () {
             this.crescendoInitialVolume[turtle] = {'default': [DEFAULTVOLUME]};
             this.intervals[turtle] = [];
             this.semitoneIntervals[turtle] = [];
+            this.markup[turtle] = [];
             this.staccato[turtle] = [];
             this.swing[turtle] = [];
             this.swingTarget[turtle] = [];
@@ -1712,6 +1714,7 @@ function Logo () {
                     if (args[0] !== null) {
                         if (that.inNoteBlock[turtle].length > 0) {
                             that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
+                            that.markup[turtle].push(args[0].toString());
                         } else {
                             if (!that.suppressOutput[turtle]) {
                                 that.textMsg(args[0].toString());
@@ -7463,7 +7466,7 @@ function Logo () {
 
         // Cheat by 15% so that the mouse has time to complete its work.
         // var stepTime = beatValue * 1000 / NOTEDIV;
-	var stepTime = beatValue * 850 / NOTEDIV;
+        var stepTime = beatValue * 850 / NOTEDIV;
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
@@ -9306,6 +9309,19 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
+
+        if (this.markup[turtle].length > 0) {
+            var markup = '';
+            for (var i = 0; i < this.markup[turtle].length; i++) {
+                markup += this.markup[turtle][i];
+                if (i < this.markup[turtle].length - 1) {
+                    markup += ' ';
+                }
+            }
+
+            this.notationMarkup(turtle, markup);
+            this.markup[turtle] = [];
+        }
     };
 
     this.notationVoices = function (turtle, arg) {
@@ -9331,6 +9347,14 @@ function Logo () {
             break;
         }
     }
+
+    this.notationMarkup = function (turtle, markup) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('markup', markup);
+    };
 
     this.notationMeter = function (turtle, count, value) {
         if (this.notationStaging[turtle] == undefined) {
