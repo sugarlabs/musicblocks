@@ -1152,6 +1152,10 @@ The *Save as Lilypond* block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
 also a *Save as Lilypond* button on the secondary toolbar.
 
+Note that if you use a *Print* block inside of a note, Lilypond will
+create a "markup" or annotation for that note. It is a simple way to
+add lyrics to your score.
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg "Save as Lilypond icon")
 
 ```
