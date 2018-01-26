@@ -63,7 +63,7 @@ Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
 Patel as part of GSoC 2017.
 
 Many students contributed to the project as part of Google Code-in
-(2015-16, 2016-17, and 2017-2018).
+(2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018).
 
 A full list of
 [contributors](https://github.com/walterbender/musicblocks/graphs/contributors)

@@ -7,9 +7,7 @@ music extension of the Logo programming language in the early
 1970s. Many of the ideas expressed in Music Blocks originated with
 Minsky.
 
-Music Blocks is a fork of TurtleArtJS created by Walter
-Bender. (Turtle Blocks JS has many
-[contributors](https://github.com/walterbender/turtleblocksjs/graphs/contributors).
+Music Blocks is a fork of TurtleArtJS created by Walter Bender.
 
 Devin Ulibarri has contributed functional and user-interface
 designs. Many of his contributions were inspired by the music
@@ -38,11 +36,15 @@ Some of the graphics were contributed by Chie Yasuda (the Mouse theme
 originates with her). She also has been very patient with Devin as he
 works on this&mdash;thanks Chie!
 
-Much of the initial coding was done by Yash Khandelwal as part of
-Google Summer of Code (GSOC) 2015. Hemant Kasat worked on additional
-widgets as part of GSOC 2016. Many students contributed to various
-parts of the code, bug reports, and other important tasks as part of
-Google Code-in (GCI) 2015&ndash;16.
+Much of the initial coding of the fork from Turtle Blocks was done by
+Yash Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant
+Kasat contributed to additional widgets as part of GSoC
+2016. Additional contributions are being made by Tayba Wasim, Dinuka
+Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
+Patel as part of GSoC 2017.
+
+Many students contributed to the project as part of Google Code-in
+(2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018).
 
 Libraries specific to Music Blocks
 ----------------------------------
