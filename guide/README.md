@@ -29,7 +29,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
       11. [Inversion](#INVERSION)
       12. [Backwards](#BACKWARDS)
       13. [Setting Voice and Keys](#SETTING)
-      14. [Vibrato, tremelo, et al.](#VIBRATO)
+      14. [Vibrato, Tremelo, et al.](#VIBRATO)
    3. [Voices](#VOICES)
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
@@ -500,7 +500,7 @@ This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
 
-#### <a name="VIBRATO"></a>3.2.14 Vibrato, tremelo, et al.
+#### <a name="VIBRATO"></a>3.2.14 Vibrato, Tremelo, et al.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
 
@@ -859,10 +859,10 @@ will expand into *Rhythm* blocks with the corresponding values.
 You can use the *Scalar step* block to generate a scale of pitches in
 the matrix. In the example above, the pitches comprising the G major
 scale in the 4th octave are added to the grid. Note that in order to
-put the highest note on top, the first pitch is the `Sol` in octave
-`5`. From there, we use `-1` as the argument to the *Scalar step*
-block inside the *Repeat*. Another detail to note is the use of the
-*Mode length* block.
+put the highest note on top, the first pitch is the `Sol` in `Octave
+5`. From there, we use `-1` as the argument to the *Scalar step* block
+inside the *Repeat*, working our way down to `Sol` in `Octave
+4`. Another detail to note is the use of the *Mode length* block.
 
 ### <a name="rhythms"></a>4.3 Generating Rhythms
 
