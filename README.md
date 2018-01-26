@@ -33,15 +33,12 @@ Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation)
 and [Music Blocks
 Guide](http://github.com/walterbender/musicblocks/tree/master/guide)
 
-Music Blocks is derived from Turtle Blocks JS which can be found
-[here](https://github.com/walterbender/turtleblocksjs).
-
 Credits
 -------
 
-Music Blocks is a fork of TurtleArtJS created by Walter
-Bender. (Turtle Blocks JS has many
-[contributors](https://github.com/walterbender/turtleblocksjs/graphs/contributors)).
+Music Blocks is a fork of
+[TurtleArtJS]https://github.com/walterbender/turtleblocksjs)
+created by Walter Bender.
 
 Devin Ulibarri has contributed functional and user-interface
 designs. Many of his contributions were inspired by the music
@@ -66,16 +63,18 @@ Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
 Patel as part of GSoC 2017.
 
 Many students contributed to the project as part of Google Code-in
-(2015-16 and 2016-17).
+(2015-16, 2016-17, and 2017-2018).
+
+A full list of
+[contributors](https://github.com/walterbender/musicblocks/graphs/contributors)
+is available.
 
 Reporting Bugs
 --------------
 
-Bugs can be reported in the [Sugar Labs bug
-tracker](https://bugs.sugarlabs.org/newticket?component=Turtleart) or
-in the [issues
-section](https://github.com/walterbender/musicblocks/issues) of this
-repository.
+Bugs can be reported in the
+[issues section](https://github.com/walterbender/musicblocks/issues)
+of this repository.
 
 Contributing
 ------------
@@ -83,5 +82,5 @@ Contributing
 Please consider contributing to the project, with your ideas, your
 music, your lesson plans, your artwork, and your code.
 
-Programmers, please follow these general [guidelines for
-contributions](https://github.com/sugarlabs/sugar-docs/blob/master/contributing.md).
+Programmers, please follow these general
+[guidelines for contributions](https://github.com/sugarlabs/sugar-docs/blob/master/contributing.md).
