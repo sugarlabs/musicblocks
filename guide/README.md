@@ -303,9 +303,8 @@ In the example above, we take the song we programmed previously and
 raise it by one octave.
 
 As a convenience, a number of standard transpositions are provided:
-*Unison*, *Second*, *Third*, *Fourth*, *Fifth*, *Sixth*, *Seventh*,
-*Down third*, and *Down sixth*, as well as a transposition for
-*Octave*.
+*Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*, and *Down
+sixth*, as well as a transposition for *Octave*.
 
 #### <a name="DOTTED"></a>3.2.4 Dotted Notes
 
@@ -416,8 +415,8 @@ the current mode, e.g., a *fifth*, and adds the additional pitches to a
 note's playback. In the figure, we add `La` to `Re` and `Ti` to `Mi`.
 
 As a convenience, a number of standard scalar intervals are provided:
-*Unison*, *Second*, *Third*, *Fourth*, *Fifth*, *Sixth*, *Seventh*,
-*Down third*, and *Down sixth*.
+*Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*, and *Down
+sixth*.
 
 The *Scalar interval measure* block can be used to measure the number
 of scalar steps between two pitched.
@@ -440,13 +439,8 @@ example, which includes a shift of one octave, first a chord of `D5`
 and `F5` is played, followed by chord of `E5` and `G6`.
 
 As a convenience, a number of standard absolute intervals are
-provided: *Major 2*, *Major 3*, *Major 6*, *Major 7*, *Down major 3*,
-*Down major 6*, *Minor 2*, *Minor 3*, *Minor 6*, *Minor 7*, *Down
-minor 3*, *Down minor 6*, *Perfect 4*, *Perfect 5*, *Perfect 8*,
-*Augmented 1*, *Augmented 2*, *Augmented 3*, *Augmented 4*, *Augmented
-5*, *Augmented 6*, *Augmented 7*, *Augmented 8*, *Diminished 2*,
-*Diminished 3*, *Diminished 4*, *Diminished 5*, *Diminished 6*,
-*Diminished 7*, and *Diminished 8*.
+provided, e.g. *Major 2*, *Minor 3*, *Perfect 4*, *Augmented 6*,
+*Diminished 8*, et al.
 
 The *Doubly* block can be used to apply an augmentation or
 diminishment twice.
