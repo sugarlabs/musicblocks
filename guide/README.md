@@ -414,10 +414,10 @@ maintaining the specified rhythmic value of the notes.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Scalar interval block")
 
 The *Scalar interval* block calculates a relative interval based on
-the current mode, e.g., a *fifth*, and adds the additional pitches to a
+the current mode, skipping all notes outside of the mode. For example, a *fifth*, and adds the additional pitches to a
 note's playback. In the figure, we add `La` to `Re` and `Ti` to `Mi`.
 
-As a convenience, a number of standard scalar intervals are provided:
+As a convenience, a number of standard scalar intervals are provided in the palette:
 *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*, and *Down
 sixth*.
 
