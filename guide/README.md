@@ -336,7 +336,7 @@ equivalent of a `1/4` note.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
 
 In the above example, the sequence of [drum](#DRUMS) note values is
-decreased over time.
+decreased over time, at each repetition.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
 
