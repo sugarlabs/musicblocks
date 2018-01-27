@@ -384,7 +384,7 @@ the range is `0` (silence) to `100` (full volume). In the example, the
 *synth name* block is used to select the current synth.
 
 As a convenience, a number of standard volume blocks are provided:
-*fff*, *ff* *f*, *mf*, *mp*, *p*, *pp*, and *ppp*.
+from loudest to quietest, there is *fff*, *ff* *f*, *mf*, *mp*, *p*, *pp*, and *ppp*. In musical terms "f" means "forte" or loud, "p" means "piano" or soft, and "m" means "mezzo" or middle.
 
 The *Set Relative Volume* block modifies the clamped note's volume
 according to the input value of the block in an added (or subtracted
@@ -396,6 +396,8 @@ contained notes by a specified amount for every note played. For
 example, if you have 3 notes in sequence contained in a *Crescendo*
 block with a value of `5`, the final note will be at 15% more 
 than the original value for volume.
+
+NOTE: The *Crescendo* block does not alter the volume of a note as it is being played. Music Blocks does not yet have this functionality.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform17.svg "Staccato, and Slur blocks")
 
