@@ -317,8 +317,10 @@ play for `3/8` `(i.e. 1/4 + 1/8)` of a beat. A dotted eighth note will play for
 `(i.e. 50% + [50% of 50%])`. For example, a double-dotted quarter note will play for
 `7/16` `(i.e. 1/4 + 1/8 + 1/16)` of a beat, which can be thought of as `4/16 + 2/16 + 1/16 = 7/16`.
 
-You can also simply change the note value to mimic a dotted note, for
-example indicating `3/8` instead of `1/4`, for a dotted quarter note.
+The dot block is useful as an expression of musical rhythm--it is convenient and helps to
+organize musical ideas (e.g. many melodies use dots as the basis of their rhythmic motifs), however you can achieve the same rhythmic result as dot by putting the calculation directly into note value as well. For example, indicating `3/8` instead of `1/4` will result in a dotted quarter note.
+
+The chart below shows two common examples, dotted quarter and dotted eighth, and how to achieve them with either the dot block or by direct calculation into a note's note value.
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
