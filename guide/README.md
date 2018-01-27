@@ -452,9 +452,9 @@ number of half-steps between two pitched.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
 
-The *Invert* block will invert a series of notes around a target
-note. There are two different modes of the *Invert* block: *odd*
-and *even*, the latter shifts the point of rotation up by a `1/4`
+The *Invert* block will rotate a series of notes around a target
+note. There are two different modes of the *Invert* block: *even* and
+*odd*. In *odd* mode, the point of rotation is shifted up by a `1/4`
 step, enabling rotation around a point between two notes.
 
 In the *invert (even)* example, `D4` is inverted around `G4`,
