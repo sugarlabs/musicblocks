@@ -9158,13 +9158,12 @@ function Logo () {
 	    } else if (this.invertList[turtle][i][2] === 'odd') {
                 delta += num2 - num1 + 0.5;
                 num1 += 2 * delta;
-	    } else { // scalar
+	    } else {
                 // We need to calculate the scalar difference.
                 var scalarSteps = this._scalarDistance(turtle, num2, num1);
-                // And then turn this into half-steps
 		var note3 = this._addScalarTransposition(turtle, note2[0], note2[1], -scalarSteps);
                 var num3 = pitchToNumber(note3[0], note3[1], this.keySignature[turtle]) - this.pitchNumberOffset[turtle];
-		delta += num3 - num2;
+                delta += (num3 - num1) / 2;
                 num1 = num3;
 	    }
         }
@@ -9196,7 +9195,6 @@ function Logo () {
     };
 
     this._scalarDistance = function (turtle, firstNote, lastNote) {
-        console.log(firstNote + ' ' + lastNote);
         // Rather than just counting the semitones, we need to count
         // the steps in the current key needed to get from firstNote pitch
         // to lastNote pitch.
