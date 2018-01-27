@@ -261,8 +261,9 @@ There are many ways to transform pitch, rhythm, and other sonic qualities.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg "Using the Step Pitch block")
 
 The *Step Pitch* block will move up or down notes in a scale from the
-last played note. In the example above, *Step Pitch* blocks are used inside
-of *Repeat* blocks to repeat the code `7` times, playing up and down a scale.
+last played note. In the example above, *Step Pitch* blocks are used
+inside of *Repeat* blocks to repeat the code `7` times, playing up and
+down a scale.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
@@ -294,8 +295,8 @@ step.
 The *Adjust-transposition* block can be used to make larger shifts in
 pitch in half step units. A positive number shifts the pitch up and a
 negative number shifts the pitch down. The input must be a whole
-number. To shift an entire octave, transpose by `12` half-steps up. `-12`
-will shift an octave down.
+number. To shift an entire octave, transpose by `12` half-steps
+up. `-12` will shift an octave down.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using Adjust-transposition")
 
@@ -312,15 +313,22 @@ sixth*, as well as a transposition for *Octave*.
 
 You can "dot" notes using the *Dot* block. A dotted note extends the
 rhythmic duration of a note by 50%. E.g., a dotted quarter note will
-play for `3/8` `(i.e. 1/4 + 1/8)` of a beat. A dotted eighth note will play for
-`3/16` `(i.e. 1/8 + 1/16)` of a beat. A double dot extends the duration by `75%`
-`(i.e. 50% + [50% of 50%])`. For example, a double-dotted quarter note will play for
-`7/16` `(i.e. 1/4 + 1/8 + 1/16)` of a beat, which can be thought of as `4/16 + 2/16 + 1/16 = 7/16`.
+play for `3/8` `(i.e. 1/4 + 1/8)` of a beat. A dotted eighth note will
+play for `3/16` `(i.e. 1/8 + 1/16)` of a beat. A double dot extends
+the duration by `75%` `(i.e. 50% + [50% of 50%])`. For example, a
+double-dotted quarter note will play for `7/16` `(i.e. 1/4 + 1/8 +
+1/16)` of a beat (which is the same as `4/16 + 2/16 + 1/16 = 7/16`).
 
-The dot block is useful as an expression of musical rhythm--it is convenient and helps to
-organize musical ideas (e.g. many melodies use dots as the basis of their rhythmic motifs), however you can achieve the same rhythmic result as dot by putting the calculation directly into note value as well. For example, indicating `3/8` instead of `1/4` will result in a dotted quarter note.
+The dot block is useful as an expression of musical rhythm--it is
+convenient and helps to organize musical ideas (e.g. many melodies use
+dots as the basis of their rhythmic motifs), however you can achieve
+the same rhythmic result as dot by putting the calculation directly
+into note value as well. For example, indicating `3/8` instead of
+`1/4` will result in a dotted quarter note.
 
-The chart below shows two common examples, dotted quarter and dotted eighth, and how to achieve them with either the dot block or by direct calculation into a note's note value.
+The chart below shows two common examples, dotted quarter and dotted
+eighth, and how to achieve them with either the dot block or by direct
+calculation into a note's note value.
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
@@ -328,10 +336,12 @@ The chart below shows two common examples, dotted quarter and dotted eighth, and
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Changing note duration for a note or notes")
 
-You can also multiply (or divide) the note value, which will change the duration of the notes by changing their note values. Multiplying the note value of an `1/8` note by
-`1/2` is the equivalent of playing a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note
-value of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`) will result in the
-equivalent of a `1/4` note.
+You can also multiply (or divide) the note value, which will change
+the duration of the notes by changing their note values. Multiplying
+the note value of an `1/8` note by `1/2` is the equivalent of playing
+a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note value
+of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`)
+will result in the equivalent of a `1/4` note.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
 
@@ -414,12 +424,13 @@ maintaining the specified rhythmic value of the notes.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Scalar interval block")
 
 The *Scalar interval* block calculates a relative interval based on
-the current mode, skipping all notes outside of the mode. For example, a *fifth*, and adds the additional pitches to a
-note's playback. In the figure, we add `La` to `Re` and `Ti` to `Mi`.
+the current mode, skipping all notes outside of the mode. For example,
+a *fifth*, and adds the additional pitches to a note's playback. In
+the figure, we add `La` to `Re` and `Ti` to `Mi`.
 
-As a convenience, a number of standard scalar intervals are provided in the palette:
-*Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*, and *Down
-sixth*.
+As a convenience, a number of standard scalar intervals are provided
+on the *Intervals* palette: *Unison*, *Second*, *Third*, ...,
+*Seventh*, *Down third*, and *Down sixth*.
 
 The *Scalar interval measure* block can be used to measure the number
 of scalar steps between two pitched.
@@ -441,9 +452,9 @@ played, followed by a chord of `E5` and `C5`. In the minor third
 example, which includes a shift of one octave, first a chord of `D5`
 and `F5` is played, followed by chord of `E5` and `G6`.
 
-As a convenience, a number of standard absolute intervals are
-provided, e.g. *Major 2*, *Minor 3*, *Perfect 4*, *Augmented 6*,
-*Diminished 8*, et al.
+As a convenience, a number of standard absolute intervals are provided
+on the *Intervals* palette: *Major 2*, *Minor 3*, *Perfect 4*,
+*Augmented 6*, *Diminished 8*, et al.
 
 The *Doubly* block can be used to create a double augmentation or
 double diminishment.
