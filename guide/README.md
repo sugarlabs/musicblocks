@@ -324,15 +324,14 @@ The chart below shows two common examples, dotted quarter and dotted eighth, and
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Changing Note(s) duration via Mathematical Operations
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Speeding up and slowing down the tempo")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Changing note duration for a note or notes")
 
-You can also multiply (or divide) the note value, which will speed up
-or slowdown the notes. Multiplying the note value of an `1/8` note by
-`1/2` is the equivalent of playing a `1/16` note. Multiplying the note
-value of an `1/8` note by `2/1` (or dividing by `1/2`) is the
-equivalent of playing a `1/4` note.
+You can also multiply (or divide) the note value, which will change the duration of the notes by changing their note values. Multiplying the note value of an `1/8` note by
+`1/2` is the equivalent of playing a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note
+value of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`) will result in the
+equivalent of a `1/4` note.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
 
