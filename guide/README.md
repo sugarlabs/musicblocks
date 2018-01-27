@@ -312,30 +312,31 @@ sixth*, as well as a transposition for *Octave*.
 
 You can "dot" notes using the *Dot* block. A dotted note extends the
 rhythmic duration of a note by 50%. E.g., a dotted quarter note will
-play for `3/8` `(1/4 + 1/8)` of a beat. A dotted eighth note will play for
-`3/16` `(1/8 + 1/16)` of a beat. A double dot extends the duration by `75%`
-`(50% + 50% of 50%)`. E.g., a double-dotted quarter note will play for
-`7/16` `(1/4 + 1/8 + 1/16)` of a beat.
+play for `3/8` `(i.e. 1/4 + 1/8)` of a beat. A dotted eighth note will play for
+`3/16` `(i.e. 1/8 + 1/16)` of a beat. A double dot extends the duration by `75%`
+`(i.e. 50% + [50% of 50%])`. For example, a double-dotted quarter note will play for
+`7/16` `(i.e. 1/4 + 1/8 + 1/16)` of a beat, which can be thought of as `4/16 + 2/16 + 1/16 = 7/16`.
 
-You can also simply change the note value to mimic a dotted note, for
-example indicating `3/8` instead of `1/4`, for a dotted quarter note.
+The dot block is useful as an expression of musical rhythm--it is convenient and helps to
+organize musical ideas (e.g. many melodies use dots as the basis of their rhythmic motifs), however you can achieve the same rhythmic result as dot by putting the calculation directly into note value as well. For example, indicating `3/8` instead of `1/4` will result in a dotted quarter note.
+
+The chart below shows two common examples, dotted quarter and dotted eighth, and how to achieve them with either the dot block or by direct calculation into a note's note value.
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Changing Note(s) duration via Mathematical Operations
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Speeding up and slowing down the tempo")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg "Changing note duration for a note or notes")
 
-You can also multiply (or divide) the note value, which will speed up
-or slowdown the notes. Multiplying the note value of an `1/8` note by
-`1/2` is the equivalent of playing a `1/16` note. Multiplying the note
-value of an `1/8` note by `2/1` (or dividing by `1/2`) is the
-equivalent of playing a `1/4` note.
+You can also multiply (or divide) the note value, which will change the duration of the notes by changing their note values. Multiplying the note value of an `1/8` note by
+`1/2` is the equivalent of playing a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note
+value of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`) will result in the
+equivalent of a `1/4` note.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg "increasing sequence of drum beats over time")
 
 In the above example, the sequence of [drum](#DRUMS) note values is
-decreased over time.
+decreased over time, at each repetition.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
 
@@ -383,7 +384,7 @@ the range is `0` (silence) to `100` (full volume). In the example, the
 *synth name* block is used to select the current synth.
 
 As a convenience, a number of standard volume blocks are provided:
-*fff*, *ff* *f*, *mf*, *mp*, *p*, *pp*, and *ppp*.
+from loudest to quietest, there is *fff*, *ff* *f*, *mf*, *mp*, *p*, *pp*, and *ppp*. In musical terms "f" means "forte" or loud, "p" means "piano" or soft, and "m" means "mezzo" or middle.
 
 The *Set Relative Volume* block modifies the clamped note's volume
 according to the input value of the block in an added (or subtracted
@@ -395,6 +396,8 @@ contained notes by a specified amount for every note played. For
 example, if you have 3 notes in sequence contained in a *Crescendo*
 block with a value of `5`, the final note will be at 15% more 
 than the original value for volume.
+
+NOTE: The *Crescendo* block does not alter the volume of a note as it is being played. Music Blocks does not yet have this functionality.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform17.svg "Staccato, and Slur blocks")
 
@@ -411,10 +414,10 @@ maintaining the specified rhythmic value of the notes.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg "Scalar interval block")
 
 The *Scalar interval* block calculates a relative interval based on
-the current mode, e.g., a *fifth*, and adds the additional pitches to a
+the current mode, skipping all notes outside of the mode. For example, a *fifth*, and adds the additional pitches to a
 note's playback. In the figure, we add `La` to `Re` and `Ti` to `Mi`.
 
-As a convenience, a number of standard scalar intervals are provided:
+As a convenience, a number of standard scalar intervals are provided in the palette:
 *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*, and *Down
 sixth*.
 
