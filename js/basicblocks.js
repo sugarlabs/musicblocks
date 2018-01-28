@@ -127,7 +127,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var consonantStepDownBlock = new ProtoBlock('consonantstepsizedown');
     consonantStepDownBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['consonantstepsizedown'] = consonantStepDownBlock;
-    //.TRANS: step down one note in current mode
+    //.TRANS: step down one note in current musical scale
     consonantStepDownBlock.staticLabels.push(_('scalar step down'));
     consonantStepDownBlock.adjustWidthToLabel();
     consonantStepDownBlock.parameterBlock();
@@ -135,7 +135,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var consonantStepUpBlock = new ProtoBlock('consonantstepsizeup');
     consonantStepUpBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['consonantstepsizeup'] = consonantStepUpBlock;
-    //.TRANS: step up one note in current mode
+    //.TRANS: step up one note in current musical scale
     consonantStepUpBlock.staticLabels.push(_('scalar step up'));
     consonantStepUpBlock.adjustWidthToLabel();
     consonantStepUpBlock.parameterBlock();
@@ -228,7 +228,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     //.TRANS: pitch inversion rotates a pitch around another pitch
     invertBlock.staticLabels.push(_('invert'));
     invertBlock.staticLabels.push(_('name'), _('octave'));
-    //.TRANS: even or odd number
+    //.TRANS: invert based on even or odd number or musical scale
     invertBlock.staticLabels.push(_('even') + '/' + _('odd') + '/' + _('scalar'));
     invertBlock.extraWidth = 10;
     invertBlock.adjustWidthToLabel();
@@ -376,7 +376,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var scalarTranspositionBlock = new ProtoBlock('setscalartransposition');
     scalarTranspositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['setscalartransposition'] = scalarTranspositionBlock;
-    //.TRANS: adjust the amount of shift (up or down) of a pitch by scalar steps
+    //.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
     scalarTranspositionBlock.staticLabels.push(_('scalar transpose') + ' (+/–)');
     scalarTranspositionBlock.adjustWidthToLabel();
     scalarTranspositionBlock.defaults.push('1');
@@ -436,7 +436,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitchStepBlock = new ProtoBlock('steppitch');
     pitchStepBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['steppitch'] = pitchStepBlock;
-    //.TRANS: step some number of notes in current mode
+    //.TRANS: step some number of notes in current musical scale
     pitchStepBlock.staticLabels.push(_('scalar step') + ' (+/–)');
     pitchStepBlock.oneArgBlock();
     pitchStepBlock.adjustWidthToLabel();
@@ -1438,7 +1438,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var intervalMeasure2 = new ProtoBlock('measureintervalscalar');
     intervalMeasure2.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['measureintervalscalar'] = intervalMeasure2;
-    //.TRANS: measure the distance between two pitches in scalar steps
+    //.TRANS: measure the distance between two pitches in steps of musical scale
     intervalMeasure2.staticLabels.push(_('scalar interval measure'));
     intervalMeasure2.argFlowClampBlock();
     intervalMeasure2.adjustWidthToLabel();
@@ -1788,7 +1788,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var intervalBlock = new ProtoBlock('interval');
     intervalBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['interval'] = intervalBlock;
-    //.TRANS: calculate a relative step between notes based on the current mode
+    //.TRANS: calculate a relative step between notes based on the current musical scale
     intervalBlock.staticLabels.push(_('scalar interval') + ' (+/–)');
     intervalBlock.adjustWidthToLabel();
     intervalBlock.flowClampOneArgBlock();
