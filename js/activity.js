@@ -327,17 +327,7 @@ define(MYDEFINES, function (compatibility) {
 
                 var parts = blocks.blockArt[i].split('><');
                 svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
-                switch(blocks.blockList[i].name) {
-                case 'text':
-                case 'boolean':
-                case 'solfege':
-                case 'eastindiansolfege':
-                case 'notename':
-                case 'rest':
-                case 'number':
-                case 'modename':
-                case 'voicename':
-                case 'drumname':
+                if (SPECIALINPUTS.indexOf(blocks.blockList[i].name) !== -1) { 
                     for (var p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -357,8 +347,7 @@ define(MYDEFINES, function (compatibility) {
                             svg += parts[p] + '><';
                         }
                     }
-                    break;
-                default:
+		} else {
                     for (var p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -375,7 +364,6 @@ define(MYDEFINES, function (compatibility) {
                             svg += parts[p] + '><';
                         }
                     }
-                    break;
                 }
                 svg += '</g>';
             }
