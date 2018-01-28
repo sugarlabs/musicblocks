@@ -35,20 +35,21 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
    5. [Beat](#BEAT)
    6. [Interactions](#INTERACTIONS)
  4. [Widgets](#WIDGETS)
-    1. [Monitoring status](#status)
-    2. [Generating chunks of notes](#pitch-time)
+    1. [Monitoring Status](#status)
+    2. [Generating Chunks of Notes](#pitch-time)
        1. [Pitch-Time Matrix](#pitch-time) 
        2. [The Rhythm Block](#THE-RHYTHM-BLOCK) 
        3. [Creating Tuplets](#CREATING-TUPLETS)
        4. [What is a Tuplet?](#WHAT-IS-TUPLET)
        5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
-       6. [Using a scale of pitches in the Matrix](#USING-A-SCALE)
-    3. [Generating rhythms](#rhythms)
+       6. [Using a Scale of Pitches in the Matrix](#USING-A-SCALE)
+    3. [Generating Rhythms](#rhythms)
     4. [Musical Modes](#modes)
     5. [The Pitch-Drum Matrix](#pitch-drum)
-    6. [Exploring musical proportions](#stairs)
-    7. [Generating arbitrary pitches](#slider)
-    8. [Changing tempo](#tempo)
+    6. [Exploring Musical Proportions](#stairs)
+    7. [Generating Arbitrary Pitches](#slider)
+    8. [Changing Tempo](#tempo)
+    9. [Custom Timbre](#timbre)
  5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
@@ -853,14 +854,14 @@ defining your matrix.
 
 ![alt tag](https://rawgit.com/walterbender/musicblocks/master/charts/TripletChart.svg "triplet chart")
 
-#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using individual notes in the Matrix
+#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Matrix
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
 
-#### <a name="USING-A-SCALE"></a>4.2.6 Using a scale of pitches in the Matrix
+#### <a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Matrix
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix15.svg)
 
@@ -1151,6 +1152,58 @@ You can also update the tempo by clicking twice in spaced succession
 in the widget: the new beats per minute (BPM) is determined as the
 time between the two clicks. For example, if there is `1/2` second
 between clicks, the new BPM will be set as `120`.
+
+### <a name="timbre"></a>4.9 Custom Timbres
+
+While Music Blocks comes with many built-in instruments, it is also
+possible to create custom instruments with unique sound qualities.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre1.svg "the Timbre widget")
+
+The *Timbre* block can be used to launch the *Timbre* widget, which
+lets you add synthesizers, oscillators, effects, and filters to create
+a custom timbre, which can be used in your Music Blocks programs.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2.svg "the Timbre widget toolbar")
+
+From left to right:
+
+* The *Play* button, which lets you test the sound quality of your
+custom timbre. By default, it will play `Sol`, `Mi`, `Sol` using the
+combination of filters you define. You can also put notes in the
+*Timbre* block.)
+
+* The *Save* button, which will save your custom timbre for use in
+your program.
+
+* The *Synth* button, which lets you choose between an AM synth, a PM
+synth, or a Duo synth.
+
+* The *Oscillator* button, which lets you choose between a sine wave,
+square wave, tirangle wave, or sawtooth wave. You can also change
+the number of partials.
+
+* The *Envelope* button, which lets you change the shape of the sound
+envelope, with controls for attack, decay, sustain, and release.
+
+* The *Effects* button, which lets you add effects to your custom
+timbre: tremelo, vibrato, chorus, phaser, and distortion.
+
+* The *Filter* button, which lets you choose between a number of
+different filter types.
+
+* The *Add filter* button, which lets you add addition filters to your
+custom timbre.
+
+* The *Undo* button.
+
+* The *Close* button.
+
+* The *Drag* button.
+
+As you add synthesizers, effects, and filters with the widget, blocks
+corresponding to your choices are added to the *Timbre* block. This
+lets you reopen the widget to fine-tune your custom timbre.
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
 
