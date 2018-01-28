@@ -56,7 +56,7 @@ processLilypondNotes = function (logo, turtle) {
     var tupletDuration = 0;
     var multivoice = false;
     for (var i = 0; i < logo.notationStaging[turtle].length; i++) {
-        obj = logo.notationStaging[turtle][i];
+        var obj = logo.notationStaging[turtle][i];
         if (typeof(obj) === 'string') {
             switch (obj) {
             case 'markup':
@@ -221,14 +221,17 @@ processLilypondNotes = function (logo, turtle) {
                     }
                 }
 
-                // Workaround to a Lilypond "feature": if a slur
-                // ends on a tuplet, the closing ) must be inside
-                // the closing } of the tuplet.
                 if (i + j - 1 < logo.notationStaging[turtle].length - 1) {
                     var nextObj = logo.notationStaging[turtle][i + j];
+                    // Workaround to a Lilypond "feature": if a slur
+                    // ends on a tuplet, the closing ) must be inside
+                    // the closing } of the tuplet. Same for markup.
                     if (typeof(nextObj) === 'string' && nextObj === ')') {
                         logo.notationNotes[turtle] += ')} ';
                         i += 1;
+                    } else if (typeof(nextObj) === 'string' && nextObj === 'markup') {
+			logo.notationNotes[turtle] += '_\\markup {' + logo.notationStaging[turtle][i + j + 1] + '} } ';
+			j += 2;
                     } else {
                         logo.notationNotes[turtle] += '} ';
                     }
@@ -339,7 +342,7 @@ saveLilypondOutput = function(logo, saveName) {
             var octaveTotal = 0;
             var noteCount = 0;
             for (var i = 0; i < logo.notationStaging[t].length; i++) {
-                obj = logo.notationStaging[t][i];
+                var obj = logo.notationStaging[t][i];
                 if (typeof(obj) === 'object') {
                     if (obj[0].length < 2) {
                         // Test for rests
