@@ -97,6 +97,10 @@ processLilypondNotes = function (logo, turtle) {
             case 'tie':
                 logo.notationNotes[turtle] += '~';
                 break;
+            case 'key':
+                logo.notationNotes[turtle] += ' \\key ' + __toLilynote(logo.notationStaging[turtle][i + 1]) + ' \\' + logo.notationStaging[turtle][i + 2] + '\n';
+                i += 2;
+                break;
             case 'meter':
                 logo.notationNotes[turtle] += ' \\time ' + logo.notationStaging[turtle][i + 1] + '/' + logo.notationStaging[turtle][i + 2] + '\n';
                 i += 2;
@@ -230,8 +234,8 @@ processLilypondNotes = function (logo, turtle) {
                         logo.notationNotes[turtle] += ')} ';
                         i += 1;
                     } else if (typeof(nextObj) === 'string' && nextObj === 'markup') {
-			logo.notationNotes[turtle] += '_\\markup {' + logo.notationStaging[turtle][i + j + 1] + '} } ';
-			j += 2;
+                        logo.notationNotes[turtle] += '_\\markup {' + logo.notationStaging[turtle][i + j + 1] + '} } ';
+                        j += 2;
                     } else {
                         logo.notationNotes[turtle] += '} ';
                     }
@@ -254,10 +258,10 @@ processLilypondNotes = function (logo, turtle) {
                     var b = tupletFraction[0] * tupletFraction[1];
 
                     if (Math.floor(a) !== a) {
-			var c = toFraction(a / 1);
-			a = c[0];
-			b = c[1];
-		    }
+                        var c = toFraction(a / 1);
+                        a = c[0];
+                        b = c[1];
+                    }
 
                     logo.notationNotes[turtle] += '\\tuplet ' + a + '/' + b + ' { ';
 

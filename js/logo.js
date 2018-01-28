@@ -2915,8 +2915,10 @@ function Logo () {
                 if (turtle in that.transposition) {
                     var noteObj = getNote(args[0], 4, that.transposition[turtle], that.keySignature[turtle], false, null, that.errorMsg);
                     that.keySignature[turtle] = noteObj[0] + ' ' + modename;
+                    that.notationKey(turtle, noteObj[0], modename);
                 } else {
                     that.keySignature[turtle] = args[0] + ' ' + modename;
+                    that.notationKey(turtle, args[0], modename);
                 }
             }
             break;
@@ -6207,7 +6209,7 @@ function Logo () {
         if (this.inTimbre) {
             var noteObj = getNote(this.notePitches[turtle][last(this.inNoteBlock[turtle])][0], this.noteOctaves[turtle][last(this.inNoteBlock[turtle])][0], 0, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg);
             this.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
-	    this.previousNotePlayed[turtle] = this.lastNotePlayed[turtle];
+            this.previousNotePlayed[turtle] = this.lastNotePlayed[turtle];
             this.lastNotePlayed[turtle] = [noteObj[0] + noteObj[1], noteBeatValue];
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle].length > 0) {
@@ -9154,20 +9156,20 @@ function Logo () {
         for (var i = len - 1; i > -1; i--) {
             var note2 = getNote(this.invertList[turtle][i][0], this.invertList[turtle][i][1], 0, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg);
             var num2 = pitchToNumber(note2[0], note2[1], this.keySignature[turtle]) - this.pitchNumberOffset[turtle];
-	    if (this.invertList[turtle][i][2] === 'even') {
+            if (this.invertList[turtle][i][2] === 'even') {
                 delta += num2 - num1;
                 num1 += 2 * delta;
-	    } else if (this.invertList[turtle][i][2] === 'odd') {
+            } else if (this.invertList[turtle][i][2] === 'odd') {
                 delta += num2 - num1 + 0.5;
                 num1 += 2 * delta;
-	    } else {
+            } else {
                 // We need to calculate the scalar difference.
                 var scalarSteps = this._scalarDistance(turtle, num2, num1);
-		var note3 = this._addScalarTransposition(turtle, note2[0], note2[1], -scalarSteps);
+                var note3 = this._addScalarTransposition(turtle, note2[0], note2[1], -scalarSteps);
                 var num3 = pitchToNumber(note3[0], note3[1], this.keySignature[turtle]) - this.pitchNumberOffset[turtle];
                 delta += (num3 - num1) / 2;
                 num1 = num3;
-	    }
+            }
         }
 
         return delta;
@@ -9292,6 +9294,14 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push('markup', markup);
+    };
+
+    this.notationKey = function (turtle, key, mode) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('key', key, mode);
     };
 
     this.notationMeter = function (turtle, count, value) {
