@@ -229,7 +229,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertBlock.staticLabels.push(_('invert'));
     invertBlock.staticLabels.push(_('name'), _('octave'));
     //.TRANS: even or odd number
-    invertBlock.staticLabels.push(_('even') + '/' + _('odd'));
+    invertBlock.staticLabels.push(_('even') + '/' + _('odd') + '/' + _('scalar'));
+    invertBlock.extraWidth = 10;
     invertBlock.adjustWidthToLabel();
     invertBlock.flowClampThreeArgBlock();
     invertBlock.adjustWidthToLabel();
