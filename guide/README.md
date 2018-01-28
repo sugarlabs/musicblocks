@@ -1185,7 +1185,7 @@ combination of filters you define.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre1a.svg "the notes inside Timbre block")
 
 You can also put notes in the *Timbre* block to use for testing your
-sound. In the example above, a scale will be used as for the test.
+sound. In the example above, a scale will be used for the test.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2b.svg "the save button")
 
