@@ -1164,14 +1164,22 @@ The *Timbre* block can be used to launch the *Timbre* widget, which
 lets you add synthesizers, oscillators, effects, and filters to create
 a custom timbre, which can be used in your Music Blocks programs.
 
+The name of the custom timbre is defined by the argment passed to the
+block (by default, `custom`). This name is passed to the *Set timbre*
+block in order to use your custom timbre.
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2.svg "the Timbre widget toolbar")
+
+The *Timbre* widget has a number of different panels, each of which is
+used to define the parameters of the components that together create
+your custom timbre.
 
 From left to right:
 
 * The *Play* button, which lets you test the sound quality of your
 custom timbre. By default, it will play `Sol`, `Mi`, `Sol` using the
 combination of filters you define. You can also put notes in the
-*Timbre* block.)
+*Timbre* block to use for testing your sound.
 
 * The *Save* button, which will save your custom timbre for use in
 your program.
@@ -1180,7 +1188,7 @@ your program.
 synth, or a Duo synth.
 
 * The *Oscillator* button, which lets you choose between a sine wave,
-square wave, tirangle wave, or sawtooth wave. You can also change
+square wave, triangle wave, or sawtooth wave. You can also change
 the number of partials.
 
 * The *Envelope* button, which lets you change the shape of the sound
