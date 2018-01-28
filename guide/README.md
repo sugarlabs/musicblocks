@@ -7,7 +7,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
 ## <a name="TOC"></a> Table of Contents
 
 1. [Getting Started](#GETTING-STARTED)
-2. [Making a Sound](#NOTES)
+2. [Making Sounds](#NOTES)
    1. [Note Value Blocks](#NOTE-VALUE)
    2. [Pitch Blocks](#PITCH)
    3. [Chords](#CHORDS)
@@ -56,7 +56,7 @@ run. Look for `RUN LIVE` links.
 
 ## <a name="GETTING-STARTED"></a>1. Getting Started
 
-[Back to Table of Contents](#TOC) | [Next Section (2. Making a sound)](#NOTES)
+[Back to Table of Contents](#TOC) | [Next Section (2. Making Sounds)](#NOTES)
 
 Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox. You can
@@ -69,7 +69,7 @@ Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
 For more details on how to use Turtle Blocks, see
 [Using Turtle Blocks JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
-## <a name="NOTES"></a>2. Making a Sound
+## <a name="NOTES"></a>2. Making Sounds
 
 [Previous Section (1. Getting Started)](#GETTING-STARTED) | [Back to
 Table of Contents](#TOC) | [Next Section (3. Programming with
@@ -187,7 +187,7 @@ with *Pitch* blocks as well.
 
 ## <a name="PROGRAMMING-WITH-MUSIC"></a>3. Programming with Music
 
-[Previous Section (2. Making a Sound)](#NOTES) | [Back to Table of Contents](#TOC) | [Next Section (4. Widgets)](#WIDGETS)
+[Previous Section (2. Making Sounds)](#NOTES) | [Back to Table of Contents](#TOC) | [Next Section (4. Widgets)](#WIDGETS)
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
