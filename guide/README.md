@@ -1203,7 +1203,8 @@ envelope, with controls for attack, decay, sustain, and release.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre6.svg "select effect")
 
 * The *Effects* button, which lets you add effects to your custom
-timbre: tremelo, vibrato, chorus, phaser, and distortion.
+timbre: tremelo, vibrato, chorus, phaser, and distortion. When an
+effect is selected, additional controls will appear in the widget.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre7.svg "select filter")
 
