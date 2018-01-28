@@ -9338,6 +9338,9 @@ function Logo () {
                 this.notationStaging[turtle].push('pickup', '8..');
                 console.log('partial 8..');
                 break;
+            case 0.675:
+                this.notationStaging[turtle].push('pickup', '2 8');
+                console.log('partial 2 8');
             default:
                 console.log('cannot process pickup of ' + factor + ' for Lilypond output');
                 break;
