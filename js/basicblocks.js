@@ -1795,10 +1795,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.hidden = true;
 
     // macro
-    var movableBlock = new ProtoBlock('movable');
+    var movableBlock = new ProtoBlock('movable');  // legacy typo
     movableBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['movable'] = movableBlock;
-    movableBlock.staticLabels.push(_('movable'));
+    movableBlock.staticLabels.push(_('moveable'));
     movableBlock.adjustWidthToLabel();
     movableBlock.oneBooleanArgBlock();
 
