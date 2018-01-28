@@ -49,7 +49,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
     6. [Exploring Musical Proportions](#stairs)
     7. [Generating Arbitrary Pitches](#slider)
     8. [Changing Tempo](#tempo)
-    9. [Custom Timbre](#timbre)
+    9. [Custom Timbres](#timbre)
  5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
