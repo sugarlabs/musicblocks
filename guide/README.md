@@ -1176,10 +1176,14 @@ timbre.
 
 From left to right:
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2a.svg "the play button")
+
 * The *Play* button, which lets you test the sound quality of your
 custom timbre. By default, it will play `Sol`, `Mi`, `Sol` using the
 combination of filters you define. You can also put notes in the
 *Timbre* block to use for testing your sound.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2b.svg "the save button")
 
 * The *Save* button, which will save your custom timbre for use in
 your program.
@@ -1211,14 +1215,22 @@ effect is selected, additional controls will appear in the widget.
 * The *Filter* button, which lets you choose between a number of
 different filter types.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2c.svg "the add filter button")
+
 * The *Add filter* button, which lets you add addition filters to your
 custom timbre.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2d.svg "the undo button")
+
 * The *Undo* button.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2e.svg "the close button")
 
 * The *Close* button.
 
-* The *Drag* button.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2f.svg "the drag handle")
+
+* The *Drag* handle.
 
 As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
