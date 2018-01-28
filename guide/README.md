@@ -1156,7 +1156,7 @@ between clicks, the new BPM will be set as `120`.
 ### <a name="timbre"></a>4.9 Custom Timbres
 
 While Music Blocks comes with many built-in instruments, it is also
-possible to create custom instruments with unique sound qualities.
+possible to create custom timbres with unique sound qualities.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre1.svg "the Timbre widget")
 
@@ -1171,8 +1171,8 @@ block in order to use your custom timbre.
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2.svg "the Timbre widget toolbar")
 
 The *Timbre* widget has a number of different panels, each of which is
-used to define the parameters of the components that together create
-your custom timbre.
+used to set the parameters of the components that define your custom
+timbre.
 
 From left to right:
 
