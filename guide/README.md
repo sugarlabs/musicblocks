@@ -1184,18 +1184,28 @@ combination of filters you define. You can also put notes in the
 * The *Save* button, which will save your custom timbre for use in
 your program.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo3.svg "select synth")
+
 * The *Synth* button, which lets you choose between an AM synth, a PM
 synth, or a Duo synth.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo4.svg "select osc")
 
 * The *Oscillator* button, which lets you choose between a sine wave,
 square wave, triangle wave, or sawtooth wave. You can also change
 the number of partials.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo5.svg "set envelope")
+
 * The *Envelope* button, which lets you change the shape of the sound
 envelope, with controls for attack, decay, sustain, and release.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo6.svg "select effect")
+
 * The *Effects* button, which lets you add effects to your custom
 timbre: tremelo, vibrato, chorus, phaser, and distortion.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/tempo7.svg "select filter")
 
 * The *Filter* button, which lets you choose between a number of
 different filter types.
