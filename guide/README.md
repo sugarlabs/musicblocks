@@ -470,11 +470,14 @@ number of half-steps between two pitched.
 The *Invert* block will rotate a series of notes around a target
 note. There are two different modes of the *Invert* block: *even* and
 *odd*. In *odd* mode, the point of rotation is shifted up by a `1/4`
-step, enabling rotation around a point between two notes.
+step, enabling rotation around a point between two notes. In "scalar"
+mode, the scalar interval is preserved around the point of rotation.
 
-In the *invert (even)* example above, `D4` is inverted around `G4`,
-resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
-around a point midway between `G4` and `G♯4` resulting in a `C♯5`
+In the *invert (even)* example above, `F5` `D5` are inverted around
+`C5`, resulting in a `G4` `B♭4`. In the *invert (odd)* example, `F5`
+`D5` are inverted around a point midway between `C5` and `C♯5`
+resulting in a `A♭4` `B4`. In the *invert (scalar)* example, `G4`
+`B4`.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-score.png "invert example")
 
