@@ -472,9 +472,11 @@ note. There are two different modes of the *Invert* block: *even* and
 *odd*. In *odd* mode, the point of rotation is shifted up by a `1/4`
 step, enabling rotation around a point between two notes.
 
-In the *invert (even)* example, `D4` is inverted around `G4`,
+In the *invert (even)* example above, `D4` is inverted around `G4`,
 resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
 around a point midway between `G4` and `G♯4` resulting in a `C♯5`
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-score.svg "invert example")
 
 #### <a name="BACKWARDS"></a>3.2.12 Backwards
 
