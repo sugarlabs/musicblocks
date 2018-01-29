@@ -465,8 +465,6 @@ number of half-steps between two pitched.
 
 #### <a name= "INVERSION"></a>3.2.11 Inversion
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
-
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
 *odd*, and *scalar*. In *even* and *odd* modes, the rotation is based
@@ -476,15 +474,20 @@ a `1/4` step, enabling rotation around a point between two notes. In
 "scalar" mode, the scalar interval is preserved around the point of
 rotation.
 
-In the *invert (even)* example above, `F5` (5 half-steps above `C5`)
-`D5` (2 half-steps above `C5`) are inverted around `C5`, resulting in
-a `G4` `B♭4`. In the *invert (odd)* example, `F5` `D5` are inverted
-around a point midway between `C5` and `C♯5` resulting in a `A♭4`
-`B4`. In the *invert (scalar)* example, `F5` (3 scalar steps above
-`C5`) `D5` (1 scalar step above `C5`) are inverted around `C5`,
-resulting in a `G4` `B4`.
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-score.png "invert example")
+
+| Note | Half-steps above `C5` | Scalar steps above `C5` | Even  |  Odd  | Scalar |
+| ---- | :-------------------: | :---------------------: | ----- | ----- | ------ |
+| `F5` | 5                     | 3                       | `G4`  | `A♭4` | `G4`   |
+| `D5` | 2                     | 1                       | `B♭4` | `B4`  | `B4`   |
+
+In the *invert (even)* example above, notes are inverted around `C5`.
+In the *invert (odd)* example, notes are inverted around a point
+midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
+notes are inverted around `C5`, by scalar steps rather than
+half-steps.
 
 #### <a name="BACKWARDS"></a>3.2.12 Backwards
 
