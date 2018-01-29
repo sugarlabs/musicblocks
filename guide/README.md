@@ -476,7 +476,7 @@ In the *invert (even)* example above, `D4` is inverted around `G4`,
 resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
 around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-score.svg "invert example")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-score.png "invert example")
 
 #### <a name="BACKWARDS"></a>3.2.12 Backwards
 
