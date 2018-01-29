@@ -28,7 +28,7 @@ function UtilityBox () {
     this._doBigger = null;
     this._doSmaller = null;
     this._doPlugins = null;
-    this.deletePlugin = null;
+    this._deletePlugin = null;
     this._doStats = null;
     this._doScroller = null;
     this._toggleSearch = null;
@@ -65,7 +65,7 @@ function UtilityBox () {
     };
 
     this.deletePlugins = function (plugin) {
-        this.deletePlugin = plugin;
+        this._deletePlugin = plugin;
         return this;
     };
 
@@ -141,25 +141,25 @@ function UtilityBox () {
 
             dx += BOXBUTTONSPACING;;
 
-            this.pluginsButton = makeButton('plugins-button', _('Load plugin from file'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.pluginsButton.visible = true;
-            this._positionHoverText(this.pluginsButton);
-            this.pluginsButton.on('click', function (event) {
+            this._pluginsButton = makeButton('plugins-button', _('Load plugin from file'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._pluginsButton.visible = true;
+            this._positionHoverText(this._pluginsButton);
+            this._pluginsButton.on('click', function (event) {
                 that._doPlugins();
                 that._hide();
             });
 
             dx += BOXBUTTONSPACING;;
 
-            this.pluginsDeleteButton = makeButton('plugins-delete-disabled-button', _(' '), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.pluginsDeleteButton.visible = !status;
-            this._positionHoverText(this.pluginsDeleteButton);
+            this._pluginsDeleteButton = makeButton('plugins-delete-disabled-button', _(' '), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._pluginsDeleteButton.visible = !status;
+            this._positionHoverText(this._pluginsDeleteButton);
 
-            this.pluginsDeleteButton2 = makeButton('plugins-delete-button', _('Delete plugin'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.pluginsDeleteButton2.visible = status;
-            this._positionHoverText(this.pluginsDeleteButton2);
-            this.pluginsDeleteButton2.on('click', function (event) {
-                that.deletePlugin();
+            this._pluginsDeleteButton2 = makeButton('plugins-delete-button', _('Delete plugin'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._pluginsDeleteButton2.visible = status;
+            this._positionHoverText(this._pluginsDeleteButton2);
+            this._pluginsDeleteButton2.on('click', function (event) {
+                that._deletePlugin();
                 that._hide();
             });
 
@@ -221,9 +221,9 @@ function UtilityBox () {
             this._biggerButton.visible = false;
             this._biggerButton2.visible = false;
             this._statsButton.visible = false;
-            this.pluginsButton.visible = false;
-            this.pluginsDeleteButton.visible = false;
-            this.pluginsDeleteButton2.visible = false;
+            this._pluginsButton.visible = false;
+            this._pluginsDeleteButton.visible = false;
+            this._pluginsDeleteButton2.visible = false;
             this._scrollButton.visible = false;
             this._scrollButton2.visible = false;
             this._searchButton.visible = false;
@@ -240,9 +240,9 @@ function UtilityBox () {
             this._biggerButton.visible = this._increaseStatus;
             this._biggerButton2.visible = !this._increaseStatus;
             this._statsButton.visible = true;
-            this.pluginsButton.visible = true;
-            this.pluginsDeleteButton.visible = !status;
-            this.pluginsDeleteButton2.visible = status;
+            this._pluginsButton.visible = true;
+            this._pluginsDeleteButton.visible = !status;
+            this._pluginsDeleteButton2.visible = status;
             this._scrollButton.visible = !this._scrollStatus;
             this._scrollButton2.visible = this._scrollStatus;
             this._searchButton.visible = true;
