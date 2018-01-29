@@ -395,7 +395,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     flatBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['flat'] = flatBlock;
     //.TRANS: flat is a half-step down in pitch
-    flatBlock.staticLabels.push(_('flat'));
+    flatBlock.staticLabels.push(_('flat') + ' ♭');
     flatBlock.adjustWidthToLabel();
     flatBlock.flowClampZeroArgBlock();
 
@@ -404,7 +404,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sharpBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sharp'] = sharpBlock;
     //.TRANS: sharp is a half-step up in pitch
-    sharpBlock.staticLabels.push(_('sharp'));
+    sharpBlock.staticLabels.push(_('sharp') + ' ♯');
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
 
