@@ -682,6 +682,10 @@ define(MYDEFINES, function (compatibility) {
             } 
         };
 
+        function deletePlugin() {
+            palettes.paletteObject._promptPaletteDelete();
+        };
+
         function getPlaybackQueueStatus () {
             return Object.keys(logo.playbackQueue).length > 0;
         };
@@ -901,6 +905,7 @@ define(MYDEFINES, function (compatibility) {
                 .setBigger(doBiggerFont)
                 .setSmaller(doSmallerFont)
                 .setPlugins(doOpenPlugin)
+                .deletePlugins(deletePlugin)
                 .setStats(doAnalytics)
                 .setSearch(showSearchWidget, hideSearchWidget)
                 .setScroller(toggleScroller);
@@ -2044,7 +2049,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doUtilityBox() {
-            utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
+            utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
         };
 
         function _doPlaybackBox() {
