@@ -2180,6 +2180,16 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, DEFAULTINTERVAL];
+        } else if (name === 'invertmode') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, DEFAULTINVERT];
         } else if (name === 'number') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -3834,6 +3844,15 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'intervalname':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'invertmode':
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];

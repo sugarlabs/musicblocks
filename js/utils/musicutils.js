@@ -120,6 +120,8 @@ const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(e
 
 const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
 
+const INVERTMODES = [[_('even'), 'even'], [_('odd'), 'odd'], [_('scalar'), 'scalar']];
+
 const INTERVALNAMES = [
     [_('unison'), 'unison'],
     [_('augmented') + ' 1', 'augmented 1'],
@@ -355,6 +357,7 @@ var OSCTYPES = [
     [_('sawtooth'), 'sawtooth'],
 ];
 
+const DEFAULTINVERT = 'even';
 const DEFAULTINTERVAL = _('perfect') + ' 5';
 const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick drum';
@@ -363,6 +366,25 @@ const DEFAULTFILTERTYPE = 'highpass';
 const DEFAULTOSCILLATORTYPE = 'sine';
 
 var customMode = MUSICALMODES['custom'];
+
+
+function getInvertMode(name) {
+    for (var interval in INVERTMODES) {
+        if (INVERTMODES[interval][0] === name || INVERTMODES[interval][1].toLowerCase() === name.toLowerCase()) {
+            if (INVERTMODES[interval][0] != '') {
+                return INVERTMODES[interval][0];
+            } else {
+                console.log('I18n for invert mode is misbehaving.');
+                console.log(name + ' ' + name.toLowerCase() + ' ' + INVERTMODES[interval][0].toLowerCase() + ' ' + INVERTMODES[interval][1].toLowerCase());
+                return INVERTMODES[interval][1];
+            }
+        }
+    }
+
+    console.log(name + ' not found in INVERTMODES');
+    return name;
+};
+
 
 function getIntervalName(name) {
     for (var interval in INTERVALNAMES) {

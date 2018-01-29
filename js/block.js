@@ -14,7 +14,7 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -545,6 +545,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'intervalname':
                     this.value = getIntervalName(DEFAULTINTERVAL);
+                    break;
+                case 'invertmode':
+                    this.value = getInvertMode(DEFAULTINVERT);
                     break;
                 case 'voicename':
                     this.value = getVoiceName(DEFAULTVOICE);
@@ -1752,6 +1755,31 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('intervalnameLabel');
+        } else if (this.name === 'invertmode') {
+            var type = 'invertmode';
+            if (this.value != null) {
+                var selectedinvert = this.value;
+            } else {
+                var selectedinvert = getInvertMode(DEFAULTINVERT);
+            }
+
+            var labelHTML = '<select name="invertmode" id="invertModeLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">'
+            for (var i = 0; i < INVERTMODES.length; i++) {
+                if (INVERTMODES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + INVERTMODES[i][1] + '">' + INVERTMODES[i][1] + '</option>';
+                } else if (selectedinvert === INVERTMODES[i][0]) {
+                    labelHTML += '<option value="' + selectedinvert + '" selected>' + selectedinvert + '</option>';
+                } else if (selectedinvert === INVERTMODES[i][1]) {
+                    labelHTML += '<option value="' + selectedinvert + '" selected>' + selectedinvert + '</option>';
+                } else {
+                    labelHTML += '<option value="' + INVERTMODES[i][0] + '">' + INVERTMODES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('invertModeLabel');
         } else if (this.name === 'drumname') {
             var type = 'drumname';
             if (this.value != null) {

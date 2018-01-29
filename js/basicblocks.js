@@ -116,6 +116,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.defaults.push(440);
 
     // Status blocks
+    var invertmodeBlock = new ProtoBlock('invertmode');
+    invertmodeBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['invertmode'] = invertmodeBlock;
+    invertmodeBlock.valueBlock();
+    invertmodeBlock.adjustWidthToLabel();
+    invertmodeBlock.dockTypes[0] = 'textout';
+
     var transposition = new ProtoBlock('transpositionfactor');
     transposition.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['transpositionfactor'] = transposition;
