@@ -16,8 +16,8 @@ function UtilityBox () {
     const BOXBUTTONOFFSET = 40;
     const BOXBUTTONSPACING = 65;
 
-    // 6 buttons, 5 intrabuttons spaces, 2 extrabutton spaces
-    var boxwidth = 6 * 55 + 5 * 10 + 2 * 20;
+    // 7 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
+    var boxwidth = 7 * 55 + 6 * 10 + 2 * 20;
     var boxwidth2 = boxwidth - 1.5;
     var boxclose = boxwidth - 55;
 
@@ -28,6 +28,7 @@ function UtilityBox () {
     this._doBigger = null;
     this._doSmaller = null;
     this._doPlugins = null;
+    this.deletePlugin = null;
     this._doStats = null;
     this._doScroller = null;
     this._toggleSearch = null;
@@ -63,6 +64,11 @@ function UtilityBox () {
         return this;
     };
 
+    this.deletePlugins = function (plugin) {
+        this.deletePlugin = plugin;
+        return this;
+    };
+
     this.setStats = function (stats) {
         this._doStats = stats;
         return this;
@@ -83,7 +89,7 @@ function UtilityBox () {
         return [this._container.x, this._container.y];
     };
 
-    this.init = function (scale, x, y, makeButton) {
+    this.init = function (scale, x, y, makeButton, status) {
         if (this._container === null) {
             this._createBox(scale, x, y);
             var that = this;
@@ -145,6 +151,20 @@ function UtilityBox () {
 
             dx += BOXBUTTONSPACING;;
 
+            this.pluginsDeleteButton = makeButton('plugins-delete-disabled-button', _(' '), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.pluginsDeleteButton.visible = !status;
+            this._positionHoverText(this.pluginsDeleteButton);
+
+            this.pluginsDeleteButton2 = makeButton('plugins-delete-button', _('Delete plugin'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.pluginsDeleteButton2.visible = status;
+            this._positionHoverText(this.pluginsDeleteButton2);
+            this.pluginsDeleteButton2.on('click', function (event) {
+                that.deletePlugin();
+                that._hide();
+            });
+
+            dx += BOXBUTTONSPACING;;
+
             this._scrollButton = makeButton('scroll-unlock-button', _('Enable scrolling'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._scrollButton.visible = true;
             this._positionHoverText(this._scrollButton);
@@ -175,7 +195,7 @@ function UtilityBox () {
                 that._toggleSearch();
             });
         } else {
-            this._show();
+            this._show(status);
         }
     };
 
@@ -202,6 +222,8 @@ function UtilityBox () {
             this._biggerButton2.visible = false;
             this._statsButton.visible = false;
             this.pluginsButton.visible = false;
+            this.pluginsDeleteButton.visible = false;
+            this.pluginsDeleteButton2.visible = false;
             this._scrollButton.visible = false;
             this._scrollButton2.visible = false;
             this._searchButton.visible = false;
@@ -211,7 +233,7 @@ function UtilityBox () {
         }
     };
 
-    this._show = function () {
+    this._show = function (status) {
         if (this._container !== null) {
             this._smallerButton.visible = this._decreaseStatus;
             this._smallerButton2.visible = !this._decreaseStatus;
@@ -219,6 +241,8 @@ function UtilityBox () {
             this._biggerButton2.visible = !this._increaseStatus;
             this._statsButton.visible = true;
             this.pluginsButton.visible = true;
+            this.pluginsDeleteButton.visible = !status;
+            this.pluginsDeleteButton2.visible = status;
             this._scrollButton.visible = !this._scrollStatus;
             this._scrollButton2.visible = this._scrollStatus;
             this._searchButton.visible = true;

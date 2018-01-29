@@ -71,6 +71,8 @@ function Palettes () {
     this.palette_text = new createjs.Text('', '20px Arial', '#ff7700');
     this.mouseOver = false;
     this.activePalette = null;
+    this.paletteObject = null;
+    this.pluginsDeleteStatus = false;
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
@@ -1338,6 +1340,7 @@ function Palette(palettes, name) {
             this._hideMenuItems();
         }
 
+        this.palettes.pluginsDeleteStatus = false;
         this._moveMenu(this.palettes.cellSize, this.palettes.cellSize);
     };
 
@@ -1346,6 +1349,13 @@ function Palette(palettes, name) {
             this.menuContainer.visible = false;
         } else {
             this.menuContainer.visible = true;
+        }
+
+        if (BUILTINPALETTES.indexOf(this.name) === -1) {
+            this.palettes.pluginsDeleteStatus = true;
+            this.palettes.paletteObject = this;
+        } else {
+            this.palettes.pluginsDeleteStatus = false;
         }
     };
 
@@ -1631,40 +1641,11 @@ function Palette(palettes, name) {
         });
 
         this.menuContainer.on('mousedown', function (event) {
-            trashcan.show();
             // Move them all?
             var offset = {
                 x: that.menuContainer.x - Math.round(event.stageX / that.palettes.scale),
                 y: that.menuContainer.y - Math.round(event.stageY / that.palettes.scale)
             };
-
-            that.menuContainer.removeAllEventListeners('pressup');
-            that.menuContainer.on('pressup', function (event) {
-                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
-                    if (trashcan.isVisible) {
-                        that.hide();
-                        that.palettes.refreshCanvas();
-                        // Only delete plugin palettes.
-                        if (that.name === 'myblocks') {
-                            that._promptMacrosDelete();
-                        } else if (BUILTINPALETTES.indexOf(that.name) === -1) {
-                            that._promptPaletteDelete();
-                        }
-                    }
-                }
-                trashcan.hide();
-            });
-
-            that.menuContainer.removeAllEventListeners('mouseout');
-            that.menuContainer.on('mouseout', function (event) {
-                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
-                    if (trashcan.isVisible) {
-                        that.hide();
-                        that.palettes.refreshCanvas();
-                    }
-                }
-                trashcan.hide();
-            });
 
             that.menuContainer.removeAllEventListeners('pressmove');
             that.menuContainer.on('pressmove', function (event) {
@@ -1677,13 +1658,6 @@ function Palette(palettes, name) {
                 var dy = that.menuContainer.y - oldY;
                 that.palettes.initial_x = that.menuContainer.x;
                 that.palettes.initial_y = that.menuContainer.y;
-
-                // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
-                    trashcan.startHighlightAnimation();
-                } else {
-                    trashcan.stopHighlightAnimation();
-                }
 
                 // Hide the menu items while drag.
                 that._hideMenuItems();
@@ -1843,14 +1817,17 @@ function Palette(palettes, name) {
         // this palette.
         if ('MACROPLUGINS' in pluginObjs) {
             for (name in pluginObjs['MACROPLUGINS']) {
-		delete pluginObjs['MACROPLUGINS'][name];
+		      delete pluginObjs['MACROPLUGINS'][name];
             }
-	}
+	    }
 
         storage.plugins = preparePluginExports({});
         if (sugarizerCompatibility.isInsideSugarizer()) {
             sugarizerCompatibility.saveLocally();
         }
+
+        this.menuContainer.visible = false;
+        this._hideMenuItems();
     };
 
     this._promptMacrosDelete = function () {
