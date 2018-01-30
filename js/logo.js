@@ -179,6 +179,8 @@ function Logo () {
     this.noteDirection = {};
     this.pitchNumberOffset = [];  // 39, C4
     this.currentOctave = {};
+    this.inHarmonic = {};
+    this.partials = {};
     this.inNeighbor = [];
     this.neighborStepPitch = {};
     this.neighborNoteValue = {};
@@ -1046,6 +1048,8 @@ function Logo () {
             this.inNeighbor[turtle] = [];
             this.neighborStepPitch[turtle] = [];
             this.neighborNoteValue[turtle] = [];
+            this.inHarmonic[turtle] = [];
+            this.partials[turtle] = [];
 
             if (this.compiling) {
                 this._saveX[turtle] = this.turtles.turtleList[turtle].x;
@@ -4767,6 +4771,38 @@ function Logo () {
                 instrumentsEffects[that.timbre.instrumentName]['chorusDepth'] = chorusDepth;
             }
             break;
+        case 'harmonic':
+            that.inHarmonic[turtle].push(blk);
+            // temp
+            that.partials[turtle].push([]);
+
+            childFlow = args[0];
+            childFlowCount = 1;
+
+            var listenerName = '_harmonic_' + turtle + '_' + blk;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.inHarmonic[turtle].pop();
+                that.partials[turtle].pop();
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
+        case 'partial':
+            if (typeof(args[0]) !== 'number' || args[0] > 1 || args[0] < 0) {
+                that.errorMsg(_('Partial must be between 0 and 1.'));
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (that.inHarmonic[turtle].length > 0) {
+                var n = that.inHarmonic[turtle].length - 1;
+                that.partials[turtle][n].push(args[0]);
+            } else {
+                errorMsg(_('Partial block should be used inside of a Harmonic block.'));
+            }
+            break;
         case 'neighbor':
             if (typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
                 that.errorMsg(NANERRORMSG, blk);
@@ -6082,6 +6118,7 @@ function Logo () {
         var chorusRate = 0;
         var delayTime = 0;
         var chorusDepth = 0;
+        var partials = [];
         var neighborArgNote1 = [];
         var neighborArgNote2 = [];
         var neighborArgBeat = 0;
@@ -6091,6 +6128,7 @@ function Logo () {
         var doTremolo = false;
         var doPhaser = false;
         var doChorus = false;
+        var doPartials = false;
         var doNeighbor = false;
         var filters = null;
 
@@ -6168,6 +6206,17 @@ function Logo () {
             delayTime = last(this.delayTime[turtle]);
             chorusDepth = last(this.chorusDepth[turtle]);
             doChorus = true;
+        }
+
+        if (this.inHarmonic[turtle].length > 0) {
+            partials = last(this.partials[turtle]);
+            if (partials.length === 0) {
+                errorMsg(_('You must have at least one Partial block inside of a Harmonic block'));
+                partials = [1];
+            }
+
+            console.log(partials);
+            doPartials = true;
         }
 
         if (this.inNeighbor[turtle].length > 0) {
@@ -6618,6 +6667,7 @@ function Logo () {
                                     'doTremolo': doTremolo,
                                     'doPhaser': doPhaser,
                                     'doChorus': doChorus,
+                                    'doPartials': doPartials,
                                     'doNeighbor': doNeighbor,
                                     'vibratoIntensity': vibratoIntensity,
                                     'vibratoFrequency': vibratoValue,
@@ -6630,6 +6680,7 @@ function Logo () {
                                     'chorusRate': chorusRate,
                                     'delayTime': delayTime,
                                     'chorusDepth': chorusDepth,
+                                    'partials': partials,
                                     'neighborArgNote1': neighborArgNote1,
                                     'neighborArgNote2': neighborArgNote2,
                                     'neighborArgBeat': neighborArgBeat,
@@ -6637,7 +6688,7 @@ function Logo () {
                                 };
 
                                 __hasParamEffect = function () {
-                                    return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous;
+                                    return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous || paramsEffects.doPartial;
                                 }
 
                                 if (that.oscList[turtle][thisBlk].length > 0) {

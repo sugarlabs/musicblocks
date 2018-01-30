@@ -688,6 +688,22 @@ function Synth() {
                     synth.chain(chorusEffect, Tone.Master);
                 }
 
+                if (paramsEffects.doPartials) {
+                    // Depending on the synth, the oscillator is found
+                    // somewhere else in the synth obj.
+
+                    if (synth.oscillator != undefined) {
+                        synth.oscillator.partials = paramsEffects.partials;
+                    } else if (synth.voices != undefined) {
+                        for (i = 0; i < synth.voices.length; i++) {
+                            synth.voices[i].oscillator.partials = paramsEffects.
+partials;
+                        }
+                    } else {
+                        console.log('cannot find oscillator to apply partials');
+                    }
+                }
+
                 if (paramsEffects.doNeighbor) {
                     var firstTwoBeats = paramsEffects['neighborArgBeat'];
                     var finalBeat = paramsEffects['neighborArgCurrentBeat'];
@@ -733,6 +749,16 @@ function Synth() {
 
                     if (paramsEffects.doChorus) {
                         chorusEffect.dispose();
+                    }
+
+                    if (paramsEffects.doPartials) {
+                        if (synth.oscillator != undefined) {
+                            synth.oscillator.partials = [1];
+                        } else if (synth.voices != undefined) {
+                            for (i = 0; i < synth.voices.length; i++) {
+                                synth.voices[i].oscillator.partials = [1];
+                            }
+                        }
                     }
 
                     if (paramsEffects.doNeighbor) {
