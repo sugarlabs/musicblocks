@@ -9324,67 +9324,84 @@ function Logo () {
 
         // partial must be an integer or a dotted integer
         var partial =  1 / factor;
-        if (Math.floor(partial) !== partial) {
-            switch(factor) {
-            case 0.09375:  // 3/32
-                this.notationStaging[turtle].push('pickup', '16.');
-                console.log('partial 16.');
-                break;
-            case 0.1875:  // 3/16
-                this.notationStaging[turtle].push('pickup', '8.');
-                console.log('partial 8.');
-                break;
-            case 0.21875:  // 7/32
-                this.notationStaging[turtle].push('pickup', '8..');
-                console.log('partial 8..');
-                break;
-            case 0.3125:  // 5/16
-                this.notationStaging[turtle].push('pickup', '4 16');
-                console.log('partial 4 16');
-                break;
-            case 0.375:  // 3/8
-                this.notationStaging[turtle].push('pickup', '4.');
-                console.log('partial 4.');
-                break;
-            case 0.4375:  // 7/16
-                this.notationStaging[turtle].push('pickup', '4..');
-                console.log('partial 4..');
-                break;
-            case 0.5625:  // 9/16
-                this.notationStaging[turtle].push('pickup', '2 16');
-                console.log('partial 2 16');
-                break;
-            case 0.675:   // 5/8
-                this.notationStaging[turtle].push('pickup', '2 8');
-                console.log('partial 2 8');
-                break;
-            case 0.6875:  // 11/16
-                this.notationStaging[turtle].push('pickup', '2 8 16');
-                console.log('partial 2 8 16');
-                break;
-            case 0.75:    // 3/4
-                this.notationStaging[turtle].push('pickup', '2.');
-                console.log('partial 2.');
-                break;
-            case 0.8125:  // 13/16
-                this.notationStaging[turtle].push('pickup', '2 4 16');
-                console.log('partial 2 4 16');
-                break;
-            case 0.875:   // 7/8
-                this.notationStaging[turtle].push('pickup', '2..');
-                console.log('partial 2..');
-                break;
-            case 0.9375:  // 15/16
-                this.notationStaging[turtle].push('pickup', '2 4 8 16');
-                console.log('partial 2 4 8 16');
-                break;
-            default:
-                console.log('cannot process pickup of ' + factor + ' for Lilypond output');
-                break;
-            }
-        } else {
-            this.notationStaging[turtle].push('pickup', partial);
-            console.log('partial ' + partial);
+        switch(factor) {
+        case 0.0625:  // 1/16
+            this.notationStaging[turtle].push('pickup', '16');
+            console.log('partial 16');
+            break;
+        case 0.125:  // 1/8
+            this.notationStaging[turtle].push('pickup', '8');
+            console.log('partial 8');
+            break;
+        case 0.09375:  // 3/32
+            this.notationStaging[turtle].push('pickup', '16.');
+            console.log('partial 16.');
+            break;
+        case 0.1875:  // 3/16
+            this.notationStaging[turtle].push('pickup', '8.');
+            console.log('partial 8.');
+            break;
+        case 0.21875:  // 7/32
+            this.notationStaging[turtle].push('pickup', '8..');
+            console.log('partial 8..');
+            break;
+        case 0.25:  // 1/4
+            this.notationStaging[turtle].push('pickup', '4');
+            console.log('partial 4');
+            break;
+        case 0.3125:  // 5/16
+            this.notationStaging[turtle].push('pickup', '4 16');
+            console.log('partial 4 16');
+            break;
+        case 0.375:  // 3/8
+            this.notationStaging[turtle].push('pickup', '4.');
+            console.log('partial 4.');
+            break;
+        case 0.4375:  // 7/16
+            this.notationStaging[turtle].push('pickup', '4..');
+            console.log('partial 4..');
+            break;
+        case 0.5:  // 1/2
+            this.notationStaging[turtle].push('pickup', '2');
+            console.log('partial 2');
+            break;
+        case 0.5625:  // 9/16
+            this.notationStaging[turtle].push('pickup', '2 16');
+            console.log('partial 2 16');
+            break;
+        case 0.675:   // 5/8
+            this.notationStaging[turtle].push('pickup', '2 8');
+            console.log('partial 2 8');
+            break;
+        case 0.6875:  // 11/16
+            this.notationStaging[turtle].push('pickup', '2 8 16');
+            console.log('partial 2 8 16');
+            break;
+        case 0.75:    // 3/4
+            this.notationStaging[turtle].push('pickup', '2.');
+            console.log('partial 2.');
+            break;
+        case 0.8125:  // 13/16
+            this.notationStaging[turtle].push('pickup', '2 4 16');
+            console.log('partial 2 4 16');
+            break;
+        case 0.875:   // 7/8
+            this.notationStaging[turtle].push('pickup', '2..');
+            console.log('partial 2..');
+            break;
+        case 0.9375:  // 15/16
+            this.notationStaging[turtle].push('pickup', '2 4 8 16');
+            console.log('partial 2 4 8 16');
+            break;
+        case 1:  // 1/1
+            this.notationStaging[turtle].push('pickup', '1');
+            console.log('partial 1');
+            break;
+        default:
+            obj = rationalToFraction(factor);
+            this.errorMsg(_('Lilypond cannot process partial of ') + obj[0] + '/' + obj[1]);
+            console.log('cannot process pickup of ' + factor + ' for Lilypond output');
+            break;
         }
     };
 
