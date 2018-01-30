@@ -9449,9 +9449,13 @@ function Logo () {
             console.log('partial 1');
             break;
         default:
-            obj = rationalToFraction(factor);
-            this.errorMsg(_('Lilypond cannot process partial of ') + obj[0] + '/' + obj[1]);
-            console.log('cannot process pickup of ' + factor + ' for Lilypond output');
+	    if (this.runningLilypond) {
+                obj = rationalToFraction(factor);
+                this.errorMsg(_('Lilypond cannot process partial of ') + obj[0] + '/' + obj[1]);
+                console.log('using spaces to pad pickup for ' + factor);
+            }
+
+            this.updateNotation('R', 1 / (1 - factor), turtle, false);
             break;
         }
     };
