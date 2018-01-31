@@ -38,9 +38,10 @@
     position: absolute;
     background-color: white;
     background-repeat: no-repeat;
-    padding: 12px 20px 12px 40px;
+    padding: 6px 10px 6px 20px;
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
+    font-size: 24px;
 }
 
 #search:focus {
