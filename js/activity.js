@@ -1637,6 +1637,11 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
 
+            // Check for RETURN in search widget ahead of other events.
+            if (event.keyCode === RETURN && docById('search').value.length > 0) {
+                doSearch();
+            }
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planetdiv').style.display === '';
             } else {
