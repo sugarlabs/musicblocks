@@ -268,6 +268,7 @@ function Logo () {
     this.notationStaging = {};
     this.notationOutput = '';
     this.notationNotes = {};
+    this.pickupPoint = {};
     this.runningLilypond = false;
     this.runningAbc = false;
     this.checkingCompletionState = false;
@@ -1040,6 +1041,7 @@ function Logo () {
             this.currentMeasure[turtle] = 0;
             this.justCounting[turtle] = [];
             this.justMeasuring[turtle] = [];
+            this.pickupPoint[turtle] = null;
             this.firstPitch[turtle] = [];
             this.lastPitch[turtle] = [];
             this.pitchNumberOffset[turtle] = 39; // C4
@@ -9301,6 +9303,8 @@ function Logo () {
 
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
 
+        this.pickupPoint[turtle] = null;
+
         if (this.markup[turtle].length > 0) {
             var markup = '';
             for (var i = 0; i < this.markup[turtle].length; i++) {
@@ -9337,6 +9341,8 @@ function Logo () {
             this.notationStaging[turtle].push('one voice');
             break;
         }
+
+        this.pickupPoint[turtle] = null;
     }
 
     this.notationMarkup = function (turtle, markup) {
@@ -9345,6 +9351,7 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push('markup', markup);
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationKey = function (turtle, key, mode) {
@@ -9353,6 +9360,7 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push('key', key, mode);
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationMeter = function (turtle, count, value) {
@@ -9360,7 +9368,25 @@ function Logo () {
             this.notationStaging[turtle] = [];
         }
 
-        this.notationStaging[turtle].push('meter', count, value);
+        if (this.pickupPoint[turtle] != null) {
+            // Lilypond prefers meter to be before partials.
+            var d = this.notationStaging[turtle].length - this.pickupPoint[turtle];
+            var pickup = [];
+            for (var i = 0; i < d; i++) {
+                pickup.push(this.notationStaging[turtle].pop());
+            }
+
+            this.notationStaging[turtle].push('meter', count, value);
+            for (var i = 0; i < d; i++) {
+                this.notationStaging[turtle].push(pickup.pop());
+            }
+
+
+        } else {
+            this.notationStaging[turtle].push('meter', count, value);
+        }
+
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationPickup = function (turtle, factor) {
@@ -9373,7 +9399,9 @@ function Logo () {
             return;
         }
 
-        // partial must be an integer or a dotted integer
+        var pickupPoint = this.notationStaging[turtle].length;
+
+        // partial must be a combination of powers of two
         var partial =  1 / factor;
         switch(factor) {
         case 0.0625:  // 1/16
@@ -9449,7 +9477,7 @@ function Logo () {
             console.log('partial 1');
             break;
         default:
-	    if (this.runningLilypond) {
+            if (this.runningLilypond) {
                 obj = rationalToFraction(factor);
                 this.errorMsg(_('Lilypond cannot process partial of ') + obj[0] + '/' + obj[1]);
                 console.log('using spaces to pad pickup for ' + factor);
@@ -9457,10 +9485,13 @@ function Logo () {
 
             obj = rationalToFraction(1 - factor);
             for (var i = 0; i < obj[0]; i++) {
-		this.updateNotation('R', obj[1], turtle, false);
-	    }
+                this.updateNotation('R', obj[1], turtle, false);
+            }
+
             break;
         }
+
+        this.pickupPoint[turtle] = pickupPoint;
     };
 
     this.notationLineBreak = function (turtle) {
@@ -9469,6 +9500,7 @@ function Logo () {
         }
 
         // this.notationStaging[turtle].push('break');
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationBeginArticulation = function (turtle) {
@@ -9477,10 +9509,12 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push('begin articulation');
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationEndArticulation = function (turtle) {
         this.notationStaging[turtle].push('end articulation');
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationBeginCrescendo = function (turtle, factor) {
@@ -9493,6 +9527,8 @@ function Logo () {
         } else {
             this.notationStaging[turtle].push('begin decrescendo');
         }
+
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationEndCrescendo = function (turtle, factor) {
@@ -9501,6 +9537,8 @@ function Logo () {
         } else {
             this.notationStaging[turtle].push('end decrescendo');
         }
+
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationBeginSlur = function (turtle) {
@@ -9509,10 +9547,12 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push('begin slur');
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationEndSlur = function (turtle) {
         this.notationStaging[turtle].push('end slur');
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationInsertTie = function (turtle) {
@@ -9521,9 +9561,11 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push('tie');
+        this.pickupPoint[turtle] = null;
     };
 
     this.notationRemoveTie = function (turtle) {
         this.notationStaging[turtle].pop();
+        this.pickupPoint[turtle] = null;
     };
 };
