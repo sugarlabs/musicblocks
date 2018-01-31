@@ -6707,7 +6707,7 @@ function Logo () {
                                     'doTremolo': doTremolo,
                                     'doPhaser': doPhaser,
                                     'doChorus': doChorus,
-                                    'doPartials': doPartials,
+                                    'doPartials': false,  // doPartials,
                                     'doNeighbor': doNeighbor,
                                     'vibratoIntensity': vibratoIntensity,
                                     'vibratoFrequency': vibratoValue,
@@ -6729,6 +6729,15 @@ function Logo () {
 
                                 __hasParamEffect = function () {
                                     return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous || paramsEffects.doPartial;
+                                }
+
+                                // Apply harmonic here instead of in synth.
+                                var p = partials.indexOf(1);
+                                if (p > 0) {
+                                    for (var n = 0; n < notes.length; n++) {
+                                        var obj = frequencyToPitch(noteToFrequency(note, that.keySignature[turtle]) * (p + 1));
+                                        notes[n] = obj[0] + obj[1];
+                                    }
                                 }
 
                                 if (that.oscList[turtle][thisBlk].length > 0) {
