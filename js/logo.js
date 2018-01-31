@@ -4800,7 +4800,7 @@ function Logo () {
                 var n = that.inHarmonic[turtle].length - 1;
                 that.partials[turtle][n].push(args[0]);
             } else {
-                errorMsg(_('Partial block should be used inside of a Harmonic block.'));
+                that.errorMsg(_('Partial block should be used inside of a Harmonic block.'));
             }
             break;
         case 'neighbor':
