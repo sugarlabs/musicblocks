@@ -395,7 +395,9 @@ the range is `0` (silence) to `100` (full volume). In the example, the
 *synth name* block is used to select the current synth.
 
 As a convenience, a number of standard volume blocks are provided:
-from loudest to quietest, there is *fff*, *ff* *f*, *mf*, *mp*, *p*, *pp*, and *ppp*. In musical terms "f" means "forte" or loud, "p" means "piano" or soft, and "m" means "mezzo" or middle.
+from loudest to quietest, there is *fff*, *ff* *f*, *mf*, *mp*, *p*,
+*pp*, and *ppp*. In musical terms "f" means "forte" or loud, "p" means
+"piano" or soft, and "m" means "mezzo" or middle.
 
 The *Set Relative Volume* block modifies the clamped note's volume
 according to the input value of the block in an added (or subtracted
@@ -478,14 +480,30 @@ rotation.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-score.png "invert example")
 
-| Note | Half-steps above `C5` | Scalar steps above `C5` | Even  |  Odd  | Scalar |
-| ---- | :-------------------: | :---------------------: | ----- | ----- | ------ |
-| `F5` | 5                     | 3                       | `G4`  | `A♭4` | `G4`   |
-| `D5` | 2                     | 1                       | `B♭4` | `B4`  | `B4`   |
+Even mode
+
+| Starting Note | Half-steps above `C5` | Half-steps below `C5` | Ending Note |
+| :-----------: | :-------------------: | :-------------------: | :---------: |
+| `F5`          | 5                     | 5                     | `G4`        |
+| `D5`          | 2                     | 2                     | `B♭4`       |
+
+Odd mode
+
+| Starting Note | Half-steps above point midway between `C5` and `C♯5` | Half-steps below point midway between `C5` and `C♯5` | Ending Note |
+| :-----------: | :--------------------------------------------------: | :--------------------------------------------------: | :---------: |
+| `F5`          | 4.5                                                  | 4.5                                                  | `A♭4`       |
+| `D5`          | 1.5                                                  | 1.5                                                  | `B4`        |
+
+Scalar mode
+
+| Starting Note | Scalar steps above `C5` | Scalar steps below `C5` | Ending Note |
+| :-----------: | :---------------------: | :---------------------: | :---------: |
+| `F5`          | 3                       | 3                       | `G4`        |
+| `D5`          | 1                       | 1                       | `B4`        |
 
 In the *invert (even)* example above, notes are inverted around `C5`.
 In the *invert (odd)* example, notes are inverted around a point
-midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
+midway between `C5` and  `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
