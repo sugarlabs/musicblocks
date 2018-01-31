@@ -6344,7 +6344,7 @@ function Logo () {
                     if (!match) {
                         // If we don't have a match, then we need to
                         // play the previous note.
-                        this.errorMsg(_('You can only tie notes of the same pitch.'), saveBlk);
+                        this.errorMsg(_('You can only tie notes of the same pitch. Did you mean to use slur?'), saveBlk);
 
                         // Save the current note.
                         var saveCurrentNote = [];
