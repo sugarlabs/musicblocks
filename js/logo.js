@@ -9455,7 +9455,10 @@ function Logo () {
                 console.log('using spaces to pad pickup for ' + factor);
             }
 
-            this.updateNotation('R', 1 / (1 - factor), turtle, false);
+            obj = rationalToFraction(1 - factor);
+            for (var i = 0; i < obj[0]; i++) {
+		this.updateNotation('R', obj[1], turtle, false);
+	    }
             break;
         }
     };
