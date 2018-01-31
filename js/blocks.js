@@ -3007,13 +3007,13 @@ function Blocks () {
         }
 
         // Reposition the paste location relative to the stage position.
+        console.log(this.selectedBlocksObj);
         if (this.selectedBlocksObj != null) {
             this.selectedBlocksObj[0][2] = 75 - this.stage.x + this._pasteDX;
             this.selectedBlocksObj[0][3] = 75 - this.stage.y + this._pasteDY;
             this._pasteDX += 21;
             this._pasteDY += 21;
             this.loadNewBlocks(this.selectedBlocksObj);
-            this.selectedBlocksObj = null;
             this.updatePasteButton();
 
         }
