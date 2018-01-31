@@ -4773,9 +4773,39 @@ function Logo () {
                 instrumentsEffects[that.timbre.instrumentName]['chorusDepth'] = chorusDepth;
             }
             break;
+        case 'harmonic2':
+            if (typeof(args[0]) !== 'number' || args[0] < 1) {
+                //.TRANS: partials components in a harmonic series
+                that.errorMsg(_('Partial must be greater than or equal to 1.'));
+                that.stopTurtle = true;
+                break;
+            }
+
+            that.inHarmonic[turtle].push(blk);
+            that.partials[turtle].push([]);
+            var n = that.partials[turtle].length - 1;
+
+            for (var i = 0; i < args[0]; i++) {
+                that.partials[turtle][n].push(0);
+            }
+
+            that.partials[turtle][n].push(1);
+
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_harmonic_' + turtle + '_' + blk;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.inHarmonic[turtle].pop();
+                that.partials[turtle].pop();
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
         case 'harmonic':
             that.inHarmonic[turtle].push(blk);
-            // temp
             that.partials[turtle].push([]);
 
             childFlow = args[0];
@@ -4793,7 +4823,8 @@ function Logo () {
             break;
         case 'partial':
             if (typeof(args[0]) !== 'number' || args[0] > 1 || args[0] < 0) {
-                that.errorMsg(_('Partial must be between 0 and 1.'));
+                //.TRANS: partials are weighted components in a harmonic series
+                that.errorMsg(_('Partial weight must be between 0 and 1.'));
                 that.stopTurtle = true;
                 break;
             }
@@ -4802,7 +4833,8 @@ function Logo () {
                 var n = that.inHarmonic[turtle].length - 1;
                 that.partials[turtle][n].push(args[0]);
             } else {
-                that.errorMsg(_('Partial block should be used inside of a Harmonic block.'));
+                //.TRANS: partials are weighted components in a harmonic series
+                that.errorMsg(_('Partial block should be used inside of a Weighted-partisls block.'));
             }
             break;
         case 'neighbor':
@@ -6213,11 +6245,17 @@ function Logo () {
         if (this.inHarmonic[turtle].length > 0) {
             partials = last(this.partials[turtle]);
             if (partials.length === 0) {
-                this.errorMsg(_('You must have at least one Partial block inside of a Harmonic block'));
+                //.TRANS: partials are weighted components in a harmonic series
+                this.errorMsg(_('You must have at least one Partial block inside of a Weighted-partial block'));
                 partials = [1];
             }
 
-            console.log(partials);
+            doPartials = true;
+        } else {
+            // Since there is a race condition when trying to clear
+            // the partials, instead we just set them to the
+            // fundumental if we are not using a partial.
+            partials = [1];
             doPartials = true;
         }
 

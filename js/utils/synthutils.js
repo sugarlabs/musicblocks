@@ -691,7 +691,6 @@ function Synth() {
                 if (paramsEffects.doPartials) {
                     // Depending on the synth, the oscillator is found
                     // somewhere else in the synth obj.
-
                     if (synth.oscillator != undefined) {
                         synth.oscillator.partials = paramsEffects.partials;
                     } else if (synth.voices != undefined) {
@@ -749,16 +748,6 @@ partials;
 
                     if (paramsEffects.doChorus) {
                         chorusEffect.dispose();
-                    }
-
-                    if (paramsEffects.doPartials) {
-                        if (synth.oscillator != undefined) {
-                            synth.oscillator.partials = [1];
-                        } else if (synth.voices != undefined) {
-                            for (i = 0; i < synth.voices.length; i++) {
-                                synth.voices[i].oscillator.partials = [1];
-                            }
-                        }
                     }
 
                     if (paramsEffects.doNeighbor) {

@@ -1254,7 +1254,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var partialBlock = new ProtoBlock('partial');
     partialBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['partial'] = partialBlock;
-    //.TRANS: partials are weighted values in a harmonic series
+    //.TRANS: partials are weighted components in a harmonic series
     partialBlock.staticLabels.push(_('partial'));
     partialBlock.adjustWidthToLabel();
     partialBlock.oneArgBlock();
@@ -1264,10 +1264,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     var harmonicBlock = new ProtoBlock('harmonic');
     harmonicBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['harmonic'] = harmonicBlock;
-    //.TRANS: A harmonic is a overtone.
-    harmonicBlock.staticLabels.push(_('harmonic'));
+    //.TRANS: partials are weighted components in a harmonic series
+    harmonicBlock.staticLabels.push(_('weighed partials'));
     harmonicBlock.adjustWidthToLabel();
     harmonicBlock.flowClampZeroArgBlock();
+
+    var harmonic2Block = new ProtoBlock('harmonic2');
+    harmonic2Block.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['harmonic2'] = harmonic2Block;
+    //.TRANS: A harmonic is a overtone.
+    harmonic2Block.staticLabels.push(_('harmonic'));
+    harmonic2Block.adjustWidthToLabel();
+    harmonic2Block.flowClampOneArgBlock();
+    harmonic2Block.dockTypes[1] = 'numberin';
+    harmonic2Block.defaults.push(1);
 
     // macro
     var neighborBlock = new ProtoBlock('neighbor');
