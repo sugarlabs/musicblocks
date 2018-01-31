@@ -4774,9 +4774,9 @@ function Logo () {
             }
             break;
         case 'harmonic2':
-            if (typeof(args[0]) !== 'number' || args[0] < 1) {
+            if (typeof(args[0]) !== 'number' || args[0] < 0) {
                 //.TRANS: partials components in a harmonic series
-                that.errorMsg(_('Partial must be greater than or equal to 1.'));
+                that.errorMsg(_('Partial must be greater than or equal to 0.'));
                 that.stopTurtle = true;
                 break;
             }
@@ -6735,7 +6735,7 @@ function Logo () {
                                 var p = partials.indexOf(1);
                                 if (p > 0) {
                                     for (var n = 0; n < notes.length; n++) {
-                                        var obj = frequencyToPitch(noteToFrequency(note, that.keySignature[turtle]) * (p + 1));
+                                        var obj = frequencyToPitch(noteToFrequency(notes[n], that.keySignature[turtle]) * (p + 1));
                                         notes[n] = obj[0] + obj[1];
                                     }
                                 }
