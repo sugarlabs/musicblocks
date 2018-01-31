@@ -6211,7 +6211,7 @@ function Logo () {
         if (this.inHarmonic[turtle].length > 0) {
             partials = last(this.partials[turtle]);
             if (partials.length === 0) {
-                errorMsg(_('You must have at least one Partial block inside of a Harmonic block'));
+                this.errorMsg(_('You must have at least one Partial block inside of a Harmonic block'));
                 partials = [1];
             }
 
