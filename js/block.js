@@ -1354,6 +1354,11 @@ function Block(protoblock, blocks, overrideName) {
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
 
+                // Don't allow silence block to be dragged out of a note.
+                if (that.name === 'rest2') {
+                    return;
+                }
+
                 if (window.hasMouse) {
                     moved = true;
                 } else {
