@@ -59,51 +59,51 @@ var VOICENAMES = [
 
 var DRUMNAMES = [
     //.TRANS: musical instrument
-    [_('snare drum'), 'snare drum', 'images/snaredrum.svg'],
+    [_('snare drum'), 'snare drum', 'images/snaredrum.svg', 'sn'],
     //.TRANS: musical instrument
-    [_('kick drum'), 'kick drum', 'images/kick.svg'],
+    [_('kick drum'), 'kick drum', 'images/kick.svg', 'hh'],
     //.TRANS: musical instrument
-    [_('tom tom'), 'tom tom', 'images/tom.svg'],
+    [_('tom tom'), 'tom tom', 'images/tom.svg', 'tomml'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floor tom tom', 'images/floortom.svg'],
+    [_('floor tom tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl'],
     //.TRANS: a drum made from an inverted cup
-    [_('cup drum'), 'cup drum', 'images/cup.svg'],
+    [_('cup drum'), 'cup drum', 'images/cup.svg', 'hh'],
     //.TRANS: musical instrument
-    [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg'],
+    [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg', 'hh'],
     //.TRANS: musical instrument
-    [_('hi hat'), 'hi hat', 'images/hihat.svg'],
+    [_('hi hat'), 'hi hat', 'images/hihat.svg', 'hh'],
     //.TRANS: a small metal bell
-    [_('ride bell'), 'ride bell', 'images/ridebell.svg'],
+    [_('ride bell'), 'ride bell', 'images/ridebell.svg', 'rb'],
     //.TRANS: musical instrument
-    [_('cow bell'), 'cow bell', 'images/cowbell.svg'],
+    [_('cow bell'), 'cow bell', 'images/cowbell.svg', 'cb'],
     //.TRANS: musical instrument
-    [_('triangle bell'), 'triangle bell', 'images/trianglebell.svg'],
+    [_('triangle bell'), 'triangle bell', 'images/trianglebell.svg', 'tri'],
     //.TRANS: musical instrument
-    [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg'],
+    [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca'],
     //.TRANS: a musically tuned set of bells
-    [_('chime'), 'chine', 'images/chine.svg'],
+    [_('chime'), 'chine', 'images/chine.svg', 'cymca'],
     //.TRANS: sound effect
-    [_('clang'), 'clang', 'images/clang.svg'],
+    [_('clang'), 'clang', 'images/clang.svg', 'cymca'],
     //.TRANS: sound effect
-    [_('crash'), 'crash', 'images/crash.svg'],
+    [_('crash'), 'crash', 'images/crash.svg', 'cymca'],
     //.TRANS: sound effect
-    [_('bottle'), 'bottle', 'images/bottle.svg'],
+    [_('bottle'), 'bottle', 'images/bottle.svg', 'hh'],
     //.TRANS: sound effect
-    [_('clap'), 'clap', 'images/clap.svg'],
+    [_('clap'), 'clap', 'images/clap.svg', 'hc'],
     //.TRANS: sound effect
-    [_('slap'), 'slap', 'images/slap.svg'],
+    [_('slap'), 'slap', 'images/slap.svg', 'vibs'],
     //.TRANS: sound effect
-    [_('splash'), 'splash', 'images/splash.svg'],
+    [_('splash'), 'splash', 'images/splash.svg', 'hh'],
     //.TRANS: sound effect
-    [_('bubbles'), 'bubbles', 'images/bubbles.svg'],
+    [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh'],
     //.TRANS: animal sound effect
-    [_('cat'), 'cat', 'images/cat.svg'],
+    [_('cat'), 'cat', 'images/cat.svg', 'hh'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/cricket.svg'],
+    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh'],
     //.TRANS: animal sound effect
-    [_('dog'), 'dog', 'images/dog.svg'],
+    [_('dog'), 'dog', 'images/dog.svg', 'hh'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/duck.svg'],
+    [_('duck'), 'duck', 'images/duck.svg', 'hh'],
 ];
 
 var SOUNDSAMPLESDEFINES = [

@@ -550,6 +550,26 @@ function getDrumName(name) {
     return null;
 };
 
+function getDrumSymbol(name) {
+    if (name === '') {
+        console.log('getDrumName passed blank name. Returning ' + 'hh');
+        return 'hh';
+    }
+
+    for (var drum = 0; drum < DRUMNAMES.length; drum++) {
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            if (DRUMNAMES[drum][0] != '') {
+                return DRUMNAMES[drum][3];
+            } else {
+                console.log('I18n is misbehaving when parsing drum name: ' + name);
+                return 'hh';
+            }
+        }
+    }
+
+    return 'hh';
+};
+
 
 function getFilterTypes(name) {
     if (name === '') {

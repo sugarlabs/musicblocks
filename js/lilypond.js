@@ -338,11 +338,21 @@ processLilypondNotes = function (logo, turtle) {
 
 
 saveLilypondOutput = function(logo, saveName) {
+    const NUMBERNAMES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     var turtleCount = 0;
     var clef = [];
     for (var t in logo.notationStaging) {
+        console.log(typeof(t) + ' ' + t + ' ' + turtleCount);
         turtleCount += 1;
     }
+
+    var startDrums = turtleCount;
+    for (var t in logo.notationDrumStaging) {
+        console.log(typeof(t) + ' ' + t + ' ' + turtleCount);
+        logo.notationStaging[turtleCount.toString()] = logo.notationDrumStaging[t];
+        turtleCount += 1;
+    }
+
     console.log('saving as lilypond: ' + turtleCount);
 
     logo.notationOutput += '% You can change the MIDI instruments below to anything on logo list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n';
@@ -350,6 +360,7 @@ saveLilypondOutput = function(logo, saveName) {
     var c = 0;
     for (var t in logo.notationStaging) {
         if (logo.notationStaging[t].length > 0) {
+            console.log(logo.notationStaging[t]);
             var octaveTotal = 0;
             var noteCount = 0;
             for (var i = 0; i < logo.notationStaging[t].length; i++) {
@@ -368,7 +379,9 @@ saveLilypondOutput = function(logo, saveName) {
                     }
                 }
             }
-            if (logo.turtles.turtleList[t].drum) {
+
+            if (Number(t) > startDrums - 1 || logo.turtles.turtleList[t].drum) {
+                console.log('percussion');
                 clef.push('percussion');
             } else if (noteCount > 0) {
                 // console.log(t + ': ' + octaveTotal + ' ' + noteCount);
@@ -391,45 +404,65 @@ saveLilypondOutput = function(logo, saveName) {
 
             processLilypondNotes(logo, t);
 
-            var instrumentName = logo.turtles.turtleList[t].name;
-            if (instrumentName === _('start') || instrumentName === _('start drum')) {
-                instrumentName = RODENTS[t % 12];
-            } else if (instrumentName === t.toString()) {
-                instrumentName = RODENTS[t % 12];
-            }
+            if (Number(t) > startDrums - 1) {
+                instrumentName = _('drum') + NUMBERNAMES[Number(t) - startDrums];
+                instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
+                logo.notationOutput += instrumentName + ' = {\n';
+                logo.notationOutput += '\\drummode {\n';
+                var foo = logo.notationNotes[t];
+                console.log(foo);
+                logo.notationOutput += foo; // logo.notationNotes[t];
+                // Add bar to last turtle's output.
+                if (c === turtleCount - 1) {
+                    logo.notationOutput += ' \\bar "|."'
+                }
+                logo.notationOutput += '\n}\n';
+                logo.notationOutput += '\n}\n\n';
+            } else {
+                var instrumentName = logo.turtles.turtleList[t].name;
+                if (instrumentName === _('start') || instrumentName === _('start drum')) {
+                    instrumentName = RODENTS[t % 12];
+                } else if (instrumentName === t.toString()) {
+                    instrumentName = RODENTS[t % 12];
+                }
 
-            if (instrumentName === "") {
-                instrumentName = RODENTSEN[t % 12];
-            }
+                if (instrumentName === '') {
+                    instrumentName = RODENTSEN[t % 12];
+                }
 
-            instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
+                instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
 
-            logo.notationOutput += instrumentName + ' = {\n';
-            logo.notationOutput += logo.notationNotes[t];
+                logo.notationOutput += instrumentName + ' = {\n';
+                logo.notationOutput += logo.notationNotes[t];
 
-            // Add bar to last turtle's output.
-            if (c === turtleCount - 1) {
-                logo.notationOutput += ' \\bar "|."'
-            }
-            logo.notationOutput += '\n}\n\n';
+                // Add bar to last turtle's output.
+                if (c === turtleCount - 1) {
+                    logo.notationOutput += ' \\bar "|."'
+                }
+                logo.notationOutput += '\n}\n\n';
 
-            var shortInstrumentName = RODENTSSHORT[t % 12];
+                var shortInstrumentName = RODENTSSHORT[t % 12];
 
-            if (shortInstrumentName === '') {
-                shortInstrumentName = RODENTSSHORTEN[t % 12];
+                if (shortInstrumentName === '') {
+                    shortInstrumentName = RODENTSSHORTEN[t % 12];
+                }
             }
 
             logo.notationOutput += instrumentName.replace(/ /g, '_').replace('.', '') + 'Voice = ';
-            if (logo.turtles.turtleList[t].drum) {
+            if (Number(t) > startDrums - 1 || logo.turtles.turtleList[t].drum) {
                 logo.notationOutput += '\\new DrumStaff \\with {\n';
-                // logo.notationOutput += '   \\drummode {\n      hihat4 hh bassdrum bd\n   }\n';
             } else {
                 logo.notationOutput += '\\new Staff \\with {\n';
             }
             logo.notationOutput += '   \\clef "' + last(clef) + '"\n';
             logo.notationOutput += '   instrumentName = "' + instrumentName + '"\n';
-            logo.notationOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
-            logo.notationOutput += '   midiInstrument = "acoustic grand"\n';
+            if (Number(t) > startDrums - 1) {
+		logo.notationOutput += '   shortInstrumentName = "' + 'd' + '"\n';
+		logo.notationOutput += '   midiInstrument = "snare drum"\n';
+            } else {
+		logo.notationOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
+		logo.notationOutput += '   midiInstrument = "acoustic grand"\n';
+	    }
             // Automatic note splitting
             // logo.notationOutput += '\n   \\remove "Note_heads_engraver"\n   \\consists "Completion_heads_engraver"\n   \\remove "Rest_engraver"\n   \\consists "Completion_rest_engraver"\n'
 
@@ -448,12 +481,17 @@ saveLilypondOutput = function(logo, saveName) {
         for (var t in logo.notationNotes) {
             if (clef[i] === CLEFS[c]) {
                 if (logo.notationStaging[t].length > 0) {
-                    var instrumentName = logo.turtles.turtleList[t].name;
-                    if (instrumentName === _('start') || instrumentName === _('start drum')) {
-                        instrumentName = RODENTS[t % 12];
-                    } else if (instrumentName === t.toString()) {
-                        instrumentName = RODENTS[t % 12];
+                    if (Number(t) > startDrums - 1) {
+                        var instrumentName = _('drum') + NUMBERNAMES[Number(t) - startDrums];
+                    } else {
+                        var instrumentName = logo.turtles.turtleList[t].name;
+                        if (instrumentName === _('start') || instrumentName === _('start drum')) {
+                            instrumentName = RODENTS[t % 12];
+                        } else if (instrumentName === t.toString()) {
+                            instrumentName = RODENTS[t % 12];
+                        }
                     }
+
                     instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
                     logo.notationOutput += '      \\' + instrumentName + 'Voice\n';
                 }
@@ -468,12 +506,17 @@ saveLilypondOutput = function(logo, saveName) {
         for (var t in logo.notationNotes) {
             if (clef[i] === CLEFS[c]) {
                 if (logo.notationStaging[t].length > 0) {
-                    var instrumentName = logo.turtles.turtleList[t].name;
-                    if (instrumentName === _('start') || instrumentName === _('start drum')) {
-                        instrumentName = RODENTS[t % 12]
-                    } else if (instrumentName === t.toString()) {
-                        instrumentName = RODENTS[t % 12];
+                    if (Number(t) > startDrums - 1) {
+                        var instrumentName = _('drum') + NUMBERNAMES[Number(t) - startDrums];
+                    } else {
+                        var instrumentName = logo.turtles.turtleList[t].name;
+                        if (instrumentName === _('start') || instrumentName === _('start drum')) {
+                            instrumentName = RODENTS[t % 12]
+                        } else if (instrumentName === t.toString()) {
+                            instrumentName = RODENTS[t % 12];
+                        }
                     }
+
                     instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
                     logo.notationOutput += '         \\context TabVoice = "'+ instrumentName + '" \\' + instrumentName.replace(/ /g, '_').replace('.', '') + '\n';
                 }

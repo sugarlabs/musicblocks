@@ -266,6 +266,7 @@ function Logo () {
 
     // parameters used by notations
     this.notationStaging = {};
+    this.notationDrumStaging = {};
     this.notationOutput = '';
     this.notationNotes = {};
     this.pickupPoint = {};
@@ -6636,10 +6637,9 @@ function Logo () {
                             var p = partials.indexOf(1);
                             if (p > 0) {
                                 note = noteToFrequency(note, that.keySignature[turtle]) * (p + 1);
-				notes.push(note);
-                            } else {
-				notes.push(note);
-			    }
+                            }
+
+                            notes.push(note);
                         }
 
                         if (duration > 0) {
@@ -6654,11 +6654,16 @@ function Logo () {
                             }
 
                             if (that.justCounting[turtle].length === 0) {
-                                that.updateNotation(note, originalDuration, turtle, insideChord);
+                                if (that.noteDrums[turtle][thisBlk].length > 0) {
+                                    console.log(that.noteDrums[turtle][thisBlk][0]);
+                                    that.updateNotation(note, originalDuration, turtle, insideChord, that.noteDrums[turtle][thisBlk][0]);
+                                } else {
+                                    that.updateNotation(note, originalDuration, turtle, insideChord, '');
+                                }
                             }
                         } else if (that.tieCarryOver[turtle] > 0) {
                             if (that.justCounting[turtle].length === 0) {
-                                that.updateNotation(note, that.tieCarryOver[turtle], turtle, insideChord);
+                                that.updateNotation(note, that.tieCarryOver[turtle], turtle, insideChord, '');
                             }
                         }
                     }
@@ -9335,17 +9340,31 @@ function Logo () {
         }
     };
 
-    this.updateNotation = function (note, duration, turtle, insideChord) {
+    this.updateNotation = function (note, duration, turtle, insideChord, drum) {
         var obj = durationToNoteValue(duration);
         if (!(turtle in this.notationStaging)) {
             this.notationStaging[turtle] = [];
         }
 
+        if (!(turtle in this.notationDrumStaging)) {
+            this.notationDrumStaging[turtle] = [];
+        }
+
+        // Deprecated
         if (this.turtles.turtleList[turtle].drum) {
             note = "c'";
         }
 
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
+
+        // If no drum is specified, as a rest to the drum
+        // line. Otherwise, add the drum.
+        if (drum === '') {
+            this.notationDrumStaging[turtle].push(['R', obj[0], obj[1], obj[2], obj[3], insideChord, false]);
+        } else {
+            var drumSymbol = getDrumSymbol(drum);
+	    this.notationDrumStaging[turtle].push([drumSymbol, obj[0], obj[1], obj[2], obj[3], insideChord, false]);
+        }
 
         this.pickupPoint[turtle] = null;
 
@@ -9362,7 +9381,7 @@ function Logo () {
             this.markup[turtle] = [];
         }
 
-        if (typeof(note) === "number") {
+        if (typeof(note) === 'number') {
             this.notationMarkup(turtle, toFixed2(note), false);
         }
     };
@@ -9370,6 +9389,7 @@ function Logo () {
     this.notationVoices = function (turtle, arg) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         switch(arg) {
@@ -9396,6 +9416,7 @@ function Logo () {
     this.notationMarkup = function (turtle, markup, below) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         if (below) {
@@ -9410,6 +9431,7 @@ function Logo () {
     this.notationKey = function (turtle, key, mode) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         this.notationStaging[turtle].push('key', key, mode);
@@ -9419,6 +9441,7 @@ function Logo () {
     this.notationMeter = function (turtle, count, value) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         if (this.pickupPoint[turtle] != null) {
@@ -9445,6 +9468,7 @@ function Logo () {
     this.notationPickup = function (turtle, factor) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         if (factor === 0) {
@@ -9538,7 +9562,7 @@ function Logo () {
 
             obj = rationalToFraction(1 - factor);
             for (var i = 0; i < obj[0]; i++) {
-                this.updateNotation('R', obj[1], turtle, false);
+                this.updateNotation('R', obj[1], turtle, false, '');
             }
 
             break;
@@ -9547,9 +9571,20 @@ function Logo () {
         this.pickupPoint[turtle] = pickupPoint;
     };
 
+    this.notationHarmonic = function (turtle) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
+        }
+
+        this.notationStaging.push('harmonic');
+        this.pickupPoint[turtle] = null;
+    };
+
     this.notationLineBreak = function (turtle) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         // this.notationStaging[turtle].push('break');
@@ -9559,6 +9594,7 @@ function Logo () {
     this.notationBeginArticulation = function (turtle) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         this.notationStaging[turtle].push('begin articulation');
@@ -9573,6 +9609,7 @@ function Logo () {
     this.notationBeginCrescendo = function (turtle, factor) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         if (factor > 0) {
@@ -9597,6 +9634,7 @@ function Logo () {
     this.notationBeginSlur = function (turtle) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         this.notationStaging[turtle].push('begin slur');
@@ -9611,6 +9649,7 @@ function Logo () {
     this.notationInsertTie = function (turtle) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
         }
 
         this.notationStaging[turtle].push('tie');
