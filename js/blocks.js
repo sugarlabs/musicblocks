@@ -1578,6 +1578,11 @@ function Blocks () {
         }
     };
 
+    this.moveBlock = function (blk, x, y) {
+	this._moveBlock(blk, x, y);
+	this.adjustDocks(blk, true);
+    };
+
     this._moveBlock = function (blk, x, y) {
         // Move a block (and its label) to x, y.
         var myBlock = this.blockList[blk];

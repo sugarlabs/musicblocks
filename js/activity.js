@@ -1520,7 +1520,7 @@ define(MYDEFINES, function (compatibility) {
             if (searchInput.length > 0) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
-                        blocks._moveBlock(newBlock, searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
+                        blocks.moveBlock(newBlock, searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
                     });
 
                     // Move the position of the next newly created block.
