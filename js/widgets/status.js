@@ -328,10 +328,11 @@ function StatusMatrix() {
                 if (this._logo.noteStatus[turtle] != null) {
                     var notes = this._logo.noteStatus[turtle][0];
                     for (var j = 0; j < notes.length; j++) {
-                        note += notes[j];
                         if (typeof(notes[j]) === 'number') {
+                            note += toFixed2(notes[j]);
                             note += 'Hz ';
                         } else {
+                            note += notes[j];
                             note += ' ';
                         }
                     }
