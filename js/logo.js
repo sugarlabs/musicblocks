@@ -6617,7 +6617,6 @@ function Logo () {
                             that.previousNotePlayed[turtle] = that.lastNotePlayed[turtle];
                         } else {
                             var noteObj = getNote(that.notePitches[turtle][thisBlk][i], that.noteOctaves[turtle][thisBlk][i], 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
-
                             // If the cents for this note != 0, then
                             // we need to convert to frequency and add
                             // in the cents.
@@ -6636,7 +6635,8 @@ function Logo () {
                             // Apply harmonic here instead of in synth.
                             var p = partials.indexOf(1);
                             if (p > 0) {
-                                notes.push(noteToFrequency(note, that.keySignature[turtle]) * (p + 1));
+                                note = noteToFrequency(note, that.keySignature[turtle]) * (p + 1);
+				notes.push(note);
                             } else {
 				notes.push(note);
 			    }
@@ -9358,8 +9358,12 @@ function Logo () {
                 }
             }
 
-            this.notationMarkup(turtle, markup);
+            this.notationMarkup(turtle, markup, true);
             this.markup[turtle] = [];
+        }
+
+        if (typeof(note) === "number") {
+            this.notationMarkup(turtle, toFixed2(note), false);
         }
     };
 
@@ -9389,12 +9393,17 @@ function Logo () {
         this.pickupPoint[turtle] = null;
     }
 
-    this.notationMarkup = function (turtle, markup) {
+    this.notationMarkup = function (turtle, markup, below) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
         }
 
-        this.notationStaging[turtle].push('markup', markup);
+        if (below) {
+            this.notationStaging[turtle].push('markdown', markup);
+        } else {
+            this.notationStaging[turtle].push('markup', markup);
+        }
+
         this.pickupPoint[turtle] = null;
     };
 

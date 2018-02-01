@@ -60,7 +60,11 @@ processLilypondNotes = function (logo, turtle) {
         if (typeof(obj) === 'string') {
             switch (obj) {
             case 'markup':
-                logo.notationNotes[turtle] += '_\\markup {' + logo.notationStaging[turtle][i + 1] + '} ';
+                logo.notationNotes[turtle] += '^\\markup { \\abs-fontsize #6 { ' + logo.notationStaging[turtle][i + 1] + ' } } ';
+                i += 1;
+                break;
+            case 'markdown':
+                logo.notationNotes[turtle] += '_\\markup { ' + logo.notationStaging[turtle][i + 1] + ' } ';
                 i += 1;
                 break;
             case 'break':
@@ -234,6 +238,9 @@ processLilypondNotes = function (logo, turtle) {
                         logo.notationNotes[turtle] += ')} ';
                         i += 1;
                     } else if (typeof(nextObj) === 'string' && nextObj === 'markup') {
+                        logo.notationNotes[turtle] += '^\\markup { \\abs-fontsize #6 { ' + logo.notationStaging[turtle][i + j + 1] + ' } } } ';
+                        j += 2;
+                    } else if (typeof(nextObj) === 'string' && nextObj === 'markdown') {
                         logo.notationNotes[turtle] += '_\\markup {' + logo.notationStaging[turtle][i + j + 1] + '} } ';
                         j += 2;
                     } else {
