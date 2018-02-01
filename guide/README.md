@@ -478,7 +478,7 @@ rotation.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-score.png "invert example")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-even.png "even invert example")
 
 Even mode
 
@@ -487,12 +487,16 @@ Even mode
 | `F5`          | 5                     | 5                     | `G4`        |
 | `D5`          | 2                     | 2                     | `B♭4`       |
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-odd.png "odd invert example")
+
 Odd mode
 
 | Starting note | Half steps above point midway between `C5` and `C♯5` | Half steps below point midway between `C5` and `C♯5` | Ending note |
 | :-----------: | :--------------------------------------------------: | :--------------------------------------------------: | :---------: |
 | `F5`          | 4.5                                                  | 4.5                                                  | `A♭4`       |
 | `D5`          | 1.5                                                  | 1.5                                                  | `B4`        |
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-scalar.png "scalar invert example")
 
 Scalar mode
 
