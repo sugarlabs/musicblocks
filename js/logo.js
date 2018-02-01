@@ -6736,7 +6736,7 @@ function Logo () {
                                 if (p > 0) {
                                     for (var n = 0; n < notes.length; n++) {
                                         var obj = frequencyToPitch(noteToFrequency(notes[n], that.keySignature[turtle]) * (p + 1));
-                                        notes[n] = obj[0] + obj[1];
+                                        notes[n] = obj[0].replace(/♯/g, '#').replace(/♭/g, 'b') + obj[1];
                                     }
                                 }
 
