@@ -1640,6 +1640,8 @@ define(MYDEFINES, function (compatibility) {
             // Check for RETURN in search widget ahead of other events.
             if (event.keyCode === RETURN && docById('search').value.length > 0) {
                 doSearch();
+                palettes.hide();
+                palettes.show();
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
