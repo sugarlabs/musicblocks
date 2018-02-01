@@ -482,21 +482,21 @@ rotation.
 
 Even mode
 
-| Starting Note | Half-steps above `C5` | Half-steps below `C5` | Ending Note |
+| Starting note | Half steps above `C5` | Half steps below `C5` | Ending note |
 | :-----------: | :-------------------: | :-------------------: | :---------: |
 | `F5`          | 5                     | 5                     | `G4`        |
 | `D5`          | 2                     | 2                     | `B♭4`       |
 
 Odd mode
 
-| Starting Note | Half-steps above point midway between `C5` and `C♯5` | Half-steps below point midway between `C5` and `C♯5` | Ending Note |
+| Starting note | Half steps above point midway between `C5` and `C♯5` | Half steps below point midway between `C5` and `C♯5` | Ending note |
 | :-----------: | :--------------------------------------------------: | :--------------------------------------------------: | :---------: |
 | `F5`          | 4.5                                                  | 4.5                                                  | `A♭4`       |
 | `D5`          | 1.5                                                  | 1.5                                                  | `B4`        |
 
 Scalar mode
 
-| Starting Note | Scalar steps above `C5` | Scalar steps below `C5` | Ending Note |
+| Starting note | Scalar steps above `C5` | Scalar steps below `C5` | Ending note |
 | :-----------: | :---------------------: | :---------------------: | :---------: |
 | `F5`          | 3                       | 3                       | `G4`        |
 | `D5`          | 1                       | 1                       | `B4`        |
