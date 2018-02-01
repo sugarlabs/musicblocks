@@ -6595,7 +6595,7 @@ function Logo () {
                     var staccatoBeatValue = last(that.staccato[turtle]);
                     if (staccatoBeatValue < 0) {
                         // slur
-                        var beatValue = bpmFactor / (noteBeatValue + (bpmFactor / -staccatoBeatValue));
+                        var beatValue = bpmFactor * ((1 / noteBeatValue) - (1 / staccatoBeatValue));
                     } else if (staccatoBeatValue > noteBeatValue) {
                         // staccato
                         var beatValue = bpmFactor / staccatoBeatValue;
