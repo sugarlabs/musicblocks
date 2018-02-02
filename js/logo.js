@@ -6232,7 +6232,6 @@ function Logo () {
         var doTremolo = false;
         var doPhaser = false;
         var doChorus = false;
-        var doPartials = false;
         var doNeighbor = false;
         var filters = null;
 
@@ -6319,14 +6318,11 @@ function Logo () {
                 this.errorMsg(_('You must have at least one Partial block inside of a Weighted-partial block'));
                 partials = [1];
             }
-
-            doPartials = true;
         } else {
             // Since there is a race condition when trying to clear
             // the partials, instead we just set them to the
             // fundumental if we are not using a partial.
             partials = [1];
-            doPartials = true;
         }
 
         if (this.inNeighbor[turtle].length > 0) {
@@ -6789,7 +6785,7 @@ function Logo () {
                                     'doTremolo': doTremolo,
                                     'doPhaser': doPhaser,
                                     'doChorus': doChorus,
-                                    'doPartials': false,  // doPartials,
+                                    'doPartials': true,
                                     'doNeighbor': doNeighbor,
                                     'vibratoIntensity': vibratoIntensity,
                                     'vibratoFrequency': vibratoValue,
@@ -6810,7 +6806,8 @@ function Logo () {
                                 };
 
                                 __hasParamEffect = function () {
-                                    return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous || paramsEffects.doPartial;
+                                    return true;
+                                    // return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous || paramsEffects.doPartial;
                                 }
 
                                 if (that.oscList[turtle][thisBlk].length > 0) {

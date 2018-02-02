@@ -1259,7 +1259,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     partialBlock.adjustWidthToLabel();
     partialBlock.oneArgBlock();
     partialBlock.defaults.push(1);
-    partialBlock.hidden = true;
 
     // macro
     var harmonicBlock = new ProtoBlock('harmonic');
@@ -1269,7 +1268,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     harmonicBlock.staticLabels.push(_('weighed partials'));
     harmonicBlock.adjustWidthToLabel();
     harmonicBlock.flowClampZeroArgBlock();
-    harmonicBlock.hidden = true;
 
     var harmonic2Block = new ProtoBlock('harmonic2');
     harmonic2Block.palette = palettes.dict['tone'];
