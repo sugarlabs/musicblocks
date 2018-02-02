@@ -51,8 +51,35 @@
 .ui-menu {
   position: relative;
   background-color: rgba(255,255,255,1.0);
-  max-width: 200px;
+  max-width: 250px;
   font-size: 24px;
+}
+
+#ui-id-1 {
+	margin: 0;
+	padding: 0;
+	-webkit-margin-before: 0;
+	-webkit-margin-after: 0;
+	-webkit-margin-start: 0;
+	-webkit-margin-end: 0;
+	-webkit-padding-start: 0;
+	list-style-type: none;
+}
+
+#ui-id-1 li:before {
+	content:"• ";
+    margin-right: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+#ui-id-1 li:hover:before {
+    background-color: #D0D3D4;
+}
+
+.ui-state-focus {
+    background-color: #D0D3D4;
 }
 
 .scrollSearch {
