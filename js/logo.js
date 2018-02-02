@@ -291,7 +291,6 @@ function Logo () {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
         this.synth = new Synth();
-        this.synth.createDefaultSynth();
     }
     else {
         this.turtleOscs = {};
@@ -557,7 +556,12 @@ function Logo () {
         this.sounds = [];
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.synth.stopSound('default');
+            for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                for (var instrumentName in instruments[turtle]) {
+                    this.synth.stopSound(turtle, instrumentName);
+                }
+            }
+
             this.synth.stop();
         }
 
@@ -939,6 +943,37 @@ function Logo () {
         this.masterVolume = [DEFAULTVOLUME];
         this.checkingCompletionState = false;
 
+        // Prep synths for each turtle.
+        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            if (!(turtle in instruments)) {
+                instruments[turtle] = {};
+                instrumentsFilters[turtle] = {};
+                instrumentsEffects[turtle] = {};
+            }
+
+            // Make sure there is a default synth for each turtle
+            if (!('default' in instruments[turtle])) {
+                this.synth.createDefaultSynth(turtle);
+            }
+
+            // Copy any preloaded synths from the default turtle
+            for (var instrumentName in instruments[0]) {
+                if (!(instrumentName in instruments[turtle])) {
+                    this.synth.loadSynth(turtle, instrumentName);
+
+                    // Copy any filters
+                    if (instrumentName in instrumentsFilters[0]) {
+                        instrumentsFilters[turtle][instrumentName] = instrumentsFilters[0][instrumentName];
+                    }
+
+                    // and any effects
+                    if (instrumentName in instrumentsEffects[0]) {
+                        instrumentsEffects[turtle][instrumentName] = instrumentsEffects[0][instrumentName];
+                    }
+                }
+            }
+        }
+
         // Each turtle needs to keep its own wait time and music
         // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -1073,7 +1108,7 @@ function Logo () {
             this._setMasterVolume(DEFAULTVOLUME);
             for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (var synth in this.synthVolume[turtle]) {
-                    this._setSynthVolume(synth, DEFAULTVOLUME);
+                    this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
                 }
             }
         }
@@ -2841,7 +2876,7 @@ function Logo () {
 
             if (that.inTimbre) {
                 that.timbre.amSynthParamvals['harmonicity'] = harmonicity;
-                that.synth.createSynth(that.timbre.instrumentName, 'amsynth', that.timbre.amSynthParamvals);
+                that.synth.createSynth(turtle, that.timbre.instrumentName, 'amsynth', that.timbre.amSynthParamvals);
 
                 that.timbre.AMSynthesizer.push(blk);
                 that.timbre.AMSynthParams.push(harmonicity);
@@ -2865,7 +2900,7 @@ function Logo () {
 
             if (that.inTimbre) {
                 that.timbre.fmSynthParamvals['modulationIndex'] = modulationIndex;
-                that.synth.createSynth(that.timbre.instrumentName, 'fmsynth', that.timbre.fmSynthParamvals);
+                that.synth.createSynth(turtle, that.timbre.instrumentName, 'fmsynth', that.timbre.fmSynthParamvals);
 
                 that.timbre.FMSynthesizer.push(blk);
                 that.timbre.FMSynthParams.push(modulationIndex);
@@ -2890,7 +2925,7 @@ function Logo () {
             if (that.inTimbre) {
                 that.timbre.duoSynthParamVals['vibratoRate'] = synthVibratoRate;
                 that.timbre.duoSynthParamVals['vibratoAmount'] = synthVibratoAmount;
-                that.synth.createSynth(that.timbre.instrumentName, 'duosynth', that.timbre.duoSynthParamVals);
+                that.synth.createSynth(turtle, that.timbre.instrumentName, 'duosynth', that.timbre.duoSynthParamVals);
 
                 that.timbre.duoSynthesizer.push(blk);
                 that.timbre.duoSynthParams.push(synthVibratoRate);
@@ -3062,13 +3097,13 @@ function Logo () {
             if (typeof(args[0]) === 'string') {
                 // CLear out the instrument because we will recreate it in the widget.
                 that.timbre.instrumentName = args[0];
-                instrumentsEffects[that.timbre.instrumentName] = {};
-                instrumentsEffects[that.timbre.instrumentName]['vibratoActive'] = false;
-                instrumentsEffects[that.timbre.instrumentName]['distortionActive'] = false;
-                instrumentsEffects[that.timbre.instrumentName]['tremoloActive'] = false;
-                instrumentsEffects[that.timbre.instrumentName]['phaserActive'] = false;
-                instrumentsEffects[that.timbre.instrumentName]['chorusActive'] = false;
-                instrumentsFilters[that.timbre.instrumentName] = [];
+                instrumentsEffects[turtle][that.timbre.instrumentName] = {};
+                instrumentsEffects[turtle][that.timbre.instrumentName]['vibratoActive'] = false;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['distortionActive'] = false;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['tremoloActive'] = false;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['phaserActive'] = false;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['chorusActive'] = false;
+                instrumentsFilters[turtle][that.timbre.instrumentName] = [];
             } else {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 that.stopTurtle = true;
@@ -3344,7 +3379,7 @@ function Logo () {
                     that.errorMsg(_('You are adding multiple envelope blocks.'));
                 } else {
                     // Create the synth for the instrument.
-                    that.synth.createSynth(that.timbre.instrumentName, that.timbre.synthVals['oscillator']['source'], that.timbre.synthVals);
+                    that.synth.createSynth(turtle, that.timbre.instrumentName, that.timbre.synthVals['oscillator']['source'], that.timbre.synthVals);
                 }
 
                 that.timbre.env.push(blk);
@@ -3377,11 +3412,11 @@ function Logo () {
                 freq = args[2];
 
                 if (that.inTimbre) {
-                    if (!(that.timbre.instrumentName in instrumentsFilters)) {
-                        instrumentsFilters[that.timbre.instrumentName] = [];
+                    if (!(that.timbre.instrumentName in instrumentsFilters[turtle])) {
+                        instrumentsFilters[turtle][that.timbre.instrumentName] = [];
                     }
                     // Add the filter to the instrument
-                    instrumentsFilters[that.timbre.instrumentName].push({'filterType': filtertype, 'filterRolloff': rollOff, 'filterFrequency': freq});
+                    instrumentsFilters[turtle][that.timbre.instrumentName].push({'filterType': filtertype, 'filterRolloff': rollOff, 'filterFrequency': freq});
 
                     that.timbre.fil.push(blk);
                     that.timbre.filterParams.push(filtertype);
@@ -3411,7 +3446,7 @@ function Logo () {
                     that.errorMsg(_('You are adding multiple oscillator blocks.'));
                 } else {
                     that.timbre.oscParams = [];
-                    that.synth.createSynth(that.timbre.instrumentName, oscillatorType, that.timbre.synthVals);
+                    that.synth.createSynth(turtle, that.timbre.instrumentName, oscillatorType, that.timbre.synthVals);
                 }
 
                 that.timbre.osc.push(blk);
@@ -4437,7 +4472,7 @@ function Logo () {
                 }
 
                 that.instrumentNames[turtle].push(synth);
-                that.synth.loadSynth(synth);
+                that.synth.loadSynth(turtle, synth);
 
                 if (that.synthVolume[turtle][synth] == undefined) {
                     that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
@@ -4634,12 +4669,12 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
 
             if (that.inTimbre) {
-                instrumentsEffects[that.timbre.instrumentName]['vibratoActive'] = true;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['vibratoActive'] = true;
                 that.timbre.vibratoEffect.push(blk);
                 that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
-                instrumentsEffects[that.timbre.instrumentName]['vibratoIntensity'] = that.vibratoIntensity[turtle];
+                instrumentsEffects[turtle][that.timbre.instrumentName]['vibratoIntensity'] = that.vibratoIntensity[turtle];
                 that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
-                instrumentsEffects[that.timbre.instrumentName]['vibratoFrequency'] = rate;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['vibratoFrequency'] = rate;
             }
             break;
         case 'dis':
@@ -4663,10 +4698,10 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
 
             if (that.inTimbre) {
-                instrumentsEffects[that.timbre.instrumentName]['distortionActive'] = true;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['distortionActive'] = true;
                 that.timbre.distortionEffect.push(blk);
                 that.timbre.distortionParams.push(last(that.distortionAmount[turtle]) * 100);
-                instrumentsEffects[that.timbre.instrumentName]['distortionAmount'] = distortion;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['distortionAmount'] = distortion;
             }
             break;
         case 'tremolo':
@@ -4695,12 +4730,12 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             if (that.inTimbre) {
-                instrumentsEffects[that.timbre.instrumentName]['tremoloActive'] = true;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['tremoloActive'] = true;
                 that.timbre.tremoloEffect.push(blk);
                 that.timbre.tremoloParams.push(last(that.tremoloFrequency[turtle]));
-                instrumentsEffects[that.timbre.instrumentName]['tremoloFrequency'] = frequency;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['tremoloFrequency'] = frequency;
                 that.timbre.tremoloParams.push(last(that.tremoloDepth[turtle]) * 100);
-                instrumentsEffects[that.timbre.instrumentName]['tremoloDepth'] = depth;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['tremoloDepth'] = depth;
             }
             break;
         case 'phaser':
@@ -4726,14 +4761,14 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             if (that.inTimbre) {
-                instrumentsEffects[that.timbre.instrumentName]['phaserActive'] = true;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['phaserActive'] = true;
                 that.timbre.phaserEffect.push(blk);
                 that.timbre.phaserParams.push(last(that.rate[turtle]));
-                instrumentsEffects[that.timbre.instrumentName]['rate'] = rate;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['rate'] = rate;
                 that.timbre.phaserParams.push(last(that.octaves[turtle]));
-                instrumentsEffects[that.timbre.instrumentName]['octaves'] = octaves;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['octaves'] = octaves;
                 that.timbre.phaserParams.push(last(that.baseFrequency[turtle]));
-                instrumentsEffects[that.timbre.instrumentName]['baseFrequency'] = baseFrequency;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['baseFrequency'] = baseFrequency;
             }
             break;
         case 'chorus':
@@ -4766,14 +4801,14 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
 
             if (that.inTimbre) {
-                instrumentsEffects[that.timbre.instrumentName]['chorusActive'] = true;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['chorusActive'] = true;
                 that.timbre.chorusEffect.push(blk);
                 that.timbre.chorusParams.push(last(that.chorusRate[turtle]));
-                instrumentsEffects[that.timbre.instrumentName]['chorusRate'] = chorusRate;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['chorusRate'] = chorusRate;
                 that.timbre.chorusParams.push(last(that.delayTime[turtle]));
-                instrumentsEffects[that.timbre.instrumentName]['delayTime'] = delayTime;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['delayTime'] = delayTime;
                 that.timbre.chorusParams.push(last(that.chorusDepth[turtle]) * 100);
-                instrumentsEffects[that.timbre.instrumentName]['chorusDepth'] = chorusDepth;
+                instrumentsEffects[turtle][that.timbre.instrumentName]['chorusDepth'] = chorusDepth;
             }
             break;
         case 'harmonic2':
@@ -5415,7 +5450,7 @@ function Logo () {
                     }
 
                     if (!this.suppressOutput[turtle]) {
-                        that._setSynthVolume(synth, newVolume);
+                        that._setSynthVolume(turtle, synth, newVolume);
                     }
                 }
 
@@ -5436,7 +5471,7 @@ function Logo () {
                 var __listener = function (event) {
                     for (var synth in that.synthVolume[turtle]) {
                         that.synthVolume[turtle][synth].pop();
-                        that._setSynthVolume(synth, last(that.synthVolume[turtle][synth]));
+                        that._setSynthVolume(turtle, synth, last(that.synthVolume[turtle][synth]));
                         that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', synth, last(that.synthVolume[turtle][synth])]);
                     }
 
@@ -5541,7 +5576,7 @@ function Logo () {
 
                     that.synthVolume[turtle][synth].push(args[1]);
                     if (!this.suppressOutput[turtle]) {
-                        that._setSynthVolume(synth, args[1]);
+                        that._setSynthVolume(turtle, synth, args[1]);
                     }
 
                     if (that.justCounting[turtle].length === 0) {
@@ -5596,7 +5631,7 @@ function Logo () {
 
                 that.synthVolume[turtle][synth].push(args[1]);
                 if (!this.suppressOutput[turtle]) {
-                    that._setSynthVolume(synth, args[1]);
+                    that._setSynthVolume(turtle, synth, args[1]);
                 }
 
                 if (that.justCounting[turtle].length === 0) {
@@ -5613,7 +5648,7 @@ function Logo () {
                     that.synthVolume[turtle][synth].pop();
                     // Restore previous volume.
                     if (that.justCounting[turtle].length === 0 && that.synthVolume[turtle][synth].length > 0) {
-                        that._setSynthVolume(synth, last(that.synthVolume[turtle][synth]));
+                        that._setSynthVolume(turtle, synth, last(that.synthVolume[turtle][synth]));
                         that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setsynthvolume', synth, last(that.synthVolume[turtle][synth])]);
                     }
                 };
@@ -6135,7 +6170,7 @@ function Logo () {
         }
     };
 
-    this._setSynthVolume = function (synth, volume) {
+    this._setSynthVolume = function (turtle, synth, volume) {
         if (volume > 100) {
             volume = 100;
         } else if (volume < 0) {
@@ -6148,10 +6183,10 @@ function Logo () {
             case 'noise2':
             case 'noise3':
                 // Noise is very very loud.
-                this.synth.setVolume(synth, volume / 25);
+                this.synth.setVolume(turtle, synth, volume / 25);
                 break;
             default:
-                this.synth.setVolume(synth, volume);
+                this.synth.setVolume(turtle, synth, volume);
                 break;
             }
         }
@@ -6205,8 +6240,8 @@ function Logo () {
         if (this.inSetTimbre[turtle] && (turtle in this.instrumentNames) && last(this.instrumentNames[turtle])) {
             var name = last(this.instrumentNames[turtle]);
 
-            if (name in instrumentsEffects) {
-                var timbreEffects = instrumentsEffects[name];
+            if (name in instrumentsEffects[turtle]) {
+                var timbreEffects = instrumentsEffects[turtle][name];
 
                 if (timbreEffects['vibratoActive']) {
                     vibratoRate = timbreEffects['vibratoRate'];
@@ -6240,8 +6275,8 @@ function Logo () {
                 }
             }
 
-            if (name in instrumentsFilters) {
-                filters = instrumentsFilters[name];
+            if (name in instrumentsFilters[turtle]) {
+                filters = instrumentsFilters[turtle][name];
             }
         }
 
@@ -6311,7 +6346,7 @@ function Logo () {
         if (this.inCrescendo[turtle].length > 0 && this.crescendoDelta[turtle].length === 0) {
             this.inCrescendo[turtle].pop();
             for (var synth in this.synthVolume[turtle]) {
-                this._setSynthVolume('default', last(this.synthVolume[turtle][synth]));
+                this._setSynthVolume(turtle, 'default', last(this.synthVolume[turtle][synth]));
                 this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setsynthvolume', synth, last(this.synthVolume[turtle][synth])]);
             }
         } else if (this.crescendoDelta[turtle].length > 0) {
@@ -6325,7 +6360,7 @@ function Logo () {
                 console.log(synth + '= ' + this.synthVolume[turtle][synth][len - 1]);
                 this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setsynthvolume', synth, last(this.synthVolume[turtle][synth])]);
                 if (!this.suppressOutput[turtle]) {
-                    this._setSynthVolume(synth, last(this.synthVolume[turtle][synth]));
+                    this._setSynthVolume(turtle, synth, last(this.synthVolume[turtle][synth]));
                 }
             }
         }
@@ -6784,7 +6819,7 @@ function Logo () {
                                     }
 
                                     if (!that.suppressOutput[turtle]) {
-                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null);
+                                        that.synth.trigger(turtle, notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null);
                                     }
 
                                     if (that.justCounting[turtle].length === 0) {
@@ -6796,7 +6831,7 @@ function Logo () {
                                     }
                                 } else if (that.drumStyle[turtle].length > 0) {
                                     if (!that.suppressOutput[turtle]) {
-                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null, null);
+                                        that.synth.trigger(trigger, notes, beatValue, last(that.drumStyle[turtle]), null, null);
                                     }
 
                                     if (that.justCounting[turtle].length === 0) {
@@ -6804,7 +6839,7 @@ function Logo () {
                                     }
                                 } else if (that.turtles.turtleList[turtle].drum) {
                                     if (!that.suppressOutput[turtle]) {
-                                        that.synth.trigger(notes, beatValue, 'drum', null, null);
+                                        that.synth.trigger(turtle, notes, beatValue, 'drum', null, null);
                                     }
 
                                     if (that.justCounting[turtle].length === 0) {
@@ -6814,7 +6849,7 @@ function Logo () {
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             if (!that.suppressOutput[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null);
+                                                that.synth.trigger(turtle, notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
@@ -6822,7 +6857,7 @@ function Logo () {
                                             }
                                         } else if (turtle in that.instrumentNames && last(that.instrumentNames[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters);
+                                                that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
@@ -6834,7 +6869,7 @@ function Logo () {
                                             }
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null);
+                                                that.synth.trigger(turtle, notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
@@ -6846,7 +6881,7 @@ function Logo () {
                                             }
                                         } else {
                                             if (!that.suppressOutput[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, 'default', paramsEffects, null);
+                                                that.synth.trigger(turtle, notes[d], beatValue, 'default', paramsEffects, null);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
@@ -6915,7 +6950,7 @@ function Logo () {
                                 for (var i = 0; i < drums.length; i++) {
                                     if (that.drumStyle[turtle].length > 0) {
                                         if (!that.suppressOutput[turtle]) {
-                                            that.synth.trigger(['C2'], newBeatValue, last(that.drumStyle[turtle]), null, null);
+                                            that.synth.trigger(turtle, ['C2'], newBeatValue, last(that.drumStyle[turtle]), null, null);
                                         }
 
                                         if (that.justCounting[turtle].length === 0) {
@@ -6923,7 +6958,7 @@ function Logo () {
                                         }
                                     } else {
                                         if (!that.suppressOutput[turtle]) {
-                                            that.synth.trigger(['C2'], newBeatValue, drums[i], null, null);
+                                            that.synth.trigger(turtle, ['C2'], newBeatValue, drums[i], null, null);
                                         }
 
                                         if (that.justCounting[turtle].length === 0) {
@@ -7057,7 +7092,7 @@ function Logo () {
                 case 'notes':
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
-                        that.synth.trigger(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
+                        that.synth.trigger(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
                     }
                     break;
                 case 'controlpoint1':
@@ -7084,7 +7119,7 @@ function Logo () {
                     that._setMasterVolume(that.playbackQueue[turtle][idx][2]);
                     break;
                 case 'setsynthvolume':
-                    that._setSynthVolume(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
+                    that._setSynthVolume(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
                 case 'arc':
                     that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);

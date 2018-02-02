@@ -144,7 +144,7 @@ function RhythmRuler () {
                 // FIXME: Should be based on meter
                 for (var i = 0; i < 4; i++) {
                     setTimeout(function () {
-                        that._logo.synth.trigger(0, that._logo.defaultBPMFactor / 16, drum, null, null);
+                        that._logo.synth.trigger(0, 'C4', that._logo.defaultBPMFactor / 16, drum, null, null);
                     }, interval * i / 4);
                 }
 
@@ -321,7 +321,7 @@ function RhythmRuler () {
             that._inLongPress = false;
 
             that._longPressBeep = setTimeout(function () {
-                that._logo.synth.trigger('C4', 1 / 32, 'chime', null, null);
+                that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
                 var cell = that._mouseDownCell;
                 if (cell != null) {
@@ -895,7 +895,7 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-                that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum, null, null);
+                that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
             }
 
             // And highlight its cell.

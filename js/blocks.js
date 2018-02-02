@@ -2012,7 +2012,7 @@ function Blocks () {
         // If we drag in a synth block, we need to load the synth.
         if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(name) !== -1) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.logo.synth.loadSynth(name);
+                this.logo.synth.loadSynth(0, name);
             }
         }
 
@@ -2523,7 +2523,7 @@ function Blocks () {
                 if (c != null && ['playdrum', 'setdrum', 'setvoice'].indexOf(this.blockList[c].name) !== -1) {
                     if (this.blockList[blk].value.slice(0, 4) === 'http') {
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.logo.synth.loadSynth(this.blockList[blk].value);
+                            this.logo.synth.loadSynth(0, this.blockList[blk].value);
                         }
                     }
                 }
@@ -3619,7 +3619,7 @@ function Blocks () {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
-                    this.logo.synth.loadSynth('kick');
+                    this.logo.synth.loadSynth(0, 'kick');
                 }
                 break;
             case 'action':
@@ -3878,7 +3878,7 @@ function Blocks () {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
-                    this.logo.synth.loadSynth(getDrumSynthName(value));
+                    this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
                 break;
             case 'filtertype':
@@ -3912,7 +3912,7 @@ function Blocks () {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this voice
                     try {
-                        this.logo.synth.loadSynth(getVoiceSynthName(value));
+                        this.logo.synth.loadSynth(0, getVoiceSynthName(value));
                     } catch (e) {
                         console.log(e)
                     }
