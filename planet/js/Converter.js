@@ -20,19 +20,24 @@ function Converter(Planet) {
 	//Conversion Functions
 
 	this.ly2pdf = function(data, callback){
-		this.ServerInterface.convertFile("ly","pdf",data,function(result){this.afterly2pdf(result,callback);}.bind(this));
+		this.ServerInterface.convertFile("ly","pdf",window.btoa(data),function(result){this.afterly2pdf(result,callback);}.bind(this));
 	}
 
 	this.afterly2pdf = function(data, callback){
 		if (!data.success){
 			callback(false,data.error);
 		} else {
-			callback(true,this.getBlob(data.contenttype, data.data));
+			callback(true,this.getDataURL(data.data.contenttype, data.data.blob));
 		}
 	}
 
 	//Ancillary Functions
 
+	this.getDataURL = function(mime, data){
+		return "data:"+mime+";base64,"+data;
+	}
+
+	//Unused, but might be useful.
 	this.getBlob = function(mime, data){
 		var rawData = window.atob(data);
 		var len = rawData.length;

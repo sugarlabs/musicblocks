@@ -419,7 +419,10 @@ processLilypondNotes = function (logo, turtle) {
 };
 
 
-saveLilypondOutput = function(logo, saveName) {
+saveLilypondOutput = function(logo, saveName, format) {
+    if (format===undefined){
+        format = null;
+    }
     const NUMBERNAMES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     var turtleCount = 0;
     var clef = [];
@@ -664,6 +667,12 @@ saveLilypondOutput = function(logo, saveName) {
     var projectData = prepareExport();
     logo.notationOutput += projectData.replace(/]],/g, ']],\n');
     logo.notationOutput += '\n%}\n\n';
-
-    doSaveLilypond(logo, saveName);
+    switch(format){
+        case "pdf":
+            doSaveLilypondPDF(logo, saveName);
+            break;
+        default:
+            doSaveLilypond(logo, saveName);
+            break;
+    }
 };
