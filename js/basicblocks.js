@@ -1379,10 +1379,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     voiceBlock.hidden = true;
 
     // macro
+    var glideBlock = new ProtoBlock('glide');
+    glideBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['glide'] = glideBlock;
+    //.TRANS: glide is a blended overlap successive notes
+    glideBlock.staticLabels.push(_('glide'));
+    glideBlock.adjustWidthToLabel();
+    glideBlock.flowClampOneArgBlock();
+    glideBlock.defaults.push(1 / 16);
+    glideBlock.hidden = true;
+
+    // macro
     var slurBlock = new ProtoBlock('slur');
     slurBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['slur'] = slurBlock;
-    //.TRANS: legato: overlap successive notes
+    //.TRANS: slur or legato is an overlap successive notes
     slurBlock.staticLabels.push(_('slur'));
     slurBlock.adjustWidthToLabel();
     slurBlock.flowClampOneArgBlock();

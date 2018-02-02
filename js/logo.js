@@ -214,6 +214,7 @@ function Logo () {
     this.semitoneIntervals = {};  // absolute interval (based on semitones)
     this.markup = {};
     this.staccato = {};
+    this.glide = {};
     this.swing = {};
     this.swingTarget = {};
     this.swingCarryOver = {};
@@ -998,6 +999,7 @@ function Logo () {
             this.semitoneIntervals[turtle] = [];
             this.markup[turtle] = [];
             this.staccato[turtle] = [];
+            this.glide[turtle] = [];
             this.swing[turtle] = [];
             this.swingTarget[turtle] = [];
             this.swingCarryOver[turtle] = 0;
@@ -4944,10 +4946,10 @@ function Logo () {
         case 'newslur':
         case 'slur':
             if (args.length > 1) {
-                if (that.blocks.blockList[blk].name === 'newslur') {
-                    that.staccato[turtle].push(-1 / args[0]);
-                } else {
+                if (that.blocks.blockList[blk].name === 'slur') {
                     that.staccato[turtle].push(-args[0]);
+                } else {
+                    that.staccato[turtle].push(-1 / args[0]);
                 }
 
                 if (that.justCounting[turtle].length === 0) {
@@ -4969,6 +4971,38 @@ function Logo () {
 
                 that._setListener(turtle, listenerName, __listener);
             }
+            break;
+        case 'glide':
+            // TODO: Duration should be the sum of all the notes (like
+            // in a tie). If we set the synth portamento and use
+            // setNote for all but the first note, it should produce a
+            // glissando. But it will not work for polySynth since we
+            // don't know which voice to use and we'll suffer
+            // collisions.
+            if (that.blocks.blockList[blk].name === 'glide') {
+                that.glide[turtle].push(blk);
+            }
+
+            if (that.justCounting[turtle].length === 0) {
+                that.notationBeginSlur(turtle);
+            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_glide_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.staccato[turtle].pop();
+                if (that.justCounting[turtle].length === 0) {
+                    that.notationEndSlur(turtle);
+                }
+
+                that.glide[turtle].pop();
+            };
+
+            that._setListener(turtle, listenerName, __listener);
             break;
         case 'drift':
             that.drift[turtle] += 1;
@@ -6591,6 +6625,8 @@ function Logo () {
 
                 // Use the beatValue of the first note in
                 // the group since there can only be one.
+                var portamento = 0;
+
                 if (that.staccato[turtle].length > 0) {
                     var staccatoBeatValue = last(that.staccato[turtle]);
                     if (staccatoBeatValue < 0) {
@@ -9363,7 +9399,7 @@ function Logo () {
             this.notationDrumStaging[turtle].push(['R', obj[0], obj[1], obj[2], obj[3], insideChord, false]);
         } else {
             var drumSymbol = getDrumSymbol(drum);
-	    this.notationDrumStaging[turtle].push([drumSymbol, obj[0], obj[1], obj[2], obj[3], insideChord, false]);
+            this.notationDrumStaging[turtle].push([drumSymbol, obj[0], obj[1], obj[2], obj[3], insideChord, false]);
         }
 
         this.pickupPoint[turtle] = null;
