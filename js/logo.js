@@ -275,6 +275,7 @@ function Logo () {
     this.notationStaging = {};
     this.notationDrumStaging = {};
     this.notationOutput = '';
+    this.notationConvert = '';
     this.notationNotes = {};
     this.pickupPOW2 = {};
     this.pickupPoint = {};
@@ -6600,8 +6601,9 @@ function Logo () {
                         if (filename == undefined || filename.length === 0) {
                             filename = _('My Project') + '.ly';
                         }
-
-                        saveLilypondOutput(that, filename);
+                        console.log(that.notationConvert);
+                        saveLilypondOutput(that, filename, that.notationConvert);
+                        that.notationConvert = "";
                         that.runningLilypond = false;
                     } else if (that.runningAbc) {
                         console.log('saving abc output:');

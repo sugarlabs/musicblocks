@@ -552,6 +552,23 @@ function doSaveLilypond (logo, desc) {
     download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
 };
 
+function doSaveLilypondPDF (logo, desc) {
+    var data = logo.notationOutput;
+    window.Converter.ly2pdf(data,function(success,dataurl){
+        if (!success){
+            console.log("Error: "+dataurl);
+            //TODO: Error message box
+        } else {
+            afterSaveLilypondPDF(dataurl, desc);
+        }
+    });
+};
+
+function afterSaveLilypondPDF (dataurl, desc) {
+    desc = desc.substring(0, desc.length - 3);
+    desc+=".pdf";
+    download(desc, dataurl);
+}
 
 function doSaveAbc (logo, desc) {
     download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');

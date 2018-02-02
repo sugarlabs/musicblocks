@@ -197,7 +197,7 @@ define(MYDEFINES, function (compatibility) {
         var languageBox = null;
         var playbackBox = null;
         var planet;
-        var converter;
+        window.converter;
         var storage;
         var buttonsVisible = true;
         var headerContainer = null;
@@ -1286,6 +1286,10 @@ define(MYDEFINES, function (compatibility) {
                     this.planet.openProjectFromPlanet(id,error);
                 }
 
+                this.onConverterLoad = function(){
+                    window.Converter = this.planet.Converter;
+                }
+
                 this.init = function(){
                     this.iframe = document.getElementById("planet-iframe");
                     this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_,storage);
@@ -1294,13 +1298,14 @@ define(MYDEFINES, function (compatibility) {
                     this.planet.setPlanetClose(this.closePlanet.bind(this));
                     this.planet.setLoadNewProject(this.newProject.bind(this));
                     this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
+                    this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
+                    window.Converter = this.planet.Converter;
                     this.mainCanvas = canvas;
                 }
             }
 
             planet = new PlanetInterface(storage);
             planet.init();
-            converter = planet.planet.Converter;
 
             saveLocally = planet.saveLocally.bind(planet);
 
@@ -2717,6 +2722,8 @@ define(MYDEFINES, function (compatibility) {
             docById('guitarText').textContent = _('Include guitar tablature output?');
             //.TRANS: Lilypond is a scripting language for generating sheet music
             docById('submitLilypond').textContent = _('Save as Lilypond');
+            //.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
+            docById('submitPDF').textContent = _('Save as PDF');
 
             //TRANS: default file name when saving as Lilypond
             docById('fileName').value = _('My Project') + '.ly';
@@ -2732,7 +2739,10 @@ define(MYDEFINES, function (compatibility) {
                 docById('author').value = _('Mr. Mouse');
             }
 
-            docById('submitLilypond').onclick = function () {
+            function saveLYFile(isPDF) {
+                if (isPDF===undefined){
+                    isPDF = false;
+                }
                 var filename = docById('fileName').value;
                 projectTitle = docById('title').value;
                 projectAuthor = docById('author').value;
@@ -2775,6 +2785,11 @@ define(MYDEFINES, function (compatibility) {
                 // Suppress music and turtle output when generating
                 // Lilypond output.
                 logo.runningLilypond = true;
+                if (isPDF){
+                    logo.notationConvert = "pdf";
+                } else {
+                    logo.notationConvert = "";
+                }
                 logo.notationOutput = LILYPONDHEADER;
                 logo.notationNotes = {};
                 for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -2788,6 +2803,9 @@ define(MYDEFINES, function (compatibility) {
                 // Close the dialog box after hitting button.
                 docById('lilypondModal').style.display = 'none';
             }
+
+            docById('submitLilypond').onclick = function(){saveLYFile(false)}.bind(this);
+            docById('submitPDF').onclick = function(){saveLYFile(true)}.bind(this);
 
             docByClass('close')[0].onclick = function () {
                 logo.runningLilypond = false;
