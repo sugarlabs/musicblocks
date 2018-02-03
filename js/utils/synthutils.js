@@ -638,7 +638,7 @@ function Synth() {
         return null;
     }
 
-    this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters) {
+    this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
         if (paramsEffects == null && paramsFilters == null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
@@ -699,11 +699,24 @@ function Synth() {
                         synth.oscillator.partials = paramsEffects.partials;
                     } else if (synth.voices != undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
-                            synth.voices[i].oscillator.partials = paramsEffects.
-partials;
+                            synth.voices[i].oscillator.partials = paramsEffects.partials;
                         }
                     } else {
                         console.log('cannot find oscillator to apply partials');
+                    }
+                }
+
+                if (paramsEffects.doPortamento) {
+                    // Depending on the synth, the oscillator is found
+                    // somewhere else in the synth obj.
+                    if (synth.oscillator != undefined) {
+			synth.portamento = paramsEffects.portamento;
+                    } else if (synth.voices != undefined) {
+                        for (i = 0; i < synth.voices.length; i++) {
+                            synth.voices[i].portamento = paramsEffects.portamento;
+                        }
+                    } else {
+                        console.log('cannot find oscillator to apply portamento');
                     }
                 }
 
@@ -729,7 +742,11 @@ partials;
             }
 
             if (!paramsEffects.doNeighbor) {
-                synth.triggerAttackRelease(notes, beatValue);
+                if (setNote != undefined && setNote) {
+                    synth.setNote(notes);
+		} else {
+                    synth.triggerAttackRelease(notes, beatValue);
+		}
             }
 
             setTimeout(function () {
@@ -769,7 +786,8 @@ partials;
     };
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
-    this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters) {
+    this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
+
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] != 0) {
                 paramsEffects.doVibrato = true;
@@ -824,21 +842,21 @@ partials;
             var obj = noteToPitchOctave(notes);
             var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
             tempNotes = noteNum - centerNo;
-            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters, setNote);
             break;
         case 3:  // builtin synth
             if (typeof(notes) === 'object') {
                 tempNotes = notes[0];
             }
 
-            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters, setNote);
             break;
         case 4:
-            tempSynth.triggerAttackRelease(beatValue);
+	    tempSynth.triggerAttackRelease(beatValue);
             break;
         case 0:  // default synth
         default:
-            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters, setNote);
             break;
         }
     };
