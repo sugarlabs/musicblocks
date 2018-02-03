@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+const POLYCOUNT = 3;
+
 var VOICENAMES = [
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg'],
@@ -469,7 +471,7 @@ function Synth() {
             break;
         case 'poly':
             var synthOptions = {
-                polyphony: 6
+                polyphony: POLYCOUNT
             };
             break;
         default:
@@ -483,7 +485,7 @@ function Synth() {
     // Poly synth will be loaded as the default synth.
     this.createDefaultSynth = function (turtle) {
         console.log('create default poly/default/custom synth for turtle ' + turtle);
-        var default_synth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
+        var default_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth).toMaster();
         instruments[turtle]['default'] = default_synth;
         instrumentsSource['default'] = [0, 'default'];
         instruments[turtle]['custom'] = default_synth;
@@ -555,7 +557,7 @@ function Synth() {
         default:
             instrumentsSource[instrumentName] = [0, 'poly'];
             console.log('poly (default)');
-            var builtin_synth = new Tone.PolySynth(6, Tone.AMSynth);
+            var builtin_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
             break;
         }
 
@@ -577,7 +579,7 @@ function Synth() {
         } else if (sourceName.toLowerCase() === 'duosynth') {
             var tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
-            var tempSynth = new Tone.PolySynth(6, Tone.AMSynth);
+            var tempSynth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
         }
 
         return tempSynth;
