@@ -1380,12 +1380,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     var glideBlock = new ProtoBlock('glide');
     glideBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['glide'] = glideBlock;
-    //.TRANS: glide is a blended overlap successive notes
+    //.TRANS: glide (glissando) is a blended overlap successive notes
     glideBlock.staticLabels.push(_('glide'));
     glideBlock.adjustWidthToLabel();
     glideBlock.flowClampOneArgBlock();
     glideBlock.defaults.push(1 / 16);
-    glideBlock.hidden = true;
 
     // macro
     var slurBlock = new ProtoBlock('slur');
