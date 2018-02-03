@@ -5025,11 +5025,12 @@ function Logo () {
             childFlow = args[1];
             childFlowCount = 1;
 
+            console.log('length of glide ' + that._noteCounter(turtle, childFlow));
+
             var listenerName = '_glide_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                that.staccato[turtle].pop();
                 if (that.justCounting[turtle].length === 0) {
                     that.notationEndSlur(turtle);
                 }
@@ -5105,7 +5106,7 @@ function Logo () {
                     that.noteBeatValues[turtle][saveBlk] = that.tieNoteExtras[turtle][3];
                     that.noteDrums[turtle][saveBlk] = that.tieNoteExtras[turtle][4];
                     // Graphics will have already been rendered.
-                    that.embeddedGraphics[turtle][saveBlk] = []; // that.tieNoteExtras[turtle][5];
+                    that.embeddedGraphics[turtle][saveBlk] = [];
 
                     that._processNote(noteValue, saveBlk, turtle);
 
@@ -6091,11 +6092,11 @@ function Logo () {
 
                     // Give the last note time to play.
                     setTimeout(function () {
-                        if (that.suppressOutput[turtle]&&that.recording) {
+                        if (that.suppressOutput[turtle] && that.recording) {
                             that.suppressOutput[turtle] = false;
                             that.checkingCompletionState = false;
                             that.saveLocally();
-                            that.playback(-1,true);
+                            that.playback(-1, true);
                             that.recording = false;
                         } else {
                             that.suppressOutput[turtle] = false;
@@ -6404,7 +6405,7 @@ function Logo () {
             var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000;
             if (this.drift[turtle] === 0) {
                 // How far behind is this turtle lagging?
-                var turtleLag = elapsedTime - this.turtleTime[turtle];
+                var turtleLag = Math.max(elapsedTime - this.turtleTime[turtle], 0);
             } else {
                 // When we are "drifting", we don't bother with lag.
                 var turtleLag = 0;
@@ -8015,19 +8016,19 @@ function Logo () {
                 break;
             case 'namedarg':
                 var name = that.blocks.blockList[blk].privateData;
-                var action_args = receivedArg;
+                var actionArgs = receivedArg;
 
                 // If an action block with an arg is clicked,
                 // the arg will have no value.
-                if (action_args == null) {
+                if (actionArgs == null) {
                     that.errorMsg('Invalid argument', blk);
                     that.stopTurtle = true;
                     that.blocks.blockList[blk].value = null;
                     return;
                 }
 
-                if (action_args.length >= Number(name)) {
-                    var value = action_args[Number(name)-1];
+                if (actionArgs.length >= Number(name)) {
+                    var value = actionArgs[Number(name)-1];
                     that.blocks.blockList[blk].value = value;
                 } else {
                     that.errorMsg('Invalid argument', blk);
@@ -8866,74 +8867,7 @@ function Logo () {
                 break;
             case 'notecounter':
                 var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk == null) {
-                    that.blocks.blockList[blk].value = 0;
-                } else {
-                    var saveSuppressStatus = that.suppressOutput[turtle];
-
-                    // We need to save the state of the boxes and heap
-                    // although there is a potential of a boxes
-                    // collision with other turtles.
-                    var saveBoxes = JSON.stringify(that.boxes);
-                    var saveTurtleHeaps = JSON.stringify(that.turtleHeaps[turtle]);
-                    // And the turtle state
-                    var saveX = that.turtles.turtleList[turtle].x;
-                    var saveY = that.turtles.turtleList[turtle].y;
-                    var saveColor = that.turtles.turtleList[turtle].color;
-                    var saveValue = that.turtles.turtleList[turtle].value;
-                    var saveChroma = that.turtles.turtleList[turtle].chroma;
-                    var saveStroke = that.turtles.turtleList[turtle].stroke;
-                    var saveCanvasAlpha = that.turtles.turtleList[turtle].canvasAlpha;
-                    var saveOrientation = that.turtles.turtleList[turtle].orientation;
-                    var savePenState = that.turtles.turtleList[turtle].penState;
-
-                    var saveWhichNoteToCount = that.whichNoteToCount[turtle];
-
-                    that.suppressOutput[turtle] = true;
-                    that.justCounting[turtle].push(true);
-
-                    for (var b in that.endOfClampSignals[turtle]) {
-                        that.butNotThese[turtle][b] = [];
-                        for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
-                            that.butNotThese[turtle][b].push(i);
-                        }
-                    }
-
-                    var actionArgs = [];
-                    var saveNoteCount = that.notesPlayed[turtle];
-                    that.turtles.turtleList[turtle].running = true;
-
-                    // FIXME: Test to see if this nests properly.
-                    if (that.inNoteBlock[turtle]) {
-                        that.whichNoteToCount[turtle] += 1;
-                    }
-
-                    that._runFromBlockNow(that, turtle, cblk, true, actionArgs, that.turtles.turtleList[turtle].queue.length);
-                    that.blocks.blockList[blk].value = that.notesPlayed[turtle] - saveNoteCount;
-                    that.notesPlayed[turtle] = saveNoteCount;
-
-                    // Restore previous state
-                    that.boxes = JSON.parse(saveBoxes);
-                    that.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-
-                    that.turtles.turtleList[turtle].doPenUp();
-                    that.turtles.turtleList[turtle].doSetXY(saveX, saveY);
-                    that.turtles.turtleList[turtle].color = saveColor;
-                    that.turtles.turtleList[turtle].value = saveValue;
-                    that.turtles.turtleList[turtle].chroma = saveChroma;
-                    that.turtles.turtleList[turtle].stroke = saveStroke;
-                    that.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
-                    that.turtles.turtleList[turtle].doSetHeading(saveOrientation);
-                    that.turtles.turtleList[turtle].penState = savePenState;
-
-                    that.whichNoteToCount[turtle] = saveWhichNoteToCount;
-
-                    that.justCounting[turtle].pop();
-                    that.suppressOutput[turtle] = saveSuppressStatus;
-
-                    // FIXME: we need to handle cascading.
-                    that.butNotThese[turtle] = {};
-                }
+                that.blocks.blockList[blk].value = that._noteCounter(turtle, cblk);
                 break;
             case 'measureintervalsemitones':
                 var cblk = that.blocks.blockList[blk].connections[1];
@@ -9178,6 +9112,84 @@ function Logo () {
         } else {
             return blk;
         }
+    };
+
+    this._noteCounter = function (turtle, cblk) {
+        if (cblk == null) {
+            return 0;
+        } else {
+            var saveSuppressStatus = this.suppressOutput[turtle];
+
+            // We need to save the state of the boxes and heap
+            // although there is a potential of a boxes collision with
+            // other turtles.
+            var saveBoxes = JSON.stringify(this.boxes);
+            var saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
+            // And the turtle state
+            var saveX = this.turtles.turtleList[turtle].x;
+            var saveY = this.turtles.turtleList[turtle].y;
+            var saveColor = this.turtles.turtleList[turtle].color;
+            var saveValue = this.turtles.turtleList[turtle].value;
+            var saveChroma = this.turtles.turtleList[turtle].chroma;
+            var saveStroke = this.turtles.turtleList[turtle].stroke;
+            var saveCanvasAlpha = this.turtles.turtleList[turtle].canvasAlpha;
+            var saveOrientation = this.turtles.turtleList[turtle].orientation;
+            var savePenState = this.turtles.turtleList[turtle].penState;
+
+            var saveWhichNoteToCount = this.whichNoteToCount[turtle];
+
+            var savePrevTurtleTime = this.previousTurtleTime[turtle];
+            var saveTurtleTime = this.turtleTime[turtle];
+
+            this.suppressOutput[turtle] = true;
+            this.justCounting[turtle].push(true);
+
+            for (var b in this.endOfClampSignals[turtle]) {
+                this.butNotThese[turtle][b] = [];
+                for (var i = 0; i < this.endOfClampSignals[turtle][b].length; i++) {
+                    this.butNotThese[turtle][b].push(i);
+                }
+            }
+
+            var actionArgs = [];
+            var saveNoteCount = this.notesPlayed[turtle];
+            this.turtles.turtleList[turtle].running = true;
+
+            if (this.inNoteBlock[turtle]) {
+                this.whichNoteToCount[turtle] += this.inNoteBlock[turtle].length;
+            }
+
+            this._runFromBlockNow(this, turtle, cblk, true, actionArgs, this.turtles.turtleList[turtle].queue.length);
+
+            var returnValue = this.notesPlayed[turtle] - saveNoteCount;
+            this.notesPlayed[turtle] = saveNoteCount;
+
+            // Restore previous state
+            this.boxes = JSON.parse(saveBoxes);
+            this.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+
+            this.turtles.turtleList[turtle].doPenUp();
+            this.turtles.turtleList[turtle].doSetXY(saveX, saveY);
+            this.turtles.turtleList[turtle].color = saveColor;
+            this.turtles.turtleList[turtle].value = saveValue;
+            this.turtles.turtleList[turtle].chroma = saveChroma;
+            this.turtles.turtleList[turtle].stroke = saveStroke;
+            this.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
+            this.turtles.turtleList[turtle].doSetHeading(saveOrientation);
+            this.turtles.turtleList[turtle].penState = savePenState;
+
+            this.previousTurtleTime[turtle] = savePrevTurtleTime;
+            this.turtleTime[turtle] = saveTurtleTime;
+
+            this.whichNoteToCount[turtle] = saveWhichNoteToCount;
+
+            this.justCounting[turtle].pop();
+            this.suppressOutput[turtle] = saveSuppressStatus;
+
+            this.butNotThese[turtle] = {};
+        }
+
+        return returnValue;
     };
 
     this._doWait = function (turtle, secs) {
