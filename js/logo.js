@@ -5013,13 +5013,7 @@ function Logo () {
             // TODO: Duration should be the sum of all the notes (like
             // in a tie). If we set the synth portamento and use
             // setNote for all but the first note, it should produce a
-            // glissando. But it will not work for polySynth since we
-            // don't know which voice to use and we'll suffer
-            // collisions.
-	    if (['default', 'poly'].indexOf(last(that.instrumentNames[turtle])) !== -1) {
-                that.errorMsg(_('Glide block will not work with the default synth. Please use a simple synth'));
-            }
-
+            // glissando.
             if (args.length > 1) {
                 if (that.blocks.blockList[blk].name === 'glide') {
                     that.glide[turtle].push(args[0]);
@@ -6859,8 +6853,7 @@ function Logo () {
                                         } else if (turtle in that.instrumentNames && last(that.instrumentNames[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
                                                 // If we are in a glide, use setNote after the first note.
-                                                // Glide does not work with polySynth.
-                                                if (['default', 'poly'].indexOf(last(that.instrumentNames[turtle])) === -1 && that.glide[turtle].length > 0) {
+                                                if (that.glide[turtle].length > 0) {
                                                     if (that.glideOverride[turtle] === 0) {
 							console.log('glide note ' + beatValue);
                                                         that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, true);

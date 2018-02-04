@@ -710,7 +710,7 @@ function Synth() {
                     // Depending on the synth, the oscillator is found
                     // somewhere else in the synth obj.
                     if (synth.oscillator != undefined) {
-			synth.portamento = paramsEffects.portamento;
+                        synth.portamento = paramsEffects.portamento;
                     } else if (synth.voices != undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].portamento = paramsEffects.portamento;
@@ -743,10 +743,18 @@ function Synth() {
 
             if (!paramsEffects.doNeighbor) {
                 if (setNote != undefined && setNote) {
-                    synth.setNote(notes);
-		} else {
+                    if (synth.oscillator != undefined) {
+                        synth.setNote(notes);
+                    } else if (synth.voices != undefined) {
+                        for (i = 0; i < synth.voices.length; i++) {
+                            synth.voices[i].setNote(notes);
+                        }
+                    } else {
+                        console.log('cannot find oscillator to setNote');
+                    }
+                } else {
                     synth.triggerAttackRelease(notes, beatValue);
-		}
+                }
             }
 
             setTimeout(function () {
@@ -852,7 +860,7 @@ function Synth() {
             this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters, setNote);
             break;
         case 4:
-	    tempSynth.triggerAttackRelease(beatValue);
+            tempSynth.triggerAttackRelease(beatValue);
             break;
         case 0:  // default synth
         default:
