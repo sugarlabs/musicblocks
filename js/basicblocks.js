@@ -1250,7 +1250,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     duoSynthBlock.dockTypes[1] = 'numberin';
     duoSynthBlock.dockTypes[2] = 'numberin';
 
-    // macro
     var partialBlock = new ProtoBlock('partial');
     partialBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['partial'] = partialBlock;
@@ -1269,6 +1268,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     harmonicBlock.adjustWidthToLabel();
     harmonicBlock.flowClampZeroArgBlock();
 
+    // macro
     var harmonic2Block = new ProtoBlock('harmonic2');
     harmonic2Block.palette = palettes.dict['tone'];
     blocks.protoBlockDict['harmonic2'] = harmonic2Block;
@@ -1385,6 +1385,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     glideBlock.adjustWidthToLabel();
     glideBlock.flowClampOneArgBlock();
     glideBlock.defaults.push(1 / 16);
+    glideBlock.hidden = true;
 
     // macro
     var slurBlock = new ProtoBlock('slur');
