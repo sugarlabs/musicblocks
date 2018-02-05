@@ -975,6 +975,9 @@ function Logo () {
             }
         }
 
+        this.notationStaging = {};
+        this.notationDrumStaging = {};
+
         // Each turtle needs to keep its own wait time and music
         // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -1081,6 +1084,8 @@ function Logo () {
             this.currentMeasure[turtle] = 0;
             this.justCounting[turtle] = [];
             this.justMeasuring[turtle] = [];
+            this.notationStaging[turtle] = [];
+            this.notationDrumStaging[turtle] = [];
             this.pickupPoint[turtle] = null;
             this.firstPitch[turtle] = [];
             this.lastPitch[turtle] = [];
@@ -6843,7 +6848,7 @@ function Logo () {
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             if (!that.suppressOutput[turtle]) {
-						console.log(that.glide[turtle].length);
+                                                console.log(that.glide[turtle].length);
                                                 that.synth.trigger(turtle, notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null, false);
                                             }
 
@@ -6855,7 +6860,7 @@ function Logo () {
                                                 // If we are in a glide, use setNote after the first note.
                                                 if (that.glide[turtle].length > 0) {
                                                     if (that.glideOverride[turtle] === 0) {
-							console.log('glide note ' + beatValue);
+                                                        console.log('glide note ' + beatValue);
                                                         that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, true);
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
@@ -6875,7 +6880,7 @@ function Logo () {
                                             }
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
-						console.log(that.glide[turtle].length);
+                                                console.log(that.glide[turtle].length);
                                                 that.synth.trigger(turtle, notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null, false);
                                             }
 

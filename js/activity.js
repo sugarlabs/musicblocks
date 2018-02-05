@@ -387,6 +387,7 @@ define(MYDEFINES, function (compatibility) {
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
                 logo.notationStaging[turtle] = [];
+                logo.notationDrumStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true, true);
             }
 
@@ -2423,6 +2424,7 @@ define(MYDEFINES, function (compatibility) {
                 logo.notationNotes = {};
                 for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                     logo.notationStaging[turtle] = [];
+                    logo.notationDrumStaging[turtle] = [];
                     turtles.turtleList[turtle].doClear(true, true, true);
                 }
 
@@ -2452,6 +2454,7 @@ define(MYDEFINES, function (compatibility) {
             logo.notationNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.notationStaging[turtle] = [];
+                logo.notationDrumStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true, true);
             }
             logo.runLogoCommands();
@@ -2737,6 +2740,7 @@ define(MYDEFINES, function (compatibility) {
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             logo.turtleHeaps[turtle] = [];
                             logo.notationStaging[turtle] = [];
+                            logo.notationDrumStaging[turtle] = [];
                             turtles.turtleList[turtle].doClear(true, true, false);
                         }
                     }, 1000);
@@ -2747,6 +2751,7 @@ define(MYDEFINES, function (compatibility) {
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             logo.turtleHeaps[turtle] = [];
                             logo.notationStaging[turtle] = [];
+                            logo.notationDrumStaging[turtle] = [];
                             turtles.turtleList[turtle].doClear(true, true, false);
                         }
                     }, 1000);
