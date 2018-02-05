@@ -6870,7 +6870,6 @@ function Logo () {
                                                         that.glideOverride[turtle] = 0;
                                                     }
                                                 } else {
-                                                    console.log(beatValue);
                                                     that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, false);
                                                 }
                                             }
@@ -9428,14 +9427,6 @@ function Logo () {
 
     this.updateNotation = function (note, duration, turtle, insideChord, drum) {
         var obj = durationToNoteValue(duration);
-        if (!(turtle in this.notationStaging)) {
-            this.notationStaging[turtle] = [];
-        }
-
-        if (!(turtle in this.notationDrumStaging)) {
-            this.notationDrumStaging[turtle] = [];
-        }
-
         // Deprecated
         if (this.turtles.turtleList[turtle].drum) {
             note = "c'";
@@ -9443,7 +9434,7 @@ function Logo () {
 
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
 
-        // If no drum is specified, as a rest to the drum
+        // If no drum is specified, add a rest to the drum
         // line. Otherwise, add the drum.
         if (drum === '') {
             this.notationDrumStaging[turtle].push(['R', obj[0], obj[1], obj[2], obj[3], insideChord, false]);
@@ -9473,11 +9464,6 @@ function Logo () {
     };
 
     this.notationVoices = function (turtle, arg) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         switch(arg) {
         case 1:
             this.notationStaging[turtle].push('voice one');
@@ -9500,11 +9486,6 @@ function Logo () {
     }
 
     this.notationMarkup = function (turtle, markup, below) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         if (below) {
             this.notationStaging[turtle].push('markdown', markup);
         } else {
@@ -9515,21 +9496,11 @@ function Logo () {
     };
 
     this.notationKey = function (turtle, key, mode) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         this.notationStaging[turtle].push('key', key, mode);
         this.pickupPoint[turtle] = null;
     };
 
     this.notationMeter = function (turtle, count, value) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         if (this.pickupPoint[turtle] != null) {
             // Lilypond prefers meter to be before partials.
             var d = this.notationStaging[turtle].length - this.pickupPoint[turtle];
@@ -9552,11 +9523,6 @@ function Logo () {
     };
 
     this.notationPickup = function (turtle, factor) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         if (factor === 0) {
             console.log('ignoring partial of 0');
             return;
@@ -9658,31 +9624,16 @@ function Logo () {
     };
 
     this.notationHarmonic = function (turtle) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         this.notationStaging.push('harmonic');
         this.pickupPoint[turtle] = null;
     };
 
     this.notationLineBreak = function (turtle) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         // this.notationStaging[turtle].push('break');
         this.pickupPoint[turtle] = null;
     };
 
     this.notationBeginArticulation = function (turtle) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         this.notationStaging[turtle].push('begin articulation');
         this.pickupPoint[turtle] = null;
     };
@@ -9693,11 +9644,6 @@ function Logo () {
     };
 
     this.notationBeginCrescendo = function (turtle, factor) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         if (factor > 0) {
             this.notationStaging[turtle].push('begin crescendo');
         } else {
@@ -9718,11 +9664,6 @@ function Logo () {
     };
 
     this.notationBeginSlur = function (turtle) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         this.notationStaging[turtle].push('begin slur');
         this.pickupPoint[turtle] = null;
     };
@@ -9733,11 +9674,6 @@ function Logo () {
     };
 
     this.notationInsertTie = function (turtle) {
-        if (this.notationStaging[turtle] == undefined) {
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-        }
-
         this.notationStaging[turtle].push('tie');
         this.pickupPoint[turtle] = null;
     };
