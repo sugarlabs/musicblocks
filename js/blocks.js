@@ -2532,9 +2532,10 @@ function Blocks () {
     };
 
     this.renameBoxes = function (oldName, newName) {
-        if (oldName === newName) {
+        if (oldName === newName || oldName === _('box')) {
             return;
         }
+
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === 'text') {
                 var c = this.blockList[blk].connections[0];
@@ -2553,8 +2554,31 @@ function Blocks () {
         }
     };
 
+    this.renameStoreinBoxes = function (oldName, newName) {
+        if (oldName === newName || oldName === _('box')) {
+            return;
+        }
+
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'text') {
+                var c = this.blockList[blk].connections[0];
+                if (c != null && this.blockList[c].name === 'storein') {
+                    if (this.blockList[blk].value === oldName) {
+                        this.blockList[blk].value = newName;
+                        this.blockList[blk].text.text = newName;
+                        try {
+                            this.blockList[blk].container.updateCache();
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     this.renameNamedboxes = function (oldName, newName) {
-        if (oldName === newName) {
+        if (oldName === newName || oldName === _('box')) {
             return;
         }
 
@@ -2572,25 +2596,6 @@ function Blocks () {
                     }
                 }
             }
-        }
-
-        // Update the palette
-        var blockPalette = this.palettes.dict['boxes'];
-        var nameChanged = false;
-        for (var blockId = 0; blockId < blockPalette.protoList.length; blockId++) {
-            var block = blockPalette.protoList[blockId];
-            if (block.name === 'namedbox' && block.defaults[0] !== _('box') && block.defaults[0] === oldName) {
-                // console.log('renaming ' + block.defaults[0] + ' to ' + newName);
-                block.defaults[0] = newName;
-                nameChanged = true;
-            }
-        }
-
-        // Force an update if the name has changed.
-        if (nameChanged) {
-            this.palettes.hide();
-            this.palettes.updatePalettes('boxes');
-            this.palettes.show();
         }
     };
 

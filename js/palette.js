@@ -401,7 +401,8 @@ function Palettes () {
             var myPalettes = this;
             setTimeout(function () {
                 myPalettes.dict[showPalette]._resetLayout();
-                // Show the action palette after adding/deleting new nameddo blocks.
+                // Show the action palette after adding/deleting new
+                // nameddo blocks.
                 myPalettes.dict[showPalette].showMenu();
                 myPalettes.dict[showPalette]._showMenuItems();
                 myPalettes.refreshCanvas();
@@ -1530,7 +1531,6 @@ function Palette(palettes, name) {
 
     this.remove = function (protoblock, name) {
         // Remove the protoblock and its associated artwork container.
-        // console.log('removing action ' + name);
         var i = this.protoList.indexOf(protoblock);
         if (i !== -1) {
             this.protoList.splice(i, 1);
@@ -1540,8 +1540,12 @@ function Palette(palettes, name) {
             if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.model.blocks[i].blkname) !== -1 && this.model.blocks[i].modname === name) {
                 this.model.blocks.splice(i, 1);
                 break;
+            } else if (['storein'].indexOf(this.model.blocks[i].blkname) !== -1 && this.model.blocks[i].modname === _('store in') + ' ' + name) {
+                this.model.blocks.splice(i, 1);
+                break;
             }
         }
+
         this.palettes.stage.removeChild(this.protoContainers[name]);
         delete this.protoContainers[name];
     };

@@ -2139,7 +2139,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                     else {
                         if (block.name === 'nameddo' && block.defaults[0] === oldValue) {
-                            blockPalette.remove(block,oldValue);
+                            blockPalette.remove(block, oldValue);
                         }
                     }
                 }
@@ -2157,12 +2157,15 @@ function Block(protoblock, blocks, overrideName) {
                 // If the label was the name of a storein, update the
                 // associated box this.blocks and the palette buttons.
                 if (this.value !== 'box') {
-                    this.blocks.newStoreinBlock(this.value);
                     this.blocks.newNamedboxBlock(this.value);
+                    this.blocks.newStoreinBlock(this.value);
                 }
+
                 // Rename both box <- name and namedbox blocks.
+                this.blocks.renameStoreinBoxes(oldValue, newValue);
                 this.blocks.renameBoxes(oldValue, newValue);
                 this.blocks.renameNamedboxes(oldValue, newValue);
+
                 this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('boxes');
                 this.blocks.palettes.show();
