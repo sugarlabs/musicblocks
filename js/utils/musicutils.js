@@ -30,6 +30,8 @@ const SIXTYFOURTHNOTE = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.
 // is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
 const SHARP = '♯';
 const FLAT = '♭';
+const DOUBLESHARP = '𝄪';
+const DOUBLEFLAT = '𝄫';
 const BTOFLAT = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
 const STOSHARP = {'E#': 'E♯', 'G#': 'G♯', 'A#': 'A♯', 'B#': 'B♯', 'D#': 'D♯', 'C#': 'C♯', 'F#': 'F♯', 'e#': 'E♯', 'g#': 'G♯', 'a#': 'A♯', 'b#': 'B♯', 'd#': 'D♯', 'c#': 'C♯', 'f#': 'F♯'};
 const NOTESSHARP = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
@@ -61,7 +63,7 @@ const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
 // const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut']; //the "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
 // const IROHASOLFNOTES = ['ro', 'i', 'to', 'he', 'ho', 'ni', 'ha']; //https://en.wikipedia.org/wiki/Iroha
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
-const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+const SOLFATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
 
 
 function getSharpFlatPreference (keySignature) {
@@ -1314,11 +1316,15 @@ function pitchToNumber(pitch, octave, keySignature) {
     if (len > 1) {
         if (len > 2) {
             var lastTwo = pitch.slice(len - 2);
-            if (lastTwo === 'bb' || lastTwo === '♭♭') {
+            var lastOne=pitch.slice(len-1);
+            if (lastTwo === 'bb') {
                 pitch = pitch.slice(0, len - 2);
                 transposition -= 2;
-            } else if (lastTwo === '##' || lastTwo === '♯♯') {
-                pitch = pitch.slice(0, len - 2);
+            } else if (lastOne === '𝄫') {
+                pitch = pitch.slice(0, len - 1);
+                transposition -= 2;
+            } else if (lastTwo === '*' || lastTwo === '𝄪') {
+                pitch = pitch.slice(0, len - 1);
                 transposition += 2;
             } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
                 // Not sure this could occur... but just in case.
@@ -1403,14 +1409,14 @@ function splitSolfege(value) {
             if (value.length === 4) {
                 var attr = value[3];
             } else {
-                var attr = value[3] + value[3];
+                var attr = value[3] + value[4];
             }
         } else {
             var note = value.slice(0, 2);
             if (value.length === 3) {
                 var attr = value[2];
             } else {
-                var attr = value[2] + value[2];
+                var attr = value[2] + value[3];
             }
         }
     } else {
@@ -1437,9 +1443,9 @@ function getNumber(notename, octave) {
         num += NOTESTEP[notename.substring(0, 1)];
         if (notename.length >= 1) {
             var delta = notename.substring(1);
-            if (delta === 'bb' || delta === '♭♭') {
+            if (delta === 'bb' || delta === '𝄫') {
                 num -= 2;
-            } else if (delta === '##' || delta === '♯♯') {
+            } else if (delta === '*' || delta === '𝄪') {
                 num += 2;
             } else if (delta === 'b' || delta === '♭') {
                 num -= 1;
@@ -1569,10 +1575,14 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
     var len = noteArg.length;
     if (len > 2) {
         var lastTwo = noteArg.slice(len - 2);
-        if (lastTwo === 'bb' || lastTwo === '♭♭') {
+        var lastOne = noteArg.slice(len-1);
+        if (lastTwo === 'bb') {
             noteArg = noteArg.slice(0, len - 1);
             transposition -= 1;
-        } else if (lastTwo === '##' || lastTwo === '♯♯') {
+        } else if (lastOne === '𝄫') {
+            noteArg = noteArg.slice(0, len - 1);
+            transposition -= 1;
+        } else if (lastTwo === '*' || lastTwo === '𝄪') {
             noteArg = noteArg.slice(0, len - 1);
             transposition += 1;
         } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
