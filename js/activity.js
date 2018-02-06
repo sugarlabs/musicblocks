@@ -50,14 +50,31 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     };
 }
 
-var lang = document.webL10n.getLanguage();
-if (lang.indexOf('-') !== -1) {
-    lang = lang.slice(0, lang.indexOf("-"));
-    document.webL10n.setLanguage(lang);
+try{
+    console.log(localStorage.languagePreference);
+
+    if (localStorage.languagePreference) {
+        console.log('setting language from local storage');
+        try {
+            lang = localStorage.languagePreference;
+            document.webL10n.setLanguage(lang);
+        } catch (e) {
+            console.log(e);
+        }
+    } else {
+        var lang = document.webL10n.getLanguage();
+        if (lang.indexOf('-') !== -1) {
+            lang = lang.slice(0, lang.indexOf('-'));
+            document.webL10n.setLanguage(lang);
+        }
+    }
+} catch (e) {
+    console.log(e);
 }
 
+
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'prefixfree.min'];
+    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
     MYDEFINES = MYDEFINES
 } else {
     var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'prefixfree.min'];
@@ -124,6 +141,7 @@ define(MYDEFINES, function (compatibility) {
         var logo;
         var clearBox;
         var utilityBox;
+        var languageBox = null;
         var playbackBox = null;
         var thumbnails;
         var buttonsVisible = true;
@@ -347,7 +365,7 @@ define(MYDEFINES, function (compatibility) {
                             svg += parts[p] + '><';
                         }
                     }
-		} else {
+                } else {
                     for (var p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -899,6 +917,13 @@ define(MYDEFINES, function (compatibility) {
                 saveBox.setSaveFB(doShareOnFacebook);
             }
 
+            languageBox = new LanguageBox();
+            languageBox
+                .setCanvas(canvas)
+                .setStage(stage)
+                .setMessage(errorMsg)
+                .setRefreshCanvas(refreshCanvas);
+
             utilityBox = new UtilityBox();
             utilityBox
                 .setStage(stage)
@@ -909,7 +934,8 @@ define(MYDEFINES, function (compatibility) {
                 .deletePlugins(deletePlugin)
                 .setStats(doAnalytics)
                 .setSearch(showSearchWidget, hideSearchWidget)
-                .setScroller(toggleScroller);
+                .setScroller(toggleScroller)
+                .setLanguage(doLanguageBox, languageBox);
 
             playbackBox = new PlaybackBox();
             playbackBox
@@ -2054,6 +2080,11 @@ define(MYDEFINES, function (compatibility) {
         function _deleteBlocksBox() {
             clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
             clearBox.show();
+        };
+
+        function doLanguageBox() {
+            languageBox.createBox(turtleBlocksScale, saveButton.x - 27, saveButton.y - 55);
+            languageBox.show();
         };
 
         function _doUtilityBox() {
