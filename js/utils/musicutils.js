@@ -409,10 +409,10 @@ function getIntervalName(name) {
 function getIntervalNumber(name) {
     for (var interval in INTERVALNAMES) {
         if (INTERVALNAMES[interval][0] === name) {
-	    return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
-	} else if (INTERVALNAMES[interval][1] === name) {
-	    return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
-	}
+            return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
+        } else if (INTERVALNAMES[interval][1] === name) {
+            return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
+        }
     }
 
     console.log(name + ' not found in INTERVALNAMES');
@@ -423,10 +423,10 @@ function getIntervalNumber(name) {
 function getIntervalDirection(name) {
     for (var interval in INTERVALNAMES) {
         if (INTERVALNAMES[interval][0] === name) {
-	    return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
-	} else if (INTERVALNAMES[interval][1] === name) {
-	    return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
-	}
+            return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
+        } else if (INTERVALNAMES[interval][1] === name) {
+            return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
+        }
     }
 
     console.log(name + ' not found in INTERVALNAMES');
@@ -868,7 +868,7 @@ function _getStepSize(keySignature, pitch, direction) {
         while (scale.indexOf(thisPitch) === -1) {
             var i = PITCHES.indexOf(thisPitch);
             if (i === -1) {
-		i = PITCHES2.indexOf(thisPitch);
+                i = PITCHES2.indexOf(thisPitch);
             }
 
             if (direction === 'up') {
@@ -894,7 +894,7 @@ function _getStepSize(keySignature, pitch, direction) {
         while (scale.indexOf(thisPitch) === -1) {
             var i = PITCHES2.indexOf(thisPitch);
             if (i === -1) {
-		i = PITCHES.indexOf(thisPitch);
+                i = PITCHES.indexOf(thisPitch);
             }
 
             if (direction === 'up') {
@@ -1445,7 +1445,7 @@ function getNumber(notename, octave) {
             var delta = notename.substring(1);
             if (delta === 'bb' || delta === '𝄫') {
                 num -= 2;
-            } else if (delta === '*' || delta === '𝄪') {
+            } else if (delta === '##' || delta === '*' || delta === '𝄪') {
                 num += 2;
             } else if (delta === 'b' || delta === '♭') {
                 num -= 1;
@@ -1571,24 +1571,38 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
         noteArg = noteArg.toString();
     }
 
-    // Check for double flat or double sharp.
-    var len = noteArg.length;
-    if (len > 2) {
-        var lastTwo = noteArg.slice(len - 2);
-        var lastOne = noteArg.slice(len-1);
-        if (lastTwo === 'bb') {
-            noteArg = noteArg.slice(0, len - 1);
-            transposition -= 1;
-        } else if (lastOne === '𝄫') {
-            noteArg = noteArg.slice(0, len - 1);
-            transposition -= 1;
-        } else if (lastTwo === '*' || lastTwo === '𝄪') {
-            noteArg = noteArg.slice(0, len - 1);
-            transposition += 1;
-        } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
-            // Not sure this could occur... but just in case.
-            noteArg = noteArg.slice(0, len - 2);
-        }
+    // Check for double flat or double sharp. Since 𝄫 and 𝄪 behave
+    // funny with string operations, we jump through some hoops.
+    var articulation = noteArg.replace('do', '').replace('re', '').replace('mi', '').replace('fa', '').replace('sol', '').replace('la', '').replace('ti', '').replace('A', '').replace('B', '').replace('C', '').replace('D', '').replace('E', '').replace('F', '').replace('G', '');
+
+    noteArg = noteArg.replace(articulation, '');
+
+    switch(articulation) {
+    case 'bb':
+    case '𝄫':
+        noteArg += 'b';
+        transposition -= 1;
+        break;
+    case 'b':
+    case '♭':
+        noteArg += 'b';
+        break;
+    case '##':
+    case '*':
+    case '𝄪':
+        noteArg += '#';
+        transposition += 1;
+        break;
+    case '#':
+    case '♯':
+        noteArg += '#';
+        break;
+    case 'b#':
+    case '#b':
+    case '♭♯':
+    case '♯♭':
+    default:
+        break;
     }
 
     // Already a note? No need to convert from solfege.
@@ -1702,7 +1716,7 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
             } else if (index < 0) {
                 index += 12;
                 octave -= 1;
-	    }
+            }
 
             var note = thisScale[index];
         } else {
