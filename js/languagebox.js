@@ -53,12 +53,35 @@ function LanguageBox () {
     };
 
     this._hide = function () {
+        const MSG = {
+	    'default': _('Refresh your browser to change your language preference.'),
+            'en': 'Refresh your browser to change your language preference.',
+	    'ja': 'ブラウザをリフレッシュして、言語設定を変更してください。',
+            'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
+            'zh-CN': '刷新浏览器以更改您的语言偏好',
+            'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
+            'hi': 'अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें',
+            'ibo': 'Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.',
+            'ar': 'حدث المتصفح لتغيير تفضيلات اللغة.',
+            'he': 'רענן את הדפדפן כדי לשנות את העדפת השפה שלך.',
+	};
+
+        var language = localStorage.languagePreference;
+        if (language == undefined || language === '' || language === 'en-US'  || language === 'en-US') {
+            language = 'en';
+        }
+
         if (this._container != null) {
             this._container.visible = false;
             var myDiv = docById('languageDiv');
             myDiv.style.display = 'none';
             myDiv.style.visibility = 'hidden';
-            this._message(_('Refresh your web browser to change your language preference.'));
+	    if (language in MSG) {
+		this._message(MSG[language]);
+	    } else {
+		this._message('default');
+	    }
+
             this._refreshCanvas();
         }
     };
@@ -96,7 +119,9 @@ function LanguageBox () {
 	    ['ภาษาไทย', 'th'],
 	    ['aymara', 'ayc'],
 	    ['हिंदी', 'hi'],
+            ['igbo', 'ibo'],
             ['عربى', 'ar'],
+            ['עִברִית', 'he'],
         ];
 
         var myDiv = docById('languageDiv');
