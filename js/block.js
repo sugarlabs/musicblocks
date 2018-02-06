@@ -1667,7 +1667,7 @@ function Block(protoblock, blocks, overrideName) {
         } else if (this.name === 'notename') {
             var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
-            const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+            const NOTEATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
             if (this.value != null) {
                 var selectednote = this.value[0];
                 if (this.value.length === 1) {
@@ -1675,7 +1675,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (this.value.length === 2) {
                     var selectedattr = this.value[1];
                 } else {
-                    var selectedattr = this.value[1] + this.value[1];
+                    var selectedattr = this.value[1] + this.value[2];
                 }
             } else {
                 var selectednote = 'G';
@@ -2019,9 +2019,9 @@ function Block(protoblock, blocks, overrideName) {
         if (this.labelattr != null) {
             var attrValue = this.labelattr.value;
             switch (attrValue) {
-            case '♯♯':
+            case '𝄪':
             case '♯':
-            case '♭♭':
+            case '𝄫':
             case '♭':
                 newValue = newValue + attrValue;
                 break;
