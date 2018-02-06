@@ -98,6 +98,12 @@ processLilypondNotes = function (logo, turtle) {
             case 'end slur':
                 logo.notationNotes[turtle] += ') ';
                 break;
+            case 'begin harmonics':
+                logo.notationNotes[turtle] += '\\harmonicsOn ';
+                break;
+            case 'end harmonics':
+                logo.notationNotes[turtle] += '\\harmonicsOff ';
+                break;
             case 'tie':
                 logo.notationNotes[turtle] += '~';
                 break;

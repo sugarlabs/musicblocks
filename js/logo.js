@@ -4835,6 +4835,7 @@ function Logo () {
             }
 
             that.partials[turtle][n].push(1);
+            that.notationBeginHarmonics(turtle);
 
             childFlow = args[1];
             childFlowCount = 1;
@@ -4845,6 +4846,7 @@ function Logo () {
             var __listener = function (event) {
                 that.inHarmonic[turtle].pop();
                 that.partials[turtle].pop();
+        	that.notationEndHarmonics(turtle);
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -9680,6 +9682,16 @@ function Logo () {
 
     this.notationRemoveTie = function (turtle) {
         this.notationStaging[turtle].pop();
+        this.pickupPoint[turtle] = null;
+    };
+
+    this.notationBeginHarmonics = function (turtle) {
+        this.notationStaging[turtle].push('begin harmonics');
+        this.pickupPoint[turtle] = null;
+    };
+
+    this.notationEndHarmonics = function (turtle) {
+        this.notationStaging[turtle].push('end harmonics');
         this.pickupPoint[turtle] = null;
     };
 };
