@@ -1386,6 +1386,7 @@ function PitchTimeMatrix () {
             } else { // the previous note block
                 newStack[endOfStackIdx][4][n - 1] = idx;
             }
+
             var endOfStackIdx = idx;
 
             // Add a vspace to prevent divide block from obscuring the pitch block.
@@ -1399,7 +1400,7 @@ function PitchTimeMatrix () {
                 var obj = toFraction(note[1]);
                 newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 4, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
-           } else {
+            } else {
                 newStack.push([idx + 3, ['number', {'value': 1}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 4, ['number', {'value': note[1]}], 0, 0, [idx + 2]]);
             }
@@ -1418,6 +1419,7 @@ function PitchTimeMatrix () {
                 } else {
                     var previousBlock = idx;  // Note block
                 }
+
                 delta -= 2;
                 var thisBlock = idx + delta;
                 newStack.push([thisBlock + 1, 'rest2', 0, 0, [previousBlock, lastConnection]]);
@@ -1520,23 +1522,39 @@ function PitchTimeMatrix () {
                             var lastConnection = thisBlock + 3;
                         }
 
-                        newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                        if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
-                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
+                        if (note[0][j][1] === '♯') {
+                            newStack.push([thisBlock, 'sharp', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 4]]);
+                            newStack.push([thisBlock + 1, 'pitch', 0, 0, [thisBlock, thisBlock + 2, thisBlock + 3, null]]);
+                            newStack.push([thisBlock + 2, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 1]]);
+                            newStack.push([thisBlock + 3, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 1]]);
+                            if (lastConnection != null) {
+                                lastConnection += 2;
+                            }
+                            newStack.push([thisBlock + 4, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                            previousBlock = thisBlock + 4;
+                            thisBlock += 5;
+                        } else if (note[0][j][1] === '♭') {
+                            newStack.push([thisBlock, 'flat', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 4]]);
+                            newStack.push([thisBlock + 1, 'pitch', 0, 0, [thisBlock, thisBlock + 2, thisBlock + 3, null]]);
+                            newStack.push([thisBlock + 2, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 1]]);
+                            newStack.push([thisBlock + 3, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 1]]);
+                            if (lastConnection != null) {
+                                lastConnection += 2;
+                            }
+                            newStack.push([thisBlock + 4, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                            previousBlock = thisBlock + 4;
+                            thisBlock += 5;
                         } else {
+                            newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
                             newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
                             newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
+                            previousBlock = thisBlock;
+                            thisBlock += 3;
                         }
-
-                        thisBlock += 3;
-                        previousBlock = thisBlock - 3;
                     }
                 }
             }
         }
-
-
 
         // Create a new stack for the chunk.
         console.log(newStack);
