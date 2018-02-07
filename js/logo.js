@@ -2991,6 +2991,11 @@ function Logo () {
 
             var __listener = function (event) {
                 MUSICALMODES[modeName] = [];
+                if (that.defineMode[turtle].indexOf(0) === -1) {
+                    that.defineMode[turtle].push(0);
+                    console.log('adding missing pitch number 0');
+                }
+
                 var pitchNumbers = that.defineMode[turtle].sort(
 		    function(a, b) {
 			return a[0] - b[0];
@@ -3014,7 +3019,8 @@ function Logo () {
                     }
 		}
 
-                that.inDefineMode = false;
+                console.log(MUSICALMODES[modeName]);
+                that.inDefineMode[turtle] = false;
             };
 
             that._setListener(turtle, listenerName, __listener);
