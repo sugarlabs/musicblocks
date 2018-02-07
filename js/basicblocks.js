@@ -203,12 +203,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     numberToOctaveBlock.defaults.push(48);
 
     // Value blocks
-    var modenameBlock = new ProtoBlock('modename');
-    modenameBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['modename'] = modenameBlock;
-    modenameBlock.valueBlock();
-    modenameBlock.dockTypes[0] = 'textout';
-
     var accidentalnameBlock = new ProtoBlock('accidentalname');
     accidentalnameBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['accidentalname'] = accidentalnameBlock;
@@ -1473,6 +1467,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.defaults.push(_('custom'));
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
+    var modenameBlock = new ProtoBlock('modename');
+    modenameBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['modename'] = modenameBlock;
+    modenameBlock.valueBlock();
+    modenameBlock.dockTypes[0] = 'textout';
 
     var doublyBlock = new ProtoBlock('doubly');
     doublyBlock.palette = palettes.dict['intervals'];
@@ -1858,6 +1857,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
     intervalBlock.hidden = true;
+
+    // macro
+    var defineModeBlock = new ProtoBlock('definemode');
+    defineModeBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['definemode'] = defineModeBlock;
+    //.TRANS: define a custom mode
+    defineModeBlock.staticLabels.push(_('define mode'));
+    defineModeBlock.adjustWidthToLabel();
+    defineModeBlock.flowClampOneArgBlock();
+    defineModeBlock.defaults.push(_('custom'));
 
     // macro
     var movableBlock = new ProtoBlock('movable');  // legacy typo

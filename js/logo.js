@@ -184,6 +184,8 @@ function Logo () {
     this.inNeighbor = [];
     this.neighborStepPitch = {};
     this.neighborNoteValue = {};
+    this.inDefineMode = {};
+    this.defineMode = {};
 
     // parameters used in time signature
     this.pickup = {};
@@ -1072,6 +1074,8 @@ function Logo () {
             this.neighborArgNote2[turtle] = [];
             this.neighborArgBeat[turtle] = [];
             this.neighborArgCurrentBeat[turtle] = [];
+            this.inDefineMode[turtle] = false;
+            this.defineMode[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.pickup[turtle] = 0;
             this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
@@ -2973,6 +2977,54 @@ function Logo () {
                 }
             }
             break;
+        case 'definemode':
+            that.inDefineMode[turtle] = true;
+            that.defineMode[turtle] = [];
+
+            var modeName = args[0].toLowerCase();
+
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_definemode_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                MUSICALMODES[modeName] = [];
+                if (that.defineMode[turtle].indexOf(0) === -1) {
+                    that.defineMode[turtle].push(0);
+                    console.log('adding missing pitch number 0');
+                }
+
+                var pitchNumbers = that.defineMode[turtle].sort(
+		    function(a, b) {
+			return a[0] - b[0];
+		    });
+
+                for (var i = 0; i < pitchNumbers.length; i++) {
+                    if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
+                        console.log('ignoring pitch number ' + pitchNumbers[i]);
+                        continue;
+                    }
+
+                    if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
+                        console.log('ignoring duplicate pitch number ' + pitchNumbers[i]);
+                        continue;
+                    }
+
+                    if (i < pitchNumbers.length - 1) {
+                        MUSICALMODES[modeName].push(pitchNumbers[i + 1] - pitchNumbers[i]);
+                    } else {
+                        MUSICALMODES[modeName].push(12 - pitchNumbers[i]);
+                    }
+		}
+
+                console.log(MUSICALMODES[modeName]);
+                that.inDefineMode[turtle] = false;
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
         case 'rhythmruler2':
         case 'rhythmruler':
             if (that.blocks.blockList[blk].name === 'rhythmruler') {
@@ -3804,12 +3856,18 @@ function Logo () {
                     break;
                 }
 
-                // In number to pitch we assume A0 == 0. Here we
-                // assume that C4 == 0, so we need an offset of 39.
-                var obj = numberToPitch(Math.floor(args[0] + that.pitchNumberOffset[turtle]));
-                note = obj[0];
-                octave = obj[1];
-                cents = 0;
+                if (that.inDefineMode[turtle]) {
+                    that.defineMode[turtle].push(Math.floor(args[0]));
+                    break;
+                } else {
+                    // In number to pitch we assume A0 == 0. Here we
+                    // assume that C4 == 0, so we need an offset of 39.
+                    var obj = numberToPitch(Math.floor(args[0] + that.pitchNumberOffset[turtle]));
+
+                    note = obj[0];
+                    octave = obj[1];
+                    cents = 0;
+                }
             } else {
                 if (args.length !== 2 || args[0] == null || args[1] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);

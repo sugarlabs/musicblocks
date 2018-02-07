@@ -847,5 +847,40 @@ function ModeWidget() {
         // Create a new stack for the chunk.
         console.log(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
+
+        // And save a stack of pitchnumbers to be used with the define mode
+        var newStack = [[0, 'definemode', 150, 120, [null, 1, 3, 2]], [1, ['modename', {'value': modeName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+        var endOfStackIdx = 0;
+        var previousBlock = 0;
+
+        var modeLength = this._calculateMode().length;
+        var p = 0;
+
+        for (var i = 0; i < 12; i++) {
+            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+            if (cell.style.backgroundColor !== 'black') {
+		continue;
+	    }
+
+            p += 1;
+            var idx = newStack.length;
+
+            if (p === modeLength) {
+		newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, null]]);
+	    } else {
+		newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, idx + 2]]);
+	    }
+
+            newStack.push([idx + 1, ['number', {'value': i}], 0, 0, [idx]]);
+            var previousBlock = idx;
+        }
+
+        // Create a new stack for the chunk.
+        console.log(newStack);
+        var that = this;
+        setTimeout(function() {
+            that._logo.blocks.palettes.hide();
+            that._logo.blocks.loadNewBlocks(newStack);
+        }, 2000);
     };
 };
