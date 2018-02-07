@@ -220,6 +220,7 @@ var urlsToCache = [
     'js/clearbox.js',
     'js/palette.js',
     'js/playbackbox.js',
+    'js/languagebox.js',
     'js/sugarizer-compatibility.js',
 
     'js/widgets/pitchdrummatrix.js',

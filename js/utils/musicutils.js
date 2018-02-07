@@ -122,6 +122,10 @@ const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(e
 
 const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
 
+//.TRANS: sharp, flat, and natural are music terms related to pitch
+const ACCIDENTALNAMES = [_('double sharp') + ' 𝄪', _('sharp') + ' ♯', _('natural') + ' ♮', _('flat') + ' ♭', _('double flat') + ' 𝄫'];
+const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
+
 const INVERTMODES = [[_('even'), 'even'], [_('odd'), 'odd'], [_('scalar'), 'scalar']];
 
 const INTERVALNAMES = [
@@ -366,6 +370,7 @@ const DEFAULTDRUM = 'kick drum';
 const DEFAULTMODE = 'major';
 const DEFAULTFILTERTYPE = 'highpass';
 const DEFAULTOSCILLATORTYPE = 'sine';
+const DEFAULTACCIDENTAL = _('natural') + ' ♮';
 
 var customMode = MUSICALMODES['custom'];
 

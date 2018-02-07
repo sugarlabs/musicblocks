@@ -5539,6 +5539,7 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+            // deprecated
         case 'sharp':
             if (!(that.invertList[turtle].length === 0)) {
                 that.transposition[turtle] -= 1;
@@ -5562,6 +5563,7 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+            // deprecated
         case 'flat':
             if (!(that.invertList[turtle].length === 0)) {
                 that.transposition[turtle] += 1;
@@ -5580,6 +5582,46 @@ function Logo () {
                     that.transposition[turtle] -= 1;
                 } else {
                     that.transposition[turtle] += 1;
+                }
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
+        case 'accidental':
+            var i = ACCIDENTALNAMES.indexOf(args[0]);
+            if (i === -1) {
+                switch (args[0]) {
+                case _('sharp'):
+                    value = 1;
+                    break;
+                case _('flat'):
+                    value = -1;
+                    break;
+                default:
+                    value = 0;
+                    break;
+                }
+            } else {
+                value = ACCIDENTALVALUES[i];
+            }
+
+            if (!(that.invertList[turtle].length === 0)) {
+                that.transposition[turtle] -= value;
+            } else {
+                that.transposition[turtle] += value;
+            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_accidental_' + turtle + '_' + blk;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                if (!(that.invertList[turtle].length === 0)) {
+                    that.transposition[turtle] += value;
+                } else {
+                    that.transposition[turtle] -= value;
                 }
             };
 
@@ -6267,6 +6309,7 @@ function Logo () {
                         that.runningAbc = false;
                     } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
+                        that.errorMsg(_('Playback is ready.')); 
                         that.setPlaybackStatus();
                         that.compiling = false;
                         for (t in that.turtles.turtleList) {

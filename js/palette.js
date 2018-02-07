@@ -725,6 +725,10 @@ function PaletteModel(palette, palettes, name) {
             case 'eastindiansolfege':
                 label = 'sargam';
                 break;
+            case 'accidentalname':
+                //TRANS: accidental refers to sharps, flats, etc.
+                label = _('accidental');
+                break;
             case 'notename':
                 label = 'G';
                 break;
