@@ -4100,9 +4100,54 @@ function Logo () {
                 if (flag === 0) {
                     that.pitchStaircase.Stairs.push([noteObj1[0], noteObj1[1], parseFloat(frequency), 1, 1]);
                 }
-            }
-            else {
-                that.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
+            } else {
+                if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
+                    // Play a stand-alone pitch block as a quarter note.
+                    that.oscList[turtle][blk] = [];
+                    that.noteBeat[turtle][blk] = [];
+                    that.noteBeatValues[turtle][blk] = [];
+                    that.noteValue[turtle][blk] = null;
+                    that.notePitches[turtle][blk] = [];
+                    that.noteOctaves[turtle][blk] = [];
+                    that.noteCents[turtle][blk] = [];
+                    that.noteHertz[turtle][blk] = [];
+                    that.embeddedGraphics[turtle][blk] = [];
+                    that.noteDrums[turtle][blk] = [];
+
+                    var noteObj = getNote(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    if (!that.validNote) {
+                        that.errorMsg(INVALIDPITCH, blk);
+                        that.stopTurtle = true;
+                    }
+
+                    that.inNoteBlock[turtle].push(blk);
+                    that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(noteObj[0]);
+                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(noteObj[1]);
+                    that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
+                    if (cents !== 0) {
+                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(pitchToFrequency(noteObj[0], noteObj[1], cents, that.keySignature[turtle]));
+                    } else {
+                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(0);
+                    }
+
+                    if (that.bpm[turtle].length > 0) {
+                        var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                    } else {
+                        var bpmFactor = TONEBPM / that._masterBPM;
+                    }
+
+                    var noteBeatValue = 4;
+                    var beatValue = bpmFactor / noteBeatValue;
+
+                    that._processNote(noteBeatValue, blk, turtle);
+                
+                    setTimeout(function () {
+                        that.noteDrums[turtle][blk] = [];
+                        that.inNoteBlock[turtle].pop();
+                    }, beatValue * 1000);
+                } else {
+                    that.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
+                }
             }
             break;
         case 'rhythm2':
