@@ -56,7 +56,7 @@ function LanguageBox () {
         const MSG = {
 	    'default': _('Refresh your browser to change your language preference.'),
             'en': 'Refresh your browser to change your language preference.',
-	    'ja': 'ブラウザをリフレッシュして、言語設定を変更してください。',
+	    'ja': '言語設定についた変化（日本語）をするため、ブラウザをリフレッシュしてください。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
             'zh-CN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
