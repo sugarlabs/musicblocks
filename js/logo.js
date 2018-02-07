@@ -6209,6 +6209,7 @@ function Logo () {
                         that.runningAbc = false;
                     } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
+                        that.errorMsg(_('Playback is ready.')); 
                         that.setPlaybackStatus();
                         that.compiling = false;
                         for (t in that.turtles.turtleList) {
