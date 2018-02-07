@@ -1579,8 +1579,8 @@ function Blocks () {
     };
 
     this.moveBlock = function (blk, x, y) {
-	this._moveBlock(blk, x, y);
-	this.adjustDocks(blk, true);
+        this._moveBlock(blk, x, y);
+        this.adjustDocks(blk, true);
     };
 
     this._moveBlock = function (blk, x, y) {
@@ -1674,7 +1674,7 @@ function Blocks () {
             }
         }
 
-        if (myBlock.name !== 'intervalname' && label.length > maxLength) {
+        if (WIDENAMES.indexOf(myBlock.name) === -1 && label.length > maxLength) {
             label = label.substr(0, maxLength - 1) + '...';
         }
 
@@ -2175,6 +2175,16 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, DEFAULTMODE];
+        } else if (name === 'accidentalname') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === 'intervalname') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2319,7 +2329,7 @@ function Blocks () {
                         var value = args[1];
                         that.blockList[thisBlock].value = value;
                         var label = value.toString();
-                        if (that.blockList[thisBlock].name !== 'intervalname' && label.length > 8) {
+                        if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && label.length > 8) {
                             label = label.substr(0, 7) + '...';
                         }
                         that.blockList[thisBlock].text.text = label;
@@ -2343,7 +2353,7 @@ function Blocks () {
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
                     var label = value.toString();
-                    if (that.blockList[thisBlock].name !== 'intervalname' && label.length > 8) {
+                    if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && label.length > 8) {
                         label = label.substr(0, 7) + '...';
                     }
                     that.blockList[thisBlock].text.text = label;
@@ -3845,6 +3855,15 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'modename':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'accidentalname':
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];

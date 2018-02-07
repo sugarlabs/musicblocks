@@ -209,6 +209,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     modenameBlock.valueBlock();
     modenameBlock.dockTypes[0] = 'textout';
 
+    var accidentalnameBlock = new ProtoBlock('accidentalname');
+    accidentalnameBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['accidentalname'] = accidentalnameBlock;
+    accidentalnameBlock.valueBlock();
+    accidentalnameBlock.dockTypes[0] = 'textout';
+    accidentalnameBlock.extraWidth = 50;
+
     var eastindiansolfegeBlock = new ProtoBlock('eastindiansolfege');
     eastindiansolfegeBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['eastindiansolfege'] = eastindiansolfegeBlock;
@@ -389,6 +396,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     scalarTranspositionBlock.defaults.push('1');
     scalarTranspositionBlock.flowClampOneArgBlock();
     scalarTranspositionBlock.hidden = true;
+
+    // macro
+    var accidentalBlock = new ProtoBlock('accidental');
+    accidentalBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['accidental'] = accidentalBlock;
+    //.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
+    accidentalBlock.staticLabels.push(_('accidental'));
+    accidentalBlock.adjustWidthToLabel();
+    accidentalBlock.flowClampOneArgBlock();
+    accidentalBlock.dockTypes[1] = 'textin';
 
     // macro
     var flatBlock = new ProtoBlock('flat');

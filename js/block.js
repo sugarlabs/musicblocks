@@ -14,7 +14,8 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname'];
+const WIDENAMES = ['intervalname', 'accidentalname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -543,6 +544,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'modename':
                     this.value = getModeName(DEFAULTMODE);
                     break;
+                case 'accidentalname':
+                    this.value = DEFAULTACCIDENTAL;
+                    break;
                 case 'intervalname':
                     this.value = getIntervalName(DEFAULTINTERVAL);
                     break;
@@ -584,7 +588,7 @@ function Block(protoblock, blocks, overrideName) {
                 var label = this.value.toString();
             }
 
-            if (this.name !== 'intervalname' && label.length > 8) {
+            if (WIDENAMES.indexOf(this.name) === -1 && label.length > 8) {
                 label = label.substr(0, 7) + '...';
             }
 
@@ -986,7 +990,7 @@ function Block(protoblock, blocks, overrideName) {
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
-            if (this.name === 'intervalname') {
+            if (WIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 1.75;
             }
         } else if (this.protoblock.args === 0) {
@@ -1565,18 +1569,10 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // A place in the DOM to put modifiable labels (textareas).
-        if (this.name === 'intervalname') {
-            if (this.label != null) {
-                var labelValue = this.label.value
-            } else {
-                var labelValue = this.value;
-            }
+        if (this.label != null) {
+            var labelValue = this.label.value
         } else {
-            if (this.label != null) {
-                var labelValue = this.label.value
-            } else {
-                var labelValue = this.value;
-            }
+            var labelValue = this.value;
         }
 
         var labelElem = docById('labelDiv');
@@ -1735,6 +1731,26 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('modenameLabel');
+        } else if (this.name === 'accidentalname') {
+            var type = 'accidentalname';
+            if (this.value != null) {
+                var selectedaccidental = this.value[0];
+            } else {
+                var selectedaccidental = DEFAULTACCIDENTAL;
+            }
+
+            var labelHTML = '<select name="accidentalname" id="accidentalnameLabel" style="position: absolute;  background-color: #88e20a; width: 90px;">'
+            for (var i = 0; i < ACCIDENTALNAMES.length; i++) {
+                if (selectedaccidental === ACCIDENTALNAMES[i]) {
+                    labelHTML += '<option value="' + selectedaccidental + '" selected>' + selectedaccidental + '</option>';
+                } else {
+                    labelHTML += '<option value="' + ACCIDENTALNAMES[i] + '">' + ACCIDENTALNAMES[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('accidentalnameLabel');
         } else if (this.name === 'intervalname') {
             var type = 'intervalname';
             if (this.value != null) {
@@ -1743,7 +1759,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedinterval = getIntervalName(DEFAULTINTERVAL);
             }
 
-            var labelHTML = '<select name="intervalname" id="intervalnameLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">'
+            var labelHTML = '<select name="intervalname" id="intervalnameLabel" style="position: absolute;  background-color: #3ea4a3; width: 90px;">'
             for (var i = 0; i < INTERVALNAMES.length; i++) {
                 if (INTERVALNAMES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -2099,7 +2115,7 @@ function Block(protoblock, blocks, overrideName) {
             var label = this.value.toString();
         }
 
-        if (this.name !== 'intervalname' && label.length > 8) {
+        if (WIDENAMES.indexOf(this.name) === -1 && label.length > 8) {
             label = label.substr(0, 7) + '...';
         }
 
