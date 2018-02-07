@@ -32,6 +32,11 @@
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:45
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+#: js/block.js:536
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:45
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
+## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "rest"
 msgstr "休符"
 
@@ -45,22 +50,22 @@ msgstr "休符"
 #: js/palette.js:681
 #: js/palette.js:690
 #: js/palette.js:699
-#: js/palette.js:1915
-#: js/palette.js:1926
-#: js/palette.js:1937
-#: js/palette.js:1948
+#: js/palette.js:1924
+#: js/palette.js:1935
+#: js/palette.js:1946
+#: js/palette.js:1957
 #: js/turtledefs.js:23
 #: js/basicblocks.js:1130
 #: js/basicblocks.js:1141
-#: js/basicblocks.js:2733
-#: js/basicblocks.js:2764
-#: js/basicblocks.js:2771
-#: js/basicblocks.js:2800
-#: js/basicblocks.js:2810
-#: js/basicblocks.js:2842
-#: js/basicblocks.js:2887
-#: js/basicblocks.js:2891
-#: js/basicblocks.js:2897
+#: js/basicblocks.js:2734
+#: js/basicblocks.js:2765
+#: js/basicblocks.js:2772
+#: js/basicblocks.js:2801
+#: js/basicblocks.js:2811
+#: js/basicblocks.js:2843
+#: js/basicblocks.js:2888
+#: js/basicblocks.js:2892
+#: js/basicblocks.js:2898
 #: js/macros.js:44
 #: js/blocks.js:801
 #: js/blocks.js:2311
@@ -79,7 +84,7 @@ msgstr "動作"
 #: js/logo.js:1298
 #: js/turtle.js:564
 #: js/turtle.js:565
-#: js/basicblocks.js:2879
+#: js/basicblocks.js:2880
 #: js/lilypond.js:444
 #: js/lilypond.js:523
 #: js/lilypond.js:561
@@ -104,7 +109,7 @@ msgstr "ステータス"
 #: js/turtle.js:406
 #: js/turtledefs.js:23
 #: js/basicblocks.js:1043
-#: js/basicblocks.js:2128
+#: js/basicblocks.js:2129
 #: js/lilypond.js:428
 #: js/lilypond.js:513
 #: js/lilypond.js:551
@@ -135,7 +140,7 @@ msgid "tempo"
 msgstr "テンポ"
 
 #: js/block.js:677
-#: js/basicblocks.js:1917
+#: js/basicblocks.js:1918
 #.TRANS: mode, e.g., Major in C Major
 ## 旋法＝せんぽう；https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%BC%E3%83%89_(%E6%97%8B%E6%B3%95)
 msgid "mode"
@@ -162,7 +167,7 @@ msgstr "シ ラ ソ ファ ミ レ ド"
 #: js/block.js:1919
 #: js/logo.js:683
 #: js/logo.js:8161
-#: js/palette.js:739
+#: js/palette.js:748
 #: js/blocks.js:2097
 ## http://jisho.org/word/%E7%9C%9F 
 msgid "true"
@@ -341,19 +346,19 @@ msgid "My Music Blocks Creation"
 msgstr "私のミュージック・ブロックスの開発"
 
 #: js/activity.js:2408
-#: js/basicblocks.js:3537
-#: js/basicblocks.js:3546
-#: js/basicblocks.js:3556
-#: js/basicblocks.js:3566
-#: js/basicblocks.js:3576
-#: js/basicblocks.js:3586
-#: js/basicblocks.js:3596
-#: js/basicblocks.js:3606
-#: js/basicblocks.js:3616
-#: js/basicblocks.js:3625
-#: js/basicblocks.js:3634
-#: js/basicblocks.js:3655
-#: js/basicblocks.js:3665
+#: js/basicblocks.js:3538
+#: js/basicblocks.js:3547
+#: js/basicblocks.js:3557
+#: js/basicblocks.js:3567
+#: js/basicblocks.js:3577
+#: js/basicblocks.js:3587
+#: js/basicblocks.js:3597
+#: js/basicblocks.js:3607
+#: js/basicblocks.js:3617
+#: js/basicblocks.js:3626
+#: js/basicblocks.js:3635
+#: js/basicblocks.js:3656
+#: js/basicblocks.js:3666
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
 msgstr "ネズミさん"
@@ -498,7 +503,7 @@ msgstr "リズム"
 #: js/turtledefs.js:23
 #: js/basicblocks.js:468
 #: js/basicblocks.js:476
-#: js/basicblocks.js:3435
+#: js/basicblocks.js:3436
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
 msgstr "ピッチ"
@@ -557,10 +562,10 @@ msgid "Not a valid pitch name"
 msgstr "選ばれたピッチが妥当ではありません。"
 
 #: js/logo.js:1030
-#: js/basicblocks.js:1731
-#: js/basicblocks.js:1739
-#: js/basicblocks.js:1747
-#: js/basicblocks.js:1755
+#: js/basicblocks.js:1732
+#: js/basicblocks.js:1740
+#: js/basicblocks.js:1748
+#: js/basicblocks.js:1756
 #: js/macros.js:163
 #: js/musicutils.js:136
 #: js/musicutils.js:140
@@ -823,7 +828,7 @@ msgstr "フラット(変)"
 #: js/logo.js:5740
 #: js/logo.js:5793
 #: js/logo.js:5795
-#: js/basicblocks.js:3185
+#: js/basicblocks.js:3186
 #: js/macros.js:166
 #: js/synthutils.js:34
 #.TRANS: the default case used in a switch statement in programming
@@ -862,7 +867,7 @@ msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, 
 msgstr "音符の名前はA, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭の中から必要があります。"
 
 #: js/logo.js:9097
-#: js/basicblocks.js:2951
+#: js/basicblocks.js:2952
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 msgid "empty heap"
@@ -882,12 +887,12 @@ msgid "confirm"
 msgstr "確認する"
 
 #: js/palette.js:654
-#: js/palette.js:756
-#: js/palette.js:1893
-#: js/basicblocks.js:2692
-#: js/basicblocks.js:2696
-#: js/basicblocks.js:2710
-#: js/basicblocks.js:2718
+#: js/palette.js:765
+#: js/palette.js:1902
+#: js/basicblocks.js:2693
+#: js/basicblocks.js:2697
+#: js/basicblocks.js:2711
+#: js/basicblocks.js:2719
 #: js/blocks.js:851
 #: js/blocks.js:2545
 #: js/blocks.js:2568
@@ -899,72 +904,84 @@ msgid "box"
 msgstr "ボックス"
 
 #: js/palette.js:717
-#: js/basicblocks.js:3149
+#: js/basicblocks.js:3150
 #: js/blocks.js:2087
 msgid "text"
 msgstr "文事"
 
-#: js/palette.js:730
+#: js/palette.js:729
+msgid "mode name"
+msgstr ""
+
+#: js/palette.js:732
+msgid "invert mode"
+msgstr ""
+
+#: js/palette.js:735
+msgid "voice name"
+msgstr ""
+
+#: js/palette.js:739
 #: js/basicblocks.js:399
 #.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental"
 msgstr ""
 
-#: js/palette.js:736
+#: js/palette.js:745
 ## 明確＝めいかく；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B 
 msgid "interval name"
 msgstr "明確な音程"
 
-#: js/palette.js:757
-#: js/palette.js:1547
-#: js/basicblocks.js:2706
+#: js/palette.js:766
+#: js/palette.js:1556
+#: js/basicblocks.js:2707
 #: js/blocks.js:2711
 #.TRANS: put something into a container for later reference
 ## ほうぞん means "to save"; put に before the word for "in"
 msgid "store in"
 msgstr "方存"
 
-#: js/palette.js:765
+#: js/palette.js:774
 #: js/blocks.js:1648
 msgid "open file"
 msgstr "ファイルを開く"
 
-#: js/palette.js:859
+#: js/palette.js:868
 msgid "Click to select a block."
 msgstr "ブロックを選ぶため、一回クリックをしてください"
 
-#: js/palette.js:859
-#: js/basicblocks.js:2261
+#: js/palette.js:868
+#: js/basicblocks.js:2262
 #: plugins/rodi.rtp:71
 #: plugins/rodi.rtp:391
 #.TRANS: move backward (in the opposite direction of the current heading)
 msgid "back"
 msgstr "後ろ"
 
-#: js/palette.js:867
-#: js/palette.js:868
+#: js/palette.js:876
+#: js/palette.js:877
 #.TRANS: popout: to detach as a separate window
 msgid "hide"
 msgstr "隠す"
 
-#: js/palette.js:870
-#: js/palette.js:871
-#: js/basicblocks.js:3145
+#: js/palette.js:879
+#: js/palette.js:880
+#: js/basicblocks.js:3146
 #.TRANS: a media object
 ## Uncertain. Maybe 展示する。Or Maybe 現らす
 msgid "show"
 msgstr "示す"
 
-#: js/palette.js:873
-#: js/palette.js:874
+#: js/palette.js:882
+#: js/palette.js:883
 msgid "popout"
 msgstr "ポップアップ"
 
 #: js/turtle.js:405
 #: js/turtle.js:560
 #: js/turtle.js:561
-#: js/basicblocks.js:2861
-#: js/basicblocks.js:2870
+#: js/basicblocks.js:2862
+#: js/basicblocks.js:2871
 #: js/lilypond.js:444
 #: js/lilypond.js:523
 #: js/lilypond.js:561
@@ -987,8 +1004,8 @@ msgid "intervals"
 msgstr "音程"
 
 #: js/turtledefs.js:23
-#: js/basicblocks.js:3744
-#: js/basicblocks.js:3756
+#: js/basicblocks.js:3745
+#: js/basicblocks.js:3757
 msgid "volume"
 msgstr "音量"
 
@@ -1362,8 +1379,8 @@ msgstr "ピッチ数字のゼロを設定"
 #: js/basicblocks.js:179
 #: js/basicblocks.js:238
 #: js/basicblocks.js:477
-#: js/basicblocks.js:2707
-#: js/basicblocks.js:3121
+#: js/basicblocks.js:2708
+#: js/basicblocks.js:3122
 #: js/blocks.js:2711
 msgid "name"
 msgstr "名前"
@@ -1375,7 +1392,7 @@ msgstr "名前"
 #: js/basicblocks.js:298
 #: js/basicblocks.js:446
 #: js/basicblocks.js:477
-#: js/basicblocks.js:3121
+#: js/basicblocks.js:3122
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
 msgstr "オクターヴ"
@@ -1420,63 +1437,63 @@ msgid "semi-tone transpose"
 msgstr "半音で移調"
 
 #: js/basicblocks.js:307
-#: js/basicblocks.js:1775
+#: js/basicblocks.js:1776
 #.TRANS: down sixth means the note is five scale degrees below current note
 #.TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
 msgstr "音階で六度下"
 
 #: js/basicblocks.js:316
-#: js/basicblocks.js:1784
+#: js/basicblocks.js:1785
 #.TRANS: down third means the note is two scale degrees below current note
 #.TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
 msgstr "音階で三度下"
 
 #: js/basicblocks.js:325
-#: js/basicblocks.js:1793
+#: js/basicblocks.js:1794
 #.TRANS: seventh means the note is the six scale degrees above current note
 #.TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
 msgstr "音階で七度上"
 
 #: js/basicblocks.js:334
-#: js/basicblocks.js:1802
+#: js/basicblocks.js:1803
 #.TRANS: sixth means the note is the five scale degrees above current note
 #.TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
 msgstr "音階で六度上"
 
 #: js/basicblocks.js:343
-#: js/basicblocks.js:1811
+#: js/basicblocks.js:1812
 #.TRANS: fifth means the note is the four scale degrees above current note
 #.TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
 msgstr "音階で五度上"
 
 #: js/basicblocks.js:352
-#: js/basicblocks.js:1820
+#: js/basicblocks.js:1821
 #.TRANS: fourth means the note is three scale degrees above current note
 #.TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
 msgstr "音階で四度上"
 
 #: js/basicblocks.js:361
-#: js/basicblocks.js:1829
+#: js/basicblocks.js:1830
 #.TRANS: third means the note is two scale degrees above current note
 #.TRANS: third means the note is two scale degrees above current note
 msgid "third"
 msgstr "音階で三度上"
 
 #: js/basicblocks.js:370
-#: js/basicblocks.js:1838
+#: js/basicblocks.js:1839
 #.TRANS: second means the note is one scale degree above current note
 #.TRANS: second means the note is one scale degree above current note
 msgid "second"
 msgstr "音階で二度上"
 
 #: js/basicblocks.js:379
-#: js/basicblocks.js:1847
+#: js/basicblocks.js:1848
 #: js/musicutils.js:132
 #.TRANS: unison means the note is the same as the current note
 #.TRANS: unison means the note is the same as the current note
@@ -1489,7 +1506,7 @@ msgid "scalar transpose"
 msgstr "音階的の移調"
 
 #: js/basicblocks.js:426
-#: js/basicblocks.js:3110
+#: js/basicblocks.js:3111
 #.TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
 msgstr "ハーツ"
@@ -1566,7 +1583,7 @@ msgid "rolloff"
 msgstr "ロールオフ"
 
 #: js/basicblocks.js:554
-#: js/basicblocks.js:3110
+#: js/basicblocks.js:3111
 #: js/timbre.js:1354
 ## ひらがな＝しゅうはすう http://jisho.org/word/%E5%91%A8%E6%B3%A2%E6%95%B0  and http://en.wikipedia.org/wiki/Frequency?oldid=494868190  and http://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0?oldid=42704051 
 msgid "frequency"
@@ -1671,8 +1688,8 @@ msgid "simple tuplet"
 msgstr "シンプルなタプル"
 
 #: js/basicblocks.js:734
-#: js/basicblocks.js:1467
-#: js/basicblocks.js:1870
+#: js/basicblocks.js:1468
+#: js/basicblocks.js:1871
 #: js/macros.js:69
 #: js/macros.js:198
 #: js/modewidget.js:809
@@ -1841,12 +1858,12 @@ msgid "beat"
 msgstr "拍子"
 
 #: js/basicblocks.js:1138
-#: js/basicblocks.js:2729
-#: js/basicblocks.js:2780
-#: js/basicblocks.js:2797
-#: js/basicblocks.js:2837
-#: js/basicblocks.js:3230
-#: js/basicblocks.js:3237
+#: js/basicblocks.js:2730
+#: js/basicblocks.js:2781
+#: js/basicblocks.js:2798
+#: js/basicblocks.js:2838
+#: js/basicblocks.js:3231
+#: js/basicblocks.js:3238
 #.TRANS: take (do) some action
 ## 動作is action and する is "to do"; taking liberties based on context
 msgid "do"
@@ -2062,33 +2079,33 @@ msgstr "スタッカート"
 msgid "synth name"
 msgstr "シンセの名前"
 
-#: js/basicblocks.js:1462
+#: js/basicblocks.js:1463
 #.TRANS: set the characteristics of a custom instrument
 msgid "set timbre"
 msgstr "音色の設定"
 
-#: js/basicblocks.js:1481
+#: js/basicblocks.js:1482
 msgid "doubly"
 msgstr "重"
 
-#: js/basicblocks.js:1498
+#: js/basicblocks.js:1499
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
 msgstr "半音の隔たり"
 
-#: js/basicblocks.js:1506
+#: js/basicblocks.js:1507
 #.TRANS: measure the distance between two pitches in steps of musical scale
 ## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
 msgstr "音階の音程の隔たり"
 
-#: js/basicblocks.js:1514
-#: js/basicblocks.js:1522
-#: js/basicblocks.js:1530
-#: js/basicblocks.js:1538
-#: js/basicblocks.js:1546
-#: js/basicblocks.js:1554
-#: js/basicblocks.js:1562
+#: js/basicblocks.js:1515
+#: js/basicblocks.js:1523
+#: js/basicblocks.js:1531
+#: js/basicblocks.js:1539
+#: js/basicblocks.js:1547
+#: js/basicblocks.js:1555
+#: js/basicblocks.js:1563
 #: js/musicutils.js:134
 #: js/musicutils.js:138
 #: js/musicutils.js:142
@@ -2103,14 +2120,14 @@ msgstr "音階の音程の隔たり"
 msgid "diminished"
 msgstr "減"
 
-#: js/basicblocks.js:1570
-#: js/basicblocks.js:1578
-#: js/basicblocks.js:1586
-#: js/basicblocks.js:1594
-#: js/basicblocks.js:1602
-#: js/basicblocks.js:1610
-#: js/basicblocks.js:1618
-#: js/basicblocks.js:1626
+#: js/basicblocks.js:1571
+#: js/basicblocks.js:1579
+#: js/basicblocks.js:1587
+#: js/basicblocks.js:1595
+#: js/basicblocks.js:1603
+#: js/basicblocks.js:1611
+#: js/basicblocks.js:1619
+#: js/basicblocks.js:1627
 #: js/musicutils.js:133
 #: js/musicutils.js:137
 #: js/musicutils.js:141
@@ -2123,10 +2140,10 @@ msgstr "減"
 msgid "augmented"
 msgstr "増"
 
-#: js/basicblocks.js:1634
-#: js/basicblocks.js:1642
-#: js/basicblocks.js:1650
-#: js/basicblocks.js:1657
+#: js/basicblocks.js:1635
+#: js/basicblocks.js:1643
+#: js/basicblocks.js:1651
+#: js/basicblocks.js:1658
 #: js/musicutils.js:143
 #: js/musicutils.js:146
 #: js/musicutils.js:157
@@ -2134,15 +2151,15 @@ msgstr "増"
 msgid "perfect"
 msgstr "完全"
 
-#: js/basicblocks.js:1667
-#: js/basicblocks.js:1675
+#: js/basicblocks.js:1668
+#: js/basicblocks.js:1676
 msgid "down minor"
 msgstr "短３度下"
 
-#: js/basicblocks.js:1683
-#: js/basicblocks.js:1691
-#: js/basicblocks.js:1699
-#: js/basicblocks.js:1707
+#: js/basicblocks.js:1684
+#: js/basicblocks.js:1692
+#: js/basicblocks.js:1700
+#: js/basicblocks.js:1708
 #: js/musicutils.js:135
 #: js/musicutils.js:139
 #: js/musicutils.js:149
@@ -2151,65 +2168,65 @@ msgstr "短３度下"
 msgid "minor"
 msgstr "短"
 
-#: js/basicblocks.js:1715
-#: js/basicblocks.js:1723
+#: js/basicblocks.js:1716
+#: js/basicblocks.js:1724
 msgid "down major"
 msgstr "長何度した"
 
-#: js/basicblocks.js:1764
+#: js/basicblocks.js:1765
 #.TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
 msgstr "半音の音程"
 
-#: js/basicblocks.js:1856
+#: js/basicblocks.js:1857
 #.TRANS: calculate a relative step between notes based on the current musical scale
 msgid "scalar interval"
 msgstr "音階の音程"
 
-#: js/basicblocks.js:1867
+#: js/basicblocks.js:1868
 #.TRANS: define a custom mode
 msgid "define mode"
 msgstr ""
 
-#: js/basicblocks.js:1876
+#: js/basicblocks.js:1877
 msgid "moveable"
 msgstr ""
 
-#: js/basicblocks.js:1884
+#: js/basicblocks.js:1885
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
 msgstr "音階の音符の数"
 
-#: js/basicblocks.js:1892
-#: js/basicblocks.js:1915
+#: js/basicblocks.js:1893
+#: js/basicblocks.js:1916
 #.TRANS: the key is a group of pitches with which a music composition is created
 #.TRANS: key, e.g., C in C Major
 ## Also could be キー
 msgid "key"
 msgstr "調"
 
-#: js/basicblocks.js:1902
-#: js/basicblocks.js:1913
+#: js/basicblocks.js:1903
+#: js/basicblocks.js:1914
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: set the key and mode, e.g. C Major
 msgid "set key"
 msgstr "調の設定"
 
-#: js/basicblocks.js:1934
+#: js/basicblocks.js:1935
 #: js/macros.js:89
 #: js/synthutils.js:110
 #.TRANS: animal sound effect
 msgid "duck"
 msgstr "あひる"
 
-#: js/basicblocks.js:1942
+#: js/basicblocks.js:1943
 #: js/macros.js:59
 #: js/synthutils.js:104
 #.TRANS: animal sound effect
 msgid "cat"
 msgstr "猫のにゃあ"
 
-#: js/basicblocks.js:1950
+#: js/basicblocks.js:1951
 #: js/macros.js:66
 #: js/synthutils.js:106
 #.TRANS: animal sound effect
@@ -2217,21 +2234,21 @@ msgstr "猫のにゃあ"
 msgid "cricket"
 msgstr "絡糸嬢のおと"
 
-#: js/basicblocks.js:1958
+#: js/basicblocks.js:1959
 #: js/macros.js:77
 #: js/synthutils.js:108
 #.TRANS: animal sound effect
 msgid "dog"
 msgstr "犬のワン"
 
-#: js/basicblocks.js:1966
+#: js/basicblocks.js:1967
 #: js/macros.js:55
 #: js/synthutils.js:94
 #.TRANS: sound effect
 msgid "bottle"
 msgstr "空き瓶の音"
 
-#: js/basicblocks.js:1974
+#: js/basicblocks.js:1975
 #: js/macros.js:58
 #: js/synthutils.js:102
 #.TRANS: sound effect
@@ -2239,7 +2256,7 @@ msgstr "空き瓶の音"
 msgid "bubbles"
 msgstr "シュワシュワのおと"
 
-#: js/basicblocks.js:1982
+#: js/basicblocks.js:1983
 #: js/macros.js:60
 #: js/synthutils.js:88
 #.TRANS: a musically tuned set of bells
@@ -2247,7 +2264,7 @@ msgstr "シュワシュワのおと"
 msgid "chime"
 msgstr "チャイム"
 
-#: js/basicblocks.js:1990
+#: js/basicblocks.js:1991
 #: js/macros.js:61
 #: js/synthutils.js:90
 #.TRANS: sound effect
@@ -2255,14 +2272,14 @@ msgstr "チャイム"
 msgid "clang"
 msgstr "カチャカチャの音"
 
-#: js/basicblocks.js:1998
+#: js/basicblocks.js:1999
 #: js/macros.js:62
 #: js/synthutils.js:96
 #.TRANS: sound effect
 msgid "clap"
 msgstr "手を叩く音"
 
-#: js/basicblocks.js:2006
+#: js/basicblocks.js:2007
 #: js/macros.js:178
 #: js/synthutils.js:98
 #.TRANS: sound effect
@@ -2270,35 +2287,35 @@ msgstr "手を叩く音"
 msgid "slap"
 msgstr "平手打ちの音"
 
-#: js/basicblocks.js:2014
+#: js/basicblocks.js:2015
 #: js/macros.js:64
 #: js/synthutils.js:92
 #.TRANS: sound effect
 msgid "crash"
 msgstr "クラッシュ"
 
-#: js/basicblocks.js:2022
+#: js/basicblocks.js:2023
 #: js/macros.js:181
 #: js/synthutils.js:100
 #.TRANS: sound effect
 msgid "splash"
 msgstr "スプラッシュ"
 
-#: js/basicblocks.js:2030
+#: js/basicblocks.js:2031
 #: js/macros.js:63
 #: js/synthutils.js:82
 #.TRANS: musical instrument
 msgid "cow bell"
 msgstr "カウベル"
 
-#: js/basicblocks.js:2038
+#: js/basicblocks.js:2039
 #: js/macros.js:157
 #: js/synthutils.js:80
 #.TRANS: a small metal bell
 msgid "ride bell"
 msgstr "ライドのベル"
 
-#: js/basicblocks.js:2046
+#: js/basicblocks.js:2047
 #: js/macros.js:96
 #: js/synthutils.js:86
 #.TRANS: musical instrument
@@ -2306,21 +2323,21 @@ msgstr "ライドのベル"
 msgid "finger cymbals"
 msgstr "フィンガーシンバル"
 
-#: js/basicblocks.js:2054
+#: js/basicblocks.js:2055
 #: js/macros.js:201
 #: js/synthutils.js:84
 #.TRANS: musical instrument
 msgid "triangle bell"
 msgstr "トライアングルのベル"
 
-#: js/basicblocks.js:2062
+#: js/basicblocks.js:2063
 #: js/macros.js:105
 #: js/synthutils.js:78
 #.TRANS: musical instrument
 msgid "hi hat"
 msgstr "ハイハット"
 
-#: js/basicblocks.js:2070
+#: js/basicblocks.js:2071
 #: js/macros.js:68
 #: js/synthutils.js:76
 #.TRANS: musical instrument
@@ -2328,7 +2345,7 @@ msgstr "ハイハット"
 msgid "darbuka drum"
 msgstr "ダラブッカ"
 
-#: js/basicblocks.js:2078
+#: js/basicblocks.js:2079
 #: js/macros.js:67
 #: js/synthutils.js:74
 #.TRANS: a drum made from an inverted cup
@@ -2336,7 +2353,7 @@ msgstr "ダラブッカ"
 msgid "cup drum"
 msgstr "コップ・ドラム"
 
-#: js/basicblocks.js:2086
+#: js/basicblocks.js:2087
 #: js/macros.js:98
 #: js/synthutils.js:72
 #.TRANS: musical instrument
@@ -2344,7 +2361,7 @@ msgstr "コップ・ドラム"
 msgid "floor tom tom"
 msgstr "フロアタム"
 
-#: js/basicblocks.js:2094
+#: js/basicblocks.js:2095
 #: js/macros.js:199
 #: js/synthutils.js:70
 #.TRANS: musical instrument
@@ -2352,7 +2369,7 @@ msgstr "フロアタム"
 msgid "tom tom"
 msgstr "トムトム"
 
-#: js/basicblocks.js:2102
+#: js/basicblocks.js:2103
 #: js/macros.js:110
 #: js/macros.js:155
 #: js/macros.js:156
@@ -2362,7 +2379,7 @@ msgstr "トムトム"
 msgid "kick drum"
 msgstr "バス・ドラム"
 
-#: js/basicblocks.js:2110
+#: js/basicblocks.js:2111
 #: js/macros.js:115
 #: js/macros.js:155
 #: js/macros.js:156
@@ -2373,35 +2390,35 @@ msgstr "バス・ドラム"
 msgid "snare drum"
 msgstr "スネア"
 
-#: js/basicblocks.js:2119
+#: js/basicblocks.js:2120
 #.TRANS: set the current drum sound for playback
 msgid "set drum"
 msgstr "ドラムを設定"
 
-#: js/basicblocks.js:2139
+#: js/basicblocks.js:2140
 #.TRANS: orientation or compass direction
 msgid "heading"
 msgstr "向き"
 
-#: js/basicblocks.js:2147
-#: js/basicblocks.js:2172
-#: js/basicblocks.js:2185
-#: js/basicblocks.js:2198
-#: js/basicblocks.js:2232
+#: js/basicblocks.js:2148
+#: js/basicblocks.js:2173
+#: js/basicblocks.js:2186
+#: js/basicblocks.js:2199
+#: js/basicblocks.js:2233
 #.TRANS: y coordinate
 msgid "y"
 msgstr "y座標"
 
-#: js/basicblocks.js:2155
-#: js/basicblocks.js:2172
-#: js/basicblocks.js:2185
-#: js/basicblocks.js:2198
-#: js/basicblocks.js:2232
+#: js/basicblocks.js:2156
+#: js/basicblocks.js:2173
+#: js/basicblocks.js:2186
+#: js/basicblocks.js:2199
+#: js/basicblocks.js:2233
 #.TRANS: x coordinate
 msgid "x"
 msgstr "x座標"
 
-#: js/basicblocks.js:2163
+#: js/basicblocks.js:2164
 #: js/pitchdrummatrix.js:138
 #: js/pitchtimematrix.js:179
 #: js/rhythmruler.js:1178
@@ -2411,50 +2428,50 @@ msgstr "x座標"
 msgid "clear"
 msgstr "消し"
 
-#: js/basicblocks.js:2171
+#: js/basicblocks.js:2172
 #.TRANS: control point in a bezier curve
 msgid "control point 2"
 msgstr "節点２"
 
-#: js/basicblocks.js:2184
+#: js/basicblocks.js:2185
 #.TRANS: control point in a Bezier curve
 msgid "control point 1"
 msgstr "節点１"
 
-#: js/basicblocks.js:2197
+#: js/basicblocks.js:2198
 #.TRANS: Bézier curves employ at least three points to define a curve
 ## https://ja.wikipedia.org/wiki/%E3%83%99%E3%82%B8%E3%82%A7%E6%9B%B2%E7%B7%9A
 msgid "bezier"
 msgstr "ベジェ曲線"
 
-#: js/basicblocks.js:2210
+#: js/basicblocks.js:2211
 #.TRANS: draws a part of the circumference of a circle
 ## ひらがな＝えん\E3\81"
 msgid "arc"
 msgstr "円弧"
 
-#: js/basicblocks.js:2211
+#: js/basicblocks.js:2212
 ## 角度＝かくど；ジーニアス英和辞典
 msgid "angle"
 msgstr "角度"
 
-#: js/basicblocks.js:2211
+#: js/basicblocks.js:2212
 ## ひらがな＝はんけ\E3\81"
 msgid "radius"
 msgstr "半径"
 
-#: js/basicblocks.js:2222
+#: js/basicblocks.js:2223
 #.TRANS: set compass heading
 msgid "set heading"
 msgstr "向きを設定"
 
-#: js/basicblocks.js:2231
+#: js/basicblocks.js:2232
 #.TRANS: set xy position
 msgid "set xy"
 msgstr "xyの設定"
 
-#: js/basicblocks.js:2243
-#: js/basicblocks.js:3022
+#: js/basicblocks.js:2244
+#: js/basicblocks.js:3023
 #: plugins/rodi.rtp:79
 #: plugins/rodi.rtp:344
 #: plugins/rodi.rtp:379
@@ -2462,8 +2479,8 @@ msgstr "xyの設定"
 msgid "right"
 msgstr "右"
 
-#: js/basicblocks.js:2252
-#: js/basicblocks.js:3015
+#: js/basicblocks.js:2253
+#: js/basicblocks.js:3016
 #: plugins/rodi.rtp:81
 #: plugins/rodi.rtp:343
 #: plugins/rodi.rtp:366
@@ -2471,652 +2488,652 @@ msgstr "右"
 msgid "left"
 msgstr "左"
 
-#: js/basicblocks.js:2270
+#: js/basicblocks.js:2271
 #: plugins/rodi.rtp:73
 #: plugins/rodi.rtp:404
 #.TRANS: move forward (in the same direction of the current heading)
 msgid "forward"
 msgstr "前"
 
-#: js/basicblocks.js:2281
+#: js/basicblocks.js:2282
 msgid "purple"
 msgstr ""
 
-#: js/basicblocks.js:2288
-#: js/basicblocks.js:3459
+#: js/basicblocks.js:2289
+#: js/basicblocks.js:3460
 #: plugins/rodi.rtp:223
 msgid "blue"
 msgstr "青"
 
-#: js/basicblocks.js:2295
-#: js/basicblocks.js:3466
+#: js/basicblocks.js:2296
+#: js/basicblocks.js:3467
 #: plugins/rodi.rtp:222
 msgid "green"
 msgstr "緑"
 
-#: js/basicblocks.js:2302
+#: js/basicblocks.js:2303
 msgid "yellow"
 msgstr ""
 
-#: js/basicblocks.js:2309
+#: js/basicblocks.js:2310
 #: plugins/nutrition.rtp:164
 msgid "orange"
 msgstr "オレンジ"
 
-#: js/basicblocks.js:2316
-#: js/basicblocks.js:3473
+#: js/basicblocks.js:2317
+#: js/basicblocks.js:3474
 #: plugins/rodi.rtp:221
 msgid "red"
 msgstr "赤"
 
-#: js/basicblocks.js:2323
+#: js/basicblocks.js:2324
 msgid "white"
 msgstr ""
 
-#: js/basicblocks.js:2330
+#: js/basicblocks.js:2331
 msgid "black"
 msgstr ""
 
-#: js/basicblocks.js:2337
+#: js/basicblocks.js:2338
 msgid "begin fill"
 msgstr "フィルを初め"
 
-#: js/basicblocks.js:2345
+#: js/basicblocks.js:2346
 msgid "end fill"
 msgstr "フィルを外れ"
 
-#: js/basicblocks.js:2354
-#: js/basicblocks.js:2398
+#: js/basicblocks.js:2355
+#: js/basicblocks.js:2399
 #.TRANS: set the background color
 msgid "background"
 msgstr "背景"
 
-#: js/basicblocks.js:2361
+#: js/basicblocks.js:2362
 ## グレー okay too
 msgid "grey"
 msgstr "灰色"
 
-#: js/basicblocks.js:2368
+#: js/basicblocks.js:2369
 ## 暗がり＝くらがり
 msgid "shade"
 msgstr "暗がり"
 
-#: js/basicblocks.js:2375
+#: js/basicblocks.js:2376
 msgid "color"
 msgstr "いろ"
 
-#: js/basicblocks.js:2382
+#: js/basicblocks.js:2383
 msgid "pen size"
 msgstr "ペンの大きさ"
 
-#: js/basicblocks.js:2389
+#: js/basicblocks.js:2390
 msgid "set font"
 msgstr "フォントの設定"
 
-#: js/basicblocks.js:2407
+#: js/basicblocks.js:2408
 #.TRANS: draw a line that has a hollow space down its center
 msgid "hollow line"
 msgstr "空の線"
 
-#: js/basicblocks.js:2416
+#: js/basicblocks.js:2417
 #.TRANS: fill in as a solid color
 msgid "fill"
 msgstr "固体の"
 
-#: js/basicblocks.js:2424
+#: js/basicblocks.js:2425
 #.TRANS: riase up the pen so that it does not draw when it is moved
 msgid "pen up"
 msgstr "ペン上げる"
 
-#: js/basicblocks.js:2432
+#: js/basicblocks.js:2433
 #.TRANS: put down the pen so that it draws when it is moved
 msgid "pen down"
 msgstr "ペン下ろす"
 
-#: js/basicblocks.js:2440
+#: js/basicblocks.js:2441
 #.TRANS: set the width of the line drawn by the pen
 msgid "set pen size"
 msgstr "ペンの大きさの設定"
 
-#: js/basicblocks.js:2449
+#: js/basicblocks.js:2450
 #.TRANS: set degree of translucence of the pen color
 ## 透明=とうめい　https://ja.wikipedia.org/wiki/%E9%80%8F%E6%98%8E
 msgid "set translucency"
 msgstr "透明"
 
-#: js/basicblocks.js:2457
+#: js/basicblocks.js:2458
 ## 色相=しきそうhttps://ja.wikipedia.org/wiki/%E8%89%B2%E7%9B%B8
 msgid "set hue"
 msgstr "色相を設定"
 
-#: js/basicblocks.js:2465
+#: js/basicblocks.js:2466
 ## ひらがな＝のうたん
 msgid "set shade"
 msgstr "濃淡を設定"
 
-#: js/basicblocks.js:2474
+#: js/basicblocks.js:2475
 #.TRANS: set the level of vividness of the pen color
 msgid "set grey"
 msgstr "灰色を設定"
 
-#: js/basicblocks.js:2482
+#: js/basicblocks.js:2483
 ## 色の設定
 msgid "set color"
 msgstr "色を設定"
 
-#: js/basicblocks.js:2493
+#: js/basicblocks.js:2494
 #.TRANS: convert a real number to an integer
 ## 整数=せいすうhttps://ja.wikipedia.org/wiki/%E6%95%B4%E6%95%B0
 msgid "int"
 msgstr "整数に"
 
-#: js/basicblocks.js:2502
+#: js/basicblocks.js:2503
 ## trying a simple "is not"; need to verify
 msgid "not"
 msgstr "ではない"
 
-#: js/basicblocks.js:2509
+#: js/basicblocks.js:2510
 msgid "and"
 msgstr "かつ"
 
-#: js/basicblocks.js:2516
+#: js/basicblocks.js:2517
 msgid "or"
 msgstr "または"
 
-#: js/basicblocks.js:2557
+#: js/basicblocks.js:2558
 #.TRANS: evaluate some math functions, e.g., absolute value, sine, exponential, etc.
 ## ひらがな＝ひょうす
 msgid "eval"
 msgstr "評す"
 
-#: js/basicblocks.js:2571
+#: js/basicblocks.js:2572
 ## Based on Scratch po (L40) 
 msgid "mod"
 msgstr "で割った余り(mod)"
 
-#: js/basicblocks.js:2588
+#: js/basicblocks.js:2589
 ## 平方根＝へいほうこん http://jisho.org/word/%E5%B9%B3%E6%96%B9%E6%A0%B9 
 msgid "sqrt"
 msgstr "平方根"
 
-#: js/basicblocks.js:2597
+#: js/basicblocks.js:2598
 ## http://jisho.org/word/%E7%B5%B6%E5%AF%BE%E5%80%A4 
 msgid "abs"
 msgstr "絶対値"
 
-#: js/basicblocks.js:2649
+#: js/basicblocks.js:2650
 ## Literally "this or that"
 msgid "one of"
 msgstr "これかそれ"
 
-#: js/basicblocks.js:2649
+#: js/basicblocks.js:2650
 ## need context
 msgid "this"
 msgstr "この"
 
-#: js/basicblocks.js:2649
+#: js/basicblocks.js:2650
 msgid "that"
 msgstr "その"
 
-#: js/basicblocks.js:2660
+#: js/basicblocks.js:2661
 ## Scratch po (L247)
 msgid "random"
 msgstr "乱数"
 
-#: js/basicblocks.js:2660
+#: js/basicblocks.js:2661
 msgid "min"
 msgstr "最低値"
 
-#: js/basicblocks.js:2660
+#: js/basicblocks.js:2661
 msgid "max"
 msgstr "最大値"
 
-#: js/basicblocks.js:2675
+#: js/basicblocks.js:2676
 ## check this
 msgid "add 1 to"
 msgstr "に１を足す"
 
-#: js/basicblocks.js:2682
+#: js/basicblocks.js:2683
 msgid "add"
 msgstr "足し算をする"
 
-#: js/basicblocks.js:2682
+#: js/basicblocks.js:2683
 #: plugins/finance.rtp:28
 msgid "to"
 msgstr "最終の状態"
 
-#: js/basicblocks.js:2682
-#: js/basicblocks.js:2707
-#: js/basicblocks.js:2987
+#: js/basicblocks.js:2683
+#: js/basicblocks.js:2708
+#: js/basicblocks.js:2988
 #: js/blocks.js:2711
 #: plugins/bitcoin.rtp:27
 ## assuming "monetary value" ; many more values 価格、評価
 msgid "value"
 msgstr "価値"
 
-#: js/basicblocks.js:2740
+#: js/basicblocks.js:2741
 #.TRANS: return value from a function
 ## I think this is return as in "return value"
 msgid "return"
 msgstr "出る数価は"
 
-#: js/basicblocks.js:2751
+#: js/basicblocks.js:2752
 #.TRANS: return value from a function to a URL
 msgid "return to URL"
 msgstr "URLに帰ります"
 
-#: js/basicblocks.js:2755
+#: js/basicblocks.js:2756
 msgid "100"
 msgstr "百"
 
-#: js/basicblocks.js:2761
-#: js/basicblocks.js:2788
-#: js/basicblocks.js:2807
+#: js/basicblocks.js:2762
+#: js/basicblocks.js:2789
+#: js/basicblocks.js:2808
 ## 経産＝けいさん; p69 Collins Shubun
 msgid "calculate"
 msgstr "経産"
 
-#: js/basicblocks.js:2836
+#: js/basicblocks.js:2837
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
 ## I need some context...
 msgid "on"
 msgstr "の時に"
 
-#: js/basicblocks.js:2837
-#: js/basicblocks.js:2841
-#: js/basicblocks.js:2853
+#: js/basicblocks.js:2838
+#: js/basicblocks.js:2842
+#: js/basicblocks.js:2854
 #.TRANS: a condition that is broadcast in order to trigger a listener to take an action
 msgid "event"
 msgstr "イベント"
 
-#: js/basicblocks.js:2850
+#: js/basicblocks.js:2851
 #.TRANS: dispatch an event to trigger a listener
 msgid "broadcast"
 msgstr "送る"
 
-#: js/basicblocks.js:2907
+#: js/basicblocks.js:2908
 msgid "load heap from App"
 msgstr "アプリからヒープをロード"
 
-#: js/basicblocks.js:2918
+#: js/basicblocks.js:2919
 msgid "save heap to App"
 msgstr "アプリにヒープを保存"
 
-#: js/basicblocks.js:2929
+#: js/basicblocks.js:2930
 #: plugins/heap.rtp:126
 ## https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%BC%E3%83%97
 msgid "show heap"
 msgstr "ヒープを表示する"
 
-#: js/basicblocks.js:2936
+#: js/basicblocks.js:2937
 msgid "heap length"
 msgstr "ヒープの長さ"
 
-#: js/basicblocks.js:2944
+#: js/basicblocks.js:2945
 #: plugins/heap.rtp:134
 ## Literally means "throw away the heap"
 ## I am guessing
 msgid "heap empty?"
 msgstr "ヒープを捨てる"
 
-#: js/basicblocks.js:2958
+#: js/basicblocks.js:2959
 #: plugins/heap.rtp:150
 msgid "save heap"
 msgstr "ヒープを保存"
 
-#: js/basicblocks.js:2967
+#: js/basicblocks.js:2968
 #: plugins/heap.rtp:160
 msgid "load heap"
 msgstr "ヒープをロード"
 
-#: js/basicblocks.js:2977
+#: js/basicblocks.js:2978
 #.TRANS: retrieve a value from the heap at index position in the heap
 ## ひらがな＝さいば
 msgid "index heap"
 msgstr "ヒープを採番する"
 
-#: js/basicblocks.js:2987
+#: js/basicblocks.js:2988
 #.TRANS: set a value in the heap
 ## 数値＝すうち；unsure if this is just a number value http://jisho.org/word/%E6%95%B0%E5%80%A4 
 msgid "set heap"
 msgstr "ヒープに数値を入れます"
 
-#: js/basicblocks.js:2987
+#: js/basicblocks.js:2988
 ## Double-check. Not sure. May be too literal.
 msgid "index"
 msgstr "インデックス"
 
-#: js/basicblocks.js:2998
+#: js/basicblocks.js:2999
 #: plugins/heap.rtp:118
 ## Guessing
 msgid "pop"
 msgstr "ポップ"
 
-#: js/basicblocks.js:3005
+#: js/basicblocks.js:3006
 #: plugins/heap.rtp:109
 ## more guessing
 msgid "push"
 msgstr "プッシュ"
 
-#: js/basicblocks.js:3029
+#: js/basicblocks.js:3030
 ## 上端＝じょうたん;http://jisho.org/search/%E4%B8%8A%E7%AB%AF 
 msgid "top"
 msgstr "上端"
 
-#: js/basicblocks.js:3036
+#: js/basicblocks.js:3037
 ## 下端＝かたん；http://jisho.org/word/%E4%B8%8B%E7%AB%AF 
 msgid "bottom"
 msgstr "下端"
 
-#: js/basicblocks.js:3043
+#: js/basicblocks.js:3044
 ## 幅=はば；http://jisho.org/word/%E5%B9%85 
 msgid "width"
 msgstr "幅(横)"
 
-#: js/basicblocks.js:3050
+#: js/basicblocks.js:3051
 ## 縦;http://jisho.org/word/%E7%B8%A6 and https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q119659291 
 msgid "height"
 msgstr "高さ(縦)"
 
-#: js/basicblocks.js:3058
+#: js/basicblocks.js:3059
 #.TRANS: stops playback of an audio recording
 msgid "stop play"
 msgstr "音の鳴らしを停止"
 
-#: js/basicblocks.js:3067
+#: js/basicblocks.js:3068
 #.TRANS: play an audio recording
 msgid "play back"
 msgstr "プレーバック"
 
-#: js/basicblocks.js:3075
+#: js/basicblocks.js:3076
 ## Maybe 話す
 msgid "speak"
 msgstr "声を出す"
 
-#: js/basicblocks.js:3103
+#: js/basicblocks.js:3104
 ## A/Vを停止
 msgid "stop media"
 msgstr "メデイアを停止"
 
-#: js/basicblocks.js:3110
+#: js/basicblocks.js:3111
 msgid "duration (ms)"
 msgstr "1000割秒の長さ"
 
-#: js/basicblocks.js:3121
+#: js/basicblocks.js:3122
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 ## 周波数=しゅうはすう　https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
 msgid "note to frequency"
 msgstr "周波数から調子に"
 
-#: js/basicblocks.js:3133
+#: js/basicblocks.js:3134
 #.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
 msgid "shell"
 msgstr "シェル"
 
-#: js/basicblocks.js:3133
-#: js/basicblocks.js:3145
+#: js/basicblocks.js:3134
+#: js/basicblocks.js:3146
 msgid "size"
 msgstr "大きさ"
 
-#: js/basicblocks.js:3133
+#: js/basicblocks.js:3134
 msgid "image"
 msgstr "画素"
 
-#: js/basicblocks.js:3145
+#: js/basicblocks.js:3146
 msgid "obj"
 msgstr "オブジェクト"
 
-#: js/basicblocks.js:3193
+#: js/basicblocks.js:3194
 #.TRANS: the case statement used in a switch statement in programming
 ## guessing
 msgid "case"
 msgstr "ケース"
 
-#: js/basicblocks.js:3202
+#: js/basicblocks.js:3203
 #.TRANS: the switch statement used in programming
 ## more guessing
 msgid "switch"
 msgstr "スイッチ"
 
-#: js/basicblocks.js:3216
+#: js/basicblocks.js:3217
 #: plugins/rodi.rtp:31
 #: plugins/rodi.rtp:75
 #: plugins/rodi.rtp:417
 msgid "stop"
 msgstr "止めます"
 
-#: js/basicblocks.js:3223
+#: js/basicblocks.js:3224
 msgid "wait for"
 msgstr "を待つ"
 
-#: js/basicblocks.js:3230
+#: js/basicblocks.js:3231
 ## There is two types of until in Japanese, but think we want this one.
 msgid "until"
 msgstr "までに"
 
-#: js/basicblocks.js:3237
+#: js/basicblocks.js:3238
 msgid "while"
 msgstr "の際に"
 
-#: js/basicblocks.js:3244
-#: js/basicblocks.js:3251
+#: js/basicblocks.js:3245
+#: js/basicblocks.js:3252
 msgid "if"
 msgstr "もし"
 
-#: js/basicblocks.js:3244
-#: js/basicblocks.js:3251
+#: js/basicblocks.js:3245
+#: js/basicblocks.js:3252
 msgid "then"
 msgstr "なら"
 
-#: js/basicblocks.js:3244
+#: js/basicblocks.js:3245
 msgid "else"
 msgstr "でなければ"
 
-#: js/basicblocks.js:3258
+#: js/basicblocks.js:3259
 msgid "forever"
 msgstr "ずっと"
 
-#: js/basicblocks.js:3265
+#: js/basicblocks.js:3266
 ## Scrath po (L268)
 msgid "repeat"
 msgstr "回繰り返す"
 
-#: js/basicblocks.js:3277
-#: js/basicblocks.js:3288
-#: js/basicblocks.js:3297
-#: js/basicblocks.js:3307
-#: js/basicblocks.js:3315
-#: js/basicblocks.js:3324
-#: js/basicblocks.js:3334
+#: js/basicblocks.js:3278
+#: js/basicblocks.js:3289
+#: js/basicblocks.js:3298
+#: js/basicblocks.js:3308
+#: js/basicblocks.js:3316
+#: js/basicblocks.js:3325
+#: js/basicblocks.js:3335
 ## fushou
 msgid "unknown"
 msgstr "不詳"
 
-#: js/basicblocks.js:3344
+#: js/basicblocks.js:3345
 msgid "save as ABC"
 msgstr "ABCの保存"
 
-#: js/basicblocks.js:3347
-#: js/basicblocks.js:3356
-#: js/basicblocks.js:3365
+#: js/basicblocks.js:3348
+#: js/basicblocks.js:3357
+#: js/basicblocks.js:3366
 msgid "title"
 msgstr "名"
 
-#: js/basicblocks.js:3353
+#: js/basicblocks.js:3354
 msgid "save as lilypond"
 msgstr "Lilypondのファイルフォーマットで保存"
 
-#: js/basicblocks.js:3362
+#: js/basicblocks.js:3363
 msgid "save svg"
 msgstr "svgで保存"
 
-#: js/basicblocks.js:3371
+#: js/basicblocks.js:3372
 msgid "no background"
 msgstr "バックグラウンドなし"
 
-#: js/basicblocks.js:3378
+#: js/basicblocks.js:3379
 msgid "show blocks"
 msgstr "ブロックを表示"
 
-#: js/basicblocks.js:3385
+#: js/basicblocks.js:3386
 msgid "hide blocks"
 msgstr "ブロックを非表示にする"
 
-#: js/basicblocks.js:3392
+#: js/basicblocks.js:3393
 msgid "open project"
 msgstr "プロジェクトを開き"
 
-#: js/basicblocks.js:3416
+#: js/basicblocks.js:3417
 msgid "wait"
 msgstr "待ち"
 
-#: js/basicblocks.js:3424
+#: js/basicblocks.js:3425
 msgid "print"
 msgstr "印刷" #This is like "print a piece of paper"
 
-#: js/basicblocks.js:3428
+#: js/basicblocks.js:3429
 msgid "Music Blocks"
 msgstr "ミュージック・ブロックス"
 
-#: js/basicblocks.js:3443
+#: js/basicblocks.js:3444
 ## 音量＝おんりょう
 msgid "loudness"
 msgstr "音量"
 
-#: js/basicblocks.js:3451
+#: js/basicblocks.js:3452
 msgid "click"
 msgstr "クリック"
 
-#: js/basicblocks.js:3480
+#: js/basicblocks.js:3481
 #: plugins/rodi.rtp:220
 msgid "pixel color"
 msgstr "ピクセルの色"
 
-#: js/basicblocks.js:3487
+#: js/basicblocks.js:3488
 msgid "time"
 msgstr "期間"
 
-#: js/basicblocks.js:3494
+#: js/basicblocks.js:3495
 msgid "cursor y"
 msgstr "カーソル y"
 
-#: js/basicblocks.js:3502
+#: js/basicblocks.js:3503
 msgid "cursor x"
 msgstr "カーソル x"
 
-#: js/basicblocks.js:3510
+#: js/basicblocks.js:3511
 msgid "mouse button"
 msgstr "マウスのボタン"
 
-#: js/basicblocks.js:3517
+#: js/basicblocks.js:3518
 msgid "to ASCII"
 msgstr "ASCIIに"
 
-#: js/basicblocks.js:3524
+#: js/basicblocks.js:3525
 msgid "keyboard"
 msgstr "キーボード"
 
-#: js/basicblocks.js:3533
+#: js/basicblocks.js:3534
 msgid "stop mouse"
 msgstr "ネズミを止める"
 
-#: js/basicblocks.js:3542
+#: js/basicblocks.js:3543
 msgid "start mouse"
 msgstr "ネズミをスタート"
 
-#: js/basicblocks.js:3552
+#: js/basicblocks.js:3553
 #.TRANS: pen color for this mouse
 msgid "mouse color"
 msgstr "ネズミの色"
 
-#: js/basicblocks.js:3562
+#: js/basicblocks.js:3563
 #.TRANS: heading (compass direction) for this mouse
 ## http://jisho.org/word/%E6%96%B9%E4%BD%8D ; 方位＝ほうい
 msgid "mouse heading"
 msgstr "ネズミの方位"
 
-#: js/basicblocks.js:3572
+#: js/basicblocks.js:3573
 #.TRANS: y position for this mouse
 ## check for consistency against cursor x/y
 msgid "mouse y"
 msgstr "y座標"
 
-#: js/basicblocks.js:3582
+#: js/basicblocks.js:3583
 #.TRANS: x position for this mouse
 msgid "mouse x"
 msgstr "x座標"
 
-#: js/basicblocks.js:3592
+#: js/basicblocks.js:3593
 #.TRANS: notes played by this mouse
 ## To be verified
 msgid "mouse notes played"
 msgstr "ネズミの演奏した音符"
 
-#: js/basicblocks.js:3602
+#: js/basicblocks.js:3603
 #.TRANS: convert current note for this turtle to piano key (1-88)
 ## Is there a Japanese technical word for "pitch number"; below is literal
 msgid "mouse pitch number"
 msgstr "ネズミのピッチ数字"
 
-#: js/basicblocks.js:3611
-#: js/basicblocks.js:3621
+#: js/basicblocks.js:3612
+#: js/basicblocks.js:3622
 msgid "mouse note value"
 msgstr "ネズミの音価"
 
-#: js/basicblocks.js:3630
+#: js/basicblocks.js:3631
 ## http://jisho.org/word/%E5%90%8C%E6%9C%9F 
 msgid "mouse sync"
 msgstr "ネズミを動機"
 
-#: js/basicblocks.js:3639
-#: js/basicblocks.js:3647
-#: js/basicblocks.js:3661
+#: js/basicblocks.js:3640
+#: js/basicblocks.js:3648
+#: js/basicblocks.js:3662
 msgid "mouse name"
 msgstr "ネズミの名前"
 
-#: js/basicblocks.js:3648
+#: js/basicblocks.js:3649
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:83
 ## Means "of origination"
 msgid "source"
 msgstr "元の"
 
-#: js/basicblocks.js:3649
+#: js/basicblocks.js:3650
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:84
 msgid "target"
 msgstr "標的"
 
-#: js/basicblocks.js:3672
+#: js/basicblocks.js:3673
 #.TRANS: the volume at which notes are played
 msgid "master volume"
 msgstr "マスターの音量"
 
-#: js/basicblocks.js:3744
-#: js/basicblocks.js:3756
+#: js/basicblocks.js:3745
+#: js/basicblocks.js:3757
 #.TRANS: a rapid, slight variation in pitch
 #.TRANS: set the loudness level
 msgid "set synth volume"
 msgstr "シンセの音量を設定"
 
-#: js/basicblocks.js:3744
-#: js/basicblocks.js:3756
+#: js/basicblocks.js:3745
+#: js/basicblocks.js:3757
 msgid "synth"
 msgstr "シンセ"
 
-#: js/basicblocks.js:3767
-#: js/basicblocks.js:3776
+#: js/basicblocks.js:3768
+#: js/basicblocks.js:3777
 #.TRANS: set the loudness level
 #.TRANS: set the loudness level
 msgid "set master volume"
 msgstr "マスターの音量を設定"
 
-#: js/basicblocks.js:3787
+#: js/basicblocks.js:3788
 #.TRANS: set an articulation (change in volume)
 msgid "set relative volume"
 msgstr "相対的な音量を設定"
 
-#: js/basicblocks.js:3797
+#: js/basicblocks.js:3798
 #.TRANS: a gradual increase in loudness
 msgid "crescendo"
 msgstr "クレッシェンド"
@@ -4200,9 +4217,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "divide note value"
 #~msgstr "音価を割る数値"
 
-#~msgid "mashape"
-#~msgstr ""
-
 #~msgid "play backward"
 #~msgstr "逆に再生"
 
@@ -4259,10 +4273,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "rodi"
 #~msgstr "ロデイ"
 
-#: js/basicblocks.js:808
-
-#~msgid "free time"
-#~msgstr "クロックなし"
+#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
+#~msgstr "ネズミさんが私たちのミュージック・ブロックスの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
 
 #~msgid "Save your project to a server."
 #~msgstr "サバーにプロジェクトを保存"
@@ -4272,9 +4284,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "blocks"
 #~msgstr "ブロック"
-
-#~msgid "eatme"
-#~msgstr "私を食べろ"
 
 #: js/basicblocks.js:1652
 
@@ -4287,20 +4296,20 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "1/16 note ♬"
 #~msgstr "16部音符"
 
-#~msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-#~msgstr "増のブロックに 1, 2, 3, 4, 5, 6, 7, 8 からの数価の必要があります。"
-
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 #~msgstr "速いスピードで再生します・長く押すとゆっくりに再生・もと長く押すと音楽はゆっくりなペースで再生"
 
-#~msgid "Input to Major Block must be 2, 3, 6, or 7"
-#~msgstr "長のブロックに 2, 3, 6, 7からの数価の必要があります。"
+#~msgid "mashape"
+#~msgstr ""
 
 #~msgid "food"
 #~msgstr "食べ物"
 
 #~msgid "blues"
 #~msgstr "ブルース"
+
+#~msgid "eatme"
+#~msgstr "私を食べろ"
 
 #~msgid "maths"
 #~msgstr "数学"
@@ -4330,6 +4339,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "hspace"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "ツールバーを開くためにここでクリック"
+
 #~msgid "numerator"
 #~msgstr "分子"
 
@@ -4344,14 +4356,19 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "graphical notation matrix"
 #~msgstr "簡単なビジュアル・マトリックス"
 
-#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
-#~msgstr "ネズミさんが私たちのミュージック・ブロックスの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
+#: js/basicblocks.js:808
 
-#~msgid "current pitch octave"
-#~msgstr "このピッチのオクターブ"
+#~msgid "free time"
+#~msgstr "クロックなし"
+
+#~msgid "Input to Major Block must be 2, 3, 6, or 7"
+#~msgstr "長のブロックに 2, 3, 6, 7からの数価の必要があります。"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "ツールバーを開き隠し"
+
+#~msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
+#~msgstr "増のブロックに 1, 2, 3, 4, 5, 6, 7, 8 からの数価の必要があります。"
 
 #~msgid "logic"
 #~msgstr "論理"
@@ -4418,8 +4435,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "note volume"
 #~msgstr "音符の音量"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "ツールバーを開くためにここでクリック"
+#~msgid "current pitch octave"
+#~msgstr "このピッチのオクターブ"
 
 #~msgid "hours ago"
 #~msgstr "時間前"
