@@ -6812,6 +6812,28 @@ function Logo () {
                     vibratoValue = beatValue * (duration / vibratoRate);
                 }
 
+                // Check to see if we need any courtesy accidentals:
+                // e.g., are there any combinations of natural and
+                // sharp or natural and flat notes?
+                var courtesy = [];
+                for (var i = 0; i < that.notePitches[turtle][thisBlk].length; i++) {
+                    var n = that.notePitches[turtle][thisBlk][i];
+                    var thisCourtesy = false;
+                    if (n.length === 1) {
+                        for (j = 0; j < that.notePitches[turtle][thisBlk].length; j++) {
+                            if (i === j || that.noteOctaves[turtle][thisBlk][i] !== that.noteOctaves[turtle][thisBlk][j]) {
+                                continue;
+                            }
+
+                            if (n + '♯' === that.notePitches[turtle][thisBlk][j] || n + '♭' === that.notePitches[turtle][thisBlk][j]) {
+                                thisCourtesy = true;
+                            }
+                        }
+                    }
+
+                    courtesy.push(thisCourtesy);
+                }
+
                 // Process pitches
                 if (that.notePitches[turtle][thisBlk].length > 0) {
                     for (var i = 0; i < that.notePitches[turtle][thisBlk].length; i++) {
@@ -6857,15 +6879,22 @@ function Logo () {
 
                             if (that.justCounting[turtle].length === 0) {
                                 if (that.noteDrums[turtle][thisBlk].length > 0) {
-                                    console.log(that.noteDrums[turtle][thisBlk][0]);
                                     that.updateNotation(note, originalDuration, turtle, insideChord, that.noteDrums[turtle][thisBlk][0]);
                                 } else {
-                                    that.updateNotation(note, originalDuration, turtle, insideChord, '');
+                                    if (courtesy[i]) {
+                                        that.updateNotation(note + '♮', originalDuration, turtle, insideChord, '');
+                                    } else {
+                                        that.updateNotation(note, originalDuration, turtle, insideChord, '');
+                                    }
                                 }
                             }
                         } else if (that.tieCarryOver[turtle] > 0) {
                             if (that.justCounting[turtle].length === 0) {
-                                that.updateNotation(note, that.tieCarryOver[turtle], turtle, insideChord, '');
+                                if (courtesy[i]) {
+                                    that.updateNotation(note, that.tieCarryOver[turtle], turtle, insideChord, '');
+                                } else {
+                                    that.updateNotation(note + '♮', that.tieCarryOver[turtle], turtle, insideChord, '');
+                                }
                             }
                         }
                     }
@@ -9555,7 +9584,7 @@ function Logo () {
         var obj = durationToNoteValue(duration);
         // Deprecated
         if (this.turtles.turtleList[turtle].drum) {
-            note = "c'";
+            note = 'c2';
         }
 
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
