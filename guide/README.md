@@ -478,6 +478,8 @@ rotation.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg "inversion")
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/even-invert-chart.svg "even invert chart")
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-even.png "even invert example")
 
 Even mode
@@ -487,6 +489,9 @@ Even mode
 | `F5`          | 5                     | 5                     | `G4`        |
 | `D5`          | 2                     | 2                     | `B♭4`       |
 
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/odd-invert-chart.svg "odd invert chart")
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-odd.png "odd invert example")
 
 Odd mode
@@ -495,6 +500,8 @@ Odd mode
 | :-----------: | :--------------------------------------------------: | :--------------------------------------------------: | :---------: |
 | `F5`          | 4.5                                                  | 4.5                                                  | `A♭4`       |
 | `D5`          | 1.5                                                  | 1.5                                                  | `B4`        |
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/scalar-invert-chart.svg "scalar invert chart")
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/invert-scalar.png "scalar invert example")
 
