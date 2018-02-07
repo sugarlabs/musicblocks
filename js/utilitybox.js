@@ -169,7 +169,7 @@ function UtilityBox () {
 
             dx += BOXBUTTONSPACING;;
 
-            this._pluginsDeleteButton = makeButton('plugins-delete-disabled-button', _(' '), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._pluginsDeleteButton = makeButton('plugins-delete-disabled-button', '', this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._pluginsDeleteButton.visible = !status;
             this._positionHoverText(this._pluginsDeleteButton);
 
