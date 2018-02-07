@@ -16,8 +16,8 @@ function UtilityBox () {
     const BOXBUTTONOFFSET = 40;
     const BOXBUTTONSPACING = 65;
 
-    // 7 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
-    var boxwidth = 7 * 55 + 6 * 10 + 2 * 20;
+    // 8 buttons, 7 intrabuttons spaces, 2 extrabutton spaces
+    var boxwidth = 8 * 55 + 7 * 10 + 2 * 20;
     var boxwidth2 = boxwidth - 1.5;
     var boxclose = boxwidth - 55;
 
@@ -31,6 +31,8 @@ function UtilityBox () {
     this._deletePlugin = null;
     this._doStats = null;
     this._doScroller = null;
+    this._doLanguageBox = null;
+    this._languageBox = null;
     this._toggleSearch = null;
     this._hideSearch = null;
     this._scrollStatus = false;
@@ -74,6 +76,12 @@ function UtilityBox () {
         return this;
     };
 
+    this.setLanguage = function (doLanguageBox, languageBox) {
+        this._doLanguageBox = doLanguageBox;
+        this._languageBox = languageBox;
+        return this;
+    };
+
     this.setScroller = function (scroller) {
         this._doScroller = scroller;
         return this;
@@ -94,6 +102,16 @@ function UtilityBox () {
             this._createBox(scale, x, y);
             var that = this;
             var dx = BOXBUTTONOFFSET;
+
+            this._languageButton = makeButton('language-button', _('Select language'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._languageButton.visible = true;
+            this._positionHoverText(this._languageButton);
+            this._languageButton.on('click', function (event) {
+                that._doLanguageBox();
+                that._hide();
+            });
+
+            dx += BOXBUTTONSPACING;
 
             this._smallerButton = makeButton('smaller-button', _('Decrease block size'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._smallerButton.visible = true;
@@ -216,6 +234,7 @@ function UtilityBox () {
 
     this._hide = function () {
         if (this._container !== null) {
+            this._languageButton.visible = false;
             this._smallerButton.visible = false;
             this._smallerButton2.visible = false;
             this._biggerButton.visible = false;
@@ -235,6 +254,7 @@ function UtilityBox () {
 
     this._show = function (status) {
         if (this._container !== null) {
+            this._languageButton.visible = true;
             this._smallerButton.visible = this._decreaseStatus;
             this._smallerButton2.visible = !this._decreaseStatus;
             this._biggerButton.visible = this._increaseStatus;

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd' [
+	<!ENTITY stroke_color "#010101">
+	<!ENTITY fill_color "#ffffff">
+]><svg enable-background="new 0 0 55 55" height="55px" version="1.1" viewBox="0 0 55 55" width="55px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px"><g display="block" id="microphone">
+	<g display="inline">
+		<path d="M51.375,27.597    c0,0-11.387,13.041-24.001,13.041c-12.613,0-23.999-13.041-23.999-13.041s8.915-11.234,16.869-11.234c4.418,0,7.13,2.73,7.13,2.73    s2.716-2.73,7.132-2.73C42.459,16.362,51.375,27.597,51.375,27.597z" fill="&fill_color;" stroke="&stroke_color;" stroke-linecap="round" stroke-width="3.5"/>
+		<line fill="none" stroke="&stroke_color;" stroke-linecap="round" stroke-width="3.5" x1="3.375" x2="51.375" y1="27.597" y2="27.597"/>
+	</g>
+</g></svg>
