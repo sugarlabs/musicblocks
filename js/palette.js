@@ -725,6 +725,15 @@ function PaletteModel(palette, palettes, name) {
             case 'eastindiansolfege':
                 label = 'sargam';
                 break;
+            case 'modename':
+                label = _('mode name');
+                break;
+            case 'invertmode':
+                label = _('invert mode');
+                break;
+            case 'voicename':
+                label = _('voice name');
+                break;
             case 'accidentalname':
                 //TRANS: accidental refers to sharps, flats, etc.
                 label = _('accidental');

@@ -120,8 +120,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertmodeBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invertmode'] = invertmodeBlock;
     invertmodeBlock.valueBlock();
-    invertmodeBlock.adjustWidthToLabel();
     invertmodeBlock.dockTypes[0] = 'textout';
+    invertmodeBlock.extraWidth = 50;
 
     var transposition = new ProtoBlock('transpositionfactor');
     transposition.palette = palettes.dict['pitch'];
@@ -1453,6 +1453,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['voicename'] = voicenameBlock;
     voicenameBlock.valueBlock();
     voicenameBlock.dockTypes[0] = 'textout';
+    voicenameBlock.extraWidth = 50;
 
     // macro
     var setTimbreBlock = new ProtoBlock('settimbre');
