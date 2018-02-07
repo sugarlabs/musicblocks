@@ -15,7 +15,7 @@ const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname'];
-const WIDENAMES = ['intervalname', 'accidentalname'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'modename'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1714,7 +1714,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedmode = getModeName(DEFAULTMODE);
             }
 
-            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">'
             for (var i = 0; i < MODENAMES.length; i++) {
                 if (MODENAMES[i][0].length === 0) {
                     // work around some weird i18n bug
