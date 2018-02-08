@@ -3963,8 +3963,15 @@ function Logo () {
             if (that.inNeighbor[turtle].length > 0) {
                 var noteObj = getNote(note, octave, that.scalarTransposition[turtle], that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                 that.neighborArgNote1[turtle].push(noteObj[0] + noteObj[1]);
-                var transValue = that.scalarTransposition[turtle] + parseInt(that.neighborStepPitch[turtle]);
-                var noteObj2 = getNote(note, octave, transValue, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                if (that.blocks.blockList[last(that.inNeighbor[turtle])].name === 'neighbor2') {
+                    var noteObj2 = that._addScalarTransposition(turtle, note, octave, parseInt(that.neighborStepPitch[turtle]));
+                    if (that.scalarTransposition[turtle] !== 0) {
+                        noteObj2 = getNote(noteObj2[0], noteObj2[1], that.scalarTransposition[turtle], that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    }
+                } else {
+                    var noteObj2 = getNote(note, octave, that.scalarTransposition[turtle] + parseInt(that.neighborStepPitch[turtle]), that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                }
+
                 that.neighborArgNote2[turtle].push(noteObj2[0] + noteObj2[1]);
             }
 
@@ -5027,7 +5034,8 @@ function Logo () {
                 that.errorMsg(_('Partial block should be used inside of a Weighted-partisls block.'));
             }
             break;
-        case 'neighbor':
+        case 'neighbor':  // semi-tone step
+        case 'neighbor2':  // scalar step
             if (typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
                 that.errorMsg(NANERRORMSG, blk);
                 that.stopTurtle = true;
@@ -6124,6 +6132,7 @@ function Logo () {
             } else {
                 that.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
             }
+
             childFlow = args[1];
             childFlowCount = 1;
 

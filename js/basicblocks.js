@@ -1305,6 +1305,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     neighborBlock.defaults.push(1);
     neighborBlock.defaults.push(1 / 16);
 
+    // macro
+    var neighbor2Block = new ProtoBlock('neighbor2');
+    neighbor2Block.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['neighbor2'] = neighbor2Block;
+    //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
+    neighbor2Block.staticLabels.push(_('neighbor') + ' (+/–)');
+    neighbor2Block.staticLabels.push(_('scalar interval'), _('note value'));
+    neighbor2Block.extraWidth = 15;
+    neighbor2Block.adjustWidthToLabel();
+    neighbor2Block.flowClampTwoArgBlock();
+    neighbor2Block.dockTypes[1] = 'numberin';
+    neighbor2Block.dockTypes[2] = 'numberin';
+    neighbor2Block.defaults.push(1);
+    neighbor2Block.defaults.push(1 / 16);
+
     var distortionBlock = new ProtoBlock('dis');
     distortionBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['dis'] = distortionBlock;
