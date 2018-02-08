@@ -1296,7 +1296,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['neighbor'] = neighborBlock;
     //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
     neighborBlock.staticLabels.push(_('neighbor') + ' (+/–)');
-    neighborBlock.staticLabels.push(_('step pitch'), _('note value'));
+    neighborBlock.staticLabels.push(_('semi-tone interval'), _('note value'));
     neighborBlock.extraWidth = 15;
     neighborBlock.adjustWidthToLabel();
     neighborBlock.flowClampTwoArgBlock();
