@@ -282,12 +282,12 @@ returns the number of scalar steps in the current mode.)
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "Using Sharp and Flat blocks")
 
-The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
-*Note value* blocks, or [chunks](#CHUNKS). A sharp will raise the
-pitch by one half step. A flat will lower by one half step. In the
-example, on the left, just the *Pitch* block `Mi` is lowered by one
-half step; on the right, both *Pitch* blocks are raised by one half
-step.
+The *Accidental* block can be wrapped around *Pitch* blocks, *Note
+value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by
+one half step. A flat will lower by one half step. In the example, on
+the left, just the *Pitch* block `Mi` is lowered by one half step; on
+the right, both *Pitch* blocks are raised by one half step. (You can
+also use a double-sharp or double-flat accidental.)
 
 #### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjust-Transposition
 
