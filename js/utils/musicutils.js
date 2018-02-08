@@ -363,13 +363,13 @@ var OSCTYPES = [
     [_('sawtooth'), 'sawtooth'],
 ];
 
-const DEFAULTINVERT = 'even';
+const DEFAULTINVERT = _('even');
 const DEFAULTINTERVAL = _('perfect') + ' 5';
-const DEFAULTVOICE = 'sine';
-const DEFAULTDRUM = 'kick drum';
-const DEFAULTMODE = 'major';
-const DEFAULTFILTERTYPE = 'highpass';
-const DEFAULTOSCILLATORTYPE = 'sine';
+const DEFAULTVOICE = _('default');
+const DEFAULTDRUM = _('kick drum');
+const DEFAULTMODE = _('major');
+const DEFAULTFILTERTYPE = _('highpass');
+const DEFAULTOSCILLATORTYPE = _('sine');
 const DEFAULTACCIDENTAL = _('natural') + ' ♮';
 
 var customMode = MUSICALMODES['custom'];
