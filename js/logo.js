@@ -4293,17 +4293,28 @@ function Logo () {
 
                 var beatValue = bpmFactor / noteBeatValue;
 
-                for (var i = 0; i < args[0]; i++) {
+		__rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                     setTimeout(function () {
-                        that._processNote(noteBeatValue, blk, turtle);
-                    }, i * beatValue * 1000);
+                        that._processNote(thisBeat, blk, turtle, callback);
+                    }, timeout);
+                };
+
+                for (var i = 0; i < args[0]; i++) {
+                    if (i === args[0] - 1) {
+
+                        __callback = function () {
+                            that.noteDrums[turtle][blk] = [];
+                            var j = that.inNoteBlock[turtle].indexOf(blk);
+                            that.inNoteBlock[turtle].splice(j, 1);
+                        };
+
+                    } else {
+                        __callback = null;
+                    }
+                     
+                    __rhythmPlayNote(noteBeatValue, blk, turtle, __callback, i * beatValue * 1000);
                 }
                 
-                setTimeout(function () {
-                    that.noteDrums[turtle][blk] = [];
-                    that.inNoteBlock[turtle].pop();
-                }, args[0] * beatValue * 950);
-
                 that._doWait(turtle, (args[0] - 1) * beatValue);
             }
             break;
@@ -6085,16 +6096,27 @@ function Logo () {
 
                 var beatValue = (bpmFactor / noteBeatValue) / args[0];
 
-                for (var i = 0; i < args[0]; i++) {
+		__rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                     setTimeout(function () {
-                        that._processNote(noteBeatValue * args[0], blk, turtle);
-                    }, i * beatValue * 1000);
+                        that._processNote(thisBeat, blk, turtle, callback);
+                    }, timeout);
+                };
+
+                for (var i = 0; i < args[0]; i++) {
+                    if (i === args[0] - 1) {
+
+                        __callback = function () {
+                            that.noteDrums[turtle][blk] = [];
+                            var j = that.inNoteBlock[turtle].indexOf(blk);
+                            that.inNoteBlock[turtle].splice(j, 1);
+                        };
+
+                    } else {
+                        __callback = null;
+                    }
+                     
+                    __rhythmPlayNote(noteBeatValue * args[0], blk, turtle, __callback, i * beatValue * 1000);
                 }
-                
-                setTimeout(function () {
-                    that.noteDrums[turtle][blk] = [];
-                    that.inNoteBlock[turtle].pop();
-                }, i * beatValue * 950);
 
                 that._doWait(turtle, (args[0] - 1) * beatValue);
             }
@@ -6191,9 +6213,9 @@ function Logo () {
 
                     var totalBeats = 0;
 
-                    __tupletPlayNote = function (thisBeat, blk, turtle, timeout) {
+                    __tupletPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                         setTimeout(function () {
-                            that._processNote(thisBeat, blk, turtle);
+                            that._processNote(thisBeat, blk, turtle, callback);
                         }, timeout);
                     };
 
@@ -6202,16 +6224,23 @@ function Logo () {
                         var thisBeat = beatValues[i];
                         var beatValue = bpmFactor / thisBeat;
 
-                        __tupletPlayNote(thisBeat, blk, turtle, timeout);
+                        if (i === beatValues.length - 1) {
+
+                            __callback = function () {
+                                that.noteDrums[turtle][blk] = [];
+                                var j = that.inNoteBlock[turtle].indexOf(blk);
+                                that.inNoteBlock[turtle].splice(j, 1);
+                            };
+
+                        } else {
+                            __callback = null;
+                        }
+
+                        __tupletPlayNote(thisBeat, blk, turtle, __callback, timeout);
 
                         timeout += beatValue * 1000;
                         totalBeats += beatValue
                     }
-
-                    setTimeout(function () {
-                        that.noteDrums[turtle][blk] = [];
-                        that.inNoteBlock[turtle].pop();
-                    }, (totalBeats - beatValue) * 950);
 
                     that._doWait(turtle, totalBeats - beatValue);
                 }
@@ -6507,7 +6536,7 @@ function Logo () {
         }
     };
 
-    this._processNote = function (noteValue, blk, turtle) {
+    this._processNote = function (noteValue, blk, turtle, callback) {
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
         } else {
@@ -7354,6 +7383,10 @@ function Logo () {
         }
 
         this.pushedNote[turtle] = false;
+
+        if (callback !== undefined && callback !== null) {
+            callback();
+        }
     };
 
     this.playback = function (whichMouse, recording) {
