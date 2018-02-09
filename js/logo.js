@@ -4168,16 +4168,7 @@ function Logo () {
             } else {
                 if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
                     // Play a stand-alone pitch block as a quarter note.
-                    that.oscList[turtle][blk] = [];
-                    that.noteBeat[turtle][blk] = [];
-                    that.noteBeatValues[turtle][blk] = [];
-                    that.noteValue[turtle][blk] = null;
-                    that.notePitches[turtle][blk] = [];
-                    that.noteOctaves[turtle][blk] = [];
-                    that.noteCents[turtle][blk] = [];
-                    that.noteHertz[turtle][blk] = [];
-                    that.embeddedGraphics[turtle][blk] = [];
-                    that.noteDrums[turtle][blk] = [];
+		    that.clearNoteParams(turtle, blk, null);
 
                     var noteObj = getNote(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     if (!that.validNote) {
@@ -4204,12 +4195,12 @@ function Logo () {
                     var noteBeatValue = 4;
                     var beatValue = bpmFactor / noteBeatValue;
 
-                    that._processNote(noteBeatValue, blk, turtle);
-                
-                    setTimeout(function () {
-                        that.noteDrums[turtle][blk] = [];
-                        that.inNoteBlock[turtle].pop();
-                    }, beatValue * 1000);
+                    __callback = function () {
+                        var j = that.inNoteBlock[turtle].indexOf(blk);
+                        that.inNoteBlock[turtle].splice(j, 1);
+                    };
+
+                    that._processNote(noteBeatValue, blk, turtle, __callback);
                 } else {
                     that.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
                 }
