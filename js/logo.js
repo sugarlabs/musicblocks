@@ -4266,21 +4266,11 @@ function Logo () {
                     }
                 }
             } else {
-                // that.errorMsg(_('Rhythm Block: Did you mean to use a Matrix block?'), blk);
                 // Play rhythm block as if it were a drum.
-                that.oscList[turtle][blk] = [];
-                that.noteBeat[turtle][blk] = [];
-                that.noteBeatValues[turtle][blk] = [];
-                that.noteValue[turtle][blk] = null;
-                that.notePitches[turtle][blk] = [];
-                that.noteOctaves[turtle][blk] = [];
-                that.noteCents[turtle][blk] = [];
-                that.noteHertz[turtle][blk] = [];
-                that.embeddedGraphics[turtle][blk] = [];
                 if (that.drumStyle[turtle].length > 0) {
-                    that.noteDrums[turtle][blk] = [last(that.drumStyle[turtle])];
+		    that.clearNoteParams(turtle, blk, last(that.drumStyle[turtle]));
                 } else {
-                    that.noteDrums[turtle][blk] = [DEFAULTDRUM];
+		    that.clearNoteParams(turtle, blk, DEFAULTDRUM);
                 }
 
                 that.inNoteBlock[turtle].push(blk);
@@ -4497,16 +4487,7 @@ function Logo () {
             // A note can contain multiple pitch blocks to create
             // a chord. The chord is accumuated in these arrays,
             // which are used when we play the note.
-            that.oscList[turtle][blk] = [];
-            that.noteBeat[turtle][blk] = [];
-            that.noteBeatValues[turtle][blk] = [];
-            that.noteValue[turtle][blk] = null;
-            that.notePitches[turtle][blk] = [];
-            that.noteOctaves[turtle][blk] = [];
-            that.noteCents[turtle][blk] = [];
-            that.noteHertz[turtle][blk] = [];
-            that.noteDrums[turtle][blk] = [];
-            that.embeddedGraphics[turtle][blk] = [];
+	    that.clearNoteParams(turtle, blk, null);
 
             // Ensure that note duration is positive.
             if (args[0] > 0) {
@@ -6071,19 +6052,10 @@ function Logo () {
                 }
             } else {
                 // Play rhythm block as if it were a drum.
-                that.oscList[turtle][blk] = [];
-                that.noteBeat[turtle][blk] = [];
-                that.noteBeatValues[turtle][blk] = [];
-                that.noteValue[turtle][blk] = null;
-                that.notePitches[turtle][blk] = [];
-                that.noteOctaves[turtle][blk] = [];
-                that.noteCents[turtle][blk] = [];
-                that.noteHertz[turtle][blk] = [];
-                that.embeddedGraphics[turtle][blk] = [];
                 if (that.drumStyle[turtle].length > 0) {
-                    that.noteDrums[turtle][blk] = [last(that.drumStyle[turtle])];
+		    that.clearNoteParams(turtle, blk, last(that.drumStyle[turtle]));
                 } else {
-                    that.noteDrums[turtle][blk] = [DEFAULTDRUM];
+		    that.clearNoteParams(turtle, blk, DEFAULTDRUM);
                 }
 
                 that.inNoteBlock[turtle].push(blk);
@@ -6121,6 +6093,7 @@ function Logo () {
                 that._doWait(turtle, (args[0] - 1) * beatValue);
             }
             break;
+            // deprecated
         case 'tuplet2':
         case 'tuplet3':
             if (that.inMatrix) {
@@ -6129,11 +6102,11 @@ function Logo () {
                 } else {
                     that.tupletParams.push([args[0], args[1] * that.beatFactor[turtle]]);
                 }
+
                 that.tuplet = true;
                 that.addingNotesToTuplet = false;
-            } else {
-                // that.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
             }
+
             childFlow = args[2];
             childFlowCount = 1;
 
@@ -6152,7 +6125,6 @@ function Logo () {
             break;
         case 'tuplet4':
             if (!that.inMatrix) {
-                // that.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
                 that.tupletRhythms = [];
                 that.tupletParams = [];
             }
@@ -6188,19 +6160,10 @@ function Logo () {
                     }
 
                     // Play rhythm block as if it were a drum.
-                    that.oscList[turtle][blk] = [];
-                    that.noteBeat[turtle][blk] = [];
-                    that.noteBeatValues[turtle][blk] = [];
-                    that.noteValue[turtle][blk] = null;
-                    that.notePitches[turtle][blk] = [];
-                    that.noteOctaves[turtle][blk] = [];
-                    that.noteCents[turtle][blk] = [];
-                    that.noteHertz[turtle][blk] = [];
-                    that.embeddedGraphics[turtle][blk] = [];
                     if (that.drumStyle[turtle].length > 0) {
-                        that.noteDrums[turtle][blk] = [last(that.drumStyle[turtle])];
+			that.clearNoteParams(turtle, blk, last(that.drumStyle[turtle]));
                     } else {
-                        that.noteDrums[turtle][blk] = [DEFAULTDRUM];
+			that.clearNoteParams(turtle, blk, DEFAULTDRUM);
                     }
 
                     that.inNoteBlock[turtle].push(blk);
@@ -9790,6 +9753,23 @@ function Logo () {
             }
 
             return -i;
+        }
+    };
+
+    this.clearNoteParams = function (turtle, blk, drum) {
+        this.oscList[turtle][blk] = [];
+        this.noteBeat[turtle][blk] = [];
+        this.noteBeatValues[turtle][blk] = [];
+        this.noteValue[turtle][blk] = null;
+        this.notePitches[turtle][blk] = [];
+        this.noteOctaves[turtle][blk] = [];
+        this.noteCents[turtle][blk] = [];
+        this.noteHertz[turtle][blk] = [];
+        this.embeddedGraphics[turtle][blk] = [];
+        if (drum !== null) {
+            this.noteDrums[turtle][blk] = [drum];
+        } else {
+            this.noteDrums[turtle][blk] = [];
         }
     };
 
