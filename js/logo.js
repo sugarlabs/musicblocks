@@ -2997,9 +2997,9 @@ function Logo () {
                 }
 
                 var pitchNumbers = that.defineMode[turtle].sort(
-		    function(a, b) {
-			return a[0] - b[0];
-		    });
+                    function(a, b) {
+                        return a[0] - b[0];
+                    });
 
                 for (var i = 0; i < pitchNumbers.length; i++) {
                     if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
@@ -3017,7 +3017,7 @@ function Logo () {
                     } else {
                         MUSICALMODES[modeName].push(12 - pitchNumbers[i]);
                     }
-		}
+                }
 
                 console.log(MUSICALMODES[modeName]);
                 that.inDefineMode[turtle] = false;
@@ -4229,8 +4229,11 @@ function Logo () {
                 var noteBeatValue = args[1];
             }
 
-            if (that.inMatrix) {
-                that.pitchTimeMatrix.addColBlock(blk, args[0]);
+            if (that.inMatrix || that.tuplet) {
+                if (that.inMatrix) {
+                    that.pitchTimeMatrix.addColBlock(blk, args[0]);
+                }
+
                 for (var i = 0; i < args[0]; i++) {
                     that._processNote(noteBeatValue, blk, turtle);
                 }
@@ -6035,15 +6038,16 @@ function Logo () {
             break;
         case 'stuplet':
             var noteBeatValue = (1 / args[1]) * that.beatFactor[turtle];
-            if (that.inMatrix) {
+            if (that.inMatrix || that.tuplet) {
                 that.pitchTimeMatrix.addColBlock(blk, args[0]);
-                if (that.tuplet === true) {
+                if (that.tuplet) {
                     // The simple-tuplet block is inside.
                     for (var i = 0; i < args[0]; i++) {
                         if (!that.addingNotesToTuplet) {
                             that.tupletRhythms.push(['notes', 0]);
                             that.addingNotesToTuplet = true;
                         }
+
                         that._processNote(noteBeatValue, blk, turtle);
                     }
                 } else {
@@ -6106,7 +6110,7 @@ function Logo () {
                 that.tuplet = true;
                 that.addingNotesToTuplet = false;
             } else {
-                that.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
+                // that.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
             }
             childFlow = args[2];
             childFlowCount = 1;
@@ -6125,14 +6129,15 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'tuplet4':
-            if (that.inMatrix) {
-                that.tupletParams.push([1, (1 / args[0]) * that.beatFactor[turtle]]);
-                that.tuplet = true;
-                that.addingNotesToTuplet = false;
-            } else {
-                that.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
+            if (!that.inMatrix) {
+                // that.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
+                that.tupletRhythms = [];
+                that.tupletParams = [];
             }
 
+            that.tuplet = true;
+            that.addingNotesToTuplet = false;
+            that.tupletParams.push([1, (1 / args[0]) * that.beatFactor[turtle]]);
             childFlow = args[1];
             childFlowCount = 1;
 
@@ -6140,10 +6145,75 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                if (that.inMatrix) {
-                    that.tuplet = false;
-                    that.addingNotesToTuplet = false;
-                } else {
+                that.tuplet = false;
+                that.addingNotesToTuplet = false;
+                if (!that.inMatrix) {
+                    var beatValues = [];
+
+                    for (var i = 0; i < that.tupletRhythms.length; i++) {
+                        var tupletParam = [that.tupletParams[that.tupletRhythms[i][1]]];
+                        tupletParam.push([]);
+                        var tupletBeats = 0;
+                        for (var j = 2; j < that.tupletRhythms[i].length; j++) {
+                            tupletBeats += (1 / that.tupletRhythms[i][j]);
+                            tupletParam[1].push(that.tupletRhythms[i][j]);
+                        }
+
+                        var factor = tupletParam[0][0] / (tupletParam[0][1] * tupletBeats);
+                        for (var j = 2; j < that.tupletRhythms[i].length; j++) {
+                            beatValues.push(that.tupletRhythms[i][j] / factor);
+                        }
+                    }
+
+                    // Play rhythm block as if it were a drum.
+                    that.oscList[turtle][blk] = [];
+                    that.noteBeat[turtle][blk] = [];
+                    that.noteBeatValues[turtle][blk] = [];
+                    that.noteValue[turtle][blk] = null;
+                    that.notePitches[turtle][blk] = [];
+                    that.noteOctaves[turtle][blk] = [];
+                    that.noteCents[turtle][blk] = [];
+                    that.noteHertz[turtle][blk] = [];
+                    that.embeddedGraphics[turtle][blk] = [];
+                    if (that.drumStyle[turtle].length > 0) {
+                        that.noteDrums[turtle][blk] = [last(that.drumStyle[turtle])];
+                    } else {
+                        that.noteDrums[turtle][blk] = [DEFAULTDRUM];
+                    }
+
+                    that.inNoteBlock[turtle].push(blk);
+
+                    if (that.bpm[turtle].length > 0) {
+                        var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                    } else {
+                        var bpmFactor = TONEBPM / that._masterBPM;
+                    }
+
+                    var totalBeats = 0;
+
+                    __tupletPlayNote = function (thisBeat, blk, turtle, timeout) {
+                        setTimeout(function () {
+                            that._processNote(thisBeat, blk, turtle);
+                        }, timeout);
+                    };
+
+                    var timeout = 0;
+                    for (var i = 0; i < beatValues.length; i++) {
+                        var thisBeat = beatValues[i];
+                        var beatValue = bpmFactor / thisBeat;
+
+                        __tupletPlayNote(thisBeat, blk, turtle, timeout);
+
+                        timeout += beatValue * 1000;
+                        totalBeats += beatValue
+                    }
+
+                    setTimeout(function () {
+                        that.noteDrums[turtle][blk] = [];
+                        that.inNoteBlock[turtle].pop();
+                    }, (totalBeats - beatValue) * 950);
+
+                    that._doWait(turtle, totalBeats - beatValue);
                 }
             };
 
@@ -6607,7 +6677,7 @@ function Logo () {
             this.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
             this.previousNotePlayed[turtle] = this.lastNotePlayed[turtle];
             this.lastNotePlayed[turtle] = [noteObj[0] + noteObj[1], noteBeatValue];
-        } else if (this.inMatrix) {
+        } else if (this.inMatrix || this.tuplet) {
             if (this.inNoteBlock[turtle].length > 0) {
                 this.pitchTimeMatrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
@@ -6620,7 +6690,7 @@ function Logo () {
             }
 
             noteBeatValue *= this.beatFactor[turtle];
-            if (this.tuplet === true) {
+            if (this.tuplet) {
                 if (this.addingNotesToTuplet) {
                     var i = this.tupletRhythms.length - 1;
                     this.tupletRhythms[i].push(noteBeatValue);
