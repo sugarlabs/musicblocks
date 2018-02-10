@@ -990,7 +990,9 @@ function Block(protoblock, blocks, overrideName) {
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
-            if (WIDENAMES.indexOf(this.name) !== -1) {
+            if (this.name === 'modename') {
+                this.text.x *= 3.0;
+            } else if (WIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 1.75;
             }
         } else if (this.protoblock.args === 0) {
@@ -2111,6 +2113,8 @@ function Block(protoblock, blocks, overrideName) {
             if (attr !== '♮') {
                 label += attr;
             }
+        } else if (this.name === 'modename') {
+            var label = this.value + ' ' + getModeNumbers(this.value);
         } else {
             var label = this.value.toString();
         }

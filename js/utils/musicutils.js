@@ -439,6 +439,33 @@ function getIntervalDirection(name) {
 };
 
 
+function getModeNumbers(name) {
+    __convert = function (obj) {
+        var n = 0;
+        var m = '';
+        for (var i = 0; i < obj.length; i++) {
+            m += n.toString();
+            if (i < obj.length - 1) {
+                m += ' ';
+            }
+
+            n += obj[i];
+        }
+
+        return m;
+    };
+
+    for (var mode in MODENAMES) {
+        if (MODENAMES[mode][0] === name || MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
+            return __convert(MUSICALMODES[MODENAMES[mode][1]]);
+        }
+    }
+
+    console.log(name + ' not found in MODENAMES');
+    return '';
+};
+
+
 function getModeName(name) {
     for (var mode in MODENAMES) {
         if (MODENAMES[mode][0] === name || MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
