@@ -1763,6 +1763,11 @@ function Logo () {
                 that._doWait(turtle, args[0]);
             }
             break;
+        case 'comment':
+            if (args[0] !== null && !that.suppressOutput[turtle] && that.turtleDelay > 0) {
+                that.textMsg(args[0].toString());
+            }
+            break;
         case 'print':
             if (!that.inStatusMatrix) {
                 if (args.length === 1) {

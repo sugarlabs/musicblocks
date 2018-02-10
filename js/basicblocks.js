@@ -3436,6 +3436,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     waitBlock.oneArgBlock();
     waitBlock.defaults.push(1);
 
+    var commentBlock = new ProtoBlock('comment');
+    commentBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['comment'] = commentBlock;
+    commentBlock.staticLabels.push(_('comment'));
+    commentBlock.adjustWidthToLabel();
+    commentBlock.oneArgBlock();
+    commentBlock.dockTypes[1] = 'anyin';
+    commentBlock.defaults.push(_('Music Blocks'));
+
     var printBlock = new ProtoBlock('print');
     printBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['print'] = printBlock;
@@ -3443,7 +3452,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     printBlock.adjustWidthToLabel();
     printBlock.oneArgBlock();
     printBlock.dockTypes[1] = 'anyin';
-    printBlock.defaults.push(_("Music Blocks"));
+    printBlock.defaults.push(_('Music Blocks'));
 
     // SENSORS PALETTE
 
