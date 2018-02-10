@@ -18,7 +18,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
    2. [Musical Transformation](#TRANSFORMATION)
       1. [Step Pitch Block](#STEP-PITCH)
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
-      3. [Adjust-Transposition Blocks](#ADJUST-TRANSPOSITION)
+      3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Dotted Notes](#DOTTED)
       5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       6. [Repeating Notes](#REPETITION)
@@ -295,10 +295,10 @@ also use a double-sharp or double-flat accidental.)
 
 There are several ways to transpose a pitch: by semi-tone or scalar
 steps. The *Semi-tone-transposition* block (above left) can be used to
-make larger shifts in pitch in half step units. A positive number
+make larger shifts in pitch in half-step units. A positive number
 shifts the pitch up and a negative number shifts the pitch down. The
-input must be a whole number. To shift an entire octave, transpose by
-`12` half-steps up. `-12` will shift an octave down.
+input must be a whole number. To shift up an entire octave, transpose
+by `12` half-steps. `-12` will shift down an entire octave.
 
 The *Scalar-transposition* block (above right) shifts a pitch based on
 the current key and mode. For example, in `C Major`, a scalar
