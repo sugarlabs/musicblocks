@@ -1105,7 +1105,7 @@ function PitchTimeMatrix () {
                     if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
                         synthNotes.push(note[i]);
                     } else {
-                        continue;
+                        this._processGraphics(obj);
                     }
                 } else {
                     pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
@@ -1227,9 +1227,9 @@ function PitchTimeMatrix () {
                             synthNotes.push(note[i]);
                             continue;
                         } else if (MATRIXGRAPHICS.indexOf(obj[0]) !== -1) {
-                            continue;
+                            that._processGraphics(obj);
                         } else if (MATRIXGRAPHICS2.indexOf(obj[0]) !== -1) {
-                            continue;
+                            that._processGraphics(obj);
                         } else {
                             pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
                         }
@@ -1272,6 +1272,54 @@ function PitchTimeMatrix () {
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+    };
+
+    this._processGraphics = function (obj) {
+        switch(obj[0]) {
+        case 'forward':
+            this._logo.turtles.turtleList[0].doForward(obj[1]);
+            break;
+        case 'back':
+            this._logo.turtles.turtleList[0].doForward(-obj[1]);
+            break;
+        case 'right':
+            this._logo.turtles.turtleList[0].doRight(obj[1]);
+            break;
+        case 'left':
+            this._logo.turtles.turtleList[0].doRight(-obj[1]);
+            break;
+        case 'setcolor':
+            this._logo.turtles.turtleList[0].doSetColor(obj[1]);
+            break;
+        case 'sethue':
+            this._logo.turtles.turtleList[0].doSetHue(obj[1]);
+            break;
+        case 'setshade':
+            this._logo.turtles.turtleList[0].doSetValue(obj[1]);
+            break;
+        case 'setgrey':
+            this._logo.turtles.turtleList[0].doSetChroma(obj[1]);
+            break;
+        case 'settranslucency':
+            var alpha = 1.0 - (obj[1] / 100);
+            this._logo.turtles.turtleList[0].doSetPenAlpha(alpha);
+            break;
+        case 'setpensize':
+            this._logo.turtles.turtleList[0].doSetPensize(obj[1]);
+            break;
+        case 'setheading':
+            this._logo.turtles.turtleList[0].doSetHeading(obj[1]);
+            break;
+        case 'arc':
+            this._logo.turtles.turtleList[0].doArc(obj[1], obj[2]);
+            break;
+        case 'setxy':
+            this._logo.turtles.turtleList[0].doSetXY(obj[1], obj[2]);
+            break;
+        default:
+            console.log('unknown graphics command ' + obj[0]);
+            break;
+        }
     };
 
     this._setNotes = function(colIndex, rowIndex, playNote) {
