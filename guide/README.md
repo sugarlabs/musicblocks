@@ -18,7 +18,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
    2. [Musical Transformation](#TRANSFORMATION)
       1. [Step Pitch Block](#STEP-PITCH)
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
-      3. [Adjust-Transposition Block](#ADJUST-TRANSPOSITION)
+      3. [Adjust-Transposition Blocks](#ADJUST-TRANSPOSITION)
       4. [Dotted Notes](#DOTTED)
       5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       6. [Repeating Notes](#REPETITION)
@@ -289,24 +289,31 @@ the left, just the *Pitch* block `Mi` is lowered by one half step; on
 the right, both *Pitch* blocks are raised by one half step. (You can
 also use a double-sharp or double-flat accidental.)
 
-#### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjust-Transposition
+#### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjusting Transposition
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "Adjust-transposition")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "Adjusting transpositions")
 
-The *Adjust-transposition* block can be used to make larger shifts in
-pitch in half step units. A positive number shifts the pitch up and a
-negative number shifts the pitch down. The input must be a whole
-number. To shift an entire octave, transpose by `12` half-steps
-up. `-12` will shift an octave down.
+There are several ways to transpose a pitch: by semi-tone or scalar
+steps. The *Semi-tone-transposition* block (above left) can be used
+to make larger shifts in pitch in half step units. A positive number
+shifts the pitch up and a negative number shifts the pitch down. The
+input must be a whole number. To shift an entire octave, transpose by
+`12` half-steps up. `-12` will shift an octave down.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using Adjust-transposition")
+The *Scalar-transposition* block (above right) shifts a pitch based on
+the current key and mode. For example, in C Major, a scalar
+transposition of `1` would transpose `C` to `D`, even though it is a
+transposition of `2` semi-tone steps. To transpose `E` to `F` is `1`
+scalar step and `1` semi-tone step.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using semi-tone-transposition")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
 
-As a convenience, a number of standard transpositions are provided:
-*Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*, and *Down
-sixth*, as well as a transposition for *Octave*.
+As a convenience, a number of standard scalar transpositions are
+provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
+and *Down sixth*, as well as a transposition for *Octave*.
 
 #### <a name="DOTTED"></a>3.2.4 Dotted Notes
 

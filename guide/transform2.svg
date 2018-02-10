@@ -5,14 +5,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="437.40088"
-   height="412.5"
-   version="1.1"
    id="svg4307"
-   sodipodi:docname="transform2.svg"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+   version="1.1"
+   height="412.5"
+   width="949.53955">
   <metadata
      id="metadata4313">
     <rdf:RDF>
@@ -27,640 +23,1181 @@
   </metadata>
   <defs
      id="defs4311" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1366"
-     inkscape:window-height="705"
-     id="namedview4309"
-     showgrid="false"
-     inkscape:zoom="1.2993939"
-     inkscape:cx="218.70044"
-     inkscape:cy="206.25"
-     inkscape:window-x="-8"
-     inkscape:window-y="274"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg4307" />
   <g
-     transform="translate(1065.5,380.5)"
-     id="g4015">
+     id="g4015"
+     transform="translate(1065.5,380.5)">
     <g
-       transform="scale(1.5)"
-       id="g4013" />
+       id="g4013"
+       transform="scale(1.5)" />
   </g>
   <g
      id="g4029">
     <g
-       transform="scale(1.5)"
-       id="g4027">
+       id="g4027"
+       transform="scale(1.5)">
       <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 80.60059 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 210 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4017"
-         inkscape:connector-curvature="0" />
+         style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 80.60059 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 210 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4021">
+         id="text4021"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="5.3333335"
+           id="tspan4019"
            y="15.25"
-           id="tspan4019">semi-tone transpose</tspan>
+           x="5.3333335">semi-tone transpose</tspan>
       </text>
       <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4025">
+         id="text4025"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="105.93392"
+           id="tspan4023"
            y="11.25"
-           id="tspan4023" />
+           x="105.93392" />
       </text>
     </g>
   </g>
   <g
-     transform="translate(162.90088)"
-     id="g4047">
+     id="g4047"
+     transform="translate(162.90088)">
     <g
-       transform="scale(1.5)"
-       id="g4045">
+       id="g4045"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4031"
-         inkscape:connector-curvature="0" />
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
       <text
-         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4035">
+         id="text4035"
+         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4033"
            y="23.799999"
-           id="tspan4033">+</tspan>
+           x="54.333332">+</tspan>
       </text>
       <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4039">
+         id="text4039"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4037"
            y="10.75"
-           id="tspan4037" />
+           x="54.333332" />
       </text>
       <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4043">
+         id="text4043"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4041"
            y="31.75"
-           id="tspan4041" />
+           x="54.333332" />
       </text>
     </g>
   </g>
   <g
-     transform="translate(248.40088)"
-     id="g4057">
+     id="g4057"
+     transform="translate(248.40088)">
     <g
-       transform="scale(1.5)"
-       id="g4055">
+       id="g4055"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4049"
-         inkscape:connector-curvature="0" />
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4053">
+         id="text4053"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="13.333333"
+           id="tspan4051"
            y="13.833333"
-           id="tspan4051">0</tspan>
+           x="13.333333">0</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(248.40088,31.5)"
-     id="g4075">
+     id="g4075"
+     transform="translate(248.40088,31.5)">
     <g
-       transform="scale(1.5)"
-       id="g4073">
+       id="g4073"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4059"
-         inkscape:connector-curvature="0" />
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
       <text
-         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4063">
+         id="text4063"
+         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4061"
            y="23.799999"
-           id="tspan4061">×</tspan>
+           x="54.333332">×</tspan>
       </text>
       <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4067">
+         id="text4067"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4065"
            y="10.75"
-           id="tspan4065" />
+           x="54.333332" />
       </text>
       <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4071">
+         id="text4071"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4069"
            y="31.75"
-           id="tspan4069" />
+           x="54.333332" />
       </text>
     </g>
   </g>
   <g
-     transform="translate(333.90088,31.5)"
-     id="g4085">
+     id="g4085"
+     transform="translate(333.90088,31.5)">
     <g
-       transform="scale(1.5)"
-       id="g4083">
+       id="g4083"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4077"
-         inkscape:connector-curvature="0" />
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4081">
+         id="text4081"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="13.333333"
+           id="tspan4079"
            y="13.833333"
-           id="tspan4079">1</tspan>
+           x="13.333333">1</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(333.90088,63)"
-     id="g4095">
+     id="g4095"
+     transform="translate(333.90088,63)">
     <g
-       transform="scale(1.5)"
-       id="g4093">
+       id="g4093"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4087"
-         inkscape:connector-curvature="0" />
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4091">
+         id="text4091"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="13.333333"
+           id="tspan4089"
            y="13.833333"
-           id="tspan4089">12</tspan>
+           x="13.333333">12</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(13.5,31.5)"
-     id="g4105">
+     id="g4105"
+     transform="translate(13.5,31.5)">
     <g
-       transform="scale(1.5)"
-       id="g4103">
+       id="g4103"
+       transform="scale(1.5)">
       <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4097"
-         inkscape:connector-curvature="0" />
+         style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4101">
+         id="text4101"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="36.333332"
+           id="tspan4099"
            y="13.5"
-           id="tspan4099">↓</tspan>
+           x="36.333332">↓</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(13.5,63)"
-     id="g4119">
+     id="g4119"
+     transform="translate(13.5,63)">
     <g
-       transform="scale(1.5)"
-       id="g4117">
+       id="g4117"
+       transform="scale(1.5)">
       <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path4107"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4111">
-        <tspan
-           x="5.3333335"
-           y="15.25"
-           id="tspan4109">note value</tspan>
-      </text>
-      <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4115">
-        <tspan
-           x="61.480793"
-           y="11.25"
-           id="tspan4113" />
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(109.72119,63)"
-     id="g4137">
-    <g
-       transform="scale(1.5)"
-       id="g4135">
-      <path
-         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4121"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4125">
-        <tspan
-           x="54.333332"
-           y="23.799999"
-           id="tspan4123">/</tspan>
-      </text>
-      <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4129">
-        <tspan
-           x="54.333332"
-           y="10.75"
-           id="tspan4127" />
-      </text>
-      <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4133">
-        <tspan
-           x="54.333332"
-           y="31.75"
-           id="tspan4131" />
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(195.22119,63)"
-     id="g4147">
-    <g
-       transform="scale(1.5)"
-       id="g4145">
-      <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4139"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4143">
-        <tspan
-           x="13.333333"
-           y="13.833333"
-           id="tspan4141">1</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(195.22119,94.5)"
-     id="g4157">
-    <g
-       transform="scale(1.5)"
-       id="g4155">
-      <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4149"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4153">
-        <tspan
-           x="13.333333"
-           y="13.833333"
-           id="tspan4151">8</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(27,94.5)"
-     id="g4167">
-    <g
-       transform="scale(1.5)"
-       id="g4165">
-      <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4159"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4163">
-        <tspan
-           x="36.333332"
-           y="13.5"
-           id="tspan4161">↓</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(27,126)"
-     id="g4185">
-    <g
-       transform="scale(1.5)"
-       id="g4183">
-      <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
-         style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4169"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4173">
-        <tspan
-           x="46.333332"
-           y="24"
-           id="tspan4171">pitch</tspan>
-      </text>
-      <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4177">
-        <tspan
-           x="46.333332"
-           y="11.25"
-           id="tspan4175">name</tspan>
-      </text>
-      <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4181">
-        <tspan
-           x="46.333332"
-           y="32.25"
-           id="tspan4179">octave</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(100.5,126)"
-     id="g4195">
-    <g
-       transform="scale(1.5)"
-       id="g4193">
-      <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4187"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4191">
-        <tspan
-           x="13.333333"
-           y="13.833333"
-           id="tspan4189">re</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(100.5,157.5)"
-     id="g4205">
-    <g
-       transform="scale(1.5)"
-       id="g4203">
-      <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4197"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4201">
-        <tspan
-           x="13.333333"
-           y="13.833333"
-           id="tspan4199">5</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(13.5,220.5)"
-     id="g4219">
-    <g
-       transform="scale(1.5)"
-       id="g4217">
-      <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
          style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4207"
-         inkscape:connector-curvature="0" />
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4211">
+         id="text4111"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="5.3333335"
+           id="tspan4109"
            y="15.25"
-           id="tspan4209">note value</tspan>
+           x="5.3333335">note value</tspan>
       </text>
       <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4215">
+         id="text4115"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="61.480793"
+           id="tspan4113"
            y="11.25"
-           id="tspan4213" />
+           x="61.480793" />
       </text>
     </g>
   </g>
   <g
-     transform="translate(109.72119,220.5)"
-     id="g4237">
+     id="g4137"
+     transform="translate(109.72119,63)">
     <g
-       transform="scale(1.5)"
-       id="g4235">
+       id="g4135"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+         id="path4121"
          style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4221"
-         inkscape:connector-curvature="0" />
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
       <text
-         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4225">
+         id="text4125"
+         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4123"
            y="23.799999"
-           id="tspan4223">/</tspan>
+           x="54.333332">/</tspan>
       </text>
       <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4229">
+         id="text4129"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4127"
            y="10.75"
-           id="tspan4227" />
+           x="54.333332" />
       </text>
       <text
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4233">
+         id="text4133"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="54.333332"
+           id="tspan4131"
            y="31.75"
-           id="tspan4231" />
+           x="54.333332" />
       </text>
     </g>
   </g>
   <g
-     transform="translate(195.22119,220.5)"
-     id="g4247">
+     id="g4147"
+     transform="translate(195.22119,63)">
     <g
-       transform="scale(1.5)"
-       id="g4245">
+       id="g4145"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         id="path4139"
          style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4239"
-         inkscape:connector-curvature="0" />
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4243">
+         id="text4143"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="13.333333"
+           id="tspan4141"
            y="13.833333"
-           id="tspan4241">1</tspan>
+           x="13.333333">1</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(195.22119,252)"
-     id="g4257">
+     id="g4157"
+     transform="translate(195.22119,94.5)">
     <g
-       transform="scale(1.5)"
-       id="g4255">
+       id="g4155"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         id="path4149"
          style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4249"
-         inkscape:connector-curvature="0" />
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4253">
+         id="text4153"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="13.333333"
+           id="tspan4151"
            y="13.833333"
-           id="tspan4251">8</tspan>
+           x="13.333333">8</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(27,252)"
-     id="g4267">
+     id="g4167"
+     transform="translate(27,94.5)">
     <g
-       transform="scale(1.5)"
-       id="g4265">
+       id="g4165"
+       transform="scale(1.5)">
       <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         id="path4159"
          style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4259"
-         inkscape:connector-curvature="0" />
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4263">
+         id="text4163"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="36.333332"
+           id="tspan4161"
            y="13.5"
-           id="tspan4261">↓</tspan>
+           x="36.333332">↓</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(27,283.5)"
-     id="g4285">
+     id="g4185"
+     transform="translate(27,126)">
     <g
-       transform="scale(1.5)"
-       id="g4283">
+       id="g4183"
+       transform="scale(1.5)">
       <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+         id="path4169"
          style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4269"
-         inkscape:connector-curvature="0" />
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4273">
+         id="text4173"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="46.333332"
+           id="tspan4171"
            y="24"
-           id="tspan4271">pitch</tspan>
+           x="46.333332">pitch</tspan>
       </text>
       <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4277">
+         id="text4177"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="46.333332"
+           id="tspan4175"
            y="11.25"
-           id="tspan4275">name</tspan>
+           x="46.333332">name</tspan>
       </text>
       <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text4281">
+         id="text4181"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
         <tspan
-           x="46.333332"
+           id="tspan4179"
            y="32.25"
-           id="tspan4279">octave</tspan>
+           x="46.333332">octave</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(100.5,283.5)"
-     id="g4295">
+     id="g4195"
+     transform="translate(100.5,126)">
     <g
-       transform="scale(1.5)"
-       id="g4293">
+       id="g4193"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         id="path4187"
          style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4287"
-         inkscape:connector-curvature="0" />
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4291">
+         id="text4191"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="13.333333"
+           id="tspan4189"
            y="13.833333"
-           id="tspan4289">mi</tspan>
+           x="13.333333">re</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(100.5,315)"
-     id="g4305">
+     id="g4205"
+     transform="translate(100.5,157.5)">
     <g
-       transform="scale(1.5)"
-       id="g4303">
+       id="g4203"
+       transform="scale(1.5)">
       <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         id="path4197"
          style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path4297"
-         inkscape:connector-curvature="0" />
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text4301">
+         id="text4201"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
         <tspan
-           x="13.333333"
+           id="tspan4199"
            y="13.833333"
-           id="tspan4299">5</tspan>
+           x="13.333333">5</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4219"
+     transform="translate(13.5,220.5)">
+    <g
+       id="g4217"
+       transform="scale(1.5)">
+      <path
+         id="path4207"
+         style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+      <text
+         id="text4211"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+        <tspan
+           id="tspan4209"
+           y="15.25"
+           x="5.3333335">note value</tspan>
+      </text>
+      <text
+         id="text4215"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4213"
+           y="11.25"
+           x="61.480793" />
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4237"
+     transform="translate(109.72119,220.5)">
+    <g
+       id="g4235"
+       transform="scale(1.5)">
+      <path
+         id="path4221"
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+      <text
+         id="text4225"
+         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4223"
+           y="23.799999"
+           x="54.333332">/</tspan>
+      </text>
+      <text
+         id="text4229"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4227"
+           y="10.75"
+           x="54.333332" />
+      </text>
+      <text
+         id="text4233"
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4231"
+           y="31.75"
+           x="54.333332" />
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4247"
+     transform="translate(195.22119,220.5)">
+    <g
+       id="g4245"
+       transform="scale(1.5)">
+      <path
+         id="path4239"
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text4243"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+        <tspan
+           id="tspan4241"
+           y="13.833333"
+           x="13.333333">1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4257"
+     transform="translate(195.22119,252)">
+    <g
+       id="g4255"
+       transform="scale(1.5)">
+      <path
+         id="path4249"
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text4253"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+        <tspan
+           id="tspan4251"
+           y="13.833333"
+           x="13.333333">8</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4267"
+     transform="translate(27,252)">
+    <g
+       id="g4265"
+       transform="scale(1.5)">
+      <path
+         id="path4259"
+         style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+      <text
+         id="text4263"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4261"
+           y="13.5"
+           x="36.333332">↓</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4285"
+     transform="translate(27,283.5)">
+    <g
+       id="g4283"
+       transform="scale(1.5)">
+      <path
+         id="path4269"
+         style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
+      <text
+         id="text4273"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4271"
+           y="24"
+           x="46.333332">pitch</tspan>
+      </text>
+      <text
+         id="text4277"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4275"
+           y="11.25"
+           x="46.333332">name</tspan>
+      </text>
+      <text
+         id="text4281"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+        <tspan
+           id="tspan4279"
+           y="32.25"
+           x="46.333332">octave</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4295"
+     transform="translate(100.5,283.5)">
+    <g
+       id="g4293"
+       transform="scale(1.5)">
+      <path
+         id="path4287"
+         style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text4291"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+        <tspan
+           id="tspan4289"
+           y="13.833333"
+           x="13.333333">mi</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g4305"
+     transform="translate(100.5,315)">
+    <g
+       id="g4303"
+       transform="scale(1.5)">
+      <path
+         id="path4297"
+         style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text4301"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+        <tspan
+           id="tspan4299"
+           y="13.833333"
+           x="13.333333">5</tspan>
       </text>
     </g>
   </g>
   <rect
-     id="rect4327"
-     width="0"
-     height="43.22768"
-     x="453.2724"
+     ry="1.23507"
      y="453.89914"
-     ry="1.23507" />
+     x="453.2724"
+     height="43.22768"
+     width="0"
+     id="rect4327" />
+  <g
+     id="g3272"
+     transform="translate(252,-128)">
+    <g
+       transform="translate(211.5,191)"
+       id="g2298">
+      <g
+         transform="scale(1.5)"
+         id="g2296">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2286" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2290">
+          <tspan
+             x="5.3333335"
+             y="15.25"
+             id="tspan2288">note value</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2294">
+          <tspan
+             x="61.480793"
+             y="11.25"
+             id="tspan2292" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(307.72119,191)"
+       id="g2316">
+      <g
+         transform="scale(1.5)"
+         id="g2314">
+        <path
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2300" />
+        <text
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2304">
+          <tspan
+             x="54.333332"
+             y="23.799999"
+             id="tspan2302">/</tspan>
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2308">
+          <tspan
+             x="54.333332"
+             y="10.75"
+             id="tspan2306" />
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2312">
+          <tspan
+             x="54.333332"
+             y="31.75"
+             id="tspan2310" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(393.22119,191)"
+       id="g2326">
+      <g
+         transform="scale(1.5)"
+         id="g2324">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2318" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2322">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2320">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(393.22119,222.5)"
+       id="g2336">
+      <g
+         transform="scale(1.5)"
+         id="g2334">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2328" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2332">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2330">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(225,222.5)"
+       id="g2346">
+      <g
+         transform="scale(1.5)"
+         id="g2344">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2338" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2342">
+          <tspan
+             x="36.333332"
+             y="13.5"
+             id="tspan2340">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(225,254)"
+       id="g2364">
+      <g
+         transform="scale(1.5)"
+         id="g2362">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2348" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2352">
+          <tspan
+             x="46.333332"
+             y="24"
+             id="tspan2350">pitch</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2356">
+          <tspan
+             x="46.333332"
+             y="11.25"
+             id="tspan2354">name</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2360">
+          <tspan
+             x="46.333332"
+             y="32.25"
+             id="tspan2358">octave</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(298.5,254)"
+       id="g2374">
+      <g
+         transform="scale(1.5)"
+         id="g2372">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2366" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2370">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2368">re</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(298.5,285.5)"
+       id="g2384">
+      <g
+         transform="scale(1.5)"
+         id="g2382">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2376" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2380">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2378">5</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(211.5,348.5)"
+       id="g2398">
+      <g
+         transform="scale(1.5)"
+         id="g2396">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2386" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2390">
+          <tspan
+             x="5.3333335"
+             y="15.25"
+             id="tspan2388">note value</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2394">
+          <tspan
+             x="61.480793"
+             y="11.25"
+             id="tspan2392" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(307.72119,348.5)"
+       id="g2416">
+      <g
+         transform="scale(1.5)"
+         id="g2414">
+        <path
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2400" />
+        <text
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2404">
+          <tspan
+             x="54.333332"
+             y="23.799999"
+             id="tspan2402">/</tspan>
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2408">
+          <tspan
+             x="54.333332"
+             y="10.75"
+             id="tspan2406" />
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2412">
+          <tspan
+             x="54.333332"
+             y="31.75"
+             id="tspan2410" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(393.22119,348.5)"
+       id="g2426">
+      <g
+         transform="scale(1.5)"
+         id="g2424">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2418" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2422">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2420">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(393.22119,380)"
+       id="g2436">
+      <g
+         transform="scale(1.5)"
+         id="g2434">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2428" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2432">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2430">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(225,380)"
+       id="g2446">
+      <g
+         transform="scale(1.5)"
+         id="g2444">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2438" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2442">
+          <tspan
+             x="36.333332"
+             y="13.5"
+             id="tspan2440">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(225,411.5)"
+       id="g2464">
+      <g
+         transform="scale(1.5)"
+         id="g2462">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2448" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2452">
+          <tspan
+             x="46.333332"
+             y="24"
+             id="tspan2450">pitch</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2456">
+          <tspan
+             x="46.333332"
+             y="11.25"
+             id="tspan2454">name</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2460">
+          <tspan
+             x="46.333332"
+             y="32.25"
+             id="tspan2458">octave</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(298.5,411.5)"
+       id="g2474">
+      <g
+         transform="scale(1.5)"
+         id="g2472">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2466" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2470">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2468">mi</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(298.5,443)"
+       id="g2484">
+      <g
+         transform="scale(1.5)"
+         id="g2482">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2476" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2480">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2478">5</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(198,128)"
+       id="g2498">
+      <g
+         transform="scale(1.5)"
+         id="g2496">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 86.9873 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -86.9873 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 210 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2486" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2490">
+          <tspan
+             x="5.3333335"
+             y="15.25"
+             id="tspan2488">scalar transpose (+/–)</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2494">
+          <tspan
+             x="112.32064"
+             y="11.25"
+             id="tspan2492" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(370.48096,128)"
+       id="g2516">
+      <g
+         transform="scale(1.5)"
+         id="g2514">
+        <path
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2500" />
+        <text
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2504">
+          <tspan
+             x="54.333332"
+             y="23.799999"
+             id="tspan2502">+</tspan>
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2508">
+          <tspan
+             x="54.333332"
+             y="10.75"
+             id="tspan2506" />
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2512">
+          <tspan
+             x="54.333332"
+             y="31.75"
+             id="tspan2510" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(455.98096,128)"
+       id="g2526">
+      <g
+         transform="scale(1.5)"
+         id="g2524">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2518" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2522">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2520">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(455.98096,159.5)"
+       id="g2544">
+      <g
+         transform="scale(1.5)"
+         id="g2542">
+        <path
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2528" />
+        <text
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2532">
+          <tspan
+             x="54.333332"
+             y="23.799999"
+             id="tspan2530">×</tspan>
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2536">
+          <tspan
+             x="54.333332"
+             y="10.75"
+             id="tspan2534" />
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2540">
+          <tspan
+             x="54.333332"
+             y="31.75"
+             id="tspan2538" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(541.48096,159.5)"
+       id="g2554">
+      <g
+         transform="scale(1.5)"
+         id="g2552">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2546" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2550">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2548">0</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(541.48096,191)"
+       id="g2564">
+      <g
+         transform="scale(1.5)"
+         id="g2562">
+        <path
+           d="m 8.5,0.5 h 95.03906 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2556" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text2560">
+          <tspan
+             x="13.333333"
+             y="13.833333"
+             id="tspan2558">mode length</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="translate(211.5,159.5)"
+       id="g2574">
+      <g
+         transform="scale(1.5)"
+         id="g2572">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path2566" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text2570">
+          <tspan
+             x="36.333332"
+             y="13.5"
+             id="tspan2568">↓</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
 </svg>
