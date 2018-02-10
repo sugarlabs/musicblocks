@@ -751,6 +751,7 @@ define(MYDEFINES, function (compatibility) {
 
             // Suppress music and turtle output when generating
             // compiled output.
+            logo.setTurtleDelay(0);  // Compile at full speed.
             logo.playbackQueue = {};
             logo.playbackTime = 0;
             logo.compiling = true;
