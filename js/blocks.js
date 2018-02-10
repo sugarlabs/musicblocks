@@ -400,6 +400,7 @@ function Blocks () {
             return;
         }
 
+        var that = this;
         var obj = this.clampBlocksToCheck.pop();
         var blk = obj[0];
         var clamp = obj[1];
@@ -415,7 +416,7 @@ function Blocks () {
             this._adjustArgClampBlock([blk]);
         }
 
-        function clampAdjuster(blocks, blk, myBlock, clamp) {
+        function __clampAdjuster(blk, myBlock, clamp) {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
@@ -428,10 +429,10 @@ function Blocks () {
                 var c = myBlock.connections.length - 3;
             }
 
-            blocks._sizeCounter = 0;
+            that._sizeCounter = 0;
             var childFlowSize = 1;
             if (c > 0 && myBlock.connections[c] != null) {
-                childFlowSize = Math.max(blocks._getStackSize(myBlock.connections[c]), 1);
+                childFlowSize = Math.max(that._getStackSize(myBlock.connections[c]), 1);
             }
 
             // Adjust the clamp size to match the size of the child
@@ -445,13 +446,13 @@ function Blocks () {
 
             // Recurse through the list.
             setTimeout(function () {
-                if (blocks.clampBlocksToCheck.length > 0) {
-                    blocks.adjustExpandableClampBlock();
+                if (that.clampBlocksToCheck.length > 0) {
+                    that.adjustExpandableClampBlock();
                 }
             }, 250);
         };
 
-        clampAdjuster(this, blk, myBlock, clamp);
+        __clampAdjuster(blk, myBlock, clamp);
     };
 
     // Returns the block size.
