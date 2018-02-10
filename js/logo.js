@@ -3020,6 +3020,11 @@ function Logo () {
                 }
 
                 console.log(MUSICALMODES[modeName]);
+                var cblk = that.blocks.blockList[blk].connections[1];
+                if (that.blocks.blockList[cblk].name === 'modename') {
+                    that.blocks.updateBlockText(cblk);
+                }
+
                 that.inDefineMode[turtle] = false;
             };
 

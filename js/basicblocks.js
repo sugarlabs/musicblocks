@@ -1884,6 +1884,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     defineModeBlock.adjustWidthToLabel();
     defineModeBlock.flowClampOneArgBlock();
     defineModeBlock.defaults.push(_('custom'));
+    defineModeBlock.dockTypes[1] = 'textin';
 
     // macro
     var movableBlock = new ProtoBlock('movable');  // legacy typo
@@ -1941,6 +1942,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     drumnameBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['drumname'] = drumnameBlock;
     drumnameBlock.valueBlock();
+    drumnameBlock.extraWidth = 50;
     drumnameBlock.dockTypes[0] = 'textout';
 
     // macro

@@ -15,7 +15,8 @@ const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname'];
-const WIDENAMES = ['intervalname', 'accidentalname', 'modename', 'voicename'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename'];
+const EXTRAWIDENAMES = ['modename'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -990,7 +991,7 @@ function Block(protoblock, blocks, overrideName) {
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
-            if (this.name === 'modename') {
+            if (EXTRAWIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 3.0;
             } else if (WIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 1.75;
@@ -1716,7 +1717,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedmode = getModeName(DEFAULTMODE);
             }
 
-            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">'
+            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #3ea4a3; width: 150px;">'
             for (var i = 0; i < MODENAMES.length; i++) {
                 if (MODENAMES[i][0].length === 0) {
                     // work around some weird i18n bug

@@ -1665,6 +1665,8 @@ function Blocks () {
             if (attr !== '♮') {
                 label += attr;
             }
+        } else if (myBlock.name === 'modename') {
+            var label = myBlock.value + ' ' + getModeNumbers(myBlock.value);
         } else {
             if (myBlock.value == null) {
                var label = '';
@@ -2171,7 +2173,7 @@ function Blocks () {
                 var thisBlock = args[0];
                 var value = args[1];
                 that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].text.text = value + ' ' + getModeNumbers(this.value);
                 that.blockList[thisBlock].container.updateCache();
             };
 
