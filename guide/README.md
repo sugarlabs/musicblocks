@@ -294,26 +294,28 @@ also use a double-sharp or double-flat accidental.)
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg "Adjusting transpositions")
 
 There are several ways to transpose a pitch: by semi-tone or scalar
-steps. The *Semi-tone-transposition* block (above left) can be used
-to make larger shifts in pitch in half step units. A positive number
+steps. The *Semi-tone-transposition* block (above left) can be used to
+make larger shifts in pitch in half step units. A positive number
 shifts the pitch up and a negative number shifts the pitch down. The
 input must be a whole number. To shift an entire octave, transpose by
 `12` half-steps up. `-12` will shift an octave down.
 
 The *Scalar-transposition* block (above right) shifts a pitch based on
-the current key and mode. For example, in C Major, a scalar
-transposition of `1` would transpose `C` to `D`, even though it is a
-transposition of `2` semi-tone steps. To transpose `E` to `F` is `1`
-scalar step and `1` semi-tone step.
+the current key and mode. For example, in `C Major`, a scalar
+transposition of `1` would transpose `C` to `D` (even though it is a
+transposition of `2` half steps). To transpose `E` to `F` is `1`
+scalar step (or `1` half step). To shift an entire octave, scalar
+transpose by the mode length up or down. (In major scales, the mode
+length is `7`.)
+
+As a convenience, a number of standard scalar transpositions are
+provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
+and *Down sixth*, as well as a transposition for *Octave*.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg "raising an octave using semi-tone-transposition")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
-
-As a convenience, a number of standard scalar transpositions are
-provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
-and *Down sixth*, as well as a transposition for *Octave*.
 
 #### <a name="DOTTED"></a>3.2.4 Dotted Notes
 
