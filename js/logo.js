@@ -2993,7 +2993,7 @@ function Logo () {
                 MUSICALMODES[modeName] = [];
                 if (that.defineMode[turtle].indexOf(0) === -1) {
                     that.defineMode[turtle].push(0);
-                    console.log('adding missing pitch number 0');
+                    that.errorMsg(_('Adding missing pitch number 0.'));
                 }
 
                 var pitchNumbers = that.defineMode[turtle].sort(
@@ -3003,12 +3003,12 @@ function Logo () {
 
                 for (var i = 0; i < pitchNumbers.length; i++) {
                     if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
-                        console.log('ignoring pitch number ' + pitchNumbers[i]);
+                        that.errorMsg(_('Ignoring pitch numbers less than zero or greater than eleven.'));
                         continue;
                     }
 
                     if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
-                        console.log('ignoring duplicate pitch number ' + pitchNumbers[i]);
+                        that.errorMsg(_('Ignoring duplicate pitch numbers.'));
                         continue;
                     }
 
