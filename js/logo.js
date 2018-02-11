@@ -8081,6 +8081,19 @@ function Logo () {
         }
     };
 
+    this.resetSynth = function (turtle) {
+        if (!('default' in instruments[turtle])) {
+            this.synth.createDefaultSynth(turtle);
+        }
+
+        this._setMasterVolume(DEFAULTVOLUME);
+        for (var synth in this.synthVolume[turtle]) {
+            this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
+        }
+
+        this.synth.start();
+    };
+
     this._processSpeak = function (text) {
         var new_text = '';
         for (var i = 0; i < text.length; i++) {

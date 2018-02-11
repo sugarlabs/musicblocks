@@ -168,6 +168,8 @@ function PitchTimeMatrix () {
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
+
+            that._logo.resetSynth(0);
             that.playAll();
         }
 
