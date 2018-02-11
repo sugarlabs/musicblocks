@@ -30,7 +30,6 @@ function SaveBox () {
     this._canvas = null;
     this._stage = null;
     this._refreshCanvas = null;
-    this._doSaveTB = null;
     this._doSaveSVG = null;
     this._doSavePNG = null;
     this._doSaveWAV = null;
@@ -39,6 +38,7 @@ function SaveBox () {
     this._doSaveBlockArtwork = null;
     this._doSaveAbc = null;
     this._doSaveLilyPond = null;
+    this._doSaveHTML = null;
 
     this._container = null;
     this._bounds = null;
@@ -56,8 +56,8 @@ function SaveBox () {
         return this;
     };
 
-    this.setSaveTB = function (doSaveTB) {
-        this._doSaveTB = doSaveTB;
+    this.setSaveHTML = function (doSaveHTML) {
+        this._doSaveHTML = doSaveHTML;
         return this;
     };
 
@@ -112,16 +112,6 @@ function SaveBox () {
             var that = this;
 
             var dx = BOXBUTTONOFFSET;
-
-            this.saveTB = makeButton('save-tb', _('Save as .tb'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.saveTB.visible = true;
-            this.positionHoverText(this.saveTB);
-            this.saveTB.on('click', function(event) {
-                that.hide();
-                that._doSaveTB();
-            });
-
-            dx += BOXBUTTONSPACING;
 
             this.saveSVG = makeButton('save-svg', _('Save as .svg'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this.saveSVG.visible = true;
@@ -206,6 +196,16 @@ function SaveBox () {
                 that._doSaveBlockArtwork();
             });
 
+            dx += BOXBUTTONSPACING;
+
+            this.saveHTML = makeButton('save-button-dark', _('Save project'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.saveHTML.visible = true;
+            this.positionHoverText(this.saveHTML);
+            this.saveHTML.on('click', function(event) {
+                that.hide();
+                that._doSaveHTML();
+            });
+
         } else {
             this.show();
         }
@@ -228,7 +228,7 @@ function SaveBox () {
 
     this.hide = function() {
         if (this._container !== null) {
-            this.saveTB.visible = false;
+            this.saveHTML.visible = false;
             this.saveSVG.visible = false;
             this.savePNG.visible = false;
             this.uploadToPlanet.visible = false;
@@ -248,7 +248,7 @@ function SaveBox () {
 
     this.show = function() {
         if (this._container !== null) {
-            this.saveTB.visible = true;
+            this.saveHTML.visible = true;
             this.saveSVG.visible = true;
             this.savePNG.visible = true;
             this.uploadToPlanet.visible = true;
@@ -328,3 +328,101 @@ function SaveBox () {
 
     };
 };
+var htmlSaveTemplate = `
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="{{ project_description }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>{{ project_name }}</title>
+
+    <meta property="og:site_name" content="Music Blocks" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Music Blocks - {{ project_name }}" />
+    <meta property="og:description" content="{{ project_description }}" />
+
+    <style>
+        body {
+            background-color: #dbf0fb;
+        }
+        #main {
+            background-color: white;
+            padding: 5%;
+            width: 80vw;
+            min-height: 60vh;
+            margin: auto;
+            position: absolute;
+            top: 10vh;
+            left: 5vw;
+            text-align:  center;
+            color: #424242;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+            font-family: "Roboto", "Helvetica","Arial",sans-serif;
+        }
+        h3 {
+            font-weight: 400;
+            font-size: 36px;
+            margin-top: 10px;
+        }
+
+        hr {
+            border-top: 0px solid #ccc;
+            margin: 1em;
+        }
+
+        .btn {
+            border: solid;
+            border-color: #96D3F3;
+            padding: 5px 10px;
+            line-height: 50px;
+            color: #0a3e58;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transition: 0.4s;
+            -webkit-transition: 0.3s;
+            -moz-transition: 0.3s;
+            background-color: #96D3F3;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div style="color: #9E9E9E">
+            {{ project_author }}
+        </div>
+        <h4>Music Blocks Project - {{ project_name }}</h4>
+        <p>
+            {{ project_description }}
+        </p>
+        <hr>
+        <div>
+            <div style="color: #9E9E9E">
+                <h4>
+                    To Open
+                </h4>
+
+                <h3>
+                    1. Open Musicblocks
+                </h3>
+                <h3>
+                    2. Load project from file (button on the right) or drag the file onto the canvas
+                </h3>
+            </div>
+
+            <a class="btn" id="open">
+                Open in Musicblocks (for Firefox users)
+            </a>
+
+        </div>
+    </div>
+    <script>
+        var a = document.getElementById('open'); //or grab it by tagname etc
+        a.href = "https://walterbender.github.io/musicblocks/" + window.location;
+    </script>
+</body>
+</html>
+`

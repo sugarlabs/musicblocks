@@ -904,7 +904,7 @@ define(MYDEFINES, function (compatibility) {
                 .setCanvas(canvas)
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
-                .setSaveTB(doSaveTB)
+                .setSaveHTML(doSaveHTML)
                 .setSaveSVG(doSaveSVG)
                 .setSavePNG(doSavePNG)
                 .setSaveWAV(doSaveWAV)
@@ -990,7 +990,6 @@ define(MYDEFINES, function (compatibility) {
             fileChooser.addEventListener('change', function (event) {
                 // Read file here.
                 var reader = new FileReader();
-
                 reader.onload = (function (theFile) {
                     loading = true;
                     document.body.style.cursor = 'wait';
@@ -1003,7 +1002,11 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 // First, hide the palettes as they will need updating.
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
@@ -1039,7 +1042,6 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }, 200);
                 });
-
                 reader.readAsText(fileChooser.files[0]);
             }, false);
 
@@ -1062,7 +1064,11 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
@@ -1096,6 +1102,66 @@ define(MYDEFINES, function (compatibility) {
                 }
             };
 
+            var pageUrl = window.location.href;
+            if (pageUrl.indexOf('?o=') != -1){ // if there is an open request
+                var openUrl = pageUrl.match(/\?o\=(.+)$/)[1];
+                console.log(openUrl);
+                var reader = new FileReader();
+                reader.onload = (function (theFile) {
+                    loading = true;
+                    document.body.style.cursor = 'wait';
+
+                    setTimeout(function () {
+                        var rawData = reader.result;
+                        if (rawData == null || rawData === '') {
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        } else {
+                            var cleanData = rawData.replace('\n', ' ');
+
+                            try {
+                                if (cleanData.includes('html')){
+                                    var obj = JSON.parse(cleanData.match('<!--(.+)-->')[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
+                                // First, hide the palettes as they will need updating.
+                                for (var name in blocks.palettes.dict) {
+                                    blocks.palettes.dict[name].hideMenu(true);
+                                }
+
+                                stage.removeAllEventListeners('trashsignal');
+
+                                if (!merging) {
+                                    // Wait for the old blocks to be removed.
+                                    var __listener = function (event) {
+                                        logo.playbackQueue = {};
+                                        blocks.loadNewBlocks(obj);
+                                        setPlaybackStatus();
+                                        stage.removeAllEventListeners('trashsignal');
+                                    };
+
+                                    stage.addEventListener('trashsignal', __listener, false);
+                                    sendAllToTrash(false, false);
+                                } else {
+                                    merging = false;
+                                    logo.playbackQueue = {};
+                                    blocks.loadNewBlocks(obj);
+                                    setPlaybackStatus();
+                                }
+
+                                loading = false;
+                                refreshCanvas();
+                            } catch (e) {
+                                errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                                document.body.style.cursor = 'default';
+                                loading = false;
+                            }
+                        }
+                    }, 200);
+                });
+                reader.readAsText(new File([], openUrl));
+            }
+            console.log(pageUrl);
             function handleDragOver (event) {
                 event.stopPropagation();
                 event.preventDefault();
@@ -2303,14 +2369,20 @@ define(MYDEFINES, function (compatibility) {
             // }
         };
 
-        function doSaveTB() {
-            var filename = prompt('Filename:', _('untitled') + '.tb');
+        function doSaveHTML() {
+            var filename = prompt('Filename:', _('untitled') + '.html');
             if (filename != null) {
-                if (fileExt(filename) !== 'tb') {
-                    filename += '.tb';
-                }
+                var fileContents = htmlSaveTemplate;
+                fileContents = fileContents.split("{{ project_name }}").join(filename);
 
-                download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+                // Remove name and description, assume data doesn't exist
+                fileContents = fileContents.replace("{{ project_description }}", "");
+                fileContents = fileContents.replace("{{ project_author }}", "");
+                if (fileExt(filename) !== 'html') {
+                    filename += '.html';
+                }
+                fileContents = fileContents.replace("{{ data }}", prepareExport());
+                download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContents));
             }
         };
 
