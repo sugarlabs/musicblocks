@@ -1117,11 +1117,11 @@ function Blocks () {
                     // a hidden block below it.
                     continue;
                 } else if ((['backward', 'status'].indexOf(this.blockList[b].name) !== -1) && (i === 1) && (this.blockList[b].connections[1] != null) && (this.blockList[this.blockList[b].connections[1]].isNoHitBlock())) {
-                    // Don't break the connection betweem a backward
+                    // Don't break the connection between a backward
                     // block and a hidden block attached to its clamp.
                     continue;
                 } else if (this.blockList[b].name === 'action' && (i === 2) && (this.blockList[b].connections[2] != null) && (this.blockList[this.blockList[b].connections[2]].isNoHitBlock())) {
-                    // Don't break the connection betweem an action
+                    // Don't break the connection between an action
                     // block and a hidden block attached to its clamp.
                     continue;
                 }
@@ -1256,9 +1256,15 @@ function Blocks () {
                     }
                 } else if (myBlock.isArgBlock()) {
                     this.blockList[connection].connections[0] = null;
-                    this.findDragGroup(connection);
-                    for (var c = 0; c < this.dragGroup.length; c++) {
-                        this.moveBlockRelative(this.dragGroup[c], 40, 40);
+
+                    // If we are replacing a number block, put it in the trash
+                    if (this.blockList[connection].name === 'number') {
+                        this.sendStackToTrash(this.blockList[connection]);
+                    } else {
+                        this.findDragGroup(connection);
+                        for (var c = 0; c < this.dragGroup.length; c++) {
+                            this.moveBlockRelative(this.dragGroup[c], 40, 40);
+                        }
                     }
 
                     // We need to rename the action stack.
@@ -4175,12 +4181,14 @@ function Blocks () {
                 var c = myBlock.connections[1];
                 if (c != null && this.blockList[c].value !== _('box')) {
                     var name = this.blockList[c].value;
-                    // Is there an old block with this name still around?
-                    if (this.protoBlockDict['myStorein_' + name] == undefined) {
-                        console.log('adding new storein block ' + name);
-                        this.newNamedboxBlock(this.blockList[c].value);
-                        this.newStoreinBlock(this.blockList[c].value);
-                        updatePalettes = true;
+                    if (name !== null) {
+                        // Is there an old block with this name still around?
+                        if (this.protoBlockDict['myStorein_' + name] == undefined) {
+                            console.log('adding new storein block ' + name);
+                            this.newNamedboxBlock(this.blockList[c].value);
+                            this.newStoreinBlock(this.blockList[c].value);
+                            updatePalettes = true;
+                        }
                     }
                 }
             }
