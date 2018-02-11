@@ -289,10 +289,37 @@ function Blocks () {
 
     // Toggle state of collapsible blocks.
     this.toggleCollapsibles = function () {
+        var allCollapsed = true;
+        var someCollapsed = false;
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
             if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
-                myBlock.collapseToggle();
+                if (myBlock.collapsed) {
+                    someCollapsed = true;
+                } else {
+                    allCollapsed = false;
+                }
+            }
+        }
+
+        if (allCollapsed || !someCollapsed) {
+            // If all blocks are collapsed, uncollapse them all.
+            // If any blocks are collapsed, collapse them all.
+            for (var blk in this.blockList) {
+                var myBlock = this.blockList[blk];
+                if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                    myBlock.collapseToggle();
+                }
+            }
+        } else {
+            // If no blocks are collapsed, collapse them all.
+            for (var blk in this.blockList) {
+                var myBlock = this.blockList[blk];
+                if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                    if (!myBlock.collapsed) {
+                        myBlock.collapseToggle();
+                    }
+                }
             }
         }
     };
