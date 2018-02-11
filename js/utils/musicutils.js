@@ -1885,3 +1885,47 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
         return [note, octave];
     }
 };
+
+
+convertFactor = function (factor) {
+    switch(factor) {
+    case 0.0625:  // 1/16
+        return('16');
+    case 0.125:  // 1/8
+        return('8');
+    case 0.09375:  // 3/32
+        return('16.');
+    case 0.1875:  // 3/16
+        return('8.');
+    case 0.21875:  // 7/32
+        return('8..');
+    case 0.25:  // 1/4
+        return('4');
+    case 0.3125:  // 5/16
+        return('4 16');
+    case 0.375:  // 3/8
+        return('4.');
+    case 0.4375:  // 7/16
+        return('4..');
+    case 0.5:  // 1/2
+        return('2');
+    case 0.5625:  // 9/16
+        return('2 16');
+    case 0.675:   // 5/8
+        return('2 8');
+    case 0.6875:  // 11/16
+        return('2 8 16');
+    case 0.75:    // 3/4
+        return('2.');
+    case 0.8125:  // 13/16
+        return('2 4 16');
+    case 0.875:   // 7/8
+        return('2..');
+    case 0.9375:  // 15/16
+        return('2 4 8 16');
+    case 1:  // 1/1
+        return('1');
+    default:
+        return null;
+    }
+};
