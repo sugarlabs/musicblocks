@@ -2039,7 +2039,15 @@ function Blocks () {
         if (name === 'text') {
             console.log('makeBlock ' + name + ' ' + arg);
         }
-        var postProcess = null;
+
+        var postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
         var postProcessArg = null;
         var that = this;
         var thisBlock = this.blockList.length;
@@ -2058,95 +2066,23 @@ function Blocks () {
 
             postProcessArg = thisBlock;
         } else if (name === 'text') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
             postProcessArg = [thisBlock, _('text')];
         } else if (name === 'boolean') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
             postProcessArg = [thisBlock, _('true')];
         } else if (name === 'solfege') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
             postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'eastindiansolfege') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = WESTERN2EISOLFEGENAMES[value];
-                that.blockList[thisBlock].container.updateCache();
-            };
-
-            postProcessArg = [thisBlock, 'sol'];
+            postProcessArg = [thisBlock, 'pa'];
         } else if (name === 'notename') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
-            postProcessArg = [thisBlock, 'kick'];
+            postProcessArg = [thisBlock, DEFAULTDRUM];
          } else if (name === 'filtertype') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
-            postProcessArg = [thisBlock, 'highpass'];
+            postProcessArg = [thisBlock, DEFAULTFILTER];
         } else if (name === 'oscillatortype') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
-            postProcessArg = [thisBlock, 'sine'];
+            postProcessArg = [thisBlock, DEFAULTOSCILLATORTYPE];
         } else if (name === 'voicename') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
-            postProcessArg = [thisBlock, 'sine'];
+            postProcessArg = [thisBlock, DEFAULTVOICE];
         } else if (name === 'modename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2158,34 +2094,10 @@ function Blocks () {
 
             postProcessArg = [thisBlock, DEFAULTMODE];
         } else if (name === 'accidentalname') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
             postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === 'intervalname') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
             postProcessArg = [thisBlock, DEFAULTINTERVAL];
         } else if (name === 'invertmode') {
-            postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
-
             postProcessArg = [thisBlock, DEFAULTINVERT];
         } else if (name === 'number') {
             postProcess = function (args) {
@@ -2250,6 +2162,8 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, arg];
+        } else {
+            postProcess = null;
         }
 
         var protoFound = false;
@@ -3234,7 +3148,6 @@ function Blocks () {
                 }
             }
 
-            // FIXME: Use tests in block.js
             if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp', 'argflowclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
                 this._checkArgClampBlocks.push(this.blockList.length + b);
             }
@@ -3274,26 +3187,12 @@ function Blocks () {
                 break;
             }
 
-            switch (name) {
-            case 'action':
-            case 'pitchdrummatrix':
-            case 'rhythmruler':
-            case 'pitchstaircase':
-            case 'timbre':
-            case 'tempo':
-            case 'pitchslider':
-            case 'matrix':
-            case 'drum':
-            case 'status':
-            case 'start':
+            if (COLLAPSABLES.indexOf(name) !== -1) {
                 if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
                     if (blkData[1][1]['collapsed']) {
                         this.blocksToCollapse.push(this.blockList.length + b);
                     }
                 }
-                break;
-            default:
-                break;
             }
         }
 
@@ -3628,35 +3527,8 @@ function Blocks () {
 
                 // Named boxes and dos need private data.
             case 'namedbox':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].privateData = value;
-                    that.blockList[thisBlock].value = null;
-                };
-
-                this._makeNewBlockWithConnections('namedbox', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'namedarg':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].privateData = value;
-                    that.blockList[thisBlock].value = null;
-                };
-
-                this._makeNewBlockWithConnections('namedarg', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
+	    case 'namedarg':
             case 'namedcalc':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].privateData = value;
-                    that.blockList[thisBlock].value = null;
-                };
-
-                this._makeNewBlockWithConnections('namedcalc', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
             case 'nameddo':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -3665,7 +3537,7 @@ function Blocks () {
                     that.blockList[thisBlock].value = null;
                 };
 
-                this._makeNewBlockWithConnections('nameddo', blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
 
                 // Arg clamps may need extra slots added.
@@ -3788,36 +3660,16 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'text':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
             case 'boolean':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
             case 'solfege':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
             case 'eastindiansolfege':
+            case 'notename':
+            case 'modename':
+            case 'accidentalname':
+            case 'intervalname':
+            case 'invertmode':
+            case 'filtertype':
+            case 'oscillatortype':
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
@@ -3825,51 +3677,6 @@ function Blocks () {
                     that.updateBlockText(thisBlock);
                 };
 
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'notename':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'modename':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'accidentalname':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'intervalname':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'invertmode':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'drumname':
@@ -3886,24 +3693,6 @@ function Blocks () {
                     // Load the synth for this drum
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
-                break;
-            case 'filtertype':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'oscillatortype':
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.updateBlockText(thisBlock);
-                };
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'voicename':
                 postProcess = function (args) {
@@ -3924,6 +3713,7 @@ function Blocks () {
                     }
                 }
                 break;
+
             case 'media':
                 // Load a thumbnail into a media blocks.
                 postProcess = function (args) {
