@@ -78,16 +78,17 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this._createCache = function () {
+    this._createCache = function (callback, args) {
         var that = this;
         this.bounds = this.container.getBounds();
 
         if (this.bounds == null) {
             setTimeout(function () {
-                that._createCache();
+                that._createCache(callback, args);
             }, 200);
         } else {
             this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
+            callback(this, args);
         }
     };
 
@@ -415,37 +416,42 @@ function Block(protoblock, blocks, overrideName) {
                 that.container.uncache();
             }
 
-            that._createCache();
-            that.blocks.refreshCanvas();
+            __callback = function (that, firstTime) {
+		that.blocks.refreshCanvas();
+		var thisBlock = that.blocks.blockList.indexOf(that);
 
-            if (firstTime) {
-                that._loadEventHandlers();
-                if (that.image !== null) {
-                    that._addImage();
-                }
-                that._finishImageLoad();
-            } else {
-                if (that.name === 'start' || that.name === 'drum') {
-                    that._ensureDecorationOnTop();
-                }
+		if (firstTime) {
+                    that._loadEventHandlers();
+                    if (that.image !== null) {
+			that._addImage();
+                    }
 
-                // Adjust the docks.
-                that.blocks.adjustDocks(thisBlock, true);
+                    that._finishImageLoad();
+		} else {
+                    if (that.name === 'start' || that.name === 'drum') {
+			that._ensureDecorationOnTop();
+                    }
 
-                // Adjust the text position.
-                that._positionText(that.protoblock.scale);
+                    // Adjust the docks.
+                    that.blocks.adjustDocks(thisBlock, true);
 
-                if (COLLAPSABLES.indexOf(that.name) !== -1) {
-                    that.bitmap.visible = !that.collapsed;
-                    that.highlightBitmap.visible = false;
-                    that.updateCache();
-                }
+                    // Adjust the text position.
+                    that._positionText(that.protoblock.scale);
 
-                if (that.postProcess != null) {
-                    that.postProcess(that.postProcessArg);
-                    that.postProcess = null;
-                }
-            }
+                    if (COLLAPSABLES.indexOf(that.name) !== -1) {
+			that.bitmap.visible = !that.collapsed;
+			that.highlightBitmap.visible = false;
+			that.updateCache();
+                    }
+
+                    if (that.postProcess != null) {
+			that.postProcess(that.postProcessArg);
+			that.postProcess = null;
+                    }
+		}
+            };
+
+            that._createCache(__callback, firstTime);
         };
 
         // Create the bitmap for the block.
@@ -1217,10 +1223,12 @@ function Block(protoblock, blocks, overrideName) {
 
         if (bounds === null) {
             console.log('block cache for ' + this.name + ' not ready... waiting.');
-            this._createCache();
-            var that = this;
-            setTimeout(that._calculateBlockHitArea(), 250);
-            // bounds = this.bounds;
+
+            __callback = function (that) {
+                that._calculateBlockHitArea();
+            };
+
+            this._createCache(__callback);
             return;
         }
 
