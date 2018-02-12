@@ -4585,6 +4585,7 @@ function Logo () {
 
             var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
             that.beatFactor[turtle] /= newDotFactor;
+
             childFlow = args[1];
             childFlowCount = 1;
 
@@ -4595,12 +4596,11 @@ function Logo () {
                 var currentDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
                 that.beatFactor[turtle] *= currentDotFactor;
                 if (arg >= 0) {
-                    that.dotCount[turtle] += arg;
-                } else if (arg === -1) {
-                    that.dotCount[turtle] += 1 / arg;
+                    that.dotCount[turtle] -= arg;
                 } else {
-                    that.dotCount[turtle] += 1 / arg;
+                    that.dotCount[turtle] -= 1 / arg;
                 }
+
                 var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
                 that.beatFactor[turtle] /= newDotFactor;
             };
