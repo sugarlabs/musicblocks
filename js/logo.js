@@ -4578,7 +4578,8 @@ function Logo () {
                 that.dotCount[turtle] += arg;
             } else if (arg === -1) {
                 that.errorMsg(_('An argument of -1 results in a note value of 0.'), blk);
-                that.dotCount[turtle] += 1 / arg;
+                console.log('ignoring dot arg of -1');
+                arg = 0;
             } else {
                 that.dotCount[turtle] += 1 / arg;
             }
