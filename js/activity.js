@@ -3561,6 +3561,10 @@ handleComplete);
             var bitmap = last(menuContainer.children);
             if (bitmap != null) {
                 var r = bitmap.rotation;
+                if (r % 90 !== 0) {
+                    return;
+                }
+
                 createjs.Tween.get(bitmap)
                     .to({
                         rotation: r
