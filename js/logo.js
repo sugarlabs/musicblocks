@@ -283,6 +283,7 @@ function Logo () {
     //variables for progress bar
     var progressBar = document.getElementById("myBar");   
     var width = 0;
+    var turtleLength = 0;
     var progressBarDivision;
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
@@ -7415,10 +7416,11 @@ function Logo () {
             width = 0;
         }
         progressBarDivision = 100 / (that.playbackQueue[t].length);
+        turtleLength = 0;
 
         __playbackLoop = function (turtle, idx) {
             that.playbackTime = that.playbackQueue[turtle][idx][0];
-            width = width + progressBarDivision;
+            width = width + (progressBarDivision/turtleLength);
             progressBar.style.width = width + '%'; 
             progressBar.innerHTML = parseInt(width * 1)  + '%';
 
@@ -7562,12 +7564,14 @@ function Logo () {
         };
 
         __playback = function (turtle) {
+            turtleLength++;
             setTimeout(function () {
                 __playbackLoop(turtle, 0);
             }, that.playbackQueue[turtle][0][0] * 1000);
         };
 
         __resumePlayback = function (turtle) {
+            turtleLength++;
             for (var idx = 0; idx < that.playbackQueue[turtle].length; idx++) {
                 if (that.playbackQueue[turtle][idx][0] >= that.playbackTime) {
                     break;
