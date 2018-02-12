@@ -284,6 +284,7 @@ function Logo () {
     var progressBar = document.getElementById("myBar");   
     var width = 0;
     var turtleLength = 0;
+    var inLoop = 0;
     var progressBarDivision;
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
@@ -7411,16 +7412,31 @@ function Logo () {
         this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
 
         var that = this;
-
-        if (width > 100) {
+        var l = 0;
+        if (width >= 100) {
             width = 0;
+        }
+        for (var turtle in this.playbackQueue) {   //For multiple voices
+            l = l + this.playbackQueue[turtle].length;
         }
         progressBarDivision = 100 / (that.playbackQueue[t].length);
         turtleLength = 0;
+        inLoop = 0;
 
         __playbackLoop = function (turtle, idx) {
+            inLoop++;
             that.playbackTime = that.playbackQueue[turtle][idx][0];
-            width = width + (progressBarDivision/turtleLength);
+            width = width + (progressBarDivision/turtleLength)
+
+            if (inLoop == l || width > 100) {
+                width = 100;
+            }
+
+            if (width == NaN) {
+                //Not sure if this happens...but just in case
+                progressBar.style.visibility = 'hidden';
+            }
+
             progressBar.style.width = width + '%'; 
             progressBar.innerHTML = parseInt(width * 1)  + '%';
 
