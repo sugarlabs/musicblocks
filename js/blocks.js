@@ -94,22 +94,6 @@ function Blocks () {
     this._checkArgClampBlocks = [];
     // Clamp blocks that need expanding after load.
     this.clampBlocksToCheck = [];
-
-    // We need to keep track of certain classes of blocks that exhibit
-    // different types of behavior.
-
-    // Blocks with parts that expand, e.g.,
-    this._expandableBlocks = [];
-    // Blocks that contain child flows of blocks
-    this.clampBlocks = [];
-    this.doubleExpandable = [];
-    this.argClampBlocks = [];
-    // Blocks that are used as arguments to other blocks
-    this.argBlocks = [];
-    // Blocks that return values
-    this.valueBlocks = [];
-    // Two-arg blocks with two arguments (expandable).
-    this.twoArgBlocks = [];
     // Blocks that don't run when clicked.
     this.noRunBlocks = [];
 
@@ -359,44 +343,6 @@ function Blocks () {
             that.saveStack();
             that.refreshCanvas();
         });
-    };
-
-    // Walk through all of the proto blocks in order to make lists of
-    // any blocks that need special treatment.
-    this.findBlockTypes = function () {
-        for (var proto in this.protoBlockDict) {
-            if (this.protoBlockDict[proto].expandable) {
-                this._expandableBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'clamp') {
-                this.clampBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'argclamp') {
-                this.argClampBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'argflowclamp') {
-                this.clampBlocks.push(this.protoBlockDict[proto].name);
-                this.argClampBlocks.push(this.protoBlockDict[proto].name);
-                this.argBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'argclamparg') {
-                this.argClampBlocks.push(this.protoBlockDict[proto].name);
-                this.argBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'twoarg') {
-                this.twoArgBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'arg') {
-                this.argBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'value') {
-                this.argBlocks.push(this.protoBlockDict[proto].name);
-                this.valueBlocks.push(this.protoBlockDict[proto].name);
-            }
-            if (this.protoBlockDict[proto].style === 'doubleclamp') {
-                this.doubleExpandable.push(this.protoBlockDict[proto].name);
-            }
-        }
     };
 
     this._actionBlock = function (name) {

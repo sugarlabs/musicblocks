@@ -445,9 +445,6 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
 
     palettes.updatePalettes();
 
-    // Populate the lists of block types.
-    blocks.findBlockTypes();
-
     // Return the object in case we need to save it to local storage.
     return obj;
 };
