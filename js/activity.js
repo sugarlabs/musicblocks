@@ -162,6 +162,8 @@ define(MYDEFINES, function (compatibility) {
         var loading = false;
         var searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
+        var progressBar = docById('myProgress');
+        progressBar.style.visibility = 'hidden';
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -716,12 +718,16 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doPausePlayback () {
+            logo.restartPlayback = false;
             logo.playback(-1);
             playbackBox.playButton.visible = true;
             playbackBox.pauseButton.visible = false;
         };
 
         function doPlayback() {
+            progressBar.style.visibility = 'visible';
+            progressBar.style.left = (playbackBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
+            progressBar.style.top = (playbackBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
             logo.playback(-1);
             playbackBox.playButton.visible = false;
             playbackBox.pauseButton.visible = true;
@@ -731,7 +737,8 @@ define(MYDEFINES, function (compatibility) {
 
         function doRestartPlayback() {
             logo.doStopTurtle();
-
+            logo.restartPlayback = true;
+            
             setTimeout(function () {
                 // logo.playback(-1);
                 playbackBox.playButton.visible = true;
@@ -745,7 +752,7 @@ define(MYDEFINES, function (compatibility) {
             if (recording === undefined) {
                 recording = false;
             }
-
+            logo.restartPlayback = true;
             document.body.style.cursor = 'wait';
             console.log('Compiling music for playback');
 

@@ -279,7 +279,11 @@ function Logo () {
     this.checkingCompletionState = false;
     this.compiling = false;
     this.recording = false;
-
+    this.restartPlayback = true;
+    //variables for progress bar
+    var progressBar = document.getElementById("myBar");   
+    var width = 0;
+    var progressBarDivision;
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
     this._saveY = {};
@@ -7356,6 +7360,10 @@ function Logo () {
     };
 
     this.playback = function (whichMouse, recording) {
+        if (this.restartPlayback) {
+            width = 0;
+        }
+
         if (recording === undefined) {
             recording = false;
         }
@@ -7403,8 +7411,16 @@ function Logo () {
 
         var that = this;
 
+        if (width > 100) {
+            width = 0;
+        }
+        progressBarDivision = 100 / (that.playbackQueue[t].length);
+
         __playbackLoop = function (turtle, idx) {
             that.playbackTime = that.playbackQueue[turtle][idx][0];
+            width = width + progressBarDivision;
+            progressBar.style.width = width + '%'; 
+            progressBar.innerHTML = parseInt(width * 1)  + '%';
 
             if (!that.stopTurtle) {
                 switch(that.playbackQueue[turtle][idx][1]) {

@@ -89,6 +89,19 @@
     overflow-y: auto;
 }
 
+#myProgress {
+  width: 180px;
+  background-color: #92b5c8;
+  position: absolute;
+}
+
+#myBar {
+  width: 0%;
+  height: 40px;
+  background-color: #ffffff;
+  line-height: 30px;
+}
+
 #popdown-palette {
     display: none;
     position: absolute;
