@@ -94,13 +94,15 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
+    // Does this race condition still occur?
     this.updateCache = function () {
         var that = this;
 
         if (this.bounds == null) {
             setTimeout(function () {
+                console.log('CACHE NOT READY');
                 that.updateCache();
-            }, 300);
+            }, 200);
         } else {
             this.container.updateCache();
             this.blocks.refreshCanvas();
@@ -148,6 +150,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
+
         this.updateCache();
     };
 
@@ -171,6 +174,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
+
         this.updateCache();
     };
 
@@ -210,6 +214,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
             }
+
             that.updateCache();
             that._calculateBlockHitArea();
 
@@ -362,6 +367,7 @@ function Block(protoblock, blocks, overrideName) {
             that.imageBitmap = bitmap;
             that.updateCache();
         };
+
         image.src = this.image;
     };
 
@@ -698,9 +704,7 @@ function Block(protoblock, blocks, overrideName) {
 
             that._positionCollapseLabel(that.protoblock.scale);
             that.collapseText.visible = that.collapsed;
-
             that._ensureDecorationOnTop();
-
             that.updateCache();
 
             that.collapseContainer = new createjs.Container();
