@@ -185,9 +185,9 @@ function SaveInterface(PlanetInterface) {
         } else {
             docById('submitPDF').disabled = true;
         }
-
+        var t = this;
         docByClass('close')[0].onclick = function () {
-            this.logo.runningLilypond = false;
+            t.logo.runningLilypond = false;
             docById('lilypondModal').style.display = 'none';
         }
     }
