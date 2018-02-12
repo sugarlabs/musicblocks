@@ -67,6 +67,10 @@ function PlaybackBox () {
         return this;
     };
 
+    this.getPos = function () {
+        return [this._container.x, this._container.y];
+    };
+
     this.init = function (scale, x, y, makeButton, logo) {
         this._logo = logo;
 
@@ -185,6 +189,8 @@ function PlaybackBox () {
             this.norewindButton.visible = false;
             this._compileButton.visible = false;
             this._container.visible = false;
+            var progressBar = docById('myProgress');
+            progressBar.style.visibility = 'hidden';
             this._refreshCanvas();
         }
     };

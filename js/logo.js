@@ -279,7 +279,13 @@ function Logo () {
     this.checkingCompletionState = false;
     this.compiling = false;
     this.recording = false;
-
+    this.restartPlayback = true;
+    //variables for progress bar
+    var progressBar = document.getElementById("myBar");   
+    var width = 0;
+    var turtleLength = 0;
+    var inLoop = 0;
+    var progressBarDivision;
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
     this._saveY = {};
@@ -7357,6 +7363,10 @@ function Logo () {
     };
 
     this.playback = function (whichMouse, recording) {
+        if (this.restartPlayback) {
+            width = 0;
+        }
+
         if (recording === undefined) {
             recording = false;
         }
@@ -7403,9 +7413,33 @@ function Logo () {
         this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
 
         var that = this;
+        var l = 0;
+        if (width >= 100) {
+            width = 0;
+        }
+        for (var turtle in this.playbackQueue) {   //For multiple voices
+            l = l + this.playbackQueue[turtle].length;
+        }
+        progressBarDivision = 100 / (that.playbackQueue[t].length);
+        turtleLength = 0;
+        inLoop = 0;
 
         __playbackLoop = function (turtle, idx) {
+            inLoop++;
             that.playbackTime = that.playbackQueue[turtle][idx][0];
+            width = width + (progressBarDivision/turtleLength)
+
+            if (inLoop == l || width > 100) {
+                width = 100;
+            }
+
+            if (width == NaN) {
+                //Not sure if this happens...but just in case
+                progressBar.style.visibility = 'hidden';
+            }
+
+            progressBar.style.width = width + '%'; 
+            progressBar.innerHTML = parseInt(width * 1)  + '%';
 
             if (!that.stopTurtle) {
                 switch(that.playbackQueue[turtle][idx][1]) {
@@ -7547,12 +7581,14 @@ function Logo () {
         };
 
         __playback = function (turtle) {
+            turtleLength++;
             setTimeout(function () {
                 __playbackLoop(turtle, 0);
             }, that.playbackQueue[turtle][0][0] * 1000);
         };
 
         __resumePlayback = function (turtle) {
+            turtleLength++;
             for (var idx = 0; idx < that.playbackQueue[turtle].length; idx++) {
                 if (that.playbackQueue[turtle][idx][0] >= that.playbackTime) {
                     break;
