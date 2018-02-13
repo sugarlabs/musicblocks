@@ -1951,6 +1951,11 @@ function Logo () {
                 }
             }
             break;
+        case 'storein2':
+            if (args.length === 1) {
+                that.boxes[that.blocks.blockList[blk].privateData] = args[0];
+            }
+            break;
         case 'storein':
             if (args.length === 2) {
                 that.boxes[args[0]] = args[1];

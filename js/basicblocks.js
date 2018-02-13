@@ -2722,8 +2722,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var storein2Block = new ProtoBlock('storein2');
     storein2Block.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['storein2'] = storein2Block;
-    //.TRANS: put something into a container for later reference
-    storein2Block.staticLabels.push(_('store in'));
+    storein2Block.staticLabels.push(_('store in box'));
     storein2Block.adjustWidthToLabel();
     storein2Block.oneArgBlock();
     storein2Block.defaults.push(4);
