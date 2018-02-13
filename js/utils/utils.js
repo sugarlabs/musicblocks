@@ -738,6 +738,18 @@ function displayMsg (blocks, text) {
 };
 
 
+function safeSVG (label) {
+    if (typeof(label) === 'string') {
+        return label
+	    .replace(/&/, '&amp;')
+	    .replace(/</, '&lt;')
+	    .replace(/>/, '&gt;');
+    } else {
+        return label;
+    }
+};
+
+
 function toFixed2 (d) {
     // Return number as fixed 2 precision
     if (typeof(d) === 'number') {

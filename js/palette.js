@@ -823,14 +823,14 @@ function PaletteModel(palette, palettes, name) {
                 artwork = artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
-                    .replace('block_label', label);
+                    .replace('block_label', safeSVG(label));
             } else {
                 artwork = artwork
                     .replace(/fill_color/g,
                          PALETTEFILLCOLORS[protoBlock.palette.name])
                     .replace(/stroke_color/g,
                          PALETTESTROKECOLORS[protoBlock.palette.name])
-                    .replace('block_label', label);
+                    .replace('block_label', safeSVG(label));
             }
 
             for (var i = 0; i <= protoBlock.args; i++) {
