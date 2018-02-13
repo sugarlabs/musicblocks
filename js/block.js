@@ -1297,7 +1297,6 @@ function Block(protoblock, blocks, overrideName) {
                         that._changeLabel();
                     }
                 } else {
-
                     if (!that.blocks.getLongPressStatus()) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
@@ -1993,8 +1992,8 @@ function Block(protoblock, blocks, overrideName) {
             });
         }
 
-        this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.blockScale + canvasLeft) + 'px';
-        this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.blockScale + canvasTop) + 'px';
+        this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
+        this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
 
         // There may be a second select used for # and b.
         if (this.labelattr != null) {
