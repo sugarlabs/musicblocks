@@ -2540,7 +2540,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     greaterBlock.palette = palettes.dict['boolean'];
     blocks.protoBlockDict['greater'] = greaterBlock;
     greaterBlock.fontsize = 14;
-    greaterBlock.staticLabels.push('&gt;');
+    greaterBlock.staticLabels.push('>');
     greaterBlock.extraWidth = 20;
     greaterBlock.booleanTwoArgBlock();
 
@@ -2548,7 +2548,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     lessBlock.palette = palettes.dict['boolean'];
     blocks.protoBlockDict['less'] = lessBlock;
     lessBlock.fontsize = 14;
-    lessBlock.staticLabels.push('&lt;');
+    lessBlock.staticLabels.push('<');
     lessBlock.extraWidth = 20;
     lessBlock.booleanTwoArgBlock();
 
@@ -2718,6 +2718,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     // Show the value in the box as if it were a parameter.
     boxBlock.parameter = true;
     boxBlock.dockTypes[1] = 'anyin';
+
+    var storein2Block = new ProtoBlock('storein2');
+    storein2Block.palette = palettes.dict['boxes'];
+    blocks.protoBlockDict['storein2'] = storein2Block;
+    //.TRANS: put something into a container for later reference
+    storein2Block.staticLabels.push(_('store in'));
+    storein2Block.adjustWidthToLabel();
+    storein2Block.oneArgBlock();
+    storein2Block.defaults.push(4);
+    storein2Block.dockTypes[1] = 'anyin';
 
     var storeinBlock = new ProtoBlock('storein');
     storeinBlock.palette = palettes.dict['boxes'];
