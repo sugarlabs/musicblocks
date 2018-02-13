@@ -2043,6 +2043,8 @@ function Blocks () {
 
         if (name === 'text') {
             console.log('makeBlock ' + name + ' ' + arg);
+        } else if (name === 'storein2') {
+            console.log('makeBlock ' + name + ' ' + arg);
         }
 
         var postProcess = function (args) {
@@ -2160,7 +2162,7 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, null];
-        } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
+        } else if (['storein2', 'namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
             postProcess = function (args) {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
@@ -2188,6 +2190,23 @@ function Blocks () {
                         protoFound = true;
                         break;
                     }
+                } else if (name === 'storein2') {
+                    postProcess = function (args) {
+                        var c = that.blockList[thisBlock].connections[0];
+                        if (args[1] === _('store in box')) {
+                            that.blockList[c].privateData = _('box');
+                        } else {
+                            that.blockList[c].privateData = args[1];
+                            that.blockList[c].overrideName = args[1];
+                            that.blockList[c].regenerateArtwork(false);
+                        }
+                    };
+
+                    postProcessArg = [thisBlock, arg];
+
+                    that.makeNewBlock(proto, postProcess, postProcessArg);
+                    protoFound = true;
+                    break;
                 }
             }
         }
@@ -2484,6 +2503,17 @@ function Blocks () {
                         }
                     }
                 }
+            } else if (this.blockList[blk].name === 'storein2') {
+                if (this.blockList[blk].privateData === oldName) {
+		    this.blockList[blk].privateData = newName;
+		    this.blockList[blk].overrideName = newName;
+		    this.blockList[blk].regenerateArtwork();
+                    try {
+                        this.blockList[blk].container.updateCache();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
             }
         }
     };
@@ -2614,12 +2644,23 @@ function Blocks () {
         myStoreinBlock.twoArgBlock();
         myStoreinBlock.dockTypes[1] = 'anyin';
         myStoreinBlock.dockTypes[2] = 'anyin';
+
+        var myStorein2Block = new ProtoBlock('storein2');
+        this.protoBlockDict['myStorein2_' + name] = myStorein2Block;
+        myStorein2Block.palette = this.palettes.dict['boxes'];
+        myStorein2Block.defaults.push(NUMBERBLOCKDEFAULT);
+        myStorein2Block.staticLabels.push(name);
+        myStorein2Block.adjustWidthToLabel();
+        myStorein2Block.oneArgBlock();
+        myStorein2Block.dockTypes[1] = 'anyin';
+
         if (name === 'box') {
             return;
         }
 
         // Add the new block to the top of the palette.
         myStoreinBlock.palette.add(myStoreinBlock, true);
+        myStoreinBlock.palette.add(myStorein2Block, true);
     };
 
     this.newNamedboxBlock = function (name) {
@@ -3002,7 +3043,7 @@ function Blocks () {
                     blockItem = [b, [myBlock.name, {'value': myBlock.value}], x, y, []];
                     break;
                 }
-            } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) !== -1) {
+            } else if (['storein2', 'namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) !== -1) {
                 blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
             } else {
                 blockItem = [b, myBlock.name, x, y, []];
@@ -3531,8 +3572,22 @@ function Blocks () {
                 break;
 
                 // Named boxes and dos need private data.
+            case 'storein2':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].privateData = value;
+                    that.blockList[thisBlock].value = null;
+		    that.blockList[thisBlock].overrideName = value;
+		    that.blockList[thisBlock].regenerateArtwork();
+
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+
             case 'namedbox':
-	    case 'namedarg':
+            case 'namedarg':
             case 'namedcalc':
             case 'nameddo':
                 postProcess = function (args) {

@@ -423,19 +423,19 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             __callback = function (that, firstTime) {
-		that.blocks.refreshCanvas();
-		var thisBlock = that.blocks.blockList.indexOf(that);
+                that.blocks.refreshCanvas();
+                var thisBlock = that.blocks.blockList.indexOf(that);
 
-		if (firstTime) {
+                if (firstTime) {
                     that._loadEventHandlers();
                     if (that.image !== null) {
-			that._addImage();
+                        that._addImage();
                     }
 
                     that._finishImageLoad();
-		} else {
+                } else {
                     if (that.name === 'start' || that.name === 'drum') {
-			that._ensureDecorationOnTop();
+                        that._ensureDecorationOnTop();
                     }
 
                     // Adjust the docks.
@@ -445,16 +445,16 @@ function Block(protoblock, blocks, overrideName) {
                     that._positionText(that.protoblock.scale);
 
                     if (COLLAPSABLES.indexOf(that.name) !== -1) {
-			that.bitmap.visible = !that.collapsed;
-			that.highlightBitmap.visible = false;
-			that.updateCache();
+                        that.bitmap.visible = !that.collapsed;
+                        that.highlightBitmap.visible = false;
+                        that.updateCache();
                     }
 
                     if (that.postProcess != null) {
-			that.postProcess(that.postProcessArg);
-			that.postProcess = null;
+                        that.postProcess(that.postProcessArg);
+                        that.postProcess = null;
                     }
-		}
+                }
             };
 
             that._createCache(__callback, firstTime);
@@ -489,7 +489,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         if (this.overrideName) {
-            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
+            if (['storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
                 if (block_label.length > 8) {
                     block_label = block_label.substr(0, 7) + '...';
