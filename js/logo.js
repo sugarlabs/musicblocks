@@ -58,6 +58,7 @@ function Logo () {
     this.clearCurrentKeyCode = null;
     this.meSpeak = null;
     this.saveLocally = null;
+    this.showBlocksAfterRun = false;
 
     this.pitchTimeMatrix = null;
     this.pitchDrumMatrix = null;
@@ -587,6 +588,11 @@ function Logo () {
         this._restoreConnections();
 
         document.body.style.cursor = 'default';
+        if (this.showBlocksAfterRun) {
+            this.showBlocks();
+        }
+
+        this.showBlocksAfterRun = false;
     };
 
     this._restoreConnections = function () {
@@ -6470,6 +6476,11 @@ function Logo () {
 
             if (!that.turtles.running() && queueStart === 0) {
                 // TODO: Enable playback button here
+                if (that.showBlocksAfterRun) {
+                    that.showBlocks();
+                }
+
+                that.showBlocksAfterRun = false;
                 console.log('fin');
             }
         }
@@ -9705,10 +9716,11 @@ function Logo () {
         this.cameraID = id;
     };
 
-    this.hideBlocks = function () {
+    this.hideBlocks = function (show) {
         // Hide all the blocks.
         this.blocks.hide();
         this.refreshCanvas();
+        this.showBlocksAfterRun = show !== undefined && show;
     };
 
     this.showBlocks = function () {

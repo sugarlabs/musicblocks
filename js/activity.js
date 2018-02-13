@@ -487,6 +487,7 @@ define(MYDEFINES, function (compatibility) {
 
             if (!turtles.running()) {
                 console.log('running');
+                logo.hideBlocks(true);
                 logo.runLogoCommands(null, env);
             } else {
                 if (currentDelay !== 0) {
