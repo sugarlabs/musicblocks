@@ -1163,23 +1163,20 @@ define(MYDEFINES, function (compatibility) {
             // createjs.LoadQueue(true, null, true);
 
             // Enable touch interactions if supported on the current device.
-            // FIXME: voodoo
-            // createjs.Touch.enable(stage, false, true);
+            createjs.Touch.enable(stage, false, true);
+
             // Keep tracking the mouse even when it leaves the canvas.
             stage.mouseMoveOutside = true;
+	    
             // Enabled mouse over and mouse out events.
             stage.enableMouseOver(10); // default is 20
 
             cartesianBitmap = _createGrid('images/Cartesian.svg');
-
             polarBitmap = _createGrid('images/polar.svg');
 
             var URL = window.location.href;
             var projectName = null;
             var flags = {run: false, show: false, collapse: false};
-
-            // This happens in the resize code.
-            // _setupAndroidToolbar();
 
             // Scale the canvas relative to the screen size.
             _onResize();
