@@ -1157,19 +1157,6 @@ function Logo () {
             this.turtles.turtleList[turtle].listeners = {};
         }
 
-        // First we need to reconcile the values in all the value
-        // blocks with their associated textareas.
-        // FIXME: Do we still need this check???
-        for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
-            if (this.blocks.blockList[blk].label != null) {
-                if (this.blocks.blockList[blk].labelattr != null && this.blocks.blockList[blk].labelattr.value !== '♮') {
-                    this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value + this.blocks.blockList[blk].labelattr.value;
-                } else {
-                    this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value;
-                }
-            }
-        }
-
         // Init the graphic state.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.turtles.turtleList[turtle].container.x = this.turtles.turtleX2screenX(this.turtles.turtleList[turtle].x);
