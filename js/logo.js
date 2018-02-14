@@ -5296,14 +5296,20 @@ function Logo () {
         case 'swing':
             // Grab a bit from the next note to give to the current note.
             if (that.blocks.blockList[blk].name === 'newswing2') {
-                that.swing[turtle].push(1 / args[0]);
-                that.swingTarget[turtle].push(1 / args[1]);
+                if (that.suppressOutput[turtle]) {
+                    that.notationSwing(turtle);
+                } else {
+                    that.swing[turtle].push(1 / args[0]);
+                    that.swingTarget[turtle].push(1 / args[1]);
+                }
                 childFlow = args[2];
             } else if (that.blocks.blockList[blk].name === 'newswing') {
+                // deprecated
                 that.swing[turtle].push(1 / args[0]);
                 that.swingTarget[turtle].push(null);
                 childFlow = args[1];
             } else {
+                // deprecated
                 that.swing[turtle].push(args[0]);
                 that.swingTarget[turtle].push(null);
                 childFlow = args[1];
@@ -5316,8 +5322,11 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                that.swingTarget[turtle].pop();
-                that.swing[turtle].pop();
+                if (!that.suppressOutput[turtle]) {
+                    that.swingTarget[turtle].pop();
+                    that.swing[turtle].pop();
+                }
+
                 that.swingCarryOver[turtle] = 0;
             };
 
@@ -6056,9 +6065,9 @@ function Logo () {
             } else {
                 // Play rhythm block as if it were a drum.
                 if (that.drumStyle[turtle].length > 0) {
-		    that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
+                    that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
                 } else {
-		    that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
+                    that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
                 }
 
                 that.inNoteBlock[turtle].push(blk);
@@ -6071,7 +6080,7 @@ function Logo () {
 
                 var beatValue = (bpmFactor / noteBeatValue) / args[0];
 
-		__rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
+                __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                     setTimeout(function () {
                         that._processNote(thisBeat, blk, turtle, callback);
                     }, timeout);
@@ -6164,9 +6173,9 @@ function Logo () {
 
                     // Play rhythm block as if it were a drum.
                     if (that.drumStyle[turtle].length > 0) {
-			that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
+                        that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
                     } else {
-			that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
+                        that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
                     }
 
                     that.inNoteBlock[turtle].push(blk);
@@ -9920,6 +9929,10 @@ function Logo () {
         }
 
         this.pickupPoint[turtle] = null;
+    };
+
+    this.notationSwing = function (turtle) {
+        this.notationStaging[turtle].push('swing');
     };
 
     this.notationTempo = function (turtle, bpm, beatValue) {

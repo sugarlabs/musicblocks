@@ -59,6 +59,9 @@ processLilypondNotes = function (logo, turtle) {
         var obj = logo.notationStaging[turtle][i];
         if (typeof(obj) === 'string') {
             switch (obj) {
+            case 'swing':
+                logo.notationNotes[turtle] += '\\tempo swing\n';
+                break;
             case 'tempo':
                 logo.notationNotes[turtle] += '\\tempo ' + logo.notationStaging[turtle][i + 2] + ' = ' + logo.notationStaging[turtle][i + 1] + '\n';
                 i += 2;
