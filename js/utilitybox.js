@@ -108,7 +108,7 @@ function UtilityBox () {
             this._positionHoverText(this._languageButton);
             this._languageButton.on('click', function (event) {
                 that._doLanguageBox();
-                that._hide();
+                that.hide();
             });
 
             dx += BOXBUTTONSPACING;
@@ -118,7 +118,7 @@ function UtilityBox () {
             this._positionHoverText(this._smallerButton);
             this._smallerButton.on('click', function (event) {
                 that._doSmaller();
-                that._hide();
+                that.hide();
             });
 
             this._smallerButton2 = makeButton('smaller-disable-button', _('Cannot be further decreased'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
@@ -126,7 +126,7 @@ function UtilityBox () {
             this._positionHoverText(this._smallerButton2);
             this._smallerButton2.on('click', function (event) {
                 that._doSmaller();
-                that._hide();
+                that.hide();
             });
 
             dx += BOXBUTTONSPACING;
@@ -136,7 +136,7 @@ function UtilityBox () {
             this._positionHoverText(this._biggerButton);
             this._biggerButton.on('click', function (event) {
                 that._doBigger();
-                that._hide();
+                that.hide();
             });
 
             this._biggerButton2 = makeButton('bigger-disable-button', _('Cannot be further increased'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
@@ -144,7 +144,7 @@ function UtilityBox () {
             this._positionHoverText(this._biggerButton2);
             this._biggerButton2.on('click', function (event) {
                 that._doBigger();
-                that._hide();
+                that.hide();
             });
 
             dx += BOXBUTTONSPACING;;
@@ -154,7 +154,7 @@ function UtilityBox () {
             this._positionHoverText(this._statsButton);
             this._statsButton.on('click', function (event) {
                 that._doStats();
-                that._hide();
+                that.hide();
             });
 
             dx += BOXBUTTONSPACING;;
@@ -164,7 +164,7 @@ function UtilityBox () {
             this._positionHoverText(this._pluginsButton);
             this._pluginsButton.on('click', function (event) {
                 that._doPlugins();
-                that._hide();
+                that.hide();
             });
 
             dx += BOXBUTTONSPACING;;
@@ -178,7 +178,7 @@ function UtilityBox () {
             this._positionHoverText(this._pluginsDeleteButton2);
             this._pluginsDeleteButton2.on('click', function (event) {
                 that._deletePlugin();
-                that._hide();
+                that.hide();
             });
 
             dx += BOXBUTTONSPACING;;
@@ -188,7 +188,7 @@ function UtilityBox () {
             this._positionHoverText(this._scrollButton);
             this._scrollButton.on('click', function (event) {
                 that._doScroller();
-                that._hide();
+                that.hide();
                 that._scrollStatus = !that._scrollStatus;
             });
 
@@ -200,7 +200,7 @@ function UtilityBox () {
             this._positionHoverText(this._scrollButton2);
             this._scrollButton2.on('click', function (event) {
                 that._doScroller();
-                that._hide();
+                that.hide();
                 that._scrollStatus = !that._scrollStatus;
             });
 
@@ -232,7 +232,7 @@ function UtilityBox () {
         }
     };
 
-    this._hide = function () {
+    this.hide = function () {
         if (this._container !== null) {
             this._languageButton.visible = false;
             this._smallerButton.visible = false;
@@ -334,7 +334,7 @@ function UtilityBox () {
             var y = (event.stageY / that._scale) - that._container.y;
 
             if (y < 55) {
-                that._hide();
+                that.hide();
             }
         });
     };

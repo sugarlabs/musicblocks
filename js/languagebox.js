@@ -52,7 +52,7 @@ function LanguageBox () {
         myDiv.style.visibility = 'visible';
     };
 
-    this._hide = function () {
+    this.hide = function () {
         const MSG = {
 	    'default': _('Refresh your browser to change your language preference.'),
             'en': 'Refresh your browser to change your language preference.',
@@ -189,7 +189,7 @@ function LanguageBox () {
             var x = (event.stageX / that._scale) - that._container.x;
             var y = (event.stageY / that._scale) - that._container.y;
             if (x > 125 && y < 55) {
-                that._hide();
+                that.hide();
             } else if (y > 55) {
             }
         });

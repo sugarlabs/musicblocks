@@ -180,7 +180,7 @@ function PlaybackBox () {
         }
     };
 
-    this._hide = function () {
+    this.hide = function () {
         if (this._container !== null) {
             this.playButton.visible = false;
             this.noplayButton.visible = false;
@@ -279,7 +279,7 @@ function PlaybackBox () {
             var y = (event.stageY / that._scale) - that._container.y;
 
             if (y < 55) {
-                that._hide();
+                that.hide();
             }
         });
     };

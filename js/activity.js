@@ -590,7 +590,15 @@ define(MYDEFINES, function (compatibility) {
 
         function doMuteButton() {
             logo._setMasterVolume(0);
-        }
+        };
+
+        function _hideBoxes() {
+            clearBox.hide();
+            saveBox.hide();
+            languageBox.hide();
+            utilityBox.hide();
+            playbackBox.hide();
+        };
 
         function _doCartesianPolar() {
             if (cartesianBitmap.visible && polarBitmap.visible) {
@@ -2097,20 +2105,24 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _deleteBlocksBox() {
+            _hideBoxes();
             clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
             clearBox.show();
         };
 
         function doLanguageBox() {
+            _hideBoxes();
             languageBox.createBox(turtleBlocksScale, saveButton.x - 27, saveButton.y - 55);
             languageBox.show();
         };
 
         function _doUtilityBox() {
+            _hideBoxes();
             utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
         };
 
         function _doPlaybackBox() {
+            _hideBoxes();
             playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
         };
 
@@ -2317,7 +2329,8 @@ define(MYDEFINES, function (compatibility) {
             //     var name = 'My Project';
             //     download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
             // } else {
-                saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+            _hideBoxes();
+            saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
             // }
         };
 
