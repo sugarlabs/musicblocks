@@ -85,7 +85,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.bounds == null) {
             setTimeout(function () {
                 that._createCache(callback, args);
-            }, 200);
+            }, 100);
         } else {
             this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
             callback(this, args);
@@ -598,7 +598,11 @@ function Block(protoblock, blocks, overrideName) {
                     label += attr;
                 }
             } else {
-                var label = this.value.toString();
+                if (this.value !== null) {
+                    var label = this.value.toString();
+                } else {
+                    var label = '???';
+                }
             }
 
             if (WIDENAMES.indexOf(this.name) === -1 && label.length > 8) {
