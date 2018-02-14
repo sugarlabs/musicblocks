@@ -1883,6 +1883,17 @@ function Logo () {
                             that.turtles.turtleList[turtle].queue.pop();
                         }
                     }
+
+                    // We need to reset the turtle time.
+                    if (that.firstNoteTime == null) {
+                        var d = new Date();
+                        that.firstNoteTime = d.getTime();
+                    }
+
+                    var d = new Date();
+                    var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000;
+                    that.turtleTime[turtle] = elapsedTime;
+                    that.previousTurtleTime[turtle] = elapsedTime;
                 }
             }
             break;
@@ -4179,7 +4190,7 @@ function Logo () {
             } else {
                 if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
                     // Play a stand-alone pitch block as a quarter note.
-		    that.clearNoteParams(turtle, blk, []);
+                    that.clearNoteParams(turtle, blk, []);
 
                     var noteObj = getNote(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     if (!that.validNote) {
@@ -4270,9 +4281,9 @@ function Logo () {
             } else {
                 // Play rhythm block as if it were a drum.
                 if (that.drumStyle[turtle].length > 0) {
-		    that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
+                    that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
                 } else {
-		    that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
+                    that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
                 }
 
                 that.inNoteBlock[turtle].push(blk);
@@ -4285,7 +4296,7 @@ function Logo () {
 
                 var beatValue = bpmFactor / noteBeatValue;
 
-		__rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
+                __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                     setTimeout(function () {
                         that._processNote(thisBeat, blk, turtle, callback);
                     }, timeout);
@@ -4489,7 +4500,7 @@ function Logo () {
             // A note can contain multiple pitch blocks to create
             // a chord. The chord is accumuated in these arrays,
             // which are used when we play the note.
-	    that.clearNoteParams(turtle, blk, []);
+            that.clearNoteParams(turtle, blk, []);
 
             // Ensure that note duration is positive.
             if (args[0] > 0) {
