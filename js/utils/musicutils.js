@@ -468,14 +468,10 @@ function getModeNumbers(name) {
 
 function getModeName(name) {
     for (var mode in MODENAMES) {
-        if (MODENAMES[mode][0] === name || MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
-            if (MODENAMES[mode][0] != '') {
-                return MODENAMES[mode][0];
-            } else {
-                console.log('I18n for mode name is misbehaving.');
-                console.log(name + ' ' + name.toLowerCase() + ' ' + MODENAMES[mode][0].toLowerCase() + ' ' + MODENAMES[mode][1].toLowerCase());
-                return MODENAMES[mode][1];
-            }
+        if (MODENAMES[mode][0] === name) {
+            return MODENAMES[mode][0];
+        } else if (MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
+            return MODENAMES[mode][1];
         }
     }
 
@@ -486,9 +482,9 @@ function getModeName(name) {
 
 function initIntervalI18N() {
     for (var i = 0; i < INTERVALNAMES.length; i++) {
-      if (INTERVALNAMES[i][0] == null) {
+        if (INTERVALNAMES[i][0] == null) {
             INTERVALNAMES[i][0] = _(INTERVALNAMES[i][1]);
-          }
+        }
 
         if (INTERVALNAMES[i][0] == null) {
             INTERVALNAMES[i][0] = INTERVALNAMES[i][1];
@@ -499,7 +495,7 @@ function initIntervalI18N() {
 
 function initFilterI18N() {
     for (var i = 0; i < FILTERTYPES.length; i++) {
-      if (FILTERTYPES[i][0] == null) {
+        if (FILTERTYPES[i][0] == null) {
             FILTERTYPES[i][0] = _(FILTERTYPES[i][1]);
           }
 
@@ -512,9 +508,9 @@ function initFilterI18N() {
 
 function initOscI18N() {
     for (var i = 0; i < OSCTYPES.length; i++) {
-      if (OSCTYPES[i][0] == null) {
+        if (OSCTYPES[i][0] == null) {
             OSCTYPES[i][0] = _(OSCTYPES[i][1]);
-          }
+        }
 
         if (OSCTYPES[i][0] == null) {
             OSCTYPES[i][0] = OSCTYPES[i][1];
@@ -525,9 +521,9 @@ function initOscI18N() {
 
 function initModeI18N() {
     for (var i = 0; i < MODENAMES.length; i++) {
-      if (MODENAMES[i][0] == null) {
+        if (MODENAMES[i][0] == null) {
             MODENAMES[i][0] = _(MODENAMES[i][1]);
-          }
+        }
 
         if (MODENAMES[i][0] == null) {
             MODENAMES[i][0] = MODENAMES[i][1];
@@ -571,18 +567,17 @@ function getDrumName(name) {
     }
 
     for (var drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            if (DRUMNAMES[drum][0] != '') {
-                return DRUMNAMES[drum][0];
-            } else {
-                console.log('I18n is misbehaving when parsing drum name: ' + name);
-                return DRUMNAMES[drum][1];
-            }
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+            return DRUMNAMES[drum][0];
+        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            return DRUMNAMES[drum][1];
         }
     }
 
-    return null;
+    console.log(name + ' not found in DRUMNAMES');
+    return DEFAULTDRUM;
 };
+
 
 function getDrumSymbol(name) {
     if (name === '') {
@@ -591,16 +586,14 @@ function getDrumSymbol(name) {
     }
 
     for (var drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            if (DRUMNAMES[drum][0] != '') {
-                return DRUMNAMES[drum][3];
-            } else {
-                console.log('I18n is misbehaving when parsing drum name: ' + name);
-                return 'hh';
-            }
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+            return DRUMNAMES[drum][3];
+        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            return 'hh';
         }
     }
 
+    console.log(name + ' not found in MODENAMES');
     return 'hh';
 };
 
@@ -610,18 +603,17 @@ function getFilterTypes(name) {
         console.log('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
         name = DEFAULTFILTERTYPE;
     }
+
     for (var type = 0; type < FILTERTYPES.length; type++) {
-        if (FILTERTYPES[type][0].toLowerCase() === name.toLowerCase() || FILTERTYPES[type][1].toLowerCase() === name.toLowerCase()) {
-            if (FILTERTYPES[type][0] != '') {
-                return FILTERTYPES[type][0];
-            } else {
-                console.log('I18n is misbehaving when parsing filter type: ' + name);
-                return FILTERTYPES[type][1];
-            }
+        if (FILTERTYPES[type][0].toLowerCase() === name.toLowerCase()) {
+            return FILTERTYPES[type][0];
+        } else if (FILTERTYPES[type][1].toLowerCase() === name.toLowerCase()) {
+            return FILTERTYPES[type][1];
         }
     }
 
-    return null;
+    console.log(name + ' not found in FILTERTYPES');
+    return DEFAULTFILTERTYPE;
 };
 
 
@@ -630,18 +622,17 @@ function getOscillatorTypes(name) {
         console.log('getOscillatorType passed blank name. Returning ' + DEFAULTOSCILLATORTYPE);
         name = DEFAULTOSCILLATORTYPE;
     }
+
     for (var type = 0; type < OSCTYPES.length; type++) {
-        if (OSCTYPES[type][0].toLowerCase() === name.toLowerCase() || OSCTYPES[type][1].toLowerCase() === name.toLowerCase()) {
-            if (OSCTYPES[type][0] != '') {
-                return OSCTYPES[type][0];
-            } else {
-                console.log('I18n is misbehaving when parsing oscillator type: ' + name);
-                return OSCTYPES[type][1];
-            }
+        if (OSCTYPES[type][0].toLowerCase() === name.toLowerCase()) {
+            return OSCTYPES[type][0];
+        } else if (OSCTYPES[type][1].toLowerCase() === name.toLowerCase()) {
+            return OSCTYPES[type][1];
         }
     }
 
-    return null;
+    console.log(name + ' not found in OSCTYPES');
+    return DEFAULTOSCILLATORTYPE;
 };
 
 
@@ -654,11 +645,12 @@ function getDrumIcon(name) {
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        // if (DRUMNAMES[i].indexOf(name) !== -1) {
         if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[i][2];
         }
     }
+
+    console.log(name + ' not found in DRUMNAMES');
     return 'images/drum.svg';
 };
 
@@ -675,12 +667,13 @@ function getDrumSynthName(name) {
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        // if (DRUMNAMES[i].indexOf(name) !== -1) {
         if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[i][1];
         }
     }
-    return null;
+
+    console.log(name + ' not found in DRUMNAMES');
+    return DEFAULTDRUM;
 };
 
 
@@ -693,16 +686,17 @@ function getVoiceName(name) {
     }
 
     for (var i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+        if (VOICENAMES[i][0] === name) {
             if (VOICENAMES[i][0] != '') {
                 return VOICENAMES[i][0];
-            } else {
-                console.log('I18n is misbehaving when parsing voice name: ' + name);
+            } else if (VOICENAMES[i][1] === name) {
                 return VOICENAMES[i][1];
             }
         }
     }
-    return null;
+
+    console.log(name + ' not found in VOICENAMES');
+    return DEFAULTVOICE;
 };
 
 
@@ -719,6 +713,8 @@ function getVoiceIcon(name) {
             return VOICENAMES[i][2];
         }
     }
+
+    console.log(name + ' not found in VOICENAMES');
     return 'images/voices.svg';
 };
 
@@ -739,7 +735,9 @@ function getVoiceSynthName(name) {
             return VOICENAMES[i][1];
         }
     }
-    return null;
+
+    console.log(name + ' not found in VOICENAMES');
+    return DEFAULTVOICE;
 };
 
 
