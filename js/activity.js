@@ -262,7 +262,8 @@ define(MYDEFINES, function (compatibility) {
             palettes.initial_y = 55;
             palettes.updatePalettes();
             var x = 100 * turtleBlocksScale;
-            var y = 100 * turtleBlocksScale;
+            var y = 50 * turtleBlocksScale;
+            var even = true;
 
             // First start blocks
             for (var blk in blocks.blockList) {
@@ -285,10 +286,16 @@ define(MYDEFINES, function (compatibility) {
                                 }
                             }
                         }
-                        x += 200 * turtleBlocksScale;
-                        if (x > (canvas.width - 100) / (turtleBlocksScale)) {
-                            x = 100 * turtleBlocksScale;
-                            y += 100 * turtleBlocksScale;
+                        x += 150 * turtleBlocksScale;
+                        if (x > (canvas.width - 200) / (turtleBlocksScale)) {
+                            even = !even;
+                            if (even) {
+                                x = 100 * turtleBlocksScale;
+                            } else {
+                                x = 150 * turtleBlocksScale;
+                            }
+
+                            y += 50 * turtleBlocksScale;
                         }
                     }
                 }
@@ -315,10 +322,16 @@ define(MYDEFINES, function (compatibility) {
                                 }
                             }
                         }
-                        x += 200 * turtleBlocksScale;
-                        if (x > (canvas.width - 100) / (turtleBlocksScale)) {
-                            x = 100 * turtleBlocksScale;
-                            y += 100 * turtleBlocksScale;
+                        x += 150 * turtleBlocksScale;
+                        if (x > (canvas.width - 200) / (turtleBlocksScale)) {
+                            even = !even;
+                            if (even) {
+                                x = 100 * turtleBlocksScale;
+                            } else {
+                                x = 150 * turtleBlocksScale;
+                            }
+
+                            y += 50 * turtleBlocksScale;
                         }
                     }
                 }
@@ -1167,7 +1180,7 @@ define(MYDEFINES, function (compatibility) {
 
             // Keep tracking the mouse even when it leaves the canvas.
             stage.mouseMoveOutside = true;
-	    
+
             // Enabled mouse over and mouse out events.
             stage.enableMouseOver(10); // default is 20
 
@@ -2747,7 +2760,7 @@ define(MYDEFINES, function (compatibility) {
             // Warn the user -- chrome only -- if the browser level is
             // not set to 100%
             if (window.innerWidth !== window.outerWidth) {
-		blocks.errorMsg(_('Please set browser zoom level to 100%'));
+                blocks.errorMsg(_('Please set browser zoom level to 100%'));
                 console.log('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
             }
         };
