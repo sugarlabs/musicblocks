@@ -2743,6 +2743,13 @@ define(MYDEFINES, function (compatibility) {
             docById('loading-image-container').style.display = 'none';
             // docById('canvas').style.display = 'none';
             docById('hideContents').style.display = 'block';
+
+            // Warn the user -- chrome only -- if the browser level is
+            // not set to 100%
+            if (window.innerWidth !== window.outerWidth) {
+		blocks.errorMsg(_('Please set browser zoom level to 100%'));
+                console.log('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
+            }
         };
 
         function _loadStart() {
