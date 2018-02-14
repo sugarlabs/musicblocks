@@ -441,6 +441,9 @@ function PlanetView(model, controller) {
                 html = html + format(LOCAL_PROJECT_TEMPLATE, project).replace(new RegExp('_NUM_', 'g'), i.toString());
                 // console.log(i);
                 // console.log(project);
+                if (project.current){
+                    html = html.replace('<img class="delete icon" title="Delete" alt="Delete" src="header-icons/delete.svg" />         ',' ');
+                }
             });
             document.querySelector('.planet .content.l').innerHTML = html;
 
@@ -458,8 +461,10 @@ function PlanetView(model, controller) {
                    .addEventListener('click', planet.download(ele));
                 ele.querySelector('.merge')
                    .addEventListener('click', planet.open(ele, true));
-                ele.querySelector('.delete')
+                if (i != 0) {
+                    ele.querySelector('.delete')
                    .addEventListener('click', planet.delete(ele));
+                }
                 ele.querySelector('input')
                    .addEventListener('change', planet.input(ele));
                 ele.querySelector('.thumbnail')
