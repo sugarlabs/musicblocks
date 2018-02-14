@@ -958,6 +958,8 @@ function Logo () {
         this.masterVolume = [DEFAULTVOLUME];
         this.checkingCompletionState = false;
 
+        this.embeddedGraphicsFinished = {};
+
         // Prep synths for each turtle.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             if (!(turtle in instruments)) {
@@ -1024,6 +1026,7 @@ function Logo () {
             this.currentOctave[turtle] = 4;
             this.noteBeatValues[turtle] = {};
             this.embeddedGraphics[turtle] = {};
+            this.embeddedGraphicsFinished[turtle] = true;
             this.beatFactor[turtle] = 1;
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
@@ -7659,6 +7662,13 @@ function Logo () {
             return;
         }
 
+        // If the previous note's graphics are not complete, add a
+        // slight delay before drawing any new graphics.
+        if (!this.embeddedGraphicsFinished[turtle]) {
+            delay += 0.1;
+        }
+
+        this.embeddedGraphicsFinished[turtle] = false;
         var that = this;
         var inFillClamp = false;
         var inHollowLineClamp = false;
@@ -7916,7 +7926,10 @@ function Logo () {
 
         // Cheat by 15% so that the mouse has time to complete its work.
         // var stepTime = beatValue * 1000 / NOTEDIV;
-        var stepTime = beatValue * 850 / NOTEDIV;
+        var stepTime = (beatValue - delay) * 850 / NOTEDIV;
+        if (stepTime >= 0) {
+            stepTime = 0;
+        }
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
@@ -7929,18 +7942,23 @@ function Logo () {
 
         // We want to update the turtle graphics every 50ms within a note.
         if (stepTime > 200) {
-            this.dispatchFactor[turtle] = 0.25;
+            this.dispatchFactor[turtle] = NOTEDIV / 32;
         } else if (stepTime > 100) {
-            this.dispatchFactor[turtle] = 0.5;
+            this.dispatchFactor[turtle] = NOTEDIV / 16;
         } else if (stepTime > 50) {
-            this.dispatchFactor[turtle] = 1;
+            this.dispatchFactor[turtle] = NOTEDIV / 8;
         } else if (stepTime > 25) {
-            this.dispatchFactor[turtle] = 2;
+            this.dispatchFactor[turtle] = NOTEDIV / 4;
         } else if (stepTime > 12.5) {
-            this.dispatchFactor[turtle] = 4;
+            this.dispatchFactor[turtle] = NOTEDIV / 2;
         } else {
-            this.dispatchFactor[turtle] = 8;
+            this.dispatchFactor[turtle] = NOTEDIV;
         }
+
+        // Mark the end time of this note's graphics operations.
+        setTimeout(function() {
+            that.embeddedGraphicsFinished[turtle] = true;
+        }, beatValue * 1000);
 
         for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
             var b = this.embeddedGraphics[turtle][blk][i];
