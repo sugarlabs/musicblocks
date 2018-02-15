@@ -575,7 +575,7 @@ function getDrumName(name) {
     }
 
     console.log(name + ' not found in DRUMNAMES');
-    return DEFAULTDRUM;
+    return null;
 };
 
 
