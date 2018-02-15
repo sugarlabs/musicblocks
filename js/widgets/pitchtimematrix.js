@@ -332,11 +332,17 @@ function PitchTimeMatrix () {
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/synth2.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/synth2.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/mouse.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/mouse.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else {
+                const BELLSETIDX = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G': 5, 'A': 6, 'B': 7};
+                var noteName = this.rowLabels[i].replace(SHARP, '').replace(FLAT, '').replace(NATURAL, '').replace(DOUBLESHARP, '').replace(DOUBLEFLAT, '');
+                if (noteName in BELLSETIDX) {
+                    cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                }
             }
 
             // A cell for the row label
