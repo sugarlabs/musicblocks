@@ -645,8 +645,7 @@ function PaletteModel(palette, palettes, name) {
                 var arg = block.defaults[0];
                 break;
             case 'storein2':
-                console.log('storein2' + ' ' + block.defaults[0] + ' ' + block.staticLabels[0]);
-                modname = 'store in ' + block.staticLabels[0];
+                modname = 'store in2 ' + block.staticLabels[0];
                 var arg = block.staticLabels[0];
                 break;
             case 'box':
@@ -1903,7 +1902,7 @@ function Palette(palettes, name) {
         case 'storein2':
             // Use the name of the box in the label
             console.log('storein2' + ' ' + protoblk.defaults[0] + ' ' + protoblk.staticLabels[0]);
-            blkname = 'store in ' + protoblk.defaults[0];
+            blkname = 'store in2 ' + protoblk.defaults[0];
             var newBlk = protoblk.name;
             var arg = protoblk.staticLabels[0];
             break;

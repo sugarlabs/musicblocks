@@ -746,10 +746,10 @@ function Block(protoblock, blocks, overrideName) {
 
                     that.blocks.refreshCanvas();
                     that.blocks.cleanupAfterLoad(that.name);
-		    if (that.trash) {
-			that.collapseContainer.visible = false;
-			that.collapseText.visible = false;
-		    }
+                    if (that.trash) {
+                        that.collapseContainer.visible = false;
+                        that.collapseText.visible = false;
+                    }
                 };
 
                 image.src = 'images/expand.svg';
@@ -2211,14 +2211,16 @@ function Block(protoblock, blocks, overrideName) {
                 // If the label was the name of a storein, update the
                 // associated box this.blocks and the palette buttons.
                 if (this.value !== 'box') {
-                    this.blocks.newNamedboxBlock(this.value);
                     this.blocks.newStoreinBlock(this.value);
+                    this.blocks.newStorein2Block(this.value);
+                    this.blocks.newNamedboxBlock(this.value);
                 }
 
                 // Rename both box <- name and namedbox blocks.
-                this.blocks.renameStoreinBoxes(oldValue, newValue);
                 this.blocks.renameBoxes(oldValue, newValue);
                 this.blocks.renameNamedboxes(oldValue, newValue);
+                this.blocks.renameStoreinBoxes(oldValue, newValue);
+                this.blocks.renameStorein2Boxes(oldValue, newValue);
 
                 this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('boxes');

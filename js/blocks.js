@@ -1303,6 +1303,7 @@ function Blocks () {
                         // blocks to the palette.
                         if (newConnection === 1 && myBlock.value !== 'box') {
                             this.newStoreinBlock(myBlock.value);
+                            this.newStorein2Block(myBlock.value);
                             this.newNamedboxBlock(myBlock.value);
                             var that = this;
                             setTimeout(function () {
@@ -2503,11 +2504,21 @@ function Blocks () {
                         }
                     }
                 }
-            } else if (this.blockList[blk].name === 'storein2') {
+            }
+        }
+    };
+
+    this.renameStorein2Boxes = function (oldName, newName) {
+        if (oldName === newName || oldName === _('box')) {
+            return;
+        }
+
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'storein2') {
                 if (this.blockList[blk].privateData === oldName) {
-		    this.blockList[blk].privateData = newName;
-		    this.blockList[blk].overrideName = newName;
-		    this.blockList[blk].regenerateArtwork();
+                    this.blockList[blk].privateData = newName;
+                    this.blockList[blk].overrideName = newName;
+                    this.blockList[blk].regenerateArtwork();
                     try {
                         this.blockList[blk].container.updateCache();
                     } catch (e) {
@@ -2645,22 +2656,36 @@ function Blocks () {
         myStoreinBlock.dockTypes[1] = 'anyin';
         myStoreinBlock.dockTypes[2] = 'anyin';
 
+        if (name !== 'box') {
+            // Add the new block to the top of the palette.
+            this.palettes.dict['boxes'].add(myStoreinBlock, true);
+        }
+    };
+
+    this.newStorein2Block = function (name) {
+        if (name == null) {
+            console.log('null name passed to newStorein2Block');
+            return;
+        } else if (name == undefined) {
+            console.log('undefined name passed to newStorein2Block');
+            return;
+        } else if ('yourStorein2_' + name in this.protoBlockDict) {
+            return;
+        }
+
         var myStorein2Block = new ProtoBlock('storein2');
-        this.protoBlockDict['myStorein2_' + name] = myStorein2Block;
+        this.protoBlockDict['yourStorein2_' + name] = myStorein2Block;
         myStorein2Block.palette = this.palettes.dict['boxes'];
-        myStorein2Block.defaults.push(NUMBERBLOCKDEFAULT);
+        myStorein2Block.defaults.push(name);
         myStorein2Block.staticLabels.push(name);
         myStorein2Block.adjustWidthToLabel();
         myStorein2Block.oneArgBlock();
         myStorein2Block.dockTypes[1] = 'anyin';
 
-        if (name === 'box') {
-            return;
+        if (name !== 'box') {
+            // Add the new block to the top of the palette.
+            this.palettes.dict['boxes'].add(myStorein2Block, true);
         }
-
-        // Add the new block to the top of the palette.
-        myStoreinBlock.palette.add(myStoreinBlock, true);
-        myStoreinBlock.palette.add(myStorein2Block, true);
     };
 
     this.newNamedboxBlock = function (name) {
@@ -3252,8 +3277,9 @@ function Blocks () {
                 } else {
                     var name = blkData[1][1]['value'];
                 }
-                // console.log('Adding new palette entries for store-in ' + name);
+
                 this.newStoreinBlock(name);
+                this.newStorein2Block(name);
                 this.newNamedboxBlock(name);
                 updatePalettes = true;
             }
@@ -3578,8 +3604,8 @@ function Blocks () {
                     var value = args[1];
                     that.blockList[thisBlock].privateData = value;
                     that.blockList[thisBlock].value = null;
-		    that.blockList[thisBlock].overrideName = value;
-		    that.blockList[thisBlock].regenerateArtwork();
+                    that.blockList[thisBlock].overrideName = value;
+                    that.blockList[thisBlock].regenerateArtwork();
 
                 };
 
@@ -4006,10 +4032,11 @@ function Blocks () {
                     var name = this.blockList[c].value;
                     if (name !== null) {
                         // Is there an old block with this name still around?
-                        if (this.protoBlockDict['myStorein_' + name] == undefined) {
+                        if (this.protoBlockDict['myStorein_' + name] == undefined || this.protoBlockDict['yourStorein2_' + name] == undefined) {
                             console.log('adding new storein block ' + name);
-                            this.newNamedboxBlock(this.blockList[c].value);
                             this.newStoreinBlock(this.blockList[c].value);
+                            this.newStorein2Block(this.blockList[c].value);
+                            this.newNamedboxBlock(this.blockList[c].value);
                             updatePalettes = true;
                         }
                     }
