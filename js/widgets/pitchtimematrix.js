@@ -130,6 +130,8 @@ function PitchTimeMatrix () {
         this._rests = 0;
         this._logo = logo;
 
+        this.playingNow = false;	
+
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
@@ -1075,6 +1077,12 @@ function PitchTimeMatrix () {
 
     this.playAll = function() {
         // Play all of the notes in the matrix.
+        if (this.playingNow) {
+            return;
+        }
+
+        this.playingNow = true;
+
         this._logo.synth.stop();
 
         var notes = [];
@@ -1182,6 +1190,7 @@ function PitchTimeMatrix () {
                     var cell = row.cells[i];
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 }
+
                 if (that._matrixHasTuplets) {
                     var row = docById('ptmTupletNoteValueRow');
                     for (var i = 0; i < row.cells.length; i++) {
@@ -1189,6 +1198,8 @@ function PitchTimeMatrix () {
                         cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                     }
                 }
+
+                that.playingNow = false;
             } else {
                 var row = docById('ptmNoteValueRow');
                 var cell = row.cells[that._colIndex];
@@ -1276,6 +1287,7 @@ function PitchTimeMatrix () {
                 }
 
                 noteCounter += 1;
+
                 if (noteCounter < that._notesToPlay.length) {
                     that.__playNote(time, noteCounter);
                 }
