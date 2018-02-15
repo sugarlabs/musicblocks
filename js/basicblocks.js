@@ -282,6 +282,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertBlock.dockTypes[2] = 'anyin';
     invertBlock.hidden = true;
 
+    var registerBlock = new ProtoBlock('register');
+    registerBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['register'] = registerBlock;
+    //.TRANS: register is the octave of the current pitch
+    registerBlock.staticLabels.push(_('register'));
+    registerBlock.defaults.push(0);
+    registerBlock.oneArgBlock();
+    registerBlock.adjustWidthToLabel();
+
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;

@@ -162,6 +162,7 @@ function Logo () {
     this._masterBPM = TARGETBPM;
     this.defaultBPMFactor = TONEBPM / this._masterBPM;
 
+    this.register = {};
     this.beatFactor = {};
     this.dotCount = {};
     this.noteBeat = {};
@@ -1024,6 +1025,7 @@ function Logo () {
             this.notePitches[turtle] = {};
             this.noteOctaves[turtle] = {};
             this.currentOctave[turtle] = 4;
+            this.register[turtle] = 0;
             this.noteBeatValues[turtle] = {};
             this.embeddedGraphics[turtle] = {};
             this.embeddedGraphicsFinished[turtle] = true;
@@ -3718,7 +3720,8 @@ function Logo () {
             }
 
             function addPitch(note, octave, cents, direction) {
-                var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], true, direction, that.errorMsg);
+                t = transposition + that.register[turtle] * 12;
+                var noteObj = getNote(note, octave, t, that.keySignature[turtle], true, direction, that.errorMsg);
 
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
@@ -4108,7 +4111,8 @@ function Logo () {
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, direction) {
-                    var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.moveable[turtle], direction, that.errorMsg);
+                    t = transposition + that.register[turtle] * 12;
+                    var noteObj = getNote(note, octave, t, that.keySignature[turtle], that.moveable[turtle], direction, that.errorMsg);
                     if (!that.validNote) {
                         that.errorMsg(INVALIDPITCH, blk);
                         that.stopTurtle = true;
@@ -5541,6 +5545,11 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'register':
+            if (typeof(args[0]) === 'number') {
+                that.register[turtle] = Math.floor(args[0]);
+            }
+            break;
         case 'settransposition':
             var transValue = args[0];
             if (!(that.invertList[turtle].length === 0)) {
@@ -5947,7 +5956,8 @@ function Logo () {
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, frequency, direction) {
-                    var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.moveable[turtle], direction, that.errorMsg);
+                    t = transposition + that.register[turtle] * 12;
+                    var noteObj = getNote(note, octave, t, that.keySignature[turtle], that.moveable[turtle], direction, that.errorMsg);
                     if (that.drumStyle[turtle].length > 0) {
                         var drumname = last(that.drumStyle[turtle]);
                         that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
