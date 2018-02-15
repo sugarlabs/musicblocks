@@ -2504,6 +2504,17 @@ function Blocks () {
                         }
                     }
                 }
+            } else if (this.blockList[blk].name === 'storein2') {
+                if (this.blockList[blk].privateData === oldName) {
+		    this.blockList[blk].privateData = newName;
+		    this.blockList[blk].overrideName = newName;
+		    this.blockList[blk].regenerateArtwork();
+                    try {
+                        this.blockList[blk].container.updateCache();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
             }
         }
     };
@@ -3606,7 +3617,6 @@ function Blocks () {
                     that.blockList[thisBlock].value = null;
                     that.blockList[thisBlock].overrideName = value;
                     that.blockList[thisBlock].regenerateArtwork();
-
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
