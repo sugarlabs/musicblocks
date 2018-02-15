@@ -2728,11 +2728,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     boxBlock.parameter = true;
     boxBlock.dockTypes[1] = 'anyin';
 
+    var namedBoxBlock = new ProtoBlock('namedbox');
+    namedBoxBlock.palette = palettes.dict['boxes'];
+    blocks.protoBlockDict['namedbox'] = namedBoxBlock;
+    namedBoxBlock.staticLabels.push(_('box'));
+    namedBoxBlock.extraWidth = 10;
+    namedBoxBlock.adjustWidthToLabel();
+    namedBoxBlock.parameterBlock();
+    namedBoxBlock.dockTypes[0] = 'anyout';
+
     var storein2Block = new ProtoBlock('storein2');
     storein2Block.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['storein2'] = storein2Block;
-    //.TRANS: put something into a container for later reference
-    storein2Block.staticLabels.push(_('store in'));
+    storein2Block.staticLabels.push(_('store in box'));
     storein2Block.adjustWidthToLabel();
     storein2Block.oneArgBlock();
     storein2Block.defaults.push(4);
@@ -2750,15 +2758,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     storeinBlock.defaults.push(4);
     storeinBlock.dockTypes[1] = 'anyin';
     storeinBlock.dockTypes[2] = 'anyin';
-
-    var namedBoxBlock = new ProtoBlock('namedbox');
-    namedBoxBlock.palette = palettes.dict['boxes'];
-    blocks.protoBlockDict['namedbox'] = namedBoxBlock;
-    namedBoxBlock.staticLabels.push(_('box'));
-    namedBoxBlock.extraWidth = 10;
-    namedBoxBlock.adjustWidthToLabel();
-    namedBoxBlock.parameterBlock();
-    namedBoxBlock.dockTypes[0] = 'anyout';
 
     // ACTIONS PALETTE
 

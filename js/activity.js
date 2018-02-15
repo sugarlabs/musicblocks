@@ -3096,6 +3096,10 @@ define(MYDEFINES, function (compatibility) {
                     var args = {
                         'value': myBlock.privateData
                     }
+                } else if (myBlock.name === 'storein2') {
+                    var args = {
+                        'value': myBlock.privateData
+                    }
                 } else if (myBlock.name === 'nameddo') {
                     var args = {
                         'value': myBlock.privateData
