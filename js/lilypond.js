@@ -115,7 +115,11 @@ processLilypondNotes = function (logo, turtle) {
                 logo.notationNotes[turtle] += '~';
                 break;
             case 'key':
-                logo.notationNotes[turtle] += ' \\key ' + __toLilynote(logo.notationStaging[turtle][i + 1]) + ' \\' + logo.notationStaging[turtle][i + 2] + '\n';
+                if (['major', 'minor'].indexOf(logo.notationStaging[turtle][i + 2]) !== -1) {
+                    logo.notationNotes[turtle] += ' \\key ' + __toLilynote(logo.notationStaging[turtle][i + 1]) + ' \\' + logo.notationStaging[turtle][i + 2] + '\n';
+                } else {
+                    logo.errorMsg(_('Lilypond ignoring mode') + ' ' + logo.notationStaging[turtle][i + 2]);
+                }
                 i += 2;
                 break;
             case 'meter':
