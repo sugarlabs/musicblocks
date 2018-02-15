@@ -164,7 +164,14 @@ define(MYDEFINES, function (compatibility) {
         searchWidget.style.visibility = 'hidden';
         var progressBar = docById('myProgress');
         progressBar.style.visibility = 'hidden';
+        var paste = new createjs.DOMElement(document.getElementById('paste'));
+        var pasteStyle = document.getElementById('paste');
+        var pasteX = document.getElementById('myCanvas').width;
+        var pasteY = document.getElementById('myCanvas').height;
 
+        pasteStyle.style.left = pasteX/2.5 * turtleBlocksScale + 'px';
+        pasteStyle.style.top = pasteY/3.5 * turtleBlocksScale + 'px';
+        
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
             PALETTEFILLCOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1], PALETTECOLORS[p][2]);
@@ -1681,6 +1688,7 @@ define(MYDEFINES, function (compatibility) {
             const KEYCODE_UP = 38;
             const KEYCODE_DOWN = 40;
             const DEL = 46;
+            const V = 86;
 
             // Shortcuts for creating new notes
             const KEYCODE_D = 68; // do
@@ -1729,6 +1737,16 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 }
             } else if (event.ctrlKey && !disableKeys) {
+                switch(event.keyCode)
+                {
+                    case CTRL && V:
+                    paste.visible = true;
+                    document.getElementById("paste").focus();
+                    stage.addChild(paste);
+                    update = true;
+                    console.log("It jsut worked")
+                    break;
+                }
             } else if (event.shiftKey && !disableKeys){
                 switch (event.keyCode) {
                 case KEYCODE_D:
@@ -1854,9 +1872,12 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case RETURN:
+                    paste.visible = false;
                     if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
                     } else if (docById('search').value.length > 0){
                         doSearch();
+                    } else if (docById('paste').value.length > 0){
+                        pasted();
                     } else {
                         if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
                             logo.runLogoCommands();
@@ -3850,6 +3871,27 @@ handleComplete);
                 isExtraLong = false;
             });
         };
+
+        function pasted() {
+
+            var pasteinput = document.getElementById("paste").value;
+            var rawData = pasteinput;
+            if (rawData == null || rawData == "")
+			{
+				alert("Invalid code.");
+			}
+            var cleanData = rawData.replace('\n', ' ');
+            var obj = JSON.parse(cleanData);
+            for (var name in blocks.palettes.dict) 
+            {
+                            
+                blocks.palettes.dict[name].hideMenu(true);
+            }
+
+            refreshCanvas();
+            blocks.loadNewBlocks(obj);
+        }
+
 
     };
 });
