@@ -1579,6 +1579,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
+        var selectorWidth = 100;
+
         var movedStage = false;
         if (!window.hasMouse && this.blocks.stage.y + y > 75) {
             movedStage = true;
@@ -1749,6 +1751,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('modenameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'accidentalname') {
             var type = 'accidentalname';
             if (this.value != null) {
@@ -1769,6 +1772,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('accidentalnameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'intervalname') {
             var type = 'intervalname';
             if (this.value != null) {
@@ -1794,6 +1798,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('intervalnameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'invertmode') {
             var type = 'invertmode';
             if (this.value != null) {
@@ -1819,6 +1824,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('invertModeLabel');
+            selectorWidth = 150;
         } else if (this.name === 'drumname') {
             var type = 'drumname';
             if (this.value != null) {
@@ -1844,6 +1850,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('drumnameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'filtertype') {
             var type = 'filtertype';
             if (this.value != null) {
@@ -1869,6 +1876,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('filtertypeLabel');
+            selectorWidth = 150;
         } else if (this.name === 'oscillatortype') {
             var type = 'oscillatortype';
             if (this.value != null) {
@@ -1894,6 +1902,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('oscillatortypeLabel');
+            selectorWidth = 150;
         } else if (this.name === 'voicename') {
             var type = 'voicename';
             if (this.value != null) {
@@ -1919,6 +1928,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('voicenameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'boolean') {
             var type = 'boolean';
             if (this.value != null) {
@@ -2002,12 +2012,12 @@ function Block(protoblock, blocks, overrideName) {
         // There may be a second select used for # and b.
         if (this.labelattr != null) {
             this.label.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 50) * this.blocks.blockScale + canvasLeft) + 'px';
-            this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.blockScale + canvasTop) + 'px';
+            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 50) * this.blocks.getStageScale() + canvasLeft) + 'px';
+            this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
             this.labelattr.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
             this.labelattr.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         } else {
-            this.label.style.width = Math.round(100 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
         }
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
