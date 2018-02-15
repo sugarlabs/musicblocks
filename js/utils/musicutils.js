@@ -30,6 +30,7 @@ const SIXTYFOURTHNOTE = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.
 // is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
 const SHARP = '♯';
 const FLAT = '♭';
+const NATURAL = '♮';
 const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
 const BTOFLAT = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
@@ -574,7 +575,7 @@ function getDrumName(name) {
         }
     }
 
-    console.log(name + ' not found in DRUMNAMES');
+    // console.log(name + ' not found in DRUMNAMES');
     return null;
 };
 
@@ -593,7 +594,7 @@ function getDrumSymbol(name) {
         }
     }
 
-    console.log(name + ' not found in MODENAMES');
+    console.log(name + ' not found in DRUMNAMES');
     return 'hh';
 };
 
