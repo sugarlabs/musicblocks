@@ -342,7 +342,7 @@ function PitchTimeMatrix () {
                 // Don't add bellset image with sharps and flats.
                 var noteName = this.rowLabels[i];
                 if (noteName in BELLSETIDX) {
-                    cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                    cell.innerHTML = '<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
                 }
             }
 
