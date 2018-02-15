@@ -700,6 +700,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doBiggerFont() {
+            hideDOMLabel();
+
             if (blockscale < BLOCKSCALES.length - 1) {
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
@@ -713,6 +715,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSmallerFont() {
+            hideDOMLabel();
+
             if (blockscale > 0) {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
@@ -2132,6 +2136,7 @@ define(MYDEFINES, function (compatibility) {
                 blocks.palettes.dict[name].hideMenu(true);
             }
 
+            hideDOMLabel();
             refreshCanvas();
 
             var actionBlockCounter = 0;
