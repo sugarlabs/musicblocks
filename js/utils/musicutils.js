@@ -1590,6 +1590,8 @@ function reducedFraction(a, b) {
 
 getNote = function (noteArg, octave, transposition, keySignature, movable, direction, errorMsg) {
     var sharpFlat = false;
+    var rememberFlat = false;
+    var rememberSharp = false;    
 
     octave = Math.round(octave);
 
@@ -1612,21 +1614,25 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
     case 'bb':
     case '𝄫':
         noteArg += 'b';
+        rememberFlat = true;
         transposition -= 1;
         break;
     case 'b':
     case '♭':
         noteArg += 'b';
+        rememberFlat = true;
         break;
     case '##':
     case '*':
     case '𝄪':
         noteArg += '#';
+        rememberSharp = true;
         transposition += 1;
         break;
     case '#':
     case '♯':
         noteArg += '#';
+        rememberSharp = true;
         break;
     case 'b#':
     case '#b':
@@ -1637,7 +1643,11 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
     }
 
     // Already a note? No need to convert from solfege.
-    if (noteArg in BTOFLAT) {
+    if (rememberSharp) {
+        if (noteArg in STOSHARP) {
+            noteArg = STOSHARP[noteArg];
+        }
+    } else if (noteArg in BTOFLAT) {
         noteArg = BTOFLAT[noteArg];
     } else if (noteArg in STOSHARP) {
         noteArg = STOSHARP[noteArg];
@@ -1858,7 +1868,7 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
         break;
     }
 
-    // Finally consider the note direction (in the case of intervals)
+    // Consider the note direction (in the case of intervals)
     if (direction != undefined) {
         switch(direction) {
         case -1:
@@ -1873,6 +1883,16 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
             break;
         default:
             break;
+        }
+    }
+
+    if (rememberSharp) {
+        if (note in EQUIVALENTSHARPS) {
+            note = EQUIVALENTSHARPS[note];
+        }
+    } else if (rememberFlat) {
+        if (note in EQUIVALENTFLATS) {
+            note = EQUIVALENTFLATS[note];
         }
     }
 
