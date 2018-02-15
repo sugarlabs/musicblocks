@@ -338,7 +338,7 @@ function PitchTimeMatrix () {
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
-                const BELLSETIDX = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G': 5, 'A': 6, 'B': 7};
+                const BELLSETIDX = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G': 5, 'A': 6, 'B': 7, 'do': 1, 're': 2, 'me': 3, 'fa': 4, 'sol': 5, 'la': 6, 'ti': 7};
                 var noteName = this.rowLabels[i].replace(SHARP, '').replace(FLAT, '').replace(NATURAL, '').replace(DOUBLESHARP, '').replace(DOUBLEFLAT, '');
                 if (noteName in BELLSETIDX) {
                     cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
