@@ -706,9 +706,11 @@ define(MYDEFINES, function (compatibility) {
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
+
             if (BLOCKSCALES[blockscale] > 1) {
                 utilityBox._decreaseStatus = true;
             }
+
             if (BLOCKSCALES[blockscale] == 4) {
                 utilityBox._increaseStatus = false;
             }
@@ -721,9 +723,11 @@ define(MYDEFINES, function (compatibility) {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
+
             if (BLOCKSCALES[blockscale] == 1) {
                 utilityBox._decreaseStatus = false;
             }
+
             if (BLOCKSCALES[blockscale] < 4) {
                 utilityBox._increaseStatus = true;
             } 
@@ -2205,6 +2209,7 @@ define(MYDEFINES, function (compatibility) {
                     stage.removeChild(chartBitmap);
                     chartBitmap = null;
                 }
+
                 logo.showBlocks();
                 palettes.show();
                 palettes.bringToTop();
@@ -3762,7 +3767,9 @@ handleComplete);
             var formerContainer = container;
 
             container.on('mouseover', function (event) {
-                document.body.style.cursor = 'pointer';
+                if (!loading) {
+                    document.body.style.cursor = 'pointer';
+		}
             });
 
             container.on('mouseout', function (event) {

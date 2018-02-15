@@ -627,6 +627,10 @@ function Block(protoblock, blocks, overrideName) {
 
             this.blocks.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
+            if (this.trash) {
+                this.collapseContainer.visible = false;
+                this.collapseText.visible = false;
+            }
         } else {
             // Start blocks and Action blocks can collapse, so add an
             // event handler.
@@ -742,6 +746,10 @@ function Block(protoblock, blocks, overrideName) {
 
                     that.blocks.refreshCanvas();
                     that.blocks.cleanupAfterLoad(that.name);
+		    if (that.trash) {
+			that.collapseContainer.visible = false;
+			that.collapseText.visible = false;
+		    }
                 };
 
                 image.src = 'images/expand.svg';
