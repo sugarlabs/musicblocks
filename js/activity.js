@@ -1080,7 +1080,7 @@ define(MYDEFINES, function (compatibility) {
                 reader.readAsText(fileChooser.files[0]);
             }, false);
 
-            function handleFileSelect (event) {
+            var __handleFileSelect = function (event) {
                 event.stopPropagation();
                 event.preventDefault();
 
@@ -1133,15 +1133,15 @@ define(MYDEFINES, function (compatibility) {
                 }
             };
 
-            function handleDragOver (event) {
+            var __handleDragOver = function (event) {
                 event.stopPropagation();
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';
             };
 
             var dropZone = docById('canvasHolder');
-            dropZone.addEventListener('dragover', handleDragOver, false);
-            dropZone.addEventListener('drop', handleFileSelect, false);
+            dropZone.addEventListener('dragover', __handleDragOver, false);
+            dropZone.addEventListener('drop', __handleFileSelect, false);
 
             allFilesChooser.addEventListener('click', function (event) {
                 this.value = null;
@@ -1301,12 +1301,18 @@ define(MYDEFINES, function (compatibility) {
         function _setupBlocksContainerEvents() {
             var moving = false;
 
+            var __wheelHandler = function (event) {
+                blocksContainer.y -= event.deltaY;
+            };
+
+            docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
+
             stage.on('stagemousemove', function (event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
             });
 
-            function __stageMouseUpHandler (event) {
+            var __stageMouseUpHandler = function (event) {
                 stageMouseDown = false;
                 moving = false;
             };
