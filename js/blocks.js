@@ -771,7 +771,7 @@ function Blocks () {
             var cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 var that = this;
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var parentblk = args[0];
                     var oldBlock = args[1];
 
@@ -821,7 +821,7 @@ function Blocks () {
             var cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 var that = this;
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var parentblk = args[0];
                     var oldBlock = args[1];
 
@@ -3575,7 +3575,7 @@ function Blocks () {
             case 'start':
                 blkData[4][0] = null;
                 blkData[4][2] = null;
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var blkInfo = args[1];
                     that.blockList[thisBlock].value = that.turtles.turtleList.length;
@@ -3587,7 +3587,7 @@ function Blocks () {
             case 'drum':
                 blkData[4][0] = null;
                 blkData[4][2] = null;
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var blkInfo = args[1];
                     that.blockList[thisBlock].value = that.turtles.turtleList.length;
@@ -3610,7 +3610,7 @@ function Blocks () {
 
                 // Named boxes and dos need private data.
             case 'storein2':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -3626,7 +3626,7 @@ function Blocks () {
             case 'namedarg':
             case 'namedcalc':
             case 'nameddo':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -3638,7 +3638,7 @@ function Blocks () {
 
                 // Arg clamps may need extra slots added.
             case 'doArg':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var extraSlots = args[1].length - 4;
                     if (extraSlots > 0) {
@@ -3663,7 +3663,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('doArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
             case 'nameddoArg':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -3691,7 +3691,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('nameddoArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
                 break;
             case 'calcArg':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var extraSlots = args[1].length - 3;
                     if (extraSlots > 0) {
@@ -3716,7 +3716,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('calcArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
             case 'namedcalcArg':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -3746,7 +3746,7 @@ function Blocks () {
 
                 // Value blocks need a default value set.
             case 'number':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = Number(value);
@@ -3766,7 +3766,7 @@ function Blocks () {
             case 'invertmode':
             case 'filtertype':
             case 'oscillatortype':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -3776,7 +3776,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'drumname':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -3791,7 +3791,7 @@ function Blocks () {
                 }
                 break;
             case 'voicename':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -3812,7 +3812,7 @@ function Blocks () {
 
             case 'media':
                 // Load a thumbnail into a media blocks.
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -3825,7 +3825,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'camera':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = CAMERAVALUE;
@@ -3834,7 +3834,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'video':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = VIDEOVALUE;
@@ -3847,7 +3847,7 @@ function Blocks () {
                 // backward compatibility with Python projects.
             case 'red':
             case 'black':
-                postProcess = function (thisBlock) {
+                var postProcess = function (thisBlock) {
                     that.blockList[thisBlock].value = 0;
                     that.updateBlockText(thisBlock);
                 };
@@ -3855,7 +3855,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'white':
-                postProcess = function (thisBlock) {
+                var postProcess = function (thisBlock) {
                     that.blockList[thisBlock].value = 100;
                     that.updateBlockText(thisBlock);
                 };
@@ -3863,7 +3863,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'orange':
-                postProcess = function (thisBlock) {
+                var postProcess = function (thisBlock) {
                     that.blockList[thisBlock].value = 10;
                     that.updateBlockText(thisBlock);
                 };
@@ -3871,7 +3871,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'yellow':
-                postProcess = function (thisBlock) {
+                var postProcess = function (thisBlock) {
                     that.blockList[thisBlock].value = 20;
                     that.updateBlockText(thisBlock);
                 };
@@ -3879,7 +3879,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'green':
-                postProcess = function (thisBlock) {
+                var postProcess = function (thisBlock) {
                     that.blockList[thisBlock].value = 40;
                     that.updateBlockText(thisBlock);
                 };
@@ -3887,7 +3887,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'blue':
-                postProcess = function (thisBlock) {
+                var postProcess = function (thisBlock) {
                     that.blockList[thisBlock].value = 70;
                     that.updateBlockText(thisBlock);
                 };
@@ -3895,7 +3895,7 @@ function Blocks () {
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'loadFile':
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     that.blockList[args[0]].value = args[1];
                     that.updateBlockText(args[0]);
                 };
@@ -3905,7 +3905,7 @@ function Blocks () {
             default:
                 // Check that name is in the proto list
                 if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
-                    postProcessUnknownBlock = function (args) {
+                    var postProcessUnknownBlock = function (args) {
                         // save original block name
                         that.blockList[args[0]].privateData = args[1];
                     };
@@ -3915,8 +3915,9 @@ function Blocks () {
                     // Lots of assumptions here.
                     // TODO: figure out if it is a flow or an arg block.
                     // Substitute a NOP block for an unknown block.
-                    n = blkData[4].length;
+                    var n = blkData[4].length;
                     console.log(n + ': substituting nop block for ' + name);
+
                     switch (n) {
                     case 1:
                         newName = 'nopValueBlock';
@@ -3932,6 +3933,9 @@ function Blocks () {
                         break;
                     case 5:
                     default:
+                        if (n > 5) {
+                            console.log('WARNING: arg count exceed.');
+                        }
                         newName = 'nopThreeArgBlock';
                         break;
                     }
