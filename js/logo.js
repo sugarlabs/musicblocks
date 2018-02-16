@@ -95,6 +95,7 @@ function Logo () {
     this.turtleHeaps = {};
     this.invertList = {};
     this.beatList = {};
+    this.factorList = {};
 
     // We store each case arg and flow by switch block no. and turtle.
     this.switchCases = {};
@@ -1033,6 +1034,7 @@ function Logo () {
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
             this.beatList[turtle] = [];
+            this.factorList[turtle] = [];
             this.switchCases[turtle] = {};
             this.switchBlocks[turtle] = [];
             this.connectionStore[turtle] = {};
@@ -4429,7 +4431,11 @@ function Logo () {
                     var eventName = '__beat_' + args[0] + '_' + turtle + '__';
                     that._setListener(turtle, eventName, __listener);
 
-                    that.beatList[turtle].push(args[0]);
+                    if (args[0] > that.beatsPerMeasure[turtle]) {
+                        that.factorList[turtle].push(args[0]);
+		    } else {
+			that.beatList[turtle].push(args[0]);
+		    }
                 }
             }
             break;
@@ -4506,6 +4512,20 @@ function Logo () {
 
                     var eventName = '__offbeat_' + turtle + '__';
                     that.stage.dispatchEvent(eventName);
+                }
+
+                var thisBeat = beatValue + that.beatsPerMeasure[turtle] * (that.currentMeasure[turtle] - 1);
+                for (var f = 0; f < that.factorList[turtle].length; f++) {
+                    var factor = thisBeat / that.factorList[turtle][f];
+                    if (factor === Math.floor(factor)) {
+			var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
+			that.parentFlowQueue[turtle].push(blk);
+			that.turtles.turtleList[turtle].queue.push(queueBlock);
+			childFlow = null;
+
+			var eventName = '__beat_' + that.factorList[turtle][f] + '_' + turtle + '__';
+			that.stage.dispatchEvent(eventName);
+                    }
                 }
             }
 
