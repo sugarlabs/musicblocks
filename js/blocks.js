@@ -394,7 +394,7 @@ function Blocks () {
             this._adjustArgClampBlock([blk]);
         }
 
-        function __clampAdjuster(blk, myBlock, clamp) {
+        var __clampAdjuster = function (blk, myBlock, clamp) {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
@@ -516,7 +516,18 @@ function Blocks () {
 
         var that = this;
 
-        var vSpaceCount = howManyVSpaceBlocksBelow(blk);
+        var __howManyVSpaceBlocksBelow = function (blk) {
+            // Need to know how many vspace blocks are below the block
+            // we're checking against.
+            var nextBlock = last(that.blockList[blk].connections);
+            if (nextBlock && that.blockList[nextBlock].name === 'vspace') {
+                return 1 + __howManyVSpaceBlocksBelow(nextBlock);
+                // Recurse until it isn't a vspace
+            }
+            return 0;
+        };
+
+        var vSpaceCount = __howManyVSpaceBlocksBelow(blk);
         if (secondArgumentSize < vSpaceCount + 1) {
             // Remove a vspace block
             var n = Math.abs(secondArgumentSize - vSpaceCount - 1);
@@ -541,12 +552,13 @@ function Blocks () {
 
             var that = this;
 
-            function vspaceAdjuster(args) { // nextBlock, vspace, i, n
+            var __vspaceAdjuster = function (args) {
                 var thisBlock = args[0];
                 var nextBlock = args[1];
                 var vspace = args[2];
                 var i = args[3];
                 var n = args[4];
+
                 var vspaceBlock = that.blockList[vspace];
                 var lastDock = last(thisBlock.docks);
                 var dx = lastDock[0] - vspaceBlock.docks[0][0];
@@ -559,26 +571,16 @@ function Blocks () {
                 if (nextBlock) {
                     that.blockList[nextBlock].connections[0] = vspace;
                 }
+
                 if (i + 1 < n) {
                     var newPos = that.blockList.length;
                     thisBlock = last(that.blockList);
                     nextBlock = last(thisBlock.connections);
-                    that._makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, i + 1, n]);
+                    that._makeNewBlockWithConnections('vspace', newPos, [null, null], __vspaceAdjuster, [thisBlock, nextBlock, newPos, i + 1, n]);
                 }
             };
 
-            this._makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, 0, n]);
-        };
-
-        function howManyVSpaceBlocksBelow(blk) {
-            // Need to know how many vspace blocks are below the block
-            // we're checking against.
-            var nextBlock = last(that.blockList[blk].connections);
-            if (nextBlock && that.blockList[nextBlock].name === 'vspace') {
-                return 1 + howManyVSpaceBlocksBelow(nextBlock);
-                // Recurse until it isn't a vspace
-            }
-            return 0;
+            this._makeNewBlockWithConnections('vspace', newPos, [null, null], __vspaceAdjuster, [thisBlock, nextBlock, newPos, 0, n]);
         };
     };
 
@@ -3912,21 +3914,72 @@ function Blocks () {
 
                     var newName = name;
 
-                    // Lots of assumptions here.
-                    // TODO: figure out if it is a flow or an arg block.
                     // Substitute a NOP block for an unknown block.
                     var n = blkData[4].length;
-                    console.log(n + ': substituting nop block for ' + name);
+                    // Try to figure out if it is a flow or an arg block.
+                    var flowBlock = true;
+                    // Is the first connection attached to a flow block?
+                    var c = blkData[4][0];
+                    if (c !== null) {
+                        var cc = blockObjs[c][4].indexOf(b);
+                        if (typeof(blockObjs[c][1]) === 'string') {
+                            if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
+                                if (this.protoBlockDict[blockObjs[c][1]].dockTypes[cc] !== 'in') {
+                                    flowBlock = false;
+                                }
+                            }
+                        } else {
+                            if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
+                                if (this.protoBlockDict[blockObjs[c][1][0]].dockTypes[cc] !== 'in') {
+                                    flowBlock = false;
+                                }
+                            }
+                        }
+                    } else {
+                        // Or the last connection attached to a flow block?
+                        var c = last(blkData[4]);
+                        if (c !== null) {
+                            var cc = blockObjs[c][4].indexOf(b);
+                            if (typeof(blockObjs[c][1]) === 'string') {
+                                if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
+                                    if (this.protoBlockDict[blockObjs[c][1]].dockTypes[cc] !== 'out') {
+                                        flowBlock = false;
+                                    }
+                                } else {
+                                    if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
+                                        if (this.protoBlockDict[blockObjs[c][1][0]].dockTypes[cc] !== 'out') {
+                                            flowBlock = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
+                    if (flowBlock) {
+                        console.log(n + ': substituting nop flow block for ' + name);
+                    } else {
+                        console.log(n + ': substituting nop arg block for ' + name);
+                    }
+
+                    // We cover the common cases here.
                     switch (n) {
                     case 1:
                         newName = 'nopValueBlock';
                         break;
                     case 2:
-                        newName = 'nopZeroArgBlock';
+                        if (flowBlock) {
+                            newName = 'nopZeroArgBlock';
+                        } else {
+                            newName = 'nopOneArgMathBlock';
+                        }
                         break;
                     case 3:
-                        newName = 'nopOneArgBlock';
+                        if (flowBlock) {
+                            newName = 'nopOneArgBlock';
+                        } else {
+                            newName = 'nopTwoArgMathBlock';
+                        }
                         break;
                     case 4:
                         newName = 'nopTwoArgBlock';

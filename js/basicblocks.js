@@ -3317,7 +3317,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     nopValueBlock.valueBlock();
     nopValueBlock.dockTypes[0] = 'anyout';
 
-    /*
     var nopOneArgMathBlock = new ProtoBlock('nopOneArgMathBlock');
     blocks.protoBlockDict['nopOneArgMathBlock'] = nopOneArgMathBlock;
     nopOneArgMathBlock.hidden = true;
@@ -3336,7 +3335,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     nopTwoArgMathBlock.dockTypes[0] = 'anyout';
     nopTwoArgMathBlock.dockTypes[1] = 'anyin';
     nopTwoArgMathBlock.dockTypes[2] = 'anyin';
-    */
 
     var nopZeroArgBlock = new ProtoBlock('nopZeroArgBlock');
     blocks.protoBlockDict['nopZeroArgBlock'] = nopZeroArgBlock;

@@ -402,7 +402,7 @@ function Block(protoblock, blocks, overrideName) {
         var block_label = '';
 
         // Create the highlight bitmap for the block.
-        function __processHighlightBitmap(name, bitmap, that) {
+        var __processHighlightBitmap = function (name, bitmap, that) {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
             }
@@ -461,7 +461,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Create the bitmap for the block.
-        function __processBitmap(name, bitmap, that) {
+        var __processBitmap = function (name, bitmap, that) {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
             }
@@ -658,7 +658,7 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-        function __processHighlightCollapseBitmap(name, bitmap, that) {
+        var __processHighlightCollapseBitmap = function (name, bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
             that.container.addChild(that.highlightCollapseBlockBitmap);
@@ -756,7 +756,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 
-        function __processCollapseBitmap(name, bitmap, that) {
+        var __processCollapseBitmap = function (name, bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
@@ -907,7 +907,7 @@ function Block(protoblock, blocks, overrideName) {
         var fileChooser = docById('myOpenAll');
         var that = this;
 
-        readerAction = function (event) {
+        var __readerAction = function (event) {
             window.scroll(0, 0);
 
             var reader = new FileReader();
@@ -928,10 +928,10 @@ function Block(protoblock, blocks, overrideName) {
             else {
                 reader.readAsText(fileChooser.files[0]);
             }
-            fileChooser.removeEventListener('change', readerAction);
+            fileChooser.removeEventListener('change', __readerAction);
         };
 
-        fileChooser.addEventListener('change', readerAction, false);
+        fileChooser.addEventListener('change', __readerAction, false);
         fileChooser.focus();
         fileChooser.click();
         window.scroll(0, 0)
@@ -943,7 +943,7 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         this.blocks.findDragGroup(thisBlock);
 
-        function __toggle() {
+        var __toggle = function () {
             var collapse = that.collapsed;
             if (that.collapseBitmap === null) {
                 console.log('collapse bitmap not ready');
@@ -1240,7 +1240,7 @@ function Block(protoblock, blocks, overrideName) {
         if (bounds === null) {
             console.log('block cache for ' + this.name + ' not ready... waiting.');
 
-            __callback = function (that) {
+            var __callback = function (that) {
                 that._calculateBlockHitArea();
             };
 
