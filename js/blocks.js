@@ -4153,31 +4153,72 @@ function Blocks () {
         var actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             var actionName = actionArg.value;
+            // Look for any "orphan" action blocks.
             for (var blk = 0; blk < this.blockList.length; blk++) {
-                var myBlock = this.blockList[blk];
-                var blkParent = this.blockList[myBlock.connections[0]];
-                if (blkParent == null) {
+                var thisBlock = this.blockList[blk];
+
+                // We are only interested in do and nameddo blocks.
+                if (['nameddo', 'namedcalcArg', 'nameddoArg', 'do', 'calc', 'calcArg', 'doArg'].indexOf(thisBlock.name) === -1) {
                     continue;
                 }
 
-                if (['namedcalc', 'calc', 'nameddo', 'do', 'action'].indexOf(blkParent.name) !== -1) {
+                // Make sure it is not connected.
+                if (thisBlock.connections[0] !== null) {
                     continue;
                 }
 
-                var blockValue = myBlock.value;
-                if (blockValue === _('action')) {
-                    continue;
+                if (thisBlock.name !== 'calc') {
+                    if (last(thisBlock.connections) !== null) {
+                        continue;
+                    }
+                }
+
+                if (thisBlock.name === 'calcArg') {
+                    if (thisBlock.connections[2] !== null) {
+                        continue;
+                    }
+                }
+
+                if (thisBlock.name === 'doArg') {
+                    if (thisBlock.connections[2] !== null) {
+                        continue;
+                    }
+                }
+
+                if (thisBlock.name === 'namedcalcArg') {
+                    if (thisBlock.connections[1] !== null) {
+                        continue;
+                    }
+                }
+
+                switch (thisBlock.name) {
+                case 'doArg':
+                case 'calcArg':
+                case 'calc':
+                case 'do':
+                    var argBlock = this.blockList[thisBlock.connections[1]];
+                    var blockValue = argBlock.value;
+                    break;
+                case 'nameddoArg':
+                case 'namedcalcArg':
+                case 'nameddo':
+                    var argBlock = null;
+                    var blockValue = thisBlock.privateData;
+                    break;
                 }
 
                 if (blockValue === actionName) {
-                    blkParent.hide();
-                    myBlock.hide();
-                    myBlock.trash = true;
-                    blkParent.trash = true;
+                    thisBlock.hide();
+                    thisBlock.trash = true;
+                    if (argBlock !== null) {
+                        argBlock.hide();
+                        argBlock.trash = true;
+                    }
                 }
             }
 
-            // Avoid palette refreash race condition.
+            // Delete action blocks from action palette.
+            // Use a timeout to avoid palette refresh race condition.
             this.deleteActionTimeout += 500;
             var timeout = this.deleteActionTimeout;
             var that = this;
@@ -4213,7 +4254,8 @@ function Blocks () {
             }
             myBlock.connections[0] = null;
 
-            // Add default block if user deletes all blocks from inside the note block
+            // Add default block if user deletes all blocks from
+            // inside the note block.
             this.addDefaultBlock(parentBlock, thisBlock);
         }
 
@@ -4225,6 +4267,7 @@ function Blocks () {
                     turtleNotInTrash += 1;
                 }
             }
+
             if (turtle != null && turtleNotInTrash > 1) {
                 console.log('putting turtle ' + turtle + ' in the trash');
                 this.turtles.turtleList[turtle].trash = true;
