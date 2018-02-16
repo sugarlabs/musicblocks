@@ -3905,6 +3905,13 @@ function Blocks () {
             default:
                 // Check that name is in the proto list
                 if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
+                    postProcessUnknownBlock = function (args) {
+                        // save original block name
+                        that.blockList[args[0]].privateData = args[1];
+                    };
+
+                    var newName = name;
+
                     // Lots of assumptions here.
                     // TODO: figure out if it is a flow or an arg block.
                     // Substitute a NOP block for an unknown block.
@@ -3912,24 +3919,27 @@ function Blocks () {
                     console.log(n + ': substituting nop block for ' + name);
                     switch (n) {
                     case 1:
-                        name = 'nopValueBlock';
+                        newName = 'nopValueBlock';
                         break;
                     case 2:
-                        name = 'nopZeroArgBlock';
+                        newName = 'nopZeroArgBlock';
                         break;
                     case 3:
-                        name = 'nopOneArgBlock';
+                        newName = 'nopOneArgBlock';
                         break;
                     case 4:
-                        name = 'nopTwoArgBlock';
+                        newName = 'nopTwoArgBlock';
                         break;
                     case 5:
                     default:
-                        name = 'nopThreeArgBlock';
+                        newName = 'nopThreeArgBlock';
                         break;
                     }
+
+                    this._makeNewBlockWithConnections(newName, blockOffset, blkData[4], postProcessUnknownBlock, [thisBlock, name]);
+                } else {
+                    this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
                 }
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
                 break;
             }
 

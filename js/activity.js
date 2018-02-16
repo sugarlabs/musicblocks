@@ -3050,84 +3050,82 @@ define(MYDEFINES, function (compatibility) {
                     var args = {
                         'value': myBlock.value
                     };
-                } else if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                    // Find the turtle associated with this block.
-                    var turtle = turtles.turtleList[myBlock.value];
-                    if (turtle == null) {
-                        var args = {
-                            'collapsed': false,
-                            'xcor': 0,
-                            'ycor': 0,
-                            'heading': 0,
-                            'color': 0,
-                            'shade': 50,
-                            'pensize': 5,
-                            'grey': 100
-                        };
-                    } else {
-                        var args = {
-                            'collapsed': myBlock.collapsed,
-                            'xcor': turtle.x,
-                            'ycor': turtle.y,
-                            'heading': turtle.orientation,
-                            'color': turtle.color,
-                            'shade': turtle.value,
-                            'pensize': turtle.stroke,
-                            'grey': turtle.chroma
-                        };
-                    }
-                } else if (myBlock.name === 'action') {
-                    var args = {
-                        'collapsed': myBlock.collapsed
-                    }
-                } else if(myBlock.name === 'matrix') {
-                    var args = {
-                        'collapsed' : myBlock.collapsed
-                    }
-                } else if(myBlock.name === 'pitchdrummatrix') {
-                    var args = {
-                        'collapsed' : myBlock.collapsed
-                    }
-                } else if(myBlock.name === 'status') {
-                    var args = {
-                        'collapsed' : myBlock.collapsed
-                    }
-                } else if (myBlock.name === 'namedbox') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'storein2') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'nameddo') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'nameddoArg') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'namedcalc') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'namedcalcArg') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'namedarg') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'matrixData') {
-                    var args = {
-                        'notes': window.savedMatricesNotes,
-                        'count': window.savedMatricesCount
-                    }
-                    hasMatrixDataBlock = true;
                 } else {
-                    var args = {}
+                    switch (myBlock.name) {
+                    case 'start':
+                    case 'drum':
+                        // Find the turtle associated with this block.
+                        var turtle = turtles.turtleList[myBlock.value];
+                        if (turtle == null) {
+                            var args = {
+                                'collapsed': false,
+                                'xcor': 0,
+                                'ycor': 0,
+                                'heading': 0,
+                                'color': 0,
+                                'shade': 50,
+                                'pensize': 5,
+                                'grey': 100
+                            };
+                        } else {
+                            var args = {
+                                'collapsed': myBlock.collapsed,
+                                'xcor': turtle.x,
+                                'ycor': turtle.y,
+                                'heading': turtle.orientation,
+                                'color': turtle.color,
+                                'shade': turtle.value,
+                                'pensize': turtle.stroke,
+                                'grey': turtle.chroma
+                            };
+                        }
+                        break;
+                    case 'action':
+                    case 'matrix':
+                    case 'pitchdrummatrix':
+                    case 'rhythmruler':
+                    case 'timbre':
+                    case 'pitchstaircase':
+                    case 'tempo':
+                    case 'pitchslider':
+                    case 'modewidget':
+                    case 'status':
+                        var args = {
+                            'collapsed': myBlock.collapsed
+                        }
+                        break;
+                    case 'namedbox':
+                    case 'storein2':
+                    case 'nameddo':
+                    case 'nameddoArg':
+                    case 'namedcalc':
+                    case 'namedcalcArg':
+                    case 'namedArg':
+                        var args = {
+                            'value': myBlock.privateData
+                        }
+                        break;
+                    case 'nopValueBlock':
+                    case 'nopZeroArgBlock':
+                    case 'nopOneArgBlock':
+                    case 'nopTwoArgBlock':
+                    case 'nopThreeArgBlock':
+                        // restore original block name
+                        myBlock.name = myBlock.privateData;
+                        var args = {}
+                        break;
+                    case 'matrixData':
+                        // deprecated
+                        var args = {
+                            'notes': window.savedMatricesNotes,
+                            'count': window.savedMatricesCount
+                        }
+                        hasMatrixDataBlock = true;
+                        break;
+                    default:
+                        var args = {}
+                        break;
+                    }
                 }
 
                 connections = [];
@@ -3773,7 +3771,7 @@ handleComplete);
             container.on('mouseover', function (event) {
                 if (!loading) {
                     document.body.style.cursor = 'pointer';
-		}
+                }
             });
 
             container.on('mouseout', function (event) {
