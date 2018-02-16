@@ -815,6 +815,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixgMBlock.zeroArgBlock();
 
     // macro
+    var matrixcMBlock = new ProtoBlock('matrixcmajor');
+    matrixcMBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['matrixcmajor'] = matrixcMBlock;
+    matrixcMBlock.staticLabels.push(_('C major scale'));
+    matrixcMBlock.adjustWidthToLabel();
+    matrixcMBlock.zeroArgBlock();
+
+    // macro
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
