@@ -1257,7 +1257,7 @@ function Turtles () {
                 y: newTurtle.container.y - (event.stageY / that.scale)
             }
 
-	    newTurtle.container.removeAllEventListeners('pressmove');
+            newTurtle.container.removeAllEventListeners('pressmove');
             newTurtle.container.on('pressmove', function (event) {
                 if (newTurtle.running) {
                     return;
@@ -1278,16 +1278,24 @@ function Turtles () {
         });
 
         newTurtle.container.on('mouseover', function (event) {
-            newTurtle.bitmap.scaleX *= 1.2;
-            newTurtle.bitmap.scaleY = newTurtle.bitmap.scaleX;
-            newTurtle.bitmap.scale = newTurtle.bitmap.scaleX;
+            if (newTurtle.running) {
+                return;
+            }
+
+            newTurtle.container.scaleX *= 1.2;
+            newTurtle.container.scaleY = newTurtle.container.scaleX;
+            newTurtle.container.scale = newTurtle.container.scaleX;
             that.refreshCanvas();
         });
 
         newTurtle.container.on('mouseout', function (event) {
-            newTurtle.bitmap.scaleX /= 1.2;
-            newTurtle.bitmap.scaleY = newTurtle.bitmap.scaleX;
-            newTurtle.bitmap.scale = newTurtle.bitmap.scaleX;
+            if (newTurtle.running) {
+                return;
+            }
+
+            newTurtle.container.scaleX /= 1.2;
+            newTurtle.container.scaleY = newTurtle.container.scaleX;
+            newTurtle.container.scale = newTurtle.container.scaleX;
             that.refreshCanvas();
         });
 
