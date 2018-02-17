@@ -115,8 +115,11 @@ processLilypondNotes = function (logo, turtle) {
                 logo.notationNotes[turtle] += '~';
                 break;
             case 'key':
-                if (['major', 'minor'].indexOf(logo.notationStaging[turtle][i + 2]) !== -1) {
-                    logo.notationNotes[turtle] += ' \\key ' + __toLilynote(logo.notationStaging[turtle][i + 1]) + ' \\' + logo.notationStaging[turtle][i + 2] + '\n';
+                var key = logo.notationStaging[turtle][i + 1];
+                var mode = logo.notationStaging[turtle][i + 2]
+                var obj = modeMapper(key, mode);
+                if (['major', 'minor'].indexOf(obj[1]) !== -1) {
+                    logo.notationNotes[turtle] += ' \\key ' + __toLilynote(obj[0]) + ' \\' + obj[1] + '\n';
                 } else {
                     logo.errorMsg(_('Lilypond ignoring mode') + ' ' + logo.notationStaging[turtle][i + 2]);
                 }

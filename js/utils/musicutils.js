@@ -68,9 +68,13 @@ const SOLFATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
 
 
 function getSharpFlatPreference (keySignature) {
-    if (SHARPPREFERENCE.indexOf(keySignature.toLowerCase()) !== -1) {
+    var obj = keySignatureToMode(keySignature);
+    var obj2 = modeMapper(obj[0], obj[1]);
+    var ks = obj2[0] + ' ' + obj2[1];
+
+    if (SHARPPREFERENCE.indexOf(ks) !== -1) {
         return 'sharp';
-    } else if (FLATPREFERENCE.indexOf(keySignature.toLowerCase()) !== -1) {
+    } else if (FLATPREFERENCE.indexOf(ks) !== -1) {
         return 'flat';
     } else {
         return 'natural';
@@ -1947,4 +1951,391 @@ convertFactor = function (factor) {
     default:
         return null;
     }
+};
+
+
+modeMapper = function (key, mode) {
+    // map common modes into their major/minor equivalent
+    console.log(key + ' ' + mode + ' >>');
+    key = key.toLowerCase();
+    mode = mode.toLowerCase();
+
+    switch(mode) {
+    case 'ionian':
+        mode = 'major';
+        break;
+    case 'dorian':
+        switch(key) {
+        case 'c':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'g':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'd';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'phrygian':
+        switch(key) {
+        case 'c':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'a':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'g♭';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'a♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'lydian':
+        switch(key) {
+        case 'c':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'a♯':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'g';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'd';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'mixolydian':
+        switch(key) {
+        case 'c':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'd♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'c';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'locrian':
+        switch(key) {
+        case 'c':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'e':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'a ';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'e♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'g♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'aeolian':
+        mode = 'minor';
+        break;
+    case 'natural minor':
+        mode = 'minor';
+        break;
+    case 'major':
+    case 'minor':
+    default:
+        break;
+    }
+
+    console.log('>> ' + key + ' ' + mode);
+    return [key, mode];
 };
