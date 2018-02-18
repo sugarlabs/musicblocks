@@ -9626,6 +9626,7 @@ function Logo () {
                 var y = that.turtles.turtleY2screenY(that.turtles.turtleList[turtle].y);
 
                 // We special case note blocks.
+                //.TRANS: a musical note consisting of pitch and duration
                 if (name === _('note')) {
                     switch(blockArgs.length) {
                     case 1:
@@ -9665,8 +9666,14 @@ function Logo () {
                             // FIXME: type check args
                             if (i < blockArgs.length) {
                                 if (typeof(blockArgs[i]) === 'number') {
+                                    if (['anyin', 'numberin'].indexOf(that.blocks.protoBlockDict[protoblk].dockTypes[i]) === -1) {
+                                        that.errorMsg(_('Warning: block argument type mismatch'));
+                                    }
                                     newBlock.push([i, ['number', {'value': blockArgs[i]}], 0, 0, [0]]);
                                 } else {
+                                    if (['anyin', 'textin'].indexOf(that.blocks.protoBlockDict[protoblk].dockTypes[i]) === -1) {
+                                        that.errorMsg(_('Warning: block argument type mismatch'));
+                                    }
                                     newBlock.push([i, ['string', {'value': blockArgs[i]}], 0, 0, [0]]);
                                 }
 
