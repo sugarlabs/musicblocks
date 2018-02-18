@@ -1302,16 +1302,31 @@ define(MYDEFINES, function (compatibility) {
             var moving = false;
 
             var __wheelHandler = function (event) {
-                if (scrollBlockContainer) {
+                //Vertical Scroll
+                if (event.deltaY != 0 && event.axis==event.VERTICAL_AXIS) { 
                     if (palettes.paletteVisible) {
                         if (event.clientX > cellSize + MENUWIDTH) {
                             blocksContainer.y -= event.deltaY;
-                        } 
+                        }    
                     } else {
                         if (event.clientX > cellSize) {
                             blocksContainer.y -= event.deltaY;
                         }
-                    } 
+                    }   
+                }
+                //Horizontal scroll 
+                if (scrollBlockContainer) {
+                    if (event.deltaX != 0 && event.axis==event.HORIZONTAL_AXIS) { 
+                        if (palettes.paletteVisible) {
+                            if (event.clientX > cellSize + MENUWIDTH) {
+                                blocksContainer.x -= event.deltaX;
+                            }    
+                        } else {
+                            if (event.clientX > cellSize) {
+                                blocksContainer.x -= event.deltaX;
+                            }
+                        }   
+                    }
                 } else {
                     event.preventDefault();
                 } 
