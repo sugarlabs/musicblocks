@@ -570,6 +570,12 @@ This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform19.svg "Define mode block")
+
+The *Define mode* block can be used to define a custom mode by
+defining the number and size of the steps within an octave. You can
+use your custom mode with the *Set key* block.
+
 #### <a name="VIBRATO"></a>3.2.14 Vibrato, Tremelo, et al.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
