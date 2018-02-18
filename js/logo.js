@@ -6272,6 +6272,41 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'deleteblock':
+            if (args.length < 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            // Is the block already in the trash?
+            if (that.blocks.blockList[args[0]].trash) {
+                break;
+            }
+
+            // Disconnect the block.
+            var c = that.blocks.blockList[args[0]].connections[0];
+	    that.blocks.blockList[args[0]].connections[0] = null;
+            if (c !== null) {
+                for (var i = 0; i < that.blocks.blockList[c].connections.length; i++) {
+                    if (that.blocks.blockList[c].connections[i] === args[0]) {
+	                that.blocks.blockList[c].connections[i] = null;
+                    }
+                }
+            }
+
+            // Send it to the trash.
+            that.blocks.sendStackToTrash(that.blocks.blockList[args[0]]);
+
+            // And adjust the docs of the former connection
+            that.blocks.adjustDocks(c, true);
+            break;
         case 'moveblock':
             if (args.length < 3) {
                 that.errorMsg(NOINPUTERRORMSG, blk);

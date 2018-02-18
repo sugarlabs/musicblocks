@@ -3381,6 +3381,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     nopThreeArgBlock.dockTypes[2] = 'anyin';
     nopThreeArgBlock.dockTypes[3] = 'anyin';
 
+    var deleteBlock = new ProtoBlock('deleteblock');
+    deleteBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['deleteblock'] = deleteBlock;
+    deleteBlock.staticLabels.push(_('delete block'));
+    deleteBlock.adjustWidthToLabel();
+    deleteBlock.oneArgBlock();
+    deleteBlock.dockTypes[1] = 'numberin';
+
     var moveBlock = new ProtoBlock('moveblock');
     moveBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['moveblock'] = moveBlock;
