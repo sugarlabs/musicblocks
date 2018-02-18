@@ -9611,7 +9611,7 @@ function Logo () {
                 }
                 break;
             case 'makeblock':
-                var blockArgs = [];
+                var blockArgs = [null];
                 if (that.blocks.blockList[blk].argClampSlots.length > 0) {
                     for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
                         var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
@@ -9625,25 +9625,25 @@ function Logo () {
                 // We special case note blocks.
                 if (name === _('note')) {
                     switch(blockArgs.length) {
-                    case 0:
+                    case 1:
                         var p = 'sol';
                         var o = 4;
                         var v = 4;
                         break;
-                    case 1:
-                        var p = blockArgs[0];
+                    case 2:
+                        var p = blockArgs[1];
                         var o = 4;
                         var v = 4;
                         break;
-                    case 2:
-                        var p = blockArgs[0];
-                        var o = blockArgs[1];
+                    case 3:
+                        var p = blockArgs[1];
+                        var o = blockArgs[2];
                         var v = 4;
                         break;
                     default:
-                        var p = blockArgs[0];
-                        var o = blockArgs[1];
-                        var v = blockArgs[2];
+                        var p = blockArgs[1];
+                        var o = blockArgs[2];
+                        var v = blockArgs[3];
                         break;
                     }
 
@@ -9651,22 +9651,31 @@ function Logo () {
                     that.blocks.loadNewBlocks(newNote);
                     that.blocks.blockList[blk].value = blockNumber;
                 } else {
-                    var newBlock = [[0, name, 100, 100, [null]]];
-                    for (var i = 0; i < blockArgs.length; i++) {
-                        if (typeof(blockArgs[i]) === 'number') {
-                            newBlock.push([i + 1, ['number', {'value': blockArgs[i]}], 0, 0, [0]]);
-                        } else {
-                            newBlock.push([i + 1, ['string', {'value': blockArgs[i]}], 0, 0, [0]]);
-                        }
+                    var obj = that.blocks.palettes.getProtoNameAndPalette(name);
+                    var protoblk = obj[0];
+                    var protoName = obj[2];
+                    if (protoblk === null) {
+                        that.errorMsg(_('Cannot find block') + ' ' + name);
+                    } else {
+                        var newBlock = [[0, protoName, 100, 100, [null]]];
+                        for (var i = 1; i < that.blocks.protoBlockDict[protoblk].dockTypes.length; i++) {
+                            // FIXME: type check args
+                            if (i < blockArgs.length) {
+                                if (typeof(blockArgs[i]) === 'number') {
+                                    newBlock.push([i, ['number', {'value': blockArgs[i]}], 0, 0, [0]]);
+                                } else {
+                                    newBlock.push([i, ['string', {'value': blockArgs[i]}], 0, 0, [0]]);
+                                }
 
-                        newBlock[0][4].push(i + 1);
+                                newBlock[0][4].push(i);
+                            } else {
+                                newBlock[0][4].push(null);
+                            }
                     }
 
-                    // Fixme: we need to convert name back to an
-                    // internal block name; and we need to type-check
-                    // args.
                     that.blocks.loadNewBlocks(newBlock);
                     that.blocks.blockList[blk].value = blockNumber;
+                    }
                 }
                 break;
             default:
