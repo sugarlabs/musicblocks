@@ -72,6 +72,7 @@ function Palettes () {
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
+    this.paletteVisible = false;
     this.pluginsDeleteStatus = false;
     this.visible = true;
     this.scale = 1.0;
@@ -1359,6 +1360,7 @@ function Palette(palettes, name) {
     };
 
     this.hideMenu = function () {
+        this.palettes.paletteVisible = false;
         if (this.menuContainer != null) {
             this.menuContainer.visible = false;
             this._hideMenuItems();
@@ -1369,6 +1371,7 @@ function Palette(palettes, name) {
     };
 
     this.showMenu = function () {
+        this.palettes.paletteVisible = true;
         if (this.palettes.mobile) {
             this.menuContainer.visible = false;
         } else {
