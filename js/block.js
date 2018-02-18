@@ -1253,7 +1253,9 @@ function Block(protoblock, blocks, overrideName) {
         // Since hitarea is concave, we only detect hits on top
         // section of block. Otherwise we would not be able to grab
         // blocks placed inside of clamps.
-        if (this.isClampBlock() || this.isArgClamp()) {
+        if (['calcArg', 'doArg', 'makeblock', 'nameddoArg', 'namedcalcArg'].indexOf(this.name) !== -1) {
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale * 0.75);
+        } else if (this.isClampBlock() || this.isArgClamp()) {
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale);
         } else if (this.isNoHitBlock()) {
             // No hit area
@@ -1261,7 +1263,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             // Shrinking the height makes it easier to grab blocks below
             // in the stack.
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height);
         }
 
         this.container.hitArea = hitArea;
