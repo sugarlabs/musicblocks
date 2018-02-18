@@ -281,13 +281,6 @@ In this example, we are using the *Mode length* block, which returns
 the number of scalar steps in the current mode (7 for Major and Minor
 modes).
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform18.svg "The Register block")
-
-The *Register* block provides an easy way to modify the register
-(octave) of the notes that follow it. In the example above it is first
-used to bump the `Mi 4` note up by one octave and then to bump the
-`Sol 4` note down by one octave.
-
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "Using Sharp and Flat blocks")
@@ -326,6 +319,13 @@ and *Down sixth*, as well as a transposition for *Octave*.
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform18.svg "The Register block")
+
+The *Register* block provides an easy way to modify the register
+(octave) of the notes that follow it. In the example above it is first
+used to bump the `Mi 4` note up by one octave and then to bump the
+`Sol 4` note down by one octave.
 
 #### <a name="DOTTED"></a>3.2.4 Dotted Notes
 
