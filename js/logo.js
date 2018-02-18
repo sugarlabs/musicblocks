@@ -9622,6 +9622,9 @@ function Logo () {
                 var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
                 var blockNumber = that.blocks.blockList.length;
 
+                var x = that.turtles.turtleX2screenX(that.turtles.turtleList[turtle].x);
+                var y = that.turtles.turtleY2screenY(that.turtles.turtleList[turtle].y);
+
                 // We special case note blocks.
                 if (name === _('note')) {
                     switch(blockArgs.length) {
@@ -9647,7 +9650,7 @@ function Logo () {
                         break;
                     }
 
-                    var newNote = [[0, 'newnote', 100, 100, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': v}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': p}], 0, 0, [5]], [7, ['number', {'value': o}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
+                    var newNote = [[0, 'newnote', x, y, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': v}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': p}], 0, 0, [5]], [7, ['number', {'value': o}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
                     that.blocks.loadNewBlocks(newNote);
                     that.blocks.blockList[blk].value = blockNumber;
                 } else {
@@ -9657,7 +9660,7 @@ function Logo () {
                     if (protoblk === null) {
                         that.errorMsg(_('Cannot find block') + ' ' + name);
                     } else {
-                        var newBlock = [[0, protoName, 100, 100, [null]]];
+                        var newBlock = [[0, protoName, x, y, [null]]];
                         for (var i = 1; i < that.blocks.protoBlockDict[protoblk].dockTypes.length; i++) {
                             // FIXME: type check args
                             if (i < blockArgs.length) {
