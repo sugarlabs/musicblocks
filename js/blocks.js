@@ -449,7 +449,7 @@ function Blocks () {
         var myBlock = this.blockList[blk];
 
         // Which connection do we start with?
-        if (['doArg', 'calcArg'].indexOf(myBlock.name) !== -1) {
+        if (['doArg', 'calcArg', 'makeblock'].indexOf(myBlock.name) !== -1) {
             var ci = 2;
         } else {
             var ci = 1;
@@ -1132,7 +1132,7 @@ function Blocks () {
                 if (this.blockList[newBlock].isArgClamp()) {
                     // If it is an arg clamp, we may have to adjust
                     // the slot size.
-                    if ((this.blockList[newBlock].name === 'doArg' || this.blockList[newBlock].name === 'calcArg') && newConnection === 1) {
+                    if (['doArg', 'calcArg', 'makeblock'].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === 1) {
                     } else if (['doArg', 'nameddoArg'].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === this.blockList[newBlock].connections.length - 1) {
                     } else {
                         // Get the size of the block we are inserting
@@ -1143,7 +1143,7 @@ function Blocks () {
                         var slotList = this.blockList[newBlock].argClampSlots;
 
                         // Which slot is this block in?
-                        if (['doArg', 'calcArg'].indexOf(this.blockList[newBlock].name) !== -1) {
+                        if (['doArg', 'calcArg', 'makeblock'].indexOf(this.blockList[newBlock].name) !== -1) {
                             var si = newConnection - 2;
                         } else {
                             var si = newConnection - 1;
@@ -1170,7 +1170,7 @@ function Blocks () {
                 // entry for the new namedbox.
                 insertAfterDefault = false;
                 if (this.blockList[newBlock].isArgClamp()) {
-                    if ((this.blockList[newBlock].name === 'doArg' || this.blockList[newBlock].name === 'calcArg') && newConnection === 1) {
+                    if (['doArg', 'calcArg', 'makeblock'].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === 1) {
                         // If it is the action name then treat it like
                         // a standard replacement.
                         this.blockList[connection].connections[0] = null;
@@ -1196,7 +1196,7 @@ function Blocks () {
                         var slotList = this.blockList[newBlock].argClampSlots;
                         // Which slot is this block in?
                         var ci = this.blockList[newBlock].connections.indexOf(connection);
-                        if (['doArg', 'calcArg'].indexOf(this.blockList[newBlock].name) !== -1) {
+                        if (['doArg', 'calcArg', 'makeblock'].indexOf(this.blockList[newBlock].name) !== -1) {
                             var si = ci - 2;
                         } else {
                             var si = ci - 1;
@@ -1214,7 +1214,9 @@ function Blocks () {
 
                         if (emptyConnection == null) {
                             slotList.push(1);
-                            this._newLocalArgBlock(slotList.length);
+                            if (this.blockList[newBlock].name !== 'makeblock') {
+                                this._newLocalArgBlock(slotList.length);
+                            }
                             emptyConnection = ci + emptySlot - si;
                             this.blockList[newBlock].connections.push(null);
 
@@ -1366,9 +1368,10 @@ function Blocks () {
 
         // If it is an arg block, where is it coming from?
         // FIXME: improve mechanism for testing block types.
-        if ((myBlock.isArgBlock() || myBlock.name === 'calcArg' || myBlock.name === 'namedcalcArg') && newBlock != null) {
+        if ((myBlock.isArgBlock() || ['calcArg', 'namedcalcArg', 'makeblock'].indexOf(myBlock.name) !== -1) && newBlock != null) {
             // We care about twoarg blocks with connections to the
             // first arg;
+            console.log(newBlock);
             if (this.blockList[newBlock].isTwoArgBlock()) {
                 if (this.blockList[newBlock].connections[1] === thisBlock) {
                     if (this._checkTwoArgBlocks.indexOf(newBlock) === -1) {
@@ -2508,9 +2511,9 @@ function Blocks () {
                 }
             } else if (this.blockList[blk].name === 'storein2') {
                 if (this.blockList[blk].privateData === oldName) {
-		    this.blockList[blk].privateData = newName;
-		    this.blockList[blk].overrideName = newName;
-		    this.blockList[blk].regenerateArtwork();
+                    this.blockList[blk].privateData = newName;
+                    this.blockList[blk].overrideName = newName;
+                    this.blockList[blk].regenerateArtwork();
                     try {
                         this.blockList[blk].container.updateCache();
                     } catch (e) {
@@ -3744,6 +3747,30 @@ function Blocks () {
                 };
 
                 this._makeNewBlockWithConnections('namedcalcArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
+                break;
+            case 'makeblock':
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var extraSlots = args[1].length - 3;
+                    if (extraSlots > 0) {
+                        var slotList = that.blockList[thisBlock].argClampSlots;
+                        for (var i = 0; i < extraSlots; i++) {
+                            slotList.push(1);
+                            that.blockList[thisBlock].connections.push(null);
+                        }
+                        that.blockList[thisBlock].updateArgSlots(slotList);
+                        for (var i = 0; i < args[1].length; i++) {
+                            if (args[1][i] != null) {
+                                that.blockList[thisBlock].connections[i] = args[1][i] + firstBlock;
+                            } else {
+                                that.blockList[thisBlock].connections[i] = args[1][i];
+                            }
+                        }
+                    }
+                    that._checkArgClampBlocks.push(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections('makeblock', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
 
                 // Value blocks need a default value set.

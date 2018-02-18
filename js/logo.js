@@ -6272,6 +6272,57 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'moveblock':
+            if (args.length < 3) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            that.blocks.moveBlock(args[0], args[1], args[2]);
+            break;
+        case 'dockblock':
+            if (args.length < 3) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] === args[2]) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[2] < 0 || args[2] > that.blocks.blockList.length - 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[1] < 1 || args[1] > that.blocks.blockList[args[0]].connections.length - 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            that.blocks.blockList[args[0]].connections[args[1]] = args[2];
+            that.blocks.blockList[args[2]].connections[0] = args[0];
+
+            that.blocks.adjustDocks(args[0], true);
+            break;
         default:
             if (that.blocks.blockList[blk].name in that.evalFlowDict) {
                 eval(that.evalFlowDict[that.blocks.blockList[blk].name]);
@@ -9557,6 +9608,65 @@ function Logo () {
                 } else {
                     console.log('WARNING: No return value.');
                     that.blocks.blockList[blk].value = 0;
+                }
+                break;
+            case 'makeblock':
+                var blockArgs = [];
+                if (that.blocks.blockList[blk].argClampSlots.length > 0) {
+                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
+                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
+                        blockArgs.push(t);
+                    }
+                }
+                var cblk = that.blocks.blockList[blk].connections[1];
+                var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                var blockNumber = that.blocks.blockList.length;
+
+                // We special case note blocks.
+                if (name === _('note')) {
+                    switch(blockArgs.length) {
+                    case 0:
+                        var p = 'sol';
+                        var o = 4;
+                        var v = 4;
+                        break;
+                    case 1:
+                        var p = blockArgs[0];
+                        var o = 4;
+                        var v = 4;
+                        break;
+                    case 2:
+                        var p = blockArgs[0];
+                        var o = blockArgs[1];
+                        var v = 4;
+                        break;
+                    default:
+                        var p = blockArgs[0];
+                        var o = blockArgs[1];
+                        var v = blockArgs[2];
+                        break;
+                    }
+
+                    var newNote = [[0, 'newnote', 100, 100, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': v}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': p}], 0, 0, [5]], [7, ['number', {'value': o}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
+                    that.blocks.loadNewBlocks(newNote);
+                    that.blocks.blockList[blk].value = blockNumber;
+                } else {
+                    var newBlock = [[0, name, 100, 100, [null]]];
+                    for (var i = 0; i < blockArgs.length; i++) {
+                        if (typeof(blockArgs[i]) === 'number') {
+                            newBlock.push([i + 1, ['number', {'value': blockArgs[i]}], 0, 0, [0]]);
+                        } else {
+                            newBlock.push([i + 1, ['string', {'value': blockArgs[i]}], 0, 0, [0]]);
+                        }
+
+                        newBlock[0][4].push(i + 1);
+                    }
+
+                    // Fixme: we need to convert name back to an
+                    // internal block name; and we need to type-check
+                    // args.
+                    that.blocks.loadNewBlocks(newBlock);
+                    that.blocks.blockList[blk].value = blockNumber;
                 }
                 break;
             default:

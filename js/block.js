@@ -277,6 +277,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'less':
                 var obj = this.protoblock.generator(this.clampCount[0]);
                 break;
+            case 'makeblock':
             case 'calcArg':
             case 'doArg':
             case 'namedcalcArg':
@@ -323,6 +324,7 @@ function Block(protoblock, blocks, overrideName) {
 
             this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
             break;
+        case 'makeblock':
         case 'calcArg':
             this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
             for (var i = 2; i < obj[1].length; i++) {

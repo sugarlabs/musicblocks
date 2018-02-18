@@ -3381,6 +3381,37 @@ function initBasicProtoBlocks(palettes, blocks) {
     nopThreeArgBlock.dockTypes[2] = 'anyin';
     nopThreeArgBlock.dockTypes[3] = 'anyin';
 
+    var moveBlock = new ProtoBlock('moveblock');
+    moveBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['moveblock'] = moveBlock;
+    moveBlock.staticLabels.push(_('move block'), _('block number'), _('x'), _('y'));
+    moveBlock.adjustWidthToLabel();
+    moveBlock.threeArgBlock();
+    moveBlock.dockTypes[1] = 'numberin';
+    moveBlock.dockTypes[2] = 'numberin';
+    moveBlock.dockTypes[3] = 'numberin';
+
+    var dockBlock = new ProtoBlock('dockblock');
+    dockBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['dockblock'] = dockBlock;
+    dockBlock.staticLabels.push(_('dock block'), _('target block'), _('dock number'), _('block number'));
+    dockBlock.adjustWidthToLabel();
+    dockBlock.threeArgBlock();
+    dockBlock.dockTypes[1] = 'numberin';
+    dockBlock.dockTypes[2] = 'numberin';
+    dockBlock.dockTypes[3] = 'numberin';
+
+    var makeBlock = new ProtoBlock('makeblock');
+    makeBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['makeblock'] = makeBlock;
+    makeBlock.staticLabels.push(_('make block'));
+    makeBlock.adjustWidthToLabel();
+    makeBlock.argClampOneArgMathBlock();
+    makeBlock.defaults.push(_('note'));
+    makeBlock.dockTypes[0] = 'anyout';
+    makeBlock.dockTypes[1] = 'anyin';
+    makeBlock.dockTypes[2] = 'anyin';
+
     var abcBlock = new ProtoBlock('saveabc');
     abcBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['saveabc'] = abcBlock;
