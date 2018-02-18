@@ -1302,7 +1302,19 @@ define(MYDEFINES, function (compatibility) {
             var moving = false;
 
             var __wheelHandler = function (event) {
-                blocksContainer.y -= event.deltaY;
+                if (scrollBlockContainer) {
+                    if (palettes.paletteVisible) {
+                        if (event.clientX > cellSize + MENUWIDTH) {
+                            blocksContainer.y -= event.deltaY;
+                        } 
+                    } else {
+                        if (event.clientX > cellSize) {
+                            blocksContainer.y -= event.deltaY;
+                        }
+                    } 
+                } else {
+                    event.preventDefault();
+                } 
             };
 
             docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
