@@ -6353,6 +6353,31 @@ function Logo () {
                 break;
             }
 
+            // Make sure there is not another block already connected.
+            if (args[1] === -1) {
+                // Find the last connection.
+                args[1] = that.blocks.blockList[args[0]].connections.length - 1;
+            }
+
+            var c = that.blocks.blockList[args[0]].connections[args[1]];
+            if (c !== null) {
+                if (that.blocks.blockList[c].name === 'hidden') {
+                    // Dock to the hidden block.
+                    args[0] = c;
+                    args[1] = 1;
+                } else {
+                    // Or disconnection the old connection.
+                    for (var i = 0; i < that.blocks.blockList[c].connections.length; i++) {
+                        if (that.blocks.blockList[c].connections[i] === args[0]) {
+                            that.blocks.blockList[c].connections[i] = null;
+                            break;
+                        }
+                    }
+
+                    that.blocks.blockList[args[0]].connections[args][1] = null;
+                }
+            }
+
             that.blocks.blockList[args[0]].connections[args[1]] = args[2];
             that.blocks.blockList[args[2]].connections[0] = args[0];
 
@@ -9646,6 +9671,7 @@ function Logo () {
                 }
                 break;
             case 'makeblock':
+                that.showBlocks();  // Force blocks to be visible.
                 var blockArgs = [null];
                 if (that.blocks.blockList[blk].argClampSlots.length > 0) {
                     for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
