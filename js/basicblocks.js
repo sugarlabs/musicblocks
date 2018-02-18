@@ -867,22 +867,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     skipFactor.parameterBlock();
     skipFactor.hidden = true;
 
-    var beatfactor = new ProtoBlock('beatfactor');
-    beatfactor.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['beatfactor'] = beatfactor;
-    //.TRANS: number of beats per minute
-    beatfactor.staticLabels.push(_('beat factor'));
-    beatfactor.adjustWidthToLabel();
-    beatfactor.parameterBlock();
-
-    var bpmBlock = new ProtoBlock('bpmfactor');
-    bpmBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['bpmfactor'] = bpmBlock;
-    //.TRANS: number of beats played per minute
-    bpmBlock.staticLabels.push(_('beats per minute'));
-    bpmBlock.adjustWidthToLabel();
-    bpmBlock.parameterBlock();
-
     // macro
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['rhythm'];
@@ -928,53 +912,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     newswingBlock.flowClampTwoArgBlock();
     newswingBlock.defaults.push(1 / 24);
     newswingBlock.defaults.push(1 / 8);
-
-    // macro
-    var setMasterBPMBlock2 = new ProtoBlock('setmasterbpm2');
-    setMasterBPMBlock2.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['setmasterbpm2'] = setMasterBPMBlock2;
-    //.TRANS: sets tempo by defniing a beat and beats per minute
-    setMasterBPMBlock2.staticLabels.push(_('master beats per minute'));
-    setMasterBPMBlock2.staticLabels.push(_('bpm'), _('beat value'));
-    setMasterBPMBlock2.extraWidth = 15;
-    setMasterBPMBlock2.adjustWidthToLabel();
-    setMasterBPMBlock2.defaults.push(90);
-    setMasterBPMBlock2.defaults.push(1 / 4);
-    setMasterBPMBlock2.twoArgBlock();
-
-    // macro
-    var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
-    setMasterBPMBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['setmasterbpm'] = setMasterBPMBlock;
-    //.TRANS: old block to set master tempo which doesn't set value of beat
-    setMasterBPMBlock.staticLabels.push(_('master beats per minute'));
-    setMasterBPMBlock.adjustWidthToLabel();
-    setMasterBPMBlock.oneArgBlock();
-    setMasterBPMBlock.defaults.push(90);
-    setMasterBPMBlock.hidden = true;
-
-    // macro
-    var setbpmBlock2 = new ProtoBlock('setbpm2');
-    setbpmBlock2.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['setbpm2'] = setbpmBlock2;
-    // .TRANS: sets tempo for notes contained in block
-    setbpmBlock2.staticLabels.push(_('beats per minute'));
-    setbpmBlock2.staticLabels.push(_('bpm'), _('beat value'));
-    setbpmBlock2.adjustWidthToLabel();
-    setbpmBlock2.flowClampTwoArgBlock();
-    setbpmBlock2.defaults.push(90);
-    setbpmBlock2.defaults.push(1 / 4);
-
-    // macro
-    var setbpmBlock = new ProtoBlock('setbpm');
-    setbpmBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['setbpm'] = setbpmBlock;
-    // .TRANS: old block to set tempo using only bpm for notes contained in block
-    setbpmBlock.staticLabels.push(_('beats per minute'));
-    setbpmBlock.adjustWidthToLabel();
-    setbpmBlock.flowClampOneArgBlock();
-    setbpmBlock.defaults.push(90);
-    setbpmBlock.hidden = true;
 
     // macro
     var backwardBlock = new ProtoBlock('backward');
@@ -1130,6 +1067,62 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // METER PALETTE
 
+    var beatfactor = new ProtoBlock('beatfactor');
+    beatfactor.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['beatfactor'] = beatfactor;
+    //.TRANS: number of beats per minute
+    beatfactor.staticLabels.push(_('beat factor'));
+    beatfactor.adjustWidthToLabel();
+    beatfactor.parameterBlock();
+
+    var bpmBlock = new ProtoBlock('bpmfactor');
+    bpmBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['bpmfactor'] = bpmBlock;
+    //.TRANS: number of beats played per minute
+    bpmBlock.staticLabels.push(_('beats per minute'));
+    bpmBlock.adjustWidthToLabel();
+    bpmBlock.parameterBlock();
+
+    var measureValueBlock = new ProtoBlock('measurevalue');
+    measureValueBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['measurevalue'] = measureValueBlock;
+    //.TRANS: count of current measure in meter
+    measureValueBlock.staticLabels.push(_('measure count'));
+    measureValueBlock.adjustWidthToLabel();
+    measureValueBlock.parameterBlock();
+
+    var beatValueBlock = new ProtoBlock('beatvalue');
+    beatValueBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['beatvalue'] = beatValueBlock;
+    //.TRANS: count of current beat in meter
+    beatValueBlock.staticLabels.push(_('beat count'));
+    beatValueBlock.adjustWidthToLabel();
+    beatValueBlock.parameterBlock();
+
+    var noteCounter = new ProtoBlock('notecounter');
+    noteCounter.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['notecounter'] = noteCounter;
+    //.TRANS: count the number of notes
+    noteCounter.staticLabels.push(_('note counter'));
+    noteCounter.argFlowClampBlock();
+    noteCounter.adjustWidthToLabel();
+
+    var elapsedNotes = new ProtoBlock('elapsednotes');
+    elapsedNotes.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['elapsednotes'] = elapsedNotes;
+    //.TRANS: number of whole notes that have been played
+    elapsedNotes.staticLabels.push(_('whole notes played'));
+    elapsedNotes.adjustWidthToLabel();
+    elapsedNotes.parameterBlock();
+
+    var elapsedNotes2 = new ProtoBlock('elapsednotes2');
+    elapsedNotes2.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['elapsednotes2'] = elapsedNotes2;
+    //.TRANS: number of notes that have been played
+    elapsedNotes2.staticLabels.push(_('notes played'));
+    elapsedNotes2.adjustWidthToLabel();
+    elapsedNotes2.oneArgMathBlock();
+
     var driftBlock = new ProtoBlock('drift');
     driftBlock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['drift'] = driftBlock;
@@ -1160,21 +1153,52 @@ function initBasicProtoBlocks(palettes, blocks) {
     onBeatDoBlock.dockTypes[2] = 'textin';
     onBeatDoBlock.adjustWidthToLabel();
 
-    var measureValueBlock = new ProtoBlock('measurevalue');
-    measureValueBlock.palette = palettes.dict['meter'];
-    blocks.protoBlockDict['measurevalue'] = measureValueBlock;
-    //.TRANS: count of current measure in meter
-    measureValueBlock.staticLabels.push(_('measure count'));
-    measureValueBlock.adjustWidthToLabel();
-    measureValueBlock.parameterBlock();
+    // macro
+    var setMasterBPMBlock2 = new ProtoBlock('setmasterbpm2');
+    setMasterBPMBlock2.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['setmasterbpm2'] = setMasterBPMBlock2;
+    //.TRANS: sets tempo by defniing a beat and beats per minute
+    setMasterBPMBlock2.staticLabels.push(_('master beats per minute'));
+    setMasterBPMBlock2.staticLabels.push(_('bpm'), _('beat value'));
+    setMasterBPMBlock2.extraWidth = 15;
+    setMasterBPMBlock2.adjustWidthToLabel();
+    setMasterBPMBlock2.defaults.push(90);
+    setMasterBPMBlock2.defaults.push(1 / 4);
+    setMasterBPMBlock2.twoArgBlock();
 
-    var beatValueBlock = new ProtoBlock('beatvalue');
-    beatValueBlock.palette = palettes.dict['meter'];
-    blocks.protoBlockDict['beatvalue'] = beatValueBlock;
-    //.TRANS: count of current beat in meter
-    beatValueBlock.staticLabels.push(_('beat count'));
-    beatValueBlock.adjustWidthToLabel();
-    beatValueBlock.parameterBlock();
+    // macro
+    var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
+    setMasterBPMBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['setmasterbpm'] = setMasterBPMBlock;
+    //.TRANS: old block to set master tempo which doesn't set value of beat
+    setMasterBPMBlock.staticLabels.push(_('master beats per minute'));
+    setMasterBPMBlock.adjustWidthToLabel();
+    setMasterBPMBlock.oneArgBlock();
+    setMasterBPMBlock.defaults.push(90);
+    setMasterBPMBlock.hidden = true;
+
+    // macro
+    var setbpmBlock2 = new ProtoBlock('setbpm2');
+    setbpmBlock2.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['setbpm2'] = setbpmBlock2;
+    // .TRANS: sets tempo for notes contained in block
+    setbpmBlock2.staticLabels.push(_('beats per minute'));
+    setbpmBlock2.staticLabels.push(_('bpm'), _('beat value'));
+    setbpmBlock2.adjustWidthToLabel();
+    setbpmBlock2.flowClampTwoArgBlock();
+    setbpmBlock2.defaults.push(90);
+    setbpmBlock2.defaults.push(1 / 4);
+
+    // macro
+    var setbpmBlock = new ProtoBlock('setbpm');
+    setbpmBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['setbpm'] = setbpmBlock;
+    // .TRANS: old block to set tempo using only bpm for notes contained in block
+    setbpmBlock.staticLabels.push(_('beats per minute'));
+    setbpmBlock.adjustWidthToLabel();
+    setbpmBlock.flowClampOneArgBlock();
+    setbpmBlock.defaults.push(90);
+    setbpmBlock.hidden = true;
 
     // macro
     var pickupBlock = new ProtoBlock('pickup');
@@ -1197,31 +1221,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.defaults.push(4);
     meter.defaults.push(0.25);
     meter.twoArgBlock();
-
-    var noteCounter = new ProtoBlock('notecounter');
-    noteCounter.palette = palettes.dict['meter'];
-    blocks.protoBlockDict['notecounter'] = noteCounter;
-    //.TRANS: count the number of notes
-    noteCounter.staticLabels.push(_('note counter'));
-    noteCounter.argFlowClampBlock();
-    noteCounter.adjustWidthToLabel();
-
-    var elapsedNotes = new ProtoBlock('elapsednotes');
-    elapsedNotes.palette = palettes.dict['meter'];
-    blocks.protoBlockDict['elapsednotes'] = elapsedNotes;
-    //.TRANS: number of whole notes that have been played
-    elapsedNotes.staticLabels.push(_('whole notes played'));
-    elapsedNotes.adjustWidthToLabel();
-    elapsedNotes.parameterBlock();
-
-    var elapsedNotes2 = new ProtoBlock('elapsednotes2');
-    elapsedNotes2.palette = palettes.dict['meter'];
-    blocks.protoBlockDict['elapsednotes2'] = elapsedNotes2;
-    //.TRANS: number of notes that have been played
-    elapsedNotes2.staticLabels.push(_('notes played'));
-    elapsedNotes2.adjustWidthToLabel();
-    elapsedNotes2.oneArgMathBlock();
-
 
     // TONE (ARTICULATION) PALETTE
 
