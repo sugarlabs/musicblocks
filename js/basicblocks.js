@@ -3392,6 +3392,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var moveBlock = new ProtoBlock('moveblock');
     moveBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['moveblock'] = moveBlock;
+    //.TRANS: Move the position of a block on the screen
     moveBlock.staticLabels.push(_('move block'), _('block number'), _('x'), _('y'));
     moveBlock.adjustWidthToLabel();
     moveBlock.threeArgBlock();
@@ -3402,7 +3403,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     var dockBlock = new ProtoBlock('dockblock');
     dockBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['dockblock'] = dockBlock;
-    dockBlock.staticLabels.push(_('dock block'), _('target block'), _('dock number'), _('block number'));
+    //.TRANS: We can connect a block to another block.
+    dockBlock.staticLabels.push(_('connect blocks'), _('target block'), _('connection number'), _('block number'));
     dockBlock.adjustWidthToLabel();
     dockBlock.threeArgBlock();
     dockBlock.dockTypes[1] = 'numberin';
@@ -3412,6 +3414,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var makeBlock = new ProtoBlock('makeblock');
     makeBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['makeblock'] = makeBlock;
+    //.TRANS: Make a new block programmatically
     makeBlock.staticLabels.push(_('make block'));
     makeBlock.adjustWidthToLabel();
     makeBlock.argClampOneArgMathBlock();
