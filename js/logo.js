@@ -6320,7 +6320,9 @@ function Logo () {
                 break;
             }
 
-            that.blocks.moveBlock(args[0], args[1], args[2]);
+            var x = that.turtles.turtleX2screenX(args[1]);
+            var y = that.turtles.turtleY2screenY(args[2]);
+            that.blocks.moveBlock(args[0], x, y);
             break;
         case 'runblock':
             if (args.length < 1) {
@@ -6398,6 +6400,22 @@ function Logo () {
             that.blocks.blockList[args[2]].connections[0] = args[0];
 
             that.blocks.adjustDocks(args[0], true);
+            break;
+        case 'openpalette':
+            if (args.length < 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            for (var p in that.blocks.palettes.dict) {
+                if (_(that.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
+                    that.blocks.palettes.hide();
+                    that.blocks.palettes.dict[p].show();
+                    that.blocks.palettes.show();
+                    break;
+                }
+            }
             break;
         default:
             if (that.blocks.blockList[blk].name in that.evalFlowDict) {
