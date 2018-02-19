@@ -416,7 +416,6 @@ define(MYDEFINES, function (compatibility) {
             hideMsgs();
             logo.setBackgroundColor(-1);
             logo.notationOutput = '';
-
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
                 logo.notationStaging[turtle] = [];
@@ -2849,14 +2848,16 @@ define(MYDEFINES, function (compatibility) {
             // to ensure a clean start.
             if (document.addEventListener) {
                 document.addEventListener('finishedLoading', function () {
-                    setTimeout(function () {
-                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                            logo.turtleHeaps[turtle] = [];
-                            logo.notationStaging[turtle] = [];
-                            logo.notationDrumStaging[turtle] = [];
-                            turtles.turtleList[turtle].doClear(true, true, false);
-                        }
-                    }, 1000);
+                    if (!turtles.running()) {
+                        setTimeout(function () {
+                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                                logo.turtleHeaps[turtle] = [];
+                                logo.notationStaging[turtle] = [];
+                                logo.notationDrumStaging[turtle] = [];
+                                turtles.turtleList[turtle].doClear(true, true, false);
+                            }
+                        }, 1000);
+                    }
                 });
             } else {
                 document.attachEvent('finishedLoading', function () {
