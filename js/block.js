@@ -1260,9 +1260,11 @@ function Block(protoblock, blocks, overrideName) {
         } else if (this.isNoHitBlock()) {
             // No hit area
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
-        } else {
+        } else if (this.isTwoArgBlock()) {
             // Shrinking the height makes it easier to grab blocks below
             // in the stack.
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
+        } else {
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height);
         }
 
