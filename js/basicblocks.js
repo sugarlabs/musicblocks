@@ -3384,6 +3384,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var deleteBlock = new ProtoBlock('deleteblock');
     deleteBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['deleteblock'] = deleteBlock;
+    //.TRANS: Move this block to the trash.
     deleteBlock.staticLabels.push(_('delete block'));
     deleteBlock.adjustWidthToLabel();
     deleteBlock.oneArgBlock();
@@ -3392,13 +3393,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     var moveBlock = new ProtoBlock('moveblock');
     moveBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['moveblock'] = moveBlock;
-    //.TRANS: Move the position of a block on the screen
+    //.TRANS: Move the position of a block on the screen.
     moveBlock.staticLabels.push(_('move block'), _('block number'), _('x'), _('y'));
     moveBlock.adjustWidthToLabel();
     moveBlock.threeArgBlock();
     moveBlock.dockTypes[1] = 'numberin';
     moveBlock.dockTypes[2] = 'numberin';
     moveBlock.dockTypes[3] = 'numberin';
+
+    var runBlock = new ProtoBlock('runblock');
+    runBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['runblock'] = runBlock;
+    //.TRANS: Run program beginning at this block.
+    runBlock.staticLabels.push(_('run block'));
+    runBlock.adjustWidthToLabel();
+    runBlock.oneArgBlock();
+    runBlock.dockTypes[1] = 'numberin';
 
     var dockBlock = new ProtoBlock('dockblock');
     dockBlock.palette = palettes.dict['extras'];
@@ -3414,7 +3424,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var makeBlock = new ProtoBlock('makeblock');
     makeBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['makeblock'] = makeBlock;
-    //.TRANS: Make a new block programmatically
+    //.TRANS: Create a new block programmatically.
     makeBlock.staticLabels.push(_('make block'));
     makeBlock.adjustWidthToLabel();
     makeBlock.argClampOneArgMathBlock();

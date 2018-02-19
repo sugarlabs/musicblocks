@@ -6322,6 +6322,22 @@ function Logo () {
 
             that.blocks.moveBlock(args[0], args[1], args[2]);
             break;
+        case 'runblock':
+            if (args.length < 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            childFlow = args[0];
+            childFlowCount = 1;
+            break;
         case 'dockblock':
             if (args.length < 3) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
