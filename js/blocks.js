@@ -423,11 +423,10 @@ function Blocks () {
             }
 
             // Recurse through the list.
-            setTimeout(function () {
-                if (that.clampBlocksToCheck.length > 0) {
-                    that.adjustExpandableClampBlock();
-                }
-            }, 250);
+            // (Removed timeout)
+            if (that.clampBlocksToCheck.length > 0) {
+                that.adjustExpandableClampBlock();
+            }
         };
 
         __clampAdjuster(blk, myBlock, clamp);
@@ -1401,54 +1400,52 @@ function Blocks () {
         // Put block adjustments inside a slight delay to make the
         // addition/substraction of vspace and changes of block shape
         // appear less abrupt (and it can be a little racy).
-        var that = this;
-        setTimeout(function () {
-            // If we changed the contents of a arg block, we may need a vspace.
-            if (checkArgBlocks.length > 0) {
-                for (var i = 0; i < checkArgBlocks.length; i++) {
-                    that._addRemoveVspaceBlock(checkArgBlocks[i]);
-                }
-            }
-
-            // If we changed the contents of a two-arg block, we need to
-            // adjust it.
-            if (that._checkTwoArgBlocks.length > 0) {
-                that._adjustExpandableTwoArgBlock(that._checkTwoArgBlocks);
-            }
-
-            // First, adjust the docks for any blocks that may have
-            // had a vspace added.
+        // (Removed timeout)
+        // If we changed the contents of a arg block, we may need a vspace.
+        if (checkArgBlocks.length > 0) {
             for (var i = 0; i < checkArgBlocks.length; i++) {
-                // console.log('Adjust Docks: ' + this.blockList[checkArgBlocks[i]].name);
-                that.adjustDocks(checkArgBlocks[i], true);
+                this._addRemoveVspaceBlock(checkArgBlocks[i]);
+            }
+        }
+
+        // If we changed the contents of a two-arg block, we need to
+        // adjust it.
+        if (this._checkTwoArgBlocks.length > 0) {
+            this._adjustExpandableTwoArgBlock(this._checkTwoArgBlocks);
+        }
+
+        // First, adjust the docks for any blocks that may have
+        // had a vspace added.
+        for (var i = 0; i < checkArgBlocks.length; i++) {
+            // console.log('Adjust Docks: ' + this.blockList[checkArgBlocks[i]].name);
+            this.adjustDocks(checkArgBlocks[i], true);
+        }
+
+        // Next, recheck if the connection is inside of a
+        // expandable block.
+        var blk = this._insideExpandableBlock(thisBlock);
+        var expandableLoopCounter = 0;
+        while (blk != null) {
+            // Extra check for malformed data.
+            expandableLoopCounter += 1;
+            if (expandableLoopCounter > 2 * this.blockList.length) {
+                console.log('Infinite loop checking for expandables?');
+                console.log(this.blockList);
+                break;
             }
 
-            // Next, recheck if the connection is inside of a
-            // expandable block.
-            var blk = that._insideExpandableBlock(thisBlock);
-            var expandableLoopCounter = 0;
-            while (blk != null) {
-                // Extra check for malformed data.
-                expandableLoopCounter += 1;
-                if (expandableLoopCounter > 2 * that.blockList.length) {
-                    console.log('Infinite loop checking for expandables?');
-                    console.log(that.blockList);
-                    break;
-                }
-
-                if (that.blockList[blk].name === 'ifthenelse') {
-                    that.clampBlocksToCheck.push([blk, 0]);
-                    that.clampBlocksToCheck.push([blk, 1]);
-                } else {
-                    that.clampBlocksToCheck.push([blk, 0]);
-                }
-
-                blk = that._insideExpandableBlock(blk);
+            if (this.blockList[blk].name === 'ifthenelse') {
+                this.clampBlocksToCheck.push([blk, 0]);
+                this.clampBlocksToCheck.push([blk, 1]);
+            } else {
+                this.clampBlocksToCheck.push([blk, 0]);
             }
 
-            that.adjustExpandableClampBlock();
-            that.refreshCanvas();
-        }, 250);
+            blk = this._insideExpandableBlock(blk);
+        }
+
+        this.adjustExpandableClampBlock();
+        this.refreshCanvas();
     };
 
     this._testConnectionType = function (type1, type2) {
