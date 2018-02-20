@@ -3679,6 +3679,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleheadingBlock.dockTypes[1] = 'anyin';
     turtleheadingBlock.defaults.push(_('Mr. Mouse'));
 
+    var setTurtleXYBlock = new ProtoBlock('setxyturtle');
+    setTurtleXYBlock.palette = palettes.dict['mice'];
+    blocks.protoBlockDict['setxyturtle'] = setTurtleXYBlock;
+    //.TRANS: set xy position for this mouse
+    setTurtleXYBlock.staticLabels.push(_('set mouse'), _('name'), _('x'), _('y'));
+    setTurtleXYBlock.threeArgBlock();
+    setTurtleXYBlock.adjustWidthToLabel();
+    setTurtleXYBlock.dockTypes[1] = 'anyin';
+    setTurtleXYBlock.dockTypes[2] = 'numberin';
+    setTurtleXYBlock.dockTypes[3] = 'numberin';
+    setTurtleXYBlock.defaults.push(_('Mr. Mouse'), 0, 0);
+
     var turtleyBlock = new ProtoBlock('yturtle');
     turtleyBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['yturtle'] = turtleyBlock;

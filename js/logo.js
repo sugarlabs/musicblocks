@@ -6417,6 +6417,23 @@ function Logo () {
                 }
             }
             break;
+        case 'setxyturtle':
+            var targetTurtle = that._getTargetTurtle(args);
+            if (targetTurtle == null) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
+                } else {
+                    that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk)
+                }
+            } else if (args.length === 3) {
+                if (typeof(args[1]) === 'string' || typeof(args[2]) === 'string') {
+                    that.errorMsg(NANERRORMSG, blk);
+                    that.stopTurtle = true;
+                } else {
+                    that.turtles.turtleList[targetTurtle].doSetXY(args[1], args[2]);
+                }
+            }
+            break;
         default:
             if (that.blocks.blockList[blk].name in that.evalFlowDict) {
                 eval(that.evalFlowDict[that.blocks.blockList[blk].name]);
