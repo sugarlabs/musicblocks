@@ -18,7 +18,7 @@
 <h2 id="-a-name-toc-a-table-of-contents"><a name="TOC"></a> Table of Contents</h2>
 <ol>
 <li><a href="#GETTING-STARTED">Getting Started</a></li>
-<li><a href="#NOTES">Making a Sound</a><ol>
+<li><a href="#NOTES">Making Sounds</a><ol>
 <li><a href="#NOTE-VALUE">Note Value Blocks</a></li>
 <li><a href="#PITCH">Pitch Blocks</a></li>
 <li><a href="#CHORDS">Chords</a></li>
@@ -28,10 +28,10 @@
 </li>
 <li><a href="#PROGRAMMING-WITH-MUSIC">Programming with Music</a><ol>
 <li><a href="#CHUNKS">Chunks</a></li>
-<li><a href="#TRANSFORMATION">Musical Transformation</a><ol>
+<li><a href="#TRANSFORMATION">Musical Transformations</a><ol>
 <li><a href="#STEP-PITCH">Step Pitch Block</a></li>
 <li><a href="#SHARPS-AND-FLATS">Sharps and Flats</a></li>
-<li><a href="#ADJUST-TRANSPOSITION">Adjust-Transposition Block</a></li>
+<li><a href="#ADJUST-TRANSPOSITION">Adjusting Transposition</a></li>
 <li><a href="#DOTTED">Dotted Notes</a></li>
 <li><a href="#MULTIPLY-AND-DIVIDE">Speeding Up and Slowing Down Notes via Mathematical Operations</a></li>
 <li><a href="#REPETITION">Repeating Notes</a></li>
@@ -42,7 +42,7 @@
 <li><a href="#INVERSION">Inversion</a></li>
 <li><a href="#BACKWARDS">Backwards</a></li>
 <li><a href="#SETTING">Setting Voice and Keys</a></li>
-<li><a href="#VIBRATO">Vibrato, tremelo, et al.</a></li>
+<li><a href="#VIBRATO">Vibrato, Tremelo, et al.</a></li>
 </ol>
 </li>
 <li><a href="#VOICES">Voices</a></li>
@@ -50,21 +50,23 @@
 <li><a href="#BEAT">Beat</a></li>
 <li><a href="#INTERACTIONS">Interactions</a></li>
 <li><a href="#WIDGETS">Widgets</a><ol>
-<li><a href="#status">Monitoring status</a></li>
-<li><a href="#pitch-time">Generating chunks of notes</a><ol>
+<li><a href="#status">Monitoring Status</a></li>
+<li><a href="#pitch-time">Generating Chunks of Notes</a><ol>
 <li><a href="#pitch-time">Pitch-Time Matrix</a> </li>
 <li><a href="#THE-RHYTHM-BLOCK">The Rhythm Block</a> </li>
 <li><a href="#CREATING-TUPLETS">Creating Tuplets</a></li>
 <li><a href="#WHAT-IS-TUPLET">What is a Tuplet?</a></li>
 <li><a href="#INDIVIDUAL-NOTES">Using Individual Notes in the Matrix</a></li>
+<li><a href="#USING-A-SCALE">Using a Scale of Pitches in the Matrix</a></li>
 </ol>
 </li>
-<li><a href="#rhythms">Generating rhythms</a></li>
+<li><a href="#rhythms">Generating Rhythms</a></li>
 <li><a href="#modes">Musical Modes</a></li>
 <li><a href="#pitch-drum">The Pitch-Drum Matrix</a></li>
-<li><a href="#stairs">Exploring musical proportions</a></li>
-<li><a href="#slider">Generating arbitrary pitches</a></li>
-<li><a href="#tempo">Changing tempo</a></li>
+<li><a href="#stairs">Exploring Musical Proportions</a></li>
+<li><a href="#slider">Generating Arbitrary Pitches</a></li>
+<li><a href="#tempo">Changing Tempo</a></li>
+<li><a href="#timbre">Custom Timbres</a></li>
 </ol>
 </li>
 <li><a href="#BEYOND-MUSIC-BLOCKS">Beyond Music Blocks</a></li>
@@ -74,7 +76,7 @@
 <p>Many of the examples given in the guide have links to code you can
 run. Look for <code>RUN LIVE</code> links.</p>
 <h2 id="-a-name-getting-started-a-1-getting-started"><a name="GETTING-STARTED"></a>1. Getting Started</h2>
-<p><a href="#TOC">Back to Table of Contents</a> | <a href="#NOTES">Next Section (2. Making a sound)</a></p>
+<p><a href="#TOC">Back to Table of Contents</a> | <a href="#NOTES">Next Section (2. Making Sounds)</a></p>
 <p>Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox. You can
 run it from <a href="http://walterbender.github.io/musicblocks">github io</a> or
@@ -84,7 +86,7 @@ from the file system of your computer.</p>
 Blocks</a>.
 For more details on how to use Turtle Blocks, see
 <a href="http://github.com/walterbender/turtleblocksjs/tree/master/documentation">Using Turtle Blocks JS</a>.</p>
-<h2 id="-a-name-notes-a-2-making-a-sound"><a name="NOTES"></a>2. Making a Sound</h2>
+<h2 id="-a-name-notes-a-2-making-sounds"><a name="NOTES"></a>2. Making Sounds</h2>
 <p><a href="#GETTING-STARTED">Previous Section (1. Getting Started)</a> | <a href="#TOC">Back to
 Table of Contents</a> | <a href="#PROGRAMMING-WITH-MUSIC">Next Section (3. Programming with
 Music)</a></p>
@@ -108,8 +110,8 @@ they are: <code>1/4</code> for an quarter note, <code>1/16</code> for a sixteent
 <code>1/2</code> for a half note.</p>
 <p>Note that any mathematical operations can be used as input to the
 <em>Note value</em>.</p>
-<p><img width="100%" src="https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg" alt="alt
- tag" title="A chart of note values and their corresponding note value blocks"></p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg" alt="alt
+ tag" title="A chart of note values and their corresponding note value blocks" width="100%"></p>
 <p>Please refer to the above picture for a visual representation of note
 values.</p>
 <h3 id="-a-name-pitch-a-2-2-pitch-blocks"><a name="PITCH"></a>2.2 Pitch Blocks</h3>
@@ -136,8 +138,8 @@ the frequency of the sound made.</p>
 whole numbers. In the case where the pitch name is specified by
 frequency, the octave is ignored.</p>
 <p>Note that the pitch name can also be specified using a <em>Text</em> block. </p>
-<p><img width="100%" src="https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg" alt="alt tag" title="Note layout chart for keyboard"></p>
-<p><img width="100%" src="https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg" alt="alt tag" title="Note layout chart for mallet"></p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg" alt="alt tag" title="Note layout chart for keyboard" width="100%"></p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg" alt="alt tag" title="Note layout chart for mallet" width="100%"></p>
 <p>Please refer to the above charts for a visual representation of where
 notes are located on a keyboard or staff.</p>
 <h3 id="-a-name-chords-a-2-3-chords"><a name="CHORDS"></a>2.3 Chords</h3>
@@ -160,7 +162,7 @@ to choose. The default drum is a kick drum.</p>
 <em>Drum</em> blocks within a single <em>Note value</em> blocks, and combine them
 with <em>Pitch</em> blocks as well.</p>
 <h2 id="-a-name-programming-with-music-a-3-programming-with-music"><a name="PROGRAMMING-WITH-MUSIC"></a>3. Programming with Music</h2>
-<p><a href="#NOTES">Previous Section (2. Making a Sound)</a> | <a href="#TOC">Back to Table of Contents</a> | <a href="#WIDGETS">Next Section (4. Widgets)</a></p>
+<p><a href="#NOTES">Previous Section (2. Making Sounds)</a> | <a href="#TOC">Back to Table of Contents</a> | <a href="#WIDGETS">Next Section (4. Widgets)</a></p>
 <p>This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
 hand or use the <a href="#pitch-time"><em>Pitch-time Matrix</em></a> widget to help you
@@ -212,8 +214,9 @@ song we created?)</p>
 <h4 id="-a-name-step-pitch-a-3-2-1-step-pitch-block"><a name="STEP-PITCH"></a>3.2.1 Step Pitch Block</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg" alt="alt tag" title="Using the Step Pitch block"></p>
 <p>The <em>Step Pitch</em> block will move up or down notes in a scale from the
-last played note. In the example above, <em>Step Pitch</em> blocks are used inside
-of <em>Repeat</em> blocks to repeat the code <code>7</code> times, playing up and down a scale.</p>
+last played note. In the example above, <em>Step Pitch</em> blocks are used
+inside of <em>Repeat</em> blocks to repeat the code <code>7</code> times, playing up and
+down a scale.</p>
 <p><a href="http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb">RUN LIVE</a></p>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform16.svg" alt="alt tag" title="Using the Scalar Step Up and Down blocks"></p>
 <p>Another way to move up and down notes in a scale is to use the <em>Scalar
@@ -221,51 +224,74 @@ Step Up</em> and <em>Scalar Step Down</em> blocks. These blocks calculate the
 number of half-steps to the next note in the current mode. (You can
 read more about <a href="#modes">Musical Modes</a> below.) Note that the <em>Mouse
 Pitch Number</em> block returns the pitch number of the most recent note
-played. (Note that here we are using the <em>Mode length</em> block, which
-returns the number of scalar steps in the current mode.)</p>
+played.</p>
+<p>In this example, we are using the <em>Mode length</em> block, which returns
+the number of scalar steps in the current mode (7 for Major and Minor
+modes).</p>
 <h4 id="-a-name-sharps-and-flats-a-3-2-2-sharps-and-flats"><a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg" alt="alt tag" title="Using Sharp and Flat blocks"></p>
-<p>The <em>Sharp</em> and <em>Flat</em> blocks can be wrapped around <em>Pitch</em> blocks,
-<em>Note value</em> blocks, or <a href="#CHUNKS">chunks</a>. A sharp will raise the
-pitch by one half step. A flat will lower by one half step. In the
-example, on the left, just the <em>Pitch</em> block <code>Mi</code> is lowered by one
-half step; on the right, both <em>Pitch</em> blocks are raised by one half
-step.</p>
-<h4 id="-a-name-adjust-transposition-a-3-2-3-adjust-transposition"><a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjust-Transposition</h4>
-<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg" alt="alt tag" title="Adjust-transposition"></p>
-<p>The <em>Adjust-transposition</em> block can be used to make larger shifts in
-pitch in half step units. A positive number shifts the pitch up and a
-negative number shifts the pitch down. The input must be a whole
-number. To shift an entire octave, transpose by <code>12</code> half-steps up. <code>-12</code>
-will shift an octave down.</p>
-<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg" alt="alt tag" title="raising an octave using Adjust-transposition"></p>
+<p>The <em>Accidental</em> block can be wrapped around <em>Pitch</em> blocks, <em>Note
+value</em> blocks, or <a href="#CHUNKS">chunks</a>. A sharp will raise the pitch by
+one half step. A flat will lower by one half step. In the example, on
+the left, just the <em>Pitch</em> block <code>Mi</code> is lowered by one half step; on
+the right, both <em>Pitch</em> blocks are raised by one half step. (You can
+also use a double-sharp or double-flat accidental.)</p>
+<h4 id="-a-name-adjust-transposition-a-3-2-3-adjusting-transposition"><a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjusting Transposition</h4>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg" alt="alt tag" title="Adjusting transpositions"></p>
+<p>There are several ways to transpose a pitch: by semi-tone or scalar
+steps. The <em>Semi-tone-transposition</em> block (above left) can be used to
+make larger shifts in pitch in half-step units. A positive number
+shifts the pitch up and a negative number shifts the pitch down. The
+input must be a whole number. To shift up an entire octave, transpose
+by <code>12</code> half-steps. <code>-12</code> will shift down an entire octave.</p>
+<p>The <em>Scalar-transposition</em> block (above right) shifts a pitch based on
+the current key and mode. For example, in <code>C Major</code>, a scalar
+transposition of <code>1</code> would transpose <code>C</code> to <code>D</code> (even though it is a
+transposition of <code>2</code> half steps). To transpose <code>E</code> to <code>F</code> is <code>1</code>
+scalar step (or <code>1</code> half step). To shift an entire octave, scalar
+transpose by the mode length up or down. (In major scales, the mode
+length is <code>7</code>.)</p>
+<p>As a convenience, a number of standard scalar transpositions are
+provided: <em>Unison</em>, <em>Second</em>, <em>Third</em>, ..., <em>Seventh</em>, <em>Down third</em>,
+and <em>Down sixth</em>, as well as a transposition for <em>Octave</em>.</p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg" alt="alt tag" title="raising an octave using semi-tone-transposition"></p>
 <p>In the example above, we take the song we programmed previously and
 raise it by one octave.</p>
-<p>As a convenience, a number of standard transpositions are provided:
-<em>Unison</em>, <em>Second</em>, <em>Third</em>, <em>Fourth</em>, <em>Fifth</em>, <em>Sixth</em>, <em>Seventh</em>,
-<em>Down third</em>, and <em>Down sixth</em>, as well as a transposition for
-<em>Octave</em>.</p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform18.svg" alt="alt tag" title="The Register block"></p>
+<p>The <em>Register</em> block provides an easy way to modify the register
+(octave) of the notes that follow it. In the example above it is first
+used to bump the <code>Mi 4</code> note up by one octave and then to bump the
+<code>Sol 4</code> note down by one octave.</p>
 <h4 id="-a-name-dotted-a-3-2-4-dotted-notes"><a name="DOTTED"></a>3.2.4 Dotted Notes</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg" alt="alt tag" title="Creating dotted notes using the Dot block"></p>
 <p>You can &quot;dot&quot; notes using the <em>Dot</em> block. A dotted note extends the
 rhythmic duration of a note by 50%. E.g., a dotted quarter note will
-play for <code>3/8</code> <code>(1/4 + 1/8)</code> of a beat. A dotted eighth note will play for
-<code>3/16</code> <code>(1/8 + 1/16)</code> of a beat. A double dot extends the duration by <code>75%</code>
-<code>(50% + 50% of 50%)</code>. E.g., a double-dotted quarter note will play for
-<code>7/16</code> <code>(1/4 + 1/8 + 1/16)</code> of a beat.</p>
-<p>You can also simply change the note value to mimic a dotted note, for
-example indicating <code>3/8</code> instead of <code>1/4</code>, for a dotted quarter note.</p>
+play for <code>3/8</code> <code>(i.e. 1/4 + 1/8)</code> of a beat. A dotted eighth note will
+play for <code>3/16</code> <code>(i.e. 1/8 + 1/16)</code> of a beat. A double dot extends
+the duration by <code>75%</code> <code>(i.e. 50% + [50% of 50%])</code>. For example, a
+double-dotted quarter note will play for <code>7/16</code> <code>(i.e. 1/4 + 1/8 +
+1/16)</code> of a beat (which is the same as <code>4/16 + 2/16 + 1/16 = 7/16</code>).</p>
+<p>The dot block is useful as an expression of musical rhythm--it is
+convenient and helps to organize musical ideas (e.g. many melodies use
+dots as the basis of their rhythmic motifs), however you can achieve
+the same rhythmic result as dot by putting the calculation directly
+into note value as well. For example, indicating <code>3/8</code> instead of
+<code>1/4</code> will result in a dotted quarter note.</p>
+<p>The chart below shows two common examples, dotted quarter and dotted
+eighth, and how to achieve them with either the dot block or by direct
+calculation into a note&#39;s note value.</p>
 <p><img src="https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg" alt="alt tag" title="using dotted notes"></p>
-<h4 id="-a-name-multiply-and-divide-a-3-2-5-speeding-up-and-slowing-down-notes-via-mathematical-operations"><a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations</h4>
-<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg" alt="alt tag" title="Speeding up and slowing down the tempo"></p>
-<p>You can also multiply (or divide) the note value, which will speed up
-or slowdown the notes. Multiplying the note value of an <code>1/8</code> note by
-<code>1/2</code> is the equivalent of playing a <code>1/16</code> note. Multiplying the note
-value of an <code>1/8</code> note by <code>2/1</code> (or dividing by <code>1/2</code>) is the
-equivalent of playing a <code>1/4</code> note.</p>
+<h4 id="-a-name-multiply-and-divide-a-3-2-5-changing-note-s-duration-via-mathematical-operations"><a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Changing Note(s) duration via Mathematical Operations</h4>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg" alt="alt tag" title="Changing note duration for a note or notes"></p>
+<p>You can also multiply (or divide) the note value, which will change
+the duration of the notes by changing their note values. Multiplying
+the note value of an <code>1/8</code> note by <code>1/2</code> is the equivalent of playing
+a <code>1/16</code> note (i.e. <code>1/2 * 1/8 = 1/16</code>) . Multiplying the note value
+of an <code>1/8</code> note by <code>2/1</code> (which has the effect of dividing by <code>1/2</code>)
+will result in the equivalent of a <code>1/4</code> note.</p>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg" alt="alt tag" title="increasing sequence of drum beats over time"></p>
 <p>In the above example, the sequence of <a href="#DRUMS">drum</a> note values is
-decreased over time.</p>
+decreased over time, at each repetition.</p>
 <p><a href="http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb">RUN LIVE</a></p>
 <h4 id="-a-name-repetition-a-3-2-6-repeating-notes"><a name="REPETITION"></a>3.2.6 Repeating Notes</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg" alt="alt tag" title="repeating notes"></p>
@@ -297,7 +323,9 @@ synth, e.g., <code>violin</code>, <code>snare drum</code>, etc. The default volu
 the range is <code>0</code> (silence) to <code>100</code> (full volume). In the example, the
 <em>synth name</em> block is used to select the current synth.</p>
 <p>As a convenience, a number of standard volume blocks are provided:
-<em>fff</em>, <em>ff</em> <em>f</em>, <em>mf</em>, <em>mp</em>, <em>p</em>, <em>pp</em>, and <em>ppp</em>.</p>
+from loudest to quietest, there is <em>fff</em>, <em>ff</em> <em>f</em>, <em>mf</em>, <em>mp</em>, <em>p</em>,
+<em>pp</em>, and <em>ppp</em>. In musical terms &quot;f&quot; means &quot;forte&quot; or loud, &quot;p&quot; means
+&quot;piano&quot; or soft, and &quot;m&quot; means &quot;mezzo&quot; or middle.</p>
 <p>The <em>Set Relative Volume</em> block modifies the clamped note&#39;s volume
 according to the input value of the block in an added (or subtracted
 when negative) percentage with respect to the original volume. For
@@ -307,6 +335,7 @@ contained notes by a specified amount for every note played. For
 example, if you have 3 notes in sequence contained in a <em>Crescendo</em>
 block with a value of <code>5</code>, the final note will be at 15% more 
 than the original value for volume.</p>
+<p>NOTE: The <em>Crescendo</em> block does not alter the volume of a note as it is being played. Music Blocks does not yet have this functionality.</p>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform17.svg" alt="alt tag" title="Staccato, and Slur blocks"></p>
 <p>The <em>Staccato</em> block shortens the length of the actual
 note&mdash;making them tighter bursts&mdash;while maintaining the
@@ -317,11 +346,12 @@ maintaining the specified rhythmic value of the notes.</p>
 <h4 id="-a-name-intervals-a-3-2-9-intervals"><a name="INTERVALS"></a>3.2.9 Intervals</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg" alt="alt tag" title="Scalar interval block"></p>
 <p>The <em>Scalar interval</em> block calculates a relative interval based on
-the current mode, e.g., a <em>fifth</em>, and adds the additional pitches to a
-note&#39;s playback. In the figure, we add <code>La</code> to <code>Re</code> and <code>Ti</code> to <code>Mi</code>.</p>
-<p>As a convenience, a number of standard scalar intervals are provided:
-<em>Unison</em>, <em>Second</em>, <em>Third</em>, <em>Fourth</em>, <em>Fifth</em>, <em>Sixth</em>, <em>Seventh</em>,
-<em>Down third</em>, and <em>Down sixth</em>.</p>
+the current mode, skipping all notes outside of the mode. For example,
+a <em>fifth</em>, and adds the additional pitches to a note&#39;s playback. In
+the figure, we add <code>La</code> to <code>Re</code> and <code>Ti</code> to <code>Mi</code>.</p>
+<p>As a convenience, a number of standard scalar intervals are provided
+on the <em>Intervals</em> palette: <em>Unison</em>, <em>Second</em>, <em>Third</em>, ...,
+<em>Seventh</em>, <em>Down third</em>, and <em>Down sixth</em>.</p>
 <p>The <em>Scalar interval measure</em> block can be used to measure the number
 of scalar steps between two pitched.</p>
 <h4 id="-a-name-absolute-intervals-a-absolute-intervals"><a name= "ABSOLUTE-INTERVALS"></a>Absolute Intervals</h4>
@@ -336,27 +366,109 @@ e.g., a minor third. Other absolute intervals include <em>Perfect</em>,
 played, followed by a chord of <code>E5</code> and <code>C5</code>. In the minor third
 example, which includes a shift of one octave, first a chord of <code>D5</code>
 and <code>F5</code> is played, followed by chord of <code>E5</code> and <code>G6</code>.</p>
-<p>As a convenience, a number of standard absolute intervals are
-provided: <em>Major 2</em>, <em>Major 3</em>, <em>Major 6</em>, <em>Major 7</em>, <em>Down major 3</em>,
-<em>Down major 6</em>, <em>Minor 2</em>, <em>Minor 3</em>, <em>Minor 6</em>, <em>Minor 7</em>, <em>Down
-minor 3</em>, <em>Down minor 6</em>, <em>Perfect 4</em>, <em>Perfect 5</em>, <em>Perfect 8</em>,
-<em>Augmented 1</em>, <em>Augmented 2</em>, <em>Augmented 3</em>, <em>Augmented 4</em>, <em>Augmented
-5</em>, <em>Augmented 6</em>, <em>Augmented 7</em>, <em>Augmented 8</em>, <em>Diminished 2</em>,
-<em>Diminished 3</em>, <em>Diminished 4</em>, <em>Diminished 5</em>, <em>Diminished 6</em>,
-<em>Diminished 7</em>, and <em>Diminished 8</em>.</p>
-<p>The <em>Doubly</em> block can be used to apply an augmentation or
-diminishment twice.</p>
+<p>As a convenience, a number of standard absolute intervals are provided
+on the <em>Intervals</em> palette: <em>Major 2</em>, <em>Minor 3</em>, <em>Perfect 4</em>,
+<em>Augmented 6</em>, <em>Diminished 8</em>, et al.</p>
+<p>The <em>Doubly</em> block can be used to create a double augmentation or
+double diminishment.</p>
 <p>The <em>Semi-tone interval measure</em> block can be used to measure the
 number of half-steps between two pitched.</p>
 <h4 id="-a-name-inversion-a-3-2-11-inversion"><a name= "INVERSION"></a>3.2.11 Inversion</h4>
+<p>The <em>Invert</em> block will rotate a series of notes around a target
+note. There are three different modes of the <em>Invert</em> block: <em>even</em>,
+<em>odd</em>, and <em>scalar</em>. In <em>even</em> and <em>odd</em> modes, the rotation is based
+on half-steps. In <em>even</em> and <em>scalar</em> mode, the point of rotation is
+the given note. In <em>odd</em> mode, the point of rotation is shifted up by
+a <code>1/4</code> step, enabling rotation around a point between two notes. In
+&quot;scalar&quot; mode, the scalar interval is preserved around the point of
+rotation.</p>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg" alt="alt tag" title="inversion"></p>
-<p>The <em>Invert</em> block will invert a series of notes around a target
-note. There are two different modes of the <em>Invert</em> block: <em>odd</em>
-and <em>even</em>, the latter shifts the point of rotation up by a <code>1/4</code>
-step, enabling rotation around a point between two notes.</p>
-<p>In the <em>invert (even)</em> example, <code>D4</code> is inverted around <code>G4</code>,
-resulting in a <code>C5</code>. In the <em>invert (odd)</em> example, <code>D4</code> is inverted
-around a point midway between <code>G4</code> and <code>G♯4</code> resulting in a <code>C♯5</code></p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/even-invert-chart.svg" alt="alt tag" title="even invert chart"></p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/invert-even.png" alt="alt tag" title="even invert example"></p>
+<p>Even mode</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Starting note</th>
+<th style="text-align:center">Half steps above <code>C5</code></th>
+<th style="text-align:center">Half steps below <code>C5</code></th>
+<th style="text-align:center">Ending note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>F5</code></td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center"><code>G4</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>D5</code></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center"><code>B♭4</code></td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/odd-invert-chart.svg" alt="alt tag" title="odd invert chart"></p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/invert-odd.png" alt="alt tag" title="odd invert example"></p>
+<p>Odd mode</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Starting note</th>
+<th style="text-align:center">Half steps above point midway between <code>C5</code> and <code>C♯5</code></th>
+<th style="text-align:center">Half steps below point midway between <code>C5</code> and <code>C♯5</code></th>
+<th style="text-align:center">Ending note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>F5</code></td>
+<td style="text-align:center">4.5</td>
+<td style="text-align:center">4.5</td>
+<td style="text-align:center"><code>A♭4</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>D5</code></td>
+<td style="text-align:center">1.5</td>
+<td style="text-align:center">1.5</td>
+<td style="text-align:center"><code>B4</code></td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/scalar-invert-chart.svg" alt="alt tag" title="scalar invert chart"></p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/invert-scalar.png" alt="alt tag" title="scalar invert example"></p>
+<p>Scalar mode</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Starting note</th>
+<th style="text-align:center">Scalar steps above <code>C5</code></th>
+<th style="text-align:center">Scalar steps below <code>C5</code></th>
+<th style="text-align:center">Ending note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>F5</code></td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center"><code>G4</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>D5</code></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><code>B4</code></td>
+</tr>
+</tbody>
+</table>
+<p>In the <em>invert (even)</em> example above, notes are inverted around <code>C5</code>.
+In the <em>invert (odd)</em> example, notes are inverted around a point
+midway between <code>C5</code> and  <code>C♯5</code>.  In the <em>invert (scalar)</em> example,
+notes are inverted around <code>C5</code>, by scalar steps rather than
+half-steps.</p>
 <h4 id="-a-name-backwards-a-3-2-12-backwards"><a name="BACKWARDS"></a>3.2.12 Backwards</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg" alt="alt tag" title="Backward block"></p>
 <p>The <em>Backward</em> block will play the contained notes in reverse order
@@ -380,7 +492,11 @@ and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
 This block allows users to access &quot;movable Do&quot; within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user&#39;s specified tonality.</p>
-<h4 id="-a-name-vibrato-a-3-2-14-vibrato-tremelo-et-al-"><a name="VIBRATO"></a>3.2.14 Vibrato, tremelo, et al.</h4>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform19.svg" alt="alt tag" title="Define mode block"></p>
+<p>The <em>Define mode</em> block can be used to define a custom mode by
+defining the number and size of the steps within an octave. You can
+use your custom mode with the <em>Set key</em> block.</p>
+<h4 id="-a-name-vibrato-a-3-2-14-vibrato-tremelo-et-al-"><a name="VIBRATO"></a>3.2.14 Vibrato, Tremelo, et al.</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg" alt="alt tag" title="Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks"></p>
 <p>The <em>Vibrato</em> Block adds a rapid variation in pitch to any contained
 notes. The intensity of the variation ranges from <code>1</code> to <code>100</code> (cents),
@@ -608,13 +724,22 @@ for intermixing multiple rhythms within single tuplet.</p>
 <em>Tuplet</em> block, resulting in a more complex rhythm.</p>
 <p>Note: You can mix and match <em>Rhythm</em> blocks and <em>Tuplet</em> blocks when
 defining your matrix.</p>
-<h4 id="-a-name-what-is-tuplet-a-4-2-4-what-is-a-tuplet-"><a name="WHAT-IS-TUPLET"></a>4.2.4 What is a tuplet?</h4>
+<h4 id="-a-name-what-is-tuplet-a-4-2-4-what-is-a-tuplet-"><a name="WHAT-IS-TUPLET"></a>4.2.4 What is a Tuplet?</h4>
 <p><img src="https://rawgit.com/walterbender/musicblocks/master/charts/TupletChart.svg" alt="alt tag" title="tuplet chart"></p>
 <p><img src="https://rawgit.com/walterbender/musicblocks/master/charts/TripletChart.svg" alt="alt tag" title="triplet chart"></p>
-<h4 id="-a-name-individual-notes-a-4-2-5-using-individual-notes-in-the-matrix"><a name="INDIVIDUAL-NOTES"></a>4.2.5 Using individual notes in the matrix</h4>
+<h4 id="-a-name-individual-notes-a-4-2-5-using-individual-notes-in-the-matrix"><a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Matrix</h4>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/matrix14.svg" alt="alt tag"></p>
 <p>You can also use individual notes when defining the grid. These blocks
 will expand into <em>Rhythm</em> blocks with the corresponding values.</p>
+<h4 id="-a-name-using-a-scale-a-4-2-6-using-a-scale-of-pitches-in-the-matrix"><a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Matrix</h4>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/matrix15.svg" alt="alt tag"></p>
+<p>You can use the <em>Scalar step</em> block to generate a scale of pitches in
+the matrix. In the example above, the pitches comprising the G major
+scale in the 4th octave are added to the grid. Note that in order to
+put the highest note on top, the first pitch is the <code>Sol</code> in <code>Octave
+5</code>. From there, we use <code>-1</code> as the argument to the <em>Scalar step</em> block
+inside the <em>Repeat</em>, working our way down to <code>Sol</code> in <code>Octave
+4</code>. Another detail to note is the use of the <em>Mode length</em> block.</p>
 <h3 id="-a-name-rhythms-a-4-3-generating-rhythms"><a name="rhythms"></a>4.3 Generating Rhythms</h3>
 <p>The <em>Rhythm Ruler</em> block is used to launch a widget similar to the
 <em>Pitch-time Matrix</em> block. The widget can be used to generate rhythmic
@@ -806,6 +931,82 @@ Tempo.</p>
 in the widget: the new beats per minute (BPM) is determined as the
 time between the two clicks. For example, if there is <code>1/2</code> second
 between clicks, the new BPM will be set as <code>120</code>.</p>
+<h3 id="-a-name-timbre-a-4-9-custom-timbres"><a name="timbre"></a>4.9 Custom Timbres</h3>
+<p>While Music Blocks comes with many built-in instruments, it is also
+possible to create custom timbres with unique sound qualities.</p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre1.svg" alt="alt tag" title="the Timbre widget"></p>
+<p>The <em>Timbre</em> block can be used to launch the <em>Timbre</em> widget, which
+lets you add synthesizers, oscillators, effects, and filters to create
+a custom timbre, which can be used in your Music Blocks programs.</p>
+<p>The name of the custom timbre is defined by the argment passed to the
+block (by default, <code>custom</code>). This name is passed to the <em>Set timbre</em>
+block in order to use your custom timbre.</p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2.svg" alt="alt tag" title="the Timbre widget toolbar"></p>
+<p>The <em>Timbre</em> widget has a number of different panels, each of which is
+used to set the parameters of the components that define your custom
+timbre.</p>
+<p>From left to right:</p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2a.svg" alt="alt tag" title="the play button"></p>
+<ul>
+<li>The <em>Play</em> button, which lets you test the sound quality of your
+custom timbre. By default, it will play <code>Sol</code>, <code>Mi</code>, <code>Sol</code> using the
+combination of filters you define.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre1a.svg" alt="alt tag" title="the notes inside Timbre block"></p>
+<p>You can also put notes in the <em>Timbre</em> block to use for testing your
+sound. In the example above, a scale will be used for the test.</p>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2b.svg" alt="alt tag" title="the save button"></p>
+<ul>
+<li>The <em>Save</em> button, which will save your custom timbre for use in
+your program.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre3.svg" alt="alt tag" title="select synth"></p>
+<ul>
+<li>The <em>Synth</em> button, which lets you choose between an AM synth, a PM
+synth, or a Duo synth.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre4.svg" alt="alt tag" title="select osc"></p>
+<ul>
+<li>The <em>Oscillator</em> button, which lets you choose between a sine wave,
+square wave, triangle wave, or sawtooth wave. You can also change
+the number of partials.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre5.svg" alt="alt tag" title="set envelope"></p>
+<ul>
+<li>The <em>Envelope</em> button, which lets you change the shape of the sound
+envelope, with controls for attack, decay, sustain, and release.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre6.svg" alt="alt tag" title="select effect"></p>
+<ul>
+<li>The <em>Effects</em> button, which lets you add effects to your custom
+timbre: tremelo, vibrato, chorus, phaser, and distortion. When an
+effect is selected, additional controls will appear in the widget.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre7.svg" alt="alt tag" title="select filter"></p>
+<ul>
+<li>The <em>Filter</em> button, which lets you choose between a number of
+different filter types.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2c.svg" alt="alt tag" title="the add filter button"></p>
+<ul>
+<li>The <em>Add filter</em> button, which lets you add addition filters to your
+custom timbre.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2d.svg" alt="alt tag" title="the undo button"></p>
+<ul>
+<li>The <em>Undo</em> button.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2e.svg" alt="alt tag" title="the close button"></p>
+<ul>
+<li>The <em>Close</em> button.</li>
+</ul>
+<p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/timbre2f.svg" alt="alt tag" title="the drag handle"></p>
+<ul>
+<li>The <em>Drag</em> handle.</li>
+</ul>
+<p>As you add synthesizers, effects, and filters with the widget, blocks
+corresponding to your choices are added to the <em>Timbre</em> block. This
+lets you reopen the widget to fine-tune your custom timbre.</p>
 <h2 id="-a-name-beyond-music-blocks-a-beyond-music-blocks"><a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks</h2>
 <p><a href="#WIDGETS">Previous Section (4. Widgets)</a> | <a href="#TOC">Back to Table of Contents</a></p>
 <p>Music Blocks is a waypoint, not a destination. One of the goals is to
@@ -815,6 +1016,9 @@ point the learner towards other powerful tools. One such tool is
 <p>The <em>Save as Lilypond</em> block will transcribe your composition. The
 output of the program above is saved to <code>Downloads/hotdog.ly</code>. There is
 also a <em>Save as Lilypond</em> button on the secondary toolbar.</p>
+<p>Note that if you use a <em>Print</em> block inside of a note, Lilypond will
+create a &quot;markup&quot; or annotation for that note. It is a simple way to
+add lyrics to your score.</p>
 <p><img src="https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg" alt="alt tag" title="Save as Lilypond icon"></p>
 <pre><code>\version <span class="hljs-string">"2.18.2"</span>
 
