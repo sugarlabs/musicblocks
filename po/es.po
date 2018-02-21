@@ -967,7 +967,7 @@ msgstr "guardar en"
 #: js/basicblocks.js:2750
 #: js/blocks.js:2199
 msgid "store in box"
-msgstr "guardar en cada"
+msgstr "guardar en caja"
 
 #: js/palette.js:785
 #: js/blocks.js:1636

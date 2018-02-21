@@ -1223,7 +1223,7 @@ msgstr "imaña"
 #: js/palette.js:774
 #: js/basicblocks.js:2750
 #: js/blocks.js:2199
-#.TRANS: guardar en cada
+#.TRANS: guardar en caja
 msgid "store in box"
 msgstr ""
 
