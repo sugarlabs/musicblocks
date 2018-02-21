@@ -410,6 +410,7 @@ function Blocks () {
             that._sizeCounter = 0;
             var childFlowSize = 1;
             if (c > 0 && myBlock.connections[c] != null) {
+		this._sizeCounter = 0;
                 childFlowSize = Math.max(that._getStackSize(myBlock.connections[c]), 1);
             }
 
@@ -423,7 +424,6 @@ function Blocks () {
             }
 
             // Recurse through the list.
-            // (Removed timeout)
             if (that.clampBlocksToCheck.length > 0) {
                 that.adjustExpandableClampBlock();
             }
@@ -640,7 +640,7 @@ function Blocks () {
         }
 
         // check on any connected block
-        if (!myBlock.isValueBlock()) {
+        if (myBlock.connections.length > 1) {
             var cblk = last(myBlock.connections);
             if (cblk != null) {
                 size += this._getStackSize(cblk);
