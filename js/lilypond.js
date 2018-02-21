@@ -386,7 +386,7 @@ saveLilypondOutput = function(logo, saveName) {
 
     console.log('saving as lilypond: ' + turtleCount);
 
-    logo.notationOutput += '% You can change the MIDI instruments below to anything on logo list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n';
+    logo.notationOutput += '% You can change the MIDI instruments below to anything on this list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n';
 
     var c = 0;
     for (var t in logo.notationStaging) {
@@ -595,7 +595,7 @@ saveLilypondOutput = function(logo, saveName) {
 
     // ADD TURTLE BLOCKS CODE HERE
     logo.notationOutput += '% MUSIC BLOCKS CODE\n';
-    logo.notationOutput += '% Below is the code for the Music Blocks project that generated logo Lilypond file.\n%{\n\n';
+    logo.notationOutput += '% Below is the code for the Music Blocks project that generated this Lilypond file.\n%{\n\n';
     // prepareExport() returns json-encoded project data.
     var projectData = prepareExport();
     logo.notationOutput += projectData.replace(/]],/g, ']],\n');
