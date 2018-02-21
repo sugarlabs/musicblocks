@@ -8598,14 +8598,16 @@ function Logo () {
             case 'arg':
                 var cblk = that.blocks.blockList[blk].connections[1];
                 var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                var action_args=receivedArg
-                if (action_args.length >= Number(name)) {
-                    var value = action_args[Number(name)-1];
+                var action_args = receivedArg
+                if (action_args && action_args.length >= Number(name)) {
+                    var value = action_args[Number(name) - 1];
                     that.blocks.blockList[blk].value = value;
-                }else {
-                    that.errorMsg('Invalid argument',blk);
+                } else {
+                    that.errorMsg('Invalid argument', blk);
                     that.stopTurtle = true;
+                    return 0;
                 }
+
                 return that.blocks.blockList[blk].value;
                 break;
             case 'box':

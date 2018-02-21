@@ -1370,7 +1370,7 @@ function Blocks () {
         if ((myBlock.isArgBlock() || ['calcArg', 'namedcalcArg', 'makeblock'].indexOf(myBlock.name) !== -1) && newBlock != null) {
             // We care about twoarg blocks with connections to the
             // first arg;
-            console.log(newBlock);
+            // console.log(newBlock + ' ' + this.blockList[newBlock].name);
             if (this.blockList[newBlock].isTwoArgBlock()) {
                 if (this.blockList[newBlock].connections[1] === thisBlock) {
                     if (this._checkTwoArgBlocks.indexOf(newBlock) === -1) {
@@ -1755,12 +1755,19 @@ function Blocks () {
 
     this._blockInStack = function (thisBlock, names) {
         // Is there a block of any of these names in this stack?
+        var counter = 0;
         while (thisBlock != null) {
             if (names.indexOf(this.blockList[thisBlock].name) !== -1) {
                 return true;
             }
 
             thisBlock = last(this.blockList[thisBlock].connections);
+            counter += 1;
+            if (counter > this.blockList.length) {
+                console.log('infinite loop finding block name in stack');
+                console.log(names);
+                break;
+            }
         }
 
         return false;
