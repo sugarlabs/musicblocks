@@ -1761,11 +1761,16 @@ function Blocks () {
                 return true;
             }
 
-            thisBlock = last(this.blockList[thisBlock].connections);
+            if (this.blockList[thisBlock].connections.length > 1) {
+		thisBlock = last(this.blockList[thisBlock].connections);
+            } else {
+                thisBlock = null;
+	    }
+
+            // Just in case there is a loop in the block list.
             counter += 1;
             if (counter > this.blockList.length) {
                 console.log('infinite loop finding block name in stack');
-                console.log(names);
                 break;
             }
         }
