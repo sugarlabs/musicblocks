@@ -932,7 +932,7 @@ function Blocks () {
         } else {
             // Remove the Silence block from a Note block if another
             // block is inserted anywhere above the silence block.
-            if (thisBlockobj.connectons.length === 1) {
+            if (thisBlockobj && thisBlockobj.connections.length === 1) {
                 console.log('Value block encountered? ' + thisBlockobj.name);
                 return;
             }
@@ -962,7 +962,7 @@ function Blocks () {
             this._deletePitchBlocks(thisBlock);
             return this.blockList[thisBlock].connections[0];
         } else {
-            if (thisBlockobj.connectons.length === 1) {
+            if (thisBlockobj && thisBlockobj.connections.length === 1) {
                 console.log('Value block encountered? ' + thisBlockobj.name);
                 return;
             }
