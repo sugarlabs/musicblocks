@@ -873,6 +873,7 @@ function Blocks () {
             console.log('Silence block was not inside a note block');
         }
 
+        var counter = 0;
         while (true) {
             if (NOTEBLOCKS.indexOf(this.blockList[c].name) !== -1) {
                 break;
@@ -884,9 +885,21 @@ function Blocks () {
                 console.log('Silence block was not inside a note block');
                 break;
             }
+
+            counter += 1;
+            if (counter > this.blockList.length) {
+                console.log('Connection loop???');
+                break;
+            }
         }
 
+        counter = 0;
         while (thisBlock != null) {
+            if (this.blockList[thisBlock].connections.length < 2) {
+                console.log('value block encountered??? ' + thisBlock);
+                break;
+            }
+
             var nextBlock = last(this.blockList[thisBlock].connections);
             if (PITCHBLOCKS.indexOf(this.blockList[thisBlock].name) !== -1) {
                 this._extractBlock(thisBlock, false);
@@ -899,6 +912,12 @@ function Blocks () {
             }
 
             thisBlock = nextBlock;
+
+            counter += 1;
+            if (counter > this.blockList.length) {
+                console.log('Connection loop???');
+                break;
+            }
         }
     };
 
@@ -913,6 +932,11 @@ function Blocks () {
         } else {
             // Remove the Silence block from a Note block if another
             // block is inserted anywhere above the silence block.
+            if (thisBlockobj.connectons.length === 1) {
+                console.log('Value block encountered? ' + thisBlockobj.name);
+                return;
+            }
+
             while (last(thisBlockobj.connections) != null) {
                 var lastc = thisBlockobj.connections.length - 1;
                 var i = thisBlockobj.connections[lastc];
@@ -938,6 +962,11 @@ function Blocks () {
             this._deletePitchBlocks(thisBlock);
             return this.blockList[thisBlock].connections[0];
         } else {
+            if (thisBlockobj.connectons.length === 1) {
+                console.log('Value block encountered? ' + thisBlockobj.name);
+                return;
+            }
+
             while (thisBlockobj.connections[0] != null) {
                 var i = thisBlockobj.connections[0];
                 if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
