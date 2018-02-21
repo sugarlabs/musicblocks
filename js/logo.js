@@ -2881,11 +2881,19 @@ function Logo () {
                 var idx = Math.floor(args[0]);
                 if (idx < 1) {
                     that.errorMsg(_('Index must be > 0.'))
+                    idx = 1;
                 }
+
+                if (idx > 1000) {
+                    that.errorMsg(_('Maximum heap size is 1000.'))
+                    idx = 1000;
+		}
+
                 // If index > heap length, grow the heap.
                 while (that.turtleHeaps[turtle].length < idx) {
-                    that.turtleHeaps[turtle].push(null);
+		    that.turtleHeaps[turtle].push(0);
                 }
+
                 that.turtleHeaps[turtle][idx - 1] = args[1];
             }
             break;
@@ -9468,10 +9476,22 @@ function Logo () {
                 if (!(turtle in that.turtleHeaps)) {
                     that.turtleHeaps[turtle] = [];
                 }
+
+                if (a < 1) {
+                    a = 1;
+                    that.errorMsg(_('Index must be > 0.'))
+                }
+
+                if (a > 1000) {
+                    a = 1000;
+                    that.errorMsg(_('Maximum heap size is 1000.'))
+                }
+
                 // If index > heap length, grow the heap.
                 while (that.turtleHeaps[turtle].length < a) {
-                    that.turtleHeaps[turtle].push(null);
+                    that.turtleHeaps[turtle].push(0);
                 }
+
                 block.value = that.turtleHeaps[turtle][a - 1];
                 break;
             case 'heapLength':
