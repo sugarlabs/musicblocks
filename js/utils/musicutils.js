@@ -1215,23 +1215,19 @@ function durationToNoteValue(duration) {
         roundDown = 128;
     }
 
-    /*
-    // Next, see if the note has a factor of 2.
-    var factorOfTwo = 1;
-    var tupletValue = duration;
-    while (Math.floor(tupletValue / 2) * 2 === tupletValue) {
-        factorOfTwo *= 2;
-        tupletValue /= 2;
+    // Convert duration into parts based on POW2 factors
+    // e.g., 1 / 6 ==> [3, 2], 1 / 12 ==> [3, 4]
+    var i = 1;
+    while (Math.floor(duration / i) * i === duration) {
+        i = i * 2;
+        if (i > duration / 2) {
+            break;
+        }
     }
 
-    if (factorOfTwo > 1) {
-        // We have a tuplet of sorts
-        return [duration, 0, tupletValue, roundDown];
-    }
-    */
+    i = i / 2;
 
-    // Next, generate a fauve tuplet for a singleton.
-    return [1, 0, duration, roundDown];
+    return [1, 0, [duration / i, i], roundDown];
 };
 
 
@@ -1597,6 +1593,10 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
     var rememberFlat = false;
     var rememberSharp = false;    
 
+    if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
+        return ['R', ''];
+    }
+
     octave = Math.round(octave);
 
     if (transposition == undefined) {
@@ -1751,9 +1751,7 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
             }
         }
 
-        if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
-            return ['R', ''];
-        } else if (halfSteps.indexOf(solfegePart) !== -1) {
+        if (halfSteps.indexOf(solfegePart) !== -1) {
             var index = halfSteps.indexOf(solfegePart) + offset;
             if (index > 11) {
                 index -= 12;

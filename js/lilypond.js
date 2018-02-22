@@ -182,15 +182,22 @@ processLilypondNotes = function (logo, turtle) {
 
             var note = __toLilynote(obj[NOTATIONNOTE]);
             var incompleteTuplet = 0;  // An incomplete tuplet
+            var tupletFactor = null;
 
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
             if (obj[NOTATIONTUPLETVALUE] != null) {
                 targetDuration = (1 / logo.notationStaging[turtle][i][NOTATIONDURATION]);
                 tupletDuration = (1 / logo.notationStaging[turtle][i][NOTATIONROUNDDOWN]);
+                if (tupletFactor === null) {
+                    tupletFactor = obj[NOTATIONTUPLETVALUE][1];
+                } else if (obj[NOTATIONTUPLETVALUE][1] < tupletFactor) {
+                    tupletFactor = obj[NOTATIONTUPLETVALUE][1];
+                }
+
                 var j = 1;
                 var k = 1;
-                while (k < obj[NOTATIONTUPLETVALUE]) {
+                while (k < (obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1])) {
                     if (i + j >= logo.notationStaging[turtle].length) {
                         incompleteTuplet = j;
                         break;
@@ -199,7 +206,11 @@ processLilypondNotes = function (logo, turtle) {
                     if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 && logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] === logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]) {
                         // In a chord, so jump to next note.
                         j++;
-                    } else if (logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE] !== obj[NOTATIONTUPLETVALUE]) {
+                    } else if (logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE] === null) {
+                        incompleteTuplet = j;
+                        break;
+                    } else if (logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE][0] !== obj[NOTATIONTUPLETVALUE][0]) {
+                        // Match if sharing same factor, e.g., 1/3, 1/6, 1/12
                         incompleteTuplet = j;
                         break;
                     } else {
@@ -219,7 +230,7 @@ processLilypondNotes = function (logo, turtle) {
                     var tupletDuration = 2 * logo.notationStaging[turtle][i + j][NOTATIONDURATION];
                     // Are we in a chord?
                     if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0) {
-                        // Is logo the first note in the chord?
+                        // Is this the first note in the chord?
                         if ((i === 0 && j === 0) || logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD] !== logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD]) {
                             logo.notationNotes[turtle] += '<';
                         }
@@ -231,11 +242,12 @@ processLilypondNotes = function (logo, turtle) {
 
                         logo.notationNotes[turtle] += ' ';
 
-                        // Is logo the last note in the chord?
+                        // Is this the last note in the chord?
                         if (i + j === logo.notationStaging[turtle].length - 1 || logo.notationStaging[turtle][i + j + 1][NOTATIONINSIDECHORD] !== logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD]) {
                             logo.notationNotes[turtle] += '>' + logo.notationStaging[turtle][i + j + 1][NOTATIONROUNDDOWN] + ' ';
                             k++;  // Increment notes in tuplet.
                         }
+
                         j++;
                     } else {
                         logo.notationNotes[turtle] += __toLilynote(logo.notationStaging[turtle][i + j][NOTATIONNOTE]) + logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
@@ -273,7 +285,7 @@ processLilypondNotes = function (logo, turtle) {
                 return j;
             };
 
-            if (obj[NOTATIONTUPLETVALUE] > 0) {
+            if (obj[NOTATIONTUPLETVALUE] != null && (obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]) > 0) {
                 // lilypond tuplets look like logo: \tuplet 3/2 { f8 g a }
                 // multiplier = tupletDuration / targetDuration
                 // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
@@ -292,9 +304,10 @@ processLilypondNotes = function (logo, turtle) {
 
                     logo.notationNotes[turtle] += '\\tuplet ' + a + '/' + b + ' { ';
 
-                    i += __processTuplet(logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
+                    i += __processTuplet(logo, turtle, i, obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]) - 1;
                 } else {
-                    var tupletFraction = toFraction(obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
+                    var tupletFraction = toFraction((obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]) / incompleteTuplet);
+                    tupletFraction[1] *= tupletFactor;
                     logo.notationNotes[turtle] += '\\tuplet ' + tupletFraction[0] + '/' + tupletFraction[1] + ' { ';
 
                     i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
@@ -304,7 +317,7 @@ processLilypondNotes = function (logo, turtle) {
                 tupletDuration = 0;
             } else {
                 if (obj[NOTATIONINSIDECHORD] > 0) {
-                    // Is logo the first note in the chord?
+                    // Is this the first note in the chord?
                     if (i === 0 || logo.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]) {
                         // Open the chord.
                         logo.notationNotes[turtle] += '<';
@@ -312,7 +325,7 @@ processLilypondNotes = function (logo, turtle) {
 
                     logo.notationNotes[turtle] += (note);
 
-                    // Is logo the last note in the chord?
+                    // Is this the last note in the chord?
                     if (i === logo.notationStaging[turtle].length - 1 || logo.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]) {
                         // Close the chord and add note duration.
                         logo.notationNotes[turtle] += '>';
