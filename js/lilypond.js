@@ -183,25 +183,25 @@ processLilypondNotes = function (logo, turtle) {
             var note = __toLilynote(obj[NOTATIONNOTE]);
             var incompleteTuplet = 0;  // An incomplete tuplet
             var tupletFactor = null;
-            var tupletLength = 0;
-            var shortNote = null;
-            var counter = 0;
+	    var totalTupletDuration = 0;
+            var commonTupletNote = null;
+            var tupletNoteCounter = 0;
 
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
             if (obj[NOTATIONTUPLETVALUE] != null) {
                 targetDuration = (1 / logo.notationStaging[turtle][i][NOTATIONDURATION]);
                 tupletDuration = (1 / logo.notationStaging[turtle][i][NOTATIONROUNDDOWN]);
-                tupletLength = 1 / (obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]);
+                totalTupletDuration = 1 / (obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]);
 
-                if (shortNote === null) {
-                    shortNote = obj[NOTATIONROUNDDOWN];
-		    var counter = 1;
-                } else if (obj[NOTATIONROUNDDOWN] > shortNote) {
-                    var f = obj[NOTATIONROUNDDOWN] / shortNote;
-                    shortNote = obj[NOTATIONROUNDDOWN];
-                    counter *= f;
-                    counter += 1;
+                if (commonTupletNote === null) {
+                    commonTupletNote = obj[NOTATIONROUNDDOWN];
+		    var tupletNoteCounter = 1;
+                } else if (obj[NOTATIONROUNDDOWN] > commonTupletNote) {
+                    var f = obj[NOTATIONROUNDDOWN] / commonTupletNote;
+                    commonTupletNote = obj[NOTATIONROUNDDOWN];
+                    tupletNoteCounter *= f;
+                    tupletNoteCounter += 1;
                 }
 
                 if (tupletFactor === null) {
@@ -221,7 +221,7 @@ processLilypondNotes = function (logo, turtle) {
                     if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 && logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] === logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]) {
                         // In a chord, so jump to next note.
                         j++;
-                    } else if ([1, 0.5, 0.25, 0.125, 0.0625].indexOf(tupletLength) !== -1) {
+                    } else if ([1, 0.5, 0.25, 0.125, 0.0625].indexOf(totalTupletDuration) !== -1) {
                         // Break up tuplet on POW2 values
                         incompleteTuplet = j;
                         break;
@@ -233,22 +233,22 @@ processLilypondNotes = function (logo, turtle) {
                         incompleteTuplet = j;
                         break;
                     } else {
-			if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] > shortNote) {
-			    var f = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] / shortNote;
-			    shortNote = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
-			    counter *= f;
-			    counter += 1;
-			} else if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] < shortNote) {
-			    var f = shortNote / logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
-			    counter += f;
+			if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] > commonTupletNote) {
+			    var f = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] / commonTupletNote;
+			    commonTupletNote = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+			    tupletNoteCounter *= f;
+			    tupletNoteCounter += 1;
+			} else if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] < commonTupletNote) {
+			    var f = commonTupletNote / logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+			    tupletNoteCounter += f;
 			} else {
-                            counter += 1;
+                            tupletNoteCounter += 1;
                         }
 
                         targetDuration += (1 / logo.notationStaging[turtle][i + j][NOTATIONDURATION]);
                         tupletDuration += (1 / logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN]);
 
-                        tupletLength += (1 / (logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE][0] * logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE][1]));
+                        totalTupletDuration += (1 / (logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE][0] * logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE][1]));
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
@@ -343,7 +343,7 @@ processLilypondNotes = function (logo, turtle) {
                     // duration = 1/6 + 1/12 ==> 1/4
                     // 3 x 1/8 note in the time of a 1/4 note ==> 3/8 / 1/4 = 3/2
 
-                    var f = (counter / shortNote) / tupletLength;
+                    var f = (tupletNoteCounter / commonTupletNote) / totalTupletDuration;
                     var tupletFraction = toFraction(f);
                     var a = tupletFraction[0];
                     var b = tupletFraction[1];
