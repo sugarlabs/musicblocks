@@ -183,12 +183,27 @@ processLilypondNotes = function (logo, turtle) {
             var note = __toLilynote(obj[NOTATIONNOTE]);
             var incompleteTuplet = 0;  // An incomplete tuplet
             var tupletFactor = null;
+            var tupletLength = 0;
+            var shortNote = null;
+            var counter = 0;
 
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
             if (obj[NOTATIONTUPLETVALUE] != null) {
                 targetDuration = (1 / logo.notationStaging[turtle][i][NOTATIONDURATION]);
                 tupletDuration = (1 / logo.notationStaging[turtle][i][NOTATIONROUNDDOWN]);
+                tupletLength = 1 / (obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]);
+
+                if (shortNote === null) {
+                    shortNote = obj[NOTATIONROUNDDOWN];
+		    var counter = 1;
+                } else if (obj[NOTATIONROUNDDOWN] > shortNote) {
+                    var f = obj[NOTATIONROUNDDOWN] / shortNote;
+                    shortNote = obj[NOTATIONROUNDDOWN];
+                    counter *= f;
+                    counter += 1;
+                }
+
                 if (tupletFactor === null) {
                     tupletFactor = obj[NOTATIONTUPLETVALUE][1];
                 } else if (obj[NOTATIONTUPLETVALUE][1] < tupletFactor) {
@@ -206,6 +221,10 @@ processLilypondNotes = function (logo, turtle) {
                     if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 && logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] === logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]) {
                         // In a chord, so jump to next note.
                         j++;
+                    } else if ([1, 0.5, 0.25, 0.125, 0.0625].indexOf(tupletLength) !== -1) {
+                        // Break up tuplet on POW2 values
+                        incompleteTuplet = j;
+                        break;
                     } else if (logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE] === null) {
                         incompleteTuplet = j;
                         break;
@@ -214,8 +233,22 @@ processLilypondNotes = function (logo, turtle) {
                         incompleteTuplet = j;
                         break;
                     } else {
+			if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] > shortNote) {
+			    var f = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] / shortNote;
+			    shortNote = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+			    counter *= f;
+			    counter += 1;
+			} else if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] < shortNote) {
+			    var f = shortNote / logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+			    counter += f;
+			} else {
+                            counter += 1;
+                        }
+
                         targetDuration += (1 / logo.notationStaging[turtle][i + j][NOTATIONDURATION]);
                         tupletDuration += (1 / logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN]);
+
+                        tupletLength += (1 / (logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE][0] * logo.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE][1]));
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
@@ -286,10 +319,9 @@ processLilypondNotes = function (logo, turtle) {
             };
 
             if (obj[NOTATIONTUPLETVALUE] != null && (obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]) > 0) {
-                // lilypond tuplets look like logo: \tuplet 3/2 { f8 g a }
+                // Lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
                 // multiplier = tupletDuration / targetDuration
                 // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
-                // There may be chords embedded.
 
                 if (incompleteTuplet === 0) {
                     var tupletFraction = toFraction(tupletDuration / targetDuration);
@@ -306,9 +338,22 @@ processLilypondNotes = function (logo, turtle) {
 
                     i += __processTuplet(logo, turtle, i, obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]) - 1;
                 } else {
-                    var tupletFraction = toFraction((obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1]) / incompleteTuplet);
-                    tupletFraction[1] *= tupletFactor;
-                    logo.notationNotes[turtle] += '\\tuplet ' + tupletFraction[0] + '/' + tupletFraction[1] + ' { ';
+                    // Incomplete tuplets look like this: \tuplet 3/2 { f4 a8 }
+                    // for 1/6 1/12
+                    // duration = 1/6 + 1/12 ==> 1/4
+                    // 3 x 1/8 note in the time of a 1/4 note ==> 3/8 / 1/4 = 3/2
+
+                    var f = (counter / shortNote) / tupletLength;
+                    var tupletFraction = toFraction(f);
+                    var a = tupletFraction[0];
+                    var b = tupletFraction[1];
+                    if (Math.floor(a) !== a) {
+                        var c = toFraction(a / 1);
+                        a = c[0];
+                        b = c[1];
+                    }
+
+                    logo.notationNotes[turtle] += '\\tuplet ' + a + '/' + b + ' { ';
 
                     i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
                 }
