@@ -276,6 +276,7 @@ function Logo () {
     this.notationDrumStaging = {};
     this.notationOutput = '';
     this.notationNotes = {};
+    this.pickupPOW2 = {};
     this.pickupPoint = {};
     this.runningLilypond = false;
     this.runningAbc = false;
@@ -1110,6 +1111,7 @@ function Logo () {
             this.notationStaging[turtle] = [];
             this.notationDrumStaging[turtle] = [];
             this.pickupPoint[turtle] = null;
+            this.pickupPOW2[turtle] = false;
             this.firstPitch[turtle] = [];
             this.lastPitch[turtle] = [];
             this.pitchNumberOffset[turtle] = 39; // C4
@@ -10162,7 +10164,43 @@ function Logo () {
     };
 
     this.updateNotation = function (note, duration, turtle, insideChord, drum) {
+        console.log(note + ' ' + duration + ' ' + insideChord);
+
+        // Check to see if this note straddles a measure boundary.
+        if (this.pickupPOW2[turtle]) {
+            var a = this.notesPlayed[turtle] - this.pickup[turtle];
+        } else {
+            var a = this.notesPlayed[turtle] + (1 - this.pickup[turtle]);
+        }
+
+        var b = this.noteValuePerBeat[turtle] / this.beatsPerMeasure[turtle];
+        var c = a * b;
+        var measureValue = Math.floor(a * b) + 1;
+        var d = (a * b) + 1 - measureValue;
+        
+        // console.log(a.toFixed(3) + '\t' + b.toFixed(3) + '\t' + c.toFixed(3) + '\t' + measureValue + '\t[' + d.toFixed(3) + ']\t' + duration + '\t' + this.pickupPOW2[turtle]);
+
+        // If the note won't fit in this measure, split it in two with
+        // a tie.
+        // FIXME: won't work with chords.
+        if (insideChord === -1 && d > 0 && duration > 0 && 1 / duration > d) {
+            console.log('Houston, we have a problem');
+            var d2 = (1 / duration) - d;
+	    var obj = rationalToFraction(d);
+	    var obj2 = rationalToFraction(d2);
+            console.log(obj[0] + '/' + obj[1] + ' ' + obj2[0] + '/' + obj2[1]);
+            this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum);
+            this.notesPlayed[turtle] += d2;
+	    this.notationInsertTie(turtle);
+            this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum);
+            this.notesPlayed[turtle] -= d2;
+            console.log(this.notationStaging[turtle]);
+            return;
+        }
+
+        // Otherwise proceed as normal.
         var obj = durationToNoteValue(duration);
+
         // Deprecated
         if (this.turtles.turtleList[turtle].drum) {
             note = 'c2';
@@ -10249,8 +10287,6 @@ function Logo () {
             for (var i = 0; i < d; i++) {
                 this.notationStaging[turtle].push(pickup.pop());
             }
-
-
         } else {
             this.notationStaging[turtle].push('meter', count, value);
         }
@@ -10285,6 +10321,7 @@ function Logo () {
         var beat = convertFactor(factor);
         if (beat !== null) {
             this.notationStaging[turtle].push('pickup', beat);
+            this.pickupPOW2[turtle] = true;
         } else {
             if (this.runningLilypond) {
                 obj = rationalToFraction(factor);

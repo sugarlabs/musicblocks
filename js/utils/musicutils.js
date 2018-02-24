@@ -1954,7 +1954,7 @@ convertFactor = function (factor) {
 
 modeMapper = function (key, mode) {
     // map common modes into their major/minor equivalent
-    console.log(key + ' ' + mode + ' >>');
+    // console.log(key + ' ' + mode + ' >>');
     key = key.toLowerCase();
     mode = mode.toLowerCase();
 
@@ -2334,6 +2334,6 @@ modeMapper = function (key, mode) {
         break;
     }
 
-    console.log('>> ' + key + ' ' + mode);
+    // console.log('>> ' + key + ' ' + mode);
     return [key, mode];
 };

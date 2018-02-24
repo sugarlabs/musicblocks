@@ -221,6 +221,9 @@ processLilypondNotes = function (logo, turtle) {
                     if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 && logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] === logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]) {
                         // In a chord, so jump to next note.
                         j++;
+                    } else if (logo.notationStaging[turtle][i + j] === 'tie') {
+                        console.log('saw a tie');
+                        j++;
                     } else if ([1, 0.5, 0.25, 0.125, 0.0625].indexOf(totalTupletDuration) !== -1) {
                         // Break up tuplet on POW2 values
                         incompleteTuplet = j;
@@ -283,7 +286,12 @@ processLilypondNotes = function (logo, turtle) {
 
                         j++;
                     } else {
-                        logo.notationNotes[turtle] += __toLilynote(logo.notationStaging[turtle][i + j][NOTATIONNOTE]) + logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+                        if (logo.notationStaging[turtle][i + j] === 'tie') {
+                            logo.notationNotes[turtle] += '~';
+                        } else {
+                            logo.notationNotes[turtle] += __toLilynote(logo.notationStaging[turtle][i + j][NOTATIONNOTE]) + logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+			}
+
                         if (obj[NOTATIONSTACCATO]) {
                             logo.notationNotes[turtle] += '\\staccato';
                         }
