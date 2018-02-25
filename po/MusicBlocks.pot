@@ -892,7 +892,7 @@ msgid "Lilypond cannot process tempo of "
 msgstr ""
 
 #: js/logo.js:10269
-msgid "Lilypond cannot process partial of "
+msgid "Lilypond cannot process pickup of "
 msgstr ""
 
 #: js/clearbox.js:70

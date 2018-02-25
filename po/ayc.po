@@ -1147,8 +1147,8 @@ msgid "Lilypond cannot process tempo of "
 msgstr ""
 
 #: js/logo.js:10269
-#.TRANS: Lilypond no puede procesar parte de 
-msgid "Lilypond cannot process partial of "
+#.TRANS: Lilypond no puede procesar pickup de 
+msgid "Lilypond cannot process pickup of "
 msgstr ""
 
 #: js/clearbox.js:70

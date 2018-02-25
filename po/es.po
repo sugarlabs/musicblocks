@@ -901,7 +901,7 @@ msgstr "Lilypond no puede procesar tempo de "
 
 #: js/logo.js:10269
 msgid "Lilypond cannot process partial of "
-msgstr "Lilypond no puede procesar parte de "
+msgstr "Lilypond no puede procesar pickup de "
 
 #: js/clearbox.js:70
 msgid "confirm"
