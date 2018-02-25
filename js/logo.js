@@ -36,7 +36,7 @@ const NOTATIONDURATION = 1;
 const NOTATIONDOTCOUNT = 2;
 const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
-const NOTATIONINSIDECHORD = 5;
+const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
 
 function Logo () {
@@ -7151,6 +7151,8 @@ function Logo () {
                 this.skipIndex[turtle] += 1;
             }
 
+            var chordNotes = [];
+            var chordDrums = [];
             var that = this;
             __playnote = function () {
                 var thisBlk = last(that.inNoteBlock[turtle]);
@@ -7289,23 +7291,51 @@ function Logo () {
 
                             if (that.justCounting[turtle].length === 0) {
                                 if (that.noteDrums[turtle][thisBlk].length > 0) {
-                                    that.updateNotation(note, originalDuration, turtle, insideChord, that.noteDrums[turtle][thisBlk][0]);
+                                    if (chordNotes.indexOf(note) === -1) {
+                                        chordNotes.push(note);
+                                    }
+
+                                    if (chordDrums.indexOf(that.noteDrums[turtle][thisBlk][0]) === -1) {
+                                        chordDrums.push(that.noteDrums[turtle][thisBlk][0]);
+                                    }
                                 } else {
                                     if (courtesy[i]) {
-                                        that.updateNotation(note + '♮', originalDuration, turtle, insideChord, '');
+                                        if (chordNotes.indexOf(note + '♮') === -1) {
+                                            chordNotes.push(note + '♮');
+                                        }
                                     } else {
-                                        that.updateNotation(note, originalDuration, turtle, insideChord, '');
+                                        if (chordNotes.indexOf(note) === -1) {
+                                            chordNotes.push(note);
+                                        }
                                     }
                                 }
                             }
                         } else if (that.tieCarryOver[turtle] > 0) {
                             if (that.justCounting[turtle].length === 0) {
                                 if (courtesy[i]) {
-                                    that.updateNotation(note, that.tieCarryOver[turtle], turtle, insideChord, '');
+                                    if (chordNotes.indexOf(note) === -1) {
+                                        chordNotes.push(note);
+                                    }
                                 } else {
-                                    that.updateNotation(note + '♮', that.tieCarryOver[turtle], turtle, insideChord, '');
+                                    if (chordNotes.indexOf(note) === -1) {
+                                        chordNotes.push(note);
+                                    }
                                 }
                             }
+                        }
+
+                        if (i === that.notePitches[turtle][thisBlk].length - 1) {
+                            if (duration > 0) {
+                                if (carry > 0) {
+                                    var d = 1 / ((1 / duration) - (1 / carry));
+                                } else {
+                                    var d = duration;
+                                }
+                            } else if (that.tieCarryOver[turtle] > 0) {
+                                var d = that.tieCarryOver[turtle];
+                            }
+
+                            that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                         }
                     }
 
@@ -10164,8 +10194,6 @@ function Logo () {
     };
 
     this.updateNotation = function (note, duration, turtle, insideChord, drum) {
-        console.log(note + ' ' + duration + ' ' + insideChord);
-
         // Check to see if this note straddles a measure boundary.
         if (this.pickupPOW2[turtle]) {
             var a = this.notesPlayed[turtle] - this.pickup[turtle];
@@ -10178,23 +10206,21 @@ function Logo () {
         var measureValue = Math.floor(a * b) + 1;
         var d = (a * b) + 1 - measureValue;
         
-        // console.log(a.toFixed(3) + '\t' + b.toFixed(3) + '\t' + c.toFixed(3) + '\t' + measureValue + '\t[' + d.toFixed(3) + ']\t' + duration + '\t' + this.pickupPOW2[turtle]);
-
-        // If the note won't fit in this measure, split it in two with
-        // a tie.
-        // FIXME: won't work with chords.
-        if (insideChord === -1 && d > 0 && duration > 0 && 1 / duration > d) {
-            console.log('Houston, we have a problem');
+        // If the note won't fit in this measure, split it with a tie.
+        if (d > 0 && duration > 0 && 1 / duration > d) {
+            console.log('splitting note across measure boundary.');
             var d2 = (1 / duration) - d;
-	    var obj = rationalToFraction(d);
-	    var obj2 = rationalToFraction(d2);
-            console.log(obj[0] + '/' + obj[1] + ' ' + obj2[0] + '/' + obj2[1]);
-            this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum);
+            var obj = rationalToFraction(d);
+            var obj2 = rationalToFraction(d2);
+            if (obj2[0] > 0) {
+                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum);
+                this.notationInsertTie(turtle);
+            }
+
             this.notesPlayed[turtle] += d2;
-	    this.notationInsertTie(turtle);
             this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum);
             this.notesPlayed[turtle] -= d2;
-            console.log(this.notationStaging[turtle]);
+
             return;
         }
 
@@ -10210,11 +10236,11 @@ function Logo () {
 
         // If no drum is specified, add a rest to the drum
         // line. Otherwise, add the drum.
-        if (drum === '') {
-            this.notationDrumStaging[turtle].push(['R', obj[0], obj[1], obj[2], obj[3], insideChord, false]);
+        if (drum.length === 0) {
+            this.notationDrumStaging[turtle].push([['R'], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
         } else {
-            var drumSymbol = getDrumSymbol(drum);
-            this.notationDrumStaging[turtle].push([drumSymbol, obj[0], obj[1], obj[2], obj[3], insideChord, false]);
+            var drumSymbol = getDrumSymbol(drum[0]);
+            this.notationDrumStaging[turtle].push([[drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
         }
 
         this.pickupPoint[turtle] = null;
@@ -10310,13 +10336,13 @@ function Logo () {
 
     this.notationPickup = function (turtle, factor) {
         if (factor === 0) {
-            console.log('ignoring partial of 0');
+            console.log('ignoring pickup of 0');
             return;
         }
 
         var pickupPoint = this.notationStaging[turtle].length;
 
-        // partial must be a combination of powers of two
+        // Lilypond partial must be a combination of powers of two.
         var partial =  1 / factor;
         var beat = convertFactor(factor);
         if (beat !== null) {
@@ -10325,12 +10351,12 @@ function Logo () {
         } else {
             if (this.runningLilypond) {
                 obj = rationalToFraction(factor);
-                this.errorMsg(_('Lilypond cannot process partial of ') + obj[0] + '/' + obj[1]);
+                this.errorMsg(_('Lilypond cannot process pickup of ') + obj[0] + '/' + obj[1]);
             }
 
             obj = rationalToFraction(1 - factor);
             for (var i = 0; i < obj[0]; i++) {
-                this.updateNotation('R', obj[1], turtle, false, '');
+                this.updateNotation(['R'], obj[1], turtle, false, '');
             }
         }
 

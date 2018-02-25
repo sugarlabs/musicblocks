@@ -180,10 +180,16 @@ processLilypondNotes = function (logo, turtle) {
 
             noteCounter += 1;
 
-            var note = __toLilynote(obj[NOTATIONNOTE]);
+            if (typeof(obj[NOTATIONNOTE]) === 'string') {
+                var note = __toLilynote(obj[NOTATIONNOTE]);
+            } else {
+                var notes = obj[NOTATIONNOTE];
+                var note = __toLilynote(notes[0]);
+            }
+
             var incompleteTuplet = 0;  // An incomplete tuplet
             var tupletFactor = null;
-	    var totalTupletDuration = 0;
+            var totalTupletDuration = 0;
             var commonTupletNote = null;
             var tupletNoteCounter = 0;
 
@@ -196,7 +202,7 @@ processLilypondNotes = function (logo, turtle) {
 
                 if (commonTupletNote === null) {
                     commonTupletNote = obj[NOTATIONROUNDDOWN];
-		    var tupletNoteCounter = 1;
+                    var tupletNoteCounter = 1;
                 } else if (obj[NOTATIONROUNDDOWN] > commonTupletNote) {
                     var f = obj[NOTATIONROUNDDOWN] / commonTupletNote;
                     commonTupletNote = obj[NOTATIONROUNDDOWN];
@@ -218,11 +224,9 @@ processLilypondNotes = function (logo, turtle) {
                         break;
                     }
 
-                    if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 && logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] === logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]) {
-                        // In a chord, so jump to next note.
-                        j++;
-                    } else if (logo.notationStaging[turtle][i + j] === 'tie') {
+                    if (logo.notationStaging[turtle][i + j] === 'tie') {
                         console.log('saw a tie');
+                        k++;  // Increment notes in tuplet.
                         j++;
                     } else if ([1, 0.5, 0.25, 0.125, 0.0625].indexOf(totalTupletDuration) !== -1) {
                         // Break up tuplet on POW2 values
@@ -236,15 +240,15 @@ processLilypondNotes = function (logo, turtle) {
                         incompleteTuplet = j;
                         break;
                     } else {
-			if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] > commonTupletNote) {
-			    var f = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] / commonTupletNote;
-			    commonTupletNote = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
-			    tupletNoteCounter *= f;
-			    tupletNoteCounter += 1;
-			} else if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] < commonTupletNote) {
-			    var f = commonTupletNote / logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
-			    tupletNoteCounter += f;
-			} else {
+                        if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] > commonTupletNote) {
+                            var f = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] / commonTupletNote;
+                            commonTupletNote = logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+                            tupletNoteCounter *= f;
+                            tupletNoteCounter += 1;
+                        } else if (logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN] < commonTupletNote) {
+                            var f = commonTupletNote / logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+                            tupletNoteCounter += f;
+                        } else {
                             tupletNoteCounter += 1;
                         }
 
@@ -264,39 +268,36 @@ processLilypondNotes = function (logo, turtle) {
 
                 while (k < count) {
                     var tupletDuration = 2 * logo.notationStaging[turtle][i + j][NOTATIONDURATION];
-                    // Are we in a chord?
-                    if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0) {
-                        // Is this the first note in the chord?
-                        if ((i === 0 && j === 0) || logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD] !== logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD]) {
+
+                    var notes = logo.notationStaging[turtle][i + j][NOTATIONNOTE];
+                    if (typeof(notes) === 'object') {
+                        if (notes.length > 1) {
                             logo.notationNotes[turtle] += '<';
                         }
 
-                        logo.notationNotes[turtle] += __toLilynote(logo.notationStaging[turtle][i + j][NOTATIONNOTE]);
+                        for (ii = 0; ii < notes.length; ii++) {
+                            logo.notationNotes[turtle] += __toLilynote(notes[ii]);
+                            logo.notationNotes[turtle] += ' ';
+                        }
+
                         if (obj[NOTATIONSTACCATO]) {
                             logo.notationNotes[turtle] += '\\staccato';
                         }
 
-                        logo.notationNotes[turtle] += ' ';
-
-                        // Is this the last note in the chord?
-                        if (i + j === logo.notationStaging[turtle].length - 1 || logo.notationStaging[turtle][i + j + 1][NOTATIONINSIDECHORD] !== logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD]) {
-                            logo.notationNotes[turtle] += '>' + logo.notationStaging[turtle][i + j + 1][NOTATIONROUNDDOWN] + ' ';
-                            k++;  // Increment notes in tuplet.
+                        if (notes.length > 1) {
+                            logo.notationNotes[turtle] += '>';
                         }
 
-                        j++;
+                        logo.notationNotes[turtle] += logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+                        j++;  // Jump to next note.
+                        k++;  // Increment notes in tuplet.
+                    } else if (logo.notationStaging[turtle][i + j] === 'tie') {
+                        console.log('adding a tie');
+                        logo.notationNotes[turtle] += '~';
+                        j++;  // Jump to next note.
+                        k++;  // Increment notes in tuplet.
                     } else {
-                        if (logo.notationStaging[turtle][i + j] === 'tie') {
-                            logo.notationNotes[turtle] += '~';
-                        } else {
-                            logo.notationNotes[turtle] += __toLilynote(logo.notationStaging[turtle][i + j][NOTATIONNOTE]) + logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
-			}
-
-                        if (obj[NOTATIONSTACCATO]) {
-                            logo.notationNotes[turtle] += '\\staccato';
-                        }
-
-                        logo.notationNotes[turtle] += ' ';
+                        console.log('ignoring ' + notes);
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
@@ -369,32 +370,21 @@ processLilypondNotes = function (logo, turtle) {
                 targetDuration = 0;
                 tupletDuration = 0;
             } else {
-                if (obj[NOTATIONINSIDECHORD] > 0) {
-                    // Is this the first note in the chord?
-                    if (i === 0 || logo.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]) {
-                        // Open the chord.
+                if (typeof(notes) === 'object') {
+                    if (notes.length > 1) {
                         logo.notationNotes[turtle] += '<';
                     }
 
-                    logo.notationNotes[turtle] += (note);
-
-                    // Is this the last note in the chord?
-                    if (i === logo.notationStaging[turtle].length - 1 || logo.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]) {
-                        // Close the chord and add note duration.
-                        logo.notationNotes[turtle] += '>';
-                        logo.notationNotes[turtle] += obj[NOTATIONDURATION];
-                        for (var d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                            logo.notationNotes[turtle] += '.';
-                        }
-
-                        if (articulation) {
-                            logo.notationNotes[turtle] += '->';
-                        }
-
+                    for (ii = 0; ii < notes.length; ii++) {
+                        logo.notationNotes[turtle] += __toLilynote(notes[ii]);
                         logo.notationNotes[turtle] += ' ';
                     }
-                } else {
-                    logo.notationNotes[turtle] += (note + obj[NOTATIONDURATION]);
+
+                    if (notes.length > 1) {
+                        logo.notationNotes[turtle] += '>';
+                    }
+
+                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
                     for (var d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         logo.notationNotes[turtle] += '.';
                     }
@@ -402,6 +392,8 @@ processLilypondNotes = function (logo, turtle) {
                     if (articulation) {
                         logo.notationNotes[turtle] += '->';
                     }
+
+                    logo.notationNotes[turtle] += ' ';
                 }
 
                 if (obj[NOTATIONSTACCATO]) {
@@ -437,7 +429,7 @@ saveLilypondOutput = function(logo, saveName) {
         var foundNotes = false;
         for (var i = 0; i < logo.notationDrumStaging[t].length; i++) {
             var obj = logo.notationDrumStaging[t][i];
-            if (typeof(obj) !== 'string' && obj[0] !== 'R') {
+            if (typeof(obj) !== 'string' && obj[0] !== ['R']) {
                 foundNotes = true;
             }
         }
@@ -468,15 +460,16 @@ saveLilypondOutput = function(logo, saveName) {
             for (var i = 0; i < logo.notationStaging[t].length; i++) {
                 var obj = logo.notationStaging[t][i];
                 if (typeof(obj) === 'object') {
-                    if (obj[0].length < 2) {
-                        // Test for rests
-                    } else {
-                        if (typeof(obj[0]) === 'string') {
-                            octaveTotal += Number(obj[0].substr(-1));
+                    for (var ii = 0; ii < obj[0].length; ii++) {
+                        if (obj[0][ii] === 'R') {
+                            continue;
+                        } else if (typeof(obj[0][ii]) === 'string') {
+                            octaveTotal += Number(obj[0][ii].substr(-1));
                         } else {
-                            var pitchObj = frequencyToPitch(obj[0]);
+                            var pitchObj = frequencyToPitch(obj[0][ii]);
                             octaveTotal += pitchObj[1];
                         }
+
                         noteCount += 1;
                     }
                 }
