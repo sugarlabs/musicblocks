@@ -10215,6 +10215,7 @@ function Logo () {
             if (obj2[0] > 0) {
                 this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum);
                 this.notationInsertTie(turtle);
+                this.notationDrumStaging[turtle].push('tie');
             }
 
             this.notesPlayed[turtle] += d2;
