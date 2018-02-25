@@ -1184,10 +1184,6 @@ function RhythmRuler () {
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
         cell.onclick = function () {
             that._save(0);
-        };
-
-        var cell = this._addButton(row, 'export-tuplets.svg', iconSize, _('save tuplets'), '');
-        cell.onclick = function () {
             that._saveTuplets(0);
         };
 
