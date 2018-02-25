@@ -974,6 +974,64 @@ function RhythmRuler () {
         }, 500);
     };
 
+    this._saveTuplets = function(selectedRuler) {
+        var that = this;
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        this._logo.refreshCanvas();
+        setTimeout( function() {
+            var ruler = docById('ruler' + selectedRuler);
+            var noteValues = that.Rulers[selectedRuler][0];
+            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('rhythm');
+            var delta = selectedRuler * 42;
+            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
+            var previousBlock = 0;
+            var sameNoteValue = 1;
+            for (var i = 0; i < ruler.cells.length; i++) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
+                    sameNoteValue += 1;
+                    continue;
+                } else {
+                    var idx = newStack.length;
+                    var noteValue = noteValues[i];
+                    var obj = rationalToFraction(1 / Math.abs(noteValue));
+                    var n = obj[1]/sameNoteValue ;
+                    if (Number.isInteger(n)) {
+                        newStack.push([idx, 'stuplet', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
+                        newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
+                        newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+                        newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ['number', {'value': n}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
+                    } else {
+                        newStack.push([idx, 'rhythm2', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
+                        newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
+                        newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+                        newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
+                    }
+                    
+                    if (i == ruler.cells.length - 1) {
+                        newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
+                    } else {
+                        newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, idx + 7]]);
+                    }
+                    previousBlock = idx + 6;
+                    sameNoteValue = 1;
+                }
+            }
+            that._logo.blocks.loadNewBlocks(newStack);
+            if (selectedRuler > that.Rulers.length - 2) {
+                return;
+            } else {
+                that._saveTuplets(selectedRuler + 1);
+            }
+        }, 500);
+    }
+
     this._saveDrumMachine = function(selectedRuler) {
         var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
@@ -1126,6 +1184,7 @@ function RhythmRuler () {
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
         cell.onclick = function () {
             that._save(0);
+            that._saveTuplets(0);
         };
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
