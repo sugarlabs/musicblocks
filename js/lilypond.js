@@ -277,11 +277,13 @@ processLilypondNotes = function (logo, turtle) {
 
                         for (ii = 0; ii < notes.length; ii++) {
                             logo.notationNotes[turtle] += __toLilynote(notes[ii]);
-                            logo.notationNotes[turtle] += ' ';
+                            if (notes.length === 1 || ii < notes.length - 1) {
+				logo.notationNotes[turtle] += ' ';
+                            }
                         }
 
                         if (obj[NOTATIONSTACCATO]) {
-                            logo.notationNotes[turtle] += '\\staccato';
+                            logo.notationNotes[turtle] += ' \\staccato ';
                         }
 
                         if (notes.length > 1) {
@@ -377,7 +379,9 @@ processLilypondNotes = function (logo, turtle) {
 
                     for (ii = 0; ii < notes.length; ii++) {
                         logo.notationNotes[turtle] += __toLilynote(notes[ii]);
-                        logo.notationNotes[turtle] += ' ';
+                        if (ii < notes.length - 1) {
+                            logo.notationNotes[turtle] += ' ';
+                        }
                     }
 
                     if (notes.length > 1) {
