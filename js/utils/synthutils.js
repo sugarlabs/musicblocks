@@ -883,7 +883,7 @@ function Synth() {
 
     this.setVolume = function (turtle, instrumentName, volume) {
         // volume in decibals
-        var db = Tone.gainToDb(volume / 100);
+        var db = this.tone.gainToDb(volume / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
         }
@@ -900,7 +900,7 @@ function Synth() {
     };
 
     this.setMasterVolume = function (volume) {
-        var db = Tone.gainToDb(volume / 100);
+        var db = this.tone.gainToDb(volume / 100);
         Tone.Master.volume.rampTo(db, 0.01);
     };
 
