@@ -433,7 +433,7 @@ saveLilypondOutput = function(logo, saveName) {
         var foundNotes = false;
         for (var i = 0; i < logo.notationDrumStaging[t].length; i++) {
             var obj = logo.notationDrumStaging[t][i];
-            if (typeof(obj) !== 'string' && obj[0] !== ['R']) {
+            if (typeof(obj) === 'object' && typeof(obj[0]) === 'object' && obj[0][0] !== 'R') {
                 foundNotes = true;
             }
         }
