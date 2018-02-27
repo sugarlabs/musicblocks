@@ -1828,7 +1828,7 @@ define(MYDEFINES, function (compatibility) {
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1843,7 +1843,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_DOWN:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1858,7 +1858,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_LEFT:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1868,7 +1868,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_RIGHT:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1899,7 +1899,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case RETURN:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (docById('search').value.length > 0){
                         doSearch();
                     } else {
