@@ -592,6 +592,7 @@ function Logo () {
 
         document.body.style.cursor = 'default';
         if (this.showBlocksAfterRun) {
+            console.log('SHOW BLOCKS');
             this.showBlocks();
         }
 
@@ -2889,11 +2890,11 @@ function Logo () {
                 if (idx > 1000) {
                     that.errorMsg(_('Maximum heap size is 1000.'))
                     idx = 1000;
-		}
+                }
 
                 // If index > heap length, grow the heap.
                 while (that.turtleHeaps[turtle].length < idx) {
-		    that.turtleHeaps[turtle].push(0);
+                    that.turtleHeaps[turtle].push(0);
                 }
 
                 that.turtleHeaps[turtle][idx - 1] = args[1];
@@ -4443,9 +4444,9 @@ function Logo () {
 
                     if (args[0] > that.beatsPerMeasure[turtle]) {
                         that.factorList[turtle].push(args[0]);
-		    } else {
-			that.beatList[turtle].push(args[0]);
-		    }
+                    } else {
+                        that.beatList[turtle].push(args[0]);
+                    }
                 }
             }
             break;
@@ -4528,13 +4529,13 @@ function Logo () {
                 for (var f = 0; f < that.factorList[turtle].length; f++) {
                     var factor = thisBeat / that.factorList[turtle][f];
                     if (factor === Math.floor(factor)) {
-			var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
-			that.parentFlowQueue[turtle].push(blk);
-			that.turtles.turtleList[turtle].queue.push(queueBlock);
-			childFlow = null;
+                        var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
+                        that.parentFlowQueue[turtle].push(blk);
+                        that.turtles.turtleList[turtle].queue.push(queueBlock);
+                        childFlow = null;
 
-			var eventName = '__beat_' + that.factorList[turtle][f] + '_' + turtle + '__';
-			that.stage.dispatchEvent(eventName);
+                        var eventName = '__beat_' + that.factorList[turtle][f] + '_' + turtle + '__';
+                        that.stage.dispatchEvent(eventName);
                     }
                 }
             }
@@ -6302,11 +6303,11 @@ function Logo () {
 
             // Disconnect the block.
             var c = that.blocks.blockList[args[0]].connections[0];
-	    that.blocks.blockList[args[0]].connections[0] = null;
+            that.blocks.blockList[args[0]].connections[0] = null;
             if (c !== null) {
                 for (var i = 0; i < that.blocks.blockList[c].connections.length; i++) {
                     if (that.blocks.blockList[c].connections[i] === args[0]) {
-	                that.blocks.blockList[c].connections[i] = null;
+                        that.blocks.blockList[c].connections[i] = null;
                     }
                 }
             }
@@ -6694,10 +6695,15 @@ function Logo () {
             if (!that.turtles.running() && queueStart === 0) {
                 // TODO: Enable playback button here
                 if (that.showBlocksAfterRun) {
-                    that.showBlocks();
+                    // If this is a status stack, not run showBlocks.
+                    if (blk !== null && that.blocks.blockList[blk].connections[0] !== null && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'status') {
+                        console.log('running status block');
+                    } else {
+                        that.showBlocks();
+                        that.showBlocksAfterRun = false;
+                    }
                 }
 
-                that.showBlocksAfterRun = false;
                 console.log('fin');
             }
         }
@@ -10208,7 +10214,7 @@ function Logo () {
         var d2 = (1 / duration) - d;
         
         // If the note won't fit in this measure, split it with a tie.
-        if (d > 0.0000001 && d2 > 0 && duration > 0 && 1 / duration > d) {
+        if (d > 0 && d2 > 0 && duration > 0 && 1 / duration > d) {
             console.log('splitting note across measure boundary.');
             var obj = rationalToFraction(d);
             var obj2 = rationalToFraction(d2);
@@ -10216,17 +10222,18 @@ function Logo () {
 
             if (obj2[0] > 0) {
                 this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum);
-		if (obj[0] > 0) {
+                if (obj[0] > 0) {
                     this.notationInsertTie(turtle);
                     this.notationDrumStaging[turtle].push('tie');
-		}
+                }
             }
 
-            this.notesPlayed[turtle] = rationalSum(this.notesPlayed[turtle], obj2); // += d2;
+            this.notesPlayed[turtle] = rationalSum(this.notesPlayed[turtle], obj2);
             if (obj[0] > 0) {
-		this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum);
+                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum);
             }
-            this.notesPlayed[turtle]  = rationalSum(this.notesPlayed[turtle], [-obj2[0], obj2[1]]); // -= d2;
+
+            this.notesPlayed[turtle]  = rationalSum(this.notesPlayed[turtle], [-obj2[0], obj2[1]]);
 
             return;
         }
