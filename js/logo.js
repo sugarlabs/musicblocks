@@ -1044,7 +1044,7 @@ function Logo () {
             this.inDuplicate[turtle] = false;
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
-            this.notesPlayed[turtle] = 0;
+            this.notesPlayed[turtle] = [0, 1];
             this.whichNoteToCount[turtle] = 1;
             this.playbackQueue[turtle] = [];
             this.keySignature[turtle] = 'C ' + _('major');
@@ -4485,12 +4485,12 @@ function Logo () {
 
             // Use the outer most note when nesting to determine the beat.
             if (that.inNoteBlock[turtle].length === 0) {
-                if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+                if (that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] < that.pickup[turtle]) {
                     var beatValue = 0;
                     var measureValue = 0;
                 } else {
-                    var beatValue = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
-                    var measureValue = Math.floor(((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
+                    var beatValue = (((that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
+                    var measureValue = Math.floor(((that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
                 }
 
                 that.currentBeat[turtle] = beatValue;
@@ -7175,7 +7175,7 @@ function Logo () {
                 }
 
                 if (that.inNoteBlock[turtle].length === that.whichNoteToCount[turtle]) {
-                    that.notesPlayed[turtle] += (1 / noteValue);
+                    that.notesPlayed[turtle] = rationalSum(that.notesPlayed[turtle], [1, noteValue]);
                 }
 
                 var notes = [];
@@ -9068,7 +9068,7 @@ function Logo () {
                     if (notevalue == null || notevalue === 0) {
                         that.blocks.blockList[blk].value = 0;
                     } else {
-                        that.blocks.blockList[blk].value = that.notesPlayed[turtle] / notevalue;
+                        that.blocks.blockList[blk].value = (that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1]) / notevalue;
                     }
                 }
                 break;
@@ -9076,7 +9076,7 @@ function Logo () {
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'elapsednotes']);
                 } else {
-                    that.blocks.blockList[blk].value = that.notesPlayed[turtle];
+                    that.blocks.blockList[blk].value = that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1];
                 }
                 break;
             case 'turtleelapsednotes':
@@ -9086,7 +9086,7 @@ function Logo () {
                 for (var i = 0; i < that.turtles.turtleList.length; i++) {
                     var thisTurtle = that.turtles.turtleList[i];
                     if (targetTurtle === thisTurtle.name) {
-                        value = that.notesPlayed[i];
+                        value = that.notesPlayed[i][0] / that.notesPlayed[i][1];
                         that.blocks.blockList[blk].value = value;
                         break;
                     }
@@ -9099,7 +9099,7 @@ function Logo () {
                         that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
                     }
 
-                    that.blocks.blockList[blk].value = that.notesPlayed[turtle];
+                    that.blocks.blockList[blk].value = that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1];
                 }
                 break;
             case 'beatfactor':
@@ -9220,10 +9220,10 @@ function Logo () {
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'beatvalue']);
                 } else {
-                    if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+                    if (that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] < that.pickup[turtle]) {
                         that.blocks.blockList[blk].value = 0;
                     } else {
-                        that.blocks.blockList[blk].value = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
+                        that.blocks.blockList[blk].value = (((that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
                     }
                 }
                 break;
@@ -9231,10 +9231,10 @@ function Logo () {
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'measurevalue']);
                 } else {
-                    if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+                    if (that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] < that.pickup[turtle]) {
                         that.blocks.blockList[blk].value = 0;
                     } else {
-                        that.blocks.blockList[blk].value = Math.floor(((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
+                        that.blocks.blockList[blk].value = Math.floor(((that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
                     }
                 }
                 break;
@@ -9916,7 +9916,7 @@ function Logo () {
 
             this._runFromBlockNow(this, turtle, cblk, true, actionArgs, this.turtles.turtleList[turtle].queue.length);
 
-            var returnValue = this.notesPlayed[turtle] - saveNoteCount;
+            var returnValue = rationalSum(this.notesPlayed[turtle], [-saveNoteCount[0], saveNoteCount[1]]);
             this.notesPlayed[turtle] = saveNoteCount;
 
             // Restore previous state
@@ -10196,31 +10196,37 @@ function Logo () {
     this.updateNotation = function (note, duration, turtle, insideChord, drum) {
         // Check to see if this note straddles a measure boundary.
         if (this.pickupPOW2[turtle]) {
-            var a = this.notesPlayed[turtle] - this.pickup[turtle];
+            var a = this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] - this.pickup[turtle];
         } else {
-            var a = this.notesPlayed[turtle] + (1 - this.pickup[turtle]);
+            var a = this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] + (1 - this.pickup[turtle]);
         }
 
         var b = this.noteValuePerBeat[turtle] / this.beatsPerMeasure[turtle];
         var c = a * b;
         var measureValue = Math.floor(a * b) + 1;
         var d = (a * b) + 1 - measureValue;
+        var d2 = (1 / duration) - d;
         
         // If the note won't fit in this measure, split it with a tie.
-        if (d > 0 && duration > 0 && 1 / duration > d) {
+        if (d > 0.0000001 && d2 > 0 && duration > 0 && 1 / duration > d) {
             console.log('splitting note across measure boundary.');
-            var d2 = (1 / duration) - d;
             var obj = rationalToFraction(d);
             var obj2 = rationalToFraction(d2);
+            console.log(obj[0] + '/' + obj[1] + ' ' + obj2[0] + '/' + obj2[1]);
+
             if (obj2[0] > 0) {
                 this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum);
-                this.notationInsertTie(turtle);
-                this.notationDrumStaging[turtle].push('tie');
+		if (obj[0] > 0) {
+                    this.notationInsertTie(turtle);
+                    this.notationDrumStaging[turtle].push('tie');
+		}
             }
 
-            this.notesPlayed[turtle] += d2;
-            this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum);
-            this.notesPlayed[turtle] -= d2;
+            this.notesPlayed[turtle] = rationalSum(this.notesPlayed[turtle], obj2); // += d2;
+            if (obj[0] > 0) {
+		this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum);
+            }
+            this.notesPlayed[turtle]  = rationalSum(this.notesPlayed[turtle], [-obj2[0], obj2[1]]); // -= d2;
 
             return;
         }
