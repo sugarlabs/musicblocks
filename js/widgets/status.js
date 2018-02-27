@@ -302,7 +302,7 @@ function StatusMatrix() {
                     }
                     break;
                 case 'beatvalue':
-                    var value = this._logo.currentBeat[turtle];
+                    var value = mixedNumber(this._logo.currentBeat[turtle]);
                     break;
                 case 'measurevalue':
                     var value = this._logo.currentMeasure[turtle];
