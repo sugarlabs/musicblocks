@@ -581,6 +581,11 @@ define(MYDEFINES, function (compatibility) {
         function doHardStopButton() {
             logo.doStopTurtle();
             logo._setMasterVolume(0);
+            if (docById('tempoDiv').style.visibility === 'visible') {
+                if (logo.tempo.isMoving) {
+                    logo.tempo.pause();
+                }
+	    }
         };
 
         function doStopButton() {

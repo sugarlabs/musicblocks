@@ -58,6 +58,10 @@ function Tempo () {
 
         // Restart the interval.
         var that = this;
+        if (this._intervalID !== null) {
+            clearInterval(this._intervalID);
+        }
+
         this._intervalID = setInterval(function() {
             that._draw();
         }, TEMPOINTERVAL);
