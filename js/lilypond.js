@@ -482,7 +482,8 @@ saveLilypondOutput = function(logo, saveName) {
             if (tNumber > startDrums - 1) {
                 clef.push('percussion');
             } else if (noteCount > 0) {
-                switch (Math.floor(octaveTotal / noteCount)) {
+                console.log(octaveTotal + ' ' + noteCount + ' ' + Math.floor(0.5 + (octaveTotal / noteCount)));
+                switch (Math.floor(0.5 + (octaveTotal / noteCount))) {
                 case 0:
                 case 1:
                 case 2:
