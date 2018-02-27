@@ -14,6 +14,7 @@
 
 
 function Tempo () {
+    const TEMPOSYNTH = 'bottle';
     const TEMPOINTERVAL = 5;
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
@@ -120,7 +121,7 @@ function Tempo () {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this._logo.synth.trigger(0, 'C4', 0.125, 'default', null, null);
+                this._logo.synth.trigger(0, ['C2'], 0.0625, TEMPOSYNTH, null, null, false);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
@@ -182,6 +183,8 @@ function Tempo () {
         this._intervals = [];
         this.isMoving = true;
         this._intervalID = null;
+
+        this._logo.synth.loadSynth(0, getDrumSynthName(TEMPOSYNTH));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
