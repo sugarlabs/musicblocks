@@ -125,15 +125,15 @@ var SOUNDSAMPLESDEFINES = [
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
 const SAMPLECENTERNO = {
-  'violin': 51,
-  'cello': 39,
-  'basse': 15,
-  'guitar': 39,
-  'flute': 57,
-  'saxophone': 51,
-  'clarinet': 39,
-  'tuba': 49,
-  'trumpet': 27
+    'violin': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
+    'cello': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'basse': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
+    'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'flute': ['F5', 57], // pitchToNumber('F', 5, 'C Major')],
+    'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
+    'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'tuba': ['A#4', 49], // pitchToNumber('A#', 4, 'C Major')],
+    'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
 };
 
 
@@ -497,8 +497,9 @@ function Synth() {
     this._createSampleSynth = function (turtle, instrumentName, sourceName, params) {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
-            console.log(sourceName);
-            var tempSynth = new Tone.Sampler({'C3': this.samples.voice[sourceName]});
+            console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
+            var n = SAMPLECENTERNO[sourceName][0];
+            var tempSynth = new Tone.Sampler({'C4': this.samples.voice[sourceName]});
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
@@ -846,11 +847,15 @@ function Synth() {
             }
             break;
         case 2:  // voice sample
-            var centerNo = SAMPLECENTERNO[sampleName];
-            var obj = noteToPitchOctave(notes);
-            var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
-            tempNotes = noteNum - centerNo;
-            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters, setNote);
+            // The new Sampler code does the recentering making this
+            // calculation redundant.
+	    
+            // var centerNo = SAMPLECENTERNO[sampleName][1];
+            // var obj = noteToPitchOctave(notes);
+            // var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
+            // tempNotes = noteNum - centerNo;
+
+            this._performNotes(tempSynth.toMaster(), notes, beatValue, null, null, setNote);
             break;
         case 3:  // builtin synth
             if (typeof(notes) === 'object') {
