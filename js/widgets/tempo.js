@@ -72,11 +72,14 @@ function Tempo () {
         this.BPMs[i] = docById('BPMInput' + i).value
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
+            this._logo.errorMsg(_('The beats per minute must be between 30 and 1000.'));
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
+            this._logo.errorMsg(_('The beats per minute must be between 30 and 1000.'));
         }
 
         this._updateBPM(i);
+        docById('BPMInput' + i).value = this.BPMs[i];
     };
 
     this._speedUp = function (i) {
