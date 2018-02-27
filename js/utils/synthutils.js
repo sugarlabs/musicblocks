@@ -498,16 +498,16 @@ function Synth() {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             console.log(sourceName);
-            var tempSynth = new Tone.Sampler(this.samples.voice[sourceName]);
+            var tempSynth = new Tone.Sampler({'C3': this.samples.voice[sourceName]});
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
-            var tempSynth = new Tone.Sampler(this.samples.drum[sourceName]);
+            var tempSynth = new Tone.Player(this.samples.drum[sourceName]);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, 'drum'];
             console.log(DEFAULTDRUM);
-            var tempSynth = new Tone.Sampler(this.samples.drum[DEFAULTDRUM]);
+            var tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
         }
 
         return tempSynth;
@@ -838,11 +838,11 @@ function Synth() {
         switch(flag) {
         case 1:  // drum
             if (instrumentName.slice(0, 4) === 'http') {
-                tempSynth.triggerAttack(0, beatValue);
+                tempSynth.start();
             } else if (instrumentName.slice(0, 4) === 'file') {
-                tempSynth.triggerAttack(0, beatValue);
+                tempSynth.start();
             } else {
-                tempSynth.triggerAttack(0);
+                tempSynth.start();
             }
             break;
         case 2:  // voice sample
@@ -870,7 +870,15 @@ function Synth() {
     };
 
     this.stopSound = function (turtle, instrumentName) {
-        instruments[turtle][instrumentName].triggerRelease();
+        var flag = instrumentsSource[instrumentName][0];
+        switch(flag) {
+        case 1:  // drum
+            instruments[turtle][instrumentName].stop();
+            break;
+        default:
+            instruments[turtle][instrumentName].triggerRelease();
+	    break;
+	}
     };
 
     this.start = function () {
@@ -883,7 +891,7 @@ function Synth() {
 
     this.setVolume = function (turtle, instrumentName, volume) {
         // volume in decibals
-        var db = this.tone.gainToDb(volume / 100);
+        var db = Tone.gainToDb(volume / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
         }
@@ -900,7 +908,7 @@ function Synth() {
     };
 
     this.setMasterVolume = function (volume) {
-        var db = this.tone.gainToDb(volume / 100);
+        var db = Tone.gainToDb(volume / 100);
         Tone.Master.volume.rampTo(db, 0.01);
     };
 
