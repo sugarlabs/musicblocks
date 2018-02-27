@@ -3443,6 +3443,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     makeBlock.dockTypes[1] = 'anyin';
     makeBlock.dockTypes[2] = 'anyin';
 
+    // deprecated in favor of save button
     var abcBlock = new ProtoBlock('saveabc');
     abcBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['saveabc'] = abcBlock;
@@ -3451,7 +3452,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     abcBlock.oneArgBlock();
     abcBlock.defaults.push(_('title') + '.abc');
     abcBlock.dockTypes[1] = 'textin';
+    abcBlock.hidden = true;
 
+    // deprecated in favor of save button
     var lilypondBlock = new ProtoBlock('savelilypond');
     lilypondBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savelilypond'] = lilypondBlock;
@@ -3460,7 +3463,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     lilypondBlock.oneArgBlock();
     lilypondBlock.defaults.push(_('title') + '.ly');
     lilypondBlock.dockTypes[1] = 'textin';
+    lilypondBlock.hidden = true;
 
+    // deprecated in favor of save button
     var svgBlock = new ProtoBlock('savesvg');
     svgBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savesvg'] = svgBlock;
@@ -3469,6 +3474,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     svgBlock.oneArgBlock();
     svgBlock.defaults.push(_('title') + '.svg');
     svgBlock.dockTypes[1] = 'textin';
+    svgBlock.hidden = true;
 
     var noBackgroundBlock = new ProtoBlock('nobackground');
     blocks.protoBlockDict['nobackground'] = noBackgroundBlock;
