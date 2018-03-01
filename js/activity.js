@@ -245,13 +245,7 @@ define(MYDEFINES, function (compatibility) {
         }
 
         window.onblur = function () {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                if (!logo.runningLilypond) {
-                    doHardStopButton();
-                }
-            } else {
-                doHardStopButton();
-            }
+            doHardStopButton(true);
         };
 
         function _findBlocks() {
@@ -578,14 +572,23 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function doHardStopButton() {
+        function doHardStopButton(onblur) {
+            if (onblur == undefined) {
+                onblur = false;
+            }
+
+            if (onblur && _THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
+                console.log('ignoring hard stop due to blur');
+                return;
+            }
+
             logo.doStopTurtle();
             logo._setMasterVolume(0);
             if (docById('tempoDiv').style.visibility === 'visible') {
                 if (logo.tempo.isMoving) {
                     logo.tempo.pause();
                 }
-	    }
+            }
         };
 
         function doStopButton() {

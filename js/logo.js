@@ -555,6 +555,10 @@ function Logo () {
         };
     };
 
+    this.recordingStatus = function () {
+        return this.recording || this.runningLilypond || this.runningAbc;
+    };
+
     this.doStopTurtle = function () {
         // The stop button was pressed. Stop the turtle and clean up a
         // few odds and ends.
@@ -6640,7 +6644,8 @@ function Logo () {
                             that.checkingCompletionState = false;
                             that.saveLocally();
                             that.playback(-1, true);
-                            that.recording = false;
+                            // console.log('setting recording to false');
+                            // that.recording = false;
                         } else {
                             that.suppressOutput[turtle] = false;
                             that.checkingCompletionState = false;
@@ -7637,6 +7642,8 @@ function Logo () {
         if (recording === undefined) {
             recording = false;
         }
+
+        this.recording = recording;
 
         if (recording){
             this.playbackTime = 0;
