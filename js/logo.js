@@ -283,6 +283,7 @@ function Logo () {
     this.checkingCompletionState = false;
     this.compiling = false;
     this.recording = false;
+    this.lastNote = {};
     this.restartPlayback = true;
     //variables for progress bar
     var progressBar = document.getElementById("myBar");   
@@ -6644,7 +6645,6 @@ function Logo () {
                             that.checkingCompletionState = false;
                             that.saveLocally();
                             that.playback(-1, true);
-                            // console.log('setting recording to false');
                             // that.recording = false;
                         } else {
                             that.suppressOutput[turtle] = false;
@@ -6656,7 +6656,7 @@ function Logo () {
                             // And save the session.
                             that.saveLocally();
                         }
-                    }, 1000);  // Should be based on length of last note.
+                    }, 1000);
                 } else if (that.suppressOutput[turtle]) {
                     setTimeout(function () {
                         __checkCompletionState();
@@ -7743,6 +7743,7 @@ function Logo () {
                 case 'notes':
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
+                        that.lastNote[turtle] = that.playbackQueue[turtle][idx][3];
                         that.synth.trigger(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
                     }
                     break;
@@ -7845,12 +7846,19 @@ function Logo () {
                         that.onStopTurtle();
                         that.playbackTime = 0;
                         if (recording){
+                            var lastNote = 0;
+                            for (var turtle in that.playbackQueue) {
+                                if (that.lastNote[turtle] > lastNote) {
+                                    lastNote = that.lastNote[turtle];
+                                }
+                            }
+
                             setTimeout(function(){
                                 console.log('finishing recording');
                                 that.synth.recorder.stop();
                                 that.synth.recorder.exportWAV(that.synth.download);
                                 that.recording = false;
-                            }, 2000);  // Should this be based on the duration of the last note?
+                            }, Math.max(2000, lastNote * 1000));
                         }
                     }
 
@@ -7896,6 +7904,7 @@ function Logo () {
 
         if (whichMouse < 0) {
             for (var turtle in this.playbackQueue) {
+                this.lastNote[turtle] = 0;
                 if (this.playbackQueue[turtle].length > 0) {
                     if (turtle < this.turtles.turtleList.length) {
                         this.turtles.turtleList[turtle].running = true;
