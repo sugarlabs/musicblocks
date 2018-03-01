@@ -22,6 +22,7 @@ function PitchStaircase () {
 
     // A list of stair steps.
     this.Stairs = [];
+    this.stairPitchBlocks = [];
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
