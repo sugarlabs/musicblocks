@@ -969,36 +969,7 @@ function Logo () {
 
         this.embeddedGraphicsFinished = {};
 
-        // Prep synths for each turtle.
-        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-            if (!(turtle in instruments)) {
-                instruments[turtle] = {};
-                instrumentsFilters[turtle] = {};
-                instrumentsEffects[turtle] = {};
-            }
-
-            // Make sure there is a default synth for each turtle
-            if (!('default' in instruments[turtle])) {
-                this.synth.createDefaultSynth(turtle);
-            }
-
-            // Copy any preloaded synths from the default turtle
-            for (var instrumentName in instruments[0]) {
-                if (!(instrumentName in instruments[turtle])) {
-                    this.synth.loadSynth(turtle, instrumentName);
-
-                    // Copy any filters
-                    if (instrumentName in instrumentsFilters[0]) {
-                        instrumentsFilters[turtle][instrumentName] = instrumentsFilters[0][instrumentName];
-                    }
-
-                    // and any effects
-                    if (instrumentName in instrumentsEffects[0]) {
-                        instrumentsEffects[turtle][instrumentName] = instrumentsEffects[0][instrumentName];
-                    }
-                }
-            }
-        }
+        this._prepSynths();
 
         this.notationStaging = {};
         this.notationDrumStaging = {};
@@ -1104,10 +1075,6 @@ function Logo () {
             this.defineMode[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.pickup[turtle] = 0;
-            this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
-                                        'noise1': [DEFAULTVOLUME],
-                                        'noise2': [DEFAULTVOLUME],
-                                        'noise3': [DEFAULTVOLUME]};
             this.beatsPerMeasure[turtle] = 4;  // Default is 4/4 time.
             this.noteValuePerBeat[turtle] = 4;
             this.currentBeat[turtle] = 0;
@@ -1139,15 +1106,6 @@ function Logo () {
                 this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].canvasAlpha;
                 this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
                 this._savePenState[turtle] = this.turtles.turtleList[turtle].penState;
-            }
-        }
-
-        if (!this.suppressOutput[turtle]) {
-            this._setMasterVolume(DEFAULTVOLUME);
-            for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                for (var synth in this.synthVolume[turtle]) {
-                    this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
-                }
             }
         }
 
@@ -7899,6 +7857,8 @@ function Logo () {
             }
         };
 
+        this._prepSynths();
+
         this.onRunTurtle();
         this.stopTurtle = false;
 
@@ -10213,6 +10173,53 @@ function Logo () {
             }
 
             return -i;
+        }
+    };
+
+    this._prepSynths = function () {
+        // Prep synths for each turtle.
+        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            if (!(turtle in instruments)) {
+                instruments[turtle] = {};
+                instrumentsFilters[turtle] = {};
+                instrumentsEffects[turtle] = {};
+            }
+
+            // Make sure there is a default synth for each turtle
+            if (!('default' in instruments[turtle])) {
+                this.synth.createDefaultSynth(turtle);
+            }
+
+            // Copy any preloaded synths from the default turtle
+            for (var instrumentName in instruments[0]) {
+                if (!(instrumentName in instruments[turtle])) {
+                    this.synth.loadSynth(turtle, instrumentName);
+
+                    // Copy any filters
+                    if (instrumentName in instrumentsFilters[0]) {
+                        instrumentsFilters[turtle][instrumentName] = instrumentsFilters[0][instrumentName];
+                    }
+
+                    // and any effects
+                    if (instrumentName in instrumentsEffects[0]) {
+                        instrumentsEffects[turtle][instrumentName] = instrumentsEffects[0][instrumentName];
+                    }
+                }
+            }
+
+            this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
+                                        'noise1': [DEFAULTVOLUME],
+                                        'noise2': [DEFAULTVOLUME],
+                                        'noise3': [DEFAULTVOLUME]};
+        }
+
+        if (!this.suppressOutput[turtle]) {
+            this._setMasterVolume(DEFAULTVOLUME);
+            for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                for (var synth in this.synthVolume[turtle]) {
+                    this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
+                }
+            }
         }
     };
 
