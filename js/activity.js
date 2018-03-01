@@ -245,13 +245,7 @@ define(MYDEFINES, function (compatibility) {
         }
 
         window.onblur = function () {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                if (!logo.runningLilypond) {
-                    doHardStopButton();
-                }
-            } else {
-                doHardStopButton();
-            }
+            doHardStopButton(true);
         };
 
         function _findBlocks() {
@@ -262,7 +256,8 @@ define(MYDEFINES, function (compatibility) {
             palettes.initial_y = 55;
             palettes.updatePalettes();
             var x = 100 * turtleBlocksScale;
-            var y = 100 * turtleBlocksScale;
+            var y = 50 * turtleBlocksScale;
+            var even = true;
 
             // First start blocks
             for (var blk in blocks.blockList) {
@@ -285,10 +280,16 @@ define(MYDEFINES, function (compatibility) {
                                 }
                             }
                         }
-                        x += 200 * turtleBlocksScale;
-                        if (x > (canvas.width - 100) / (turtleBlocksScale)) {
-                            x = 100 * turtleBlocksScale;
-                            y += 100 * turtleBlocksScale;
+                        x += 150 * turtleBlocksScale;
+                        if (x > (canvas.width - 200) / (turtleBlocksScale)) {
+                            even = !even;
+                            if (even) {
+                                x = 100 * turtleBlocksScale;
+                            } else {
+                                x = 150 * turtleBlocksScale;
+                            }
+
+                            y += 50 * turtleBlocksScale;
                         }
                     }
                 }
@@ -315,10 +316,16 @@ define(MYDEFINES, function (compatibility) {
                                 }
                             }
                         }
-                        x += 200 * turtleBlocksScale;
-                        if (x > (canvas.width - 100) / (turtleBlocksScale)) {
-                            x = 100 * turtleBlocksScale;
-                            y += 100 * turtleBlocksScale;
+                        x += 150 * turtleBlocksScale;
+                        if (x > (canvas.width - 200) / (turtleBlocksScale)) {
+                            even = !even;
+                            if (even) {
+                                x = 100 * turtleBlocksScale;
+                            } else {
+                                x = 150 * turtleBlocksScale;
+                            }
+
+                            y += 50 * turtleBlocksScale;
                         }
                     }
                 }
@@ -403,7 +410,6 @@ define(MYDEFINES, function (compatibility) {
             hideMsgs();
             logo.setBackgroundColor(-1);
             logo.notationOutput = '';
-
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
                 logo.notationStaging[turtle] = [];
@@ -566,9 +572,23 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function doHardStopButton() {
+        function doHardStopButton(onblur) {
+            if (onblur == undefined) {
+                onblur = false;
+            }
+
+            if (onblur && _THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
+                console.log('ignoring hard stop due to blur');
+                return;
+            }
+
             logo.doStopTurtle();
             logo._setMasterVolume(0);
+            if (docById('tempoDiv').style.visibility === 'visible') {
+                if (logo.tempo.isMoving) {
+                    logo.tempo.pause();
+                }
+            }
         };
 
         function doStopButton() {
@@ -577,7 +597,15 @@ define(MYDEFINES, function (compatibility) {
 
         function doMuteButton() {
             logo._setMasterVolume(0);
-        }
+        };
+
+        function _hideBoxes() {
+            clearBox.hide();
+            saveBox.hide();
+            languageBox.hide();
+            utilityBox.hide();
+            playbackBox.hide();
+        };
 
         function _doCartesianPolar() {
             if (cartesianBitmap.visible && polarBitmap.visible) {
@@ -679,26 +707,34 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doBiggerFont() {
+            hideDOMLabel();
+
             if (blockscale < BLOCKSCALES.length - 1) {
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
+
             if (BLOCKSCALES[blockscale] > 1) {
                 utilityBox._decreaseStatus = true;
             }
+
             if (BLOCKSCALES[blockscale] == 4) {
                 utilityBox._increaseStatus = false;
             }
         };
 
         function doSmallerFont() {
+            hideDOMLabel();
+
             if (blockscale > 0) {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
+
             if (BLOCKSCALES[blockscale] == 1) {
                 utilityBox._decreaseStatus = false;
             }
+
             if (BLOCKSCALES[blockscale] < 4) {
                 utilityBox._increaseStatus = true;
             } 
@@ -1051,7 +1087,7 @@ define(MYDEFINES, function (compatibility) {
                 reader.readAsText(fileChooser.files[0]);
             }, false);
 
-            function handleFileSelect (event) {
+            var __handleFileSelect = function (event) {
                 event.stopPropagation();
                 event.preventDefault();
 
@@ -1104,15 +1140,15 @@ define(MYDEFINES, function (compatibility) {
                 }
             };
 
-            function handleDragOver (event) {
+            var __handleDragOver = function (event) {
                 event.stopPropagation();
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';
             };
 
             var dropZone = docById('canvasHolder');
-            dropZone.addEventListener('dragover', handleDragOver, false);
-            dropZone.addEventListener('drop', handleFileSelect, false);
+            dropZone.addEventListener('dragover', __handleDragOver, false);
+            dropZone.addEventListener('drop', __handleFileSelect, false);
 
             allFilesChooser.addEventListener('click', function (event) {
                 this.value = null;
@@ -1163,23 +1199,20 @@ define(MYDEFINES, function (compatibility) {
             // createjs.LoadQueue(true, null, true);
 
             // Enable touch interactions if supported on the current device.
-            // FIXME: voodoo
-            // createjs.Touch.enable(stage, false, true);
+            createjs.Touch.enable(stage, false, true);
+
             // Keep tracking the mouse even when it leaves the canvas.
             stage.mouseMoveOutside = true;
+
             // Enabled mouse over and mouse out events.
             stage.enableMouseOver(10); // default is 20
 
             cartesianBitmap = _createGrid('images/Cartesian.svg');
-
             polarBitmap = _createGrid('images/polar.svg');
 
             var URL = window.location.href;
             var projectName = null;
             var flags = {run: false, show: false, collapse: false};
-
-            // This happens in the resize code.
-            // _setupAndroidToolbar();
 
             // Scale the canvas relative to the screen size.
             _onResize();
@@ -1275,12 +1308,45 @@ define(MYDEFINES, function (compatibility) {
         function _setupBlocksContainerEvents() {
             var moving = false;
 
+            var __wheelHandler = function (event) {
+                //Vertical Scroll
+                if (event.deltaY != 0 && event.axis==event.VERTICAL_AXIS) { 
+                    if (palettes.paletteVisible) {
+                        if (event.clientX > cellSize + MENUWIDTH) {
+                            blocksContainer.y -= event.deltaY;
+                        }    
+                    } else {
+                        if (event.clientX > cellSize) {
+                            blocksContainer.y -= event.deltaY;
+                        }
+                    }   
+                }
+                //Horizontal scroll 
+                if (scrollBlockContainer) {
+                    if (event.deltaX != 0 && event.axis==event.HORIZONTAL_AXIS) { 
+                        if (palettes.paletteVisible) {
+                            if (event.clientX > cellSize + MENUWIDTH) {
+                                blocksContainer.x -= event.deltaX;
+                            }    
+                        } else {
+                            if (event.clientX > cellSize) {
+                                blocksContainer.x -= event.deltaX;
+                            }
+                        }   
+                    }
+                } else {
+                    event.preventDefault();
+                } 
+            };
+
+            docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
+
             stage.on('stagemousemove', function (event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
             });
 
-            function __stageMouseUpHandler (event) {
+            var __stageMouseUpHandler = function (event) {
                 stageMouseDown = false;
                 moving = false;
             };
@@ -1765,7 +1831,7 @@ define(MYDEFINES, function (compatibility) {
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1780,7 +1846,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_DOWN:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1795,7 +1861,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_LEFT:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1805,7 +1871,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case KEYCODE_RIGHT:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1836,7 +1902,7 @@ define(MYDEFINES, function (compatibility) {
                     }
                     break;
                 case RETURN:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && docById('sliderDiv').style.visibility === 'visible') {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (docById('search').value.length > 0){
                         doSearch();
                     } else {
@@ -2087,20 +2153,24 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _deleteBlocksBox() {
+            _hideBoxes();
             clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
             clearBox.show();
         };
 
         function doLanguageBox() {
+            _hideBoxes();
             languageBox.createBox(turtleBlocksScale, saveButton.x - 27, saveButton.y - 55);
             languageBox.show();
         };
 
         function _doUtilityBox() {
+            _hideBoxes();
             utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
         };
 
         function _doPlaybackBox() {
+            _hideBoxes();
             playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
         };
 
@@ -2110,6 +2180,7 @@ define(MYDEFINES, function (compatibility) {
                 blocks.palettes.dict[name].hideMenu(true);
             }
 
+            hideDOMLabel();
             refreshCanvas();
 
             var actionBlockCounter = 0;
@@ -2178,6 +2249,7 @@ define(MYDEFINES, function (compatibility) {
                     stage.removeChild(chartBitmap);
                     chartBitmap = null;
                 }
+
                 logo.showBlocks();
                 palettes.show();
                 palettes.bringToTop();
@@ -2307,7 +2379,8 @@ define(MYDEFINES, function (compatibility) {
             //     var name = 'My Project';
             //     download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
             // } else {
-                saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+            _hideBoxes();
+            saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
             // }
         };
 
@@ -2746,6 +2819,13 @@ define(MYDEFINES, function (compatibility) {
             docById('loading-image-container').style.display = 'none';
             // docById('canvas').style.display = 'none';
             docById('hideContents').style.display = 'block';
+
+            // Warn the user -- chrome only -- if the browser level is
+            // not set to 100%
+            if (window.innerWidth !== window.outerWidth) {
+                blocks.errorMsg(_('Please set browser zoom level to 100%'));
+                console.log('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
+            }
         };
 
         function _loadStart() {
@@ -2776,14 +2856,16 @@ define(MYDEFINES, function (compatibility) {
             // to ensure a clean start.
             if (document.addEventListener) {
                 document.addEventListener('finishedLoading', function () {
-                    setTimeout(function () {
-                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                            logo.turtleHeaps[turtle] = [];
-                            logo.notationStaging[turtle] = [];
-                            logo.notationDrumStaging[turtle] = [];
-                            turtles.turtleList[turtle].doClear(true, true, false);
-                        }
-                    }, 1000);
+                    if (!turtles.running()) {
+                        setTimeout(function () {
+                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                                logo.turtleHeaps[turtle] = [];
+                                logo.notationStaging[turtle] = [];
+                                logo.notationDrumStaging[turtle] = [];
+                                turtles.turtleList[turtle].doClear(true, true, false);
+                            }
+                        }, 1000);
+                    }
                 });
             } else {
                 document.attachEvent('finishedLoading', function () {
@@ -3010,80 +3092,82 @@ define(MYDEFINES, function (compatibility) {
                     var args = {
                         'value': myBlock.value
                     };
-                } else if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                    // Find the turtle associated with this block.
-                    var turtle = turtles.turtleList[myBlock.value];
-                    if (turtle == null) {
-                        var args = {
-                            'collapsed': false,
-                            'xcor': 0,
-                            'ycor': 0,
-                            'heading': 0,
-                            'color': 0,
-                            'shade': 50,
-                            'pensize': 5,
-                            'grey': 100
-                        };
-                    } else {
-                        var args = {
-                            'collapsed': myBlock.collapsed,
-                            'xcor': turtle.x,
-                            'ycor': turtle.y,
-                            'heading': turtle.orientation,
-                            'color': turtle.color,
-                            'shade': turtle.value,
-                            'pensize': turtle.stroke,
-                            'grey': turtle.chroma
-                        };
-                    }
-                } else if (myBlock.name === 'action') {
-                    var args = {
-                        'collapsed': myBlock.collapsed
-                    }
-                } else if(myBlock.name === 'matrix') {
-                    var args = {
-                        'collapsed' : myBlock.collapsed
-                    }
-                } else if(myBlock.name === 'pitchdrummatrix') {
-                    var args = {
-                        'collapsed' : myBlock.collapsed
-                    }
-                } else if(myBlock.name === 'status') {
-                    var args = {
-                        'collapsed' : myBlock.collapsed
-                    }
-                } else if (myBlock.name === 'namedbox') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'nameddo') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'nameddoArg') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'namedcalc') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'namedcalcArg') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'namedarg') {
-                    var args = {
-                        'value': myBlock.privateData
-                    }
-                } else if (myBlock.name === 'matrixData') {
-                    var args = {
-                        'notes': window.savedMatricesNotes,
-                        'count': window.savedMatricesCount
-                    }
-                    hasMatrixDataBlock = true;
                 } else {
-                    var args = {}
+                    switch (myBlock.name) {
+                    case 'start':
+                    case 'drum':
+                        // Find the turtle associated with this block.
+                        var turtle = turtles.turtleList[myBlock.value];
+                        if (turtle == null) {
+                            var args = {
+                                'collapsed': false,
+                                'xcor': 0,
+                                'ycor': 0,
+                                'heading': 0,
+                                'color': 0,
+                                'shade': 50,
+                                'pensize': 5,
+                                'grey': 100
+                            };
+                        } else {
+                            var args = {
+                                'collapsed': myBlock.collapsed,
+                                'xcor': turtle.x,
+                                'ycor': turtle.y,
+                                'heading': turtle.orientation,
+                                'color': turtle.color,
+                                'shade': turtle.value,
+                                'pensize': turtle.stroke,
+                                'grey': turtle.chroma
+                            };
+                        }
+                        break;
+                    case 'action':
+                    case 'matrix':
+                    case 'pitchdrummatrix':
+                    case 'rhythmruler':
+                    case 'timbre':
+                    case 'pitchstaircase':
+                    case 'tempo':
+                    case 'pitchslider':
+                    case 'modewidget':
+                    case 'status':
+                        var args = {
+                            'collapsed': myBlock.collapsed
+                        }
+                        break;
+                    case 'namedbox':
+                    case 'storein2':
+                    case 'nameddo':
+                    case 'nameddoArg':
+                    case 'namedcalc':
+                    case 'namedcalcArg':
+                    case 'namedArg':
+                        var args = {
+                            'value': myBlock.privateData
+                        }
+                        break;
+                    case 'nopValueBlock':
+                    case 'nopZeroArgBlock':
+                    case 'nopOneArgBlock':
+                    case 'nopTwoArgBlock':
+                    case 'nopThreeArgBlock':
+                        // restore original block name
+                        myBlock.name = myBlock.privateData;
+                        var args = {}
+                        break;
+                    case 'matrixData':
+                        // deprecated
+                        var args = {
+                            'notes': window.savedMatricesNotes,
+                            'count': window.savedMatricesCount
+                        }
+                        hasMatrixDataBlock = true;
+                        break;
+                    default:
+                        var args = {}
+                        break;
+                    }
                 }
 
                 connections = [];
@@ -3727,7 +3811,9 @@ handleComplete);
             var formerContainer = container;
 
             container.on('mouseover', function (event) {
-                document.body.style.cursor = 'pointer';
+                if (!loading) {
+                    document.body.style.cursor = 'pointer';
+                }
             });
 
             container.on('mouseout', function (event) {

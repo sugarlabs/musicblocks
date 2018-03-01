@@ -14,6 +14,7 @@
 
 
 function Tempo () {
+    const TEMPOSYNTH = 'bottle';
     const TEMPOINTERVAL = 5;
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
@@ -58,6 +59,10 @@ function Tempo () {
 
         // Restart the interval.
         var that = this;
+        if (this._intervalID !== null) {
+            clearInterval(this._intervalID);
+        }
+
         this._intervalID = setInterval(function() {
             that._draw();
         }, TEMPOINTERVAL);
@@ -67,15 +72,18 @@ function Tempo () {
         this.BPMs[i] = docById('BPMInput' + i).value
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
+            this._logo.errorMsg(_('The beats per minute must be between 30 and 1000.'));
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
+            this._logo.errorMsg(_('The beats per minute must be between 30 and 1000.'));
         }
 
         this._updateBPM(i);
+        docById('BPMInput' + i).value = this.BPMs[i];
     };
 
     this._speedUp = function (i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) + 5;
+        this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPM[i]);
 
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
@@ -86,7 +94,7 @@ function Tempo () {
     };
 
     this._slowDown = function (i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) - 5;
+        this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPM[i]);
         if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
         }
@@ -116,7 +124,7 @@ function Tempo () {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this._logo.synth.trigger(0, 'C4', 0.125, 'default', null, null);
+                this._logo.synth.trigger(0, ['C2'], 0.0625, TEMPOSYNTH, null, null, false);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
@@ -177,7 +185,13 @@ function Tempo () {
         this._firstClickTimes = null;
         this._intervals = [];
         this.isMoving = true;
+        if (this._intervalID != undefined && this._intervalID != null) {
+            clearInterval(this._intervalID);
+        }
+
         this._intervalID = null;
+
+        this._logo.synth.loadSynth(0, getDrumSynthName(TEMPOSYNTH));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);

@@ -277,6 +277,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'less':
                 var obj = this.protoblock.generator(this.clampCount[0]);
                 break;
+            case 'makeblock':
             case 'calcArg':
             case 'doArg':
             case 'namedcalcArg':
@@ -323,6 +324,7 @@ function Block(protoblock, blocks, overrideName) {
 
             this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
             break;
+        case 'makeblock':
         case 'calcArg':
             this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
             for (var i = 2; i < obj[1].length; i++) {
@@ -402,7 +404,7 @@ function Block(protoblock, blocks, overrideName) {
         var block_label = '';
 
         // Create the highlight bitmap for the block.
-        function __processHighlightBitmap(name, bitmap, that) {
+        var __processHighlightBitmap = function (name, bitmap, that) {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
             }
@@ -423,19 +425,19 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             __callback = function (that, firstTime) {
-		that.blocks.refreshCanvas();
-		var thisBlock = that.blocks.blockList.indexOf(that);
+                that.blocks.refreshCanvas();
+                var thisBlock = that.blocks.blockList.indexOf(that);
 
-		if (firstTime) {
+                if (firstTime) {
                     that._loadEventHandlers();
                     if (that.image !== null) {
-			that._addImage();
+                        that._addImage();
                     }
 
                     that._finishImageLoad();
-		} else {
+                } else {
                     if (that.name === 'start' || that.name === 'drum') {
-			that._ensureDecorationOnTop();
+                        that._ensureDecorationOnTop();
                     }
 
                     // Adjust the docks.
@@ -445,23 +447,23 @@ function Block(protoblock, blocks, overrideName) {
                     that._positionText(that.protoblock.scale);
 
                     if (COLLAPSABLES.indexOf(that.name) !== -1) {
-			that.bitmap.visible = !that.collapsed;
-			that.highlightBitmap.visible = false;
-			that.updateCache();
+                        that.bitmap.visible = !that.collapsed;
+                        that.highlightBitmap.visible = false;
+                        that.updateCache();
                     }
 
                     if (that.postProcess != null) {
-			that.postProcess(that.postProcessArg);
-			that.postProcess = null;
+                        that.postProcess(that.postProcessArg);
+                        that.postProcess = null;
                     }
-		}
+                }
             };
 
             that._createCache(__callback, firstTime);
         };
 
         // Create the bitmap for the block.
-        function __processBitmap(name, bitmap, that) {
+        var __processBitmap = function (name, bitmap, that) {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
             }
@@ -489,7 +491,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         if (this.overrideName) {
-            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
+            if (['storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
                 if (block_label.length > 8) {
                     block_label = block_label.substr(0, 7) + '...';
@@ -627,6 +629,10 @@ function Block(protoblock, blocks, overrideName) {
 
             this.blocks.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
+            if (this.trash) {
+                this.collapseContainer.visible = false;
+                this.collapseText.visible = false;
+            }
         } else {
             // Start blocks and Action blocks can collapse, so add an
             // event handler.
@@ -654,7 +660,7 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-        function __processHighlightCollapseBitmap(name, bitmap, that) {
+        var __processHighlightCollapseBitmap = function (name, bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
             that.container.addChild(that.highlightCollapseBlockBitmap);
@@ -742,13 +748,17 @@ function Block(protoblock, blocks, overrideName) {
 
                     that.blocks.refreshCanvas();
                     that.blocks.cleanupAfterLoad(that.name);
+                    if (that.trash) {
+                        that.collapseContainer.visible = false;
+                        that.collapseText.visible = false;
+                    }
                 };
 
                 image.src = 'images/expand.svg';
             }
         };
 
-        function __processCollapseBitmap(name, bitmap, that) {
+        var __processCollapseBitmap = function (name, bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
@@ -899,7 +909,7 @@ function Block(protoblock, blocks, overrideName) {
         var fileChooser = docById('myOpenAll');
         var that = this;
 
-        readerAction = function (event) {
+        var __readerAction = function (event) {
             window.scroll(0, 0);
 
             var reader = new FileReader();
@@ -920,10 +930,10 @@ function Block(protoblock, blocks, overrideName) {
             else {
                 reader.readAsText(fileChooser.files[0]);
             }
-            fileChooser.removeEventListener('change', readerAction);
+            fileChooser.removeEventListener('change', __readerAction);
         };
 
-        fileChooser.addEventListener('change', readerAction, false);
+        fileChooser.addEventListener('change', __readerAction, false);
         fileChooser.focus();
         fileChooser.click();
         window.scroll(0, 0)
@@ -935,7 +945,7 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         this.blocks.findDragGroup(thisBlock);
 
-        function __toggle() {
+        var __toggle = function () {
             var collapse = that.collapsed;
             if (that.collapseBitmap === null) {
                 console.log('collapse bitmap not ready');
@@ -1232,7 +1242,7 @@ function Block(protoblock, blocks, overrideName) {
         if (bounds === null) {
             console.log('block cache for ' + this.name + ' not ready... waiting.');
 
-            __callback = function (that) {
+            var __callback = function (that) {
                 that._calculateBlockHitArea();
             };
 
@@ -1243,15 +1253,19 @@ function Block(protoblock, blocks, overrideName) {
         // Since hitarea is concave, we only detect hits on top
         // section of block. Otherwise we would not be able to grab
         // blocks placed inside of clamps.
-        if (this.isClampBlock() || this.isArgClamp()) {
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale * 0.5);
+        if (['calcArg', 'doArg', 'makeblock', 'nameddoArg', 'namedcalcArg'].indexOf(this.name) !== -1) {
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale * 0.75);
+        } else if (this.isClampBlock() || this.isArgClamp()) {
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale);
         } else if (this.isNoHitBlock()) {
             // No hit area
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
-        } else {
+        } else if (this.isTwoArgBlock()) {
             // Shrinking the height makes it easier to grab blocks below
             // in the stack.
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
+        } else {
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height);
         }
 
         this.container.hitArea = hitArea;
@@ -1579,6 +1593,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
+        var selectorWidth = 100;
+
         var movedStage = false;
         if (!window.hasMouse && this.blocks.stage.y + y > 75) {
             movedStage = true;
@@ -1749,6 +1765,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('modenameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'accidentalname') {
             var type = 'accidentalname';
             if (this.value != null) {
@@ -1769,6 +1786,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('accidentalnameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'intervalname') {
             var type = 'intervalname';
             if (this.value != null) {
@@ -1794,6 +1812,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('intervalnameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'invertmode') {
             var type = 'invertmode';
             if (this.value != null) {
@@ -1819,6 +1838,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('invertModeLabel');
+            selectorWidth = 150;
         } else if (this.name === 'drumname') {
             var type = 'drumname';
             if (this.value != null) {
@@ -1844,6 +1864,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('drumnameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'filtertype') {
             var type = 'filtertype';
             if (this.value != null) {
@@ -1869,6 +1890,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('filtertypeLabel');
+            selectorWidth = 150;
         } else if (this.name === 'oscillatortype') {
             var type = 'oscillatortype';
             if (this.value != null) {
@@ -1894,6 +1916,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('oscillatortypeLabel');
+            selectorWidth = 150;
         } else if (this.name === 'voicename') {
             var type = 'voicename';
             if (this.value != null) {
@@ -1919,6 +1942,7 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('voicenameLabel');
+            selectorWidth = 150;
         } else if (this.name === 'boolean') {
             var type = 'boolean';
             if (this.value != null) {
@@ -2002,12 +2026,12 @@ function Block(protoblock, blocks, overrideName) {
         // There may be a second select used for # and b.
         if (this.labelattr != null) {
             this.label.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 50) * this.blocks.blockScale + canvasLeft) + 'px';
-            this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.blockScale + canvasTop) + 'px';
+            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 50) * this.blocks.getStageScale() + canvasLeft) + 'px';
+            this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
             this.labelattr.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
             this.labelattr.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         } else {
-            this.label.style.width = Math.round(100 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
         }
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
@@ -2193,14 +2217,16 @@ function Block(protoblock, blocks, overrideName) {
                 // If the label was the name of a storein, update the
                 // associated box this.blocks and the palette buttons.
                 if (this.value !== 'box') {
-                    this.blocks.newNamedboxBlock(this.value);
                     this.blocks.newStoreinBlock(this.value);
+                    this.blocks.newStorein2Block(this.value);
+                    this.blocks.newNamedboxBlock(this.value);
                 }
 
                 // Rename both box <- name and namedbox blocks.
-                this.blocks.renameStoreinBoxes(oldValue, newValue);
                 this.blocks.renameBoxes(oldValue, newValue);
                 this.blocks.renameNamedboxes(oldValue, newValue);
+                this.blocks.renameStoreinBoxes(oldValue, newValue);
+                this.blocks.renameStorein2Boxes(oldValue, newValue);
 
                 this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('boxes');

@@ -37,17 +37,16 @@ Credits
 -------
 
 Music Blocks is a fork of
-[TurtleArtJS](https://github.com/walterbender/turtleblocksjs)
+[TurtleBlocksJS](https://github.com/walterbender/turtleblocksjs)
 created by Walter Bender.
 
 Devin Ulibarri has contributed functional and user-interface
 designs. Many of his contributions were inspired by the music
 education ideas, representations and practices (e.g. aspects of
-matrix, musical cups) developed and published by Dr. Lawrence Scripp
-with whom Devin studied at New England Conservatory and for whom he
-worked at Affron Scripp & Associates, LLC.
-
-[Larry Scripp](http://www.larryscripp.net/)
+matrix, musical cups) developed and published by [Larry
+Scripp](http://www.larryscripp.net/) with whom Devin studied at New
+England Conservatory and for whom he worked at Affron Scripp &
+Associates, LLC.
 
 [Center for Music and the Arts in Education (CMAIE)](http://centerformie.org/)
 

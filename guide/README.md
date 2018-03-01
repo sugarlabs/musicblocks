@@ -15,7 +15,7 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
    5. [Drums](#DRUMS)
 3. [Programming with Music](#PROGRAMMING-WITH-MUSIC)
    1. [Chunks](#CHUNKS)
-   2. [Musical Transformation](#TRANSFORMATION)
+   2. [Musical Transformations](#TRANSFORMATION)
       1. [Step Pitch Block](#STEP-PITCH)
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
@@ -275,8 +275,11 @@ Step Up* and *Scalar Step Down* blocks. These blocks calculate the
 number of half-steps to the next note in the current mode. (You can
 read more about [Musical Modes](#modes) below.) Note that the *Mouse
 Pitch Number* block returns the pitch number of the most recent note
-played. (Note that here we are using the *Mode length* block, which
-returns the number of scalar steps in the current mode.)
+played.
+
+In this example, we are using the *Mode length* block, which returns
+the number of scalar steps in the current mode (7 for Major and Minor
+modes).
 
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
 
@@ -316,6 +319,13 @@ and *Down sixth*, as well as a transposition for *Octave*.
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform18.svg "The Register block")
+
+The *Register* block provides an easy way to modify the register
+(octave) of the notes that follow it. In the example above it is first
+used to bump the `Mi 4` note up by one octave and then to bump the
+`Sol 4` note down by one octave.
 
 #### <a name="DOTTED"></a>3.2.4 Dotted Notes
 
@@ -559,6 +569,12 @@ and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
 This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform19.svg "Define mode block")
+
+The *Define mode* block can be used to define a custom mode by
+defining the number and size of the steps within an octave. You can
+use your custom mode with the *Set key* block.
 
 #### <a name="VIBRATO"></a>3.2.14 Vibrato, Tremelo, et al.
 

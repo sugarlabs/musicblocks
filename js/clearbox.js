@@ -44,7 +44,7 @@ function ClearBox () {
         return this;
     };
 
-    this._hide = function () {
+    this.hide = function () {
         if (this._container != null) {
             this._container.visible = false;
             this._refreshCanvas();
@@ -103,11 +103,11 @@ function ClearBox () {
             var x = (event.stageX / that._scale) - that._container.x;
             var y = (event.stageY / that._scale) - that._container.y;
             if (x > 125 && y < 55) {
-                that._hide();
+                that.hide();
             } else if (y > 55) {
                 // Clear
                 that._doClear(true);
-                that._hide();
+                that.hide();
             }
         });
 

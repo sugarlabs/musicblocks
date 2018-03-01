@@ -72,6 +72,7 @@ function Palettes () {
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
+    this.paletteVisible = false;
     this.pluginsDeleteStatus = false;
     this.visible = true;
     this.scale = 1.0;
@@ -644,6 +645,10 @@ function PaletteModel(palette, palettes, name) {
                 modname = 'store in ' + block.defaults[0];
                 var arg = block.defaults[0];
                 break;
+            case 'storein2':
+                modname = 'store in2 ' + block.staticLabels[0];
+                var arg = block.staticLabels[0];
+                break;
             case 'box':
                 modname = block.defaults[0];
                 var arg = block.defaults[0];
@@ -762,8 +767,14 @@ function PaletteModel(palette, palettes, name) {
             default:
                 if (blkname != modname) {
                     // Override label for do, storein, box, and namedarg
-                    if (blkname === 'storein' && block.defaults[0] === _('box')) {
+                    if (blkname === 'storein'  && block.defaults[0] === _('box')) {
                         label = _('store in');
+                    } else if (blkname === 'storein2') {
+                        if (block.staticLabels[0] === _('store in box')) {
+                            label = _('store in box');
+                        } else {
+                            label = _('store in') + ' ' + block.staticLabels[0];
+                        }
                     } else {
                         label = block.defaults[0];
                     }
@@ -1349,6 +1360,7 @@ function Palette(palettes, name) {
     };
 
     this.hideMenu = function () {
+        this.palettes.paletteVisible = false;
         if (this.menuContainer != null) {
             this.menuContainer.visible = false;
             this._hideMenuItems();
@@ -1359,6 +1371,7 @@ function Palette(palettes, name) {
     };
 
     this.showMenu = function () {
+        this.palettes.paletteVisible = true;
         if (this.palettes.mobile) {
             this.menuContainer.visible = false;
         } else {
@@ -1834,9 +1847,9 @@ function Palette(palettes, name) {
         // this palette.
         if ('MACROPLUGINS' in pluginObjs) {
             for (name in pluginObjs['MACROPLUGINS']) {
-		      delete pluginObjs['MACROPLUGINS'][name];
+                      delete pluginObjs['MACROPLUGINS'][name];
             }
-	    }
+        }
 
         storage.plugins = preparePluginExports({});
         if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -1889,6 +1902,13 @@ function Palette(palettes, name) {
             var newBlk = protoblk.name;
             var arg = protoblk.defaults[0];
             break;
+        case 'storein2':
+            // Use the name of the box in the label
+            console.log('storein2' + ' ' + protoblk.defaults[0] + ' ' + protoblk.staticLabels[0]);
+            blkname = 'store in2 ' + protoblk.defaults[0];
+            var newBlk = protoblk.name;
+            var arg = protoblk.staticLabels[0];
+            break;
         case 'box':
             // Use the name of the box in the label
             blkname = protoblk.defaults[0];
@@ -1901,6 +1921,7 @@ function Palette(palettes, name) {
                 blkname = 'namedbox';
                 var arg = _('box');
             } else {
+                console.log(protoblk.defaults[0]);
                 blkname = protoblk.defaults[0];
                 var arg = protoblk.defaults[0];
             }

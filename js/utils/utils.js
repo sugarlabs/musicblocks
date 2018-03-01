@@ -803,7 +803,7 @@ function LCD (a, b) {
 };
 
 
-function GCD( a, b) {
+function GCD (a, b) {
     a = Math.abs(a);
     b = Math.abs(b);
 
@@ -814,6 +814,18 @@ function GCD( a, b) {
     }
 
     return a;
+};
+
+
+function rationalSum (a, b) {
+    if (a === 0 || b === 0) {
+        console.log('divide by zero?');
+        return [0, 1];
+    }
+
+    var lcd = LCD(a[1], b[1]);
+    var c0 = a[0] * lcd / a[1] + b[0] * lcd / b[1];
+    return [a[0] * lcd / a[1] + b[0] * lcd / b[1], lcd];
 };
 
 

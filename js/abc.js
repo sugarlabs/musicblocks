@@ -20,7 +20,7 @@ getABCHeader = function () {
 
 processAbcNotes = function (logo, turtle) {
     // obj = [instructions] or
-    // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
+    // obj = [[notes], duration, dotCount, tupletValue, roundDown, insideChord, staccato]
 
     logo.notationNotes[turtle] = '';
 
@@ -198,7 +198,13 @@ processAbcNotes = function (logo, turtle) {
             }
             counter += 1;
 
-            var note = __toABCnote(obj[NOTATIONNOTE]);
+            if (typeof(obj[NOTATIONNOTE]) === 'string') {
+                var note = __toABCnote(obj[NOTATIONNOTE]);
+            } else {
+                var notes = obj[NOTATIONNOTE];
+                var note = __toABCnote(notes[0]);
+            }
+
             var incompleteTuplet = 0;  // An incomplete tuplet
 
             // If it is a tuplet, look ahead to see if it is complete.
@@ -235,42 +241,36 @@ processAbcNotes = function (logo, turtle) {
 
                 while (k < count) {
                     var tupletDuration = 2 * logo.notationStaging[turtle][i + j][NOTATIONDURATION];
-                    // Are we in a chord?
-                    if (logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0) {
-                        // Is logo the first note in the chord?
-                        if ((i === 0 && j === 0) || logo.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD] !== logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD]) {
+
+                    if (typeof(notes) === 'object') {
+                        if (notes.length > 1) {
                             logo.notationNotes[turtle] += '[';
                         }
 
-                        logo.notationNotes[turtle] += __toABCnote(logo.notationStaging[turtle][i + j][NOTATIONNOTE]);
+                        for (ii = 0; ii < notes.length; ii++) {
+                            logo.notationNotes[turtle] += __toABCnote(notes[ii]);
+                            logo.notationNotes[turtle] += ' ';
+                        }
+
                         if (obj[NOTATIONSTACCATO]) {
                             logo.notationNotes[turtle] += '.';
                         }
 
-                        // logo.notationNotes[turtle] += '';
-
-                        // Is logo the last note in the chord?
-                        if (i + j === logo.notationStaging[turtle].length - 1 || logo.notationStaging[turtle][i + j + 1][NOTATIONINSIDECHORD] !== logo.notationStaging[turtle][i + j][NOTATIONINSIDECHORD]) {
-                            logo.notationNotes[turtle] += ']' + __convertDuration(logo.notationStaging[turtle][i + j + 1][NOTATIONROUNDDOWN]);
-                            k++;  // Increment notes in tuplet.
+                        if (notes.length > 1) {
+                            logo.notationNotes[turtle] += ']';
                         }
-                        j++;
+
+                        logo.notationNotes[turtle] += logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+                        j++;  // Jump to next note.
+                        k++;  // Increment notes in tuplet.
                     } else {
-                        logo.notationNotes[turtle] += __toABCnote(logo.notationStaging[turtle][i + j][NOTATIONNOTE]) + __convertDuration(logo.notationStaging[turtle][i + j][NOTATIONROUNDDOWN]);
-                        if (obj[NOTATIONSTACCATO]) {
-                            logo.notationNotes[turtle] += '.';
-                        }
-
-                        // logo.notationNotes[turtle] += '';
+                        console.log('ignoring ' + notes);
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
                 }
 
                 // FIXME: Debug for ABC
-                // Workaround to a Lilypond "feature": if a slur
-                // ends on a tuplet, the closing ) must be inside
-                // the closing } of the tuplet.
                 if (i + j - 1 < logo.notationStaging[turtle].length - 1) {
                     var nextObj = logo.notationStaging[turtle][i + j];
                     if (typeof(nextObj) === 'string' && nextObj === ')') {
@@ -302,6 +302,32 @@ processAbcNotes = function (logo, turtle) {
                 targetDuration = 0;
                 tupletDuration = 0;
             } else {
+                if (typeof(notes) === 'object') {
+                    if (notes.length > 1) {
+                        logo.notationNotes[turtle] += '[';
+                    }
+
+                    for (ii = 0; ii < notes.length; ii++) {
+                        logo.notationNotes[turtle] += __toABCnote(notes[ii]);
+                        logo.notationNotes[turtle] += ' ';
+                    }
+
+                    if (notes.length > 1) {
+                        logo.notationNotes[turtle] += ']';
+                    }
+
+                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
+                    for (var d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
+                        logo.notationNotes[turtle] += '.';
+                    }
+
+                    logo.notationNotes[turtle] += ' ';
+                }
+
+                if (obj[NOTATIONSTACCATO]) {
+                    logo.notationNotes[turtle] += '.';
+                }
+
                 if (obj[NOTATIONINSIDECHORD] > 0) {
                     // Is logo the first note in the chord?
                     if (i === 0 || logo.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]) {

@@ -130,6 +130,8 @@ function PitchTimeMatrix () {
         this._rests = 0;
         this._logo = logo;
 
+        this.playingNow = false;	
+
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
@@ -332,11 +334,20 @@ function PitchTimeMatrix () {
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/synth2.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/synth2.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/mouse.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/mouse.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else {
+                const BELLSETIDX = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G': 5, 'A': 6, 'B': 7, 'do': 1, 're': 2, 'me': 3, 'fa': 4, 'sol': 5, 'la': 6, 'ti': 7};
+                // Don't add bellset image with sharps and flats.
+                var noteName = this.rowLabels[i];
+                if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
+                    cell.innerHTML = '<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
+                } else if (noteName === 'C' && this.rowArgs[i] === 5) {
+                    cell.innerHTML = '<img src="' + 'images/8_bellset_key_8.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
+                }
             }
 
             // A cell for the row label
@@ -1068,6 +1079,12 @@ function PitchTimeMatrix () {
 
     this.playAll = function() {
         // Play all of the notes in the matrix.
+        if (this.playingNow) {
+            return;
+        }
+
+        this.playingNow = true;
+
         this._logo.synth.stop();
 
         var notes = [];
@@ -1175,6 +1192,7 @@ function PitchTimeMatrix () {
                     var cell = row.cells[i];
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 }
+
                 if (that._matrixHasTuplets) {
                     var row = docById('ptmTupletNoteValueRow');
                     for (var i = 0; i < row.cells.length; i++) {
@@ -1182,6 +1200,8 @@ function PitchTimeMatrix () {
                         cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                     }
                 }
+
+                that.playingNow = false;
             } else {
                 var row = docById('ptmNoteValueRow');
                 var cell = row.cells[that._colIndex];
@@ -1269,6 +1289,7 @@ function PitchTimeMatrix () {
                 }
 
                 noteCounter += 1;
+
                 if (noteCounter < that._notesToPlay.length) {
                     that.__playNote(time, noteCounter);
                 }
@@ -1573,27 +1594,31 @@ function PitchTimeMatrix () {
                         }
 
                         if (note[0][j][1] === '♯') {
-                            newStack.push([thisBlock, 'sharp', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 4]]);
-                            newStack.push([thisBlock + 1, 'pitch', 0, 0, [thisBlock, thisBlock + 2, thisBlock + 3, null]]);
-                            newStack.push([thisBlock + 2, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 1]]);
-                            newStack.push([thisBlock + 3, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 1]]);
+                            newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
+                            newStack.push([thisBlock + 1, ['accidentalname', {value: _('sharp') + ' ♯'}], 0, 0, [thisBlock]]);
+                            newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
+                            newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
+                            newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
                             if (lastConnection != null) {
-                                lastConnection += 2;
+                                lastConnection += 3;
                             }
-                            newStack.push([thisBlock + 4, 'hidden', 0, 0, [thisBlock, lastConnection]]);
-                            previousBlock = thisBlock + 4;
-                            thisBlock += 5;
+
+                            newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                            previousBlock = thisBlock + 5;
+                            thisBlock += 6;
                         } else if (note[0][j][1] === '♭') {
-                            newStack.push([thisBlock, 'flat', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 4]]);
-                            newStack.push([thisBlock + 1, 'pitch', 0, 0, [thisBlock, thisBlock + 2, thisBlock + 3, null]]);
-                            newStack.push([thisBlock + 2, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 1]]);
-                            newStack.push([thisBlock + 3, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 1]]);
+                            newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
+                            newStack.push([thisBlock + 1, ['accidentalname', {value: _('flat') + ' ♭'}], 0, 0, [thisBlock]]);
+                            newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
+                            newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
+                            newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
                             if (lastConnection != null) {
-                                lastConnection += 2;
+                                lastConnection += 3;
                             }
-                            newStack.push([thisBlock + 4, 'hidden', 0, 0, [thisBlock, lastConnection]]);
-                            previousBlock = thisBlock + 4;
-                            thisBlock += 5;
+
+                            newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                            previousBlock = thisBlock + 5;
+                            thisBlock += 6;
                         } else {
                             newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
                             newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);

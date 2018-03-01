@@ -30,6 +30,7 @@ const SIXTYFOURTHNOTE = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.
 // is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
 const SHARP = '♯';
 const FLAT = '♭';
+const NATURAL = '♮';
 const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
 const BTOFLAT = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
@@ -67,9 +68,13 @@ const SOLFATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
 
 
 function getSharpFlatPreference (keySignature) {
-    if (SHARPPREFERENCE.indexOf(keySignature.toLowerCase()) !== -1) {
+    var obj = keySignatureToMode(keySignature);
+    var obj2 = modeMapper(obj[0], obj[1]);
+    var ks = obj2[0] + ' ' + obj2[1];
+
+    if (SHARPPREFERENCE.indexOf(ks) !== -1) {
         return 'sharp';
-    } else if (FLATPREFERENCE.indexOf(keySignature.toLowerCase()) !== -1) {
+    } else if (FLATPREFERENCE.indexOf(ks) !== -1) {
         return 'flat';
     } else {
         return 'natural';
@@ -468,14 +473,10 @@ function getModeNumbers(name) {
 
 function getModeName(name) {
     for (var mode in MODENAMES) {
-        if (MODENAMES[mode][0] === name || MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
-            if (MODENAMES[mode][0] != '') {
-                return MODENAMES[mode][0];
-            } else {
-                console.log('I18n for mode name is misbehaving.');
-                console.log(name + ' ' + name.toLowerCase() + ' ' + MODENAMES[mode][0].toLowerCase() + ' ' + MODENAMES[mode][1].toLowerCase());
-                return MODENAMES[mode][1];
-            }
+        if (MODENAMES[mode][0] === name) {
+            return MODENAMES[mode][0];
+        } else if (MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
+            return MODENAMES[mode][1];
         }
     }
 
@@ -486,9 +487,9 @@ function getModeName(name) {
 
 function initIntervalI18N() {
     for (var i = 0; i < INTERVALNAMES.length; i++) {
-      if (INTERVALNAMES[i][0] == null) {
+        if (INTERVALNAMES[i][0] == null) {
             INTERVALNAMES[i][0] = _(INTERVALNAMES[i][1]);
-          }
+        }
 
         if (INTERVALNAMES[i][0] == null) {
             INTERVALNAMES[i][0] = INTERVALNAMES[i][1];
@@ -499,7 +500,7 @@ function initIntervalI18N() {
 
 function initFilterI18N() {
     for (var i = 0; i < FILTERTYPES.length; i++) {
-      if (FILTERTYPES[i][0] == null) {
+        if (FILTERTYPES[i][0] == null) {
             FILTERTYPES[i][0] = _(FILTERTYPES[i][1]);
           }
 
@@ -512,9 +513,9 @@ function initFilterI18N() {
 
 function initOscI18N() {
     for (var i = 0; i < OSCTYPES.length; i++) {
-      if (OSCTYPES[i][0] == null) {
+        if (OSCTYPES[i][0] == null) {
             OSCTYPES[i][0] = _(OSCTYPES[i][1]);
-          }
+        }
 
         if (OSCTYPES[i][0] == null) {
             OSCTYPES[i][0] = OSCTYPES[i][1];
@@ -525,9 +526,9 @@ function initOscI18N() {
 
 function initModeI18N() {
     for (var i = 0; i < MODENAMES.length; i++) {
-      if (MODENAMES[i][0] == null) {
+        if (MODENAMES[i][0] == null) {
             MODENAMES[i][0] = _(MODENAMES[i][1]);
-          }
+        }
 
         if (MODENAMES[i][0] == null) {
             MODENAMES[i][0] = MODENAMES[i][1];
@@ -571,18 +572,17 @@ function getDrumName(name) {
     }
 
     for (var drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            if (DRUMNAMES[drum][0] != '') {
-                return DRUMNAMES[drum][0];
-            } else {
-                console.log('I18n is misbehaving when parsing drum name: ' + name);
-                return DRUMNAMES[drum][1];
-            }
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+            return DRUMNAMES[drum][0];
+        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            return DRUMNAMES[drum][1];
         }
     }
 
+    // console.log(name + ' not found in DRUMNAMES');
     return null;
 };
+
 
 function getDrumSymbol(name) {
     if (name === '') {
@@ -591,16 +591,14 @@ function getDrumSymbol(name) {
     }
 
     for (var drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            if (DRUMNAMES[drum][0] != '') {
-                return DRUMNAMES[drum][3];
-            } else {
-                console.log('I18n is misbehaving when parsing drum name: ' + name);
-                return 'hh';
-            }
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+            return DRUMNAMES[drum][3];
+        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            return 'hh';
         }
     }
 
+    console.log(name + ' not found in DRUMNAMES');
     return 'hh';
 };
 
@@ -610,18 +608,17 @@ function getFilterTypes(name) {
         console.log('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
         name = DEFAULTFILTERTYPE;
     }
+
     for (var type = 0; type < FILTERTYPES.length; type++) {
-        if (FILTERTYPES[type][0].toLowerCase() === name.toLowerCase() || FILTERTYPES[type][1].toLowerCase() === name.toLowerCase()) {
-            if (FILTERTYPES[type][0] != '') {
-                return FILTERTYPES[type][0];
-            } else {
-                console.log('I18n is misbehaving when parsing filter type: ' + name);
-                return FILTERTYPES[type][1];
-            }
+        if (FILTERTYPES[type][0].toLowerCase() === name.toLowerCase()) {
+            return FILTERTYPES[type][0];
+        } else if (FILTERTYPES[type][1].toLowerCase() === name.toLowerCase()) {
+            return FILTERTYPES[type][1];
         }
     }
 
-    return null;
+    console.log(name + ' not found in FILTERTYPES');
+    return DEFAULTFILTERTYPE;
 };
 
 
@@ -630,18 +627,17 @@ function getOscillatorTypes(name) {
         console.log('getOscillatorType passed blank name. Returning ' + DEFAULTOSCILLATORTYPE);
         name = DEFAULTOSCILLATORTYPE;
     }
+
     for (var type = 0; type < OSCTYPES.length; type++) {
-        if (OSCTYPES[type][0].toLowerCase() === name.toLowerCase() || OSCTYPES[type][1].toLowerCase() === name.toLowerCase()) {
-            if (OSCTYPES[type][0] != '') {
-                return OSCTYPES[type][0];
-            } else {
-                console.log('I18n is misbehaving when parsing oscillator type: ' + name);
-                return OSCTYPES[type][1];
-            }
+        if (OSCTYPES[type][0].toLowerCase() === name.toLowerCase()) {
+            return OSCTYPES[type][0];
+        } else if (OSCTYPES[type][1].toLowerCase() === name.toLowerCase()) {
+            return OSCTYPES[type][1];
         }
     }
 
-    return null;
+    console.log(name + ' not found in OSCTYPES');
+    return DEFAULTOSCILLATORTYPE;
 };
 
 
@@ -654,11 +650,12 @@ function getDrumIcon(name) {
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        // if (DRUMNAMES[i].indexOf(name) !== -1) {
         if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[i][2];
         }
     }
+
+    console.log(name + ' not found in DRUMNAMES');
     return 'images/drum.svg';
 };
 
@@ -675,12 +672,13 @@ function getDrumSynthName(name) {
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        // if (DRUMNAMES[i].indexOf(name) !== -1) {
         if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[i][1];
         }
     }
-    return null;
+
+    console.log(name + ' not found in DRUMNAMES');
+    return DEFAULTDRUM;
 };
 
 
@@ -693,16 +691,17 @@ function getVoiceName(name) {
     }
 
     for (var i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+        if (VOICENAMES[i][0] === name) {
             if (VOICENAMES[i][0] != '') {
                 return VOICENAMES[i][0];
-            } else {
-                console.log('I18n is misbehaving when parsing voice name: ' + name);
+            } else if (VOICENAMES[i][1] === name) {
                 return VOICENAMES[i][1];
             }
         }
     }
-    return null;
+
+    console.log(name + ' not found in VOICENAMES');
+    return DEFAULTVOICE;
 };
 
 
@@ -719,6 +718,8 @@ function getVoiceIcon(name) {
             return VOICENAMES[i][2];
         }
     }
+
+    console.log(name + ' not found in VOICENAMES');
     return 'images/voices.svg';
 };
 
@@ -739,7 +740,9 @@ function getVoiceSynthName(name) {
             return VOICENAMES[i][1];
         }
     }
-    return null;
+
+    console.log(name + ' not found in VOICENAMES');
+    return DEFAULTVOICE;
 };
 
 
@@ -1212,23 +1215,19 @@ function durationToNoteValue(duration) {
         roundDown = 128;
     }
 
-    /*
-    // Next, see if the note has a factor of 2.
-    var factorOfTwo = 1;
-    var tupletValue = duration;
-    while (Math.floor(tupletValue / 2) * 2 === tupletValue) {
-        factorOfTwo *= 2;
-        tupletValue /= 2;
+    // Convert duration into parts based on POW2 factors
+    // e.g., 1 / 6 ==> [3, 2], 1 / 12 ==> [3, 4]
+    var i = 1;
+    while (Math.floor(duration / i) * i === duration) {
+        i = i * 2;
+        if (i > duration / 2) {
+            break;
+        }
     }
 
-    if (factorOfTwo > 1) {
-        // We have a tuplet of sorts
-        return [duration, 0, tupletValue, roundDown];
-    }
-    */
+    i = i / 2;
 
-    // Next, generate a fauve tuplet for a singleton.
-    return [1, 0, duration, roundDown];
+    return [1, 0, [duration / i, i], roundDown];
 };
 
 
@@ -1591,6 +1590,12 @@ function reducedFraction(a, b) {
 
 getNote = function (noteArg, octave, transposition, keySignature, movable, direction, errorMsg) {
     var sharpFlat = false;
+    var rememberFlat = false;
+    var rememberSharp = false;    
+
+    if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
+        return ['R', ''];
+    }
 
     octave = Math.round(octave);
 
@@ -1613,21 +1618,25 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
     case 'bb':
     case '𝄫':
         noteArg += 'b';
+        rememberFlat = true;
         transposition -= 1;
         break;
     case 'b':
     case '♭':
         noteArg += 'b';
+        rememberFlat = true;
         break;
     case '##':
     case '*':
     case '𝄪':
         noteArg += '#';
+        rememberSharp = true;
         transposition += 1;
         break;
     case '#':
     case '♯':
         noteArg += '#';
+        rememberSharp = true;
         break;
     case 'b#':
     case '#b':
@@ -1638,7 +1647,11 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
     }
 
     // Already a note? No need to convert from solfege.
-    if (noteArg in BTOFLAT) {
+    if (rememberSharp) {
+        if (noteArg in STOSHARP) {
+            noteArg = STOSHARP[noteArg];
+        }
+    } else if (noteArg in BTOFLAT) {
         noteArg = BTOFLAT[noteArg];
     } else if (noteArg in STOSHARP) {
         noteArg = STOSHARP[noteArg];
@@ -1738,9 +1751,7 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
             }
         }
 
-        if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
-            return ['R', ''];
-        } else if (halfSteps.indexOf(solfegePart) !== -1) {
+        if (halfSteps.indexOf(solfegePart) !== -1) {
             var index = halfSteps.indexOf(solfegePart) + offset;
             if (index > 11) {
                 index -= 12;
@@ -1859,7 +1870,7 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
         break;
     }
 
-    // Finally consider the note direction (in the case of intervals)
+    // Consider the note direction (in the case of intervals)
     if (direction != undefined) {
         switch(direction) {
         case -1:
@@ -1874,6 +1885,16 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
             break;
         default:
             break;
+        }
+    }
+
+    if (rememberSharp) {
+        if (note in EQUIVALENTSHARPS) {
+            note = EQUIVALENTSHARPS[note];
+        }
+    } else if (rememberFlat) {
+        if (note in EQUIVALENTFLATS) {
+            note = EQUIVALENTFLATS[note];
         }
     }
 
@@ -1928,4 +1949,391 @@ convertFactor = function (factor) {
     default:
         return null;
     }
+};
+
+
+modeMapper = function (key, mode) {
+    // map common modes into their major/minor equivalent
+    // console.log(key + ' ' + mode + ' >>');
+    key = key.toLowerCase();
+    mode = mode.toLowerCase();
+
+    switch(mode) {
+    case 'ionian':
+        mode = 'major';
+        break;
+    case 'dorian':
+        switch(key) {
+        case 'c':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'g':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'd';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'phrygian':
+        switch(key) {
+        case 'c':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'a':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'g♭';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'a♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'lydian':
+        switch(key) {
+        case 'c':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'a♯':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'g';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'd';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'mixolydian':
+        switch(key) {
+        case 'c':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'e':
+            key = 'a';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'd♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'e♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'e♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'c';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'locrian':
+        switch(key) {
+        case 'c':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd':
+            key = 'c';
+            mode = 'minor';
+            break;
+        case 'e':
+            key = 'f';
+            mode = 'major';
+            break;
+        case 'f':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'g':
+            key = 'g♯';
+            mode = 'major';
+            break;
+        case 'a':
+            key = 'a♯';
+            mode = 'major';
+            break;
+        case 'b':
+            key = 'c';
+            mode = 'major';
+            break;
+        case 'c♯':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'd♯':
+            key = 'e';
+            mode = 'major';
+            break;
+        case 'f♯':
+            key = 'g';
+            mode = 'major';
+            break;
+        case 'g♯':
+            key = 'a ';
+            mode = 'major';
+            break;
+        case 'a♯':
+            key = 'b';
+            mode = 'major';
+            break;
+        case 'd♭':
+            key = 'd';
+            mode = 'major';
+            break;
+        case 'e♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        case 'g♭':
+            key = 'f';
+            mode = 'minor';
+            break;
+        case 'a♭':
+            key = 'g♭';
+            mode = 'minor';
+            break;
+        case 'b♭':
+            key = 'd♭';
+            mode = 'minor';
+            break;
+        }
+        break;
+    case 'aeolian':
+        mode = 'minor';
+        break;
+    case 'natural minor':
+        mode = 'minor';
+        break;
+    case 'major':
+    case 'minor':
+    default:
+        break;
+    }
+
+    // console.log('>> ' + key + ' ' + mode);
+    return [key, mode];
 };
