@@ -6651,7 +6651,7 @@ function Logo () {
                             // And save the session.
                             that.saveLocally();
                         }
-                    }, 1000);
+                    }, 1000);  // Should be based on length of last note.
                 } else if (that.suppressOutput[turtle]) {
                     setTimeout(function () {
                         __checkCompletionState();
@@ -7637,9 +7637,11 @@ function Logo () {
         if (recording === undefined) {
             recording = false;
         }
+
         if (recording){
             this.playbackTime = 0;
         }
+
         if (this.turtles.running()) {
             if (this.playbackTime === 0) {
                 return;
@@ -7650,6 +7652,9 @@ function Logo () {
         } else if (this.playbackTime === 0) {
             var inFillClamp = false;
             var inHollowLineClamp = false;
+
+            this.hideBlocks();
+            this.showBlocksAfterRun = true;
         }
 
         // We need to sort the playback queue by time (as graphics
@@ -7841,9 +7846,14 @@ function Logo () {
                             }, 2000);  // Should this be based on the duration of the last note?
                         }
                     }
+
+                    that.showBlocks();
+                    that.showBlocksAfterRun = false;
                 }
             } else {
                 that.turtles.turtleList[turtle].running = false;
+                that.showBlocks();
+                that.showBlocksAfterRun = false;
             }
         };
 
@@ -10234,8 +10244,8 @@ function Logo () {
                     d2 -= b;
                 }
 
-		var obj2 = rationalToFraction(d2);
-		console.log(obj2[0] + '/' + obj2[1]);
+                var obj2 = rationalToFraction(d2);
+                console.log(obj2[0] + '/' + obj2[1]);
                 this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 if (i > 0 || obj[0] > 0) {
                     this.notationInsertTie(turtle);
@@ -10245,18 +10255,18 @@ function Logo () {
 
                 while (i > 0) {
                     i -= 1;
-		    console.log(obj2[0] + '/' + obj2[1]);
+                    console.log(obj2[0] + '/' + obj2[1]);
                     this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                     if (obj[0] > 0) {
-			this.notationInsertTie(turtle);
-			this.notationDrumStaging[turtle].push('tie');
-		    }
+                        this.notationInsertTie(turtle);
+                        this.notationDrumStaging[turtle].push('tie');
+                    }
                 }
 
             }
 
             if (obj[0] > 0) {
-		console.log(obj[0] + '/' + obj[1]);
+                console.log(obj[0] + '/' + obj[1]);
                 this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
             }
 
