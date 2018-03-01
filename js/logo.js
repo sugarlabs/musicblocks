@@ -6614,7 +6614,10 @@ function Logo () {
                         that.runningAbc = false;
                     } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
-                        that.errorMsg(_('Playback is ready.')); 
+                        if (!that.recording) {
+                            that.errorMsg(_('Playback is ready.')); 
+                        }
+
                         that.setPlaybackStatus();
                         that.compiling = false;
                         for (t in that.turtles.turtleList) {
@@ -7835,7 +7838,7 @@ function Logo () {
                                 that.synth.recorder.stop();
                                 that.synth.recorder.exportWAV(that.synth.download);
                                 that.recording = false;
-                            },2000);
+                            }, 2000);  // Should this be based on the duration of the last note?
                         }
                     }
                 }
