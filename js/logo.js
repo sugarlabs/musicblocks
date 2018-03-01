@@ -3106,6 +3106,7 @@ function Logo () {
             }
 
             that.pitchStaircase.Stairs = [];
+            that.pitchStaircase.stairPitchBlocks = [];
 
             childFlow = args[0];
             childFlowCount = 1;
@@ -3718,7 +3719,7 @@ function Logo () {
         case 'steppitch':
             // Similar to pitch but calculated from previous note played.
             if (!that.inMatrix && that.inNoteBlock[turtle].length === 0) {
-                that.errorMsg(_('The Step Pitch Block must be used inside of a Note Block.'), blk);
+                that.errorMsg(_('The Scaler Step Block must be used inside of a Note Block.'), blk);
                 that.stopTurtle = true;
                 break;
             }
@@ -3737,7 +3738,7 @@ function Logo () {
             }
 
             if (that.lastNotePlayed[turtle] == null) {
-                that.errorMsg('The Step Pitch Block must be preceded by a Pitch Block.', blk);
+                that.errorMsg('The Scalar Step Block must be preceded by a Pitch Block.', blk);
                 that.stopTurtle = true;
                 break;
             }
@@ -4217,6 +4218,8 @@ function Logo () {
                 if (flag === 0) {
                     that.pitchStaircase.Stairs.push([noteObj1[0], noteObj1[1], parseFloat(frequency), 1, 1]);
                 }
+
+                that.pitchStaircase.stairPitchBlocks.push(blk);
             } else {
                 if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
                     // Play a stand-alone pitch block as a quarter note.
@@ -6054,6 +6057,8 @@ function Logo () {
                 if (flag === 0) {
                     that.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
                 }
+
+                that.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (that.inPitchSlider) {
                 that.pitchSlider.Sliders.push([args[0], 0, 0]);
             } else {
