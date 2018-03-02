@@ -813,7 +813,7 @@ function PaletteModel(palette, palettes, name) {
                 svg.setOutie(true);
                 var artwork = svg.basicBox();
                 var docks = svg.docks;
-		var height = svg.getHeight();
+                var height = svg.getHeight();
                 break;
             case 'nameddo':
                 // so the label will fit
@@ -823,13 +823,13 @@ function PaletteModel(palette, palettes, name) {
                 svg.setExpand(30, 0, 0, 0);
                 var artwork = svg.basicBlock();
                 var docks = svg.docks;
-		var height = svg.getHeight();
+                var height = svg.getHeight();
                 break;
             default:
                 var obj = protoBlock.generator();
                 var artwork = obj[0];
                 var docks = obj[1];
-		var height = obj[3];
+                var height = obj[3];
                 break;
             }
 
