@@ -1234,7 +1234,7 @@ function Palette(palettes, name) {
             for (var b in that.model.blocks) {
                 if (that.model.blocks[b].modname === modname) {
                     if (that.protoHeights[modname] == undefined) {
-                        console.log('assigning height to ' + modname);
+                        // console.log('assigning height to ' + modname);
                         that.protoHeights[modname] = that.model.blocks[b].actualHeight;
                     }
                 }
