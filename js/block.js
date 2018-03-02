@@ -1059,7 +1059,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._calculateCollapseHitArea = function () {
         var hitArea = new createjs.Shape();
-        var w2 = this.width;
+        var w2 = STANDARDBLOCKHEIGHT * this.collapseBitmap.scaleX;
         var h2 = this.hitHeight;
 
         hitArea.graphics.beginFill('#FFF').drawRect(0, 0, w2, h2);
