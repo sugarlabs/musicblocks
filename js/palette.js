@@ -856,7 +856,7 @@ function PaletteModel(palette, palettes, name) {
                 blkname,
                 modname,
                 height: STANDARDBLOCKHEIGHT,
-                _height: height,
+                actualHeight: height,
                 label,
                 artwork,
                 artwork64: 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))),
@@ -1235,7 +1235,7 @@ function Palette(palettes, name) {
                 if (that.model.blocks[b].modname === modname) {
                     if (that.protoHeights[modname] == undefined) {
                         console.log('assigning height to ' + modname);
-                        that.protoHeights[modname] = that.model.blocks[b]._height;
+                        that.protoHeights[modname] = that.model.blocks[b].actualHeight;
                     }
                 }
             }
@@ -1326,8 +1326,8 @@ function Palette(palettes, name) {
             } else {
                 this.protoContainers[b.modname].x = this.menuContainer.x;
                 this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
-                this.protoHeights[b.modname] = b._height;
-                this.y += Math.ceil(b._height * PROTOBLOCKSCALE);
+                this.protoHeights[b.modname] = b.actualHeight;
+                this.y += Math.ceil(b.actualHeight * PROTOBLOCKSCALE);
             }
         }
 
