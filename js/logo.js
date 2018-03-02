@@ -334,12 +334,30 @@ function Logo () {
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         this.mic = new Tone.UserMedia();
+        console.log(this.mic);
+        /*
+        // This should be run if there is a loudness block loaded...
+	this.mic.open().then(function(){
+	    //opening is activates the microphone
+	    //starting lets audio through
+	    this.mic.start(10);
+	});
+        */
+
         this.limit = 1024;
-        this.analyser = new Tone.Analyser({
-                        "type" : "waveform",
-                        "size" : this.limit
+        this.volumeAnalyser = new Tone.Analyser({
+            'type': 'waveform',  // or 'fft'
+            'size': this.limit
         });
-        this.mic.connect(this.analyser);
+
+        /*
+        this.pitchAnalyser = new Tone.Analyser({
+            'type': 'fft'
+            'size': this.limit
+        });
+        */
+
+        this.mic.connect(this.volumeAnalyser);
     } else {
         try {
             this.mic = new p5.AudioIn()
@@ -798,7 +816,7 @@ function Logo () {
                     if (_THIS_IS_TURTLE_BLOCKS) {
                         value = Math.round(this.mic.getLevel() * 1000);
                     } else {
-                        var values = this.analyser.analyse();
+                        var values = this.volumeAnalyser.getValue();
                         var sum = 0;
                         for (var k = 0; k < this.limit; k++) {
                             sum += (values[k] * values[k]);
@@ -8571,7 +8589,7 @@ function Logo () {
                     // FIXME
                     that.blocks.blockList[blk].value = 440;
                 } else {
-                    var signal = that.analyser.analyse();
+                    var signal = that.volumeAnalyser.getValue();
                     var dft = new DFT(that.limit, 44100);
                     dft.forward(signal);
                     var values = dft.spectrum;
@@ -8605,7 +8623,8 @@ function Logo () {
                         that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
                     }
                 } else {
-                    var values = that.analyser.analyse();
+                    var values = that.volumeAnalyser.getValue();
+                    console.log(values);
                     var sum = 0;
                     for(var k=0; k<that.limit; k++) {
                             sum += (values[k] * values[k]);
