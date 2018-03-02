@@ -1700,7 +1700,7 @@ function Blocks () {
         myBlock.text.text = label;
 
         // Make sure text is on top.
-        var z = myBlock.container.getNumChildren() - 1;
+        var z = myBlock.container.children.length - 1;
         myBlock.container.setChildIndex(myBlock.text, z);
 
         if (myBlock.loadComplete) {
@@ -3021,7 +3021,7 @@ function Blocks () {
         // We display some extra buttons when we long-press an action block.
         var myBlock = this.blockList[this.activeBlock];
         if (myBlock.name === 'action') {
-            var z = this.stage.getNumChildren() - 1;
+            var z = this.stage.children.length - 1;
             this.dismissButton.visible = true;
             this.dismissButton.x = myBlock.container.x - 27;
             this.dismissButton.y = myBlock.container.y - 27;
@@ -4268,7 +4268,7 @@ function Blocks () {
         var topBlk = this.findTopBlock(blk);
         this.findDragGroup(topBlk);
 
-        var z = this.stage.getNumChildren() - 1;
+        var z = this.stage.children.length - 1;
         for (var b = 0; b < this.dragGroup.length; b++) {
             this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
             if (this.blockList[this.dragGroup[b]].collapseContainer !== null) {

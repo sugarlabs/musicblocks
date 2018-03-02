@@ -841,9 +841,9 @@ function Turtle (name, turtles, drum) {
                 that.startBlock.container.addChild(that.decorationBitmap);
                 that.decorationBitmap.name = 'decoration';
 
-                var bounds = that.startBlock.container.getBounds();
+                var width = that.startBlock.width;
                 // FIXME: Why is the position off? Does it need a scale factor?
-                that.decorationBitmap.x = bounds.width - 50 * that.startBlock.protoblock.scale / 2;
+                that.decorationBitmap.x = width - 50 * that.startBlock.protoblock.scale / 2;
                 that.decorationBitmap.y = 20 * that.startBlock.protoblock.scale / 2;
                 that.decorationBitmap.scaleX = (27.5 / image.width) * that.startBlock.protoblock.scale / 2;
                 that.decorationBitmap.scaleY = (27.5 / image.height) * that.startBlock.protoblock.scale / 2;
@@ -1212,16 +1212,16 @@ function Turtles () {
                 newTurtle.decorationBitmap = newTurtle.bitmap.clone();
                 startBlock.container.addChild(newTurtle.decorationBitmap);
                 newTurtle.decorationBitmap.name = 'decoration';
-                var bounds = startBlock.container.getBounds();
+                var width = startBlock.width;
 
                 // Race condition with collapse/expand bitmap generation.
-                if (startBlock.expandBitmap == null) {
-                    var offset = 75;
-                } else {
-                    var offset = 40;
-                }
+                // if (startBlock.expandBitmap == null) {
+                //     var offset = 75;
+                // } else {
+                var offset = 40;
+                // }
 
-                newTurtle.decorationBitmap.x = bounds.width - offset * startBlock.protoblock.scale / 2;
+                newTurtle.decorationBitmap.x = width - offset * startBlock.protoblock.scale / 2;
 
                 newTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
                 newTurtle.decorationBitmap.scaleX = newTurtle.decorationBitmap.scaleY = newTurtle.decorationBitmap.scale = 0.5 * startBlock.protoblock.scale / 2

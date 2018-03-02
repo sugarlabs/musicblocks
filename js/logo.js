@@ -6654,7 +6654,7 @@ function Logo () {
                 }
 
                 // Make sure the turtles are on top.
-                var i = that.stage.getNumChildren() - 1;
+                var i = that.stage.children.length - 1;
                 that.stage.setChildIndex(that.turtles.turtleList[turtle].container, i);
                 that.refreshCanvas();
             }
