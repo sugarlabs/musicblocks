@@ -332,41 +332,9 @@ function Logo () {
     this.svgOutput = '';
     this.svgBackground = true;
 
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        this.mic = new Tone.UserMedia();
-        console.log(this.mic);
-        /*
-        // This should be run if there is a loudness block loaded...
-	this.mic.open().then(function(){
-	    //opening is activates the microphone
-	    //starting lets audio through
-	    this.mic.start(10);
-	});
-        */
-
-        this.limit = 1024;
-        this.volumeAnalyser = new Tone.Analyser({
-            'type': 'waveform',  // or 'fft'
-            'size': this.limit
-        });
-
-        /*
-        this.pitchAnalyser = new Tone.Analyser({
-            'type': 'fft'
-            'size': this.limit
-        });
-        */
-
-        this.mic.connect(this.volumeAnalyser);
-    } else {
-        try {
-            this.mic = new p5.AudioIn()
-        } catch (e) {
-            console.log(e);
-            console.log(NOMICERRORMSG);
-            this.mic = null;
-        }
-    }
+    this.mic = null;
+    this.volumeAnalyser = null;
+    this.pitchAnalyser = null;
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
         this.setPlaybackStatus = setPlaybackStatus;
@@ -816,11 +784,21 @@ function Logo () {
                     if (_THIS_IS_TURTLE_BLOCKS) {
                         value = Math.round(this.mic.getLevel() * 1000);
                     } else {
+                        if (this.volumeAnalyser == null) {
+			    this.volumeAnalyser = new Tone.Analyser({
+				'type': 'waveform',
+				'size': this.limit
+			    });
+
+			    this.mic.connect(this.volumeAnalyser);
+			}
+
                         var values = this.volumeAnalyser.getValue();
                         var sum = 0;
                         for (var k = 0; k < this.limit; k++) {
                             sum += (values[k] * values[k]);
                         }
+
                         value = Math.round(Math.sqrt(sum / this.limit));
                     }
                 }
@@ -949,6 +927,47 @@ function Logo () {
 
             this.blocks.blockList[blk].container.updateCache();
             this.refreshCanvas();
+        }
+    };
+
+    this.initMediaDevices = function () {
+        // Do we need to initialize media devices?
+        for (var blk = 0; this.blocks.blockList.length; blk++) {
+            switch (this.blocks.blockList[blk].name) {
+            case 'pitchness':
+            case 'loudness':
+		if (_THIS_IS_MUSIC_BLOCKS_) {
+		    Tone.UserMedia.enumerateDevices().then(function(devices) {
+			console.log(devices)
+		    });
+
+		    this.mic = new Tone.UserMedia();
+		    this.mic.open().then(function(){
+                        if (this.mic != undefined) {
+			    console.log(this.mic);
+			    this.mic.start();
+                        }
+		    });
+
+		    this.limit = 1024;
+		} else {
+		    try {
+			this.mic = new p5.AudioIn()
+                        that.mic.start();
+		    } catch (e) {
+			console.log(e);
+			console.log(NOMICERRORMSG);
+			this.mic = null;
+		    }
+		}
+                break;
+	    default:
+                break;
+            }
+
+            if (this.mic !== null) {
+                break;
+            }
         }
     };
 
@@ -8584,64 +8603,45 @@ function Logo () {
         } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {
             case 'pitchness':
-                // Experimental
-                if (_THIS_IS_TURTLE_BLOCKS_) {
-                    // FIXME
+                if (this.mic === null || _THIS_IS_TURTLE_BLOCKS_) {
                     that.blocks.blockList[blk].value = 440;
                 } else {
-                    var signal = that.volumeAnalyser.getValue();
-                    var dft = new DFT(that.limit, 44100);
-                    dft.forward(signal);
-                    var values = dft.spectrum;
+                    if (this.pitchAnalyser == null) {
+			this.pitchAnalyser = new Tone.Analyser({
+			    'type': 'fft',
+			    'size': this.limit
+			});
 
-                    try {
-                        if (!that.mic.open()) {
-                            that.mic.open();
-                            that.blocks.blockList[blk].value = 0;
-                        } else {
-                            that.blocks.blockList[blk].value = values[0];
-                        }
-                    } catch (e) {
-                        console.log(e);
-                        that.mic.open();
-                        that.blocks.blockList[blk].value = values[0];
-                    }
+			this.mic.connect(this.pitchAnalyser);
+		    }
+
+		    var values = that.pitchAnalyser.getValue();
+                    that.blocks.blockList[blk].value = values[0];
                 }
                 break;
             case 'loudness':
-                if (_THIS_IS_TURTLE_BLOCKS_) {
-                    try {
-                        if (!that.mic.enabled) {
-                            that.mic.start();
-                            that.blocks.blockList[blk].value = 0;
-                        } else {
-                            that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
-                        }
-                    } catch (e) {
-                        console.log(e);
-                        that.mic.start();
-                        that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
-                    }
+                if (this.mic === null) {
+                    that.blocks.blockList[blk].value = 0;
+                } else if (_THIS_IS_TURTLE_BLOCKS_) {
+                    that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
                 } else {
-                    var values = that.volumeAnalyser.getValue();
-                    console.log(values);
+		    if (this.volumeAnalyser == null) {
+			this.volumeAnalyser = new Tone.Analyser({
+			    'type': 'waveform',
+			    'size': this.limit
+			});
+
+			this.mic.connect(this.volumeAnalyser);
+                    }
+
+		    var values = that.volumeAnalyser.getValue();
                     var sum = 0;
                     for(var k=0; k<that.limit; k++) {
-                            sum += (values[k] * values[k]);
+                        sum += (values[k] * values[k]);
                     }
-                    var rms = Math.sqrt(sum/that.limit);
-                    try {
-                        if (!that.mic.open()) {
-                            that.mic.open();
-                            that.blocks.blockList[blk].value = 0;
-                        } else {
-                            that.blocks.blockList[blk].value = Math.round(rms);
-                        }
-                    } catch (e) {  // MORE DEBUGGING
-                        console.log(e);
-                        that.mic.open();
-                        that.blocks.blockList[blk].value = Math.round(rms);
-                    }
+
+                    var rms = Math.sqrt(sum / that.limit);
+                    that.blocks.blockList[blk].value = Math.round(rms);
                 }
                 break;
             /*

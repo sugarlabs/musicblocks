@@ -2160,6 +2160,10 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
+        } else if (name === 'loudness' || name === 'pitchness') {
+            postProcess = function () {
+		that.logo.initMediaDevices();
+            };
         } else if (name === 'media') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -3875,6 +3879,12 @@ function Blocks () {
                         console.log(e)
                     }
                 }
+                break;
+
+            case 'loudness':
+            case 'pitchness':
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null, []);
+		this.logo.initMediaDevices();
                 break;
 
             case 'media':
