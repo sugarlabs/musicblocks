@@ -932,20 +932,24 @@ function Logo () {
 
     this.initMediaDevices = function () {
         // Do we need to initialize media devices?
+        console.log('INIT MEDIA DEVICES');
         for (var blk = 0; this.blocks.blockList.length; blk++) {
             switch (this.blocks.blockList[blk].name) {
             case 'pitchness':
             case 'loudness':
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    Tone.UserMedia.enumerateDevices().then(function(devices) {
-                        console.log(devices)
-                    });
-
                     this.mic = new Tone.UserMedia();
                     this.mic.open().then(function(){
                         if (this.mic != undefined) {
                             console.log(this.mic);
                             this.mic.start();
+                        } else {
+			    Tone.UserMedia.enumerateDevices().then(function(devices) {
+				console.log(devices)
+			    });
+
+                            console.log('MIC NOT FOUND');
+                            this.mic = null;
                         }
                     });
 
