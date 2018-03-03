@@ -932,21 +932,33 @@ function Logo () {
 
     this.initMediaDevices = function () {
         // Do we need to initialize media devices?
+        var that = this;
         console.log('INIT MICROPHONE');
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.mic = new Tone.UserMedia();
-            if (this.mic != undefined) {
-                console.log('MIC NOT FOUND');
-                this.errorMsg(NOMICERRORMSG);
-                this.mic = null;
-		Tone.UserMedia.enumerateDevices().then(function(devices) {
-		    console.log(devices)
-		});
-            } else {
-		this.mic.open().then(function(){
-                    this.mic.start();
-		});
-	    }
+            this.mic.open('audioinput').then(function() {
+                that.mic.start();
+            }).catch(function(err) {
+                console.log(err.name + ": " + err.message);
+                that.mic.open('default').then(function() {
+                    that.mic.start();
+                }).catch(function(err) {
+                    console.log(err.name + ": " + err.message);
+                    console.log('MIC NOT FOUND');
+                    that.errorMsg(NOMICERRORMSG);
+                    Tone.UserMedia.enumerateDevices().then(function(devices) {
+                        console.log(devices)
+                    });
+                    navigator.mediaDevices.enumerateDevices().then(function(devices) {
+                        devices.forEach(function(device) {
+                            console.log(device.kind + ": " + device.label +
+                                        " id = " + device.deviceId);
+                        });
+                    }).catch(function(err) {
+                        console.log(err.name + ": " + err.message);
+                    });
+                });
+            });
 
             this.limit = 1024;
         } else {
