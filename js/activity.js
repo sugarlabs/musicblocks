@@ -74,10 +74,10 @@ try{
 
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
+    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
     MYDEFINES = MYDEFINES
 } else {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'prefixfree.min'];
+    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'prefixfree.min'];
 }
 
 define(MYDEFINES, function (compatibility) {
@@ -119,6 +119,21 @@ define(MYDEFINES, function (compatibility) {
         } catch (e) {
             console.log(e);
         }
+
+/*
+// Prefer camera resolution nearest to 1280x720.
+var constraints = { audio: true, video: { width: 1280, height: 720 } }; 
+
+navigator.mediaDevices.getUserMedia(constraints)
+.then(function(mediaStream) {
+  var video = document.querySelector('video');
+  video.srcObject = mediaStream;
+  video.onloadedmetadata = function(e) {
+    video.play();
+  };
+})
+.catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+*/	    
 
         document.title = TITLESTRING;
 
