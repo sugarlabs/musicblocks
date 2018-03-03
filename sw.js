@@ -82,7 +82,6 @@ var urlsToCache = [
     'header-icons/save-blocks-button.svg',
     'header-icons/save-button.svg',
     'header-icons/save-lilypond.svg',
-    'header-icons/save-png-inactive.svg',
     'header-icons/save-png.svg',
     'header-icons/save-svg.svg',
     'header-icons/save-tb.svg',
