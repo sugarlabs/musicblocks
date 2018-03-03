@@ -793,13 +793,14 @@ function Logo () {
                             this.mic.connect(this.volumeAnalyser);
                         }
 
-                        var values = this.volumeAnalyser.getValue();
+                        var values = that.volumeAnalyser.getValue();
                         var sum = 0;
-                        for (var k = 0; k < this.limit; k++) {
+                        for(var k = 0; k < that.limit; k++) {
                             sum += (values[k] * values[k]);
                         }
 
-                        value = Math.round(Math.sqrt(sum / this.limit));
+                        var rms = Math.sqrt(sum / that.limit);
+                        that.blocks.blockList[blk].value = Math.round(rms * 100);
                     }
                 }
                 break;
@@ -931,35 +932,25 @@ function Logo () {
     };
 
     this.initMediaDevices = function () {
-        // Do we need to initialize media devices?
         var that = this;
         console.log('INIT MICROPHONE');
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.mic = new Tone.UserMedia();
-            this.mic.open('audioinput').then(function() {
-                that.mic.start();
-            }).catch(function(err) {
-                console.log(err.name + ": " + err.message);
-                that.mic.open('default').then(function() {
-                    that.mic.start();
-                }).catch(function(err) {
-                    console.log(err.name + ": " + err.message);
+            var mic = new Tone.UserMedia();
+            mic.open().then(function() {
+                try {
+                    console.log(mic.start);
+                    mic.start();
+                } catch (e) {
                     console.log('MIC NOT FOUND');
+                    console.log(e.name + ': ' + e.message);
+
+                    console.log(mic);
                     that.errorMsg(NOMICERRORMSG);
-                    Tone.UserMedia.enumerateDevices().then(function(devices) {
-                        console.log(devices)
-                    });
-                    navigator.mediaDevices.enumerateDevices().then(function(devices) {
-                        devices.forEach(function(device) {
-                            console.log(device.kind + ": " + device.label +
-                                        " id = " + device.deviceId);
-                        });
-                    }).catch(function(err) {
-                        console.log(err.name + ": " + err.message);
-                    });
-                });
+                    mic = null;
+                }
             });
 
+            this.mic = mic;
             this.limit = 1024;
         } else {
             try {
