@@ -8641,7 +8641,7 @@ function Logo () {
                     }
 
                     var rms = Math.sqrt(sum / that.limit);
-                    that.blocks.blockList[blk].value = Math.round(rms);
+                    that.blocks.blockList[blk].value = Math.round(rms * 100);
                 }
                 break;
             /*
