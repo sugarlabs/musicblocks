@@ -785,13 +785,13 @@ function Logo () {
                         value = Math.round(this.mic.getLevel() * 1000);
                     } else {
                         if (this.volumeAnalyser == null) {
-			    this.volumeAnalyser = new Tone.Analyser({
-				'type': 'waveform',
-				'size': this.limit
-			    });
+                            this.volumeAnalyser = new Tone.Analyser({
+                                'type': 'waveform',
+                                'size': this.limit
+                            });
 
-			    this.mic.connect(this.volumeAnalyser);
-			}
+                            this.mic.connect(this.volumeAnalyser);
+                        }
 
                         var values = this.volumeAnalyser.getValue();
                         var sum = 0;
@@ -936,32 +936,32 @@ function Logo () {
             switch (this.blocks.blockList[blk].name) {
             case 'pitchness':
             case 'loudness':
-		if (_THIS_IS_MUSIC_BLOCKS_) {
-		    Tone.UserMedia.enumerateDevices().then(function(devices) {
-			console.log(devices)
-		    });
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    Tone.UserMedia.enumerateDevices().then(function(devices) {
+                        console.log(devices)
+                    });
 
-		    this.mic = new Tone.UserMedia();
-		    this.mic.open().then(function(){
+                    this.mic = new Tone.UserMedia();
+                    this.mic.open().then(function(){
                         if (this.mic != undefined) {
-			    console.log(this.mic);
-			    this.mic.start();
+                            console.log(this.mic);
+                            this.mic.start();
                         }
-		    });
+                    });
 
-		    this.limit = 1024;
-		} else {
-		    try {
-			this.mic = new p5.AudioIn()
+                    this.limit = 1024;
+                } else {
+                    try {
+                        this.mic = new p5.AudioIn()
                         that.mic.start();
-		    } catch (e) {
-			console.log(e);
-			console.log(NOMICERRORMSG);
-			this.mic = null;
-		    }
-		}
+                    } catch (e) {
+                        console.log(e);
+                        console.log(NOMICERRORMSG);
+                        this.mic = null;
+                    }
+                }
                 break;
-	    default:
+            default:
                 break;
             }
 
@@ -8607,15 +8607,15 @@ function Logo () {
                     that.blocks.blockList[blk].value = 440;
                 } else {
                     if (this.pitchAnalyser == null) {
-			this.pitchAnalyser = new Tone.Analyser({
-			    'type': 'fft',
-			    'size': this.limit
-			});
+                        this.pitchAnalyser = new Tone.Analyser({
+                            'type': 'fft',
+                            'size': this.limit
+                        });
 
-			this.mic.connect(this.pitchAnalyser);
-		    }
+                        this.mic.connect(this.pitchAnalyser);
+                    }
 
-		    var values = that.pitchAnalyser.getValue();
+                    var values = that.pitchAnalyser.getValue();
                     that.blocks.blockList[blk].value = values[0];
                 }
                 break;
@@ -8625,18 +8625,18 @@ function Logo () {
                 } else if (_THIS_IS_TURTLE_BLOCKS_) {
                     that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
                 } else {
-		    if (this.volumeAnalyser == null) {
-			this.volumeAnalyser = new Tone.Analyser({
-			    'type': 'waveform',
-			    'size': this.limit
-			});
+                    if (this.volumeAnalyser == null) {
+                        this.volumeAnalyser = new Tone.Analyser({
+                            'type': 'waveform',
+                            'size': this.limit
+                        });
 
-			this.mic.connect(this.volumeAnalyser);
+                        this.mic.connect(this.volumeAnalyser);
                     }
 
-		    var values = that.volumeAnalyser.getValue();
+                    var values = that.volumeAnalyser.getValue();
                     var sum = 0;
-                    for(var k=0; k<that.limit; k++) {
+                    for(var k = 0; k < that.limit; k++) {
                         sum += (values[k] * values[k]);
                     }
 

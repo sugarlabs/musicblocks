@@ -410,7 +410,7 @@ function Blocks () {
             that._sizeCounter = 0;
             var childFlowSize = 1;
             if (c > 0 && myBlock.connections[c] != null) {
-		this._sizeCounter = 0;
+                this._sizeCounter = 0;
                 childFlowSize = Math.max(that._getStackSize(myBlock.connections[c]), 1);
             }
 
@@ -1791,10 +1791,10 @@ function Blocks () {
             }
 
             if (this.blockList[thisBlock].connections.length > 1) {
-		thisBlock = last(this.blockList[thisBlock].connections);
+                thisBlock = last(this.blockList[thisBlock].connections);
             } else {
                 thisBlock = null;
-	    }
+            }
 
             // Just in case there is a loop in the block list.
             counter += 1;
@@ -2162,7 +2162,7 @@ function Blocks () {
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
         } else if (name === 'loudness' || name === 'pitchness') {
             postProcess = function () {
-		that.logo.initMediaDevices();
+                that.logo.initMediaDevices();
             };
         } else if (name === 'media') {
             postProcess = function (args) {
@@ -3884,7 +3884,7 @@ function Blocks () {
             case 'loudness':
             case 'pitchness':
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null, []);
-		this.logo.initMediaDevices();
+                this.logo.initMediaDevices();
                 break;
 
             case 'media':
