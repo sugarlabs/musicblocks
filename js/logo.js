@@ -936,22 +936,19 @@ function Logo () {
         console.log('INIT MICROPHONE');
         if (_THIS_IS_MUSIC_BLOCKS_) {
             var mic = new Tone.UserMedia();
-            mic.open().then(function() {
-                try {
-                    console.log(mic.start);
-                    mic.start();
-                } catch (e) {
-                    console.log('MIC NOT FOUND');
-                    console.log(e.name + ': ' + e.message);
+            try {
+		mic.open();
+            } catch (e) {
+                console.log('MIC NOT FOUND');
+                console.log(e.name + ': ' + e.message);
 
-                    console.log(mic);
-                    that.errorMsg(NOMICERRORMSG);
-                    mic = null;
-                }
-            });
+                console.log(mic);
+                that.errorMsg(NOMICERRORMSG);
+                mic = null;
+            }
 
             this.mic = mic;
-            this.limit = 1024;
+            this.limit = 256;
         } else {
             try {
                 this.mic = new p5.AudioIn()
