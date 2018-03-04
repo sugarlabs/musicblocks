@@ -214,7 +214,6 @@ var urlsToCache = [
     'js/blocks.js',
     'js/utilitybox.js',
     'js/boundary.js',
-    'js/samplesviewer.js',
     'js/clearbox.js',
     'js/palette.js',
     'js/playbackbox.js',

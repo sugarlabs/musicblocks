@@ -36,9 +36,8 @@ Other utilities
 * `background.js` -- extenstion utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
-* `samplesviewer.js` -- planet interface
-* `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
-* `trash.js` -- trash-can manager
+* sugarizer-`compatibility.js` -- datastore utilities used by sugarizer
+* `trash.js` -- trash can manager
 * `turtledefs.js` -- strings and palettes unique to Music Blocks
 
 Subdirectories with additional utilities
