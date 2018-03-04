@@ -53,6 +53,15 @@ function ProjectStorage(Planet){
 		}
 	}
 
+	this.getCurrentProjectName = function(){
+		var c = this.data.CurrentProject;
+		if (this.data.Projects[c]===undefined){
+			return this.defaultProjectName;
+		} else {
+			return this.data.Projects[c].ProjectName;
+		}
+	}
+
 	this.initialiseNewProject = function(name,data,image){
 		if (name===undefined){
 			name=this.defaultProjectName;

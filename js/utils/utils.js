@@ -541,49 +541,6 @@ function prepareMacroExports (name, stack, macroDict) {
     return JSON.stringify(macroDict);
 };
 
-
-function doSaveSVG (logo, desc) {
-    var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
-    download(desc, 'data:image/svg+xml;utf8,' + svg, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-};
-
-
-function doSaveLilypond (logo, desc) {
-    download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-};
-
-function doSaveLilypondPDF (logo, desc) {
-    var data = logo.notationOutput;
-    window.Converter.ly2pdf(data,function(success,dataurl){
-        if (!success){
-            console.log("Error: "+dataurl);
-            //TODO: Error message box
-        } else {
-            afterSaveLilypondPDF(dataurl, desc);
-        }
-    });
-};
-
-function afterSaveLilypondPDF (dataurl, desc) {
-    desc = desc.substring(0, desc.length - 3);
-    desc+=".pdf";
-    download(desc, dataurl);
-}
-
-function doSaveAbc (logo, desc) {
-    download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-};
-
-
-function download (filename, data) {
-    var a = document.createElement('a');
-    a.setAttribute('href', data);
-    a.setAttribute('download', filename);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-};
-
 // Some block-specific code
 
 // Publish to FB

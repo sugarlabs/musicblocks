@@ -278,7 +278,6 @@ function Logo () {
     this.notationStaging = {};
     this.notationDrumStaging = {};
     this.notationOutput = '';
-    this.notationConvert = '';
     this.notationNotes = {};
     this.pickupPOW2 = {};
     this.pickupPoint = {};
@@ -2767,7 +2766,7 @@ function Logo () {
                 if (that.svgBackground) {
                     that.svgOutput = '<rect x="0" y="0" height="' + that.canvas.height + '" width="' + that.canvas.width + '" fill="' + body.style.background + '"/> ' + that.svgOutput;
                 }
-                doSaveSVG(that, args[0]);
+                save.saveSVG(args[0]);
             }
             break;
         case 'showHeap':
@@ -2791,17 +2790,8 @@ function Logo () {
             }
             break;
         case 'saveHeap':
-            function downloadFile(filename, mimetype, content) {
-                var download = document.createElement('a');
-                download.setAttribute('href', 'data:' + mimetype + ';charset-utf-8,' + content);
-                download.setAttribute('download', filename);
-                document.body.appendChild(download);
-                download.click();
-                document.body.removeChild(download);
-            };
-
             if (args[0] && turtle in that.turtleHeaps) {
-                downloadFile(args[0], 'text/json', JSON.stringify(that.turtleHeaps[turtle]));
+                save.download('json', 'data:text/json;charset-utf-8,'+JSON.stringify(that.turtleHeaps[turtle]), args[0]);
             }
             break;
         case 'loadHeap':
@@ -2903,7 +2893,7 @@ function Logo () {
             // Actions for music-related blocks
         case 'savelilypond':
             if (args.length === 1) {
-                saveLilypondOutput(that, args[0]);
+                save.afterSaveLilypond(args[0]);
             }
             break;
         case 'amsynth':
@@ -2982,7 +2972,7 @@ function Logo () {
             break;
         case 'saveabc':
             if (args.length === 1) {
-                saveAbcOutput(that, args[0]);
+                save.afterSaveAbc(args[0]);
             }
             break;
 
@@ -6613,17 +6603,11 @@ function Logo () {
                 if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
                     if (that.runningLilypond) {
                         console.log('saving lilypond output:');
-                        var filename = docById('fileName').value;
-                        if (filename == undefined || filename.length === 0) {
-                            filename = _('My Project') + '.ly';
-                        }
-                        console.log(that.notationConvert);
-                        saveLilypondOutput(that, filename, that.notationConvert);
-                        that.notationConvert = "";
+                        save.afterSaveLilypond();
                         that.runningLilypond = false;
                     } else if (that.runningAbc) {
                         console.log('saving abc output:');
-                        saveAbcOutput(that, _('My Project') + '.abc');
+                        save.afterSaveAbc();
                         that.runningAbc = false;
                     } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
@@ -7868,7 +7852,7 @@ function Logo () {
                             setTimeout(function(){
                                 console.log('finishing recording');
                                 that.synth.recorder.stop();
-                                that.synth.recorder.exportWAV(that.synth.download);
+                                that.synth.recorder.exportWAV(save.afterSaveWAV.bind(save));
                                 that.recording = false;
                             }, Math.max(2000, lastNote * 1000));
                         }
