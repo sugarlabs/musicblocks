@@ -3555,7 +3555,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchnessBlock.staticLabels.push(_('pitch'));
     pitchnessBlock.adjustWidthToLabel();
     pitchnessBlock.parameterBlock();
-    pitchnessBlock.hidden = true;
+    // pitchnessBlock.hidden = true;
 
     var loudnessBlock = new ProtoBlock('loudness');
     loudnessBlock.palette = palettes.dict['sensors'];

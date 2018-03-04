@@ -948,7 +948,7 @@ function Logo () {
             }
 
             this.mic = mic;
-            this.limit = 256;
+            this.limit = 1024;
         } else {
             try {
                 this.mic = new p5.AudioIn()
@@ -8606,7 +8606,17 @@ function Logo () {
                     }
 
                     var values = that.pitchAnalyser.getValue();
-                    that.blocks.blockList[blk].value = values[0];
+                    var max = 0;
+                    var idx = 0;
+                    for (var i = 0; i < this.limit; i++) {
+                        var v2 = values[i] * values[i];
+                        if (v2 > max) {
+                            max = v2;
+                            idx = i;
+                        }
+                    }
+
+                    that.blocks.blockList[blk].value = idx;
                 }
                 break;
             case 'loudness':
