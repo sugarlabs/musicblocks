@@ -38,7 +38,7 @@ function SaveBox () {
     this._doShareOnFacebook = null;
     this._doSaveBlockArtwork = null;
     this._doSaveAbc = null;
-    this._doSaveLilyPond = null;
+    this._doSaveLilypond = null;
 
     this._container = null;
     this._bounds = null;
@@ -46,65 +46,11 @@ function SaveBox () {
     this.close = null;
     this._scale = 1;
 
-    this.setCanvas = function (canvas) {
-        this._canvas = canvas;
-        return this;
-    };
-
-    this.setStage = function (stage) {
-        this._stage = stage;
-        return this;
-    };
-
-    this.setSaveTB = function (doSaveTB) {
-        this._doSaveTB = doSaveTB;
-        return this;
-    };
-
-    this.setSaveSVG = function (doSaveSVG) {
-        this._doSaveSVG = doSaveSVG;
-        return this;
-    };
-
-    this.setSavePNG = function (doSavePNG) {
-        this._doSavePNG = doSavePNG;
-        return this;
-    };
-
-    this.setSaveWAV = function (doSaveWAV) {
-        this._doSaveWAV = doSaveWAV;
-        return this;
-    };
-
-    this.setSaveFB = function (doSaveFB) {
-        this._doShareOnFacebook = doSaveFB;
-        return this;
-    };
-
-    this.setSaveBlockArtwork = function (doSaveBlockArtwork) {
-        this._doSaveBlockArtwork = doSaveBlockArtwork;
-        return this;
-    };
-
-    this.setSaveLilypond = function (doSaveLilypond) {
-        this._doSaveLilypond = doSaveLilypond;
-        return this;
-    };
-
-    this.setSaveAbc = function (doSaveAbc) {
-        this._doSaveAbc = doSaveAbc;
-        return this;
+    this.setVariables = function(vars){
+        for (var i = 0; i<vars.length; i++){
+            this[vars[i][0]]=vars[i][1];
+        }
     }
-
-    this.setSavePlanet = function (doSavePlanet) {
-        this._doUploadToPlanet = doSavePlanet;
-        return this;
-    };
-
-    this.setRefreshCanvas = function (refreshCanvas) {
-        this._refreshCanvas = refreshCanvas;
-        return this;
-    };
 
     this.init = function(scale, x, y, makeButton) {
         if (this._container === null) {
@@ -238,10 +184,10 @@ function SaveBox () {
                 this.saveLilypond.visible = false;
                 this.saveAbc.visible = false;
             } else {
-		this.shareOnFb.visible = false;
+                this.shareOnFb.visible = false;
             }
 
-	    this._container.visible = false;
+            this._container.visible = false;
             this._refreshCanvas();
         }
     };
