@@ -79,7 +79,6 @@ function Planet(isMusicBlocks,storage){
 			t.loadProjectFromFile();
 		});
 		document.getElementById("planet-new-project").addEventListener('click', function (evt) {
-			t.ProjectStorage.initialiseNewProject();
 			t.loadNewProject();
 		})
 		this.ServerInterface.getTagManifest(function(data){this.initPlanets(data)}.bind(this));
@@ -89,7 +88,6 @@ function Planet(isMusicBlocks,storage){
 		if (this.ProjectStorage.getCurrentProjectID()!=this.oldCurrentProjectID){
 			var d = this.ProjectStorage.getCurrentProjectData();
 			if (d==null){
-				this.ProjectStorage.initialiseNewProject();
 				this.loadNewProject();
 			} else {
 				this.loadProjectFromData(d);

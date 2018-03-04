@@ -998,13 +998,6 @@ define(MYDEFINES, function (compatibility) {
             // Set the default background color...
             logo.setBackgroundColor(-1);
 
-            clearBox = new ClearBox();
-            clearBox
-                .setCanvas(canvas)
-                .setStage(stage)
-                .setRefreshCanvas(refreshCanvas)
-                .setClear(sendAllToTrash);
-
             saveBox = new SaveBox();
             saveBox
                 .setCanvas(canvas)
@@ -1245,11 +1238,14 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 this.newProject = function(){
-                    this.loadProjectFromData("[]",false);
+                    this.closePlanet();
+                    this.initialiseNewProject();
                 }
 
                 this.initialiseNewProject = function(){
                     this.planet.ProjectStorage.initialiseNewProject();
+                    sendAllToTrash(true,false);
+                    blocks.trashStacks = [];
                     this.saveLocally();
                 }
 
@@ -1308,6 +1304,13 @@ define(MYDEFINES, function (compatibility) {
 
             window.saveLocally = saveLocally;
             logo.setSaveLocally(saveLocally);
+
+            clearBox = new ClearBox();
+            clearBox
+                .setCanvas(canvas)
+                .setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setClear(planet.initialiseNewProject.bind(planet));
 
             initBasicProtoBlocks(palettes, blocks);
 
@@ -3496,7 +3499,7 @@ handleComplete);
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['empty-trash', _deleteBlocksBox, _('Delete all'), null, null, null, null],
+                    ['new-project', _deleteBlocksBox, _('New Project'), null, null, null, null],
                     ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
                 ];
             } else {
@@ -3508,7 +3511,7 @@ handleComplete);
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['empty-trash', _deleteBlocksBox, _('Delete all'), null, null, null, null],
+                    ['new-project', _deleteBlocksBox, _('Delete all'), null, null, null, null],
                     ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
                 ];
             }
@@ -3554,7 +3557,7 @@ handleComplete);
                     saveButton = container;
                 } else if (menuNames[i][0] === 'compile') {
                     playbackButton = container;
-                } else if (menuNames[i][0] === 'empty-trash') {
+                } else if (menuNames[i][0] === 'new-project') {
                     deleteAllButton = container;
                 }
 

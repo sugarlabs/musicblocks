@@ -36,7 +36,7 @@ function getMainToolbarButtonNames(name) {
 
 
 function getAuxToolbarButtonNames(name) {
-    return (['planet', 'open', 'save', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'empty-trash', 'restore-trash'].indexOf(name) > -1);
+    return (['planet', 'open', 'save', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'new-project', 'restore-trash'].indexOf(name) > -1);
 }
 
 
@@ -115,7 +115,7 @@ function createHelpContent() {
         [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugins-button.svg'],
         [_('Delete plugin'), _('Delete a selected plugin.'), 'header-icons/plugins-delete-button.svg'],
         [_('Select language'), _('Select your language preference.'), 'header-icons/language-button.svg'],
-        [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
+        [_('New Project'), _('Initialise a new project.'), 'header-icons/new-project-button.svg'],
         [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
         [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
         [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
