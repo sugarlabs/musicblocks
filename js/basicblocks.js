@@ -1107,6 +1107,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteCounter.argFlowClampBlock();
     noteCounter.adjustWidthToLabel();
 
+    // deprecated
     var elapsedNotes = new ProtoBlock('elapsednotes');
     elapsedNotes.palette = palettes.dict['meter'];
     blocks.protoBlockDict['elapsednotes'] = elapsedNotes;
@@ -1501,6 +1502,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.defaults.push(_('custom'));
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
+
     var modenameBlock = new ProtoBlock('modename');
     modenameBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['modename'] = modenameBlock;
