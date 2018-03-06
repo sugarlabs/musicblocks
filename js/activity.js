@@ -2610,6 +2610,7 @@ define(MYDEFINES, function (compatibility) {
 
             var img = new Image();
             var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+            /*
             img.onload = function () {
                 var bitmap = new createjs.Bitmap(img);
                 var bounds = bitmap.getBounds();
@@ -2623,7 +2624,16 @@ define(MYDEFINES, function (compatibility) {
 
             img.src = 'data:image/svg+xml;base64,' +
             window.btoa(unescape(encodeURIComponent(svgData)));
-            // console.log(img.src);
+            */
+
+            // Don't bother to convert the session image to PNG. Just
+            // save it as svg.
+            try {
+                storage['SESSIONIMAGE' + p] = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
+            } catch (e) {
+                console.log(e);
+            }
+
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 sugarizerCompatibility.saveLocally();
             }
