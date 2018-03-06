@@ -30,7 +30,7 @@ function SaveBox () {
     this._canvas = null;
     this._stage = null;
     this._refreshCanvas = null;
-    this._doSaveTB = null;
+    this._doSaveHTML = null;
     this._doSaveSVG = null;
     this._doSavePNG = null;
     this._doSaveWAV = null;
@@ -38,7 +38,7 @@ function SaveBox () {
     this._doShareOnFacebook = null;
     this._doSaveBlockArtwork = null;
     this._doSaveAbc = null;
-    this._doSaveLilyPond = null;
+    this._doSaveLilypond = null;
 
     this._container = null;
     this._bounds = null;
@@ -46,65 +46,11 @@ function SaveBox () {
     this.close = null;
     this._scale = 1;
 
-    this.setCanvas = function (canvas) {
-        this._canvas = canvas;
-        return this;
-    };
-
-    this.setStage = function (stage) {
-        this._stage = stage;
-        return this;
-    };
-
-    this.setSaveTB = function (doSaveTB) {
-        this._doSaveTB = doSaveTB;
-        return this;
-    };
-
-    this.setSaveSVG = function (doSaveSVG) {
-        this._doSaveSVG = doSaveSVG;
-        return this;
-    };
-
-    this.setSavePNG = function (doSavePNG) {
-        this._doSavePNG = doSavePNG;
-        return this;
-    };
-
-    this.setSaveWAV = function (doSaveWAV) {
-        this._doSaveWAV = doSaveWAV;
-        return this;
-    };
-
-    this.setSaveFB = function (doSaveFB) {
-        this._doShareOnFacebook = doSaveFB;
-        return this;
-    };
-
-    this.setSaveBlockArtwork = function (doSaveBlockArtwork) {
-        this._doSaveBlockArtwork = doSaveBlockArtwork;
-        return this;
-    };
-
-    this.setSaveLilypond = function (doSaveLilypond) {
-        this._doSaveLilypond = doSaveLilypond;
-        return this;
-    };
-
-    this.setSaveAbc = function (doSaveAbc) {
-        this._doSaveAbc = doSaveAbc;
-        return this;
+    this.setVariables = function(vars){
+        for (var i = 0; i<vars.length; i++){
+            this[vars[i][0]]=vars[i][1];
+        }
     }
-
-    this.setSavePlanet = function (doSavePlanet) {
-        this._doUploadToPlanet = doSavePlanet;
-        return this;
-    };
-
-    this.setRefreshCanvas = function (refreshCanvas) {
-        this._refreshCanvas = refreshCanvas;
-        return this;
-    };
 
     this.init = function(scale, x, y, makeButton) {
         if (this._container === null) {
@@ -113,12 +59,12 @@ function SaveBox () {
 
             var dx = BOXBUTTONOFFSET;
 
-            this.saveTB = makeButton('save-tb', _('Save as .tb'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.saveTB.visible = true;
-            this.positionHoverText(this.saveTB);
-            this.saveTB.on('click', function(event) {
+            this.saveHTML = makeButton('save-button-dark', _('Save project'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.saveHTML.visible = true;
+            this.positionHoverText(this.saveHTML);
+            this.saveHTML.on('click', function(event) {
                 that.hide();
-                that._doSaveTB();
+                that._doSaveHTML();
             });
 
             dx += BOXBUTTONSPACING;
@@ -228,7 +174,7 @@ function SaveBox () {
 
     this.hide = function() {
         if (this._container !== null) {
-            this.saveTB.visible = false;
+            this.saveHTML.visible = false;
             this.saveSVG.visible = false;
             this.savePNG.visible = false;
             this.uploadToPlanet.visible = false;
@@ -238,17 +184,17 @@ function SaveBox () {
                 this.saveLilypond.visible = false;
                 this.saveAbc.visible = false;
             } else {
-		this.shareOnFb.visible = false;
+                this.shareOnFb.visible = false;
             }
 
-	    this._container.visible = false;
+            this._container.visible = false;
             this._refreshCanvas();
         }
     };
 
     this.show = function() {
         if (this._container !== null) {
-            this.saveTB.visible = true;
+            this.saveHTML.visible = true;
             this.saveSVG.visible = true;
             this.savePNG.visible = true;
             this.uploadToPlanet.visible = true;

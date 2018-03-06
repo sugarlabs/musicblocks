@@ -216,7 +216,7 @@
 
         <div id="ioDiv" style="display:none">
           <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*">
-          <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb">
+          <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb, .html">
           <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json">
           <input tabindex="-1" class="file" type="file" id="myOpenAll">
         </div>
@@ -239,30 +239,7 @@
 
       <div id="header" class="EaselJS">
       </div>
-
-      <div class="planet" id="planetdiv" style="display: none;">
-        <nav>
-          <div class="nav-container">
-            <img src="header-icons/planet-button.svg" class="logo" />
-            <h1 id="planetTitle"></h1>
-            <ul>
-              <li class="back"><img src="header-icons/cancel-button.svg" /></li>
-              <li class="new"><img src="header-icons/add.svg" /></li>
-              <li class="open"><img src="header-icons/folder-open.svg" /></li>
-            </ul>
-          </div>
-        </nav>
-
-        <div class="nav-spacer">
-        </div>
-
-        <div class="planet-content">
-          <h2 id="planetMyDevice"></h2>
-          <ul class="content l"></ul>
-          <h2 id="planetWorldwide"></h2>
-          <ul class="content w"></ul>
-        </div>
-      </div> <!-- planet -->
+      <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
 
       <div id="modeDiv" draggable="false">
         <div id="modeButtonsDiv">
@@ -381,7 +358,7 @@
         <p><div id="authorText"></div><input type="text" id="author"></input></p>
         <p><div id="MIDIText"></div><input type="checkbox" id="MIDICheck"></input></p>
         <p><div id="guitarText"></div><input type="checkbox" id="guitarCheck"></input></p>
-        <p><button id="submitLilypond"></button></p>
+        <p><button id="submitLilypond"></button> <button id="submitPDF"></button></p>
       </div>
 
     </div>

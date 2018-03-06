@@ -383,7 +383,7 @@ processAbcNotes = function (logo, turtle) {
 };
 
 
-saveAbcOutput = function(logo, saveName) {
+saveAbcOutput = function(logo) {
     var turtleCount = 0;
     var clef = [];
 
@@ -403,6 +403,5 @@ saveAbcOutput = function(logo, saveName) {
     }
 
     logo.notationOutput += '\n';
-    console.log(logo.notationOutput);
-    doSaveAbc(logo, saveName);
+    return logo.notationOutput;
 };
