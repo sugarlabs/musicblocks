@@ -8809,7 +8809,12 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    var r = that.blocks.blockList[cblk1].value;
+                    if (r == 'current' || r == _('current')) {
+                        var a = that.currentOctave[turtle];
+                    } else {
+                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    }
                     var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                     that.blocks.blockList[blk].value = that._doPlus(a, b);
                 }
@@ -8820,9 +8825,19 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    var r = that.blocks.blockList[cblk1].value;
                     var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    that.blocks.blockList[blk].value = that._doMultiply(a, b);
+                    if (r == 'previous' || r == _('previous') || r == 'next' || r == _('next')) { 
+                        var a = that.currentOctave[turtle]; 
+                        if (r == 'previous' || r == _('previous')) {
+                            that.blocks.blockList[blk].value = that._doMinus(a, b);
+                        } else {
+                            that.blocks.blockList[blk].value = that._doPlus(a, b);
+                        }
+                    } else {
+                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        that.blocks.blockList[blk].value = that._doMultiply(a, b);
+                    }
                 }
                 break;
             case 'power':
@@ -8853,7 +8868,12 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    var r = that.blocks.blockList[cblk1].value;
+                    if (r == 'current' || r == _('current')) {
+                        var a = that.currentOctave[turtle];
+                    } else {
+                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    }
                     var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                     that.blocks.blockList[blk].value = that._doMinus(a, b);
                 }
