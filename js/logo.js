@@ -8809,13 +8809,35 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var r = that.blocks.blockList[cblk1].value;
-                    if (r == 'current' || r == _('current')) {
-                        var a = that.currentOctave[turtle];
+                    if (cblk1 === null || cblk2 === null) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                    }
+
+                    // We have a special case for certain keywords
+                    // associated with octaves: current, next, and
+                    // previous. In the case of plus, since we use it
+                    // for string concatenation as well, we check to
+                    // see if the block is connected to a pitch block
+                    // before assuming octave.
+
+                    var cblk0 = that.blocks.blockList[blk].connections[0];
+                    if (cblk0 !== null && that.blocks.blockList[cblk0].name === 'pitch') {
+                        if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
+                            var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
+                        } else {
+                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        }
+
+                        if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
+                            var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                        } else {
+                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                        }
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                     }
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+
                     that.blocks.blockList[blk].value = that._doPlus(a, b);
                 }
                 break;
@@ -8825,19 +8847,26 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var r = that.blocks.blockList[cblk1].value;
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    if (r == 'previous' || r == _('previous') || r == 'next' || r == _('next')) { 
-                        var a = that.currentOctave[turtle]; 
-                        if (r == 'previous' || r == _('previous')) {
-                            that.blocks.blockList[blk].value = that._doMinus(a, b);
-                        } else {
-                            that.blocks.blockList[blk].value = that._doPlus(a, b);
-                        }
+                    if (cblk1 === null || cblk2 === null) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                    }
+
+                    // We have a special case for certain keywords
+                    // associated with octaves: current, next, and
+                    // previous.
+                    if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
+                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        that.blocks.blockList[blk].value = that._doMultiply(a, b);
                     }
+
+                    if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
+                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                    } else {
+                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    }
+
+                    that.blocks.blockList[blk].value = that._doMultiply(a, b);
                 }
                 break;
             case 'power':
@@ -8868,13 +8897,25 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var r = that.blocks.blockList[cblk1].value;
-                    if (r == 'current' || r == _('current')) {
-                        var a = that.currentOctave[turtle];
+                    if (cblk1 === null || cblk2 === null) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                    }
+
+                    // We have a special case for certain keywords
+                    // associated with octaves: current, next, and
+                    // previous.
+                    if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
+                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                     }
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+
+                    if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
+                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                    } else {
+                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    }
+
                     that.blocks.blockList[blk].value = that._doMinus(a, b);
                 }
                 break;
