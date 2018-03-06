@@ -801,6 +801,9 @@ function PaletteModel(palette, palettes, name) {
                 label = '';
             }
 
+            var saveScale = protoBlock.scale;
+	    protoBlock.scale = DEFAULTBLOCKSCALE;
+
             // Finally, the SVGs!
             switch (protoBlock.name) {
             case 'namedbox':
@@ -832,6 +835,8 @@ function PaletteModel(palette, palettes, name) {
                 var height = obj[3];
                 break;
             }
+
+	    protoBlock.scale = saveScale;
 
             if (protoBlock.disabled) {
                 artwork = artwork
