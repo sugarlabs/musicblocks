@@ -72,6 +72,11 @@ function ProtoBlock(name) {
     // What follows are the initializations for different block
     // styles.
 
+    // The generator methods return the svg artwork, the dock
+    // positions, and the width and height, and the height used to
+    // calculate the hit area for the block. (Note that clamp blocks
+    // only extend their hit area to the top of the clamp.)
+
     // E.g., penup, pendown
     this.zeroArgBlock = function () {
         this.args = 0;
@@ -91,7 +96,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., hidden (used at end of clamp)
@@ -127,7 +132,7 @@ function ProtoBlock(name) {
         var artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
         // And bring the last dock position to the top.
         svg.docks[1][1] = svg.docks[0][1];
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, 0, 0, 0];
     };
 
     // E.g., break
@@ -144,12 +149,14 @@ function ProtoBlock(name) {
         svg.setScale(this.scale);
         svg.setSlot(true);
         svg.setTail(true);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., collapsed
@@ -166,12 +173,14 @@ function ProtoBlock(name) {
         svg.setScale(this.scale);
         svg.setCap(true);
         svg.setTail(true);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., forward, right
@@ -190,12 +199,14 @@ function ProtoBlock(name) {
         svg.setTab(true);
         svg.setInnies([true]);
         svg.setSlot(true);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., wait for
@@ -216,12 +227,14 @@ function ProtoBlock(name) {
         svg.setSlot(true);
         svg.setBoolean(true);
         svg.setClampCount(0);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., setxy. These are expandable.
@@ -244,16 +257,19 @@ function ProtoBlock(name) {
         svg.setTab(true);
         svg.setInnies([true, true]);
         svg.setSlot(true);
+
         if (expandY) {
             svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., ??? These are expandable.
@@ -277,16 +293,19 @@ function ProtoBlock(name) {
         svg.setTab(true);
         svg.setInnies([true, true, true]);
         svg.setSlot(true);
+
         if (expandY) {
             svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     this.fourArgBlock = function () {
@@ -310,16 +329,19 @@ function ProtoBlock(name) {
         svg.setTab(true);
         svg.setInnies([true, true, true, true]);
         svg.setSlot(true);
+
         if (expandY) {
             svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., sqrt, box
@@ -341,12 +363,14 @@ function ProtoBlock(name) {
         svg.setInnies([true]);
         svg.setOutie(true);
         svg.setTab(false);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., plus, minus, multiply, divide, power. These are also expandable.
@@ -370,16 +394,19 @@ function ProtoBlock(name) {
         svg.setInnies([true, true]);
         svg.setOutie(true);
         svg.setTab(false);
+
         if (expandY) {
             svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     //
@@ -404,16 +431,19 @@ function ProtoBlock(name) {
         svg.setInnies([true, true, true]);
         svg.setOutie(true);
         svg.setTab(false);
+
         if (expandY) {
             svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., number, string. Value blocks get DOM textareas associated
@@ -433,11 +463,13 @@ function ProtoBlock(name) {
         // Extra room for parameter label
         svg.setExpand(60 + this.extraWidth, 0, 0, 0);
         svg.setOutie(true);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBox();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., media. Media blocks invoke a chooser and a thumbnail
@@ -458,11 +490,13 @@ function ProtoBlock(name) {
         // Extra room for graphics
         svg.setExpand(60 + this.extraWidth, 23, 0, 0);
         svg.setOutie(true);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBox();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., start. A "child" flow is docked in an expandable clamp.
@@ -485,16 +519,19 @@ function ProtoBlock(name) {
         svg.setCap(true);
         svg.setTail(true);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     };
 
     // E.g., emptyclamp. Unlike start, there is a flow above and below.
@@ -517,16 +554,19 @@ function ProtoBlock(name) {
 
         svg.setSlot(true);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     };
 
     // E.g., repeat. Unlike action, there is a flow above and below.
@@ -550,16 +590,19 @@ function ProtoBlock(name) {
         svg.setSlot(true);
         svg.setInnies([true]);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     };
 
     // E.g., tuplet, which takes two args plus an interior flow. There is a flow above and below.
@@ -584,16 +627,19 @@ function ProtoBlock(name) {
         svg.setSlot(true);
         svg.setInnies([true, true]);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[3][1]];
     };
 
     this.flowClampThreeArgBlock = function (){
@@ -618,16 +664,19 @@ function ProtoBlock(name) {
         svg.setSlot(true);
         svg.setInnies([true, true,true]);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[4][1]];
     };
 
     // E.g., do with args: innies instead of interior slots.
@@ -651,16 +700,21 @@ function ProtoBlock(name) {
         svg.setSlot(true);
         svg.setInnies([true]);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, [1]);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.argClamp();
-    return [artwork, svg.docks];
+        // The hit area extends halfway between the label dock and the
+        // first innie arg dock.
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), (svg.docks[1][1] + svg.docks[2][1]) / 2];
     };
 
     // E.g., calculate with args: innies instead of interior slots.
@@ -684,16 +738,21 @@ function ProtoBlock(name) {
         svg.setTab(false);
         svg.setSlot(false);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, [1]);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.argClamp();
-        return [artwork, svg.docks];
+        // The hit area extends halfway between the label dock and the
+        // first innie arg dock.
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), (svg.docks[1][1] + svg.docks[2][1]) / 2];
     };
 
     // E.g., named do with args: innies instead of interior slots.
@@ -720,11 +779,13 @@ function ProtoBlock(name) {
         } else {
             svg.setClampSlots(0, [1]);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.argClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1] * 2 / 3];
     };
 
     // E.g., named calculate with args: innies instead of interior slots.
@@ -746,16 +807,19 @@ function ProtoBlock(name) {
         svg.setTab(false);
         svg.setSlot(false);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, [1]);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.argClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1] * 2 / 3];
     };
 
     // E.g., if.  A "child" flow is docked in an expandable clamp. The
@@ -780,16 +844,19 @@ function ProtoBlock(name) {
         svg.setBoolean(true);
         svg.setSlot(true);
         svg.setExpand(this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     };
 
     // E.g., if then else.  Two "child" flows are docked in expandable
@@ -830,12 +897,13 @@ function ProtoBlock(name) {
         }
 
         svg.setExpand(this.extraWidth, 0, 0, 0);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     };
 
     // E.g., forever. Unlike start, there is flow above and below.
@@ -857,16 +925,19 @@ function ProtoBlock(name) {
         svg.setTab(true);
         svg.setSlot(true);
         svg.setExpand(10 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     };
 
     // E.g., count clamp: math block with interior slots
@@ -887,16 +958,19 @@ function ProtoBlock(name) {
         svg.setSlot(false);
         svg.setOutie(true);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, [1]);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     };
 
     // E.g., action. A "child" flow is docked in an expandable clamp.
@@ -921,16 +995,19 @@ function ProtoBlock(name) {
         svg.setTail(true);
         svg.setInnies([true]);
         svg.setExpand(10 + this.extraWidth, 0, 0, 0);
+
         if (slots) {
             svg.setClampSlots(0, slots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     };
 
     // E.g., mouse button.
@@ -947,11 +1024,13 @@ function ProtoBlock(name) {
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(60 + this.extraWidth, 0, 0, 4);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.booleanNot(true);
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., named sensor blocks
@@ -970,12 +1049,14 @@ function ProtoBlock(name) {
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         svg.setInnies([true]);
         var artwork = svg.booleanNot(true);  // OneArg
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., not
@@ -994,11 +1075,13 @@ function ProtoBlock(name) {
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.booleanNot(false);
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., and, or
@@ -1018,11 +1101,13 @@ function ProtoBlock(name) {
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.booleanAndOr();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., greater, less, equal
@@ -1042,16 +1127,19 @@ function ProtoBlock(name) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
+
         if (expandY) {
             svg.setExpand(10 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
         } else {
             svg.setExpand(10 + this.extraWidth, 0, 0, 0);
         }
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.booleanCompare();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., color, shade, pensize, ...
@@ -1071,10 +1159,12 @@ function ProtoBlock(name) {
         // Extra room for parameter label
         svg.setExpand(70 + this.extraWidth, 0, 0, 0);
         svg.setOutie(true);
+
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicBox();
-        return [artwork, svg.docks];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 };

@@ -126,6 +126,25 @@ function PitchStaircase () {
         var i = this._history.pop();
         this.Stairs.splice(i, 1);
 
+        // Remove the last block added to the tempo widget
+        var blk = this.stairPitchBlocks.pop();
+        console.log('removing block ' + blk);
+        var c0 = this._logo.blocks.blockList[blk].connections[0];
+        var c1 = last(this._logo.blocks.blockList[blk].connections);
+        var i = this._logo.blocks.blockList[c0].connections.indexOf(blk);
+        this._logo.blocks.blockList[c0].connections[i] = c1;
+
+        this._logo.blocks.blockList[blk].connections[0] = null;
+        var i = this._logo.blocks.blockList[blk].connections.length - 1;
+        this._logo.blocks.blockList[blk].connections[i] = null;
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blk]);
+
+        // Force the clamp to adjust.
+        this._logo.blocks.blockMoved(c0);
+        this._logo.blocks.adjustDocks(this._logo.blocks.findTopBlock(c0));
+        this._logo.blocks.clampThisToCheck = [[this._logo.blocks.findTopBlock(c0), 0]];
+        this._logo.blocks.adjustExpandableClampBlock();
+
         // And rebuild the stairs.
         this._refresh();
     };
@@ -167,19 +186,21 @@ function PitchStaircase () {
             return;
         }
 
+        // TODO: look to see if the same frequency is already in the list.
+
         var obj = frequencyToPitch(parseFloat(frequency) / inputNum);
         var foundStep = false;
         var isStepDeleted = true;
 
         for (var i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1)]);
+                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
                 foundStep = true;
                 break;
             }
 
             if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1)]);
+                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
                 foundStep = true;
                 isStepDeleted = false;
                 break;
@@ -187,11 +208,40 @@ function PitchStaircase () {
         }
 
         if (!foundStep) {
-            this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1)]);
+            this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
             this._history.push(this.Stairs.length - 1);
         } else {
             this._history.push(i);
         }
+
+        // Add a new block to the tempo widget
+        var note  = this.Stairs[i][0];
+        var octave = this.Stairs[i][1];
+        var frequency = this.Stairs[i][2];
+        var pitch = frequencyToPitch(frequency);
+
+        var bb = last(this.stairPitchBlocks);
+        var b = this._logo.blocks.findBottomBlock(bb);
+        var c = last(this._logo.blocks.blockList[b].connections);
+
+        if (pitch[2] === 0) {
+            var newStack = [[0, 'pitch', 0, 0, [null, 1, 2, c]], [1, ['notename', {'value': pitch[1]}], 0, 0, [0]], [2, ['number', {'value': pitch[1]}], 0, 0, [0]]];
+        } else {
+            // var newStack = [[0, 'hertz', 0, 0, [null, 1, c]], [1, ['number', {'value': frequency.toFixed(2)}], 0, 0, [0]]];
+            var newStack = [[0, 'hertz', 0, 0, [null, 1, 6]], [1, 'multiply', 0, 0, [0, 2, 3]], [2, ['number', {'value': this.Stairs[n][5].toFixed(2)}], 0, 0, [1]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': this.Stairs[n][4]}], 0, 0, [3]], [5, ['number', {'value': this.Stairs[n][3]}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, 7]], [7, 'vspace', 0, 0, [6, c]]];
+        }
+
+        var blk = this._logo.blocks.blockList.length;
+        console.log(newStack);
+        this._logo.blocks.loadNewBlocks(newStack);
+
+        // Make the connections
+        var i = this._logo.blocks.blockList[b].connections.length - 1;
+        this._logo.blocks.blockList[b].connections[i] = blk;
+        this._logo.blocks.blockList[blk].connections[0] = b;
+        this._logo.blocks.adjustDocks(b, true);
+
+        this.stairPitchBlocks.push(blk);
 
         this._makeStairs(i, isStepDeleted);
         this._resizeWidget();
@@ -202,6 +252,7 @@ function PitchStaircase () {
         stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         var frequency = Number(stepCell.getAttribute('id'));
         this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
+
         setTimeout(function () {
             stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
         }, 1000)
@@ -308,8 +359,8 @@ function PitchStaircase () {
         var previousBlock = 0;
 
         for (var i = 0; i < this.Stairs.length; i++) {
-            console.log(this._initialFrequency + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
-
+            // console.log(this._initialFrequency + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
+            console.log(this.Stairs[i][5] + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
             var noteobj = frequencyToPitch(this.Stairs[i][2]);
             var note  = this.Stairs[i][0];
             var octave = this.Stairs[i][1];
@@ -328,7 +379,7 @@ function PitchStaircase () {
                 var hiddenBlockName = 'hidden';
 
                 newStack.push([hertzBlockIdx, 'pitch', 0, 0, [previousBlock, noteIdx, octaveIdx, hiddenIdx]]);
-                newStack.push([noteIdx, ['text', {'value': pitch[0]}], 0, 0, [pitchBlockIdx]]);
+                newStack.push([noteIdx, ['notename', {'value': pitch[0]}], 0, 0, [pitchBlockIdx]]);
                 newStack.push([octaveIdx, ['number', {'value': pitch[1]}], 0, 0, [pitchBlockIdx]])
             } else {
                 var hertzBlockIdx = newStack.length;
@@ -342,7 +393,8 @@ function PitchStaircase () {
                 var hiddenBlockName = 'vspace';
                 newStack.push([hertzBlockIdx, 'hertz', 0, 0, [previousBlock, multiplyIdx, vspaceIdx]]);
                 newStack.push([multiplyIdx, 'multiply', 0, 0, [hertzBlockIdx, frequencyIdx, divideIdx]]);
-                newStack.push([frequencyIdx, ['number', {'value': this._initialFrequency.toFixed(2)}], 0, 0, [multiplyIdx]]);
+                // newStack.push([frequencyIdx, ['number', {'value': this._initialFrequency.toFixed(2)}], 0, 0, [multiplyIdx]]);
+                newStack.push([frequencyIdx, ['number', {'value': this.Stairs[i][5].toFixed(2)}], 0, 0, [multiplyIdx]]);
                 newStack.push([divideIdx, 'divide', 0, 0, [multiplyIdx, numeratorIdx, denominatorIdx]]);
                 newStack.push([numeratorIdx, ['number', {'value': this.Stairs[i][4]}], 0, 0, [divideIdx]]);
                 newStack.push([denominatorIdx, ['number', {'value': this.Stairs[i][3]}], 0, 0, [divideIdx]]);
@@ -352,8 +404,7 @@ function PitchStaircase () {
 
             if (i === this.Stairs.length - 1) {
                 newStack.push([hiddenIdx, hiddenBlockName, 0, 0, [hertzBlockIdx, null]]);
-            }
-            else {
+            } else {
                 newStack.push([hiddenIdx, hiddenBlockName, 0, 0, [hertzBlockIdx, hiddenIdx + 1]]);
             }
 
@@ -365,7 +416,13 @@ function PitchStaircase () {
 
     this.init = function (logo) {
         this._logo = logo;
-        this._initialFrequency = this.Stairs[0][2];
+        for (var i = 0; i < this.Stairs.length; i++) {
+            this.Stairs[i].push(1);  // denominator
+            this.Stairs[i].push(1);  // numerator
+            this.Stairs[i].push(this.Stairs[i][2]);  // initial frequency
+        }
+
+        // this._initialFrequency = this.Stairs[0][2];
         this._history = [];
 
         var w = window.innerWidth;

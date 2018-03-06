@@ -1529,7 +1529,16 @@ calcOctave = function (current, arg) {
     case 'current':
         return current;
     default:
-        return Math.floor(arg);
+        if (typeof(arg) === 'string') {
+            try {
+                return Math.floor(Number(arg));
+            } catch (e) {
+                console.log('cannot convert ' + arg + ' to a number');
+                return (current);
+            }
+        } else {
+            return Math.floor(arg);
+        }
     }
 };
 

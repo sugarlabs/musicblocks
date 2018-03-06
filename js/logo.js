@@ -332,23 +332,9 @@ function Logo () {
     this.svgOutput = '';
     this.svgBackground = true;
 
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        this.mic = new Tone.UserMedia();
-        this.limit = 1024;
-        this.analyser = new Tone.Analyser({
-                        "type" : "waveform",
-                        "size" : this.limit
-        });
-        this.mic.connect(this.analyser);
-    } else {
-        try {
-            this.mic = new p5.AudioIn()
-        } catch (e) {
-            console.log(e);
-            console.log(NOMICERRORMSG);
-            this.mic = null;
-        }
-    }
+    this.mic = null;
+    this.volumeAnalyser = null;
+    this.pitchAnalyser = null;
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
         this.setPlaybackStatus = setPlaybackStatus;
@@ -798,12 +784,23 @@ function Logo () {
                     if (_THIS_IS_TURTLE_BLOCKS) {
                         value = Math.round(this.mic.getLevel() * 1000);
                     } else {
-                        var values = this.analyser.analyse();
+                        if (this.volumeAnalyser == null) {
+                            this.volumeAnalyser = new Tone.Analyser({
+                                'type': 'waveform',
+                                'size': this.limit
+                            });
+
+                            this.mic.connect(this.volumeAnalyser);
+                        }
+
+                        var values = that.volumeAnalyser.getValue();
                         var sum = 0;
-                        for (var k = 0; k < this.limit; k++) {
+                        for(var k = 0; k < that.limit; k++) {
                             sum += (values[k] * values[k]);
                         }
-                        value = Math.round(Math.sqrt(sum / this.limit));
+
+                        var rms = Math.sqrt(sum / that.limit);
+                        that.blocks.blockList[blk].value = Math.round(rms * 100);
                     }
                 }
                 break;
@@ -934,6 +931,36 @@ function Logo () {
         }
     };
 
+    this.initMediaDevices = function () {
+        var that = this;
+        console.log('INIT MICROPHONE');
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            var mic = new Tone.UserMedia();
+            try {
+		mic.open();
+            } catch (e) {
+                console.log('MIC NOT FOUND');
+                console.log(e.name + ': ' + e.message);
+
+                console.log(mic);
+                that.errorMsg(NOMICERRORMSG);
+                mic = null;
+            }
+
+            this.mic = mic;
+            this.limit = 1024;
+        } else {
+            try {
+                this.mic = new p5.AudioIn()
+                that.mic.start();
+            } catch (e) {
+                console.log(e);
+                this.errorMsg(NOMICERRORMSG);
+                this.mic = null;
+            }
+        }
+    };
+
     this.runLogoCommands = function (startHere, env) {
         // Restore any broken connections.
         this._restoreConnections();
@@ -969,36 +996,7 @@ function Logo () {
 
         this.embeddedGraphicsFinished = {};
 
-        // Prep synths for each turtle.
-        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-            if (!(turtle in instruments)) {
-                instruments[turtle] = {};
-                instrumentsFilters[turtle] = {};
-                instrumentsEffects[turtle] = {};
-            }
-
-            // Make sure there is a default synth for each turtle
-            if (!('default' in instruments[turtle])) {
-                this.synth.createDefaultSynth(turtle);
-            }
-
-            // Copy any preloaded synths from the default turtle
-            for (var instrumentName in instruments[0]) {
-                if (!(instrumentName in instruments[turtle])) {
-                    this.synth.loadSynth(turtle, instrumentName);
-
-                    // Copy any filters
-                    if (instrumentName in instrumentsFilters[0]) {
-                        instrumentsFilters[turtle][instrumentName] = instrumentsFilters[0][instrumentName];
-                    }
-
-                    // and any effects
-                    if (instrumentName in instrumentsEffects[0]) {
-                        instrumentsEffects[turtle][instrumentName] = instrumentsEffects[0][instrumentName];
-                    }
-                }
-            }
-        }
+        this._prepSynths();
 
         this.notationStaging = {};
         this.notationDrumStaging = {};
@@ -1104,10 +1102,6 @@ function Logo () {
             this.defineMode[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.pickup[turtle] = 0;
-            this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
-                                        'noise1': [DEFAULTVOLUME],
-                                        'noise2': [DEFAULTVOLUME],
-                                        'noise3': [DEFAULTVOLUME]};
             this.beatsPerMeasure[turtle] = 4;  // Default is 4/4 time.
             this.noteValuePerBeat[turtle] = 4;
             this.currentBeat[turtle] = 0;
@@ -1139,15 +1133,6 @@ function Logo () {
                 this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].canvasAlpha;
                 this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
                 this._savePenState[turtle] = this.turtles.turtleList[turtle].penState;
-            }
-        }
-
-        if (!this.suppressOutput[turtle]) {
-            this._setMasterVolume(DEFAULTVOLUME);
-            for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                for (var synth in this.synthVolume[turtle]) {
-                    this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
-                }
             }
         }
 
@@ -2890,12 +2875,6 @@ function Logo () {
                 if (idx < 1) {
                     that.errorMsg(_('Index must be > 0.'))
                     idx = 1;
-                }
-
-                if (idx > 1000) {
-                    that.errorMsg(_('Maximum heap size is 1000.'))
-                    idx = 1000;
-                }
 
                 // If index > heap length, grow the heap.
                 while (that.turtleHeaps[turtle].length < idx) {
@@ -6696,7 +6675,7 @@ function Logo () {
                 }
 
                 // Make sure the turtles are on top.
-                var i = that.stage.getNumChildren() - 1;
+                var i = that.stage.children.length - 1;
                 that.stage.setChildIndex(that.turtles.turtleList[turtle].container, i);
                 that.refreshCanvas();
             }
@@ -7339,8 +7318,13 @@ function Logo () {
                                     if (chordNotes.indexOf(note) === -1) {
                                         chordNotes.push(note);
                                     }
+
                                 }
+                            } else if (that.tieCarryOver[turtle] > 0) {
+                                var d = that.tieCarryOver[turtle];
                             }
+
+                            that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                         }
 
                         if (i === that.notePitches[turtle][thisBlk].length - 1) {
@@ -7898,6 +7882,8 @@ function Logo () {
                 __playbackLoop(turtle, idx);
             }
         };
+
+        this._prepSynths();
 
         this.onRunTurtle();
         this.stopTurtle = false;
@@ -8606,63 +8592,55 @@ function Logo () {
         } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {
             case 'pitchness':
-                // Experimental
-                if (_THIS_IS_TURTLE_BLOCKS_) {
-                    // FIXME
+                if (this.mic === null || _THIS_IS_TURTLE_BLOCKS_) {
                     that.blocks.blockList[blk].value = 440;
                 } else {
-                    var signal = that.analyser.analyse();
-                    var dft = new DFT(that.limit, 44100);
-                    dft.forward(signal);
-                    var values = dft.spectrum;
+                    if (this.pitchAnalyser == null) {
+                        this.pitchAnalyser = new Tone.Analyser({
+                            'type': 'fft',
+                            'size': this.limit
+                        });
 
-                    try {
-                        if (!that.mic.open()) {
-                            that.mic.open();
-                            that.blocks.blockList[blk].value = 0;
-                        } else {
-                            that.blocks.blockList[blk].value = values[0];
-                        }
-                    } catch (e) {
-                        console.log(e);
-                        that.mic.open();
-                        that.blocks.blockList[blk].value = values[0];
+                        this.mic.connect(this.pitchAnalyser);
                     }
+
+                    var values = that.pitchAnalyser.getValue();
+                    var max = 0;
+                    var idx = 0;
+                    for (var i = 0; i < this.limit; i++) {
+                        var v2 = values[i] * values[i];
+                        if (v2 > max) {
+                            max = v2;
+                            idx = i;
+                        }
+                    }
+
+                    that.blocks.blockList[blk].value = idx;
                 }
                 break;
             case 'loudness':
-                if (_THIS_IS_TURTLE_BLOCKS_) {
-                    try {
-                        if (!that.mic.enabled) {
-                            that.mic.start();
-                            that.blocks.blockList[blk].value = 0;
-                        } else {
-                            that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
-                        }
-                    } catch (e) {
-                        console.log(e);
-                        that.mic.start();
-                        that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
-                    }
+                if (this.mic === null) {
+                    that.blocks.blockList[blk].value = 0;
+                } else if (_THIS_IS_TURTLE_BLOCKS_) {
+                    that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
                 } else {
-                    var values = that.analyser.analyse();
+                    if (this.volumeAnalyser == null) {
+                        this.volumeAnalyser = new Tone.Analyser({
+                            'type': 'waveform',
+                            'size': this.limit
+                        });
+
+                        this.mic.connect(this.volumeAnalyser);
+                    }
+
+                    var values = that.volumeAnalyser.getValue();
                     var sum = 0;
-                    for(var k=0; k<that.limit; k++) {
-                            sum += (values[k] * values[k]);
+                    for(var k = 0; k < that.limit; k++) {
+                        sum += (values[k] * values[k]);
                     }
-                    var rms = Math.sqrt(sum/that.limit);
-                    try {
-                        if (!that.mic.open()) {
-                            that.mic.open();
-                            that.blocks.blockList[blk].value = 0;
-                        } else {
-                            that.blocks.blockList[blk].value = Math.round(rms);
-                        }
-                    } catch (e) {  // MORE DEBUGGING
-                        console.log(e);
-                        that.mic.open();
-                        that.blocks.blockList[blk].value = Math.round(rms);
-                    }
+
+                    var rms = Math.sqrt(sum / that.limit);
+                    that.blocks.blockList[blk].value = Math.round(rms * 100);
                 }
                 break;
             /*
@@ -8830,8 +8808,35 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    if (cblk1 === null || cblk2 === null) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                    }
+
+                    // We have a special case for certain keywords
+                    // associated with octaves: current, next, and
+                    // previous. In the case of plus, since we use it
+                    // for string concatenation as well, we check to
+                    // see if the block is connected to a pitch block
+                    // before assuming octave.
+
+                    var cblk0 = that.blocks.blockList[blk].connections[0];
+                    if (cblk0 !== null && that.blocks.blockList[cblk0].name === 'pitch') {
+                        if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
+                            var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
+                        } else {
+                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        }
+
+                        if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
+                            var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                        } else {
+                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                        }
+                    } else {
+                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    }
+
                     that.blocks.blockList[blk].value = that._doPlus(a, b);
                 }
                 break;
@@ -8841,8 +8846,25 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    if (cblk1 === null || cblk2 === null) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                    }
+
+                    // We have a special case for certain keywords
+                    // associated with octaves: current, next, and
+                    // previous.
+                    if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
+                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
+                    } else {
+                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    }
+
+                    if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
+                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                    } else {
+                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    }
+
                     that.blocks.blockList[blk].value = that._doMultiply(a, b);
                 }
                 break;
@@ -8874,8 +8896,25 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    if (cblk1 === null || cblk2 === null) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                    }
+
+                    // We have a special case for certain keywords
+                    // associated with octaves: current, next, and
+                    // previous.
+                    if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
+                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
+                    } else {
+                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    }
+
+                    if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
+                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                    } else {
+                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                    }
+
                     that.blocks.blockList[blk].value = that._doMinus(a, b);
                 }
                 break;
@@ -10213,6 +10252,53 @@ function Logo () {
             }
 
             return -i;
+        }
+    };
+
+    this._prepSynths = function () {
+        // Prep synths for each turtle.
+        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            if (!(turtle in instruments)) {
+                instruments[turtle] = {};
+                instrumentsFilters[turtle] = {};
+                instrumentsEffects[turtle] = {};
+            }
+
+            // Make sure there is a default synth for each turtle
+            if (!('default' in instruments[turtle])) {
+                this.synth.createDefaultSynth(turtle);
+            }
+
+            // Copy any preloaded synths from the default turtle
+            for (var instrumentName in instruments[0]) {
+                if (!(instrumentName in instruments[turtle])) {
+                    this.synth.loadSynth(turtle, instrumentName);
+
+                    // Copy any filters
+                    if (instrumentName in instrumentsFilters[0]) {
+                        instrumentsFilters[turtle][instrumentName] = instrumentsFilters[0][instrumentName];
+                    }
+
+                    // and any effects
+                    if (instrumentName in instrumentsEffects[0]) {
+                        instrumentsEffects[turtle][instrumentName] = instrumentsEffects[0][instrumentName];
+                    }
+                }
+            }
+
+            this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
+                                        'noise1': [DEFAULTVOLUME],
+                                        'noise2': [DEFAULTVOLUME],
+                                        'noise3': [DEFAULTVOLUME]};
+        }
+
+        if (!this.suppressOutput[turtle]) {
+            this._setMasterVolume(DEFAULTVOLUME);
+            for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                for (var synth in this.synthVolume[turtle]) {
+                    this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
+                }
+            }
         }
     };
 

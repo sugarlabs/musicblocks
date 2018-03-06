@@ -45,6 +45,9 @@ function Block(protoblock, blocks, overrideName) {
     // All blocks have at a container and least one bitmap.
     this.container = null;
     this.bounds = null;
+    this.width = 0;
+    this.height = 0;
+    this.hitHeight = 0;
     this.bitmap = null;
     this.highlightBitmap = null;
 
@@ -200,7 +203,7 @@ function Block(protoblock, blocks, overrideName) {
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
-                z = that.container.getNumChildren() - 1;
+                z = that.container.children.length - 1;
                 that.container.setChildIndex(that.imageBitmap, z);
             }
 
@@ -341,6 +344,10 @@ function Block(protoblock, blocks, overrideName) {
             this.docks[i][0] = obj[1][i][0];
             this.docks[i][1] = obj[1][i][1];
         }
+
+        this.width = obj[2];
+        this.height = obj[3];
+        this.hitHeight = obj[4];
     };
 
     this.imageLoad = function () {
@@ -515,6 +522,10 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < obj[1].length; i++) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], this.protoblock.dockTypes[i]]);
             }
+
+            this.width = obj[2];
+            this.height = obj[3];
+            this.hitHeight = obj[4];
         }
 
         if (this.protoblock.disabled) {
@@ -846,7 +857,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.removeChildBitmap = function (name) {
-        for (var child = 0; child < this.container.getNumChildren(); child++) {
+        for (var child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
                 break;
@@ -984,7 +995,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             // Make sure the text is on top.
-            var z = that.container.getNumChildren() - 1;
+            var z = that.container.children.length - 1;
             that.container.setChildIndex(that.collapseText, z);
 
             // Set collapsed state of blocks in drag group.
@@ -1022,7 +1033,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         } else if (this.protoblock.args === 0) {
             var bounds = this.container.getBounds();
-            this.text.x = bounds.width - 25;
+            this.text.x = this.width - 25;
         } else {
             this.text.textAlign = 'left';
             if (this.docks[0][2] === 'booleanout') {
@@ -1031,7 +1042,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Ensure text is on top.
-        z = this.container.getNumChildren() - 1;
+        z = this.container.children.length - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
@@ -1047,10 +1058,9 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._calculateCollapseHitArea = function () {
-        var bounds = this.collapseContainer.getBounds();
         var hitArea = new createjs.Shape();
-        var w2 = bounds.width;
-        var h2 = bounds.height;
+        var w2 = STANDARDBLOCKHEIGHT * this.collapseBitmap.scaleX;
+        var h2 = this.hitHeight;
 
         hitArea.graphics.beginFill('#FFF').drawRect(0, 0, w2, h2);
         hitArea.x = 0;
@@ -1063,7 +1073,7 @@ function Block(protoblock, blocks, overrideName) {
         this.collapseText.y = COLLAPSETEXTY * blockScale / 2;
 
         // Ensure text is on top.
-        z = this.container.getNumChildren() - 1;
+        z = this.container.children.length - 1;
         this.container.setChildIndex(this.collapseText, z);
     };
 
@@ -1120,7 +1130,7 @@ function Block(protoblock, blocks, overrideName) {
             // Raise entire stack to the top.
             that.blocks.raiseStackToTop(thisBlock);
             // And the collapse button
-            that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.getNumChildren() - 1);
+            that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.children.length - 1);
             moved = false;
             var original = {
                 x: event.stageX / that.blocks.getStageScale(),
@@ -1237,37 +1247,6 @@ function Block(protoblock, blocks, overrideName) {
 
     this._calculateBlockHitArea = function () {
         var hitArea = new createjs.Shape();
-        var bounds = this.container.getBounds()
-
-        if (bounds === null) {
-            console.log('block cache for ' + this.name + ' not ready... waiting.');
-
-            var __callback = function (that) {
-                that._calculateBlockHitArea();
-            };
-
-            this._createCache(__callback);
-            return;
-        }
-
-        // Since hitarea is concave, we only detect hits on top
-        // section of block. Otherwise we would not be able to grab
-        // blocks placed inside of clamps.
-        if (['calcArg', 'doArg', 'makeblock', 'nameddoArg', 'namedcalcArg'].indexOf(this.name) !== -1) {
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale * 0.75);
-        } else if (this.isClampBlock() || this.isArgClamp()) {
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale);
-        } else if (this.isNoHitBlock()) {
-            // No hit area
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
-        } else if (this.isTwoArgBlock()) {
-            // Shrinking the height makes it easier to grab blocks below
-            // in the stack.
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
-        } else {
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height);
-        }
-
         this.container.hitArea = hitArea;
     };
 
@@ -1352,7 +1331,7 @@ function Block(protoblock, blocks, overrideName) {
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.getNumChildren() - 1);
+                that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.children.length - 1);
             }
 
             moved = false;
@@ -1440,7 +1419,7 @@ function Block(protoblock, blocks, overrideName) {
 
                 if (that.isValueBlock() && that.name !== 'media') {
                     // Ensure text is on top
-                    var z = that.container.getNumChildren() - 1;
+                    var z = that.container.children.length - 1;
                     that.container.setChildIndex(that.text, z);
                 } else if (that.collapseContainer != null) {
                     that._positionCollapseContainer(that.protoblock.scale);
@@ -1540,7 +1519,7 @@ function Block(protoblock, blocks, overrideName) {
         if (hideDOM) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
-            if (this.bounds != null && (event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.bounds.width || event.stageY < this.container.y || event.stageY > this.container.y + this.bounds.height)) {
+            if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
                 this._labelChanged();
                 hideDOMLabel();
                 this.blocks.unhighlight(null);
@@ -1561,25 +1540,25 @@ function Block(protoblock, blocks, overrideName) {
 
     this._ensureDecorationOnTop = function () {
         // Find the turtle decoration and move it to the top.
-        for (var child = 0; child < this.container.getNumChildren(); child++) {
+        for (var child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === 'decoration') {
                 // Drum block in collapsed state is less wide.
                 if (this.name === 'drum') {
-                    var bounds = this.container.getBounds();
                     if (this.collapsed) {
                         var dx = 25 * this.protoblock.scale / 2;
                     } else {
                         var dx = 0;
                     }
+
                     for (var turtle = 0; turtle < this.blocks.turtles.turtleList.length; turtle++) {
                         if (this.blocks.turtles.turtleList[turtle].startBlock === this) {
-                            this.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * this.protoblock.scale / 2;
+                            this.blocks.turtles.turtleList[turtle].decorationBitmap.x = this.width - dx - 50 * this.protoblock.scale / 2;
                             break;
                         }
                     }
                 }
 
-                this.container.setChildIndex(this.container.children[child], this.container.getNumChildren() - 1);
+                this.container.setChildIndex(this.container.children[child], this.container.children.length - 1);
                 break;
             }
         }
@@ -2169,7 +2148,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.display = 'none';
 
         // Make sure text is on top.
-        var z = this.container.getNumChildren() - 1;
+        var z = this.container.children.length - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
 

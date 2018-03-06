@@ -1501,6 +1501,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.defaults.push(_('custom'));
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
+
     var modenameBlock = new ProtoBlock('modename');
     modenameBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['modename'] = modenameBlock;
@@ -2648,6 +2649,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     multiplyBlock.fontsize = 14;
     multiplyBlock.staticLabels.push('×');
     multiplyBlock.twoArgMathBlock();
+    multiplyBlock.dockTypes[1] = 'anyin';
+    multiplyBlock.dockTypes[2] = 'anyin';
     multiplyBlock.defaults.push(1, 12)
 
     var negBlock = new ProtoBlock('neg');
@@ -2665,6 +2668,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     minusBlock.fontsize = 14;
     minusBlock.staticLabels.push('–');
     minusBlock.twoArgMathBlock();
+    minusBlock.dockTypes[1] = 'anyin';
+    minusBlock.dockTypes[2] = 'anyin';
     minusBlock.defaults.push(8, 4)
 
     var plusBlock = new ProtoBlock('plus');
@@ -3555,7 +3560,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchnessBlock.staticLabels.push(_('pitch'));
     pitchnessBlock.adjustWidthToLabel();
     pitchnessBlock.parameterBlock();
-    pitchnessBlock.hidden = true;
+    // pitchnessBlock.hidden = true;
 
     var loudnessBlock = new ProtoBlock('loudness');
     loudnessBlock.palette = palettes.dict['sensors'];

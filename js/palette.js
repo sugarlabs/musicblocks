@@ -813,6 +813,7 @@ function PaletteModel(palette, palettes, name) {
                 svg.setOutie(true);
                 var artwork = svg.basicBox();
                 var docks = svg.docks;
+                var height = svg.getHeight();
                 break;
             case 'nameddo':
                 // so the label will fit
@@ -822,11 +823,13 @@ function PaletteModel(palette, palettes, name) {
                 svg.setExpand(30, 0, 0, 0);
                 var artwork = svg.basicBlock();
                 var docks = svg.docks;
+                var height = svg.getHeight();
                 break;
             default:
                 var obj = protoBlock.generator();
                 var artwork = obj[0];
                 var docks = obj[1];
+                var height = obj[3];
                 break;
             }
 
@@ -853,6 +856,7 @@ function PaletteModel(palette, palettes, name) {
                 blkname,
                 modname,
                 height: STANDARDBLOCKHEIGHT,
+                actualHeight: height,
                 label,
                 artwork,
                 artwork64: 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))),
@@ -975,6 +979,7 @@ function Palette(palettes, name) {
     this.menuContainer = null;
     this.protoList = [];
     this.protoContainers = {};
+    this.protoHeights = {};
     this.background = null;
     this.scrollDiff = 0
     this.y = 0;
@@ -1186,24 +1191,24 @@ function Palette(palettes, name) {
 
         this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
         var items = [];
+        var heights = [];
         // Reverse order
         for (var i in this.protoContainers) {
             items.push(this.protoContainers[i]);
+            heights.push(this.protoHeights[i]);
         }
+
         var n = items.length;
         for (var j = 0; j < n; j++) {
             var i = items.pop();
+            var h = heights.pop();
             i.x = this.menuContainer.x;
-            i.y = this.y;
-            var bounds = i.getBounds();
-            if (bounds != null) {
-                // Pack them in a bit tighter
-                this.y += bounds.height - (STANDARDBLOCKHEIGHT * 0.1);
-            } else {
-                // If artwork isn't ready, assume it is of standard
-                // size, e.g., and action block.
-                this.y += STANDARDBLOCKHEIGHT * 0.9;
+            if (h == undefined) {
+                h = STANDARDBLOCKHEIGHT;
             }
+
+            i.y = this.y;
+            this.y += h + (STANDARDBLOCKHEIGHT * 0.1);
         }
 
         for (var i in this.protoContainers) {
@@ -1225,6 +1230,15 @@ function Palette(palettes, name) {
             that.protoContainers[modname].hitArea = hitArea;
             that._loadPaletteMenuItemHandler(protoListBlk, modname);
             that.palettes.refreshCanvas();
+
+            for (var b in that.model.blocks) {
+                if (that.model.blocks[b].modname === modname) {
+                    if (that.protoHeights[modname] == undefined) {
+                        // console.log('assigning height to ' + modname);
+                        that.protoHeights[modname] = that.model.blocks[b].actualHeight;
+                    }
+                }
+            }
         };
 
         function __processBitmap(palette, modname, bitmap, args) {
@@ -1312,7 +1326,8 @@ function Palette(palettes, name) {
             } else {
                 this.protoContainers[b.modname].x = this.menuContainer.x;
                 this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
-                this.y += Math.ceil(b.height * PROTOBLOCKSCALE);
+                this.protoHeights[b.modname] = b.actualHeight;
+                this.y += Math.ceil(b.actualHeight * PROTOBLOCKSCALE);
             }
         }
 
@@ -1542,7 +1557,7 @@ function Palette(palettes, name) {
 
         this._updateBlockMasks();
         var stage = this.palettes.stage;
-        stage.setChildIndex(this.menuContainer, stage.getNumChildren() - 1);
+        stage.setChildIndex(this.menuContainer, stage.children.length - 1);
         this.palettes.refreshCanvas();
         this.count += 1;
     };
@@ -1630,7 +1645,7 @@ function Palette(palettes, name) {
     };
 
     // Palette Menu event handlers
-    this._loadPaletteMenuHandler =function () {
+    this._loadPaletteMenuHandler = function () {
         // The palette menu is the container for the protoblocks. One
         // palette per palette button.
 
@@ -1714,7 +1729,7 @@ function Palette(palettes, name) {
 
         this.protoContainers[blkname].on('mousedown', function (event) {
             var stage = that.palettes.stage;
-            stage.setChildIndex(that.protoContainers[blkname], stage.getNumChildren() - 1);
+            stage.setChildIndex(that.protoContainers[blkname], stage.children.length - 1);
 
             var h = Math.min(maxPaletteHeight(that.palettes.cellSize, that.palettes.scale), that.palettes.y);
             var clickY = event.stageY/that.palettes.scale;

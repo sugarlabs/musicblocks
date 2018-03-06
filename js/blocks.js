@@ -410,7 +410,6 @@ function Blocks () {
             that._sizeCounter = 0;
             var childFlowSize = 1;
             if (c > 0 && myBlock.connections[c] != null) {
-		this._sizeCounter = 0;
                 childFlowSize = Math.max(that._getStackSize(myBlock.connections[c]), 1);
             }
 
@@ -1700,7 +1699,7 @@ function Blocks () {
         myBlock.text.text = label;
 
         // Make sure text is on top.
-        var z = myBlock.container.getNumChildren() - 1;
+        var z = myBlock.container.children.length - 1;
         myBlock.container.setChildIndex(myBlock.text, z);
 
         if (myBlock.loadComplete) {
@@ -1791,11 +1790,6 @@ function Blocks () {
             }
 
             if (this.blockList[thisBlock].connections.length > 1) {
-		thisBlock = last(this.blockList[thisBlock].connections);
-            } else {
-                thisBlock = null;
-	    }
-
             // Just in case there is a loop in the block list.
             counter += 1;
             if (counter > this.blockList.length) {
@@ -2160,6 +2154,10 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
+        } else if (name === 'loudness' || name === 'pitchness') {
+            postProcess = function () {
+                that.logo.initMediaDevices();
+            };
         } else if (name === 'media') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -3021,7 +3019,7 @@ function Blocks () {
         // We display some extra buttons when we long-press an action block.
         var myBlock = this.blockList[this.activeBlock];
         if (myBlock.name === 'action') {
-            var z = this.stage.getNumChildren() - 1;
+            var z = this.stage.children.length - 1;
             this.dismissButton.visible = true;
             this.dismissButton.x = myBlock.container.x - 27;
             this.dismissButton.y = myBlock.container.y - 27;
@@ -3877,6 +3875,12 @@ function Blocks () {
                 }
                 break;
 
+            case 'loudness':
+            case 'pitchness':
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null, []);
+                this.logo.initMediaDevices();
+                break;
+
             case 'media':
                 // Load a thumbnail into a media blocks.
                 var postProcess = function (args) {
@@ -4268,7 +4272,7 @@ function Blocks () {
         var topBlk = this.findTopBlock(blk);
         this.findDragGroup(topBlk);
 
-        var z = this.stage.getNumChildren() - 1;
+        var z = this.stage.children.length - 1;
         for (var b = 0; b < this.dragGroup.length; b++) {
             this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
             if (this.blockList[this.dragGroup[b]].collapseContainer !== null) {

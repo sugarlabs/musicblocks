@@ -82,7 +82,6 @@ var urlsToCache = [
     'header-icons/save-blocks-button.svg',
     'header-icons/save-button.svg',
     'header-icons/save-lilypond.svg',
-    'header-icons/save-png-inactive.svg',
     'header-icons/save-png.svg',
     'header-icons/save-svg.svg',
     'header-icons/save-tb.svg',
@@ -179,11 +178,11 @@ var urlsToCache = [
     'lib/Tone.min.js',
     'lib/jquery.ruler.js',
     'lib/modernizr-2.6.2.min.js',
-    'lib/easeljs-0.8.2.min.js',
-    'lib/tweenjs-0.6.2.min.js',
-    'lib/movieclip-0.7.1.min.js',
+    'lib/easeljs.min.js',
+    'lib/tweenjs.min.js',
+    // 'lib/movieclip-0.7.1.min.js',
 
-    'lib/preloadjs-0.6.2.min.js',
+    'lib/preloadjs.min.js',
     'lib/howler.js',
     'lib/p5.min.js',
     'lib/p5.sound.min.js',
@@ -193,7 +192,6 @@ var urlsToCache = [
     'lib/voices/en/en.json',
     'lib/prefixfree.min.js',
     'lib/Chart.js',
-    'lib/dsp.js',
 
     'css/activity.css',
 

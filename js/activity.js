@@ -74,10 +74,10 @@ try{
 
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
+    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
     MYDEFINES = MYDEFINES
 } else {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'prefixfree.min'];
+    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'prefixfree.min'];
 }
 
 define(MYDEFINES, function (compatibility) {
@@ -2633,6 +2633,7 @@ define(MYDEFINES, function (compatibility) {
 
             var img = new Image();
             var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+            /*
             img.onload = function () {
                 var bitmap = new createjs.Bitmap(img);
                 var bounds = bitmap.getBounds();
@@ -2646,7 +2647,16 @@ define(MYDEFINES, function (compatibility) {
 
             img.src = 'data:image/svg+xml;base64,' +
             window.btoa(unescape(encodeURIComponent(svgData)));
-            // console.log(img.src);
+            */
+
+            // Don't bother to convert the session image to PNG. Just
+            // save it as svg.
+            try {
+                storage['SESSIONIMAGE' + p] = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
+            } catch (e) {
+                console.log(e);
+            }
+
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 sugarizerCompatibility.saveLocally();
             }
@@ -2951,7 +2961,7 @@ define(MYDEFINES, function (compatibility) {
             msgContainer.visible = true;
             msgText.text = msg;
             msgContainer.updateCache();
-            stage.setChildIndex(msgContainer, stage.getNumChildren() - 1);
+            stage.setChildIndex(msgContainer, stage.children.length - 1);
         };
 
         function errorMsg(msg, blk, text, timeout) {
@@ -2978,7 +2988,7 @@ define(MYDEFINES, function (compatibility) {
                 var line = new createjs.Shape();
                 errorMsgArrow.addChild(line);
                 line.graphics.setStrokeStyle(4).beginStroke('#ff0031').moveTo(fromX, fromY).lineTo(toX, toY);
-                stage.setChildIndex(errorMsgArrow, stage.getNumChildren() - 1);
+                stage.setChildIndex(errorMsgArrow, stage.children.length - 1);
 
                 var angle = Math.atan2(toX - fromX, fromY - toY) / Math.PI * 180;
                 var head = new createjs.Shape();
@@ -2992,19 +3002,19 @@ define(MYDEFINES, function (compatibility) {
             switch (msg) {
             case NOMICERRORMSG:
                 errorArtwork['nomicrophone'].visible = true;
-                stage.setChildIndex(errorArtwork['nomicrophone'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['nomicrophone'], stage.children.length - 1);
                 break;
             case NOSTRINGERRORMSG:
                 errorArtwork['notastring'].visible = true;
-                stage.setChildIndex(errorArtwork['notastring'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['notastring'], stage.children.length - 1);
                 break;
             case EMPTYHEAPERRORMSG:
                 errorArtwork['emptyheap'].visible = true;
-                stage.setChildIndex(errorArtwork['emptyheap'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['emptyheap'], stage.children.length - 1);
                 break;
             case NOSQRTERRORMSG:
                 errorArtwork['negroot'].visible = true;
-                stage.setChildIndex(errorArtwork['negroot'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['negroot'], stage.children.length - 1);
                 break;
             case NOACTIONERRORMSG:
                 if (text == null) {
@@ -3013,7 +3023,7 @@ define(MYDEFINES, function (compatibility) {
                 errorArtwork['nostack'].children[1].text = text;
                 errorArtwork['nostack'].visible = true;
                 errorArtwork['nostack'].updateCache();
-                stage.setChildIndex(errorArtwork['nostack'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['nostack'], stage.children.length - 1);
                 break;
             case NOBOXERRORMSG:
                 if (text == null) {
@@ -3022,25 +3032,25 @@ define(MYDEFINES, function (compatibility) {
                 errorArtwork['emptybox'].children[1].text = text;
                 errorArtwork['emptybox'].visible = true;
                 errorArtwork['emptybox'].updateCache();
-                stage.setChildIndex(errorArtwork['emptybox'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['emptybox'], stage.children.length - 1);
                 break;
             case ZERODIVIDEERRORMSG:
                 errorArtwork['zerodivide'].visible = true;
-                stage.setChildIndex(errorArtwork['zerodivide'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['zerodivide'], stage.children.length - 1);
                 break;
               case NANERRORMSG:
                 errorArtwork['notanumber'].visible = true;
-                stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['notanumber'], stage.children.length - 1);
                 break;
             case NOINPUTERRORMSG:
                 errorArtwork['noinput'].visible = true;
-                stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
+                stage.setChildIndex(errorArtwork['noinput'], stage.children.length - 1);
                 break;
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;
                 errorMsgText.text = msg;
-                stage.setChildIndex(errorMsgContainer, stage.getNumChildren() - 1);
+                stage.setChildIndex(errorMsgContainer, stage.children.length - 1);
                 errorMsgContainer.updateCache();
                 break;
             }
