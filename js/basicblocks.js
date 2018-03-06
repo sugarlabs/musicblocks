@@ -2650,6 +2650,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     multiplyBlock.fontsize = 14;
     multiplyBlock.staticLabels.push('×');
     multiplyBlock.twoArgMathBlock();
+    multiplyBlock.dockTypes[1] = 'anyin';
     multiplyBlock.defaults.push(1, 12)
 
     var negBlock = new ProtoBlock('neg');
@@ -2667,6 +2668,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     minusBlock.fontsize = 14;
     minusBlock.staticLabels.push('–');
     minusBlock.twoArgMathBlock();
+    minusBlock.dockTypes[1] = 'anyin';
     minusBlock.defaults.push(8, 4)
 
     var plusBlock = new ProtoBlock('plus');

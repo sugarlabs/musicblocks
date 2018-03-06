@@ -381,13 +381,7 @@ function ProtoBlock(name) {
         this.args = 2;
         this.parameter = true;
         this.dockTypes.push('numberout');
-
-        if (this.name == 'multiply' || this.name == 'plus' || this.name == 'minus') {
-            this.dockTypes.push('anyin');
-        } else {
-            this.dockTypes.push('numberin');
-        }
-        
+        this.dockTypes.push('numberin');
         this.dockTypes.push('numberin');
         this.generator = this.twoArgMathBlockGenerator;
     };

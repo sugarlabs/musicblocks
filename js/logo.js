@@ -8810,7 +8810,7 @@ function Logo () {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
                     var r = that.blocks.blockList[cblk1].value;
-                    if (r == 'current') {
+                    if (r == 'current' || r == _('current')) {
                         var a = that.currentOctave[turtle];
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
@@ -8827,9 +8827,9 @@ function Logo () {
                     var cblk2 = that.blocks.blockList[blk].connections[2];
                     var r = that.blocks.blockList[cblk1].value;
                     var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    if (r == 'previous' || r == 'next') { 
+                    if (r == 'previous' || r == _('previous') || r == 'next' || r == _('next')) { 
                         var a = that.currentOctave[turtle]; 
-                        if (r == 'previous') {
+                        if (r == 'previous' || r == _('previous')) {
                             that.blocks.blockList[blk].value = that._doMinus(a, b);
                         } else {
                             that.blocks.blockList[blk].value = that._doPlus(a, b);
@@ -8869,7 +8869,7 @@ function Logo () {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
                     var r = that.blocks.blockList[cblk1].value;
-                    if (r == 'current') {
+                    if (r == 'current' || r == _('current')) {
                         var a = that.currentOctave[turtle];
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
