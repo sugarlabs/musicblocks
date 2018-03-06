@@ -96,7 +96,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight()];
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
     // E.g., hidden (used at end of clamp)
@@ -132,7 +132,7 @@ function ProtoBlock(name) {
         var artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
         // And bring the last dock position to the top.
         svg.docks[1][1] = svg.docks[0][1];
-        return [artwork, svg.docks, 0, 0];
+        return [artwork, svg.docks, 0, 0, 0];
     };
 
     // E.g., break
