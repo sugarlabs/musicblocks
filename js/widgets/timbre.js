@@ -523,6 +523,15 @@ function TimbreWidget () {
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
 
+        _unhighlightButtons = function () {
+            addFilterButtonCell.style.backgroundColor = '#808080';
+            synthButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            oscillatorButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            envelopeButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            effectsButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            filterButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
         cell.onclick = function () {
             that._play();
         };
@@ -537,7 +546,7 @@ function TimbreWidget () {
         this.isActive['synth'] = false;
 
         synthButtonCell.onclick = function () {
-            addFilterButtonCell.style.backgroundColor = '#808080';
+            _unhighlightButtons();
             //console.log('synth button cell');
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
@@ -557,7 +566,7 @@ function TimbreWidget () {
         this.isActive['oscillator'] = false;
 
         oscillatorButtonCell.onclick = function () {
-            addFilterButtonCell.style.backgroundColor = '#808080';
+            _unhighlightButtons();
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -593,7 +602,7 @@ function TimbreWidget () {
         this.isActive['envelope'] = false;
 
         envelopeButtonCell.onclick = function () {
-            addFilterButtonCell.style.backgroundColor = '#808080';
+            _unhighlightButtons();
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -628,7 +637,7 @@ function TimbreWidget () {
         this.isActive['effects'] = false;
 
         effectsButtonCell.onclick = function () {
-            addFilterButtonCell.style.backgroundColor = '#808080';
+            _unhighlightButtons();
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -642,7 +651,7 @@ function TimbreWidget () {
         this.isActive['filter'] = false;
 
         filterButtonCell.onclick = function () {
-            addFilterButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            _unhighlightButtons();
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
