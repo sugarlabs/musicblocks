@@ -229,7 +229,6 @@ function Block(protoblock, blocks, overrideName) {
 
         this.postProcessArg = this;
 
-        console.log(this.name + ' ' + scale);
         this.protoblock.scale = scale;
         this._newArtwork(0);
         this.regenerateArtwork(true, []);
@@ -245,10 +244,11 @@ function Block(protoblock, blocks, overrideName) {
                 that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 2;
 
                 that._positionCollapseContainer(that.protoblock.scale);
-                var bounds = that.collapseContainer.getBounds();
-                that.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
-                // that._positionCollapseContainer(that.protoblock.scale);
+                // bounds is not calculating correctly -- see #1142 --
+                // so sizing cache by hand.
+                that.collapseContainer.cache(0, 0, 55 * scale / 2, 55 * scale / 2);
+                that._positionCollapseContainer(that.protoblock.scale);
                 that._calculateCollapseHitArea();
             };
 
