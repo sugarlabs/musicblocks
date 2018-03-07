@@ -229,6 +229,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.postProcessArg = this;
 
+        console.log(this.name + ' ' + scale);
         this.protoblock.scale = scale;
         this._newArtwork(0);
         this.regenerateArtwork(true, []);
@@ -517,6 +518,8 @@ function Block(protoblock, blocks, overrideName) {
 
         if (firstTime) {
             // Create artwork and dock.
+            this.protoblock.scale = this.blocks.blockScale;
+
             var obj = this.protoblock.generator();
             this.artwork = obj[0];
             for (var i = 0; i < obj[1].length; i++) {

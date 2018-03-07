@@ -217,7 +217,7 @@ function Blocks () {
 
     // The scale of the graphics is determined by screen size.
     this.setScale = function (scale) {
-        this.blockScale = scale;
+        // this.blockScale = scale;
         return this;
     };
 
