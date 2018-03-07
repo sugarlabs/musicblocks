@@ -289,6 +289,8 @@ function TimbreWidget () {
     };
 
     this._play = function () {
+        this._logo.resetSynth(0);
+
         var that = this;
 
         if (this.notesToPlay.length === 0) {
@@ -531,6 +533,8 @@ function TimbreWidget () {
         };
 
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
+        synthButtonCell.id = 'synthButtonCell';
+        this.isActive['synth'] = false;
 
         synthButtonCell.onclick = function () {
             addFilterButtonCell.style.backgroundColor = '#808080';
@@ -538,8 +542,8 @@ function TimbreWidget () {
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
+
             that.isActive['synth'] = true;
-            synthButtonCell.id = 'synthButtonCell';
 
             if (that.osc.length === 0) {
                 that._synth();
@@ -549,6 +553,8 @@ function TimbreWidget () {
         }
 
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
+        oscillatorButtonCell.id = 'oscillatorButtonCell';
+        this.isActive['oscillator'] = false;
 
         oscillatorButtonCell.onclick = function () {
             addFilterButtonCell.style.backgroundColor = '#808080';
@@ -557,7 +563,6 @@ function TimbreWidget () {
             }
 
             that.isActive['oscillator'] = true;
-            oscillatorButtonCell.id = 'oscillatorButtonCell';
 
             if (that.osc.length === 0) {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
@@ -584,6 +589,8 @@ function TimbreWidget () {
         }
 
         var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
+        envelopeButtonCell.id = 'envelopeButtonCell';
+        this.isActive['envelope'] = false;
 
         envelopeButtonCell.onclick = function () {
             addFilterButtonCell.style.backgroundColor = '#808080';
@@ -592,7 +599,6 @@ function TimbreWidget () {
             }
 
             that.isActive['envelope'] = true;
-            envelopeButtonCell.id = 'envelopeButtonCell';
 
             if (that.env.length === 0) {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
@@ -618,6 +624,8 @@ function TimbreWidget () {
 
 
         var effectsButtonCell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
+        effectsButtonCell.id = 'effectsButtonCell';
+        this.isActive['effects'] = false;
 
         effectsButtonCell.onclick = function () {
             addFilterButtonCell.style.backgroundColor = '#808080';
@@ -626,11 +634,12 @@ function TimbreWidget () {
             }
 
             that.isActive['effects'] = true;
-            effectsButtonCell.id = 'effectsButtonCell';
             that._effects();
         }
 
         var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
+        filterButtonCell.id = 'filterButtonCell';
+        this.isActive['filter'] = false;
 
         filterButtonCell.onclick = function () {
             addFilterButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -639,7 +648,6 @@ function TimbreWidget () {
             }
 
             that.isActive['filter'] = true;
-            filterButtonCell.id = 'filterButtonCell';
 
             if (that.fil.length === 0) {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
@@ -1048,7 +1056,7 @@ function TimbreWidget () {
                                 if (that.AMSynthesizer.length !== 0) {
                                     that._blockReplace(last(that.AMSynthesizer), last(that.NoiseSynthesizer));
                                     that.AMSynthesizer.pop();
-							    } else if (that.FMSynthesizer.length !== 0) {
+                                } else if (that.FMSynthesizer.length !== 0) {
                                     that._blockReplace(last(that.FMSynthesizer), last(that.NoiseSynthesizer));
                                     that.FMSynthesizer.pop();
                                 } else if (that.duoSynthesizer.length !== 0) {
