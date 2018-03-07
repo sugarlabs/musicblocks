@@ -338,7 +338,9 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _printBlockSVG() {
-            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + logo.canvas.width + '" height="' + logo.canvas.height + '">';
+            var svg = '';
+            var xMax = 0;
+            var yMax = 0;
             for (var i = 0; i < blocks.blockList.length; i++) {
                 if (blocks.blockList[i].name === 'hidden') {
                     continue;
@@ -350,6 +352,14 @@ define(MYDEFINES, function (compatibility) {
 
                 if (blocks.blockList[i].trash) {
                     continue;
+                }
+
+                if (blocks.blockList[i].container.x + blocks.blockList[i].width > xMax) {
+                    xMax = blocks.blockList[i].container.x + blocks.blockList[i].width;
+                }
+
+                if (blocks.blockList[i].container.y + blocks.blockList[i].height > yMax) {
+                    yMax = blocks.blockList[i].container.y + blocks.blockList[i].height;
                 }
 
                 var parts = blocks.blockArt[i].split('><');
@@ -394,10 +404,10 @@ define(MYDEFINES, function (compatibility) {
                 }
                 svg += '</g>';
             }
-            svg += '</svg>';
-            download('blockArtwork.svg', 'data:image/svg+xml;utf8,' + svg, 'blockArtwork.svg', '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
 
-        }
+            svg += '</svg>';
+            download('blockArtwork.svg', 'data:image/svg+xml;utf8,' + '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + svg, 'blockArtwork.svg', '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
+        };
 
         function _allClear() {
             if (chartBitmap != null) {
