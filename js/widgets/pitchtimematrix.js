@@ -47,6 +47,10 @@ function PitchTimeMatrix () {
     // rowArgs can contain an octave or the arg(s) to a graphics command
     this.rowArgs = [];
 
+    // We need to treat note blocks differently since they have both
+    // pitch and rhythm.
+    this._noteBlocks = false;
+
     this._sorted = false;
     this._notesToPlay = [];
     this._matrixHasTuplets = false;
@@ -104,13 +108,16 @@ function PitchTimeMatrix () {
     };
 
     this.addNode = function(pitchBlock, rhythmBlock, n) {
+        var j = 0;
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                return;  // node is already in the list
+                console.log('node is already in the list');
+                j += 1;
             }
         }
-        this._blockMap.push([pitchBlock, [rhythmBlock, n]]);
+
+        this._blockMap.push([pitchBlock, [rhythmBlock, n], j]);
     };
 
     this.removeNode = function(pitchBlock, rhythmBlock, n) {
@@ -127,10 +134,11 @@ function PitchTimeMatrix () {
         // and them make another one in DOM (document object model)
         this._noteStored = [];
         this._sorted = false;
+        this._noteBlocks = false;
         this._rests = 0;
         this._logo = logo;
 
-        this.playingNow = false;	
+        this.playingNow = false;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -511,6 +519,7 @@ function PitchTimeMatrix () {
 
         this.rowLabels = [];
         this.rowArgs = [];
+
         for (var i = 0; i < sortedList.length; i++) {
             var obj = sortedList[i];
 
@@ -983,6 +992,7 @@ function PitchTimeMatrix () {
         // Once the entire matrix is generated, this function makes it
         // clickable.
         var rowCount = this.rowLabels.length;
+        console.log(rowCount);
 
         for (var i = 0; i < rowCount; i++) {
             var row = docById('ptm' + i);
@@ -1046,15 +1056,54 @@ function PitchTimeMatrix () {
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
         for (var i = 0; i < this._blockMap.length; i++) {
+            if (this._logo.blocks.blockList[this._blockMap[i][1][0]].name === 'newnote') {
+                console.log('FOUND A NOTE BLOCK.');
+                this._noteBlocks = true;
+                break;
+            }
+        }
+
+        for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
             if (obj[0] !== -1) {
-                // Look for this note in the pitch and rhythm blocks.
-                var r = this._rowMap[this._rowBlocks.indexOf(obj[0])] + this._rowOffset[this._rowMap[this._rowBlocks.indexOf(obj[0])]];
+                var n = obj[2];
+                var c = 0;
+                var rIdx = null;
+                // Look in the rowBlocks for the nth match
+                for (var j = 0; j < this._rowBlocks.length; j++) {
+                    if (this._rowBlocks[j] === obj[0]) {
+                        if (this._sorted) {
+                            var rIdx = j;
+                            break;
+                        } else if (c === n) {
+                            var rIdx = j;
+                            break;
+                        }
+
+                        c += 1;
+                    }
+                }
+
+                if (rIdx === null) {
+                    console.log('Could not find a row match.');
+                    continue;
+                }
+
+                var r = this._rowMap[rIdx] + this._rowOffset[this._rowMap[rIdx]];
+                // var r = this._rowMap[this._rowBlocks.indexOf(obj[0])] + this._rowOffset[this._rowMap[this._rowBlocks.indexOf(obj[0])]];
+
                 var c = -1;
                 for (var j = 0; j < this._colBlocks.length; j++) {
-                    if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === obj[1][1]) {
-                        c = j;
-                        break;
+                    if (this._noteBlocks) {
+                        if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === n) {
+                            c = j;
+                            break;
+                        }
+                    } else {
+                        if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === obj[1][1]) {
+                            c = j;
+                            break;
+                        }
                     }
                 }
 
@@ -1065,13 +1114,18 @@ function PitchTimeMatrix () {
                 // If we found a match, mark this cell and add this
                 // note to the play list.
                 var row = docById('ptm' + r);
-                var cell = row.cells[c];
-                if (cell != undefined) {
-                    cell.style.backgroundColor = 'black';
-                    if (this._notesToPlay[c][0][0] === 'R') {
-                        this._notesToPlay[c][0] = [];
+                if (row === null) {
+                    console.log('COULD NOT FIND ROW ' + r);
+                } else {
+                    var cell = row.cells[c];
+                    if (cell != undefined) {
+                        cell.style.backgroundColor = 'black';
+                        if (this._notesToPlay[c][0][0] === 'R') {
+                            this._notesToPlay[c][0] = [];
+                        }
+
+                        this._setNoteCell(r, c, cell, false, null);
                     }
-                    this._setNoteCell(r, c, cell, false, null);
                 }
             }
         }
