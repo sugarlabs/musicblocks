@@ -51,7 +51,7 @@ function PitchTimeMatrix () {
     // pitch and rhythm.
     this._noteBlocks = false;
 
-    this._sorted = false;
+    this.sorted = false;
     this._notesToPlay = [];
     this._matrixHasTuplets = false;
     this._notesCounter = 0;
@@ -133,7 +133,6 @@ function PitchTimeMatrix () {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
         this._noteStored = [];
-        this._sorted = false;
         this._noteBlocks = false;
         this._rests = 0;
         this._logo = logo;
@@ -430,6 +429,18 @@ function PitchTimeMatrix () {
         var ptmCell = ptmTableRow.insertCell();
         // Create tables to store individual note values.
         ptmCell.innerHTML = '<table  class="ptmTable" cellpadding="0px"><tr id="ptmTupletNoteValueRow"></tr><tr id="ptmTupletValueRow"></tr><tr id="ptmNoteValueRow"></tr></table>';
+
+        // Sort the if there are note blocks.
+        this._lookForNoteBlocks();
+        if (!this.sorted && this._noteBlocks) {
+            console.log('SHALL WE SORT?');
+            setTimeout(function () {
+                console.log('sorting');
+                that._sort();
+            }, 1000);
+        } else {
+            this.sorted = false;
+        }
     };
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -460,9 +471,25 @@ function PitchTimeMatrix () {
     };
 
     this._sort = function() {
-        if (this._sorted) {
+        if (this.sorted) {
             console.log('already sorted');
             return;
+        }
+
+        // Keep track of marked cells.
+        this._markedColsInRow = [];
+        for (var r = 0; r < this.rowLabels.length; r++) {
+            var thisRow = [];
+            var row = docById('ptm' + r);
+            var n = row.cells.length;
+            for (var i = 0; i < n; i++) {
+                var cell = row.cells[i];
+                if (cell.style.backgroundColor === 'black') {
+                    thisRow.push(i);
+                }
+            }
+
+            this._markedColsInRow.push(thisRow);
         }
 
         var sortableList = [];
@@ -519,6 +546,13 @@ function PitchTimeMatrix () {
 
         this.rowLabels = [];
         this.rowArgs = [];
+        this._sortedRowMap = [];
+
+        // Build a table to map back to original order.
+        this._rowMapper = [];
+        for (var i = 0; i < sortedList.length; i++) {
+            this._rowMapper.push(sortedList[i][3]);
+        }
 
         for (var i = 0; i < sortedList.length; i++) {
             var obj = sortedList[i];
@@ -526,26 +560,43 @@ function PitchTimeMatrix () {
             this._rowMap[obj[3]] = i;
             this._noteStored[i] = obj[4];
 
-            if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
-                // skip duplicates
-                for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
-                    this._rowOffset[j] -= 1;
+            if (this._noteBlocks) {
+                if (i === 0) {
+                    this._sortedRowMap.push(0);
+                } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+                    this._sortedRowMap.push(last(this._sortedRowMap));
+                    // skip duplicates
+                    for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                        this._rowOffset[j] -= 1;
+                    }
+
+                    this._rowMap[i] = this._rowMap[i - 1];
+                    continue;
+                } else {
+                    this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 }
+            } else {
+                if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
+                    // skip duplicates
+                    for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                        this._rowOffset[j] -= 1;
+                    }
 
-                this._rowMap[i] = this._rowMap[i - 1];
-                continue;
-            } else if (i > 0 && obj[1] === last(this.rowLabels)) {
-                // test multiple args for match
-                var argType = typeof(last(this.rowArgs));
-                if (argType === 'object') {
-                    if ((Number(obj[2][0]) === last(this.rowArgs)[0]) && (Number(obj[2][1]) === last(this.rowArgs)[1])) {
-                        // skip duplicates
-                        for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
-                            this._rowOffset[j] -= 1;
+                    this._rowMap[i] = this._rowMap[i - 1];
+                    continue;
+                } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+                    // test multiple args for match
+                    var argType = typeof(last(this.rowArgs));
+                    if (argType === 'object') {
+                        if ((Number(obj[2][0]) === last(this.rowArgs)[0]) && (Number(obj[2][1]) === last(this.rowArgs)[1])) {
+                            // skip duplicates
+                            for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                                this._rowOffset[j] -= 1;
+                            }
+
+                            this._rowMap[i] = this._rowMap[i - 1];
+                            continue;
                         }
-
-                        this._rowMap[i] = this._rowMap[i - 1];
-                        continue;
                     }
                 }
             }
@@ -554,9 +605,10 @@ function PitchTimeMatrix () {
             this.rowArgs.push(Number(obj[2]));
         }
 
-        this._matrixHasTuplets = false;  // Force regenration of tuplet rows.
+        this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
+        this.sorted = true;
         this.init(this._logo);
-        this._sorted = true;
+        this.sorted = true;
 
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
@@ -988,11 +1040,21 @@ function PitchTimeMatrix () {
         }
     };
 
+    this._lookForNoteBlocks = function () {
+        this._noteBlocks = false;
+        for (var i = 0; i < this._blockMap.length; i++) {
+            if (this._logo.blocks.blockList[this._blockMap[i][1][0]].name === 'newnote') {
+                console.log('FOUND A NOTE BLOCK.');
+                this._noteBlocks = true;
+                break;
+            }
+        }
+    };
+
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
         var rowCount = this.rowLabels.length;
-        console.log(rowCount);
 
         for (var i = 0; i < rowCount; i++) {
             var row = docById('ptm' + i);
@@ -1053,78 +1115,90 @@ function PitchTimeMatrix () {
             }
         }
 
+        this._lookForNoteBlocks();
+
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
-        for (var i = 0; i < this._blockMap.length; i++) {
-            if (this._logo.blocks.blockList[this._blockMap[i][1][0]].name === 'newnote') {
-                console.log('FOUND A NOTE BLOCK.');
-                this._noteBlocks = true;
-                break;
-            }
-        }
 
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var obj = this._blockMap[i];
-            if (obj[0] !== -1) {
-                var n = obj[2];
-                var c = 0;
-                var rIdx = null;
-                // Look in the rowBlocks for the nth match
-                for (var j = 0; j < this._rowBlocks.length; j++) {
-                    if (this._rowBlocks[j] === obj[0]) {
-                        if (this._sorted) {
-                            var rIdx = j;
-                            break;
-                        } else if (c === n) {
-                            var rIdx = j;
-                            break;
-                        }
-
-                        c += 1;
-                    }
-                }
-
-                if (rIdx === null) {
-                    console.log('Could not find a row match.');
-                    continue;
-                }
-
-                var r = this._rowMap[rIdx] + this._rowOffset[this._rowMap[rIdx]];
-                // var r = this._rowMap[this._rowBlocks.indexOf(obj[0])] + this._rowOffset[this._rowMap[this._rowBlocks.indexOf(obj[0])]];
-
-                var c = -1;
-                for (var j = 0; j < this._colBlocks.length; j++) {
-                    if (this._noteBlocks) {
-                        if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === n) {
-                            c = j;
-                            break;
-                        }
-                    } else {
-                        if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === obj[1][1]) {
-                            c = j;
-                            break;
-                        }
-                    }
-                }
-
-                if (c == -1) {
-                    continue;
-                }
-
-                // If we found a match, mark this cell and add this
-                // note to the play list.
+        // If we have sorted the rows, we can simply restore the
+        // marked blocks.
+        if (this.sorted && this._noteBlocks) {
+            for (var i = 0; i < this._rowMapper.length; i++) {
+                var ii = this._rowMapper[i];
+                var r = this._sortedRowMap[i];
                 var row = docById('ptm' + r);
-                if (row === null) {
-                    console.log('COULD NOT FIND ROW ' + r);
-                } else {
+                for (var j = 0; j < this._markedColsInRow[ii].length; j++) {
+                    var c = this._markedColsInRow[ii][j];
                     var cell = row.cells[c];
-                    if (cell != undefined) {
-                        cell.style.backgroundColor = 'black';
-                        if (this._notesToPlay[c][0][0] === 'R') {
-                            this._notesToPlay[c][0] = [];
-                        }
+                    cell.style.backgroundColor = 'black';
+                    if (this._notesToPlay[c][0][0] === 'R') {
+                        this._notesToPlay[c][0] = [];
+                    }
 
-                        this._setNoteCell(r, c, cell, false, null);
+                    this._setNoteCell(r, c, cell, false, null);
+                }
+            }
+        } else {
+            // otherwise, we need to look at the blockMap.
+            for (var i = 0; i < this._blockMap.length; i++) {
+                var obj = this._blockMap[i];
+                if (obj[0] !== -1) {
+                    var n = obj[2];
+                    var c = 0;
+                    var rIdx = null;
+                    // Look in the rowBlocks for the nth match
+                    for (var j = 0; j < this._rowBlocks.length; j++) {
+                        if (this._rowBlocks[j] === obj[0]) {
+                            if (c === n) {
+                                var rIdx = j;
+                                break;
+                            }
+
+                            c += 1;
+                        }
+                    }
+
+                    if (rIdx === null) {
+                        console.log('Could not find a row match.');
+                        continue;
+                    }
+
+                    var r = this._rowMap[rIdx] + this._rowOffset[this._rowMap[rIdx]];
+
+                    var c = -1;
+                    for (var j = 0; j < this._colBlocks.length; j++) {
+                        if (this._noteBlocks) {
+                            if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === n) {
+                                c = j;
+                                break;
+                            }
+                        } else {
+                            if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === obj[1][1]) {
+                                c = j;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (c == -1) {
+                        continue;
+                    }
+
+                    // If we found a match, mark this cell and add this
+                    // note to the play list.
+                    var row = docById('ptm' + r);
+                    if (row === null) {
+                        console.log('COULD NOT FIND ROW ' + r);
+                    } else {
+                        var cell = row.cells[c];
+                        if (cell != undefined) {
+                            cell.style.backgroundColor = 'black';
+                            if (this._notesToPlay[c][0][0] === 'R') {
+                                this._notesToPlay[c][0] = [];
+                            }
+
+                            this._setNoteCell(r, c, cell, false, null);
+                        }
                     }
                 }
             }

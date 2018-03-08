@@ -3413,6 +3413,7 @@ function Logo () {
                     that.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
                 } else {
                     // Process queued up rhythms.
+                    that.pitchTimeMatrix.sorted = false;
                     that.pitchTimeMatrix.init(that);
 
                     for (var i = 0; i < that.tupletRhythms.length; i++) {
