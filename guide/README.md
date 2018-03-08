@@ -139,13 +139,19 @@ The next block is specified using a *Pitch-number* block (the `7th
 semi-tone` above `C` in `Octave 4`). The offset for the pitch number
 can be modified using the *Set-pitch-number-offset* block.
 
-The pitch of the last block is specified using the *Hertz* block in
+The pitch of the next block is specified using the *Hertz* block in
 conjunction with a *Number* block (`392` Hertz) , which corresponds to
 the frequency of the sound made.
 
 The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
-frequency, the octave is ignored.
+frequency, the octave is ignored.The octave argument can also be specified using a *Text* block with values *current*, *previous*, *next* which does as 0, -1, 1 respectively.
+
+The octave of the next block is specified using a *current* text block (`Sol` in `Octave 4`).
+
+The octave of the next block is specified using a *previous* text block (`G` in `Octave 3`).
+
+The octave of the last block is specified using a *next* text block (`G` in `Octave 5`).
 
 Note that the pitch name can also be specified using a *Text* block. 
 
