@@ -1043,7 +1043,14 @@ function PitchTimeMatrix () {
     this._lookForNoteBlocks = function () {
         this._noteBlocks = false;
         for (var i = 0; i < this._blockMap.length; i++) {
-            if (this._logo.blocks.blockList[this._blockMap[i][1][0]].name === 'newnote') {
+            var blk = this._blockMap[i][1][0];
+            // console.log(blk);
+            if (this._logo.blocks.blockList[blk] === null) {
+                continue;
+	    }
+
+            // console.log(this._logo.blocks.blockList[blk].name);
+            if (this._logo.blocks.blockList[blk].name === 'newnote') {
                 console.log('FOUND A NOTE BLOCK.');
                 this._noteBlocks = true;
                 break;
