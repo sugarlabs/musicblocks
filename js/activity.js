@@ -74,10 +74,10 @@ try{
 
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
+    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/pastebox', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
     MYDEFINES = MYDEFINES
 } else {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'prefixfree.min'];
+    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/pastebox', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'prefixfree.min'];
 }
 
 define(MYDEFINES, function (compatibility) {
@@ -140,6 +140,7 @@ define(MYDEFINES, function (compatibility) {
         var blocks;
         var logo;
         var clearBox;
+        var pasteBox;
         var utilityBox;
         var languageBox = null;
         var playbackBox = null;
@@ -152,7 +153,8 @@ define(MYDEFINES, function (compatibility) {
         var currentKeyCode = 0;
         var pasteContainer = null;
         var pasteImage = null;
-        var bitmapActivePaste, bitmapDisablePaste; // For UpdatePasteButton Function
+        // For updatePasteButton function
+        var bitmapActivePaste, bitmapDisablePaste;
         var gridContainer = null;
         var gridButtonLabel = null;
         var gridImages = [];
@@ -167,13 +169,13 @@ define(MYDEFINES, function (compatibility) {
         var progressBar = docById('myProgress');
         progressBar.style.visibility = 'hidden';
 
-        var paste = new createjs.DOMElement(document.getElementById('paste'));
-        var pasteStyle = document.getElementById('paste');
-        var pasteX = document.getElementById('myCanvas').width;
-        var pasteY = document.getElementById('myCanvas').height;
-        pasteStyle.style.left = pasteX / 2.5 * turtleBlocksScale + 'px';
-        pasteStyle.style.top = pasteY / 3.5 * turtleBlocksScale + 'px';
-        pasteStyle.style.visibility = 'hidden';
+        new createjs.DOMElement(docById('paste'));
+        var paste = docById('paste');
+        var pasteX = canvas.width;
+        var pasteY = canvas.height;
+        paste.style.left = pasteX / 2.5 * turtleBlocksScale + 'px';
+        paste.style.top = pasteY / 3.5 * turtleBlocksScale + 'px';
+        paste.style.visibility = 'hidden';
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -620,6 +622,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _hideBoxes() {
+            pasteBox.hide();
             clearBox.hide();
             saveBox.hide();
             languageBox.hide();
@@ -955,6 +958,13 @@ define(MYDEFINES, function (compatibility) {
 
             // Set the default background color...
             logo.setBackgroundColor(-1);
+
+            pasteBox = new PasteBox();
+            pasteBox
+                .setCanvas(canvas)
+                .setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setPaste(paste);
 
             clearBox = new ClearBox();
             clearBox
@@ -1563,7 +1573,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         // Prepare the search widget
-        searchWidget.style.visibility = "hidden";
+        searchWidget.style.visibility = 'hidden';
         var searchBlockPosition = [100, 100];
 
         var searchSuggestions = [];
@@ -1768,7 +1778,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planetdiv').style.display === '';
+                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planetdiv').style.display === '' || docById('paste').style.visibility === 'visible';
             } else {
                 var disableKeys = searchWidget.style.visibility === 'visible';
             }
@@ -1797,13 +1807,15 @@ define(MYDEFINES, function (compatibility) {
                     blocks.pasteStack();
                     break;
                 }
-            } else if (event.ctrlKey && !disableKeys) {
+            } else if (event.ctrlKey) {
                 switch(event.keyCode)
                 {
                     case CTRL && V:
-                    paste.visible = true;
-                    document.getElementById('paste').focus();
-                    stage.addChild(paste);
+                    pasteBox.createBox(turtleBlocksScale, pasteX / 2.5 * turtleBlocksScale, pasteY / 3.5 * turtleBlocksScale);
+                    pasteBox.show();
+                    docById('paste').focus();
+                    docById('paste').style.visibility = 'visible';
+                    // stage.addChild(paste);
                     update = true;
                     console.log('Paste')
                     break;
@@ -1847,7 +1859,11 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 }
             } else {
-              if (!disableKeys){
+                if (docById('paste').style.visibility === 'visible' && event.keyCode === RETURN) {
+                    if (docById('paste').value.length > 0){
+                        pasted();
+                    }
+                } else if (!disableKeys) {
                 switch (event.keyCode) {
                 case END:
                     blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
@@ -1936,9 +1952,6 @@ define(MYDEFINES, function (compatibility) {
                     if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
                     } else if (docById('search').value.length > 0){
                         doSearch();
-                    } else if (docById('paste').value.length > 0){
-                        pasted();
-                        paste.visible = false;
                     } else {
                         if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
                             logo.runLogoCommands();
@@ -3951,15 +3964,21 @@ handleComplete);
             });
         };
 
-	function pasted() {
-            var pasteinput = document.getElementById("paste").value;
+        function pasted() {
+            var pasteinput = docById('paste').value;
             var rawData = pasteinput;
-	    if (rawData == null || rawData == '') {
-		alert('Invalid code.');
-	    }
+            if (rawData == null || rawData == '') {
+                return;
+            }
 
             var cleanData = rawData.replace('\n', ' ');
-            var obj = JSON.parse(cleanData);
+            try {
+                var obj = JSON.parse(cleanData);
+            } catch (e) {
+                errorMsg(_('Could not parse JSON input.'));
+                return;
+            }
+
             for (var name in blocks.palettes.dict) {
                 blocks.palettes.dict[name].hideMenu(true);
             }
@@ -3967,6 +3986,7 @@ handleComplete);
             refreshCanvas();
 
             blocks.loadNewBlocks(obj);
+            pasteBox.hide();
        };
 
     };

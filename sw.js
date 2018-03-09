@@ -98,6 +98,7 @@ var urlsToCache = [
     'header-icons/stats-button.svg',
     'header-icons/step-button.svg',
     'header-icons/step-music-button.svg',
+    'header-icons/stop-button.svg',
     'header-icons/stop-turtle-button.svg',
     'header-icons/synth.svg',
     'header-icons/tap-active-button.svg',
@@ -220,6 +221,7 @@ var urlsToCache = [
     'js/playbackbox.js',
     'js/languagebox.js',
     'js/sugarizer-compatibility.js',
+    'js/pastebox.js',
 
     'js/widgets/pitchdrummatrix.js',
     'js/widgets/pitchslider.js',
