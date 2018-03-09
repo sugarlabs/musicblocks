@@ -560,45 +560,19 @@ function PitchTimeMatrix () {
             this._rowMap[obj[3]] = i;
             this._noteStored[i] = obj[4];
 
-            if (this._noteBlocks) {
-                if (i === 0) {
-                    this._sortedRowMap.push(0);
-                } else if (i > 0 && obj[1] === last(this.rowLabels)) {
-                    this._sortedRowMap.push(last(this._sortedRowMap));
-                    // skip duplicates
-                    for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
-                        this._rowOffset[j] -= 1;
-                    }
-
-                    this._rowMap[i] = this._rowMap[i - 1];
-                    continue;
-                } else {
-                    this._sortedRowMap.push(last(this._sortedRowMap) + 1);
+            if (i === 0) {
+                this._sortedRowMap.push(0);
+            } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+                this._sortedRowMap.push(last(this._sortedRowMap));
+                // skip duplicates
+                for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                    this._rowOffset[j] -= 1;
                 }
+
+                this._rowMap[i] = this._rowMap[i - 1];
+                continue;
             } else {
-                if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
-                    // skip duplicates
-                    for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
-                        this._rowOffset[j] -= 1;
-                    }
-
-                    this._rowMap[i] = this._rowMap[i - 1];
-                    continue;
-                } else if (i > 0 && obj[1] === last(this.rowLabels)) {
-                    // test multiple args for match
-                    var argType = typeof(last(this.rowArgs));
-                    if (argType === 'object') {
-                        if ((Number(obj[2][0]) === last(this.rowArgs)[0]) && (Number(obj[2][1]) === last(this.rowArgs)[1])) {
-                            // skip duplicates
-                            for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
-                                this._rowOffset[j] -= 1;
-                            }
-
-                            this._rowMap[i] = this._rowMap[i - 1];
-                            continue;
-                        }
-                    }
-                }
+                this._sortedRowMap.push(last(this._sortedRowMap) + 1);
             }
 
             this.rowLabels.push(obj[1]);
@@ -1047,7 +1021,7 @@ function PitchTimeMatrix () {
             // console.log(blk);
             if (this._logo.blocks.blockList[blk] === null) {
                 continue;
-	    }
+            }
 
             // console.log(this._logo.blocks.blockList[blk].name);
             if (this._logo.blocks.blockList[blk].name === 'newnote') {
@@ -1129,7 +1103,7 @@ function PitchTimeMatrix () {
 
         // If we have sorted the rows, we can simply restore the
         // marked blocks.
-        if (this.sorted && this._noteBlocks) {
+        if (this.sorted) {
             for (var i = 0; i < this._rowMapper.length; i++) {
                 var ii = this._rowMapper[i];
                 var r = this._sortedRowMap[i];
