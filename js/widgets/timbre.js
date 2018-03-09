@@ -288,8 +288,17 @@ function TimbreWidget () {
        }
     };
 
-    this._play = function () {
+    this._play = function (row) {
+        this._playing = !this._playing;
+
         this._logo.resetSynth(0);
+
+        var cell = row.cells[0];
+        if (this._playing) {
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'pause-button.svg' + '" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        } else {
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        }
 
         var that = this;
 
@@ -298,17 +307,24 @@ function TimbreWidget () {
         }
 
         __playLoop = function (i) {
-            that._playNote(that.notesToPlay[i][0], that.notesToPlay[i][1]);
+            if (that._playing) {
+                that._playNote(that.notesToPlay[i][0], that.notesToPlay[i][1]);
+            }
 
             i += 1;
-            if (i < that.notesToPlay.length) {
+            if (i < that.notesToPlay.length && that._playing) {
                 setTimeout(function () {
                     __playLoop(i);
                 }, that._logo.defaultBPMFactor * 1000 * that.notesToPlay[i - 1][1]);
+            } else {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                that._playing = false;
             }
         };
 
-        __playLoop(0);
+        if (this._playing) {
+            __playLoop(0);
+        }
     };
 
     this._save = function () {
@@ -498,6 +514,8 @@ function TimbreWidget () {
         this._logo = logo;
         this._delta = 0;
 
+        this._playing = false;
+
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
@@ -521,8 +539,6 @@ function TimbreWidget () {
 
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
-
         _unhighlightButtons = function () {
             addFilterButtonCell.style.backgroundColor = '#808080';
             synthButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -532,8 +548,10 @@ function TimbreWidget () {
             filterButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+
         cell.onclick = function () {
-            that._play();
+            that._play(row);
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
