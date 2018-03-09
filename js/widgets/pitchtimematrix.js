@@ -179,7 +179,7 @@ function PitchTimeMatrix () {
             that._logo.setTurtleDelay(0);
 
             that._logo.resetSynth(0);
-            that.playAll();
+            that.playAll(row);
         }
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
@@ -1186,104 +1186,124 @@ function PitchTimeMatrix () {
         }
     };
 
-    this.playAll = function() {
+    this.playAll = function(row) {
         // Play all of the notes in the matrix.
+        this.playingNow = !this.playingNow;
+
+        var playButtonCell = row.cells[0];
+
         if (this.playingNow) {
-            return;
-        }
+            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
 
-        this.playingNow = true;
+            this._logo.synth.stop();
 
-        this._logo.synth.stop();
+            var notes = [];
 
-        var notes = [];
-
-        for (var i in this._notesToPlay) {
-            notes.push(this._notesToPlay[i]);
-        }
-
-        this._notesToPlay = notes;
-
-        this._notesCounter = 0;
-
-        // We have an array of pitches and note values.
-        var note = this._notesToPlay[this._notesCounter][0];
-        var pitchNotes = [];
-        var synthNotes = [];
-        var drumNotes = [];
-
-        // Note can be a chord, hence it is an array.
-        for (var i = 0; i < note.length; i++) {
-            if (typeof(note[i]) === 'number') {
-                var drumName = null;
-            } else {
-                var drumName = getDrumName(note[i]);
+            for (var i in this._notesToPlay) {
+                notes.push(this._notesToPlay[i]);
             }
 
-            if (typeof(note[i]) === 'number') {
-                synthNotes.push(note[i]);
-            } else if (drumName != null) {
-                drumNotes.push(drumName);
-            } else if (note[i].slice(0, 4) === 'http') {
-                drumNotes.push(note[i]);
-            } else {
-                var obj = note[i].split(':');
-                if (obj.length > 1) {
-                    // Deprecated
-                    if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
-                        synthNotes.push(note[i]);
-                    } else {
-                        this._processGraphics(obj);
-                    }
+            this._notesToPlay = notes;
+
+            this._notesCounter = 0;
+
+            // We have an array of pitches and note values.
+            var note = this._notesToPlay[this._notesCounter][0];
+            var pitchNotes = [];
+            var synthNotes = [];
+            var drumNotes = [];
+
+            // Note can be a chord, hence it is an array.
+            for (var i = 0; i < note.length; i++) {
+                if (typeof(note[i]) === 'number') {
+                    var drumName = null;
                 } else {
-                    pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
+                    var drumName = getDrumName(note[i]);
+                }
+
+                if (typeof(note[i]) === 'number') {
+                    synthNotes.push(note[i]);
+                } else if (drumName != null) {
+                    drumNotes.push(drumName);
+                } else if (note[i].slice(0, 4) === 'http') {
+                    drumNotes.push(note[i]);
+                } else {
+                    var obj = note[i].split(':');
+                    if (obj.length > 1) {
+                        // Deprecated
+                        if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
+                            synthNotes.push(note[i]);
+                        } else {
+                            this._processGraphics(obj);
+                        }
+                    } else {
+                        pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
+                    }
                 }
             }
-        }
 
-        var noteValue = this._notesToPlay[this._notesCounter][1];
+            var noteValue = this._notesToPlay[this._notesCounter][1];
 
-        this._notesCounter += 1;
+            this._notesCounter += 1;
 
-        this._colIndex = 0;
+            this._colIndex = 0;
 
-        // We highlight the note-value cells (bottom row).
-        var row = docById('ptmNoteValueRow');
+            // We highlight the note-value cells (bottom row).
+            var row = docById('ptmNoteValueRow');
 
-        // Highlight first note.
-        var cell = row.cells[this._colIndex];
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            // Highlight first note.
+            var cell = row.cells[this._colIndex];
+            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        // If we are in a tuplet, we don't update the column until
-        // we've played all of the notes in the column span.
-        if (cell.colSpan > 1) {
-            this._spanCounter = 1;
-            var row = docById('ptmTupletNoteValueRow');
-            var tupletCell = row.cells[this._colIndex];
-            tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            // If we are in a tuplet, we don't update the column until
+            // we've played all of the notes in the column span.
+            if (cell.colSpan > 1) {
+                this._spanCounter = 1;
+                var row = docById('ptmTupletNoteValueRow');
+                var tupletCell = row.cells[this._colIndex];
+                tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            } else {
+                this._spanCounter = 0;
+                this._colIndex += 1;
+            }
+
+            if (note[0] !== 'R' && pitchNotes.length > 0) {
+
+                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, 'default', null, null);
+            }
+
+            for (var i = 0; i < synthNotes.length; i++) {
+                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, 'default', null, null);
+            }
+
+            for (var i = 0; i < drumNotes.length; i++) {
+                this._logo.synth.trigger(0, 'C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i], null, null);
+
+            }
+
+            this.__playNote(0, 0, playButtonCell);
         } else {
-            this._spanCounter = 0;
-            this._colIndex += 1;
+            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
-
-        if (note[0] !== 'R' && pitchNotes.length > 0) {
-
-            this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, 'default', null, null);
-        }
-
-        for (var i = 0; i < synthNotes.length; i++) {
-            this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, 'default', null, null);
-        }
-
-        for (var i = 0; i < drumNotes.length; i++) {
-            this._logo.synth.trigger(0, 'C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i], null, null);
-
-        }
-
-        this.__playNote(0, 0);
     };
 
-    this.__playNote = function(time, noteCounter) {
+    this._resetMatrix = function() {
+        var row = docById('ptmNoteValueRow');
+        for (var i = 0; i < row.cells.length; i++) {
+            var cell = row.cells[i];
+            cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+        }
+
+        if (that._matrixHasTuplets) {
+            var row = docById('ptmTupletNoteValueRow');
+            for (var i = 0; i < row.cells.length; i++) {
+                var cell = row.cells[i];
+                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+            }
+        }
+    };
+
+    this.__playNote = function(time, noteCounter, playButtonCell) {
         // If the widget it closed, stop playing.
         if (docById('ptmDiv').style.visibility === 'hidden') {
             return;
@@ -1296,20 +1316,9 @@ function PitchTimeMatrix () {
         setTimeout(function() {
             // Did we just play the last note?
             if (noteCounter === that._notesToPlay.length - 1) {
-                var row = docById('ptmNoteValueRow');
-                for (var i = 0; i < row.cells.length; i++) {
-                    var cell = row.cells[i];
-                    cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-                }
+                that._resetMatrix();
 
-                if (that._matrixHasTuplets) {
-                    var row = docById('ptmTupletNoteValueRow');
-                    for (var i = 0; i < row.cells.length; i++) {
-                        var cell = row.cells[i];
-                        cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-                    }
-                }
-
+                playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that.playingNow = false;
             } else {
                 var row = docById('ptmNoteValueRow');
@@ -1380,7 +1389,6 @@ function PitchTimeMatrix () {
                     that._logo.synth.trigger(0, ['C2'], that._logo.defaultBPMFactor / noteValue, drumNotes[i], null, null);
 
                 }
-
             }
 
             var row = docById('ptmNoteValueRow');
@@ -1399,8 +1407,11 @@ function PitchTimeMatrix () {
 
                 noteCounter += 1;
 
-                if (noteCounter < that._notesToPlay.length) {
-                    that.__playNote(time, noteCounter);
+                if (noteCounter < that._notesToPlay.length && that.playingNow) {
+                    that.__playNote(time, noteCounter, playButtonCell);
+                } else {
+                    that._resetMatrix();
+                    playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);

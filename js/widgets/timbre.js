@@ -295,7 +295,7 @@ function TimbreWidget () {
 
         var cell = row.cells[0];
         if (this._playing) {
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'pause-button.svg' + '" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         } else {
             cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
