@@ -7368,9 +7368,7 @@ function Logo () {
                     if (notes.length > 0) {
                         var len = notes[0].length;
 
-                        if (typeof(notes[i]) === 'string') {
-                            that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
-                        }
+                        that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
 
                         if (that.turtles.turtleList[turtle].drum) {
                             for (var i = 0; i < notes.length; i++) {
