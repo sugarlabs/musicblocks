@@ -1107,7 +1107,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteCounter.argFlowClampBlock();
     noteCounter.adjustWidthToLabel();
 
-    // deprecated
     var elapsedNotes = new ProtoBlock('elapsednotes');
     elapsedNotes.palette = palettes.dict['meter'];
     blocks.protoBlockDict['elapsednotes'] = elapsedNotes;

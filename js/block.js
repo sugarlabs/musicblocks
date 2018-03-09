@@ -1250,7 +1250,6 @@ function Block(protoblock, blocks, overrideName) {
 
     this._calculateBlockHitArea = function () {
         var hitArea = new createjs.Shape();
-        hitArea.graphics.beginFill('#FFF').drawRect(0, 0, this.width, this.hitHeight);
         this.container.hitArea = hitArea;
     };
 

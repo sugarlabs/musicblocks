@@ -410,7 +410,6 @@ function Blocks () {
             that._sizeCounter = 0;
             var childFlowSize = 1;
             if (c > 0 && myBlock.connections[c] != null) {
-                this._sizeCounter = 0;
                 childFlowSize = Math.max(that._getStackSize(myBlock.connections[c]), 1);
             }
 
@@ -1791,11 +1790,6 @@ function Blocks () {
             }
 
             if (this.blockList[thisBlock].connections.length > 1) {
-                thisBlock = last(this.blockList[thisBlock].connections);
-            } else {
-                thisBlock = null;
-            }
-
             // Just in case there is a loop in the block list.
             counter += 1;
             if (counter > this.blockList.length) {

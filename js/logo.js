@@ -2875,12 +2875,6 @@ function Logo () {
                 if (idx < 1) {
                     that.errorMsg(_('Index must be > 0.'))
                     idx = 1;
-                }
-
-                if (idx > 1000) {
-                    that.errorMsg(_('Maximum heap size is 1000.'))
-                    idx = 1000;
-                }
 
                 // If index > heap length, grow the heap.
                 while (that.turtleHeaps[turtle].length < idx) {
@@ -7325,8 +7319,13 @@ function Logo () {
                                     if (chordNotes.indexOf(note) === -1) {
                                         chordNotes.push(note);
                                     }
+
                                 }
+                            } else if (that.tieCarryOver[turtle] > 0) {
+                                var d = that.tieCarryOver[turtle];
                             }
+
+                            that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                         }
 
                         if (i === that.notePitches[turtle][thisBlk].length - 1) {
