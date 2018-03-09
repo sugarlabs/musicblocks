@@ -208,6 +208,7 @@ function PitchTimeMatrix () {
             for (var i = 0; i < that._rowMap.length; i++) {
                 that._rowMap[i] = i;
             }
+
             that._logo.synth.stopSound(0, 'default');
             that._logo.synth.stop();
 
