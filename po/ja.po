@@ -556,7 +556,7 @@ msgstr "鼠の関係"
 #: js/logo.js:31
 ## http://jisho.org/word/%E5%A6%A5%E5%BD%93 ; 妥当=だとう; maybe just ヴァリッド(http://jisho.org/word/%E3%83%B4%E3%82%A1%E3%83%AA%E3%83%83%E3%83%89 )
 msgid "Not a valid pitch name"
-msgstr "選ばれたピッチが妥当ではありません。"
+msgstr "選ばれた音名が妥当ではありません。"
 
 #: js/logo.js:1049
 #: js/turtledefs.js:29
@@ -887,7 +887,7 @@ msgstr "このシンセは和音ができません"
 
 #: js/logo.js:9432
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
-msgstr "音符の名前はA, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭の中から必要があります。"
+msgstr "音名はA, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭の中から必要があります。"
 
 #: js/logo.js:9458
 #: js/basicblocks.js:2996
@@ -2116,7 +2116,7 @@ msgstr "ピッチ数字のゼロを設定"
 #: js/basicblocks.js:3686
 #: js/blocks.js:2666
 msgid "name"
-msgstr "名前"
+msgstr "音名"
 
 #: js/basicblocks.js:179
 #: js/basicblocks.js:238
