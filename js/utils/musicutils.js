@@ -43,6 +43,7 @@ const EQUIVALENTSHARPS = {'D♭': 'C♯', 'E♭': 'D♯', 'G♭': 'F♯', 'A♭'
 const EQUIVALENTNATURALS = {'E♯': 'F', 'B♯': 'C', 'C♭': 'B', 'F♭': 'E'};
 const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
 const SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
+const SOLFEGENAMES1 = ['do', 'do♯', 'do𝄪', 're𝄫', 're♭', 're', 're♯', 're𝄪', 'mi𝄫',  'mi♭', 'mi', 'fa', 'fa♯', 'fa𝄪', 'sol𝄫',  'sol♭', 'sol', 'sol♯', 'sol𝄪', 'la', 'la𝄫',  'la♭', 'la#', 'la𝄪', 'ti𝄫',  'ti♭', 'ti'];
 const SOLFEGECONVERSIONTABLE = {'C': 'do', 'C♯': 'do' + '♯', 'D': 're', 'D♯': 're' + '♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa' + '♯', 'G': 'sol', 'G♯': 'sol' + '♯', 'A': 'la', 'A♯': 'la' + '♯', 'B': 'ti', 'D♭': 're' + '♭', 'E♭': 'mi' + '♭', 'G♭': 'sol' + '♭', 'A♭': 'la' + '♭', 'B♭': 'ti' + '♭', 'R': _('rest')};
 const WESTERN2EISOLFEGENAMES = {'do': 'sa', 're': 're', 'mi': 'ga', 'fa': 'ma', 'sol': 'pa', 'la': 'dha', 'ti': 'ni'};
 
@@ -52,6 +53,7 @@ const PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 
 const PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const NOTESTABLE = {1: 'do', 2: 'do♯', 3: 're', 4: 're♯', 5: 'mi', 6: 'fa', 7: 'fa♯', 8: 'sol', 9: 'sol♯', 10: 'la', 11: 'la♯', 0: 'ti'};
 const FIXEDSOLFEGE = {'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'ti': 'B'};
+const FIXEDSOLFEGE1 = {'do': 'C', 'do♯': 'C' + '♯', 'do𝄪': 'C' + '𝄪', 're𝄫' : 'D' + '𝄫', 're': 'D', 're♯': 'D' + '♯', 're𝄪': 'D' + '𝄪', 'mi𝄫' : 'E' + '𝄫', 'mi': 'E', 'fa': 'F', 'fa♯': 'F' + '♯', 'fa𝄪': 'F' + '𝄪', 'sol𝄫' : 'G' + '𝄫', 'sol': 'G', 'sol♯': 'G' + '♯', 'sol𝄪': 'G' + '𝄪', 'la𝄫' : 'A' + '𝄫', 'la': 'A', 'la♯': 'A' + '♯', 'la𝄪': 'A' + '𝄪', 'ti𝄫' : 'B' + '𝄫', 'ti': 'B', 're♭': 'D' + '♭', 'mi♭': 'E' + '♭', 'sol♭': 'G' + '♭', 'la♭': 'A' + '♭', 'ti♭': 'B' + '♭', 'R': _('rest')};
 const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Preference for sharps or flats
@@ -1517,17 +1519,58 @@ function getNumNote(value, delta) {
 };
 
 
-calcOctave = function (current, arg) {
+calcOctave = function (current, arg, lastNotePlayed, currentNote) {
+    var note, stepCurrentNote, stepLastNotePlayed, changedCurrent;
+
+    if (SOLFEGENAMES1.indexOf(currentNote) !== -1) {
+        note = FIXEDSOLFEGE1[currentNote];
+    } else {
+        note = currentNote;
+    } 
+
+    stepCurrentNote = getNumber(note, current);
+    stepCurrentNote1 = getNumber(note, current+1);
+    stepCurrentNote2 = getNumber(note, current-1);
+
+    if (lastNotePlayed != null) {
+        lastNotePlayed = lastNotePlayed[0];
+        var len = lastNotePlayed.length;
+        if (lastNotePlayed.substring(len-2,len) == '10') {
+            lastNotePlayed = lastNotePlayed.substring(0,len-2);
+        } else {
+            lastNotePlayed = lastNotePlayed.substring(0,len-1);
+        }
+         stepLastNotePlayed = getNumber(lastNotePlayed,current);    
+    }
+
+    var halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
+    var halfSteps1 = Math.abs(stepLastNotePlayed - stepCurrentNote1);
+    var halfSteps2 = Math.abs(stepLastNotePlayed - stepCurrentNote2);
+
+    if (halfSteps <= 5 || isNaN(halfSteps)) { //NaN in case of first note.
+        changedCurrent = current;
+    } 
+    if (halfSteps > 5 && halfSteps1 > 5 && halfSteps2 < 5) {
+        changedCurrent = Math.max(current - 1, 1);
+    }
+    if (halfSteps > 5 && halfSteps1 < 5 && halfSteps2 > 5) {
+        changedCurrent = Math.min(current + 1, 10);
+    } 
+    if (halfSteps > 5 && halfSteps1 > 5 && halfSteps2 > 5) { //Relative Octave for tritones are arbitrated as current.
+        changedCurrent = current;
+    }
+    
     switch(arg) {
-    case _('next'):
-    case 'next':
-        return Math.min(current + 1, 10);
-    case _('previous'):
-    case 'previous':
-        return Math.max(current - 1, 1);
     case _('current'):
     case 'current':
-        return current;
+        return changedCurrent;
+    case _('next'):
+    case 'next':
+        return Math.min(changedCurrent + 1, 10);
+    case _('previous'):
+    case 'previous':
+        return Math.max(changedCurrent - 1, 1);
+      
     default:
         if (typeof(arg) === 'string') {
             try {
