@@ -1025,7 +1025,7 @@ function Logo () {
             this.noteBeat[turtle] = {};
             this.noteValue[turtle] = {};
             this.noteCents[turtle] = {};
-            this.noteHertz[turtle] = {};;
+            this.noteHertz[turtle] = {};
             this.lastNotePlayed[turtle] = null;
             this.previousNotePlayed[turtle] = null;
             this.noteStatus[turtle] = null;
@@ -3554,7 +3554,6 @@ function Logo () {
             }
             break;
         case 'invert1':
-            var cblk0 = that.blocks.blockList[blk].connections[0]; 
             if (typeof(args[2]) === 'number') {
                 if (args[2] % 2 === 0) {
                     args[2] = 'even';
