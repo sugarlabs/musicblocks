@@ -913,7 +913,7 @@ msgstr "音符"
 
 #: js/logo.js:9774
 msgid "Cannot find block"
-msgstr ""
+msgstr "ブロックが見つかりません"
 
 #: js/logo.js:9782
 #: js/logo.js:9787
@@ -958,8 +958,9 @@ msgid "text"
 msgstr "文事"
 
 #: js/palette.js:734
+## To be checked
 msgid "mode name"
-msgstr ""
+msgstr "音階の名前"
 
 #: js/palette.js:737
 msgid "invert mode"
@@ -1546,25 +1547,25 @@ msgstr "フルート"
 #: js/synthutils.js:26
 #.TRANS: musical instrument
 msgid "clarinet"
-msgstr ""
+msgstr "クラリネット"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:28
 #.TRANS: musical instrument
 msgid "saxophone"
-msgstr ""
+msgstr "サクソフォン"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:30
 #.TRANS: musical instrument
 msgid "tuba"
-msgstr ""
+msgstr "チューバ"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:32
 #.TRANS: musical instrument
 msgid "trumpet"
-msgstr ""
+msgstr "トランペット"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:36
@@ -1645,7 +1646,7 @@ msgstr "トムトム"
 
 #: js/turtledefs.js:29
 msgid "floor tom"
-msgstr ""
+msgstr "フロア・トム"
 
 #: js/turtledefs.js:29
 #: js/basicblocks.js:2114
@@ -1699,7 +1700,7 @@ msgstr "トライアングルのベル"
 
 #: js/turtledefs.js:29
 msgid "finger cymbols"
-msgstr ""
+msgstr "指のシンボル"
 
 #: js/turtledefs.js:29
 #: js/basicblocks.js:2018
@@ -2035,7 +2036,7 @@ msgstr "新しいブロックをファイルシステムからロードできま
 #: js/turtledefs.js:116
 #: js/utilitybox.js:176
 msgid "Delete plugin"
-msgstr ""
+msgstr "プラグインを消す"
 
 #: js/turtledefs.js:116
 msgid "Delete a selected plugin."
@@ -2044,11 +2045,11 @@ msgstr ""
 #: js/turtledefs.js:117
 #: js/utilitybox.js:106
 msgid "Select language"
-msgstr ""
+msgstr "国語を選ぶ"
 
 #: js/turtledefs.js:117
 msgid "Select your language preference."
-msgstr ""
+msgstr "国語を選んでください"
 
 #: js/turtledefs.js:118
 msgid "Remove all content on the canvas, including the blocks."
@@ -2435,7 +2436,7 @@ msgstr "G メジャー（ト長調）"
 
 #: js/basicblocks.js:821
 msgid "C major scale"
-msgstr ""
+msgstr "C メジャー"
 
 #: js/basicblocks.js:830
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
@@ -2973,7 +2974,7 @@ msgstr "前"
 
 #: js/basicblocks.js:2317
 msgid "purple"
-msgstr ""
+msgstr "紫"
 
 #: js/basicblocks.js:2324
 #: js/basicblocks.js:3573
@@ -2989,7 +2990,7 @@ msgstr "緑"
 
 #: js/basicblocks.js:2338
 msgid "yellow"
-msgstr ""
+msgstr "黄色"
 
 #: js/basicblocks.js:2345
 #: plugins/nutrition.rtp:164
@@ -3004,11 +3005,11 @@ msgstr "赤"
 
 #: js/basicblocks.js:2359
 msgid "white"
-msgstr ""
+msgstr "白"
 
 #: js/basicblocks.js:2366
 msgid "black"
-msgstr ""
+msgstr "黒"
 
 #: js/basicblocks.js:2373
 msgid "begin fill"
@@ -3432,32 +3433,34 @@ msgstr ""
 
 #: js/basicblocks.js:3392
 msgid "Rhythm"
-msgstr ""
+msgstr "リズム"
 
 #: js/basicblocks.js:3398
 #.TRANS: Move this block to the trash.
 msgid "delete block"
-msgstr ""
+msgstr "ブロックを消す"
 
 #: js/basicblocks.js:3407
 #.TRANS: Move the position of a block on the screen.
 msgid "move block"
-msgstr ""
+msgstr "ブロックを動かす"
 
 #: js/basicblocks.js:3407
 #: js/basicblocks.js:3427
+## I need some context
 msgid "block number"
-msgstr ""
+msgstr "ブロックの番号"
 
 #: js/basicblocks.js:3418
 #.TRANS: Run program beginning at this block.
 msgid "run block"
-msgstr ""
+msgstr "ブロックを再生"
 
 #: js/basicblocks.js:3427
 #.TRANS: We can connect a block to another block.
+## Check
 msgid "connect blocks"
-msgstr ""
+msgstr "ブロックを繋ぐ"
 
 #: js/basicblocks.js:3427
 msgid "target block"
@@ -3470,7 +3473,7 @@ msgstr ""
 #: js/basicblocks.js:3438
 #.TRANS: Create a new block programmatically.
 msgid "make block"
-msgstr ""
+msgstr "ブロックを作る"
 
 #: js/basicblocks.js:3449
 msgid "save as ABC"
@@ -3913,8 +3916,9 @@ msgid "prepare music for playback"
 msgstr "コードをすべてコンパイルします"
 
 #: js/languagebox.js:57
+## Check
 msgid "Refresh your browser to change your language preference."
-msgstr ""
+msgstr "選んだ国語をするのにブラウザーをリフレッシュが必要です。"
 
 #: js/pitchdrummatrix.js:132
 #: js/pitchtimematrix.js:178
