@@ -940,7 +940,7 @@ function Logo () {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             var mic = new Tone.UserMedia();
             try {
-		mic.open();
+                mic.open();
             } catch (e) {
                 console.log('MIC NOT FOUND');
                 console.log(e.name + ': ' + e.message);
@@ -3995,10 +3995,10 @@ function Logo () {
                     if (calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote) < 0) {
                         console.log('minimum allowable octave is 0');
                         var octave = 0;
-                    } else if (calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote) > 10) {
+                    } else if (calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote) > 9) {
                         // Humans can only hear 10 octaves.
-                        console.log('clipping octave at 10');
-                        var octave = 10;
+                        console.log('clipping octave at 9');
+                        var octave = 9;
                     } else {
                         // Octave must be a whole number.
                         var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote));
@@ -7380,13 +7380,8 @@ function Logo () {
                     if (notes.length > 0) {
                         var len = notes[0].length;
               
-                        if (notes[0].substring(len-2,len) == '10') {
-                            that.currentOctave[turtle] = parseInt(notes[0].slice(len - 2));
-                            that.currentCalculatedOctave[turtle] = that.currentOctave[turtle];
-                        } else {
-                            that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
-                            that.currentCalculatedOctave[turtle] = that.currentOctave[turtle];
-                        }
+                        that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
+                        that.currentCalculatedOctave[turtle] = that.currentOctave[turtle];
                         
                         if (that.turtles.turtleList[turtle].drum) {
                             for (var i = 0; i < notes.length; i++) {

@@ -33,27 +33,28 @@ const FLAT = '♭';
 const NATURAL = '♮';
 const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
-const BTOFLAT = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
-const STOSHARP = {'E#': 'E♯', 'G#': 'G♯', 'A#': 'A♯', 'B#': 'B♯', 'D#': 'D♯', 'C#': 'C♯', 'F#': 'F♯', 'e#': 'E♯', 'g#': 'G♯', 'a#': 'A♯', 'b#': 'B♯', 'd#': 'D♯', 'c#': 'C♯', 'f#': 'F♯'};
-const NOTESSHARP = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
-const NOTESFLAT = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
-const NOTESFLAT2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
-const EQUIVALENTFLATS = {'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯': 'A♭', 'A♯': 'B♭'};
-const EQUIVALENTSHARPS = {'D♭': 'C♯', 'E♭': 'D♯', 'G♭': 'F♯', 'A♭': 'G♯', 'B♭': 'A♯'};
+
+const BTOFLAT = {'Eb': 'E' + FLAT, 'Gb': 'G' + FLAT, 'Ab': 'A' + FLAT, 'Bb': 'B' + FLAT, 'Db': 'D' + FLAT, 'Cb': 'C' + FLAT, 'Fb': 'F' + FLAT, 'eb': 'E' + FLAT, 'gb': 'G' + FLAT, 'ab': 'A' + FLAT, 'bb': 'B' + FLAT, 'db': 'D' + FLAT, 'cb': 'C' + FLAT, 'fb': 'F' + FLAT};
+const STOSHARP = {'E#': 'E' + SHARP, 'G#': 'G' + SHARP, 'A#': 'A' + SHARP, 'B#': 'B' + SHARP, 'D#': 'D' + SHARP, 'C#': 'C' + SHARP, 'F#': 'F' + SHARP, 'e#': 'E' + SHARP, 'g#': 'G' + SHARP, 'a#': 'A' + SHARP, 'b#': 'B' + SHARP, 'd#': 'D' + SHARP, 'c#': 'C' + SHARP, 'f#': 'F' + SHARP};
+const NOTESSHARP = ['C', 'C' + SHARP, 'D', 'D' + SHARP, 'E', 'F', 'F' + SHARP, 'G', 'G' + SHARP, 'A', 'A' + SHARP, 'B'];
+const NOTESFLAT = ['C', 'D' + FLAT, 'D', 'E' + FLAT, 'E', 'F', 'G' + FLAT, 'G', 'A' + FLAT, 'A', 'B' + FLAT, 'B'];
+const NOTESFLAT2 = ['c', 'd' + FLAT, 'd', 'e' + FLAT, 'e', 'f', 'g' + FLAT, 'g', 'a' + FLAT, 'a', 'b' + FLAT, 'b'];
+const EQUIVALENTFLATS = {'C♯': 'D' + FLAT, 'D♯': 'E' + FLAT, 'F♯': 'G' + FLAT, 'G♯': 'A' + FLAT, 'A♯': 'B' + FLAT};
+const EQUIVALENTSHARPS = {'D♭': 'C' + SHARP, 'E♭': 'D' + SHARP, 'G♭': 'F' + SHARP, 'A♭': 'G' + SHARP, 'B♭': 'A' + SHARP};
 const EQUIVALENTNATURALS = {'E♯': 'F', 'B♯': 'C', 'C♭': 'B', 'F♭': 'E'};
 const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
 const SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
-const SOLFEGENAMES1 = ['do', 'do♯', 'do𝄪', 're𝄫', 're♭', 're', 're♯', 're𝄪', 'mi𝄫',  'mi♭', 'mi', 'fa', 'fa♯', 'fa𝄪', 'sol𝄫',  'sol♭', 'sol', 'sol♯', 'sol𝄪', 'la', 'la𝄫',  'la♭', 'la#', 'la𝄪', 'ti𝄫',  'ti♭', 'ti'];
-const SOLFEGECONVERSIONTABLE = {'C': 'do', 'C♯': 'do' + '♯', 'D': 're', 'D♯': 're' + '♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa' + '♯', 'G': 'sol', 'G♯': 'sol' + '♯', 'A': 'la', 'A♯': 'la' + '♯', 'B': 'ti', 'D♭': 're' + '♭', 'E♭': 'mi' + '♭', 'G♭': 'sol' + '♭', 'A♭': 'la' + '♭', 'B♭': 'ti' + '♭', 'R': _('rest')};
+const SOLFEGENAMES1 = ['do', 'do' + SHARP, 'do' + DOUBLESHARP, 're𝄫', 're' + FLAT, 're', 're' + SHARP, 're' + DOUBLESHARP, 'mi𝄫',  'mi' + FLAT, 'mi', 'fa', 'fa' + SHARP, 'fa' + DOUBLESHARP, 'sol𝄫',  'sol' + FLAT, 'sol', 'sol' + SHARP, 'sol' + DOUBLESHARP, 'la', 'la𝄫',  'la' + FLAT, 'la#', 'la' + DOUBLESHARP, 'ti𝄫',  'ti' + FLAT, 'ti'];
+const SOLFEGECONVERSIONTABLE = {'C': 'do', 'C♯': 'do' + SHARP, 'D': 're', 'D♯': 're' + SHARP, 'E': 'mi', 'F': 'fa', 'F♯': 'fa' + SHARP, 'G': 'sol', 'G♯': 'sol' + SHARP, 'A': 'la', 'A♯': 'la' + SHARP, 'B': 'ti', 'D♭': 're' + FLAT, 'E♭': 'mi' + FLAT, 'G♭': 'sol' + FLAT, 'A♭': 'la' + FLAT, 'B♭': 'ti' + FLAT, 'R': _('rest')};
 const WESTERN2EISOLFEGENAMES = {'do': 'sa', 're': 're', 'mi': 'ga', 'fa': 'ma', 'sol': 'pa', 'la': 'dha', 'ti': 'ni'};
 
-const PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+const PITCHES = ['C', 'D' + FLAT, 'D', 'E' + FLAT, 'E', 'F', 'G' + FLAT, 'G', 'A' + FLAT, 'A', 'B' + FLAT, 'B'];
 const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-const PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+const PITCHES2 = ['C', 'C' + SHARP, 'D', 'D' + SHARP, 'E', 'F', 'F' + SHARP, 'G', 'G' + SHARP, 'A', 'A' + SHARP, 'B'];
 const PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const NOTESTABLE = {1: 'do', 2: 'do♯', 3: 're', 4: 're♯', 5: 'mi', 6: 'fa', 7: 'fa♯', 8: 'sol', 9: 'sol♯', 10: 'la', 11: 'la♯', 0: 'ti'};
+const NOTESTABLE = {1: 'do', 2: 'do' + SHARP, 3: 're', 4: 're' + SHARP, 5: 'mi', 6: 'fa', 7: 'fa' + SHARP, 8: 'sol', 9: 'sol' + SHARP, 10: 'la', 11: 'la' + SHARP, 0: 'ti'};
 const FIXEDSOLFEGE = {'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'ti': 'B'};
-const FIXEDSOLFEGE1 = {'do': 'C', 'do♯': 'C' + '♯', 'do𝄪': 'C' + '𝄪', 're𝄫' : 'D' + '𝄫', 're': 'D', 're♯': 'D' + '♯', 're𝄪': 'D' + '𝄪', 'mi𝄫' : 'E' + '𝄫', 'mi': 'E', 'fa': 'F', 'fa♯': 'F' + '♯', 'fa𝄪': 'F' + '𝄪', 'sol𝄫' : 'G' + '𝄫', 'sol': 'G', 'sol♯': 'G' + '♯', 'sol𝄪': 'G' + '𝄪', 'la𝄫' : 'A' + '𝄫', 'la': 'A', 'la♯': 'A' + '♯', 'la𝄪': 'A' + '𝄪', 'ti𝄫' : 'B' + '𝄫', 'ti': 'B', 're♭': 'D' + '♭', 'mi♭': 'E' + '♭', 'sol♭': 'G' + '♭', 'la♭': 'A' + '♭', 'ti♭': 'B' + '♭', 'R': _('rest')};
+const FIXEDSOLFEGE1 = {'do': 'C', 'do♯': 'C' + SHARP, 'do𝄪': 'C' + DOUBLESHARP, 're𝄫': 'D' + DOUBLEFLAT, 're': 'D', 're♯': 'D' + SHARP, 're𝄪': 'D' + DOUBLESHARP, 'mi𝄫': 'E' + DOUBLEFLAT, 'mi': 'E', 'fa': 'F', 'fa♯': 'F' + SHARP, 'fa𝄪': 'F' + DOUBLESHARP, 'sol𝄫': 'G' + DOUBLEFLAT, 'sol': 'G', 'sol♯': 'G' + SHARP, 'sol𝄪': 'G' + DOUBLESHARP, 'la𝄫': 'A' + DOUBLEFLAT, 'la': 'A', 'la♯': 'A' + SHARP, 'la𝄪': 'A' + DOUBLESHARP, 'ti𝄫': 'B' + DOUBLEFLAT, 'ti': 'B', 're♭': 'D' + FLAT, 'mi♭': 'E' + FLAT, 'sol♭': 'G' + FLAT, 'la♭': 'A' + FLAT, 'ti♭': 'B' + FLAT, 'R': _('rest')};
 const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Preference for sharps or flats
@@ -66,7 +67,7 @@ const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
 // const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut']; //the "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
 // const IROHASOLFNOTES = ['ro', 'i', 'to', 'he', 'ho', 'ni', 'ha']; //https://en.wikipedia.org/wiki/Iroha
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
-const SOLFATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
+const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 
 
 function getSharpFlatPreference (keySignature) {
@@ -130,7 +131,7 @@ const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(e
 const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
 
 //.TRANS: sharp, flat, and natural are music terms related to pitch
-const ACCIDENTALNAMES = [_('double sharp') + ' 𝄪', _('sharp') + ' ♯', _('natural') + ' ♮', _('flat') + ' ♭', _('double flat') + ' 𝄫'];
+const ACCIDENTALNAMES = [_('double sharp') + ' ' + DOUBLESHARP, _('sharp') + ' ' + SHARP, _('natural') + ' ' + NATURAL, _('flat') + ' ' + FLAT, _('double flat') + ' ' + DOUBLEFLAT];
 const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 
 const INVERTMODES = [[_('even'), 'even'], [_('odd'), 'odd'], [_('scalar'), 'scalar']];
@@ -377,7 +378,7 @@ const DEFAULTDRUM = _('kick drum');
 const DEFAULTMODE = _('major');
 const DEFAULTFILTERTYPE = _('highpass');
 const DEFAULTOSCILLATORTYPE = _('sine');
-const DEFAULTACCIDENTAL = _('natural') + ' ♮';
+const DEFAULTACCIDENTAL = _('natural') + ' ' + NATURAL;
 
 var customMode = MUSICALMODES['custom'];
 
@@ -1353,13 +1354,13 @@ function pitchToNumber(pitch, octave, keySignature) {
             if (lastTwo === 'bb') {
                 pitch = pitch.slice(0, len - 2);
                 transposition -= 2;
-            } else if (lastOne === '𝄫') {
+            } else if (lastOne === DOUBLEFLAT) {
                 pitch = pitch.slice(0, len - 1);
                 transposition -= 2;
-            } else if (lastTwo === '*' || lastTwo === '𝄪') {
+            } else if (lastTwo === '*' || lastTwo === DOUBLESHARP) {
                 pitch = pitch.slice(0, len - 1);
                 transposition += 2;
-            } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
+            } else if (lastTwo === '#b' || lastTwo === SHARP + FLAT || lastTwo === 'b#' || lastTwo === FLAT + SHARP) {
                 // Not sure this could occur... but just in case.
                 pitch = pitch.slice(0, len - 2);
             }
@@ -1367,10 +1368,10 @@ function pitchToNumber(pitch, octave, keySignature) {
 
         if (pitch.length > 1) {
             var lastOne = pitch.slice(len - 1);
-            if (lastOne === 'b' || lastOne === '♭') {
+            if (lastOne === 'b' || lastOne === FLAT) {
                 pitch = pitch.slice(0, len - 1);
                 transposition -= 1;
-            } else if (lastOne === '#' || lastOne === '♯') {
+            } else if (lastOne === '#' || lastOne === SHARP) {
                 pitch = pitch.slice(0, len - 1);
                 transposition += 1;
             }
@@ -1476,13 +1477,13 @@ function getNumber(notename, octave) {
         num += NOTESTEP[notename.substring(0, 1)];
         if (notename.length >= 1) {
             var delta = notename.substring(1);
-            if (delta === 'bb' || delta === '𝄫') {
+            if (delta === 'bb' || delta === DOUBLEFLAT) {
                 num -= 2;
-            } else if (delta === '##' || delta === '*' || delta === '𝄪') {
+            } else if (delta === '##' || delta === '*' || delta === DOUBLESHARP) {
                 num += 2;
-            } else if (delta === 'b' || delta === '♭') {
+            } else if (delta === 'b' || delta === FLAT) {
                 num -= 1;
-            } else if (delta === '#' || delta === '♯') {
+            } else if (delta === '#' || delta === SHARP) {
                 num += 1;
             }
         }
@@ -1519,7 +1520,18 @@ function getNumNote(value, delta) {
 };
 
 
-calcOctave = function (current, arg, lastNotePlayed, currentNote) {
+calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
+    // Calculate the octave based on the current Octave and the arg,
+    // which can be a number, a 'number' as a string, 'current',
+    // 'previous', or 'next'.
+
+    if (typeof(arg) === 'number') {
+        return Math.max(1, Math.min(Math.floor(arg), 9));
+    }
+
+    // The relative octave for tritones are arbitrated as being in the
+    // current octave, so we need to determine the number of half
+    // steps between lastNotePlayed and currentNote.
     var note, stepCurrentNote, stepLastNotePlayed, changedCurrent;
 
     if (SOLFEGENAMES1.indexOf(currentNote) !== -1) {
@@ -1528,36 +1540,38 @@ calcOctave = function (current, arg, lastNotePlayed, currentNote) {
         note = currentNote;
     } 
 
-    stepCurrentNote = getNumber(note, current);
-    stepCurrentNote1 = getNumber(note, current+1);
-    stepCurrentNote2 = getNumber(note, current-1);
+    stepCurrentNote = getNumber(note, currentOctave);
+    stepUpCurrentNote = getNumber(note, currentOctave + 1);
+    stepDownCurrentNote = getNumber(note, currentOctave - 1);
 
     if (lastNotePlayed != null) {
         lastNotePlayed = lastNotePlayed[0];
-        var len = lastNotePlayed.length;
-        if (lastNotePlayed.substring(len-2,len) == '10') {
-            lastNotePlayed = lastNotePlayed.substring(0,len-2);
-        } else {
-            lastNotePlayed = lastNotePlayed.substring(0,len-1);
-        }
-         stepLastNotePlayed = getNumber(lastNotePlayed,current);    
+        // strip off octave from end of note
+        lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
+    } else {
+        lastNotePlated = 'G';
     }
+
+    stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);    
 
     var halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
-    var halfSteps1 = Math.abs(stepLastNotePlayed - stepCurrentNote1);
-    var halfSteps2 = Math.abs(stepLastNotePlayed - stepCurrentNote2);
+    var halfStepsUp = Math.abs(stepLastNotePlayed - stepUpCurrentNote);
+    var halfStepsDown = Math.abs(stepLastNotePlayed - stepDownCurrentNote);
 
-    if (halfSteps <= 5 || isNaN(halfSteps)) { //NaN in case of first note.
-        changedCurrent = current;
+    if (halfSteps <= 5 || isNaN(halfSteps)) {
+        changedCurrent = currentOctave;
     } 
-    if (halfSteps > 5 && halfSteps1 > 5 && halfSteps2 < 5) {
-        changedCurrent = Math.max(current - 1, 1);
+
+    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
+        changedCurrent = Math.max(currentOctave - 1, 1);
     }
-    if (halfSteps > 5 && halfSteps1 < 5 && halfSteps2 > 5) {
-        changedCurrent = Math.min(current + 1, 10);
+
+    if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
+        changedCurrent = Math.min(currentOctave + 1, 9);
     } 
-    if (halfSteps > 5 && halfSteps1 > 5 && halfSteps2 > 5) { //Relative Octave for tritones are arbitrated as current.
-        changedCurrent = current;
+
+    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
+        changedCurrent = currentOctave;
     }
     
     switch(arg) {
@@ -1570,17 +1584,12 @@ calcOctave = function (current, arg, lastNotePlayed, currentNote) {
     case _('previous'):
     case 'previous':
         return Math.max(changedCurrent - 1, 1);
-      
     default:
-        if (typeof(arg) === 'string') {
-            try {
-                return Math.floor(Number(arg));
-            } catch (e) {
-                console.log('cannot convert ' + arg + ' to a number');
-                return (current);
-            }
-        } else {
-            return Math.floor(arg);
+        try {
+            return Math.floor(Number(arg));
+        } catch (e) {
+            console.log('cannot convert ' + arg + ' to a number');
+            return (currentOctave);
         }
     }
 };
@@ -1668,32 +1677,32 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
 
     switch(articulation) {
     case 'bb':
-    case '𝄫':
+    case DOUBLEFLAT:
         noteArg += 'b';
         rememberFlat = true;
         transposition -= 1;
         break;
     case 'b':
-    case '♭':
+    case FLAT:
         noteArg += 'b';
         rememberFlat = true;
         break;
     case '##':
     case '*':
-    case '𝄪':
+    case DOUBLESHARP:
         noteArg += '#';
         rememberSharp = true;
         transposition += 1;
         break;
     case '#':
-    case '♯':
+    case SHARP:
         noteArg += '#';
         rememberSharp = true;
         break;
     case 'b#':
     case '#b':
-    case '♭♯':
-    case '♯♭':
+    case FLAT + SHARP:
+    case SHARP + FLAT:
     default:
         break;
     }
@@ -1728,7 +1737,7 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
             noteArg = noteArg.substr(0, noteArg.indexOf('<'));
         }
 
-        if (['#', '♯', '♭', 'b'].indexOf(noteArg.substr(-1)) !== -1) {
+        if (['#', SHARP, FLAT, 'b'].indexOf(noteArg.substr(-1)) !== -1) {
             sharpFlat = true;
         }
 
@@ -1771,9 +1780,9 @@ getNote = function (noteArg, octave, transposition, keySignature, movable, direc
         if (sharpFlat) {
             if (noteArg.substr(-1) === '#') {
                 offset += 1;
-            } else if (noteArg.substr(-1) === '♯') {
+            } else if (noteArg.substr(-1) === SHARP) {
                 offset += 1;
-            } else if (noteArg.substr(-1) === '♭') {
+            } else if (noteArg.substr(-1) === FLAT) {
                 offset -= 1;
             } else if (noteArg.substr(-1) === 'b') {
                 offset -= 1;
@@ -2017,7 +2026,7 @@ modeMapper = function (key, mode) {
     case 'dorian':
         switch(key) {
         case 'c':
-            key = 'a♯';
+            key = 'a' + SHARP;
             mode = 'major';
             break;
         case 'd':
@@ -2044,43 +2053,43 @@ modeMapper = function (key, mode) {
             key = 'a';
             mode = 'major';
             break;
-        case 'c♯':
+        case 'c' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'd♯':
+        case 'd' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'f♯':
+        case 'f' + SHARP:
             key = 'f';
             mode = 'major';
             break;
-        case 'g♯':
+        case 'g' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'a♯':
-            key = 'g♯';
+        case 'a' + SHARP:
+            key = 'g' + SHARP;
             mode = 'major';
             break;
-        case 'd♭':
-            key = 'e♭';
+        case 'd' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
-        case 'e♭':
-            key = 'e♭';
+        case 'e' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
-        case 'g♭':
+        case 'g' + FLAT:
             key = 'd';
             mode = 'minor';
             break;
-        case 'a♭':
-            key = 'e♭';
+        case 'a' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
-        case 'b♭':
+        case 'b' + FLAT:
             key = 'f';
             mode = 'minor';
             break;
@@ -2089,11 +2098,11 @@ modeMapper = function (key, mode) {
     case 'phrygian':
         switch(key) {
         case 'c':
-            key = 'g♯';
+            key = 'g' + SHARP;
             mode = 'major';
             break;
         case 'd':
-            key = 'a♯';
+            key = 'a' + SHARP;
             mode = 'major';
             break;
         case 'e':
@@ -2116,44 +2125,44 @@ modeMapper = function (key, mode) {
             key = 'g';
             mode = 'major';
             break;
-        case 'c♯':
+        case 'c' + SHARP:
             key = 'a';
             mode = 'major';
             break;
-        case 'd♯':
+        case 'd' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'f♯':
+        case 'f' + SHARP:
             key = 'd';
             mode = 'major';
             break;
-        case 'g♯':
+        case 'g' + SHARP:
             key = 'e';
             mode = 'major';
             break;
-        case 'a♯':
+        case 'a' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'd♭':
-            key = 'g♭';
+        case 'd' + FLAT:
+            key = 'g' + FLAT;
             mode = 'minor';
             break;
-        case 'e♭':
-            key = 'e♭';
+        case 'e' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
-        case 'g♭':
+        case 'g' + FLAT:
             key = 'd';
             mode = 'major';
             break;
-        case 'a♭':
-            key = 'd♭';
+        case 'a' + FLAT:
+            key = 'd' + FLAT;
             mode = 'minor';
             break;
-        case 'b♭':
-            key = 'e♭';
+        case 'b' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
         }
@@ -2188,43 +2197,43 @@ modeMapper = function (key, mode) {
             key = 'b';
             mode = 'major';
             break;
-        case 'c♯':
-            key = 'g♯';
+        case 'c' + SHARP:
+            key = 'g' + SHARP;
             mode = 'major';
             break;
-        case 'd♯':
-            key = 'a♯';
+        case 'd' + SHARP:
+            key = 'a' + SHARP;
             mode = 'major';
             break;
-        case 'f♯':
+        case 'f' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'g♯':
+        case 'g' + SHARP:
             key = 'c';
             mode = 'minor';
             break;
-        case 'a♯':
+        case 'a' + SHARP:
             key = 'f';
             mode = 'major';
             break;
-        case 'd♭':
+        case 'd' + FLAT:
             key = 'f';
             mode = 'minor';
             break;
-        case 'e♭':
+        case 'e' + FLAT:
             key = 'g';
             mode = 'minor';
             break;
-        case 'g♭':
-            key = 'd♭';
+        case 'g' + FLAT:
+            key = 'd' + FLAT;
             mode = 'minor';
             break;
-        case 'a♭':
+        case 'a' + FLAT:
             key = 'c';
             mode = 'minor';
             break;
-        case 'b♭':
+        case 'b' + FLAT:
             key = 'd';
             mode = 'minor';
             break;
@@ -2245,7 +2254,7 @@ modeMapper = function (key, mode) {
             mode = 'major';
             break;
         case 'f':
-            key = 'a♯';
+            key = 'a' + SHARP;
             mode = 'major';
             break;
         case 'g':
@@ -2260,43 +2269,43 @@ modeMapper = function (key, mode) {
             key = 'e';
             mode = 'major';
             break;
-        case 'c♯':
+        case 'c' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'd♯':
-            key = 'g♯';
+        case 'd' + SHARP:
+            key = 'g' + SHARP;
             mode = 'major';
             break;
-        case 'f♯':
+        case 'f' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'g♯':
+        case 'g' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'a♯':
+        case 'a' + SHARP:
             key = 'c';
             mode = 'minor';
             break;
-        case 'd♭':
-            key = 'e♭';
+        case 'd' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
-        case 'e♭':
+        case 'e' + FLAT:
             key = 'f';
             mode = 'minor';
             break;
-        case 'g♭':
-            key = 'e♭';
+        case 'g' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
-        case 'a♭':
-            key = 'e♭';
+        case 'a' + FLAT:
+            key = 'e' + FLAT;
             mode = 'minor';
             break;
-        case 'b♭':
+        case 'b' + FLAT:
             key = 'c';
             mode = 'minor';
             break;
@@ -2321,55 +2330,55 @@ modeMapper = function (key, mode) {
             mode = 'major';
             break;
         case 'g':
-            key = 'g♯';
+            key = 'g' + SHARP;
             mode = 'major';
             break;
         case 'a':
-            key = 'a♯';
+            key = 'a' + SHARP;
             mode = 'major';
             break;
         case 'b':
             key = 'c';
             mode = 'major';
             break;
-        case 'c♯':
+        case 'c' + SHARP:
             key = 'd';
             mode = 'major';
             break;
-        case 'd♯':
+        case 'd' + SHARP:
             key = 'e';
             mode = 'major';
             break;
-        case 'f♯':
+        case 'f' + SHARP:
             key = 'g';
             mode = 'major';
             break;
-        case 'g♯':
+        case 'g' + SHARP:
             key = 'a ';
             mode = 'major';
             break;
-        case 'a♯':
+        case 'a' + SHARP:
             key = 'b';
             mode = 'major';
             break;
-        case 'd♭':
+        case 'd' + FLAT:
             key = 'd';
             mode = 'major';
             break;
-        case 'e♭':
-            key = 'd♭';
+        case 'e' + FLAT:
+            key = 'd' + FLAT;
             mode = 'minor';
             break;
-        case 'g♭':
+        case 'g' + FLAT:
             key = 'f';
             mode = 'minor';
             break;
-        case 'a♭':
-            key = 'g♭';
+        case 'a' + FLAT:
+            key = 'g' + FLAT;
             mode = 'minor';
             break;
-        case 'b♭':
-            key = 'd♭';
+        case 'b' + FLAT:
+            key = 'd' + FLAT;
             mode = 'minor';
             break;
         }
