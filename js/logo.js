@@ -177,11 +177,14 @@ function Logo () {
     this.noteBeatValues = {};
     this.embeddedGraphics = {};
     this.lastNotePlayed = {};
+    this.lastPitchPlayed = {}; //For a stand-alone pitch block. 
     this.previousNotePlayed = {};
     this.noteStatus = {};
     this.noteDirection = {};
     this.pitchNumberOffset = [];  // 39, C4
     this.currentOctave = {};
+    this.currentCalculatedOctave = {}; //For a stand-alone pitch block.
+    this.currentNote = {};
     this.inHarmonic = {};
     this.partials = {};
     this.inNeighbor = [];
@@ -1022,7 +1025,7 @@ function Logo () {
             this.noteBeat[turtle] = {};
             this.noteValue[turtle] = {};
             this.noteCents[turtle] = {};
-            this.noteHertz[turtle] = {};
+            this.noteHertz[turtle] = {};;
             this.lastNotePlayed[turtle] = null;
             this.previousNotePlayed[turtle] = null;
             this.noteStatus[turtle] = null;
@@ -3551,6 +3554,7 @@ function Logo () {
             }
             break;
         case 'invert1':
+            var cblk0 = that.blocks.blockList[blk].connections[0]; 
             if (typeof(args[2]) === 'number') {
                 if (args[2] % 2 === 0) {
                     args[2] = 'even';
@@ -3568,7 +3572,7 @@ function Logo () {
             }
 
             if (args[2] === 'even' || args[2] === 'odd' || args[2] === 'scalar') {
-                var octave = calcOctave(that.currentOctave[turtle], args[1]);
+                var octave = calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], args[0]);
                 that.invertList[turtle].push([args[0], octave, args[2]]);
             } else {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -3874,8 +3878,7 @@ function Logo () {
                 that.stopTurtle = true;
                 break;
             }
-
-            var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1]));
+            var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], args[0]));
             that.pitchNumberOffset[turtle] = pitchToNumber(args[0], octave, that.keySignature[turtle]);
             break;
         case 'pitchnumber':
@@ -3905,6 +3908,7 @@ function Logo () {
                     note = obj[0];
                     octave = obj[1];
                     cents = 0;
+                    that.currentNote = note;
                 }
             } else {
                 if (args.length !== 2 || args[0] == null || args[1] == null) {
@@ -3923,13 +3927,15 @@ function Logo () {
                         note = '?'; // throws an error
                     } else if (args[0] < 13) { // moveable solfege
                         note = scaleDegreeToPitch(that.keySignature[turtle], Math.floor(args[0]));
-                        var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1]));
+                        that.currentNote = note;
+                        var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote));
                         var cents = 0;
                     } else if (args[0] < A0 || args[0] > C8) {
                         note = '?'; // throws an error
                     } else {
                         var obj = frequencyToPitch(args[0]);
                         var note = obj[0];
+                        that.currentNote = note;
                         var octave = obj[1];
                         var cents = obj[2];
                     }
@@ -3966,12 +3972,14 @@ function Logo () {
                                 scaleDegree = modeLength - scaleDegree + 2;
                             }
                             note = scaleDegreeToPitch(that.keySignature[turtle], scaleDegree);
+                            that.currentNote = note;
                             var deltaOctave = Math.floor((args[0] + modeLength - 2) / modeLength);
-                            var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1])) - deltaOctave;
+                            var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote)) - deltaOctave;
                         } else {
                             note = scaleDegreeToPitch(that.keySignature[turtle], scaleDegree);
+                            that.currentNote = note;
                             var deltaOctave = Math.floor((args[0] - 1) / modeLength);
-                            var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1])) + deltaOctave;
+                            var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote)) + deltaOctave;
                         }
                         var cents = 0;
                     }
@@ -3984,16 +3992,17 @@ function Logo () {
                 } else {
                     var cents = 0;
                     var note = args[0];
-                    if (calcOctave(that.currentOctave[turtle], args[1]) < 0) {
+                    that.currentNote = note;
+                    if (calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote) < 0) {
                         console.log('minimum allowable octave is 0');
                         var octave = 0;
-                    } else if (calcOctave(that.currentOctave[turtle], args[1]) > 10) {
+                    } else if (calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote) > 10) {
                         // Humans can only hear 10 octaves.
                         console.log('clipping octave at 10');
                         var octave = 10;
                     } else {
                         // Octave must be a whole number.
-                        var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1]));
+                        var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote));
                     }
                 }
             }
@@ -4015,6 +4024,7 @@ function Logo () {
 
             var noteObj = that._addScalarTransposition(turtle, note, octave, that.scalarTransposition[turtle]);
             note = noteObj[0];
+            that.currentNote = note;
             octave = noteObj[1];
 
             var delta = 0;
@@ -4183,8 +4193,9 @@ function Logo () {
                 var noteObj1 = getNote(note, octave, transposition, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                 that.pitchDrumTable[turtle][noteObj1[0] + noteObj1[1]] = drumname;
             } else if (that.inPitchStaircase) {
-                var frequency = pitchToFrequency(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle]);
-                var noteObj1 = getNote(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                var frequency = pitchToFrequency(args[0], calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], args[0]), 0, that.keySignature[turtle]);
+                var noteObj1 = getNote(args[0], calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], args[0]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+
                 var flag = 0;
 
                 for (var i = 0 ; i < that.pitchStaircase.Stairs.length; i++) {
@@ -4210,8 +4221,10 @@ function Logo () {
                 if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
                     // Play a stand-alone pitch block as a quarter note.
                     that.clearNoteParams(turtle, blk, []);
-
-                    var noteObj = getNote(args[0], calcOctave(that.currentOctave[turtle], args[1]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    if (that.currentCalculatedOctave[turtle] == undefined) {
+                        that.currentCalculatedOctave[turtle] = 4;
+                    }
+                    var noteObj = getNote(args[0], calcOctave(that.currentCalculatedOctave[turtle], args[1], that.lastPitchPlayed[turtle], args[0]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     if (!that.validNote) {
                         that.errorMsg(INVALIDPITCH, blk);
                         that.stopTurtle = true;
@@ -7367,9 +7380,15 @@ function Logo () {
 
                     if (notes.length > 0) {
                         var len = notes[0].length;
-
-                        that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
-
+              
+                        if (notes[0].substring(len-2,len) == '10') {
+                            that.currentOctave[turtle] = parseInt(notes[0].slice(len - 2));
+                            that.currentCalculatedOctave[turtle] = that.currentOctave[turtle];
+                        } else {
+                            that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
+                            that.currentCalculatedOctave[turtle] = that.currentOctave[turtle];
+                        }
+                        
                         if (that.turtles.turtleList[turtle].drum) {
                             for (var i = 0; i < notes.length; i++) {
                                 notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#'); // 'C2'; // Remove pitch
@@ -7502,6 +7521,7 @@ function Logo () {
                         that.previousNotePlayed[turtle] = that.lastNotePlayed[turtle];
                         that.lastNotePlayed[turtle] = [notes[0], noteBeatValue];
                         that.noteStatus[turtle] = [notes, noteBeatValue];
+                        that.lastPitchPlayed[turtle] = that.lastNotePlayed[turtle]; //For a stand-alone pitch block.
                     }
                 }
 
@@ -8821,14 +8841,15 @@ function Logo () {
 
                     var cblk0 = that.blocks.blockList[blk].connections[0];
                     if (cblk0 !== null && that.blocks.blockList[cblk0].name === 'pitch') {
+                        var noteBlock = that.blocks.blockList[cblk0].connections[1];
                         if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
-                            var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
+                            var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
                         } else {
                             var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                         }
 
                         if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
-                            var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                            var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
                         } else {
                             var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                         }
@@ -8846,6 +8867,8 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
+                    var cblk0 = that.blocks.blockList[blk].connections[0];
+                    var noteBlock = that.blocks.blockList[cblk0].connections[1];
                     if (cblk1 === null || cblk2 === null) {
                         that.errorMsg(NOINPUTERRORMSG, blk);
                     }
@@ -8854,13 +8877,13 @@ function Logo () {
                     // associated with octaves: current, next, and
                     // previous.
                     if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
-                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
+                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                     }
 
                     if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
-                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
                     } else {
                         var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                     }
@@ -8896,6 +8919,8 @@ function Logo () {
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
+                    var cblk0 = that.blocks.blockList[blk].connections[0];
+                    var noteBlock = that.blocks.blockList[cblk0].connections[1];
                     if (cblk1 === null || cblk2 === null) {
                         that.errorMsg(NOINPUTERRORMSG, blk);
                     }
@@ -8904,13 +8929,13 @@ function Logo () {
                     // associated with octaves: current, next, and
                     // previous.
                     if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
-                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value);
+                        var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value, that.lastNotePlayed[turtle],  that.blocks.blockList[noteBlock].value);
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                     }
 
                     if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
-                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value);
+                        var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value, that.lastNotePlayed[turtle],  that.blocks.blockList[noteBlock].value);
                     } else {
                         var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                     }
@@ -9533,7 +9558,7 @@ function Logo () {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
                     var note = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var octave = Math.floor(calcOctave(that.currentOctave[turtle], that.parseArg(that, turtle, cblk2, blk, receivedArg)));
+                    var octave = Math.floor(calcOctave(that.currentOctave[turtle], that.parseArg(that, turtle, cblk2, blk, receivedArg), that.lastNotePlayed[turtle], note));
                     block.value = Math.round(pitchToFrequency(note, octave, 0, that.keySignature[turtle]));
                 } else {
                     const NOTENAMES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
