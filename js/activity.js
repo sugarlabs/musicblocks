@@ -3588,6 +3588,27 @@ handleComplete);
         function _showHelp(firstTime) {
             helpIdx = 0;
 
+            var __setHelpHTML = function (helpIdx, imageScale) {
+                if (HELPCONTENT[helpIdx].length > 4) {
+                    try {
+                        var helpLang = localStorage.languagePreference;
+                    } catch (e) {
+                        var helpLang = 'en';
+                    }
+
+                    switch (helpLang) {
+                    case 'ja':
+                        docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p><p><a href="' + HELPCONTENT[helpIdx][3] + '-ja" target="_blank">' + HELPCONTENT[helpIdx][4] + '</a></p>';
+                        break;
+                    default:
+                        docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p><p><a href="' + HELPCONTENT[helpIdx][3] + '" target="_blank">' + HELPCONTENT[helpIdx][4] + '</a></p>';
+                        break;
+                    }
+                } else {
+                    docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
+                }
+            };
+
             if (firstTime) {
                 if (helpContainer == null) {
                     helpContainer = new createjs.Container();
@@ -3615,7 +3636,7 @@ handleComplete);
                             }
 
                             var imageScale = 55 * turtleBlocksScale;
-                            helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
+                            __setHelpHTML(helpIdx, imageScale);
                         }
 
                         update = true;
@@ -3639,7 +3660,9 @@ handleComplete);
                         hitArea.y = 0;
                         helpContainer.hitArea = hitArea;
 
-                        docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
+                        var imageScale = 55 * turtleBlocksScale;
+                        __setHelpHTML(helpIdx, imageScale);
+
                         if (!doneTour) {
                             docById('helpElem').style.visibility = 'visible';
                         }
@@ -3686,7 +3709,8 @@ handleComplete);
                     storage.doneTour = 'true';
                 }
 
-                docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
+                var imageScale = 55 * turtleBlocksScale;
+                __setHelpHTML(helpIdx, imageScale);
                 docById('helpElem').style.visibility = 'visible';
                 helpContainer.visible = true;
                 update = true;

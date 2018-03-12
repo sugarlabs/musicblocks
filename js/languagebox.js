@@ -40,7 +40,7 @@ function LanguageBox () {
     };
 
     this.setRefreshCanvas = function (refreshCanvas) {
-        this._refreshCanvas = refreshCanvas;
+	this._refreshCanvas = refreshCanvas;
         return this;
     };
 
