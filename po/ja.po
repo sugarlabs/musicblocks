@@ -303,7 +303,7 @@ msgstr "ブロックが見つかりません。"
 #: js/activity.js:2444
 #: js/activity.js:2459
 msgid "untitled"
-msgstr ""
+msgstr "無題"
 
 #: js/activity.js:2512
 #.TRANS: File name prompt for save as Lilypond
@@ -365,8 +365,9 @@ msgid "Mr. Mouse"
 msgstr "ネズミさん"
 
 #: js/activity.js:2881
+## check verb
 msgid "Please set browser zoom level to 100%"
-msgstr ""
+msgstr "ブラウザーのズームを１００%に設定してください。"
 
 #: js/activity.js:3371
 #: js/activity.js:3385
@@ -496,7 +497,7 @@ msgstr "貼り付け"
 
 #: js/activity.js:4000
 msgid "Could not parse JSON input."
-msgstr ""
+msgstr "JSONのインプットのパースができません。"
 
 #: js/analytics.js:475
 #: js/turtledefs.js:23
@@ -671,7 +672,7 @@ msgstr "インデクス番号は 0 より大きい必要があります。"
 #: js/logo.js:2884
 #: js/logo.js:9617
 msgid "Maximum heap size is 1000."
-msgstr ""
+msgstr "ヒープの最大は1000です。"
 
 #: js/logo.js:2908
 #: js/logo.js:2932
@@ -687,15 +688,16 @@ msgstr "マイナスの数値をいれることはできません。"
 
 #: js/logo.js:3027
 msgid "Adding missing pitch number 0."
-msgstr ""
+msgstr "行方不明な「０」のピッチ番号が入れられました。"
 
 #: js/logo.js:3037
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
-msgstr ""
+msgstr "０より小さいか１１より大きい番号を捨て置きます。"
 
 #: js/logo.js:3042
+## check verb
 msgid "Ignoring duplicate pitch numbers."
-msgstr ""
+msgstr "重複ピッチ番号を捨て置きます"
 
 #: js/logo.js:3176
 msgid "You must have at least one pitch block and one drum block in the matrix."
@@ -772,16 +774,18 @@ msgstr "奇数"
 #: js/turtledefs.js:29
 #: js/basicblocks.js:240
 #: js/musicutils.js:137
+## check
 msgid "scalar"
-msgstr ""
+msgstr "音階的"
 
 #: js/logo.js:3640
 msgid "The Case Block must be used inside of a Switch Block."
 msgstr "ケースブロックはスイッチブロックの中にある必要があります。"
 
 #: js/logo.js:3711
+## should be "scalar"
 msgid "The Scaler Step Block must be used inside of a Note Block."
-msgstr ""
+msgstr "音階的ステップ"
 
 #: js/logo.js:3864
 msgid "Drum Block: Did you mean to use a Note block?"
@@ -802,7 +806,7 @@ msgstr "音価の数値は０より大きい必要があります"
 
 #: js/logo.js:4639
 msgid "An argument of -1 results in a note value of 0."
-msgstr ""
+msgstr "ー１は０の音価にします"
 
 #: js/logo.js:4861
 msgid "Vibrato intensity must be between 1 and 100."
@@ -827,17 +831,17 @@ msgstr "大きさが変域外です。"
 #: js/logo.js:5032
 #.TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
-msgstr ""
+msgstr "倍音が０より大きい必要あります。"
 
 #: js/logo.js:5082
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
-msgstr ""
+msgstr "倍音のウェートが０より大きくて、１より小さい必要があります。"
 
 #: js/logo.js:5092
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partisls block."
-msgstr ""
+msgstr "倍音ブロックが「倍音ウェートブロック」の中にある必要があります。"
 
 #: js/logo.js:5674
 #: js/basicblocks.js:427
@@ -889,16 +893,16 @@ msgstr "ハーツ・ブロック：音符ブロックを使うつもりですか
 
 #: js/logo.js:6626
 msgid "Playback is ready."
-msgstr ""
+msgstr "コンパイルが完了です。"
 
 #: js/logo.js:6880
 #.TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
-msgstr ""
+msgstr "「倍音ウェート」ブロックの中に倍音ブロックが入っている必要があります。"
 
 #: js/logo.js:7011
 msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-msgstr ""
+msgstr "同じピッチの音符だけタイすることが可能です。"
 
 #: js/logo.js:7432
 msgid "synth cannot play chords."
@@ -937,15 +941,15 @@ msgstr "ブロックが見つかりません"
 #: js/logo.js:9934
 #: js/logo.js:9939
 msgid "Warning: block argument type mismatch"
-msgstr ""
+msgstr "ワーニング：ブロックの論法が不突合です。"
 
 #: js/logo.js:10509
 msgid "Lilypond cannot process tempo of "
-msgstr ""
+msgstr "このテンポはLilypondソフトができません："
 
 #: js/logo.js:10530
 msgid "Lilypond cannot process pickup of "
-msgstr ""
+msgstr "この弱起はLilypondソフトができません："
 
 #: js/clearbox.js:70
 msgid "confirm"
@@ -983,17 +987,17 @@ msgstr "音階の名前"
 
 #: js/palette.js:737
 msgid "invert mode"
-msgstr ""
+msgstr "音階を転倒"
 
 #: js/palette.js:740
 msgid "voice name"
-msgstr ""
+msgstr "音声名"
 
 #: js/palette.js:744
 #: js/basicblocks.js:408
 #.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental"
-msgstr ""
+msgstr "変化記号"
 
 #: js/palette.js:750
 ## 明確＝めいかく；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B 
@@ -1015,7 +1019,7 @@ msgstr "方存"
 #: js/basicblocks.js:2756
 #: js/blocks.js:2244
 msgid "store in box"
-msgstr ""
+msgstr "ボックスに保存"
 
 #: js/palette.js:785
 #: js/blocks.js:1665
@@ -1297,7 +1301,7 @@ msgstr "アラビア・スケール"
 #: js/turtledefs.js:29
 #: js/musicutils.js:311
 msgid "byzantine"
-msgstr ""
+msgstr "ビザンティン"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:313
@@ -1387,15 +1391,15 @@ msgstr "平調子 (日本)"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:335
-## I cannot find the Japanese translation on Wikipedia and therefore cannot guess the Kanji
+## https://kotobank.jp/word/%E9%99%B0%E9%9F%B3%E9%9A%8E-32775
 msgid "in (Japan)"
-msgstr ""
+msgstr "陰音階　(日本)"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:336
 ## I cannot find the Japanese translation on Wikipedia and therefore cannot guess the Kanji
 msgid "minyo (Japan)"
-msgstr ""
+msgstr "民謡音階 (日本)"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:337
@@ -2062,7 +2066,7 @@ msgstr "プラグインを消す"
 
 #: js/turtledefs.js:116
 msgid "Delete a selected plugin."
-msgstr ""
+msgstr "選ばれているプラグインを消します。
 
 #: js/turtledefs.js:117
 #: js/utilitybox.js:106
@@ -2091,15 +2095,16 @@ msgstr "「d」を打つと「ド」のブロックが作られ、「r」を打�
 
 #: js/turtledefs.js:121
 msgid "Guide"
-msgstr ""
+msgstr "案内"
 
 #: js/turtledefs.js:121
+## しょうさい＝詳細
 msgid "A detailed guide to Music Blocks is available."
-msgstr ""
+msgstr "ミュージック・ブロックスの詳細的な案内があります。"
 
 #: js/turtledefs.js:121
 msgid "Music Blocks Guide"
-msgstr ""
+msgstr "ミュージック・ブロックス案内"
 
 #: js/turtledefs.js:122
 msgid "Congratulations."
@@ -2118,17 +2123,17 @@ msgstr "移調"
 #: js/basicblocks.js:138
 #.TRANS: step down one note in current musical scale
 msgid "scalar step down"
-msgstr "音階の音符を下げる"
+msgstr "音階的の音符を下げる"
 
 #: js/basicblocks.js:146
 #.TRANS: step up one note in current musical scale
 msgid "scalar step up"
-msgstr "音階の音符を上る"
+msgstr "音階的の音符を上る"
 
 #: js/basicblocks.js:154
 #.TRANS: the change meaused in half-steps between the current pitch and the previous pitch
 msgid "change in pitch"
-msgstr ""
+msgstr "音程の違い"
 
 #: js/basicblocks.js:162
 #: js/basicblocks.js:444
@@ -2163,7 +2168,7 @@ msgstr "音名"
 #: js/basicblocks.js:3172
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr "オクターヴ"
+msgstr "オクターブ"
 
 #: js/basicblocks.js:191
 #.TRANS: convert piano key number (1-88) to pitch
@@ -2195,7 +2200,7 @@ msgstr "転回を (偶数)"
 #: js/basicblocks.js:289
 #.TRANS: register is the octave of the current pitch
 msgid "register"
-msgstr ""
+msgstr "レジスタ"
 
 #: js/basicblocks.js:298
 #.TRANS: adjust the amount of shift (up or down) of a pitch
@@ -2691,24 +2696,25 @@ msgstr "ビブラートエフェクタの強度"
 #: js/basicblocks.js:1285
 #.TRANS: partials are weighted components in a harmonic series
 msgid "partial"
-msgstr ""
+msgstr "倍音"
 
 #: js/basicblocks.js:1295
 #.TRANS: partials are weighted components in a harmonic series
 msgid "weighed partials"
-msgstr ""
+msgstr "ウェート倍音"
 
 #: js/basicblocks.js:1304
 #.TRANS: A harmonic is a overtone.
 msgid "harmonic"
-msgstr ""
+msgstr "ハーモニックス"
 
 #: js/basicblocks.js:1315
 #: js/basicblocks.js:1330
 #.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
 #.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
+## This seems to have a lot of great stuff: https://ja.wikipedia.org/wiki/%E9%9D%9E%E5%92%8C%E5%A3%B0%E9%9F%B3#%E5%88%BA%E7%B9%8D%E9%9F%B3
 msgid "neighbor"
-msgstr ""
+msgstr "刺繍音"
 
 #: js/basicblocks.js:1316
 #: js/basicblocks.js:1800
@@ -2720,7 +2726,7 @@ msgstr "半音の音程"
 #: js/basicblocks.js:1892
 #.TRANS: calculate a relative step between notes based on the current musical scale
 msgid "scalar interval"
-msgstr "音階の音程"
+msgstr "音階的の音程"
 
 #: js/basicblocks.js:1344
 #: js/timbre.js:1557
@@ -2802,7 +2808,7 @@ msgstr "シンセを設定"
 #: js/basicblocks.js:1427
 #.TRANS: glide (glissando) is a blended overlap successive notes
 msgid "glide"
-msgstr ""
+msgstr "グリッサンド"
 
 #: js/basicblocks.js:1438
 #: js/basicblocks.js:1460
@@ -2840,7 +2846,7 @@ msgstr "半音の隔たり"
 #.TRANS: measure the distance between two pitches in steps of musical scale
 ## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
-msgstr "音階の音程の隔たり"
+msgstr "音階的の音程の隔たり"
 
 #: js/basicblocks.js:1703
 #: js/basicblocks.js:1711
@@ -2854,12 +2860,14 @@ msgstr "長何度した"
 
 #: js/basicblocks.js:1903
 #.TRANS: define a custom mode
+## http://jisho.org/word/%E5%AE%9A%E7%BE%A9 
 msgid "define mode"
-msgstr ""
+msgstr "音階を定義します。"
 
 #: js/basicblocks.js:1913
+## https://ja.wikipedia.org/wiki/%E7%A7%BB%E5%8B%95%E3%83%89
 msgid "moveable"
-msgstr ""
+msgstr "移動"
 
 #: js/basicblocks.js:1921
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -3467,7 +3475,7 @@ msgstr "不詳"
 #: js/basicblocks.js:3394
 #.TRANS: Open a palette of blocks.
 msgid "open palette"
-msgstr ""
+msgstr "パレットを開きます"
 
 #: js/basicblocks.js:3398
 msgid "Rhythm"
@@ -3501,12 +3509,14 @@ msgid "connect blocks"
 msgstr "ブロックを繋ぐ"
 
 #: js/basicblocks.js:3433
+## check
 msgid "target block"
-msgstr ""
+msgstr "目標のブロック"
 
 #: js/basicblocks.js:3433
+## check; http://jisho.org/word/%E6%8E%A5%E7%B6%9A 
 msgid "connection number"
-msgstr ""
+msgstr "接続の番号"
 
 #: js/basicblocks.js:3444
 #.TRANS: Create a new block programmatically.
@@ -3625,7 +3635,7 @@ msgstr "ネズミの方位"
 #: js/basicblocks.js:3698
 #.TRANS: set xy position for this mouse
 msgid "set mouse"
-msgstr ""
+msgstr "マウスを設定"
 
 #: js/basicblocks.js:3710
 #.TRANS: y position for this mouse
@@ -3715,11 +3725,11 @@ msgstr "クレッシェンド"
 
 #: js/utilitybox.js:124
 msgid "Cannot be further decreased"
-msgstr ""
+msgstr "これより小さくできません"
 
 #: js/utilitybox.js:142
 msgid "Cannot be further increased"
-msgstr ""
+msgstr "これより大きくできません"
 
 #: js/utilitybox.js:198
 msgid "Disable scrolling"
@@ -3923,13 +3933,13 @@ msgstr "蝙"
 
 #: js/lilypond.js:124
 msgid "Lilypond ignoring mode"
-msgstr ""
+msgstr "Lilypondはこの音階を捨て置きます"
 
 #: js/macros.js:43
 #: js/musicutils.js:134
 #: js/musicutils.js:381
 msgid "natural"
-msgstr ""
+msgstr "本位(ナチュラル)"
 
 #: js/blocks.js:331
 msgid "Save stack"
@@ -4048,7 +4058,7 @@ msgstr "ディストーションの大きさ"
 #: js/tempo.js:75
 #: js/tempo.js:78
 msgid "The beats per minute must be between 30 and 1000."
-msgstr ""
+msgstr "BPM(一分当たりの拍数)は30から1000の必要があります。"
 
 #: js/tempo.js:338
 msgid "speed up"
@@ -4096,11 +4106,11 @@ msgstr "音階を弾く"
 #: js/musicutils.js:134
 #.TRANS: sharp, flat, and natural are music terms related to pitch
 msgid "double sharp"
-msgstr ""
+msgstr "重嬰"
 
 #: js/musicutils.js:134
 msgid "double flat"
-msgstr ""
+msgstr "重変"
 
 #: js/musicutils.js:1578
 #: js/musicutils.js:1612
