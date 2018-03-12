@@ -783,8 +783,7 @@ msgid "The Case Block must be used inside of a Switch Block."
 msgstr "ケースブロックはスイッチブロックの中にある必要があります。"
 
 #: js/logo.js:3711
-## should be "scalar"
-msgid "The Scaler Step Block must be used inside of a Note Block."
+msgid "The Scalar Step Block must be used inside of a Note Block."
 msgstr "音階的ステップ"
 
 #: js/logo.js:3864
@@ -840,7 +839,7 @@ msgstr "倍音のウェートが０より大きくて、１より小さい必要
 
 #: js/logo.js:5092
 #.TRANS: partials are weighted components in a harmonic series
-msgid "Partial block should be used inside of a Weighted-partisls block."
+msgid "Partial block should be used inside of a Weighted-partials block."
 msgstr "倍音ブロックが「倍音ウェートブロック」の中にある必要があります。"
 
 #: js/logo.js:5674

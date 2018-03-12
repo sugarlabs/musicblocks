@@ -3708,7 +3708,7 @@ function Logo () {
         case 'steppitch':
             // Similar to pitch but calculated from previous note played.
             if (!that.inMatrix && that.inNoteBlock[turtle].length === 0) {
-                that.errorMsg(_('The Scaler Step Block must be used inside of a Note Block.'), blk);
+                that.errorMsg(_('The Scalar Step Block must be used inside of a Note Block.'), blk);
                 that.stopTurtle = true;
                 break;
             }
@@ -5089,7 +5089,7 @@ function Logo () {
                 that.partials[turtle][n].push(args[0]);
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
-                that.errorMsg(_('Partial block should be used inside of a Weighted-partisls block.'));
+                that.errorMsg(_('Partial block should be used inside of a Weighted-partials block.'));
             }
             break;
         case 'neighbor':  // semi-tone step

@@ -743,7 +743,7 @@ msgid "The Case Block must be used inside of a Switch Block."
 msgstr ""
 
 #: js/logo.js:3711
-msgid "The Scaler Step Block must be used inside of a Note Block."
+msgid "The Scalar Step Block must be used inside of a Note Block."
 msgstr ""
 
 #: js/logo.js:3864
@@ -798,7 +798,7 @@ msgstr ""
 
 #: js/logo.js:5092
 #.TRANS: partials are weighted components in a harmonic series
-msgid "Partial block should be used inside of a Weighted-partisls block."
+msgid "Partial block should be used inside of a Weighted-partials block."
 msgstr ""
 
 #: js/logo.js:5674
