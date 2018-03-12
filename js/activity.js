@@ -1737,12 +1737,13 @@ define(MYDEFINES, function (compatibility) {
 
             const BACKSPACE = 8;
             const TAB = 9;
-                        /*
+
+            /*
             if (event.keyCode === TAB || event.keyCode === BACKSPACE) {
                 // Prevent browser from grabbing TAB key
                 event.preventDefault();
             }
-                        */
+            */
 
             const ESC = 27;
             const ALT = 18;
@@ -1808,16 +1809,13 @@ define(MYDEFINES, function (compatibility) {
                     break;
                 }
             } else if (event.ctrlKey) {
-                switch(event.keyCode)
-                {
-                    case CTRL && V:
+                switch (event.keyCode) {
+                case V:
                     pasteBox.createBox(turtleBlocksScale, pasteX / 2.5 * turtleBlocksScale, pasteY / 3.5 * turtleBlocksScale);
                     pasteBox.show();
                     docById('paste').focus();
                     docById('paste').style.visibility = 'visible';
-                    // stage.addChild(paste);
                     update = true;
-                    console.log('Paste')
                     break;
                 }
             } else if (event.shiftKey && !disableKeys){
