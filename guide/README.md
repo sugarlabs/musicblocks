@@ -1,8 +1,12 @@
 # Guide to Programming with Music Blocks
   
-Music Blocks is a programming environment for children interested in music and graphics. It expands upon Turtle Blocks by adding a collection of features relating to pitch and rhythm.
+Music Blocks is a programming environment for children interested in
+music and graphics. It expands upon Turtle Blocks by adding a
+collection of features relating to pitch and rhythm.
 
-The Turtle Blocks guide is a good place to start learning about the basics. In this guide, we illustrate the musical features by walking the reader through numerous examples.
+The Turtle Blocks guide is a good place to start learning about the
+basics. In this guide, we illustrate the musical features by walking
+the reader through numerous examples.
 
 ## <a name="TOC"></a> Table of Contents
 
@@ -60,15 +64,21 @@ run. Look for `RUN LIVE` links.
 [Back to Table of Contents](#TOC) | [Next Section (2. Making Sounds)](#NOTES)
 
 Music Blocks is designed to run in a browser. Most of the development
-has been done in Chrome, but it should also work in Firefox. You can
-run it from [github io](http://walterbender.github.io/musicblocks) or
-by downloading a copy of the code and running a local copy directly
-from the file system of your computer.
+has been done in Chrome, but it should also work in Firefox, Opera,
+and some versions of Safari. You can run it from [github
+io](http://walterbender.github.io/musicblocks) or by downloading a
+copy of the code and running a local copy directly from the file
+system of your computer.
+
+This guide details the music-specific features of Music Blocks.  You
+may also be interested in the [Turtle Blocks
+Guide](http://github.com/walterbender/turtleblocksjs/tree/master/guide),
+which reviews many programming features common to both projects.
 
 For more details on how to use Music Blocks, see [Using Music
 Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
-For more details on how to use Turtle Blocks, see
-[Using Turtle Blocks JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
+For more details on how to use Turtle Blocks, see [Using Turtle Blocks
+JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
 ## <a name="NOTES"></a>2. Making Sounds
 
