@@ -7381,8 +7381,12 @@ function Logo () {
 
                     if (notes.length > 0) {
                         var len = notes[0].length;
-              
-                        that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
+                        if (typeof(notes[0]) === 'number') {
+                            var obj = frequencyToPitch(notes[0]);
+                            that.currentOctave[turtle] = obj[1];
+                        } else {
+                            that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
+                        }
                         that.currentCalculatedOctave[turtle] = that.currentOctave[turtle];
                         
                         if (that.turtles.turtleList[turtle].drum) {
