@@ -999,7 +999,9 @@ function Logo () {
 
         this.embeddedGraphicsFinished = {};
 
-        this._prepSynths();
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this._prepSynths();
+        }
 
         this.notationStaging = {};
         this.notationDrumStaging = {};
@@ -7897,7 +7899,9 @@ function Logo () {
             }
         };
 
-        this._prepSynths();
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this._prepSynths();
+        }
 
         this.onRunTurtle();
         this.stopTurtle = false;
