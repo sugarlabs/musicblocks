@@ -1690,6 +1690,14 @@ function Palette(palettes, name) {
             that.palettes.refreshCanvas();
         });
 
+        this.menuContainer.on('mouseover', function(event) {
+            document.body.style.cursor = 'pointer';
+        });
+
+        this.menuContainer.on('mouseout', function(event) {
+            document.body.style.cursor = 'default';
+        });
+
         this.menuContainer.on('mousedown', function (event) {
             // Move them all?
             var offset = {
