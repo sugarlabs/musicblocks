@@ -2778,6 +2778,9 @@ function Logo () {
         case 'emptyHeap':
             that.turtleHeaps[turtle] = [];
             break;
+        case 'reverseHeap':
+            that.turtleHeaps[turtle] = that.turtleHeaps[turtle].reverse();
+            break;
         case 'push':
             if (args.length === 1) {
                 if (!(turtle in that.turtleHeaps)) {

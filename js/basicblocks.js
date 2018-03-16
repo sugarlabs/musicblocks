@@ -2955,6 +2955,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var loadHeapFromApp = new ProtoBlock('loadHeapFromApp');
     loadHeapFromApp.palette = palettes.dict['heap'];
     blocks.protoBlockDict['loadHeapFromApp'] = loadHeapFromApp;
+    //.TRANS: load the heap contents from a URL
     loadHeapFromApp.staticLabels.push(_('load heap from App'));
     loadHeapFromApp.adjustWidthToLabel();
     loadHeapFromApp.twoArgBlock();
@@ -2966,6 +2967,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var saveHeapToApp = new ProtoBlock('saveHeapToApp');
     saveHeapToApp.palette = palettes.dict['heap'];
     blocks.protoBlockDict['saveHeapToApp'] = saveHeapToApp;
+    //.TRANS: save the heap contents to a URL
     saveHeapToApp.staticLabels.push(_('save heap to App'));
     saveHeapToApp.adjustWidthToLabel();
     saveHeapToApp.twoArgBlock();
@@ -2977,6 +2979,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var showHeap = new ProtoBlock('showHeap');
     showHeap.palette = palettes.dict['heap'];
     blocks.protoBlockDict['showHeap'] = showHeap;
+    //.TRANS: Display the heap contents
     showHeap.staticLabels.push(_('show heap'));
     showHeap.adjustWidthToLabel();
     showHeap.zeroArgBlock();
@@ -2984,6 +2987,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var heapLength = new ProtoBlock('heapLength');
     heapLength.palette = palettes.dict['heap'];
     blocks.protoBlockDict['heapLength'] = heapLength;
+    //.TRANS: How many entries are in the heap?
     heapLength.staticLabels.push(_('heap length'));
     heapLength.adjustWidthToLabel();
     heapLength.parameterBlock();
@@ -2992,6 +2996,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var heapEmpty = new ProtoBlock('heapEmpty');
     heapEmpty.palette = palettes.dict['heap'];
     blocks.protoBlockDict['heapEmpty'] = heapEmpty;
+    //.TRANS: Is the heap empty?
     heapEmpty.staticLabels.push(_('heap empty?'));
     heapEmpty.adjustWidthToLabel();
     heapEmpty.booleanZeroArgBlock();
@@ -2999,6 +3004,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var emptyHeap = new ProtoBlock('emptyHeap');
     emptyHeap.palette = palettes.dict['heap'];
     blocks.protoBlockDict['emptyHeap'] = emptyHeap;
+    //.TRANS: empty the heap
     emptyHeap.staticLabels.push(_('empty heap'));
     emptyHeap.adjustWidthToLabel();
     emptyHeap.zeroArgBlock();
@@ -3006,6 +3012,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var saveHeap = new ProtoBlock('saveHeap');
     saveHeap.palette = palettes.dict['heap'];
     blocks.protoBlockDict['saveHeap'] = saveHeap;
+    //.TRANS: save the heap to a file
     saveHeap.staticLabels.push(_('save heap'));
     saveHeap.adjustWidthToLabel();
     saveHeap.oneArgBlock();
@@ -3015,11 +3022,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     var loadHeap = new ProtoBlock('loadHeap');
     loadHeap.palette = palettes.dict['heap'];
     blocks.protoBlockDict['loadHeap'] = loadHeap;
+    //.TRANS: load the heap from a file
     loadHeap.staticLabels.push(_('load heap'));
     loadHeap.adjustWidthToLabel();
     loadHeap.oneArgBlock();
     loadHeap.dockTypes[1] = 'filein';
     loadHeap.defaults = [[null, null]];
+
+    var reverseHeap = new ProtoBlock('reverseHeap');
+    reverseHeap.palette = palettes.dict['heap'];
+    //.TRANS: reverse the order of the heap
+    blocks.protoBlockDict['reverseHeap'] = reverseHeap;
+    reverseHeap.staticLabels.push(_('reverse heap'));
+    reverseHeap.adjustWidthToLabel();
+    reverseHeap.zeroArgBlock();
 
     var indexHeap = new ProtoBlock('indexHeap');
     indexHeap.palette = palettes.dict['heap'];
@@ -3046,6 +3062,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var popBlk = new ProtoBlock('pop');
     popBlk.palette = palettes.dict['heap'];
     blocks.protoBlockDict['pop'] = popBlk;
+    //.TRANS: pop a value off the top of the heap
     popBlk.staticLabels.push(_('pop'));
     popBlk.adjustWidthToLabel();
     popBlk.parameterBlock();
@@ -3053,6 +3070,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pushBlk = new ProtoBlock('push');
     pushBlk.palette = palettes.dict['heap'];
     blocks.protoBlockDict['push'] = pushBlk;
+    //.TRANS: push a value onto the top of the heap
     pushBlk.staticLabels.push(_('push'));
     pushBlk.adjustWidthToLabel();
     pushBlk.oneArgBlock();
