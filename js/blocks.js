@@ -13,6 +13,9 @@
 // connecting them.
 const MINIMUMDOCKDISTANCE = 400;
 
+// Soft limit on the number of blocks in a single stack.
+const LONGSTACK = 300;
+
 // Special value flags to uniquely identify these media blocks.
 const CAMERAVALUE = '##__CAMERA__##';
 const VIDEOVALUE = '##__VIDEO__##';
@@ -1153,6 +1156,11 @@ function Blocks () {
         }
 
         if (newBlock != null) {
+            var n = this._countBlocksInStack(this.findTopBlock(newBlock));
+            if (n > LONGSTACK) {
+		this.errorMsg(_('Consider breaking this stack into parts.'));
+            }
+
             // We found a match.
             myBlock.connections[0] = newBlock;
             var connection = this.blockList[newBlock].connections[newConnection];
@@ -1834,6 +1842,20 @@ function Blocks () {
             myBlock = this.blockList[blk];
         }
         return blk;
+    };
+
+    this._countBlocksInStack = function (blk) {
+        // Counts blocks in a stack starting from blk.
+        var c = 0;
+        if (blk !== null) {
+            c += 1;
+
+            for (var i = 1; i < this.blockList[blk].connections.length; i++) {
+                c += this._countBlocksInStack(this.blockList[blk].connections[i]);
+            }
+        }
+
+        return c;
     };
 
     this.findStacks = function () {
