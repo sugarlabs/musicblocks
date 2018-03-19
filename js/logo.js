@@ -2995,7 +2995,7 @@ function Logo () {
             if (args.length === 2) {
                 var modename = 'major';
                 for (var i = 0; i < MODENAMES.length; i++) {
-                    if (MODENAMES[i][0] === args[1]) {
+                    if (MODENAMES[i][0] === args[1] || MODENAMES[i][1] === args[1]) {
                         modename = MODENAMES[i][1];
                         that._modeBlock = that.blocks.blockList[blk].connections[2];
                         break;

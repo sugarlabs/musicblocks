@@ -24,7 +24,6 @@ function ModeWidget() {
         this._logo = logo;
         this._modeBlock = modeBlock;
         this._locked = false;
-        console.log(this._logo.keySignature);
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
 
@@ -776,16 +775,21 @@ function ModeWidget() {
 
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
-                table.rows[n].cells[0].innerHTML = getModeName(mode);
+                var label = getModeName(mode);
+                label = getModei18nName(label);
+
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
                     this._logo.blocks.blockList[this._modeBlock].value = getModeName(mode);
-                    this._logo.blocks.blockList[this._modeBlock].text.text = getModeName(mode);
+
+                    this._logo.blocks.blockList[this._modeBlock].text.text = label;
                     this._logo.blocks.blockList[this._modeBlock].updateCache();
 
                     this._logo.refreshCanvas();
                 }
+
+                table.rows[n].cells[0].innerHTML = label;
                 return;
             }
         }
@@ -795,14 +799,14 @@ function ModeWidget() {
 
     this._save = function() {
         var table = docById('modeTable');
-	var n = table.rows.length - 1;
+        var n = table.rows.length - 1;
 
         // If the mode is not in the list, save it as the new custom mode.
         if (table.rows[n].cells[0].innerHTML === '') {
             customMode = this._calculateMode();
             console.log('custom mode: ' + customMode);
             storage.custommode = JSON.stringify(customMode);
-	}
+        }
 
         var modeName = table.rows[n].cells[0].innerHTML;
         if (modeName === '') {
@@ -822,8 +826,8 @@ function ModeWidget() {
             var j = 11 - i;
             var cell = table.rows[MODEMAP[j][0]].cells[MODEMAP[j][1]];
             if (cell.style.backgroundColor !== 'black') {
-		continue;
-	    }
+                continue;
+            }
 
             p += 1;
             var pitch = NOTESTABLE[(j + 1) % 12];
@@ -835,10 +839,10 @@ function ModeWidget() {
             var octaveidx = pitchidx + 2;
 
             if (p === modeLength) {
-		newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, null]]);
-	    } else {
-		newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, pitchidx + 3]]);
-	    }
+                newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, null]]);
+            } else {
+                newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, pitchidx + 3]]);
+            }
             newStack.push([notenameidx, ['solfege', {'value': pitch}], 0, 0, [pitchidx]]);
             newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchidx]]);
             var previousBlock = pitchidx;
@@ -859,17 +863,17 @@ function ModeWidget() {
         for (var i = 0; i < 12; i++) {
             var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor !== 'black') {
-		continue;
-	    }
+                continue;
+            }
 
             p += 1;
             var idx = newStack.length;
 
             if (p === modeLength) {
-		newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, null]]);
-	    } else {
-		newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, idx + 2]]);
-	    }
+                newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, null]]);
+            } else {
+                newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, idx + 2]]);
+            }
 
             newStack.push([idx + 1, ['number', {'value': i}], 0, 0, [idx]]);
             var previousBlock = idx;

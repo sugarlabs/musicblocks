@@ -488,6 +488,22 @@ function getModeName(name) {
 };
 
 
+function getModei18nName(name) {
+    for (var m = 0; m < MODENAMES.length; m++) {
+        if (MODENAMES[m][1] === name) {
+            if (MODENAMES[m][0] == null || MODENAMES[m][0] === '') {
+                return name;
+            } else {
+                return MODENAMES[m][0];
+            }
+        }
+    }
+
+    console.log(name + ' not found in MODENAMES');
+    return name;
+};
+
+
 function initIntervalI18N() {
     for (var i = 0; i < INTERVALNAMES.length; i++) {
         if (INTERVALNAMES[i][0] == null) {
