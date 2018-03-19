@@ -840,6 +840,7 @@ function RhythmRuler () {
 
     this._playAll = function () {
         this._logo.synth.stop();
+        this._logo.resetSynth(0);
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
@@ -856,6 +857,7 @@ function RhythmRuler () {
 
     this._playOne = function () {
         this._logo.synth.stop();
+        this._logo.resetSynth(0);
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
@@ -889,6 +891,14 @@ function RhythmRuler () {
         noteTime = Math.abs(1 / noteValue);
         var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
         var drum = this._logo.blocks.blockList[drumblockno].value;
+
+        // Convert i18n drum name to English.
+        for (var d = 0; d < DRUMNAMES.length; d++) {
+            if (DRUMNAMES[d][0] === drum) {
+                drum = DRUMNAMES[d][1];
+                break;
+            }
+        }
 
         var that = this;
 
