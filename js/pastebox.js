@@ -80,6 +80,10 @@ function PasteBox () {
 	docById('paste').style.visibility = 'visible';
     };
 
+    this.getPos = function () {
+        return [this._container.x, this._container.y];
+    };
+
     this._loadClearContainerHandler = function () {
         var hitArea = new createjs.Shape();
         this.bounds = this._container.getBounds();

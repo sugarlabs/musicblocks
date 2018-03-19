@@ -171,10 +171,6 @@ define(MYDEFINES, function (compatibility) {
 
         new createjs.DOMElement(docById('paste'));
         var paste = docById('paste');
-        var pasteX = canvas.width;
-        var pasteY = canvas.height;
-        paste.style.left = pasteX / 2.5 * turtleBlocksScale + 'px';
-        paste.style.top = pasteY / 3.5 * turtleBlocksScale + 'px';
         paste.style.visibility = 'hidden';
 
         // Calculate the palette colors.
@@ -1813,8 +1809,10 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
                 case V:
-                    pasteBox.createBox(turtleBlocksScale, pasteX / 2.5 * turtleBlocksScale, pasteY / 3.5 * turtleBlocksScale);
+                    pasteBox.createBox(turtleBlocksScale, 200, 200);
                     pasteBox.show();
+                    docById('paste').style.left = (pasteBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
+                    docById('paste').style.top = (pasteBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
                     docById('paste').focus();
                     docById('paste').style.visibility = 'visible';
                     update = true;
