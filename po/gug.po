@@ -1347,28 +1347,28 @@ msgstr "octatónico"
 #: js/musicutils.js:285
 #.TRANS: harmonic major scale in music
 #.TRANS: armónico mayor
-msgid "harmonic major"
+msgid "harmonic-major"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:287
 #.TRANS: natural minor scales in music
 #.TRANS: natural menor
-msgid "natural minor"
+msgid "natural-minor"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:289
 #.TRANS: harmonic minor scale in music
 #.TRANS: armónico menor
-msgid "harmonic minor"
+msgid "harmonic-minor"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:291
 #.TRANS: melodic minor scale in music
 #.TRANS: melódico menor
-msgid "melodic minor"
+msgid "melodic-minor"
 msgstr ""
 
 #: js/turtledefs.js:29
@@ -1424,7 +1424,7 @@ msgstr "locrio"
 #: js/musicutils.js:307
 #.TRANS: minor jazz scale for music
 #.TRANS: jazz menor
-msgid "jazz minor"
+msgid "jazz-minor"
 msgstr "jazz michĩve"
 
 #: js/turtledefs.js:29
@@ -1482,13 +1482,13 @@ msgstr "hungaro"
 #: js/musicutils.js:320
 #.TRANS: minor Romanian scale for music
 #.TRANS: romano menor
-msgid "romanian minor"
+msgid "romanian-minor"
 msgstr "romano michĩve"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:321
 #.TRANS: gitana española
-msgid "spanish gypsy"
+msgid "spanish-gypsy"
 msgstr "gitana española"
 
 #: js/turtledefs.js:29
@@ -1502,27 +1502,27 @@ msgstr "maqam"
 #: js/musicutils.js:325
 #.TRANS: minor blues scale for music
 #.TRANS: 
-msgid "minor blues"
+msgid "minor-blues"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:327
 #.TRANS: major blues scale for music
 #.TRANS: blues mayor
-msgid "major blues"
+msgid "major-blues"
 msgstr "blues guasuve"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:328
 #.TRANS: 
-msgid "whole tone"
+msgid "whole-tone"
 msgstr "pu oĩmbava"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:330
 #.TRANS: pentatonic scale in music
 #.TRANS: 
-msgid "minor pentatonic"
+msgid "minor-pentatonic"
 msgstr ""
 
 #: js/turtledefs.js:29
@@ -1537,23 +1537,26 @@ msgstr "chino"
 msgid "egyptian"
 msgstr "egipcio"
 
+msgid "Japan"
+msgstr "japonés"
+
 #: js/turtledefs.js:29
 #: js/musicutils.js:334
 #.TRANS: Japanese pentatonic scale for music
 #.TRANS: hirajoshi (Japonés)
-msgid "hirajoshi (Japan)"
+msgid "hirajoshi"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:335
 #.TRANS: in (Japonés)
-msgid "in (Japan)"
+msgid "in"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:336
 #.TRANS: minyo (Japonés)
-msgid "minyo (Japan)"
+msgid "minyo"
 msgstr ""
 
 #: js/turtledefs.js:29
@@ -1791,21 +1794,21 @@ msgstr ""
 #: js/synthutils.js:44
 #.TRANS: white noise synthesizer
 #.TRANS: ruido blanco
-msgid "white noise"
+msgid "white-noise"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:46
 #.TRANS: brown noise synthesizer
 #.TRANS: ruido marrón
-msgid "brown noise"
+msgid "brown-noise"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:48
 #.TRANS: pink noise synthesizer
 #.TRANS: ruido rosa
-msgid "pink noise"
+msgid "pink-noise"
 msgstr ""
 
 #: js/turtledefs.js:29
@@ -1817,7 +1820,7 @@ msgstr ""
 #: js/synthutils.js:66
 #.TRANS: musical instrument
 #.TRANS: tambor militar pequeño
-msgid "snare drum"
+msgid "snare-drum"
 msgstr "angu’atarara miliko michĩa"
 
 #: js/turtledefs.js:29
@@ -1829,7 +1832,7 @@ msgstr "angu’atarara miliko michĩa"
 #: js/musicutils.js:377
 #.TRANS: musical instrument
 #.TRANS: bombo
-msgid "kick drum"
+msgid "kick-drum"
 msgstr "angu’atarara guasu"
 
 #: js/turtledefs.js:29
@@ -1838,12 +1841,12 @@ msgstr "angu’atarara guasu"
 #: js/synthutils.js:70
 #.TRANS: musical instrument
 #.TRANS: 
-msgid "tom tom"
+msgid "tom-tom"
 msgstr "tom tom"
 
 #: js/turtledefs.js:29
 #.TRANS: piso tom
-msgid "floor tom"
+msgid "floor-tom"
 msgstr ""
 
 #: js/turtledefs.js:29
@@ -1852,7 +1855,7 @@ msgstr ""
 #: js/synthutils.js:74
 #.TRANS: a drum made from an inverted cup
 #.TRANS: tambor taza
-msgid "cup drum"
+msgid "cup-drum"
 msgstr "angu’atarara mba’yru’I apu’a"
 
 #: js/turtledefs.js:29
@@ -1861,7 +1864,7 @@ msgstr "angu’atarara mba’yru’I apu’a"
 #: js/synthutils.js:76
 #.TRANS: musical instrument
 #.TRANS: darbuka
-msgid "darbuka drum"
+msgid "darbuka-drum"
 msgstr " darbuka "
 
 #: js/turtledefs.js:29
@@ -1870,7 +1873,7 @@ msgstr " darbuka "
 #: js/synthutils.js:78
 #.TRANS: musical instrument
 #.TRANS: 
-msgid "hi hat"
+msgid "hi-hat"
 msgstr " hi hat "
 
 #: js/turtledefs.js:29
@@ -1879,7 +1882,7 @@ msgstr " hi hat "
 #: js/synthutils.js:80
 #.TRANS: a small metal bell
 #.TRANS: 
-msgid "ride bell"
+msgid "ride-bell"
 msgstr "myatyrõ itapu"
 
 #: js/turtledefs.js:29
@@ -1888,7 +1891,7 @@ msgstr "myatyrõ itapu"
 #: js/synthutils.js:82
 #.TRANS: musical instrument
 #.TRANS: cencerro
-msgid "cow bell"
+msgid "cow-bell"
 msgstr "itapu"
 
 #: js/turtledefs.js:29
@@ -1897,7 +1900,7 @@ msgstr "itapu"
 #: js/synthutils.js:84
 #.TRANS: musical instrument
 #.TRANS: campana triángulo
-msgid "triangle bell"
+msgid "triangle-bell"
 msgstr "itapu mbohapy takamby"
 
 #: js/basicblocks.js:2084
@@ -1905,7 +1908,7 @@ msgstr "itapu mbohapy takamby"
 #: js/synthutils.js:86
 #.TRANS: musical instrument
 #.TRANS: castañuelas
-msgid "finger cymbals"
+msgid "finger-cymbals"
 msgstr "castañuelas"
 
 #: js/turtledefs.js:29

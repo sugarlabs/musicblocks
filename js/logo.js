@@ -3055,7 +3055,6 @@ function Logo () {
                     }
                 }
 
-                console.log(MUSICALMODES[modeName]);
                 var cblk = that.blocks.blockList[blk].connections[1];
                 if (that.blocks.blockList[cblk].name === 'modename') {
                     that.blocks.updateBlockText(cblk);
@@ -3262,7 +3261,6 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                console.log(that.keySignature[turtle]);
                 that.modeWidget.init(that, that._modeBlock);
             }
 

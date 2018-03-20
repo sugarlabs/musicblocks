@@ -282,13 +282,13 @@ var MODENAMES = [
     //.TRANS: major scales in music
     [_('major'), 'major'],
     //.TRANS: harmonic major scale in music
-    [_('harmonic major'), 'harmonic major'],
+    [_('harmonic-major'), 'harmonic major'],
     //.TRANS: natural minor scales in music
-    [_('natural minor'), 'natural minor'],
+    [_('natural-minor'), 'natural minor'],
     //.TRANS: harmonic minor scale in music
-    [_('harmonic minor'), 'harmonic minor'],
+    [_('harmonic-minor'), 'harmonic minor'],
     //.TRANS: melodic minor scale in music
-    [_('melodic minor'), 'melodic minor'],
+    [_('melodic-minor'), 'melodic minor'],
     //.TRANS: modal scale for music
     [_('ionian'), 'ionian'],
     //.TRANS: modal scale for music
@@ -304,7 +304,7 @@ var MODENAMES = [
     //.TRANS: modal scale for music
     [_('locrian'), 'locrian'],
     //.TRANS: minor jazz scale for music
-    [_('jazz minor'), 'jazz minor'],
+    [_('jazz-minor'), 'jazz minor'],
     //.TRANS: bebop scale for music
     [_('bebop'), 'bebop'],
     [_('arabic'), 'arabic'],
@@ -317,23 +317,23 @@ var MODENAMES = [
     [_('hindu'), 'hindu'],
     [_('hungarian'), 'hungarian'],
     //.TRANS: minor Romanian scale for music
-    [_('romanian minor'), 'romanian minor'],
-    [_('spanish gypsy'), 'spanish gypsy'],
+    [_('romanian-minor'), 'romanian minor'],
+    [_('spanish-gypsy'), 'spanish gypsy'],
     //.TRANS: musical scale for Mid-Eastern music
     [_('maqam'), 'maqam'],
     //.TRANS: minor blues scale for music
-    [_('minor blues'), 'minor blues'],
+    [_('minor-blues'), 'minor blues'],
     //.TRANS: major blues scale for music
-    [_('major blues'), 'major blues'],
-    [_('whole tone'), 'whole tone'],
+    [_('major-blues'), 'major blues'],
+    [_('whole-tone'), 'whole tone'],
     //.TRANS: pentatonic scale in music
-    [_('minor pentatonic'), 'minor pentatonic'],
+    [_('minor-pentatonic'), 'minor pentatonic'],
     [_('chinese'), 'chinese'],
     [_('egyptian'), 'egyptian'],
     //.TRANS: Japanese pentatonic scale for music
-    [_('hirajoshi (Japan)'), 'hirajoshi (Japan)'],
-    [_('in (Japan)'), 'in (Japan)'],
-    [_('minyo (Japan)'), 'minyo (Japan)'],
+    [_('hirajoshi') + ' (' + _('Japan') + ')', 'hirajoshi (Japan)'],
+    [_('in') + ' (' + _('Japan') + ')', 'in (Japan)'],
+    [_('minyo') + ' (' + _('Japan') + ')', 'minyo (Japan)'],
     [_('japanese'), 'japanese'],
     //.TRANS: Italian mathematician
     [_('fibonacci'), 'fibonacci'],
@@ -480,22 +480,6 @@ function getModeName(name) {
             return MODENAMES[mode][0];
         } else if (MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
             return MODENAMES[mode][1];
-        }
-    }
-
-    console.log(name + ' not found in MODENAMES');
-    return name;
-};
-
-
-function getModei18nName(name) {
-    for (var m = 0; m < MODENAMES.length; m++) {
-        if (MODENAMES[m][1] === name) {
-            if (MODENAMES[m][0] == null || MODENAMES[m][0] === '') {
-                return name;
-            } else {
-                return MODENAMES[m][0];
-            }
         }
     }
 
