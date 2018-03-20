@@ -2159,7 +2159,7 @@ msgstr "الاسم"
 #: js/basicblocks.js:3190
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr ""
+msgstr "اوكتاف"
 
 #: js/basicblocks.js:191
 #.TRANS: convert piano key number (1-88) to pitch
