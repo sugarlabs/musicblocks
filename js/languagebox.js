@@ -64,6 +64,8 @@ function LanguageBox () {
             'ibo': 'Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.',
             'ar': 'حدث المتصفح لتغيير تفضيلات اللغة.',
             'he': 'רענן את הדפדפן כדי לשנות את העדפת השפה שלך.',
+            'ayc': 'Actualice su navegador para cambiar su preferencia de idioma.',
+            'gug': 'Actualice su navegador para cambiar su preferencia de idioma.',
 	};
 
         var language = localStorage.languagePreference;
@@ -118,6 +120,7 @@ function LanguageBox () {
             ['中文', 'zh-CN'],
 	    ['ภาษาไทย', 'th'],
 	    ['aymara', 'ayc'],
+            ['guarani', 'gug'],
 	    ['हिंदी', 'hi'],
             ['igbo', 'ibo'],
             ['عربى', 'ar'],
