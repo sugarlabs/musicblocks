@@ -102,13 +102,14 @@ block or one note per button press.
 ## 5. Show and Hide blocks
 
 The *Show* and *Hide* blocks (found on the *Extras* palette) are
-useful for setting "break points" in your program to debug a specific
-section of code. By putting a *Show* block at the start of a
-problematic section of code and a *Hide* block at the end of the
-section, your program can be run full speed until it gets to the
-*Show* block. Then the blocks are blocks are displayed and run in
-*Playback Slow* mode. When the *Hide* block is encountered, the blocks
-are hidden and the program resumes running at full speed.
+useful for setting
+"[breakpoints](https://en.wikipedia.org/wiki/Breakpoint)" in your
+program to debug a specific section of code. By putting a *Show* block
+at the start of a problematic section of code and a *Hide* block at
+the end of the section, your program can be run full speed until it
+gets to the *Show* block. Then the blocks are blocks are displayed and
+run in *Playback Slow* mode. When the *Hide* block is encountered, the
+blocks are hidden and the program resumes running at full speed.
 
 ## 6. Browser Console
 
