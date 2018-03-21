@@ -52,7 +52,7 @@ parameter contains an expected value.
 The *Comment* block (also found on the *Extras* palette) is similar to
 the *Print* block, except it only prints a message when the program is
 being run in *Playback Slow* mode (See below). Comments are also
-written the Browser Console.
+written to the browser console.
 
 ## 3. Status widget
 
