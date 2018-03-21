@@ -2,7 +2,7 @@
 
 *Learning is hard fun.*&mdash;Marvin Minsky
 
-*Make the complicated comprehensible* &mdash; Arthur Miller
+*Make the complicated comprehensible*&mdash;Arthur Miller
 
 *Debugging is the learning opportunity of the 21st Century.* &mdash;
 Cynthia Solomon
@@ -10,16 +10,16 @@ Cynthia Solomon
 *The important message that comes from ideas about debugging is that
 we learn from our mistakes; that the intricate process of making
 things work or learning new skills has to do with hypothesizing,
-testing, revising, etc.* &mdash; Cynthia Solomon
+testing, revising, etc.*&mdash;Cynthia Solomon
 
 *Sometimes bugs are serendipitously adopted as features worth
 perpetuating, sometimes procedures must be constructed to deal with
 the phenomena caused by their appearance, and sometimes the bugs and
 their side effect need to be removed. But in this pursuit, children
 become creative researchers studying behavior, making up theories,
-trying out ideas, etc.* &mdash; Cynthia Solomon
+trying out ideas, etc.*&mdash;Cynthia Solomon
 
-*6 Stages of Debugging* &mdash; Anonymous
+*6 Stages of Debugging*&mdash;Anonymous
 1. That can't happen.
 2. That doesn't happen on my machine.
 3. That shouldn't happen.
