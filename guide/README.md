@@ -8,6 +8,10 @@ The Turtle Blocks guide is a good place to start learning about the
 basics. In this guide, we illustrate the musical features by walking
 the reader through numerous examples.
 
+A short [Guide to
+Debugging](http://github.com/walterbender/musicblocks/tree/master/Debugging.md). is
+also available.
+
 ## <a name="TOC"></a> Table of Contents
 
 1. [Getting Started](#GETTING-STARTED)
