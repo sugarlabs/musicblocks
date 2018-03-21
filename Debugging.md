@@ -19,7 +19,7 @@ their side effect need to be removed. But in this pursuit, children
 become creative researchers studying behavior, making up theories,
 trying out ideas, etc.* &mdash; Cynthia Solomon
 
-## 6 Stages of Debugging &mdash; Anonymous
+*6 Stages of Debugging* &mdash; Anonymous
 1. That can't happen.
 2. That doesn't happen on my machine.
 3. That shouldn't happen.
@@ -35,14 +35,14 @@ you will make mistakes along the way. Music Blocks provides a number
 of mechanism, reviewed below, to help you explore ideas and find
 mistakes.
 
-## Clicking on stacks of blocks
+## 1. Clicking on an individual stack of blocks
 
 The *Play* button will run all of the *Start* blocks
-simultenously. But you can also run individual stacks of code by
-clicking on the stacks. This lets you test and debug small sections of
+simultenously. But you can also run an individual stack of code by
+clicking on the stack. This lets you test and debug small sections of
 code.
 
-## Print and Comment blocks
+## 2. Print and Comment blocks
 
 The *Print* block can be used to print a message while running a
 program. It is useful to determine if a section of code is being
@@ -53,7 +53,7 @@ The *Comment* block is similar to the *Print* block, except it only
 prints a message when the program is being run in *Playback Slow* mode
 (See below). Comments are also written the Browser Console.
 
-## status widget
+## 3. Status Widget
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg "given Music block")
 
@@ -76,7 +76,7 @@ You can do additional programming within the status block. In the
 example above, `whole notes played` is divided by `4` (e.g. quarter notes)
 before being displayed.
 
-## Playback modes
+## 4. Playback modes
 
 Clicking on the *Play* button will play your program at full
 speed. (It will also hide the blocks while the program runs, which
@@ -98,7 +98,7 @@ are run at full speed.
 Two other modes, *Run Step by Step* and *Run Note by Note* advance one
 block or one note per button press.
 
-## Show and Hide blocks
+## 5. Show and Hide blocks
 
 The *Show* and *Hide* blocks, found on the *Extras* palette, are
 useful for setting "break points" in your program to debug a specific
@@ -109,7 +109,7 @@ section, your program can be run full speed until it gets to the
 *Playback Slow* mode. When the *Hide* block is encountered, the blocks
 are hidden and the program resumes running at full speed.
 
-## Browser console
+## 6. Browser Console
 
 As Music Blocks runs, some debugging information is written to the
 Browser Console, such as the notes being played and comments (See the
