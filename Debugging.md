@@ -44,14 +44,15 @@ code.
 
 ## 2. Print and Comment blocks
 
-The *Print* block can be used to print a message while running a
-program. It is useful to determine if a section of code is being
-executed when expected or if a box or parameter contains an expected
-value.
+The *Print* block (found on the *Extras* palette) can be used to print
+a message while running a program. It is useful to determine if a
+section of code is being executed when expected or if a box or
+parameter contains an expected value.
 
-The *Comment* block is similar to the *Print* block, except it only
-prints a message when the program is being run in *Playback Slow* mode
-(See below). Comments are also written the Browser Console.
+The *Comment* block (also found on the *Extras* palette) is similar to
+the *Print* block, except it only prints a message when the program is
+being run in *Playback Slow* mode (See below). Comments are also
+written the Browser Console.
 
 ## 3. Status Widget
 
@@ -100,7 +101,7 @@ block or one note per button press.
 
 ## 5. Show and Hide blocks
 
-The *Show* and *Hide* blocks, found on the *Extras* palette, are
+The *Show* and *Hide* blocks (found on the *Extras* palette) are
 useful for setting "break points" in your program to debug a specific
 section of code. By putting a *Show* block at the start of a
 problematic section of code and a *Hide* block at the end of the
