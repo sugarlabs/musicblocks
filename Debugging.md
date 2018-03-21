@@ -54,7 +54,7 @@ the *Print* block, except it only prints a message when the program is
 being run in *Playback Slow* mode (See below). Comments are also
 written the Browser Console.
 
-## 3. Status Widget
+## 3. Status widget
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg "given Music block")
 
@@ -111,9 +111,9 @@ gets to the *Show* block. Then the blocks are blocks are displayed and
 run in *Playback Slow* mode. When the *Hide* block is encountered, the
 blocks are hidden and the program resumes running at full speed.
 
-## 6. Browser Console
+## 6. Browser console
 
 As Music Blocks runs, some debugging information is written to the
-Browser Console, such as the notes being played and comments (See the
+browser console, such as the notes being played and comments (See the
 *Comment* block above). The console can be accessed by typing
 `Ctrl-Shift-J` on most web browsers.
