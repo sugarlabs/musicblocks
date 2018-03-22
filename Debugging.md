@@ -37,9 +37,9 @@ mistakes.
 
 ## 1. Clicking on an individual stack of blocks
 
-The *Play* button (in top left corner) will run all of the *Start* blocks simultenously.
-Start blocks are amber colored clamps (They are shown in first row of the picture below).
-But you can also run an individual stack of code by
+The *Play* button (in top left corner) will run all of the *Start*
+blocks simultenously. (Every Music Blocks project has at least one
+*Start* block). But you can also run an individual stack of code by
 clicking on the stack. This lets you test and debug small sections of
 code.
 
@@ -47,14 +47,18 @@ code.
 
 ## 2. Print and Comment blocks
 
-The *Print* block (found on the *Extras* palette, Extras palette can be found on bottom of left sidebar) can be used to print
-a message while running a program. It is useful to determine if a
-section of code is being executed when expected or if a box or
-parameter contains an expected value. Print block result is shown in upper part of the picture shown below.
+The *Print* block (found on the *Extras* palette, Extras palette can
+be found on bottom of left sidebar) can be used to print a message
+while running a program. It is useful to determine if a section of
+code is being executed when expected or if a box or parameter contains
+an expected value. The output of the *Print* block is displayed at the
+top of the browser window, as seen in shown in the picture shown
+below.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example1_debug%20guide.png "Print blocks")
 
-When the printblock is placed at the end total notes time =1/4  +  1/4  +1/2=1
+The *Print* block is used to display the number of whole notes played,
+in this case, `1/4 + 1/4 + 1/2`, which adds up to `1`.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
 
@@ -125,7 +129,8 @@ blocks are hidden and the program resumes running at full speed.
 As Music Blocks runs, some debugging information is written to the
 browser console, such as the notes being played and comments (See the
 *Comment* block above). The console can be accessed by typing
-`Ctrl-Shift-J` on most web browsers. An example image for default sol mi sol is shown below.
+`Ctrl-Shift-J` on most web browsers.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/browserconsole_debug_guide.png "Console blocks")
 
+Shown above is the console output from three notes: `sol mi sol`.
