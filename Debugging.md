@@ -37,7 +37,7 @@ mistakes.
 
 ## 1. Clicking on an individual stack of blocks
 
-The *Play* button will run all of the *Start* blocks simultenously. The play button is in top left corner.
+The *Play* button (in top left corner) will run all of the *Start* blocks simultenously.
 Start blocks are amber colored clamps (They are shown in first row of the picture below).
 But you can also run an individual stack of code by
 clicking on the stack. This lets you test and debug small sections of
