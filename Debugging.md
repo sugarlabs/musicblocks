@@ -37,14 +37,15 @@ mistakes.
 
 ## 1. Clicking on an individual stack of blocks
 
-The *Play* button will run all of the *Start* blocks
-simultenously. But you can also run an individual stack of code by
+The *Play* button will run all of the *Start* blocks simultenously. The play button is in top left corner.
+Start blocks are amber colored clamps (They are shown in first row of the picture below).
+But you can also run an individual stack of code by
 clicking on the stack. This lets you test and debug small sections of
 code.
 
 ## 2. Print and Comment blocks
 
-The *Print* block (found on the *Extras* palette) can be used to print
+The *Print* block (found on the *Extras* palette, Extras palette can be found on bottom of left sidebar) can be used to print
 a message while running a program. It is useful to determine if a
 section of code is being executed when expected or if a box or
 parameter contains an expected value.
@@ -116,4 +117,4 @@ blocks are hidden and the program resumes running at full speed.
 As Music Blocks runs, some debugging information is written to the
 browser console, such as the notes being played and comments (See the
 *Comment* block above). The console can be accessed by typing
-`Ctrl-Shift-J` on most web browsers.
+`Ctrl-Shift-J` on most web browsers. An example image for default sol mi sol is shown below.
