@@ -52,7 +52,7 @@ a message while running a program. It is useful to determine if a
 section of code is being executed when expected or if a box or
 parameter contains an expected value. Print block result is shown in upper part of the picture shown below.
 
-![alt tag](https://github.com/a-ritwik/pictures/blob/master/printblocks.png "Print blocks")
+![alt tag](https://github.com/a-ritwik/pictures/blob/master/printblock.png "Print blocks")
 
 The *Comment* block (also found on the *Extras* palette) is similar to
 the *Print* block, except it only prints a message when the program is
