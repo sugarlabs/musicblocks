@@ -122,3 +122,6 @@ As Music Blocks runs, some debugging information is written to the
 browser console, such as the notes being played and comments (See the
 *Comment* block above). The console can be accessed by typing
 `Ctrl-Shift-J` on most web browsers. An example image for default sol mi sol is shown below.
+
+![alt tag](https://github.com/a-ritwik/pictures/blob/master/browserconsole.png "Console blocks")
+
