@@ -43,17 +43,16 @@ blocks simultenously. (Every Music Blocks project has at least one
 clicking on a stack. This lets you test and debug small sections of
 code, or, as in the example below, you can play a single voice by
 clicking on one of the *Start* blocks or single phase by clicking on
-an *Action* block.
+one of the *Action* blocks.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/startblocks_debug_guide.png "Start blocks")
 
 ## 2. Print and Comment blocks
 
-The *Print* block (found on the *Extras* palette, Extras palette can
-be found on bottom of left sidebar) can be used to print a message
-while running a program. It is useful to determine if a section of
-code is being executed when expected or if a box or parameter contains
-an expected value.
+The *Print* block (found on the *Extras* palette) can be used to print
+a message while running a program. It is useful to determine if a
+section of code is being executed when expected or if a box or
+parameter contains an expected value.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
 
