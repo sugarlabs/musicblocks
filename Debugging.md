@@ -40,8 +40,10 @@ mistakes.
 The *Play* button (in top left corner) will run all of the *Start*
 blocks simultenously. (Every Music Blocks project has at least one
 *Start* block). But you can also run an individual stack of code by
-clicking on the stack. This lets you test and debug small sections of
-code.
+clicking on a stack. This lets you test and debug small sections of
+code, or, as in the example below, you can play a single voice by
+clicking on one of the *Start* blocks or single phase by clicking on
+an *Action* block.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/startblocks_debug_guide.png "Start blocks")
 
@@ -51,8 +53,7 @@ The *Print* block (found on the *Extras* palette, Extras palette can
 be found on bottom of left sidebar) can be used to print a message
 while running a program. It is useful to determine if a section of
 code is being executed when expected or if a box or parameter contains
-an expected value. The output of the *Print* block is displayed at the
-top of the browser window.
+an expected value.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
 
