@@ -37,17 +37,26 @@ mistakes.
 
 ## 1. Clicking on an individual stack of blocks
 
-The *Play* button will run all of the *Start* blocks
-simultenously. But you can also run an individual stack of code by
+The *Play* button (in top left corner) will run all of the *Start* blocks simultenously.
+Start blocks are amber colored clamps (They are shown in first row of the picture below).
+But you can also run an individual stack of code by
 clicking on the stack. This lets you test and debug small sections of
 code.
 
+![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/startblocks_debug_guide.png "Start blocks")
+
 ## 2. Print and Comment blocks
 
-The *Print* block (found on the *Extras* palette) can be used to print
+The *Print* block (found on the *Extras* palette, Extras palette can be found on bottom of left sidebar) can be used to print
 a message while running a program. It is useful to determine if a
 section of code is being executed when expected or if a box or
-parameter contains an expected value.
+parameter contains an expected value. Print block result is shown in upper part of the picture shown below.
+
+![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example1_debug%20guide.png "Print blocks")
+
+When the printblock is placed at the end total notes time =1/4  +  1/4  +1/2=1
+
+![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
 
 The *Comment* block (also found on the *Extras* palette) is similar to
 the *Print* block, except it only prints a message when the program is
@@ -116,4 +125,7 @@ blocks are hidden and the program resumes running at full speed.
 As Music Blocks runs, some debugging information is written to the
 browser console, such as the notes being played and comments (See the
 *Comment* block above). The console can be accessed by typing
-`Ctrl-Shift-J` on most web browsers.
+`Ctrl-Shift-J` on most web browsers. An example image for default sol mi sol is shown below.
+
+![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/browserconsole_debug_guide.png "Console blocks")
+
