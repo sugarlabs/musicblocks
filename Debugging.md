@@ -43,7 +43,7 @@ But you can also run an individual stack of code by
 clicking on the stack. This lets you test and debug small sections of
 code.
 
-![alt tag](https://github.com/a-ritwik/pictures/startblocks.png "Start blocks")
+![alt tag](https://github.com/a-ritwik/pictures/blob/master/startblocks.png "Start blocks")
 
 ## 2. Print and Comment blocks
 
