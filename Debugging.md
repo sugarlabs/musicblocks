@@ -52,10 +52,11 @@ a message while running a program. It is useful to determine if a
 section of code is being executed when expected or if a box or
 parameter contains an expected value. Print block result is shown in upper part of the picture shown below.
 
-![alt tag](https://github.com/a-ritwik/musicblocks/blob/master/images/print_example1_a_debug%20guide.png "Print blocks")
+![alt tag](https://github.com/a-ritwik/musicblocks/blob/master/images/print_example1_debug%20guide.png "Print blocks")
 
 When the printblock is placed at the end total notes time =1/4  +  1/4  +1/2=1
-![alt tag](https://github.com/a-ritwik/musicblocks/blob/master/images/print_example2_a_debug%20guide.png "Print blocks")
+
+![alt tag](https://github.com/a-ritwik/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
 
 The *Comment* block (also found on the *Extras* palette) is similar to
 the *Print* block, except it only prints a message when the program is
