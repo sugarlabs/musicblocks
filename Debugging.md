@@ -43,6 +43,8 @@ But you can also run an individual stack of code by
 clicking on the stack. This lets you test and debug small sections of
 code.
 
+![alt tag](https://github.com/a-ritwik/pictures/startblocks.png "Start blocks")
+
 ## 2. Print and Comment blocks
 
 The *Print* block (found on the *Extras* palette, Extras palette can be found on bottom of left sidebar) can be used to print
