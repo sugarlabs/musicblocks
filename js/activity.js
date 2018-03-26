@@ -1025,32 +1025,6 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 .setPaste(paste);
 
-            clearBox = new ClearBox();
-            clearBox
-                .setCanvas(canvas)
-                .setStage(stage)
-                .setRefreshCanvas(refreshCanvas)
-                .setClear(sendAllToTrash);
-
-            saveBox = new SaveBox();
-            saveBox
-                .setCanvas(canvas)
-                .setStage(stage)
-                .setRefreshCanvas(refreshCanvas)
-                .setSaveTB(doSaveTB)
-                .setSaveSVG(doSaveSVG)
-                .setSavePNG(doSavePNG)
-                .setSaveWAV(doSaveWAV)
-                .setSavePlanet(doUploadToPlanet)
-                .setSaveBlockArtwork(doSaveBlockArtwork);
-
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                saveBox.setSaveAbc(doSaveAbc);
-                saveBox.setSaveLilypond(doSaveLilypond);
-            } else {
-                saveBox.setSaveFB(doShareOnFacebook);
-            }
-
             languageBox = new LanguageBox();
             languageBox
                 .setCanvas(canvas)
