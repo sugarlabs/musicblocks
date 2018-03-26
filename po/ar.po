@@ -174,7 +174,7 @@ msgstr ""
 #: js/blocks.js:2856
 #: js/blocks.js:3381
 #: js/blocks.js:4185
-#.TRANS: a stack of blocks to run (an action to take)
+#. TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "الإجراء"
 
@@ -218,7 +218,7 @@ msgstr ""
 
 #: js/block.js:705
 #: js/basicblocks.js:739
-#.TRANS: timbre is the character or quality of a musical sound
+#. TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
 msgstr ""
 
@@ -228,13 +228,13 @@ msgstr ""
 
 #: js/block.js:711
 #: js/basicblocks.js:758
-#.TRANS: the speed at music is should be played.
+#. TRANS: the speed at music is should be played.
 msgid "tempo"
 msgstr ""
 
 #: js/block.js:714
 #: js/basicblocks.js:1954
-#.TRANS: mode, e.g., Major in C Major
+#. TRANS: mode, e.g., Major in C Major
 msgid "mode"
 msgstr ""
 
@@ -245,9 +245,9 @@ msgstr ""
 #: js/block.js:1611
 #: js/musicutils.js:1424
 #: js/musicutils.js:1805
-#.TRANS: the note names must be separated by single spaces
-#.TRANS: the note names must be separated by single spaces
-#.TRANS: the note names must be separated by single spaces
+#. TRANS: the note names must be separated by single spaces
+#. TRANS: the note names must be separated by single spaces
+#. TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
 msgstr ""
 
@@ -342,7 +342,7 @@ msgid "Worldwide"
 msgstr "في جميع أنحاء العالم"
 
 #: js/activity.js:635
-#.TRANS: hide Polar coordinate overlay grid
+#. TRANS: hide Polar coordinate overlay grid
 msgid "hide grid"
 msgstr ""
 
@@ -351,7 +351,7 @@ msgstr ""
 #: js/activity.js:3479
 #: js/activity.js:3491
 #: js/turtledefs.js:107
-#.TRANS: show Cartesian coordinate overlay grid
+#. TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
 msgstr "الديكارتي"
 
@@ -361,7 +361,7 @@ msgstr "الديكارتي"
 #: js/activity.js:3491
 #: js/turtledefs.js:107
 #: js/turtledefs.js:108
-#.TRANS: show Polar coordinate overlay grid
+#. TRANS: show Polar coordinate overlay grid
 msgid "Polar"
 msgstr "قطبي"
 
@@ -391,32 +391,32 @@ msgid "untitled"
 msgstr ""
 
 #: js/activity.js:2512
-#.TRANS: File name prompt for save as Lilypond
+#. TRANS: File name prompt for save as Lilypond
 msgid "File name"
 msgstr ""
 
 #: js/activity.js:2514
-#.TRANS: Project title prompt for save as Lilypond
+#. TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
 msgstr ""
 
 #: js/activity.js:2516
-#.TRANS: Project title prompt for save as Lilypond
+#. TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
 msgstr ""
 
 #: js/activity.js:2518
-#.TRANS: MIDI prompt for save as Lilypond
+#. TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
 msgstr ""
 
 #: js/activity.js:2520
-#.TRANS: Guitar prompt for save as Lilypond
+#. TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
 msgstr ""
 
 #: js/activity.js:2522
-#.TRANS: Lilypond is a scripting language for generating sheet music
+#. TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
 msgstr ""
 
@@ -445,7 +445,7 @@ msgstr ""
 #: js/basicblocks.js:3790
 #: js/basicblocks.js:3811
 #: js/basicblocks.js:3821
-#.TRANS: default project author when saving as Lilypond
+#. TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
 msgstr ""
 
@@ -589,8 +589,8 @@ msgstr ""
 #: js/basicblocks.js:724
 #: js/rhythmruler.js:946
 #: js/rhythmruler.js:997
-#.TRANS: an arrangement of notes based on duration
-#.TRANS: an arrangement of notes based on duration
+#. TRANS: an arrangement of notes based on duration
+#. TRANS: an arrangement of notes based on duration
 msgid "rhythm"
 msgstr ""
 
@@ -599,7 +599,7 @@ msgstr ""
 #: js/basicblocks.js:477
 #: js/basicblocks.js:485
 #: js/basicblocks.js:3579
-#.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
+#. TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
 msgstr ""
 
@@ -666,7 +666,7 @@ msgstr ""
 #: js/musicutils.js:162
 #: js/musicutils.js:283
 #: js/musicutils.js:380
-#.TRANS: major scales in music
+#. TRANS: major scales in music
 msgid "major"
 msgstr ""
 
@@ -820,7 +820,7 @@ msgid "You are adding multiple envelope blocks."
 msgstr ""
 
 #: js/logo.js:3510
-#.TRANS: rolloff is the steepness of a change in frequency.
+#. TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
 msgstr ""
 
@@ -835,7 +835,7 @@ msgstr ""
 #: js/macros.js:109
 #: js/musicutils.js:137
 #: js/musicutils.js:376
-#.TRANS: invert based on even or odd number or musical scale
+#. TRANS: invert based on even or odd number or musical scale
 msgid "even"
 msgstr ""
 
@@ -874,7 +874,7 @@ msgid "polyphonic rhythm"
 msgstr ""
 
 #: js/logo.js:4566
-#.TRANS: Note value is the note duration.
+#. TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
 msgstr ""
 
@@ -896,23 +896,23 @@ msgstr ""
 
 #: js/logo.js:4931
 #: js/logo.js:4999
-#.TRANS: Depth is the intesity of the tremolo effect.
-#.TRANS: Depth is the intesity of the chorus effect.
+#. TRANS: Depth is the intesity of the tremolo effect.
+#. TRANS: Depth is the intesity of the chorus effect.
 msgid "Depth is out of range."
 msgstr ""
 
 #: js/logo.js:5035
-#.TRANS: partials components in a harmonic series
+#. TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
 msgstr ""
 
 #: js/logo.js:5085
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
 msgstr ""
 
 #: js/logo.js:5095
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partials block."
 msgstr ""
 
@@ -921,7 +921,7 @@ msgstr ""
 #: js/macros.js:173
 #: js/pitchtimematrix.js:1719
 #: js/musicutils.js:134
-#.TRANS: sharp is a half-step up in pitch
+#. TRANS: sharp is a half-step up in pitch
 msgid "sharp"
 msgstr ""
 
@@ -930,7 +930,7 @@ msgstr ""
 #: js/macros.js:97
 #: js/pitchtimematrix.js:1732
 #: js/musicutils.js:134
-#.TRANS: flat is a half-step down in pitch
+#. TRANS: flat is a half-step down in pitch
 msgid "flat"
 msgstr ""
 
@@ -953,8 +953,8 @@ msgstr ""
 #: js/macros.js:218
 #: js/synthutils.js:34
 #: js/musicutils.js:378
-#.TRANS: the default case used in a switch statement in programming
-#.TRANS: polytone synthesizer
+#. TRANS: the default case used in a switch statement in programming
+#. TRANS: polytone synthesizer
 msgid "default"
 msgstr ""
 
@@ -967,7 +967,7 @@ msgid "Playback is ready."
 msgstr ""
 
 #: js/logo.js:6883
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
 msgstr ""
 
@@ -987,7 +987,7 @@ msgstr ""
 #: js/basicblocks.js:3008
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
-#.TRANS: empty the heap
+#. TRANS: empty the heap
 msgid "empty heap"
 msgstr "قم بتفريغ الكومة"
 
@@ -1002,7 +1002,7 @@ msgstr ""
 #: js/basicblocks.js:3465
 #: js/status.js:211
 #: plugins/rodi.rtp:196
-#.TRANS: a musical note consisting of pitch and duration
+#. TRANS: a musical note consisting of pitch and duration
 msgid "note"
 msgstr "ملاحظة"
 
@@ -1041,7 +1041,7 @@ msgstr "تأكيد"
 #: js/blocks.js:2592
 #: js/blocks.js:2613
 #: js/blocks.js:4205
-#.TRANS: a container into which to put something
+#. TRANS: a container into which to put something
 msgid "box"
 msgstr "صندوق المتغير"
 
@@ -1065,7 +1065,7 @@ msgstr ""
 
 #: js/palette.js:744
 #: js/basicblocks.js:408
-#.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
+#. TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental"
 msgstr ""
 
@@ -1078,7 +1078,7 @@ msgstr ""
 #: js/palette.js:1589
 #: js/basicblocks.js:2766
 #: js/blocks.js:2733
-#.TRANS: put something into a container for later reference
+#. TRANS: put something into a container for later reference
 msgid "store in"
 msgstr "خزن القيمة في الصندوق"
 
@@ -1102,20 +1102,20 @@ msgstr ""
 #: js/basicblocks.js:2299
 #: plugins/rodi.rtp:71
 #: plugins/rodi.rtp:391
-#.TRANS: move backward (in the opposite direction of the current heading)
+#. TRANS: move backward (in the opposite direction of the current heading)
 msgid "back"
 msgstr "رجوع"
 
 #: js/palette.js:896
 #: js/palette.js:897
-#.TRANS: popout: to detach as a separate window
+#. TRANS: popout: to detach as a separate window
 msgid "hide"
 msgstr "إخفاء"
 
 #: js/palette.js:899
 #: js/palette.js:900
 #: js/basicblocks.js:3214
-#.TRANS: a media object
+#. TRANS: a media object
 msgid "show"
 msgstr "نص"
 
@@ -1132,7 +1132,7 @@ msgstr "الصندوق المنبثق"
 #: js/lilypond.js:522
 #: js/lilypond.js:601
 #: js/lilypond.js:639
-#.TRANS: start block with an embedded set drum block
+#. TRANS: start block with an embedded set drum block
 msgid "start drum"
 msgstr ""
 
@@ -1142,7 +1142,7 @@ msgstr ""
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:1218
-#.TRANS: musical meter (time signature)
+#. TRANS: musical meter (time signature)
 msgid "meter"
 msgstr ""
 
@@ -1180,8 +1180,8 @@ msgstr "إضافات"
 #: js/basicblocks.js:388
 #: js/basicblocks.js:1883
 #: js/musicutils.js:140
-#.TRANS: unison means the note is the same as the current note
-#.TRANS: unison means the note is the same as the current note
+#. TRANS: unison means the note is the same as the current note
+#. TRANS: unison means the note is the same as the current note
 msgid "unison"
 msgstr ""
 
@@ -1222,7 +1222,7 @@ msgstr ""
 #: js/musicutils.js:160
 #: js/musicutils.js:164
 #: js/musicutils.js:278
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "diminished"
 msgstr ""
 
@@ -1252,7 +1252,7 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:275
-#.TRANS: twelve semi-tone scale for music
+#. TRANS: twelve semi-tone scale for music
 msgid "chromatic"
 msgstr ""
 
@@ -1268,85 +1268,85 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:281
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "octatonic"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:285
-#.TRANS: harmonic major scale in music
+#. TRANS: harmonic major scale in music
 msgid "harmonic-major"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:287
-#.TRANS: natural minor scales in music
+#. TRANS: natural minor scales in music
 msgid "natural-minor"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:289
-#.TRANS: harmonic minor scale in music
+#. TRANS: harmonic minor scale in music
 msgid "harmonic-minor"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:291
-#.TRANS: melodic minor scale in music
+#. TRANS: melodic minor scale in music
 msgid "melodic-minor"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:293
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "ionian"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:295
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "dorian"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:297
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "phrygian"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:299
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "lydian"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:301
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "mixolydian"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:303
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "aeolian"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:305
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "locrian"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:307
-#.TRANS: minor jazz scale for music
+#. TRANS: minor jazz scale for music
 msgid "jazz-minor"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:309
-#.TRANS: bebop scale for music
+#. TRANS: bebop scale for music
 msgid "bebop"
 msgstr ""
 
@@ -1362,7 +1362,7 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:313
-#.TRANS: musical scale for music by Verdi
+#. TRANS: musical scale for music by Verdi
 msgid "enigmatic"
 msgstr ""
 
@@ -1373,7 +1373,7 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:316
-#.TRANS: Ethiopic scale for music
+#. TRANS: Ethiopic scale for music
 msgid "geez"
 msgstr ""
 
@@ -1389,7 +1389,7 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:320
-#.TRANS: minor Romanian scale for music
+#. TRANS: minor Romanian scale for music
 msgid "romanian-minor"
 msgstr ""
 
@@ -1400,19 +1400,19 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:323
-#.TRANS: musical scale for Mid-Eastern music
+#. TRANS: musical scale for Mid-Eastern music
 msgid "maqam"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:325
-#.TRANS: minor blues scale for music
+#. TRANS: minor blues scale for music
 msgid "minor-blues"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:327
-#.TRANS: major blues scale for music
+#. TRANS: major blues scale for music
 msgid "major-blues"
 msgstr ""
 
@@ -1423,7 +1423,7 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:330
-#.TRANS: pentatonic scale in music
+#. TRANS: pentatonic scale in music
 msgid "minor-pentatonic"
 msgstr ""
 
@@ -1439,7 +1439,7 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:334
-#.TRANS: Japanese pentatonic scale for music
+#. TRANS: Japanese pentatonic scale for music
 msgid "hirajoshi"
 msgstr ""
 
@@ -1452,13 +1452,13 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:336
-#.TRANS: Japanese pentatonic scale for music
+#. TRANS: Japanese pentatonic scale for music
 msgid "in"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:338
-#.TRANS: Japanese pentatonic scale for music
+#. TRANS: Japanese pentatonic scale for music
 msgid "minyo"
 msgstr ""
 
@@ -1469,7 +1469,7 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:341
-#.TRANS: Italian mathematician
+#. TRANS: Italian mathematician
 msgid "fibonacci"
 msgstr ""
 
@@ -1482,8 +1482,8 @@ msgstr ""
 #: js/modewidget.js:844
 #: js/synthutils.js:58
 #: js/musicutils.js:342
-#.TRANS: user-defined
-#.TRANS: customize voice
+#. TRANS: user-defined
+#. TRANS: customize voice
 msgid "custom"
 msgstr ""
 
@@ -1491,50 +1491,50 @@ msgstr ""
 #: js/basicblocks.js:567
 #: js/musicutils.js:348
 #: js/musicutils.js:381
-#.TRANS: highpass filter
-#.TRANS: highpass filter
+#. TRANS: highpass filter
+#. TRANS: highpass filter
 msgid "highpass"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:350
-#.TRANS: lowpass filter
+#. TRANS: lowpass filter
 msgid "lowpass"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:352
-#.TRANS: bandpass filter
+#. TRANS: bandpass filter
 msgid "bandpass"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:354
-#.TRANS: highshelf filter
+#. TRANS: highshelf filter
 msgid "highshelf"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:356
-#.TRANS: lowshelf filter
+#. TRANS: lowshelf filter
 msgid "lowshelf"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:358
-#.TRANS: notch filter
+#. TRANS: notch filter
 msgid "notch"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:360
-#.TRANS: allpass filter
+#. TRANS: allpass filter
 msgid "allpass"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:362
-#.TRANS: peaking filter
+#. TRANS: peaking filter
 msgid "peaking"
 msgstr ""
 
@@ -1544,9 +1544,9 @@ msgstr ""
 #: js/synthutils.js:50
 #: js/musicutils.js:367
 #: js/musicutils.js:382
-#.TRANS: sine wave
-#.TRANS: sine wave
-#.TRANS: sine wave
+#. TRANS: sine wave
+#. TRANS: sine wave
+#. TRANS: sine wave
 msgid "sine"
 msgstr ""
 
@@ -1555,9 +1555,9 @@ msgstr ""
 #: js/basicblocks.js:77
 #: js/synthutils.js:52
 #: js/musicutils.js:369
-#.TRANS: square wave
-#.TRANS: square wave
-#.TRANS: square wave
+#. TRANS: square wave
+#. TRANS: square wave
+#. TRANS: square wave
 msgid "square"
 msgstr ""
 
@@ -1567,10 +1567,10 @@ msgstr ""
 #: js/basicblocks.js:507
 #: js/synthutils.js:56
 #: js/musicutils.js:371
-#.TRANS: triangle wave
-#.TRANS: triangle wave
-#.TRANS: triangle wave
-#.TRANS: triangle wave
+#. TRANS: triangle wave
+#. TRANS: triangle wave
+#. TRANS: triangle wave
+#. TRANS: triangle wave
 msgid "triangle"
 msgstr ""
 
@@ -1579,9 +1579,9 @@ msgstr ""
 #: js/basicblocks.js:113
 #: js/synthutils.js:54
 #: js/musicutils.js:373
-#.TRANS: sawtooth wave
-#.TRANS: sawtooth wave
-#.TRANS: sawtooth wave
+#. TRANS: sawtooth wave
+#. TRANS: sawtooth wave
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -1589,55 +1589,55 @@ msgstr ""
 #: js/basicblocks.js:1419
 #: js/macros.js:170
 #: js/synthutils.js:16
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "violin"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:18
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "cello"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:20
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "bass"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:22
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "guitar"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:24
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "flute"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:26
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "clarinet"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:28
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "saxophone"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:30
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "tuba"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:32
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "trumpet"
 msgstr ""
 
@@ -1659,37 +1659,37 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:44
-#.TRANS: white noise synthesizer
+#. TRANS: white noise synthesizer
 msgid "white-noise"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:46
-#.TRANS: brown noise synthesizer
+#. TRANS: brown noise synthesizer
 msgid "brown-noise"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:48
-#.TRANS: pink noise synthesizer
+#. TRANS: pink noise synthesizer
 msgid "pink-noise"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:66
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "snare-drum"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:68
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "kick-drum"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:70
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "tom-tom"
 msgstr ""
 
@@ -1699,43 +1699,43 @@ msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:74
-#.TRANS: a drum made from an inverted cup
+#. TRANS: a drum made from an inverted cup
 msgid "cup-drum"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:76
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "darbuka-drum"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:78
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "hi-hat"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:80
-#.TRANS: a small metal bell
+#. TRANS: a small metal bell
 msgid "ride-bell"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:82
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "cow-bell"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:84
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "triangle-bell"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:86
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "finger-cymbals"
 msgstr ""
 
@@ -1743,7 +1743,7 @@ msgstr ""
 #: js/basicblocks.js:2020
 #: js/macros.js:60
 #: js/synthutils.js:88
-#.TRANS: a musically tuned set of bells
+#. TRANS: a musically tuned set of bells
 msgid "chime"
 msgstr ""
 
@@ -1751,7 +1751,7 @@ msgstr ""
 #: js/basicblocks.js:2028
 #: js/macros.js:61
 #: js/synthutils.js:90
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "clang"
 msgstr ""
 
@@ -1759,7 +1759,7 @@ msgstr ""
 #: js/basicblocks.js:2052
 #: js/macros.js:64
 #: js/synthutils.js:92
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "crash"
 msgstr ""
 
@@ -1767,7 +1767,7 @@ msgstr ""
 #: js/basicblocks.js:2004
 #: js/macros.js:55
 #: js/synthutils.js:94
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "bottle"
 msgstr ""
 
@@ -1775,7 +1775,7 @@ msgstr ""
 #: js/basicblocks.js:2036
 #: js/macros.js:62
 #: js/synthutils.js:96
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "clap"
 msgstr ""
 
@@ -1783,7 +1783,7 @@ msgstr ""
 #: js/basicblocks.js:2044
 #: js/macros.js:180
 #: js/synthutils.js:98
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "slap"
 msgstr ""
 
@@ -1791,7 +1791,7 @@ msgstr ""
 #: js/basicblocks.js:2060
 #: js/macros.js:183
 #: js/synthutils.js:100
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "splash"
 msgstr ""
 
@@ -1799,7 +1799,7 @@ msgstr ""
 #: js/basicblocks.js:2012
 #: js/macros.js:58
 #: js/synthutils.js:102
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "bubbles"
 msgstr ""
 
@@ -1807,7 +1807,7 @@ msgstr ""
 #: js/basicblocks.js:1980
 #: js/macros.js:59
 #: js/synthutils.js:104
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "cat"
 msgstr ""
 
@@ -1815,7 +1815,7 @@ msgstr ""
 #: js/basicblocks.js:1988
 #: js/macros.js:66
 #: js/synthutils.js:106
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "cricket"
 msgstr ""
 
@@ -1823,7 +1823,7 @@ msgstr ""
 #: js/basicblocks.js:1996
 #: js/macros.js:77
 #: js/synthutils.js:108
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "dog"
 msgstr ""
 
@@ -1831,7 +1831,7 @@ msgstr ""
 #: js/basicblocks.js:1972
 #: js/macros.js:89
 #: js/synthutils.js:110
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "duck"
 msgstr ""
 
@@ -1860,12 +1860,12 @@ msgid "Let us start our tour!"
 msgstr ""
 
 #: js/turtledefs.js:85
-#.TRANS: the buttons used to open various palettes of blocks
+#. TRANS: the buttons used to open various palettes of blocks
 msgid "Palette buttons"
 msgstr "ازرار اللوحة"
 
 #: js/turtledefs.js:87
-#.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
+#. TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
 msgstr ""
 
@@ -2112,35 +2112,35 @@ msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr ""
 
 #: js/basicblocks.js:130
-#.TRANS: musical transposition (adjustment of pitch up or down)
+#. TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
 msgstr ""
 
 #: js/basicblocks.js:138
-#.TRANS: step down one note in current musical scale
+#. TRANS: step down one note in current musical scale
 msgid "scalar step down"
 msgstr ""
 
 #: js/basicblocks.js:146
-#.TRANS: step up one note in current musical scale
+#. TRANS: step up one note in current musical scale
 msgid "scalar step up"
 msgstr ""
 
 #: js/basicblocks.js:154
-#.TRANS: the change meaused in half-steps between the current pitch and the previous pitch
+#. TRANS: the change meaused in half-steps between the current pitch and the previous pitch
 msgid "change in pitch"
 msgstr ""
 
 #: js/basicblocks.js:162
 #: js/basicblocks.js:444
-#.TRANS: convert current note to piano key (1-88)
-#.TRANS: a mapping of pitch to the 88 piano keys
+#. TRANS: convert current note to piano key (1-88)
+#. TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
 msgstr ""
 
 #: js/basicblocks.js:178
-#.TRANS: MIDI is a technical standard for electronic music
-#.TRANS: set an offset associated with the numeric piano keyboard mapping
+#. TRANS: MIDI is a technical standard for electronic music
+#. TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
 msgstr ""
 
@@ -2162,126 +2162,126 @@ msgstr "الاسم"
 #: js/basicblocks.js:455
 #: js/basicblocks.js:486
 #: js/basicblocks.js:3190
-#.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
+#. TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
 msgstr "اوكتاف"
 
 #: js/basicblocks.js:191
-#.TRANS: convert piano key number (1-88) to pitch
+#. TRANS: convert piano key number (1-88) to pitch
 msgid "number to pitch"
 msgstr ""
 
 #: js/basicblocks.js:200
-#.TRANS: convert piano key number (1-88) to octave
+#. TRANS: convert piano key number (1-88) to octave
 msgid "number to octave"
 msgstr ""
 
 #: js/basicblocks.js:237
 #: js/modewidget.js:89
-#.TRANS: pitch inversion rotates a pitch around another pitch
+#. TRANS: pitch inversion rotates a pitch around another pitch
 msgid "invert"
 msgstr ""
 
 #: js/basicblocks.js:257
-#.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
+#. TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
 msgstr ""
 
 #: js/basicblocks.js:274
-#.TRANS: pitch inversion rotates a pitch around another pitch (even number)
+#. TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
 msgstr ""
 
 #: js/basicblocks.js:289
-#.TRANS: register is the octave of the current pitch
+#. TRANS: register is the octave of the current pitch
 msgid "register"
 msgstr ""
 
 #: js/basicblocks.js:298
-#.TRANS: adjust the amount of shift (up or down) of a pitch
+#. TRANS: adjust the amount of shift (up or down) of a pitch
 msgid "semi-tone transpose"
 msgstr ""
 
 #: js/basicblocks.js:316
 #: js/basicblocks.js:1811
-#.TRANS: down sixth means the note is five scale degrees below current note
-#.TRANS: down sixth means the note is five scale degrees below current note
+#. TRANS: down sixth means the note is five scale degrees below current note
+#. TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
 msgstr ""
 
 #: js/basicblocks.js:325
 #: js/basicblocks.js:1820
-#.TRANS: down third means the note is two scale degrees below current note
-#.TRANS: down third means the note is two scale degrees below current note
+#. TRANS: down third means the note is two scale degrees below current note
+#. TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
 msgstr ""
 
 #: js/basicblocks.js:334
 #: js/basicblocks.js:1829
-#.TRANS: seventh means the note is the six scale degrees above current note
-#.TRANS: seventh means the note is the six scale degrees above current note
+#. TRANS: seventh means the note is the six scale degrees above current note
+#. TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
 msgstr ""
 
 #: js/basicblocks.js:343
 #: js/basicblocks.js:1838
-#.TRANS: sixth means the note is the five scale degrees above current note
-#.TRANS: sixth means the note is the five scale degrees above current note
+#. TRANS: sixth means the note is the five scale degrees above current note
+#. TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
 msgstr ""
 
 #: js/basicblocks.js:352
 #: js/basicblocks.js:1847
-#.TRANS: fifth means the note is the four scale degrees above current note
-#.TRANS: fifth means the note is the four scale degrees above current note
+#. TRANS: fifth means the note is the four scale degrees above current note
+#. TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
 msgstr ""
 
 #: js/basicblocks.js:361
 #: js/basicblocks.js:1856
-#.TRANS: fourth means the note is three scale degrees above current note
-#.TRANS: fourth means the note is three scale degrees above current note
+#. TRANS: fourth means the note is three scale degrees above current note
+#. TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
 msgstr ""
 
 #: js/basicblocks.js:370
 #: js/basicblocks.js:1865
-#.TRANS: third means the note is two scale degrees above current note
-#.TRANS: third means the note is two scale degrees above current note
+#. TRANS: third means the note is two scale degrees above current note
+#. TRANS: third means the note is two scale degrees above current note
 msgid "third"
 msgstr ""
 
 #: js/basicblocks.js:379
 #: js/basicblocks.js:1874
-#.TRANS: second means the note is one scale degree above current note
-#.TRANS: second means the note is one scale degree above current note
+#. TRANS: second means the note is one scale degree above current note
+#. TRANS: second means the note is one scale degree above current note
 msgid "second"
 msgstr ""
 
 #: js/basicblocks.js:397
-#.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
+#. TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
 msgstr ""
 
 #: js/basicblocks.js:435
 #: js/basicblocks.js:3179
-#.TRANS: a measure of frequency: one cycle per second
+#. TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
 msgstr ""
 
 #: js/basicblocks.js:454
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+#. TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
 msgstr ""
 
 #: js/basicblocks.js:467
-#.TRANS: step some number of notes in current musical scale
+#. TRANS: step some number of notes in current musical scale
 msgid "scalar step"
 msgstr ""
 
 #: js/basicblocks.js:500
 #: js/timbre.js:586
-#.TRANS: there are different types (sine, triangle, square...) of oscillators.
+#. TRANS: there are different types (sine, triangle, square...) of oscillators.
 msgid "oscillator"
 msgstr ""
 
@@ -2289,51 +2289,51 @@ msgstr ""
 #: js/basicblocks.js:560
 #: js/timbre.js:1218
 #: js/timbre.js:1391
-#.TRANS: type of filter, e.g., lowpass, highpass, etc.
+#. TRANS: type of filter, e.g., lowpass, highpass, etc.
 msgid "type"
 msgstr ""
 
 #: js/basicblocks.js:503
 #: js/timbre.js:1219
-#.TRANS: Partials refers to the number of sine waves combined into the sound.
+#. TRANS: Partials refers to the number of sine waves combined into the sound.
 msgid "partials"
 msgstr ""
 
 #: js/basicblocks.js:532
 #: js/timbre.js:622
-#.TRANS: sound envelope (ADSR)
+#. TRANS: sound envelope (ADSR)
 msgid "envelope"
 msgstr ""
 
 #: js/basicblocks.js:534
-#.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
+#. TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
 msgid "attack"
 msgstr ""
 
 #: js/basicblocks.js:536
-#.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
+#. TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
 msgid "decay"
 msgstr ""
 
 #: js/basicblocks.js:538
-#.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
+#. TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 msgid "sustain"
 msgstr ""
 
 #: js/basicblocks.js:540
-#.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
+#. TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 msgid "release"
 msgstr ""
 
 #: js/basicblocks.js:558
 #: js/timbre.js:671
-#.TRANS: a filter removes some unwanted components from a signal
+#. TRANS: a filter removes some unwanted components from a signal
 msgid "filter"
 msgstr ""
 
 #: js/basicblocks.js:562
 #: js/timbre.js:1392
-#.TRANS: rolloff is the steepness of a change in frequency.
+#. TRANS: rolloff is the steepness of a change in frequency.
 msgid "rolloff"
 msgstr ""
 
@@ -2374,7 +2374,7 @@ msgstr ""
 #: js/basicblocks.js:636
 #: js/basicblocks.js:650
 #: js/basicblocks.js:663
-#.TRANS: A tuplet is a note value divided into irregular time values.
+#. TRANS: A tuplet is a note value divided into irregular time values.
 msgid "tuplet"
 msgstr ""
 
@@ -2409,22 +2409,22 @@ msgstr ""
 #: js/pitchtimematrix.js:681
 #: js/pitchtimematrix.js:724
 #: js/pitchtimematrix.js:822
-#.TRANS: the value (e.g., 1/4 note) of the note being played.
+#. TRANS: the value (e.g., 1/4 note) of the note being played.
 msgid "note value"
 msgstr ""
 
 #: js/basicblocks.js:674
-#.TRANS: A tuplet divided into 7 time values.
+#. TRANS: A tuplet divided into 7 time values.
 msgid "septuplet"
 msgstr ""
 
 #: js/basicblocks.js:682
-#.TRANS: A tuplet divided into 5 time values.
+#. TRANS: A tuplet divided into 5 time values.
 msgid "quintuplet"
 msgstr ""
 
 #: js/basicblocks.js:690
-#.TRANS: A tuplet divided into 3 time values.
+#. TRANS: A tuplet divided into 3 time values.
 msgid "triplet"
 msgstr ""
 
@@ -2433,28 +2433,28 @@ msgid "simple tuplet"
 msgstr ""
 
 #: js/basicblocks.js:749
-#.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
+#. TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
 msgstr ""
 
 #: js/basicblocks.js:768
-#.TRANS: makes a mapping between pitches and drum sounds
+#. TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
 msgstr ""
 
 #: js/basicblocks.js:777
-#.TRANS: widget to generate pitches using a slider
+#. TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
 msgstr ""
 
 #: js/basicblocks.js:786
-#.TRANS: generate a progressive sequence of pitches
+#. TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
 msgstr ""
 
 #: js/basicblocks.js:795
 #: js/basicblocks.js:805
-#.TRANS: widget for subdividing a measure into distinct rhythmic elements
+#. TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm ruler"
 msgstr ""
 
@@ -2467,62 +2467,62 @@ msgid "C major scale"
 msgstr ""
 
 #: js/basicblocks.js:830
-#.TRANS: assigns pitch to a sequence of beats to generate a melody
+#. TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "pitch-time matrix"
 msgstr ""
 
 #: js/basicblocks.js:857
-#.TRANS: factor used in determining how many duplications to make
+#. TRANS: factor used in determining how many duplications to make
 msgid "duplicate factor"
 msgstr ""
 
 #: js/basicblocks.js:875
-#.TRANS: oscillator time (in micro seconds)
+#. TRANS: oscillator time (in micro seconds)
 msgid "osctime"
 msgstr ""
 
 #: js/basicblocks.js:885
 #: js/basicblocks.js:896
 #: js/basicblocks.js:906
-#.TRANS: swing is a rhythmic variation that emphasises the offbeat
-#.TRANS: swing is a rhythmic variation that emphasises the offbeat
+#. TRANS: swing is a rhythmic variation that emphasises the offbeat
+#. TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
 msgstr ""
 
 #: js/basicblocks.js:908
-#.TRANS: the amount to shift to the offbeat note
+#. TRANS: the amount to shift to the offbeat note
 msgid "swing value"
 msgstr ""
 
 #: js/basicblocks.js:921
-#.TRANS: play music backward
+#. TRANS: play music backward
 msgid "backward"
 msgstr ""
 
 #: js/basicblocks.js:930
-#.TRANS: substitute rests on notes being skipped
+#. TRANS: substitute rests on notes being skipped
 msgid "skip notes"
 msgstr ""
 
 #: js/basicblocks.js:940
-#.TRANS: play each note more than once
+#. TRANS: play each note more than once
 msgid "duplicate"
 msgstr ""
 
 #: js/basicblocks.js:949
-#.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
+#. TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 msgid "multiply note value"
 msgstr ""
 
 #: js/basicblocks.js:959
-#.TRANS: tie notes together into one longer note
+#. TRANS: tie notes together into one longer note
 msgid "tie"
 msgstr ""
 
 #: js/basicblocks.js:969
 #: js/basicblocks.js:979
-#.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
-#.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
+#. TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
+#. TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 msgid "dot"
 msgstr ""
 
@@ -2537,44 +2537,44 @@ msgid "392 hertz"
 msgstr ""
 
 #: js/basicblocks.js:1074
-#.TRANS: number of beats per minute
+#. TRANS: number of beats per minute
 msgid "beat factor"
 msgstr ""
 
 #: js/basicblocks.js:1082
 #: js/basicblocks.js:1186
 #: js/basicblocks.js:1198
-#.TRANS: number of beats played per minute
+#. TRANS: number of beats played per minute
 msgid "beats per minute"
 msgstr ""
 
 #: js/basicblocks.js:1090
-#.TRANS: count of current measure in meter
+#. TRANS: count of current measure in meter
 msgid "measure count"
 msgstr ""
 
 #: js/basicblocks.js:1098
-#.TRANS: count of current beat in meter
+#. TRANS: count of current beat in meter
 msgid "beat count"
 msgstr ""
 
 #: js/basicblocks.js:1106
-#.TRANS: count the number of notes
+#. TRANS: count the number of notes
 msgid "note counter"
 msgstr ""
 
 #: js/basicblocks.js:1115
-#.TRANS: number of whole notes that have been played
+#. TRANS: number of whole notes that have been played
 msgid "whole notes played"
 msgstr ""
 
 #: js/basicblocks.js:1123
-#.TRANS: number of notes that have been played
+#. TRANS: number of notes that have been played
 msgid "notes played"
 msgstr ""
 
 #: js/basicblocks.js:1131
-#.TRANS: don't lock notes to master clock
+#. TRANS: don't lock notes to master clock
 msgid "no clock"
 msgstr ""
 
@@ -2597,14 +2597,14 @@ msgstr ""
 #: js/basicblocks.js:2888
 #: js/basicblocks.js:3299
 #: js/basicblocks.js:3306
-#.TRANS: take (do) some action
+#. TRANS: take (do) some action
 msgid "do"
 msgstr "أجرِ"
 
 #: js/basicblocks.js:1162
 #: js/basicblocks.js:1175
-#.TRANS: sets tempo by defniing a beat and beats per minute
-#.TRANS: old block to set master tempo which doesn't set value of beat
+#. TRANS: sets tempo by defniing a beat and beats per minute
+#. TRANS: old block to set master tempo which doesn't set value of beat
 msgid "master beats per minute"
 msgstr ""
 
@@ -2619,7 +2619,7 @@ msgid "beat value"
 msgstr ""
 
 #: js/basicblocks.js:1209
-#.TRANS: anacrusis
+#. TRANS: anacrusis
 msgid "pickup"
 msgstr ""
 
@@ -2628,30 +2628,30 @@ msgid "number of beats"
 msgstr ""
 
 #: js/basicblocks.js:1232
-#.TRANS: the duration of a note played as staccato
+#. TRANS: the duration of a note played as staccato
 msgid "staccato factor"
 msgstr ""
 
 #: js/basicblocks.js:1240
-#.TRANS: the degree of overlap of notes played as legato
+#. TRANS: the degree of overlap of notes played as legato
 msgid "slur factor"
 msgstr ""
 
 #: js/basicblocks.js:1248
 #: js/timbre.js:942
-#.TRANS: AM (amplitude modulation) synthesizer
+#. TRANS: AM (amplitude modulation) synthesizer
 msgid "AM synth"
 msgstr ""
 
 #: js/basicblocks.js:1259
 #: js/timbre.js:942
-#.TRANS: FM (frequency modulation) synthesizer
+#. TRANS: FM (frequency modulation) synthesizer
 msgid "FM synth"
 msgstr ""
 
 #: js/basicblocks.js:1271
 #: js/timbre.js:942
-#.TRANS: a duo synthesizer combines a synth with a sequencer
+#. TRANS: a duo synthesizer combines a synth with a sequencer
 msgid "duo synth"
 msgstr ""
 
@@ -2665,48 +2665,48 @@ msgid "vibrato intensity"
 msgstr ""
 
 #: js/basicblocks.js:1285
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "partial"
 msgstr ""
 
 #: js/basicblocks.js:1295
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "weighed partials"
 msgstr ""
 
 #: js/basicblocks.js:1304
-#.TRANS: A harmonic is a overtone.
+#. TRANS: A harmonic is a overtone.
 msgid "harmonic"
 msgstr ""
 
 #: js/basicblocks.js:1315
 #: js/basicblocks.js:1330
-#.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
-#.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
+#. TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
+#. TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
 msgid "neighbor"
 msgstr ""
 
 #: js/basicblocks.js:1316
 #: js/basicblocks.js:1800
-#.TRANS: calculate a relative step between notes based on semi-tones
+#. TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
 msgstr ""
 
 #: js/basicblocks.js:1331
 #: js/basicblocks.js:1892
-#.TRANS: calculate a relative step between notes based on the current musical scale
+#. TRANS: calculate a relative step between notes based on the current musical scale
 msgid "scalar interval"
 msgstr ""
 
 #: js/basicblocks.js:1344
 #: js/timbre.js:1557
-#.TRANS: distortion is an alteration in the sound
+#. TRANS: distortion is an alteration in the sound
 msgid "distortion"
 msgstr ""
 
 #: js/basicblocks.js:1354
 #: js/timbre.js:1557
-#.TRANS: a wavering effect in a musical tone
+#. TRANS: a wavering effect in a musical tone
 msgid "tremolo"
 msgstr ""
 
@@ -2718,7 +2718,7 @@ msgstr ""
 #: js/timbre.js:1647
 #: js/timbre.js:1720
 #: js/timbre.js:1794
-#.TRANS: rate at which tremolo wavers
+#. TRANS: rate at which tremolo wavers
 msgid "rate"
 msgstr ""
 
@@ -2726,13 +2726,13 @@ msgstr ""
 #: js/basicblocks.js:1387
 #: js/timbre.js:1584
 #: js/timbre.js:1726
-#.TRANS: amplitude of tremolo waver
+#. TRANS: amplitude of tremolo waver
 msgid "depth"
 msgstr ""
 
 #: js/basicblocks.js:1370
 #: js/timbre.js:1557
-#.TRANS: alter the phase of the sound
+#. TRANS: alter the phase of the sound
 msgid "phaser"
 msgstr ""
 
@@ -2748,7 +2748,7 @@ msgstr ""
 
 #: js/basicblocks.js:1386
 #: js/timbre.js:1557
-#.TRANS: musical effect to simulate a choral sound
+#. TRANS: musical effect to simulate a choral sound
 msgid "chorus"
 msgstr ""
 
@@ -2758,7 +2758,7 @@ msgstr ""
 
 #: js/basicblocks.js:1402
 #: js/timbre.js:1557
-#.TRANS: a rapid, slight variation in pitch
+#. TRANS: a rapid, slight variation in pitch
 msgid "vibrato"
 msgstr ""
 
@@ -2768,26 +2768,26 @@ msgid "intensity"
 msgstr ""
 
 #: js/basicblocks.js:1415
-#.TRANS: select synthesizer
+#. TRANS: select synthesizer
 msgid "set synth"
 msgstr ""
 
 #: js/basicblocks.js:1427
-#.TRANS: glide (glissando) is a blended overlap successive notes
+#. TRANS: glide (glissando) is a blended overlap successive notes
 msgid "glide"
 msgstr ""
 
 #: js/basicblocks.js:1438
 #: js/basicblocks.js:1460
-#.TRANS: slur or legato is an overlap successive notes
-#.TRANS: legato: overlap successive notes
+#. TRANS: slur or legato is an overlap successive notes
+#. TRANS: legato: overlap successive notes
 msgid "slur"
 msgstr ""
 
 #: js/basicblocks.js:1449
 #: js/basicblocks.js:1470
-#.TRANS: play each note sharply detached from the others
-#.TRANS: play each note sharply detached from the others
+#. TRANS: play each note sharply detached from the others
+#. TRANS: play each note sharply detached from the others
 msgid "staccato"
 msgstr ""
 
@@ -2796,7 +2796,7 @@ msgid "synth name"
 msgstr ""
 
 #: js/basicblocks.js:1497
-#.TRANS: set the characteristics of a custom instrument
+#. TRANS: set the characteristics of a custom instrument
 msgid "set timbre"
 msgstr ""
 
@@ -2805,12 +2805,12 @@ msgid "doubly"
 msgstr ""
 
 #: js/basicblocks.js:1534
-#.TRANS: measure the distance between two pitches in semi-tones
+#. TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
 msgstr ""
 
 #: js/basicblocks.js:1542
-#.TRANS: measure the distance between two pitches in steps of musical scale
+#. TRANS: measure the distance between two pitches in steps of musical scale
 msgid "scalar interval measure"
 msgstr ""
 
@@ -2825,7 +2825,7 @@ msgid "down major"
 msgstr ""
 
 #: js/basicblocks.js:1903
-#.TRANS: define a custom mode
+#. TRANS: define a custom mode
 msgid "define mode"
 msgstr ""
 
@@ -2834,21 +2834,21 @@ msgid "moveable"
 msgstr ""
 
 #: js/basicblocks.js:1921
-#.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
+#. TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
 msgstr ""
 
 #: js/basicblocks.js:1929
 #: js/basicblocks.js:1952
-#.TRANS: the key is a group of pitches with which a music composition is created
-#.TRANS: key, e.g., C in C Major
+#. TRANS: the key is a group of pitches with which a music composition is created
+#. TRANS: key, e.g., C in C Major
 msgid "key"
 msgstr ""
 
 #: js/basicblocks.js:1939
 #: js/basicblocks.js:1950
-#.TRANS: set the key and mode, e.g. C Major
-#.TRANS: set the key and mode, e.g. C Major
+#. TRANS: set the key and mode, e.g. C Major
+#. TRANS: set the key and mode, e.g. C Major
 msgid "set key"
 msgstr ""
 
@@ -2914,12 +2914,12 @@ msgid "snare drum"
 msgstr ""
 
 #: js/basicblocks.js:2157
-#.TRANS: set the current drum sound for playback
+#. TRANS: set the current drum sound for playback
 msgid "set drum"
 msgstr ""
 
 #: js/basicblocks.js:2177
-#.TRANS: orientation or compass direction
+#. TRANS: orientation or compass direction
 msgid "heading"
 msgstr "الترويسة"
 
@@ -2930,7 +2930,7 @@ msgstr "الترويسة"
 #: js/basicblocks.js:2270
 #: js/basicblocks.js:3431
 #: js/basicblocks.js:3716
-#.TRANS: y coordinate
+#. TRANS: y coordinate
 msgid "y"
 msgstr "ص"
 
@@ -2941,7 +2941,7 @@ msgstr "ص"
 #: js/basicblocks.js:2270
 #: js/basicblocks.js:3431
 #: js/basicblocks.js:3716
-#.TRANS: x coordinate
+#. TRANS: x coordinate
 msgid "x"
 msgstr "س"
 
@@ -2950,28 +2950,28 @@ msgstr "س"
 #: js/pitchtimematrix.js:190
 #: js/rhythmruler.js:1247
 #: js/modewidget.js:71
-#.TRANS: erase the screen and return the mice to the center position
-#.TRANS: clear all subdivisions from the ruler.
+#. TRANS: erase the screen and return the mice to the center position
+#. TRANS: clear all subdivisions from the ruler.
 msgid "clear"
 msgstr "نظف الشاشة"
 
 #: js/basicblocks.js:2209
-#.TRANS: control point in a bezier curve
+#. TRANS: control point in a bezier curve
 msgid "control point 2"
 msgstr ""
 
 #: js/basicblocks.js:2222
-#.TRANS: control point in a Bezier curve
+#. TRANS: control point in a Bezier curve
 msgid "control point 1"
 msgstr ""
 
 #: js/basicblocks.js:2235
-#.TRANS: Bézier curves employ at least three points to define a curve
+#. TRANS: Bézier curves employ at least three points to define a curve
 msgid "bezier"
 msgstr ""
 
 #: js/basicblocks.js:2248
-#.TRANS: draws a part of the circumference of a circle
+#. TRANS: draws a part of the circumference of a circle
 msgid "arc"
 msgstr "قوس"
 
@@ -2984,12 +2984,12 @@ msgid "radius"
 msgstr "نصف القطر"
 
 #: js/basicblocks.js:2260
-#.TRANS: set compass heading
+#. TRANS: set compass heading
 msgid "set heading"
 msgstr "حدد الترويسة"
 
 #: js/basicblocks.js:2269
-#.TRANS: set xy position
+#. TRANS: set xy position
 msgid "set xy"
 msgstr "حدد س ص"
 
@@ -2998,7 +2998,7 @@ msgstr "حدد س ص"
 #: plugins/rodi.rtp:79
 #: plugins/rodi.rtp:344
 #: plugins/rodi.rtp:379
-#.TRANS: turn right (clockwise)
+#. TRANS: turn right (clockwise)
 msgid "right"
 msgstr "يمين"
 
@@ -3007,14 +3007,14 @@ msgstr "يمين"
 #: plugins/rodi.rtp:81
 #: plugins/rodi.rtp:343
 #: plugins/rodi.rtp:366
-#.TRANS: turn left (counter-clockwise)
+#. TRANS: turn left (counter-clockwise)
 msgid "left"
 msgstr "يسار"
 
 #: js/basicblocks.js:2308
 #: plugins/rodi.rtp:73
 #: plugins/rodi.rtp:404
-#.TRANS: move forward (in the same direction of the current heading)
+#. TRANS: move forward (in the same direction of the current heading)
 msgid "forward"
 msgstr "إلى الأمام"
 
@@ -3067,7 +3067,7 @@ msgstr "أنه تعبئة اللون"
 
 #: js/basicblocks.js:2392
 #: js/basicblocks.js:2436
-#.TRANS: set the background color
+#. TRANS: set the background color
 msgid "background"
 msgstr "الخلفية"
 
@@ -3092,32 +3092,32 @@ msgid "set font"
 msgstr ""
 
 #: js/basicblocks.js:2445
-#.TRANS: draw a line that has a hollow space down its center
+#. TRANS: draw a line that has a hollow space down its center
 msgid "hollow line"
 msgstr ""
 
 #: js/basicblocks.js:2454
-#.TRANS: fill in as a solid color
+#. TRANS: fill in as a solid color
 msgid "fill"
 msgstr ""
 
 #: js/basicblocks.js:2462
-#.TRANS: riase up the pen so that it does not draw when it is moved
+#. TRANS: riase up the pen so that it does not draw when it is moved
 msgid "pen up"
 msgstr "احتجز"
 
 #: js/basicblocks.js:2470
-#.TRANS: put down the pen so that it draws when it is moved
+#. TRANS: put down the pen so that it draws when it is moved
 msgid "pen down"
 msgstr "احتجز"
 
 #: js/basicblocks.js:2478
-#.TRANS: set the width of the line drawn by the pen
+#. TRANS: set the width of the line drawn by the pen
 msgid "set pen size"
 msgstr "اضبط حجم القلم"
 
 #: js/basicblocks.js:2487
-#.TRANS: set degree of translucence of the pen color
+#. TRANS: set degree of translucence of the pen color
 msgid "set translucency"
 msgstr ""
 
@@ -3130,7 +3130,7 @@ msgid "set shade"
 msgstr "حدد درجة اللون"
 
 #: js/basicblocks.js:2512
-#.TRANS: set the level of vividness of the pen color
+#. TRANS: set the level of vividness of the pen color
 msgid "set grey"
 msgstr "اختر الرمادي"
 
@@ -3139,7 +3139,7 @@ msgid "set color"
 msgstr "حدد اللون"
 
 #: js/basicblocks.js:2531
-#.TRANS: convert a real number to an integer
+#. TRANS: convert a real number to an integer
 msgid "int"
 msgstr ""
 
@@ -3156,7 +3156,7 @@ msgid "or"
 msgstr "أو"
 
 #: js/basicblocks.js:2595
-#.TRANS: evaluate some math functions, e.g., absolute value, sine, exponential, etc.
+#. TRANS: evaluate some math functions, e.g., absolute value, sine, exponential, etc.
 msgid "eval"
 msgstr "قيّم"
 
@@ -3218,12 +3218,12 @@ msgid "value"
 msgstr "قيمة المتغير"
 
 #: js/basicblocks.js:2791
-#.TRANS: return value from a function
+#. TRANS: return value from a function
 msgid "return"
 msgstr ""
 
 #: js/basicblocks.js:2802
-#.TRANS: return value from a function to a URL
+#. TRANS: return value from a function to a URL
 msgid "return to URL"
 msgstr ""
 
@@ -3238,73 +3238,73 @@ msgid "calculate"
 msgstr ""
 
 #: js/basicblocks.js:2887
-#.TRANS: an event, such as user actions (mouse clicks, key presses)
+#. TRANS: an event, such as user actions (mouse clicks, key presses)
 msgid "on"
 msgstr "في"
 
 #: js/basicblocks.js:2888
 #: js/basicblocks.js:2892
 #: js/basicblocks.js:2904
-#.TRANS: a condition that is broadcast in order to trigger a listener to take an action
+#. TRANS: a condition that is broadcast in order to trigger a listener to take an action
 msgid "event"
 msgstr "في حالة"
 
 #: js/basicblocks.js:2901
-#.TRANS: dispatch an event to trigger a listener
+#. TRANS: dispatch an event to trigger a listener
 msgid "broadcast"
 msgstr "بث"
 
 #: js/basicblocks.js:2959
-#.TRANS: load the heap contents from a URL
+#. TRANS: load the heap contents from a URL
 msgid "load heap from App"
 msgstr ""
 
 #: js/basicblocks.js:2971
-#.TRANS: save the heap contents to a URL
+#. TRANS: save the heap contents to a URL
 msgid "save heap to App"
 msgstr ""
 
 #: js/basicblocks.js:2983
 #: plugins/heap.rtp:126
-#.TRANS: Display the heap contents
+#. TRANS: Display the heap contents
 msgid "show heap"
 msgstr "أظهر مكونات الكومة"
 
 #: js/basicblocks.js:2991
-#.TRANS: How many entries are in the heap?
+#. TRANS: How many entries are in the heap?
 msgid "heap length"
 msgstr "عدد المدخلات التي تكون في الكومة"
 
 #: js/basicblocks.js:3000
 #: plugins/heap.rtp:134
-#.TRANS: Is the heap empty?
+#. TRANS: Is the heap empty?
 msgid "heap empty?"
 msgstr "هل الكومة فارغة؟"
 
 #: js/basicblocks.js:3016
 #: plugins/heap.rtp:150
-#.TRANS: save the heap to a file
+#. TRANS: save the heap to a file
 msgid "save heap"
 msgstr "قم بتخزين الكومة"
 
 #: js/basicblocks.js:3026
 #: plugins/heap.rtp:160
-#.TRANS: load the heap from a file
+#. TRANS: load the heap from a file
 msgid "load heap"
 msgstr "حمّل الكومة"
 
 #: js/basicblocks.js:3036
-#.TRANS: reverse the order of the heap
+#. TRANS: reverse the order of the heap
 msgid "reverse heap"
 msgstr ""
 
 #: js/basicblocks.js:3044
-#.TRANS: retrieve a value from the heap at index position in the heap
+#. TRANS: retrieve a value from the heap at index position in the heap
 msgid "index heap"
 msgstr "قيمة (مؤشر) الكومة"
 
 #: js/basicblocks.js:3054
-#.TRANS: set a value in the heap
+#. TRANS: set a value in the heap
 msgid "set heap"
 msgstr "حدد القيمة المدخلة إلى الكومة"
 
@@ -3314,13 +3314,13 @@ msgstr "مؤشر"
 
 #: js/basicblocks.js:3066
 #: plugins/heap.rtp:118
-#.TRANS: pop a value off the top of the heap
+#. TRANS: pop a value off the top of the heap
 msgid "pop"
 msgstr "أظهر"
 
 #: js/basicblocks.js:3074
 #: plugins/heap.rtp:109
-#.TRANS: push a value onto the top of the heap
+#. TRANS: push a value onto the top of the heap
 msgid "push"
 msgstr "ادفع قيمة إلى أعلى الكومة"
 
@@ -3341,12 +3341,12 @@ msgid "height"
 msgstr ""
 
 #: js/basicblocks.js:3127
-#.TRANS: stops playback of an audio recording
+#. TRANS: stops playback of an audio recording
 msgid "stop play"
 msgstr "أوقف العرض"
 
 #: js/basicblocks.js:3136
-#.TRANS: play an audio recording
+#. TRANS: play an audio recording
 msgid "play back"
 msgstr "شغل"
 
@@ -3363,12 +3363,12 @@ msgid "duration (ms)"
 msgstr "المدة الزمنية (بالميكرو ثانية)"
 
 #: js/basicblocks.js:3190
-#.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
+#. TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 msgid "note to frequency"
 msgstr "النغمة إلى التردد"
 
 #: js/basicblocks.js:3202
-#.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
+#. TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
 msgid "shell"
 msgstr "صدفة السلحفاة"
 
@@ -3386,12 +3386,12 @@ msgid "obj"
 msgstr "كينونة"
 
 #: js/basicblocks.js:3262
-#.TRANS: the case statement used in a switch statement in programming
+#. TRANS: the case statement used in a switch statement in programming
 msgid "case"
 msgstr ""
 
 #: js/basicblocks.js:3271
-#.TRANS: the switch statement used in programming
+#. TRANS: the switch statement used in programming
 msgid "switch"
 msgstr ""
 
@@ -3451,7 +3451,7 @@ msgid "unknown"
 msgstr "المجهول"
 
 #: js/basicblocks.js:3412
-#.TRANS: Open a palette of blocks.
+#. TRANS: Open a palette of blocks.
 msgid "open palette"
 msgstr ""
 
@@ -3460,12 +3460,12 @@ msgid "Rhythm"
 msgstr ""
 
 #: js/basicblocks.js:3422
-#.TRANS: Move this block to the trash.
+#. TRANS: Move this block to the trash.
 msgid "delete block"
 msgstr ""
 
 #: js/basicblocks.js:3431
-#.TRANS: Move the position of a block on the screen.
+#. TRANS: Move the position of a block on the screen.
 msgid "move block"
 msgstr ""
 
@@ -3475,12 +3475,12 @@ msgid "block number"
 msgstr ""
 
 #: js/basicblocks.js:3442
-#.TRANS: Run program beginning at this block.
+#. TRANS: Run program beginning at this block.
 msgid "run block"
 msgstr ""
 
 #: js/basicblocks.js:3451
-#.TRANS: We can connect a block to another block.
+#. TRANS: We can connect a block to another block.
 msgid "connect blocks"
 msgstr ""
 
@@ -3493,7 +3493,7 @@ msgid "connection number"
 msgstr ""
 
 #: js/basicblocks.js:3462
-#.TRANS: Create a new block programmatically.
+#. TRANS: Create a new block programmatically.
 msgid "make block"
 msgstr ""
 
@@ -3595,37 +3595,37 @@ msgid "start mouse"
 msgstr ""
 
 #: js/basicblocks.js:3696
-#.TRANS: pen color for this mouse
+#. TRANS: pen color for this mouse
 msgid "mouse color"
 msgstr ""
 
 #: js/basicblocks.js:3706
-#.TRANS: heading (compass direction) for this mouse
+#. TRANS: heading (compass direction) for this mouse
 msgid "mouse heading"
 msgstr ""
 
 #: js/basicblocks.js:3716
-#.TRANS: set xy position for this mouse
+#. TRANS: set xy position for this mouse
 msgid "set mouse"
 msgstr ""
 
 #: js/basicblocks.js:3728
-#.TRANS: y position for this mouse
+#. TRANS: y position for this mouse
 msgid "mouse y"
 msgstr "الفأرة ص"
 
 #: js/basicblocks.js:3738
-#.TRANS: x position for this mouse
+#. TRANS: x position for this mouse
 msgid "mouse x"
 msgstr "الفأرة س"
 
 #: js/basicblocks.js:3748
-#.TRANS: notes played by this mouse
+#. TRANS: notes played by this mouse
 msgid "mouse notes played"
 msgstr ""
 
 #: js/basicblocks.js:3758
-#.TRANS: convert current note for this turtle to piano key (1-88)
+#. TRANS: convert current note for this turtle to piano key (1-88)
 msgid "mouse pitch number"
 msgstr ""
 
@@ -3657,14 +3657,14 @@ msgid "target"
 msgstr "اللغة الهدف"
 
 #: js/basicblocks.js:3828
-#.TRANS: the volume at which notes are played
+#. TRANS: the volume at which notes are played
 msgid "master volume"
 msgstr ""
 
 #: js/basicblocks.js:3900
 #: js/basicblocks.js:3912
-#.TRANS: a rapid, slight variation in pitch
-#.TRANS: set the loudness level
+#. TRANS: a rapid, slight variation in pitch
+#. TRANS: set the loudness level
 msgid "set synth volume"
 msgstr ""
 
@@ -3675,18 +3675,18 @@ msgstr ""
 
 #: js/basicblocks.js:3923
 #: js/basicblocks.js:3932
-#.TRANS: set the loudness level
-#.TRANS: set the loudness level
+#. TRANS: set the loudness level
+#. TRANS: set the loudness level
 msgid "set master volume"
 msgstr ""
 
 #: js/basicblocks.js:3943
-#.TRANS: set an articulation (change in volume)
+#. TRANS: set an articulation (change in volume)
 msgid "set relative volume"
 msgstr ""
 
 #: js/basicblocks.js:3953
-#.TRANS: a gradual increase in loudness
+#. TRANS: a gradual increase in loudness
 msgid "crescendo"
 msgstr ""
 
@@ -3923,24 +3923,24 @@ msgstr ""
 
 #: js/playbackbox.js:83
 #: js/playbackbox.js:91
-#.TRANS: playback in the case refers to playing back music that has been preprocessed.
+#. TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "playback music"
 msgstr ""
 
 #: js/playbackbox.js:96
-#.TRANS: playback in the case refers to playing back music that has been preprocessed.
+#. TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "pause playback"
 msgstr ""
 
 #: js/playbackbox.js:107
 #: js/playbackbox.js:116
-#.TRANS: playback in the case refers to playing back music that has been preprocessed.
-#.TRANS: playback in the case refers to playing back music that has been preprocessed.
+#. TRANS: playback in the case refers to playing back music that has been preprocessed.
+#. TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "restart playback"
 msgstr ""
 
 #: js/playbackbox.js:123
-#.TRANS: playback in the case refers to playing back music that has been preprocessed.
+#. TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "prepare music for playback"
 msgstr ""
 
@@ -4037,7 +4037,7 @@ msgstr ""
 #: js/rhythmruler.js:782
 #: js/rhythmruler.js:782
 #: js/rhythmruler.js:1241
-#.TRANS: user can tap out a rhythm by clicking on a ruler.
+#. TRANS: user can tap out a rhythm by clicking on a ruler.
 msgid "tap a rhythm"
 msgstr ""
 
@@ -4066,32 +4066,32 @@ msgid "play scale"
 msgstr ""
 
 #: js/synthutils.js:36
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple-1"
 msgstr ""
 
 #: js/synthutils.js:38
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple-2"
 msgstr ""
 
 #: js/synthutils.js:40
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple-3"
 msgstr ""
 
 #: js/synthutils.js:42
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple-4"
 msgstr ""
 
 #: js/synthutils.js:72
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "floor-tom-tom"
 msgstr ""
 
 #: js/musicutils.js:134
-#.TRANS: sharp, flat, and natural are music terms related to pitch
+#. TRANS: sharp, flat, and natural are music terms related to pitch
 msgid "double sharp"
 msgstr ""
 
