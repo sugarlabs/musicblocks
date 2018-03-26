@@ -109,6 +109,7 @@ var MYDEFINES = [
     'utils/musicutils',
     'utils/synthutils',
     'activity/playbackbox',
+    'activity/pastebox',
     'prefixfree.min'
 ];
 
