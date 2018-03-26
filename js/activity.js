@@ -105,6 +105,7 @@ var MYDEFINES = [
     'activity/blockfactory',
     'activity/analytics',
     'activity/macros',
+    'activity/SaveInterface',
     'utils/musicutils',
     'utils/synthutils',
     'activity/playbackbox',
@@ -861,10 +862,7 @@ define(MYDEFINES, function (compatibility) {
             }, 500);
         };
 
-        function doCompile(recording) {
-            if (recording === undefined) {
-                recording = false;
-            }
+        function doCompile() {
             logo.restartPlayback = true;
             document.body.style.cursor = 'wait';
             console.log('Compiling music for playback');
@@ -1020,7 +1018,6 @@ define(MYDEFINES, function (compatibility) {
             // Set the default background color...
             logo.setBackgroundColor(-1);
 
-<<<<<<< HEAD
             pasteBox = new PasteBox();
             pasteBox
                 .setCanvas(canvas)
@@ -1035,8 +1032,6 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 .setClear(sendAllToTrash);
 
-=======
->>>>>>> Merged https://github.com/walterbender/musicblocks/blame/master/js/clearbox.js - note that the doClear function in planet interface takes no arguments
             saveBox = new SaveBox();
             saveBox
                 .setCanvas(canvas)
@@ -1056,6 +1051,8 @@ define(MYDEFINES, function (compatibility) {
                 saveBox.setSaveFB(doShareOnFacebook);
             }
 
+=======
+>>>>>>> Merged https://github.com/walterbender/musicblocks/commit/c8efd5d8b33f273ce3cbf173664046c96f1371fb and https://github.com/walterbender/musicblocks/commit/493ec0cbed20617b24c0ecfc02fca621ce42d880
             languageBox = new LanguageBox();
             languageBox
                 .setCanvas(canvas)
@@ -1328,6 +1325,10 @@ define(MYDEFINES, function (compatibility) {
                     window.Converter = this.planet.Converter;
                 }
 
+                this.getCurrentProjectName = function(){
+                    return this.planet.ProjectStorage.getCurrentProjectName();
+                }
+
                 this.init = function(){
                     this.iframe = document.getElementById("planet-iframe");
                     this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_,storage);
@@ -1345,10 +1346,43 @@ define(MYDEFINES, function (compatibility) {
             planet = new PlanetInterface(storage);
             planet.init();
 
+            save = new SaveInterface(planet);
+            save.setVariables([
+                ["logo",logo],
+                ["turtles",turtles],
+                ["storage",storage],
+                ["printBlockSVG",_printBlockSVG]
+            ]);
+            save.init();
+
             saveLocally = planet.saveLocally.bind(planet);
 
             window.saveLocally = saveLocally;
             logo.setSaveLocally(saveLocally);
+
+            saveBox = new SaveBox();
+            saveBox.setVariables([
+                ['_canvas',canvas],
+                ['_stage',stage],
+                ['_refreshCanvas',refreshCanvas],
+                ['_doSaveTB',save.saveTB.bind(save)],
+                ['_doSaveSVG',save.saveSVG.bind(save)],
+                ['_doSavePNG',save.savePNG.bind(save)],
+                ['_doSavePlanet',doUploadToPlanet],
+                ['_doSaveBlockArtwork',save.saveBlockArtwork.bind(save)]
+            ]);
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveBox.setVariables([
+                    ['_doSaveWAV',save.saveWAV.bind(save)],
+                    ['_doSaveAbc',save.saveAbc.bind(save)],
+                    ['_doSaveLilypond',save.saveLilypond.bind(save)]
+                ]);
+            } else {
+                saveBox.setVariables([
+                    ['_doShareOnFacebook',doShareOnFacebook]
+                ]);
+            }
 
             clearBox = new ClearBox();
             clearBox
@@ -2119,7 +2153,7 @@ define(MYDEFINES, function (compatibility) {
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
                 case 66: // 'B'
-                    _printBlockSVG();
+                    save.saveBlockArtwork();
                     break;
                 case 67: // 'C'
                     blocks.prepareStackForCopy();
@@ -2680,54 +2714,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSave() {
-            // if (_THIS_IS_MUSIC_BLOCKS_) {
-            //     console.log('Saving .tb file');
-            //     var name = 'My Project';
-            //     download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
-            // } else {
             _hideBoxes();
             saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
-            // }
-        };
-
-        function doSaveTB() {
-            var filename = prompt('Filename:', _('untitled') + '.tb');
-            if (filename != null) {
-                if (fileExt(filename) !== 'tb') {
-                    filename += '.tb';
-                }
-
-                download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
-            }
-        };
-
-        function doSaveSVG() {
-            var filename = prompt('Filename:', _('untitled') + '.svg');
-            if (filename != null) {
-                if (fileExt(filename) !== 'svg') {
-                    filename += '.svg';
-                }
-                var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
-                download(filename, 'data:image/svg+xml;utf8,' + svg, filename, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-            }
-        };
-
-        function doSaveBlockArtwork() {
-            _printBlockSVG();
-        };
-
-        function doSavePNG() {
-            var filename = prompt('Filename:', _('untitled') + '.png');
-            if (fileExt(filename) !== 'png') {
-                filename += '.png';
-            }
-            var data = docById('overlayCanvas').toDataURL('image/png');
-            download(filename, data);
-        };
-
-        function doSaveWAV() {
-            console.log('Recording');
-            doCompile(true);
         };
 
         function doUploadToPlanet() {
@@ -2757,143 +2745,6 @@ define(MYDEFINES, function (compatibility) {
             window.scroll(0, 0);
             doStopButton();
             _allClear();
-        };
-
-        function doSaveLilypond() {
-            _doLilypond();
-        };
-
-        function _doLilypond() {
-            console.log('Saving .ly file');
-            docById('lilypondModal').style.display = 'block';
-            var projectTitle, projectAuthor, MIDICheck, guitarCheck;
-
-            //.TRANS: File name prompt for save as Lilypond
-            docById('fileNameText').textContent = _('File name');
-            //.TRANS: Project title prompt for save as Lilypond
-            docById('titleText').textContent = _('Project title');
-            //.TRANS: Project title prompt for save as Lilypond
-            docById('authorText').textContent = _('Project author');
-            //.TRANS: MIDI prompt for save as Lilypond
-            docById('MIDIText').textContent = _('Include MIDI output?');
-            //.TRANS: Guitar prompt for save as Lilypond
-            docById('guitarText').textContent = _('Include guitar tablature output?');
-            //.TRANS: Lilypond is a scripting language for generating sheet music
-            docById('submitLilypond').textContent = _('Save as Lilypond');
-            //.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
-            docById('submitPDF').textContent = _('Save as PDF');
-
-            //TRANS: default file name when saving as Lilypond
-            docById('fileName').value = _('My Project') + '.ly';
-            //TRANS: default project title when saving as Lilypond
-            docById('title').value = _('My Music Blocks Creation');
-
-            // Load custom author saved in local storage.
-            var customAuthorData = storage.getItem('customAuthor');
-            if (customAuthorData != undefined) {
-                docById('author').value = JSON.parse(customAuthorData);
-            } else {
-                //.TRANS: default project author when saving as Lilypond
-                docById('author').value = _('Mr. Mouse');
-            }
-
-            function saveLYFile(isPDF) {
-                if (isPDF===undefined){
-                    isPDF = false;
-                }
-                var filename = docById('fileName').value;
-                projectTitle = docById('title').value;
-                projectAuthor = docById('author').value;
-
-                // Save the author in local storage.
-                storage.setItem('customAuthor', JSON.stringify(projectAuthor));
-
-                MIDICheck = docById('MIDICheck').checked;
-                guitarCheck = docById('guitarCheck').checked;
-
-                if (filename != null) {
-                    if (fileExt(filename) !== 'ly') {
-                        filename += '.ly';
-                    }
-                }
-
-                var mapLilypondObj = {
-                    'My Music Blocks Creation': projectTitle,
-                    'Mr. Mouse': projectAuthor
-                };
-
-                LILYPONDHEADER = LILYPONDHEADER.replace(/My Music Blocks Creation|Mr. Mouse/gi, function(matched){
-                    return mapLilypondObj[matched];
-                });
-
-                if (MIDICheck) {
-                    MIDIOutput = '% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n';
-                } else {
-                    MIDIOutput = '% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n';
-                }
-
-                if (guitarCheck) {
-                    guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                    guitarOutputEnd = '      >>\n\n';
-                } else {
-                    guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                    guitarOutputEnd = '      >>\n%}\n';
-                }
-
-                // Suppress music and turtle output when generating
-                // Lilypond output.
-                logo.runningLilypond = true;
-                if (isPDF){
-                    logo.notationConvert = "pdf";
-                } else {
-                    logo.notationConvert = "";
-                }
-                logo.notationOutput = LILYPONDHEADER;
-                logo.notationNotes = {};
-                for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                    logo.notationStaging[turtle] = [];
-                    logo.notationDrumStaging[turtle] = [];
-                    turtles.turtleList[turtle].doClear(true, true, true);
-                }
-
-                logo.runLogoCommands();
-
-                // Close the dialog box after hitting button.
-                docById('lilypondModal').style.display = 'none';
-            }
-
-            docById('submitLilypond').onclick = function(){saveLYFile(false)}.bind(this);
-            if (window.Converter.isConnected()){
-                docById('submitPDF').onclick = function(){saveLYFile(true)}.bind(this);
-                docById('submitPDF').disabled = false;
-            } else {
-                docById('submitPDF').disabled = true;
-            }
-
-            docByClass('close')[0].onclick = function () {
-                logo.runningLilypond = false;
-                docById('lilypondModal').style.display = 'none';
-            }
-        };
-
-        function doSaveAbc() {
-            _doAbc();
-        };
-
-        function _doAbc() {
-            document.body.style.cursor = 'wait';
-            console.log('Saving .abc file');
-            //Suppress music and turtle output when generating
-            // Abc output.
-            logo.runningAbc = true;
-            logo.notationOutput = ABCHEADER;
-            logo.notationNotes = {};
-            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                logo.notationStaging[turtle] = [];
-                logo.notationDrumStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true, true);
-            }
-            logo.runLogoCommands();
         };
 
         window.prepareExport = prepareExport;
@@ -3360,14 +3211,6 @@ define(MYDEFINES, function (compatibility) {
             // Click on the plugin open chooser in the DOM (.json).
             pluginChooser.focus();
             pluginChooser.click();
-        };
-
-        function saveToFile() {
-            var filename = prompt('Filename:');
-            if (fileExt(filename) !== 'tb') {
-                filename += '.tb';
-            }
-            download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
         };
 
         function _hideStopButton() {
