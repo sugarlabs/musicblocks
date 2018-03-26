@@ -1051,8 +1051,6 @@ define(MYDEFINES, function (compatibility) {
                 saveBox.setSaveFB(doShareOnFacebook);
             }
 
-=======
->>>>>>> Merged https://github.com/walterbender/musicblocks/commit/c8efd5d8b33f273ce3cbf173664046c96f1371fb and https://github.com/walterbender/musicblocks/commit/493ec0cbed20617b24c0ecfc02fca621ce42d880
             languageBox = new LanguageBox();
             languageBox
                 .setCanvas(canvas)
