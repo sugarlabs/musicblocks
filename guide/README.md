@@ -815,13 +815,11 @@ The matrix in the figure above has three *Pitch* blocks and one
 *Rhythm* block, which is used to create a 3 x 3 grid of pitch and
 time.
 
-Note that the default matrix has five *Pitch* blocks, hence, you will
-see five rows, one for each pitch. (A sixth row at the bottom is used
+Note that the default matrix has five *Pitch* blocks, one *Drum* block, and two *Mouse* (movement) blocks. Hence, you will
+see eight rows, one for each pitch, drum, and mouse (movement). (A ninth row at the bottom is used
 for specifying the rhythms associated with each note.) Also by
-default, there are two *Rhythm* blocks, which specifies six quarter
-notes followed by one half note. Since the *Rhythm* blocks are inside
-of a *Repeat* block, there are fourteen (2 x 7) columns for selecting
-notes.
+default, there are two *Rhythm* blocks, which specifies six quarter `(1/4)`
+notes followed by one half `(1/2)` note. 
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg "matrix")
 
