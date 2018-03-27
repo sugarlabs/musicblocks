@@ -69,10 +69,12 @@ run. Look for `RUN LIVE` links.
 
 Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox, Opera,
-and some versions of Safari. You can run it from [github
-io](http://walterbender.github.io/musicblocks) or by downloading a
-copy of the code and running a local copy directly from the file
-system of your computer.
+and some versions of Safari. You can run it from
+[musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org), from
+[github io](https://walterbender.github.io/musicblocks), or by
+downloading a copy of the code and running a local copy directly from
+the file system of your computer. (Note that when running locally, you
+may have to use a local server to expose all of the features.)
 
 This guide details the music-specific features of Music Blocks.  You
 may also be interested in the [Turtle Blocks
@@ -815,11 +817,12 @@ The matrix in the figure above has three *Pitch* blocks and one
 *Rhythm* block, which is used to create a 3 x 3 grid of pitch and
 time.
 
-Note that the default matrix has five *Pitch* blocks, one *Drum* block, and two *Mouse* (movement) blocks. Hence, you will
-see eight rows, one for each pitch, drum, and mouse (movement). (A ninth row at the bottom is used
-for specifying the rhythms associated with each note.) Also by
-default, there are two *Rhythm* blocks, which specifies six quarter `(1/4)`
-notes followed by one half `(1/2)` note. 
+Note that the default matrix has five *Pitch* blocks, one *Drum*
+block, and two *Mouse* (movement) blocks. Hence, you will see eight
+rows, one for each pitch, drum, and mouse (movement). (A ninth row at
+the bottom is used for specifying the rhythms associated with each
+note.) Also by default, there are two *Rhythm* blocks, which specifies
+six quarter `(1/4)` notes followed by one half `(1/2)` note.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg "matrix")
 
