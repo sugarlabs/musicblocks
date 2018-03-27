@@ -1019,8 +1019,12 @@ function PitchTimeMatrix () {
         this._noteBlocks = false;
         for (var i = 0; i < this._blockMap.length; i++) {
             var blk = this._blockMap[i][1][0];
-            // console.log(blk);
             if (this._logo.blocks.blockList[blk] === null) {
+                continue;
+            }
+
+            if (this._logo.blocks.blockList[blk] === undefined) {
+                console.log('block ' + blk + ' is undefined');
                 continue;
             }
 
