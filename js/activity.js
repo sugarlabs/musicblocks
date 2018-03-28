@@ -1416,6 +1416,7 @@ define(MYDEFINES, function (compatibility) {
                     setTimeout(function () {
                         var rawData = reader.result;
                         if (rawData == null || rawData === '') {
+                            console.log('rawData is ' + rawData);
                             errorMsg(_('Cannot load project from the file. Please check the file type.'));
                         } else {
                             var cleanData = rawData.replace('\n', ' ');
@@ -1444,7 +1445,7 @@ define(MYDEFINES, function (compatibility) {
 
                                     stage.addEventListener('trashsignal', __listener, false);
                                     sendAllToTrash(false, false);
-                                    planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf(".")));
+                                    planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf(".")));
                                 } else {
                                     merging = false;
                                     logo.playbackQueue = {};
@@ -1456,6 +1457,7 @@ define(MYDEFINES, function (compatibility) {
                                 refreshCanvas();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                                console.log(e);
                                 document.body.style.cursor = 'default';
                                 loading = false;
                             }
