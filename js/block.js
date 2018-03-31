@@ -512,7 +512,7 @@ function Block(protoblock, blocks, overrideName) {
             if (['storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, "bold 20pt arial") > 60) {
-                    block_label = block_label.substr(0, 5) + '...';
+                    block_label = block_label.substr(0, 6) + '...';
                 }
             } else {
                 block_label = this.overrideName;
@@ -632,7 +632,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, "bold 20pt arial") > 60 ) {   
-                label = label.substr(0, 5) + '...';
+                label = label.substr(0, 6) + '...';
             }
 
             this.text.text = label;
@@ -999,7 +999,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (that.connections[1] !== null) {
                     var text = that.blocks.blockList[that.connections[1]].value;
                     if (getTextWidth(text, "bold 20pt arial") > 60) {
-                        text = text.substr(0, 5) + '...';
+                        text = text.substr(0, 6) + '...';
                     }
                     that.collapseText.text = text;
                 } else {
@@ -2105,7 +2105,7 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = newValue;
                     var label = this.value.toString();
                     if (getTextWidth(label, "bold 20pt arial") > 60) {  
-                        label = label.substr(0, 5) + '...';
+                        label = label.substr(0, 6) + '...';
                     }
                     this.text.text = label;
                     this.label.value = newValue;
@@ -2153,7 +2153,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, "bold 20pt arial") > 60 ) {   
-            label = label.substr(0, 5) + '...';
+            label = label.substr(0, 6) + '...';
         }
 
         this.text.text = label;
