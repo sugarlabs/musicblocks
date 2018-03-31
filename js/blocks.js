@@ -793,7 +793,7 @@ function Blocks () {
                     that.blockList[blk].value = that.findUniqueActionName(_('action'));
                     var label = that.blockList[blk].value;
                     if (getTextWidth(label, "bold 20pt arial") > 60) {
-                        label = label.substr(0, 5) + '...';
+                        label = label.substr(0, 6) + '...';
                     }
                     that.blockList[blk].text.text = label;
                     that.blockList[blk].container.updateCache();
@@ -843,7 +843,7 @@ function Blocks () {
                     that.blockList[blk].value = _('box');
                     var label = that.blockList[blk].value;
                     if (getTextWidth(label, "bold 20pt arial") > 60) {
-                        label = label.substr(0, 5) + '...';
+                        label = label.substr(0, 6) + '...';
                     }
                     that.blockList[blk].text.text = label;
                     that.blockList[blk].container.updateCache();
@@ -1310,7 +1310,7 @@ function Blocks () {
                                 myBlock.value = name;
                                 var label = name;
                                 if (getTextWidth(label, "bold 20pt arial") > 60) {
-                                    label = label.substr(0, 5) + '...';
+                                    label = label.substr(0, 6) + '...';
                                 }
                                 myBlock.text.text = label;
                                 myBlock.container.updateCache();
@@ -1394,7 +1394,7 @@ function Blocks () {
                                 this.blockList[thisBlock].value = this.findUniqueActionName(this.blockList[thisBlock].value);
                                 var label = this.blockList[thisBlock].value;
                                 if (getTextWidth(label, "bold 20pt arial") > 60) {
-                                    label = label.substr(0, 5) + '...';
+                                    label = label.substr(0, 6) + '...';
                                 }
                                 this.blockList[thisBlock].text.text = label;
                                 this.blockList[thisBlock].container.updateCache();
@@ -2329,7 +2329,7 @@ function Blocks () {
                         that.blockList[thisBlock].value = value;
                         var label = value.toString();
                         if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, "bold 20pt arial") > 60) {
-                            label = label.substr(0, 5) + '...';
+                            label = label.substr(0, 6) + '...';
                         }
                         that.blockList[thisBlock].text.text = label;
                         that.blockList[thisBlock].container.updateCache();
@@ -2353,7 +2353,7 @@ function Blocks () {
                     that.blockList[thisBlock].value = value;
                     var label = value.toString();
                     if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, "bold 20pt arial") > 60) {
-                        label = label.substr(0, 5) + '...';
+                        label = label.substr(0, 6) + '...';
                     }
                     that.blockList[thisBlock].text.text = label;
                 };
@@ -2671,7 +2671,7 @@ function Blocks () {
                 myBlock.value = newName;
                 var label = myBlock.value;
                 if (getTextWidth(label, "bold 20pt arial") > 60) {
-                    label = label.substr(0, 5) + '...';
+                    label = label.substr(0, 6) + '...';
                 }
                 myBlock.text.text = label;
                 myBlock.container.updateCache();
@@ -2691,7 +2691,7 @@ function Blocks () {
                     this.blockList[blk].privateData = newName;
                     var label = newName;
                     if (getTextWidth(label, "bold 20pt arial") > 60) {
-                        label = label.substr(0, 5) + '...';
+                        label = label.substr(0, 6) + '...';
                     }
 
                     this.blockList[blk].overrideName = label;
