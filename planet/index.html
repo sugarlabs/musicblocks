@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--Import Google Icon Font-->
+        <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+        <!--Import materialize.css-->
+        <link type="text/css" rel="stylesheet" href="libs/materialize.min.css" media="screen,projection"/>
+        <!--Import style.css-->
+        <link type="text/css" rel="stylesheet" href="css/style.css"/>
+
+        <!--Let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <!--Import jQuery before materialize.js-->
+        <script type="text/javascript" src="libs/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="libs/materialize.min.js"></script>
+
+        <script type="text/javascript" src="js/helper.js"></script>
+        <script type="text/javascript" src="js/ProjectStorage.js"></script>
+        <script type="text/javascript" src="js/ServerInterface.js"></script>
+        <script type="text/javascript" src="js/Converter.js"></script>
+        <script type="text/javascript" src="js/SaveInterface.js"></script>
+
+        <script type="text/javascript" src="js/LocalCard.js"></script>
+        <script type="text/javascript" src="js/Publisher.js"></script>
+        <script type="text/javascript" src="js/LocalPlanet.js"></script>
+
+        <script type="text/javascript" src="js/GlobalTag.js"></script>
+        <script type="text/javascript" src="js/GlobalCard.js"></script>
+        <script type="text/javascript" src="js/ProjectViewer.js"></script>
+        <script type="text/javascript" src="js/GlobalPlanet.js"></script>
+
+        <script type="text/javascript" src="js/Planet.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+    </head>
+
+    <body>
+        <nav class="nav-extended light-green lighten-1" role="navigation">
+            <div class="nav-wrapper container">
+                <a id="logo-container" href="#" class="brand-logo"><i class="material-icons" id="planeticon">public</i>Planet</a>
+                <ul class="right"><li><a id="close-planet" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Close Planet"><i class="material-icons">close</i></a></li></ul>
+                <ul class="right"><li><a id="planet-open-file" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Open project from file"><i class="material-icons">folder_open</i></a></li></ul>
+                <ul class="right"><li><a id="planet-new-project" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="New project"><i class="material-icons">note_add</i></a></li></ul>
+                <ul class="right tabs tabs-transparent" id="localglobal">
+                    <li class="tab"><a class="active" id="local-tab" href="#local" onclick="toggleSearch(false);">Local</a></li>
+                    <li class="tab"><a id="global-tab" href="#global" onclick="toggleSearch(true);">Global</a></li>
+                </ul>
+            </div>
+            <div class="nav-content" id="searchcontainer" style="display: none;">
+                <div class="container">
+                    <div class="input-field search">
+                        <i class="material-icons prefix" id="searchicon">search</i><input placeholder="Search for a project" id="global-search" type="text"><span><i class="material-icons" id="search-close">clear</i></span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div id="local">
+            <div class="section no-pad-bot">
+                <div class="container">
+                    <h3 class="header center light-green-text" id="localtitle">My Projects</h3>
+                </div>
+            </div>
+            <div class="container">
+                <div class="section">
+                    <div class="row">
+                        <div class="col no-margin-left s12">
+                            <div class="section projectscontainer" id="local-projects">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="publisher" class="modal modal-fixed-footer">
+                <div class="modal-content" id="publisher-content">
+                    <a class="modal-close close-button"><i class="material-icons">close</i></a>
+                    <h4 id="publisher-ptitle">Publish Project</h4>
+                    <div class="progress" id="publisher-progress" style="visibility: hidden;">
+                        <div class="indeterminate"></div>
+                    </div>
+                    <div class="error-message" id="publisher-error" style="display: none;"></div>
+                    <form class="col no-margin-left s12" id="publisher-form">
+                        <input type="hidden" id="publish-id" name="ProjectID">
+                        <div class="row">
+                            <div class="col no-margin-left s6">
+                                <div class="row">
+                                    <div class="input-field">
+                                        <input id="publish-title" type="text" class="validate" data-length="50" required>
+                                        <label for="publish-title" id="publish-title-label">Project title</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field">
+                                        <div class="chips chips-autocomplete" id="tagsadd"></div>
+                                        <label for="publish-tags">Tags (max 5)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col no-margin-left s6">
+                                <img class="col no-margin-left s12 project-image" id="publish-image">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col no-margin-left s12">
+                                <textarea id="publish-description" class="materialize-textarea validate" data-length="1000" required></textarea>
+                                <label for="publish-description" id="publish-description-label">Description</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <a class="modal-action waves-effect waves-green btn-flat" id="publisher-submit">Submit</a>
+                    <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+                </div>
+            </div>
+            <div id="deleter" class="modal">
+                <div class="modal-content">
+                    <a class="modal-close close-button"><i class="material-icons">close</i></a>
+                    <h4>Delete "<span id="deleter-title"></span>"?</h4>
+                    <p>Permanently delete project "<span id="deleter-name"></span>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" id="deleter-button" class="modal-action modal-close waves-effect waves-red btn-flat">Delete</a>
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                </div>
+          </div>
+        </div>
+        <div id="global">
+            <div class="section no-pad-bot">
+                <div class="container">
+                    <h3 class="header center light-green-text" id="globaltitle">Explore Projects</h3>
+                </div>
+            </div>
+            <div id="globalcontents">
+                <div class="section flexcontainer" id="tagscontainer">
+                    <div class="container">
+                        <div class="flexchips", id="primarychips">
+                        </div>
+                        <div class="flexchips", id="morechips">
+                        </div>
+                        <a class="waves-effect btn-flat centre-button" id="view-more-chips" onclick="toggleExpandable('morechips','flexchips');toggleText('view-more-chips','View More','View Less');">View More</a>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="divider"></div>
+                    <div class="section">
+                        <div class="row">
+                            <div class="input-field col s3 offset-s9">
+                                <select id="sort-select">
+                                    <option value="RECENT" selected>Most recent</option>
+                                    <option value="LIKED">Most liked</option>
+                                    <option value="DOWNLOADED">Most downloaded</option>
+                                    <option value="ALPHABETICAL">A-Z</option>
+                                </select>
+                                <label>Sort by</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col no-margin-left s12">
+                                <div class="section projectscontainer" id="global-projects">
+                                </div>
+                                <a class="waves-effect btn-flat centre-button absolute" id="load-more-projects" style="display: none;">Load More Projects</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="preloader-wrapper small active centre-load" id="global-load" style="display: none;">
+                                <div class="spinner-layer spinner-blue">
+                                    <div class="circle-clipper left">
+                                        <div class="circle"></div>
+                                    </div><div class="gap-patch">
+                                        <div class="circle"></div>
+                                    </div><div class="circle-clipper right">
+                                        <div class="circle"></div>
+                                    </div>
+                                </div>
+
+                                <div class="spinner-layer spinner-red">
+                                    <div class="circle-clipper left">
+                                        <div class="circle"></div>
+                                    </div><div class="gap-patch">
+                                        <div class="circle"></div>
+                                    </div><div class="circle-clipper right">
+                                        <div class="circle"></div>
+                                    </div>
+                                </div>
+
+                                <div class="spinner-layer spinner-yellow">
+                                    <div class="circle-clipper left">
+                                        <div class="circle"></div>
+                                    </div><div class="gap-patch">
+                                        <div class="circle"></div>
+                                    </div><div class="circle-clipper right">
+                                        <div class="circle"></div>
+                                    </div>
+                                </div>
+
+                                <div class="spinner-layer spinner-green">
+                                    <div class="circle-clipper left">
+                                        <div class="circle"></div>
+                                    </div><div class="gap-patch">
+                                        <div class="circle"></div>
+                                    </div><div class="circle-clipper right">
+                                        <div class="circle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="projectviewer" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                    <a class="modal-close close-button"><i class="material-icons">close</i></a>
+                    <h4 id="projectviewer-title"></h4>
+                    <div class="col no-margin-left s12">
+                        <div class="row no-margin-bottom">
+                            <div class="col no-margin-left s6">
+                                <div class="row no-margin-bottom">
+                                    <p>
+                                        <div class="subheading">Last Updated</div><div id="projectviewer-last-updated"></div>
+                                    </p>
+                                    <p>
+                                        <div class="subheading">Creation Date</div><div id="projectviewer-date"></div>
+                                    </p>
+                                    <p>
+                                        <div class="subheading">Number of Downloads:</div><div id="projectviewer-downloads"></div>
+                                    </p>
+                                    <p>
+                                        <div class="subheading">Number of Likes:</div><div id="projectviewer-likes"></div>
+                                    </p>
+                                    <p>
+                                        <div class="subheading">Tags:</div><div id="projectviewer-tags"></div>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col no-margin-left s6">
+                                <img class="col no-margin-left s12 project-image no-padding" id="projectviewer-image">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col no-margin-left s12">
+                                <p>
+                                    <div class="subheading">Description</div>
+                                    <div id="projectviewer-description"></div>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="report-project-div">
+                        <a class="btn-flat left modal-action waves-effect waves-red" id="projectviewer-report-project">Report Project</a>
+                        <div class="card report-card" id="projectviewer-report-card" style="display: none;">
+                            <div id="projectviewer-report-content" style="display: none;">
+                                <div class="card-content">
+                                    <div class="reporttitle">Report Project</div>
+                                    <div class="progress" id="projectviewer-report-progress" style="visibility: hidden;">
+                                        <div class="indeterminate"></div>
+                                    </div>
+                                    <p>
+                                        Report projects which violate the <a href="https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md" target="_blank">Sugar Labs Code of Conduct</a>.
+                                    </p>
+                                    <div class="error-message" id="report-error" style="display: none;"></div>
+                                    <div class="input-field">
+                                        <textarea id="reportdescription" class="materialize-textarea" data-length="1000"></textarea>
+                                        <label for="reportdescription">Reason for reporting project</label>
+                                    </div>
+                                </div>
+                                <div class="card-action">
+                                    <a id="projectviewer-report-submit">Submit</a>
+                                </div>
+                            </div>
+                            <div id="projectviewer-reportsubmit-content" style="display: none;">
+                                <div class="card-content">
+                                    <div class="reporttitle">Report Project</div>
+                                    <p id="submittext"></p>
+                                </div>
+                                <div class="card-action">
+                                    <a id="projectviewer-report-close">Close</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="modal-action waves-effect waves-green btn-flat" id="projectviewer-download-file">Download as File</a>
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" id="projectviewer-open-mb">Open in Music Blocks</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

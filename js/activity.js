@@ -72,12 +72,62 @@ try{
     console.log(e);
 }
 
+var MYDEFINES = [
+    'activity/sugarizer-compatibility',
+    'utils/platformstyle',
+    'easeljs.min',
+    'tweenjs.min',
+    'preloadjs.min',
+    'Tone.min',
+    'howler',
+    'p5.min',
+    'p5.sound.min',
+    'p5.dom.min',
+    'mespeak',
+    'Chart',
+    'utils/utils',
+    'activity/artwork',
+    'widgets/status',
+    'utils/munsell',
+    'activity/trash',
+    'activity/boundary',
+    'activity/turtle',
+    'activity/palette',
+    'activity/protoblocks',
+    'activity/blocks',
+    'activity/block',
+    'activity/turtledefs',
+    'activity/logo',
+    'activity/clearbox',
+    'activity/savebox',
+    'activity/utilitybox',
+    'activity/basicblocks',
+    'activity/blockfactory',
+    'activity/analytics',
+    'activity/macros',
+    'activity/SaveInterface',
+    'utils/musicutils',
+    'utils/synthutils',
+    'activity/playbackbox',
+    'activity/pastebox',
+    'prefixfree.min'
+];
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/pastebox', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'widgets/modewidget', 'widgets/pitchtimematrix', 'widgets/pitchdrummatrix', 'widgets/rhythmruler', 'widgets/pitchstaircase', 'widgets/tempo', 'widgets/pitchslider', 'widgets/timbre', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
-    MYDEFINES = MYDEFINES
-} else {
-    var MYDEFINES = ['activity/sugarizer-compatibility', 'utils/platformstyle', 'easeljs.min', 'tweenjs.min', 'preloadjs.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'utils/utils', 'activity/artwork', 'widgets/status', 'utils/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/pastebox', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'utils/musicutils', 'utils/synthutils', 'activity/playbackbox', 'activity/languagebox', 'prefixfree.min'];
+    var MUSICBLOCKS_EXTRAS = [
+        'widgets/modewidget',
+        'widgets/pitchtimematrix',
+        'widgets/pitchdrummatrix',
+        'widgets/rhythmruler',
+        'widgets/pitchstaircase',
+        'widgets/tempo',
+        'widgets/pitchslider',
+        'widgets/timbre',
+        'activity/languagebox',
+        'activity/lilypond',
+        'activity/abc'
+    ];
+    MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
 
 define(MYDEFINES, function (compatibility) {
@@ -87,12 +137,17 @@ define(MYDEFINES, function (compatibility) {
         if (sugarizerCompatibility.isInsideSugarizer()) {
             window.addEventListener('localized', function () {
                 sugarizerCompatibility.loadData(function () {
-                    domReady(doc);
+                    var planet=document.getElementById('planet-iframe');
+                    planet.onload=function(){
+                        console.log("load");
+                        domReady(doc);
+                    };
                 });
             });
 
             document.webL10n.setLanguage(sugarizerCompatibility.getLanguage());
         } else {
+            console.log("loaded");
             domReady(doc);
         }
     });
@@ -144,7 +199,9 @@ define(MYDEFINES, function (compatibility) {
         var utilityBox;
         var languageBox = null;
         var playbackBox = null;
-        var thumbnails;
+        var planet;
+        window.converter;
+        var storage;
         var buttonsVisible = true;
         var headerContainer = null;
         var menuButtonsVisible = true;
@@ -806,10 +863,7 @@ define(MYDEFINES, function (compatibility) {
             }, 500);
         };
 
-        function doCompile(recording) {
-            if (recording === undefined) {
-                recording = false;
-            }
+        function doCompile() {
             logo.restartPlayback = true;
             document.body.style.cursor = 'wait';
             console.log('Compiling music for playback');
@@ -820,9 +874,10 @@ define(MYDEFINES, function (compatibility) {
             logo.playbackQueue = {};
             logo.playbackTime = 0;
             logo.compiling = true;
-            logo.recording = recording;
             logo.runLogoCommands();
         };
+
+        var saveLocally;
 
         // Do we need to update the stage?
         var update = true;
@@ -847,6 +902,13 @@ define(MYDEFINES, function (compatibility) {
         init();
 
         function init() {
+            if (sugarizerCompatibility.isInsideSugarizer()) {
+                //sugarizerCompatibility.data.blocks = prepareExport();
+                storage = sugarizerCompatibility.data;
+            } else {
+                storage = localStorage;
+            }
+
             docById('loader').className = 'loader';
 
             stage = new createjs.Stage(canvas);
@@ -949,8 +1011,7 @@ define(MYDEFINES, function (compatibility) {
                 .setGetCurrentKeyCode(getCurrentKeyCode)
                 .setClearCurrentKeyCode(clearCurrentKeyCode)
                 .setMeSpeak(meSpeak)
-                .setSetPlaybackStatus(setPlaybackStatus)
-                .setSaveLocally(saveLocally);
+                .setSetPlaybackStatus(setPlaybackStatus);
 
             blocks.setLogo(logo);
 
@@ -963,32 +1024,6 @@ define(MYDEFINES, function (compatibility) {
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
                 .setPaste(paste);
-
-            clearBox = new ClearBox();
-            clearBox
-                .setCanvas(canvas)
-                .setStage(stage)
-                .setRefreshCanvas(refreshCanvas)
-                .setClear(sendAllToTrash);
-
-            saveBox = new SaveBox();
-            saveBox
-                .setCanvas(canvas)
-                .setStage(stage)
-                .setRefreshCanvas(refreshCanvas)
-                .setSaveTB(doSaveTB)
-                .setSaveSVG(doSaveSVG)
-                .setSavePNG(doSavePNG)
-                .setSaveWAV(doSaveWAV)
-                .setSavePlanet(doUploadToPlanet)
-                .setSaveBlockArtwork(doSaveBlockArtwork);
-
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                saveBox.setSaveAbc(doSaveAbc);
-                saveBox.setSaveLilypond(doSaveLilypond);
-            } else {
-                saveBox.setSaveFB(doShareOnFacebook);
-            }
 
             languageBox = new LanguageBox();
             languageBox
@@ -1020,14 +1055,325 @@ define(MYDEFINES, function (compatibility) {
                 .setPause(doPausePlayback)
                 .setRewind(doRestartPlayback);
 
-            thumbnails = new SamplesViewer();
-            thumbnails
+            function PlanetInterface(storage) {
+                this.planet = null;
+                this.iframe = null;
+                this.mainCanvas = null;
+
+                this.hideMusicBlocks = function(){
+                    hideSearchWidget();
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
+                        storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
+                        storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
+                        storage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
+                        storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
+                        storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
+                        storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
+                        storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
+
+                        if (docById('ptmDiv').style.visibility !== 'hidden') {
+                            docById('ptmDiv').style.visibility = 'hidden';
+                            docById('ptmTableDiv').style.visibility = 'hidden';
+                            docById('ptmButtonsDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('pdmDiv').style.visibility !== 'hidden') {
+                            docById('pdmDiv').style.visibility = 'hidden';
+                            docById('pdmButtonsDiv').style.visibility = 'hidden';
+                            docById('pdmTableDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('rulerDiv').style.visibility !== 'hidden') {
+                            docById('rulerDiv').style.visibility = 'hidden';
+                            docById('rulerTableDiv').style.visibility = 'hidden';
+                            docById('rulerButtonsDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('pscDiv').style.visibility !== 'hidden') {
+                            docById('pscDiv').style.visibility = 'hidden';
+                            docById('pscTableDiv').style.visibility = 'hidden';
+                            docById('pscButtonsDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('timbreDiv').style.visibility !== 'hidden') {
+                            docById('timbreDiv').style.visibility = 'hidden';
+                            docById('timbreTableDiv').style.visibility = 'hidden';
+                            docById('timbreButtonsDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('statusDiv').style.visibility !== 'hidden') {
+                            docById('statusDiv').style.visibility = 'hidden';
+                            docById('statusButtonsDiv').style.visibility = 'hidden';
+                            docById('statusTableDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('sliderDiv').style.visibility !== 'hidden') {
+                            docById('sliderDiv').style.visibility = 'hidden';
+                            docById('sliderButtonsDiv').style.visibility = 'hidden';
+                            docById('sliderTableDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('modeDiv').style.visibility !== 'hidden') {
+                            docById('modeDiv').style.visibility = 'hidden';
+                            docById('modeButtonsDiv').style.visibility = 'hidden';
+                            docById('modeTableDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('tempoDiv').style.visibility !== 'hidden') {
+                            if (logo.tempo != null) {
+                                logo.tempo.hide();
+                            }
+                        }
+                    }
+
+                    storage.setItem('isStatusHidden', docById('statusDiv').style.visibility);
+                    logo.doStopTurtle();
+                    helpContainer.visible = false;
+                    docById('helpElem').style.visibility = 'hidden';
+                    document.querySelector('.canvasHolder').classList.add('hide');
+                    document.querySelector('#canvas').style.display = 'none';
+                    document.querySelector('#theme-color').content = '#8bc34a';
+                    setTimeout(function () {
+                        // Time to release the mouse
+                        stage.enableDOMEvents(false);
+                    }, 250);
+                    window.scroll(0, 0);
+                }
+
+                this.showMusicBlocks = function () {
+                    docById('statusDiv').style.visibility = storage.getItem('isStatusHidden');
+                    docById('statusButtonsDiv').style.visibility = storage.getItem('isStatusHidden');
+                    docById('statusTableDiv').style.visibility = storage.getItem('isStatusHidden');
+
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
+                        docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
+                        docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
+                        docById('pscDiv').style.visibility = storage.getItem('isStaircaseHidden');
+                        docById('pscButtonsDiv').style.visibility = storage.getItem('isStaircaseHidden');
+                        docById('pscTableDiv').style.visibility = storage.getItem('isStaircaseHidden');
+                        docById('timbreDiv').style.visibility = storage.getItem('isTimbreHidden');
+                        docById('timbreButtonsDiv').style.visibility = storage.getItem('isTimbreHidden');
+                        docById('timbreTableDiv').style.visibility = storage.getItem('isTimbreHidden');
+                        docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
+                        docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
+                        docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
+                        docById('pdmDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
+                        docById('pdmButtonsDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
+                        docById('pdmTableDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
+                        docById('rulerDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
+                        docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
+                        docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
+                        docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
+                        docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
+                        docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
+                        // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
+                        // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
+                        // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');
+                    }
+                    document.querySelector('.canvasHolder').classList.remove('hide');
+                    document.querySelector('#canvas').style.display = '';
+                    document.querySelector('#theme-color').content = platformColor.header;
+                    stage.enableDOMEvents(true);
+                    window.scroll(0, 0);
+                };
+
+                this.showPlanet = function(){
+                    this.planet.open(this.mainCanvas.toDataURL("image/png"));
+                    this.iframe.style.display = "block";
+                    this.iframe.contentWindow.document.getElementById("local-tab").click();
+                }
+
+                this.hidePlanet = function(){
+                    this.iframe.style.display = "none";
+                }
+
+                this.openPlanet = function(){
+                    console.log('save locally');
+                    this.saveLocally();
+                    this.hideMusicBlocks();
+                    this.showPlanet();
+                }
+
+                this.closePlanet = function(){
+                    this.hidePlanet();
+                    this.showMusicBlocks();
+                }
+
+                this.loadProjectFromData = function(data,merge){
+                    if (merge===undefined){
+                        merge=false;
+                    }
+                    this.closePlanet();
+                    if (!merge){
+                        sendAllToTrash(false, true);
+                    }
+                    if (data == undefined) {
+                        console.log('loadRawProject: data is undefined... punting');
+                        errorMsg('loadRawProject: project undefined');
+                        return;
+                    }
+
+                    console.log('loadRawProject ' + data);
+                    loading = true;
+                    document.body.style.cursor = 'wait';
+                    _allClear();
+
+                    // First, hide the palettes as they will need updating.
+                    for (var name in blocks.palettes.dict) {
+                        blocks.palettes.dict[name].hideMenu(true);
+                    }
+
+                    try {
+                        var obj = JSON.parse(data);
+                        logo.playbackQueue = {};
+                        blocks.loadNewBlocks(obj);
+                        setPlaybackStatus();
+                    } catch (e) {
+                        console.log('loadRawProject: could not parse project data');
+                        errorMsg(e);
+                    }
+
+                    loading = false;
+                    document.body.style.cursor = 'default';
+                }
+
+                this.loadProjectFromFile = function(){
+                    document.querySelector('#myOpenFile').focus();
+                    document.querySelector('#myOpenFile').click();
+                    window.scroll(0, 0);
+                }
+
+                this.newProject = function(){
+                    this.closePlanet();
+                    this.initialiseNewProject();
+                }
+
+                this.initialiseNewProject = function(name){
+                    this.planet.ProjectStorage.initialiseNewProject(name);
+                    sendAllToTrash(true,false);
+                    blocks.trashStacks = [];
+                    this.saveLocally();
+                }
+
+                this.saveLocally = function() {
+                    console.log('overwriting session data');
+                    var data = prepareExport();
+                    var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+                    console.log(svgData);
+                    if (svgData==null||svgData==""){
+                        this.planet.ProjectStorage.saveLocally(data,null);
+                    } else {
+                        var img = new Image();
+                        var t = this;
+                        img.onload = function () {
+                            var bitmap = new createjs.Bitmap(img);
+                            var bounds = bitmap.getBounds();
+                            bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                            try {
+                                console.log(bitmap.getCacheDataURL());
+                                t.planet.ProjectStorage.saveLocally(data,bitmap.getCacheDataURL());
+                            } catch (e) {
+                                console.log(e);
+                            }
+                        };
+                        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
+                    }
+                    //if (sugarizerCompatibility.isInsideSugarizer()) {
+                    //    sugarizerCompatibility.saveLocally();
+                    //}
+                }
+
+                this.openCurrentProject = function(){
+                    return this.planet.ProjectStorage.getCurrentProjectData();
+                }
+
+                this.openProjectFromPlanet = function(id,error){
+                    this.planet.openProjectFromPlanet(id,error);
+                }
+
+                this.onConverterLoad = function(){
+                    window.Converter = this.planet.Converter;
+                }
+
+                this.getCurrentProjectName = function(){
+                    return this.planet.ProjectStorage.getCurrentProjectName();
+                }
+
+                this.getCurrentProjectDescription = function(){
+                    return this.planet.ProjectStorage.getCurrentProjectDescription();
+                }
+
+                this.getCurrentProjectImage = function(){
+                    return this.planet.ProjectStorage.getCurrentProjectImage();
+                }
+
+                this.getTimeLastSaved = function(){
+                    return this.planet.ProjectStorage.TimeLastSaved;
+                }
+
+                this.init = function(){
+                    this.iframe = document.getElementById("planet-iframe");
+                    this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_,storage);
+                    this.planet = this.iframe.contentWindow.p;
+                    this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
+                    this.planet.setPlanetClose(this.closePlanet.bind(this));
+                    this.planet.setLoadNewProject(this.newProject.bind(this));
+                    this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
+                    this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
+                    window.Converter = this.planet.Converter;
+                    this.mainCanvas = canvas;
+                }
+            }
+
+            planet = new PlanetInterface(storage);
+            planet.init();
+
+            save = new SaveInterface(planet);
+            save.setVariables([
+                ["logo",logo],
+                ["turtles",turtles],
+                ["storage",storage],
+                ["printBlockSVG",_printBlockSVG]
+            ]);
+            save.init();
+
+            saveLocally = planet.saveLocally.bind(planet);
+
+            window.saveLocally = saveLocally;
+            logo.setSaveLocally(saveLocally);
+
+            saveBox = new SaveBox();
+            saveBox.setVariables([
+                ['_canvas',canvas],
+                ['_stage',stage],
+                ['_refreshCanvas',refreshCanvas],
+                ['_doSaveHTML',save.saveHTML.bind(save)],
+                ['_doSaveSVG',save.saveSVG.bind(save)],
+                ['_doSavePNG',save.savePNG.bind(save)],
+                ['_doSavePlanet',doUploadToPlanet],
+                ['_doSaveBlockArtwork',save.saveBlockArtwork.bind(save)]
+            ]);
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveBox.setVariables([
+                    ['_doSaveWAV',save.saveWAV.bind(save)],
+                    ['_doSaveAbc',save.saveAbc.bind(save)],
+                    ['_doSaveLilypond',save.saveLilypond.bind(save)]
+                ]);
+            } else {
+                saveBox.setVariables([
+                    ['_doShareOnFacebook',doShareOnFacebook]
+                ]);
+            }
+
+            clearBox = new ClearBox();
+            clearBox
+                .setCanvas(canvas)
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
-                .setClear(sendAllToTrash)
-                .setLoad(loadProject)
-                .setLoadRaw(loadRawProject)
-                .init();
+                .setClear(planet.initialiseNewProject.bind(planet));
 
             initBasicProtoBlocks(palettes, blocks);
 
@@ -1070,12 +1416,17 @@ define(MYDEFINES, function (compatibility) {
                     setTimeout(function () {
                         var rawData = reader.result;
                         if (rawData == null || rawData === '') {
+                            console.log('rawData is ' + rawData);
                             errorMsg(_('Cannot load project from the file. Please check the file type.'));
                         } else {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    var obj = JSON.parse(cleanData.match('<div class="code">(.+?)<\/div>')[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 // First, hide the palettes as they will need updating.
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
@@ -1094,6 +1445,7 @@ define(MYDEFINES, function (compatibility) {
 
                                     stage.addEventListener('trashsignal', __listener, false);
                                     sendAllToTrash(false, false);
+                                    planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf(".")));
                                 } else {
                                     merging = false;
                                     logo.playbackQueue = {};
@@ -1105,6 +1457,7 @@ define(MYDEFINES, function (compatibility) {
                                 refreshCanvas();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                                console.log(e);
                                 document.body.style.cursor = 'default';
                                 loading = false;
                             }
@@ -1134,21 +1487,32 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                var obj = JSON.parse(cleanData);
+                                if (cleanData.includes('html')){
+                                    dat = cleanData.match('<div class="code">(.+?)<\/div>');
+                                    var obj = JSON.parse(dat[1]);
+                                } else {
+                                    var obj = JSON.parse(cleanData);
+                                }
                                 for (var name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
-                                console.log('sending to trash');
-                                sendAllToTrash(false, false);
-                                refreshCanvas();
+                                stage.removeAllEventListeners('trashsignal');
 
-                                logo.playbackQueue = {};
-                                blocks.loadNewBlocks(obj);
-                                console.log('loading blocks');
-                                document.body.style.cursor = 'default';
+                                // Wait for the old blocks to be removed.
+                                var __listener = function (event) {
+                                    logo.playbackQueue = {};
+                                    blocks.loadNewBlocks(obj);
+                                    setPlaybackStatus();
+                                    stage.removeAllEventListeners('trashsignal');
+                                };
+
+                                stage.addEventListener('trashsignal', __listener, false);
+                                sendAllToTrash(false, false);
+                                planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf(".")));
+
                                 loading = false;
-                                setPlaybackStatus();
+                                refreshCanvas();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
                                 document.body.style.cursor = 'default';
@@ -1239,7 +1603,7 @@ define(MYDEFINES, function (compatibility) {
             polarBitmap = _createGrid('images/polar.svg');
 
             var URL = window.location.href;
-            var projectName = null;
+            var projectID = null;
             var flags = {run: false, show: false, collapse: false};
 
             // Scale the canvas relative to the screen size.
@@ -1257,8 +1621,10 @@ define(MYDEFINES, function (compatibility) {
                             var args = newUrlParts[i].split('=');
                             switch (args[0].toLowerCase()) {
                             case 'file':
-                                projectName = args[1];
+                                console.log("Warning: old Music Blocks URLs will no longer work.");
                                 break;
+                            case 'id':
+                                projectID = args[1];
                             case 'run':
                                 if (args[1].toLowerCase() === 'true')
                                     flags.run = true;
@@ -1308,17 +1674,17 @@ define(MYDEFINES, function (compatibility) {
                 } else {
                     if (urlParts[1].indexOf('=') > 0)
                         var args = urlParts[1].split('=');
-                    //File is the only arg that can stand alone
-                    if (args[0].toLowerCase() === 'file') {
-                        projectName = args[1];
+                    //ID is the only arg that can stand alone
+                    if (args[0].toLowerCase() === 'id') {
+                        projectID = args[1];
                     }
                 }
             }
 
-            if (projectName != null) {
+            if (projectID != null) {
                 setTimeout(function () {
-                    console.log('loading ' + projectName);
-                    loadStartWrapper(loadProject, projectName, flags, env);
+                    console.log('loading ' + projectID);
+                    loadStartWrapper(loadProject, projectID, flags, env);
                 }, 2000);
             } else {
                 setTimeout(function () {
@@ -1777,15 +2143,17 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planetdiv').style.display === '' || docById('paste').style.visibility === 'visible';
+                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planet-iframe').style.display === '' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
             } else {
-                var disableKeys = searchWidget.style.visibility === 'visible';
+                var disableKeys = searchWidget.style.visibility === 'visible' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
             }
+
+            var disableArrowKeys = _THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible');
 
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
                 case 66: // 'B'
-                    _printBlockSVG();
+                    save.saveBlockArtwork();
                     break;
                 case 67: // 'C'
                     blocks.prepareStackForCopy();
@@ -1862,142 +2230,143 @@ define(MYDEFINES, function (compatibility) {
                         pasted();
                     }
                 } else if (!disableKeys) {
-                switch (event.keyCode) {
-                case END:
-                    blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
-                    break;
-                case PAGE_UP:
-                    blocksContainer.y += logo.canvas.height / 2;
-                    break;
-                case PAGE_DOWN:
-                    blocksContainer.y -= logo.canvas.height / 2;
-                    break;
-                case DEL:
-                    blocks.extract();
-                    break;
-                case KEYCODE_UP:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
-                    } else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (palettes.mouseOver) {
-                        palettes.menuScrollEvent(1, 10);
-                        palettes.hidePaletteIconCircles();
-                    } else if (palettes.activePalette != null) {
-                        palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.y -= 20;
-                    }
-                    break;
-                case KEYCODE_DOWN:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
-                    } else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (palettes.mouseOver) {
-                        palettes.menuScrollEvent(-1, 10);
-                        palettes.hidePaletteIconCircles();
-                    } else if (palettes.activePalette != null) {
-                        palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.y += 20;
-                    }
-                    break;
-                case KEYCODE_LEFT:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
-                    } else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.x -= 20;
-                    }
-                    break;
-                case KEYCODE_RIGHT:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
-                    } else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.x += 20;
-                    }
-                    break;
-                case HOME:
-                    if (palettes.mouseOver) {
-                        var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
-                        palettes.menuScrollEvent(1, dy);
-                        palettes.hidePaletteIconCircles();
-                    } else if (palettes.activePalette != null) {
-                        palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
-                    } else {
-                        _findBlocks();
-                    }
-                    break;
-                case TAB:
-                    break;
-                case ESC:
-                    if (searchWidget.style.visibility === 'visible') {
-                        searchWidget.style.visibility = 'hidden';
-                    } else {
-                        // toggle full screen
-                        _toggleToolbar();
-                    }
-                    break;
-                case RETURN:
-                    if (_THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible')) {
-                    } else if (docById('search').value.length > 0){
-                        doSearch();
-                    } else {
-                        if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
-                            logo.runLogoCommands();
+                    switch (event.keyCode) {
+                    case END:
+                        blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
+                        break;
+                    case PAGE_UP:
+                        blocksContainer.y += logo.canvas.height / 2;
+                        break;
+                    case PAGE_DOWN:
+                        blocksContainer.y -= logo.canvas.height / 2;
+                        break;
+                    case DEL:
+                        blocks.extract();
+                        break;
+                    case KEYCODE_UP:
+                        if (disableArrowKeys) {
+                        } else if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (palettes.mouseOver) {
+                            palettes.menuScrollEvent(1, 10);
+                            palettes.hidePaletteIconCircles();
+                        } else if (palettes.activePalette != null) {
+                            palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.y -= 20;
                         }
+                        break;
+                    case KEYCODE_DOWN:
+                        if (disableArrowKeys) {
+                        } else if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (palettes.mouseOver) {
+                            palettes.menuScrollEvent(-1, 10);
+                            palettes.hidePaletteIconCircles();
+                        } else if (palettes.activePalette != null) {
+                            palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.y += 20;
+                        }
+                        break;
+                    case KEYCODE_LEFT:
+                        if (disableArrowKeys) {
+                        } else if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.x -= 20;
+                        }
+                        break;
+                    case KEYCODE_RIGHT:
+                        if (disableArrowKeys) {
+                        } else if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.x += 20;
+                        }
+                        break;
+                    case HOME:
+                        if (palettes.mouseOver) {
+                            var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
+                            palettes.menuScrollEvent(1, dy);
+                            palettes.hidePaletteIconCircles();
+                        } else if (palettes.activePalette != null) {
+                            palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
+                        } else {
+                            _findBlocks();
+                        }
+                        break;
+                    case TAB:
+                        break;
+                    case ESC:
+                        if (searchWidget.style.visibility === 'visible') {
+                            searchWidget.style.visibility = 'hidden';
+                        } else {
+                            // toggle full screen
+                            _toggleToolbar();
+                        }
+                        break;
+                    case RETURN:
+                        if (disableArrowKeys) {
+                        } else if (docById('search').value.length > 0){
+                            doSearch();
+                        } else {
+                            if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
+                                logo.runLogoCommands();
+                            }
+                        }
+                        break;
+                    case KEYCODE_D:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(4, 'do');
+                        }
+                        break;
+                    case KEYCODE_R:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(4, 're');
+                        }
+                        break;
+                    case KEYCODE_M:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(4, 'mi');
+                        }
+                        break;
+                    case KEYCODE_F:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(4, 'fa');
+                        }
+                        break;
+                    case KEYCODE_S:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(4, 'sol');
+                        }
+                        break;
+                    case KEYCODE_L:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(4, 'la');
+                        }
+                        break;
+                    case KEYCODE_T:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(4, 'ti');
+                        }
+                        break;
+                    default:
+                        break;
                     }
-                    break;
-                case KEYCODE_D:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(4, 'do');
-                    }
-                    break;
-                case KEYCODE_R:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(4, 're');
-                    }
-                    break;
-                case KEYCODE_M:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(4, 'mi');
-                    }
-                    break;
-                case KEYCODE_F:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(4, 'fa');
-                    }
-                    break;
-                case KEYCODE_S:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(4, 'sol');
-                    }
-                    break;
-                case KEYCODE_L:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(4, 'la');
-                    }
-                    break;
-                case KEYCODE_T:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(4, 'ti');
-                    }
-                    break;
-                default:
-                    break;
                 }
+
                 // Always store current key so as not to mask it from
                 // the keyboard block.
                 currentKeyCode = event.keyCode;
-              }
             }
         };
 
@@ -2341,137 +2710,16 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doOpenSamples() {
-            hideSearchWidget();
-
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                localStorage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
-                localStorage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
-                localStorage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
-                localStorage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
-                localStorage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
-                localStorage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
-                localStorage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
-                localStorage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
-
-                if (docById('ptmDiv').style.visibility !== 'hidden') {
-                    docById('ptmDiv').style.visibility = 'hidden';
-                    docById('ptmTableDiv').style.visibility = 'hidden';
-                    docById('ptmButtonsDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('pdmDiv').style.visibility !== 'hidden') {
-                    docById('pdmDiv').style.visibility = 'hidden';
-                    docById('pdmButtonsDiv').style.visibility = 'hidden';
-                    docById('pdmTableDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('rulerDiv').style.visibility !== 'hidden') {
-                    docById('rulerDiv').style.visibility = 'hidden';
-                    docById('rulerTableDiv').style.visibility = 'hidden';
-                    docById('rulerButtonsDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('pscDiv').style.visibility !== 'hidden') {
-                    docById('pscDiv').style.visibility = 'hidden';
-                    docById('pscTableDiv').style.visibility = 'hidden';
-                    docById('pscButtonsDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('timbreDiv').style.visibility !== 'hidden') {
-                    docById('timbreDiv').style.visibility = 'hidden';
-                    docById('timbreTableDiv').style.visibility = 'hidden';
-                    docById('timbreButtonsDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('statusDiv').style.visibility !== 'hidden') {
-                    docById('statusDiv').style.visibility = 'hidden';
-                    docById('statusButtonsDiv').style.visibility = 'hidden';
-                    docById('statusTableDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('sliderDiv').style.visibility !== 'hidden') {
-                    docById('sliderDiv').style.visibility = 'hidden';
-                    docById('sliderButtonsDiv').style.visibility = 'hidden';
-                    docById('sliderTableDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('modeDiv').style.visibility !== 'hidden') {
-                    docById('modeDiv').style.visibility = 'hidden';
-                    docById('modeButtonsDiv').style.visibility = 'hidden';
-                    docById('modeTableDiv').style.visibility = 'hidden';
-                }
-
-                if (docById('tempoDiv').style.visibility !== 'hidden') {
-                    if (logo.tempo != null) {
-                        logo.tempo.hide();
-                    }
-                }
-            }
-
-            localStorage.setItem('isStatusHidden', docById('statusDiv').style.visibility);
-
-            logo.doStopTurtle();
-            helpContainer.visible = false;
-            docById('helpElem').style.visibility = 'hidden';
-            console.log('save locally');
-            saveLocally();
-            thumbnails.show()
+            planet.openPlanet();
         };
 
         function doSave() {
-            // if (_THIS_IS_MUSIC_BLOCKS_) {
-            //     console.log('Saving .tb file');
-            //     var name = 'My Project';
-            //     download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
-            // } else {
             _hideBoxes();
             saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
-            // }
-        };
-
-        function doSaveTB() {
-            var filename = prompt('Filename:', _('untitled') + '.tb');
-            if (filename != null) {
-                if (fileExt(filename) !== 'tb') {
-                    filename += '.tb';
-                }
-
-                download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
-            }
-        };
-
-        function doSaveSVG() {
-            var filename = prompt('Filename:', _('untitled') + '.svg');
-            if (filename != null) {
-                if (fileExt(filename) !== 'svg') {
-                    filename += '.svg';
-                }
-                var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
-                download(filename, 'data:image/svg+xml;utf8,' + svg, filename, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-            }
-        };
-
-        function doSaveBlockArtwork() {
-            _printBlockSVG();
-        };
-
-        function doSavePNG() {
-            var filename = prompt('Filename:', _('untitled') + '.png');
-            if (fileExt(filename) !== 'png') {
-                filename += '.png';
-            }
-            var data = docById('overlayCanvas').toDataURL('image/png');
-            download(filename, data);
-        };
-
-        function doSaveWAV() {
-            console.log('Recording');
-            doCompile(true);
         };
 
         function doUploadToPlanet() {
-            saveLocally();
-            thumbnails.show()
+            planet.openPlanet();
         };
 
         function doShareOnFacebook() {
@@ -2499,190 +2747,7 @@ define(MYDEFINES, function (compatibility) {
             _allClear();
         };
 
-        function doSaveLilypond() {
-            _doLilypond();
-        };
-
-        function _doLilypond() {
-            console.log('Saving .ly file');
-            docById('lilypondModal').style.display = 'block';
-            var projectTitle, projectAuthor, MIDICheck, guitarCheck;
-
-            //.TRANS: File name prompt for save as Lilypond
-            docById('fileNameText').textContent = _('File name');
-            //.TRANS: Project title prompt for save as Lilypond
-            docById('titleText').textContent = _('Project title');
-            //.TRANS: Project title prompt for save as Lilypond
-            docById('authorText').textContent = _('Project author');
-            //.TRANS: MIDI prompt for save as Lilypond
-            docById('MIDIText').textContent = _('Include MIDI output?');
-            //.TRANS: Guitar prompt for save as Lilypond
-            docById('guitarText').textContent = _('Include guitar tablature output?');
-            //.TRANS: Lilypond is a scripting language for generating sheet music
-            docById('submitLilypond').textContent = _('Save as Lilypond');
-
-            //TRANS: default file name when saving as Lilypond
-            docById('fileName').value = _('My Project') + '.ly';
-            //TRANS: default project title when saving as Lilypond
-            docById('title').value = _('My Music Blocks Creation');
-
-            // Load custom author saved in local storage.
-            var customAuthorData = storage.getItem('customAuthor');
-            if (customAuthorData != undefined) {
-                docById('author').value = JSON.parse(customAuthorData);
-            } else {
-                //.TRANS: default project author when saving as Lilypond
-                docById('author').value = _('Mr. Mouse');
-            }
-
-            docById('submitLilypond').onclick = function () {
-                var filename = docById('fileName').value;
-                projectTitle = docById('title').value;
-                projectAuthor = docById('author').value;
-
-                // Save the author in local storage.
-                storage.setItem('customAuthor', JSON.stringify(projectAuthor));
-
-                MIDICheck = docById('MIDICheck').checked;
-                guitarCheck = docById('guitarCheck').checked;
-
-                if (filename != null) {
-                    if (fileExt(filename) !== 'ly') {
-                        filename += '.ly';
-                    }
-                }
-
-                var mapLilypondObj = {
-                    'My Music Blocks Creation': projectTitle,
-                    'Mr. Mouse': projectAuthor
-                };
-
-                LILYPONDHEADER = LILYPONDHEADER.replace(/My Music Blocks Creation|Mr. Mouse/gi, function(matched){
-                    return mapLilypondObj[matched];
-                });
-
-                if (MIDICheck) {
-                    MIDIOutput = '% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n';
-                } else {
-                    MIDIOutput = '% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n';
-                }
-
-                if (guitarCheck) {
-                    guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                    guitarOutputEnd = '      >>\n\n';
-                } else {
-                    guitarOutputHead = '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                    guitarOutputEnd = '      >>\n%}\n';
-                }
-
-                // Suppress music and turtle output when generating
-                // Lilypond output.
-                logo.runningLilypond = true;
-                logo.notationOutput = LILYPONDHEADER;
-                logo.notationNotes = {};
-                for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                    logo.notationStaging[turtle] = [];
-                    logo.notationDrumStaging[turtle] = [];
-                    turtles.turtleList[turtle].doClear(true, true, true);
-                }
-
-                logo.runLogoCommands();
-
-                // Close the dialog box after hitting button.
-                docById('lilypondModal').style.display = 'none';
-            }
-
-            docByClass('close')[0].onclick = function () {
-                logo.runningLilypond = false;
-                docById('lilypondModal').style.display = 'none';
-            }
-        };
-
-        function doSaveAbc() {
-            _doAbc();
-        };
-
-        function _doAbc() {
-            document.body.style.cursor = 'wait';
-            console.log('Saving .abc file');
-            //Suppress music and turtle output when generating
-            // Abc output.
-            logo.runningAbc = true;
-            logo.notationOutput = ABCHEADER;
-            logo.notationNotes = {};
-            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                logo.notationStaging[turtle] = [];
-                logo.notationDrumStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true, true);
-            }
-            logo.runLogoCommands();
-        };
-
         window.prepareExport = prepareExport;
-        window.saveLocally = saveLocally;
-
-        function saveLocally() {
-            if (sugarizerCompatibility.isInsideSugarizer()) {
-                //sugarizerCompatibility.data.blocks = prepareExport();
-                storage = sugarizerCompatibility.data;
-            } else {
-                storage = localStorage;
-            }
-
-            console.log('overwriting session data');
-
-            if (storage.currentProject === undefined) {
-                try {
-                    storage.currentProject = 'My Project';
-                    storage.allProjects = JSON.stringify(['My Project'])
-                } catch (e) {
-                    // Edge case, eg. Firefox localSorage DB corrupted
-                    console.log(e);
-                }
-            }
-
-            try {
-                var p = storage.currentProject;
-                storage['SESSION' + p] = prepareExport();
-            } catch (e) {
-                console.log(e);
-            }
-
-            // if (isSVGEmpty(turtles)) {
-                // We will use the music icon in these cases.
-                // return;
-            // }
-
-            var img = new Image();
-            var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-            /*
-            img.onload = function () {
-                var bitmap = new createjs.Bitmap(img);
-                var bounds = bitmap.getBounds();
-                bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                try {
-                    storage['SESSIONIMAGE' + p] = bitmap.getCacheDataURL();
-                } catch (e) {
-                    console.log(e);
-                }
-            };
-
-            img.src = 'data:image/svg+xml;base64,' +
-            window.btoa(unescape(encodeURIComponent(svgData)));
-            */
-
-            // Don't bother to convert the session image to PNG. Just
-            // save it as svg.
-            try {
-                storage['SESSIONIMAGE' + p] = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
-            } catch (e) {
-                console.log(e);
-            }
-
-            if (sugarizerCompatibility.isInsideSugarizer()) {
-                sugarizerCompatibility.saveLocally();
-            }
-        };
 
         function runProject (env) {
             console.log('Running Project from Event');
@@ -2694,7 +2759,7 @@ define(MYDEFINES, function (compatibility) {
             }, 5000);
         }
 
-        function loadProject (projectName, flags, env) {
+        function loadProject (projectID, flags, env) {
             //set default value of run
             flags = typeof flags !== 'undefined' ? flags : {run: false, show: false, collapse: false};
             loading = true;
@@ -2702,43 +2767,13 @@ define(MYDEFINES, function (compatibility) {
 
             // palettes.updatePalettes();
             setTimeout(function () {
-                if (fileExt(projectName) !== 'tb')
-                {
-                    projectName += '.tb';
-                }
-
                 try {
-                    try {
-                        console.log('testing httpGet');
-                        httpGet(null);
-                        console.log('running from server or the user can access to examples.');
-                        server = true;
-                    } catch (e) {
-                        console.log('running from filesystem or the connection isnt secure');
-                        server = false;
-                    }
-
-                    if (server) {
-                        console.log('testing server');
-                        var rawData = httpGet(projectName);
-                        var cleanData = rawData.replace('\n', '');
-                    }
-
-                    // First, hide the palettes as they will need updating.
-                    for (var name in blocks.palettes.dict) {
-                        blocks.palettes.dict[name].hideMenu(true);
-                    }
-
-                    var obj = JSON.parse(cleanData);
-                    logo.playbackQueue = {};
-                    blocks.loadNewBlocks(obj);
-                    setPlaybackStatus();
-                    saveLocally();
+                    planet.openProjectFromPlanet(projectID,function(){loadStartWrapper(_loadStart);});
                 } catch (e) {
                     console.log(e);
                     loadStartWrapper(_loadStart);
                 }
-
+                planet.initialiseNewProject();
                 // Restore default cursor
                 loading = false;
                 document.body.style.cursor = 'default';
@@ -2784,78 +2819,6 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function loadRawProject(data) {
-            if (data == undefined) {
-                console.log('loadRawProject: data is undefined... punting');
-                errorMsg('loadRawProject: project undefined');
-                return;
-            }
-
-            console.log('loadRawProject ' + data);
-            loading = true;
-            document.body.style.cursor = 'wait';
-            _allClear();
-
-            // First, hide the palettes as they will need updating.
-            for (var name in blocks.palettes.dict) {
-                blocks.palettes.dict[name].hideMenu(true);
-            }
-
-            try {
-                var obj = JSON.parse(data);
-                logo.playbackQueue = {};
-                blocks.loadNewBlocks(obj);
-                setPlaybackStatus();
-            } catch (e) {
-                console.log('loadRawProject: could not parse project data');
-                errorMsg(e);
-            }
-
-            loading = false;
-            document.body.style.cursor = 'default';
-        };
-
-        function saveProject(projectName) {
-            // palettes.updatePalettes();
-            loading = true;
-            document.body.style.cursor = 'wait';
-
-            setTimeout(function () {
-                var punctuationless = projectName.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g, '');
-                projectName = punctuationless.replace(/ /g, '_');
-                if (fileExt(projectName) !== 'tb') {
-                    projectName += '.tb';
-                }
-                try {
-                    // Post the project
-                    var returnValue = httpPost('MusicBlocks_'+projectName, prepareExport());
-                    errorMsg('Saved ' + projectName + ' to ' + window.location.host);
-
-                    var img = new Image();
-                    var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-                    img.onload = function () {
-                        var bitmap = new createjs.Bitmap(img);
-                        var bounds = bitmap.getBounds();
-                        bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                        // and base64-encoded png
-                        httpPost(('MusicBlocks_'+projectName).replace('.tb', '.b64'), bitmap.getCacheDataURL());
-                    };
-
-                    img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                        unescape(encodeURIComponent(svgData)));
-
-                    loading = false;
-                    document.body.style.cursor = 'default';
-                    return returnValue;
-                } catch (e) {
-                    console.log(e);
-                    loading = false;
-                    document.body.style.cursor = 'default';
-                    return;
-                }
-            }, 200);
-        };
-
         // Calculate time such that no matter how long it takes to
         // load the program, the loading animation will cycle at least
         // once.
@@ -2894,19 +2857,10 @@ define(MYDEFINES, function (compatibility) {
                 setPlaybackStatus();
             };
 
-            if (sugarizerCompatibility.isInsideSugarizer()) {
-                storage = sugarizerCompatibility.data;
-            }
-            else {
-                storage = localStorage;
-            }
-
             sessionData = null;
 
             // Try restarting where we were when we hit save.
-            var currentProject = storage.currentProject;
-            sessionData = storage['SESSION' + currentProject];
-
+            sessionData = planet.openCurrentProject();
             // After we have finished loading the project, clear all
             // to ensure a clean start.
             if (document.addEventListener) {
@@ -3259,14 +3213,6 @@ define(MYDEFINES, function (compatibility) {
             pluginChooser.click();
         };
 
-        function saveToFile() {
-            var filename = prompt('Filename:');
-            if (fileExt(filename) !== 'tb') {
-                filename += '.tb';
-            }
-            download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
-        };
-
         function _hideStopButton() {
             stopTurtleContainer.visible = false;
             hardStopTurtleContainer.visible = true;
@@ -3479,7 +3425,7 @@ handleComplete);
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['empty-trash', _deleteBlocksBox, _('Delete all'), null, null, null, null],
+                    ['new-project', _deleteBlocksBox, _('New Project'), null, null, null, null],
                     ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
                 ];
             } else {
@@ -3491,14 +3437,13 @@ handleComplete);
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['empty-trash', _deleteBlocksBox, _('Delete all'), null, null, null, null],
+                    ['new-project', _deleteBlocksBox, _('Delete all'), null, null, null, null],
                     ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
                 ];
             }
-
             document.querySelector('#myOpenFile')
                     .addEventListener('change', function (event) {
-                        thumbnails.model.controller.hide();
+                        planet.closePlanet();
             });
 
             var btnSize = cellSize;
@@ -3538,7 +3483,7 @@ handleComplete);
                     saveButton = container;
                 } else if (menuNames[i][0] === 'compile') {
                     playbackButton = container;
-                } else if (menuNames[i][0] === 'empty-trash') {
+                } else if (menuNames[i][0] === 'new-project') {
                     deleteAllButton = container;
                 }
 

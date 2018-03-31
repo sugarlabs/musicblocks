@@ -6,16 +6,16 @@ MUSIC BLOCKS
 Music Blocks is a collection of manipulative tools for exploring
 fundamental musical concepts in an integrative and fun way.
 
-![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/screenshots/Screenshot-1.png)
+![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-1.png)
 
-![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/screenshots/Screenshot-2.png)
+![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-2.png)
 
 Using Music Blocks
 ------------------
 
 Music Blocks is designed to run in the browser.
 
-The easiest way to run Music Blocks is to open [Music Blocks](http://walterbender.github.io/musicblocks/) in your browser (Firefox, Chrome, and  Opera work best).
+The easiest way to run Music Blocks is to open [Music Blocks](https://musicblocks.sugarlabs.org) in your browser (Firefox, Chrome, and  Opera work best).
 
 If you want to run Music Blocks offline, download (or git clone) this
 repo and point your browser to the index.html file found in the
@@ -29,9 +29,9 @@ Embedded](http://activities.sugarlabs.org/en-US/sugar/addon/4804)) or
 simply open Music Blocks in Browse.
 
 See
-[Using Music Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation/README.md)
+[Using Music Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
 and
-[Music Blocks Guide](http://github.com/walterbender/musicblocks/tree/master/guide/README.md)
+[Music Blocks Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
 
 Credits
 -------
@@ -65,14 +65,14 @@ Many students contributed to the project as part of Google Code-in
 (2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018).
 
 A full list of
-[contributors](https://github.com/walterbender/musicblocks/graphs/contributors)
+[contributors](https://github.com/sugarlabs/musicblocks/graphs/contributors)
 is available.
 
 Reporting Bugs
 --------------
 
 Bugs can be reported in the
-[issues section](https://github.com/walterbender/musicblocks/issues)
+[issues section](https://github.com/sugarlabs/musicblocks/issues)
 of this repository.
 
 Contributing
