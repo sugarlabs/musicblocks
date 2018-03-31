@@ -2,7 +2,7 @@
 
 *Learning is hard fun.*&mdash;Marvin Minsky
 
-*Make the complicated comprehensible* &mdash; Arthur Miller
+*Make the complicated comprehensible*&mdash;Arthur Miller
 
 *Debugging is the learning opportunity of the 21st Century.* &mdash;
 Cynthia Solomon
@@ -10,16 +10,16 @@ Cynthia Solomon
 *The important message that comes from ideas about debugging is that
 we learn from our mistakes; that the intricate process of making
 things work or learning new skills has to do with hypothesizing,
-testing, revising, etc.* &mdash; Cynthia Solomon
+testing, revising, etc.*&mdash;Cynthia Solomon
 
 *Sometimes bugs are serendipitously adopted as features worth
 perpetuating, sometimes procedures must be constructed to deal with
 the phenomena caused by their appearance, and sometimes the bugs and
 their side effect need to be removed. But in this pursuit, children
 become creative researchers studying behavior, making up theories,
-trying out ideas, etc.* &mdash; Cynthia Solomon
+trying out ideas, etc.*&mdash;Cynthia Solomon
 
-*6 Stages of Debugging* &mdash; Anonymous
+*6 Stages of Debugging*&mdash;Anonymous
 1. That can't happen.
 2. That doesn't happen on my machine.
 3. That shouldn't happen.
@@ -37,26 +37,28 @@ mistakes.
 
 ## 1. Clicking on an individual stack of blocks
 
-The *Play* button (in top left corner) will run all of the *Start* blocks simultenously.
-Start blocks are amber colored clamps (They are shown in first row of the picture below).
-But you can also run an individual stack of code by
-clicking on the stack. This lets you test and debug small sections of
-code.
+The *Play* button (in top left corner) will run all of the *Start*
+blocks simultenously. (Every Music Blocks project has at least one
+*Start* block). But you can also run an individual stack of code by
+clicking on a stack. This lets you test and debug small sections of
+code, or, as in the example below, you can play a single voice by
+clicking on one of the *Start* blocks or single phase by clicking on
+one of the *Action* blocks.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/startblocks_debug_guide.png "Start blocks")
 
 ## 2. Print and Comment blocks
 
-The *Print* block (found on the *Extras* palette, Extras palette can be found on bottom of left sidebar) can be used to print
+The *Print* block (found on the *Extras* palette) can be used to print
 a message while running a program. It is useful to determine if a
 section of code is being executed when expected or if a box or
-parameter contains an expected value. Print block result is shown in upper part of the picture shown below.
-
-![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example1_debug%20guide.png "Print blocks")
-
-When the printblock is placed at the end total notes time =1/4  +  1/4  +1/2=1
+parameter contains an expected value.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
+
+The *Print* block is used to display the number of whole notes played,
+in this case, `1/4 + 1/4 + 1/2`, which adds up to `1`, which is
+displayed at the top of the browser window.
 
 The *Comment* block (also found on the *Extras* palette) is similar to
 the *Print* block, except it only prints a message when the program is
@@ -125,7 +127,8 @@ blocks are hidden and the program resumes running at full speed.
 As Music Blocks runs, some debugging information is written to the
 browser console, such as the notes being played and comments (See the
 *Comment* block above). The console can be accessed by typing
-`Ctrl-Shift-J` on most web browsers. An example image for default sol mi sol is shown below.
+`Ctrl-Shift-J` on most web browsers.
 
 ![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/browserconsole_debug_guide.png "Console blocks")
 
+Shown above is the console output from three notes: `sol mi sol`.
