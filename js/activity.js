@@ -2097,6 +2097,10 @@ define(MYDEFINES, function (compatibility) {
                 if (docById('dissectNumber').classList.contains('hasKeyboard')) {
                     return;
                 }
+
+                if (docById('timbreName').classList.contains('hasKeyboard')) {
+                    return;
+                }
             }
 
             const BACKSPACE = 8;
