@@ -333,7 +333,8 @@ function TimbreWidget () {
 
     this._save = function () {
         // Just save a set timbre block with the current instrument name.
-        var obj = [[0, 'settimbre', 100 + this._delta, 100 + this._delta, [null, 1, null, 2]], [1, ['text', {'value': this.instrumentName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+        var timbreName = docById('timbreName').value;
+        var obj = [[0, 'settimbre', 100 + this._delta, 100 + this._delta, [null, 1, null, 2]], [1, ['text', {'value': timbreName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         this._logo.blocks.loadNewBlocks(obj);
         this._delta += 42;
     };
@@ -563,6 +564,30 @@ function TimbreWidget () {
             that._save();
         };
 
+        var cell = row.insertCell();
+        cell.innerHTML = '<input id="timbreName" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="timbreName" type="text" value="' + this.instrumentName + '" />';
+        cell.style.width = (2*BUTTONSIZE) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = BUTTONSIZE + 'px';
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var timbreInput = docById('timbreName');
+        timbreInput.classList.add('hasKeyboard');
+
+        timbreInput.oninput = function(event) {
+            var cblk0 = that._logo.blocks.blockList[that.blockNo].connections[1];
+            var blk = that._logo.blocks.blockList[cblk0];
+            blk.value = timbreInput.value;
+            var label = blk.value.toString();
+            if (label.length > 8) {
+                label = label.substr(0, 7) + '...';
+            }
+            blk.text.text = label;
+            blk.updateCache();
+        };
+
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
         synthButtonCell.id = 'synthButtonCell';
         this.isActive['synth'] = false;
@@ -726,6 +751,7 @@ function TimbreWidget () {
             docById('timbreDiv').style.visibility = 'hidden';
             docById('timbreButtonsDiv').style.visibility = 'hidden';
             docById('timbreTableDiv').style.visibility = 'hidden';
+            docById('timbreName').classList.remove('hasKeyboard');
         };
 
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
