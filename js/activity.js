@@ -1252,7 +1252,6 @@ define(MYDEFINES, function (compatibility) {
 
                 this.initialiseNewProject = function(name){
                     this.planet.ProjectStorage.initialiseNewProject(name);
-                    sendAllToTrash(true,false);
                     blocks.trashStacks = [];
                     this.saveLocally();
                 }
@@ -1368,12 +1367,17 @@ define(MYDEFINES, function (compatibility) {
                 ]);
             }
 
+            var __clearFunction = function () {
+                sendAllToTrash(true, false);
+		planet.initialiseNewProject.bind(planet);
+            };
+
             clearBox = new ClearBox();
             clearBox
                 .setCanvas(canvas)
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
-                .setClear(planet.initialiseNewProject.bind(planet));
+                .setClear(__clearFunction);
 
             initBasicProtoBlocks(palettes, blocks);
 
@@ -1688,6 +1692,7 @@ define(MYDEFINES, function (compatibility) {
                 }, 2000);
             } else {
                 setTimeout(function () {
+                    console.log('load new Start block');
                     loadStartWrapper(_loadStart);
                 }, 2000);
             }
@@ -2775,8 +2780,10 @@ define(MYDEFINES, function (compatibility) {
                     planet.openProjectFromPlanet(projectID,function(){loadStartWrapper(_loadStart);});
                 } catch (e) {
                     console.log(e);
+                    console.log('_loadStart on error');
                     loadStartWrapper(_loadStart);
                 }
+
                 planet.initialiseNewProject();
                 // Restore default cursor
                 loading = false;
@@ -2853,7 +2860,6 @@ define(MYDEFINES, function (compatibility) {
         function _loadStart() {
             // where to put this?
             // palettes.updatePalettes();
-            console.log('LOAD START')
             justLoadStart = function () {
                 console.log('loading start and a matrix');
                 logo.playbackQueue = {};
@@ -2871,6 +2877,7 @@ define(MYDEFINES, function (compatibility) {
                 document.addEventListener('finishedLoading', function () {
                     if (!turtles.running()) {
                         setTimeout(function () {
+                            console.log('reset turtles ' + turtles.turtleList.length);
                             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                                 logo.turtleHeaps[turtle] = [];
                                 logo.notationStaging[turtle] = [];
@@ -2883,6 +2890,7 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 document.attachEvent('finishedLoading', function () {
                     setTimeout(function () {
+                        console.log('reset turtles ' + turtles.turtleList.length);
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             logo.turtleHeaps[turtle] = [];
                             logo.notationStaging[turtle] = [];
