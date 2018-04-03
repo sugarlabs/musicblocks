@@ -26,15 +26,6 @@ const PITCHBLOCKS = ['pitch', 'steppitch', 'hertz', 'pitchnumber', 'scaledegree'
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
-function getTextWidth(text, font) {
-    // re-use canvas object for better performance
-    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
-    var context = canvas.getContext("2d");
-    context.font = font;
-    var metrics = context.measureText(text);
-    return metrics.width;
-}
-
 function Blocks () {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
@@ -792,7 +783,7 @@ function Blocks () {
                     that.blockList[parentblk].connections[1] = blk;
                     that.blockList[blk].value = that.findUniqueActionName(_('action'));
                     var label = that.blockList[blk].value;
-                    if (getTextWidth(label, "bold 20pt Sans") > 60) {
+                    if (getTextWidth(label, 'bold 20pt Sans') > 60) {
                         label = label.substr(0, 5) + '...';
                     }
                     that.blockList[blk].text.text = label;
@@ -842,7 +833,7 @@ function Blocks () {
                     that.blockList[parentblk].connections[1] = blk;
                     that.blockList[blk].value = _('box');
                     var label = that.blockList[blk].value;
-                    if (getTextWidth(label, "bold 20pt Sans") > 60) {
+                    if (getTextWidth(label, 'bold 20pt Sans') > 60) {
                         label = label.substr(0, 5) + '...';
                     }
                     that.blockList[blk].text.text = label;
@@ -1309,7 +1300,7 @@ function Blocks () {
                             if (name !== myBlock.value) {
                                 myBlock.value = name;
                                 var label = name;
-                                if (getTextWidth(label, "bold 20pt Sans") > 60) {
+                                if (getTextWidth(label, 'bold 20pt Sans') > 60) {
                                     label = label.substr(0, 5) + '...';
                                 }
                                 myBlock.text.text = label;
@@ -1393,7 +1384,7 @@ function Blocks () {
                             if (this.blockList[this.blockList[b].connections[1]].value === this.blockList[thisBlock].value) {
                                 this.blockList[thisBlock].value = this.findUniqueActionName(this.blockList[thisBlock].value);
                                 var label = this.blockList[thisBlock].value;
-                                if (getTextWidth(label, "bold 20pt Sans") > 60) {
+                                if (getTextWidth(label, 'bold 20pt Sans') > 60) {
                                     label = label.substr(0, 5) + '...';
                                 }
                                 this.blockList[thisBlock].text.text = label;
@@ -2328,7 +2319,7 @@ function Blocks () {
                         var value = args[1];
                         that.blockList[thisBlock].value = value;
                         var label = value.toString();
-                        if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, "bold 20pt Sans") > 60) {
+                        if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, 'bold 20pt Sans') > 60) {
                             label = label.substr(0, 5) + '...';
                         }
                         that.blockList[thisBlock].text.text = label;
@@ -2352,7 +2343,7 @@ function Blocks () {
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
                     var label = value.toString();
-                    if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, "bold 20pt Sans") > 60) {
+                    if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, 'bold 20pt Sans') > 60) {
                         label = label.substr(0, 5) + '...';
                     }
                     that.blockList[thisBlock].text.text = label;
@@ -2670,7 +2661,7 @@ function Blocks () {
             if (blockValue === oldName) {
                 myBlock.value = newName;
                 var label = myBlock.value;
-                if (getTextWidth(label, "bold 20pt Sans") > 60) {
+                if (getTextWidth(label, 'bold 20pt Sans') > 60) {
                     label = label.substr(0, 5) + '...';
                 }
                 myBlock.text.text = label;
@@ -2690,7 +2681,7 @@ function Blocks () {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
                     var label = newName;
-                    if (getTextWidth(label, "bold 20pt Sans") > 60) {
+                    if (getTextWidth(label, 'bold 20pt Sans') > 60) {
                         label = label.substr(0, 5) + '...';
                     }
 

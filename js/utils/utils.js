@@ -153,6 +153,17 @@ function last (myList) {
 };
 
 
+
+function getTextWidth(text, font) {
+    // re-use canvas object for better performance
+    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement('canvas'));
+    var context = canvas.getContext('2d');
+    context.font = font;
+    var metrics = context.measureText(text);
+    return metrics.width;
+};
+
+
 function doSVG (canvas, logo, turtles, width, height, scale) {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
