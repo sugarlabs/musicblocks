@@ -35,7 +35,7 @@ function LocalCard(Planet){
 					<div class="card share-card" id="sharebox-{ID}" style="display:none;"> \
 						<div class="card-content shareurltext"> \
 							<div class="shareurltitle">'+_('Share')+'</div> \
-							<input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://walterbender.github.io/musicblocks/index.html?id={ID}"> \
+							<input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
 							<div class="shareurl-advanced" id="advanced-{ID}"> \
 								<div class="shareurltitle">'+_('Flags')+'</div> \
 								<div><input type="checkbox" name="run" id="checkboxrun-{ID}" checked><label for="checkboxrun-{ID}">'+_('Run project on startup.')+'</label></div> \
