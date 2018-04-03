@@ -43,7 +43,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
             js = d.createElement(s);
             js.id = id;
-            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            js.src = 'https://connect.facebook.net/en_US/sdk.js';
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
     } catch (e) {
@@ -138,8 +138,8 @@ define(MYDEFINES, function (compatibility) {
             window.addEventListener('localized', function () {
                 sugarizerCompatibility.loadData(function () {
                     var planet=document.getElementById('planet-iframe');
-                    planet.onload=function(){
-                        console.log("load");
+                    planet.onload = function() {
+                        console.log('load');
                         domReady(doc);
                     };
                 });
@@ -147,7 +147,7 @@ define(MYDEFINES, function (compatibility) {
 
             document.webL10n.setLanguage(sugarizerCompatibility.getLanguage());
         } else {
-            console.log("loaded");
+            console.log('loaded');
             domReady(doc);
         }
     });
@@ -163,7 +163,6 @@ define(MYDEFINES, function (compatibility) {
             var lang = document.webL10n.getLanguage();
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 lang = sugarizerCompatibility.getLanguage();
-
             }
 
             if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
@@ -513,12 +512,6 @@ define(MYDEFINES, function (compatibility) {
             if(table != null) {
                 table.remove();
             }
-
-            /*
-            var canvas = docById("music");
-            var context = canvas.getContext("2d");
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            */
         };
 
         function _doFastButton(env) {
@@ -1180,13 +1173,13 @@ define(MYDEFINES, function (compatibility) {
                 };
 
                 this.showPlanet = function(){
-                    this.planet.open(this.mainCanvas.toDataURL("image/png"));
-                    this.iframe.style.display = "block";
-                    this.iframe.contentWindow.document.getElementById("local-tab").click();
+                    this.planet.open(this.mainCanvas.toDataURL('image/png'));
+                    this.iframe.style.display = 'block';
+                    this.iframe.contentWindow.document.getElementById('local-tab').click();
                 }
 
                 this.hidePlanet = function(){
-                    this.iframe.style.display = "none";
+                    this.iframe.style.display = 'none';
                 }
 
                 this.openPlanet = function(){
@@ -1252,7 +1245,6 @@ define(MYDEFINES, function (compatibility) {
 
                 this.initialiseNewProject = function(name){
                     this.planet.ProjectStorage.initialiseNewProject(name);
-                    sendAllToTrash(true,false);
                     blocks.trashStacks = [];
                     this.saveLocally();
                 }
@@ -1261,9 +1253,8 @@ define(MYDEFINES, function (compatibility) {
                     console.log('overwriting session data');
                     var data = prepareExport();
                     var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-                    console.log(svgData);
-                    if (svgData==null||svgData==""){
-                        this.planet.ProjectStorage.saveLocally(data,null);
+                    if (svgData === null || svgData === '') {
+                        this.planet.ProjectStorage.saveLocally(data, null);
                     } else {
                         var img = new Image();
                         var t = this;
@@ -1273,7 +1264,7 @@ define(MYDEFINES, function (compatibility) {
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             try {
                                 console.log(bitmap.getCacheDataURL());
-                                t.planet.ProjectStorage.saveLocally(data,bitmap.getCacheDataURL());
+                                t.planet.ProjectStorage.saveLocally(data, bitmap.getCacheDataURL());
                             } catch (e) {
                                 console.log(e);
                             }
@@ -1314,7 +1305,7 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 this.init = function(){
-                    this.iframe = document.getElementById("planet-iframe");
+                    this.iframe = document.getElementById('planet-iframe');
                     this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_,storage);
                     this.planet = this.iframe.contentWindow.p;
                     this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
@@ -1332,10 +1323,10 @@ define(MYDEFINES, function (compatibility) {
 
             save = new SaveInterface(planet);
             save.setVariables([
-                ["logo",logo],
-                ["turtles",turtles],
-                ["storage",storage],
-                ["printBlockSVG",_printBlockSVG]
+                ['logo', logo],
+                ['turtles', turtles],
+                ['storage', storage],
+                ['printBlockSVG', _printBlockSVG]
             ]);
             save.init();
 
@@ -1346,34 +1337,39 @@ define(MYDEFINES, function (compatibility) {
 
             saveBox = new SaveBox();
             saveBox.setVariables([
-                ['_canvas',canvas],
-                ['_stage',stage],
-                ['_refreshCanvas',refreshCanvas],
-                ['_doSaveHTML',save.saveHTML.bind(save)],
-                ['_doSaveSVG',save.saveSVG.bind(save)],
-                ['_doSavePNG',save.savePNG.bind(save)],
-                ['_doSavePlanet',doUploadToPlanet],
-                ['_doSaveBlockArtwork',save.saveBlockArtwork.bind(save)]
+                ['_canvas', canvas],
+                ['_stage', stage],
+                ['_refreshCanvas', refreshCanvas],
+                ['_doSaveHTML', save.saveHTML.bind(save)],
+                ['_doSaveSVG', save.saveSVG.bind(save)],
+                ['_doSavePNG', save.savePNG.bind(save)],
+                ['_doSavePlanet', doUploadToPlanet],
+                ['_doSaveBlockArtwork', save.saveBlockArtwork.bind(save)]
             ]);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 saveBox.setVariables([
-                    ['_doSaveWAV',save.saveWAV.bind(save)],
-                    ['_doSaveAbc',save.saveAbc.bind(save)],
-                    ['_doSaveLilypond',save.saveLilypond.bind(save)]
+                    ['_doSaveWAV', save.saveWAV.bind(save)],
+                    ['_doSaveAbc', save.saveAbc.bind(save)],
+                    ['_doSaveLilypond', save.saveLilypond.bind(save)]
                 ]);
             } else {
                 saveBox.setVariables([
-                    ['_doShareOnFacebook',doShareOnFacebook]
+                    ['_doShareOnFacebook', doShareOnFacebook]
                 ]);
             }
+
+            var __clearFunction = function () {
+                sendAllToTrash(true, false);
+                planet.initialiseNewProject.bind(planet);
+            };
 
             clearBox = new ClearBox();
             clearBox
                 .setCanvas(canvas)
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
-                .setClear(planet.initialiseNewProject.bind(planet));
+                .setClear(__clearFunction);
 
             initBasicProtoBlocks(palettes, blocks);
 
@@ -1445,7 +1441,7 @@ define(MYDEFINES, function (compatibility) {
 
                                     stage.addEventListener('trashsignal', __listener, false);
                                     sendAllToTrash(false, false);
-                                    planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf(".")));
+                                    planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
                                 } else {
                                     merging = false;
                                     logo.playbackQueue = {};
@@ -1509,7 +1505,7 @@ define(MYDEFINES, function (compatibility) {
 
                                 stage.addEventListener('trashsignal', __listener, false);
                                 sendAllToTrash(false, false);
-                                planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf(".")));
+                                planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf('.')));
 
                                 loading = false;
                                 refreshCanvas();
@@ -1518,9 +1514,7 @@ define(MYDEFINES, function (compatibility) {
                                 document.body.style.cursor = 'default';
                                 loading = false;
                             }
-
                         }
-
                     }, 200);
                 });
 
@@ -1621,7 +1615,7 @@ define(MYDEFINES, function (compatibility) {
                             var args = newUrlParts[i].split('=');
                             switch (args[0].toLowerCase()) {
                             case 'file':
-                                console.log("Warning: old Music Blocks URLs will no longer work.");
+                                console.log('Warning: old Music Blocks URLs will no longer work.');
                                 break;
                             case 'id':
                                 projectID = args[1];
@@ -1655,12 +1649,13 @@ define(MYDEFINES, function (compatibility) {
                                         xhr.send();
                                     });
                                 };
+
                                 getJSON(url).then(function (data) {
-                                    console.log('Your Json result is:  ' + data.arg); //you can comment this, i used it to debug
+                                    // console.log('Your JSON result is:  ' + data.arg);
                                     n = data.arg;
                                     env.push(parseInt(n));
-                                }, function (status) { //error detection....
-                                    alert('Something went wrong.');
+                                }, function (status) {
+                                    alert('Something went wrong reading JSON-encoded project data.');
                                 });
                                 break;
                             case 'outurl':
@@ -1672,8 +1667,10 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }
                 } else {
-                    if (urlParts[1].indexOf('=') > 0)
+                    if (urlParts[1].indexOf('=') > 0) {
                         var args = urlParts[1].split('=');
+                    }
+
                     //ID is the only arg that can stand alone
                     if (args[0].toLowerCase() === 'id') {
                         projectID = args[1];
@@ -1688,6 +1685,7 @@ define(MYDEFINES, function (compatibility) {
                 }, 2000);
             } else {
                 setTimeout(function () {
+                    console.log('load new Start block');
                     loadStartWrapper(_loadStart);
                 }, 2000);
             }
@@ -1703,8 +1701,8 @@ define(MYDEFINES, function (compatibility) {
             var moving = false;
 
             var __wheelHandler = function (event) {
-                //Vertical Scroll
-                if (event.deltaY != 0 && event.axis==event.VERTICAL_AXIS) { 
+                // vertical scroll
+                if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) { 
                     if (palettes.paletteVisible) {
                         if (event.clientX > cellSize + MENUWIDTH) {
                             blocksContainer.y -= event.deltaY;
@@ -1715,9 +1713,10 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }   
                 }
-                //Horizontal scroll 
+
+                // horizontal scroll 
                 if (scrollBlockContainer) {
-                    if (event.deltaX != 0 && event.axis==event.HORIZONTAL_AXIS) { 
+                    if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) { 
                         if (palettes.paletteVisible) {
                             if (event.clientX > cellSize + MENUWIDTH) {
                                 blocksContainer.x -= event.deltaX;
@@ -1747,7 +1746,7 @@ define(MYDEFINES, function (compatibility) {
 
             stage.on('stagemousedown', function (event) {
                 stageMouseDown = true;
-                if (stage.getObjectUnderPoint() != null | turtles.running()) {
+                if (stage.getObjectUnderPoint() !== null | turtles.running()) {
                     stage.removeAllEventListeners('stagemouseup');
                     stage.on('stagemouseup', __stageMouseUpHandler);
                     return;
@@ -1905,7 +1904,7 @@ define(MYDEFINES, function (compatibility) {
 
             var img = new Image();
             img.onload = function () {
-                console.log('creating error message artwork for ' + img.src);
+                // console.log('creating error message artwork for ' + img.src);
                 var artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
                 var text = new createjs.Text('', '20px Sans', '#000000');
@@ -2095,6 +2094,10 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 if (docById('dissectNumber').classList.contains('hasKeyboard')) {
+                    return;
+                }
+
+                if (docById('timbreName').classList.contains('hasKeyboard')) {
                     return;
                 }
             }
@@ -2771,8 +2774,10 @@ define(MYDEFINES, function (compatibility) {
                     planet.openProjectFromPlanet(projectID,function(){loadStartWrapper(_loadStart);});
                 } catch (e) {
                     console.log(e);
+                    console.log('_loadStart on error');
                     loadStartWrapper(_loadStart);
                 }
+
                 planet.initialiseNewProject();
                 // Restore default cursor
                 loading = false;
@@ -2849,7 +2854,6 @@ define(MYDEFINES, function (compatibility) {
         function _loadStart() {
             // where to put this?
             // palettes.updatePalettes();
-            console.log('LOAD START')
             justLoadStart = function () {
                 console.log('loading start and a matrix');
                 logo.playbackQueue = {};
@@ -2867,6 +2871,7 @@ define(MYDEFINES, function (compatibility) {
                 document.addEventListener('finishedLoading', function () {
                     if (!turtles.running()) {
                         setTimeout(function () {
+                            console.log('reset turtles ' + turtles.turtleList.length);
                             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                                 logo.turtleHeaps[turtle] = [];
                                 logo.notationStaging[turtle] = [];
@@ -2879,6 +2884,7 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 document.attachEvent('finishedLoading', function () {
                     setTimeout(function () {
+                        console.log('reset turtles ' + turtles.turtleList.length);
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             logo.turtleHeaps[turtle] = [];
                             logo.notationStaging[turtle] = [];
@@ -2930,7 +2936,7 @@ define(MYDEFINES, function (compatibility) {
 
         function textMsg(msg) {
             if (msgText == null) {
-                // The container may not be ready yet... so do nothing
+                // The container may not be ready yet, so do nothing.
                 return;
             }
             var msgContainer = msgText.parent;
@@ -2945,11 +2951,15 @@ define(MYDEFINES, function (compatibility) {
                 clearTimeout(errorMsgTimeoutID);
             }
 
-             _hideStopButton(); //Hide the button, as the program is going to be terminated
+            // Hide the button, as the program is going to be
+            // terminated.
+            _hideStopButton();
+
             if (errorMsgText == null) {
-                // The container may not be ready yet... so do nothing
+                // The container may not be ready yet, so do nothing.
                 return;
             }
+
             if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
                 var fromY = 128;
@@ -3085,6 +3095,7 @@ define(MYDEFINES, function (compatibility) {
                     // Don't save blocks in the trash.
                     continue;
                 }
+
                 blockMap.push(blk);
             }
 
@@ -3188,6 +3199,7 @@ define(MYDEFINES, function (compatibility) {
                         connections.push(mapConnection);
                     }
                 }
+
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
 
@@ -3372,7 +3384,7 @@ handleComplete);
                 if (buttonNames[i][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
                 } else if (buttonNames[i][0] === 'hard-stop-turtle'){
-                    console.log("hard stop turtle");
+                    console.log('hard stop turtle');
                     hardStopTurtleContainer = container;
                 } else if (buttonNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
