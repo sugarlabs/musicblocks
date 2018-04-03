@@ -1175,7 +1175,7 @@ define(MYDEFINES, function (compatibility) {
                 this.showPlanet = function(){
                     this.planet.open(this.mainCanvas.toDataURL('image/png'));
                     this.iframe.style.display = 'block';
-                    this.iframe.contentWindow.docById('local-tab').click();
+                    this.iframe.contentWindow.document.getElementById('local-tab').click();
                 }
 
                 this.hidePlanet = function(){
