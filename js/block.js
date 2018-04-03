@@ -18,6 +18,16 @@ const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notena
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename'];
 const EXTRAWIDENAMES = ['modename'];
 
+function getTextWidth(text, font) {
+    // re-use canvas object for better performance
+    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    var context = canvas.getContext("2d");
+    context.font = font;
+    var metrics = context.measureText(text);
+    return metrics.width;
+}
+
+
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
     if (protoblock === null) {
@@ -501,8 +511,8 @@ function Block(protoblock, blocks, overrideName) {
         if (this.overrideName) {
             if (['storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
-                if (block_label.length > 8) {
-                    block_label = block_label.substr(0, 7) + '...';
+                if (getTextWidth(block_label, "bold 20pt arial") > 60) {
+                    block_label = block_label.substr(0, 6) + '...';
                 }
             } else {
                 block_label = this.overrideName;
@@ -621,8 +631,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            if (WIDENAMES.indexOf(this.name) === -1 && label.length > 8) {
-                label = label.substr(0, 7) + '...';
+            if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, "bold 20pt arial") > 60 ) {   
+                label = label.substr(0, 6) + '...';
             }
 
             this.text.text = label;
@@ -988,8 +998,8 @@ function Block(protoblock, blocks, overrideName) {
                 // Label the collapsed block with the action label
                 if (that.connections[1] !== null) {
                     var text = that.blocks.blockList[that.connections[1]].value;
-                    if (text.length > 8) {
-                        text = text.substr(0, 7) + '...';
+                    if (getTextWidth(text, "bold 20pt arial") > 60) {
+                        text = text.substr(0, 6) + '...';
                     }
                     that.collapseText.text = text;
                 } else {
@@ -2094,8 +2104,8 @@ function Block(protoblock, blocks, overrideName) {
                     newValue = uniqueValue;
                     this.value = newValue;
                     var label = this.value.toString();
-                    if (label.length > 8) {
-                        label = label.substr(0, 7) + '...';
+                    if (getTextWidth(label, "bold 20pt arial") > 60) {  
+                        label = label.substr(0, 6) + '...';
                     }
                     this.text.text = label;
                     this.label.value = newValue;
@@ -2142,8 +2152,8 @@ function Block(protoblock, blocks, overrideName) {
             var label = this.value.toString();
         }
 
-        if (WIDENAMES.indexOf(this.name) === -1 && label.length > 8) {
-            label = label.substr(0, 7) + '...';
+        if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, "bold 20pt arial") > 60 ) {   
+            label = label.substr(0, 6) + '...';
         }
 
         this.text.text = label;
