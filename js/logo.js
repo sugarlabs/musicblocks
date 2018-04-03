@@ -289,7 +289,7 @@ function Logo () {
     this.lastNote = {};
     this.restartPlayback = true;
     //variables for progress bar
-    var progressBar = document.getElementById("myBar");   
+    var progressBar = docById('myBar');
     var width = 0;
     var turtleLength = 0;
     var inLoop = 0;
@@ -7665,22 +7665,24 @@ function Logo () {
         if (this.turtles.turtleList.length > 0) {
             var that = this;
             for (t in this.turtles.turtleList) {
-                var playbackList = [];
-                for (var i = 0; i < this.playbackQueue[t].length; i++) {
-                    playbackList.push([i, this.playbackQueue[t][i]]);
-                }
-
-                var sortedList = playbackList.sort(
-                    function(a, b) {
-                        if (a[1][0] === b[1][0]) {
-                            // Preserve original order if the events
-                            // have the same time stamp.
-                            return a[0] - b[0];
-                        } else {
-                            return a[1][0] - b[1][0];
-                        }
+                if (t in this.playbackQueue) {
+                    var playbackList = [];
+                    for (var i = 0; i < this.playbackQueue[t].length; i++) {
+                        playbackList.push([i, this.playbackQueue[t][i]]);
                     }
-                );
+
+                    var sortedList = playbackList.sort(
+                        function(a, b) {
+                            if (a[1][0] === b[1][0]) {
+                                // Preserve original order if the events
+                                // have the same time stamp.
+                                return a[0] - b[0];
+                            } else {
+                                return a[1][0] - b[1][0];
+                            }
+                        }
+                    );
+                }
             }
         }
 
@@ -7692,9 +7694,11 @@ function Logo () {
         if (width >= 100) {
             width = 0;
         }
+
         for (var turtle in this.playbackQueue) {   //For multiple voices
             l = l + this.playbackQueue[turtle].length;
         }
+
         progressBarDivision = 100 / (that.playbackQueue[t].length);
         turtleLength = 0;
         inLoop = 0;
