@@ -1301,8 +1301,13 @@ function Block(protoblock, blocks, overrideName) {
                     if (!that.blocks.getLongPressStatus()) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            that.blocks.logo.synth.resume();
+                        }
+
                         if (that.blocks.turtles.running()) {
                             that.blocks.logo.doStopTurtle();
+
                             setTimeout(function () {
                                 that.blocks.logo.runLogoCommands(topBlock);
                             }, 250);

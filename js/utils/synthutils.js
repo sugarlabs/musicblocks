@@ -201,6 +201,10 @@ function Synth() {
     // Using Tone.js
     this.tone = new Tone();
 
+    this.resume = function () {
+        this.tone.context.resume();
+    };
+
     Tone.Buffer.onload = function () {
         console.log('sample loaded');
     };

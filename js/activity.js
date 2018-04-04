@@ -519,6 +519,8 @@ define(MYDEFINES, function (compatibility) {
             var playingWidget = false;
             logo.setTurtleDelay(0);
             if (_THIS_IS_MUSIC_BLOCKS_) {
+                logo.synth.resume();
+
                 if (docById('ptmDiv').style.visibility === 'visible') {
                     playingWidget = true;
                     logo.pitchTimeMatrix.playAll();
@@ -584,6 +586,10 @@ define(MYDEFINES, function (compatibility) {
 
         function _doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                logo.synth.resume();
+            }
+
             if (_THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
                 logo.pitchTimeMatrix.playAll();
             } else if (!turtles.running()) {
@@ -595,6 +601,9 @@ define(MYDEFINES, function (compatibility) {
 
         function _doStepButton() {
             var turtleCount = Object.keys(logo.stepQueue).length;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                logo.synth.resume();
+            }
 
             if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -613,6 +622,9 @@ define(MYDEFINES, function (compatibility) {
 
         function _doSlowMusicButton() {
             logo.setNoteDelay(DEFAULTDELAY);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                logo.synth.resume();
+            }
 
             if (docById('ptmDiv').style.visibility === 'visible') {
                 logo.pitchTimeMatrix.playAll();
@@ -625,6 +637,9 @@ define(MYDEFINES, function (compatibility) {
 
         function _doStepMusicButton() {
             var turtleCount = Object.keys(logo.stepQueue).length;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                logo.synth.resume();
+            }
 
             if (turtleCount === 0 || logo.TurtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
