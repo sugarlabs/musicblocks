@@ -7390,6 +7390,14 @@ function Logo () {
                         }
 
                         if (duration > 0) {
+                            var __getParamsEffects = function (paramsEffects) {
+                                if (!paramsEffects.doVibrato && !paramsEffects.doDistortion && !paramsEffects.doTremolo && !paramsEffects.doPhaser && !paramsEffects.Chorus && paramsEffects.partials.length === 1 && paramsEffects.partials[1] === 1) {
+                                    return null;
+                                } else {
+                                    return paramsEffects;
+                                }
+                            };
+
                             if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                                 // Parameters related to effects
                                 var paramsEffects = {
@@ -7430,7 +7438,7 @@ function Logo () {
                                     }
 
                                     if (that.justCounting[turtle].length === 0) {
-                                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null]);
+                                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle][thisBlk]), __getParamsEffects(paramsEffects), null]);
                                     }
                                 } else if (that.drumStyle[turtle].length > 0) {
                                     if (!that.suppressOutput[turtle]) {
@@ -7479,7 +7487,7 @@ function Logo () {
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
-                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters]);
+                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.instrumentNames[turtle]), __getParamsEffects(paramsEffects), filters]);
                                             }
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
@@ -7488,7 +7496,7 @@ function Logo () {
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
-                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null]);
+                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.voices[turtle]), __getParamsEffects(paramsEffects), null]);
                                             }
                                         } else {
                                             if (!that.suppressOutput[turtle]) {
@@ -7496,7 +7504,7 @@ function Logo () {
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
-                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'default', paramsEffects, null]);
+                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'default', __getParamsEffects(paramsEffects), null]);
                                             }
                                         }
                                     }
