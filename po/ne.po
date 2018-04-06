@@ -134,7 +134,7 @@
 #: js/musicutils.js:48
 #: js/musicutils.js:57
 msgid "rest"
-msgstr ""
+msgstr "बाँकी"
 
 #: js/block.js:687
 #: js/block.js:2169
@@ -188,13 +188,13 @@ msgstr "सुरु गर"
 
 #: js/block.js:693
 msgid "matrix"
-msgstr ""
+msgstr "मेट्रिक्स"
 
 #: js/block.js:696
 #: js/basicblocks.js:838
 #: plugins/rodi.rtp:328
 msgid "status"
-msgstr ""
+msgstr "स्थिति"
 
 #: js/block.js:699
 #: js/block.js:720
@@ -207,37 +207,37 @@ msgstr ""
 #: js/lilypond.js:591
 #: js/lilypond.js:629
 msgid "drum"
-msgstr ""
+msgstr "ड्रम"
 
 #: js/block.js:702
 msgid "ruler"
-msgstr ""
+msgstr "रुलर्र"
 
 #: js/block.js:705
 #: js/basicblocks.js:739
 #.TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
-msgstr ""
+msgstr "टेम्बर"
 
 #: js/block.js:708
 msgid "stair"
-msgstr ""
+msgstr "चरण"
 
 #: js/block.js:711
 #: js/basicblocks.js:758
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr ""
+msgstr "वेग"
 
 #: js/block.js:714
 #: js/basicblocks.js:1954
 #.TRANS: mode, e.g., Major in C Major
 msgid "mode"
-msgstr ""
+msgstr "शैली"
 
 #: js/block.js:717
 msgid "slider"
-msgstr ""
+msgstr "स्लाइडर"
 
 #: js/block.js:1611
 #: js/musicutils.js:1424
@@ -246,7 +246,7 @@ msgstr ""
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
-msgstr ""
+msgstr "ति ला सोल फा मि रे दो"
 
 #: js/block.js:1937
 #: js/block.js:1941
@@ -258,7 +258,7 @@ msgstr ""
 #: js/palette.js:753
 #: js/blocks.js:2144
 msgid "true"
-msgstr ""
+msgstr "सही"
 
 #: js/block.js:1937
 #: js/block.js:1942
@@ -267,7 +267,7 @@ msgstr ""
 #: js/block.js:1945
 #: js/logo.js:695
 msgid "false"
-msgstr ""
+msgstr "गलत"
 
 #: js/samplesviewer.js:73
 #: js/samplesviewer.js:73
@@ -277,71 +277,71 @@ msgstr "खोल"
 #: js/samplesviewer.js:74
 #: js/samplesviewer.js:74
 msgid "Delete"
-msgstr ""
+msgstr "मेटाउनुस"
 
 #: js/samplesviewer.js:75
 #: js/samplesviewer.js:75
 msgid "Publish"
-msgstr ""
+msgstr "प्रकाशन गर्नुहोस"
 
 #: js/samplesviewer.js:77
 #: js/samplesviewer.js:77
 #: js/samplesviewer.js:101
 #: js/samplesviewer.js:101
 msgid "Share"
-msgstr ""
+msgstr "बाड्नुहोस"
 
 #: js/samplesviewer.js:80
 msgid "Copy this link to share your project."
-msgstr ""
+msgstr "तपाइको परियोजना बाड्न यो लिङ्क नक्कल/कपी गार्नुहोस"
 
 #: js/samplesviewer.js:81
 #: js/samplesviewer.js:84
 msgid "Advanced options"
-msgstr ""
+msgstr "उन्नत विकल्पहरू"
 
 #: js/samplesviewer.js:85
 msgid "Run project on startup."
-msgstr ""
+msgstr "परियोजना  सुरुवातमा चलाउनुहोस"
 
 #: js/samplesviewer.js:86
 msgid "Show code blocks on startup."
-msgstr ""
+msgstr "कोड बल्क सुरुवातमा देखाउनुहोस"
 
 #: js/samplesviewer.js:87
 msgid "Collapse code blocks on startup."
-msgstr ""
+msgstr "कोड बल्क सुरुवातमा नष्ट गर्नुहोस"
 
 #: js/samplesviewer.js:91
 #: js/samplesviewer.js:91
 #: js/samplesviewer.js:115
 #: js/samplesviewer.js:115
 msgid "Download"
-msgstr ""
+msgstr "डाउन्लोड"
 
 #: js/samplesviewer.js:92
 #: js/samplesviewer.js:92
 #: js/samplesviewer.js:116
 #: js/samplesviewer.js:116
 msgid "Merge with current project"
-msgstr ""
+msgstr "चालु परियोगनामा मिलाउनुहोस"
 
 #: js/samplesviewer.js:698
 msgid "Planet"
-msgstr ""
+msgstr "प्लानेट"
 
 #: js/samplesviewer.js:699
 msgid "On my device"
-msgstr ""
+msgstr "मेरो उपकरणमा"
 
 #: js/samplesviewer.js:700
 msgid "Worldwide"
-msgstr ""
+msgstr "विश्वव्यापी"
 
 #: js/activity.js:635
 #.TRANS: hide Polar coordinate overlay grid
 msgid "hide grid"
-msgstr ""
+msgstr "ग्रिड लुकाउनुहोस"
 
 #: js/activity.js:642
 #: js/activity.js:648
@@ -360,72 +360,72 @@ msgstr "कार्टेसन"
 #: js/turtledefs.js:108
 #.TRANS: show Polar coordinate overlay grid
 msgid "Polar"
-msgstr ""
+msgstr "पोलार"
 
 #: js/activity.js:672
 msgid "Close"
-msgstr ""
+msgstr "बन्दगर्नुहोस"
 
 #: js/activity.js:1073
 #: js/activity.js:1107
 #: js/activity.js:1132
 #: js/activity.js:1153
 msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
+msgstr "फाइलबाट परियोजना भर्न/लोडगर्न सकिएन। कृपया फाइलको प्रकार जाँच गर्नुहोस।"
 
 #: js/activity.js:1660
 msgid "This block is deprecated."
-msgstr ""
+msgstr "यो ब्लक हटाइएको छ।"
 
 #: js/activity.js:1662
 msgid "Block cannot be found."
-msgstr ""
+msgstr "ब्लक भेटाउन सकिएन।"
 
 #: js/activity.js:2433
 #: js/activity.js:2444
 #: js/activity.js:2459
 msgid "untitled"
-msgstr ""
+msgstr "शीर्षक विहिन"
 
 #: js/activity.js:2512
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "फाइलको नाम"
 
 #: js/activity.js:2514
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "परियोजनाको शीर्षक"
 
 #: js/activity.js:2516
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
-msgstr ""
+msgstr "परियोजनाको लेखक"
 
 #: js/activity.js:2518
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr ""
+msgstr "के  उत्पादनमा MIDI समावेश गर्न चाहनुहुन्छ?"
 
 #: js/activity.js:2520
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr ""
+msgstr "के उत्पादनमा गिटार ट्याब्लेचर समावेश गर्न चाहनुहुन्छ?"
 
 #: js/activity.js:2522
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr ""
+msgstr "लिलिपोण्डको रुपमा बचत गर्नुहोस"
 
 #: js/activity.js:2525
 #: js/logo.js:6617
 #: js/logo.js:6624
 msgid "My Project"
-msgstr ""
+msgstr "मेरो परियोजना"
 
 #: js/activity.js:2527
 msgid "My Music Blocks Creation"
-msgstr ""
+msgstr "मेरो म्युजिक ब्लक्सको सिर्जना"
 
 #: js/activity.js:2535
 #: js/basicblocks.js:3681
@@ -444,32 +444,32 @@ msgstr ""
 #: js/basicblocks.js:3821
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "मिस्टर माउस"
 
 #: js/activity.js:2881
 msgid "Please set browser zoom level to 100%"
-msgstr ""
+msgstr "कृपया ब्राउजरको जुम स्तर 100% राख्नुहोस"
 
 #: js/activity.js:3371
 #: js/activity.js:3385
 #: js/turtledefs.js:89
 msgid "Run fast"
-msgstr ""
+msgstr "छिटो चलाउनुहोस"
 
 #: js/activity.js:3371
 #: js/activity.js:3385
 msgid "long press to run slowly"
-msgstr ""
+msgstr "बिस्तारै चलाउन धेरैबेरसम्म थिच्नुहोस"
 
 #: js/activity.js:3371
 msgid "extra-long press to run music slowly"
-msgstr ""
+msgstr "संगीत बिस्तारै बजाउन अझै धेरैबेरसम्म थिच्नुहोस"
 
 #: js/activity.js:3372
 #: js/activity.js:3386
 #: js/turtledefs.js:92
 msgid "Run step by step"
-msgstr ""
+msgstr "चरणवद्धरुपमा चलाउनुहोस"
 
 #: js/activity.js:3373
 #: js/turtledefs.js:93
