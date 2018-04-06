@@ -3179,7 +3179,7 @@ define(MYDEFINES, function (compatibility) {
                     case 'nameddoArg':
                     case 'namedcalc':
                     case 'namedcalcArg':
-                    case 'namedArg':
+                    case 'namedarg':
                         var args = {
                             'value': myBlock.privateData
                         }
