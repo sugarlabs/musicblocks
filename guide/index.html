@@ -13,8 +13,15 @@
     <div class="container">
       <div id="content">
 <h1 id="guide-to-programming-with-music-blocks">Guide to Programming with Music Blocks</h1>
-<p>Music Blocks is a programming environment for children interested in music and graphics. It expands upon Turtle Blocks by adding a collection of features relating to pitch and rhythm.</p>
-<p>The Turtle Blocks guide is a good place to start learning about the basics. In this guide, we illustrate the musical features by walking the reader through numerous examples.</p>
+<p>Music Blocks is a programming environment for children interested in
+music and graphics. It expands upon Turtle Blocks by adding a
+collection of features relating to pitch and rhythm.</p>
+<p>The Turtle Blocks guide is a good place to start learning about the
+basics. In this guide, we illustrate the musical features by walking
+the reader through numerous examples.</p>
+<p>A short <a href="http://github.com/sugarlabs/musicblocks/tree/master/Debugging.md">Guide to
+Debugging</a>. is
+also available.</p>
 <h2 id="-a-name-toc-a-table-of-contents"><a name="TOC"></a> Table of Contents</h2>
 <ol>
 <li><a href="#GETTING-STARTED">Getting Started</a></li>
@@ -78,14 +85,21 @@ run. Look for <code>RUN LIVE</code> links.</p>
 <h2 id="-a-name-getting-started-a-1-getting-started"><a name="GETTING-STARTED"></a>1. Getting Started</h2>
 <p><a href="#TOC">Back to Table of Contents</a> | <a href="#NOTES">Next Section (2. Making Sounds)</a></p>
 <p>Music Blocks is designed to run in a browser. Most of the development
-has been done in Chrome, but it should also work in Firefox. You can
-run it from <a href="http://sugarlabs.github.io/musicblocks">github io</a> or
-by downloading a copy of the code and running a local copy directly
-from the file system of your computer.</p>
+has been done in Chrome, but it should also work in Firefox, Opera,
+and some versions of Safari. You can run it from
+<a href="https://musicblocks.sugarlabs.org">musicblocks.sugarlabs.org</a>, from
+<a href="https://musicblocks.sugarlabs.org">github io</a>, or by
+downloading a copy of the code and running a local copy directly from
+the file system of your computer. (Note that when running locally, you
+may have to use a local server to expose all of the features.)</p>
+<p>This guide details the music-specific features of Music Blocks.  You
+may also be interested in the <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/guide">Turtle Blocks
+Guide</a>,
+which reviews many programming features common to both projects.</p>
 <p>For more details on how to use Music Blocks, see <a href="http://github.com/sugarlabs/musicblocks/tree/master/documentation">Using Music
 Blocks</a>.
-For more details on how to use Turtle Blocks, see
-<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation">Using Turtle Blocks JS</a>.</p>
+For more details on how to use Turtle Blocks, see <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation">Using Turtle Blocks
+JS</a>.</p>
 <h2 id="-a-name-notes-a-2-making-sounds"><a name="NOTES"></a>2. Making Sounds</h2>
 <p><a href="#GETTING-STARTED">Previous Section (1. Getting Started)</a> | <a href="#TOC">Back to
 Table of Contents</a> | <a href="#PROGRAMMING-WITH-MUSIC">Next Section (3. Programming with
@@ -131,12 +145,15 @@ in the scale, &#39;G&#39;, also in &#39;Octave 4&#39;), <code>C == 1, D == 2, ..
 <p>The next block is specified using a <em>Pitch-number</em> block (the <code>7th
 semi-tone</code> above <code>C</code> in <code>Octave 4</code>). The offset for the pitch number
 can be modified using the <em>Set-pitch-number-offset</em> block.</p>
-<p>The pitch of the last block is specified using the <em>Hertz</em> block in
+<p>The pitch of the next block is specified using the <em>Hertz</em> block in
 conjunction with a <em>Number</em> block (<code>392</code> Hertz) , which corresponds to
 the frequency of the sound made.</p>
 <p>The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
-frequency, the octave is ignored.</p>
+frequency, the octave is ignored.The octave argument can also be specified using a <em>Text</em> block with values <em>current</em>, <em>previous</em>, <em>next</em> which does as 0, -1, 1 respectively.</p>
+<p>The octave of the next block is specified using a <em>current</em> text block (<code>Sol</code> in <code>Octave 4</code>).</p>
+<p>The octave of the next block is specified using a <em>previous</em> text block (<code>G</code> in <code>Octave 3</code>).</p>
+<p>The octave of the last block is specified using a <em>next</em> text block (<code>G</code> in <code>Octave 5</code>).</p>
 <p>Note that the pitch name can also be specified using a <em>Text</em> block. </p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/charts/KeyboardChart.svg" alt="alt tag" title="Note layout chart for keyboard" width="100%"></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg" alt="alt tag" title="Note layout chart for mallet" width="100%"></p>
@@ -217,7 +234,7 @@ song we created?)</p>
 last played note. In the example above, <em>Step Pitch</em> blocks are used
 inside of <em>Repeat</em> blocks to repeat the code <code>7</code> times, playing up and
 down a scale.</p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_scales.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523032034365533&amp;run=True">RUN LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform16.svg" alt="alt tag" title="Using the Scalar Step Up and Down blocks"></p>
 <p>Another way to move up and down notes in a scale is to use the <em>Scalar
 Step Up</em> and <em>Scalar Step Down</em> blocks. These blocks calculate the
@@ -292,7 +309,7 @@ will result in the equivalent of a <code>1/4</code> note.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum4.svg" alt="alt tag" title="increasing sequence of drum beats over time"></p>
 <p>In the above example, the sequence of <a href="#DRUMS">drum</a> note values is
 decreased over time, at each repetition.</p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_drumexample.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&amp;run=True">RUN LIVE</a></p>
 <h4 id="-a-name-repetition-a-3-2-6-repeating-notes"><a name="REPETITION"></a>3.2.6 Repeating Notes</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform6.svg" alt="alt tag" title="repeating notes"></p>
 <p>There are several ways to repeat notes. The <em>Repeat</em> block will play a
@@ -475,7 +492,7 @@ half-steps.</p>
 (retrograde). In the example above, the notes in <code>chunk</code> are played as
 <code>Sol</code>, <code>Ti</code>, <code>La</code>, <code>Sol</code>, i.e., from the bottom to the top of the
 stack.</p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb">RUN
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1522885752309944&amp;run=True">RUN
 LIVE</a></p>
 <p>Note that all of the blocks inside a <em>Backward</em> block are reverse, so
 use this feature with caution if you include logic intermixed with
@@ -515,7 +532,7 @@ concurrently.)</p>
 <p>It gets more interesting if we shift up and down octaves.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/voices4.svg" alt="alt tag" title="playing the various voices offset in time"></p>
 <p>And even more interesting if we bring the various voices offset in time.</p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523026536194324&amp;run=True">RUN LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/voices5.svg" alt="alt tag" title="queuing the various voices using events"></p>
 <p>An alternative to use a preprogrammed delay is to use the <em>Broadcast</em>
 block to bring in multiple voices. In the example above, after each
@@ -538,11 +555,11 @@ turtle moves forward each time a quarter note is played. It turns
 right during the eighth note. The pitch is raised by one half step,
 the pen size decreases, and the pen color increases at each step in
 the inner repeat loop.</p>
-<p><a href="https://sugarlabs.github.io/musicblocks/index.html?file=MusicBlocks_graphicsexample.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1518563680307291&amp;run=True">RUN LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/graphics3.svg" alt="alt tag" title="synchronizing graphics and music"></p>
 <p>Another example of graphics synchronized to the music by placing the
 graphics commands inside of <em>Note value</em> blocks</p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&amp;run=True">RUN LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/fibonacci3.svg" alt="alt tag" title="usage of No-clock block"></p>
 <p>In this example, because the computation and graphics are more
 complex, a <em>No-clock</em> block is used to decouple the graphics from the
@@ -553,7 +570,7 @@ actions over the specified rhythm.</p>
 <p>Another example of embedding graphics into notes: in case, a recursive
 tree drawing, where the pitch goes up as the branches assend.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/tree.svg" alt="alt tag" title="tree graphic"></p>
-<p><a href="https://sugarlabs.github.io/musicblocks/index.html?file=MusicBlocks_musicaltree.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&amp;run=True">RUN LIVE</a></p>
 <h3 id="-a-name-beat-a-3-5-beat"><a name="BEAT"></a>3.5 Beat</h3>
 <p>The beat of the music is determined by the <em>Meter</em> block (by default,
 it is set to 4:4).</p>
@@ -570,7 +587,7 @@ take on specific beats. (Note that the action is run before any blocks
 inside the note block associated with the beat are run.)</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/graphics5.svg" alt="alt tag" title="using beat to synchronize graphics"></p>
 <p>Another approach to graphics is to use modulate them based on the
-beat. In the exxample above, we call the same graphics action for each
+beat. In the example above, we call the same graphics action for each
 note, but the parameters associated with the action, such as pen
 width, are dependent upon which beat we are on. On Beat 1, the pen
 size is set to <code>50</code> and the volume to <code>75</code>. On Beat <code>3</code>, the pen size is set
@@ -586,12 +603,12 @@ the mouse position to generate a suffix: <code>0</code>, <code>1</code>, <code>2
 depending on the quadrant. When the mouse is in the lower-left
 quadrant, <code>chunk0</code> is played; lower-right quadrant, <code>chunk1</code>;
 upper-left quadrant, <code>chunk2</code>; and upper-right quadrant, <code>chunk3</code>.</p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523028011868930&amp;run=True">RUN LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/interactive2.svg" alt="alt tag" title="creation of a two-key piano"></p>
 <p>In the example above, a simple two-key piano is created by associating
 <em>click</em> events on two different turtles with individual notes. Can you
 make an 8-key piano?</p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523107390715125&amp;run=True">RUN LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/interactive3.svg" alt="alt tag" title="adding randomness to your music"></p>
 <p>You can also add a bit of randomness to your music. In the top example
 above, the <em>One-of</em> block is used to randomly assign either <code>Do</code> or
@@ -638,13 +655,12 @@ organized vertically by pitch and horizontally by rhythm.</p>
 <p>The matrix in the figure above has three <em>Pitch</em> blocks and one
 <em>Rhythm</em> block, which is used to create a 3 x 3 grid of pitch and
 time.</p>
-<p>Note that the default matrix has five <em>Pitch</em> blocks, hence, you will
-see five rows, one for each pitch. (A sixth row at the bottom is used
-for specifying the rhythms associated with each note.) Also by
-default, there are two <em>Rhythm</em> blocks, which specifies six quarter
-notes followed by one half note. Since the <em>Rhythm</em> blocks are inside
-of a <em>Repeat</em> block, there are fourteen (2 x 7) columns for selecting
-notes.</p>
+<p>Note that the default matrix has five <em>Pitch</em> blocks, one <em>Drum</em>
+block, and two <em>Mouse</em> (movement) blocks. Hence, you will see eight
+rows, one for each pitch, drum, and mouse (movement). (A ninth row at
+the bottom is used for specifying the rhythms associated with each
+note.) Also by default, there are two <em>Rhythm</em> blocks, which specifies
+six quarter <code>(1/4)</code> notes followed by one half <code>(1/2)</code> note.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix3.svg" alt="alt tag" title="matrix"></p>
 <p>By clicking on individual cells in the grid, you should hear
 individual notes (or chords if you click on more than one cell in a
@@ -1038,7 +1054,7 @@ e<span class="hljs-symbol">'4</span> e<span class="hljs-symbol">'4</span> d<span
 \layout { }
 }
 </code></pre><p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/hotdog.png" alt="alt tag" title="sheet music"></p>
-<p><a href="http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_hotdog.tb">RUN LIVE</a></p>
+<p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&amp;run=True">RUN LIVE</a></p>
       </div>
     </div>
   </body>
