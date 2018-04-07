@@ -78,7 +78,6 @@ var MYDEFINES = [
     'easeljs.min',
     'tweenjs.min',
     'preloadjs.min',
-    'Tone.min',
     'howler',
     'p5.min',
     'p5.sound.min',
@@ -110,11 +109,13 @@ var MYDEFINES = [
     'utils/synthutils',
     'activity/playbackbox',
     'activity/pastebox',
+    'activity/languagebox',
     'prefixfree.min'
 ];
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     var MUSICBLOCKS_EXTRAS = [
+        'Tone.min',
         'widgets/modewidget',
         'widgets/pitchtimematrix',
         'widgets/pitchdrummatrix',
@@ -123,7 +124,6 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         'widgets/tempo',
         'widgets/pitchslider',
         'widgets/timbre',
-        'activity/languagebox',
         'activity/lilypond',
         'activity/abc'
     ];
@@ -1321,7 +1321,7 @@ define(MYDEFINES, function (compatibility) {
 
                 this.init = function(){
                     this.iframe = document.getElementById('planet-iframe');
-                    this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_,storage);
+                    this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage);
                     this.planet = this.iframe.contentWindow.p;
                     this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
                     this.planet.setPlanetClose(this.closePlanet.bind(this));
