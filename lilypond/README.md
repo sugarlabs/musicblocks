@@ -1,6 +1,6 @@
 #LilyPond with Music Blocks software
 
-[LilyPond](http://www.lilypond.org/) is a music engraving program, devoted to producing the highest-quality sheet music possible. It brings the aesthetics of traditionally engraved music to computer printouts. LilyPond is Free/Libre Software (part of the [GNU Project](https://en.wikipedia.org/wiki/GNU_Project)). We use it with [Music Blocks software](walterbender.github.io/musicblocks/) in order to export the user-generated music to sheet music.
+[LilyPond](http://www.lilypond.org/) is a music engraving program, devoted to producing the highest-quality sheet music possible. It brings the aesthetics of traditionally engraved music to computer printouts. LilyPond is Free/Libre Software (part of the [GNU Project](https://en.wikipedia.org/wiki/GNU_Project)). We use it with [Music Blocks software](sugarlabs.github.io/musicblocks/) in order to export the user-generated music to sheet music.
 
 ##Overview
 We will use Music Blocks to create the music and then convert that to sheet music. For that:
@@ -244,7 +244,7 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 % <comments removed>
 \header {
-   dedication = "Made with LilyPond and Music Blocks (http://walterbender.github.io/musicblocks/)"
+   dedication = "Made with LilyPond and Music Blocks (https://musicblocks.sugarlabs.org)"
    title = "My Music Blocks Creation"
 %   subtitle = "Subtitle"
 %   instrument = "Instrument"

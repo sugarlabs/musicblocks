@@ -80,7 +80,7 @@ additional menu appears when a "long press" is applied to a stack of
 blocks).
 
 These toolbars are described in detail in the
-[Turtle Blocks documentation pages](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
+[Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 Keyboard shortcuts
 ------------------
@@ -108,16 +108,16 @@ The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
 
 See the
-[Turtle Blocks Programming Guide](http://github.com/walterbender/turtleblocksjs/tree/master/guide/README.md)
+[Turtle Blocks Programming Guide](http://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
 for general details on how to use the blocks. 
 
 See the
-[Music Blocks Programming Guide](http://github.com/walterbender/musicblocks/tree/master/guide/README.md)
+[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
 for details specific to music: *Rhythm*, *Pitch*, *Meter*, *Tone*,
 *Intervals*, *Volume*, *Drum*, and *Widget*.
 
 All of the other palettes are described in the 
-[Turtle Blocks documentation pages](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
+[Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 Defining a note
 ---------------
@@ -240,7 +240,7 @@ modified.)
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
 an event, such as an on beat or off beat or mouse click. See
-[Music Blocks Programming Guide](http://github.com/walterbender/musicblocks/tree/master/guide/README.md),
+[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 for further details and examples.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/storein.svg "storein")
@@ -255,7 +255,7 @@ can be modified using the *Add one* block. These blocks are the
 typical way in which variables are stored and retrieved in Music
 Blocks.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/documentation/forward.svg "forward")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/forward.svg "forward")
 
 The *Forward* block, found on the *Mouse* palette, is used to draw straight lines. (Note that if this block is used inside of a *Note value* block&mdash;the line will be drawn as the note plays; otherwise the line is drawn "instantly".)
 

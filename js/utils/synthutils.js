@@ -201,17 +201,17 @@ function Synth() {
     // Using Tone.js
     this.tone = new Tone();
 
-    this.resume = function () {
-        this.tone.context.resume();
-    };
-
     Tone.Buffer.onload = function () {
         console.log('sample loaded');
     };
 
     this.samples = null;
-    this.samplesuffix = "_SAMPLE";
+    this.samplesuffix = '_SAMPLE';
     this.samplesManifest = null;
+
+    this.resume = function () {
+        this.tone.context.resume();
+    };
 
     this.loadSamples = function () {
         this.samplesManifest = {
@@ -912,4 +912,5 @@ function Synth() {
         Tone.Master.volume.rampTo(db, 0.01);
     };
 
+    return this;
 };

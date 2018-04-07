@@ -37,7 +37,7 @@ Credits
 -------
 
 Music Blocks is a fork of
-[TurtleBlocksJS](https://github.com/walterbender/turtleblocksjs)
+[TurtleBlocksJS](https://github.com/sugarlabs/turtleblocksjs)
 created by Walter Bender.
 
 Devin Ulibarri has contributed functional and user-interface

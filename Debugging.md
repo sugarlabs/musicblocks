@@ -45,7 +45,7 @@ code, or, as in the example below, you can play a single voice by
 clicking on one of the *Start* blocks or single phase by clicking on
 one of the *Action* blocks.
 
-![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/startblocks_debug_guide.png "Start blocks")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/startblocks_debug_guide.png "Start blocks")
 
 ## 2. Print and Comment blocks
 
@@ -54,7 +54,7 @@ a message while running a program. It is useful to determine if a
 section of code is being executed when expected or if a box or
 parameter contains an expected value.
 
-![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
 
 The *Print* block is used to display the number of whole notes played,
 in this case, `1/4 + 1/4 + 1/2`, which adds up to `1`, which is
@@ -67,9 +67,9 @@ written to the browser console.
 
 ## 3. Status widget
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg "given Music block")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status1.svg "given Music block")
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg "status in tabular form")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status2.svg "status in tabular form")
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
@@ -82,7 +82,7 @@ skip, [staccato](#MORE-TRANSFORMATIONS),
 [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors,
 e.g., x, y, heading, color, shade, grey, and pensize.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg "additional programming within the Status block")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status3.svg "additional programming within the Status block")
 
 You can do additional programming within the status block. In the
 example above, `whole notes played` is divided by `4` (e.g. quarter notes)
@@ -129,6 +129,6 @@ browser console, such as the notes being played and comments (See the
 *Comment* block above). The console can be accessed by typing
 `Ctrl-Shift-J` on most web browsers.
 
-![alt tag](https://github.com/walterbender/musicblocks/blob/master/images/browserconsole_debug_guide.png "Console blocks")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/browserconsole_debug_guide.png "Console blocks")
 
 Shown above is the console output from three notes: `sol mi sol`.

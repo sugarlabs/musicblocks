@@ -12,7 +12,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 // Note: This code is inspired by the Python Turtle Blocks project
-// (https://github.com/walterbender/turtleart), but implemented from
+// (https://github.com/sugarlabs/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
 const _THIS_IS_MUSIC_BLOCKS_ = true;

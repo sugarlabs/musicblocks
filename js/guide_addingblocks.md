@@ -10,14 +10,14 @@ Defining the new block in basicblocks.js  and the corresponding code to be run w
 
 ## How to make your block a part of the main repository
 
- Make your own copy by cloning the official [respository](https://github.com/walterbender/musicblocks.git) 
+ Make your own copy by cloning the official [respository](https://github.com/sugarlabs/musicblocks.git) 
  Create your block and make a pull request.
 
 
 ## How to create new blocks
 All blocks are present in a simple format.
 
-For most blocks, there are two files that need to be edited in order to add a block: `[basicblocks.js](https://github.com/walterbender/musicblocks/blob/master/js/basicblocks.js)` and `[logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)`. `basicblocks.js` is where the block is defined, its palette assigned, its shape and label defined, and any default arguments assigned. logo.js is where the code associated with running the block is defined.
+For most blocks, there are two files that need to be edited in order to add a block: `[basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)` and `[logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)`. `basicblocks.js` is where the block is defined, its palette assigned, its shape and label defined, and any default arguments assigned. logo.js is where the code associated with running the block is defined.
 
 1) Define the type of block
   
@@ -53,7 +53,7 @@ For most blocks, there are two files that need to be edited in order to add a bl
         `uniquenameBlock.adjustWidthToLabel()`
 
   
-  check the available properties on [protoblock.js](https://github.com/walterbender/turtleblocksjs/blob/master/js/protoblocks.js)
+  check the available properties on [protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js)
   and depending on your needs you can add more features and properties.
 
  Macro expansions
@@ -81,7 +81,7 @@ For most blocks, there are two files that need to be edited in order to add a bl
     squareBlock.defaults.push(440);
   ```
 
-## Functioning of the block in [logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)
+## Functioning of the block in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
      
       
     Now here you expalin how your block works.
@@ -132,7 +132,7 @@ For most blocks, there are two files that need to be edited in order to add a bl
         ```
 
 
-## Assigning your block in [analytics.js](https://github.com/walterbender/musicblocks/blob/master/js/analytics.js)
+## Assigning your block in [analytics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/analytics.js)
 
     Here you assign a block according to its bin.
     Check which bin belongs to which pallete, and then according to assign your block to the bin
@@ -146,11 +146,11 @@ For most blocks, there are two files that need to be edited in order to add a bl
 
 ## References
 Sample block artwork
-![Empty block](https://github.com/walterbender/musicblocks/blob/master/images/emptybox.svg)
+![Empty block](https://github.com/sugarlabs/musicblocks/blob/master/images/emptybox.svg)
 
-![Current pitch name](https://github.com/walterbender/musicblocks/blob/master/documentation/currentpitchname.svg)												
+![Current pitch name](https://github.com/sugarlabs/musicblocks/blob/master/documentation/currentpitchname.svg)												
 
-![Note](https://github.com/walterbender/musicblocks/blob/master/documentation/note.svg)																	
+![Note](https://github.com/sugarlabs/musicblocks/blob/master/documentation/note.svg)																	
 
 
 Valid blocks styles in turtleblocksjs:

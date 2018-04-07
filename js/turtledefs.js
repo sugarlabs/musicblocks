@@ -118,7 +118,7 @@ function createHelpContent() {
         [_('New Project'), _('Initialise a new project.'), 'header-icons/new-project-button.svg'],
         [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
         [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
-        [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://walterbender.github.io/musicblocks/guide', _('Music Blocks Guide')],
+        [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
         [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
     ];
 };
