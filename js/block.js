@@ -903,7 +903,7 @@ function Block(protoblock, blocks, overrideName) {
 
             var bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.value = myContainer.getCacheDataURL();
+	    that.value = myContainer.bitmapCache.getCacheDataURL();
             that.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
