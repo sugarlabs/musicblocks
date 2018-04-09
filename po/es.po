@@ -475,6 +475,9 @@ msgstr "Borrar todo"
 #: js/activity.js:3483
 #: js/activity.js:3495
 #: js/turtledefs.js:119
+msgid "Restore"
+msgstr "Restaurar"
+
 msgid "Undo"
 msgstr "Deshacer"
 

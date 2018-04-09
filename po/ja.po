@@ -491,6 +491,9 @@ msgstr "ブロックを全部捨てる"
 #: js/activity.js:3483
 #: js/activity.js:3495
 #: js/turtledefs.js:119
+msgid "Restore"
+msgstr "リストア"
+
 msgid "Undo"
 msgstr "元に戻す"
 

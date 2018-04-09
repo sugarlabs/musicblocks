@@ -3455,7 +3455,7 @@ handleComplete);
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
                     ['new-project', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                    ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
+                    ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
                 ];
             } else {
                 var menuNames = [
@@ -3467,7 +3467,7 @@ handleComplete);
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
                     ['new-project', _deleteBlocksBox, _('Delete all'), null, null, null, null],
-                    ['restore-trash', _restoreTrash, _('Undo'), null, null, null, null]
+                    ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
                 ];
             }
             document.querySelector('#myOpenFile')
