@@ -1,7 +1,8 @@
 ﻿Using Music Blocks
 ==================
 
-Music Blocks is a fork of Turtle Blocks. It has extensions for
+Music Blocks is a fork of [Turtle
+Blocks](href="https://turtle.sugarlabs.org). It has extensions for
 exploring music: pitch and rhythm.
 
 Music Blocks is designed to run in a browser. Most of the development
@@ -13,10 +14,10 @@ Chrome        | Supported
 Safari        | Supported
 Firefox       | Supported
 Opera         | Supported
-Internet Explorer| Not Supported
+IE            | Not Supported
 
-You can run it directly
-from `index.html` or from [GitHub](https://musicblocks.sugarlabs.org).
+You can run it from
+[https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
 
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/documentation/getting-started.png "Music Blocks in a browser")
 
