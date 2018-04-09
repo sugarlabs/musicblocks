@@ -13,16 +13,15 @@ numerosos ejemplos.
 Empezando
 ---------
 
-Bloques de música está diseñado para ejecutarse en un navegador. La
-mayor parte del desarrollo se ha hecho en cromo, pero también debería
-funcionar en Fireqfox (aunque puede que tenga que desactivar la
-aceleración de hardware). Se puede ejecutar desde [github io]
-(http://sugarlabs.github.io/musicblocks) o por la descarga de una
+Bloques de Música está diseñado para ejecutarse en un navegador. La
+mayor parte del desarrollo se ha hecho en Cromo, pero también debería
+funcionar en Firefox. Se puede ejecutar desde [Bloques de Música]
+(https://musicblocks.sugarlabs.org) o por la descarga de una
 copia del código y se ejecuta directamente desde el archivo sistema de
 su computadora.
 
 Para más detalles sobre el uso de Bloques de Música, ver [Uso de
-Música Bloques]
+Bloques de Música]
 (http://github.com/sugarlabs/musicblocks/tree/master/documentation)
 y para más detalles sobre cómo utilizar los bloques de la tortuga, ver
 [Uso de la tortuga bloques
@@ -179,7 +178,7 @@ The *Step Pitch* block will move up or down notes in a scale from the
 current note. In the example above, *Step Pitch* blocks are used inside
 of *Repeat* blocks to play up and down a scale.
 
-[EJECUTAR EN VIVO](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_scales.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1523032034365533&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide-es/transform1.svg " ")
 
@@ -292,8 +291,7 @@ The *Backward* block will play the contained notes in reverse order
 `Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
 stack.
 
-[RUN
-LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1522885752309944&run=True)
 
 Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
@@ -315,7 +313,7 @@ and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.
 
 In the above example, the sequence of drum beats is increased over time.
 
-[EJECUTAR EN VIVO](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
 3. Voices
 ---------
@@ -340,7 +338,7 @@ It gets more interesting if we shift up and down octaves.
 
 And even more interesting if we bring the various voices offset in time.
 
-[EJECUTAR EN VIVO](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1523026536194324&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide-es/drum3.svg " ")
 
@@ -370,7 +368,7 @@ the inner repeat loop.
 In this example, the graphics are synchronized to the music by placing
 the graphics commands inside of *Note value* blocks.
 
-[EJECUTAR EN VIVO](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide-es/fibonacci3.svg " ")
 
@@ -393,7 +391,7 @@ the mouse is in the lower-left quadrant, `chunk` is played;
 lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
 upper-right quadrant, `chunk3`.
 
-[EJECUTAR EN VIVO](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1523028011868930&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide-es/interactive2.svg " ")
 
@@ -401,7 +399,7 @@ In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
 make an 8-key piano?
 
-[EJECUTAR EN VIVO](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1523107390715125&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide-es/interactive3.svg " ")
 
@@ -885,4 +883,4 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide-es/hotdog.png " ")
 
-[EJECUTAR EN VIVO](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_hotdog.tb&run=true)
+[EJECUTAR EN VIVO](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
