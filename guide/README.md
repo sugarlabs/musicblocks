@@ -744,7 +744,7 @@ In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
 make an 8-key piano?
 
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1518563680450252&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523107390715125&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/interactive3.svg "adding randomness to your music")
 
