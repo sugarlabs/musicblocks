@@ -204,7 +204,7 @@
 *Step Pitch* 拼块从上一个音符提高或降低下一个音符。
 在上面的例子里， *Step Pitch* 拼块在 *Repeat* 拼块里使用，七次重复里面的程序, 发出一个音阶的不同声音.
 
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_scales.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523032034365533&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform16.svg "Using the Consonant Step Up and Down blocks")
 
@@ -329,7 +329,8 @@
 *Backward* 拼块会倒叙的播放里面包住的音符。
 在上面的例子，*Chunk* 里面的音符播放的顺序是 `Sol`, `Ti`, `La`, `Sol`, 明确的来说从程序堆的下面到上面。
 
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
+[RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1522885752309944&run=True)
 
 注意所有在 *Backward*  拼块里面的音符是倒叙的， 所以如果你的程序有逻辑和音符混合在一起，记得注意这个拼块。
 
@@ -349,7 +350,7 @@
 
 在上面的例子, [鼓声](#DRUMS) 拍的次数跟着时间增加。
 
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
 #### <a name="VIBRATO"></a>3.2.14 颤音
 
@@ -379,7 +380,7 @@
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/voices4.svg playing the various voices offset in time")
 
 如果我们再把不同的音色在不同的时间播放，我们也可以使歌曲变有趣。
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523026536194324&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
 
@@ -404,13 +405,13 @@
 在例子里，每当一个四分之一音符被播放后，乌龟就会往前方向走一步。
 在第八个音符，乌龟就会转向右边，音符上升半步，笔的尺度被减少，笔的颜色也在里面 “重复” 的程序每一步增加。
 
-[RUN LIVE](https://sugarlabs.github.io/musicblocks/index.html?file=MusicBlocks_graphicsexample.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1518563680307291&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/graphics3.svg "synchronizing graphics and music")
 
 另外一个图像和音乐合步的程序例子就是把图像程序放进 *Note Value* 拼块。
 
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/fibonacci3.svg "usage of No-clock block")
 
@@ -425,7 +426,7 @@
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/tree.svg "tree graphic")
 
-[RUN LIVE](https://sugarlabs.github.io/musicblocks/index.html?file=MusicBlocks_musicaltree.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&run=True)
 
 ### <a name="BEAT"></a>3.5 节奏
 
@@ -462,14 +463,14 @@
 例如，我们可以交互的执行上面的拼块。
 当鼠标在左下角时，`chunk` 的拼块被执行; 而鼠标在右下角时, `chunk1` 的拼块被执行；鼠标在左上角时，`chunk2` 的拼块被执行; 和右上角时, `chunk3`拼块被执行。
 
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523028011868930&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/interactive2.svg "creation of a two-key piano")
 
 在上面的例子，我们使用两个不同 “乌龟” ，定下两个不同的 *click* 行动，一个简单的两个音符的钢琴被做出。
 你可以做出一个八个音符的钢琴吗？
 
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523107390715125&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/interactive3.svg "adding randomness to your music")
 
@@ -925,4 +926,5 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/hotdog.png "sheet music")
 
-[RUN LIVE](http://sugarlabs.github.io/musicblocks/?file=MusicBlocks_hotdog.tb)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
+
