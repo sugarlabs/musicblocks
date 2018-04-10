@@ -1278,8 +1278,8 @@ define(MYDEFINES, function (compatibility) {
                             var bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             try {
-                                console.log(bitmap.getCacheDataURL());
-                                t.planet.ProjectStorage.saveLocally(data, bitmap.getCacheDataURL());
+                                console.log(bitmap.bitmapCache.getCacheDataURL());
+                                t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
                             } catch (e) {
                                 console.log(e);
                             }
