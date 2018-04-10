@@ -1355,7 +1355,7 @@ function Logo () {
             break;
         case 'heading':
             turtleObj.doSetHeading(value);
-            this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'setheading', value]);
+            this.playbackQueue[turtle].push([this.previousTurtleTime[turtle], 'setheading', value]);
             break;
         case 'color':
             turtleObj.doSetColor(value);
