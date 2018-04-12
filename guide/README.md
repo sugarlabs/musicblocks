@@ -568,7 +568,9 @@ The *Backward* block will play the contained notes in reverse order
 `Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
 stack.
 
-[RUN
+An example from Bach is provided. In the example, there are two
+voices, one which plays the composition forward and one that plays the
+same composition backward. [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1522885752309944&run=True)
 
 Note that all of the blocks inside a *Backward* block are reverse, so
@@ -659,11 +661,11 @@ Turtle graphics can be combined with the music blocks. By placing
 graphics blocks, e.g., *Forward* and *Right*, inside of *Note value*
 blocks, the graphics stay in sync with the music. In this example, the
 turtle moves forward each time a quarter note is played. It turns
-right during the eighth note. The pitch is raised by one half step,
+right during the eighth note. The pitch is decreased by one half step,
 the pen size decreases, and the pen color increases at each step in
 the inner repeat loop.
 
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1518563680307291&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523494709674021&run=True)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/graphics3.svg "synchronizing graphics and music")
 
