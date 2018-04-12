@@ -201,6 +201,10 @@ function isSVGEmpty (turtles) {
 
 
 function fileExt (file) {
+    if (file === null) {
+        return '';
+    }
+
     var parts = file.split('.');
     if (parts.length === 1 || (parts[0] === '' && parts.length === 2)) {
         return '';

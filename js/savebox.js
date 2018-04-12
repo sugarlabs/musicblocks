@@ -101,13 +101,19 @@ function SaveBox () {
                 dx += BOXBUTTONSPACING;
             }
 
-            this.uploadToPlanet = makeButton('upload-planet', _('Upload to Planet'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this.uploadToPlanet.visible = true;
-            this.positionHoverText(this.uploadToPlanet);
-            this.uploadToPlanet.on('click', function(event) {
-                that.hide();
-                that._doUploadToPlanet();
-            });
+            if (this._doUploadToPlanet != null) {
+                this.uploadToPlanet = makeButton('upload-planet', _('Upload to Planet'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this.uploadToPlanet.visible = true;
+                this.positionHoverText(this.uploadToPlanet);
+                this.uploadToPlanet.on('click', function(event) {
+                    that.hide();
+                    that._doUploadToPlanet();
+                });
+            } else {
+                this.uploadToPlanet = makeButton('planet-disabled-button', _('The Planet is unavailable.'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this.uploadToPlanet.visible = true;
+                this.positionHoverText(this.uploadToPlanet);
+            }
 
             dx += BOXBUTTONSPACING;
 

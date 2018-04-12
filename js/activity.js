@@ -12,7 +12,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 // Note: This code is inspired by the Python Turtle Blocks project
-// (https://github.com/sugarlabs/turtleart), but implemented from
+// (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
 const _THIS_IS_MUSIC_BLOCKS_ = true;
@@ -99,6 +99,7 @@ var MYDEFINES = [
     'activity/logo',
     'activity/clearbox',
     'activity/savebox',
+    'activity/languagebox',
     'activity/utilitybox',
     'activity/basicblocks',
     'activity/blockfactory',
@@ -109,7 +110,6 @@ var MYDEFINES = [
     'utils/synthutils',
     'activity/playbackbox',
     'activity/pastebox',
-    'activity/languagebox',
     'prefixfree.min'
 ];
 
@@ -1190,7 +1190,11 @@ define(MYDEFINES, function (compatibility) {
                 this.showPlanet = function(){
                     this.planet.open(this.mainCanvas.toDataURL('image/png'));
                     this.iframe.style.display = 'block';
-                    this.iframe.contentWindow.document.getElementById('local-tab').click();
+                    try {
+			this.iframe.contentWindow.document.getElementById('local-tab').click();
+		    } catch (e) {
+                        console.log(e);
+		    }
                 }
 
                 this.hidePlanet = function(){
@@ -1209,7 +1213,7 @@ define(MYDEFINES, function (compatibility) {
                     this.showMusicBlocks();
                 }
 
-                this.loadProjectFromData = function(data,merge){
+                this.loadProjectFromData = function(data, merge){
                     if (merge===undefined){
                         merge=false;
                     }
@@ -1321,20 +1325,30 @@ define(MYDEFINES, function (compatibility) {
 
                 this.init = function(){
                     this.iframe = document.getElementById('planet-iframe');
-                    this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage);
-                    this.planet = this.iframe.contentWindow.p;
-                    this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
-                    this.planet.setPlanetClose(this.closePlanet.bind(this));
-                    this.planet.setLoadNewProject(this.newProject.bind(this));
-                    this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
-                    this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
+                    try {
+                        this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage);
+                        this.planet = this.iframe.contentWindow.p;
+                        this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
+                        this.planet.setPlanetClose(this.closePlanet.bind(this));
+                        this.planet.setLoadNewProject(this.newProject.bind(this));
+                        this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
+                        this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
+                    } catch (e) {
+                        console.log('Planet not available');
+                        this.planet = null;
+                    }
+
                     window.Converter = this.planet.Converter;
                     this.mainCanvas = canvas;
                 }
             }
 
-            planet = new PlanetInterface(storage);
-            planet.init();
+            try {
+                planet = new PlanetInterface(storage);
+                planet.init();
+            } catch (e) {
+                planet = undefined;
+	    }
 
             save = new SaveInterface(planet);
             save.setVariables([
@@ -1345,12 +1359,73 @@ define(MYDEFINES, function (compatibility) {
             ]);
             save.init();
 
-            saveLocally = planet.saveLocally.bind(planet);
+            if (planet != undefined) {
+                saveLocally = planet.saveLocally.bind(planet);
+            } else {
+
+                __saveLocally = function() {
+                    console.log('overwriting session data (local)');
+                    var data = prepareExport();
+                    var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+
+                    if (sugarizerCompatibility.isInsideSugarizer()) {
+                        //sugarizerCompatibility.data.blocks = prepareExport();
+                        storage = sugarizerCompatibility.data;
+                    } else {
+                        storage = localStorage;
+                    }
+
+                    if (storage.currentProject === undefined) {
+                        try {
+                            storage.currentProject = 'My Project';
+                            storage.allProjects = JSON.stringify(['My Project'])
+                        } catch (e) {
+                            // Edge case, eg. Firefox localSorage DB corrupted
+                            console.log(e);
+                        }
+                    }
+
+                    try {
+                        var p = storage.currentProject;
+                        storage['SESSION' + p] = prepareExport();
+                    } catch (e) {
+                        console.log(e);
+                    }
+
+                    var img = new Image();
+                    var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+
+                    img.onload = function () {
+                        var bitmap = new createjs.Bitmap(img);
+                        var bounds = bitmap.getBounds();
+                        bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                        try {
+                            storage['SESSIONIMAGE' + p] = bitmap.bitmapCache.getCacheDataURL();
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    };
+
+                    img.src = 'data:image/svg+xml;base64,' +
+                        window.btoa(unescape(encodeURIComponent(svgData)));
+                    if (sugarizerCompatibility.isInsideSugarizer()) {
+                        sugarizerCompatibility.saveLocally();
+                    }
+                }
+
+                saveLocally = __saveLocally;
+            }
 
             window.saveLocally = saveLocally;
             logo.setSaveLocally(saveLocally);
 
             saveBox = new SaveBox();
+            if (planet) {
+                var planetItem = ['_doSavePlanet', doUploadToPlanet];
+            } else {
+                var planetItem = ['_doSavePlanet', null];
+            }
+
             saveBox.setVariables([
                 ['_canvas', canvas],
                 ['_stage', stage],
@@ -1456,7 +1531,9 @@ define(MYDEFINES, function (compatibility) {
 
                                     stage.addEventListener('trashsignal', __listener, false);
                                     sendAllToTrash(false, false);
-                                    planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
+                                    if (planet) {
+                                        planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
+                                    }
                                 } else {
                                     merging = false;
                                     logo.playbackQueue = {};
@@ -2881,7 +2958,13 @@ define(MYDEFINES, function (compatibility) {
             sessionData = null;
 
             // Try restarting where we were when we hit save.
-            sessionData = planet.openCurrentProject();
+            if (planet) {
+                sessionData = planet.openCurrentProject();
+            } else {
+                var currentProject = storage.currentProject;
+                sessionData = storage['SESSION' + currentProject];
+            }
+
             // After we have finished loading the project, clear all
             // to ensure a clean start.
             if (document.addEventListener) {
@@ -3445,9 +3528,15 @@ handleComplete);
             // NOTE: see getAuxToolbarButtonNames in turtledefs.js
             // Misc. other buttons
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
+            if (planet) {
+                var planetMenuItem = ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null];
+            } else {
+                var planetMenuItem = ['planet-disabled', null, _('The Planet is unavailable.'), null, null, null, null];
+            }
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var menuNames = [
-                    ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
+                    planetMenuItem,
                     ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
                     ['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
@@ -3459,7 +3548,7 @@ handleComplete);
                 ];
             } else {
                 var menuNames = [
-                    ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null],
+                    planetMenuItem,
                     ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
                     ['paste-disabled', pasteStack, _('Paste'), null, null, null, null],
@@ -3470,10 +3559,12 @@ handleComplete);
                     ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
                 ];
             }
-            document.querySelector('#myOpenFile')
-                    .addEventListener('change', function (event) {
-                        planet.closePlanet();
-            });
+
+            if (planet) {
+                document.querySelector('#myOpenFile').addEventListener('change', function (event) {
+                    planet.closePlanet();
+                });
+            }
 
             var btnSize = cellSize;
             var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
