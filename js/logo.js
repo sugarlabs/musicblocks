@@ -10178,6 +10178,7 @@ function Logo () {
 
     this.hideBlocks = function (show) {
         // Hide all the blocks.
+        this.blocks.palettes.hide();
         this.blocks.hide();
         this.refreshCanvas();
         this.showBlocksAfterRun = show !== undefined && show;
@@ -10185,6 +10186,7 @@ function Logo () {
 
     this.showBlocks = function () {
         // Show all the blocks.
+        this.blocks.palettes.show();
         this.blocks.show();
         this.blocks.bringToTop();
         this.refreshCanvas();
