@@ -2946,7 +2946,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['nameddo'] = namedDoBlock;
     namedDoBlock.hidden = true;
     namedDoBlock.staticLabels.push(_('action'));
-    namedDoBlock.extraWidth = 10;
+    namedDoBlock.extraWidth = 40;
     namedDoBlock.adjustWidthToLabel();
     namedDoBlock.zeroArgBlock();
 

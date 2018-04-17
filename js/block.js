@@ -905,7 +905,7 @@ function Block(protoblock, blocks, overrideName) {
 
             var bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-	    that.value = myContainer.bitmapCache.getCacheDataURL();
+            that.value = myContainer.bitmapCache.getCacheDataURL();
             that.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
@@ -1038,7 +1038,10 @@ function Block(protoblock, blocks, overrideName) {
                 this.text.x *= 1.75;
             } else if (this.name === 'text') {
                 this.text.x = this.width / 2;
-	    }
+            }
+        } else if (this.name === 'nameddo') {
+            this.text.textAlign = 'center';
+            this.text.x = this.width / 2;
         } else if (this.protoblock.args === 0) {
             var bounds = this.container.getBounds();
             this.text.x = this.width - 25;
@@ -2154,20 +2157,17 @@ function Block(protoblock, blocks, overrideName) {
 
         if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {   
             var slen = label.length - 5;
-	    var nlabel = '' + label.substr(0, slen) + '...';
-            console.log(slen + ' ' + nlabel);
+            var nlabel = '' + label.substr(0, slen) + '...';
             while (getTextWidth(nlabel, 'bold 20pt Sans') > TEXTWIDTH) {
                 slen -= 1;
-		nlabel = '' + label.substr(0, slen) + '...';
-		var foo = getTextWidth(nlabel, 'bold 20pt Sans');
-		console.log(slen + ' ' + foo + ' ' + nlabel);
+                nlabel = '' + label.substr(0, slen) + '...';
+                var foo = getTextWidth(nlabel, 'bold 20pt Sans');
                 if (slen <= STRINGLEN) {
-		    break;
-		}
-	    }
+                    break;
+                }
+            }
 
             label = nlabel;
-            // label = '  ' + label.substr(0, STRINGLEN) + '...';
         }
 
         this.text.text = label;
