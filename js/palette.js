@@ -792,8 +792,10 @@ function PaletteModel(palette, palettes, name) {
                 }
             }
 
-            if (['do', 'nameddo', 'namedbox', 'namedcalc', 'doArg', 'calcArg', 'nameddoArg', 'namedcalcArg'].indexOf(protoBlock.name) != -1 && label != null && label.length > 8) {
-                label = label.substr(0, 7) + '...';
+            if (['do', 'nameddo', 'namedbox', 'namedcalc', 'doArg', 'calcArg', 'nameddoArg', 'namedcalcArg'].indexOf(protoBlock.name) != -1 && label != null) {
+                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {  
+                    label = label.substr(0, STRINGLEN) + '...';
+                }
             }
 
             // Don't display the label on image blocks.
@@ -802,7 +804,7 @@ function PaletteModel(palette, palettes, name) {
             }
 
             var saveScale = protoBlock.scale;
-	    protoBlock.scale = DEFAULTBLOCKSCALE;
+            protoBlock.scale = DEFAULTBLOCKSCALE;
 
             // Finally, the SVGs!
             switch (protoBlock.name) {
@@ -823,7 +825,7 @@ function PaletteModel(palette, palettes, name) {
                 var svg = new SVG();
                 svg.init();
                 svg.setScale(protoBlock.scale);
-                svg.setExpand(30, 0, 0, 0);
+                svg.setExpand(60, 0, 0, 0);
                 var artwork = svg.basicBlock();
                 var docks = svg.docks;
                 var height = svg.getHeight();
@@ -836,7 +838,7 @@ function PaletteModel(palette, palettes, name) {
                 break;
             }
 
-	    protoBlock.scale = saveScale;
+            protoBlock.scale = saveScale;
 
             if (protoBlock.disabled) {
                 artwork = artwork
