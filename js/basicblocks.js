@@ -3229,8 +3229,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     var textBlock = new ProtoBlock('text');
     textBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['text'] = textBlock;
+    textBlock.extraWidth = 30;
     textBlock.valueBlock();
     textBlock.dockTypes[0] = 'textout';
+
 
     // FLOW PALETTE
 

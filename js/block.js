@@ -11,6 +11,8 @@
 //
 
 // Length of a long touch
+const TEXTWIDTH = 240; // 90
+const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
@@ -501,8 +503,8 @@ function Block(protoblock, blocks, overrideName) {
         if (this.overrideName) {
             if (['storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
-                if (getTextWidth(block_label, 'bold 20pt Sans') > 60) {
-                    block_label = block_label.substr(0, 5) + '...';
+                if (getTextWidth(block_label, 'bold 20pt Sans') > TEXTWIDTH) {
+                    block_label = ' ' + block_label.substr(0, STRINGLEN) + '...';
                 }
             } else {
                 block_label = this.overrideName;
@@ -621,8 +623,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > 60 ) {   
-                label = label.substr(0, 5) + '...';
+            if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {   
+                label = label.substr(0, STRINGLEN) + '...';
             }
 
             this.text.text = label;
@@ -988,9 +990,10 @@ function Block(protoblock, blocks, overrideName) {
                 // Label the collapsed block with the action label
                 if (that.connections[1] !== null) {
                     var text = that.blocks.blockList[that.connections[1]].value;
-                    if (getTextWidth(text, 'bold 20pt Sans') > 60) {
-                        text = text.substr(0, 5) + '...';
+                    if (getTextWidth(text, 'bold 20pt Sans') > TEXTWIDTH) {
+                        text = text.substr(0, STRINGLEN) + '...';
                     }
+
                     that.collapseText.text = text;
                 } else {
                     that.collapseText.text = '';
@@ -1033,7 +1036,9 @@ function Block(protoblock, blocks, overrideName) {
                 this.text.x *= 3.0;
             } else if (WIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 1.75;
-            }
+            } else if (this.name === 'text') {
+                this.text.x = this.width / 2;
+	    }
         } else if (this.protoblock.args === 0) {
             var bounds = this.container.getBounds();
             this.text.x = this.width - 25;
@@ -1581,7 +1586,7 @@ function Block(protoblock, blocks, overrideName) {
         var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
-        var selectorWidth = 100;
+        var selectorWidth = 150;
 
         var movedStage = false;
         if (!window.hasMouse && this.blocks.stage.y + y > 75) {
@@ -2099,8 +2104,8 @@ function Block(protoblock, blocks, overrideName) {
                     newValue = uniqueValue;
                     this.value = newValue;
                     var label = this.value.toString();
-                    if (getTextWidth(label, 'bold 20pt Sans') > 60) {  
-                        label = label.substr(0, 5) + '...';
+                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {  
+                        label = label.substr(0, STRINGLEN) + '...';
                     }
                     this.text.text = label;
                     this.label.value = newValue;
@@ -2147,8 +2152,22 @@ function Block(protoblock, blocks, overrideName) {
             var label = this.value.toString();
         }
 
-        if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > 60 ) {   
-            label = label.substr(0, 5) + '...';
+        if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {   
+            var slen = label.length - 5;
+	    var nlabel = '' + label.substr(0, slen) + '...';
+            console.log(slen + ' ' + nlabel);
+            while (getTextWidth(nlabel, 'bold 20pt Sans') > TEXTWIDTH) {
+                slen -= 1;
+		nlabel = '' + label.substr(0, slen) + '...';
+		var foo = getTextWidth(nlabel, 'bold 20pt Sans');
+		console.log(slen + ' ' + foo + ' ' + nlabel);
+                if (slen <= STRINGLEN) {
+		    break;
+		}
+	    }
+
+            label = nlabel;
+            // label = '  ' + label.substr(0, STRINGLEN) + '...';
         }
 
         this.text.text = label;

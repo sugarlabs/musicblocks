@@ -783,8 +783,8 @@ function Blocks () {
                     that.blockList[parentblk].connections[1] = blk;
                     that.blockList[blk].value = that.findUniqueActionName(_('action'));
                     var label = that.blockList[blk].value;
-                    if (getTextWidth(label, 'bold 20pt Sans') > 60) {
-                        label = label.substr(0, 5) + '...';
+                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                        label = label.substr(0, STRINGLEN) + '...';
                     }
                     that.blockList[blk].text.text = label;
                     that.blockList[blk].container.updateCache();
@@ -833,8 +833,8 @@ function Blocks () {
                     that.blockList[parentblk].connections[1] = blk;
                     that.blockList[blk].value = _('box');
                     var label = that.blockList[blk].value;
-                    if (getTextWidth(label, 'bold 20pt Sans') > 60) {
-                        label = label.substr(0, 5) + '...';
+                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                        label = label.substr(0, STRINGLEN) + '...';
                     }
                     that.blockList[blk].text.text = label;
                     that.blockList[blk].container.updateCache();
@@ -1300,8 +1300,8 @@ function Blocks () {
                             if (name !== myBlock.value) {
                                 myBlock.value = name;
                                 var label = name;
-                                if (getTextWidth(label, 'bold 20pt Sans') > 60) {
-                                    label = label.substr(0, 5) + '...';
+                                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                                    label = label.substr(0, STRINGLEN) + '...';
                                 }
                                 myBlock.text.text = label;
                                 myBlock.container.updateCache();
@@ -1384,8 +1384,8 @@ function Blocks () {
                             if (this.blockList[this.blockList[b].connections[1]].value === this.blockList[thisBlock].value) {
                                 this.blockList[thisBlock].value = this.findUniqueActionName(this.blockList[thisBlock].value);
                                 var label = this.blockList[thisBlock].value;
-                                if (getTextWidth(label, 'bold 20pt Sans') > 60) {
-                                    label = label.substr(0, 5) + '...';
+                                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                                    label = label.substr(0, STRINGLEN) + '...';
                                 }
                                 this.blockList[thisBlock].text.text = label;
                                 this.blockList[thisBlock].container.updateCache();
@@ -2319,8 +2319,8 @@ function Blocks () {
                         var value = args[1];
                         that.blockList[thisBlock].value = value;
                         var label = value.toString();
-                        if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, 'bold 20pt Sans') > 60) {
-                            label = label.substr(0, 5) + '...';
+                        if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                            label = label.substr(0, STRINGLEN) + '...';
                         }
                         that.blockList[thisBlock].text.text = label;
                         that.blockList[thisBlock].container.updateCache();
@@ -2343,8 +2343,8 @@ function Blocks () {
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
                     var label = value.toString();
-                    if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, 'bold 20pt Sans') > 60) {
-                        label = label.substr(0, 5) + '...';
+                    if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                        label = label.substr(0, STRINGLEN) + '...';
                     }
                     that.blockList[thisBlock].text.text = label;
                 };
@@ -2661,8 +2661,8 @@ function Blocks () {
             if (blockValue === oldName) {
                 myBlock.value = newName;
                 var label = myBlock.value;
-                if (getTextWidth(label, 'bold 20pt Sans') > 60) {
-                    label = label.substr(0, 5) + '...';
+                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                    label = label.substr(0, STRINGLEN) + '...';
                 }
                 myBlock.text.text = label;
                 myBlock.container.updateCache();
@@ -2681,8 +2681,8 @@ function Blocks () {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
                     var label = newName;
-                    if (getTextWidth(label, 'bold 20pt Sans') > 60) {
-                        label = label.substr(0, 5) + '...';
+                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                        label = label.substr(0, STRINGLEN) + '...';
                     }
 
                     this.blockList[blk].overrideName = label;
