@@ -2745,7 +2745,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     namedBoxBlock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['namedbox'] = namedBoxBlock;
     namedBoxBlock.staticLabels.push(_('box'));
-    namedBoxBlock.extraWidth = 10;
+    namedBoxBlock.extraWidth = 20;
     namedBoxBlock.adjustWidthToLabel();
     namedBoxBlock.parameterBlock();
     namedBoxBlock.dockTypes[0] = 'anyout';
