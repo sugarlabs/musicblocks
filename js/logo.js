@@ -3689,7 +3689,7 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'rest2':
-            if (that.inNoteBlock[turlte].length > 0) {
+            if (that.inNoteBlock[turtle].length > 0) {
                 that.notePitches[turtle][last(that.inNoteBlock[turtle])].push('rest');
                 that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(4);
                 that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(0);
