@@ -756,6 +756,46 @@ above, the *One-of* block is used to randomly assign either `Do` or
 above, the *One-of* block is used to randomly select between `chunk1`
 and `chunk2`.
 
+Musical Paint has been a popular activity dating back to programs such
+as Dan Franzblau's *Vidsizer* (1979) or Morwaread Farbood's
+*Hyperscore* (2002). Music Blocks can be used to create musical paint
+as well. In the somewhat ambitious example below, we go a step further
+than the typical paint program in that you can not only paint music (a
+la Vidsizer) and playback your painting as a composition (a la
+Hyperscore), but also generate *Note* blocks from your composition.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/hyperscore.svg "musical paint")
+
+The program works by first creating an array from the heap that
+corresponds to a 20x12 grid of notes on the screen: 20 columns,
+representing time from left to right; and 12 rows, corresponding to
+scalar pitch values, which increase in value from the bottom to the
+top.
+
+The *record* action repeatedly calls the *paint* action until the
+*playback* button is clicked.
+
+The *paint* action tracks the mouse (*Set XY* to *cursor x* and
+*cursor y*) and, if the mouse button is pressed, marks an entry in the
+array corresponding to that note, plays the note, and leaves behind a
+"drop of paint".
+
+The *playback* action is invoked by clicking on the *play* mouse,
+which sets *recording* to `0`, thus breaking out of the paint "while
+loop". Playback scans each column in the array from left to right for
+pitches to play and generates a chord of pitches for each column.
+
+Once the *playback* action is complete, the *save* action is
+invoked. Again each column in the array is scanned, but this time,
+instead of playing notes, the *Make Block* block is called in order to
+generate a stack of notes that correspond to the composition. This
+stack can be copied and pasted into another composition.
+
+While a bit fanciful, this example, which can be run by clicking on
+the link below, takes musical paint in a novel direction.
+
+[RUN LIVE](https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
+
 ## <a name="WIDGETS"></a>Widgets
 
 [Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TOC) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
