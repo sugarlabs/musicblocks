@@ -615,6 +615,50 @@ above, the <em>One-of</em> block is used to randomly assign either <code>Do</cod
 <code>Re</code> each time the <em>Note value</em> block is played. In the bottom example
 above, the <em>One-of</em> block is used to randomly select between <code>chunk1</code>
 and <code>chunk2</code>.</p>
+
+<p>Musical Paint has been a popular activity dating back to programs such
+as Dan Franzblau's <em>Vidsizer</em>(1979) or Morwaread Farbood's
+*Hyperscore</em>(2002). Music Blocks can be used to create musical paint
+as well. In the somewhat ambitious example below, we go a step further
+than the typical paint program in that you can not only paint music (a
+la Vidsizer) and playback your painting as a composition (a la
+Hyperscore), but also generate <em>Note</em>blocks from your composition.</p>
+
+<p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/hyperscore.svg"
+alt="alt tag" title="musical paint"></p>
+
+<p>The program works by first creating an array from the heap that
+corresponds to a 20x12 grid of notes on the screen: 20 columns,
+representing time from left to right; and 12 rows, corresponding to
+scalar pitch values, which increase in value from the bottom to the
+top.</p>
+
+<p>The <em>record</em>action repeatedly calls the <em>paint</em>action
+until the *playback</em>button is clicked.</p>
+
+<p>The <em>paint</em>action tracks the mouse (<em>Set
+XY</em>to <em>cursor x</em>and <em>cursor y</em>) and, if the mouse
+button is pressed, marks an entry in the array corresponding to that
+note, plays the note, and leaves behind a "drop of paint".</p>
+
+<p>The <em>playback</em>action is invoked by clicking on
+the <em>play</em>mouse, which sets <em>recording</em>to `0`, thus
+breaking out of the paint "while loop". Playback scans each column in
+the array from left to right for pitches to play and generates a chord
+of pitches for each column.</p>
+
+<p>Once the <em>playback</em>action is complete,
+the <em>save</em>action is invoked. Again each column in the array is
+scanned, but this time, instead of playing notes, the <em>Make
+Block</em>block is called in order to generate a stack of notes that
+correspond to the composition. This stack can be copied and pasted
+into another composition.</p>
+
+<p>While a bit fanciful, this example, which can be run by clicking on
+the link below, takes musical paint in a novel direction.</p>
+
+<p><a href="https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True">RUN LIVE</a></p>
+
 <h2 id="-a-name-widgets-a-widgets"><a name="WIDGETS"></a>Widgets</h2>
 <p><a href="#PROGRAMMING-WITH-MUSIC">Previous Section (3. Programming with Music)</a> | <a href="#TOC">Back to Table of Contents</a> | <a href="#BEYOND-MUSIC-BLOCKS">Next Section (5. Beyond Music Blocks)</a></p>
 <p>This section of the guide will talk about the various Widgets that can
