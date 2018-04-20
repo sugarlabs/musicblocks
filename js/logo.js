@@ -4679,12 +4679,14 @@ function Logo () {
                     }
                 }
 
-                that.instrumentNames[turtle].push(synth);
-                that.synth.loadSynth(turtle, synth);
+                if (that.instrumentNames[turtle].indexOf(synth) === -1) {
+                    that.instrumentNames[turtle].push(synth);
+                    that.synth.loadSynth(turtle, synth);
 
-                if (that.synthVolume[turtle][synth] == undefined) {
-                    that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
-                    that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                    if (that.synthVolume[turtle][synth] == undefined) {
+                        that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
+                        that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                    }
                 }
 
                 childFlow = args[1];
@@ -5843,6 +5845,16 @@ function Logo () {
                         synth = 'default';
                     }
 
+                    if (that.instrumentNames[turtle].indexOf(synth) === -1) {
+                        that.instrumentNames[turtle].push(synth);
+                        that.synth.loadSynth(turtle, synth);
+
+                        if (that.synthVolume[turtle][synth] == undefined) {
+                            that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
+                            that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                        }
+                    }
+
                     that.synthVolume[turtle][synth].push(args[1]);
                     if (!this.suppressOutput[turtle]) {
                         that._setSynthVolume(turtle, synth, args[1]);
@@ -5896,6 +5908,16 @@ function Logo () {
                 if (synth == null) {
                     that.errorMsg(synth + 'not found', blk);
                     synth = 'default';
+                }
+
+                if (that.instrumentNames[turtle].indexOf(synth) === -1) {
+                    that.instrumentNames[turtle].push(synth);
+                    that.synth.loadSynth(turtle, synth);
+
+                    if (that.synthVolume[turtle][synth] == undefined) {
+                        that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
+                        that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                    }
                 }
 
                 that.synthVolume[turtle][synth].push(args[1]);
@@ -9927,7 +9949,7 @@ function Logo () {
                     var newNote = [[0, 'newnote', x, y, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': v}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': p}], 0, 0, [5]], [7, ['number', {'value': o}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
                     that.blocks.loadNewBlocks(newNote);
                     that.blocks.blockList[blk].value = blockNumber;
-		} else if (name === _('silence')) {  // FIXME: others too
+                } else if (name === _('silence')) {  // FIXME: others too
                     var newBlock = [[0, 'rest2', x, y, [null, null]]];
                     that.blocks.loadNewBlocks(newBlock);
                     that.blocks.blockList[blk].value = blockNumber;
@@ -9954,7 +9976,7 @@ function Logo () {
                                     newBlock.push([i, ['string', {'value': blockArgs[i]}], 0, 0, [0]]);
                                 } else {
                                     newBlock[0][4].push(null);
-				}
+                                }
 
                                 newBlock[0][4].push(i);
                             } else {
