@@ -9336,8 +9336,7 @@ function Logo () {
                     } else if (that.inNoteBlock[turtle] in that.notePitches[turtle] && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         var obj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     } else {
-                        console.log('Cannot find a note ');
-                        that.errorMsg(INVALIDPITCH, blk);
+                        console.log('Cannot find a note');
                         var obj = ['G', 4];
                     }
 
