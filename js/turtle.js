@@ -843,7 +843,7 @@ function Turtle (name, turtles, drum) {
 
                 var width = that.startBlock.width;
                 // FIXME: Why is the position off? Does it need a scale factor?
-                that.decorationBitmap.x = width - 50 * that.startBlock.protoblock.scale / 2;
+                that.decorationBitmap.x = width - 30 * that.startBlock.protoblock.scale / 2;
                 that.decorationBitmap.y = 20 * that.startBlock.protoblock.scale / 2;
                 that.decorationBitmap.scaleX = (27.5 / image.width) * that.startBlock.protoblock.scale / 2;
                 that.decorationBitmap.scaleY = (27.5 / image.height) * that.startBlock.protoblock.scale / 2;

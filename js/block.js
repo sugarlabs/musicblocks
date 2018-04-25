@@ -265,7 +265,7 @@ function Block(protoblock, blocks, overrideName) {
         if (COLLAPSABLES.indexOf(this.name) > -1) {
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
-            proto.extraWidth = 10;
+            proto.extraWidth = 40;
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
@@ -654,7 +654,7 @@ function Block(protoblock, blocks, overrideName) {
             // event handler.
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
-            proto.extraWidth = 10;
+            proto.extraWidth = 40;
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
@@ -1560,18 +1560,15 @@ function Block(protoblock, blocks, overrideName) {
         for (var child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === 'decoration') {
                 // Drum block in collapsed state is less wide.
-                if (this.name === 'drum') {
-                    if (this.collapsed) {
-                        var dx = 25 * this.protoblock.scale / 2;
-                    } else {
-                        var dx = 0;
-                    }
+                var dx = 0;
+                if (this.name === 'drum' && this.collapsed) {
+                    var dx = 25 * this.protoblock.scale / 2;
+                }
 
-                    for (var turtle = 0; turtle < this.blocks.turtles.turtleList.length; turtle++) {
-                        if (this.blocks.turtles.turtleList[turtle].startBlock === this) {
-                            this.blocks.turtles.turtleList[turtle].decorationBitmap.x = this.width - dx - 50 * this.protoblock.scale / 2;
-                            break;
-                        }
+                for (var turtle = 0; turtle < this.blocks.turtles.turtleList.length; turtle++) {
+                    if (this.blocks.turtles.turtleList[turtle].startBlock === this) {
+                        this.blocks.turtles.turtleList[turtle].decorationBitmap.x = this.width - dx - 30 * this.protoblock.scale / 2;
+                        break;
                     }
                 }
 
