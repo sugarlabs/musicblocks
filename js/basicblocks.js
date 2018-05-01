@@ -16,7 +16,6 @@
 var NAMEDICT = {
     'fullscreen': 'vspace',
     'fillscreen2': 'fillscreen',
-    'comment': 'print',
     'sandwichclampcollapsed': 'clamp',
     'ifelse': 'ifthenelse',
     'xcor': 'x',
@@ -3722,6 +3721,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTurtleXYBlock.dockTypes[2] = 'numberin';
     setTurtleXYBlock.dockTypes[3] = 'numberin';
     setTurtleXYBlock.defaults.push(_('Mr. Mouse'), 0, 0);
+    setTurtleXYBlock.hidden = true;
+
+    var setTurtleBlock = new ProtoBlock('setturtle');
+    setTurtleBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['setturtle'] = setTurtleBlock;
+    setTurtleBlock.staticLabels.push(_('set mouse'));
+    setTurtleBlock.adjustWidthToLabel();
+    setTurtleBlock.flowClampOneArgBlock();
+    setTurtleBlock.dockTypes[1] = 'anyin';
+    setTurtleBlock.defaults.push(_('Mr. Mouse'));
 
     var turtleyBlock = new ProtoBlock('yturtle');
     turtleyBlock.palette = palettes.dict['mice'];
@@ -3791,6 +3800,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleSyncBlock.dockTypes[1] = 'anyin';
     turtleSyncBlock.defaults.push(_('Mr. Mouse'));
 
+    var foundTurtleBlock = new ProtoBlock('foundturtle');
+    foundTurtleBlock.palette = palettes.dict['mice'];
+    blocks.protoBlockDict['foundturtle'] = foundTurtleBlock;
+    foundTurtleBlock.staticLabels.push(_('found turtle'));
+    foundTurtleBlock.adjustWidthToLabel();
+    foundTurtleBlock.extraWidth = 50;
+    foundTurtleBlock.booleanOneArgBlock();
+    foundTurtleBlock.defaults.push('Yertle');
+
     var turtleNameBlock = new ProtoBlock('turtlename');
     turtleNameBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['turtlename'] = turtleNameBlock;
@@ -3802,7 +3820,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var setTurtleName = new ProtoBlock('setturtlename');
     setTurtleName.palette = palettes.dict['mice'];
     blocks.protoBlockDict['setturtlename'] = setTurtleName;
-    setTurtleName.staticLabels.push(_('mouse name'));
+    setTurtleName.staticLabels.push(_('set name'));
     setTurtleName.staticLabels.push(_('source'));
     setTurtleName.staticLabels.push(_('target'));
     setTurtleName.adjustWidthToLabel();
@@ -3816,7 +3834,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var setTurtleName2 = new ProtoBlock('setturtlename2');
     setTurtleName2.palette = palettes.dict['mice'];
     blocks.protoBlockDict['setturtlename2'] = setTurtleName2;
-    setTurtleName2.staticLabels.push(_('mouse name'));
+    setTurtleName2.staticLabels.push(_('set name'));
     setTurtleName2.adjustWidthToLabel();
     setTurtleName2.oneArgBlock();
     setTurtleName2.dockTypes[1] = 'anyin';

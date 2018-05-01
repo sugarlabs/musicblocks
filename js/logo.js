@@ -964,6 +964,139 @@ function Logo () {
         }
     };
 
+    this.initTurtle = function (turtle) {
+        this.previousTurtleTime[turtle] = 0;
+        this.turtleTime[turtle] = 0;
+        this.waitTimes[turtle] = 0;
+        this.endOfClampSignals[turtle] = {};
+        this.butNotThese[turtle] = {};
+        this.cp1x[turtle] = 0;
+        this.cp1y[turtle] = 100;
+        this.cp2x[turtle] = 100;
+        this.cp2y[turtle] = 100;
+        this.inNoteBlock[turtle] = [];
+        this.multipleVoices[turtle] = false;
+        this.scalarTransposition[turtle] = 0;
+        this.scalarTranspositionValues[turtle] = [];
+        this.transposition[turtle] = 0;
+        this.transpositionValues[turtle] = [];
+        this.noteBeat[turtle] = {};
+        this.noteValue[turtle] = {};
+        this.noteCents[turtle] = {};
+        this.noteHertz[turtle] = {};
+        this.lastNotePlayed[turtle] = null;
+        this.previousNotePlayed[turtle] = null;
+        this.noteStatus[turtle] = null;
+        this.noteDirection[turtle] = 0;
+        this.noteDrums[turtle] = {};
+        this.notePitches[turtle] = {};
+        this.noteOctaves[turtle] = {};
+        this.currentOctave[turtle] = 4;
+        this.register[turtle] = 0;
+        this.noteBeatValues[turtle] = {};
+        this.embeddedGraphics[turtle] = {};
+        this.embeddedGraphicsFinished[turtle] = true;
+        this.beatFactor[turtle] = 1;
+        this.dotCount[turtle] = 0;
+        this.invertList[turtle] = [];
+        this.beatList[turtle] = [];
+        this.factorList[turtle] = [];
+        this.switchCases[turtle] = {};
+        this.switchBlocks[turtle] = [];
+        this.connectionStore[turtle] = {};
+        this.connectionStoreLock = false;
+        this.duplicateFactor[turtle] = 1;
+        this.inDuplicate[turtle] = false;
+        this.skipFactor[turtle] = 1;
+        this.skipIndex[turtle] = 0;
+        this.notesPlayed[turtle] = [0, 1];
+        this.whichNoteToCount[turtle] = 1;
+        this.playbackQueue[turtle] = [];
+        this.keySignature[turtle] = 'C ' + _('major');
+        this.pushedNote[turtle] = false;
+        this.oscList[turtle] = {};
+        this.bpm[turtle] = [];
+        this.inSetTimbre[turtle] = false;
+        this.instrumentNames[turtle] = ['default'];
+        this.inCrescendo[turtle] = [];
+        this.crescendoDelta[turtle] = [];
+        this.crescendoInitialVolume[turtle] = {'default': [DEFAULTVOLUME]};
+        this.intervals[turtle] = [];
+        this.semitoneIntervals[turtle] = [];
+        this.markup[turtle] = [];
+        this.staccato[turtle] = [];
+        this.glide[turtle] = [];
+        this.glideOverride[turtle] = 0;
+        this.swing[turtle] = [];
+        this.swingTarget[turtle] = [];
+        this.swingCarryOver[turtle] = 0;
+        this.tie[turtle] = false;
+        this.tieNotePitches[turtle] = [];
+        this.tieNoteExtras[turtle] = [];
+        this.tieCarryOver[turtle] = 0;
+        this.tieFirstDrums[turtle] = [];
+        this.drift[turtle] = 0;
+        this.drumStyle[turtle] = [];
+        this.voices[turtle] = [];
+        this.pitchDrumTable[turtle] = {};
+        this.backward[turtle] = [];
+        this.vibratoIntensity[turtle] = [];
+        this.vibratoRate[turtle] = [];
+        this.tremoloDepth[turtle] = [];
+        this.tremoloFrequency[turtle] = [];
+        this.distortionAmount[turtle] = [];
+        this.attack[turtle] = [];
+        this.decay[turtle] = [];
+        this.sustain[turtle] = [];
+        this.release[turtle] = [];
+        this.rate[turtle] = [];
+        this.octaves[turtle] = [];
+        this.baseFrequency[turtle] = [];
+        this.chorusRate[turtle] = [];
+        this.delayTime[turtle] = [];
+        this.chorusDepth[turtle] = [];
+        this.neighborArgNote1[turtle] = [];
+        this.neighborArgNote2[turtle] = [];
+        this.neighborArgBeat[turtle] = [];
+        this.neighborArgCurrentBeat[turtle] = [];
+        this.inDefineMode[turtle] = false;
+        this.defineMode[turtle] = [];
+        this.dispatchFactor[turtle] = 1;
+        this.pickup[turtle] = 0;
+        this.beatsPerMeasure[turtle] = 4;  // Default is 4/4 time.
+        this.noteValuePerBeat[turtle] = 4;
+        this.currentBeat[turtle] = 0;
+        this.currentMeasure[turtle] = 0;
+        this.justCounting[turtle] = [];
+        this.justMeasuring[turtle] = [];
+        this.notationStaging[turtle] = [];
+        this.notationDrumStaging[turtle] = [];
+        this.pickupPoint[turtle] = null;
+        this.pickupPOW2[turtle] = false;
+        this.firstPitch[turtle] = [];
+        this.lastPitch[turtle] = [];
+        this.pitchNumberOffset[turtle] = 39; // C4
+        this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
+        this.moveable[turtle] = false;
+        this.inNeighbor[turtle] = [];
+        this.neighborStepPitch[turtle] = [];
+        this.neighborNoteValue[turtle] = [];
+        this.inHarmonic[turtle] = [];
+        this.partials[turtle] = [];
+
+        if (this.compiling) {
+            this._saveX[turtle] = this.turtles.turtleList[turtle].x;
+            this._saveY[turtle] = this.turtles.turtleList[turtle].y;
+            this._saveColor[turtle] = this.turtles.turtleList[turtle].color;
+            this._saveValue[turtle] = this.turtles.turtleList[turtle].value;
+            this._saveChroma[turtle] = this.turtles.turtleList[turtle].chroma;
+            this._saveStroke[turtle] = this.turtles.turtleList[turtle].stroke;
+            this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].canvasAlpha;
+            this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
+            this._savePenState[turtle] = this.turtles.turtleList[turtle].penState;
+        }
+    };
+
     this.runLogoCommands = function (startHere, env) {
         // Restore any broken connections.
         this._restoreConnections();
@@ -1009,136 +1142,7 @@ function Logo () {
         // Each turtle needs to keep its own wait time and music
         // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-            this.previousTurtleTime[turtle] = 0;
-            this.turtleTime[turtle] = 0;
-            this.waitTimes[turtle] = 0;
-            this.endOfClampSignals[turtle] = {};
-            this.butNotThese[turtle] = {};
-            this.cp1x[turtle] = 0;
-            this.cp1y[turtle] = 100;
-            this.cp2x[turtle] = 100;
-            this.cp2y[turtle] = 100;
-            this.inNoteBlock[turtle] = [];
-            this.multipleVoices[turtle] = false;
-            this.scalarTransposition[turtle] = 0;
-            this.scalarTranspositionValues[turtle] = [];
-            this.transposition[turtle] = 0;
-            this.transpositionValues[turtle] = [];
-            this.noteBeat[turtle] = {};
-            this.noteValue[turtle] = {};
-            this.noteCents[turtle] = {};
-            this.noteHertz[turtle] = {};
-            this.lastNotePlayed[turtle] = null;
-            this.previousNotePlayed[turtle] = null;
-            this.noteStatus[turtle] = null;
-            this.noteDirection[turtle] = 0;
-            this.noteDrums[turtle] = {};
-            this.notePitches[turtle] = {};
-            this.noteOctaves[turtle] = {};
-            this.currentOctave[turtle] = 4;
-            this.register[turtle] = 0;
-            this.noteBeatValues[turtle] = {};
-            this.embeddedGraphics[turtle] = {};
-            this.embeddedGraphicsFinished[turtle] = true;
-            this.beatFactor[turtle] = 1;
-            this.dotCount[turtle] = 0;
-            this.invertList[turtle] = [];
-            this.beatList[turtle] = [];
-            this.factorList[turtle] = [];
-            this.switchCases[turtle] = {};
-            this.switchBlocks[turtle] = [];
-            this.connectionStore[turtle] = {};
-            this.connectionStoreLock = false;
-            this.duplicateFactor[turtle] = 1;
-            this.inDuplicate[turtle] = false;
-            this.skipFactor[turtle] = 1;
-            this.skipIndex[turtle] = 0;
-            this.notesPlayed[turtle] = [0, 1];
-            this.whichNoteToCount[turtle] = 1;
-            this.playbackQueue[turtle] = [];
-            this.keySignature[turtle] = 'C ' + _('major');
-            this.pushedNote[turtle] = false;
-            this.oscList[turtle] = {};
-            this.bpm[turtle] = [];
-            this.inSetTimbre[turtle] = false;
-            this.instrumentNames[turtle] = ['default'];
-            this.inCrescendo[turtle] = [];
-            this.crescendoDelta[turtle] = [];
-            this.crescendoInitialVolume[turtle] = {'default': [DEFAULTVOLUME]};
-            this.intervals[turtle] = [];
-            this.semitoneIntervals[turtle] = [];
-            this.markup[turtle] = [];
-            this.staccato[turtle] = [];
-            this.glide[turtle] = [];
-            this.glideOverride[turtle] = 0;
-            this.swing[turtle] = [];
-            this.swingTarget[turtle] = [];
-            this.swingCarryOver[turtle] = 0;
-            this.tie[turtle] = false;
-            this.tieNotePitches[turtle] = [];
-            this.tieNoteExtras[turtle] = [];
-            this.tieCarryOver[turtle] = 0;
-            this.tieFirstDrums[turtle] = [];
-            this.drift[turtle] = 0;
-            this.drumStyle[turtle] = [];
-            this.voices[turtle] = [];
-            this.pitchDrumTable[turtle] = {};
-            this.backward[turtle] = [];
-            this.vibratoIntensity[turtle] = [];
-            this.vibratoRate[turtle] = [];
-            this.tremoloDepth[turtle] = [];
-            this.tremoloFrequency[turtle] = [];
-            this.distortionAmount[turtle] = [];
-            this.attack[turtle] = [];
-            this.decay[turtle] = [];
-            this.sustain[turtle] = [];
-            this.release[turtle] = [];
-            this.rate[turtle] = [];
-            this.octaves[turtle] = [];
-            this.baseFrequency[turtle] = [];
-            this.chorusRate[turtle] = [];
-            this.delayTime[turtle] = [];
-            this.chorusDepth[turtle] = [];
-            this.neighborArgNote1[turtle] = [];
-            this.neighborArgNote2[turtle] = [];
-            this.neighborArgBeat[turtle] = [];
-            this.neighborArgCurrentBeat[turtle] = [];
-            this.inDefineMode[turtle] = false;
-            this.defineMode[turtle] = [];
-            this.dispatchFactor[turtle] = 1;
-            this.pickup[turtle] = 0;
-            this.beatsPerMeasure[turtle] = 4;  // Default is 4/4 time.
-            this.noteValuePerBeat[turtle] = 4;
-            this.currentBeat[turtle] = 0;
-            this.currentMeasure[turtle] = 0;
-            this.justCounting[turtle] = [];
-            this.justMeasuring[turtle] = [];
-            this.notationStaging[turtle] = [];
-            this.notationDrumStaging[turtle] = [];
-            this.pickupPoint[turtle] = null;
-            this.pickupPOW2[turtle] = false;
-            this.firstPitch[turtle] = [];
-            this.lastPitch[turtle] = [];
-            this.pitchNumberOffset[turtle] = 39; // C4
-            this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
-            this.moveable[turtle] = false;
-            this.inNeighbor[turtle] = [];
-            this.neighborStepPitch[turtle] = [];
-            this.neighborNoteValue[turtle] = [];
-            this.inHarmonic[turtle] = [];
-            this.partials[turtle] = [];
-
-            if (this.compiling) {
-                this._saveX[turtle] = this.turtles.turtleList[turtle].x;
-                this._saveY[turtle] = this.turtles.turtleList[turtle].y;
-                this._saveColor[turtle] = this.turtles.turtleList[turtle].color;
-                this._saveValue[turtle] = this.turtles.turtleList[turtle].value;
-                this._saveChroma[turtle] = this.turtles.turtleList[turtle].chroma;
-                this._saveStroke[turtle] = this.turtles.turtleList[turtle].stroke;
-                this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].canvasAlpha;
-                this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
-                this._savePenState[turtle] = this.turtles.turtleList[turtle].penState;
-            }
+            this.initTurtle(turtle);
         }
 
         this.inPitchDrumMatrix = false;
@@ -1809,6 +1813,18 @@ function Logo () {
                 }
             }
             break;
+        case 'setturtle':
+            targetTurtle = that._getTargetTurtle(args[0]);
+            if (targetTurtle !== null) {
+                that._runFromBlock(that, targetTurtle, args[1], isflow, receivedArg);
+            } else {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
+                } else {
+                    that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk)
+                }
+            }
+            break;
         case 'repeat':
             if (args.length === 2) {
                 if (typeof(args[0]) === 'string') {
@@ -2365,7 +2381,7 @@ function Logo () {
             }
             break;
         case 'startTurtle':
-            var targetTurtle = that._getTargetTurtle(args);
+            var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle == null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
@@ -2402,7 +2418,7 @@ function Logo () {
             }
             break;
         case 'stopTurtle':
-            var targetTurtle = that._getTargetTurtle(args);
+            var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle == null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
@@ -2419,7 +2435,7 @@ function Logo () {
             }
             break;
         case 'turtlesync':
-            var targetTurtle = that._getTargetTurtle(args);
+            var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle == null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
@@ -6371,8 +6387,20 @@ function Logo () {
                 break;
             }
 
-            childFlow = args[0];
-            childFlowCount = 1;
+            if (that.blocks.blockList[args[0]].name === 'start') {
+                var thisTurtle = that.blocks.blockList[args[0]].value;
+                console.log('run start ' + thisTurtle);
+                that.initTurtle(thisTurtle);
+                that.turtles.turtleList[thisTurtle].queue = [];
+                that.parentFlowQueue[thisTurtle] = [];
+                that.unhighlightQueue[thisTurtle] = [];
+                that.parameterQueue[thisTurtle] = [];
+                that.turtles.turtleList[thisTurtle].running = true;
+                that._runFromBlock(that, thisTurtle, args[0], 0, receivedArg);
+            } else {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
             break;
         case 'dockblock':
             if (args.length < 3) {
@@ -6455,7 +6483,7 @@ function Logo () {
             }
             break;
         case 'setxyturtle':
-            var targetTurtle = that._getTargetTurtle(args);
+            var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle == null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
@@ -8514,12 +8542,10 @@ function Logo () {
         }
     };
 
-    this._getTargetTurtle = function (args) {
+    this._getTargetTurtle = function (targetTurtle) {
         // The target turtle name can be a string or an int. Make
         // sure there is a turtle by this name and then find the
         // associated start block.
-
-        var targetTurtle = args[0];
 
         // We'll compare the names as strings.
         if (typeof(targetTurtle) === 'number') {
@@ -8527,12 +8553,15 @@ function Logo () {
         }
 
         for (var i = 0; i < this.turtles.turtleList.length; i++) {
-            var turtleName = this.turtles.turtleList[i].name;
-            if (typeof(turtleName) === 'number') {
-                turtleName = turtleName.toString();
-            }
-            if (turtleName === targetTurtle) {
-                return i;
+            if (!this.turtles.turtleList[i].trash) {
+                var turtleName = this.turtles.turtleList[i].name;
+                if (typeof(turtleName) === 'number') {
+                    turtleName = turtleName.toString();
+                }
+
+                if (turtleName === targetTurtle) {
+                    return i;
+                }
             }
         }
 
@@ -9336,7 +9365,8 @@ function Logo () {
                     } else if (that.inNoteBlock[turtle] in that.notePitches[turtle] && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         var obj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     } else {
-                        console.log('Cannot find a note');
+                        console.log('Cannot find a note ');
+                        that.errorMsg(INVALIDPITCH, blk);
                         var obj = ['G', 4];
                     }
 
@@ -9514,10 +9544,10 @@ function Logo () {
                 that.blocks.blockList[blk].value = (that.turtles._canvas.width / (2.0 * that.turtles.scale));
                 break;
             case 'leftpos':
-                that.blocks.blockList[blk].value = -1*(that.turtles._canvas.width / (2.0 * that.turtles.scale));
+                that.blocks.blockList[blk].value = -1 * (that.turtles._canvas.width / (2.0 * that.turtles.scale));
                 break;
             case 'bottompos':
-                that.blocks.blockList[blk].value = -1*(that.turtles._canvas.height / (2.0 * that.turtles.scale));
+                that.blocks.blockList[blk].value = -1 * (that.turtles._canvas.height / (2.0 * that.turtles.scale));
                 break;
             case 'width':
                 that.blocks.blockList[blk].value = (that.turtles._canvas.width / (that.turtles.scale));
@@ -9527,6 +9557,11 @@ function Logo () {
                 break;
             case 'mousebutton':
                 that.blocks.blockList[blk].value = that.getStageMouseDown();
+                break;
+            case 'foundturtle':
+                var cblk = that.blocks.blockList[blk].connections[1];
+                var targetTurtle = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                that.blocks.blockList[blk].value = (that._getTargetTurtle(targetTurtle) !== null);
                 break;
             case 'keyboard':
                 that.lastKeyCode = that.getCurrentKeyCode();
@@ -9948,6 +9983,10 @@ function Logo () {
                     var newNote = [[0, 'newnote', x, y, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': v}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': p}], 0, 0, [5]], [7, ['number', {'value': o}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
                     that.blocks.loadNewBlocks(newNote);
                     that.blocks.blockList[blk].value = blockNumber;
+                } else if (name === _('start')) {
+                    var newBlock = [[0, 'start', x, y, [null, null, null]]];
+                    that.blocks.loadNewBlocks(newBlock);
+                    that.blocks.blockList[blk].value = blockNumber;
                 } else if (name === _('silence')) {  // FIXME: others too
                     var newBlock = [[0, 'rest2', x, y, [null, null]]];
                     that.blocks.loadNewBlocks(newBlock);
@@ -9981,10 +10020,11 @@ function Logo () {
                             } else {
                                 newBlock[0][4].push(null);
                             }
-                    }
+                        }
 
-                    that.blocks.loadNewBlocks(newBlock);
-                    that.blocks.blockList[blk].value = blockNumber;
+                        console.log(newBlock);
+                        that.blocks.loadNewBlocks(newBlock);
+                        that.blocks.blockList[blk].value = blockNumber;
                     }
                 }
                 break;
