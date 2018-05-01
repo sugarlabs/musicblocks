@@ -3807,7 +3807,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     foundTurtleBlock.adjustWidthToLabel();
     foundTurtleBlock.extraWidth = 50;
     foundTurtleBlock.booleanOneArgBlock();
-    foundTurtleBlock.defaults.push('Yertle');
+    foundTurtleBlock.dockTypes[1] = 'anyin';
+    foundTurtleBlock.defaults.push(_('Mr. Mouse'));
+
+    var newTurtle = new ProtoBlock('newturtle');
+    newTurtle.palette = palettes.dict['mice'];
+    blocks.protoBlockDict['newturtle'] = newTurtle;
+    newTurtle.staticLabels.push(_('new turtle'));
+    newTurtle.adjustWidthToLabel();
+    newTurtle.oneArgBlock();
+    newTurtle.dockTypes[1] = 'anyin';
+    newTurtle.defaults.push(_('Mr. Mouse'));
 
     var turtleNameBlock = new ProtoBlock('turtlename');
     turtleNameBlock.palette = palettes.dict['mice'];

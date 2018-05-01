@@ -226,15 +226,14 @@ function Palettes () {
     };
 
     this.getProtoNameAndPalette = function (name) {
-        var obj = [null, null, null];
         for (var b in this.blocks.protoBlockDict) {
             // Don't return deprecated blocks.
             if (name === this.blocks.protoBlockDict[b].staticLabels[0] && !this.blocks.protoBlockDict[b].hidden) {
-                obj = [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
+                return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
             }
         }
 
-        return obj;
+        return [null, null, null];
     };
 
     this.makePalettes = function (hide) {

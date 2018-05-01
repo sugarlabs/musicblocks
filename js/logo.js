@@ -1813,6 +1813,34 @@ function Logo () {
                 }
             }
             break;
+        case 'newturtle':
+            that.showBlocks();  // Force blocks to be visible.
+
+            var cblk = that.blocks.blockList[blk].connections[1];
+            var turtleName = that.parseArg(that, turtle, cblk, blk, receivedArg);
+            if (that._getTargetTurtle(turtleName) === null) {
+                var blockNumber = that.blocks.blockList.length;
+
+                var x = that.turtles.turtleX2screenX(that.turtles.turtleList[turtle].x);
+                var y = that.turtles.turtleY2screenY(that.turtles.turtleList[turtle].y);
+
+                var newBlock = [[0, 'start', x, y, [null, 1, null]], [1, 'setturtlename2', 0, 0, [0, 2, null]], [2, ['text', {'value': turtleName}], 0, 0, [1]]];
+                that.blocks.loadNewBlocks(newBlock);
+
+                setTimeout(function() {
+                    var thisTurtle = that.blocks.blockList[blockNumber].value;
+                    that.initTurtle(thisTurtle);
+                    that.turtles.turtleList[thisTurtle].queue = [];
+                    that.parentFlowQueue[thisTurtle] = [];
+                    that.unhighlightQueue[thisTurtle] = [];
+                    that.parameterQueue[thisTurtle] = [];
+                    that.turtles.turtleList[thisTurtle].running = true;
+                    that._runFromBlock(that, thisTurtle, blockNumber, 0, receivedArg);
+                }, 100);
+            } else {
+                console.log('Turtle ' + turtleName + ' already exists.');
+            }
+            break;
         case 'setturtle':
             targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle !== null) {
@@ -8784,7 +8812,7 @@ function Logo () {
                 }
 
                 if (actionArgs.length >= Number(name)) {
-                    var value = actionArgs[Number(name)-1];
+                    var value = actionArgs[Number(name) - 1];
                     that.blocks.blockList[blk].value = value;
                 } else {
                     that.errorMsg('Invalid argument', blk);
@@ -8821,7 +8849,16 @@ function Logo () {
                 } else {
                     var cblk = that.blocks.blockList[blk].connections[1];
                     var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    that.blocks.blockList[blk].value = Math.floor(a);
+                    if (typeof(a) === 'number') {
+                        that.blocks.blockList[blk].value = Math.floor(a);
+                    } else {
+                        try {
+                            that.blocks.blockList[blk].value = Math.floor(Number(a));
+                        } catch (e) {
+                            that.errorMsg(NANERRORMSG, blk);
+                            that.blocks.blockList[blk].value = 0;
+                        }
+                    }
                 }
                 break;
             case 'mod':
