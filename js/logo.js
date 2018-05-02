@@ -1814,8 +1814,6 @@ function Logo () {
             }
             break;
         case 'newturtle':
-            that.showBlocks();  // Force blocks to be visible.
-
             var cblk = that.blocks.blockList[blk].connections[1];
             var turtleName = that.parseArg(that, turtle, cblk, blk, receivedArg);
             if (that._getTargetTurtle(turtleName) === null) {
@@ -1836,9 +1834,13 @@ function Logo () {
                     that.parameterQueue[thisTurtle] = [];
                     that.turtles.turtleList[thisTurtle].running = true;
                     that._runFromBlock(that, thisTurtle, blockNumber, 0, receivedArg);
+                    // Dispatch an event to indicate that this turtle
+                    // is running.
+                    that.stage.dispatchEvent(turtleName);
                 }, 100);
             } else {
                 console.log('Turtle ' + turtleName + ' already exists.');
+                that.stage.dispatchEvent(turtleName);
             }
             break;
         case 'setturtle':
