@@ -3077,19 +3077,19 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // MEDIA PALETTE
 
-    var leftposBlock = new ProtoBlock('leftpos');
-    leftposBlock.palette = palettes.dict['media'];
-    blocks.protoBlockDict['leftpos'] = leftposBlock;
-    leftposBlock.staticLabels.push(_('left'));
-    leftposBlock.adjustWidthToLabel();
-    leftposBlock.parameterBlock();
-
     var rightposBlock = new ProtoBlock('rightpos');
     rightposBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['rightpos'] = rightposBlock;
     rightposBlock.staticLabels.push(_('right'));
     rightposBlock.adjustWidthToLabel();
     rightposBlock.parameterBlock();
+
+    var leftposBlock = new ProtoBlock('leftpos');
+    leftposBlock.palette = palettes.dict['media'];
+    blocks.protoBlockDict['leftpos'] = leftposBlock;
+    leftposBlock.staticLabels.push(_('left'));
+    leftposBlock.adjustWidthToLabel();
+    leftposBlock.parameterBlock();
 
     var topposBlock = new ProtoBlock('toppos');
     topposBlock.palette = palettes.dict['media'];
@@ -3724,7 +3724,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTurtleXYBlock.hidden = true;
 
     var setTurtleBlock = new ProtoBlock('setturtle');
-    setTurtleBlock.palette = palettes.dict['extras'];
+    setTurtleBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['setturtle'] = setTurtleBlock;
     setTurtleBlock.staticLabels.push(_('set mouse'));
     setTurtleBlock.adjustWidthToLabel();
