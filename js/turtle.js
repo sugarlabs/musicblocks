@@ -883,6 +883,10 @@ function Turtle (name, turtles, drum) {
     this.doRight = function(degrees) {
         // Turn right and display corresponding turtle graphic.
         this.orientation += Number(degrees);
+        while (this.orientation < 0) {
+            this.orientation += 360;
+        }
+
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
         // We cannot update the cache during the 'tween'.
@@ -893,6 +897,10 @@ function Turtle (name, turtles, drum) {
 
     this.doSetHeading = function(degrees) {
         this.orientation = Number(degrees);
+        while (this.orientation < 0) {
+            this.orientation += 360;
+        }
+
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
         // We cannot update the cache during the 'tween'.

@@ -20,10 +20,12 @@ function getMunsellColor(hue, value, chroma) {
     // chroma (aka grey) 0-100 -> 0-14
     // We linear-interpret value.
     var h = Math.round(hue / 2.5);
-    h %= 40; // doesn't guarentee it will be positive.
     while (h < 0) {
         h += 40;
     }
+
+    h %= 40; // doesn't guarentee it will be positive.
+
     var v1 = Math.floor(value / 10);
     var v2 = v1 + 1;
     if (v1 < 0) {
@@ -33,23 +35,33 @@ function getMunsellColor(hue, value, chroma) {
         v1 = 10;
         v2 = 10;
     }
+
     var p = (v2 * 10 - value) / 10.;
     if (p > 1) {
         p = 1;
     } else if (p < 0) {
         p = 0;
     }
+
     var c = Math.round((chroma * 14) / 100);
     if (c < 0) {
         c = 0;
     } else if (c > 14) {
         c = 14;
     }
+
     return interpColor(MUNSELL[h * 165 + v1 * 15 + c], MUNSELL[h * 165 + v2 * 15 + c], p);
 }
 
 
 interpColor = function(hex1, hex2, p) {
+    if (hex1 === undefined && hex2 === undefined) {
+    } else if (hex1 === undefined) {
+        hex1 = hex2;
+    } else if (hex2 === undefined) {
+        hex2 = hex1;
+    }
+
     if (p === 0) {
         return hex2;
     } else if (p === 1) {
@@ -97,15 +109,15 @@ function searchColors(r, g, b) {
     var nearestColor = -1;
     var distance = 10000000;
     for (var i = 0; i < 100; i++) {
-	var color = getcolor(i);
+        var color = getcolor(i);
         var r1 = parseInt(color[2].substr(1, 2), 16);
         var g1 = parseInt(color[2].substr(3, 2), 16);
         var b1 = parseInt(color[2].substr(5, 2), 16);
-	var distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
-	if (distSquared < distance) {
-	    distance = distSquared;
-	    nearestColor = i;
-	}
+        var distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
+        if (distSquared < distance) {
+            distance = distSquared;
+            nearestColor = i;
+        }
     }
     return nearestColor;
 }
