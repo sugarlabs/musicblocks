@@ -1823,9 +1823,8 @@ function Logo () {
                 var y = that.turtles.turtleY2screenY(that.turtles.turtleList[turtle].y);
 
                 var newBlock = [[0, 'start', x, y, [null, 1, null]], [1, 'setturtlename2', 0, 0, [0, 2, null]], [2, ['text', {'value': turtleName}], 0, 0, [1]]];
-                that.blocks.loadNewBlocks(newBlock);
-
-                setTimeout(function() {
+                var __afterLoad = function () {
+                    console.log('AFTERLOAD');
                     var thisTurtle = that.blocks.blockList[blockNumber].value;
                     that.initTurtle(thisTurtle);
                     that.turtles.turtleList[thisTurtle].queue = [];
@@ -1837,7 +1836,16 @@ function Logo () {
                     // Dispatch an event to indicate that this turtle
                     // is running.
                     that.stage.dispatchEvent(turtleName);
-                }, 100);
+                    document.removeEventListener('finishedLoading', __afterLoad);
+                };
+
+                if (document.addEventListener) {
+                    document.addEventListener('finishedLoading', __afterLoad);
+                } else {
+                    document.attachEvent('finishedLoading', __afterLoad);
+                }
+
+                that.blocks.loadNewBlocks(newBlock);
             } else {
                 console.log('Turtle ' + turtleName + ' already exists.');
                 that.stage.dispatchEvent(turtleName);

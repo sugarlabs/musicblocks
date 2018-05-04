@@ -1191,10 +1191,10 @@ define(MYDEFINES, function (compatibility) {
                     this.planet.open(this.mainCanvas.toDataURL('image/png'));
                     this.iframe.style.display = 'block';
                     try {
-			this.iframe.contentWindow.document.getElementById('local-tab').click();
-		    } catch (e) {
+                        this.iframe.contentWindow.document.getElementById('local-tab').click();
+                    } catch (e) {
                         console.log(e);
-		    }
+                    }
                 }
 
                 this.hidePlanet = function(){
@@ -1348,7 +1348,7 @@ define(MYDEFINES, function (compatibility) {
                 planet.init();
             } catch (e) {
                 planet = undefined;
-	    }
+            }
 
             save = new SaveInterface(planet);
             save.setVariables([
@@ -2965,26 +2965,11 @@ define(MYDEFINES, function (compatibility) {
                 sessionData = storage['SESSION' + currentProject];
             }
 
-            // After we have finished loading the project, clear all
-            // to ensure a clean start.
-            if (document.addEventListener) {
-                document.addEventListener('finishedLoading', function () {
-                    if (!turtles.running()) {
-                        setTimeout(function () {
-                            console.log('reset turtles ' + turtles.turtleList.length);
-                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                                logo.turtleHeaps[turtle] = [];
-                                logo.notationStaging[turtle] = [];
-                                logo.notationDrumStaging[turtle] = [];
-                                turtles.turtleList[turtle].doClear(true, true, false);
-                            }
-                        }, 1000);
-                    }
-                });
-            } else {
-                document.attachEvent('finishedLoading', function () {
-                    setTimeout(function () {
+            var __afterLoad = function () {
+                if (!turtles.running()) {
+                    setTimeout(function() { 
                         console.log('reset turtles ' + turtles.turtleList.length);
+                 
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             logo.turtleHeaps[turtle] = [];
                             logo.notationStaging[turtle] = [];
@@ -2992,7 +2977,17 @@ define(MYDEFINES, function (compatibility) {
                             turtles.turtleList[turtle].doClear(true, true, false);
                         }
                     }, 1000);
-                });
+                }
+
+                document.removeEventListener('finishedLoading', __afterLoad);
+            };
+
+            // After we have finished loading the project, clear all
+            // to ensure a clean start.
+            if (document.addEventListener) {
+                document.addEventListener('finishedLoading', __afterLoad);
+            } else {
+                document.attachEvent('finishedLoading', __afterLoad);
             }
 
             if (sessionData) {
