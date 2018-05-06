@@ -1158,7 +1158,7 @@ function Blocks () {
         if (newBlock != null) {
             var n = this._countBlocksInStack(this.findTopBlock(newBlock));
             if (n > LONGSTACK) {
-		this.errorMsg(_('Consider breaking this stack into parts.'));
+                this.errorMsg(_('Consider breaking this stack into parts.'));
             }
 
             // We found a match.
@@ -2859,14 +2859,11 @@ function Blocks () {
         }
 
         if (hasReturn && hasArgs) {
-            this.newNamedcalcArgBlock(name);
-            return true;
+            return this.newNamedcalcArgBlock(name);
         } else if (!hasReturn && hasArgs) {
-            this.newNameddoArgBlock(name);
-            return true;
+            return this.newNameddoArgBlock(name);
         } else if (hasReturn && !hasArgs) {
-            this.newNamedcalcBlock(name);
-            return true;
+            return this.newNamedcalcBlock(name);
         } else if (this.protoBlockDict['myDo_' + name] === undefined) {
             var myDoBlock = new ProtoBlock('nameddo');
             this.protoBlockDict['myDo_' + name] = myDoBlock;
@@ -2884,7 +2881,6 @@ function Blocks () {
 
     this.newNamedcalcBlock = function (name) {
         if (this.protoBlockDict['myCalc_' + name] === undefined) {
-            // console.log('creating myCalc_' + name);
             var myCalcBlock = new ProtoBlock('namedcalc');
             this.protoBlockDict['myCalc_' + name] = myCalcBlock;
             myCalcBlock.palette = this.palettes.dict['action'];
@@ -2893,14 +2889,14 @@ function Blocks () {
             myCalcBlock.zeroArgBlock();
             // Add the new block to the top of the palette.
             myCalcBlock.palette.add(myCalcBlock, true);
-        // } else {
-        //     console.log('myCalc_' + name + ' already exists.');
+            return true;
         }
+
+        return false;
     };
 
     this.newNameddoArgBlock = function (name) {
         if (this.protoBlockDict['myDoArg_' + name] === undefined) {
-            // console.log('creating myDoArg_' + name);
             var myDoArgBlock = new ProtoBlock('nameddoArg');
             this.protoBlockDict['myDoArg_' + name] = myDoArgBlock;
             myDoArgBlock.palette = this.palettes.dict['action'];
@@ -2909,14 +2905,14 @@ function Blocks () {
             myDoArgBlock.zeroArgBlock();
             // Add the new block to the top of the palette.
             myDoArgBlock.palette.add(myDoArgBlock, true);
-        // } else {
-        //     console.log('myDoArg_' + name + ' already exists.');
+            return true;
         }
+
+        return false;
     };
 
     this.newNamedcalcArgBlock = function (name) {
         if (this.protoBlockDict['myCalcArg_' + name] === undefined) {
-            // console.log('creating myCalcArg_' + name);
             var myCalcArgBlock = new ProtoBlock('namedcalcArg');
             this.protoBlockDict['myCalcArg_' + name] = myCalcArgBlock;
             myCalcArgBlock.palette = this.palettes.dict['action'];
@@ -2925,9 +2921,10 @@ function Blocks () {
             myCalcArgBlock.zeroArgBlock();
             // Add the new block to the top of the palette.
             myCalcArgBlock.palette.add(myCalcArgBlock, true);
-        // } else {
-        //     console.log('myCalcArg_' + name + ' already exists.');
+            return true;
         }
+
+        return false;
     };
 
     this._insideArgClamp = function (blk) {
