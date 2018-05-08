@@ -3299,6 +3299,11 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // Next, save the playback queue.
+            if (_THIS_IS_TURTLE_BLOCKS_) {
+                // Don't save the playback queue if it is Turtle Blocks.
+		logo.playbackQueue = {};
+            }
+
             var i = data.length;
             if (i > 0) {
                 for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
