@@ -1772,8 +1772,11 @@ function Logo () {
             }
             break;
         case 'comment':
-            if (args[0] !== null && !that.suppressOutput[turtle] && that.turtleDelay > 0) {
-                that.textMsg(args[0].toString());
+            if (args[0] !== null) {
+                console.log(args[0].toString());
+                if (!that.suppressOutput[turtle] && that.turtleDelay > 0) {
+                    that.textMsg(args[0].toString());
+                }
             }
             break;
         case 'print':
