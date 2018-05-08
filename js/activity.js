@@ -515,6 +515,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doFastButton(env) {
+            stage.on('stagemousemove', function (event) {
+                stageX = event.stageX;
+                stageY = event.stageY;
+            });
+
             var currentDelay = logo.turtleDelay;
             var playingWidget = false;
             logo.setTurtleDelay(0);
@@ -585,6 +590,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doSlowButton() {
+            stage.on('stagemousemove', function (event) {
+                stageX = event.stageX;
+                stageY = event.stageY;
+            });
+
             logo.setTurtleDelay(DEFAULTDELAY);
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
@@ -600,6 +610,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepButton() {
+            stage.on('stagemousemove', function (event) {
+                stageX = event.stageX;
+                stageY = event.stageY;
+            });
+
             var turtleCount = Object.keys(logo.stepQueue).length;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
@@ -621,6 +636,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doSlowMusicButton() {
+            stage.on('stagemousemove', function (event) {
+                stageX = event.stageX;
+                stageY = event.stageY;
+            });
+
             logo.setNoteDelay(DEFAULTDELAY);
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
@@ -636,6 +656,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepMusicButton() {
+            stage.on('stagemousemove', function (event) {
+                stageX = event.stageX;
+                stageY = event.stageY;
+            });
+
             var turtleCount = Object.keys(logo.stepQueue).length;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
@@ -1825,11 +1850,6 @@ define(MYDEFINES, function (compatibility) {
             };
 
             docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
-
-            stage.on('stagemousemove', function (event) {
-                stageX = event.stageX;
-                stageY = event.stageY;
-            });
 
             var __stageMouseUpHandler = function (event) {
                 stageMouseDown = false;
