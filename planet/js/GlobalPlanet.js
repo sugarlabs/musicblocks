@@ -10,360 +10,395 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 function GlobalPlanet(Planet) {
-	this.ProjectViewer = null;
-	this.offlineHTML = '<div class="container center-align">'+_('Feature unavailable - cannot connect to server. Reload Music Blocks to try again.')+'</div>';
-	this.noProjects = '<div class="container center-align">'+_('No results found.')+'</div>';
-	this.tags = [];
-	this.specialTags = null;
-	this.defaultTag = null;
-	this.searchMode = null;
-	this.index = 0;
-	this.page = 24;
-	this.sortBy = null;
-	this.cache = {};
-	this.loadCount = 0;
-	this.cards = [];
-	this.loadButtonShown = true;
-	this.searching = false;
-	this.searchString = "";
-	this.oldSearchString = "";
-	this.remixPrefix = _("Remix of");
+    this.ProjectViewer = null;
+    this.offlineHTML = '<div class="container center-align">' + _('Feature unavailable - cannot connect to server. Reload Music Blocks to try again.') + '</div>';
+    this.noProjects = '<div class="container center-align">' + _('No results found.') + '</div>';
+    this.tags = [];
+    this.specialTags = null;
+    this.defaultTag = null;
+    this.searchMode = null;
+    this.index = 0;
+    this.page = 24;
+    this.sortBy = null;
+    this.cache = {};
+    this.loadCount = 0;
+    this.cards = [];
+    this.loadButtonShown = true;
+    this.searching = false;
+    this.searchString = '';
+    this.oldSearchString = '';
+    this.remixPrefix = _('Remix of');
 
-	this.initTagList = function(){
-		for (var i = 0; i<this.specialTags.length; i++){
-			var t = new GlobalTag(Planet);
-			t.init(this.specialTags[i]);
-			this.tags.push(t);
-			if (this.specialTags[i].defaultTag==true){
-				this.defaultTag=t;
-			}
-		}
-		var keys = Object.keys(Planet.TagsManifest);
-		for (var i = 0; i<keys.length; i++){
-			var t = new GlobalTag(Planet);
-			t.init({"id":keys[i]});
-			this.tags.push(t);
-		}
-		this.sortBy = document.getElementById("sort-select").value;
-		this.selectSpecialTag(this.defaultTag);
-	};
+    this.initTagList = function() {
+        for (var i = 0; i < this.specialTags.length; i++) {
+            var t = new GlobalTag(Planet);
+            t.init(this.specialTags[i]);
+            this.tags.push(t);
+            if (this.specialTags[i].defaultTag === true) {
+                this.defaultTag = t;
+            }
+        }
 
-	this.selectSpecialTag = function(tag){
-		for (var i = 0; i<this.tags.length; i++){
-			this.tags[i].unselect();
-		}
-		tag.select();
-		tag.func();
-	};
+        var keys = Object.keys(Planet.TagsManifest);
+        for (var i = 0; i < keys.length; i++) {
+            var t = new GlobalTag(Planet);
+            t.init({'id': keys[i]});
+            this.tags.push(t);
+        }
 
-	this.unselectSpecialTags = function(){
-		for (var i = 0; i<this.tags.length; i++){
-			if (this.tags[i].specialTag){
-				this.tags[i].unselect();
-			}
-		}
-	};
+        this.sortBy = document.getElementById('sort-select').value;
+        this.selectSpecialTag(this.defaultTag);
+    };
 
-	this.refreshTagList = function(){
-		var tagids = [];
-		for (var i = 0; i<this.tags.length; i++){
-			if (this.tags[i].specialTag==false&&this.tags[i].selected==true){
-				tagids.push(this.tags[i].id);
-			}
-		}
-		if (tagids.length==0){
-			this.selectSpecialTag(this.defaultTag);
-		} else {
-			this.unselectSpecialTags();
-			this.searchTags(tagids);
-		}
-	};
+    this.selectSpecialTag = function(tag) {
+        for (var i = 0; i < this.tags.length; i++) {
+            this.tags[i].unselect();
+        }
+        tag.select();
+        tag.func();
+    };
 
-	this.searchAllProjects = function(){
-		this.searchMode = "ALL_PROJECTS";
-		this.refreshProjects();
-	};
+    this.unselectSpecialTags = function() {
+        for (var i = 0; i < this.tags.length; i++) {
+            if (this.tags[i].specialTag) {
+                this.tags[i].unselect();
+            }
+        }
+    };
 
-	this.searchMyProjects = function(){
-		this.searchMode = "USER_PROJECTS";
-		this.refreshProjects();
-	};
+    this.refreshTagList = function() {
+        var tagids = [];
+        for (var i = 0; i < this.tags.length; i++) {
+            if (this.tags[i].specialTag === false && this.tags[i].selected === true) {
+                tagids.push(this.tags[i].id);
+            }
+        }
 
-	this.searchTags = function(tagids){
-		this.searchMode = JSON.stringify(tagids);
-		this.refreshProjects();
-	};
+        if (tagids.length === 0) {
+            this.selectSpecialTag(this.defaultTag);
+        } else {
+            this.unselectSpecialTags();
+            this.searchTags(tagids);
+        }
+    };
 
-	this.refreshProjects = function(){
-		this.index = 0;
-		this.cards = [];
-		document.getElementById("global-projects").innerHTML = "";
-		this.showLoading();
-		this.hideLoadMore();
-		if (this.oldSearchString!=""){
-			Planet.ServerInterface.searchProjects(this.oldSearchString,this.sortBy,this.index,this.index+this.page+1,this.afterRefreshProjects.bind(this));
-		} else {
-			Planet.ServerInterface.downloadProjectList(this.searchMode,this.sortBy,this.index,this.index+this.page+1,this.afterRefreshProjects.bind(this));
-		}
-	};
+    this.searchAllProjects = function() {
+        this.searchMode = 'ALL_PROJECTS';
+        this.refreshProjects();
+    };
 
-	this.loadMoreProjects = function(){
-		this.showLoading();
-		this.hideLoadMore();
-		if (this.oldSearchString!=""){
-			Planet.ServerInterface.searchProjects(this.oldSearchString,this.sortBy,this.index,this.index+this.page+1,this.afterRefreshProjects.bind(this));
-		} else {
-			Planet.ServerInterface.downloadProjectList(this.searchMode,this.sortBy,this.index,this.index+this.page+1,this.afterRefreshProjects.bind(this));
-		}
-	};
+    this.searchMyProjects = function() {
+        this.searchMode = 'USER_PROJECTS';
+        this.refreshProjects();
+    };
 
-	this.search = function(){
-		if (!this.searching){
-			if (this.searchString==""){
-				this.oldSearchString = "";
-				this.searching = false;
-				this.showTags();
-			} else {
-				this.searching = true;
-				this.hideTags();
-			}
-			this.oldSearchString = this.searchString;
-			this.index=0;
-			this.cards=[];
-			document.getElementById("global-projects").innerHTML = "";
-			this.showLoading();
-			this.hideLoadMore();
-			Planet.ServerInterface.searchProjects(this.oldSearchString,this.sortBy,this.index,this.index+this.page+1,this.afterRefreshProjects.bind(this));
-		}
-	};
+    this.searchTags = function(tagids) {
+        this.searchMode = JSON.stringify(tagids);
+        this.refreshProjects();
+    };
 
-	this.afterSearch = function(){
-		this.searching = false;
-		if (this.searchString!=this.oldSearchString){
-			this.search();
-		}
-	};
+    this.refreshProjects = function() {
+        this.index = 0;
+        this.cards = [];
+        document.getElementById('global-projects').innerHTML = '';
+        this.showLoading();
+        this.hideLoadMore();
+        if (this.oldSearchString !== '') {
+            Planet.ServerInterface.searchProjects(this.oldSearchString, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+        } else {
+            Planet.ServerInterface.downloadProjectList(this.searchMode, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+        }
+    };
 
-	this.afterRefreshProjects = function(data){
-		if (data.success){
-			this.addProjects(data.data);
-		} else {
-			this.throwOfflineError();
-		}
-	};
+    this.loadMoreProjects = function() {
+        this.showLoading();
+        this.hideLoadMore();
+        if (this.oldSearchString !== '') {
+            Planet.ServerInterface.searchProjects(this.oldSearchString, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+        } else {
+            Planet.ServerInterface.downloadProjectList(this.searchMode, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+        }
+    };
 
-	this.addProjects = function(data){
-		var toDownload = [];
-		for (var i = 0; i<data.length; i++){
-			if (this.cache.hasOwnProperty(data[i][0])){
-				if (this.cache[data[i][0]].ProjectLastUpdated!=data[i][1]){
-					toDownload.push(data[i]);
-				}
-			} else {
-				toDownload.push(data[i]);
-			}
-		}
-		this.loadCount=toDownload.length;
-		var l = data.length;
-		if (l==this.page+1){
-			data.pop();
-		}
-		if (l==0){
-			this.throwNoProjectsError();
-			this.afterAddProjects();
-		} else if (this.loadCount==0){
-			this.render(data);
-			if (l==this.page+1){
-				this.showLoadMore();
-			} else {
-				this.hideLoadMore();
-			}
-		} else if (l==this.page+1){
-			this.downloadProjectsToCache(toDownload,function(){this.render(data);this.showLoadMore();}.bind(this));
-		} else {
-			this.downloadProjectsToCache(toDownload,function(){this.render(data);this.hideLoadMore();}.bind(this));
-		}
-	};
+    this.search = function() {
+        if (!this.searching) {
+            if (this.searchString === '') {
+                this.oldSearchString = '';
+                this.searching = false;
+                this.showTags();
+            } else {
+                this.searching = true;
+                this.hideTags();
+            }
 
-	this.downloadProjectsToCache = function(data,callback){
-		this.loadCount = data.length;
-		for (var i = 0; i<data.length; i++){
-			(function(){
-				var id = data[i][0];
-				Planet.ServerInterface.getProjectDetails(id,function(d){var tempid = id;this.addProjectToCache(tempid,d,callback)}.bind(this));
-			}.bind(this))();
-		}
-	};
+            this.oldSearchString = this.searchString;
+            this.index = 0;
+            this.cards = [];
+            document.getElementById('global-projects').innerHTML = '';
+            this.showLoading();
+            this.hideLoadMore();
+            Planet.ServerInterface.searchProjects(this.oldSearchString, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+        }
+    };
 
-	this.addProjectToCache = function(id,data,callback){
-		if (data.success){
-			this.cache[id]=data.data;
-			this.cache[id].ProjectData = null;
-			this.loadCount-=1;
-			if (this.loadCount<=0){
-				callback();
-			}
-		} else {
-			this.throwOfflineError();
-		}
-	};
+    this.afterSearch = function() {
+        this.searching = false;
+        if (this.searchString !== this.oldSearchString) {
+            this.search();
+        }
+    };
 
-	this.forceAddToCache = function(id,callback){
-		Planet.ServerInterface.getProjectDetails(id,function(d){this.addProjectToCache(id,d,callback)}.bind(this));
-	};
+    this.afterRefreshProjects = function(data) {
+        if (data.success) {
+            this.addProjects(data.data);
+        } else {
+            this.throwOfflineError();
+        }
+    };
 
-	this.afterForceAddToCache = function(id,data,callback){
-		if (data.success){
-			this.cache[id]=data.data;
-			this.cache[id].ProjectData = null;
-			callback();
-		} else {
-			this.throwOfflineError();
-		}
-	};
+    this.addProjects = function(data) {
+        var toDownload = [];
+        for (var i = 0; i < data.length; i++) {
+            if (this.cache.hasOwnProperty(data[i][0])) {
+                if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1]) {
+                    toDownload.push(data[i]);
+                }
+            } else {
+                toDownload.push(data[i]);
+            }
+        }
 
-	this.getData = function(id,callback,error){
-		if (error===undefined){
-			error=null;
-		}
-		if (this.cache[id]===undefined||this.cache[id].ProjectData==null){
-			this.downloadDataToCache(id,callback,error);
-		} else {
-			callback(this.cache[id].ProjectData);
-		}
-	};
+        this.loadCount = toDownload.length;
+        var l = data.length;
+        if (l === this.page + 1) {
+            data.pop();
+        }
 
-	this.downloadDataToCache = function(id,callback,error){
-		if (error===undefined){
-			error = null;
-		}
-		Planet.ServerInterface.downloadProject(id,function(data){this.afterDownloadData(id,data,callback,error)}.bind(this));
-	};
+        if (l === 0) {
+            this.throwNoProjectsError();
+            this.afterAddProjects();
+        } else if (this.loadCount === 0) {
+            this.render(data);
+            if (l === this.page + 1) {
+                this.showLoadMore();
+            } else {
+                this.hideLoadMore();
+            }
+        } else if (l === this.page + 1) {
+            this.downloadProjectsToCache(toDownload, function() {
+                this.render(data);this.showLoadMore();
+            }.bind(this));
+        } else {
+            this.downloadProjectsToCache(toDownload, function() {
+                this.render(data);this.hideLoadMore();
+            }.bind(this));
+        }
+    };
 
-	this.afterDownloadData = function(id,data,callback,error){
-		if (error===undefined){
-			error = null;
-		}
-		if (data.success){
-			this.cache[id].ProjectData = Planet.ProjectStorage.decodeTB(data.data);
-			callback(this.cache[id].ProjectData);
-		} else {
-			console.log("Cannot find project");
-			if (error!=null){
-				error();
-			}
-		}
-	};
+    this.downloadProjectsToCache = function(data, callback) {
+        this.loadCount = data.length;
+        for (var i = 0; i < data.length; i++) {
+            (function() {
+                var id = data[i][0];
+                Planet.ServerInterface.getProjectDetails(id, function(d) {
+                    var tempid = id;this.addProjectToCache(tempid, d, callback)
+                }.bind(this));
+            }.bind(this))();
+        }
+    };
 
-	this.render = function(data){
-		for (var i = 0; i<data.length; i++){
-			if (this.cache.hasOwnProperty(data[i][0])){
-				var g = new GlobalCard(Planet);
-				g.init(data[i][0]);
-				g.render();
-				this.cards.push(g);
-			} else {
-				this.throwOfflineError();
-				return;
-			}
-		}
-		jQuery('.tooltipped').tooltip({delay: 50});
-		this.afterAddProjects();
-	};
+    this.addProjectToCache = function(id, data, callback) {
+        if (data.success) {
+            this.cache[id] = data.data;
+            this.cache[id].ProjectData = null;
+            this.loadCount -= 1;
+            if (this.loadCount <= 0) {
+                callback();
+            }
+        } else {
+            this.throwOfflineError();
+        }
+    };
 
-	this.afterAddProjects = function(){
-		this.index+=this.page;
-		this.hideLoading();
-		if (this.oldSearchString!=""){
-			this.afterSearch();
-		}
-	};
+    this.forceAddToCache = function(id, callback) {
+        Planet.ServerInterface.getProjectDetails(id, function(d) {
+            this.addProjectToCache(id, d, callback)
+        }.bind(this));
+    };
 
-	this.throwOfflineError = function(){
-		this.hideLoading();
-		this.hideLoadMore();
-		document.getElementById("global-projects").innerHTML = this.offlineHTML;
-	};
+    this.afterForceAddToCache = function(id, data, callback) {
+        if (data.success) {
+            this.cache[id] = data.data;
+            this.cache[id].ProjectData = null;
+            callback();
+        } else {
+            this.throwOfflineError();
+        }
+    };
 
-	this.throwNoProjectsError = function(){
-		this.hideLoading();
-		this.hideLoadMore();
-		document.getElementById("global-projects").innerHTML = this.noProjects;
-	};
+    this.getData = function(id, callback, error) {
+        if (error === undefined) {
+            error = null;
+        }
 
-	this.hideLoading = function(){
-		document.getElementById("global-load").style.display = "none";
-	};
+        if (this.cache[id] === undefined || this.cache[id].ProjectData === null) {
+            this.downloadDataToCache(id, callback, error);
+        } else {
+            callback(this.cache[id].ProjectData);
+        }
+    };
 
-	this.showLoading = function(){
-		document.getElementById("global-load").style.display = "block";
-	};
+    this.downloadDataToCache = function(id, callback, error) {
+        if (error === undefined) {
+            error = null;
+        }
+    
+        Planet.ServerInterface.downloadProject(id, function(data) {
+            this.afterDownloadData(id, data, callback, error)
+        }.bind(this));
+    };
 
-	this.hideLoadMore = function(){
-		document.getElementById("load-more-projects").style.display = "none";
-		this.loadButtonShown = false;
-	};
+    this.afterDownloadData = function(id, data, callback, error) {
+        if (error === undefined) {
+            error = null;
+        }
 
-	this.showLoadMore = function(){
-		var l = document.getElementById("load-more-projects");
-		l.style.display = "block";
-		l.classList.remove("disabled");
-		this.loadButtonShown = true;
-	};
+        if (data.success) {
+            if (id in this.cache) {
+                this.cache[id].ProjectData = Planet.ProjectStorage.decodeTB(data.data);
+                callback(this.cache[id].ProjectData);
+            } else {
+                callback(Planet.ProjectStorage.decodeTB(data.data));
+            }
+        } else {
+            if (error !== null) {
+                error();
+            }
+        }
+    };
 
-	this.hideTags = function(){
-		document.getElementById("tagscontainer").style.display = "none";
-	};
+    this.render = function(data) {
+        for (var i = 0; i < data.length; i++) {
+            if (this.cache.hasOwnProperty(data[i][0])) {
+                var g = new GlobalCard(Planet);
+                g.init(data[i][0]);
+                g.render();
+                this.cards.push(g);
+            } else {
+                this.throwOfflineError();
+                return;
+            }
+        }
 
-	this.showTags = function(){
-		document.getElementById("tagscontainer").style.display = "block";
-	};
+        jQuery('.tooltipped').tooltip({delay: 50});
+        this.afterAddProjects();
+    };
 
-	this.openGlobalProject = function(id,error){
-		if (error===undefined){
-			error = null;
-		}
-		var t = this;
-		this.getData(id,function(data){
-			var remixedName = t.remixPrefix + " " + t.cache[id].ProjectName;
-			Planet.ProjectStorage.initialiseNewProject(remixedName,data,t.cache[id].ProjectImage);
-			Planet.loadProjectFromData(data);
-		},error);
-	};
+    this.afterAddProjects = function() {
+        this.index += this.page;
+        this.hideLoading();
+        if (this.oldSearchString !== '') {
+            this.afterSearch();
+        }
+    };
 
-	this.init = function(){
-		if (!Planet.ConnectedToServer){
-			document.getElementById("globaltitle").textContent = _("Cannot connect to server");
-			document.getElementById("globalcontents").innerHTML = this.offlineHTML;
-		} else {
-			var t = this;
-			jQuery('#sort-select').material_select(function (evt) {
-				t.sortBy = document.getElementById("sort-select").value;
-				t.refreshProjects();
-			});
-			this.specialTags = 
-			[{"name":"All Projects","func":this.searchAllProjects.bind(this),"defaultTag":true},
-			{"name":"My Projects","func":this.searchMyProjects.bind(this)}];
-			this.initTagList();
-			var t = this;
-			document.getElementById("load-more-projects").addEventListener('click', function (evt) {
-				if (t.loadButtonShown){
-					t.loadMoreProjects();
-				}
-			});
-			var debouncedfunction = debounce(this.search.bind(this),250);
-			document.getElementById("global-search").addEventListener('input', function (evt) {
-				t.searchString = this.value;
-				debouncedfunction();
-			});
-			document.getElementById("search-close").addEventListener('click', function (evt) {
-				document.getElementById("global-search").value="";
-				t.searchString="";
-				this.style.display = "none";
-				debouncedfunction();
-			});
-			this.ProjectViewer = new ProjectViewer(Planet);
-			this.ProjectViewer.init();
-		}
-	};
+    this.throwOfflineError = function() {
+        this.hideLoading();
+        this.hideLoadMore();
+        document.getElementById('global-projects').innerHTML = this.offlineHTML;
+    };
+
+    this.throwNoProjectsError = function() {
+        this.hideLoading();
+        this.hideLoadMore();
+        document.getElementById('global-projects').innerHTML = this.noProjects;
+    };
+
+    this.hideLoading = function() {
+        document.getElementById('global-load').style.display = 'none';
+    };
+
+    this.showLoading = function() {
+        document.getElementById('global-load').style.display = 'block';
+    };
+
+    this.hideLoadMore = function() {
+        document.getElementById('load-more-projects').style.display = 'none';
+        this.loadButtonShown = false;
+    };
+
+    this.showLoadMore = function() {
+        var l = document.getElementById('load-more-projects');
+        l.style.display = 'block';
+        l.classList.remove('disabled');
+        this.loadButtonShown = true;
+    };
+
+    this.hideTags = function() {
+        document.getElementById('tagscontainer').style.display = 'none';
+    };
+
+    this.showTags = function() {
+        document.getElementById('tagscontainer').style.display = 'block';
+    };
+
+    this.openGlobalProject = function(id, error) {
+        if (error === undefined) {
+            error = null;
+        }
+
+        var that = this;
+        this.getData(id, function(data) {
+            if (id in that.cache) {
+                var remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
+            } else {
+                var remixedName = that.remixPrefix + ' ' + _('My Project');
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+            }
+
+            Planet.loadProjectFromData(data);
+        }, error);
+    };
+
+    this.init = function() {
+        if (!Planet.ConnectedToServer) {
+            document.getElementById('globaltitle').textContent = _('Cannot connect to server');
+            document.getElementById('globalcontents').innerHTML = this.offlineHTML;
+        } else {
+            var that = this;
+            jQuery('#sort-select').material_select(function (evt) {
+                that.sortBy = document.getElementById('sort-select').value;
+                that.refreshProjects();
+            });
+
+            this.specialTags = 
+                [{'name': 'All Projects', 'func': this.searchAllProjects.bind(this), 'defaultTag': true}, 
+                 {'name': 'My Projects', 'func': this.searchMyProjects.bind(this)}];
+            this.initTagList();
+
+            var that = this;
+            document.getElementById('load-more-projects').addEventListener('click',  function (evt) {
+                if (that.loadButtonShown) {
+                    that.loadMoreProjects();
+                }
+            });
+
+            var debouncedfunction = debounce(this.search.bind(this), 250);
+            document.getElementById('global-search').addEventListener('input',  function (evt) {
+                that.searchString = this.value;
+                debouncedfunction();
+            });
+
+            document.getElementById('search-close').addEventListener('click', function (evt) {
+                document.getElementById('global-search').value = '';
+                that.searchString = '';
+                this.style.display = 'none';
+                debouncedfunction();
+            });
+
+            this.ProjectViewer = new ProjectViewer(Planet);
+            this.ProjectViewer.init();
+        }
+    };
 };

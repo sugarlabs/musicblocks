@@ -2885,7 +2885,7 @@ define(MYDEFINES, function (compatibility) {
             // palettes.updatePalettes();
             setTimeout(function () {
                 try {
-                    planet.openProjectFromPlanet(projectID,function(){loadStartWrapper(_loadStart);});
+                    planet.openProjectFromPlanet(projectID, function() {loadStartWrapper(_loadStart);});
                 } catch (e) {
                     console.log(e);
                     console.log('_loadStart on error');
