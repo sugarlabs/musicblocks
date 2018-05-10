@@ -420,7 +420,6 @@ saveLilypondOutput = function(logo) {
     const NUMBERNAMES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     var turtleCount = 0;
     var clef = [];
-
     for (var t in logo.notationStaging) {
         turtleCount += 1;
     }
@@ -604,7 +603,6 @@ saveLilypondOutput = function(logo) {
                 console.log('shortInstrumentName: ' + shortInstrumentName);
             }
             
-
             logo.notationOutput += instrumentName.replace(/ /g, '_').replace('.', '') + 'Voice = ';
             if (tNumber > startDrums - 1) {
                 logo.notationOutput += '\\new DrumStaff \\with {\n';
@@ -627,8 +625,6 @@ saveLilypondOutput = function(logo) {
         }
         c += 1;
     }
-
-
 
     // Begin the SCORE section.
     logo.notationOutput += '\n\\score {\n';
