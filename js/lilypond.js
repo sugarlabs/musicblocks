@@ -549,48 +549,48 @@ saveLilypondOutput = function(logo) {
                 var done = 0;
                 var n = instrumentName.indexOf('_');
 
-                if (instrumentName.length == 1) {                         // if length of instrumentName = 1 
+                if (instrumentName.length === 1) {                         // if length of instrumentName = 1 
                 	shortInstrumentName = instrumentName;
                 	occupiedShortNames[t] = shortInstrumentName;
-                }else if (n == -1) {					                   // no space in instrument name
+                } else if (n === -1) {					                   // no space in instrument name
                 	for (var p = 2; p < instrumentName.length; p++) {
-                		if (p == 2) {
+                		if (p === 2) {
                 			final = instrumentName.slice(0, 2);
-                		}else{
+                		} else {
                 			final = final + instrumentName.charAt(p-1);
                 		}
 
-                		if (occupiedShortNames.indexOf(final) == -1) {         // not found in array so unique shortname
+                		if (occupiedShortNames.indexOf(final) === -1) {         // not found in array so unique shortname
 		                	shortInstrumentName = final;
 		                	occupiedShortNames[t] = shortInstrumentName;
 		                	break;
 	                	}
                 	}
-                }else{                                                          // atleast 1 space in instrument name
+                } else {                                                          // atleast 1 space in instrument name
 	                firstPart = instrumentName.slice(0, n);
 	                secondPart = instrumentName.slice(n+1, instrumentName.length);
 	                part1 = firstPart.charAt(0);
 	                part2 = secondPart.charAt(0);
 	                final = part1 + part2;
 
-	                if (occupiedShortNames.indexOf(final) == -1) {                 // not found in array so unique shortname
+	                if (occupiedShortNames.indexOf(final) === -1) {                 // not found in array so unique shortname
 	                	shortInstrumentName = final;
 	                	occupiedShortNames[t] = shortInstrumentName;
 	                	done = 1;
 
-	                }else if(done != 1){
+	                } else if (done !== 1) {
 	                	final = '';
 	                	for (var q = 1; i < instrumentName.length; i++) {
 	                		part2 = part2 + secondPart.charAt(q);
 	                		final = part1 + part2;
-	                		if (occupiedShortNames.indexOf(final) == -1) {         // not found in array so unique shortname
+	                		if (occupiedShortNames.indexOf(final) === -1) {         // not found in array so unique shortname
 			                	shortInstrumentName = final;
 			                	occupiedShortNames[t] = shortInstrumentName;
 			                	break;
-			                }else{
+			                } else {
 			                	part1 = part1 + firstPart.charAt(q);
 			                	final = part1 + part2;
-			                	if (occupiedShortNames.indexOf(final) == -1) {         // not found in array
+			                	if (occupiedShortNames.indexOf(final) === -1) {         // not found in array
 				                	shortInstrumentName = final;
 				                	occupiedShortNames[t] = shortInstrumentName;
 				                	break;
