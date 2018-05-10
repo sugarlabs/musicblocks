@@ -17,8 +17,8 @@ var LILYPONDHEADER = '\\version "2.18.2"\n\n% **********************************
 //.TRANS Animal names used in Lilypond output
 const RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
 const RODENTSEN = ['mouse', 'brown rat', 'mole', 'chipmunk', 'red squirrel', 'guinea pig', 'capybara', 'coypu', 'black rat', 'grey squirrel', 'flying squirrel', 'bat'];
-
 const CLEFS = ['treble', 'bass', 'bass_8', 'percussion'];
+
 
 getLilypondHeader = function () {
     return LILYPONDHEADER;
@@ -541,56 +541,50 @@ saveLilypondOutput = function(logo) {
                 }
                 logo.notationOutput += '\n}\n\n';
 
-              	
-
-                var shortInstrumentName = "";
-                var final = "";
-                var firstPart = "";
-                var secondPart = "";
-                var part1 = "";
-                var part2 = "";
+                var shortInstrumentName = '';
+                var final = '';
+                var firstPart = '';
+                var secondPart = '';
+                var part1 = '';
+                var part2 = '';
                 var done = 0;
-                var n = instrumentName.indexOf("_");
+                var n = instrumentName.indexOf('_');
 
-                if (instrumentName.length == 1) {
+                if (instrumentName.length == 1) {                         // if length of instrumentName = 1 
                 	shortInstrumentName = instrumentName;
                 	occupiedShortNames[t] = shortInstrumentName;
-                }else if (n == -1) {					// no space in instrument name
+                }else if (n == -1) {					                   // no space in instrument name
                 	for (var p = 2; p < instrumentName.length; p++) {
                 		if (p == 2) {
                 			final = instrumentName.slice(0, 2);
                 		}else{
                 			final = final + instrumentName.charAt(p-1);
-
                 		}
 
-                		if (occupiedShortNames.indexOf(final) == -1) {         // not found in array
+                		if (occupiedShortNames.indexOf(final) == -1) {         // not found in array so unique shortname
 		                	shortInstrumentName = final;
 		                	occupiedShortNames[t] = shortInstrumentName;
 		                	break;
 	                	}
                 	}
-
-
-                }else{
+                }else{                                                          // atleast 1 space in instrument name
 	                firstPart = instrumentName.slice(0, n);
 	                secondPart = instrumentName.slice(n+1, instrumentName.length);
 	                part1 = firstPart.charAt(0);
 	                part2 = secondPart.charAt(0);
 	                final = part1 + part2;
 
-
-	                if (occupiedShortNames.indexOf(final) == -1) {         // not found in array
+	                if (occupiedShortNames.indexOf(final) == -1) {                 // not found in array so unique shortname
 	                	shortInstrumentName = final;
 	                	occupiedShortNames[t] = shortInstrumentName;
 	                	done = 1;
 
 	                }else if(done != 1){
-	                	final = "";
+	                	final = '';
 	                	for (var q = 1; i < instrumentName.length; i++) {
 	                		part2 = part2 + secondPart.charAt(q);
 	                		final = part1 + part2;
-	                		if (occupiedShortNames.indexOf(final) == -1) {         // not found in array
+	                		if (occupiedShortNames.indexOf(final) == -1) {         // not found in array so unique shortname
 			                	shortInstrumentName = final;
 			                	occupiedShortNames[t] = shortInstrumentName;
 			                	break;
@@ -602,23 +596,14 @@ saveLilypondOutput = function(logo) {
 				                	occupiedShortNames[t] = shortInstrumentName;
 				                	break;
 				                }
-
-
 			                }
-	                		
 	                	}
-
 	                }
             	}
-
-
-
                 console.log('instrumentName: ' + instrumentName);
                 console.log('shortInstrumentName: ' + shortInstrumentName);
-
-
-
             }
+            
 
             logo.notationOutput += instrumentName.replace(/ /g, '_').replace('.', '') + 'Voice = ';
             if (tNumber > startDrums - 1) {
