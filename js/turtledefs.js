@@ -36,7 +36,7 @@ function getMainToolbarButtonNames(name) {
 
 
 function getAuxToolbarButtonNames(name) {
-    return (['planet', 'open', 'save', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'new-project', 'restore-trash'].indexOf(name) > -1);
+    return (['planet', 'planet-disabled', 'open', 'save', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'new-project', 'restore-trash'].indexOf(name) > -1);
 }
 
 
@@ -84,7 +84,7 @@ function createHelpContent() {
 	//.TRANS: the buttons used to open various palettes of blocks
         [_('Palette buttons'),
         //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
-	 _('Located on your left - This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+	 _('This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
         [_('Play music'), _('Click to run the music note by note.') + ' ' + _('Alternatively, you can hit the ENTER or RETURN key.'), 'header-icons/play-button.svg'],
         [_('Run fast'), _('Click the run button to run the project in fast mode.'), 'header-icons/run-button.svg'],
         [_('Run slow'), _('Long press the run button to run the project in slow mode.'), 'header-icons/slow-button.svg'],
@@ -97,10 +97,10 @@ function createHelpContent() {
         [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
         [_('Home'), _('Return all blocks to the center of the screen.'), 'header-icons/go-home-button.svg'],
         [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
-        [_('Expand/collapse option toolbar'), _('Located on your right - Click this button to expand or collapse the auxillary toolbar. '), 'header-icons/menu-button.svg'],
-        [_('Load samples from server'), _('This button opens a viewer for loading example projects. Tip: There are several projects on Music, Art, Mathematics, Use them to get feel of Music Blocks'), 'header-icons/planet-button.svg'],
-        [_('Load project from files'), _('You can also load projects from the file system.  '), 'header-icons/open-button.svg'],
-        [_('Save project'), _('Save your project to a file. In musical, visual or text form'), 'header-icons/save-button.svg'],
+        [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
+        [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
+        [_('Load project from files'), _('You can also load projects from the file system.'), 'header-icons/open-button.svg'],
+        [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
         [_('Save sheet music'), _('Save your project to as a Lilypond file.'), 'header-icons/lilypond-button.svg'],
         [_('Copy'), _('To copy a stack to the clipboard, do a long press on the stack.') + ' ' + _('You can also use Alt+C to copy a stack of blocks.') + ' ' + _('The Paste Button will highlight.'), 'header-icons/paste-button.svg'],
         [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.') + ' ' + _('You can also use Alt+V to paste a stack of blocks. '), 'header-icons/paste-disabled-button.svg'],
@@ -118,7 +118,7 @@ function createHelpContent() {
         [_('New Project'), _('Initialise a new project.'), 'header-icons/new-project-button.svg'],
         [_('Restore'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
         [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
-        [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://musicblocks.sugarlabs.org/guide/', _('Music Blocks Guide')],
+        [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
         [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
     ];
 };
