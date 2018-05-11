@@ -308,7 +308,7 @@ msgstr "Cargar ejemplos desde el servidor"
 #: js/activity.js:3554
 #: js/savebox.js:113
 msgid "The Planet is unavailable."
-msgstr ""
+msgstr "La Planeta no está disponible."
 
 #: js/activity.js:3560
 #: js/activity.js:3572
@@ -345,7 +345,7 @@ msgstr "Configuración"
 #: js/activity.js:3566
 #: js/turtledefs.js:118
 msgid "New Project"
-msgstr ""
+msgstr "Nuevo Proyecto"
 
 #: js/activity.js:3567
 #: js/activity.js:3579
@@ -1870,7 +1870,7 @@ msgstr "Seleccione su preferencia de idioma."
 
 #: js/turtledefs.js:118
 msgid "Initialise a new project."
-msgstr ""
+msgstr "Inicializa un nuevo proyecto."
 
 #: js/turtledefs.js:119
 msgid "Restore blocks from the trash."
@@ -1917,7 +1917,7 @@ msgstr "Mi proyecto"
 #: js/SaveInterface.js:74
 #: js/SaveInterface.js:78
 msgid "No description provided"
-msgstr ""
+msgstr "Ninguna descripción provista"
 
 #: js/SaveInterface.js:186
 #.TRANS: File name prompt for save as Lilypond
@@ -1952,7 +1952,7 @@ msgstr "Guardar como lilypond"
 #: js/SaveInterface.js:198
 #.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
 msgid "Save as PDF"
-msgstr ""
+msgstr "Guardar como PDF"
 
 #: js/SaveInterface.js:215
 #: js/basicblocks.js:3682
@@ -1978,7 +1978,7 @@ msgstr "Sr. Ratón"
 
 #: js/SaveInterface.js:334
 msgid "Do you want to save your project?"
-msgstr ""
+msgstr "¿Quieres guardar tu proyecto?"
 
 #: js/basicblocks.js:129
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -3159,7 +3159,7 @@ msgstr "cargar pila"
 #: js/basicblocks.js:3035
 #.TRANS: reverse the order of the heap
 msgid "reverse heap"
-msgstr ""
+msgstr "revertir la pila"
 
 #: js/basicblocks.js:3043
 #.TRANS: retrieve a value from the heap at index position in the heap
@@ -3504,11 +3504,11 @@ msgstr "sincronizar"
 
 #: js/basicblocks.js:3806
 msgid "found turtle"
-msgstr ""
+msgstr "encontró la tortuga"
 
 #: js/basicblocks.js:3816
 msgid "new turtle"
-msgstr ""
+msgstr "nueva tortuga"
 
 #: js/basicblocks.js:3825
 msgid "mouse name"
@@ -3517,7 +3517,7 @@ msgstr "renombrar ratón"
 #: js/basicblocks.js:3833
 #: js/basicblocks.js:3847
 msgid "set name"
-msgstr ""
+msgstr "fijar nombre"
 
 #: js/basicblocks.js:3834
 #: plugins/translate.rtp:95
@@ -3737,7 +3737,7 @@ msgstr "Guardar pila"
 
 #: js/blocks.js:1161
 msgid "Consider breaking this stack into parts."
-msgstr ""
+msgstr "Considera dividir esta pila en partes."
 
 #: js/blocks.js:3006
 #: js/blocks.js:3032
@@ -3843,7 +3843,7 @@ msgstr "cantidad de distorsión"
 #: js/tempo.js:75
 #: js/tempo.js:78
 msgid "The beats per minute must be between 30 and 1000."
-msgstr ""
+msgstr "Los latidos por minuto deben estar entre 30 y 1000."
 
 #: js/tempo.js:338
 msgid "speed up"
@@ -3939,16 +3939,16 @@ msgstr "anterior"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
-msgstr ""
+msgstr "Más detalles"
 
 #: js/GlobalCard.js:32
 msgid "Like project"
-msgstr ""
+msgstr "Proyecto \"Me gusta\""
 
 #: js/GlobalCard.js:34
 #: js/LocalCard.js:34
 msgid "Share project"
-msgstr ""
+msgstr "Compartir proyecto"
 
 #: js/GlobalCard.js:37
 #: js/LocalCard.js:37
@@ -3958,7 +3958,7 @@ msgstr "Compartir"
 #: js/GlobalCard.js:40
 #: js/LocalCard.js:40
 msgid "Flags"
-msgstr ""
+msgstr "Banderas"
 
 #: js/GlobalCard.js:41
 #: js/LocalCard.js:41
@@ -3978,19 +3978,19 @@ msgstr "Contraer bloques al inicio."
 #: js/GlobalCard.js:47
 #: js/LocalCard.js:47
 msgid "Advanced Options"
-msgstr ""
+msgstr "Opciones avanzadas"
 
 #: js/ProjectStorage.js:221
 msgid "anonymous"
-msgstr ""
+msgstr "anónimo"
 
 #: js/ProjectViewer.js:20
 msgid "Report description required"
-msgstr ""
+msgstr "Descripción requerida"
 
 #: js/ProjectViewer.js:21
 msgid "Report description too long"
-msgstr ""
+msgstr "La descripción es demasiado larga."
 
 #: js/Publisher.js:16
 #: js/GlobalPlanet.js:14
@@ -3999,52 +3999,52 @@ msgstr ""
 
 #: js/Publisher.js:121
 msgid "Republish Project"
-msgstr ""
+msgstr "Volver a publicar el proyecto"
 
 #: js/Publisher.js:125
 msgid "Publish Project"
-msgstr ""
+msgstr "Publicar el proyecto"
 
 #: js/Publisher.js:163
 #: js/Publisher.js:179
 msgid "This field is required"
-msgstr ""
+msgstr "Este campo es requerido."
 
 #: js/Publisher.js:170
 msgid "Title too long"
-msgstr ""
+msgstr "Título es demasiado largo."
 
 #: js/Publisher.js:186
 msgid "Description too long"
-msgstr ""
+msgstr "La descripción es demasiado largo."
 
 #: js/Publisher.js:263
 msgid "Server Error"
-msgstr ""
+msgstr "Error del Servidor"
 
 #: js/Publisher.js:263
 msgid "Try Again"
-msgstr ""
+msgstr "Inténtalo de nuevo"
 
 #: js/LocalCard.js:21
 msgid "View published project"
-msgstr ""
+msgstr "Ver proyecto publicado"
 
 #: js/LocalCard.js:24
 msgid "Publish project"
-msgstr ""
+msgstr "Publicar proyecto"
 
 #: js/LocalCard.js:31
 msgid "Edit project"
-msgstr ""
+msgstr "Editar proyecto"
 
 #: js/LocalCard.js:32
 msgid "Delete project"
-msgstr ""
+msgstr "Borrar proyecto"
 
 #: js/LocalCard.js:51
 msgid "Download project"
-msgstr ""
+msgstr "Descargar proyecto"
 
 #: js/LocalCard.js:52
 msgid "Merge with current project"
@@ -4052,19 +4052,19 @@ msgstr "Unir con el proyecto actual"
 
 #: js/LocalCard.js:53
 msgid "Duplicate project"
-msgstr ""
+msgstr "Duplucar proyecto"
 
 #: js/GlobalPlanet.js:15
 msgid "No results found."
-msgstr ""
+msgstr "No se han encontrado resultados."
 
 #: js/GlobalPlanet.js:30
 msgid "Remix of"
-msgstr ""
+msgstr "Remix de"
 
 #: js/GlobalPlanet.js:366
 msgid "Cannot connect to server"
-msgstr ""
+msgstr "No es posible conectar con el servidor."
 
 #: plugins/finance.rtp:28
 msgid "currency"
