@@ -367,6 +367,7 @@ function GlobalPlanet(Planet) {
             document.getElementById('globalcontents').innerHTML = this.offlineHTML;
         } else {
             var that = this;
+
             jQuery('#sort-select').material_select(function (evt) {
                 that.sortBy = document.getElementById('sort-select').value;
                 that.refreshProjects();
@@ -377,7 +378,6 @@ function GlobalPlanet(Planet) {
                  {'name': 'My Projects', 'func': this.searchMyProjects.bind(this)}];
             this.initTagList();
 
-            var that = this;
             document.getElementById('load-more-projects').addEventListener('click',  function (evt) {
                 if (that.loadButtonShown) {
                     that.loadMoreProjects();
@@ -385,6 +385,7 @@ function GlobalPlanet(Planet) {
             });
 
             var debouncedfunction = debounce(this.search.bind(this), 250);
+
             document.getElementById('global-search').addEventListener('input',  function (evt) {
                 that.searchString = this.value;
                 debouncedfunction();

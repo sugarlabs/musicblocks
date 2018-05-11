@@ -10,46 +10,47 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 function Converter(Planet) {
-	this.ServerInterface = Planet.ServerInterface;
+    this.ServerInterface = Planet.ServerInterface;
 
-	this.isConnected = function(){
-		return Planet.ConnectedToServer;
-	}
+    this.isConnected = function() {
+        return Planet.ConnectedToServer;
+    }
 
-	//callbacks: (success, data/error message)
-	//Conversion Functions
+    // callbacks: (success, data/error message)
+    // Conversion Functions
 
-	this.ly2pdf = function(data, callback){
-		this.ServerInterface.convertFile("ly","pdf",window.btoa(encodeURIComponent(data)),function(result){this.afterly2pdf(result,callback);}.bind(this));
-	}
+    this.ly2pdf = function(data, callback) {
+        this.ServerInterface.convertFile('ly', 'pdf', window.btoa(encodeURIComponent(data)), function(result) {
+	    this.afterly2pdf(result,callback);
+	}.bind(this));
+    };
+    
+    this.afterly2pdf = function(data, callback) {
+        if (!data.success) {
+            callback(false, data.error);
+        } else {
+            callback(true, this.getDataURL(data.data.contenttype, data.data.blob));
+        }
+    };
+    
+    // Ancillary Functions
+    this.getDataURL = function(mime, data){
+        return 'data:' + mime + ';base64,' + data;
+    };
 
-	this.afterly2pdf = function(data, callback){
-		if (!data.success){
-			callback(false,data.error);
-		} else {
-			callback(true,this.getDataURL(data.data.contenttype, data.data.blob));
-		}
-	}
+    // Unused, but might be useful.
+    this.getBlob = function(mime, data) {
+        var rawData = window.atob(data);
+        var len = rawData.length;
+        var arr = new Uint8Array(len);
+        for (var i = 0; i < len; i++){
+            arr[i] = rawData.charCodeAt(i);
+        }
 
-	//Ancillary Functions
+        var blob = new Blob([arr], {type: mime});
+        return blob;
+    };
 
-	this.getDataURL = function(mime, data){
-		return "data:"+mime+";base64,"+data;
-	}
-
-	//Unused, but might be useful.
-	this.getBlob = function(mime, data){
-		var rawData = window.atob(data);
-		var len = rawData.length;
-		var arr = new Uint8Array(len);
-		for (var i = 0; i<len; i++){
-			arr[i]=rawData.charCodeAt(i);
-		}
-		var blob = new Blob([arr],{type:mime});
-		return blob;
-	}
-
-	this.init = function(){
-
-	}
-}
+    this.init = function() {
+    };
+};
