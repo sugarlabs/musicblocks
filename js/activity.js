@@ -3318,10 +3318,12 @@ define(MYDEFINES, function (compatibility) {
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
 
-            // Next, save the playback queue.
-            if (_THIS_IS_TURTLE_BLOCKS_) {
-                // Don't save the playback queue if it is Turtle Blocks.
-		logo.playbackQueue = {};
+            // Next, save the playback queue, but don't save the
+            // playback queue if we are saving to Turtle Blocks or to
+            // Lilypond.
+
+            if (_THIS_IS_TURTLE_BLOCKS_ || logo.runningLilypond) {
+                logo.playbackQueue = {};
             }
 
             var i = data.length;
