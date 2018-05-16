@@ -177,7 +177,7 @@ function Logo () {
     this.noteBeatValues = {};
     this.embeddedGraphics = {};
     this.lastNotePlayed = {};
-    this.lastPitchPlayed = {}; //For a stand-alone pitch block. 
+    this.lastPitchPlayed = {}; //For a stand-alone pitch block.
     this.previousNotePlayed = {};
     this.noteStatus = {};
     this.noteDirection = {};
@@ -4395,10 +4395,10 @@ function Logo () {
                     } else {
                         __callback = null;
                     }
-                     
+
                     __rhythmPlayNote(noteBeatValue, blk, turtle, __callback, i * beatValue * 1000);
                 }
-                
+
                 that._doWait(turtle, (args[0] - 1) * beatValue);
             }
             break;
@@ -4696,7 +4696,12 @@ function Logo () {
             var newDotFactor = 2 - (1 / Math.pow(2, that.dotCount[turtle]));
             that.beatFactor[turtle] /= newDotFactor;
 
-            childFlow = args[1];
+            if (that.blocks.blockList[blk].name === 'rhythmicdot') {
+                childFlow = args[0];
+            } else {
+                childFlow = args[1];
+            }
+
             childFlowCount = 1;
 
             var listenerName = '_dot_' + turtle;
@@ -6238,7 +6243,7 @@ function Logo () {
                     } else {
                         __callback = null;
                     }
-                     
+
                     __rhythmPlayNote(noteBeatValue * args[0], blk, turtle, __callback, i * beatValue * 1000);
                 }
 
@@ -6705,7 +6710,7 @@ function Logo () {
                     } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
                         if (!that.recording) {
-                            that.errorMsg(_('Playback is ready.')); 
+                            that.errorMsg(_('Playback is ready.'));
                         }
 
                         that.setPlaybackStatus();
@@ -7468,7 +7473,7 @@ function Logo () {
                             that.currentOctave[turtle] = parseInt(notes[0].slice(len - 1));
                         }
                         that.currentCalculatedOctave[turtle] = that.currentOctave[turtle];
-                        
+
                         if (that.turtles.turtleList[turtle].drum) {
                             for (var i = 0; i < notes.length; i++) {
                                 notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#'); // 'C2'; // Remove pitch
@@ -7818,7 +7823,7 @@ function Logo () {
                 progressBar.style.visibility = 'hidden';
             }
 
-            progressBar.style.width = width + '%'; 
+            progressBar.style.width = width + '%';
             progressBar.innerHTML = parseInt(width * 1)  + '%';
 
             if (!that.stopTurtle) {
@@ -10484,7 +10489,7 @@ function Logo () {
         var measureValue = Math.floor(a * b) + 1;
         var d = (a * b) + 1 - measureValue;
         var d2 = (1 / duration) - d;
-        
+
         // If the note won't fit in this measure, split it with a tie.
         if (split && d > 0 && d2 > 0 && b > 0 && duration > 0 && 1 / duration > d) {
             console.log('splitting note across measure boundary.');
