@@ -373,6 +373,79 @@ var OSCTYPES = [
     [_('sawtooth'), 'sawtooth'],
 ];
 
+const TEMPERAMENT = {
+    'equal': {
+        'ratios': {
+            'unison' : Math.pow(2, (0/12)),
+            'minor 2' :  Math.pow(2, (1/12)),
+            'augmented 1': Math.pow(2, (1/12)),
+            'major 2': Math.pow(2, (2/12)),
+            'augmented 2': Math.pow(2, (3/12)),
+            'minor 3': Math.pow(2, (3/12)),
+            'major 3': Math.pow(2, (4/12)),
+            'perfect 4': Math.pow(2, (5/12)),
+            'augmented 4': Math.pow(2, (6/12)),
+            'diminished 5': Math.pow(2, (6/12)),
+            'perfect 5': Math.pow(2, (7/12)),
+            'augmented 5': Math.pow(2, (8/12)),
+            'minor 6': Math.pow(2, (8/12)),
+            'major 6': Math.pow(2, (9/12)),
+            'augmented 6': Math.pow(2, (10/12)),
+            'minor 7': Math.pow(2, (10/12)),
+            'major 7': Math.pow(2, (11/12)),
+            'perfect 8': Math.pow(2, (12/12))
+        }
+    },
+    'just intonation': {
+        'ratios': {
+            'unison' : (1/1),
+            'minor 2' :  (16/15),
+            'augmented 1': (16/15),
+            'major 2': (9/8),
+            'augmented 2': (6/5),
+            'minor 3': (6/5),
+            'major 3': (5/4),
+            'perfect 4': (4/3),
+            'augmented 4': (7/5),
+            'diminished 5': (7/5),
+            'perfect 5': (3/2),
+            'augmented 5': (8/5),
+            'minor 6': (8/5),
+            'major 6': (5/3),
+            'augmented 6': (16/9),
+            'minor 7': (16/9),
+            'major 7': (15/8),
+            'perfect 8': (2/1)
+        }
+    },
+    'meantone': {      //Quarter-comma Meantone
+        'ratios': {
+            'unison' : (1/1),
+            'minor 2' :  (16/15),
+            'augmented 1': (25/24),
+            'major 2': (9/8),
+            'augmented 2': (75/64),
+            'minor 3': (6/5),
+            'major 3': (5/4),
+            'augmented 3': (125/96),
+            'diminished 4': (32/25),
+            'perfect 4': (4/3),
+            'augmented 4': (25/18),
+            'diminished 5': (36/25),
+            'perfect 5': (3/2),
+            'augmented 5': (25/16),
+            'minor 6': (8/5),
+            'major 6': (5/3),
+            'augmented 6': (125/72),
+            'minor 7': (9/5),
+            'major 7': (15/8),
+            'augmented 7': (125/64),
+            'diminished 8': (48/25),
+            'perfect 8': (2/1)
+        } 
+    }
+};
+
 const DEFAULTINVERT = _('even');
 const DEFAULTINTERVAL = _('perfect') + ' 5';
 const DEFAULTVOICE = _('default');
