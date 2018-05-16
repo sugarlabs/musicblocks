@@ -1093,7 +1093,7 @@ define(MYDEFINES, function (compatibility) {
                 this.iframe = null;
                 this.mainCanvas = null;
 
-                this.hideMusicBlocks = function(){
+                this.hideMusicBlocks = function() {
                     hideSearchWidget();
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
@@ -1212,7 +1212,7 @@ define(MYDEFINES, function (compatibility) {
                     window.scroll(0, 0);
                 };
 
-                this.showPlanet = function(){
+                this.showPlanet = function() {
                     this.planet.open(this.mainCanvas.toDataURL('image/png'));
                     this.iframe.style.display = 'block';
                     try {
@@ -1222,30 +1222,31 @@ define(MYDEFINES, function (compatibility) {
                     }
                 }
 
-                this.hidePlanet = function(){
+                this.hidePlanet = function() {
                     this.iframe.style.display = 'none';
                 }
 
-                this.openPlanet = function(){
+                this.openPlanet = function() {
                     console.log('save locally');
                     this.saveLocally();
                     this.hideMusicBlocks();
                     this.showPlanet();
                 }
 
-                this.closePlanet = function(){
+                this.closePlanet = function() {
                     this.hidePlanet();
                     this.showMusicBlocks();
                 }
 
-                this.loadProjectFromData = function(data, merge){
-                    if (merge===undefined){
+                this.loadProjectFromData = function(data, merge) {
+                    if (merge===undefined) {
                         merge=false;
                     }
                     this.closePlanet();
-                    if (!merge){
+                    if (!merge) {
                         sendAllToTrash(false, true);
                     }
+
                     if (data == undefined) {
                         console.log('loadRawProject: data is undefined... punting');
                         errorMsg('loadRawProject: project undefined');
@@ -1262,6 +1263,8 @@ define(MYDEFINES, function (compatibility) {
                         blocks.palettes.dict[name].hideMenu(true);
                     }
 
+                    console.log('FOO');
+
                     try {
                         var obj = JSON.parse(data);
                         logo.playbackQueue = {};
@@ -1276,18 +1279,19 @@ define(MYDEFINES, function (compatibility) {
                     document.body.style.cursor = 'default';
                 }
 
-                this.loadProjectFromFile = function(){
+                this.loadProjectFromFile = function() {
+                    console.log('OPEN');
                     document.querySelector('#myOpenFile').focus();
                     document.querySelector('#myOpenFile').click();
                     window.scroll(0, 0);
                 }
 
-                this.newProject = function(){
+                this.newProject = function() {
                     this.closePlanet();
                     this.initialiseNewProject();
                 }
 
-                this.initialiseNewProject = function(name){
+                this.initialiseNewProject = function(name) {
                     this.planet.ProjectStorage.initialiseNewProject(name);
                     blocks.trashStacks = [];
                     this.saveLocally();
@@ -1320,35 +1324,35 @@ define(MYDEFINES, function (compatibility) {
                     //}
                 }
 
-                this.openCurrentProject = function(){
+                this.openCurrentProject = function() {
                     return this.planet.ProjectStorage.getCurrentProjectData();
                 }
 
-                this.openProjectFromPlanet = function(id,error){
+                this.openProjectFromPlanet = function(id,error) {
                     this.planet.openProjectFromPlanet(id,error);
                 }
 
-                this.onConverterLoad = function(){
+                this.onConverterLoad = function() {
                     window.Converter = this.planet.Converter;
                 }
 
-                this.getCurrentProjectName = function(){
+                this.getCurrentProjectName = function() {
                     return this.planet.ProjectStorage.getCurrentProjectName();
                 }
 
-                this.getCurrentProjectDescription = function(){
+                this.getCurrentProjectDescription = function() {
                     return this.planet.ProjectStorage.getCurrentProjectDescription();
                 }
 
-                this.getCurrentProjectImage = function(){
+                this.getCurrentProjectImage = function() {
                     return this.planet.ProjectStorage.getCurrentProjectImage();
                 }
 
-                this.getTimeLastSaved = function(){
+                this.getTimeLastSaved = function() {
                     return this.planet.ProjectStorage.TimeLastSaved;
                 }
 
-                this.init = function(){
+                this.init = function() {
                     this.iframe = document.getElementById('planet-iframe');
                     try {
                         this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage);
@@ -1533,7 +1537,7 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                if (cleanData.includes('html')){
+                                if (cleanData.includes('html')) {
                                     var obj = JSON.parse(cleanData.match('<div class="code">(.+?)<\/div>')[1]);
                                 } else {
                                     var obj = JSON.parse(cleanData);
@@ -1600,7 +1604,7 @@ define(MYDEFINES, function (compatibility) {
                             var cleanData = rawData.replace('\n', ' ');
 
                             try {
-                                if (cleanData.includes('html')){
+                                if (cleanData.includes('html')) {
                                     dat = cleanData.match('<div class="code">(.+?)<\/div>');
                                     var obj = JSON.parse(dat[1]);
                                 } else {
@@ -1612,21 +1616,46 @@ define(MYDEFINES, function (compatibility) {
 
                                 stage.removeAllEventListeners('trashsignal');
 
+                                var __afterLoad = function () {
+                                    if (_THIS_IS_TURTLE_BLOCKS_) {
+                                        // Play playback queue if there is one.
+                                        for (turtle in logo.playbackQueue) {
+                                            if (logo.playbackQueue[turtle].length > 0) {
+                                                setTimeout(function () {
+                                                    logo.playback(-1);
+                                                }, 3000);
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    document.removeEventListener('finishedLoading', __afterLoad);
+                                };
+
                                 // Wait for the old blocks to be removed.
                                 var __listener = function (event) {
                                     logo.playbackQueue = {};
                                     blocks.loadNewBlocks(obj);
                                     setPlaybackStatus();
                                     stage.removeAllEventListeners('trashsignal');
+
+                                    if (document.addEventListener) {
+                                        document.addEventListener('finishedLoading', __afterLoad);
+                                    } else {
+                                        document.attachEvent('finishedLoading', __afterLoad);
+                                    }
                                 };
 
                                 stage.addEventListener('trashsignal', __listener, false);
                                 sendAllToTrash(false, false);
-                                planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf('.')));
+                                if (planet !== undefined) {
+                                    planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf('.')));
+                                }
 
                                 loading = false;
                                 refreshCanvas();
                             } catch (e) {
+                                console.log(e);
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
                                 document.body.style.cursor = 'default';
                                 loading = false;
@@ -2067,7 +2096,7 @@ define(MYDEFINES, function (compatibility) {
 
         searchSuggestions = searchSuggestions.reverse();
 
-        searchWidget.onclick = function(){
+        searchWidget.onclick = function() {
             doSearch();
         };
 
@@ -2144,7 +2173,7 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function __makeNewNote(octave, solf){
+        function __makeNewNote(octave, solf) {
             var newNote = [
                 [0, 'newnote', 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
                 [1, 'divide', 0, 0, [0, 2, 3]],
@@ -2158,13 +2187,13 @@ define(MYDEFINES, function (compatibility) {
             ];
 
             blocks.loadNewBlocks(newNote);
-            if (blocks.activeBlock !== null){
+            if (blocks.activeBlock !== null) {
                 // Connect the newly created block to the active block
                 // (if it is a hidden block at the end of a new note
                 // block).
                 var bottom = blocks.findBottomBlock(blocks.activeBlock);
                 console.log(blocks.activeBlock + ' ' + bottom);
-                if (blocks.blockList[bottom].name === 'hidden' && blocks.blockList[blocks.blockList[bottom].connections[0]].name === 'newnote'){
+                if (blocks.blockList[bottom].name === 'hidden' && blocks.blockList[blocks.blockList[bottom].connections[0]].name === 'newnote') {
 
                     // The note block macro creates nine blocks.
                     var newlyCreatedBlock = blocks.blockList.length - 9;
@@ -2303,7 +2332,7 @@ define(MYDEFINES, function (compatibility) {
                     update = true;
                     break;
                 }
-            } else if (event.shiftKey && !disableKeys){
+            } else if (event.shiftKey && !disableKeys) {
                 switch (event.keyCode) {
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -2343,7 +2372,7 @@ define(MYDEFINES, function (compatibility) {
                 }
             } else {
                 if (docById('paste').style.visibility === 'visible' && event.keyCode === RETURN) {
-                    if (docById('paste').value.length > 0){
+                    if (docById('paste').value.length > 0) {
                         pasted();
                     }
                 } else if (!disableKeys) {
@@ -2433,7 +2462,7 @@ define(MYDEFINES, function (compatibility) {
                         break;
                     case RETURN:
                         if (disableArrowKeys) {
-                        } else if (docById('search').value.length > 0){
+                        } else if (docById('search').value.length > 0) {
                             doSearch();
                         } else {
                             if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
@@ -2905,25 +2934,25 @@ define(MYDEFINES, function (compatibility) {
 
             var __functionload = function () {
                 setTimeout(function () {
-                    if (!collapse && firstRun){
+                    if (!collapse && firstRun) {
                         _toggleCollapsibleStacks();
                     }
 
-                    if (run && firstRun){
+                    if (run && firstRun) {
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             turtles.turtleList[turtle].doClear(true, true, false);
                         }
 
                         runProject(env);
 
-                        if (show){
+                        if (show) {
                             _changeBlockVisibility();
                         }
 
-                        if (!collapse){
+                        if (!collapse) {
                             _toggleCollapsibleStacks();
                         }
-                    } else if (!show){
+                    } else if (!show) {
                         _changeBlockVisibility();
                     }
 
@@ -3000,7 +3029,14 @@ define(MYDEFINES, function (compatibility) {
 
                         if (_THIS_IS_TURTLE_BLOCKS_) {
                             // Play playback queue if there is one.
-                            logo.playback(-1);
+                            for (turtle in logo.playbackQueue) {
+                                if (logo.playbackQueue[turtle].length > 0) {
+                                    setTimeout(function() {
+                                        logo.playback(-1);
+                                    }, 3000);
+                                    break;
+                                }
+                            }
                         }
                     }, 1000);
                 }
@@ -3511,7 +3547,7 @@ handleComplete);
 
                 if (buttonNames[i][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
-                } else if (buttonNames[i][0] === 'hard-stop-turtle'){
+                } else if (buttonNames[i][0] === 'hard-stop-turtle') {
                     console.log('hard stop turtle');
                     hardStopTurtleContainer = container;
                 } else if (buttonNames[i][0] === 'go-home') {
@@ -3529,7 +3565,7 @@ handleComplete);
 
                 // Ensure that stop-turtle button is placed on top of
                 // hard-stop-turtle button.
-                if (!(buttonNames[i][0] === 'hard-stop-turtle' && buttonNames[i + 1][0] === 'stop-turtle')){
+                if (!(buttonNames[i][0] === 'hard-stop-turtle' && buttonNames[i + 1][0] === 'stop-turtle')) {
                     x += dx;
                     y += dy;
                 }
