@@ -1011,7 +1011,6 @@ function Logo () {
         this.skipIndex[turtle] = 0;
         this.notesPlayed[turtle] = [0, 1];
         this.whichNoteToCount[turtle] = 1;
-        this.playbackQueue[turtle] = [];
         this.keySignature[turtle] = 'C ' + _('major');
         this.pushedNote[turtle] = false;
         this.oscList[turtle] = {};
@@ -1083,6 +1082,15 @@ function Logo () {
         this.neighborNoteValue[turtle] = [];
         this.inHarmonic[turtle] = [];
         this.partials[turtle] = [];
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.playbackQueue[turtle] = [];
+        } else {
+            // Don't empty playback queue of precompiled content.
+            if (!turtle in this.playbackQueue) {
+                this.playbackQueue[turtle] = [];
+            }
+        }
 
         if (this.compiling) {
             this._saveX[turtle] = this.turtles.turtleList[turtle].x;
@@ -7807,11 +7815,17 @@ function Logo () {
             width = 0;
         }
 
-        for (var turtle in this.playbackQueue) {   //For multiple voices
-            l = l + this.playbackQueue[turtle].length;
+        for (var turtle in this.playbackQueue) {  // For multiple voices
+            l += this.playbackQueue[turtle].length;
         }
 
-        progressBarDivision = 100 / (that.playbackQueue[t].length);
+        if (l > 0) {
+            progressBarDivision = 100 / (that.playbackQueue[t].length);
+        } else {
+            // nothing to do...
+            progressBarDivision = 100;
+        }
+
         turtleLength = 0;
         inLoop = 0;
 

@@ -2908,6 +2908,7 @@ define(MYDEFINES, function (compatibility) {
                     if (!collapse && firstRun){
                         _toggleCollapsibleStacks();
                     }
+
                     if (run && firstRun){
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             turtles.turtleList[turtle].doClear(true, true, false);
@@ -2995,6 +2996,11 @@ define(MYDEFINES, function (compatibility) {
                             logo.notationStaging[turtle] = [];
                             logo.notationDrumStaging[turtle] = [];
                             turtles.turtleList[turtle].doClear(true, true, false);
+                        }
+
+                        if (_THIS_IS_TURTLE_BLOCKS_) {
+                            // Play playback queue if there is one.
+                            logo.playback(-1);
                         }
                     }, 1000);
                 }
