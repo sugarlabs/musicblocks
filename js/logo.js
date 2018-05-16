@@ -1311,7 +1311,7 @@ function Logo () {
         } else {
             console.log('Empty start block: ' + turtle + ' ' + this.suppressOutput[turtle]);
             if (this.suppressOutput[turtle] || this.suppressOutput[turtle] == undefined) {
-                this.errorMsg(NOACTIONERRORMSG, null, _('start'));
+                // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
                 this.checkingCompletionState = false;
                 // Reset cursor.
@@ -7819,7 +7819,7 @@ function Logo () {
             l += this.playbackQueue[turtle].length;
         }
 
-        if (l > 0) {
+        if (t in that.playbackQueue && l > 0) {
             progressBarDivision = 100 / (that.playbackQueue[t].length);
         } else {
             // nothing to do...

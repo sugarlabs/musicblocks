@@ -1088,6 +1088,20 @@ define(MYDEFINES, function (compatibility) {
                 .setPause(doPausePlayback)
                 .setRewind(doRestartPlayback);
 
+	    playbackOnLoad = function() {
+                if (_THIS_IS_TURTLE_BLOCKS_) {
+		    // Play playback queue if there is one.
+		    for (turtle in logo.playbackQueue) {
+                        if (logo.playbackQueue[turtle].length > 0) {
+			    setTimeout(function () {
+                                logo.playback(-1);
+			    }, 3000);
+			    break;
+                        }
+		    }
+                }
+	    };
+
             function PlanetInterface(storage) {
                 this.planet = null;
                 this.iframe = null;
@@ -1220,28 +1234,29 @@ define(MYDEFINES, function (compatibility) {
                     } catch (e) {
                         console.log(e);
                     }
-                }
+                };
 
                 this.hidePlanet = function() {
                     this.iframe.style.display = 'none';
-                }
+                };
 
                 this.openPlanet = function() {
                     console.log('save locally');
                     this.saveLocally();
                     this.hideMusicBlocks();
                     this.showPlanet();
-                }
+                };
 
                 this.closePlanet = function() {
                     this.hidePlanet();
                     this.showMusicBlocks();
-                }
+                };
 
                 this.loadProjectFromData = function(data, merge) {
                     if (merge===undefined) {
                         merge=false;
                     }
+
                     this.closePlanet();
                     if (!merge) {
                         sendAllToTrash(false, true);
@@ -1263,13 +1278,24 @@ define(MYDEFINES, function (compatibility) {
                         blocks.palettes.dict[name].hideMenu(true);
                     }
 
-                    console.log('FOO');
+                    var __afterLoad = function () {
+                        playbackOnLoad();
+                        document.removeEventListener('finishedLoading', __afterLoad);
+                    };
+
+                    if (document.addEventListener) {
+                        document.addEventListener('finishedLoading', __afterLoad);
+                    } else {
+                        document.attachEvent('finishedLoading', __afterLoad);
+                    }
 
                     try {
                         var obj = JSON.parse(data);
                         logo.playbackQueue = {};
                         blocks.loadNewBlocks(obj);
                         setPlaybackStatus();
+
+
                     } catch (e) {
                         console.log('loadRawProject: could not parse project data');
                         errorMsg(e);
@@ -1277,25 +1303,25 @@ define(MYDEFINES, function (compatibility) {
 
                     loading = false;
                     document.body.style.cursor = 'default';
-                }
+                };
 
                 this.loadProjectFromFile = function() {
                     console.log('OPEN');
                     document.querySelector('#myOpenFile').focus();
                     document.querySelector('#myOpenFile').click();
                     window.scroll(0, 0);
-                }
+                };
 
                 this.newProject = function() {
                     this.closePlanet();
                     this.initialiseNewProject();
-                }
+                };
 
                 this.initialiseNewProject = function(name) {
                     this.planet.ProjectStorage.initialiseNewProject(name);
                     blocks.trashStacks = [];
                     this.saveLocally();
-                }
+                };
 
                 this.saveLocally = function() {
                     console.log('overwriting session data');
@@ -1311,7 +1337,6 @@ define(MYDEFINES, function (compatibility) {
                             var bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             try {
-                                console.log(bitmap.bitmapCache.getCacheDataURL());
                                 t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
                             } catch (e) {
                                 console.log(e);
@@ -1322,35 +1347,35 @@ define(MYDEFINES, function (compatibility) {
                     //if (sugarizerCompatibility.isInsideSugarizer()) {
                     //    sugarizerCompatibility.saveLocally();
                     //}
-                }
+                };
 
                 this.openCurrentProject = function() {
                     return this.planet.ProjectStorage.getCurrentProjectData();
-                }
+                };
 
                 this.openProjectFromPlanet = function(id,error) {
                     this.planet.openProjectFromPlanet(id,error);
-                }
+                };
 
                 this.onConverterLoad = function() {
                     window.Converter = this.planet.Converter;
-                }
+                };
 
                 this.getCurrentProjectName = function() {
                     return this.planet.ProjectStorage.getCurrentProjectName();
-                }
+                };
 
                 this.getCurrentProjectDescription = function() {
                     return this.planet.ProjectStorage.getCurrentProjectDescription();
-                }
+                };
 
                 this.getCurrentProjectImage = function() {
                     return this.planet.ProjectStorage.getCurrentProjectImage();
-                }
+                };
 
                 this.getTimeLastSaved = function() {
                     return this.planet.ProjectStorage.TimeLastSaved;
-                }
+                };
 
                 this.init = function() {
                     this.iframe = document.getElementById('planet-iframe');
@@ -1369,8 +1394,8 @@ define(MYDEFINES, function (compatibility) {
 
                     window.Converter = this.planet.Converter;
                     this.mainCanvas = canvas;
-                }
-            }
+                };
+            };
 
             try {
                 planet = new PlanetInterface(storage);
@@ -1617,18 +1642,7 @@ define(MYDEFINES, function (compatibility) {
                                 stage.removeAllEventListeners('trashsignal');
 
                                 var __afterLoad = function () {
-                                    if (_THIS_IS_TURTLE_BLOCKS_) {
-                                        // Play playback queue if there is one.
-                                        for (turtle in logo.playbackQueue) {
-                                            if (logo.playbackQueue[turtle].length > 0) {
-                                                setTimeout(function () {
-                                                    logo.playback(-1);
-                                                }, 3000);
-                                                break;
-                                            }
-                                        }
-                                    }
-
+                                    playbackOnLoad();
                                     document.removeEventListener('finishedLoading', __afterLoad);
                                 };
 
@@ -3027,17 +3041,7 @@ define(MYDEFINES, function (compatibility) {
                             turtles.turtleList[turtle].doClear(true, true, false);
                         }
 
-                        if (_THIS_IS_TURTLE_BLOCKS_) {
-                            // Play playback queue if there is one.
-                            for (turtle in logo.playbackQueue) {
-                                if (logo.playbackQueue[turtle].length > 0) {
-                                    setTimeout(function() {
-                                        logo.playback(-1);
-                                    }, 3000);
-                                    break;
-                                }
-                            }
-                        }
+                        playbackOnLoad();
                     }, 1000);
                 }
 
