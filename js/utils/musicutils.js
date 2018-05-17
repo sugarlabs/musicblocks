@@ -1243,7 +1243,6 @@ function getInterval (interval, keySignature, pitch) {
 
 function getFrequency(startingPitch, pitch, octave, temperament, keySignature) {
     // Returns the frequency calculated through ratios in the lookup table.
-    console.log(temperament);
     var len = pitch.length;
     var len1 = startingPitch.length;
     var note, accidental, perfect8, halfSteps;
