@@ -16,7 +16,7 @@ const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename'];
 const EXTRAWIDENAMES = ['modename'];
 
@@ -598,6 +598,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'oscillatortype':
                     this.value = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
                     break;
+                case 'temperamentname':
+                    this.value = 'equal';
+                    break;
                 }
             }
 
@@ -1040,6 +1043,8 @@ function Block(protoblock, blocks, overrideName) {
                 this.text.x *= 1.75;
             } else if (this.name === 'text') {
                 this.text.x = this.width / 2;
+            } else if (this.name === 'temperamentname') {
+                this.text.x += 15;
             }
         } else if (this.name === 'nameddo') {
             this.text.textAlign = 'center';
@@ -1949,6 +1954,29 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('voicenameLabel');
+            selectorWidth = 150;
+        } else if (this.name === 'temperamentname') {
+            var type = 'temperamentname';
+            if (this.value != null) {
+                var selectedTemperament = this.value;
+            } else {
+                var selectedTemperament = 'equal';
+            }
+
+            const temperament = ['equal', 'just intonation', 'meantone', 'custom'];
+            var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            
+            for (var i = 0; i < temperament.length; i++) {
+                if (selectedTemperament === temperament[i]) {
+                    labelHTML += '<option value="' + selectedTemperament + '" selected>' + selectedTemperament + '</option>';
+                } else {
+                    labelHTML += '<option value="' + temperament[i] + '">' + temperament[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('temperamentnameLabel');
             selectorWidth = 150;
         } else if (this.name === 'boolean') {
             var type = 'boolean';

@@ -1500,6 +1500,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     //.TRANS: user-defined
     setTimbreBlock.defaults.push(_('custom'));
 
+    var setTemperamentBlock = new ProtoBlock('settemperament');
+    setTemperamentBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
+    setTemperamentBlock.staticLabels.push(_('set temperament'));
+    setTemperamentBlock.adjustWidthToLabel();
+    setTemperamentBlock.oneArgBlock();
+
+    var temperamentNameBlock = new ProtoBlock('temperamentname');
+    temperamentNameBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['temperamentname'] = temperamentNameBlock;
+    temperamentNameBlock.valueBlock();
+    //temperamentNameBlock.hidden = true; 
+    temperamentNameBlock.extraWidth = 20;
+    temperamentNameBlock.dockTypes[0] = 'anyout';   
+
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
     var modenameBlock = new ProtoBlock('modename');

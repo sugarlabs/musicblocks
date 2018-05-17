@@ -3200,6 +3200,7 @@ function Blocks () {
 
             for (var c in blkData[4]) {
                 if (blkData[4][c] === blkData[0]) {
+                    console.log(blkData[4]);
                     console.log('Circular connection in block data: ' + blkData);
                     console.log('Punting loading of new blocks!');
                     console.log(blockObjs);

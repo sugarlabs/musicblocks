@@ -142,6 +142,7 @@ function Logo () {
     this._currentDrumlock = null;
     this.inTimbre = false;
     this.inTemperament = 'equal';
+    this.startingPitch = 'C4'
     this.inSetTimbre = {};
 
     // pitch-rhythm matrix
@@ -257,6 +258,7 @@ function Logo () {
     this.neighborArgNote2 = {};
     this.neighborArgBeat = {};
     this.neighborArgCurrentBeat = {};
+    this.frequency;
 
     // When counting notes, measuring intervals, or generating lilypond output
     this.justCounting = {};
@@ -3966,6 +3968,7 @@ function Logo () {
                     note = obj[0];
                     octave = obj[1];
                     cents = 0;
+                    that.frequency = getFrequency(that.startingPitch, note, octave, that.inTemperament, that.keySignature[turtle]);
                     that.currentNote = note;
                 }
             } else {
@@ -3997,6 +4000,7 @@ function Logo () {
                         var octave = obj[1];
                         var cents = obj[2];
                     }
+                    that.frequency = getFrequency(that.startingPitch, note, octave, that.inTemperament, that.keySignature[turtle]);
 
                     if (note === '?') {
                         that.errorMsg(INVALIDPITCH, blk);
@@ -4040,6 +4044,7 @@ function Logo () {
                             var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote)) + deltaOctave;
                         }
                         var cents = 0;
+                        that.frequency = getFrequency(that.startingPitch, note, octave, that.inTemperament, that.keySignature[turtle]);
                     }
 
                     if (note === '?') {
@@ -4062,6 +4067,7 @@ function Logo () {
                         // Octave must be a whole number.
                         var octave = Math.floor(calcOctave(that.currentOctave[turtle], args[1], that.lastNotePlayed[turtle], that.currentNote));
                     }
+                    that.frequency = getFrequency(that.startingPitch, note, octave, that.inTemperament, that.keySignature[turtle]);
                 }
             }
 
@@ -5842,6 +5848,9 @@ function Logo () {
                 }
             }
             break;
+        case 'settemperament':
+            that.inTemperament = args[0];   
+            break;
         case 'setnotevolume2':
             // master volume in clamp form
             // Used by fff ff f p pp ppp blocks
@@ -7458,13 +7467,22 @@ function Logo () {
                             if (notes.length === 0) {
                                 console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                                if (that.inTemperament == 'equal') {
+                                    console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);        
+                                } else {
+                                    console.log('frequency to play: ' + that.frequency);
+                                }
+                                
                             }
                         } else {
                             if (notes.length === 0) {
                                 console.log('notes to count: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                                if (that.inTemperament == 'equal') {
+                                    console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);        
+                                } else {
+                                    console.log('frequency to play: ' + that.frequency);
+                                }
                             }
                         }
                     }
@@ -7603,6 +7621,8 @@ function Logo () {
                                                 } else {
                                                     if (that.inTemperament == 'equal') {
                                                         that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, false);
+                                                    } else {
+                                                        that.synth.trigger(turtle, that.frequency, beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, false);
                                                     }
                                                 }
                                             }
