@@ -3365,10 +3365,9 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // Next, save the playback queue, but don't save the
-            // playback queue if we are saving to Turtle Blocks or to
-            // Lilypond.
+            // playback queue if we are saving to Lilypond.
 
-            if (_THIS_IS_TURTLE_BLOCKS_ || logo.runningLilypond) {
+            if (logo.runningLilypond) {
                 logo.playbackQueue = {};
             }
 
