@@ -451,6 +451,32 @@ const TEMPERAMENT = {
             'diminished 8': (48/25),
             'perfect 8': (2/1)
         } 
+    },
+    'custom':{
+        'ratios': {
+            'unison' : Math.pow(2, (0/12)),
+            'minor 2' :  Math.pow(2, (1/12)),
+            'augmented 1': Math.pow(2, (1/12)),
+            'major 2': Math.pow(2, (2/12)),
+            'augmented 2': Math.pow(2, (3/12)),
+            'minor 3': Math.pow(2, (3/12)),
+            'major 3': Math.pow(2, (4/12)),
+            'augmented 3': Math.pow(2, (5/12)),
+            'diminished 4': Math.pow(2, (4/12)),
+            'perfect 4': Math.pow(2, (5/12)),
+            'augmented 4': Math.pow(2, (6/12)),
+            'diminished 5': Math.pow(2, (6/12)),
+            'perfect 5': Math.pow(2, (7/12)),
+            'augmented 5': Math.pow(2, (8/12)),
+            'minor 6': Math.pow(2, (8/12)),
+            'major 6': Math.pow(2, (9/12)),
+            'augmented 6': Math.pow(2, (10/12)),
+            'minor 7': Math.pow(2, (10/12)),
+            'major 7': Math.pow(2, (11/12)),
+            'augmented 7': Math.pow(2, (12/12)),
+            'diminished 8': Math.pow(2, (11/12)),
+            'perfect 8': Math.pow(2, (12/12))
+        }
     }
 };
 
