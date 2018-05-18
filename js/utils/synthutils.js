@@ -208,6 +208,58 @@ function Synth() {
     this.samples = null;
     this.samplesuffix = '_SAMPLE';
     this.samplesManifest = null;
+    this.inTemperament = 'equal';
+    this.startingPitch = 'C4';
+
+    this.temperamentChanged = function(temperament, startingPitch, notes) {
+        var t = TEMPERAMENT[temperament];
+        var length = notes.length;
+        var accidental = notes.substring(1,length-1);
+        if (accidental === 'b' || accidental === FLAT) {
+            notes = notes.substring(0,1) + '' + FLAT + notes.slice(-1); 
+        } else if (accidental === '#' || accidental === SHARP) {
+            notes = notes.substring(0,1) + '' + SHARP + notes.slice(-1);        
+        }
+        var len = startingPitch.length;
+        var number = pitchToNumber(startingPitch.substring(0,len-1),startingPitch.slice(-1), 'C major'); //Calculate number for starting pitch.
+        var frequency = Tone.Frequency(startingPitch).toFrequency();
+
+        var noteFrequency = {
+            // note : [octave, Frequency]
+            [startingPitch.substring(0,len-1)] : [Number(startingPitch.slice(-1)), frequency],
+            [numberToPitch(number+1)[0]] : [numberToPitch(number+1)[1], t['minor 2'] * frequency],
+            [numberToPitchSharp(number+1)[0]] : [numberToPitchSharp(number+1)[1], t['augmented 1'] * frequency],
+            [numberToPitch(number+2)[0]] : [numberToPitch(number+2)[1], t['major 2'] * frequency],
+            [numberToPitch(number+3)[0]] : [numberToPitch(number+3)[1], t['minor 3'] * frequency],
+            [numberToPitchSharp(number+3)[0]] : [numberToPitchSharp(number+3)[1], t['augmented 2'] * frequency],
+            [numberToPitch(number+4)[0]] : [numberToPitch(number+4)[1], t['major 3'] * frequency],
+            [numberToPitch(number+5)[0]] : [numberToPitch(number+5)[1], t['perfect 4'] * frequency],
+            [numberToPitchSharp(number+6)[0]] : [numberToPitchSharp(number+6)[1], t['augmented 4'] * frequency],
+            [numberToPitch(number+6)[0]] : [numberToPitch(number+6)[1], t['diminished 5'] * frequency],
+            [numberToPitch(number+7)[0]] : [numberToPitch(number+7)[1], t['perfect 5'] * frequency],
+            [numberToPitchSharp(number+8)[0]] : [numberToPitchSharp(number+8)[1], t['augmented 5'] * frequency],
+            [numberToPitch(number+8)[0]] : [numberToPitch(number+8)[1], t['minor 6'] * frequency],
+            [numberToPitch(number+9)[0]] : [numberToPitch(number+9)[1], t['major 6'] * frequency],
+            [numberToPitchSharp(number+10)[0]] : [numberToPitchSharp(number+10)[1], t['augmented 6'] * frequency],
+            [numberToPitch(number+10)[0]] : [numberToPitch(number+10)[1], t['minor 7'] * frequency],
+            [numberToPitch(number+11)[0]] : [numberToPitch(number+11)[1], t['major 7'] * frequency],
+            [numberToPitch(number+12)[0] + '' + numberToPitch(number+12)[1]] : [numberToPitch(number+12)[1], t['perfect 8'] * frequency]
+        };
+
+        for (var note in noteFrequency) {
+            if (note === notes.substring(0,length-1)) { 
+                if (noteFrequency[note][0] === Number(notes.slice(-1))) {
+                    //Note to be played is in the same octave.
+                    return noteFrequency[note][1];
+                } else { 
+                    //Note to be played is not in the same octave.
+                    var power = Number(notes.slice(-1)) - noteFrequency[note][0];
+                    return noteFrequency[note][1] * Math.pow(2, power);
+                }
+            }
+        }
+
+    }   
 
     this.resume = function () {
         this.tone.context.resume();
@@ -635,6 +687,9 @@ function Synth() {
     }
 
     this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
+        if (this.inTemperament !== 'equal') {
+            notes = this.temperamentChanged(this.inTemperament, this.startingPitch, notes);
+        }
         if (paramsEffects == null && paramsFilters == null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
@@ -791,7 +846,6 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] != 0) {
                 paramsEffects.doVibrato = true;

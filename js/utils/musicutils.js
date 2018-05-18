@@ -375,108 +375,100 @@ var OSCTYPES = [
 
 const TEMPERAMENT = {
     'equal': {
-        'ratios': {
-            'unison' : Math.pow(2, (0/12)),
-            'minor 2' :  Math.pow(2, (1/12)),
-            'augmented 1': Math.pow(2, (1/12)),
-            'major 2': Math.pow(2, (2/12)),
-            'augmented 2': Math.pow(2, (3/12)),
-            'minor 3': Math.pow(2, (3/12)),
-            'major 3': Math.pow(2, (4/12)),
-            'augmented 3': Math.pow(2, (5/12)),
-            'diminished 4': Math.pow(2, (4/12)),
-            'perfect 4': Math.pow(2, (5/12)),
-            'augmented 4': Math.pow(2, (6/12)),
-            'diminished 5': Math.pow(2, (6/12)),
-            'perfect 5': Math.pow(2, (7/12)),
-            'augmented 5': Math.pow(2, (8/12)),
-            'minor 6': Math.pow(2, (8/12)),
-            'major 6': Math.pow(2, (9/12)),
-            'augmented 6': Math.pow(2, (10/12)),
-            'minor 7': Math.pow(2, (10/12)),
-            'major 7': Math.pow(2, (11/12)),
-            'augmented 7': Math.pow(2, (12/12)),
-            'diminished 8': Math.pow(2, (11/12)),
-            'perfect 8': Math.pow(2, (12/12))
-        }
+        'unison' : Math.pow(2, (0/12)),
+        'minor 2' :  Math.pow(2, (1/12)),
+        'augmented 1': Math.pow(2, (1/12)),
+        'major 2': Math.pow(2, (2/12)),
+        'augmented 2': Math.pow(2, (3/12)),
+        'minor 3': Math.pow(2, (3/12)),
+        'major 3': Math.pow(2, (4/12)),
+        'augmented 3': Math.pow(2, (5/12)),
+        'diminished 4': Math.pow(2, (4/12)),
+        'perfect 4': Math.pow(2, (5/12)),
+        'augmented 4': Math.pow(2, (6/12)),
+        'diminished 5': Math.pow(2, (6/12)),
+        'perfect 5': Math.pow(2, (7/12)),
+        'augmented 5': Math.pow(2, (8/12)),
+        'minor 6': Math.pow(2, (8/12)),
+        'major 6': Math.pow(2, (9/12)),
+        'augmented 6': Math.pow(2, (10/12)),
+        'minor 7': Math.pow(2, (10/12)),
+        'major 7': Math.pow(2, (11/12)),
+        'augmented 7': Math.pow(2, (12/12)),
+        'diminished 8': Math.pow(2, (11/12)),
+        'perfect 8': Math.pow(2, (12/12))
     },
     'just intonation': {
-        'ratios': {
-            'unison' : (1/1),
-            'minor 2' :  (16/15),
-            'augmented 1': (16/15),
-            'major 2': (9/8),
-            'augmented 2': (6/5),
-            'minor 3': (6/5),
-            'major 3': (5/4),
-            'augmented 3': (4/3),
-            'diminished 4': (5/4),
-            'perfect 4': (4/3),
-            'augmented 4': (7/5),
-            'diminished 5': (7/5),
-            'perfect 5': (3/2),
-            'augmented 5': (8/5),
-            'minor 6': (8/5),
-            'major 6': (5/3),
-            'augmented 6': (16/9),
-            'minor 7': (16/9),
-            'major 7': (15/8),
-            'augmented 7': (2/1),
-            'diminished 8': (15/8),
-            'perfect 8': (2/1)
-        }
+        'unison' : (1/1),
+        'minor 2' :  (16/15),
+        'augmented 1': (16/15),
+        'major 2': (9/8),
+        'augmented 2': (6/5),
+        'minor 3': (6/5),
+        'major 3': (5/4),
+        'augmented 3': (4/3),
+        'diminished 4': (5/4),
+        'perfect 4': (4/3),
+        'augmented 4': (7/5),
+        'diminished 5': (7/5),
+        'perfect 5': (3/2),
+        'augmented 5': (8/5),
+        'minor 6': (8/5),
+        'major 6': (5/3),
+        'augmented 6': (16/9),
+        'minor 7': (16/9),
+        'major 7': (15/8),
+        'augmented 7': (2/1),
+        'diminished 8': (15/8),
+        'perfect 8': (2/1)
     },
     'meantone': {      //Quarter-comma Meantone
-        'ratios': {
-            'unison' : (1/1),
-            'minor 2' :  (16/15),
-            'augmented 1': (25/24),
-            'major 2': (9/8),
-            'augmented 2': (75/64),
-            'minor 3': (6/5),
-            'major 3': (5/4),
-            'augmented 3': (125/96),
-            'diminished 4': (32/25),
-            'perfect 4': (4/3),
-            'augmented 4': (25/18),
-            'diminished 5': (36/25),
-            'perfect 5': (3/2),
-            'augmented 5': (25/16),
-            'minor 6': (8/5),
-            'major 6': (5/3),
-            'augmented 6': (125/72),
-            'minor 7': (9/5),
-            'major 7': (15/8),
-            'augmented 7': (125/64),
-            'diminished 8': (48/25),
-            'perfect 8': (2/1)
-        } 
+        'unison' : (1/1),
+        'minor 2' :  (16/15),
+        'augmented 1': (25/24),
+        'major 2': (9/8),
+        'augmented 2': (75/64),
+        'minor 3': (6/5),
+        'major 3': (5/4),
+        'augmented 3': (125/96),
+        'diminished 4': (32/25),
+        'perfect 4': (4/3),
+        'augmented 4': (25/18),
+        'diminished 5': (36/25),
+        'perfect 5': (3/2),
+        'augmented 5': (25/16),
+        'minor 6': (8/5),
+        'major 6': (5/3),
+        'augmented 6': (125/72),
+        'minor 7': (9/5),
+        'major 7': (15/8),
+        'augmented 7': (125/64),
+        'diminished 8': (48/25),
+        'perfect 8': (2/1) 
     },
     'custom':{
-        'ratios': {
-            'unison' : Math.pow(2, (0/12)),
-            'minor 2' :  Math.pow(2, (1/12)),
-            'augmented 1': Math.pow(2, (1/12)),
-            'major 2': Math.pow(2, (2/12)),
-            'augmented 2': Math.pow(2, (3/12)),
-            'minor 3': Math.pow(2, (3/12)),
-            'major 3': Math.pow(2, (4/12)),
-            'augmented 3': Math.pow(2, (5/12)),
-            'diminished 4': Math.pow(2, (4/12)),
-            'perfect 4': Math.pow(2, (5/12)),
-            'augmented 4': Math.pow(2, (6/12)),
-            'diminished 5': Math.pow(2, (6/12)),
-            'perfect 5': Math.pow(2, (7/12)),
-            'augmented 5': Math.pow(2, (8/12)),
-            'minor 6': Math.pow(2, (8/12)),
-            'major 6': Math.pow(2, (9/12)),
-            'augmented 6': Math.pow(2, (10/12)),
-            'minor 7': Math.pow(2, (10/12)),
-            'major 7': Math.pow(2, (11/12)),
-            'augmented 7': Math.pow(2, (12/12)),
-            'diminished 8': Math.pow(2, (11/12)),
-            'perfect 8': Math.pow(2, (12/12))
-        }
+        'unison' : Math.pow(2, (0/12)),
+        'minor 2' :  Math.pow(2, (1/12)),
+        'augmented 1': Math.pow(2, (1/12)),
+        'major 2': Math.pow(2, (2/12)),
+        'augmented 2': Math.pow(2, (3/12)),
+        'minor 3': Math.pow(2, (3/12)),
+        'major 3': Math.pow(2, (4/12)),
+        'augmented 3': Math.pow(2, (5/12)),
+        'diminished 4': Math.pow(2, (4/12)),
+        'perfect 4': Math.pow(2, (5/12)),
+        'augmented 4': Math.pow(2, (6/12)),
+        'diminished 5': Math.pow(2, (6/12)),
+        'perfect 5': Math.pow(2, (7/12)),
+        'augmented 5': Math.pow(2, (8/12)),
+        'minor 6': Math.pow(2, (8/12)),
+        'major 6': Math.pow(2, (9/12)),
+        'augmented 6': Math.pow(2, (10/12)),
+        'minor 7': Math.pow(2, (10/12)),
+        'major 7': Math.pow(2, (11/12)),
+        'augmented 7': Math.pow(2, (12/12)),
+        'diminished 8': Math.pow(2, (11/12)),
+        'perfect 8': Math.pow(2, (12/12))
     }
 };
 
@@ -1267,83 +1259,6 @@ function getInterval (interval, keySignature, pitch) {
     }
 };
 
-function getFrequency(startingPitch, pitch, octave, temperament, keySignature) {
-    // Returns the frequency calculated through ratios in the lookup table.
-    var len = pitch.length;
-    var len1 = startingPitch.length;
-    var note, accidental, perfect8, halfSteps;
-    var obj = splitSolfege(pitch);
-
-    //Check if pitch is Solfege and convert it to note.
-    if (SOLFEGENAMES.indexOf(obj[0]) !== -1) {    
-        note = FIXEDSOLFEGE[obj[0]]+''+obj[1];
-        accidental = obj[1];
-    } else {
-        note = pitch;
-        accidental = pitch.slice(1,len);        
-    }
-    var note1 = startingPitch.substring(0,len1-1);
-    var octave1 = startingPitch.slice(-1);
-    var direction = 0;
-    var t = TEMPERAMENT[temperament].ratios;
-
-    //For calculating frequency of perfect 8.
-    for (var ratio in t ) {
-        if (ratio == 'perfect 8') {
-            perfect8 = t[ratio];
-        }
-    } 
-
-    //We need to calculate halfSteps to determine the interval. Once we get interval, we can get ratios from the table. 
-    if (octave == octave1) {
-        halfSteps = getNumber(note,octave)-getNumber(note1,octave1);
-    } else {   //If octave of pitch is different from the octave of starting pitch.
-        if (note1 == note) {
-            halfSteps = 12; //For C5,C6 and so on. (if C4 is starting pitch)
-        } else {
-            halfSteps = getNumber(note,octave1)-getNumber(note1,octave1);
-        }       
-    } 
-
-    if (halfSteps < 0) {
-        halfSteps = halfSteps + 12;
-    } 
-    
-    //For major 2, major 3, major 6 and major 7. 
-    if (halfSteps == 2 || halfSteps == 4 || halfSteps == 9 || halfSteps == 11) {
-        direction = 1;
-    }
-
-    if (accidental == FLAT || accidental == 'b') {
-        direction = -1;
-    } else if (accidental == SHARP || accidental == '#') {
-        direction = 1;
-    } else if (accidental == DOUBLEFLAT && halfSteps == 3 ||accidental == DOUBLEFLAT && halfSteps == 10) {
-        direction = -1;
-    }
-
-    for (var interval in INTERVALVALUES) {
-        if (halfSteps == INTERVALVALUES[interval][0] && direction == INTERVALVALUES[interval][1]) {
-            var p = interval;
-            if (octave == octave1) {
-                return t[interval] * noteToFrequency(startingPitch, keySignature); 
-            } else {
-                //If octave of pitch is different from the octave of starting pitch, we first need to calculate the frequency of starting pitch in the given octave.
-                // For Eg. If pitch is D5 and starting pitch is C4, we first calculate the frequency of C5.
-                // After calculating the frequency of C5, we calculate the frequency of D5 using the ratio in lookup table.
-                var power = octave-octave1;
-                var frequencyPerfect8 = noteToFrequency(startingPitch, keySignature) * (Math.pow(perfect8,power));
-                if (note == note1) {
-                    // Eg. If note is C5, C3 etc.
-                    return frequencyPerfect8;
-                } else {
-                    return t[interval] * frequencyPerfect8;        
-                }   
-            }
-        }
-    }
-};
-
 function calcNoteValueToDisplay(a, b, scale) {
     var noteValue = a / b;
     var noteValueToDisplay = null;
@@ -1492,6 +1407,22 @@ function numberToPitch(i) {
         return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
     } else {
         return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
+    }
+};
+
+function numberToPitchSharp(i) {
+    // numbertoPitch return only flats
+    // This function will return sharps.    
+    if (i < 0) {
+        var n = 0;
+        while (i < 0) {
+            i += 12;
+            n += 1;  
+        }
+
+        return [PITCHES2[(i + PITCHES2.indexOf('A')) % 12], Math.floor((i + PITCHES2.indexOf('A')) / 12) - n];
+    } else {
+        return [PITCHES2[(i + PITCHES2.indexOf('A')) % 12], Math.floor((i + PITCHES2.indexOf('A')) / 12)];
     }
 };
 
