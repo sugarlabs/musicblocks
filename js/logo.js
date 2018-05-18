@@ -7460,13 +7460,13 @@ function Logo () {
                             if (notes.length === 0) {
                                 console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);                
+                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);
                             }
                         } else {
                             if (notes.length === 0) {
                                 console.log('notes to count: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);             
+                                console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1]);
                             }
                         }
                     }
@@ -7543,7 +7543,7 @@ function Logo () {
                                     }
 
                                     if (!that.suppressOutput[turtle]) {    
-                                        that.synth.trigger(turtle, notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null, false);         
+                                        that.synth.trigger(turtle, notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null, false);
                                     }
 
                                     if (that.justCounting[turtle].length === 0) {
@@ -7559,7 +7559,7 @@ function Logo () {
                                     }
                                 } else if (that.turtles.turtleList[turtle].drum) {
                                     if (!that.suppressOutput[turtle]) {
-                                        that.synth.trigger(turtle, notes, beatValue, 'drum', null, null, false);               
+                                        that.synth.trigger(turtle, notes, beatValue, 'drum', null, null, false);
                                     }
 
                                     if (that.justCounting[turtle].length === 0) {
@@ -7570,7 +7570,7 @@ function Logo () {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             if (!that.suppressOutput[turtle]) {
                                                 console.log(that.glide[turtle].length);
-                                                that.synth.trigger(turtle, notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null, false);        
+                                                that.synth.trigger(turtle, notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null, false);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
@@ -7582,12 +7582,12 @@ function Logo () {
                                                 if (that.glide[turtle].length > 0) {
                                                     if (that.glideOverride[turtle] === 0) {
                                                         console.log('glide note ' + beatValue);
-                                                        that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, true);                           
+                                                        that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, true);
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
                                                         var beatValueOverride = bpmFactor / that.glideOverride[turtle];
                                                         console.log('first glide note: ' + that.glideOverride[turtle] + ' ' + beatValueOverride);
-                                                        that.synth.trigger(turtle, notes[d], beatValueOverride, last(that.instrumentNames[turtle]), paramsEffects, filters, false);        
+                                                        that.synth.trigger(turtle, notes[d], beatValueOverride, last(that.instrumentNames[turtle]), paramsEffects, filters, false);
                                                         that.glideOverride[turtle] = 0;
                                                     }
                                                 } else {
@@ -7601,7 +7601,7 @@ function Logo () {
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
                                                 console.log(that.glide[turtle].length);
-                                                that.synth.trigger(turtle, notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null, false);      
+                                                that.synth.trigger(turtle, notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null, false);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
@@ -7609,7 +7609,7 @@ function Logo () {
                                             }
                                         } else {
                                             if (!that.suppressOutput[turtle]) {
-                                                that.synth.trigger(turtle, notes[d], beatValue, 'default', paramsEffects, null, false);    
+                                                that.synth.trigger(turtle, notes[d], beatValue, 'default', paramsEffects, null, false);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
@@ -7675,7 +7675,7 @@ function Logo () {
                                 for (var i = 0; i < drums.length; i++) {
                                     if (that.drumStyle[turtle].length > 0) {
                                         if (!that.suppressOutput[turtle]) {
-                                            that.synth.trigger(turtle, ['C2'], newBeatValue, last(that.drumStyle[turtle]), null, null, false);    
+                                            that.synth.trigger(turtle, ['C2'], newBeatValue, last(that.drumStyle[turtle]), null, null, false);
                                         }
 
                                         if (that.justCounting[turtle].length === 0) {
@@ -7873,7 +7873,7 @@ function Logo () {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
                         that.lastNote[turtle] = that.playbackQueue[turtle][idx][3];
-                        that.synth.trigger(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);         
+                        that.synth.trigger(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
                     }
                     break;
                 case 'controlpoint1':
