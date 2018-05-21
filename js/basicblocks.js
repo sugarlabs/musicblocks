@@ -1498,7 +1498,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.flowClampOneArgBlock();
     setTimbreBlock.dockTypes[1] = 'textin';
     //.TRANS: user-defined
-    setTimbreBlock.defaults.push(_('custom'));
+    setTimbreBlock.defaults.push(_('custom'));   
 
     var setTemperamentBlock = new ProtoBlock('settemperament');
     setTemperamentBlock.palette = palettes.dict['tone'];
@@ -1511,7 +1511,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     temperamentNameBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['temperamentname'] = temperamentNameBlock;
     temperamentNameBlock.valueBlock();
-    //temperamentNameBlock.hidden = true; 
+    temperamentNameBlock.hidden = true; 
     temperamentNameBlock.extraWidth = 20;
     temperamentNameBlock.dockTypes[0] = 'anyout';   
 

@@ -65,6 +65,7 @@ function Logo () {
     this.rhythmRuler = null;
     this.timbre = null;
     this.pitchStaircase = null;
+    this.temperament = null;
     this.tempo = null;
     this.pitchSlider = null;
     this.modeWidget = null;
@@ -294,6 +295,7 @@ function Logo () {
     var turtleLength = 0;
     var inLoop = 0;
     var progressBarDivision;
+    var temperamentSelected = [];
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
     this._saveY = {};
@@ -5842,7 +5844,14 @@ function Logo () {
             }
             break;
         case 'settemperament':
-            that.synth.inTemperament = args[0];   
+            that.synth.inTemperament = args[0];
+            temperamentSelected.push(args[0]);
+            var len = temperamentSelected.length;
+
+            if (temperamentSelected[len-1] !== temperamentSelected[len-2]) {
+                that.synth.changeInTemperament = true;        
+            }
+              
             break;
         case 'setnotevolume2':
             // master volume in clamp form
