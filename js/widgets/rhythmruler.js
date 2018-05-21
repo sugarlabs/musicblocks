@@ -17,6 +17,34 @@
 // rulerButtonsDiv is for the widget buttons
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
+function gcd(max,min){
+    rem = max%min;
+    max=min; 
+    min=rem;
+    if(rem === 0) {
+        return max;
+    } 
+    else {
+        return  gcd(max,min);
+    }
+}
+
+//This function computes the LCM
+function lcm(a,b){
+    return (a*b)/gcd(a,b)
+}
+
+//This function is the Iterator, it computes the LCM for the numbers
+//in the INPUT array recursively by calling the previous function
+function lcmIter(arr,len){
+    if(len === 2){
+        return lcm(arr[0],arr[1])
+    } else {
+        return lcm(arr[len-1],lcmIter(arr,len-1))
+    }
+}
+
+
 function RhythmRuler () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 675;
@@ -1133,6 +1161,13 @@ function RhythmRuler () {
         }, 500);
     };
 
+    this._meterSize = function() {
+    	console.log( this.Rulers[this._rulerSelected][0] );
+		var array1 = this.Rulers[this._rulerSelected][0];
+		console.log(lcmIter(array1, array1.length)); 
+    
+    };
+
     this.init = function (logo) {
         console.log('init RhythmRuler');
 
@@ -1200,6 +1235,12 @@ function RhythmRuler () {
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
         cell.onclick = function () {
             that._saveDrumMachine(0);
+        };
+
+
+        var cell = this._addButton(row, 'oscillator.svg', iconSize, _('Meter size'), '');
+        cell.onclick = function () {
+            that._meterSize(0);
         };
 
         // An input for setting the dissect number
