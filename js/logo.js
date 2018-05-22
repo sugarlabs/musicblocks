@@ -10511,7 +10511,7 @@ function Logo () {
         var d2 = (1 / duration) - d;
 
         // If the note won't fit in this measure, split it with a tie.
-        if (split && d > 0 && d2 > 0 && b > 0 && duration > 0 && 1 / duration > d) {
+        if (split && d > 0.000000001 && d2 > 0.000000001 && b > 0 && duration > 0 && 1 / duration > d) {
             console.log('splitting note across measure boundary.');
             var obj = rationalToFraction(d);
             var obj2 = rationalToFraction(d2);
