@@ -307,6 +307,15 @@ function StatusMatrix() {
                 case 'measurevalue':
                     var value = this._logo.currentMeasure[turtle];
                     break;
+                case 'pitchinhertz':
+                    var length = this._logo.synth.pitchInHertz.length;
+                    var value = '';
+                    for (var j = 0; j < length; j++) {
+                        value += this._logo.synth.pitchInHertz[j].toFixed(2);
+                        value += ' ';
+                    }
+                    this._logo.synth.pitchInHertz = [];
+                    break;
                 default:
                     var value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value;
                     break;

@@ -212,6 +212,7 @@ function Synth() {
     this.inTemperament = 'equal';
     this.startingPitch = 'C4';
     this.notes = {};
+    this.pitchInHertz = [];
 
     this.temperamentChanged = function(temperament, startingPitch) {
         var t = TEMPERAMENT[temperament];
@@ -692,16 +693,21 @@ function Synth() {
                     if (this.note[note][0] === Number(notes.slice(-1))) {
                         //Note to be played is in the same octave.
                         notes =  this.note[note][1];
+                        this.pitchInHertz.push(this.note[note][1]);
                         break;
                     } else { 
                         //Note to be played is not in the same octave.
                         var power = Number(notes.slice(-1)) - this.note[note][0];
                         notes =  this.note[note][1] * Math.pow(2, power);
+                        this.pitchInHertz.push(this.note[note][1] * Math.pow(2, power));
                         break;
                     }
                 }
             }
+        } else {
+            this.pitchInHertz.push(Tone.Frequency(notes).toFrequency());
         }
+
         if (paramsEffects == null && paramsFilters == null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {

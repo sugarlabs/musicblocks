@@ -1123,6 +1123,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     elapsedNotes2.adjustWidthToLabel();
     elapsedNotes2.oneArgMathBlock();
 
+    var pitchInHertzBlock = new ProtoBlock('pitchinhertz');
+    pitchInHertzBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['pitchinhertz'] = pitchInHertzBlock;
+    //.TRANS: number of whole notes that have been played
+    pitchInHertzBlock.staticLabels.push(_('pitch in hertz'));
+    pitchInHertzBlock.adjustWidthToLabel();
+    pitchInHertzBlock.parameterBlock();
+
     var driftBlock = new ProtoBlock('drift');
     driftBlock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['drift'] = driftBlock;

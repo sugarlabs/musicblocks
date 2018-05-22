@@ -9324,6 +9324,11 @@ function Logo () {
                     that.blocks.blockList[blk].value = that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1];
                 }
                 break;
+            case 'pitchinhertz':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'pitchinhertz']);
+                }
+                break;
             case 'turtleelapsednotes':
                 var value = null;
                 var cblk = that.blocks.blockList[blk].connections[1];
