@@ -422,7 +422,31 @@ const TEMPERAMENT = {
         'diminished 8': (15/8),
         'perfect 8': (2/1)
     },
-    'meantone': {      //Quarter-comma Meantone
+    '1/3 comma meantone': { // 19-EDO
+        'unison' : (1/1),
+        'minor 2' :  1.075693,
+        'augmented 1': 1.037156,
+        'major 2': 1.115656,
+        'augmented 2': 1.157109,
+        'minor 3': 1.200103,
+        'major 3': 1.244694,
+        'augmented 3': 1.290943,
+        'diminished 4': 1.290943,
+        'perfect 4': 1.338902,
+        'augmented 4': 1.38865,
+        'diminished 5': 1.440247,
+        'perfect 5': 1.493762,
+        'augmented 5': 1.549255,
+        'minor 6': 1.60682,
+        'major 6': 1.666524,
+        'augmented 6': 1.728445,
+        'minor 7': 1.792668,
+        'major 7': 1.859266,
+        'augmented 7': 1.92835,
+        'diminished 8': 1.92835,
+        'perfect 8': (2/1) 
+    },
+    '1/4 comma meantone': { // 21 notes per octave
         'unison' : (1/1),
         'minor 2' :  (16/15),
         'augmented 1': (25/24),

@@ -1963,7 +1963,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedTemperament = 'equal';
             }
 
-            const temperament = ['equal', 'just intonation', 'meantone', 'custom'];
+            const temperament = ['equal', 'just intonation', '1/4 comma meantone', '1/3 comma meantone', 'custom'];
             var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
             
             for (var i = 0; i < temperament.length; i++) {
