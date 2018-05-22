@@ -3813,7 +3813,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var newTurtle = new ProtoBlock('newturtle');
     newTurtle.palette = palettes.dict['mice'];
     blocks.protoBlockDict['newturtle'] = newTurtle;
-    newTurtle.staticLabels.push(_('new turtle'));
+    newTurtle.staticLabels.push(_('new mouse'));
     newTurtle.adjustWidthToLabel();
     newTurtle.oneArgBlock();
     newTurtle.dockTypes[1] = 'anyin';
