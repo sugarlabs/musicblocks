@@ -1291,7 +1291,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     harmonicBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['harmonic'] = harmonicBlock;
     //.TRANS: partials are weighted components in a harmonic series
-    harmonicBlock.staticLabels.push(_('weighed partials'));
+    harmonicBlock.staticLabels.push(_('weighted partials'));
     harmonicBlock.adjustWidthToLabel();
     harmonicBlock.flowClampZeroArgBlock();
 
