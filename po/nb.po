@@ -2626,7 +2626,7 @@ msgstr ""
 
 #: js/basicblocks.js:1294
 #.TRANS: partials are weighted components in a harmonic series
-msgid "weighed partials"
+msgid "weighted partials"
 msgstr ""
 
 #: js/basicblocks.js:1303

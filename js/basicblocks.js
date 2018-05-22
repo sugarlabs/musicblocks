@@ -1291,7 +1291,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     harmonicBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['harmonic'] = harmonicBlock;
     //.TRANS: partials are weighted components in a harmonic series
-    harmonicBlock.staticLabels.push(_('weighed partials'));
+    harmonicBlock.staticLabels.push(_('weighted partials'));
     harmonicBlock.adjustWidthToLabel();
     harmonicBlock.flowClampZeroArgBlock();
 
@@ -3803,7 +3803,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var foundTurtleBlock = new ProtoBlock('foundturtle');
     foundTurtleBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['foundturtle'] = foundTurtleBlock;
-    foundTurtleBlock.staticLabels.push(_('found turtle'));
+    foundTurtleBlock.staticLabels.push(_('found mouse'));
     foundTurtleBlock.adjustWidthToLabel();
     foundTurtleBlock.extraWidth = 50;
     foundTurtleBlock.booleanOneArgBlock();
@@ -3813,7 +3813,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var newTurtle = new ProtoBlock('newturtle');
     newTurtle.palette = palettes.dict['mice'];
     blocks.protoBlockDict['newturtle'] = newTurtle;
-    newTurtle.staticLabels.push(_('new turtle'));
+    newTurtle.staticLabels.push(_('new mouse'));
     newTurtle.adjustWidthToLabel();
     newTurtle.oneArgBlock();
     newTurtle.dockTypes[1] = 'anyin';
