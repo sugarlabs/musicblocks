@@ -3803,7 +3803,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var foundTurtleBlock = new ProtoBlock('foundturtle');
     foundTurtleBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['foundturtle'] = foundTurtleBlock;
-    foundTurtleBlock.staticLabels.push(_('found turtle'));
+    foundTurtleBlock.staticLabels.push(_('found mouse'));
     foundTurtleBlock.adjustWidthToLabel();
     foundTurtleBlock.extraWidth = 50;
     foundTurtleBlock.booleanOneArgBlock();
