@@ -9327,6 +9327,10 @@ function Logo () {
             case 'pitchinhertz':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'pitchinhertz']);
+                } else {
+                    if (that.lastNotePlayed[turtle] !== null) {
+                        that.blocks.blockList[blk].value = that.synth.getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
+                    }
                 }
                 break;
             case 'turtleelapsednotes':

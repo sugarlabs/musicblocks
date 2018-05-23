@@ -889,7 +889,21 @@ function getVoiceSynthName(name) {
 };
 
 function getTemperamentName(name) {
+    if (name === '') {
+        console.log('getTemperamentName passed blank name. Returning ' + DEFAULTTEMPERAMENT);
+        name = DEFAULTTEMPERAMENT;
+    }
 
+    for (var i = 0; i < TEMPERAMENTS.length; i++) {
+        if (TEMPERAMENTS[i][0].toLowerCase() === name.toLowerCase()) {
+            return TEMPERAMENTS[i][1];
+        } else if (TEMPERAMENTS[i][1].toLowerCase() === name.toLowerCase()) {
+            return TEMPERAMENTS[i][1];
+        }
+    }
+
+    console.log(name + ' not found in TEMPERAMENTS');
+    return DEFAULTTEMPERAMENT;
 };
 
 function keySignatureToMode(keySignature) {

@@ -1958,19 +1958,22 @@ function Block(protoblock, blocks, overrideName) {
         } else if (this.name === 'temperamentname') {
             var type = 'temperamentname';
             if (this.value != null) {
-                var selectedTemperament = this.value;
+                var selectedTemperament = getTemperamentName(this.value);
             } else {
-                var selectedTemperament = 'equal';
+                var selectedTemperament = getTemperamentName(DEFAULTTEMPERAMENT);
             }
 
-            const temperament = ['equal', 'just intonation', '1/4 comma meantone', '1/3 comma meantone', 'custom'];
-            var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
-            
-            for (var i = 0; i < temperament.length; i++) {
-                if (selectedTemperament === temperament[i]) {
+            var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'            
+            for (var i = 0; i < TEMPERAMENTS.length; i++) {
+                if (TEMPERAMENTS[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + TEMPERAMENTS[i][1] + '">' + TEMPERAMENTS[i][1] + '</option>';
+                } else if (selectedTemperament === TEMPERAMENTS[i][0]) {
+                    labelHTML += '<option value="' + selectedTemperament + '" selected>' + selectedTemperament + '</option>';
+                } else if (selectedTemperament === TEMPERAMENTS[i][1]) {
                     labelHTML += '<option value="' + selectedTemperament + '" selected>' + selectedTemperament + '</option>';
                 } else {
-                    labelHTML += '<option value="' + temperament[i] + '">' + temperament[i] + '</option>';
+                    labelHTML += '<option value="' + TEMPERAMENTS[i][1] + '">' + TEMPERAMENTS[i][1] + '</option>';
                 }
             }
 
