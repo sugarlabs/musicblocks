@@ -1520,7 +1520,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['temperamentname'] = temperamentNameBlock;
     temperamentNameBlock.valueBlock();
     temperamentNameBlock.hidden = true; 
-    temperamentNameBlock.extraWidth = 20;
+    temperamentNameBlock.extraWidth = 50;
     temperamentNameBlock.dockTypes[0] = 'anyout';   
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
