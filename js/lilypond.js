@@ -654,7 +654,7 @@ saveLilypondOutput = function(logo) {
                 var tNumber = t;
             }
 
-            if (clef[i] === CLEFS[c]) {
+            if (clef[tNumber] === CLEFS[c]) {
                 if (logo.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
                         var instrumentName = _('drum') + NUMBERNAMES[tNumber - startDrums];
