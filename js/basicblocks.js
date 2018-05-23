@@ -1123,6 +1123,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     elapsedNotes2.adjustWidthToLabel();
     elapsedNotes2.oneArgMathBlock();
 
+    var pitchInHertzBlock = new ProtoBlock('pitchinhertz');
+    pitchInHertzBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['pitchinhertz'] = pitchInHertzBlock;
+    //.TRANS: the current pitch expressed in Hertz
+    pitchInHertzBlock.staticLabels.push(_('pitch in hertz'));
+    pitchInHertzBlock.adjustWidthToLabel();
+    pitchInHertzBlock.parameterBlock();
+
     var driftBlock = new ProtoBlock('drift');
     driftBlock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['drift'] = driftBlock;
@@ -1498,7 +1506,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.flowClampOneArgBlock();
     setTimbreBlock.dockTypes[1] = 'textin';
     //.TRANS: user-defined
-    setTimbreBlock.defaults.push(_('custom'));
+    setTimbreBlock.defaults.push(_('custom'));   
+
+    var setTemperamentBlock = new ProtoBlock('settemperament');
+    setTemperamentBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
+    setTemperamentBlock.staticLabels.push(_('set temperament'));
+    setTemperamentBlock.adjustWidthToLabel();
+    setTemperamentBlock.oneArgBlock();
+
+    var temperamentNameBlock = new ProtoBlock('temperamentname');
+    temperamentNameBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['temperamentname'] = temperamentNameBlock;
+    temperamentNameBlock.valueBlock();
+    temperamentNameBlock.hidden = true; 
+    temperamentNameBlock.extraWidth = 50;
+    temperamentNameBlock.dockTypes[0] = 'anyout';   
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 

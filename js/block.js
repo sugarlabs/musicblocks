@@ -16,8 +16,8 @@ const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname'];
-const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
 
 // Define block instance objects and any methods that are intra-block.
@@ -598,6 +598,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'oscillatortype':
                     this.value = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
                     break;
+                case 'temperamentname':
+                    this.value = 'equal';
+                    break;
                 }
             }
 
@@ -1040,6 +1043,8 @@ function Block(protoblock, blocks, overrideName) {
                 this.text.x *= 1.75;
             } else if (this.name === 'text') {
                 this.text.x = this.width / 2;
+            } else if (this.name === 'temperamentname') {
+                this.text.x += 15;
             }
         } else if (this.name === 'nameddo') {
             this.text.textAlign = 'center';
@@ -1949,6 +1954,32 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('voicenameLabel');
+            selectorWidth = 150;
+        } else if (this.name === 'temperamentname') {
+            var type = 'temperamentname';
+            if (this.value != null) {
+                var selectedTemperament = getTemperamentName(this.value);
+            } else {
+                var selectedTemperament = getTemperamentName(DEFAULTTEMPERAMENT);
+            }
+
+            var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'            
+            for (var i = 0; i < TEMPERAMENTS.length; i++) {
+                if (TEMPERAMENTS[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + TEMPERAMENTS[i][1] + '">' + TEMPERAMENTS[i][1] + '</option>';
+                } else if (selectedTemperament === TEMPERAMENTS[i][0]) {
+                    labelHTML += '<option value="' + selectedTemperament + '" selected>' + selectedTemperament + '</option>';
+                } else if (selectedTemperament === TEMPERAMENTS[i][1]) {
+                    labelHTML += '<option value="' + selectedTemperament + '" selected>' + selectedTemperament + '</option>';
+                } else {
+                    labelHTML += '<option value="' + TEMPERAMENTS[i][1] + '">' + TEMPERAMENTS[i][1] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('temperamentnameLabel');
             selectorWidth = 150;
         } else if (this.name === 'boolean') {
             var type = 'boolean';

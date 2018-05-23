@@ -65,6 +65,7 @@ function Logo () {
     this.rhythmRuler = null;
     this.timbre = null;
     this.pitchStaircase = null;
+    this.temperament = null;
     this.tempo = null;
     this.pitchSlider = null;
     this.modeWidget = null;
@@ -294,6 +295,7 @@ function Logo () {
     var turtleLength = 0;
     var inLoop = 0;
     var progressBarDivision;
+    var temperamentSelected = [];
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
     this._saveY = {};
@@ -5841,6 +5843,16 @@ function Logo () {
                 }
             }
             break;
+        case 'settemperament':
+            that.synth.inTemperament = args[0];
+            temperamentSelected.push(args[0]);
+            var len = temperamentSelected.length;
+
+            if (temperamentSelected[len-1] !== temperamentSelected[len-2]) {
+                that.synth.changeInTemperament = true;        
+            }
+              
+            break;
         case 'setnotevolume2':
             // master volume in clamp form
             // Used by fff ff f p pp ppp blocks
@@ -7539,7 +7551,7 @@ function Logo () {
                                         that.errorMsg(last(that.oscList[turtle][thisBlk]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
 
-                                    if (!that.suppressOutput[turtle]) {
+                                    if (!that.suppressOutput[turtle]) {    
                                         that.synth.trigger(turtle, notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null, false);
                                     }
 
@@ -9310,6 +9322,15 @@ function Logo () {
                     that.statusFields.push([blk, 'elapsednotes']);
                 } else {
                     that.blocks.blockList[blk].value = that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1];
+                }
+                break;
+            case 'pitchinhertz':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'pitchinhertz']);
+                } else {
+                    if (that.lastNotePlayed[turtle] !== null) {
+                        that.blocks.blockList[blk].value = that.synth.getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
+                    }
                 }
                 break;
             case 'turtleelapsednotes':

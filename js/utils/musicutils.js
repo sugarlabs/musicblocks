@@ -373,11 +373,149 @@ var OSCTYPES = [
     [_('sawtooth'), 'sawtooth'],
 ];
 
+var TEMPERAMENTS = [
+    //.TRANS: musical temperament
+    [_('equal'), 'equal'],
+    //.TRANS: musical temperament
+    [_('just-intonation'), 'just intonation'],
+    //.TRANS: musical temperament
+    [_('1/3-comma-meantone'), '1/3 comma meantone'],
+    //.TRANS: musical temperament
+    [_('1/4-comma-meantone'), '1/4 comma meantone'],
+
+    [_('custom'), 'custom'],
+
+];
+
+const TEMPERAMENT = {
+    'equal': {
+        'unison' : Math.pow(2, (0/12)),
+        'minor 2' :  Math.pow(2, (1/12)),
+        'augmented 1': Math.pow(2, (1/12)),
+        'major 2': Math.pow(2, (2/12)),
+        'augmented 2': Math.pow(2, (3/12)),
+        'minor 3': Math.pow(2, (3/12)),
+        'major 3': Math.pow(2, (4/12)),
+        'augmented 3': Math.pow(2, (5/12)),
+        'diminished 4': Math.pow(2, (4/12)),
+        'perfect 4': Math.pow(2, (5/12)),
+        'augmented 4': Math.pow(2, (6/12)),
+        'diminished 5': Math.pow(2, (6/12)),
+        'perfect 5': Math.pow(2, (7/12)),
+        'augmented 5': Math.pow(2, (8/12)),
+        'minor 6': Math.pow(2, (8/12)),
+        'major 6': Math.pow(2, (9/12)),
+        'augmented 6': Math.pow(2, (10/12)),
+        'minor 7': Math.pow(2, (10/12)),
+        'major 7': Math.pow(2, (11/12)),
+        'augmented 7': Math.pow(2, (12/12)),
+        'diminished 8': Math.pow(2, (11/12)),
+        'perfect 8': Math.pow(2, (12/12))
+    },
+    'just intonation': {
+        'unison' : (1/1),
+        'minor 2' :  (16/15),
+        'augmented 1': (16/15),
+        'major 2': (9/8),
+        'augmented 2': (6/5),
+        'minor 3': (6/5),
+        'major 3': (5/4),
+        'augmented 3': (4/3),
+        'diminished 4': (5/4),
+        'perfect 4': (4/3),
+        'augmented 4': (7/5),
+        'diminished 5': (7/5),
+        'perfect 5': (3/2),
+        'augmented 5': (8/5),
+        'minor 6': (8/5),
+        'major 6': (5/3),
+        'augmented 6': (16/9),
+        'minor 7': (16/9),
+        'major 7': (15/8),
+        'augmented 7': (2/1),
+        'diminished 8': (15/8),
+        'perfect 8': (2/1)
+    },
+    '1/3 comma meantone': { // 19-EDO
+        'unison' : (1/1),
+        'minor 2' :  1.075693,
+        'augmented 1': 1.037156,
+        'major 2': 1.115656,
+        'augmented 2': 1.157109,
+        'minor 3': 1.200103,
+        'major 3': 1.244694,
+        'augmented 3': 1.290943,
+        'diminished 4': 1.290943,
+        'perfect 4': 1.338902,
+        'augmented 4': 1.38865,
+        'diminished 5': 1.440247,
+        'perfect 5': 1.493762,
+        'augmented 5': 1.549255,
+        'minor 6': 1.60682,
+        'major 6': 1.666524,
+        'augmented 6': 1.728445,
+        'minor 7': 1.792668,
+        'major 7': 1.859266,
+        'augmented 7': 1.92835,
+        'diminished 8': 1.92835,
+        'perfect 8': (2/1) 
+    },
+    '1/4 comma meantone': { // 21 notes per octave
+        'unison' : (1/1),
+        'minor 2' :  (16/15),
+        'augmented 1': (25/24),
+        'major 2': (9/8),
+        'augmented 2': (75/64),
+        'minor 3': (6/5),
+        'major 3': (5/4),
+        'augmented 3': (125/96),
+        'diminished 4': (32/25),
+        'perfect 4': (4/3),
+        'augmented 4': (25/18),
+        'diminished 5': (36/25),
+        'perfect 5': (3/2),
+        'augmented 5': (25/16),
+        'minor 6': (8/5),
+        'major 6': (5/3),
+        'augmented 6': (125/72),
+        'minor 7': (9/5),
+        'major 7': (15/8),
+        'augmented 7': (125/64),
+        'diminished 8': (48/25),
+        'perfect 8': (2/1) 
+    },
+    'custom':{
+        'unison' : Math.pow(2, (0/12)),
+        'minor 2' :  Math.pow(2, (1/12)),
+        'augmented 1': Math.pow(2, (1/12)),
+        'major 2': Math.pow(2, (2/12)),
+        'augmented 2': Math.pow(2, (3/12)),
+        'minor 3': Math.pow(2, (3/12)),
+        'major 3': Math.pow(2, (4/12)),
+        'augmented 3': Math.pow(2, (5/12)),
+        'diminished 4': Math.pow(2, (4/12)),
+        'perfect 4': Math.pow(2, (5/12)),
+        'augmented 4': Math.pow(2, (6/12)),
+        'diminished 5': Math.pow(2, (6/12)),
+        'perfect 5': Math.pow(2, (7/12)),
+        'augmented 5': Math.pow(2, (8/12)),
+        'minor 6': Math.pow(2, (8/12)),
+        'major 6': Math.pow(2, (9/12)),
+        'augmented 6': Math.pow(2, (10/12)),
+        'minor 7': Math.pow(2, (10/12)),
+        'major 7': Math.pow(2, (11/12)),
+        'augmented 7': Math.pow(2, (12/12)),
+        'diminished 8': Math.pow(2, (11/12)),
+        'perfect 8': Math.pow(2, (12/12))
+    }
+};
+
 const DEFAULTINVERT = _('even');
 const DEFAULTINTERVAL = _('perfect') + ' 5';
 const DEFAULTVOICE = _('default');
 const DEFAULTDRUM = _('kick drum');
 const DEFAULTMODE = _('major');
+const DEFAULTTEMPERAMENT = _('equal');
 const DEFAULTFILTERTYPE = _('highpass');
 const DEFAULTOSCILLATORTYPE = _('sine');
 const DEFAULTACCIDENTAL = _('natural') + ' ' + NATURAL;
@@ -750,6 +888,23 @@ function getVoiceSynthName(name) {
     return DEFAULTVOICE;
 };
 
+function getTemperamentName(name) {
+    if (name === '') {
+        console.log('getTemperamentName passed blank name. Returning ' + DEFAULTTEMPERAMENT);
+        name = DEFAULTTEMPERAMENT;
+    }
+
+    for (var i = 0; i < TEMPERAMENTS.length; i++) {
+        if (TEMPERAMENTS[i][0].toLowerCase() === name.toLowerCase()) {
+            return TEMPERAMENTS[i][1];
+        } else if (TEMPERAMENTS[i][1].toLowerCase() === name.toLowerCase()) {
+            return TEMPERAMENTS[i][1];
+        }
+    }
+
+    console.log(name + ' not found in TEMPERAMENTS');
+    return DEFAULTTEMPERAMENT;
+};
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
@@ -1160,7 +1315,6 @@ function getInterval (interval, keySignature, pitch) {
     }
 };
 
-
 function calcNoteValueToDisplay(a, b, scale) {
     var noteValue = a / b;
     var noteValueToDisplay = null;
@@ -1309,6 +1463,22 @@ function numberToPitch(i) {
         return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
     } else {
         return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
+    }
+};
+
+function numberToPitchSharp(i) {
+    // numbertoPitch return only flats
+    // This function will return sharps.    
+    if (i < 0) {
+        var n = 0;
+        while (i < 0) {
+            i += 12;
+            n += 1;  
+        }
+
+        return [PITCHES2[(i + PITCHES2.indexOf('A')) % 12], Math.floor((i + PITCHES2.indexOf('A')) / 12) - n];
+    } else {
+        return [PITCHES2[(i + PITCHES2.indexOf('A')) % 12], Math.floor((i + PITCHES2.indexOf('A')) / 12)];
     }
 };
 

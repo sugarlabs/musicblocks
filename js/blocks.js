@@ -2170,6 +2170,8 @@ function Blocks () {
             postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === 'intervalname') {
             postProcessArg = [thisBlock, DEFAULTINTERVAL];
+        } else if (name === 'temperamentname') {
+            postProcessArg = [thisBlock, DEFAULTTEMPERAMENT];
         } else if (name === 'invertmode') {
             postProcessArg = [thisBlock, DEFAULTINVERT];
         } else if (name === 'number') {
@@ -3853,6 +3855,7 @@ function Blocks () {
             case 'modename':
             case 'accidentalname':
             case 'intervalname':
+            case 'temperamentname':
             case 'invertmode':
             case 'filtertype':
             case 'oscillatortype':
