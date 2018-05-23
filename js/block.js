@@ -1043,8 +1043,6 @@ function Block(protoblock, blocks, overrideName) {
                 this.text.x *= 1.75;
             } else if (this.name === 'text') {
                 this.text.x = this.width / 2;
-            } else if (this.name === 'temperamentname') {
-                this.text.x += 15;
             }
         } else if (this.name === 'nameddo') {
             this.text.textAlign = 'center';
@@ -1638,8 +1636,7 @@ function Block(protoblock, blocks, overrideName) {
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
-
-            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
+            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">';
             for (var i = 0; i < SOLFNOTES.length; i++) {
                 if (selectednote === solfnotes_[i]) {
                     labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + solfnotes_[i] + '</option>';
@@ -1676,8 +1673,7 @@ function Block(protoblock, blocks, overrideName) {
             var selectedattr = obj[1];
 
             var eisolfnotes_ = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa'];
-
-            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
+            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">';
             for (var i = 0; i < SOLFNOTES.length; i++) {
                 if (selectednote === eisolfnotes_[i]) {
                     labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + eisolfnotes_[i] + '</option>';
@@ -1724,7 +1720,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedattr = '♮'
             }
 
-            var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
             for (var i = 0; i < NOTENOTES.length; i++) {
                 if (selectednote === NOTENOTES[i]) {
                     labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
@@ -1739,7 +1735,6 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-
             for (var i = 0; i < NOTEATTRS.length; i++) {
                 if (selectedattr === NOTEATTRS[i]) {
                     labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
@@ -1760,7 +1755,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedmode = getModeName(DEFAULTMODE);
             }
 
-            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #3ea4a3; width: 150px;">'
+            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #3ea4a3; width: 150px;">';
             for (var i = 0; i < MODENAMES.length; i++) {
                 if (MODENAMES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1786,7 +1781,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedaccidental = DEFAULTACCIDENTAL;
             }
 
-            var labelHTML = '<select name="accidentalname" id="accidentalnameLabel" style="position: absolute;  background-color: #88e20a; width: 90px;">'
+            var labelHTML = '<select name="accidentalname" id="accidentalnameLabel" style="position: absolute;  background-color: #88e20a; width: 90px;">';
             for (var i = 0; i < ACCIDENTALNAMES.length; i++) {
                 if (selectedaccidental === ACCIDENTALNAMES[i]) {
                     labelHTML += '<option value="' + selectedaccidental + '" selected>' + selectedaccidental + '</option>';
@@ -1807,7 +1802,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedinterval = getIntervalName(DEFAULTINTERVAL);
             }
 
-            var labelHTML = '<select name="intervalname" id="intervalnameLabel" style="position: absolute;  background-color: #3ea4a3; width: 90px;">'
+            var labelHTML = '<select name="intervalname" id="intervalnameLabel" style="position: absolute;  background-color: #3ea4a3; width: 90px;">';
             for (var i = 0; i < INTERVALNAMES.length; i++) {
                 if (INTERVALNAMES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1833,7 +1828,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedinvert = getInvertMode(DEFAULTINVERT);
             }
 
-            var labelHTML = '<select name="invertmode" id="invertModeLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">'
+            var labelHTML = '<select name="invertmode" id="invertModeLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">';
             for (var i = 0; i < INVERTMODES.length; i++) {
                 if (INVERTMODES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1859,7 +1854,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selecteddrum = getDrumName(DEFAULTDRUM);
             }
 
-            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (DRUMNAMES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1885,7 +1880,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedtype = getFilterTypes(DEFAULTFILTERTYPE);
             }
 
-            var labelHTML = '<select name="filtertype" id="filtertypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            var labelHTML = '<select name="filtertype" id="filtertypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
             for (var i = 0; i < FILTERTYPES.length; i++) {
                 if (FILTERTYPES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1911,7 +1906,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedosctype = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
             }
 
-            var labelHTML = '<select name="oscillatortype" id="oscillatortypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            var labelHTML = '<select name="oscillatortype" id="oscillatortypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
             for (var i = 0; i < OSCTYPES.length; i++) {
                 if (OSCTYPES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1937,7 +1932,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedvoice = getVoiceName(DEFAULTVOICE);
             }
 
-            var labelHTML = '<select name="voicename" id="voicenameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            var labelHTML = '<select name="voicename" id="voicenameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
             for (var i = 0; i < VOICENAMES.length; i++) {
                 if (VOICENAMES[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1963,7 +1958,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedTemperament = getTemperamentName(DEFAULTTEMPERAMENT);
             }
 
-            var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'            
+            var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
             for (var i = 0; i < TEMPERAMENTS.length; i++) {
                 if (TEMPERAMENTS[i][0].length === 0) {
                     // work around some weird i18n bug
@@ -1990,8 +1985,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             var BOOLSTRINGS = [[_('true'), 'true'], [_('false'), 'false']];
-
-            var labelHTML = '<select name="booleanstring" id="booleanLabel" style="position: absolute;  background-color: #f2ec4d; width: 60px;">'
+            var labelHTML = '<select name="booleanstring" id="booleanLabel" style="position: absolute;  background-color: #f2ec4d; width: 60px;">';
             if (this.value) {
                 labelHTML += '<option value="' + _('true') + '" selected>' + _('true') + '</option>';
                 labelHTML += '<option value="' + _('false') + '">' + _('false') + '</option>';
