@@ -2958,7 +2958,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     actionBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['action'] = actionBlock;
     actionBlock.staticLabels.push(_('action'));
-    actionBlock.extraWidth = 25;
+    actionBlock.extraWidth = 42;
     actionBlock.adjustWidthToLabel();
     actionBlock.stackClampOneArgBlock();
     actionBlock.defaults.push(_('action'));
