@@ -1126,7 +1126,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitchInHertzBlock = new ProtoBlock('pitchinhertz');
     pitchInHertzBlock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['pitchinhertz'] = pitchInHertzBlock;
-    //.TRANS: number of whole notes that have been played
+    //.TRANS: the current pitch expressed in Hertz
     pitchInHertzBlock.staticLabels.push(_('pitch in hertz'));
     pitchInHertzBlock.adjustWidthToLabel();
     pitchInHertzBlock.parameterBlock();

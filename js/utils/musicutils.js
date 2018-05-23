@@ -373,6 +373,20 @@ var OSCTYPES = [
     [_('sawtooth'), 'sawtooth'],
 ];
 
+var TEMPERAMENTS = [
+    //.TRANS: musical temperament
+    [_('equal'), 'equal'],
+    //.TRANS: musical temperament
+    [_('just-intonation'), 'just intonation'],
+    //.TRANS: musical temperament
+    [_('1/3-comma-meantone'), '1/3 comma meantone'],
+    //.TRANS: musical temperament
+    [_('1/4-comma-meantone'), '1/4 comma meantone'],
+
+    [_('custom'), 'custom'],
+
+];
+
 const TEMPERAMENT = {
     'equal': {
         'unison' : Math.pow(2, (0/12)),
@@ -501,6 +515,7 @@ const DEFAULTINTERVAL = _('perfect') + ' 5';
 const DEFAULTVOICE = _('default');
 const DEFAULTDRUM = _('kick drum');
 const DEFAULTMODE = _('major');
+const DEFAULTTEMPERAMENT = _('equal');
 const DEFAULTFILTERTYPE = _('highpass');
 const DEFAULTOSCILLATORTYPE = _('sine');
 const DEFAULTACCIDENTAL = _('natural') + ' ' + NATURAL;
@@ -873,6 +888,9 @@ function getVoiceSynthName(name) {
     return DEFAULTVOICE;
 };
 
+function getTemperamentName(name) {
+
+};
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
