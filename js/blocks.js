@@ -2144,8 +2144,6 @@ function Blocks () {
             postProcessArg = [thisBlock, _('true')];
         } else if (name === 'solfege') {
             postProcessArg = [thisBlock, 'sol'];
-        } else if (name === 'eastindiansolfege') {
-            postProcessArg = [thisBlock, 'pa'];
         } else if (name === 'notename') {
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
@@ -2156,6 +2154,16 @@ function Blocks () {
             postProcessArg = [thisBlock, DEFAULTOSCILLATORTYPE];
         } else if (name === 'voicename') {
             postProcessArg = [thisBlock, DEFAULTVOICE];
+        } else if (name === 'eastindiansolfege') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text =  WESTERN2EISOLFEGENAMES[value];
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'modename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
