@@ -5,6 +5,7 @@ function TemperamentWidget () {
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
+    this.inTemperament = null;
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -53,8 +54,41 @@ function TemperamentWidget () {
 
         var that = this;
 
+        var cell = row.insertCell();
+        cell.innerHTML = this.inTemperament;
+        cell.style.width = (2*BUTTONSIZE) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = BUTTONSIZE + 'px';
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.textAlign = 'center';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'circle.svg', ICONSIZE, _('circle'));
+        var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
+
+        var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
+        for (var i = 0; i < MODENAMES.length; i++) {
+            if (MODENAMES[i][0].length === 0) {
+                modeselector += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
+            } else {
+                modeselector += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
+            }
+        }
+        modeselector += '</select>';
+
+        var cell = row.insertCell();
+        cell.innerHTML = modeselector;
+        cell.style.width = (2*BUTTONSIZE) + 'px';
+        cell.style.minWidth = 130 + 'px';
+        cell.style.maxWidth = 130 + 'px';
+        cell.style.height = BUTTONSIZE + 'px';
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick = function () {
