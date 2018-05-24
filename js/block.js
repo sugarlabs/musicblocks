@@ -1554,8 +1554,10 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                this._labelChanged();
-                hideDOMLabel();
+                if (['notename', 'solfege'].indexOf(this.name) === -1) {
+                    this._labelChanged();
+                    hideDOMLabel();
+                }
                 this.blocks.unhighlight(null);
                 this.blocks.refreshCanvas();
             } else if (this.blocks.activeBlock !== thisBlock) {
@@ -1622,13 +1624,10 @@ function Block(protoblock, blocks, overrideName) {
         var labelElem = docById('labelDiv');
 
         if (this.name === 'text') {
-            var type = 'text';
             labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
             this.label = docById('textLabel');
         } else if (this.name === 'solfege') {
-            var type = 'solfege';
-
             var obj = splitSolfege(this.value);
             var selectednote = obj[0];
             var selectedattr = obj[1];
@@ -1638,41 +1637,13 @@ function Block(protoblock, blocks, overrideName) {
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
 
             this._piemenu(solfnotes_, SOLFNOTES, SOLFATTRS, selectednote, selectedattr);
-
-            /*
-            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">';
-            for (var i = 0; i < SOLFNOTES.length; i++) {
-                if (selectednote === solfnotes_[i]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + solfnotes_[i] + '</option>';
-                } else if (selectednote === SOLFNOTES[i]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + solfnotes_[i] + '</option>';
-                } else {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '">' + solfnotes_[i] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
-            if (selectedattr === '') {
-                selectedattr = '♮';
-            }
-
-            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-            for (var i = 0; i < SOLFATTRS.length; i++) {
-                if (selectedattr === SOLFATTRS[i]) {
-                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-                } else {
-                    labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
-            */
-            labelElem.innerHTML = labelHTML;
+            // FIX ME: We need to keep the DOM elements around to
+            // prevent the block from being dragged while the pie menu
+            // is active.
+            labelElem.innerHTML = '';
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'eastindiansolfege') {
-            var type = 'solfege';
-
             var obj = splitSolfege(this.value);
             var selectednote = WESTERN2EISOLFEGENAMES[obj[0]];
             var selectedattr = obj[1];
@@ -1708,7 +1679,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
-            var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
             const NOTEATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
             if (this.value != null) {
@@ -1725,35 +1695,16 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedattr = '♮'
             }
 
-            var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-            for (var i = 0; i < NOTENOTES.length; i++) {
-                if (selectednote === NOTENOTES[i]) {
-                    labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
-                } else {
-                    labelHTML += '<option value="' + NOTENOTES[i] + '">' + NOTENOTES[i] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
             if (selectedattr === '') {
                 selectedattr = '♮';
             }
 
-            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-            for (var i = 0; i < NOTEATTRS.length; i++) {
-                if (selectedattr === NOTEATTRS[i]) {
-                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-                } else {
-                    labelHTML += '<option value="' + NOTEATTRS[i] + '">' + NOTEATTRS[i] + '</option>';
-                }
-            }
+            this._piemenu(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
+            labelElem.innerHTML = '';
             this.label = docById('notenameLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'modename') {
-            var type = 'modename';
             if (this.value != null) {
                 var selectedmode = this.value[0];
             } else {
@@ -1779,7 +1730,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('modenameLabel');
             selectorWidth = 150;
         } else if (this.name === 'accidentalname') {
-            var type = 'accidentalname';
             if (this.value != null) {
                 var selectedaccidental = this.value[0];
             } else {
@@ -1800,7 +1750,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('accidentalnameLabel');
             selectorWidth = 150;
         } else if (this.name === 'intervalname') {
-            var type = 'intervalname';
             if (this.value != null) {
                 var selectedinterval = this.value;
             } else {
@@ -1826,7 +1775,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('intervalnameLabel');
             selectorWidth = 150;
         } else if (this.name === 'invertmode') {
-            var type = 'invertmode';
             if (this.value != null) {
                 var selectedinvert = this.value;
             } else {
@@ -1852,7 +1800,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('invertModeLabel');
             selectorWidth = 150;
         } else if (this.name === 'drumname') {
-            var type = 'drumname';
             if (this.value != null) {
                 var selecteddrum = getDrumName(this.value);
             } else {
@@ -1878,7 +1825,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('drumnameLabel');
             selectorWidth = 150;
         } else if (this.name === 'filtertype') {
-            var type = 'filtertype';
             if (this.value != null) {
                 var selectedtype = getFilterTypes(this.value);
             } else {
@@ -1904,7 +1850,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('filtertypeLabel');
             selectorWidth = 150;
         } else if (this.name === 'oscillatortype') {
-            var type = 'oscillatortype';
             if (this.value != null) {
                 var selectedosctype = getOscillatorTypes(this.value);
             } else {
@@ -1930,7 +1875,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('oscillatortypeLabel');
             selectorWidth = 150;
         } else if (this.name === 'voicename') {
-            var type = 'voicename';
             if (this.value != null) {
                 var selectedvoice = getVoiceName(this.value);
             } else {
@@ -1956,7 +1900,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('voicenameLabel');
             selectorWidth = 150;
         } else if (this.name === 'temperamentname') {
-            var type = 'temperamentname';
             if (this.value != null) {
                 var selectedTemperament = getTemperamentName(this.value);
             } else {
@@ -1982,7 +1925,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('temperamentnameLabel');
             selectorWidth = 150;
         } else if (this.name === 'boolean') {
-            var type = 'boolean';
             if (this.value != null) {
                 var selectedvalue = this.value;
             } else {
@@ -2003,7 +1945,6 @@ function Block(protoblock, blocks, overrideName) {
             labelElem.innerHTML = labelHTML;
             this.label = docById('booleanLabel');
         } else {
-            var type = 'number';
             labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
             this.label = docById('numberLabel');
@@ -2197,19 +2138,19 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             switch(accidental) {
             case DOUBLEFLAT:
-                this.wheel2.navigateWheel(0);
+                this.wheel2.navigateWheel(4);
                 break;
             case FLAT:
-                this.wheel2.navigateWheel(1);
+                this.wheel2.navigateWheel(3);
                 break;
             case NATURAL:
                 this.wheel2.navigateWheel(2);
                 break;
             case SHARP:
-                this.wheel2.navigateWheel(3);
+                this.wheel2.navigateWheel(1);
                 break;
             case DOUBLESHARP:
-                this.wheel2.navigateWheel(4);
+                this.wheel2.navigateWheel(0);
                 break;
             default:
                 this.wheel2.navigateWheel(2);
