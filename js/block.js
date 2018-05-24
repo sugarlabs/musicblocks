@@ -2115,7 +2115,7 @@ function Block(protoblock, blocks, overrideName) {
 	this.wheel3.slicePathFunction = slicePath().DonutSlice;
 	this.wheel3.slicePathCustom = slicePath().DonutSliceCustomization();
 	this.wheel3.slicePathCustom.minRadiusPercent = 0.0;
-	this.wheel3.slicePathCustom.maxRadiusPercent = 0.29;
+	this.wheel3.slicePathCustom.maxRadiusPercent = 0.3;
 	this.wheel3.sliceSelectedPathCustom = this.wheel3.slicePathCustom;
 	this.wheel3.sliceInitPathCustom = this.wheel3.slicePathCustom;
 	this.wheel3.clickModeRotate = false;
