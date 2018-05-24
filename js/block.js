@@ -2089,7 +2089,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenu = function (note, accidental) {
-        console.log(note, accidental);
+        docById('wheelDiv').style.display = '';
 	// wheelnav pie menu for pitch selection
         // the pitch selector
 	this.wheel1 = new wheelnav('wheelDiv', null, 600, 600);
@@ -2111,14 +2111,15 @@ function Block(protoblock, blocks, overrideName) {
 	this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
 	this.wheel1.createWheel(['do', 're', 'mi', 'fa', 'sol', 'la', 'ti']);
 
-        this.wheel3.colors = new Array('#808080');
+        this.wheel3.colors = new Array('#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0');
 	this.wheel3.slicePathFunction = slicePath().DonutSlice;
 	this.wheel3.slicePathCustom = slicePath().DonutSliceCustomization();
 	this.wheel3.slicePathCustom.minRadiusPercent = 0.0;
 	this.wheel3.slicePathCustom.maxRadiusPercent = 0.29;
 	this.wheel3.sliceSelectedPathCustom = this.wheel3.slicePathCustom;
 	this.wheel3.sliceInitPathCustom = this.wheel3.slicePathCustom;
-	this.wheel3.createWheel([' x', null, null, null, null, null, null]);
+	this.wheel3.clickModeRotate = false;
+	this.wheel3.createWheel([' x', ' ', ' ', ' ', ' ', ' ', ' ']);
 
 	this.wheel2.colors = new Array('#E34C26', 'darkorange', '#F06529', 'darkorange');
 	this.wheel2.slicePathFunction = slicePath().DonutSlice;
@@ -2157,21 +2158,21 @@ function Block(protoblock, blocks, overrideName) {
 	};
 
 	// hide the widget when the exit button is clicked
-        // FIXME: or just hide the div?
 	this.wheel3.navItems[0].navigateFunction = function () {
-	    that.wheel1.navItems[0].navItem.hide();
-	    that.wheel1.navItems[1].navItem.hide();
-	    that.wheel1.navItems[2].navItem.hide();
-	    that.wheel1.navItems[3].navItem.hide();
-	    that.wheel1.navItems[4].navItem.hide();
-	    that.wheel1.navItems[5].navItem.hide();
-	    that.wheel1.navItems[6].navItem.hide();
-	    that.wheel2.navItems[0].navItem.hide();
-	    that.wheel2.navItems[1].navItem.hide();
-	    that.wheel2.navItems[2].navItem.hide();
-	    that.wheel2.navItems[3].navItem.hide();
-	    that.wheel2.navItems[4].navItem.hide();
-	    that.wheel3.navItems[0].navItem.hide();
+            docById('wheelDiv').style.display = 'none';
+            /*
+            for (var i = 0; i < 7; i++) {
+		that.wheel1.navItems[i].navItem.hide();
+	    }
+
+            for (var i = 0; i < 5; i++) {
+		that.wheel2.navItems[i].navItem.hide();
+	    }
+
+            for (var i = 0; i < 7; i++) {
+		that.wheel3.navItems[i].navItem.hide();
+	    }
+            */
             __selectionChanged();
 	};
 
