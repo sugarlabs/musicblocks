@@ -1554,7 +1554,7 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (['notename', 'solfege'].indexOf(this.name) === -1) {
+                if (['notename', 'solfege', 'eastindiansolfege'].indexOf(this.name) === -1) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
@@ -1629,14 +1629,12 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('textLabel');
         } else if (this.name === 'solfege') {
             var obj = splitSolfege(this.value);
-            var selectednote = obj[0];
-            var selectedattr = obj[1];
 
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
 
-            this._piemenu(solfnotes_, SOLFNOTES, SOLFATTRS, selectednote, selectedattr);
+            this._piemenu(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             // FIX ME: We need to keep the DOM elements around to
             // prevent the block from being dragged while the pie menu
             // is active.
@@ -1645,37 +1643,12 @@ function Block(protoblock, blocks, overrideName) {
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'eastindiansolfege') {
             var obj = splitSolfege(this.value);
-            var selectednote = WESTERN2EISOLFEGENAMES[obj[0]];
+            var selectednote = obj[0];
             var selectedattr = obj[1];
 
-            var eisolfnotes_ = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa'];
-            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">';
-            for (var i = 0; i < SOLFNOTES.length; i++) {
-                if (selectednote === eisolfnotes_[i]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + eisolfnotes_[i] + '</option>';
-                } else if (selectednote === WESTERN2EISOLFEGENAMES[SOLFNOTES[i]]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + eisolfnotes_[i] + '</option>';
-                } else {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '">' + eisolfnotes_[i] + '</option>';
-                }
-            }
+            this._piemenu(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
 
-            labelHTML += '</select>';
-            if (selectedattr === '') {
-                selectedattr = '♮';
-            }
-
-            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-            for (var i = 0; i < SOLFATTRS.length; i++) {
-                if (selectedattr === SOLFATTRS[i]) {
-                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-                } else {
-                    labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
+            labelElem.innerHTML = '';
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
