@@ -142,6 +142,7 @@ function Logo () {
     this.inPitchSlider = false;
     this._currentDrumlock = null;
     this.inTimbre = false;
+    this.insideTemperament = false;
     this.inSetTimbre = {};
 
     // pitch-rhythm matrix
@@ -3327,6 +3328,22 @@ function Logo () {
             var __listener = function (event) {
                 that.modeWidget.init(that, that._modeBlock);
             }
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
+        case 'temperament':
+            if (that.temperament == null) {
+                that.temperament = new TemperamentWidget();
+            }
+
+            that.insideTemperament = true;
+
+            var listenerName = '_temperament_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.temperament.init(that);
+            };
 
             that._setListener(turtle, listenerName, __listener);
             break;

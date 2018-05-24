@@ -730,6 +730,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm2.dockTypes[1] = 'anyin';
     rhythm2.dockTypes[2] = 'anyin';
 
+    var temperamentBlock = new ProtoBlock('temperament');
+    temperamentBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['temperament'] = temperamentBlock;
+    temperamentBlock.staticLabels.push(_('temperament'));
+    temperamentBlock.extraWidth = 20;
+    temperamentBlock.adjustWidthToLabel();
+    temperamentBlock.stackClampOneArgBlock();
+
     // macro
     var timbreBlock = new ProtoBlock('timbre');
     timbreBlock.palette = palettes.dict['widgets'];
