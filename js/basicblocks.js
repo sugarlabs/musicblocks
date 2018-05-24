@@ -879,6 +879,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var temperamentBlock = new ProtoBlock('temperament');
+    temperamentBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['temperament'] = temperamentBlock;
+    temperamentBlock.staticLabels.push(_('temperament'));
+    temperamentBlock.extraWidth = 20;
+    temperamentBlock.adjustWidthToLabel();
+    temperamentBlock.stackClampOneArgBlock();
+
     // macro
     var newblock = new ProtoBlock('timbre');
     newblock.palette = palettes.dict['widgets'];

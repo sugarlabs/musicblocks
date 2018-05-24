@@ -135,6 +135,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         'widgets/pitchdrummatrix',
         'widgets/rhythmruler',
         'widgets/pitchstaircase',
+        'widgets/temperament',
         'widgets/tempo',
         'widgets/pitchslider',
         'widgets/timbre',
@@ -1255,6 +1256,7 @@ define(MYDEFINES, function (compatibility) {
                         storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                         storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
                         storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
+                        storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                         storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
                         if (docById('ptmDiv').style.visibility !== 'hidden') {
@@ -1285,6 +1287,12 @@ define(MYDEFINES, function (compatibility) {
                             docById('timbreDiv').style.visibility = 'hidden';
                             docById('timbreTableDiv').style.visibility = 'hidden';
                             docById('timbreButtonsDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('temperamentDiv').style.visibility !== 'hidden') {
+                            docById('temperamentDiv').style.visibility = 'hidden';
+                            docById('temperamentTableDiv').style.visibility = 'hidden';
+                            docById('temperamentButtonsDiv').style.visibility = 'hidden';
                         }
 
                         if (docById('statusDiv').style.visibility !== 'hidden') {
@@ -1341,6 +1349,9 @@ define(MYDEFINES, function (compatibility) {
                         docById('timbreDiv').style.visibility = storage.getItem('isTimbreHidden');
                         docById('timbreButtonsDiv').style.visibility = storage.getItem('isTimbreHidden');
                         docById('timbreTableDiv').style.visibility = storage.getItem('isTimbreHidden');
+                        docById('temperamentDiv').style.visibility = storage.getItem('isTemperamentHidden');
+                        docById('temperamentButtonsDiv').style.visibility = storage.getItem('isTemperamentHidden');
+                        docById('temperamentTableDiv').style.visibility = storage.getItem('isTemperamentHidden');
                         docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
                         docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
                         docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
