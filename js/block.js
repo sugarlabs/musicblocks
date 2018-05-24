@@ -2058,6 +2058,7 @@ function Block(protoblock, blocks, overrideName) {
             accidentalLabels.push(null);
         }
         this.wheel2.createWheel(accidentalLabels);
+        this.wheel2.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
 
         var that = this;
 
