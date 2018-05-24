@@ -3337,6 +3337,14 @@ function Logo () {
             }
 
             that.insideTemperament = true;
+            that.temperament.inTemperament = args[0];
+
+            if (that.blocks.blockList[that.blocks.blockList[blk].connections[2]].name === 'pitch') {
+                var pitchBlock = that.blocks.blockList[that.blocks.blockList[blk].connections[2]];
+                var note = that.blocks.blockList[pitchBlock.connections[1]].value;
+                var octave = that.blocks.blockList[pitchBlock.connections[2]].value;
+                that.synth.startingPitch = note + octave;
+            }
 
             var listenerName = '_temperament_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
