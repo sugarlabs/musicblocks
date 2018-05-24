@@ -1633,6 +1633,9 @@ function Block(protoblock, blocks, overrideName) {
             var selectednote = obj[0];
             var selectedattr = obj[1];
 
+            this._piemenu(selectednote, selectedattr);
+
+            /*
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
@@ -1662,6 +1665,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             labelHTML += '</select>';
+            */
             labelElem.innerHTML = labelHTML;
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
@@ -2084,6 +2088,158 @@ function Block(protoblock, blocks, overrideName) {
         }, 100);
     };
 
+    this._piemenu = function (note, accidental) {
+        console.log(note, accidental);
+	// wheelnav pie menu for pitch selection
+        // the pitch selector
+	this.wheel1 = new wheelnav('wheelDiv', null, 600, 600);
+        // the accidental selector
+	this.wheel2 = new wheelnav('wheel2', this.wheel1.raphael);
+	// exit button
+	this.wheel3 = new wheelnav('wheel3', this.wheel1.raphael);
+
+	wheelnav.cssMode = true;
+
+	this.wheel1.keynavigateEnabled = true;
+
+	this.wheel1.colors = new Array('#E34C26', 'darkorange', '#F06529', 'darkorange');
+	this.wheel1.slicePathFunction = slicePath().DonutSlice;
+	this.wheel1.slicePathCustom = slicePath().DonutSliceCustomization();
+	this.wheel1.slicePathCustom.minRadiusPercent = 0.3;
+	this.wheel1.slicePathCustom.maxRadiusPercent = 0.6;
+	this.wheel1.sliceSelectedPathCustom = this.wheel1.slicePathCustom;
+	this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
+	this.wheel1.createWheel(['do', 're', 'mi', 'fa', 'sol', 'la', 'ti']);
+
+        this.wheel3.colors = new Array('#808080');
+	this.wheel3.slicePathFunction = slicePath().DonutSlice;
+	this.wheel3.slicePathCustom = slicePath().DonutSliceCustomization();
+	this.wheel3.slicePathCustom.minRadiusPercent = 0.0;
+	this.wheel3.slicePathCustom.maxRadiusPercent = 0.29;
+	this.wheel3.sliceSelectedPathCustom = this.wheel3.slicePathCustom;
+	this.wheel3.sliceInitPathCustom = this.wheel3.slicePathCustom;
+	this.wheel3.createWheel([' x', null, null, null, null, null, null]);
+
+	this.wheel2.colors = new Array('#E34C26', 'darkorange', '#F06529', 'darkorange');
+	this.wheel2.slicePathFunction = slicePath().DonutSlice;
+	this.wheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+	this.wheel2.slicePathCustom.minRadiusPercent = 0.61;
+	this.wheel2.slicePathCustom.maxRadiusPercent = 0.9;
+	this.wheel2.sliceSelectedPathCustom = this.wheel2.slicePathCustom;
+	this.wheel2.sliceInitPathCustom = this.wheel2.slicePathCustom;
+
+	//Disable rotation, set navAngle and create the menus
+	this.wheel2.clickModeRotate = false;
+	this.wheel2.navAngle = -(360 / 14) * 2;
+	this.wheel2.createWheel([DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP, null, null, null, null, null, null, null, null, null]);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+	    console.log(that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title);
+	    console.log(that.wheel2.navItems[that.wheel2.selectedNavItemIndex].title);
+
+            var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
+            var attr = that.wheel2.navItems[that.wheel2.selectedNavItemIndex].title;
+
+            if (attr !== '♮') {
+                label += attr;
+            }
+
+            console.log(label);
+            that.value = label;
+            that.text.text = label;
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+	};
+
+	// hide the widget when the exit button is clicked
+        // FIXME: or just hide the div?
+	this.wheel3.navItems[0].navigateFunction = function () {
+	    that.wheel1.navItems[0].navItem.hide();
+	    that.wheel1.navItems[1].navItem.hide();
+	    that.wheel1.navItems[2].navItem.hide();
+	    that.wheel1.navItems[3].navItem.hide();
+	    that.wheel1.navItems[4].navItem.hide();
+	    that.wheel1.navItems[5].navItem.hide();
+	    that.wheel1.navItems[6].navItem.hide();
+	    that.wheel2.navItems[0].navItem.hide();
+	    that.wheel2.navItems[1].navItem.hide();
+	    that.wheel2.navItems[2].navItem.hide();
+	    that.wheel2.navItems[3].navItem.hide();
+	    that.wheel2.navItems[4].navItem.hide();
+	    that.wheel3.navItems[0].navItem.hide();
+            __selectionChanged();
+	};
+
+        // position widget
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+	docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+	
+        // navigate to a specific starting point
+        switch(note) {
+        case 'do':
+            this.wheel1.navigateWheel(0);
+	    break;
+        case 're':
+            this.wheel1.navigateWheel(1);
+	    break;
+        case 'mi':
+            this.wheel1.navigateWheel(2);
+	    break;
+        case 'fa':
+            this.wheel1.navigateWheel(3);
+	    break;
+        case 'sol':
+            this.wheel1.navigateWheel(4);
+	    break;
+        case 'la':
+            this.wheel1.navigateWheel(5);
+	    break;
+        case 'ti':
+            this.wheel1.navigateWheel(6);
+	    break;
+        default:
+            this.wheel1.navigateWheel(4);
+	    break;
+        }
+
+        if (accidental === '') {
+	    this.wheel2.navigateWheel(2);
+	} else {
+            switch(accidental) {
+            case DOUBLEFLAT:
+		this.wheel2.navigateWheel(0);
+		break;
+            case FLAT:
+		this.wheel2.navigateWheel(1);
+		break;
+            case NATURAL:
+		this.wheel2.navigateWheel(2);
+		break;
+            case SHARP:
+		this.wheel2.navigateWheel(3);
+		break;
+            case DOUBLESHARP:
+		this.wheel2.navigateWheel(4);
+		break;
+            default:
+		this.wheel2.navigateWheel(2);
+		break;
+            }
+	}
+    };
+
     this._labelChanged = function () {
         // Update the block values as they change in the DOM label.
         if (this == null || this.label == null) {
@@ -2316,7 +2472,7 @@ function $() {
         elements.push(element);
     }
     return elements;
-}
+};
 
 
 window.hasMouse = false;
