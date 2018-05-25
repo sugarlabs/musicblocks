@@ -690,7 +690,7 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
-        if (instruments[turtle][sourceName] == null) {
+        if (instruments[turtle][sourceName] === null) {
             console.log('loading ' + sourceName);
             this.createSynth(turtle, sourceName, sourceName, null);
         }

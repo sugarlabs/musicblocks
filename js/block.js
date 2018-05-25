@@ -2002,6 +2002,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelnav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
 
+        this.launchingPieMenu = true;
         // the pitch selector
         this.wheel1 = new wheelnav('wheelDiv', null, 600, 600);
         // the accidental selector
@@ -2061,9 +2062,7 @@ function Block(protoblock, blocks, overrideName) {
             var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
             that.value = noteValues[i];
-
             var attr = that.wheel2.navItems[that.wheel2.selectedNavItemIndex].title;
-
             if (attr !== '♮') {
                 label += attr;
                 that.value += attr;
@@ -2077,7 +2076,53 @@ function Block(protoblock, blocks, overrideName) {
             that.updateCache();
         };
 
-        // hide the widget when the exit button is clicked
+        var __launchingPieMenu = function () {
+            return that.launchingPieMenu;
+        }
+
+        var __pitchPreview = function () {
+            if (__launchingPieMenu()) {
+                return;
+            }
+
+            var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            var note = noteValues[i];
+            var attr = that.wheel2.navItems[that.wheel2.selectedNavItemIndex].title;
+            if (attr !== '♮') {
+                note += attr;
+            }
+
+            // FIX ME: get octave from pitch block if available
+            // FIX ME: get key signature if available
+            // FIX ME: get moveable if available
+            // FIX ME: set voice if available
+	    var obj = getNote(note, 4, 0, 'C major', false, null, that.blocks.errorMsg);
+            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+		}
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+	}
+
+        // set up handlers for pitch preview
+        for (var i = 0; i < noteValues.length; i++) {
+	    this.wheel1.navItems[i].navigateFunction = __pitchPreview;
+	}
+
+        for (var i = 0; i < accidentals.length; i++) {
+	    this.wheel2.navItems[i].navigateFunction = __pitchPreview;
+	}
+
+        // hide the widget when the exit button is clicke
         this.wheel3.navItems[0].navigateFunction = function () {
             docById('wheelDiv').style.display = 'none';
             __selectionChanged();
@@ -2126,6 +2171,8 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
+
+	this.launchingPieMenu = false;
     };
 
     this._piemenuVoices = function (voiceLabels, voiceValues, voice) {
