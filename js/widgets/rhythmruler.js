@@ -17,30 +17,37 @@
 // rulerButtonsDiv is for the widget buttons
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
-function gcd(max,min){
-    rem = max%min;
-    max=min; 
-    min=rem;
-    if(rem === 0) {
-        return max;
-    } 
-    else {
-        return  gcd(max,min);
+
+function GCD (a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+
+    while(b) {
+        var n = b;
+        b = a % b;
+        a = n;
     }
-}
 
-//This function computes the LCM
-function lcm(a,b){
-    return (a*b)/gcd(a,b)
-}
+    return a;
+};
 
-//This function is the Iterator, it computes the LCM for the numbers
+//This function computes the LCD
+function LCD (a, b) {
+    return Math.abs((a * b) / GCD(a, b));
+};
+
+//This function is the Iterator, it computes the LCD for the numbers
 //in the INPUT array recursively by calling the previous function
 function lcmIter(arr,len){
+    //LENGTH of array -> 2 is the base case here, if there are only  
+    //two numbers just compute its LCD and return it.
     if(len === 2){
-        return lcm(arr[0],arr[1])
-    } else {
-        return lcm(arr[len-1],lcmIter(arr,len-1))
+        return LCD(arr[0],arr[1])
+    }
+    //If there are more than two numbers, compute the LCD of last 
+    //number with the rest of array(now the array is one less)
+    else{
+        return LCD(arr[len-1],lcmIter(arr,len-1))
     }
 }
 
@@ -1161,12 +1168,20 @@ function RhythmRuler () {
         }, 500);
     };
 
+
+
+
+
     this._meterSize = function() {
     	console.log( this.Rulers[this._rulerSelected][0] );
 		var array1 = this.Rulers[this._rulerSelected][0];
-		console.log(lcmIter(array1, array1.length)); 
+		console.log(lcmIter(array1, array1.length))    	
     
     };
+
+
+
+
 
     this.init = function (logo) {
         console.log('init RhythmRuler');
