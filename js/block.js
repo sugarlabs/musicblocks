@@ -1554,7 +1554,7 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (['notename', 'solfege', 'eastindiansolfege'].indexOf(this.name) === -1) {
+                if (['notename', 'solfege', 'eastindiansolfege', 'drumname'].indexOf(this.name) === -1) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
@@ -1634,7 +1634,7 @@ function Block(protoblock, blocks, overrideName) {
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
 
-            this._piemenu(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             // FIX ME: We need to keep the DOM elements around to
             // prevent the block from being dragged while the pie menu
             // is active.
@@ -1646,7 +1646,7 @@ function Block(protoblock, blocks, overrideName) {
             var selectednote = obj[0];
             var selectedattr = obj[1];
 
-            this._piemenu(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
 
             labelElem.innerHTML = '';
             this.label = docById('solfegeLabel');
@@ -1672,7 +1672,7 @@ function Block(protoblock, blocks, overrideName) {
                 selectedattr = '♮';
             }
 
-            this._piemenu(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
+            this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
 
             labelElem.innerHTML = '';
             this.label = docById('notenameLabel');
@@ -1779,24 +1779,20 @@ function Block(protoblock, blocks, overrideName) {
                 var selecteddrum = getDrumName(DEFAULTDRUM);
             }
 
-            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
+            var drumLabels = [];
+            var drumValues = [];            
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                if (DRUMNAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + DRUMNAMES[i][1] + '">' + DRUMNAMES[i][1] + '</option>';
-                } else if (selecteddrum === DRUMNAMES[i][0]) {
-                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
-                } else if (selecteddrum === DRUMNAMES[i][1]) {
-                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
+                if (getTextWidth(DRUMNAMES[i][0], 'bold 48pt Sans') > 350) {
+                    drumLabels.push(DRUMNAMES[i][0].substr(0, 7) + '...');
                 } else {
-                    labelHTML += '<option value="' + DRUMNAMES[i][0] + '">' + DRUMNAMES[i][0] + '</option>';
+                    drumLabels.push(DRUMNAMES[i][0]);
                 }
-            }
+                drumValues.push(DRUMNAMES[i][1]);
+	    }
 
-            labelHTML += '</select>';
+            this._piemenuVoices(drumLabels, drumValues, selecteddrum);
             labelElem.innerHTML = labelHTML;
             this.label = docById('drumnameLabel');
-            selectorWidth = 150;
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
                 var selectedtype = getFilterTypes(this.value);
@@ -2003,7 +1999,7 @@ function Block(protoblock, blocks, overrideName) {
         }, 100);
     };
 
-    this._piemenu = function (noteLabels, noteValues, accidentals, note, accidental) {
+    this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
         // wheelnav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
 
@@ -2131,6 +2127,92 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
+    };
+
+    this._piemenuVoices = function (voiceLabels, voiceValues, voice) {
+        // wheelnav pie menu for voice selection
+        docById('wheelDiv').style.display = '';
+
+        // the voice selector
+        this.wheel1 = new wheelnav('wheelDiv', null, 800, 800);
+        // exit button
+        this.wheel2 = new wheelnav('wheel2', this.wheel1.raphael);
+
+        wheelnav.cssMode = true;
+
+        this.wheel1.keynavigateEnabled = true;
+
+        this.wheel1.colors = new Array('#E34C26', 'darkorange', '#F06529', 'darkorange');
+        this.wheel1.slicePathFunction = slicePath().DonutSlice;
+        this.wheel1.slicePathCustom = slicePath().DonutSliceCustomization();
+        this.wheel1.slicePathCustom.minRadiusPercent = 0.3;
+        this.wheel1.slicePathCustom.maxRadiusPercent = 1;
+        this.wheel1.sliceSelectedPathCustom = this.wheel1.slicePathCustom;
+        this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
+        this.wheel1.titleRotateAngle = 0;
+        this.wheel1.createWheel(voiceLabels);
+
+        var colors = ['#808080'];
+        var labels = [' x'];
+        for (var i = 1; i < 4; i++) {
+            colors.push('#c0c0c0');
+            labels.push(' ');
+	}
+
+        this.wheel2.colors = colors;
+
+        this.wheel2.slicePathFunction = slicePath().DonutSlice;
+        this.wheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+        this.wheel2.slicePathCustom.minRadiusPercent = 0.0;
+        this.wheel2.slicePathCustom.maxRadiusPercent = 0.3;
+        this.wheel2.sliceSelectedPathCustom = this.wheel2.slicePathCustom;
+        this.wheel2.sliceInitPathCustom = this.wheel2.slicePathCustom;
+        this.wheel2.clickModeRotate = false;
+        this.wheel2.createWheel(labels);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
+            var i = voiceLabels.indexOf(label);
+            that.value = voiceValues[i];
+
+            that.text.text = label;
+
+            if (that.name === 'drumname') {
+                that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+	    }
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        // hide the widget when the exit button is clicked
+        this.wheel2.navItems[0].navigateFunction = function () {
+            docById('wheelDiv').style.display = 'none';
+            __selectionChanged();
+        };
+
+        // position widget
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
+        
+        // navigate to a specific starting point
+        var i = voiceValues.indexOf(voice);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this.wheel1.navigateWheel(i);
     };
 
     this._labelChanged = function () {
@@ -2328,7 +2410,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'playdrum':
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     if (newValue.slice(0, 4) === 'http') {
-                        this.blocks.logo.synth.loadSynth(newValue);
+                        this.blocks.logo.synth.loadSynth(0, newValue);
                     }
                 }
                 break;
@@ -2343,9 +2425,9 @@ function Block(protoblock, blocks, overrideName) {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the synth for the selected drum.
             if (this.name === 'drumname') {
-                this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
+                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === 'voicename') {
-                this.blocks.logo.synth.loadSynth(getVoiceSynthName(this.value));
+                this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
             }
         }
     };
