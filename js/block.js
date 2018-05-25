@@ -2001,49 +2001,44 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
         // wheelNav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
-
-        this.launchingPieMenu = true;
+        this._launchingPieMenu = true;
         // the pitch selector
-        this.pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
+        this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
         // the accidental selector
-        this.accidentalsWheel = new wheelnav('accidentalsWheel', this.pitchWheel.raphael);
+        this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
         // exit button
-        this.exitWheel = new wheelnav('exitWheel', this.pitchWheel.raphael);
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
 
         wheelnav.cssMode = true;
 
-        this.pitchWheel.keynavigateEnabled = true;
+        this._pitchWheel.keynavigateEnabled = true;
 
-        this.pitchWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55');
-        this.pitchWheel.slicePathFunction = slicePath().DonutSlice;
-        this.pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this.pitchWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        this.pitchWheel.sliceSelectedPathCustom = this.pitchWheel.slicePathCustom;
-        this.pitchWheel.sliceInitPathCustom = this.pitchWheel.slicePathCustom;
-        this.pitchWheel.createWheel(noteLabels);
+        this._pitchWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55');
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.createWheel(noteLabels);
 
-        this.exitWheel.colors = new Array('#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0');
-        this.exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this.exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this.exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
-        this.exitWheel.sliceSelectedPathCustom = this.exitWheel.slicePathCustom;
-        this.exitWheel.sliceInitPathCustom = this.exitWheel.slicePathCustom;
-        this.exitWheel.clickModeRotate = false;
-        this.exitWheel.createWheel([' x', ' ', ' ', ' ', ' ', ' ', ' ']);
+        this._exitWheel.colors = new Array('#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0');
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel([' x', ' ', ' ', ' ', ' ', ' ', ' ']);
 
-        this.accidentalsWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428');
-        this.accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
-        this.accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.accidentalsWheel.slicePathCustom.minRadiusPercent = 0.61;
-        this.accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.9;
-        this.accidentalsWheel.sliceSelectedPathCustom = this.accidentalsWheel.slicePathCustom;
-        this.accidentalsWheel.sliceInitPathCustom = this.accidentalsWheel.slicePathCustom;
-
-        // Disable rotation and set navAngle to align accidentals.
-        this.accidentalsWheel.clickModeRotate = false;
-        this.accidentalsWheel.navAngle = -(360 / 14) * 2;
+        this._accidentalsWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428');
+        this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
+        this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.61;
+        this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
+        this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
 
         var accidentalLabels = [];
         for (var i = 0; i < accidentals.length; i++) {
@@ -2053,16 +2048,16 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < 9; i++) {
             accidentalLabels.push(null);
         }
-        this.accidentalsWheel.createWheel(accidentalLabels);
-        this.accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
+        this._accidentalsWheel.createWheel(accidentalLabels);
+        this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
 
         var that = this;
 
         var __selectionChanged = function () {
-            var label = that.pitchWheel.navItems[that.pitchWheel.selectedNavItemIndex].title;
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
             that.value = noteValues[i];
-            var attr = that.accidentalsWheel.navItems[that.accidentalsWheel.selectedNavItemIndex].title;
+            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
             if (attr !== '♮') {
                 label += attr;
                 that.value += attr;
@@ -2077,7 +2072,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __launchingPieMenu = function () {
-            return that.launchingPieMenu;
+            return that._launchingPieMenu;
         };
 
         var __pitchPreview = function () {
@@ -2085,10 +2080,10 @@ function Block(protoblock, blocks, overrideName) {
                 return;
             }
 
-            var label = that.pitchWheel.navItems[that.pitchWheel.selectedNavItemIndex].title;
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
             var note = noteValues[i];
-            var attr = that.accidentalsWheel.navItems[that.accidentalsWheel.selectedNavItemIndex].title;
+            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
             if (attr !== '♮') {
                 note += attr;
             }
@@ -2115,15 +2110,15 @@ function Block(protoblock, blocks, overrideName) {
 
         // Set up handlers for pitch preview.
         for (var i = 0; i < noteValues.length; i++) {
-            this.pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
         }
 
         for (var i = 0; i < accidentals.length; i++) {
-            this.accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+            this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
         }
 
         // Hide the widget when the exit button is clicked.
-        this.exitWheel.navItems[0].navigateFunction = function () {
+        this._exitWheel.navItems[0].navigateFunction = function () {
             docById('wheelDiv').style.display = 'none';
             __selectionChanged();
         };
@@ -2145,59 +2140,59 @@ function Block(protoblock, blocks, overrideName) {
             i = 4;
         }
 
-        this.pitchWheel.navigateWheel(i);
+        this._pitchWheel.navigateWheel(i);
 
         // Navigate to a the current accidental value.
         if (accidental === '') {
-            this.accidentalsWheel.navigateWheel(2);
+            this._accidentalsWheel.navigateWheel(2);
         } else {
             switch(accidental) {
             case DOUBLEFLAT:
-                this.accidentalsWheel.navigateWheel(4);
+                this._accidentalsWheel.navigateWheel(4);
                 break;
             case FLAT:
-                this.accidentalsWheel.navigateWheel(3);
+                this._accidentalsWheel.navigateWheel(3);
                 break;
             case NATURAL:
-                this.accidentalsWheel.navigateWheel(2);
+                this._accidentalsWheel.navigateWheel(2);
                 break;
             case SHARP:
-                this.accidentalsWheel.navigateWheel(1);
+                this._accidentalsWheel.navigateWheel(1);
                 break;
             case DOUBLESHARP:
-                this.accidentalsWheel.navigateWheel(0);
+                this._accidentalsWheel.navigateWheel(0);
                 break;
             default:
-                this.accidentalsWheel.navigateWheel(2);
+                this._accidentalsWheel.navigateWheel(2);
                 break;
             }
         }
 
-        this.launchingPieMenu = false;
+        this._launchingPieMenu = false;
     };
 
     this._piemenuVoices = function (voiceLabels, voiceValues, voice) {
-        // wheelnav pie menu for voice selection
+        // wheelNav pie menu for voice selection
         docById('wheelDiv').style.display = '';
-
+        this._launchingPieMenu = true;
         // the voice selector
-        this.wheel1 = new wheelnav('wheelDiv', null, 800, 800);
+        this._voiceWheel = new wheelnav('wheelDiv', null, 800, 800);
         // exit button
-        this.wheel2 = new wheelnav('wheel2', this.wheel1.raphael);
+        this._exitWheel = new wheelnav('_exitWheel', this._voiceWheel.raphael);
 
         wheelnav.cssMode = true;
 
-        this.wheel1.keynavigateEnabled = true;
+        this._voiceWheel.keynavigateEnabled = true;
 
-        this.wheel1.colors = new Array('#3ea4a3', '#60bfbc', '#3ea4a3', '#1d8989');
-        this.wheel1.slicePathFunction = slicePath().DonutSlice;
-        this.wheel1.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.wheel1.slicePathCustom.minRadiusPercent = 0.3;
-        this.wheel1.slicePathCustom.maxRadiusPercent = 1;
-        this.wheel1.sliceSelectedPathCustom = this.wheel1.slicePathCustom;
-        this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
-        this.wheel1.titleRotateAngle = 0;
-        this.wheel1.createWheel(voiceLabels);
+        this._voiceWheel.colors = new Array('#3ea4a3', '#60bfbc', '#3ea4a3', '#1d8989');
+        this._voiceWheel.slicePathFunction = slicePath().DonutSlice;
+        this._voiceWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._voiceWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._voiceWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._voiceWheel.sliceSelectedPathCustom = this._voiceWheel.slicePathCustom;
+        this._voiceWheel.sliceInitPathCustom = this._voiceWheel.slicePathCustom;
+        this._voiceWheel.titleRotateAngle = 0;
+        this._voiceWheel.createWheel(voiceLabels);
 
         var colors = ['#808080'];
         var labels = [' x'];
@@ -2206,21 +2201,21 @@ function Block(protoblock, blocks, overrideName) {
             labels.push(' ');
         }
 
-        this.wheel2.colors = colors;
+        this._exitWheel.colors = colors;
 
-        this.wheel2.slicePathFunction = slicePath().DonutSlice;
-        this.wheel2.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.wheel2.slicePathCustom.minRadiusPercent = 0.0;
-        this.wheel2.slicePathCustom.maxRadiusPercent = 0.3;
-        this.wheel2.sliceSelectedPathCustom = this.wheel2.slicePathCustom;
-        this.wheel2.sliceInitPathCustom = this.wheel2.slicePathCustom;
-        this.wheel2.clickModeRotate = false;
-        this.wheel2.createWheel(labels);
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(labels);
 
         var that = this;
 
         var __selectionChanged = function () {
-            var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
+            var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
             that.value = voiceValues[i];
             that.text.text = label;
@@ -2233,10 +2228,44 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // hide the widget when the exit button is clicked
-        this.wheel2.navItems[0].navigateFunction = function () {
+        this._exitWheel.navItems[0].navigateFunction = function () {
             docById('wheelDiv').style.display = 'none';
             __selectionChanged();
         };
+
+        var __launchingPieMenu = function () {
+            return that._launchingPieMenu;
+        };
+
+        var __voicePreview = function () {
+            if (__launchingPieMenu()) {
+                return;
+            }
+
+            var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
+            var i = voiceLabels.indexOf(label);
+            var voice = voiceValues[i];
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(voice) === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(voice);
+                if (voice === 'default') {
+                    that.blocks.logo.synth.createDefaultSynth(0);
+		}
+
+                that.blocks.logo.synth.loadSynth(0, voice);
+            }
+
+            that.blocks.logo.synth.trigger(0, ['G4'], 1 / 8, voice, null, null);
+        };
+
+        // Set up handlers for voice preview.
+        for (var i = 0; i < voiceValues.length; i++) {
+            // this._voiceWheel.navItems[i].navigateFunction = __voicePreview;
+        }
 
         // position widget
         var x = this.container.x;
@@ -2255,7 +2284,8 @@ function Block(protoblock, blocks, overrideName) {
             i = 0;
         }
 
-        this.wheel1.navigateWheel(i);
+        this._voiceWheel.navigateWheel(i);
+        this._launchingPieMenu = false;
     };
 
     this._labelChanged = function () {
