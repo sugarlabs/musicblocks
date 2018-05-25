@@ -19,6 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1554,7 +1555,7 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (['notename', 'solfege', 'eastindiansolfege', 'drumname'].indexOf(this.name) === -1) {
+                if (PIEMENUS.indexOf(this.name) === -1) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
@@ -1791,7 +1792,7 @@ function Block(protoblock, blocks, overrideName) {
 	    }
 
             this._piemenuVoices(drumLabels, drumValues, selecteddrum);
-            labelElem.innerHTML = labelHTML;
+            labelElem.innerHTML = '';
             this.label = docById('drumnameLabel');
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
@@ -1850,24 +1851,22 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedvoice = getVoiceName(DEFAULTVOICE);
             }
 
-            var labelHTML = '<select name="voicename" id="voicenameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
-            for (var i = 0; i < VOICENAMES.length; i++) {
-                if (VOICENAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + VOICENAMES[i][1] + '">' + VOICENAMES[i][1] + '</option>';
-                } else if (selectedvoice === VOICENAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedvoice + '" selected>' + selectedvoice + '</option>';
-                } else if (selectedvoice === VOICENAMES[i][1]) {
-                    labelHTML += '<option value="' + selectedvoice + '" selected>' + selectedvoice + '</option>';
-                } else {
-                    labelHTML += '<option value="' + VOICENAMES[i][0] + '">' + VOICENAMES[i][0] + '</option>';
-                }
-            }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
+            var voiceLabels = [];
+            var voiceValues = [];            
+            for (var i = 0; i < VOICENAMES.length; i++) {
+                if (getTextWidth(VOICENAMES[i][0], 'bold 48pt Sans') > 350) {
+                    voiceLabels.push(VOICENAMES[i][0].substr(0, 7) + '...');
+                } else {
+                    voiceLabels.push(VOICENAMES[i][0]);
+                }
+                voiceValues.push(VOICENAMES[i][1]);
+	    }
+
+            this._piemenuVoices(voiceLabels, voiceValues, selectedvoice);
+
+            labelElem.innerHTML = '';
             this.label = docById('voicenameLabel');
-            selectorWidth = 150;
         } else if (this.name === 'temperamentname') {
             if (this.value != null) {
                 var selectedTemperament = getTemperamentName(this.value);
@@ -2176,12 +2175,8 @@ function Block(protoblock, blocks, overrideName) {
             var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
             that.value = voiceValues[i];
-
             that.text.text = label;
-
-            if (that.name === 'drumname') {
-                that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
-	    }
+            that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
