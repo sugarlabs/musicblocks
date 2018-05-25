@@ -1789,7 +1789,7 @@ function Block(protoblock, blocks, overrideName) {
                     drumLabels.push(DRUMNAMES[i][0]);
                 }
                 drumValues.push(DRUMNAMES[i][1]);
-	    }
+            }
 
             this._piemenuVoices(drumLabels, drumValues, selecteddrum);
             labelElem.innerHTML = '';
@@ -1861,7 +1861,7 @@ function Block(protoblock, blocks, overrideName) {
                     voiceLabels.push(VOICENAMES[i][0]);
                 }
                 voiceValues.push(VOICENAMES[i][1]);
-	    }
+            }
 
             this._piemenuVoices(voiceLabels, voiceValues, selectedvoice);
 
@@ -1999,51 +1999,51 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
-        // wheelnav pie menu for pitch selection
+        // wheelNav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
 
         this.launchingPieMenu = true;
         // the pitch selector
-        this.wheel1 = new wheelnav('wheelDiv', null, 600, 600);
+        this.pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
         // the accidental selector
-        this.wheel2 = new wheelnav('wheel2', this.wheel1.raphael);
+        this.accidentalsWheel = new wheelnav('accidentalsWheel', this.pitchWheel.raphael);
         // exit button
-        this.wheel3 = new wheelnav('wheel3', this.wheel1.raphael);
+        this.exitWheel = new wheelnav('exitWheel', this.pitchWheel.raphael);
 
         wheelnav.cssMode = true;
 
-        this.wheel1.keynavigateEnabled = true;
+        this.pitchWheel.keynavigateEnabled = true;
 
-        this.wheel1.colors = new Array('#E34C26', 'darkorange', '#F06529', 'darkorange');
-        this.wheel1.slicePathFunction = slicePath().DonutSlice;
-        this.wheel1.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.wheel1.slicePathCustom.minRadiusPercent = 0.3;
-        this.wheel1.slicePathCustom.maxRadiusPercent = 0.6;
-        this.wheel1.sliceSelectedPathCustom = this.wheel1.slicePathCustom;
-        this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
-        this.wheel1.createWheel(noteLabels);
+        this.pitchWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55');
+        this.pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this.pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this.pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this.pitchWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this.pitchWheel.sliceSelectedPathCustom = this.pitchWheel.slicePathCustom;
+        this.pitchWheel.sliceInitPathCustom = this.pitchWheel.slicePathCustom;
+        this.pitchWheel.createWheel(noteLabels);
 
-        this.wheel3.colors = new Array('#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0');
-        this.wheel3.slicePathFunction = slicePath().DonutSlice;
-        this.wheel3.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.wheel3.slicePathCustom.minRadiusPercent = 0.0;
-        this.wheel3.slicePathCustom.maxRadiusPercent = 0.3;
-        this.wheel3.sliceSelectedPathCustom = this.wheel3.slicePathCustom;
-        this.wheel3.sliceInitPathCustom = this.wheel3.slicePathCustom;
-        this.wheel3.clickModeRotate = false;
-        this.wheel3.createWheel([' x', ' ', ' ', ' ', ' ', ' ', ' ']);
+        this.exitWheel.colors = new Array('#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0');
+        this.exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this.exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this.exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this.exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this.exitWheel.sliceSelectedPathCustom = this.exitWheel.slicePathCustom;
+        this.exitWheel.sliceInitPathCustom = this.exitWheel.slicePathCustom;
+        this.exitWheel.clickModeRotate = false;
+        this.exitWheel.createWheel([' x', ' ', ' ', ' ', ' ', ' ', ' ']);
 
-        this.wheel2.colors = new Array('#E34C26', 'darkorange', '#F06529', 'darkorange');
-        this.wheel2.slicePathFunction = slicePath().DonutSlice;
-        this.wheel2.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.wheel2.slicePathCustom.minRadiusPercent = 0.61;
-        this.wheel2.slicePathCustom.maxRadiusPercent = 0.9;
-        this.wheel2.sliceSelectedPathCustom = this.wheel2.slicePathCustom;
-        this.wheel2.sliceInitPathCustom = this.wheel2.slicePathCustom;
+        this.accidentalsWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428');
+        this.accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
+        this.accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this.accidentalsWheel.slicePathCustom.minRadiusPercent = 0.61;
+        this.accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        this.accidentalsWheel.sliceSelectedPathCustom = this.accidentalsWheel.slicePathCustom;
+        this.accidentalsWheel.sliceInitPathCustom = this.accidentalsWheel.slicePathCustom;
 
-        //Disable rotation, set navAngle and create the menus
-        this.wheel2.clickModeRotate = false;
-        this.wheel2.navAngle = -(360 / 14) * 2;
+        // Disable rotation and set navAngle to align accidentals.
+        this.accidentalsWheel.clickModeRotate = false;
+        this.accidentalsWheel.navAngle = -(360 / 14) * 2;
 
         var accidentalLabels = [];
         for (var i = 0; i < accidentals.length; i++) {
@@ -2053,16 +2053,16 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < 9; i++) {
             accidentalLabels.push(null);
         }
-        this.wheel2.createWheel(accidentalLabels);
-        this.wheel2.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
+        this.accidentalsWheel.createWheel(accidentalLabels);
+        this.accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
 
         var that = this;
 
         var __selectionChanged = function () {
-            var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
+            var label = that.pitchWheel.navItems[that.pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
             that.value = noteValues[i];
-            var attr = that.wheel2.navItems[that.wheel2.selectedNavItemIndex].title;
+            var attr = that.accidentalsWheel.navItems[that.accidentalsWheel.selectedNavItemIndex].title;
             if (attr !== '♮') {
                 label += attr;
                 that.value += attr;
@@ -2078,17 +2078,17 @@ function Block(protoblock, blocks, overrideName) {
 
         var __launchingPieMenu = function () {
             return that.launchingPieMenu;
-        }
+        };
 
         var __pitchPreview = function () {
             if (__launchingPieMenu()) {
                 return;
             }
 
-            var label = that.wheel1.navItems[that.wheel1.selectedNavItemIndex].title;
+            var label = that.pitchWheel.navItems[that.pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
             var note = noteValues[i];
-            var attr = that.wheel2.navItems[that.wheel2.selectedNavItemIndex].title;
+            var attr = that.accidentalsWheel.navItems[that.accidentalsWheel.selectedNavItemIndex].title;
             if (attr !== '♮') {
                 note += attr;
             }
@@ -2097,13 +2097,13 @@ function Block(protoblock, blocks, overrideName) {
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
             // FIX ME: set voice if available
-	    var obj = getNote(note, 4, 0, 'C major', false, null, that.blocks.errorMsg);
+            var obj = getNote(note, 4, 0, 'C major', false, null, that.blocks.errorMsg);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
 
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
-		}
+                }
 
                 that.blocks.logo.instrumentNames[0].push('default');
                 that.blocks.logo.synth.createDefaultSynth(0);
@@ -2111,24 +2111,24 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
-	}
+        };
 
-        // set up handlers for pitch preview
+        // Set up handlers for pitch preview.
         for (var i = 0; i < noteValues.length; i++) {
-	    this.wheel1.navItems[i].navigateFunction = __pitchPreview;
-	}
+            this.pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
 
         for (var i = 0; i < accidentals.length; i++) {
-	    this.wheel2.navItems[i].navigateFunction = __pitchPreview;
-	}
+            this.accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
 
-        // hide the widget when the exit button is clicke
-        this.wheel3.navItems[0].navigateFunction = function () {
+        // Hide the widget when the exit button is clicked.
+        this.exitWheel.navItems[0].navigateFunction = function () {
             docById('wheelDiv').style.display = 'none';
             __selectionChanged();
         };
 
-        // position widget
+        // Position the widget over the note block.
         var x = this.container.x;
         var y = this.container.y;
 
@@ -2139,40 +2139,41 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
         
-        // navigate to a specific starting point
+        // Navigate to a the current note value.
         var i = noteValues.indexOf(note);
         if (i === -1) {
             i = 4;
         }
 
-        this.wheel1.navigateWheel(i);
+        this.pitchWheel.navigateWheel(i);
 
+        // Navigate to a the current accidental value.
         if (accidental === '') {
-            this.wheel2.navigateWheel(2);
+            this.accidentalsWheel.navigateWheel(2);
         } else {
             switch(accidental) {
             case DOUBLEFLAT:
-                this.wheel2.navigateWheel(4);
+                this.accidentalsWheel.navigateWheel(4);
                 break;
             case FLAT:
-                this.wheel2.navigateWheel(3);
+                this.accidentalsWheel.navigateWheel(3);
                 break;
             case NATURAL:
-                this.wheel2.navigateWheel(2);
+                this.accidentalsWheel.navigateWheel(2);
                 break;
             case SHARP:
-                this.wheel2.navigateWheel(1);
+                this.accidentalsWheel.navigateWheel(1);
                 break;
             case DOUBLESHARP:
-                this.wheel2.navigateWheel(0);
+                this.accidentalsWheel.navigateWheel(0);
                 break;
             default:
-                this.wheel2.navigateWheel(2);
+                this.accidentalsWheel.navigateWheel(2);
                 break;
             }
         }
 
-	this.launchingPieMenu = false;
+        this.launchingPieMenu = false;
     };
 
     this._piemenuVoices = function (voiceLabels, voiceValues, voice) {
@@ -2188,7 +2189,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.wheel1.keynavigateEnabled = true;
 
-        this.wheel1.colors = new Array('#E34C26', 'darkorange', '#F06529', 'darkorange');
+        this.wheel1.colors = new Array('#3ea4a3', '#60bfbc', '#3ea4a3', '#1d8989');
         this.wheel1.slicePathFunction = slicePath().DonutSlice;
         this.wheel1.slicePathCustom = slicePath().DonutSliceCustomization();
         this.wheel1.slicePathCustom.minRadiusPercent = 0.3;
@@ -2203,7 +2204,7 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 1; i < 4; i++) {
             colors.push('#c0c0c0');
             labels.push(' ');
-	}
+        }
 
         this.wheel2.colors = colors;
 
