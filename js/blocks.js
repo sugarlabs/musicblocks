@@ -3009,6 +3009,39 @@ function Blocks () {
         }
     };
 
+    this.findPitchOctave = function (blk) {
+        // Returns octave associated with pitch block
+        if (this.blockList[blk].name === 'pitch') {
+            var oblk = this.blockList[blk].connections[2];
+            if (oblk === null) {
+                return 4;
+            } else if (this.blockList[oblk].name === 'number') {
+                return this.blockList[oblk].value;
+            } else {
+                return 4;
+            }
+        } else {
+            return 4;
+        }
+    };
+
+    this.setPitchOctave = function (blk, octave) {
+        // Set octave associated with pitch block
+        if (this.blockList[blk].name === 'pitch') {
+            var oblk = this.blockList[blk].connections[2];
+            if (oblk !== null && this.blockList[oblk].name === 'number') {
+                var thisBlock = this.blockList[oblk];
+                thisBlock.value = octave;
+                thisBlock.text.text = label;
+
+                // Make sure text is on top.
+                var z = thisBlock.container.children.length - 1;
+                thisBlock.container.setChildIndex(thisBlock.text, z);
+                thisBlock.container.updateCache();
+            }
+        }
+    };
+
     this.prepareStackForCopy = function () {
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.

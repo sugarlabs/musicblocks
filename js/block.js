@@ -2092,8 +2092,10 @@ function Block(protoblock, blocks, overrideName) {
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
             // FIX ME: set voice if available
-            var obj = getNote(note, 4, 0, 'C major', false, null, that.blocks.errorMsg);
+            // console.log(that._pitchOctave);
+            var obj = getNote(note, that._pitchOctave, 0, 'C major', false, null, that.blocks.errorMsg);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+            // console.log(obj[0] + ' ' + obj[1]);
 
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
@@ -2168,6 +2170,8 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
+        // Use the octave associated with this block, if available.
+        this._pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
         this._launchingPieMenu = false;
     };
 
@@ -2254,7 +2258,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.instrumentNames[0].push(voice);
                 if (voice === 'default') {
                     that.blocks.logo.synth.createDefaultSynth(0);
-		}
+                }
 
                 that.blocks.logo.synth.loadSynth(0, voice);
             }
