@@ -1795,7 +1795,7 @@ function Block(protoblock, blocks, overrideName) {
 
                 if (categoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
                     categoriesList.push(DRUMNAMES[i][4]);
-		}
+                }
 
                 categories.push(categoriesList.indexOf(DRUMNAMES[i][4]));
             }
@@ -1876,7 +1876,7 @@ function Block(protoblock, blocks, overrideName) {
 
                 if (categoriesList.indexOf(VOICENAMES[i][3]) === -1) {
                     categoriesList.push(VOICENAMES[i][3]);
-		}
+                }
 
                 categories.push(categoriesList.indexOf(VOICENAMES[i][3]));
             }
@@ -2019,6 +2019,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
         // wheelNav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
         this._launchingPieMenu = true;
         // the pitch selector
         this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
@@ -2127,9 +2128,9 @@ function Block(protoblock, blocks, overrideName) {
             var note = noteValues[i];
             var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
 
-	    if (label === ' ') {
+            if (label === ' ') {
                 return;
-	    } else if (attr !== '♮') {
+            } else if (attr !== '♮') {
                 note += attr;
             }
 
@@ -2234,10 +2235,11 @@ function Block(protoblock, blocks, overrideName) {
         var colors = [];
 
         for (var i = 0; i < voiceLabels.length; i++) {
-	    colors.push(COLORS[categories[i] % COLORS.length]);
-	}
+            colors.push(COLORS[categories[i] % COLORS.length]);
+        }
 
         docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
         this._launchingPieMenu = true;
         // the voice selector
         this._voiceWheel = new wheelnav('wheelDiv', null, 800, 800);
@@ -2314,14 +2316,14 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 that.blocks.logo.synth.loadSynth(0, voice);
-		// give the synth time to load
+                // give the synth time to load
                 var timeout = 500;
             }
 
             setTimeout(function () {
-		console.log(voice);
-		that.blocks.logo.synth.trigger(0, ['G4'], 1 / 4, voice, null, null);
-	    }, timeout);
+                console.log(voice);
+                that.blocks.logo.synth.trigger(0, ['G4'], 1 / 4, voice, null, null);
+            }, timeout);
         };
 
         // Set up handlers for voice preview.
