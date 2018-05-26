@@ -3010,7 +3010,10 @@ function Blocks () {
     };
 
     this.findPitchOctave = function (blk) {
-        // Returns octave associated with pitch block
+        // FIXME: Make this general to finding nth arg of a block with
+        // a default return value.
+
+        // Returns octave associated with pitch block.
         if (blk === null) {
             return 4;
         }
@@ -3030,6 +3033,8 @@ function Blocks () {
     };
 
     this.setPitchOctave = function (blk, octave) {
+        // FIXME: Make this general to setting nth arg of a block
+
         // Set octave associated with pitch block
         if (blk === null) {
             return;

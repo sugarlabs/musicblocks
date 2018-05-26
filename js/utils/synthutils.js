@@ -101,13 +101,13 @@ var DRUMNAMES = [
     //.TRANS: sound effect
     [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
     //.TRANS: animal sound effect
-    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'effect'],
+    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'effect'],
+    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'effect'],
+    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'effect'],
+    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
 ];
 
 var SOUNDSAMPLESDEFINES = [

@@ -1782,16 +1782,25 @@ function Block(protoblock, blocks, overrideName) {
 
             var drumLabels = [];
             var drumValues = [];            
+            var categories = [];
+            var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (getTextWidth(DRUMNAMES[i][0], 'bold 48pt Sans') > 350) {
                     drumLabels.push(DRUMNAMES[i][0].substr(0, 7) + '...');
                 } else {
                     drumLabels.push(DRUMNAMES[i][0]);
                 }
+
                 drumValues.push(DRUMNAMES[i][1]);
+
+                if (categoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                    categoriesList.push(DRUMNAMES[i][4]);
+		}
+
+                categories.push(categoriesList.indexOf(DRUMNAMES[i][4]));
             }
 
-            this._piemenuVoices(drumLabels, drumValues, selecteddrum);
+            this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
             labelElem.innerHTML = '';
             this.label = docById('drumnameLabel');
         } else if (this.name === 'filtertype') {
@@ -1854,16 +1863,25 @@ function Block(protoblock, blocks, overrideName) {
 
             var voiceLabels = [];
             var voiceValues = [];            
+            var categories = [];
+            var categoriesList = [];
             for (var i = 0; i < VOICENAMES.length; i++) {
                 if (getTextWidth(VOICENAMES[i][0], 'bold 48pt Sans') > 350) {
                     voiceLabels.push(VOICENAMES[i][0].substr(0, 7) + '...');
                 } else {
                     voiceLabels.push(VOICENAMES[i][0]);
                 }
+
                 voiceValues.push(VOICENAMES[i][1]);
+
+                if (categoriesList.indexOf(VOICENAMES[i][3]) === -1) {
+                    categoriesList.push(VOICENAMES[i][3]);
+		}
+
+                categories.push(categoriesList.indexOf(VOICENAMES[i][3]));
             }
 
-            this._piemenuVoices(voiceLabels, voiceValues, selectedvoice);
+            this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
 
             labelElem.innerHTML = '';
             this.label = docById('voicenameLabel');
@@ -2025,7 +2043,7 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.createWheel(noteLabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -2033,7 +2051,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(['x']);
+        this._exitWheel.createWheel(['x', ' ']);
 
         this._accidentalsWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428'];
         this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2210,8 +2228,15 @@ function Block(protoblock, blocks, overrideName) {
         this._launchingPieMenu = false;
     };
 
-    this._piemenuVoices = function (voiceLabels, voiceValues, voice) {
+    this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice) {
         // wheelNav pie menu for voice selection
+        const COLORS = ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'];
+        var colors = [];
+
+        for (var i = 0; i < voiceLabels.length; i++) {
+	    colors.push(COLORS[categories[i] % COLORS.length]);
+	}
+
         docById('wheelDiv').style.display = '';
         this._launchingPieMenu = true;
         // the voice selector
@@ -2223,7 +2248,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._voiceWheel.keynavigateEnabled = true;
 
-        this._voiceWheel.colors = new Array('#3ea4a3', '#60bfbc', '#3ea4a3', '#1d8989');
+        this._voiceWheel.colors = colors;
         this._voiceWheel.slicePathFunction = slicePath().DonutSlice;
         this._voiceWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._voiceWheel.slicePathCustom.minRadiusPercent = 0.3;
@@ -2233,15 +2258,7 @@ function Block(protoblock, blocks, overrideName) {
         this._voiceWheel.titleRotateAngle = 0;
         this._voiceWheel.createWheel(voiceLabels);
 
-        var colors = ['#808080'];
-        var labels = [' x'];
-        for (var i = 1; i < 4; i++) {
-            colors.push('#c0c0c0');
-            labels.push(' ');
-        }
-
-        this._exitWheel.colors = colors;
-
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -2249,7 +2266,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(labels);
+        this._exitWheel.createWheel(['x', ' ']);
 
         var that = this;
 
