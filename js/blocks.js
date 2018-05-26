@@ -3011,6 +3011,10 @@ function Blocks () {
 
     this.findPitchOctave = function (blk) {
         // Returns octave associated with pitch block
+        if (blk === null) {
+            return 4;
+        }
+
         if (this.blockList[blk].name === 'pitch') {
             var oblk = this.blockList[blk].connections[2];
             if (oblk === null) {
@@ -3027,6 +3031,10 @@ function Blocks () {
 
     this.setPitchOctave = function (blk, octave) {
         // Set octave associated with pitch block
+        if (blk === null) {
+            return;
+        }
+
         if (this.blockList[blk].name === 'pitch') {
             var oblk = this.blockList[blk].connections[2];
             if (oblk !== null && this.blockList[oblk].name === 'number') {
