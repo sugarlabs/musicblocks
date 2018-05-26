@@ -2133,6 +2133,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo._setSynthVolume(0, 'default', DEFAULTVOLUME);
+            console.log(obj[0] + obj[1]);
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
         };
 
@@ -2283,6 +2284,7 @@ function Block(protoblock, blocks, overrideName) {
             var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
             var voice = voiceValues[i];
+            var timeout = 0;
 
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(voice) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
@@ -2295,14 +2297,19 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 that.blocks.logo.synth.loadSynth(0, voice);
+		// give the synth time to load
+                var timeout = 500;
             }
 
-            that.blocks.logo.synth.trigger(0, ['G4'], 1 / 8, voice, null, null);
+            setTimeout(function () {
+		console.log(voice);
+		that.blocks.logo.synth.trigger(0, ['G4'], 1 / 4, voice, null, null);
+	    }, timeout);
         };
 
         // Set up handlers for voice preview.
         for (var i = 0; i < voiceValues.length; i++) {
-            // this._voiceWheel.navItems[i].navigateFunction = __voicePreview;
+            this._voiceWheel.navItems[i].navigateFunction = __voicePreview;
         }
 
         // position widget
