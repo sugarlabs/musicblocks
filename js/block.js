@@ -1936,84 +1936,67 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('numberLabel');
         }
 
-        var focused = false;
+        if (PIEMENUS.indexOf(this.name) === -1) {
+            var focused = false;
 
-        var __blur = function (event) {
-            // Not sure why the change in the input is not available
-            // immediately in FireFox. We need a workaround if hardware
-            // acceleration is enabled.
+            var __blur = function (event) {
+                // Not sure why the change in the input is not available
+                // immediately in FireFox. We need a workaround if hardware
+                // acceleration is enabled.
 
-            if (!focused) {
-                return;
+                if (!focused) {
+                    return;
+                }
+
+                that._labelChanged();
+
+                event.preventDefault();
+
+                labelElem.classList.remove('hasKeyboard');
+
+                window.scroll(0, 0);
+                that.label.removeEventListener('keypress', __keypress);
+
+                if (movedStage) {
+                    that.blocks.stage.y = fromY;
+                    that.blocks.updateStage();
+                }
+            };
+
+            if (this.name === 'text' || this.name === 'number') {
+                this.label.addEventListener('blur', __blur);
             }
 
-            that._labelChanged();
+            var __keypress = function (event) {
+                if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+                    __blur(event);
+                }
+            };
 
-            event.preventDefault();
+            this.label.addEventListener('keypress', __keypress);
 
-            labelElem.classList.remove('hasKeyboard');
-
-            window.scroll(0, 0);
-            that.label.removeEventListener('keypress', __keypress);
-
-            if (movedStage) {
-                that.blocks.stage.y = fromY;
-                that.blocks.updateStage();
-            }
-        };
-
-        if (this.name === 'text' || this.name === 'number') {
-            this.label.addEventListener('blur', __blur);
-        }
-
-        var __keypress = function (event) {
-            if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
-                __blur(event);
-            }
-        };
-
-        this.label.addEventListener('keypress', __keypress);
-
-        this.label.addEventListener('change', function () {
-            that._labelChanged();
-        });
-
-        if (this.labelattr != null) {
-            this.labelattr.addEventListener('change', function () {
+            this.label.addEventListener('change', function () {
                 that._labelChanged();
             });
-        }
 
-        this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
-        this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
-
-        // There may be a second select used for # and b.
-        if (this.labelattr != null) {
-            this.label.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 50) * this.blocks.getStageScale() + canvasLeft) + 'px';
-            this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
-            this.labelattr.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
-        } else {
+            this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
+            this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
             this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-        }
 
-        this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
-        this.label.style.display = '';
-        this.label.focus();
-        if (this.labelattr != null) {
-            this.labelattr.style.display = '';
-        }
-
-        // Firefox fix
-        setTimeout(function () {
-            that.label.style.display = '';
-            that.label.focus();
-            focused = true;
-            if (that.labelattr != null) {
-                that.labelattr.style.display = '';
+            this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+            this.label.style.display = '';
+            this.label.focus();
+            if (this.labelattr != null) {
+                this.labelattr.style.display = '';
             }
-        }, 100);
+
+            // Firefox fix
+            setTimeout(function () {
+                that.label.style.display = '';
+                that.label.focus();
+                focused = true;
+            }, 100);
+        }
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
