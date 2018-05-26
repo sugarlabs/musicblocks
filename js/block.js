@@ -2004,8 +2004,11 @@ function Block(protoblock, blocks, overrideName) {
         this._launchingPieMenu = true;
         // the pitch selector
         this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
+
         // the accidental selector
         this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
+        // the octave selector
+        this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
         // exit button
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
 
@@ -2013,30 +2016,30 @@ function Block(protoblock, blocks, overrideName) {
 
         this._pitchWheel.keynavigateEnabled = true;
 
-        this._pitchWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55');
+        this._pitchWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'];
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.createWheel(noteLabels);
 
-        this._exitWheel.colors = new Array('#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0');
+        this._exitWheel.colors = ['#808080', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel([' x', ' ', ' ', ' ', ' ', ' ', ' ']);
+        this._exitWheel.createWheel(['x']);
 
-        this._accidentalsWheel.colors = new Array('#77c428', '#93e042', '#77c428', '#5ba900', '#77c428');
+        this._accidentalsWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428'];
         this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
         this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.61;
-        this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.50;
+        this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
         this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
         this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
 
@@ -2047,9 +2050,21 @@ function Block(protoblock, blocks, overrideName) {
 
         for (var i = 0; i < 9; i++) {
             accidentalLabels.push(null);
+            this._accidentalsWheel.colors.push('#c0c0c0');
         }
+
         this._accidentalsWheel.createWheel(accidentalLabels);
         this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
+
+        this._octavesWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+        this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+        this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+        this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+        this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+        this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+        var octaveLabels = ['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null, null, null];
+        this._octavesWheel.createWheel(octaveLabels);
 
         var that = this;
 
@@ -2069,6 +2084,15 @@ function Block(protoblock, blocks, overrideName) {
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
             that.updateCache();
+
+            // Set the octave of the pitch block if available
+            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            that.blocks.setPitchOctave(that.connections[0], octave);
+
+            that._pitchWheel.removeWheel();
+            that._accidentalsWheel.removeWheel();
+            that._octavesWheel.removeWheel();
+            that._exitWheel.removeWheel();
         };
 
         var __launchingPieMenu = function () {
@@ -2084,18 +2108,19 @@ function Block(protoblock, blocks, overrideName) {
             var i = noteLabels.indexOf(label);
             var note = noteValues[i];
             var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
-            if (attr !== '♮') {
+
+	    if (label === ' ') {
+                return;
+	    } else if (attr !== '♮') {
                 note += attr;
             }
 
-            // FIX ME: get octave from pitch block if available
+            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
-            // FIX ME: set voice if available
-            // console.log(that._pitchOctave);
-            var obj = getNote(note, that._pitchOctave, 0, 'C major', false, null, that.blocks.errorMsg);
+            var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
-            // console.log(obj[0] + ' ' + obj[1]);
 
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
@@ -2107,6 +2132,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.loadSynth(0, 'default');
             }
 
+            that.blocks.logo._setSynthVolume(0, 'default', DEFAULTVOLUME);
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
         };
 
@@ -2117,6 +2143,10 @@ function Block(protoblock, blocks, overrideName) {
 
         for (var i = 0; i < accidentals.length; i++) {
             this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        for (var i = 0; i < 8; i++) {
+            this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
         }
 
         // Hide the widget when the exit button is clicked.
@@ -2172,6 +2202,10 @@ function Block(protoblock, blocks, overrideName) {
 
         // Use the octave associated with this block, if available.
         this._pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+
+        // Navigate to current octave
+        this._octavesWheel.navigateWheel(this._pitchOctave - 1);
+
         this._launchingPieMenu = false;
     };
 

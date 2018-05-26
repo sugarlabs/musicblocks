@@ -3032,7 +3032,7 @@ function Blocks () {
             if (oblk !== null && this.blockList[oblk].name === 'number') {
                 var thisBlock = this.blockList[oblk];
                 thisBlock.value = octave;
-                thisBlock.text.text = label;
+                thisBlock.text.text = octave.toString();
 
                 // Make sure text is on top.
                 var z = thisBlock.container.children.length - 1;
