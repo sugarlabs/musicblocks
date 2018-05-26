@@ -5,6 +5,7 @@ function TemperamentWidget () {
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
+    var temperamentTableDiv = docById('temperamentTableDiv');
     this.inTemperament = null;
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -67,8 +68,34 @@ function TemperamentWidget () {
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
-        var cell = this._addButton(row, 'circle.svg', ICONSIZE, _('circle'));
-        var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
+        var circleButtonCell = this._addButton(row, 'circle.svg', ICONSIZE, _('circle'));
+        
+        circleButtonCell.onclick = function () {
+            temperamentTableDiv.style.display = 'inline';
+            temperamentTableDiv.style.visibility = 'visible';
+            temperamentTableDiv.style.border = '0px';
+            temperamentTableDiv.style.overflow = 'auto';
+
+            var radius = 120;
+            var height = (2*radius) + 20;
+
+            temperamentTableDiv.innerHTML = '<canvas id="temperamentTable" width = 560px height = ' + height + 'px></canvas>';
+            
+            var canvas = docById('temperamentTable');
+            var ctx = canvas.getContext("2d");
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            ctx.fillStyle = "rgba(204, 0, 102, 0)";
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#003300';
+            ctx.stroke();  
+        };
+
+        var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
 
         var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
         for (var i = 0; i < MODENAMES.length; i++) {
