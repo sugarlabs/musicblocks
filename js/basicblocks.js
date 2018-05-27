@@ -493,7 +493,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     // MATRIX PALETTE
 
     var oscillatorBlock = new ProtoBlock('oscillator');
-    oscillatorBlock.palette = palettes.dict['widgets'];
+    oscillatorBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['oscillator'] = oscillatorBlock;
     //.TRANS: there are different types (sine, triangle, square...) of oscillators.
     oscillatorBlock.staticLabels.push(_('oscillator'));
@@ -511,14 +511,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     oscillatorBlock.dockTypes[2] = 'numberin';
 
     var filtertypeBlock = new ProtoBlock('filtertype');
-    filtertypeBlock.palette = palettes.dict['widgets'];
+    filtertypeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['filtertype'] = filtertypeBlock;
     filtertypeBlock.hidden = true;
     filtertypeBlock.valueBlock();
     filtertypeBlock.dockTypes[0] = 'textout';
 
     var oscillatortypeBlock = new ProtoBlock('oscillatortype');
-    oscillatortypeBlock.palette = palettes.dict['widgets'];
+    oscillatortypeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['oscillatortype'] = oscillatortypeBlock;
     oscillatortypeBlock.hidden = true;
     oscillatortypeBlock.valueBlock();

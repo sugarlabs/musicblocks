@@ -19,7 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1740,7 +1740,7 @@ function Block(protoblock, blocks, overrideName) {
                 invertValues.push(INVERTMODES[i][1]);
             }
 
-            this._piemenuInvert(invertLabels, invertValues, selectedinvert);
+            this._piemenuBasic(invertLabels, invertValues, selectedinvert);
         } else if (this.name === 'drumname') {
             if (this.value != null) {
                 var selecteddrum = getDrumName(this.value);
@@ -1776,49 +1776,29 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedtype = getFilterTypes(DEFAULTFILTERTYPE);
             }
 
-            var labelHTML = '<select name="filtertype" id="filtertypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
+            var filterLabels = [];
+            var filterValues = [];
             for (var i = 0; i < FILTERTYPES.length; i++) {
-                if (FILTERTYPES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + FILTERTYPES[i][1] + '">' + FILTERTYPES[i][1] + '</option>';
-                } else if (selectedtype === FILTERTYPES[i][0]) {
-                    labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
-                } else if (selectedtype === FILTERTYPES[i][1]) {
-                    labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
-                } else {
-                    labelHTML += '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0] + '</option>';
-                }
-            }
+		filterLabels.push(FILTERTYPES[i][0]);
+		filterValues.push(FILTERTYPES[i][1]);
+	    }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('filtertypeLabel');
-            selectorWidth = 150;
+	    this._piemenuBasic(filterLabels, filterValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
         } else if (this.name === 'oscillatortype') {
             if (this.value != null) {
-                var selectedosctype = getOscillatorTypes(this.value);
+                var selectedtype = getOscillatorTypes(this.value);
             } else {
-                var selectedosctype = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
+                var selectedtype = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
             }
 
-            var labelHTML = '<select name="oscillatortype" id="oscillatortypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
+            var oscLabels = [];
+            var oscValues = [];
             for (var i = 0; i < OSCTYPES.length; i++) {
-                if (OSCTYPES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + OSCTYPES[i][1] + '">' + OSCTYPES[i][1] + '</option>';
-                } else if (selectedosctype === OSCTYPES[i][0]) {
-                    labelHTML += '<option value="' + selectedosctype + '" selected>' + selectedosctype + '</option>';
-                } else if (selectedosctype === OSCTYPES[i][1]) {
-                    labelHTML += '<option value="' + selectedosctype + '" selected>' + selectedosctype + '</option>';
-                } else {
-                    labelHTML += '<option value="' + OSCTYPES[i][0] + '">' + OSCTYPES[i][0] + '</option>';
-                }
-            }
+		oscLabels.push(OSCTYPES[i][0]);
+		oscValues.push(OSCTYPES[i][1]);
+	    }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('oscillatortypeLabel');
-            selectorWidth = 150;
+	    this._piemenuBasic(oscLabels, oscValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
         } else if (this.name === 'voicename') {
             if (this.value != null) {
                 var selectedvoice = getVoiceName(this.value);
@@ -2340,32 +2320,36 @@ function Block(protoblock, blocks, overrideName) {
         this._launchingPieMenu = false;
     };
 
-    this._piemenuInvert = function (invertLabels, invertValues, invert) {
-        // wheelNav pie menu for invert selection
+    this._piemenuBasic = function (menuLabels, menuValues, selectedValue, colors) {
+        // basic wheelNav pie menu
+        if (colors === undefined) {
+            colors = ['#77c428', '#93e042', '#5ba900'];
+	}
+
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
         this._launchingPieMenu = true;
-        // the inverth selector
-        this._invertWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // the selectedValueh selector
+        this._basicWheel = new wheelnav('wheelDiv', null, 600, 600);
 
         var labels = [];
-        for (var i = 0; i < invertLabels.length; i++) {
-            labels.push(invertLabels[i])
+        for (var i = 0; i < menuLabels.length; i++) {
+            labels.push(menuLabels[i])
         }
 
         wheelnav.cssMode = true;
 
-        this._invertWheel.keynavigateEnabled = true;
+        this._basicWheel.keynavigateEnabled = true;
 
-        this._invertWheel.colors = ['#77c428', '#93e042', '#5ba900'];
-        this._invertWheel.slicePathFunction = slicePath().DonutSlice;
-        this._invertWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._invertWheel.slicePathCustom.minRadiusPercent = 0;
-        this._invertWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        this._invertWheel.sliceSelectedPathCustom = this._invertWheel.slicePathCustom;
-        this._invertWheel.sliceInitPathCustom = this._invertWheel.slicePathCustom;
-        this._invertWheel.titleRotateAngle = 0;
-        this._invertWheel.createWheel(labels);
+        this._basicWheel.colors = colors;
+        this._basicWheel.slicePathFunction = slicePath().DonutSlice;
+        this._basicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._basicWheel.slicePathCustom.minRadiusPercent = 0;
+        this._basicWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        this._basicWheel.sliceSelectedPathCustom = this._basicWheel.slicePathCustom;
+        this._basicWheel.sliceInitPathCustom = this._basicWheel.slicePathCustom;
+        this._basicWheel.titleRotateAngle = 0;
+        this._basicWheel.createWheel(labels);
 
         var that = this;
 
@@ -2374,17 +2358,17 @@ function Block(protoblock, blocks, overrideName) {
                 return;
             }
 
-            var label = that._invertWheel.navItems[that._invertWheel.selectedNavItemIndex].title;
+            var label = that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex].title;
             var i = labels.indexOf(label);
-            that.value = invertValues[i];
-            that.text.text = invertLabels[i];
+            that.value = menuValues[i];
+            that.text.text = menuLabels[i];
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
             that.updateCache();
 
-            that._invertWheel.removeWheel();
+            that._basicWheel.removeWheel();
             docById('wheelDiv').style.display = 'none';
         };
 
@@ -2393,8 +2377,8 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Hide the widget when the exit button is clicked.
-        for (var i = 0; i < invertLabels.length; i++) {
-            this._invertWheel.navItems[i].navigateFunction = function () {
+        for (var i = 0; i < menuLabels.length; i++) {
+            this._basicWheel.navItems[i].navigateFunction = function () {
                 __selectionChanged();
             };
         }
@@ -2410,13 +2394,13 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
         
-        // Navigate to a the current invert value.
-        var i = invertValues.indexOf(invert);
+        // Navigate to a the current selectedValue value.
+        var i = menuValues.indexOf(selectedValue);
         if (i === -1) {
             i = 1;
         }
 
-        this._invertWheel.navigateWheel(i);
+        this._basicWheel.navigateWheel(i);
         this._launchingPieMenu = false;
     };
 
