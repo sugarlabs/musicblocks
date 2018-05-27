@@ -2134,7 +2134,8 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.loadSynth(0, 'default');
             }
 
-            that.blocks.logo._setSynthVolume(0, 'default', DEFAULTVOLUME);
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
             console.log(obj[0] + obj[1]);
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
         };
@@ -2260,7 +2261,12 @@ function Block(protoblock, blocks, overrideName) {
             var i = voiceLabels.indexOf(label);
             that.value = voiceValues[i];
             that.text.text = label;
-            that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+
+            if (getDrumName(that.value) === null) {
+		that.blocks.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
+	    } else {
+		that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+	    }
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
@@ -2305,7 +2311,11 @@ function Block(protoblock, blocks, overrideName) {
 
             setTimeout(function () {
                 console.log(voice);
-                that.blocks.logo.synth.trigger(0, ['G4'], 1 / 4, voice, null, null);
+                that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+                that.blocks.logo.setSynthVolume(0, voice, DEFAULTVOLUME);
+                that.blocks.logo.synth.trigger(0, 'G4', 1 / 4, voice, null, null, false);
+		that.blocks.logo.synth.start();
+
             }, timeout);
         };
 
