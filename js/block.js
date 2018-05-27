@@ -19,7 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1636,25 +1636,14 @@ function Block(protoblock, blocks, overrideName) {
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
 
             this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
-            // FIX ME: We need to keep the DOM elements around to
-            // prevent the block from being dragged while the pie menu
-            // is active.
-            labelElem.innerHTML = '';
-            this.label = docById('solfegeLabel');
-            this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'eastindiansolfege') {
             var obj = splitSolfege(this.value);
             var selectednote = obj[0];
             var selectedattr = obj[1];
 
             this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
-
-            labelElem.innerHTML = '';
-            this.label = docById('solfegeLabel');
-            this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
-            const NOTEATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
             if (this.value != null) {
                 var selectednote = this.value[0];
                 if (this.value.length === 1) {
@@ -1674,10 +1663,6 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
-
-            labelElem.innerHTML = '';
-            this.label = docById('notenameLabel');
-            this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'modename') {
             if (this.value != null) {
                 var selectedmode = this.value[0];
@@ -1705,24 +1690,15 @@ function Block(protoblock, blocks, overrideName) {
             selectorWidth = 150;
         } else if (this.name === 'accidentalname') {
             if (this.value != null) {
-                var selectedaccidental = this.value[0];
+                var selectedaccidental = this.value;
             } else {
                 var selectedaccidental = DEFAULTACCIDENTAL;
             }
 
-            var labelHTML = '<select name="accidentalname" id="accidentalnameLabel" style="position: absolute;  background-color: #88e20a; width: 90px;">';
-            for (var i = 0; i < ACCIDENTALNAMES.length; i++) {
-                if (selectedaccidental === ACCIDENTALNAMES[i]) {
-                    labelHTML += '<option value="' + selectedaccidental + '" selected>' + selectedaccidental + '</option>';
-                } else {
-                    labelHTML += '<option value="' + ACCIDENTALNAMES[i] + '">' + ACCIDENTALNAMES[i] + '</option>';
-                }
-            }
+            this._piemenuAccidentals(ACCIDENTALLABELS, ACCIDENTALNAMES, selectedaccidental);
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('accidentalnameLabel');
-            selectorWidth = 150;
+            // labelElem.innerHTML = '';
+            // this.label = docById('accidentalnameLabel');
         } else if (this.name === 'intervalname') {
             if (this.value != null) {
                 var selectedinterval = this.value;
@@ -1801,8 +1777,6 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
-            labelElem.innerHTML = '';
-            this.label = docById('drumnameLabel');
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
                 var selectedtype = getFilterTypes(this.value);
@@ -1860,7 +1834,6 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedvoice = getVoiceName(DEFAULTVOICE);
             }
 
-
             var voiceLabels = [];
             var voiceValues = [];            
             var categories = [];
@@ -1882,9 +1855,6 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
-
-            labelElem.innerHTML = '';
-            this.label = docById('voicenameLabel');
         } else if (this.name === 'temperamentname') {
             if (this.value != null) {
                 var selectedTemperament = getTemperamentName(this.value);
@@ -2213,6 +2183,102 @@ function Block(protoblock, blocks, overrideName) {
         this._launchingPieMenu = false;
     };
 
+    this._piemenuAccidentals = function (accidentalLabels, accidentalValues, accidental) {
+        console.log(accidentalLabels);
+        console.log(accidentalValues);
+        console.log(accidental);
+        // wheelNav pie menu for accidental selection
+        docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
+        this._launchingPieMenu = true;
+        // the accidentalh selector
+        this._accidentalWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._accidentalWheel.raphael);
+
+        var labels = [];
+        for (var i = 0; i < accidentalLabels.length; i++) {
+            var obj = accidentalLabels[i].split(' ');
+            labels.push(last(obj));
+        }
+
+        for (var i = 0; i < accidentalLabels.length; i++) {
+            labels.push(null);
+        }
+
+        wheelnav.cssMode = true;
+
+        this._accidentalWheel.keynavigateEnabled = true;
+
+        this._accidentalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
+        this._accidentalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
+        this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
+        this._accidentalWheel.titleRotateAngle = 0;
+        this._accidentalWheel.createWheel(labels);
+        this._accidentalWheel.setTooltips(accidentalLabels)
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._accidentalWheel.navItems[that._accidentalWheel.selectedNavItemIndex].title;
+            var i = labels.indexOf(label);
+            that.value = accidentalValues[i];
+            that.text.text = accidentalLabels[i];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            that._accidentalWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var __launchingPieMenu = function () {
+            return that._launchingPieMenu;
+        };
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDiv').style.display = 'none';
+            __selectionChanged();
+        };
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        
+        // Navigate to a the current accidental value.
+        var i = accidentalValues.indexOf(accidental);
+        if (i === -1) {
+            i = 2;
+        }
+
+        this._accidentalWheel.navigateWheel(i);
+        this._launchingPieMenu = false;
+    };
+
     this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice) {
         // wheelNav pie menu for voice selection
         const COLORS = ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'];
@@ -2263,10 +2329,10 @@ function Block(protoblock, blocks, overrideName) {
             that.text.text = label;
 
             if (getDrumName(that.value) === null) {
-		that.blocks.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
-	    } else {
-		that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
-	    }
+                that.blocks.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
+            } else {
+                that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+            }
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
@@ -2314,7 +2380,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
                 that.blocks.logo.setSynthVolume(0, voice, DEFAULTVOLUME);
                 that.blocks.logo.synth.trigger(0, 'G4', 1 / 4, voice, null, null, false);
-		that.blocks.logo.synth.start();
+                that.blocks.logo.synth.start();
 
             }, timeout);
         };
