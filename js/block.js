@@ -19,7 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1731,24 +1731,15 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedinvert = getInvertMode(DEFAULTINVERT);
             }
 
-            var labelHTML = '<select name="invertmode" id="invertModeLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">';
+            var invertLabels = [];
+            var invertValues = [];
+
             for (var i = 0; i < INVERTMODES.length; i++) {
-                if (INVERTMODES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + INVERTMODES[i][1] + '">' + INVERTMODES[i][1] + '</option>';
-                } else if (selectedinvert === INVERTMODES[i][0]) {
-                    labelHTML += '<option value="' + selectedinvert + '" selected>' + selectedinvert + '</option>';
-                } else if (selectedinvert === INVERTMODES[i][1]) {
-                    labelHTML += '<option value="' + selectedinvert + '" selected>' + selectedinvert + '</option>';
-                } else {
-                    labelHTML += '<option value="' + INVERTMODES[i][0] + '">' + INVERTMODES[i][0] + '</option>';
-                }
+                invertLabels.push(INVERTMODES[i][0]);
+                invertValues.push(INVERTMODES[i][1]);
             }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('invertModeLabel');
-            selectorWidth = 150;
+            this._piemenuInvert(invertLabels, invertValues, selectedinvert);
         } else if (this.name === 'drumname') {
             if (this.value != null) {
                 var selecteddrum = getDrumName(this.value);
@@ -2191,7 +2182,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
         this._launchingPieMenu = true;
-        // the accidentalh selector
+        // the accidental selector
         this._accidentalWheel = new wheelnav('wheelDiv', null, 600, 600);
         // exit button
         this._exitWheel = new wheelnav('_exitWheel', this._accidentalWheel.raphael);
@@ -2276,6 +2267,100 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._accidentalWheel.navigateWheel(i);
+        this._launchingPieMenu = false;
+    };
+
+    this._piemenuInvert = function (invertLabels, invertValues, invert) {
+        console.log(invertLabels);
+        console.log(invertValues);
+        console.log(invert);
+        // wheelNav pie menu for invert selection
+        docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
+        this._launchingPieMenu = true;
+        // the inverth selector
+        this._invertWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._invertWheel.raphael);
+
+        var labels = [];
+        for (var i = 0; i < invertLabels.length; i++) {
+            labels.push(invertLabels[i])
+        }
+
+        for (var i = 0; i < invertLabels.length; i++) {
+            labels.push(null);
+        }
+
+        wheelnav.cssMode = true;
+
+        this._invertWheel.keynavigateEnabled = true;
+
+        this._invertWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._invertWheel.slicePathFunction = slicePath().DonutSlice;
+        this._invertWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._invertWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._invertWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._invertWheel.sliceSelectedPathCustom = this._invertWheel.slicePathCustom;
+        this._invertWheel.sliceInitPathCustom = this._invertWheel.slicePathCustom;
+        this._invertWheel.titleRotateAngle = 0;
+        this._invertWheel.createWheel(labels);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._invertWheel.navItems[that._invertWheel.selectedNavItemIndex].title;
+            var i = labels.indexOf(label);
+            that.value = invertValues[i];
+            that.text.text = invertLabels[i];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            that._invertWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var __launchingPieMenu = function () {
+            return that._launchingPieMenu;
+        };
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDiv').style.display = 'none';
+            __selectionChanged();
+        };
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        
+        // Navigate to a the current invert value.
+        var i = invertValues.indexOf(invert);
+        if (i === -1) {
+            i = 2;
+        }
+
+        this._invertWheel.navigateWheel(i);
         this._launchingPieMenu = false;
     };
 
