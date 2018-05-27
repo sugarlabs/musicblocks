@@ -965,11 +965,6 @@ function Blocks () {
             this._deletePitchBlocks(thisBlock);
             return this.blockList[thisBlock].connections[0];
         } else {
-            if (thisBlockobj && thisBlockobj.connections.length === 1) {
-                console.log('Value block encountered? ' + thisBlockobj.name);
-                return;
-            }
-
             while (thisBlockobj.connections[0] != null) {
                 var i = thisBlockobj.connections[0];
                 if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
@@ -1364,7 +1359,7 @@ function Blocks () {
 
             // Remove the silence block (if it is present) after
             // adding a new block inside of a note block.
-            if (this._insideNoteBlock(thisBlock) != null) {
+            if (this._insideNoteBlock(thisBlock) != null && this.blockList[thisBlock].connections.length > 1) {
                 // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
