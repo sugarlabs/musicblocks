@@ -3005,16 +3005,12 @@ function Blocks () {
     };
 
     this.findPitchOctave = function (blk) {
-        // FIXME: Make this general to finding nth arg of a block with
-        // a default return value.
-        // TODO: Test for other blocks that include octave, e.g., invert
-
         // Returns octave associated with pitch block.
         if (blk === null) {
             return 4;
         }
 
-        if (this.blockList[blk].name === 'pitch') {
+        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blockList[blk].name) !== -1) {
             var oblk = this.blockList[blk].connections[2];
             if (oblk === null) {
                 return 4;
@@ -3029,14 +3025,12 @@ function Blocks () {
     };
 
     this.setPitchOctave = function (blk, octave) {
-        // FIXME: Make this general to setting nth arg of a block
-
         // Set octave associated with pitch block
         if (blk === null) {
             return;
         }
 
-        if (this.blockList[blk].name === 'pitch') {
+        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blockList[blk].name) !== -1) {
             var oblk = this.blockList[blk].connections[2];
             if (oblk !== null && this.blockList[oblk].name === 'number') {
                 var thisBlock = this.blockList[oblk];

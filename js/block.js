@@ -1960,8 +1960,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._octaveNumber = function () {
         // Is this a number block being used as an octave argument?
-        // TODO: Check for other places we use octave, e.g., invert block
-        return (this.name === 'number' && this.connections[0] !== null && this.blocks.blockList[this.connections[0]].name === 'pitch' && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
+        return (this.name === 'number' && this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {

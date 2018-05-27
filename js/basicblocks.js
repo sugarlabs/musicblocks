@@ -3212,7 +3212,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     toFrequencyBlock.staticLabels.push(_('note to frequency'), _('name'), _('octave'));
     toFrequencyBlock.adjustWidthToLabel();
     toFrequencyBlock.defaults.push('G');
-    toFrequencyBlock.defaults.push('4');
+    toFrequencyBlock.defaults.push(4);
     toFrequencyBlock.twoArgMathBlock();
     toFrequencyBlock.dockTypes[1] = 'notein';
     toFrequencyBlock.dockTypes[2] = 'anyin';
