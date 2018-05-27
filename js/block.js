@@ -19,7 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1878,19 +1878,10 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedvalue = true;
             }
 
-            var BOOLSTRINGS = [[_('true'), 'true'], [_('false'), 'false']];
-            var labelHTML = '<select name="booleanstring" id="booleanLabel" style="position: absolute;  background-color: #f2ec4d; width: 60px;">';
-            if (this.value) {
-                labelHTML += '<option value="' + _('true') + '" selected>' + _('true') + '</option>';
-                labelHTML += '<option value="' + _('false') + '">' + _('false') + '</option>';
-            } else {
-                labelHTML += '<option value="' + _('true') + '">' + _('true') + '</option>';
-                labelHTML += '<option value="' + _('false') + '" selected>' + _('false') + '</option>';
-            }
+            var booleanLabels = [_('true'), _('false')];
+            var booleanValues = ['true', 'false'];
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('booleanLabel');
+            this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
         } else {
             labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
@@ -2175,9 +2166,6 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuAccidentals = function (accidentalLabels, accidentalValues, accidental) {
-        console.log(accidentalLabels);
-        console.log(accidentalValues);
-        console.log(accidental);
         // wheelNav pie menu for accidental selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
@@ -2271,54 +2259,39 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuInvert = function (invertLabels, invertValues, invert) {
-        console.log(invertLabels);
-        console.log(invertValues);
-        console.log(invert);
         // wheelNav pie menu for invert selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
         this._launchingPieMenu = true;
         // the inverth selector
         this._invertWheel = new wheelnav('wheelDiv', null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav('_exitWheel', this._invertWheel.raphael);
 
         var labels = [];
         for (var i = 0; i < invertLabels.length; i++) {
             labels.push(invertLabels[i])
         }
 
-        for (var i = 0; i < invertLabels.length; i++) {
-            labels.push(null);
-        }
-
         wheelnav.cssMode = true;
 
         this._invertWheel.keynavigateEnabled = true;
 
-        this._invertWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._invertWheel.colors = ['#77c428', '#93e042', '#5ba900'];
         this._invertWheel.slicePathFunction = slicePath().DonutSlice;
         this._invertWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._invertWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._invertWheel.slicePathCustom.minRadiusPercent = 0;
         this._invertWheel.slicePathCustom.maxRadiusPercent = 0.6;
         this._invertWheel.sliceSelectedPathCustom = this._invertWheel.slicePathCustom;
         this._invertWheel.sliceInitPathCustom = this._invertWheel.slicePathCustom;
         this._invertWheel.titleRotateAngle = 0;
         this._invertWheel.createWheel(labels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(['x', ' ']);
-
         var that = this;
 
         var __selectionChanged = function () {
+            if (__launchingPieMenu()) {
+                return;
+            }
+
             var label = that._invertWheel.navItems[that._invertWheel.selectedNavItemIndex].title;
             var i = labels.indexOf(label);
             that.value = invertValues[i];
@@ -2330,7 +2303,7 @@ function Block(protoblock, blocks, overrideName) {
             that.updateCache();
 
             that._invertWheel.removeWheel();
-            that._exitWheel.removeWheel();
+            docById('wheelDiv').style.display = 'none';
         };
 
         var __launchingPieMenu = function () {
@@ -2338,10 +2311,11 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Hide the widget when the exit button is clicked.
-        this._exitWheel.navItems[0].navigateFunction = function () {
-            docById('wheelDiv').style.display = 'none';
-            __selectionChanged();
-        };
+        for (var i = 0; i < invertLabels.length; i++) {
+            this._invertWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+            };
+        }
 
         // Position the widget over the note block.
         var x = this.container.x;
@@ -2357,10 +2331,92 @@ function Block(protoblock, blocks, overrideName) {
         // Navigate to a the current invert value.
         var i = invertValues.indexOf(invert);
         if (i === -1) {
-            i = 2;
+            i = 1;
         }
 
         this._invertWheel.navigateWheel(i);
+        this._launchingPieMenu = false;
+    };
+
+    this._piemenuBoolean = function (booleanLabels, booleanValues, boolean) {
+        // wheelNav pie menu for boolean selection
+        docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
+        this._launchingPieMenu = true;
+        // the booleanh selector
+        this._booleanWheel = new wheelnav('wheelDiv', null, 600, 600);
+
+        var labels = [];
+        for (var i = 0; i < booleanLabels.length; i++) {
+            labels.push(booleanLabels[i])
+        }
+
+        wheelnav.cssMode = true;
+
+        this._booleanWheel.keynavigateEnabled = true;
+
+        this._booleanWheel.colors = ['#d3cf76', '#b8b45f'];
+        this._booleanWheel.slicePathFunction = slicePath().DonutSlice;
+        this._booleanWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._booleanWheel.slicePathCustom.minRadiusPercent = 0;
+        this._booleanWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._booleanWheel.sliceSelectedPathCustom = this._booleanWheel.slicePathCustom;
+        this._booleanWheel.sliceInitPathCustom = this._booleanWheel.slicePathCustom;
+        this._booleanWheel.titleRotateAngle = 0;
+        this._booleanWheel.createWheel(labels);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            if (__launchingPieMenu()) {
+                return;
+            }
+
+            var label = that._booleanWheel.navItems[that._booleanWheel.selectedNavItemIndex].title;
+            var i = labels.indexOf(label);
+            that.value = booleanValues[i];
+            that.text.text = booleanLabels[i];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            that._booleanWheel.removeWheel();
+            docById('wheelDiv').style.display = 'none';
+        };
+
+        var __launchingPieMenu = function () {
+            return that._launchingPieMenu;
+        };
+
+        // Hide the widget when the exit button is clicked.
+        this._booleanWheel.navItems[0].navigateFunction = function () {
+            __selectionChanged();
+        };
+
+        this._booleanWheel.navItems[1].navigateFunction = function () {
+            __selectionChanged();
+        };
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        
+        // Navigate to a the current boolean value.
+        var i = booleanValues.indexOf(boolean);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._booleanWheel.navigateWheel(i);
         this._launchingPieMenu = false;
     };
 
