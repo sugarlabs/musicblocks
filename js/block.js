@@ -1785,8 +1785,8 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                if (getTextWidth(DRUMNAMES[i][0], 'bold 48pt Sans') > 350) {
-                    drumLabels.push(DRUMNAMES[i][0].substr(0, 7) + '...');
+                if (getTextWidth(DRUMNAMES[i][0], 'bold 48pt Sans') > 400) {
+                    drumLabels.push(DRUMNAMES[i][0].substr(0, 8) + '...');
                 } else {
                     drumLabels.push(DRUMNAMES[i][0]);
                 }
@@ -1866,8 +1866,8 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < VOICENAMES.length; i++) {
-                if (getTextWidth(VOICENAMES[i][0], 'bold 48pt Sans') > 350) {
-                    voiceLabels.push(VOICENAMES[i][0].substr(0, 7) + '...');
+                if (getTextWidth(VOICENAMES[i][0], 'bold 48pt Sans') > 400) {
+                    voiceLabels.push(VOICENAMES[i][0].substr(0, 8) + '...');
                 } else {
                     voiceLabels.push(VOICENAMES[i][0]);
                 }
@@ -2237,7 +2237,7 @@ function Block(protoblock, blocks, overrideName) {
         this._voiceWheel.colors = colors;
         this._voiceWheel.slicePathFunction = slicePath().DonutSlice;
         this._voiceWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._voiceWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._voiceWheel.slicePathCustom.minRadiusPercent = 0.2;
         this._voiceWheel.slicePathCustom.maxRadiusPercent = 1;
         this._voiceWheel.sliceSelectedPathCustom = this._voiceWheel.slicePathCustom;
         this._voiceWheel.sliceInitPathCustom = this._voiceWheel.slicePathCustom;
@@ -2248,7 +2248,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
