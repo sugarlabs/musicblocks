@@ -3007,6 +3007,7 @@ function Blocks () {
     this.findPitchOctave = function (blk) {
         // FIXME: Make this general to finding nth arg of a block with
         // a default return value.
+        // TODO: Test for other blocks that include octave, e.g., invert
 
         // Returns octave associated with pitch block.
         if (blk === null) {

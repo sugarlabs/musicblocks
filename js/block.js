@@ -1555,10 +1555,11 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (PIEMENUS.indexOf(this.name) === -1) {
+                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber()) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
+
                 this.blocks.unhighlight(null);
                 this.blocks.refreshCanvas();
             } else if (this.blocks.activeBlock !== thisBlock) {
@@ -1883,12 +1884,18 @@ function Block(protoblock, blocks, overrideName) {
 
             this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
         } else {
-            labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
-            labelElem.classList.add('hasKeyboard');
-            this.label = docById('numberLabel');
+            // If the number block is connected to a pitch block, then
+            // use the pie menu for octaves.
+            if (this._octaveNumber()) {
+                this._piemenuOctave(this.value);
+            } else {
+                labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
+                labelElem.classList.add('hasKeyboard');
+                this.label = docById('numberLabel');
+            }
         }
 
-        if (PIEMENUS.indexOf(this.name) === -1) {
+        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber()) {
             var focused = false;
 
             var __blur = function (event) {
@@ -1949,6 +1956,12 @@ function Block(protoblock, blocks, overrideName) {
                 focused = true;
             }, 100);
         }
+    };
+
+    this._octaveNumber = function () {
+        // Is this a number block being used as an octave argument?
+        // TODO: Check for other places we use octave, e.g., invert block
+        return (this.name === 'number' && this.connections[0] !== null && this.blocks.blockList[this.connections[0]].name === 'pitch' && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
@@ -2188,7 +2201,7 @@ function Block(protoblock, blocks, overrideName) {
         this._accidentalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
         this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
         this._accidentalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0;
+        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.2;
         this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.6;
         this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
@@ -2246,6 +2259,85 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._accidentalWheel.navigateWheel(i);
+        this._launchingPieMenu = false;
+    };
+
+    this._piemenuOctave = function (octave) {
+        // wheelNav pie menu for octave selection
+        docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
+        this._launchingPieMenu = true;
+        // the octave selector
+        this._octaveWheel = new wheelnav('wheelDiv', null, 600, 600);
+
+        // TODO: add prev, current, next options (but you'll need to
+        // replace this number block with a text block)
+        var octaveLabels = ['1', '2', '3', '4', '5', '6', '7', '8', null];
+
+        wheelnav.cssMode = true;
+
+        this._octaveWheel.keynavigateEnabled = true;
+
+        this._octaveWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._octaveWheel.slicePathFunction = slicePath().DonutSlice;
+        this._octaveWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._octaveWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._octaveWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._octaveWheel.sliceSelectedPathCustom = this._octaveWheel.slicePathCustom;
+        this._octaveWheel.sliceInitPathCustom = this._octaveWheel.slicePathCustom;
+        this._octaveWheel.titleRotateAngle = 0;
+        this._octaveWheel.createWheel(octaveLabels);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            if (__launchingPieMenu()) {
+                return;
+            }
+
+            that.value = that._octaveWheel.selectedNavItemIndex + 1;
+            that.text.text = octaveLabels[that.value -1];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            that._octaveWheel.removeWheel();
+            docById('wheelDiv').style.display = 'none';
+        };
+
+        var __launchingPieMenu = function () {
+            return that._launchingPieMenu;
+        };
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < octaveLabels.length; i++) {
+            this._octaveWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+            };
+        }
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        
+        // Navigate to a the current octave value.
+        var i = [1, 2, 3, 4, 5, 6, 7, 8].indexOf(octave);
+        if (i === -1) {
+            i = 3;
+        }
+
+        console.log(i);
+
+        this._octaveWheel.navigateWheel(i);
         this._launchingPieMenu = false;
     };
 
