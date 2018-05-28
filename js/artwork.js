@@ -130,7 +130,7 @@ const PALETTECOLORS0 = {
     'rhythm' : [12.5, 60, 80],
     'meter' : [12.5, 60, 80],
     'tone' : [57.5, 50, 28],
-    'intervals':  [57.5, 50, 28],
+    'intervals':  [37.5, 70, 50],
     'volume' : [57.5, 50, 28],
     'drum' : [57.5, 50, 28],
     'mouse': [37.5, 70, 50],
