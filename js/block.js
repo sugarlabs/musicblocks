@@ -2611,6 +2611,8 @@ function Block(protoblock, blocks, overrideName) {
         //Use advanced constructor for more wheelnav on same div
         this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
         this._intervalWheel = new wheelnav('this._intervalWheel', this._intervalNameWheel.raphael);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._intervalNameWheel.raphael);
 
         wheelnav.cssMode = true;
 
@@ -2620,8 +2622,8 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
         this._intervalNameWheel.slicePathFunction = slicePath().DonutSlice;
         this._intervalNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0;
-        this._intervalNameWheel.slicePathCustom.maxRadiusPercent = 0.7;
+        this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._intervalNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
         this._intervalNameWheel.sliceSelectedPathCustom = this._intervalNameWheel.slicePathCustom;
         this._intervalNameWheel.sliceInitPathCustom = this._intervalNameWheel.slicePathCustom;
         this._intervalNameWheel.titleRotateAngle = 0;
@@ -2636,7 +2638,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
         this._intervalWheel.slicePathFunction = slicePath().DonutSlice;
         this._intervalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._intervalWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._intervalWheel.slicePathCustom.minRadiusPercent = 0.8;
         this._intervalWheel.slicePathCustom.maxRadiusPercent = 1;
         this._intervalWheel.sliceSelectedPathCustom = this._intervalWheel.slicePathCustom;
         this._intervalWheel.sliceInitPathCustom = this._intervalWheel.slicePathCustom;
@@ -2646,6 +2648,16 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalWheel.navAngle = -(360 / 12) * 3.5;
         // this._intervalWheel.selectedNavItemIndex = 2;
         this._intervalWheel.createWheel(['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null]);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
 
         var that = this;
 
@@ -2685,7 +2697,6 @@ function Block(protoblock, blocks, overrideName) {
 
         // navigate to a specific starting point
         var obj = selectedInterval.split(' ');
-        console.log(obj[0] + ' ' + obj[1]);
         for (var i = 0; i < INTERVALS.length; i++) {
             if (obj[0] === INTERVALS[i][1]) {
                 break;
@@ -2705,24 +2716,53 @@ function Block(protoblock, blocks, overrideName) {
             this._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
         }
 
-        var __selectionChanged = function () {
-            var label = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1];
-            var number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
-            that.value = label + ' ' + number;
-            that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
-
-            // Make sure text is on top.
-            var z = that.container.children.length - 1;
-            that.container.setChildIndex(that.text, z);
-            that.updateCache();
-
-            docById('wheelDiv').style.display = 'none';
+        var __exit = function () {
+            __selectionChanged(true);
         };
 
-        // Set up handlers for voice preview.
+        var __selectionChanged = function (exit) {
+            var label = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1];
+            var number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
+
+            var key = label + ' ' + number;
+
+            if (exit !== undefined) {
+                that.value = key;
+                that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
+
+                // Make sure text is on top.
+                var z = that.container.children.length - 1;
+                that.container.setChildIndex(that.text, z);
+                that.updateCache();
+
+                docById('wheelDiv').style.display = 'none';
+            } else {
+                console.log(key + ' ' + INTERVALVALUES[key][0]);
+                var obj = getNote('C', 4, INTERVALVALUES[key][0], 'C major', false, null, null);
+                obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+
+                if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                    if (that.blocks.logo.instrumentNames[0] === undefined) {
+                        that.blocks.logo.instrumentNames[0] = [];
+                    }
+
+                    that.blocks.logo.instrumentNames[0].push('default');
+                    that.blocks.logo.synth.createDefaultSynth(0);
+                    that.blocks.logo.synth.loadSynth(0, 'default');
+                }
+
+                that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+                that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+                that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, 'default', null, null);
+            }
+        };
+
+        // Set up handlers for preview.
         for (var i = 0; i < 8; i++) {
             this._intervalWheel.navItems[i].navigateFunction = __selectionChanged;
         }
+
+        this._exitWheel.navItems[0].navigateFunction = __exit;
 
         this._launchingPieMenu = false;
     };
