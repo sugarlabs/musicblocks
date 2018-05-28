@@ -19,7 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1707,24 +1707,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedinterval = getIntervalName(DEFAULTINTERVAL);
             }
 
-            var labelHTML = '<select name="intervalname" id="intervalnameLabel" style="position: absolute;  background-color: #3ea4a3; width: 90px;">';
-            for (var i = 0; i < INTERVALNAMES.length; i++) {
-                if (INTERVALNAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + INTERVALNAMES[i][1] + '">' + INTERVALNAMES[i][1] + '</option>';
-                } else if (selectedinterval === INTERVALNAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedinterval + '" selected>' + selectedinterval + '</option>';
-                } else if (selectedinterval === INTERVALNAMES[i][1]) {
-                    labelHTML += '<option value="' + selectedinterval + '" selected>' + selectedinterval + '</option>';
-                } else {
-                    labelHTML += '<option value="' + INTERVALNAMES[i][0] + '">' + INTERVALNAMES[i][0] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('intervalnameLabel');
-            selectorWidth = 150;
+            this._piemenuIntervals(selectedinterval);
         } else if (this.name === 'invertmode') {
             if (this.value != null) {
                 var selectedinvert = this.value;
@@ -1779,11 +1762,11 @@ function Block(protoblock, blocks, overrideName) {
             var filterLabels = [];
             var filterValues = [];
             for (var i = 0; i < FILTERTYPES.length; i++) {
-		filterLabels.push(FILTERTYPES[i][0]);
-		filterValues.push(FILTERTYPES[i][1]);
-	    }
+                filterLabels.push(FILTERTYPES[i][0]);
+                filterValues.push(FILTERTYPES[i][1]);
+            }
 
-	    this._piemenuBasic(filterLabels, filterValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
+            this._piemenuBasic(filterLabels, filterValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
         } else if (this.name === 'oscillatortype') {
             if (this.value != null) {
                 var selectedtype = getOscillatorTypes(this.value);
@@ -1794,11 +1777,11 @@ function Block(protoblock, blocks, overrideName) {
             var oscLabels = [];
             var oscValues = [];
             for (var i = 0; i < OSCTYPES.length; i++) {
-		oscLabels.push(OSCTYPES[i][0]);
-		oscValues.push(OSCTYPES[i][1]);
-	    }
+                oscLabels.push(OSCTYPES[i][0]);
+                oscValues.push(OSCTYPES[i][1]);
+            }
 
-	    this._piemenuBasic(oscLabels, oscValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
+            this._piemenuBasic(oscLabels, oscValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
         } else if (this.name === 'voicename') {
             if (this.value != null) {
                 var selectedvoice = getVoiceName(this.value);
@@ -2324,7 +2307,7 @@ function Block(protoblock, blocks, overrideName) {
         // basic wheelNav pie menu
         if (colors === undefined) {
             colors = ['#77c428', '#93e042', '#5ba900'];
-	}
+        }
 
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
@@ -2615,6 +2598,130 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._voiceWheel.navigateWheel(i);
+        this._launchingPieMenu = false;
+    };
+
+    this._piemenuIntervals = function (selectedInterval) {
+        // pie menu for interval selection
+        docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
+        this._launchingPieMenu = true;
+
+        //Use advanced constructor for more wheelnav on same div
+        this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
+        this._intervalWheel = new wheelnav('this._intervalWheel', this._intervalNameWheel.raphael);
+        wheel3 = new wheelnav('wheel3', this._intervalNameWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._intervalNameWheel.keynavigateEnabled = true;
+
+        //Customize slicePaths for proper size
+        this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._intervalNameWheel.slicePathFunction = slicePath().DonutSlice;
+        this._intervalNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0;
+        this._intervalNameWheel.slicePathCustom.maxRadiusPercent = 0.7;
+        this._intervalNameWheel.sliceSelectedPathCustom = this._intervalNameWheel.slicePathCustom;
+        this._intervalNameWheel.sliceInitPathCustom = this._intervalNameWheel.slicePathCustom;
+        this._intervalNameWheel.titleRotateAngle = 0;
+        // this._intervalNameWheel.clickModeRotate = false;
+        var labels = [];
+        for (var i = 0; i < INTERVALS.length; i++) {
+            labels.push(INTERVALS[i][1]);
+        }
+
+        this._intervalNameWheel.createWheel(labels);
+
+        this._intervalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._intervalWheel.slicePathFunction = slicePath().DonutSlice;
+        this._intervalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._intervalWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._intervalWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._intervalWheel.sliceSelectedPathCustom = this._intervalWheel.slicePathCustom;
+        this._intervalWheel.sliceInitPathCustom = this._intervalWheel.slicePathCustom;
+
+        //Disable rotation, set navAngle and create the menus
+        this._intervalWheel.clickModeRotate = false;
+        this._intervalWheel.navAngle = -(360 / 12) * 3.5;
+        // this._intervalWheel.selectedNavItemIndex = 2;
+        this._intervalWheel.createWheel(['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null]);
+
+        var that = this;
+
+        var __launchingPieMenu = function () {
+            return that._launchingPieMenu;
+        };
+
+        // position widget
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
+
+        //Add function to each main menu for show/hide sub menus
+        var __setupAction = function (i, active) {
+            that._intervalNameWheel.navItems[i].navigateFunction = function () {
+                for (var j = 0; j < 8; j++) {
+                    if (active.indexOf(j + 1) === -1) {
+                        that._intervalWheel.navItems[j].navItem.hide();
+                    } else {
+                        that._intervalWheel.navItems[j].navItem.show();
+                    }
+                }
+            };
+        }
+
+        for (var i = 0; i < INTERVALS.length; i++) {
+            __setupAction(i, INTERVALS[i][2]);
+        }
+
+        // navigate to a specific starting point
+        var obj = selectedInterval.split(' ');
+        console.log(obj[0] + ' ' + obj[1]);
+        for (var i = 0; i < INTERVALS.length; i++) {
+            if (obj[0] === INTERVALS[i][1]) {
+                break;
+            }
+        }
+
+        if (i === INTERVALS.length) {
+            i = 5;
+        }
+
+        this._intervalNameWheel.navigateWheel(i);
+
+        var j = Number(obj[1]);
+        if (INTERVALS[i][2].indexOf(j) !== -1) {
+            this._intervalWheel.navigateWheel(j - 1);
+        } else {
+            this._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
+        }
+
+        var __selectionChanged = function () {
+            var label = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1];
+            var number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
+            that.value = label + ' ' + number;
+            that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            docById('wheelDiv').style.display = 'none';
+        };
+
+        // Set up handlers for voice preview.
+        for (var i = 0; i < 8; i++) {
+            this._intervalWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+
         this._launchingPieMenu = false;
     };
 
