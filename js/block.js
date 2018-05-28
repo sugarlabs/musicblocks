@@ -1900,7 +1900,17 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
+        // Some blocks have both pitch and octave, so we can modify
+        // both at once.
         var hasOctaveWheel = (this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1);
+
+        // If we are attached to a sset key block, we want to order
+        // pitch by fifths.
+        if (this.connections[0] !== null && ['setkey', 'setkey2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1) {
+            noteLabels = ['C', 'G', 'D', 'A', 'E', 'B', 'F'];
+            noteValues = ['C', 'G', 'D', 'A', 'E', 'B', 'F'];
+        }
+
         // wheelNav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
