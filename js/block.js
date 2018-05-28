@@ -2154,8 +2154,8 @@ function Block(protoblock, blocks, overrideName) {
         this._accidentalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
         this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
         this._accidentalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.5;
+        this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.75;
         this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.titleRotateAngle = 0;
