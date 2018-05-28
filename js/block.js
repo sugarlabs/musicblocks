@@ -19,7 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1666,29 +1666,12 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
         } else if (this.name === 'modename') {
             if (this.value != null) {
-                var selectedmode = this.value[0];
+                var selectedmode = this.value;
             } else {
                 var selectedmode = getModeName(DEFAULTMODE);
             }
 
-            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #3ea4a3; width: 150px;">';
-            for (var i = 0; i < MODENAMES.length; i++) {
-                if (MODENAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
-                } else if (selectedmode === MODENAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
-                } else if (selectedmode === MODENAMES[i][1]) {
-                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
-                } else {
-                    labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('modenameLabel');
-            selectorWidth = 150;
+            this._piemenuModes(selectedmode);
         } else if (this.name === 'accidentalname') {
             if (this.value != null) {
                 var selectedaccidental = this.value;
@@ -1927,6 +1910,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
+        var hasOctaveWheel = (this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1);
         // wheelNav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
@@ -1937,7 +1921,10 @@ function Block(protoblock, blocks, overrideName) {
         // the accidental selector
         this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
         // the octave selector
-        this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
+        if (hasOctaveWheel) {
+            this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
+        }
+
         // exit button
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
 
@@ -1985,15 +1972,17 @@ function Block(protoblock, blocks, overrideName) {
         this._accidentalsWheel.createWheel(accidentalLabels);
         this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
 
-        this._octavesWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
-        this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
-        this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
-        this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
-        this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
-        this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-        var octaveLabels = ['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null, null, null];
-        this._octavesWheel.createWheel(octaveLabels);
+        if (hasOctaveWheel) {
+            this._octavesWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+            this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+            var octaveLabels = ['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null, null, null];
+            this._octavesWheel.createWheel(octaveLabels);
+        }
 
         var that = this;
 
@@ -2014,13 +2003,15 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
 
-            // Set the octave of the pitch block if available
-            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
-            that.blocks.setPitchOctave(that.connections[0], octave);
+            if (hasOctaveWheel) {
+                // Set the octave of the pitch block if available
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+                that.blocks.setPitchOctave(that.connections[0], octave);
+                that._octavesWheel.removeWheel();
+            }
 
             that._pitchWheel.removeWheel();
             that._accidentalsWheel.removeWheel();
-            that._octavesWheel.removeWheel();
             that._exitWheel.removeWheel();
         };
 
@@ -2044,7 +2035,11 @@ function Block(protoblock, blocks, overrideName) {
                 note += attr;
             }
 
-            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            if (hasOctaveWheel) {
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            } else {
+                octave = 4;
+            }
 
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
@@ -2076,8 +2071,10 @@ function Block(protoblock, blocks, overrideName) {
             this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
         }
 
-        for (var i = 0; i < 8; i++) {
-            this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+        if (hasOctaveWheel) {
+            for (var i = 0; i < 8; i++) {
+                this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
         }
 
         // Hide the widget when the exit button is clicked.
@@ -2094,6 +2091,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
         
@@ -2131,11 +2130,13 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        // Use the octave associated with this block, if available.
-        this._pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+        if (hasOctaveWheel) {
+            // Use the octave associated with this block, if available.
+            this._pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
 
-        // Navigate to current octave
-        this._octavesWheel.navigateWheel(this._pitchOctave - 1);
+            // Navigate to current octave
+            this._octavesWheel.navigateWheel(this._pitchOctave - 1);
+        }
 
         this._launchingPieMenu = false;
     };
@@ -2211,6 +2212,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
         
@@ -2288,6 +2291,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
         
@@ -2374,6 +2379,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
         
@@ -2456,6 +2463,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
         
@@ -2588,6 +2597,8 @@ function Block(protoblock, blocks, overrideName) {
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '400px';
+        docById('wheelDiv').style.width = '400px';
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
         
@@ -2610,7 +2621,6 @@ function Block(protoblock, blocks, overrideName) {
         //Use advanced constructor for more wheelnav on same div
         this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
         this._intervalWheel = new wheelnav('this._intervalWheel', this._intervalNameWheel.raphael);
-        wheel3 = new wheelnav('wheel3', this._intervalNameWheel.raphael);
 
         wheelnav.cssMode = true;
 
@@ -2661,14 +2671,16 @@ function Block(protoblock, blocks, overrideName) {
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '400px';
+        docById('wheelDiv').style.width = '400px';
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
 
         //Add function to each main menu for show/hide sub menus
-        var __setupAction = function (i, active) {
+        var __setupAction = function (i, activeTabs) {
             that._intervalNameWheel.navItems[i].navigateFunction = function () {
                 for (var j = 0; j < 8; j++) {
-                    if (active.indexOf(j + 1) === -1) {
+                    if (activeTabs.indexOf(j + 1) === -1) {
                         that._intervalWheel.navItems[j].navItem.hide();
                     } else {
                         that._intervalWheel.navItems[j].navItem.show();
@@ -2721,6 +2733,164 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < 8; i++) {
             this._intervalWheel.navItems[i].navigateFunction = __selectionChanged;
         }
+
+        this._launchingPieMenu = false;
+    };
+
+    this._piemenuModes = function (selectedMode) {
+        // pie menu for mode selection
+        docById('wheelDiv').style.display = '';
+        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
+        this._launchingPieMenu = true;
+
+        //Use advanced constructor for more wheelnav on same div
+        this._modeNameWheel = new wheelnav('wheelDiv', null, 1200, 1200);
+        this._modeWheel = new wheelnav('this._modeWheel', this._modeNameWheel.raphael);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._modeNameWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._modeNameWheel.keynavigateEnabled = true;
+
+        //Customize slicePaths
+        var colors = [];
+        for (var i = 0; i < MODENAMES.length; i++) {
+            var key = MODENAMES[i][1];
+            if (key in MUSICALMODES) {
+                switch (MUSICALMODES[key].length % 5) {
+                case 0:
+                    colors.push('#5ba900');
+                    break;
+                case 1:
+                    colors.push('#77c428');
+                    break;
+                case 2:
+                    colors.push('#93e042');
+                    break;
+                case 3:
+                    colors.push('#3d8d00');
+                    break;
+                case 4:
+                default:
+                    colors.push('#adfd55');
+                    break;
+                }
+            } else {
+                colors.push('#93e042');
+            }
+        }
+
+        this._modeNameWheel.colors = colors;
+        this._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
+        this._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._modeNameWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._modeNameWheel.sliceSelectedPathCustom = this._modeNameWheel.slicePathCustom;
+        this._modeNameWheel.sliceInitPathCustom = this._modeNameWheel.slicePathCustom;
+        this._modeNameWheel.titleRotateAngle = 0;
+        // this._modeNameWheel.clickModeRotate = false;
+        var labels = [];
+        for (var i = 0; i < MODENAMES.length; i++) {
+            labels.push(MODENAMES[i][0]);
+        }
+
+        this._modeNameWheel.createWheel(labels);
+
+        this._modeWheel.colors = ['#77c428', '#93e042'];
+        this._modeWheel.slicePathFunction = slicePath().DonutSlice;
+        this._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._modeWheel.slicePathCustom.minRadiusPercent = 0.8;
+        this._modeWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._modeWheel.sliceSelectedPathCustom = this._modeWheel.slicePathCustom;
+        this._modeWheel.sliceInitPathCustom = this._modeWheel.slicePathCustom;
+
+        // Disable rotation, set navAngle and create the menus
+        this._modeWheel.clickModeRotate = false;
+        this._modeWheel.navAngle = -90;
+        // this._modeWheel.selectedNavItemIndex = 2;
+        this._modeWheel.createWheel(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __launchingPieMenu = function () {
+            return that._launchingPieMenu;
+        };
+
+        // position widget
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '600px';
+        docById('wheelDiv').style.width = '600px';
+        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
+        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
+
+        //Add function to each main menu for show/hide sub menus
+        var __setupAction = function (i, activeTabs) {
+            that._modeNameWheel.navItems[i].navigateFunction = function () {
+                for (var j = 0; j < 12; j++) {
+                    if (activeTabs.indexOf(j) === -1) {
+                        that._modeWheel.navItems[j].navItem.hide();
+                    } else {
+                        that._modeWheel.navItems[j].navItem.show();
+                    }
+                }
+            };
+        }
+
+        for (var i = 0; i < MODENAMES.length; i++) {
+            var key = MODENAMES[i][1];
+            if (key in MUSICALMODES) {
+                var activeTabs = [0];
+                for (var j = 0; j < MUSICALMODES[key].length; j++) {
+                    activeTabs.push(last(activeTabs) + MUSICALMODES[key][j]);
+                }
+
+                __setupAction(i, activeTabs);
+            }
+        }
+
+        // navigate to a specific starting point
+        for (var i = 0; i < MODENAMES.length; i++) {
+            if (MODENAMES[i][1] === selectedMode) {
+                break;
+            }
+        }
+
+        if (i === MODENAMES.length) {
+            i = 5;  // MAJOR
+        }
+
+        this._modeNameWheel.navigateWheel(i);
+
+        var __selectionChanged = function () {
+            that.value = MODENAMES[that._modeNameWheel.selectedNavItemIndex][1];
+            that.text.text = MODENAMES[that._modeNameWheel.selectedNavItemIndex][0];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            docById('wheelDiv').style.display = 'none';
+        };
+
+        this._exitWheel.navItems[0].navigateFunction = __selectionChanged;
 
         this._launchingPieMenu = false;
     };

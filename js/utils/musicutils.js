@@ -219,7 +219,7 @@ const MUSICALMODES = {
     'algerian': [2, 1, 2, 1, 1, 1, 3, 1],
     'diminished': [2, 1, 2, 1, 2, 1, 2, 1],
     'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
-    'ocatonic': [1, 2, 1, 2, 1, 2, 1, 2],
+    'octatonic': [1, 2, 1, 2, 1, 2, 1, 2],
 
      // 7 notes in an octave
     'major': [2, 2, 1, 2, 2, 2, 1],
@@ -346,7 +346,6 @@ var MODENAMES = [
     [_('in') + ' (' + _('Japan') + ')', 'in (Japan)'],
     //.TRANS: Japanese pentatonic scale for music
     [_('minyo') + ' (' + _('Japan') + ')', 'minyo (Japan)'],
-    [_('japanese'), 'japanese'],
     //.TRANS: Italian mathematician
     [_('fibonacci'), 'fibonacci'],
     [_('custom'), 'custom'],
