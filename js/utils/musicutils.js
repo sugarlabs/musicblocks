@@ -386,12 +386,11 @@ var TEMPERAMENTS = [
     //.TRANS: musical temperament
     [_('equal'), 'equal'],
     //.TRANS: musical temperament
-    [_('just-intonation'), 'just intonation'],
+    [_('Pythagorean'), 'just intonation'],
     //.TRANS: musical temperament
-    [_('1/3-comma-meantone'), '1/3 comma meantone'],
+    [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
     //.TRANS: musical temperament
-    [_('1/4-comma-meantone'), '1/4 comma meantone'],
-
+    [_('meantone') + ' (1/4)', '1/4 comma meantone'],
     [_('custom'), 'custom'],
 
 ];

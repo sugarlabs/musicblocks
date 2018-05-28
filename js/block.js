@@ -19,7 +19,7 @@ const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
 const EXTRAWIDENAMES = ['modename'];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1800,24 +1800,14 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedTemperament = getTemperamentName(DEFAULTTEMPERAMENT);
             }
 
-            var labelHTML = '<select name="temperamentname" id="temperamentnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">';
+            var temperamentLabels = [];
+            var temperamentValues = [];
             for (var i = 0; i < TEMPERAMENTS.length; i++) {
-                if (TEMPERAMENTS[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + TEMPERAMENTS[i][1] + '">' + TEMPERAMENTS[i][1] + '</option>';
-                } else if (selectedTemperament === TEMPERAMENTS[i][0]) {
-                    labelHTML += '<option value="' + selectedTemperament + '" selected>' + selectedTemperament + '</option>';
-                } else if (selectedTemperament === TEMPERAMENTS[i][1]) {
-                    labelHTML += '<option value="' + selectedTemperament + '" selected>' + selectedTemperament + '</option>';
-                } else {
-                    labelHTML += '<option value="' + TEMPERAMENTS[i][1] + '">' + TEMPERAMENTS[i][1] + '</option>';
-                }
+                temperamentLabels.push(TEMPERAMENTS[i][0]);
+                temperamentValues.push(TEMPERAMENTS[i][1]);
             }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('temperamentnameLabel');
-            selectorWidth = 150;
+            this._piemenuBasic(temperamentLabels, temperamentValues, selectedTemperament, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
         } else if (this.name === 'boolean') {
             if (this.value != null) {
                 var selectedvalue = this.value;
@@ -2318,11 +2308,11 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
         this._launchingPieMenu = true;
         // the selectedValueh selector
-        this._basicWheel = new wheelnav('wheelDiv', null, 600, 600);
+        this._basicWheel = new wheelnav('wheelDiv', null, 800, 800);
 
         var labels = [];
         for (var i = 0; i < menuLabels.length; i++) {
-            labels.push(menuLabels[i])
+            labels.push(menuLabels[i]);
         }
 
         wheelnav.cssMode = true;
