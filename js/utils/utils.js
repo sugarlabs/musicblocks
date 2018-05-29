@@ -670,26 +670,6 @@ function hideDOMLabel () {
         numberLabel.style.display = 'none';
     }
 
-    var modenameLabel = docById('modenameLabel');
-    if (modenameLabel !== null) {
-        modenameLabel.style.display = 'none';
-    }
-
-    var temperamentnameLabel = docById('temperamentnameLabel');
-    if (temperamentnameLabel !== null) {
-        temperamentnameLabel.style.display = 'none';
-    }
-
-    var filtertypeLabel = docById('filtertypeLabel');
-    if (filtertypeLabel !== null) {
-        filtertypeLabel.style.display = 'none';
-    }
-
-    var oscillatortypeLabel = docById('oscillatortypeLabel');
-    if (oscillatortypeLabel !== null) {
-        oscillatortypeLabel.style.display = 'none';
-    }
-
     var piemenu = docById('wheelDiv');
     if (piemenu !== null) {
         piemenu.style.display = 'none';
