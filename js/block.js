@@ -2139,7 +2139,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for accidental selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
+
         // the accidental selector
         this._accidentalWheel = new wheelnav('wheelDiv', null, 600, 600);
 
@@ -2169,10 +2169,6 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
 
         var __selectionChanged = function () {
-            if (__launchingPieMenu()) {
-                return;
-            }
-
             var label = that._accidentalWheel.navItems[that._accidentalWheel.selectedNavItemIndex].title;
             var i = labels.indexOf(label);
             that.value = accidentalValues[i];
@@ -2182,21 +2178,12 @@ function Block(protoblock, blocks, overrideName) {
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
             that.updateCache();
+        };
 
+        var __exitMenu = function () {
             that._accidentalWheel.removeWheel();
             docById('wheelDiv').style.display = 'none';
         };
-
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
-        };
-
-        // Hide the widget when the selection is made.
-        for (var i = 0; i < accidentalLabels.length; i++) {
-            this._accidentalWheel.navItems[i].navigateFunction = function () {
-                __selectionChanged();
-            };
-        }
 
         // Position the widget over the note block.
         var x = this.container.x;
@@ -2218,14 +2205,21 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._accidentalWheel.navigateWheel(i);
-        this._launchingPieMenu = false;
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < accidentalLabels.length; i++) {
+            this._accidentalWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
     };
 
     this._piemenuOctave = function (octave) {
         // wheelNav pie menu for octave selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
+
         // the octave selector
         this._octaveWheel = new wheelnav('wheelDiv', null, 600, 600);
 
@@ -2250,10 +2244,6 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
 
         var __selectionChanged = function () {
-            if (__launchingPieMenu()) {
-                return;
-            }
-
             that.value = that._octaveWheel.selectedNavItemIndex + 1;
             that.text.text = octaveLabels[that.value -1];
 
@@ -2261,21 +2251,12 @@ function Block(protoblock, blocks, overrideName) {
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
             that.updateCache();
+        };
 
+        var __exitMenu = function () {
             that._octaveWheel.removeWheel();
             docById('wheelDiv').style.display = 'none';
         };
-
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
-        };
-
-        // Hide the widget when the selection is made.
-        for (var i = 0; i < octaveLabels.length; i++) {
-            this._octaveWheel.navItems[i].navigateFunction = function () {
-                __selectionChanged();
-            };
-        }
 
         // Position the widget over the note block.
         var x = this.container.x;
@@ -2296,10 +2277,15 @@ function Block(protoblock, blocks, overrideName) {
             i = 3;
         }
 
-        console.log(i);
-
         this._octaveWheel.navigateWheel(i);
-        this._launchingPieMenu = false;
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < octaveLabels.length; i++) {
+            this._octaveWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
     };
 
     this._piemenuBasic = function (menuLabels, menuValues, selectedValue, colors) {
@@ -2310,7 +2296,7 @@ function Block(protoblock, blocks, overrideName) {
 
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
+
         // the selectedValueh selector
         this._basicWheel = new wheelnav('wheelDiv', null, 800, 800);
 
@@ -2336,10 +2322,6 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
 
         var __selectionChanged = function () {
-            if (__launchingPieMenu()) {
-                return;
-            }
-
             var label = that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex].title;
             var i = labels.indexOf(label);
             that.value = menuValues[i];
@@ -2349,21 +2331,12 @@ function Block(protoblock, blocks, overrideName) {
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
             that.updateCache();
+        };
 
+        var __exitMenu = function () {
             that._basicWheel.removeWheel();
             docById('wheelDiv').style.display = 'none';
         };
-
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
-        };
-
-        // Hide the widget when the exit button is clicked.
-        for (var i = 0; i < menuLabels.length; i++) {
-            this._basicWheel.navItems[i].navigateFunction = function () {
-                __selectionChanged();
-            };
-        }
 
         // Position the widget over the note block.
         var x = this.container.x;
@@ -2385,14 +2358,21 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._basicWheel.navigateWheel(i);
-        this._launchingPieMenu = false;
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < menuLabels.length; i++) {
+            this._basicWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
     };
 
     this._piemenuBoolean = function (booleanLabels, booleanValues, boolean) {
         // wheelNav pie menu for boolean selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
+
         // the booleanh selector
         this._booleanWheel = new wheelnav('wheelDiv', null, 600, 600);
 
@@ -2418,10 +2398,6 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
 
         var __selectionChanged = function () {
-            if (__launchingPieMenu()) {
-                return;
-            }
-
             var label = that._booleanWheel.navItems[that._booleanWheel.selectedNavItemIndex].title;
             var i = labels.indexOf(label);
             that.value = booleanValues[i];
@@ -2431,22 +2407,11 @@ function Block(protoblock, blocks, overrideName) {
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
             that.updateCache();
+        };
 
+        var __exitMenu = function () {
             that._booleanWheel.removeWheel();
             docById('wheelDiv').style.display = 'none';
-        };
-
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
-        };
-
-        // Hide the widget when the exit button is clicked.
-        this._booleanWheel.navItems[0].navigateFunction = function () {
-            __selectionChanged();
-        };
-
-        this._booleanWheel.navItems[1].navigateFunction = function () {
-            __selectionChanged();
         };
 
         // Position the widget over the note block.
@@ -2469,7 +2434,17 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._booleanWheel.navigateWheel(i);
-        this._launchingPieMenu = false;
+
+        // Hide the widget when the selection is made.
+        this._booleanWheel.navItems[0].navigateFunction = function () {
+            __selectionChanged();
+            __exitMenu();
+        };
+
+        this._booleanWheel.navItems[1].navigateFunction = function () {
+            __selectionChanged();
+            __exitMenu();
+        };
     };
 
     this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice) {
@@ -2483,7 +2458,7 @@ function Block(protoblock, blocks, overrideName) {
 
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
+
         // the voice selector
         this._voiceWheel = new wheelnav('wheelDiv', null, 800, 800);
         // exit button
@@ -2533,21 +2508,7 @@ function Block(protoblock, blocks, overrideName) {
             that.updateCache();
         };
 
-        // hide the widget when the exit button is clicked
-        this._exitWheel.navItems[0].navigateFunction = function () {
-            docById('wheelDiv').style.display = 'none';
-            __selectionChanged();
-        };
-
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
-        };
-
         var __voicePreview = function () {
-            if (__launchingPieMenu()) {
-                return;
-            }
-
             var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
             var voice = voiceValues[i];
@@ -2576,12 +2537,9 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.start();
 
             }, timeout);
-        };
 
-        // Set up handlers for voice preview.
-        for (var i = 0; i < voiceValues.length; i++) {
-            this._voiceWheel.navItems[i].navigateFunction = __voicePreview;
-        }
+            __selectionChanged();
+        };
 
         // position widget
         var x = this.container.x;
@@ -2603,16 +2561,24 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._voiceWheel.navigateWheel(i);
-        this._launchingPieMenu = false;
+
+        // Set up handlers for voice preview.
+        for (var i = 0; i < voiceValues.length; i++) {
+            this._voiceWheel.navItems[i].navigateFunction = __voicePreview;
+        }
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDiv').style.display = 'none';
+        };
     };
 
     this._piemenuIntervals = function (selectedInterval) {
         // pie menu for interval selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
 
-        //Use advanced constructor for more wheelnav on same div
+        // Use advanced constructor for more wheelnav on same div
         this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
         this._intervalWheel = new wheelnav('this._intervalWheel', this._intervalNameWheel.raphael);
         // exit button
@@ -2665,10 +2631,6 @@ function Block(protoblock, blocks, overrideName) {
 
         var that = this;
 
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
-        };
-
         // position widget
         var x = this.container.x;
         var y = this.container.y;
@@ -2682,7 +2644,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
 
-        //Add function to each main menu for show/hide sub menus
+        // Add function to each main menu for show/hide sub menus
+        // FIXME: Add all tabs to each interval
         var __setupAction = function (i, activeTabs) {
             that._intervalNameWheel.navItems[i].navigateFunction = function () {
                 for (var j = 0; j < 8; j++) {
@@ -2693,10 +2656,6 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
             };
-        }
-
-        for (var i = 0; i < INTERVALS.length; i++) {
-            __setupAction(i, INTERVALS[i][2]);
         }
 
         // navigate to a specific starting point
@@ -2720,45 +2679,40 @@ function Block(protoblock, blocks, overrideName) {
             this._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
         }
 
-        var __exit = function () {
-            __selectionChanged(true);
+        var __exitMenu = function () {
+            docById('wheelDiv').style.display = 'none';
         };
 
-        var __selectionChanged = function (exit) {
+        var __selectionChanged = function () {
             var label = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1];
             var number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
             var key = label + ' ' + number;
 
-            if (exit !== undefined) {
-                that.value = key;
-                that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
+            that.value = key;
+            that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
 
-                // Make sure text is on top.
-                var z = that.container.children.length - 1;
-                that.container.setChildIndex(that.text, z);
-                that.updateCache();
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
 
-                docById('wheelDiv').style.display = 'none';
-            } else {
-                console.log(key + ' ' + INTERVALVALUES[key][0]);
-                var obj = getNote('C', 4, INTERVALVALUES[key][0], 'C major', false, null, null);
-                obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+            var obj = getNote('C', 4, INTERVALVALUES[key][0], 'C major', false, null, null);
+            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
 
-                if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
-                    if (that.blocks.logo.instrumentNames[0] === undefined) {
-                        that.blocks.logo.instrumentNames[0] = [];
-                    }
-
-                    that.blocks.logo.instrumentNames[0].push('default');
-                    that.blocks.logo.synth.createDefaultSynth(0);
-                    that.blocks.logo.synth.loadSynth(0, 'default');
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
                 }
 
-                that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-                that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-                that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, 'default', null, null);
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
             }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, 'default', null, null);
         };
 
         // Set up handlers for preview.
@@ -2766,16 +2720,17 @@ function Block(protoblock, blocks, overrideName) {
             this._intervalWheel.navItems[i].navigateFunction = __selectionChanged;
         }
 
-        this._exitWheel.navItems[0].navigateFunction = __exit;
+        for (var i = 0; i < INTERVALS.length; i++) {
+            __setupAction(i, INTERVALS[i][2]);
+        }
 
-        this._launchingPieMenu = false;
+        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
     };
 
     this._piemenuModes = function (selectedMode) {
         // pie menu for mode selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
 
         //Use advanced constructor for more wheelnav on same div
         this._modeNameWheel = new wheelnav('wheelDiv', null, 1200, 1200);
@@ -2787,7 +2742,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._modeNameWheel.keynavigateEnabled = true;
 
-        //Customize slicePaths
+        // Customize slicePaths
         var colors = [];
         for (var i = 0; i < MODENAMES.length; i++) {
             var key = MODENAMES[i][1];
@@ -2857,8 +2812,18 @@ function Block(protoblock, blocks, overrideName) {
 
         var that = this;
 
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
+        var __exitMenu = function () {
+            docById('wheelDiv').style.display = 'none';
+        };
+
+        var __selectionChanged = function () {
+            that.value = MODENAMES[that._modeNameWheel.selectedNavItemIndex][1];
+            that.text.text = MODENAMES[that._modeNameWheel.selectedNavItemIndex][0];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
         };
 
         // position widget
@@ -2874,7 +2839,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
         docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
 
-        //Add function to each main menu for show/hide sub menus
+        // Add function to each main menu for show/hide sub menus
         var __setupAction = function (i, activeTabs) {
             that._modeNameWheel.navItems[i].navigateFunction = function () {
                 for (var j = 0; j < 12; j++) {
@@ -2884,6 +2849,8 @@ function Block(protoblock, blocks, overrideName) {
                         that._modeWheel.navItems[j].navItem.show();
                     }
                 }
+
+                __selectionChanged();
             };
         }
 
@@ -2912,21 +2879,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._modeNameWheel.navigateWheel(i);
 
-        var __selectionChanged = function () {
-            that.value = MODENAMES[that._modeNameWheel.selectedNavItemIndex][1];
-            that.text.text = MODENAMES[that._modeNameWheel.selectedNavItemIndex][0];
-
-            // Make sure text is on top.
-            var z = that.container.children.length - 1;
-            that.container.setChildIndex(that.text, z);
-            that.updateCache();
-
-            docById('wheelDiv').style.display = 'none';
-        };
-
-        this._exitWheel.navItems[0].navigateFunction = __selectionChanged;
-
-        this._launchingPieMenu = false;
+        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
     };
 
     this._labelChanged = function () {
