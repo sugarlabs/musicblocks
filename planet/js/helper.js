@@ -129,4 +129,14 @@ $(document).ready(function() {
             document.getElementById('search-close').style.display = 'none';
         }
     });
+    document.getElementById('local-tab').addEventListener('click', function (evt) {
+        toggleSearch(false);
+    });
+    document.getElementById('global-tab').addEventListener('click', function (evt) {
+        toggleSearch(true);
+    });
+    document.getElementById('view-more-chips').addEventListener('click', function (evt) {
+        toggleExpandable('morechips','flexchips');
+        toggleText('view-more-chips','View More','View Less');
+    });
 });
