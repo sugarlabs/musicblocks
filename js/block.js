@@ -2146,6 +2146,8 @@ function Block(protoblock, blocks, overrideName) {
 
         // the accidental selector
         this._accidentalWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._accidentalWheel.raphael);
 
         var labels = [];
         for (var i = 0; i < accidentalLabels.length; i++) {
@@ -2162,14 +2164,24 @@ function Block(protoblock, blocks, overrideName) {
         this._accidentalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
         this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
         this._accidentalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.5;
-        this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.75;
+        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.6;
         this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.titleRotateAngle = 0;
         this._accidentalWheel.animatetime = 300;
         this._accidentalWheel.createWheel(labels);
         this._accidentalWheel.setTooltips(accidentalLabels)
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
 
         var that = this;
 
@@ -2187,6 +2199,7 @@ function Block(protoblock, blocks, overrideName) {
 
         var __exitMenu = function () {
             that._accidentalWheel.removeWheel();
+            that._exitWheel.removeWheel();
             docById('wheelDiv').style.display = 'none';
         };
 
@@ -2218,6 +2231,11 @@ function Block(protoblock, blocks, overrideName) {
                 __exitMenu();
             };
         }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+                __exitMenu();
+        };
     };
 
     this._piemenuOctave = function (octave) {
@@ -2227,6 +2245,9 @@ function Block(protoblock, blocks, overrideName) {
 
         // the octave selector
         this._octaveWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._octaveWheel.raphael);
+
 
         // TODO: add prev, current, next options (but you'll need to
         // replace this number block with a text block)
@@ -2247,6 +2268,16 @@ function Block(protoblock, blocks, overrideName) {
         this._octaveWheel.animatetime = 300;
         this._octaveWheel.createWheel(octaveLabels);
 
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
         var that = this;
 
         var __selectionChanged = function () {
@@ -2261,6 +2292,7 @@ function Block(protoblock, blocks, overrideName) {
 
         var __exitMenu = function () {
             that._octaveWheel.removeWheel();
+            that._exitWheel.removeWheel();
             docById('wheelDiv').style.display = 'none';
         };
 
@@ -2292,6 +2324,11 @@ function Block(protoblock, blocks, overrideName) {
                 __exitMenu();
             };
         }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+                __exitMenu();
+        };
     };
 
     this._piemenuBasic = function (menuLabels, menuValues, selectedValue, colors) {
