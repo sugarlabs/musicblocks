@@ -2598,7 +2598,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalNameWheel.keynavigateEnabled = true;
 
         //Customize slicePaths for proper size
-        this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042'];
         this._intervalNameWheel.slicePathFunction = slicePath().DonutSlice;
         this._intervalNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -2606,6 +2606,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalNameWheel.sliceSelectedPathCustom = this._intervalNameWheel.slicePathCustom;
         this._intervalNameWheel.sliceInitPathCustom = this._intervalNameWheel.slicePathCustom;
         this._intervalNameWheel.titleRotateAngle = 0;
+        this._intervalNameWheel.clickModeRotate = false;
         // this._intervalNameWheel.clickModeRotate = false;
         var labels = [];
         for (var i = 0; i < INTERVALS.length; i++) {
@@ -2625,10 +2626,18 @@ function Block(protoblock, blocks, overrideName) {
 
         //Disable rotation, set navAngle and create the menus
         this._intervalWheel.clickModeRotate = false;
-        this._intervalWheel.navAngle = -(360 / 12) * 3.5;
-        // this._intervalWheel.selectedNavItemIndex = 2;
+        // Align each set of numbers with its corresponding interval
+        this._intervalWheel.navAngle = -(180 / labels.length) + (180 / (8 * labels.length));
         this._intervalWheel.animatetime = 300;
-        this._intervalWheel.createWheel(['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null]);
+
+        var numbers = [];
+        for (var i = 0; i < INTERVALS.length; i++) {
+            for (var j = 1; j < 9; j++) {
+                numbers.push(j.toString());
+            }
+        }
+
+        this._intervalWheel.createWheel(numbers);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2659,14 +2668,24 @@ function Block(protoblock, blocks, overrideName) {
         // FIXME: Add all tabs to each interval
         var __setupAction = function (i, activeTabs) {
             that._intervalNameWheel.navItems[i].navigateFunction = function () {
-                for (var j = 0; j < 8; j++) {
-                    if (activeTabs.indexOf(j + 1) === -1) {
-                        that._intervalWheel.navItems[j].navItem.hide();
-                    } else {
-                        that._intervalWheel.navItems[j].navItem.show();
+                for (var l = 0; l < labels.length; l++) {
+                    for (var j = 0; j < 8; j++) {
+                        if (l !== i) {
+                            that._intervalWheel.navItems[l * 8 + j].navItem.hide();
+                        } else if (activeTabs.indexOf(j + 1) === -1) {
+                            that._intervalWheel.navItems[l * 8 + j].navItem.hide();
+                        } else {
+                            that._intervalWheel.navItems[l * 8 + j].navItem.show();
+                        }
                     }
                 }
             };
+        };
+
+        // Set up action for interval name so number tabs will
+        // initialize on load.
+        for (var i = 0; i < INTERVALS.length; i++) {
+            __setupAction(i, INTERVALS[i][2]);
         }
 
         // navigate to a specific starting point
@@ -2727,12 +2746,8 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Set up handlers for preview.
-        for (var i = 0; i < 8; i++) {
+        for (var i = 0; i < 8 * labels.length; i++) {
             this._intervalWheel.navItems[i].navigateFunction = __selectionChanged;
-        }
-
-        for (var i = 0; i < INTERVALS.length; i++) {
-            __setupAction(i, INTERVALS[i][2]);
         }
 
         this._exitWheel.navItems[0].navigateFunction = __exitMenu;

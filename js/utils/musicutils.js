@@ -138,12 +138,12 @@ const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 const INVERTMODES = [[_('even'), 'even'], [_('odd'), 'odd'], [_('scalar'), 'scalar']];
 
 const INTERVALS = [
-    [_('unison'), 'unison', [1]],
     [_('augmented'), 'augmented', [1, 2, 3, 4, 5, 6, 7, 8]],
     [_('diminished'),'diminished', [2, 3, 4, 5, 6, 7, 8]],
     [_('minor'), 'minor', [2, 3, 6, 7]],
     [_('major'), 'major', [2, 3, 6, 7]],
     [_('perfect'), 'perfect', [4, 5, 8]],
+    [_('unison'), 'unison', [1]],
 ];
 
 const INTERVALNAMES = [
