@@ -1940,6 +1940,8 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 300;
         this._pitchWheel.createWheel(noteLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -1970,6 +1972,7 @@ function Block(protoblock, blocks, overrideName) {
             this._accidentalsWheel.colors.push('#c0c0c0');
         }
 
+        this._accidentalsWheel.animatetime = 300;
         this._accidentalsWheel.createWheel(accidentalLabels);
         this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
 
@@ -1982,6 +1985,7 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
             var octaveLabels = ['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null, null, null];
+            this._octavesWheel.animatetime = 300;
             this._octavesWheel.createWheel(octaveLabels);
         }
 
@@ -2163,6 +2167,7 @@ function Block(protoblock, blocks, overrideName) {
         this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.titleRotateAngle = 0;
+        this._accidentalWheel.animatetime = 300;
         this._accidentalWheel.createWheel(labels);
         this._accidentalWheel.setTooltips(accidentalLabels)
 
@@ -2239,6 +2244,7 @@ function Block(protoblock, blocks, overrideName) {
         this._octaveWheel.sliceSelectedPathCustom = this._octaveWheel.slicePathCustom;
         this._octaveWheel.sliceInitPathCustom = this._octaveWheel.slicePathCustom;
         this._octaveWheel.titleRotateAngle = 0;
+        this._octaveWheel.animatetime = 300;
         this._octaveWheel.createWheel(octaveLabels);
 
         var that = this;
@@ -2317,6 +2323,7 @@ function Block(protoblock, blocks, overrideName) {
         this._basicWheel.sliceSelectedPathCustom = this._basicWheel.slicePathCustom;
         this._basicWheel.sliceInitPathCustom = this._basicWheel.slicePathCustom;
         this._basicWheel.titleRotateAngle = 0;
+        this._basicWheel.animatetime = 300;
         this._basicWheel.createWheel(labels);
 
         var that = this;
@@ -2393,6 +2400,7 @@ function Block(protoblock, blocks, overrideName) {
         this._booleanWheel.sliceSelectedPathCustom = this._booleanWheel.slicePathCustom;
         this._booleanWheel.sliceInitPathCustom = this._booleanWheel.slicePathCustom;
         this._booleanWheel.titleRotateAngle = 0;
+        this._booleanWheel.animatetime = 300;
         this._booleanWheel.createWheel(labels);
 
         var that = this;
@@ -2476,6 +2484,7 @@ function Block(protoblock, blocks, overrideName) {
         this._voiceWheel.sliceSelectedPathCustom = this._voiceWheel.slicePathCustom;
         this._voiceWheel.sliceInitPathCustom = this._voiceWheel.slicePathCustom;
         this._voiceWheel.titleRotateAngle = 0;
+        this._voiceWheel.animatetime = 300;
         this._voiceWheel.createWheel(voiceLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -2603,6 +2612,7 @@ function Block(protoblock, blocks, overrideName) {
             labels.push(INTERVALS[i][1]);
         }
 
+        this._intervalNameWheel.animatetime = 300;
         this._intervalNameWheel.createWheel(labels);
 
         this._intervalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
@@ -2617,6 +2627,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalWheel.clickModeRotate = false;
         this._intervalWheel.navAngle = -(360 / 12) * 3.5;
         // this._intervalWheel.selectedNavItemIndex = 2;
+        this._intervalWheel.animatetime = 300;
         this._intervalWheel.createWheel(['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null]);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -2784,6 +2795,7 @@ function Block(protoblock, blocks, overrideName) {
             labels.push(MODENAMES[i][0]);
         }
 
+        this._modeNameWheel.animatetime = 300;
         this._modeNameWheel.createWheel(labels);
 
         this._modeWheel.colors = ['#77c428', '#93e042'];
@@ -2798,6 +2810,7 @@ function Block(protoblock, blocks, overrideName) {
         this._modeWheel.clickModeRotate = false;
         this._modeWheel.navAngle = -90;
         // this._modeWheel.selectedNavItemIndex = 2;
+        this._modeWheel.animatetime = 300;
         this._modeWheel.createWheel(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
