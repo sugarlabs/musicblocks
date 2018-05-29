@@ -1900,6 +1900,8 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
+        // wheelNav pie menu for pitch selection
+
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
         var hasOctaveWheel = (this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1);
@@ -1911,10 +1913,9 @@ function Block(protoblock, blocks, overrideName) {
             noteValues = ['C', 'G', 'D', 'A', 'E', 'B', 'F'];
         }
 
-        // wheelNav pie menu for pitch selection
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
-        this._launchingPieMenu = true;
+
         // the pitch selector
         this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
 
@@ -1984,105 +1985,6 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.createWheel(octaveLabels);
         }
 
-        var that = this;
-
-        var __selectionChanged = function () {
-            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-            var i = noteLabels.indexOf(label);
-            that.value = noteValues[i];
-            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
-            if (attr !== '♮') {
-                label += attr;
-                that.value += attr;
-            }
-
-            that.text.text = label;
-
-            // Make sure text is on top.
-            var z = that.container.children.length - 1;
-            that.container.setChildIndex(that.text, z);
-            that.updateCache();
-
-            if (hasOctaveWheel) {
-                // Set the octave of the pitch block if available
-                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
-                that.blocks.setPitchOctave(that.connections[0], octave);
-                that._octavesWheel.removeWheel();
-            }
-
-            that._pitchWheel.removeWheel();
-            that._accidentalsWheel.removeWheel();
-            that._exitWheel.removeWheel();
-        };
-
-        var __launchingPieMenu = function () {
-            return that._launchingPieMenu;
-        };
-
-        var __pitchPreview = function () {
-            if (__launchingPieMenu()) {
-                return;
-            }
-
-            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-            var i = noteLabels.indexOf(label);
-            var note = noteValues[i];
-            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
-
-            if (label === ' ') {
-                return;
-            } else if (attr !== '♮') {
-                note += attr;
-            }
-
-            if (hasOctaveWheel) {
-                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
-            } else {
-                octave = 4;
-            }
-
-            // FIX ME: get key signature if available
-            // FIX ME: get moveable if available
-            var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg);
-            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
-
-            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
-
-                that.blocks.logo.instrumentNames[0].push('default');
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, 'default');
-            }
-
-            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            console.log(obj[0] + obj[1]);
-            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
-        };
-
-        // Set up handlers for pitch preview.
-        for (var i = 0; i < noteValues.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
-        }
-
-        for (var i = 0; i < accidentals.length; i++) {
-            this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
-        }
-
-        if (hasOctaveWheel) {
-            for (var i = 0; i < 8; i++) {
-                this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
-            }
-        }
-
-        // Hide the widget when the exit button is clicked.
-        this._exitWheel.navItems[0].navigateFunction = function () {
-            docById('wheelDiv').style.display = 'none';
-            __selectionChanged();
-        };
-
         // Position the widget over the note block.
         var x = this.container.x;
         var y = this.container.y;
@@ -2138,7 +2040,99 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.navigateWheel(this._pitchOctave - 1);
         }
 
-        this._launchingPieMenu = false;
+        // Set up event handlers
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            that.value = noteValues[i];
+            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+            if (attr !== '♮') {
+                label += attr;
+                that.value += attr;
+            }
+
+            that.text.text = label;
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            if (hasOctaveWheel) {
+                // Set the octave of the pitch block if available
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+        };
+
+        var __pitchPreview = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            var note = noteValues[i];
+            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+
+            if (label === ' ') {
+                return;
+            } else if (attr !== '♮') {
+                note += attr;
+            }
+
+            if (hasOctaveWheel) {
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            } else {
+                octave = 4;
+            }
+
+            // FIX ME: get key signature if available
+            // FIX ME: get moveable if available
+            var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg);
+            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            console.log(obj[0] + obj[1]);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+
+            __selectionChanged();
+        };
+
+        // Set up handlers for pitch preview.
+        for (var i = 0; i < noteValues.length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        for (var i = 0; i < accidentals.length; i++) {
+            this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        if (hasOctaveWheel) {
+            for (var i = 0; i < 8; i++) {
+                this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
+        }
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDiv').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._accidentalsWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            if (hasOctaveWheel) {
+                that._octavesWheel.removeWheel();
+            }
+        };
     };
 
     this._piemenuAccidentals = function (accidentalLabels, accidentalValues, accidental) {
