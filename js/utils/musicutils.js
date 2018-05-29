@@ -138,16 +138,15 @@ const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 const INVERTMODES = [[_('even'), 'even'], [_('odd'), 'odd'], [_('scalar'), 'scalar']];
 
 const INTERVALS = [
-    [_('augmented'), 'augmented', [1, 2, 3, 4, 5, 6, 7, 8]],
-    [_('diminished'),'diminished', [2, 3, 4, 5, 6, 7, 8]],
+    [_('perfect'), 'perfect', [1, 4, 5, 8]],
     [_('minor'), 'minor', [2, 3, 6, 7]],
+    [_('diminished'),'diminished', [2, 3, 4, 5, 6, 7, 8]],
+    [_('augmented'), 'augmented', [1, 2, 3, 4, 5, 6, 7, 8]],
     [_('major'), 'major', [2, 3, 6, 7]],
-    [_('perfect'), 'perfect', [4, 5, 8]],
-    [_('unison'), 'unison', [1]],
 ];
 
 const INTERVALNAMES = [
-    [_('unison'), 'unison'],
+    [_('unison'), 'perfect 1'],
     [_('augmented') + ' 1', 'augmented 1'],
     [_('diminished') + ' 2', 'diminished 2'],
     [_('minor') + ' 2', 'minor 2'],
@@ -178,7 +177,7 @@ const INTERVALNAMES = [
 
 // [semi-tones, direction -1 == down; 0 == neutral; 1 == up]
 const INTERVALVALUES = {
-    'unison': [0, 0],
+    'perfect 1': [0, 0],
     'augmented 1': [1, 1],
     'diminished 2': [0, -1],
     'minor 2': [1, -1],

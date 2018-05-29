@@ -2598,7 +2598,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalNameWheel.keynavigateEnabled = true;
 
         //Customize slicePaths for proper size
-        this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042'];
+        this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
         this._intervalNameWheel.slicePathFunction = slicePath().DonutSlice;
         this._intervalNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -2720,7 +2720,11 @@ function Block(protoblock, blocks, overrideName) {
             var key = label + ' ' + number;
 
             that.value = key;
-            that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
+            if (key === 'perfect 1') {
+                that.text.text = 'unison';
+            } else {
+                that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
+            }
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
