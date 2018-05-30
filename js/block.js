@@ -2946,8 +2946,10 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '600px';
         docById('wheelDiv').style.width = '600px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
+
+        // This widget is large. Be sure it fits on the screen.
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 600, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 650, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
 
         // Add function to each main menu for show/hide sub menus
         var __setupAction = function (i, activeTabs) {
