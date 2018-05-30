@@ -313,6 +313,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _findBlocks() {
+            hideDOMLabel();
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
@@ -475,6 +476,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _allClear() {
+            hideDOMLabel();
+
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
@@ -515,6 +518,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doFastButton(env) {
+            hideDOMLabel();
+
             stage.on('stagemousemove', function (event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
@@ -590,6 +595,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doSlowButton() {
+            hideDOMLabel();
+
             stage.on('stagemousemove', function (event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
@@ -610,6 +617,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepButton() {
+            hideDOMLabel();
+
             stage.on('stagemousemove', function (event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
@@ -636,6 +645,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doSlowMusicButton() {
+            hideDOMLabel();
+
             stage.on('stagemousemove', function (event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
@@ -656,6 +667,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepMusicButton() {
+            hideDOMLabel();
+
             stage.on('stagemousemove', function (event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
@@ -682,6 +695,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doHardStopButton(onblur) {
+            hideDOMLabel();
+
             if (onblur == undefined) {
                 onblur = false;
             }
@@ -710,6 +725,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _hideBoxes() {
+            hideDOMLabel();
+
             pasteBox.hide();
             clearBox.hide();
             saveBox.hide();
@@ -1088,19 +1105,19 @@ define(MYDEFINES, function (compatibility) {
                 .setPause(doPausePlayback)
                 .setRewind(doRestartPlayback);
 
-	    playbackOnLoad = function() {
+            playbackOnLoad = function() {
                 if (_THIS_IS_TURTLE_BLOCKS_) {
-		    // Play playback queue if there is one.
-		    for (turtle in logo.playbackQueue) {
+                    // Play playback queue if there is one.
+                    for (turtle in logo.playbackQueue) {
                         if (logo.playbackQueue[turtle].length > 0) {
-			    setTimeout(function () {
+                            setTimeout(function () {
                                 logo.playback(-1);
-			    }, 3000);
-			    break;
+                            }, 3000);
+                            break;
                         }
-		    }
+                    }
                 }
-	    };
+            };
 
             function PlanetInterface(storage) {
                 this.planet = null;
@@ -2303,7 +2320,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planet-iframe').style.display === '' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
+                var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planet-iframe').style.display === '' || docById('paste').style.visibility === 'visible' || docById('wheelDiv').style.display === '' || logo.turtles.running();
             } else {
                 var disableKeys = searchWidget.style.visibility === 'visible' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
             }
@@ -2815,6 +2832,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _changeBlockVisibility() {
+            hideDOMLabel();
+
             if (blocks.visible) {
                 logo.hideBlocks();
                 palettes.hide();
@@ -2834,6 +2853,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _toggleCollapsibleStacks() {
+            hideDOMLabel();
+
             if (blocks.visible) {
                 console.log('calling toggleCollapsibles');
                 blocks.toggleCollapsibles();

@@ -670,44 +670,9 @@ function hideDOMLabel () {
         numberLabel.style.display = 'none';
     }
 
-    var solfegeLabel = docById('solfegeLabel');
-    if (solfegeLabel !== null) {
-        solfegeLabel.style.display = 'none';
-    }
-
-    var notenameLabel = docById('notenameLabel');
-    if (notenameLabel !== null) {
-        notenameLabel.style.display = 'none';
-    }
-
-    var noteattrLabel = docById('noteattrLabel');
-    if (noteattrLabel !== null) {
-        noteattrLabel.style.display = 'none';
-    }
-
-    var drumnameLabel = docById('drumnameLabel');
-    if (drumnameLabel !== null) {
-        drumnameLabel.style.display = 'none';
-    }
-
-    var voicenameLabel = docById('voicenameLabel');
-    if (voicenameLabel !== null) {
-        voicenameLabel.style.display = 'none';
-    }
-
-    var modenameLabel = docById('modenameLabel');
-    if (modenameLabel !== null) {
-        modenameLabel.style.display = 'none';
-    }
-
-    var filtertypeLabel = docById('filtertypeLabel');
-    if (filtertypeLabel !== null) {
-        filtertypeLabel.style.display = 'none';
-    }
-
-    var oscillatortypeLabel = docById('oscillatortypeLabel');
-    if (oscillatortypeLabel !== null) {
-        oscillatortypeLabel.style.display = 'none';
+    var piemenu = docById('wheelDiv');
+    if (piemenu !== null) {
+        piemenu.style.display = 'none';
     }
 };
 

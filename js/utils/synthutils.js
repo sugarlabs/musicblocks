@@ -13,49 +13,49 @@ const POLYCOUNT = 3;
 
 var VOICENAMES = [
     //.TRANS: musical instrument
-    [_('violin'), 'violin', 'images/voices.svg'],
+    [_('violin'), 'violin', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('cello'), 'cello', 'images/voices.svg'],
+    [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    // [_('bass'), 'basse', 'images/voices.svg'],
+    // [_('bass'), 'basse', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('guitar'), 'guitar', 'images/voices.svg'],
+    [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('flute'), 'flute', 'images/voices.svg'],
+    [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
-    [_('clarinet'), 'clarinet', 'images/voices.svg'],
+    [_('clarinet'), 'clarinet', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
-    [_('saxophone'), 'saxophone', 'images/voices.svg'],
+    [_('saxophone'), 'saxophone', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
-    [_('tuba'), 'tuba', 'images/voices.svg'],
+    [_('tuba'), 'tuba', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
-    [_('trumpet'), 'trumpet', 'images/voices.svg'],
+    [_('trumpet'), 'trumpet', 'images/voices.svg', 'wind'],
     //.TRANS: polytone synthesizer
-    [_('default'), 'default', 'images/synth.svg'],
+    [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-1'), 'mono1', 'images/synth.svg'],
+    [_('simple-1'), 'mono1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-2'), 'mono2', 'images/synth.svg'],
+    [_('simple-2'), 'mono2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-3'), 'mono3', 'images/synth.svg'],
+    [_('simple-3'), 'mono3', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-4'), 'mono4', 'images/synth.svg'],
+    [_('simple-4'), 'mono4', 'images/synth.svg', 'electronic'],
     //.TRANS: white noise synthesizer
-    [_('white-noise'), 'noise1', 'images/synth.svg'],
+    [_('white-noise'), 'noise1', 'images/synth.svg', 'electronic'],
     //.TRANS: brown noise synthesizer
-    [_('brown-noise'), 'noise2', 'images/synth.svg'],
+    [_('brown-noise'), 'noise2', 'images/synth.svg', 'electronic'],
     //.TRANS: pink noise synthesizer
-    [_('pink-noise'), 'noise3', 'images/synth.svg'],
+    [_('pink-noise'), 'noise3', 'images/synth.svg', 'electronic'],
     //.TRANS: sine wave
-    [_('sine'), 'sine', 'images/synth.svg'],
+    [_('sine'), 'sine', 'images/synth.svg', 'electronic'],
     //.TRANS: square wave
-    [_('square'), 'square', 'images/synth.svg'],
+    [_('square'), 'square', 'images/synth.svg', 'electronic'],
     //.TRANS: sawtooth wave
-    [_('sawtooth'), 'sawtooth', 'images/synth.svg'],
+    [_('sawtooth'), 'sawtooth', 'images/synth.svg', 'electronic'],
     //.TRANS: triangle wave
-    [_('triangle'), 'triangle', 'images/synth.svg'],
+    [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
     //.TRANS: customize voice
-    [_('custom'), 'custom', 'images/synth.svg'],
+    [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
 ];
 
 
@@ -63,51 +63,51 @@ var VOICENAMES = [
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
 var DRUMNAMES = [
     //.TRANS: musical instrument
-    [_('snare-drum'), 'snare drum', 'images/snaredrum.svg', 'sn'],
+    [_('snare-drum'), 'snare drum', 'images/snaredrum.svg', 'sn', 'drum'],
     //.TRANS: musical instrument
-    [_('kick-drum'), 'kick drum', 'images/kick.svg', 'hh'],
+    [_('kick-drum'), 'kick drum', 'images/kick.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
-    [_('tom-tom'), 'tom tom', 'images/tom.svg', 'tomml'],
+    [_('tom-tom'), 'tom tom', 'images/tom.svg', 'tomml', 'drum'],
     //.TRANS: musical instrument
-    [_('floor-tom-tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl'],
+    [_('floor-tom-tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl', 'drum'],
     //.TRANS: a drum made from an inverted cup
-    [_('cup-drum'), 'cup drum', 'images/cup.svg', 'hh'],
+    [_('cup-drum'), 'cup drum', 'images/cup.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
-    [_('darbuka-drum'), 'darbuka drum', 'images/darbuka.svg', 'hh'],
+    [_('darbuka-drum'), 'darbuka drum', 'images/darbuka.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
-    [_('hi-hat'), 'hi hat', 'images/hihat.svg', 'hh'],
+    [_('hi-hat'), 'hi hat', 'images/hihat.svg', 'hh', 'bell'],
     //.TRANS: a small metal bell
-    [_('ride-bell'), 'ride bell', 'images/ridebell.svg', 'rb'],
+    [_('ride-bell'), 'ride bell', 'images/ridebell.svg', 'rb', 'bell'],
     //.TRANS: musical instrument
-    [_('cow-bell'), 'cow bell', 'images/cowbell.svg', 'cb'],
+    [_('cow-bell'), 'cow bell', 'images/cowbell.svg', 'cb', 'bell'],
     //.TRANS: musical instrument
-    [_('triangle-bell'), 'triangle bell', 'images/trianglebell.svg', 'tri'],
+    [_('triangle-bell'), 'triangle bell', 'images/trianglebell.svg', 'tri', 'bell'],
     //.TRANS: musical instrument
-    [_('finger-cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca'],
+    [_('finger-cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
-    [_('chime'), 'chine', 'images/chine.svg', 'cymca'],
+    [_('chime'), 'chine', 'images/chine.svg', 'cymca', 'bell'],
     //.TRANS: sound effect
-    [_('clang'), 'clang', 'images/clang.svg', 'cymca'],
+    [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
-    [_('crash'), 'crash', 'images/crash.svg', 'cymca'],
+    [_('crash'), 'crash', 'images/crash.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
-    [_('bottle'), 'bottle', 'images/bottle.svg', 'hh'],
+    [_('bottle'), 'bottle', 'images/bottle.svg', 'hh', 'effect'],
     //.TRANS: sound effect
-    [_('clap'), 'clap', 'images/clap.svg', 'hc'],
+    [_('clap'), 'clap', 'images/clap.svg', 'hc', 'effect'],
     //.TRANS: sound effect
-    [_('slap'), 'slap', 'images/slap.svg', 'vibs'],
+    [_('slap'), 'slap', 'images/slap.svg', 'vibs', 'effect'],
     //.TRANS: sound effect
-    [_('splash'), 'splash', 'images/splash.svg', 'hh'],
+    [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
     //.TRANS: sound effect
-    [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh'],
+    [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
     //.TRANS: animal sound effect
-    [_('cat'), 'cat', 'images/cat.svg', 'hh'],
+    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh'],
+    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('dog'), 'dog', 'images/dog.svg', 'hh'],
+    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/duck.svg', 'hh'],
+    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
 ];
 
 var SOUNDSAMPLESDEFINES = [
@@ -243,11 +243,11 @@ function Synth() {
         };
 
         for (var key in noteFrequency) {
-            if (key.substring(1, key.length) == FLAT || key.substring(1, key.length) == 'b' ) {
+            if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === 'b' ) {
                 var note = key.substring(0, 1) + '' + 'b';
                 noteFrequency[note] = noteFrequency[key];
                 delete noteFrequency[key]; 
-            } else if (key.substring(1, key.length) == SHARP || key.substring(1, key.length) == '#' ) {
+            } else if (key.substring(1, key.length) === SHARP || key.substring(1, key.length) === '#' ) {
                 var note = key.substring(0, 1) + '' + '#';
                 noteFrequency[note] = noteFrequency[key];
                 delete noteFrequency[key]; 
@@ -321,7 +321,7 @@ function Synth() {
             ]
         }
 
-        if (this.samples == null) {
+        if (this.samples === null) {
             this.samples = {};
             for (var type in this.samplesManifest) {
                 if (this.samplesManifest.hasOwnProperty(type)) {
@@ -364,7 +364,7 @@ function Synth() {
     this.getDefaultParamValues = function (sourceName) {
         // sourceName may need to be 'untranslated'
         var sourceNameLC = sourceName.toLowerCase();
-        if (getOscillatorTypes(sourceNameLC) != null) {
+        if (getOscillatorTypes(sourceNameLC) !== null) {
             sourceNameLC = getOscillatorTypes(sourceNameLC);
         }
 
@@ -677,7 +677,7 @@ function Synth() {
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (turtle, instrumentName, sourceName, params) {
         // We may have a race condition with the samples loader.
-        if (this.samples == null) {
+        if (this.samples === null) {
             this.samplesQueue.push([instrumentName, sourceName, params]);
 
             var that = this;
@@ -690,7 +690,9 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
-        if (instruments[turtle][sourceName] == null) {
+        if (sourceName in instruments[turtle]) {
+            console.log(sourceName + ' already loaded');
+        } else {
             console.log('loading ' + sourceName);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
@@ -706,10 +708,10 @@ function Synth() {
         if (this.inTemperament !== 'equal') {
             notes = this.getFrequency(notes, this.changeInTemperament);
         }
-        if (paramsEffects == null && paramsFilters == null) {
+        if (paramsEffects === null && paramsFilters === null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
-            if (paramsFilters != null && paramsFilters != undefined) {
+            if (paramsFilters !== null && paramsFilters !== undefined) {
                 var numFilters = paramsFilters.length;  // no. of filters
                 var k = 0;
                 var temp_filters = [];
@@ -722,7 +724,7 @@ function Synth() {
                 }
             }
 
-            if (paramsEffects != null && paramsEffects != undefined) {
+            if (paramsEffects !== null && paramsEffects !== undefined) {
                 if (paramsEffects.doVibrato) {
                     var vibrato = new Tone.Vibrato(1 / paramsEffects.vibratoFrequency, paramsEffects.vibratoIntensity);
                     synth.chain(vibrato, Tone.Master);
@@ -762,9 +764,9 @@ function Synth() {
                 if (paramsEffects.doPartials) {
                     // Depending on the synth, the oscillator is found
                     // somewhere else in the synth obj.
-                    if (synth.oscillator != undefined) {
+                    if (synth.oscillator !== undefined) {
                         synth.oscillator.partials = paramsEffects.partials;
-                    } else if (synth.voices != undefined) {
+                    } else if (synth.voices !== undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].oscillator.partials = paramsEffects.partials;
                         }
@@ -776,9 +778,9 @@ function Synth() {
                 if (paramsEffects.doPortamento) {
                     // Depending on the synth, the oscillator is found
                     // somewhere else in the synth obj.
-                    if (synth.oscillator != undefined) {
+                    if (synth.oscillator !== undefined) {
                         synth.portamento = paramsEffects.portamento;
-                    } else if (synth.voices != undefined) {
+                    } else if (synth.voices !== undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].portamento = paramsEffects.portamento;
                         }
@@ -809,10 +811,10 @@ function Synth() {
             }
 
             if (!paramsEffects.doNeighbor) {
-                if (setNote != undefined && setNote) {
-                    if (synth.oscillator != undefined) {
+                if (setNote !== undefined && setNote) {
+                    if (synth.oscillator !== undefined) {
                         synth.setNote(notes);
-                    } else if (synth.voices != undefined) {
+                    } else if (synth.voices !== undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].setNote(notes);
                         }
@@ -825,7 +827,7 @@ function Synth() {
             }
 
             setTimeout(function () {
-                if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
+                if (paramsEffects && paramsEffects !== null && paramsEffects !== undefined) {
                     if (paramsEffects.doVibrato) {
                         vibrato.dispose();
                     }
@@ -851,7 +853,7 @@ function Synth() {
                     }
                 }
 
-                if (paramsFilters && paramsFilters != null && paramsFilters != undefined) {
+                if (paramsFilters && paramsFilters !== null && paramsFilters !== undefined) {
                     for (k = 0; k < numFilters; k++) {
                         temp_filters[k].dispose();
                     }
@@ -863,23 +865,23 @@ function Synth() {
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
         if (paramsEffects !== null && paramsEffects !== undefined) {
-            if (paramsEffects['vibratoIntensity'] != 0) {
+            if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
             }
 
-            if (paramsEffects['distortionAmount'] != 0) {
+            if (paramsEffects['distortionAmount'] !== 0) {
                 paramsEffects.doDistortion = true;
             }
 
-            if (paramsEffects['tremoloFrequency'] != 0) {
+            if (paramsEffects['tremoloFrequency'] !== 0) {
                 paramsEffects.doTremolo = true;
             }
 
-            if (paramsEffects['rate'] != 0) {
+            if (paramsEffects['rate'] !== 0) {
                 paramsEffects.doPhaser = true;
             }
 
-            if (paramsEffects['chorusRate'] != 0) {
+            if (paramsEffects['chorusRate'] !== 0) {
                 paramsEffects.doChorus = true;
             }
 

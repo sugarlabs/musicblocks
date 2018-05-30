@@ -5793,7 +5793,7 @@ function Logo () {
                     }
 
                     if (!this.suppressOutput[turtle]) {
-                        that._setSynthVolume(turtle, synth, newVolume);
+                        that.setSynthVolume(turtle, synth, newVolume);
                     }
                 }
 
@@ -5814,7 +5814,7 @@ function Logo () {
                 var __listener = function (event) {
                     for (var synth in that.synthVolume[turtle]) {
                         that.synthVolume[turtle][synth].pop();
-                        that._setSynthVolume(turtle, synth, last(that.synthVolume[turtle][synth]));
+                        that.setSynthVolume(turtle, synth, last(that.synthVolume[turtle][synth]));
                         that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setsynthvolume', synth, last(that.synthVolume[turtle][synth])]);
                     }
 
@@ -5939,7 +5939,7 @@ function Logo () {
 
                     that.synthVolume[turtle][synth].push(args[1]);
                     if (!this.suppressOutput[turtle]) {
-                        that._setSynthVolume(turtle, synth, args[1]);
+                        that.setSynthVolume(turtle, synth, args[1]);
                     }
 
                     if (that.justCounting[turtle].length === 0) {
@@ -6004,7 +6004,7 @@ function Logo () {
 
                 that.synthVolume[turtle][synth].push(args[1]);
                 if (!this.suppressOutput[turtle]) {
-                    that._setSynthVolume(turtle, synth, args[1]);
+                    that.setSynthVolume(turtle, synth, args[1]);
                 }
 
                 if (that.justCounting[turtle].length === 0) {
@@ -6021,7 +6021,7 @@ function Logo () {
                     that.synthVolume[turtle][synth].pop();
                     // Restore previous volume.
                     if (that.justCounting[turtle].length === 0 && that.synthVolume[turtle][synth].length > 0) {
-                        that._setSynthVolume(turtle, synth, last(that.synthVolume[turtle][synth]));
+                        that.setSynthVolume(turtle, synth, last(that.synthVolume[turtle][synth]));
                         that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setsynthvolume', synth, last(that.synthVolume[turtle][synth])]);
                     }
                 };
@@ -6839,7 +6839,7 @@ function Logo () {
         }
     };
 
-    this._setSynthVolume = function (turtle, synth, volume) {
+    this.setSynthVolume = function (turtle, synth, volume) {
         if (volume > 100) {
             volume = 100;
         } else if (volume < 0) {
@@ -7007,7 +7007,7 @@ function Logo () {
         if (this.inCrescendo[turtle].length > 0 && this.crescendoDelta[turtle].length === 0) {
             this.inCrescendo[turtle].pop();
             for (var synth in this.synthVolume[turtle]) {
-                this._setSynthVolume(turtle, 'default', last(this.synthVolume[turtle][synth]));
+                this.setSynthVolume(turtle, 'default', last(this.synthVolume[turtle][synth]));
                 this._playbackPush(turtle, [this.previousTurtleTime[turtle], 'setsynthvolume', synth, last(this.synthVolume[turtle][synth])]);
             }
         } else if (this.crescendoDelta[turtle].length > 0) {
@@ -7021,7 +7021,7 @@ function Logo () {
                 console.log(synth + '= ' + this.synthVolume[turtle][synth][len - 1]);
                 this._playbackPush(turtle, [this.previousTurtleTime[turtle], 'setsynthvolume', synth, last(this.synthVolume[turtle][synth])]);
                 if (!this.suppressOutput[turtle]) {
-                    this._setSynthVolume(turtle, synth, last(this.synthVolume[turtle][synth]));
+                    this.setSynthVolume(turtle, synth, last(this.synthVolume[turtle][synth]));
                 }
             }
         }
@@ -7909,7 +7909,7 @@ function Logo () {
                     that._setMasterVolume(that.playbackQueue[turtle][idx][2]);
                     break;
                 case 'setsynthvolume':
-                    that._setSynthVolume(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
+                    that.setSynthVolume(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
                 case 'arc':
                     that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
@@ -8575,7 +8575,7 @@ function Logo () {
 
         this._setMasterVolume(DEFAULTVOLUME);
         for (var synth in this.synthVolume[turtle]) {
-            this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
+            this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
         }
 
         this.synth.start();
@@ -10489,7 +10489,7 @@ function Logo () {
             this._setMasterVolume(DEFAULTVOLUME);
             for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (var synth in this.synthVolume[turtle]) {
-                    this._setSynthVolume(turtle, synth, DEFAULTVOLUME);
+                    this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
                 }
             }
         }

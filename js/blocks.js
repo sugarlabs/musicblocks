@@ -965,11 +965,6 @@ function Blocks () {
             this._deletePitchBlocks(thisBlock);
             return this.blockList[thisBlock].connections[0];
         } else {
-            if (thisBlockobj && thisBlockobj.connections.length === 1) {
-                console.log('Value block encountered? ' + thisBlockobj.name);
-                return;
-            }
-
             while (thisBlockobj.connections[0] != null) {
                 var i = thisBlockobj.connections[0];
                 if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
@@ -1364,7 +1359,7 @@ function Blocks () {
 
             // Remove the silence block (if it is present) after
             // adding a new block inside of a note block.
-            if (this._insideNoteBlock(thisBlock) != null) {
+            if (this._insideNoteBlock(thisBlock) != null && this.blockList[thisBlock].connections.length > 1) {
                 // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
@@ -2144,8 +2139,6 @@ function Blocks () {
             postProcessArg = [thisBlock, _('true')];
         } else if (name === 'solfege') {
             postProcessArg = [thisBlock, 'sol'];
-        } else if (name === 'eastindiansolfege') {
-            postProcessArg = [thisBlock, 'pa'];
         } else if (name === 'notename') {
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
@@ -2156,6 +2149,16 @@ function Blocks () {
             postProcessArg = [thisBlock, DEFAULTOSCILLATORTYPE];
         } else if (name === 'voicename') {
             postProcessArg = [thisBlock, DEFAULTVOICE];
+        } else if (name === 'eastindiansolfege') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text =  WESTERN2EISOLFEGENAMES[value];
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'modename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2997,6 +3000,47 @@ function Blocks () {
                 }
             } else {
                 return this._insideNoteBlock(cblk);
+            }
+        }
+    };
+
+    this.findPitchOctave = function (blk) {
+        // Returns octave associated with pitch block.
+        if (blk === null) {
+            return 4;
+        }
+
+        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blockList[blk].name) !== -1) {
+            var oblk = this.blockList[blk].connections[2];
+            if (oblk === null) {
+                return 4;
+            } else if (this.blockList[oblk].name === 'number') {
+                return this.blockList[oblk].value;
+            } else {
+                return 4;
+            }
+        } else {
+            return 4;
+        }
+    };
+
+    this.setPitchOctave = function (blk, octave) {
+        // Set octave associated with pitch block
+        if (blk === null) {
+            return;
+        }
+
+        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blockList[blk].name) !== -1) {
+            var oblk = this.blockList[blk].connections[2];
+            if (oblk !== null && this.blockList[oblk].name === 'number') {
+                var thisBlock = this.blockList[oblk];
+                thisBlock.value = octave;
+                thisBlock.text.text = octave.toString();
+
+                // Make sure text is on top.
+                var z = thisBlock.container.children.length - 1;
+                thisBlock.container.setChildIndex(thisBlock.text, z);
+                thisBlock.container.updateCache();
             }
         }
     };

@@ -131,13 +131,22 @@ const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(e
 const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
 
 //.TRANS: sharp, flat, and natural are music terms related to pitch
-const ACCIDENTALNAMES = [_('double sharp') + ' ' + DOUBLESHARP, _('sharp') + ' ' + SHARP, _('natural') + ' ' + NATURAL, _('flat') + ' ' + FLAT, _('double flat') + ' ' + DOUBLEFLAT];
+const ACCIDENTALLABELS = [_('double sharp') + ' ' + DOUBLESHARP, _('sharp') + ' ' + SHARP, _('natural') + ' ' + NATURAL, _('flat') + ' ' + FLAT, _('double flat') + ' ' + DOUBLEFLAT];
+const ACCIDENTALNAMES = ['double sharp' + ' ' + DOUBLESHARP, 'sharp' + ' ' + SHARP, 'natural' + ' ' + NATURAL, 'flat' + ' ' + FLAT, 'double flat' + ' ' + DOUBLEFLAT];
 const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 
 const INVERTMODES = [[_('even'), 'even'], [_('odd'), 'odd'], [_('scalar'), 'scalar']];
 
+const INTERVALS = [
+    [_('perfect'), 'perfect', [1, 4, 5, 8]],
+    [_('minor'), 'minor', [2, 3, 6, 7]],
+    [_('diminished'),'diminished', [2, 3, 4, 5, 6, 7, 8]],
+    [_('augmented'), 'augmented', [1, 2, 3, 4, 5, 6, 7, 8]],
+    [_('major'), 'major', [2, 3, 6, 7]],
+];
+
 const INTERVALNAMES = [
-    [_('unison'), 'unison'],
+    [_('unison'), 'perfect 1'],
     [_('augmented') + ' 1', 'augmented 1'],
     [_('diminished') + ' 2', 'diminished 2'],
     [_('minor') + ' 2', 'minor 2'],
@@ -168,7 +177,7 @@ const INTERVALNAMES = [
 
 // [semi-tones, direction -1 == down; 0 == neutral; 1 == up]
 const INTERVALVALUES = {
-    'unison': [0, 0],
+    'perfect 1': [0, 0],
     'augmented 1': [1, 1],
     'diminished 2': [0, -1],
     'minor 2': [1, -1],
@@ -209,7 +218,7 @@ const MUSICALMODES = {
     'algerian': [2, 1, 2, 1, 1, 1, 3, 1],
     'diminished': [2, 1, 2, 1, 2, 1, 2, 1],
     'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
-    'ocatonic': [1, 2, 1, 2, 1, 2, 1, 2],
+    'octatonic': [1, 2, 1, 2, 1, 2, 1, 2],
 
      // 7 notes in an octave
     'major': [2, 2, 1, 2, 2, 2, 1],
@@ -336,7 +345,6 @@ var MODENAMES = [
     [_('in') + ' (' + _('Japan') + ')', 'in (Japan)'],
     //.TRANS: Japanese pentatonic scale for music
     [_('minyo') + ' (' + _('Japan') + ')', 'minyo (Japan)'],
-    [_('japanese'), 'japanese'],
     //.TRANS: Italian mathematician
     [_('fibonacci'), 'fibonacci'],
     [_('custom'), 'custom'],
@@ -377,12 +385,11 @@ var TEMPERAMENTS = [
     //.TRANS: musical temperament
     [_('equal'), 'equal'],
     //.TRANS: musical temperament
-    [_('just-intonation'), 'just intonation'],
+    [_('Pythagorean'), 'just intonation'],
     //.TRANS: musical temperament
-    [_('1/3-comma-meantone'), '1/3 comma meantone'],
+    [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
     //.TRANS: musical temperament
-    [_('1/4-comma-meantone'), '1/4 comma meantone'],
-
+    [_('meantone') + ' (1/4)', '1/4 comma meantone'],
     [_('custom'), 'custom'],
 
 ];
