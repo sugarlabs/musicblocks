@@ -2796,6 +2796,24 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuModes = function (selectedMode) {
         // pie menu for mode selection
+
+        // Look for a key block
+        var key = 'C';
+
+        var c = this.connections[0];
+        if (c !== null) {
+            if (this.blocks.blockList[c].name === 'setkey2') {
+                var c1 = this.blocks.blockList[c].connections[1];
+                if (c1 !== null) {
+                    if (this.blocks.blockList[c1].name === 'notename') {
+                        var key = this.blocks.blockList[c1].value;
+                    }
+                }
+            }
+        }
+
+        console.log(key);
+
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
@@ -2812,9 +2830,9 @@ function Block(protoblock, blocks, overrideName) {
         // Customize slicePaths
         var colors = [];
         for (var i = 0; i < MODENAMES.length; i++) {
-            var key = MODENAMES[i][1];
-            if (key in MUSICALMODES) {
-                switch (MUSICALMODES[key].length % 5) {
+            var mode = MODENAMES[i][1];
+            if (mode in MUSICALMODES) {
+                switch (MUSICALMODES[mode].length % 5) {
                 case 0:
                     colors.push('#5ba900');
                     break;
@@ -2885,6 +2903,29 @@ function Block(protoblock, blocks, overrideName) {
             docById('wheelDiv').style.display = 'none';
         };
 
+        var __playNote = function () {
+            var i = that._modeWheel.selectedNavItemIndex;
+            // console.log(key + ' ' + i + ' ' + MODENAMES[that._modeNameWheel.selectedNavItemIndex][1]);
+            // The mode doesn't matter here, since we are using semi-tones.
+            var obj = getNote(key, 4, i, key + ' chromatic', false, null, null);
+            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+            console.log(obj[0]);
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+        };
+
         var __selectionChanged = function () {
             that.value = MODENAMES[that._modeNameWheel.selectedNavItemIndex][1];
             that.text.text = MODENAMES[that._modeNameWheel.selectedNavItemIndex][0];
@@ -2921,14 +2962,18 @@ function Block(protoblock, blocks, overrideName) {
 
                 __selectionChanged();
             };
+        };
+
+        for (var i = 0; i < 12; i++) {
+            that._modeWheel.navItems[i].navigateFunction = __playNote;
         }
 
         for (var i = 0; i < MODENAMES.length; i++) {
-            var key = MODENAMES[i][1];
-            if (key in MUSICALMODES) {
+            var mode = MODENAMES[i][1];
+            if (mode in MUSICALMODES) {
                 var activeTabs = [0];
-                for (var j = 0; j < MUSICALMODES[key].length; j++) {
-                    activeTabs.push(last(activeTabs) + MUSICALMODES[key][j]);
+                for (var j = 0; j < MUSICALMODES[mode].length; j++) {
+                    activeTabs.push(last(activeTabs) + MUSICALMODES[mode][j]);
                 }
 
                 __setupAction(i, activeTabs);
