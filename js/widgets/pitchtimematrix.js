@@ -14,7 +14,7 @@ const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshad
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 // Deprecated
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
-var a = 0;
+var stopOrCloseClicked = 0;
 
 function PitchTimeMatrix () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
@@ -211,7 +211,7 @@ function PitchTimeMatrix () {
 
             that._logo.synth.stopSound(0, 'default');
             that._logo.synth.stop();
-            a = 1;
+            stopOrCloseClicked = 1;
             ptmTableDiv.style.visibility = 'hidden';
             ptmButtonsDiv.style.visibility = 'hidden';
             ptmDiv.style.visibility = 'hidden';
@@ -1245,7 +1245,7 @@ function PitchTimeMatrix () {
                         pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
                     }
                 }
-                a = 0; 
+                stopOrCloseClicked = 0; 
             }
 
             var noteValue = this._notesToPlay[this._notesCounter][1];
@@ -1288,7 +1288,7 @@ function PitchTimeMatrix () {
             }            
             this.__playNote(0, 0, playButtonCell);        	
         } else {
-        	a = 1;
+        	stopOrCloseClicked = 1;
             playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';        	
         }
     };
@@ -1353,7 +1353,7 @@ function PitchTimeMatrix () {
                 var drumNotes = [];
 
                 // Note can be a chord, hence it is an array.
-                if (a == 0) {
+                if (stopOrCloseClicked == 0) {
 	                for (var i = 0; i < note.length; i++) {
 	                    if (typeof(note[i]) === 'number') {
 	                        var drumName = null;
