@@ -2647,7 +2647,7 @@ function Block(protoblock, blocks, overrideName) {
         // this._intervalNameWheel.clickModeRotate = false;
         var labels = [];
         for (var i = 0; i < INTERVALS.length; i++) {
-            labels.push(INTERVALS[i][1]);
+            labels.push(_(INTERVALS[i][1]));
         }
 
         this._intervalNameWheel.animatetime = 300;
@@ -2734,7 +2734,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (i === INTERVALS.length) {
-            i = 5;
+            i = 0;
         }
 
         this._intervalNameWheel.navigateWheel(i);
@@ -2751,16 +2751,14 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __selectionChanged = function () {
-            var label = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1];
+            var label = that._intervalNameWheel.navItems[that._intervalNameWheel.selectedNavItemIndex].title;
             var number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
-            var key = label + ' ' + number;
-
-            that.value = key;
-            if (key === 'perfect 1') {
-                that.text.text = 'unison';
+            that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + ' ' + number;
+            if (label === 'perfect 1') {
+                that.text.text = _('unison');
             } else {
-                that.text.text = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][0] + ' ' + number;
+                that.text.text = label + ' ' + number;
             }
 
             // Make sure text is on top.
@@ -2768,7 +2766,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
 
-            var obj = getNote('C', 4, INTERVALVALUES[key][0], 'C major', false, null, null);
+            var obj = getNote('C', 4, INTERVALVALUES[that.value][0], 'C major', false, null, null);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
 
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {

@@ -1685,7 +1685,10 @@ function Blocks () {
                 label += attr;
             }
         } else if (myBlock.name === 'modename') {
-            var label = myBlock.value + ' ' + getModeNumbers(myBlock.value);
+            var label = _(myBlock.value) + ' ' + getModeNumbers(myBlock.value);
+        } else if (myBlock.name === 'intervalname') {
+            var obj = myBlock.value.split(' ');
+            var label = _(obj[0]) + ' ' + obj[1];
         } else {
             if (myBlock.value == null) {
                var label = '';
@@ -2102,11 +2105,7 @@ function Blocks () {
         // Make a new block from a proto block.
         // Called from palettes.
 
-        if (name === 'text') {
-            console.log('makeBlock ' + name + ' ' + arg);
-        } else if (name === 'storein2') {
-            console.log('makeBlock ' + name + ' ' + arg);
-        }
+        // console.log('makeBlock ' + name + ' ' + arg);
 
         var postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2120,14 +2119,14 @@ function Blocks () {
         var that = this;
         var thisBlock = this.blockList.length;
         if (name === 'start') {
-            postProcess = function (thisBlock) {
+            var postProcess = function (thisBlock) {
                 that.blockList[thisBlock].value = that.turtles.turtleList.length;
                 that.turtles.addTurtle(that.blockList[thisBlock]);
             };
 
             postProcessArg = thisBlock;
         } else if (name === 'drum') {
-            postProcess = function (thisBlock) {
+            var postProcess = function (thisBlock) {
                 that.blockList[thisBlock].value = that.turtles.turtleList.length;
                 that.turtles.addDrum(that.blockList[thisBlock]);
             };
@@ -2150,7 +2149,7 @@ function Blocks () {
         } else if (name === 'voicename') {
             postProcessArg = [thisBlock, DEFAULTVOICE];
         } else if (name === 'eastindiansolfege') {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
                 that.blockList[thisBlock].value = value;
@@ -2160,7 +2159,7 @@ function Blocks () {
 
             postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'modename') {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
                 that.blockList[thisBlock].value = value;
@@ -2172,13 +2171,22 @@ function Blocks () {
         } else if (name === 'accidentalname') {
             postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === 'intervalname') {
+            var postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                var obj = value.split(' ');
+                that.blockList[thisBlock].text.text = _(obj[0]) + ' ' + obj[1];
+                that.blockList[thisBlock].container.updateCache();
+            };
+
             postProcessArg = [thisBlock, DEFAULTINTERVAL];
         } else if (name === 'temperamentname') {
             postProcessArg = [thisBlock, DEFAULTTEMPERAMENT];
         } else if (name === 'invertmode') {
             postProcessArg = [thisBlock, DEFAULTINVERT];
         } else if (name === 'number') {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = Number(args[1]);
                 that.blockList[thisBlock].value = value;
@@ -2188,11 +2196,11 @@ function Blocks () {
 
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
         } else if (name === 'loudness' || name === 'pitchness') {
-            postProcess = function () {
+            var postProcess = function () {
                 that.logo.initMediaDevices();
             };
         } else if (name === 'media') {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
                 that.blockList[thisBlock].value = value;
@@ -2205,7 +2213,7 @@ function Blocks () {
 
             postProcessArg = [thisBlock, null];
         } else if (name === 'camera') {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 console.log('post process camera ' + args[1]);
                 var thisBlock = args[0];
                 var value = args[1];
@@ -2219,7 +2227,7 @@ function Blocks () {
 
             postProcessArg = [thisBlock, null];
         } else if (name === 'video') {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
                 that.blockList[thisBlock].value = VIDEOVALUE;
@@ -2232,20 +2240,20 @@ function Blocks () {
 
             postProcessArg = [thisBlock, null];
         } else if (name === 'loadFile') {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 that.updateBlockText(args[0]);
             };
 
             postProcessArg = [thisBlock, null];
         } else if (['storein2', 'namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
-            postProcess = function (args) {
+            var postProcess = function (args) {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
             };
 
             postProcessArg = [thisBlock, arg];
         } else {
-            postProcess = null;
+            var postProcess = null;
         }
 
         var protoFound = false;
@@ -2266,7 +2274,7 @@ function Blocks () {
                         break;
                     }
                 } else if (name === 'storein2') {
-                    postProcess = function (args) {
+                    var postProcess = function (args) {
                         var c = that.blockList[thisBlock].connections[0];
                         if (args[1] === _('store in box')) {
                             that.blockList[c].privateData = _('box');
@@ -2319,7 +2327,7 @@ function Blocks () {
                 if (value == null) {
                     console.log('cannot set default value');
                 } else if (typeof(value) === 'string') {
-                    postProcess = function (args) {
+                    var postProcess = function (args) {
                         var thisBlock = args[0];
                         var value = args[1];
                         that.blockList[thisBlock].value = value;
@@ -2333,7 +2341,7 @@ function Blocks () {
 
                     this.makeNewBlock('text', postProcess, [thisBlock, value]);
                 } else {
-                    postProcess = function (args) {
+                    var postProcess = function (args) {
                         var thisBlock = args[0];
                         var value = Number(args[1]);
                         that.blockList[thisBlock].value = value;
@@ -2343,7 +2351,7 @@ function Blocks () {
                     this.makeNewBlock('number', postProcess, [thisBlock, value]);
                 }
             } else if (myBlock.docks[i + 1][2] === 'textin') {
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -2356,7 +2364,7 @@ function Blocks () {
 
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'solfegein') {
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -2366,7 +2374,7 @@ function Blocks () {
 
                 this.makeNewBlock('solfege', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'notein') {
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -2376,7 +2384,7 @@ function Blocks () {
 
                 this.makeNewBlock('notename', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'mediain') {
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -2387,12 +2395,12 @@ function Blocks () {
 
                 this.makeNewBlock('media', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'filein') {
-                postProcess = function (blk) {
+                var postProcess = function (blk) {
                     that.updateBlockText(blk);
                 }
                 this.makeNewBlock('loadFile', postProcess, thisBlock);
             } else {
-                postProcess = function (args) {
+                var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -4273,6 +4281,7 @@ function Blocks () {
                 that.palettes.show();
             }, 1500);
         }
+
         console.log("Finished block loading");
         document.body.style.cursor = 'default';
 
