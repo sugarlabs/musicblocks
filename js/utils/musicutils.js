@@ -972,8 +972,6 @@ function keySignatureToMode(keySignature) {
         mode = mode.toLowerCase();
     }
 
-    mode = getModeName(mode);
-
     for (var i = 0; i < MODENAMES.length; i++) {
         if (MODENAMES[i][0] === mode) {
             mode = MODENAMES[i][1];

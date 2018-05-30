@@ -1013,7 +1013,7 @@ function Logo () {
         this.skipIndex[turtle] = 0;
         this.notesPlayed[turtle] = [0, 1];
         this.whichNoteToCount[turtle] = 1;
-        this.keySignature[turtle] = 'C ' + _('major');
+        this.keySignature[turtle] = 'C ' + 'major';
         this.pushedNote[turtle] = false;
         this.oscList[turtle] = {};
         this.bpm[turtle] = [];

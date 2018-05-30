@@ -2864,7 +2864,7 @@ function Block(protoblock, blocks, overrideName) {
         // this._modeNameWheel.clickModeRotate = false;
         var labels = [];
         for (var i = 0; i < MODENAMES.length; i++) {
-            labels.push(MODENAMES[i][0]);
+            labels.push(_(MODENAMES[i][1]));
         }
 
         this._modeNameWheel.animatetime = 300;
@@ -2903,7 +2903,6 @@ function Block(protoblock, blocks, overrideName) {
 
         var __playNote = function () {
             var i = that._modeWheel.selectedNavItemIndex;
-            // console.log(key + ' ' + i + ' ' + MODENAMES[that._modeNameWheel.selectedNavItemIndex][1]);
             // The mode doesn't matter here, since we are using semi-tones.
             var obj = getNote(key, 4, i, key + ' chromatic', false, null, null);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
@@ -2926,7 +2925,7 @@ function Block(protoblock, blocks, overrideName) {
 
         var __selectionChanged = function () {
             that.value = MODENAMES[that._modeNameWheel.selectedNavItemIndex][1];
-            that.text.text = MODENAMES[that._modeNameWheel.selectedNavItemIndex][0];
+            that.text.text = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
