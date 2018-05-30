@@ -1999,8 +1999,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
         docById('wheelDiv').style.width = '300px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
         
         // Navigate to a the current note value.
         var i = noteValues.indexOf(note);
@@ -2213,8 +2213,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
         docById('wheelDiv').style.width = '300px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
         
         // Navigate to a the current accidental value.
         var i = accidentalValues.indexOf(accidental);
@@ -2306,8 +2306,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
         docById('wheelDiv').style.width = '300px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
         
         // Navigate to a the current octave value.
         var i = [1, 2, 3, 4, 5, 6, 7, 8].indexOf(octave);
@@ -2392,8 +2392,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
         docById('wheelDiv').style.width = '300px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
         
         // Navigate to a the current selectedValue value.
         var i = menuValues.indexOf(selectedValue);
@@ -2469,8 +2469,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
         docById('wheelDiv').style.width = '300px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
         
         // Navigate to a the current boolean value.
         var i = booleanValues.indexOf(boolean);
@@ -2597,8 +2597,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '400px';
         docById('wheelDiv').style.width = '400px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 400, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 450, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
         
         // navigate to a specific starting point
         var i = voiceValues.indexOf(voice);
@@ -2698,8 +2698,8 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '400px';
         docById('wheelDiv').style.width = '400px';
-        docById('wheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200 + 'px';
-        docById('wheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200 + 'px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 400, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 450, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
 
         // Add function to each main menu for show/hide sub menus
         // FIXME: Add all tabs to each interval
