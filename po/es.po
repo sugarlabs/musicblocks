@@ -1067,25 +1067,25 @@ msgstr ""
 #: js/turtledefs.js:29
 #: js/musicutils.js:285
 #.TRANS: harmonic major scale in music
-msgid "harmonic-major"
+msgid "harmonic major"
 msgstr "armónico mayor"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:287
 #.TRANS: natural minor scales in music
-msgid "natural-minor"
+msgid "natural minor"
 msgstr "natural menor"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:289
 #.TRANS: harmonic minor scale in music
-msgid "harmonic-minor"
+msgid "harmonic minor"
 msgstr "armónico menor"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:291
 #.TRANS: melodic minor scale in music
-msgid "melodic-minor"
+msgid "melodic minor"
 msgstr "melódico menor"
 
 #: js/turtledefs.js:29
@@ -1133,7 +1133,7 @@ msgstr ""
 #: js/turtledefs.js:29
 #: js/musicutils.js:307
 #.TRANS: minor jazz scale for music
-msgid "jazz-minor"
+msgid "jazz minor"
 msgstr "jazz menor"
 
 #: js/turtledefs.js:29
@@ -1182,12 +1182,12 @@ msgstr "húngaro"
 #: js/turtledefs.js:29
 #: js/musicutils.js:320
 #.TRANS: minor Romanian scale for music
-msgid "romanian-minor"
+msgid "romanian minor"
 msgstr "romano menor"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:321
-msgid "spanish-gypsy"
+msgid "spanish gypsy"
 msgstr "gitana española"
 
 #: js/turtledefs.js:29
@@ -1199,24 +1199,24 @@ msgstr ""
 #: js/turtledefs.js:29
 #: js/musicutils.js:325
 #.TRANS: minor blues scale for music
-msgid "minor-blues"
+msgid "minor blues"
 msgstr "blues menor"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:327
 #.TRANS: major blues scale for music
-msgid "major-blues"
+msgid "major blues"
 msgstr "blues mayor"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:328
-msgid "whole-tone"
+msgid "whole tone"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:330
 #.TRANS: pentatonic scale in music
-msgid "minor-pentatonic"
+msgid "minor pentatonic"
 msgstr ""
 
 #: js/turtledefs.js:29
@@ -1452,83 +1452,83 @@ msgstr ""
 #: js/turtledefs.js:29
 #: js/synthutils.js:44
 #.TRANS: white noise synthesizer
-msgid "white-noise"
+msgid "white noise"
 msgstr "ruido blanco"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:46
 #.TRANS: brown noise synthesizer
-msgid "brown-noise"
+msgid "brown noise"
 msgstr "ruido marrón"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:48
 #.TRANS: pink noise synthesizer
-msgid "pink-noise"
+msgid "pink noise"
 msgstr "ruido rosa"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:66
 #.TRANS: musical instrument
-msgid "snare-drum"
+msgid "snare drum"
 msgstr "tambor militar pequeño"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:68
 #.TRANS: musical instrument
-msgid "kick-drum"
+msgid "kick drum"
 msgstr "bombo"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:70
 #.TRANS: musical instrument
-msgid "tom-tom"
+msgid "tom tom"
 msgstr ""
 
 #: js/turtledefs.js:29
-msgid "floor-tom"
+msgid "floor tom"
 msgstr "piso tom"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:74
 #.TRANS: a drum made from an inverted cup
-msgid "cup-drum"
+msgid "cup drum"
 msgstr "tambor taza"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:76
 #.TRANS: musical instrument
-msgid "darbuka-drum"
+msgid "darbuka drum"
 msgstr "darbuka"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:78
 #.TRANS: musical instrument
-msgid "hi-hat"
+msgid "hi hat"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:80
 #.TRANS: a small metal bell
-msgid "ride-bell"
+msgid "ride bell"
 msgstr ""
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:82
 #.TRANS: musical instrument
-msgid "cow-bell"
+msgid "cow bell"
 msgstr "cencerro"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:84
 #.TRANS: musical instrument
-msgid "triangle-bell"
+msgid "triangle bell"
 msgstr "campana triángulo"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:86
 #.TRANS: musical instrument
-msgid "finger-cymbals"
+msgid "finger cymbals"
 msgstr "castañuelas"
 
 #: js/turtledefs.js:29
@@ -3890,27 +3890,27 @@ msgstr "jugar escala"
 
 #: js/synthutils.js:36
 #.TRANS: simple monotone synthesizer
-msgid "simple-1"
+msgid "simple 1"
 msgstr ""
 
 #: js/synthutils.js:38
 #.TRANS: simple monotone synthesizer
-msgid "simple-2"
+msgid "simple 2"
 msgstr ""
 
 #: js/synthutils.js:40
 #.TRANS: simple monotone synthesizer
-msgid "simple-3"
+msgid "simple 3"
 msgstr ""
 
 #: js/synthutils.js:42
 #.TRANS: simple monotone synthesizer
-msgid "simple-4"
+msgid "simple 4"
 msgstr ""
 
 #: js/synthutils.js:72
 #.TRANS: musical instrument
-msgid "floor-tom-tom"
+msgid "floor tom tom"
 msgstr ""
 
 #: js/musicutils.js:134

@@ -3052,9 +3052,9 @@ function Logo () {
         case 'setkey2':
             if (args.length === 2) {
                 var modename = 'major';
-                for (var i = 0; i < MODENAMES.length; i++) {
-                    if (MODENAMES[i][0] === args[1] || MODENAMES[i][1] === args[1]) {
-                        modename = MODENAMES[i][1];
+                for (var mode in MUSICALMODES) {
+                    if (mode === args[1] || _(mode) === args[1]) {
+                        modename = mode;
                         that._modeBlock = that.blocks.blockList[blk].connections[2];
                         break;
                     }

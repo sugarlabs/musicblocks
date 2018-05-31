@@ -1423,7 +1423,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     voiceBlock.adjustWidthToLabel();
     voiceBlock.flowClampOneArgBlock();
     voiceBlock.dockTypes[1] = 'textin';
-    voiceBlock.defaults.push(_('violin'));
+    voiceBlock.defaults.push('violin');
     voiceBlock.hidden = true;
 
     // macro

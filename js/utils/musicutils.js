@@ -130,7 +130,174 @@ const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(e
 
 const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
 
-//.TRANS: sharp, flat, and natural are music terms related to pitch
+// Musical terms that need translations
+const SELECTORSTRINGS = [
+    //.TRANS: unison is a music term related to intervals
+    _('unison'),
+    //.TRANS: augmented is a music term related to intervals
+    _('augmented'),
+    //.TRANS: diminished is a music term related to intervals and mode
+    _('diminished'),
+    //.TRANS: minor is a music term related to intervals and mode
+    _('minor'),
+    //.TRANS: major is a music term related to intervals and mode
+    _('major'),
+    //.TRANS: perfect is a music term related to intervals
+    _('perfect'),
+    //.TRANS: twelve semi-tone scale for music
+    _('chromatic'),
+    _('algerian'),
+    _('spanish'),
+    //.TRANS: modal scale in music
+    _('octatonic'),
+    //.TRANS: harmonic major scale in music
+    _('harmonic major'),
+    //.TRANS: natural minor scales in music
+    _('natural minor'),
+    //.TRANS: harmonic minor scale in music
+    _('harmonic minor'),
+    //.TRANS: melodic minor scale in music
+    _('melodic minor'),
+    //.TRANS: modal scale for music
+    _('ionian'),
+    //.TRANS: modal scale for music
+    _('dorian'),
+    //.TRANS: modal scale for music
+    _('phrygian'),
+    //.TRANS: modal scale for music
+    _('lydian'),
+    //.TRANS: modal scale for music
+    _('mixolydian'),
+    //.TRANS: modal scale for music
+    _('aeolian'),
+    //.TRANS: modal scale for music
+    _('locrian'),
+    //.TRANS: minor jazz scale for music
+    _('jazz minor'),
+    //.TRANS: bebop scale for music
+    _('bebop'),
+    _('arabic'),
+    _('byzantine'),
+    //.TRANS: musical scale for music by Verdi
+    _('enigmatic'),
+    _('ethiopian'),
+    //.TRANS: Ethiopic scale for music
+    _('geez'),
+    _('hindu'),
+    _('hungarian'),
+    //.TRANS: minor Romanian scale for music
+    _('romanian minor'),
+    _('spanish gypsy'),
+    //.TRANS: musical scale for Mid-Eastern music
+    _('maqam'),
+    //.TRANS: minor blues scale for music
+    _('minor blues'),
+    //.TRANS: major blues scale for music
+    _('major blues'),
+    _('whole tone'),
+    //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
+    _('minor pentatonic'),
+    _('chinese'),
+    _('egyptian'),
+    //.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
+    _('hirajoshi'),
+    _('Japan'),
+    //.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
+    _('in'),
+    //.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
+    _('minyo'),
+    //.TRANS: Italian mathematician
+    _('fibonacci'),
+    _('custom'),
+    //.TRANS: highpass filter
+    _('highpass'),
+    //.TRANS: lowpass filter
+    _('lowpass'),
+    //.TRANS: bandpass filter
+    _('bandpass'),
+    //.TRANS: high-shelf filter
+    _('highshelf'),
+    //.TRANS: low-shelf filter
+    _('lowshelf'),
+    //.TRANS: notch-shelf filter
+    _('notch'),
+    //.TRANS: all-pass filter
+    _('allpass'),
+    //.TRANS: peaking filter
+    _('peaking'),
+    //.TRANS: sine wave
+    _('sine'),
+    //.TRANS: square wave
+    _('square'),
+    //.TRANS: triangle wave
+    _('triangle'),
+    //.TRANS: sawtooth wave
+    _('sawtooth'),
+    //.TRANS: even numbers
+    _('even'),
+    //.TRANS: odd numbers
+    _('odd'),
+    _('scalar'),
+    _('violin'),
+    _('cello'),
+    _('bass'),
+    _('guitar'),
+    _('flute'),
+    _('clarinet'),
+    _('saxophone'),
+    _('tuba'),
+    _('trumpet'),
+    _('default'),
+    _('simple 1'),
+    _('simple 2'),
+    _('simple 3'),
+    _('simple 4'),
+    _('white noise'),
+    _('brown noise'),
+    _('pink noise'),
+    _('custom'),
+    _('snare drum'),
+    _('kick drum'),
+    _('tom tom'),
+    _('floor tom'),
+    _('cup drum'),
+    _('darbuka drum'),
+    _('hi hat'),
+    _('ride bell'),
+    _('cow bell'),
+    _('triangle bell'),
+    _('finger cymbals'),
+    _('chime'),
+    _('clang'),
+    _('crash'),
+    _('bottle'),
+    _('clap'),
+    _('slap'),
+    _('splash'),
+    _('bubbles'),
+    _('cat'),
+    _('cricket'),
+    _('dog'),
+    _('duck'),
+    //.TRANS: musical temperament
+    _('equal'),
+    //.TRANS: musical temperament
+    _('Pythagorian'),  // just intonation
+    //.TRANS: musical temperament
+    _('meantone'),
+    _('custom'),
+    //.TRANS: double flat is a music term related to pitch
+    _('double flat'),
+    //.TRANS: flat is a music term related to pitch
+    _('flat'),
+    //.TRANS: natural is a music term related to pitch
+    _('natural'),
+    //.TRANS: sharp is a music term related to pitch
+    _('sharp'),
+    //.TRANS: double sharp is a music term related to pitch
+    _('double sharp'),
+];
+
 const ACCIDENTALLABELS = [_('double sharp') + ' ' + DOUBLESHARP, _('sharp') + ' ' + SHARP, _('natural') + ' ' + NATURAL, _('flat') + ' ' + FLAT, _('double flat') + ' ' + DOUBLEFLAT];
 const ACCIDENTALNAMES = ['double sharp' + ' ' + DOUBLESHARP, 'sharp' + ' ' + SHARP, 'natural' + ' ' + NATURAL, 'flat' + ' ' + FLAT, 'double flat' + ' ' + DOUBLEFLAT];
 const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
@@ -255,12 +422,12 @@ const MUSICALMODES = {
     'whole tone': [2, 2, 2, 2, 2, 2],
 
      // 5 notes in an octave
-    'minor pentatonic': [3, 2, 2, 3, 2], //pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
+    'minor pentatonic': [3, 2, 2, 3, 2],
     'chinese': [4, 2, 1, 4, 1],
     'egyptian': [2, 3, 2, 3, 2],
-    'hirajoshi (Japan)': [1, 4, 1, 4, 2], //https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
-    'in (Japan)': [1, 4, 2, 1, 4], //https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
-    'minyo (Japan)': [3, 2, 2, 3, 2], //https://en.wikipedia.org/wiki/Miny%C5%8D_scale
+    'hirajoshi': [1, 4, 1, 4, 2],
+    'in': [1, 4, 2, 1, 4],
+    'minyo': [3, 2, 2, 3, 2],
     'fibonacci': [1, 1, 2, 3, 5],
 
      // User definition overrides this constant
@@ -279,116 +446,28 @@ const MAQAMTABLE = {
     'ajam maqam': 'Bb maqam',
 };
 
-var MODENAMES = [
-    //.TRANS: twelve semi-tone scale for music
-    [_('chromatic'), 'chromatic'],
-    [_('algerian'), 'algerian'],
-    //.TRANS: modal scale for music
-    [_('diminished'), 'diminished'],
-    [_('spanish'), 'spanish'],
-    //.TRANS: modal scale for music
-    [_('octatonic'), 'octatonic'],
-    //.TRANS: major scales in music
-    [_('major'), 'major'],
-    //.TRANS: harmonic major scale in music
-    [_('harmonic-major'), 'harmonic major'],
-    //.TRANS: natural minor scales in music
-    [_('natural-minor'), 'natural minor'],
-    //.TRANS: harmonic minor scale in music
-    [_('harmonic-minor'), 'harmonic minor'],
-    //.TRANS: melodic minor scale in music
-    [_('melodic-minor'), 'melodic minor'],
-    //.TRANS: modal scale for music
-    [_('ionian'), 'ionian'],
-    //.TRANS: modal scale for music
-    [_('dorian'), 'dorian'],
-    //.TRANS: modal scale for music
-    [_('phrygian'), 'phrygian'],
-    //.TRANS: modal scale for music
-    [_('lydian'), 'lydian'],
-    //.TRANS: modal scale for music
-    [_('mixolydian'), 'mixolydian'],
-    //.TRANS: modal scale for music
-    [_('aeolian'), 'aeolian'],
-    //.TRANS: modal scale for music
-    [_('locrian'), 'locrian'],
-    //.TRANS: minor jazz scale for music
-    [_('jazz-minor'), 'jazz minor'],
-    //.TRANS: bebop scale for music
-    [_('bebop'), 'bebop'],
-    [_('arabic'), 'arabic'],
-    [_('byzantine'), 'byzantine'],
-    //.TRANS: musical scale for music by Verdi
-    [_('enigmatic'), 'enigmatic'],
-    [_('ethiopian'), 'ethiopian'],
-    //.TRANS: Ethiopic scale for music
-    [_('geez'), 'geez'],
-    [_('hindu'), 'hindu'],
-    [_('hungarian'), 'hungarian'],
-    //.TRANS: minor Romanian scale for music
-    [_('romanian-minor'), 'romanian minor'],
-    [_('spanish-gypsy'), 'spanish gypsy'],
-    //.TRANS: musical scale for Mid-Eastern music
-    [_('maqam'), 'maqam'],
-    //.TRANS: minor blues scale for music
-    [_('minor-blues'), 'minor blues'],
-    //.TRANS: major blues scale for music
-    [_('major-blues'), 'major blues'],
-    [_('whole-tone'), 'whole tone'],
-    //.TRANS: pentatonic scale in music
-    [_('minor-pentatonic'), 'minor pentatonic'],
-    [_('chinese'), 'chinese'],
-    [_('egyptian'), 'egyptian'],
-    //.TRANS: Japanese pentatonic scale for music
-    [_('hirajoshi') + ' (' + _('Japan') + ')', 'hirajoshi (Japan)'],
-    //.TRANS: Japanese pentatonic scale for music
-    [_('in') + ' (' + _('Japan') + ')', 'in (Japan)'],
-    //.TRANS: Japanese pentatonic scale for music
-    [_('minyo') + ' (' + _('Japan') + ')', 'minyo (Japan)'],
-    //.TRANS: Italian mathematician
-    [_('fibonacci'), 'fibonacci'],
-    [_('custom'), 'custom'],
-];
-
-
 var FILTERTYPES = [
-    //.TRANS: highpass filter
     [_('highpass'), 'highpass'],
-    //.TRANS: lowpass filter
     [_('lowpass'), 'lowpass'],
-    //.TRANS: bandpass filter
     [_('bandpass'), 'bandpass'],
-    //.TRANS: highshelf filter
     [_('highshelf'), 'highshelf'],
-    //.TRANS: lowshelf filter
     [_('lowshelf'), 'lowshelf'],
-    //.TRANS: notch filter
     [_('notch'), 'notch'],
-    //.TRANS: allpass filter
     [_('allpass'), 'allpass'],
-    //.TRANS: peaking filter
     [_('peaking'), 'peaking'],
 ];
 
 var OSCTYPES = [
-    //.TRANS: sine wave
     [_('sine'), 'sine'],
-    //.TRANS: square wave
     [_('square'), 'square'],
-    //.TRANS: triangle wave
     [_('triangle'), 'triangle'],
-    //.TRANS: sawtooth wave
     [_('sawtooth'), 'sawtooth'],
 ];
 
 var TEMPERAMENTS = [
-    //.TRANS: musical temperament
     [_('equal'), 'equal'],
-    //.TRANS: musical temperament
     [_('Pythagorean'), 'just intonation'],
-    //.TRANS: musical temperament
     [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
-    //.TRANS: musical temperament
     [_('meantone') + ' (1/4)', '1/4 comma meantone'],
     [_('custom'), 'custom'],
 
@@ -517,15 +596,15 @@ const TEMPERAMENT = {
     }
 };
 
-const DEFAULTINVERT = _('even');
-const DEFAULTINTERVAL = _('perfect') + ' 5';
-const DEFAULTVOICE = _('default');
-const DEFAULTDRUM = _('kick drum');
-const DEFAULTMODE = _('major');
-const DEFAULTTEMPERAMENT = _('equal');
-const DEFAULTFILTERTYPE = _('highpass');
-const DEFAULTOSCILLATORTYPE = _('sine');
-const DEFAULTACCIDENTAL = _('natural') + ' ' + NATURAL;
+const DEFAULTINVERT = 'even';
+const DEFAULTINTERVAL = 'perfect' + ' 5';
+const DEFAULTVOICE = 'default';
+const DEFAULTDRUM = 'kick drum';
+const DEFAULTMODE = 'major';
+const DEFAULTTEMPERAMENT = 'equal';
+const DEFAULTFILTERTYPE = 'highpass';
+const DEFAULTOSCILLATORTYPE = 'sine';
+const DEFAULTACCIDENTAL = 'natural' + ' ' + NATURAL;
 
 var customMode = MUSICALMODES['custom'];
 
@@ -610,106 +689,14 @@ function getModeNumbers(name) {
         return m;
     };
 
-    for (var mode in MODENAMES) {
-        if (MODENAMES[mode][0] === name || MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
-            return __convert(MUSICALMODES[MODENAMES[mode][1]]);
+    for (var mode in MUSICALMODES) {
+        if (mode === name.toLowerCase()) {
+            return __convert(MUSICALMODES[mode]);
         }
     }
 
-    console.log(name + ' not found in MODENAMES');
+    console.log(name + ' not found in MUSICALMODES');
     return '';
-};
-
-
-function getModeName(name) {
-    for (var mode in MODENAMES) {
-        if (MODENAMES[mode][0] === name) {
-            return MODENAMES[mode][0];
-        } else if (MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
-            return MODENAMES[mode][1];
-        }
-    }
-
-    console.log(name + ' not found in MODENAMES');
-    return name;
-};
-
-
-function initIntervalI18N() {
-    for (var i = 0; i < INTERVALNAMES.length; i++) {
-        if (INTERVALNAMES[i][0] == null) {
-            INTERVALNAMES[i][0] = _(INTERVALNAMES[i][1]);
-        }
-
-        if (INTERVALNAMES[i][0] == null) {
-            INTERVALNAMES[i][0] = INTERVALNAMES[i][1];
-        }
-    }
-};
-
-
-function initFilterI18N() {
-    for (var i = 0; i < FILTERTYPES.length; i++) {
-        if (FILTERTYPES[i][0] == null) {
-            FILTERTYPES[i][0] = _(FILTERTYPES[i][1]);
-          }
-
-        if (FILTERTYPES[i][0] == null) {
-            FILTERTYPES[i][0] = FILTERTYPES[i][1];
-        }
-    }
-};
-
-
-function initOscI18N() {
-    for (var i = 0; i < OSCTYPES.length; i++) {
-        if (OSCTYPES[i][0] == null) {
-            OSCTYPES[i][0] = _(OSCTYPES[i][1]);
-        }
-
-        if (OSCTYPES[i][0] == null) {
-            OSCTYPES[i][0] = OSCTYPES[i][1];
-        }
-    }
-};
-
-
-function initModeI18N() {
-    for (var i = 0; i < MODENAMES.length; i++) {
-        if (MODENAMES[i][0] == null) {
-            MODENAMES[i][0] = _(MODENAMES[i][1]);
-        }
-
-        if (MODENAMES[i][0] == null) {
-            MODENAMES[i][0] = MODENAMES[i][1];
-        }
-    }
-};
-
-
-function initVoiceI18N() {
-    for (var i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] == null) {
-            VOICENAMES[i][0] = _(VOICENAMES[i][1]);
-        }
-
-        if (VOICENAMES[i][0] == null) {
-            VOICENAMES[i][0] = VOICENAMES[i][1];
-        }
-    }
-};
-
-
-function initDrumI18N() {
-    for (var i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i][0] == null || DRUMNAMES[i][0] === '') {
-            DRUMNAMES[i][0] = _(DRUMNAMES[i][1]);
-        }
-
-        if (DRUMNAMES[i][0] == null) {
-            DRUMNAMES[i][0] = DRUMNAMES[i][1];
-        }
-    }
 };
 
 
@@ -970,13 +957,6 @@ function keySignatureToMode(keySignature) {
         mode = 'major';
     } else {
         mode = mode.toLowerCase();
-    }
-
-    for (var i = 0; i < MODENAMES.length; i++) {
-        if (MODENAMES[i][0] === mode) {
-            mode = MODENAMES[i][1];
-            break;
-        }
     }
 
     if (mode in MUSICALMODES) {

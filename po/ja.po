@@ -1106,28 +1106,28 @@ msgstr "オクトトニック・スケール"
 #: js/musicutils.js:285
 #.TRANS: harmonic major scale in music
 ## https://en.wikipedia.org/wiki/Harmonic_major_scale
-msgid "harmonic-major"
+msgid "harmonic major"
 msgstr "ハーモニック・メジャー"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:287
 #.TRANS: natural minor scales in music
 ## https://cyta.jp/composition/c/entry/6542
-msgid "natural-minor"
+msgid "natural minor"
 msgstr "自然短音階"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:289
 #.TRANS: harmonic minor scale in music
 ## 和声短音階=わせいたのんかい； https://ja.wikipedia.org/wiki/%E9%9F%B3%E9%9A%8E
-msgid "harmonic-minor"
+msgid "harmonic minor"
 msgstr "和声短音階"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:291
 #.TRANS: melodic minor scale in music
 ## 旋律短音階=せんりつたのんかい；http://jisho.org/word/%E6%97%8B%E5%BE%8B%E7%9A%84%E7%9F%AD%E9%9F%B3%E9%9A%8E 
-msgid "melodic-minor"
+msgid "melodic minor"
 msgstr "旋律短音階"
 
 #: js/turtledefs.js:29
@@ -1175,7 +1175,7 @@ msgstr "ロクリアン・スケール"
 #: js/turtledefs.js:29
 #: js/musicutils.js:307
 #.TRANS: minor jazz scale for music
-msgid "jazz-minor"
+msgid "jazz minor"
 msgstr "オルタード・スケール"
 
 #: js/turtledefs.js:29
@@ -1226,12 +1226,12 @@ msgstr "ハンガリーの"
 #: js/turtledefs.js:29
 #: js/musicutils.js:320
 #.TRANS: minor Romanian scale for music
-msgid "romanian-minor"
+msgid "romanian minor"
 msgstr "ルーマニアのマイナー・スケール"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:321
-msgid "spanish-gypsy"
+msgid "spanish gypsy"
 msgstr "スパニッシュ・ジプシー"
 
 #: js/turtledefs.js:29
@@ -1244,24 +1244,24 @@ msgstr "マカーム"
 #: js/turtledefs.js:29
 #: js/musicutils.js:325
 #.TRANS: minor blues scale for music
-msgid "minor-blues"
+msgid "minor blues"
 msgstr "マイナー・ブルース・スケール"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:327
 #.TRANS: major blues scale for music
-msgid "major-blues"
+msgid "major blues"
 msgstr "メジャー・ブルース・スケール"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:328
-msgid "whole-tone"
+msgid "whole tone"
 msgstr "ホールトーン・スケール"
 
 #: js/turtledefs.js:29
 #: js/musicutils.js:330
 #.TRANS: pentatonic scale in music
-msgid "minor-pentatonic"
+msgid "minor pentatonic"
 msgstr "マイナー・ペンタトニック・スケール"
 
 #: js/turtledefs.js:29
@@ -1509,90 +1509,90 @@ msgstr ""
 #: js/synthutils.js:44
 #.TRANS: white noise synthesizer
 ## guessing -- to be verified
-msgid "white-noise"
+msgid "white noise"
 msgstr "ホワイトノイズ"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:46
 #.TRANS: brown noise synthesizer
 ## https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%A9%E3%82%A6%E3%83%8B%E3%82%A2%E3%83%B3%E3%83%8E%E3%82%A4%E3%82%BA
-msgid "brown-noise"
+msgid "brown noise"
 msgstr "ブラウニアンノイズ"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:48
 #.TRANS: pink noise synthesizer
-msgid "pink-noise"
+msgid "pink noise"
 msgstr "ピンクノイズ"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:66
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
-msgid "snare-drum"
+msgid "snare drum"
 msgstr "スネア"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:68
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
-msgid "kick-drum"
+msgid "kick drum"
 msgstr "バス・ドラム"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:70
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
-msgid "tom-tom"
+msgid "tom tom"
 msgstr "トムトム"
 
 #: js/turtledefs.js:29
-msgid "floor-tom"
+msgid "floor tom"
 msgstr "フロア・トム"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:74
 #.TRANS: a drum made from an inverted cup
 ## Guessing
-msgid "cup-drum"
+msgid "cup drum"
 msgstr "コップ・ドラム"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:76
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%A9%E3%83%96%E3%83%83%E3%82%AB
-msgid "darbuka-drum"
+msgid "darbuka drum"
 msgstr "ダラブッカ"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:78
 #.TRANS: musical instrument
-msgid "hi-hat"
+msgid "hi hat"
 msgstr "ハイハット"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:80
 #.TRANS: a small metal bell
-msgid "ride-bell"
+msgid "ride bell"
 msgstr "ライドのベル"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:82
 #.TRANS: musical instrument
-msgid "cow-bell"
+msgid "cow bell"
 msgstr "カウベル"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:84
 #.TRANS: musical instrument
-msgid "triangle-bell"
+msgid "triangle bell"
 msgstr "トライアングルのベル"
 
 #: js/turtledefs.js:29
 #: js/synthutils.js:86
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%B3%E3%82%AC%E3%83%BC%E3%82%B7%E3%83%B3%E3%83%90%E3%83%AB
-msgid "finger-cymbals"
+msgid "finger cymbals"
 msgstr "フィンガーシンバル"
 
 #: js/turtledefs.js:29

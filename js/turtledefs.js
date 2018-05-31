@@ -23,13 +23,6 @@ BUILTINPALETTES = ['rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', '
 const BUILTINPALETTESFORL23N = [_('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('mice'), _('extras')];
 
 
-// We repeat the selector strings from musicutils and synthutils here
-// because of an i18 initialization problem.
-const SELECTORSTRINGS = [
-    _('unison'), _('augmented'), _('diminished'), _('minor'), _('major'), _('perfect'), _('chromatic'), _('algerian'), _('diminished'), _('spanish'), _('octatonic'), _('major'), _('harmonic-major'), _('natural-minor'), _('harmonic-minor'), _('melodic-minor'), _('ionian'), _('dorian'), _('phrygian'), _('lydian'), _('mixolydian'), _('aeolian'), _('locrian'), _('jazz-minor'), _('bebop'), _('arabic'), _('byzantine'), _('enigmatic'), _('ethiopian'), _('geez'), _('hindu'), _('hungarian'), _('romanian-minor'), _('spanish-gypsy'), _('maqam'), _('minor-blues'), _('major-blues'), _('whole-tone'), _('minor-pentatonic'), _('chinese'), _('egyptian'), _('hirajoshi'), _('Japan'), _('in'), _('minyo'), _('japanese'), _('fibonacci'), _('custom'), _('highpass'), _('lowpass'), _('bandpass'), _('highshelf'), _('lowshelf'), _('notch'), _('allpass'), _('peaking'), _('sine'), _('square'), _('triangle'), _('sawtooth'), _('even'), _('odd'), _('scalar'), _('violin'), _('cello'), _('bass'), _('guitar'), _('flute'), _('clarinet'), _('saxophone'), _('tuba'), _('trumpet'), _('default'), _('simple 1'), _('simple 2'), _('simple 3'), _('simple 4'), _('white-noise'), _('brown-noise'), _('pink-noise'), _('sine'), _('square'), _('sawtooth'), _('triangle'), _('custom'), _('snare-drum'), _('kick-drum'), _('tom-tom'), _('floor-tom'), _('cup-drum'), _('darbuka-drum'), _('hi-hat'), _('ride-bell'), _('cow-bell'), _('triangle-bell'), _('finger-cymbals'), _('chime'), _('clang'), _('crash'), _('bottle'), _('clap'), _('slap'), _('splash'), _('bubbles'), _('cat'), _('cricket'), _('dog'), _('duck'), _('equal'), _('just-intonation'), _('1/3-comma-meantone'), _('1/4-comma-meantone'), _('custom'),
-];
-
-
 function getMainToolbarButtonNames(name) {
     return (['popdown-palette', 'run', 'step', 'step-music', 'stop-turtle', 'hard-stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help', 'sugarizer-stop'].indexOf(name) > -1);
 };

@@ -295,19 +295,6 @@ define(MYDEFINES, function (compatibility) {
 
         pluginsImages = {};
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            // Sometimes (race condition?) Firefox does not properly
-            // initialize strings in musicutils. These methods ensure that
-            // the names are never null.
-            console.log('initing i18n for music terms');
-            initIntervalI18N();
-            initDrumI18N();
-            initModeI18N();
-            initVoiceI18N();
-            initFilterI18N();
-            initOscI18N();
-        }
-
         window.onblur = function () {
             doHardStopButton(true);
         };

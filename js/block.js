@@ -567,7 +567,7 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = 'G';
                     break;
                 case 'rest':
-                    this.value = _('rest');
+                    this.value = 'rest';
                     break;
                 case 'boolean':
                     this.value = true;
@@ -576,28 +576,28 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = NUMBERBLOCKDEFAULT;
                     break;
                 case 'modename':
-                    this.value = getModeName(DEFAULTMODE);
+                    this.value = DEFAULTMODE;
                     break;
                 case 'accidentalname':
                     this.value = DEFAULTACCIDENTAL;
                     break;
                 case 'intervalname':
-                    this.value = getIntervalName(DEFAULTINTERVAL);
+                    this.value = DEFAULTINTERVAL;
                     break;
                 case 'invertmode':
-                    this.value = getInvertMode(DEFAULTINVERT);
+                    this.value = DEFAULTINVERT;
                     break;
                 case 'voicename':
-                    this.value = getVoiceName(DEFAULTVOICE);
+                    this.value = DEFAULTVOICE;
                     break;
                 case 'drumname':
-                    this.value = getDrumName(DEFAULTDRUM);
+                    this.value = DEFAULTDRUM;
                     break;
                 case 'filtertype':
-                    this.value = getFilterTypes(DEFAULTFILTERTYPE);
+                    this.value = DEFAULTFILTERTYPE;
                     break;
                 case 'oscillatortype':
-                    this.value = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
+                    this.value = DEFAULTOSCILLATORTYPE;
                     break;
                 case 'temperamentname':
                     this.value = 'equal';
@@ -1668,7 +1668,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.value != null) {
                 var selectedmode = this.value;
             } else {
-                var selectedmode = getModeName(DEFAULTMODE);
+                var selectedmode = DEFAULTMODE;
             }
 
             this._piemenuModes(selectedmode);
@@ -1695,7 +1695,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.value != null) {
                 var selectedinvert = this.value;
             } else {
-                var selectedinvert = getInvertMode(DEFAULTINVERT);
+                var selectedinvert = DEFAULTINVERT;
             }
 
             var invertLabels = [];
@@ -1709,9 +1709,9 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuBasic(invertLabels, invertValues, selectedinvert);
         } else if (this.name === 'drumname') {
             if (this.value != null) {
-                var selecteddrum = getDrumName(this.value);
+                var selecteddrum = this.value;
             } else {
-                var selecteddrum = getDrumName(DEFAULTDRUM);
+                var selecteddrum = DEFAULTDRUM;
             }
 
             var drumLabels = [];
@@ -1719,10 +1719,11 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                if (getTextWidth(DRUMNAMES[i][0], 'bold 48pt Sans') > 400) {
-                    drumLabels.push(DRUMNAMES[i][0].substr(0, 8) + '...');
+                var label = _(DRUMNAMES[i][1]);
+                if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                    drumLabels.push(label.substr(0, 8) + '...');
                 } else {
-                    drumLabels.push(DRUMNAMES[i][0]);
+                    drumLabels.push(label);
                 }
 
                 drumValues.push(DRUMNAMES[i][1]);
@@ -1737,9 +1738,9 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
-                var selectedtype = getFilterTypes(this.value);
+                var selectedtype = this.value;
             } else {
-                var selectedtype = getFilterTypes(DEFAULTFILTERTYPE);
+                var selectedtype = DEFAULTFILTERTYPE;
             }
 
             var filterLabels = [];
@@ -1752,9 +1753,9 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuBasic(filterLabels, filterValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
         } else if (this.name === 'oscillatortype') {
             if (this.value != null) {
-                var selectedtype = getOscillatorTypes(this.value);
+                var selectedtype = this.value;
             } else {
-                var selectedtype = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
+                var selectedtype = DEFAULTOSCILLATORTYPE;
             }
 
             var oscLabels = [];
@@ -1767,20 +1768,23 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuBasic(oscLabels, oscValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
         } else if (this.name === 'voicename') {
             if (this.value != null) {
-                var selectedvoice = getVoiceName(this.value);
+                var selectedvoice = this.value;
             } else {
-                var selectedvoice = getVoiceName(DEFAULTVOICE);
+                var selectedvoice = DEFAULTVOICE;
             }
+
+            console.log(this.value + ' ' + DEFAULTVOICE + ' ' + selectedvoice);
 
             var voiceLabels = [];
             var voiceValues = [];            
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < VOICENAMES.length; i++) {
-                if (getTextWidth(VOICENAMES[i][0], 'bold 48pt Sans') > 400) {
-                    voiceLabels.push(VOICENAMES[i][0].substr(0, 8) + '...');
+                var label = _(VOICENAMES[i][1]);
+                if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                    voiceLabels.push(label.substr(0, 8) + '...');
                 } else {
-                    voiceLabels.push(VOICENAMES[i][0]);
+                    voiceLabels.push(label);
                 }
 
                 voiceValues.push(VOICENAMES[i][1]);
@@ -1795,9 +1799,9 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
         } else if (this.name === 'temperamentname') {
             if (this.value != null) {
-                var selectedTemperament = getTemperamentName(this.value);
+                var selectedTemperament = this.value;
             } else {
-                var selectedTemperament = getTemperamentName(DEFAULTTEMPERAMENT);
+                var selectedTemperament = DEFAULTTEMPERAMENT;
             }
 
             var temperamentLabels = [];
@@ -1816,7 +1820,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             var booleanLabels = [_('true'), _('false')];
-            var booleanValues = ['true', 'false'];
+            var booleanValues = [true, false];
 
             this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
         } else {
@@ -2191,6 +2195,8 @@ function Block(protoblock, blocks, overrideName) {
             that.value = accidentalValues[i];
             that.text.text = accidentalLabels[i];
 
+            console.log(accidentalLabels[i] + ' ' + accidentalValues[i]); 
+
             // Make sure text is on top.
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
@@ -2345,7 +2351,9 @@ function Block(protoblock, blocks, overrideName) {
 
         var labels = [];
         for (var i = 0; i < menuLabels.length; i++) {
-            labels.push(menuLabels[i]);
+            // labels.push(menuLabels[i]);
+            console.log(menuLabels[i] + ' ' + menuValues[i] + ' ' + _(menuValues[i]));
+            labels.push(_(menuValues[i]));
         }
 
         wheelnav.cssMode = true;
@@ -2810,8 +2818,6 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        console.log(key);
-
         docById('wheelDiv').style.display = '';
         docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
@@ -2827,8 +2833,8 @@ function Block(protoblock, blocks, overrideName) {
 
         // Customize slicePaths
         var colors = [];
-        for (var i = 0; i < MODENAMES.length; i++) {
-            var mode = MODENAMES[i][1];
+        for (var modename in MUSICALMODES) {
+            var mode = MUSICALMODES[modename];
             if (mode in MUSICALMODES) {
                 switch (MUSICALMODES[mode].length % 5) {
                 case 0:
@@ -2863,8 +2869,8 @@ function Block(protoblock, blocks, overrideName) {
         this._modeNameWheel.titleRotateAngle = 0;
         // this._modeNameWheel.clickModeRotate = false;
         var labels = [];
-        for (var i = 0; i < MODENAMES.length; i++) {
-            labels.push(_(MODENAMES[i][1]));
+        for (var modename in MUSICALMODES) {
+            labels.push(_(modename));
         }
 
         this._modeNameWheel.animatetime = 300;
@@ -2924,8 +2930,13 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __selectionChanged = function () {
-            that.value = MODENAMES[that._modeNameWheel.selectedNavItemIndex][1];
             that.text.text = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
+            for (modename in MUSICALMODES) {
+                if (_(modename) === that.text.text) {
+                    that.value = modename;
+                    break;
+                }
+            }
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
@@ -2967,27 +2978,31 @@ function Block(protoblock, blocks, overrideName) {
             that._modeWheel.navItems[i].navigateFunction = __playNote;
         }
 
-        for (var i = 0; i < MODENAMES.length; i++) {
-            var mode = MODENAMES[i][1];
-            if (mode in MUSICALMODES) {
-                var activeTabs = [0];
-                for (var j = 0; j < MUSICALMODES[mode].length; j++) {
-                    activeTabs.push(last(activeTabs) + MUSICALMODES[mode][j]);
-                }
-
-                __setupAction(i, activeTabs);
+        var i = 0;
+        for (var modename in MUSICALMODES) {
+            var mode = MUSICALMODES[modename];
+            var activeTabs = [0];
+            for (var j = 0; j < mode.length; j++) {
+                activeTabs.push(last(activeTabs) + mode[j]);
             }
+
+            __setupAction(i, activeTabs);
+            i += 1;
         }
 
         // navigate to a specific starting point
-        for (var i = 0; i < MODENAMES.length; i++) {
-            if (MODENAMES[i][1] === selectedMode) {
+        var i = 0;
+        for (var modename in MUSICALMODES) {
+            if (modename === selectedMode) {
                 break;
             }
+
+            i += 1;
         }
 
-        if (i === MODENAMES.length) {
-            i = 5;  // MAJOR
+        // if we didn't find the mode, use a default
+        if (i === labels.length) {
+            i = 5; // major
         }
 
         this._modeNameWheel.navigateWheel(i);

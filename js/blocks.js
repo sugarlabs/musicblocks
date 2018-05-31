@@ -1661,14 +1661,16 @@ function Blocks () {
             return;
         }
 
-        if (myBlock.name === 'loadFile') {
+        switch (myBlock.name) {
+        case 'loadFile':
             try {
                 var label = myBlock.value[0].toString();
             } catch (e) {
                 var label = _('open file');
             }
             maxLength = 10;
-        } else if (myBlock.name === 'solfege') {
+            break;
+        case 'solfege':
             var obj = splitSolfege(myBlock.value);
             var label = i18nSolfege(obj[0]);
             var attr = obj[1];
@@ -1676,7 +1678,8 @@ function Blocks () {
             if (attr !== '♮') {
                 label += attr;
             }
-        } else if (myBlock.name === 'eastindiansolfege') {
+            break;
+        case 'eastindiansolfege':
             var obj = splitSolfege(myBlock.value);
             var label = WESTERN2EISOLFEGENAMES[obj[0]];
             var attr = obj[1];
@@ -1684,12 +1687,32 @@ function Blocks () {
             if (attr !== '♮') {
                 label += attr;
             }
-        } else if (myBlock.name === 'modename') {
+            break;
+        case 'modename':
             var label = _(myBlock.value) + ' ' + getModeNumbers(myBlock.value);
-        } else if (myBlock.name === 'intervalname') {
+            break;
+        case 'accidentalname':
+        case 'intervalname':
             var obj = myBlock.value.split(' ');
             var label = _(obj[0]) + ' ' + obj[1];
-        } else {
+            break;
+        case 'filtertype':
+        case 'drumname':
+        case 'voicename':
+        case 'oscillatortype':
+        case 'temperamentname':
+        case 'invertmode':
+            var label = _(myBlock.value);
+            break;
+        case 'boolean':
+            if (myBlock.value) {
+                var label = _('true');
+	    } else {
+                var label = _('false');
+	    }
+
+            break;
+        default:
             if (myBlock.value == null) {
                var label = '';
             } else if (typeof myBlock.value !== 'string'){
@@ -1697,6 +1720,7 @@ function Blocks () {
             } else {
                 var label = myBlock.value;
             }
+            break;
         }
 
         if (WIDENAMES.indexOf(myBlock.name) === -1 && label.length > maxLength) {
@@ -2108,12 +2132,33 @@ function Blocks () {
         // console.log('makeBlock ' + name + ' ' + arg);
 
         var postProcess = function (args) {
-                var thisBlock = args[0];
-                var value = args[1];
-                that.blockList[thisBlock].value = value;
+            var thisBlock = args[0];
+            var value = args[1];
+            that.blockList[thisBlock].value = value;
+            switch (that.blockList[thisBlock].name) {
+            case 'drumname':
+            case 'voicename':
+            case 'filtertype':
+            case 'oscillatortype':
+            case 'temperamentname':
+            case 'invertmode':
+                that.blockList[thisBlock].text.text = _(value);
+                break;
+            case 'boolean':
+                if (value) {
+                    that.blockList[thisBlock].text.text = _('true');
+		} else {
+                    that.blockList[thisBlock].text.text = _('false');
+		}
+
+		break;
+            default:
                 that.blockList[thisBlock].text.text = value;
-                that.blockList[thisBlock].container.updateCache();
-            };
+                break;
+            }
+
+            that.blockList[thisBlock].container.updateCache();
+        };
 
         var postProcessArg = null;
         var that = this;
@@ -2135,7 +2180,8 @@ function Blocks () {
         } else if (name === 'text') {
             postProcessArg = [thisBlock, _('text')];
         } else if (name === 'boolean') {
-            postProcessArg = [thisBlock, _('true')];
+            console.log('boolean' + ' ' + true);
+            postProcessArg = [thisBlock, true];
         } else if (name === 'solfege') {
             postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'notename') {
@@ -2169,6 +2215,15 @@ function Blocks () {
 
             postProcessArg = [thisBlock, DEFAULTMODE];
         } else if (name === 'accidentalname') {
+            var postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                var obj = value.split(' ');
+                that.blockList[thisBlock].text.text = _(obj[0]) + ' ' + obj[1];
+                that.blockList[thisBlock].container.updateCache();
+            };
+
             postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === 'intervalname') {
             var postProcess = function (args) {
@@ -3900,17 +3955,17 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'text':
-            case 'boolean':
             case 'solfege':
             case 'eastindiansolfege':
             case 'notename':
             case 'modename':
-            case 'accidentalname':
-            case 'intervalname':
             case 'temperamentname':
             case 'invertmode':
             case 'filtertype':
             case 'oscillatortype':
+            case 'accidentalname':
+            case 'intervalname':
+            case 'boolean':
                 var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];

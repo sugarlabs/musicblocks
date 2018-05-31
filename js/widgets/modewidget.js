@@ -431,22 +431,7 @@ function ModeWidget() {
         var table = docById('modeTable');
         var n = table.rows.length - 1;
 
-	var __getModei18nName = function(name) {
-	    for (var m = 0; m < MODENAMES.length; m++) {
-		if (MODENAMES[m][1] === name) {
-		    if (MODENAMES[m][0] == null || MODENAMES[m][0] === '') {
-			return name;
-		    } else {
-			return MODENAMES[m][0];
-		    }
-		}
-	    }
-
-	    return name;
-	};
-
-        var label = getModeName(currentModeName[1]);
-        table.rows[n].cells[0].innerHTML = __getModei18nName(label);
+        table.rows[n].cells[0].innerHTML = _(currentModeName[1]);
 
         var that = this;
         var k = 0;
@@ -791,36 +776,18 @@ function ModeWidget() {
 
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
-
-		var __getModei18nName = function(name) {
-		    for (var m = 0; m < MODENAMES.length; m++) {
-			if (MODENAMES[m][1] === name) {
-			    if (MODENAMES[m][0] == null || MODENAMES[m][0] === '') {
-				return name;
-			    } else {
-				return MODENAMES[m][0];
-			    }
-			}
-		    }
-
-		    return name;
-		};
-
-                var label = getModeName(mode);
-                label = __getModei18nName(label);
-
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
-                    this._logo.blocks.blockList[this._modeBlock].value = getModeName(mode);
+                    this._logo.blocks.blockList[this._modeBlock].value = mode;
 
-                    this._logo.blocks.blockList[this._modeBlock].text.text = label;
+                    this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
                     this._logo.blocks.blockList[this._modeBlock].updateCache();
 
                     this._logo.refreshCanvas();
                 }
 
-                table.rows[n].cells[0].innerHTML = label;
+                table.rows[n].cells[0].innerHTML = _(mode);
                 return;
             }
         }
