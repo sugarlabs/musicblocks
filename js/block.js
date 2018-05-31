@@ -1918,7 +1918,6 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         // the pitch selector
         this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
@@ -2146,7 +2145,6 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuAccidentals = function (accidentalLabels, accidentalValues, accidental) {
         // wheelNav pie menu for accidental selection
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         // the accidental selector
         this._accidentalWheel = new wheelnav('wheelDiv', null, 600, 600);
@@ -2247,7 +2245,6 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuOctave = function (octave) {
         // wheelNav pie menu for octave selection
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         // the octave selector
         this._octaveWheel = new wheelnav('wheelDiv', null, 600, 600);
@@ -2344,7 +2341,6 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         // the selectedValueh selector
         this._basicWheel = new wheelnav('wheelDiv', null, 800, 800);
@@ -2421,7 +2417,6 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuBoolean = function (booleanLabels, booleanValues, boolean) {
         // wheelNav pie menu for boolean selection
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         // the booleanh selector
         this._booleanWheel = new wheelnav('wheelDiv', null, 600, 600);
@@ -2508,7 +2503,6 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         // the voice selector
         this._voiceWheel = new wheelnav('wheelDiv', null, 800, 800);
@@ -2628,7 +2622,6 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuIntervals = function (selectedInterval) {
         // pie menu for interval selection
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         // Use advanced constructor for more wheelnav on same div
         this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
@@ -2817,7 +2810,6 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         docById('wheelDiv').style.display = '';
-        docById('wheelDiv').style.backgroundColor = '#c0c0c0';
 
         //Use advanced constructor for more wheelnav on same div
         this._modeNameWheel = new wheelnav('wheelDiv', null, 1200, 1200);
