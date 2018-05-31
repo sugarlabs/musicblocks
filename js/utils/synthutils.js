@@ -211,7 +211,7 @@ function Synth() {
     this.changeInTemperament = false;
     this.inTemperament = 'equal';
     this.startingPitch = 'C4';
-    this.notes = {};
+    this.noteFrequencies = {};
 
     this.temperamentChanged = function(temperament, startingPitch) {
         var t = TEMPERAMENT[temperament];
@@ -220,7 +220,7 @@ function Synth() {
         var number = pitchToNumber(startingPitch.substring(0, len - 1), startingPitch.slice(-1), 'C major');
         var frequency = Tone.Frequency(startingPitch).toFrequency();
 
-        var noteFrequency = {
+        this.noteFrequencies = {
             // note: [octave, Frequency]
             [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency],
             [numberToPitch(number + 1)[0]]: [numberToPitch(number + 1)[1], t['minor 2'] * frequency],
@@ -242,39 +242,55 @@ function Synth() {
             [numberToPitch(number + 12)[0] + '' + numberToPitch(number + 12)[1]]: [numberToPitch(number + 12)[1], t['perfect 8'] * frequency]
         };
 
-        for (var key in noteFrequency) {
+        for (var key in this.noteFrequencies) {
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === 'b' ) {
                 var note = key.substring(0, 1) + '' + 'b';
-                noteFrequency[note] = noteFrequency[key];
-                delete noteFrequency[key]; 
+                this.noteFrequencies[note] = this.noteFrequencies[key];
+                delete this.noteFrequencies[key]; 
             } else if (key.substring(1, key.length) === SHARP || key.substring(1, key.length) === '#' ) {
                 var note = key.substring(0, 1) + '' + '#';
-                noteFrequency[note] = noteFrequency[key];
-                delete noteFrequency[key]; 
+                this.noteFrequencies[note] = this.noteFrequencies[key];
+                delete this.noteFrequencies[key]; 
             }
         }
-        this.note = noteFrequency;
+
         this.changeInTemperament = false;
     };
 
-    this.getFrequency = function(notes, changeInTemperament) {
+    this._getFrequency = function(notes, changeInTemperament) {
         if (changeInTemperament) {
             this.temperamentChanged(this.inTemperament, this.startingPitch);
         }
 
-        var len = notes.length;
-        for (var note in this.note) {
-            if (note === notes.substring(0, len - 1)) { 
-                if (this.note[note][0] === Number(notes.slice(-1))) {
-                    //Note to be played is in the same octave.
-                    return  this.note[note][1];
-                } else { 
-                    //Note to be played is not in the same octave.
-                    var power = Number(notes.slice(-1)) - this.note[note][0];
-                    return this.note[note][1] * Math.pow(2, power);
-                }
+        var that = this;
+
+        var __getFrequency = function (oneNote) {
+            var len = oneNote.length;
+
+            for (var note in that.noteFrequencies) {
+		if (note === oneNote.substring(0, len - 1)) { 
+                    if (that.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
+			//Note to be played is in the same octave.
+			return that.noteFrequencies[note][1];
+                    } else { 
+			//Note to be played is not in the same octave.
+			var power = Number(oneNote.slice(-1)) - that.noteFrequencies[note][0];
+			return that.noteFrequencies[note][1] * Math.pow(2, power);
+                    }
+		}
             }
-        }
+        };
+
+        if (typeof(notes) === 'string') {
+	    return __getFrequency(notes);
+	} else {
+            var results = [];
+            for (var i = 0; i < notes.length; i++) {
+		results.push(__getFrequency(notes[i]));
+	    }
+
+	    return results;
+	}
     };
 
     this.resume = function () {
@@ -706,8 +722,9 @@ function Synth() {
 
     this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
         if (this.inTemperament !== 'equal') {
-            notes = this.getFrequency(notes, this.changeInTemperament);
+            notes = this._getFrequency(notes, this.changeInTemperament);
         }
+
         if (paramsEffects === null && paramsFilters === null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
