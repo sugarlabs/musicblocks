@@ -14,7 +14,7 @@ const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshad
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 // Deprecated
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
-
+var stopOrCloseClicked = 0;
 
 function PitchTimeMatrix () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
@@ -211,7 +211,7 @@ function PitchTimeMatrix () {
 
             that._logo.synth.stopSound(0, 'default');
             that._logo.synth.stop();
-
+            stopOrCloseClicked = 1;
             ptmTableDiv.style.visibility = 'hidden';
             ptmButtonsDiv.style.visibility = 'hidden';
             ptmDiv.style.visibility = 'hidden';
@@ -1245,6 +1245,7 @@ function PitchTimeMatrix () {
                         pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
                     }
                 }
+                stopOrCloseClicked = 0;
             }
 
             var noteValue = this._notesToPlay[this._notesCounter][1];
@@ -1288,6 +1289,7 @@ function PitchTimeMatrix () {
 
             this.__playNote(0, 0, playButtonCell);
         } else {
+        	  stopOrCloseClicked = 1;
             playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
     };
@@ -1309,7 +1311,7 @@ function PitchTimeMatrix () {
     };
 
     this.__playNote = function(time, noteCounter, playButtonCell) {
-        // If the widget it closed, stop playing.
+        // If the widget is closed, stop playing.
         if (docById('ptmDiv').style.visibility === 'hidden') {
             return;
         }
@@ -1352,34 +1354,36 @@ function PitchTimeMatrix () {
                 var drumNotes = [];
 
                 // Note can be a chord, hence it is an array.
-                for (var i = 0; i < note.length; i++) {
-                    if (typeof(note[i]) === 'number') {
-                        var drumName = null;
-                    } else {
-                        var drumName = getDrumName(note[i]);
-                    }
+                if (stopOrCloseClicked == 0) {
+	                for (var i = 0; i < note.length; i++) {
+	                    if (typeof(note[i]) === 'number') {
+	                        var drumName = null;
+	                    } else {
+	                        var drumName = getDrumName(note[i]);
+	                    }
 
-                    if (typeof(note[i]) === 'number') {
-                        synthNotes.push(note[i]);
-                    } else if (drumName != null) {
-                        drumNotes.push(drumName);
-                    } else if (note[i].slice(0, 4) === 'http') {
-                        drumNotes.push(note[i]);
-                    } else {
-                        var obj = note[i].split(':');
-                        // Deprecated
-                        if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
-                            synthNotes.push(note[i]);
-                            continue;
-                        } else if (MATRIXGRAPHICS.indexOf(obj[0]) !== -1) {
-                            that._processGraphics(obj);
-                        } else if (MATRIXGRAPHICS2.indexOf(obj[0]) !== -1) {
-                            that._processGraphics(obj);
-                        } else {
-                            pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
-                        }
-                    }
-                }
+	                    if (typeof(note[i]) === 'number') {
+	                        synthNotes.push(note[i]);
+	                    } else if (drumName != null) {
+	                        drumNotes.push(drumName);
+	                    } else if (note[i].slice(0, 4) === 'http') {
+	                        drumNotes.push(note[i]);
+	                    } else {
+	                        var obj = note[i].split(':');
+	                        // Deprecated
+	                        if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
+	                            synthNotes.push(note[i]);
+	                            continue;
+	                        } else if (MATRIXGRAPHICS.indexOf(obj[0]) !== -1) {
+	                            that._processGraphics(obj);
+	                        } else if (MATRIXGRAPHICS2.indexOf(obj[0]) !== -1) {
+	                            that._processGraphics(obj);
+	                        } else {
+	                            pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
+	                        }
+	                    }
+	                }
+               	}
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
 
@@ -1420,7 +1424,7 @@ function PitchTimeMatrix () {
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
-    };
+	  };
 
     this._processGraphics = function (obj) {
         switch(obj[0]) {
