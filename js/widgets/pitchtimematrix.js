@@ -1245,7 +1245,7 @@ function PitchTimeMatrix () {
                         pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
                     }
                 }
-                stopOrCloseClicked = 0; 
+                stopOrCloseClicked = 0;
             }
 
             var noteValue = this._notesToPlay[this._notesCounter][1];
@@ -1285,11 +1285,12 @@ function PitchTimeMatrix () {
             for (var i = 0; i < drumNotes.length; i++) {
                 this._logo.synth.trigger(0, 'C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i], null, null);
 
-            }            
-            this.__playNote(0, 0, playButtonCell);        	
+            }
+
+            this.__playNote(0, 0, playButtonCell);
         } else {
-        	stopOrCloseClicked = 1;
-            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';        	
+        	  stopOrCloseClicked = 1;
+            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
     };
 
@@ -1382,7 +1383,7 @@ function PitchTimeMatrix () {
 	                        }
 	                    }
 	                }
-               	} 
+               	}
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
 
@@ -1422,8 +1423,8 @@ function PitchTimeMatrix () {
                     playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 }
             }
-        }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);	
-	};
+        }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+	  };
 
     this._processGraphics = function (obj) {
         switch(obj[0]) {
