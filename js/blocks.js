@@ -1700,9 +1700,17 @@ function Blocks () {
         case 'drumname':
         case 'voicename':
         case 'oscillatortype':
-        case 'temperamentname':
         case 'invertmode':
             var label = _(myBlock.value);
+            break;
+        case 'temperamentname':
+            var label = _(TEMPERAMENTS[0][1]);  // equal by default
+            for (var i = 0; i < TEMPERAMENTS.length; i++) {
+                if (TEMPERAMENTS[i][1] === myBlock.value) {
+		    label = TEMPERAMENTS[i][0];
+		    break;
+		}
+	    }
             break;
         case 'boolean':
             if (myBlock.value) {
@@ -2140,10 +2148,18 @@ function Blocks () {
             case 'voicename':
             case 'filtertype':
             case 'oscillatortype':
-            case 'temperamentname':
             case 'invertmode':
                 that.blockList[thisBlock].text.text = _(value);
                 break;
+            case 'temperamentname':
+		that.blockList[thisBlock].text.text = _(TEMPERAMENTS[0][1]);
+		for (var i = 0; i < TEMPERAMENTS.length; i++) {
+                    if (TEMPERAMENTS[i][1] === value) {
+			that.blockList[thisBlock].text.text = TEMPERAMENTS[i][0];
+			break;
+		    }
+		}
+		break;
             case 'boolean':
                 if (value) {
                     that.blockList[thisBlock].text.text = _('true');

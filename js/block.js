@@ -1687,7 +1687,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.value != null) {
                 var selectedinterval = this.value;
             } else {
-                var selectedinterval = getIntervalName(DEFAULTINTERVAL);
+                var selectedinterval = DEFAULTINTERVAL;
             }
 
             this._piemenuIntervals(selectedinterval);
@@ -1702,7 +1702,7 @@ function Block(protoblock, blocks, overrideName) {
             var invertValues = [];
 
             for (var i = 0; i < INVERTMODES.length; i++) {
-                invertLabels.push(INVERTMODES[i][0]);
+                invertLabels.push(_(INVERTMODES[i][1]));
                 invertValues.push(INVERTMODES[i][1]);
             }
 
@@ -1746,7 +1746,7 @@ function Block(protoblock, blocks, overrideName) {
             var filterLabels = [];
             var filterValues = [];
             for (var i = 0; i < FILTERTYPES.length; i++) {
-                filterLabels.push(FILTERTYPES[i][0]);
+                filterLabels.push(_(FILTERTYPES[i][0]));
                 filterValues.push(FILTERTYPES[i][1]);
             }
 
@@ -1761,7 +1761,7 @@ function Block(protoblock, blocks, overrideName) {
             var oscLabels = [];
             var oscValues = [];
             for (var i = 0; i < OSCTYPES.length; i++) {
-                oscLabels.push(OSCTYPES[i][0]);
+                oscLabels.push(_(OSCTYPES[i][1]));
                 oscValues.push(OSCTYPES[i][1]);
             }
 
@@ -2351,9 +2351,7 @@ function Block(protoblock, blocks, overrideName) {
 
         var labels = [];
         for (var i = 0; i < menuLabels.length; i++) {
-            // labels.push(menuLabels[i]);
-            console.log(menuLabels[i] + ' ' + menuValues[i] + ' ' + _(menuValues[i]));
-            labels.push(_(menuValues[i]));
+            labels.push(menuLabels[i]);
         }
 
         wheelnav.cssMode = true;
