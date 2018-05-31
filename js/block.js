@@ -2825,27 +2825,23 @@ function Block(protoblock, blocks, overrideName) {
         var colors = [];
         for (var modename in MUSICALMODES) {
             var mode = MUSICALMODES[modename];
-            if (mode in MUSICALMODES) {
-                switch (MUSICALMODES[mode].length % 5) {
-                case 0:
-                    colors.push('#5ba900');
-                    break;
-                case 1:
-                    colors.push('#77c428');
-                    break;
-                case 2:
-                    colors.push('#93e042');
-                    break;
-                case 3:
-                    colors.push('#3d8d00');
-                    break;
-                case 4:
-                default:
-                    colors.push('#adfd55');
-                    break;
-                }
-            } else {
+            switch (mode.length % 5) {
+            case 0:
+                colors.push('#5ba900');
+                break;
+            case 1:
+                colors.push('#77c428');
+                break;
+            case 2:
                 colors.push('#93e042');
+                break;
+            case 3:
+                colors.push('#3d8d00');
+                break;
+            case 4:
+            default:
+                colors.push('#adfd55');
+                break;
             }
         }
 
