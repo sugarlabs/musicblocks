@@ -1133,6 +1133,16 @@ function RhythmRuler () {
         }, 500);
     };
 
+    this._showRuler = function() {
+     //   console.log( this.Rulers[this._rulerSelected][0] );
+     //   var array1 = this.Rulers[this._rulerSelected][0];
+        if (meterInRhythmRulerGlobal) {
+        	console.log('There is atleast one meter block inside rhythm ruler');
+        } else {
+        	console.log('Please add a meter block to know the ruler size');
+        }
+    };
+
     this.init = function (logo) {
         console.log('init RhythmRuler');
 
@@ -1200,6 +1210,11 @@ function RhythmRuler () {
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
         cell.onclick = function () {
             that._saveDrumMachine(0);
+        };
+
+        var cell = this._addButton(row, 'oscillator.svg', iconSize, _('Show Ruler'), '');
+        cell.onclick = function () {
+            that._showRuler(0);
         };
 
         // An input for setting the dissect number

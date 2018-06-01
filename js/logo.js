@@ -38,6 +38,7 @@ const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
+var meterInRhythmRulerGlobal = 0;
 
 function Logo () {
 
@@ -306,6 +307,7 @@ function Logo () {
     this._saveCanvasAlpha = {};
     this._saveOrientation = {};
     this._savePenState = {};
+    
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
@@ -4534,8 +4536,8 @@ function Logo () {
             } else {
                 that.noteValuePerBeat[turtle] = 1 / args[1];
             }
-            var meterInRhythmRuler = this.inRhythmRuler;
-            console.log('Is meter block inside RhythmRuler ? ' + meterInRhythmRuler);
+            meterInRhythmRulerGlobal = this.inRhythmRuler;
+            console.log('Is meter block inside RhythmRuler ? ' + meterInRhythmRulerGlobal);
             that.notationMeter(turtle, that.beatsPerMeasure[turtle], that.noteValuePerBeat[turtle]);
             break;
         case 'osctime':
