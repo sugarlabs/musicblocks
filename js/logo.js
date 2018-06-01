@@ -4534,7 +4534,8 @@ function Logo () {
             } else {
                 that.noteValuePerBeat[turtle] = 1 / args[1];
             }
-
+            var meterInRhythmRuler = this.inRhythmRuler;
+            console.log('Is meter block inside RhythmRuler ? ' + meterInRhythmRuler);
             that.notationMeter(turtle, that.beatsPerMeasure[turtle], that.noteValuePerBeat[turtle]);
             break;
         case 'osctime':
