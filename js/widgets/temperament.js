@@ -107,6 +107,13 @@ function TemperamentWidget () {
 
             docById('wheelDiv2').style.display = '';
             docById('wheelDiv2').style.background = 'none'; 
+            var pitchNumber = TEMPERAMENT[that.inTemperament].pitchNumber;
+
+            var labels = [];
+            for (var j = 0; j < pitchNumber; j++) {
+                var label = "" + j;
+                labels.push(label);
+            } 
 
             that.notesCircle = new wheelnav('wheelDiv2');
             that.notesCircle.wheelRadius = 230;
@@ -116,12 +123,16 @@ function TemperamentWidget () {
             that.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
             that.notesCircle.sliceSelectedPathCustom = that.notesCircle.slicePathCustom;
             that.notesCircle.sliceInitPathCustom = that.notesCircle.slicePathCustom;
-            that.notesCircle.initWheel(["0", "1", "2", "3","4","5","6"]);
+            var menuRadius = (2 * Math.PI * radius / pitchNumber) / 3; 
+            that.notesCircle.slicePathCustom.menuRadius = menuRadius;
+            that.notesCircle.initWheel(labels);
             
             for (var i = 0; i < that.notesCircle.navItemCount; i++) {
                 that.notesCircle.navItems[i].fillAttr = "#c8C8C8";
+                that.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                that.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
             }
-            
+
             that.notesCircle.createWheel();
 
             docById('wheelDiv2').style.position = 'absolute';
@@ -129,6 +140,7 @@ function TemperamentWidget () {
             docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
             docById('wheelDiv2').style.left = canvas.style.x + 'px';
             docById('wheelDiv2').style.top = canvas.style.y + 'px';
+            console.log(that.notesCircle);
 
         };
 

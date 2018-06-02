@@ -483,7 +483,8 @@ const TEMPERAMENT = {
         'major 7': Math.pow(2, (11/12)),
         'augmented 7': Math.pow(2, (12/12)),
         'diminished 8': Math.pow(2, (11/12)),
-        'perfect 8': Math.pow(2, (12/12))
+        'perfect 8': Math.pow(2, (12/12)),
+        'pitchNumber': 12
     },
     'just intonation': {
         'unison' : (1/1),
@@ -507,7 +508,8 @@ const TEMPERAMENT = {
         'major 7': (15/8),
         'augmented 7': (2/1),
         'diminished 8': (15/8),
-        'perfect 8': (2/1)
+        'perfect 8': (2/1),
+        'pitchNumber': 12
     },
     'Pythagorean': {
         'unison' : (1/1),
@@ -555,7 +557,8 @@ const TEMPERAMENT = {
         'major 7': 1.859266,
         'augmented 7': 1.92835,
         'diminished 8': 1.92835,
-        'perfect 8': (2/1) 
+        'perfect 8': (2/1), 
+        'pitchNumber': 19
     },
     '1/4 comma meantone': { // 21 notes per octave
         'unison' : (1/1),
@@ -579,7 +582,8 @@ const TEMPERAMENT = {
         'major 7': (15/8),
         'augmented 7': (125/64),
         'diminished 8': (48/25),
-        'perfect 8': (2/1) 
+        'perfect 8': (2/1),
+        'pitchNumber': 21 
     },
     'custom':{
         'unison' : Math.pow(2, (0/12)),
@@ -603,7 +607,8 @@ const TEMPERAMENT = {
         'major 7': Math.pow(2, (11/12)),
         'augmented 7': Math.pow(2, (12/12)),
         'diminished 8': Math.pow(2, (11/12)),
-        'perfect 8': Math.pow(2, (12/12))
+        'perfect 8': Math.pow(2, (12/12)),
+        'pitchNumber': 12
     }
 };
 
