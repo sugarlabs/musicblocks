@@ -1,6 +1,6 @@
 function TemperamentWidget () {
 	
-	const BUTTONDIVWIDTH = 476;
+	const BUTTONDIVWIDTH = 430;
     const OUTERWINDOWWIDTH = 685;
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
@@ -75,13 +75,24 @@ function TemperamentWidget () {
             temperamentTableDiv.style.visibility = 'visible';
             temperamentTableDiv.style.border = '0px';
             temperamentTableDiv.style.overflow = 'auto';
+            temperamentTableDiv.style.backgroundColor = 'white';
+            temperamentTableDiv.style.height = '300px';
+            temperamentTableDiv.innerHTML = '<div id="temperamentTable"></div>';
+            var temperamentTable = docById('temperamentTable');
+            temperamentTable.style.position = 'relative';
 
-            var radius = 120;
-            var height = (2*radius) + 20;
+            var radius = 150;
+            var height = (2*radius) + 60;
 
-            temperamentTableDiv.innerHTML = '<canvas id="temperamentTable" width = 560px height = ' + height + 'px></canvas>';
-            
-            var canvas = docById('temperamentTable');
+            var html = '<canvas id="circ" width = ' + BUTTONDIVWIDTH + 'px height = ' + height + 'px></canvas>';
+            html += '<div id="wheelDiv2" class="wheelNav"></div>';
+
+            temperamentTable.innerHTML = html;
+            temperamentTable.style.width = temperamentDiv.width;
+
+            var canvas = docById('circ');
+            canvas.style.position = 'absolute';
+            canvas.style.background = 'rgba(255, 255, 255, 0.85)';
             var ctx = canvas.getContext("2d");
             var centerX = canvas.width / 2;
             var centerY = canvas.height / 2;
@@ -92,12 +103,38 @@ function TemperamentWidget () {
             ctx.fill();
             ctx.lineWidth = 1;
             ctx.strokeStyle = '#003300';
-            ctx.stroke();  
+            ctx.stroke();
+
+            docById('wheelDiv2').style.display = '';
+            docById('wheelDiv2').style.background = 'none'; 
+
+            that.notesCircle = new wheelnav('wheelDiv2');
+            that.notesCircle.wheelRadius = 230;
+            that.notesCircle.navItemsEnabled = false;
+            that.notesCircle.navAngle = 270;
+            that.notesCircle.slicePathFunction = slicePath().MenuSliceWithoutLine;
+            that.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
+            that.notesCircle.sliceSelectedPathCustom = that.notesCircle.slicePathCustom;
+            that.notesCircle.sliceInitPathCustom = that.notesCircle.slicePathCustom;
+            that.notesCircle.initWheel(["0", "1", "2", "3","4","5","6"]);
+            
+            for (var i = 0; i < that.notesCircle.navItemCount; i++) {
+                that.notesCircle.navItems[i].fillAttr = "#c8C8C8";
+            }
+            
+            that.notesCircle.createWheel();
+
+            docById('wheelDiv2').style.position = 'absolute';
+            docById('wheelDiv2').style.height = height + 'px';
+            docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
+            docById('wheelDiv2').style.left = canvas.style.x + 'px';
+            docById('wheelDiv2').style.top = canvas.style.y + 'px';
+
         };
 
         var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
 
-        var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
+        /*var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
         for (var i = 0; i < MODENAMES.length; i++) {
             if (MODENAMES[i][0].length === 0) {
                 modeselector += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
@@ -115,13 +152,17 @@ function TemperamentWidget () {
         cell.style.height = BUTTONSIZE + 'px';
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;*/
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick = function () {
             docById('temperamentDiv').style.visibility = 'hidden';
             docById('temperamentButtonsDiv').style.visibility = 'hidden';
             docById('temperamentTableDiv').style.visibility = 'hidden';
+            if (docById('wheelDiv2') != null) {
+                docById('wheelDiv2').style.display = 'none';
+                that.notesCircle.removeWheel(); 
+            }   
         };
 
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
