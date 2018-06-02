@@ -80,7 +80,8 @@ function Block(protoblock, blocks, overrideName) {
     this.postProcessArg = this;
 
     // Lock on label change
-    this._label_lock = false;
+    this._labelLock = false;
+    this._piemenuExitTime = null;
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -1636,13 +1637,17 @@ function Block(protoblock, blocks, overrideName) {
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
 
-            this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            }
         } else if (this.name === 'eastindiansolfege') {
             var obj = splitSolfege(this.value);
             var selectednote = obj[0];
             var selectedattr = obj[1];
 
-            this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            }
         } else if (this.name === 'notename') {
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
             if (this.value != null) {
@@ -1663,7 +1668,9 @@ function Block(protoblock, blocks, overrideName) {
                 selectedattr = '♮';
             }
 
-            this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
+            }
         } else if (this.name === 'modename') {
             if (this.value != null) {
                 var selectedmode = this.value;
@@ -1679,8 +1686,9 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedaccidental = DEFAULTACCIDENTAL;
             }
 
-            this._piemenuAccidentals(ACCIDENTALLABELS, ACCIDENTALNAMES, selectedaccidental);
-
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuAccidentals(ACCIDENTALLABELS, ACCIDENTALNAMES, selectedaccidental);
+            }
             // labelElem.innerHTML = '';
             // this.label = docById('accidentalnameLabel');
         } else if (this.name === 'intervalname') {
@@ -1690,7 +1698,9 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedinterval = DEFAULTINTERVAL;
             }
 
-            this._piemenuIntervals(selectedinterval);
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuIntervals(selectedinterval);
+            }
         } else if (this.name === 'invertmode') {
             if (this.value != null) {
                 var selectedinvert = this.value;
@@ -1706,7 +1716,9 @@ function Block(protoblock, blocks, overrideName) {
                 invertValues.push(INVERTMODES[i][1]);
             }
 
-            this._piemenuBasic(invertLabels, invertValues, selectedinvert);
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuBasic(invertLabels, invertValues, selectedinvert);
+            }
         } else if (this.name === 'drumname') {
             if (this.value != null) {
                 var selecteddrum = this.value;
@@ -1895,6 +1907,20 @@ function Block(protoblock, blocks, overrideName) {
                 that.label.focus();
                 focused = true;
             }, 100);
+        }
+    };
+
+    this.piemenuOKtoLaunch = function () {
+        if (this._piemenuExitTime === null) {
+            return true;
+        }
+
+        var d = new Date();
+        var now = d.getTime();
+        if (now - this._piemenuExitTime > 200) {
+            return true;
+        } else {
+            return false;
         }
     };
 
@@ -2132,6 +2158,8 @@ function Block(protoblock, blocks, overrideName) {
 
         // Hide the widget when the exit button is clicked.
         this._exitWheel.navItems[0].navigateFunction = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._accidentalsWheel.removeWheel();
@@ -2202,9 +2230,11 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
             that._accidentalWheel.removeWheel();
             that._exitWheel.removeWheel();
-            docById('wheelDiv').style.display = 'none';
         };
 
         // Position the widget over the note block.
@@ -2294,9 +2324,11 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
             that._octaveWheel.removeWheel();
             that._exitWheel.removeWheel();
-            docById('wheelDiv').style.display = 'none';
         };
 
         // Position the widget over the note block.
@@ -2380,8 +2412,10 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __exitMenu = function () {
-            that._basicWheel.removeWheel();
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
+            that._basicWheel.removeWheel();
         };
 
         // Position the widget over the note block.
@@ -2456,8 +2490,10 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __exitMenu = function () {
-            that._booleanWheel.removeWheel();
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
+            that._booleanWheel.removeWheel();
         };
 
         // Position the widget over the note block.
@@ -2615,6 +2651,8 @@ function Block(protoblock, blocks, overrideName) {
 
         // Hide the widget when the exit button is clicked.
         this._exitWheel.navItems[0].navigateFunction = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
         };
     };
@@ -2746,6 +2784,8 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
         };
 
@@ -2848,8 +2888,8 @@ function Block(protoblock, blocks, overrideName) {
         this._modeNameWheel.colors = colors;
         this._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
         this._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._modeNameWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._modeNameWheel.slicePathCustom.minRadiusPercent = 0.15;
+        this._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.85;
         this._modeNameWheel.sliceSelectedPathCustom = this._modeNameWheel.slicePathCustom;
         this._modeNameWheel.sliceInitPathCustom = this._modeNameWheel.slicePathCustom;
         this._modeNameWheel.titleRotateAngle = 0;
@@ -2865,7 +2905,7 @@ function Block(protoblock, blocks, overrideName) {
         this._modeWheel.colors = ['#77c428', '#93e042'];
         this._modeWheel.slicePathFunction = slicePath().DonutSlice;
         this._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._modeWheel.slicePathCustom.minRadiusPercent = 0.8;
+        this._modeWheel.slicePathCustom.minRadiusPercent = 0.85;
         this._modeWheel.slicePathCustom.maxRadiusPercent = 1;
         this._modeWheel.sliceSelectedPathCustom = this._modeWheel.slicePathCustom;
         this._modeWheel.sliceInitPathCustom = this._modeWheel.slicePathCustom;
@@ -2881,7 +2921,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.15;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
@@ -2890,6 +2930,8 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
 
         var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
         };
 
@@ -2998,12 +3040,12 @@ function Block(protoblock, blocks, overrideName) {
 
     this._labelChanged = function () {
         // Update the block values as they change in the DOM label.
-        if (this == null || this.label == null) {
-            this._label_lock = false;
+        if (this === null || this.label === null) {
+            this._labelLock = false;
             return;
         }
 
-        this._label_lock = true;
+        this._labelLock = true;
 
         this.label.style.display = 'none';
         if (this.labelattr != null) {
@@ -3034,7 +3076,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (oldValue === newValue) {
             // Nothing to do in this case.
-            this._label_lock = false;
+            this._labelLock = false;
             return;
         }
 
@@ -3201,7 +3243,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // We are done changing the label, so unlock.
-        this._label_lock = false;
+        this._labelLock = false;
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the synth for the selected drum.
@@ -3221,12 +3263,17 @@ function $() {
 
     for (var i = 0; i < arguments.length; i++) {
         var element = arguments[i];
-        if (typeof element === 'string')
+        if (typeof element === 'string') {
             element = docById(element);
-        if (arguments.length === 1)
+        }
+
+        if (arguments.length === 1) {
             return element;
+        }
+
         elements.push(element);
     }
+
     return elements;
 };
 
@@ -3242,6 +3289,7 @@ function _makeBitmap(data, name, callback, args) {
     // Async creation of bitmap from SVG data.
     // Works with Chrome, Safari, Firefox (untested on IE).
     var img = new Image();
+
     img.onload = function () {
         var bitmap = new createjs.Bitmap(img);
         callback(name, bitmap, args);

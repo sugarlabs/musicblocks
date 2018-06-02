@@ -312,36 +312,6 @@ const INTERVALS = [
     [_('major'), 'major', [2, 3, 6, 7]],
 ];
 
-const INTERVALNAMES = [
-    [_('unison'), 'perfect 1'],
-    [_('augmented') + ' 1', 'augmented 1'],
-    [_('diminished') + ' 2', 'diminished 2'],
-    [_('minor') + ' 2', 'minor 2'],
-    [_('major') + ' 2', 'major 2'],
-    [_('augmented') + ' 2', 'augmented 2'],
-    [_('diminished') + ' 3', 'diminished 3'],
-    [_('minor') + ' 3', 'minor 3'],
-    [_('major') + ' 3', 'major 3'],
-    [_('augmented') + ' 3', 'augmented 3'],
-    [_('diminished') + ' 4', 'diminished 4'],
-    [_('perfect') + ' 4', 'perfect 4'],
-    [_('augmented') + ' 4', 'augmented 4'],
-    [_('diminished') + ' 5', 'diminished 5'],
-    [_('perfect') + ' 5', 'perfect 5'],
-    [_('augmented') + ' 5', 'augmented 5'],
-    [_('diminished') + ' 6', 'diminished 6'],
-    [_('minor') + ' 6', 'minor 6'],
-    [_('major') + ' 6', 'major 6'],
-    [_('augmented') + ' 6', 'augmented 6'],
-    [_('diminished') + ' 7', 'diminished 7'],
-    [_('minor') + ' 7', 'minor 7'],
-    [_('major') + ' 7', 'major 7'],
-    [_('augmented') + ' 7', 'augmented 7'],
-    [_('diminished') + ' 8', 'diminished 8'],
-    [_('perfect') + ' 8', 'perfect 8'],
-    [_('augmented') + ' 8', 'augmented 8'],
-];
-
 // [semi-tones, direction -1 == down; 0 == neutral; 1 == up]
 const INTERVALVALUES = {
     'perfect 1': [0, 0],
@@ -627,49 +597,13 @@ function getInvertMode(name) {
 };
 
 
-function getIntervalName(name) {
-    for (var interval in INTERVALNAMES) {
-        if (INTERVALNAMES[interval][0] === name || INTERVALNAMES[interval][1].toLowerCase() === name.toLowerCase()) {
-            if (INTERVALNAMES[interval][0] != '') {
-                return INTERVALNAMES[interval][0];
-            } else {
-                console.log('I18n for interval name is misbehaving.');
-                console.log(name + ' ' + name.toLowerCase() + ' ' + INTERVALNAMES[interval][0].toLowerCase() + ' ' + INTERVALNAMES[interval][1].toLowerCase());
-                return INTERVALNAMES[interval][1];
-            }
-        }
-    }
-
-    console.log(name + ' not found in INTERVALNAMES');
-    return name;
-};
-
-
 function getIntervalNumber(name) {
-    for (var interval in INTERVALNAMES) {
-        if (INTERVALNAMES[interval][0] === name) {
-            return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
-        } else if (INTERVALNAMES[interval][1] === name) {
-            return INTERVALVALUES[INTERVALNAMES[interval][1]][0];
-        }
-    }
-
-    console.log(name + ' not found in INTERVALNAMES');
-    return 0;
+    return INTERVALVALUES[name][0];
 };
 
 
 function getIntervalDirection(name) {
-    for (var interval in INTERVALNAMES) {
-        if (INTERVALNAMES[interval][0] === name) {
-            return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
-        } else if (INTERVALNAMES[interval][1] === name) {
-            return INTERVALVALUES[INTERVALNAMES[interval][1]][1];
-        }
-    }
-
-    console.log(name + ' not found in INTERVALNAMES');
-    return 0;
+    return INTERVALVALUES[name][1];
 };
 
 
