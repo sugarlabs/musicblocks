@@ -1556,7 +1556,7 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber()) {
+                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber()) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
@@ -1840,6 +1840,8 @@ function Block(protoblock, blocks, overrideName) {
             // use the pie menu for octaves.
             if (this._octaveNumber()) {
                 this._piemenuOctave(this.value);
+            } else if (this._noteValueNumber()) {
+                this._piemenuNoteValue(this.value);
             } else {
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
@@ -1847,7 +1849,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber()) {
+        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber()) {
             var focused = false;
 
             var __blur = function (event) {
@@ -1922,6 +1924,55 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             return false;
         }
+    };
+
+    this._noteValueNumber = function () {
+        // Is this a number block being used as a note value
+        // denominator argument?
+        var dblk = this.connections[0];
+        // Are we connected to a divide block?
+        if (this.name === 'number' && dblk !== null && this.blocks.blockList[dblk].name === 'divide') {
+            // Are we the denominator?
+            if (this.blocks.blockList[dblk].connections[2] === this.blocks.blockList.indexOf(this)) {
+                // Is the divide block connected to a note value block?
+                cblk = this.blocks.blockList[dblk].connections[0];
+                if (cblk !== null) {
+                    // Is it the first or second arg?
+                    switch (this.blocks.blockList[cblk].name) {
+                    case 'newnote':
+                    case 'pickup':
+                    case 'tuplet4':
+                    case 'newstaccato':
+                    case 'newslur':
+                        if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case 'meter':
+                    case 'setbpm2':
+                    case 'setmasterbpm2':
+                    case 'stuplet':
+                    case 'rhythm2':
+                    case 'newswing2':
+                    case 'neighbor':
+                    case 'neighbor2':
+                        if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return false;
     };
 
     this._octaveNumber = function () {
@@ -2363,6 +2414,126 @@ function Block(protoblock, blocks, overrideName) {
         // Or use the exit wheel...
         this._exitWheel.navItems[0].navigateFunction = function () {
                 __exitMenu();
+        };
+    };
+
+    this._piemenuNoteValue = function (noteValue) {
+        // input form and  wheelNav pie menu for note value selection
+        docById('wheelDiv').style.display = '';
+
+        const WHEELVALUES = [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 16, 32, 64];
+
+        // the noteValue selector
+        this._noteValueWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._noteValueWheel.raphael);
+
+        var noteValueLabels = [];
+        for (var i = 0; i < WHEELVALUES.length; i++) {
+            noteValueLabels.push(WHEELVALUES[i].toString());
+        }
+
+        // spacer
+        noteValueLabels.push(null);
+
+        wheelnav.cssMode = true;
+
+        this._noteValueWheel.keynavigateEnabled = true;
+
+        this._noteValueWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._noteValueWheel.slicePathFunction = slicePath().DonutSlice;
+        this._noteValueWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._noteValueWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._noteValueWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._noteValueWheel.sliceSelectedPathCustom = this._noteValueWheel.slicePathCustom;
+        this._noteValueWheel.sliceInitPathCustom = this._noteValueWheel.slicePathCustom;
+        this._noteValueWheel.titleRotateAngle = 0;
+        this._noteValueWheel.animatetime = 300;
+        this._noteValueWheel.createWheel(noteValueLabels);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            that.value = WHEELVALUES[that._noteValueWheel.selectedNavItemIndex];
+            that.text.text = noteValueLabels[that._noteValueWheel.selectedNavItemIndex];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._noteValueWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that.label.style.display = 'none';
+        };
+
+        var labelElem = docById('labelDiv');
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + noteValue + '" />';
+        labelElem.classList.add('hasKeyboard');
+        this.label = docById('numberLabel');
+
+        // this.label.addEventListener('keypress', __keypress);
+
+        this.label.addEventListener('change', function () {
+            that._labelChanged();
+        });
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+        
+        // Navigate to a the current noteValue value.
+        var i = WHEELVALUES.indexOf(noteValue);
+        if (i === -1) {
+            i = 3;
+        }
+
+        this._noteValueWheel.navigateWheel(i);
+
+        var selectorWidth = 150;
+        this.label.style.left = (Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + (300 - selectorWidth) / 2) + 'px';
+        this.label.style.top = (Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 300) + 'px';
+        this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+
+        this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        this.label.style.display = '';
+        this.label.focus();
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < noteValueLabels.length; i++) {
+            this._noteValueWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            __exitMenu();
         };
     };
 
@@ -3051,6 +3222,9 @@ function Block(protoblock, blocks, overrideName) {
         if (this.labelattr != null) {
             this.labelattr.style.display = 'none';
         }
+
+        // The pie menu may be visible too, so hide it.
+        docById('wheelDiv').style.display = 'none';
 
         var oldValue = this.value;
 
