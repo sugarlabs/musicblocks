@@ -2421,12 +2421,22 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for note value selection
         docById('wheelDiv').style.display = '';
 
-        const WHEELVALUES = [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 16, 32, 64];
+        // We want powers of two on the bottom, nearest the input box
+        // as it is most common.
+        const WHEELVALUES = [3, 2, 7, 5];
+        const SUBWHEELS = {
+            2: [1, 2, 4, 8, 16, 32],
+            3: [1, 3, 6, 9, 12, 27],
+            5: [1, 5, 10, 15, 20, 25],
+            7: [1, 7, 14, 21, 28, 35],
+        };
 
         // the noteValue selector
         this._noteValueWheel = new wheelnav('wheelDiv', null, 600, 600);
         // exit button
         this._exitWheel = new wheelnav('_exitWheel', this._noteValueWheel.raphael);
+        // submenu wheel
+        this._tabsWheel = new wheelnav('_tabsWheel', this._noteValueWheel.raphael);
 
         var noteValueLabels = [];
         for (var i = 0; i < WHEELVALUES.length; i++) {
@@ -2434,7 +2444,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // spacer
-        noteValueLabels.push(null);
+        // noteValueLabels.push(null);
 
         wheelnav.cssMode = true;
 
@@ -2447,8 +2457,8 @@ function Block(protoblock, blocks, overrideName) {
         this._noteValueWheel.slicePathCustom.maxRadiusPercent = 0.6;
         this._noteValueWheel.sliceSelectedPathCustom = this._noteValueWheel.slicePathCustom;
         this._noteValueWheel.sliceInitPathCustom = this._noteValueWheel.slicePathCustom;
-        this._noteValueWheel.titleRotateAngle = 0;
         this._noteValueWheel.animatetime = 300;
+        this._noteValueWheel.clickModeRotate = false;
         this._noteValueWheel.createWheel(noteValueLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -2461,11 +2471,29 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
 
+        var tabsLabels = [];
+        for (var i = 0; i < WHEELVALUES.length; i++) {
+            for (var j = 0; j < SUBWHEELS[WHEELVALUES[i]].length; j++) {
+                tabsLabels.push(SUBWHEELS[WHEELVALUES[i]][j].toString());
+            }
+        }
+
+        this._tabsWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
+        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
+        this._tabsWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.clickModeRotate = false;
+        this._tabsWheel.navAngle = -180 / WHEELVALUES.length + 180 / (WHEELVALUES.length * SUBWHEELS[WHEELVALUES[0]].length);
+        this._tabsWheel.createWheel(tabsLabels);
+        
         var that = this;
 
         var __selectionChanged = function () {
-            that.value = WHEELVALUES[that._noteValueWheel.selectedNavItemIndex];
-            that.text.text = noteValueLabels[that._noteValueWheel.selectedNavItemIndex];
+            that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
+            that.value = Number(that.text.text);
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
@@ -2515,22 +2543,173 @@ function Block(protoblock, blocks, overrideName) {
 
         this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
-        // Navigate to a the current noteValue value.
-        var i = WHEELVALUES.indexOf(noteValue);
-        if (i === -1) {
-            i = 3;
+        var __showHide = function () {
+            var i = that._noteValueWheel.selectedNavItemIndex;
+            for (var k = 0; k < WHEELVALUES.length; k++) {
+                for (var j = 0; j < SUBWHEELS[WHEELVALUES[0]].length; j++) {
+                    var n = k * SUBWHEELS[WHEELVALUES[0]].length;
+                    if (that._noteValueWheel.selectedNavItemIndex === k) {
+                        that._tabsWheel.navItems[n + j].navItem.show();
+                    } else {
+                        that._tabsWheel.navItems[n + j].navItem.hide();
+                    }
+                }
+            }
+        };
+
+        for (var i = 0; i < noteValueLabels.length; i++) {
+            this._noteValueWheel.navItems[i].navigateFunction = __showHide;
         }
 
-        this._noteValueWheel.navigateWheel(i);
+        // Navigate to a the current noteValue value.
+        for (var i = 0; i < WHEELVALUES.length; i++) {
+            for (var j = 0; j < SUBWHEELS[WHEELVALUES[i]].length; j++) {
+                if (SUBWHEELS[WHEELVALUES[i]][j] === noteValue) {
+                    this._noteValueWheel.navigateWheel(i);
+                    this._tabsWheel.navigateWheel(i * SUBWHEELS[WHEELVALUES[i]].length + j);
+                    break;
+                }
+            }
 
+            if (j < SUBWHEELS[WHEELVALUES[i]].length) {
+                break;
+            }
+        }
+
+        if (i === WHEELVALUES.length) {
+            this._noteValueWheel.navigateWheel(0);
+            this._tabsWheel.navigateWheel(2);
+        }
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
         this.label.focus();
 
         // Hide the widget when the selection is made.
-        for (var i = 0; i < noteValueLabels.length; i++) {
-            this._noteValueWheel.navItems[i].navigateFunction = function () {
+        for (var i = 0; i < tabsLabels.length; i++) {
+            this._tabsWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            __exitMenu();
+        };
+    };
+
+    this._piemenuNumber = function (wheelValues, selectedValue) {
+        // input form and  wheelNav pie menu for number selection
+        docById('wheelDiv').style.display = '';
+
+        // the number selector
+        this._numberWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._numberWheel.raphael);
+
+        var wheelLabels = [];
+        for (var i = 0; i < wheelValues.length; i++) {
+            wheelLabels.push(wheelValues[i].toString());
+        }
+
+        // spacer
+        wheelLabels.push(null);
+
+        wheelnav.cssMode = true;
+
+        this._numberWheel.keynavigateEnabled = true;
+
+        this._numberWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
+        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
+        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
+        this._numberWheel.titleRotateAngle = 0;
+        this._numberWheel.animatetime = 300;
+        this._numberWheel.createWheel(wheelLabels);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            that.value = WHEELVALUES[that._numberWheel.selectedNavItemIndex];
+            that.text.text = wheelLabels[that._numberWheel.selectedNavItemIndex];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._numberWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that.label.style.display = 'none';
+        };
+
+        var labelElem = docById('labelDiv');
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + selectedValue + '" />';
+        labelElem.classList.add('hasKeyboard');
+        this.label = docById('numberLabel');
+
+        // this.label.addEventListener('keypress', __keypress);
+
+        this.label.addEventListener('change', function () {
+            that._labelChanged();
+        });
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+
+        var selectorWidth = 150;
+        var left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft);
+        var top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop);
+        this.label.style.left = left + 'px';
+        this.label.style.top = top + 'px';
+
+        docById('wheelDiv').style.left = (left - (300 - selectorWidth) / 2) + 'px';
+        docById('wheelDiv').style.top = (top - 300) + 'px';
+
+        this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+
+        // Navigate to a the current number value.
+        var i = wheelValues.indexOf(selectedValue);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._numberWheel.navigateWheel(i);
+
+        this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        this.label.style.display = '';
+        this.label.focus();
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < wheelLabels.length; i++) {
+            this._numberWheel.navItems[i].navigateFunction = function () {
                 __selectionChanged();
                 __exitMenu();
             };
