@@ -1892,7 +1892,7 @@ function Block(protoblock, blocks, overrideName) {
                 that._labelChanged();
             });
 
-            this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
+	    this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
             this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
             this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
@@ -2503,9 +2503,18 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
         docById('wheelDiv').style.width = '300px';
-        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
-        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
+
+        var selectorWidth = 150;
+        var left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft);
+        var top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop);
+        this.label.style.left = left + 'px';
+        this.label.style.top = top + 'px';
+
+        docById('wheelDiv').style.left = (left - (300 - selectorWidth) / 2) + 'px';
+        docById('wheelDiv').style.top = (top - 300) + 'px';
+
+        this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+
         // Navigate to a the current noteValue value.
         var i = WHEELVALUES.indexOf(noteValue);
         if (i === -1) {
@@ -2514,10 +2523,6 @@ function Block(protoblock, blocks, overrideName) {
 
         this._noteValueWheel.navigateWheel(i);
 
-        var selectorWidth = 150;
-        this.label.style.left = (Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + (300 - selectorWidth) / 2) + 'px';
-        this.label.style.top = (Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 300) + 'px';
-        this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
