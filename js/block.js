@@ -1556,7 +1556,7 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber()) {
+                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1)) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
@@ -1840,8 +1840,21 @@ function Block(protoblock, blocks, overrideName) {
             // use the pie menu for octaves.
             if (this._octaveNumber()) {
                 this._piemenuOctave(this.value);
-            } else if (this._noteValueNumber()) {
+            } else if (this._noteValueNumber(2)) {
                 this._piemenuNoteValue(this.value);
+            } else if (this._noteValueNumber(1)) {
+                var d = this._noteValueValue();
+                if (d === 1) {
+                    var values = [1, 2, 3, 4, 5, 6, 7, 8];
+                } else {
+                    var values = [];
+                    for (var i = 0; i < d; i++) {
+                        values.push(i + 1);
+                    }
+                }
+
+                // FIXME: find the range based on the denominator.
+                this._piemenuNumber(values, this.value);
             } else {
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
@@ -1849,7 +1862,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber()) {
+        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1)) {
             var focused = false;
 
             var __blur = function (event) {
@@ -1892,7 +1905,7 @@ function Block(protoblock, blocks, overrideName) {
                 that._labelChanged();
             });
 
-	    this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
+            this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
             this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
             this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
@@ -1926,14 +1939,14 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    this._noteValueNumber = function () {
+    this._noteValueNumber = function (c) {
         // Is this a number block being used as a note value
         // denominator argument?
         var dblk = this.connections[0];
         // Are we connected to a divide block?
         if (this.name === 'number' && dblk !== null && this.blocks.blockList[dblk].name === 'divide') {
-            // Are we the denominator?
-            if (this.blocks.blockList[dblk].connections[2] === this.blocks.blockList.indexOf(this)) {
+            // Are we the denominator (c == 2) or numerator (c == 1)?
+            if (this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)) {
                 // Is the divide block connected to a note value block?
                 cblk = this.blocks.blockList[dblk].connections[0];
                 if (cblk !== null) {
@@ -1973,6 +1986,56 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         return false;
+    };
+
+    this._noteValueValue = function () {
+        // Return the number block value being used as a note value
+        // denominator argument.
+        var dblk = this.connections[0];
+        // We are connected to a divide block.
+        // Is the divide block connected to a note value block?
+        cblk = this.blocks.blockList[dblk].connections[0];
+        if (cblk !== null) {
+            // Is it the first or second arg?
+            switch (this.blocks.blockList[cblk].name) {
+            case 'newnote':
+            case 'pickup':
+            case 'tuplet4':
+            case 'newstaccato':
+            case 'newslur':
+                if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                    cblk = this.blocks.blockList[dblk].connections[2];
+                    return this.blocks.blockList[cblk].value;
+                } else {
+                    return 1;
+                }
+                break;
+            case 'meter':
+            case 'setbpm2':
+            case 'setmasterbpm2':
+            case 'stuplet':
+            case 'rhythm2':
+            case 'newswing2':
+            case 'neighbor':
+            case 'neighbor2':
+                if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                    if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                        cblk = this.blocks.blockList[dblk].connections[2];
+                        return this.blocks.blockList[cblk].value;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+                break;
+            }
+        }
+
+        return 1;
     };
 
     this._octaveNumber = function () {
@@ -2577,7 +2640,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (i === WHEELVALUES.length) {
-            this._noteValueWheel.navigateWheel(0);
+            this._noteValueWheel.navigateWheel(1);
             this._tabsWheel.navigateWheel(2);
         }
 
@@ -2624,7 +2687,12 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.slicePathFunction = slicePath().DonutSlice;
         this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        if (wheelValues.length > 16) {
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        } else {
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        }
+
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.titleRotateAngle = 0;
@@ -2644,7 +2712,7 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
 
         var __selectionChanged = function () {
-            that.value = WHEELVALUES[that._numberWheel.selectedNavItemIndex];
+            that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
             that.text.text = wheelLabels[that._numberWheel.selectedNavItemIndex];
 
             // Make sure text is on top.
