@@ -1867,6 +1867,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'meter':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
                     break;
+                case 'steppitch':
+                    this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
+                    break;
                 }
             } else {
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
@@ -1942,7 +1945,7 @@ function Block(protoblock, blocks, overrideName) {
         // Return true if this number block plugs into a block that
         // uses a pie menu. Add block names to the list below and the
         // switch statement about 80 lines above.
-        return this.connections[0] !== null && ['meter', 'scaledegree', 'rhythmicdot2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
+        return this.connections[0] !== null && ['steppitch', 'meter', 'scaledegree', 'rhythmicdot2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
     };
 
     this.piemenuOKtoLaunch = function () {
