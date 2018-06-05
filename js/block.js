@@ -1861,6 +1861,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'rhythmicdot2':
                     this._piemenuNumber([1, 2, 3], this.value);
                     break;
+                case 'register':
+                    this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
+                    break;
                 case 'scaledegree':
                     this._piemenuNumber([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
                     break;
@@ -1948,7 +1951,7 @@ function Block(protoblock, blocks, overrideName) {
         // Return true if this number block plugs into a block that
         // uses a pie menu. Add block names to the list below and the
         // switch statement about 80 lines above.
-        return this.connections[0] !== null && ['steppitch', 'pitchnumber', 'meter', 'scaledegree', 'rhythmicdot2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
+        return this.connections[0] !== null && ['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
     };
 
     this.piemenuOKtoLaunch = function () {
