@@ -1556,7 +1556,7 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._rhythmicDot()) {
+                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._usePieNumber()) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
@@ -1856,8 +1856,12 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 this._piemenuNumber(values, this.value);
-            } else if (this._rhythmicDot()) {
-                this._piemenuNumber([1, 2, 3], this.value);         
+            } else if (this._usePieNumber()) {
+                switch (this.blocks.blockList[this.connections[0]].name) {
+                case 'rhythmicdot2':
+                    this._piemenuNumber([1, 2, 3], this.value);         
+                    break;
+                }
             } else {
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
@@ -1865,7 +1869,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._rhythmicDot()) {
+        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._usePieNumber()) {
             var focused = false;
 
             var __blur = function (event) {
@@ -1928,8 +1932,11 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    this._rhythmicDot = function () {
-        return this.connections[0] !== null && this.blocks.blockList[this.connections[0]].name === 'rhythmicdot2';
+    this._usePieNumber = function () {
+        // Return true if this number block plugs into a block that
+        // uses a pie menu. Add block names to the list below and the
+        // switch statement about 80 lines above.
+        return this.connections[0] !== null && ['rhythmicdot2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
     };
 
     this.piemenuOKtoLaunch = function () {
