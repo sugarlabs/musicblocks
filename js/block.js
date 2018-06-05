@@ -2524,9 +2524,6 @@ function Block(protoblock, blocks, overrideName) {
             noteValueLabels.push(WHEELVALUES[i].toString());
         }
 
-        // spacer
-        // noteValueLabels.push(null);
-
         wheelnav.cssMode = true;
 
         this._noteValueWheel.keynavigateEnabled = true;
@@ -2619,8 +2616,12 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.left = left + 'px';
         this.label.style.top = top + 'px';
 
-        docById('wheelDiv').style.left = (left - (300 - selectorWidth) / 2) + 'px';
-        docById('wheelDiv').style.top = (top - 300) + 'px';
+        docById('wheelDiv').style.left = Math.min(Math.max((left - (300 - selectorWidth) / 2), 0), this.blocks.turtles._canvas.width - 300)  + 'px';
+        if (top - 300 < 0) {
+            docById('wheelDiv').style.top = (top + 40) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (top - 300) + 'px';
+        }
 
         this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
@@ -2643,23 +2644,29 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Navigate to a the current noteValue value.
-        for (var i = 0; i < WHEELVALUES.length; i++) {
-            for (var j = 0; j < SUBWHEELS[WHEELVALUES[i]].length; j++) {
-                if (SUBWHEELS[WHEELVALUES[i]][j] === noteValue) {
-                    this._noteValueWheel.navigateWheel(i);
-                    this._tabsWheel.navigateWheel(i * SUBWHEELS[WHEELVALUES[i]].length + j);
+        // Special case 1 to use power of 2.
+        if (noteValue === 1) {
+            this._noteValueWheel.navigateWheel(1);
+            this._tabsWheel.navigateWheel(0);
+        } else {
+            for (var i = 0; i < WHEELVALUES.length; i++) {
+                for (var j = 0; j < SUBWHEELS[WHEELVALUES[i]].length; j++) {
+                    if (SUBWHEELS[WHEELVALUES[i]][j] === noteValue) {
+                        this._noteValueWheel.navigateWheel(i);
+                        this._tabsWheel.navigateWheel(i * SUBWHEELS[WHEELVALUES[i]].length + j);
+                        break;
+                    }
+                }
+
+                if (j < SUBWHEELS[WHEELVALUES[i]].length) {
                     break;
                 }
             }
 
-            if (j < SUBWHEELS[WHEELVALUES[i]].length) {
-                break;
+            if (i === WHEELVALUES.length) {
+                this._noteValueWheel.navigateWheel(1);
+                this._tabsWheel.navigateWheel(2);
             }
-        }
-
-        if (i === WHEELVALUES.length) {
-            this._noteValueWheel.navigateWheel(1);
-            this._tabsWheel.navigateWheel(2);
         }
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
@@ -2713,7 +2720,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        this._numberWheel.titleRotateAngle = 0;
+        // this._numberWheel.titleRotateAngle = 0;
         this._numberWheel.animatetime = 300;
         this._numberWheel.createWheel(wheelLabels);
 
@@ -2776,8 +2783,12 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.left = left + 'px';
         this.label.style.top = top + 'px';
 
-        docById('wheelDiv').style.left = (left - (300 - selectorWidth) / 2) + 'px';
-        docById('wheelDiv').style.top = (top - 300) + 'px';
+        docById('wheelDiv').style.left = Math.min(Math.max((left - (300 - selectorWidth) / 2), 0), this.blocks.turtles._canvas.width - 300)  + 'px';
+        if (top - 300 < 0) {
+            docById('wheelDiv').style.top = (top + 40) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (top - 300) + 'px';
+        }
 
         this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
