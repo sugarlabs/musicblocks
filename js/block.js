@@ -1841,7 +1841,7 @@ function Block(protoblock, blocks, overrideName) {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
             if (this._octaveNumber()) {
-                this._piemenuOctave(this.value);
+                this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8], this.value);
             } else if (this._noteValueNumber(2)) {
                 this._piemenuNoteValue(this.value);
             } else if (this._noteValueNumber(1)) {
@@ -2408,100 +2408,6 @@ function Block(protoblock, blocks, overrideName) {
         // Hide the widget when the selection is made.
         for (var i = 0; i < accidentalLabels.length; i++) {
             this._accidentalWheel.navItems[i].navigateFunction = function () {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-
-        // Or use the exit wheel...
-        this._exitWheel.navItems[0].navigateFunction = function () {
-                __exitMenu();
-        };
-    };
-
-    this._piemenuOctave = function (octave) {
-        // wheelNav pie menu for octave selection
-        docById('wheelDiv').style.display = '';
-
-        // the octave selector
-        this._octaveWheel = new wheelnav('wheelDiv', null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav('_exitWheel', this._octaveWheel.raphael);
-
-
-        // TODO: add prev, current, next options (but you'll need to
-        // replace this number block with a text block)
-        var octaveLabels = ['1', '2', '3', '4', '5', '6', '7', '8', null];
-
-        wheelnav.cssMode = true;
-
-        this._octaveWheel.keynavigateEnabled = true;
-
-        this._octaveWheel.colors = ['#ffb2bc', '#ffccd6'];
-        this._octaveWheel.slicePathFunction = slicePath().DonutSlice;
-        this._octaveWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._octaveWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._octaveWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        this._octaveWheel.sliceSelectedPathCustom = this._octaveWheel.slicePathCustom;
-        this._octaveWheel.sliceInitPathCustom = this._octaveWheel.slicePathCustom;
-        this._octaveWheel.titleRotateAngle = 0;
-        this._octaveWheel.animatetime = 300;
-        this._octaveWheel.createWheel(octaveLabels);
-
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(['x', ' ']);
-
-        var that = this;
-
-        var __selectionChanged = function () {
-            that.value = that._octaveWheel.selectedNavItemIndex + 1;
-            that.text.text = octaveLabels[that.value -1];
-
-            // Make sure text is on top.
-            var z = that.container.children.length - 1;
-            that.container.setChildIndex(that.text, z);
-            that.updateCache();
-        };
-
-        var __exitMenu = function () {
-            var d = new Date();
-            that._piemenuExitTime = d.getTime();
-            docById('wheelDiv').style.display = 'none';
-            that._octaveWheel.removeWheel();
-            that._exitWheel.removeWheel();
-        };
-
-        // Position the widget over the note block.
-        var x = this.container.x;
-        var y = this.container.y;
-
-        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById('wheelDiv').style.position = 'absolute';
-        docById('wheelDiv').style.height = '300px';
-        docById('wheelDiv').style.width = '300px';
-        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
-        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
-        // Navigate to a the current octave value.
-        var i = [1, 2, 3, 4, 5, 6, 7, 8].indexOf(octave);
-        if (i === -1) {
-            i = 3;
-        }
-
-        this._octaveWheel.navigateWheel(i);
-
-        // Hide the widget when the selection is made.
-        for (var i = 0; i < octaveLabels.length; i++) {
-            this._octaveWheel.navItems[i].navigateFunction = function () {
                 __selectionChanged();
                 __exitMenu();
             };
