@@ -1410,7 +1410,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     vibratoBlock.staticLabels.push(_('intensity'), _('rate'));
     vibratoBlock.adjustWidthToLabel();
     vibratoBlock.flowClampTwoArgBlock();
-    vibratoBlock.defaults.push(10);
+    vibratoBlock.defaults.push(5);
     vibratoBlock.defaults.push(1 / 16);
 
     // deprecated by set timbre block
