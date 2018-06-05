@@ -1556,7 +1556,7 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1)) {
+                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._rhythmicDot()) {
                     this._labelChanged();
                     hideDOMLabel();
                 }
@@ -1836,8 +1836,10 @@ function Block(protoblock, blocks, overrideName) {
 
             this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
         } else {
+            console.log(this.connections[0]);
+            console.log(this.blocks.blockList[this.connections[0]].name);
             // If the number block is connected to a pitch block, then
-            // use the pie menu for octaves.
+            // use the pie menu for octaves. Other special cases as well.
             if (this._octaveNumber()) {
                 this._piemenuOctave(this.value);
             } else if (this._noteValueNumber(2)) {
@@ -1853,8 +1855,9 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
 
-                // FIXME: find the range based on the denominator.
                 this._piemenuNumber(values, this.value);
+            } else if (this._rhythmicDot()) {
+                this._piemenuNumber([1, 2, 3], this.value);         
             } else {
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
@@ -1862,7 +1865,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1)) {
+        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._rhythmicDot()) {
             var focused = false;
 
             var __blur = function (event) {
@@ -1925,6 +1928,10 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
+    this._rhythmicDot = function () {
+        return this.connections[0] !== null && this.blocks.blockList[this.connections[0]].name === 'rhythmicdot2';
+    };
+
     this.piemenuOKtoLaunch = function () {
         if (this._piemenuExitTime === null) {
             return true;
@@ -1970,7 +1977,7 @@ function Block(protoblock, blocks, overrideName) {
                     case 'stuplet':
                     case 'rhythm2':
                     case 'newswing2':
-		    case 'vibrato':
+                    case 'vibrato':
                     case 'neighbor':
                     case 'neighbor2':
                         if (this.blocks.blockList[cblk].connections[2] === dblk) {
@@ -2005,7 +2012,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'tuplet4':
             case 'newstaccato':
             case 'newslur':
-	    case 'elapsednotes2':
+            case 'elapsednotes2':
                 if (this.blocks.blockList[cblk].connections[1] === dblk) {
                     cblk = this.blocks.blockList[dblk].connections[2];
                     return this.blocks.blockList[cblk].value;
