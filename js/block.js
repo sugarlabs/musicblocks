@@ -1957,6 +1957,7 @@ function Block(protoblock, blocks, overrideName) {
                     case 'tuplet4':
                     case 'newstaccato':
                     case 'newslur':
+                    case 'elapsednotes2':
                         if (this.blocks.blockList[cblk].connections[1] === dblk) {
                             return true;
                         } else {
@@ -1969,6 +1970,7 @@ function Block(protoblock, blocks, overrideName) {
                     case 'stuplet':
                     case 'rhythm2':
                     case 'newswing2':
+		    case 'vibrato':
                     case 'neighbor':
                     case 'neighbor2':
                         if (this.blocks.blockList[cblk].connections[2] === dblk) {
@@ -2003,6 +2005,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'tuplet4':
             case 'newstaccato':
             case 'newslur':
+	    case 'elapsednotes2':
                 if (this.blocks.blockList[cblk].connections[1] === dblk) {
                     cblk = this.blocks.blockList[dblk].connections[2];
                     return this.blocks.blockList[cblk].value;
@@ -2016,6 +2019,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'stuplet':
             case 'rhythm2':
             case 'newswing2':
+            case 'vibrato':
             case 'neighbor':
             case 'neighbor2':
                 if (this.blocks.blockList[cblk].connections[2] === dblk) {
@@ -2040,7 +2044,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._octaveNumber = function () {
         // Is this a number block being used as an octave argument?
-        return (this.name === 'number' && this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
+        return (this.name === 'number' && this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
