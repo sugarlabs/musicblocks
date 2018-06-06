@@ -17,6 +17,45 @@
 // rulerButtonsDiv is for the widget buttons
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
+
+
+function GCD (a, b) {
+	console.log('a is ' + a);
+	console.log('b is ' + b);
+    a = Math.abs(a);
+    b = Math.abs(b);
+
+    while(b) {
+        var n = b;
+        b = a % b;
+        a = n;
+    }
+    console.log('the gcd is ' + a);
+    return a;
+};
+
+//This function computes the LCD
+function LCD (a, b) {
+	console.log('the lcd is ' + Math.abs((a * b) / GCD(a, b)));
+    return Math.abs((a * b) / GCD(a, b));
+};
+
+//This function is the Iterator, it computes the LCD for the numbers
+//in the INPUT array recursively by calling the previous function
+function lcmIter(arr,len){
+    //LENGTH of array -> 2 is the base case here, if there are only  
+    //two numbers just compute its LCD and return it.
+    if(len === 2){
+        return LCD(arr[0],arr[1])
+    }
+    //If there are more than two numbers, compute the LCD of last 
+    //number with the rest of array(now the array is one less)
+    else{
+        return LCD(arr[len-1],lcmIter(arr,len-1))
+    }
+}
+
+
 function RhythmRuler () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 675;
@@ -1053,7 +1092,6 @@ function RhythmRuler () {
         setTimeout(function () {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-
             var delta = selectedRuler * 42;
             var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
             newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
@@ -1061,6 +1099,7 @@ function RhythmRuler () {
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
                 if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
+                    console.log('note value is ' + noteValues[i]);
                     sameNoteValue += 1;
                     continue;
                 } else {
@@ -1134,13 +1173,18 @@ function RhythmRuler () {
     };
 
     this._showRuler = function() {
-     //   console.log( this.Rulers[this._rulerSelected][0] );
-     //   var array1 = this.Rulers[this._rulerSelected][0];
-        if (meterInRhythmRulerGlobal) {
-        	console.log('There is atleast one meter block inside rhythm ruler');
-        } else {
-        	console.log('Please add a meter block to know the ruler size');
+
+        // meterInRhythmRulerCount = 0;
+        // meterInRhythmRulerNumBeats = [];
+        // meterInRhythmRulerNoteValues = [];
+        
+        for (z = 0; z < meterInRhythmRulerCount; z++) {
+                      console.log("NumBeats " + meterInRhythmRulerNumBeats[z]);
+                      console.log("NoteValue " + meterInRhythmRulerNoteValues[z]);
         }
+        console.log(lcmIter(meterInRhythmRulerNoteValues, meterInRhythmRulerNoteValues.length)) ;
+
+
     };
 
     this.init = function (logo) {
@@ -1189,6 +1233,7 @@ function RhythmRuler () {
 
         // For the button callbacks
         var that = this;
+
 
         this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
 

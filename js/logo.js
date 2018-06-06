@@ -38,7 +38,9 @@ const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
-var meterInRhythmRulerGlobal = 0;
+var meterInRhythmRulerCount = 0;
+var meterInRhythmRulerNumBeats = [];
+var meterInRhythmRulerNoteValues = [];
 
 function Logo () {
 
@@ -4536,9 +4538,14 @@ function Logo () {
             } else {
                 that.noteValuePerBeat[turtle] = 1 / args[1];
             }
-            meterInRhythmRulerGlobal = this.inRhythmRuler;
-            console.log('Is meter block inside RhythmRuler ? ' + meterInRhythmRulerGlobal);
-            that.notationMeter(turtle, that.beatsPerMeasure[turtle], that.noteValuePerBeat[turtle]);
+
+            
+            if (that.inRhythmRuler) {
+                console.log('Meter inside rhythm ruler');
+                meterInRhythmRulerCount++;
+                meterInRhythmRulerNumBeats.push(args[0]);
+                meterInRhythmRulerNoteValues.push(args[1]);
+            }
             break;
         case 'osctime':
         case 'newnote':
