@@ -107,11 +107,15 @@ function TemperamentWidget () {
 
             docById('wheelDiv2').style.display = '';
             docById('wheelDiv2').style.background = 'none'; 
-            var pitchNumber = TEMPERAMENT[that.inTemperament].pitchNumber;
+            var t = TEMPERAMENT[that.inTemperament];
+            var pitchNumber = t.pitchNumber;
+            var startingPitch = that._logo.synth.startingPitch;
+            var len = startingPitch.length;
+            var number = pitchToNumber(startingPitch.substring(0, len - 1), startingPitch.slice(-1), 'C major');
 
             var labels = [];
             for (var j = 0; j < pitchNumber; j++) {
-                var label = "" + j;
+                var label = j.toString();
                 labels.push(label);
             } 
 
@@ -126,7 +130,7 @@ function TemperamentWidget () {
             var menuRadius = (2 * Math.PI * radius / pitchNumber) / 3; 
             that.notesCircle.slicePathCustom.menuRadius = menuRadius;
             that.notesCircle.initWheel(labels);
-            
+
             for (var i = 0; i < that.notesCircle.navItemCount; i++) {
                 that.notesCircle.navItems[i].fillAttr = "#c8C8C8";
                 that.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
@@ -140,7 +144,41 @@ function TemperamentWidget () {
             docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
             docById('wheelDiv2').style.left = canvas.style.x + 'px';
             docById('wheelDiv2').style.top = canvas.style.y + 'px';
-            console.log(that.notesCircle);
+
+            var lastTriggered = null;
+
+            docById('wheelDiv2').onmouseover = function(event) {
+                for(var i=0; i< that.notesCircle.navItemCount; i++) {
+                    if(event.target.id == 'wheelnav-wheelDiv2-slice-' + i){
+                        if (lastTriggered === i) {
+                            event.preventDefault();
+                        } else {
+                            var x = event.clientX - docById('wheelDiv2').getBoundingClientRect().left;
+                            var y = event.clientY - docById('wheelDiv2').getBoundingClientRect().top;
+
+                            if (docById('noteInfo') !== null) {
+                                docById('noteInfo').remove();
+                            }
+                            that._logo.synth.inTemperament = that.inTemperament;
+                            docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>'
+                            docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px><br>';
+                            docById('noteInfo').innerHTML += '&nbsp Note : ' + numberToPitch(number + i) + '<br>';
+                            
+                            docById('close').onclick = function() {
+                                docById('noteInfo').remove();
+                            }
+                            lastTriggered = i;
+                        }
+                        
+                    }
+                }
+            }
+
+            docById('wheelDiv2').onmouseout = function(event) {
+                if (docById('noteInfo') === null) {
+                    lastTriggered = null;
+                }
+            }
 
         };
 
