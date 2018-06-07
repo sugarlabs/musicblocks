@@ -1184,6 +1184,12 @@ function Logo () {
 
         // Set up status block
         if (docById('statusDiv').style.visibility === 'visible') {
+            // Ensure widget has been created before trying to
+            // initialize it.
+            if (this.statusMatrix === null) {
+                this.statusMatrix = new StatusMatrix();
+            }
+
             this.statusMatrix.init(this);
         }
 
