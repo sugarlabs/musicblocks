@@ -776,8 +776,8 @@ input.timbreName {
     -ms-user-select: none;
     user-select: none;
     background-color: white;
-    height:50px;
-    width:120px;
+    height: 68px;
+    width: 160px;
     border: 1px solid black;
 }
 

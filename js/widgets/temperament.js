@@ -7,6 +7,8 @@ function TemperamentWidget () {
     const ICONSIZE = 32;
     var temperamentTableDiv = docById('temperamentTableDiv');
     this.inTemperament = null;
+    this.notes = [];
+    this.frequencies = [];
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -107,11 +109,24 @@ function TemperamentWidget () {
 
             docById('wheelDiv2').style.display = '';
             docById('wheelDiv2').style.background = 'none'; 
+
             var t = TEMPERAMENT[that.inTemperament];
             var pitchNumber = t.pitchNumber;
             var startingPitch = that._logo.synth.startingPitch;
             var len = startingPitch.length;
             var number = pitchToNumber(startingPitch.substring(0, len - 1), startingPitch.slice(-1), 'C major');
+            var str = [];
+            
+            for(var i=0; i < pitchNumber; i++) {
+                str[i] = numberToPitch(number + i).toString();
+                that.notes[i] = str[i].replace(',', '');
+                if (that.notes[i].substring(1, that.notes[i].length-1) === FLAT || that.notes[i].substring(1, that.notes[i].length-1) === 'b' ) {
+                    that.notes[i] = that.notes[i].replace(FLAT, 'b');
+                } else if (that.notes[i].substring(1, that.notes[i].length-1) === SHARP || that.notes[i].substring(1, that.notes[i].length-1) === '#' ) {
+                    that.notes[i] = that.notes[i].replace(SHARP, '#'); 
+                }
+                that.frequencies[i] = that._logo.synth._getFrequency(that.notes[i], true).toFixed(2);
+            }
 
             var labels = [];
             for (var j = 0; j < pitchNumber; j++) {
@@ -155,21 +170,29 @@ function TemperamentWidget () {
                         } else {
                             var x = event.clientX - docById('wheelDiv2').getBoundingClientRect().left;
                             var y = event.clientY - docById('wheelDiv2').getBoundingClientRect().top;
-
+                            var frequency = that.frequencies[i];
                             if (docById('noteInfo') !== null) {
                                 docById('noteInfo').remove();
                             }
                             that._logo.synth.inTemperament = that.inTemperament;
                             docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>'
-                            docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px><br>';
+                            docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px>';
+                            docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px align="right" data-message="' + i + '"><br>';
                             docById('noteInfo').innerHTML += '&nbsp Note : ' + numberToPitch(number + i) + '<br>';
-                            
+                            docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
+
                             docById('close').onclick = function() {
                                 docById('noteInfo').remove();
                             }
+
+                            docById('edit').onclick = function(event) {
+                                var index = event.target.dataset.message;
+                                docById('frequency').innerHTML = '&nbsp Frequency : &nbsp<input type = "text" id="changedFrequency" value=' + frequency + ' style="position:absolute; width:52px;" data-message= ' + index + '></input>'
+                                docById('changedFrequency').addEventListener ("mouseout", changeFrequency, false);
+                            }
+
                             lastTriggered = i;
-                        }
-                        
+                        }   
                     }
                 }
             }
@@ -178,6 +201,14 @@ function TemperamentWidget () {
                 if (docById('noteInfo') === null) {
                     lastTriggered = null;
                 }
+            }
+
+            function changeFrequency(event) {
+                var i = event.target.dataset.message;
+                frequency = docById('changedFrequency').value;
+                docById('changedFrequency').remove();
+                docById('frequency').innerHTML = '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';   
+                that.frequencies[i] = frequency;
             }
 
         };
