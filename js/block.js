@@ -101,7 +101,6 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    // Does this race condition still occur?
     this.updateCache = function () {
         var that = this;
 
@@ -2158,7 +2157,7 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
             this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-            var octaveLabels = ['1', '2', '3', '4', '5', '6', '7', '8', null, null, null, null, null, null];
+            var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
             this._octavesWheel.animatetime = 300;
             this._octavesWheel.createWheel(octaveLabels);
         }
@@ -2212,10 +2211,10 @@ function Block(protoblock, blocks, overrideName) {
 
         if (hasOctaveWheel) {
             // Use the octave associated with this block, if available.
-            this._pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+            var pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
 
             // Navigate to current octave
-            this._octavesWheel.navigateWheel(this._pitchOctave - 1);
+            this._octavesWheel.navigateWheel(8 - pitchOctave);
         }
 
         // Set up event handlers
