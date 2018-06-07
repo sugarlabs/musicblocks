@@ -1841,13 +1841,13 @@ function Block(protoblock, blocks, overrideName) {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
             if (this._octaveNumber()) {
-                this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8], this.value);
+                this._piemenuNumber([8, 7, 6, 5, 4, 3, 2, 1], this.value);
             } else if (this._noteValueNumber(2)) {
                 this._piemenuNoteValue(this.value);
             } else if (this._noteValueNumber(1)) {
                 var d = this._noteValueValue();
                 if (d === 1) {
-                    var values = [1, 2, 3, 4, 5, 6, 7, 8];
+                    var values = [8, 7, 6, 5, 4, 3, 2, 1];
                 } else {
                     var values = [];
                     for (var i = 0; i < d; i++) {
