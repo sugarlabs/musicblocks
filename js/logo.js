@@ -38,9 +38,8 @@ const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
-var meterInRhythmRulerCount = 0;
-var meterInRhythmRulerNumBeats = [];
-var meterInRhythmRulerNoteValues = [];
+var currentMeterNumBeats = 0;
+var currentMeterNoteValues = 0;
 
 function Logo () {
 
@@ -4363,14 +4362,17 @@ function Logo () {
                 for (var i = 0; i < that.rhythmRuler.Drums.length; i++) {
                     var j = that.rhythmRuler.Drums.length - i - 1;
                     if (that.rhythmRuler.Drums[j] === that._currentDrumBlock) {
-                        drumIndex = j;
+                    	drumIndex = j;
                         break;
                     }
                 }
 
                 if (drumIndex !== -1) {
-                    for (var i = 0; i < args[0]; i++) {
+                    for (var i = 0; i < 2; i++) {   // args[0]
                         that.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
+                        that.rhythmRuler.Rulers[drumIndex][1].push(currentMeterNumBeats*currentMeterNoteValues);
+                        console.log('Note value in rhythm ' +that.rhythmRuler.Rulers[drumIndex][0]);
+                		console.log('Corresponding product of Meter ' +that.rhythmRuler.Rulers[drumIndex][1]);
                     }
                 }
             } else {
@@ -4415,6 +4417,7 @@ function Logo () {
 
                 that._doWait(turtle, (args[0] - 1) * beatValue);
             }
+
             break;
 
             // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
@@ -4539,14 +4542,13 @@ function Logo () {
                 that.noteValuePerBeat[turtle] = 1 / args[1];
             }
 
-            
             if (that.inRhythmRuler) {
-                console.log('Meter inside rhythm ruler');
-                meterInRhythmRulerCount++;
-                meterInRhythmRulerNumBeats.push(args[0]);
-                meterInRhythmRulerNoteValues.push(args[1]);
+                currentMeterNumBeats = args[0];
+            	currentMeterNoteValues = args[1];
             }
             break;
+
+
         case 'osctime':
         case 'newnote':
         case 'note':
