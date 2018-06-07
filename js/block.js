@@ -85,13 +85,27 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this._createCache = function (callback, args) {
+    this._createCache = function (callback, args, counter) {
+        if (counter === undefined) {
+            var loopCount = 0;
+        } else {
+            var loopCount = counter;
+        }
+
+        if (loopCount > 3) {
+            console.log('COULD NOT CREATE CACHE');
+            return;
+        }
+
         var that = this;
         this.bounds = this.container.getBounds();
 
         if (this.bounds == null) {
             setTimeout(function () {
-                that._createCache(callback, args);
+                // console.log('CREATE CACHE: BOUNDS NOT READY');
+                // Try regenerating the artwork
+                that.regenerateArtwork(true, []);
+                that._createCache(callback, args, loopCount + 1);
             }, 100);
         } else {
             this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
@@ -101,13 +115,24 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this.updateCache = function () {
+    this.updateCache = function (counter) {
+        if (counter === undefined) {
+            var loopCount = 0;
+        } else {
+            var loopCount = counter;
+        }
+
+        if (loopCount > 3) {
+            console.log('COULD NOT UPDATE CACHE');
+            return;
+        }
+
         var that = this;
 
         if (this.bounds == null) {
             setTimeout(function () {
-                console.log('CACHE NOT READY');
-                that.updateCache();
+                // console.log('UPDATE CACHE: BOUNDS NOT READY');
+                that.updateCache(loopCount + 1);
             }, 200);
         } else {
             this.container.updateCache();
