@@ -122,6 +122,11 @@ they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
 Note that any mathematical operations can be used as input to the
 *Note value*.
 
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/piemenu1.svg
+ "A pie menu for selecting note values.")
+
+As a convenience, a pie menu is used for selecting common note values.
+
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/NotationRestChart.svg
  "A chart of note values and their corresponding note value blocks")
@@ -171,7 +176,7 @@ The octave of the last block is specified using a *next* text block (`G` in `Oct
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/piemenu1.svg
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/piemenu2.svg
  "A pie menu for selecting pitch.")
 
 As a convenience, a pie menu is used for selecting pitch, accidental, and octave.
