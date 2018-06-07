@@ -1836,8 +1836,6 @@ function Block(protoblock, blocks, overrideName) {
 
             this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
         } else {
-            console.log(this.connections[0]);
-            console.log(this.blocks.blockList[this.connections[0]].name);
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
             if (this._octaveNumber()) {
@@ -1850,7 +1848,7 @@ function Block(protoblock, blocks, overrideName) {
                     var values = [8, 7, 6, 5, 4, 3, 2, 1];
                 } else {
                     var values = [];
-                    for (var i = 0; i < d; i++) {
+                    for (var i = 0; i < Math.min(d, 16); i++) {
                         values.push(i + 1);
                     }
                 }
@@ -1865,7 +1863,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
                     break;
                 case 'scaledegree':
-                    this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7], this.value);
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7], this.value);
                     break;
                 case 'meter':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
