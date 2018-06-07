@@ -171,6 +171,11 @@ The octave of the last block is specified using a *next* text block (`G` in `Oct
 
 Note that the pitch name can also be specified using a *Text* block. 
 
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/piemenu1.svg
+ "A pie menu for selecting pitch.")
+
+As a convenience, a pie menu is used for selecting pitch, accidental, and octave.
+
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/KeyboardChart.svg "Note layout chart for keyboard")
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg "Note layout chart for mallet")
