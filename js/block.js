@@ -17,8 +17,8 @@ const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
-const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname'];
-const EXTRAWIDENAMES = ['modename'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename'];
+const EXTRAWIDENAMES = [];
 const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname'];
 
 // Define block instance objects and any methods that are intra-block.
@@ -3258,15 +3258,16 @@ function Block(protoblock, blocks, overrideName) {
 
         // Customize slicePaths
         var colors = [];
-        for (var modename in MUSICALMODES) {
+        for (var modename in MUSICALMODES_SHORTLIST) {
             var mode = MUSICALMODES[modename];
-            switch (mode.length % 5) {
+            switch (mode.length % 2) {
             case 0:
                 colors.push('#5ba900');
                 break;
             case 1:
                 colors.push('#77c428');
                 break;
+            /*
             case 2:
                 colors.push('#93e042');
                 break;
@@ -3277,6 +3278,7 @@ function Block(protoblock, blocks, overrideName) {
             default:
                 colors.push('#adfd55');
                 break;
+            */
             }
         }
 
@@ -3290,12 +3292,33 @@ function Block(protoblock, blocks, overrideName) {
         this._modeNameWheel.titleRotateAngle = 0;
         // this._modeNameWheel.clickModeRotate = false;
         var labels = [];
-        for (var modename in MUSICALMODES) {
-            labels.push(_(modename));
+        for (var modename in MUSICALMODES_SHORTLIST) {
+            switch (modename) {
+            case 'ionian':
+            case 'major':
+                labels.push(_('major') + ' / ' + _('ionian'));
+                break;
+            case 'aeolian':
+            case 'minor':
+                labels.push(_('minor') + ' / ' + _('aeolian'));
+                break;
+            default:
+                labels.push(_(modename));
+                break;
+            }
         }
 
         this._modeNameWheel.animatetime = 300;
         this._modeNameWheel.createWheel(labels);
+
+        // Special case for Japanese
+        var language = localStorage.languagePreference;
+        if (language === 'ja') {
+            for (var i = 0; i < this._modeNameWheel.navItems.length; i++) {
+                this._modeNameWheel.navItems[i].titleAttr.font = "30 30px Impact, Black, sans-serif";
+                this._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px Impact, Black, sans-serif";
+            }
+        }
 
         this._modeWheel.colors = ['#77c428', '#93e042'];
         this._modeWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3354,7 +3377,7 @@ function Block(protoblock, blocks, overrideName) {
 
         var __selectionChanged = function () {
             that.text.text = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
-            for (modename in MUSICALMODES) {
+            for (modename in MUSICALMODES_SHORTLIST) {
                 if (_(modename) === that.text.text) {
                     that.value = modename;
                     break;
@@ -3402,7 +3425,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         var i = 0;
-        for (var modename in MUSICALMODES) {
+        for (var modename in MUSICALMODES_SHORTLIST) {
             var mode = MUSICALMODES[modename];
             var activeTabs = [0];
             for (var j = 0; j < mode.length; j++) {
@@ -3415,7 +3438,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // navigate to a specific starting point
         var i = 0;
-        for (var modename in MUSICALMODES) {
+        for (var modename in MUSICALMODES_SHORTLIST) {
             if (modename === selectedMode) {
                 break;
             }
@@ -3425,7 +3448,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // if we didn't find the mode, use a default
         if (i === labels.length) {
-            i = 5; // major
+            i = 0; // major/ionian
         }
 
         this._modeNameWheel.navigateWheel(i);

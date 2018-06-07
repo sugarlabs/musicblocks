@@ -345,6 +345,22 @@ const INTERVALVALUES = {
     'augmented 8': [13, 1]
 };
 
+// This list of modes is used in the pie menu associated with the mode
+// name block. The complete list of modes is available from the Mode
+// Widget.
+const MUSICALMODES_SHORTLIST = {
+    'ionian': [2, 2, 1, 2, 2, 2, 1],
+    'dorian': [2, 1, 2, 2, 2, 1, 2],
+    'phrygian': [1, 2, 2, 2, 1, 2, 2],
+    'lydian': [2, 2, 2, 1, 2, 2, 1],
+    'mixolydian': [2, 2, 1, 2, 2, 1, 2],
+    'aeolian': [2, 1, 2, 2, 1, 2, 2],
+    'locrian': [1, 2, 2, 1, 2, 2, 2],
+     // User definition overrides this constant
+    'custom': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+}
+
+
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org <== this is in no way definitive

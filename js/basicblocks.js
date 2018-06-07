@@ -1530,7 +1530,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['modename'] = modenameBlock;
     modenameBlock.valueBlock();
     modenameBlock.dockTypes[0] = 'textout';
-    modenameBlock.extraWidth = 150;
+    modenameBlock.extraWidth = 50;  // 150;
 
     var doublyBlock = new ProtoBlock('doubly');
     doublyBlock.palette = palettes.dict['intervals'];

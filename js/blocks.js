@@ -1689,7 +1689,7 @@ function Blocks () {
             }
             break;
         case 'modename':
-            var label = _(myBlock.value) + ' ' + getModeNumbers(myBlock.value);
+            var label = _(myBlock.value);  // + ' ' + getModeNumbers(myBlock.value);
             break;
         case 'accidentalname':
         case 'intervalname':
@@ -2225,7 +2225,7 @@ function Blocks () {
                 var thisBlock = args[0];
                 var value = args[1];
                 that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value + ' ' + getModeNumbers(this.value);
+                that.blockList[thisBlock].text.text = value;  // + ' ' + getModeNumbers(this.value);
                 that.blockList[thisBlock].container.updateCache();
             };
 
