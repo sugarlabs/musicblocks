@@ -7,6 +7,7 @@ function TemperamentWidget () {
     const ICONSIZE = 32;
     var temperamentTableDiv = docById('temperamentTableDiv');
     this.inTemperament = null;
+    this.lastTriggered = null;
     this.notes = [];
     this.frequencies = [];
 
@@ -29,6 +30,149 @@ function TemperamentWidget () {
         }
 
         return cell;
+    };
+
+    this._circleOfNotes = function() {
+        temperamentTableDiv.style.display = 'inline';
+        temperamentTableDiv.style.visibility = 'visible';
+        temperamentTableDiv.style.border = '0px';
+        temperamentTableDiv.style.overflow = 'auto';
+        temperamentTableDiv.style.backgroundColor = 'white';
+        temperamentTableDiv.style.height = '300px';
+        temperamentTableDiv.innerHTML = '<div id="temperamentTable"></div>';
+        var temperamentTable = docById('temperamentTable');
+        temperamentTable.style.position = 'relative';
+
+        var radius = 150;
+        var height = (2*radius) + 60;
+
+        var html = '<canvas id="circ" width = ' + BUTTONDIVWIDTH + 'px height = ' + height + 'px></canvas>';
+        html += '<div id="wheelDiv2" class="wheelNav"></div>';
+
+        temperamentTable.innerHTML = html;
+        temperamentTable.style.width = temperamentDiv.width;
+
+        var canvas = docById('circ');
+        canvas.style.position = 'absolute';
+        canvas.style.background = 'rgba(255, 255, 255, 0.85)';
+        var ctx = canvas.getContext("2d");
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+            
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        ctx.fillStyle = "rgba(204, 0, 102, 0)";
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#003300';
+        ctx.stroke();
+
+        docById('wheelDiv2').style.display = '';
+        docById('wheelDiv2').style.background = 'none';
+
+        var t = TEMPERAMENT[this.inTemperament];
+        var pitchNumber = t.pitchNumber;
+        var startingPitch = this._logo.synth.startingPitch;
+        var len = startingPitch.length;
+        var number = pitchToNumber(startingPitch.substring(0, len - 1), startingPitch.slice(-1), 'C major');
+        var str = [];
+
+        for(var i=0; i < pitchNumber; i++) {
+            str[i] = numberToPitch(number + i).toString();
+            this.notes[i] = str[i].replace(',', '');
+            if (this.notes[i].substring(1, this.notes[i].length-1) === FLAT || this.notes[i].substring(1, this.notes[i].length-1) === 'b' ) {
+                this.notes[i] = this.notes[i].replace(FLAT, 'b');
+            } else if (this.notes[i].substring(1, this.notes[i].length-1) === SHARP || this.notes[i].substring(1, this.notes[i].length-1) === '#' ) {
+                this.notes[i] = this.notes[i].replace(SHARP, '#'); 
+            }
+            this.frequencies[i] = this._logo.synth._getFrequency(this.notes[i], true).toFixed(2);
+        }
+
+        var labels = [];
+        for (var j = 0; j < pitchNumber; j++) {
+            var label = j.toString();
+            labels.push(label);
+        } 
+
+        this.notesCircle = new wheelnav('wheelDiv2');
+        this.notesCircle.wheelRadius = 230;
+        this.notesCircle.navItemsEnabled = false;
+        this.notesCircle.navAngle = 270;
+        this.notesCircle.slicePathFunction = slicePath().MenuSliceWithoutLine;
+        this.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
+        this.notesCircle.sliceSelectedPathCustom = this.notesCircle.slicePathCustom;
+        this.notesCircle.sliceInitPathCustom = this.notesCircle.slicePathCustom;
+        var menuRadius = (2 * Math.PI * radius / pitchNumber) / 3; 
+        this.notesCircle.slicePathCustom.menuRadius = menuRadius;
+        this.notesCircle.initWheel(labels);
+
+        for (var i = 0; i < this.notesCircle.navItemCount; i++) {
+            this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
+            this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
+            this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
+        }
+
+        this.notesCircle.createWheel();
+        var that = this;
+        docById('wheelDiv2').style.position = 'absolute';
+        docById('wheelDiv2').style.height = height + 'px';
+        docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
+        docById('wheelDiv2').style.left = canvas.style.x + 'px';
+        docById('wheelDiv2').style.top = canvas.style.y + 'px';
+
+        docById('wheelDiv2').addEventListener('mouseover', function(e) {
+            that.showNoteInfo(e);
+        });
+
+        docById('wheelDiv2').onmouseout = function(event) {
+            if (docById('noteInfo') === null) {
+                that.lastTriggered = null;
+            }
+        }; 
+    };
+
+    this.showNoteInfo = function(event) {
+        for(var i=0; i< this.notesCircle.navItemCount; i++) {
+            if(event.target.id == 'wheelnav-wheelDiv2-slice-' + i){
+                if (this.lastTriggered === i) {
+                    event.preventDefault();
+                } else {
+                    var x = event.clientX - docById('wheelDiv2').getBoundingClientRect().left;
+                    var y = event.clientY - docById('wheelDiv2').getBoundingClientRect().top;
+                    var frequency = this.frequencies[i];
+                    var that = this;
+                    if (docById('noteInfo') !== null) {
+                        docById('noteInfo').remove();
+                    }
+                    this._logo.synth.inTemperament = this.inTemperament;
+                    docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>'
+                    docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px>';
+                    docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px align="right" data-message="' + i + '"><br>';
+                    docById('noteInfo').innerHTML += '&nbsp Note : ' + this.notes[i] + '<br>';
+                    docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
+
+                    docById('close').onclick = function() {
+                        docById('noteInfo').remove();
+                    }
+
+                    docById('edit').onclick = function(event) {
+                        var index = event.target.dataset.message;
+                        docById('frequency').innerHTML = '&nbsp Frequency : &nbsp<input type = "text" id="changedFrequency" value=' + frequency + ' style="position:absolute; width:52px;" data-message= ' + index + '></input>'
+                        docById('changedFrequency').addEventListener ("mouseout", changeFrequency, false);
+                    }
+
+                    function changeFrequency(event) {
+                        var j = event.target.dataset.message;
+                        frequency = docById('changedFrequency').value;
+                        docById('changedFrequency').remove();
+                        docById('frequency').innerHTML = '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';   
+                        that.frequencies[j] = frequency;
+                    }
+
+                    this.lastTriggered = i;
+                }   
+            }
+        }
     };
 
     this.init = function(logo) {
@@ -72,146 +216,7 @@ function TemperamentWidget () {
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         var circleButtonCell = this._addButton(row, 'circle.svg', ICONSIZE, _('circle'));
         
-        circleButtonCell.onclick = function () {
-            temperamentTableDiv.style.display = 'inline';
-            temperamentTableDiv.style.visibility = 'visible';
-            temperamentTableDiv.style.border = '0px';
-            temperamentTableDiv.style.overflow = 'auto';
-            temperamentTableDiv.style.backgroundColor = 'white';
-            temperamentTableDiv.style.height = '300px';
-            temperamentTableDiv.innerHTML = '<div id="temperamentTable"></div>';
-            var temperamentTable = docById('temperamentTable');
-            temperamentTable.style.position = 'relative';
-
-            var radius = 150;
-            var height = (2*radius) + 60;
-
-            var html = '<canvas id="circ" width = ' + BUTTONDIVWIDTH + 'px height = ' + height + 'px></canvas>';
-            html += '<div id="wheelDiv2" class="wheelNav"></div>';
-
-            temperamentTable.innerHTML = html;
-            temperamentTable.style.width = temperamentDiv.width;
-
-            var canvas = docById('circ');
-            canvas.style.position = 'absolute';
-            canvas.style.background = 'rgba(255, 255, 255, 0.85)';
-            var ctx = canvas.getContext("2d");
-            var centerX = canvas.width / 2;
-            var centerY = canvas.height / 2;
-            
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-            ctx.fillStyle = "rgba(204, 0, 102, 0)";
-            ctx.fill();
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = '#003300';
-            ctx.stroke();
-
-            docById('wheelDiv2').style.display = '';
-            docById('wheelDiv2').style.background = 'none'; 
-
-            var t = TEMPERAMENT[that.inTemperament];
-            var pitchNumber = t.pitchNumber;
-            var startingPitch = that._logo.synth.startingPitch;
-            var len = startingPitch.length;
-            var number = pitchToNumber(startingPitch.substring(0, len - 1), startingPitch.slice(-1), 'C major');
-            var str = [];
-            
-            for(var i=0; i < pitchNumber; i++) {
-                str[i] = numberToPitch(number + i).toString();
-                that.notes[i] = str[i].replace(',', '');
-                if (that.notes[i].substring(1, that.notes[i].length-1) === FLAT || that.notes[i].substring(1, that.notes[i].length-1) === 'b' ) {
-                    that.notes[i] = that.notes[i].replace(FLAT, 'b');
-                } else if (that.notes[i].substring(1, that.notes[i].length-1) === SHARP || that.notes[i].substring(1, that.notes[i].length-1) === '#' ) {
-                    that.notes[i] = that.notes[i].replace(SHARP, '#'); 
-                }
-                that.frequencies[i] = that._logo.synth._getFrequency(that.notes[i], true).toFixed(2);
-            }
-
-            var labels = [];
-            for (var j = 0; j < pitchNumber; j++) {
-                var label = j.toString();
-                labels.push(label);
-            } 
-
-            that.notesCircle = new wheelnav('wheelDiv2');
-            that.notesCircle.wheelRadius = 230;
-            that.notesCircle.navItemsEnabled = false;
-            that.notesCircle.navAngle = 270;
-            that.notesCircle.slicePathFunction = slicePath().MenuSliceWithoutLine;
-            that.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
-            that.notesCircle.sliceSelectedPathCustom = that.notesCircle.slicePathCustom;
-            that.notesCircle.sliceInitPathCustom = that.notesCircle.slicePathCustom;
-            var menuRadius = (2 * Math.PI * radius / pitchNumber) / 3; 
-            that.notesCircle.slicePathCustom.menuRadius = menuRadius;
-            that.notesCircle.initWheel(labels);
-
-            for (var i = 0; i < that.notesCircle.navItemCount; i++) {
-                that.notesCircle.navItems[i].fillAttr = "#c8C8C8";
-                that.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
-                that.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
-            }
-
-            that.notesCircle.createWheel();
-
-            docById('wheelDiv2').style.position = 'absolute';
-            docById('wheelDiv2').style.height = height + 'px';
-            docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
-            docById('wheelDiv2').style.left = canvas.style.x + 'px';
-            docById('wheelDiv2').style.top = canvas.style.y + 'px';
-
-            var lastTriggered = null;
-
-            docById('wheelDiv2').onmouseover = function(event) {
-                for(var i=0; i< that.notesCircle.navItemCount; i++) {
-                    if(event.target.id == 'wheelnav-wheelDiv2-slice-' + i){
-                        if (lastTriggered === i) {
-                            event.preventDefault();
-                        } else {
-                            var x = event.clientX - docById('wheelDiv2').getBoundingClientRect().left;
-                            var y = event.clientY - docById('wheelDiv2').getBoundingClientRect().top;
-                            var frequency = that.frequencies[i];
-                            if (docById('noteInfo') !== null) {
-                                docById('noteInfo').remove();
-                            }
-                            that._logo.synth.inTemperament = that.inTemperament;
-                            docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>'
-                            docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px>';
-                            docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px align="right" data-message="' + i + '"><br>';
-                            docById('noteInfo').innerHTML += '&nbsp Note : ' + numberToPitch(number + i) + '<br>';
-                            docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
-
-                            docById('close').onclick = function() {
-                                docById('noteInfo').remove();
-                            }
-
-                            docById('edit').onclick = function(event) {
-                                var index = event.target.dataset.message;
-                                docById('frequency').innerHTML = '&nbsp Frequency : &nbsp<input type = "text" id="changedFrequency" value=' + frequency + ' style="position:absolute; width:52px;" data-message= ' + index + '></input>'
-                                docById('changedFrequency').addEventListener ("mouseout", changeFrequency, false);
-                            }
-
-                            lastTriggered = i;
-                        }   
-                    }
-                }
-            }
-
-            docById('wheelDiv2').onmouseout = function(event) {
-                if (docById('noteInfo') === null) {
-                    lastTriggered = null;
-                }
-            }
-
-            function changeFrequency(event) {
-                var i = event.target.dataset.message;
-                frequency = docById('changedFrequency').value;
-                docById('changedFrequency').remove();
-                docById('frequency').innerHTML = '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';   
-                that.frequencies[i] = frequency;
-            }
-
-        };
+        this._circleOfNotes();
 
         var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
 
