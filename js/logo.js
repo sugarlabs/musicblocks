@@ -4368,7 +4368,7 @@ function Logo () {
                 }
 
                 if (drumIndex !== -1) {
-                    for (var i = 0; i < 2; i++) {   // args[0]
+                    for (var i = 0; i < args[0]; i++) {   
                         that.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
                         that.rhythmRuler.Rulers[drumIndex][1].push(currentMeterNumBeats*currentMeterNoteValues);
                         console.log('Note value in rhythm ' +that.rhythmRuler.Rulers[drumIndex][0]);
