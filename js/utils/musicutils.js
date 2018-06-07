@@ -282,7 +282,9 @@ const SELECTORSTRINGS = [
     //.TRANS: musical temperament
     _('equal'),
     //.TRANS: musical temperament
-    _('Pythagorian'),  // just intonation
+    _('Pythagorian'),
+    //.TRANS: musical temperament
+    _('just intonation'),
     //.TRANS: musical temperament
     _('meantone'),
     _('custom'),
@@ -436,7 +438,7 @@ var OSCTYPES = [
 
 var TEMPERAMENTS = [
     [_('equal'), 'equal'],
-    [_('Pythagorean'), 'just intonation'],
+    [_('just intonation'), 'just intonation'],
     [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
     [_('meantone') + ' (1/4)', '1/4 comma meantone'],
     [_('custom'), 'custom'],
