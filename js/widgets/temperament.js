@@ -175,6 +175,34 @@ function TemperamentWidget () {
         }
     };
 
+    this._graphOfNotes = function (){
+        temperamentTable.remove();
+        if (docById('wheelDiv2') != null) {
+            docById('wheelDiv2').style.display = 'none';
+            this.notesCircle.removeWheel();
+        }
+
+        temperamentTableDiv.innerHTML = '<table id="notesGraph" width=' + BUTTONDIVWIDTH + '></table>'
+        var notesGraph = docById('notesGraph');
+        var headerNotes = notesGraph.createTHead();
+        var rowNotes = headerNotes.insertRow(0);
+        var menuLabels = ['Pitch Number', 'Interval', 'Note', 'Ratio', 'Frequency'] //TODO: Add mode
+        notesGraph.innerHTML = '<tbody><tr id="menu"></tr></tbody>'
+        docById('menu').innerHTML = '';
+        
+        for(var i = 0; i < menuLabels.length; i++) {
+            docById('menu').innerHTML += '<td id="menuLabels">'+ menuLabels[i] + '</td>';
+        }
+        
+        var menuItems =  document.querySelectorAll("#menuLabels");
+        for(var i = 0; i < menuLabels.length; i++) {
+            menuItems[i].style.background = MATRIXLABELCOLOR; 
+            menuItems[i].style.height = 30 + 'px';
+            menuItems[i].style.textAlign = 'center';
+            menuItems[i].style.fontWeight = 'bold';
+        }
+    }
+
     this.init = function(logo) {
     	this._logo = logo;
 
@@ -217,6 +245,10 @@ function TemperamentWidget () {
         var circleButtonCell = this._addButton(row, 'circle.svg', ICONSIZE, _('circle'));
         
         this._circleOfNotes();
+
+        circleButtonCell.onclick = function(event) {
+            that._graphOfNotes();
+        }
 
         var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
 
