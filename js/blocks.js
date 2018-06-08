@@ -3089,7 +3089,7 @@ function Blocks () {
             return 4;
         }
 
-        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blockList[blk].name) !== -1) {
+        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blockList[blk].name) !== -1) {
             var oblk = this.blockList[blk].connections[2];
             if (oblk === null) {
                 return 4;
@@ -3109,7 +3109,7 @@ function Blocks () {
             return;
         }
 
-        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blockList[blk].name) !== -1) {
+        if (['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blockList[blk].name) !== -1) {
             var oblk = this.blockList[blk].connections[2];
             if (oblk !== null && this.blockList[oblk].name === 'number') {
                 var thisBlock = this.blockList[oblk];

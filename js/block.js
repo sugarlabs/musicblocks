@@ -1887,7 +1887,8 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
                     break;
                 case 'scaledegree':
-                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7], this.value);
+                    console.log('SCALE DEGREE');
+                    this._piemenuScaleDegree([1, 2, 3, 4, 5, 6, 7], this.value);
                     break;
                 case 'meter':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
@@ -2336,6 +2337,151 @@ function Block(protoblock, blocks, overrideName) {
             if (hasOctaveWheel) {
                 that._octavesWheel.removeWheel();
             }
+        };
+    };
+
+    this._piemenuScaleDegree = function (noteValues, note) {
+        // wheelNav pie menu for scale degree pitch selection
+
+        var noteLabels = [];
+        for (var i = 0; i < noteValues.length; i++) {
+            noteLabels.push(noteValues[i].toString());
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
+        this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = true;
+
+        this._pitchWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'];
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 300;
+        this._pitchWheel.createWheel(noteLabels);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        this._octavesWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+        this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+        this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+        this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+        this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+        this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+        var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
+        this._octavesWheel.animatetime = 300;
+        this._octavesWheel.createWheel(octaveLabels);
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+        
+        // Navigate to a the current note value.
+        var i = noteValues.indexOf(note);
+        if (i === -1) {
+            i = 4;
+        }
+
+        this._pitchWheel.navigateWheel(i);
+
+        // Use the octave associated with this block, if available.
+        var pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+
+        // Navigate to current octave
+        this._octavesWheel.navigateWheel(8 - pitchOctave);
+
+        // Set up event handlers
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            that.value = noteValues[i];
+            that.text.text = label;
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            // Set the octave of the pitch block if available
+            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            that.blocks.setPitchOctave(that.connections[0], octave);
+        };
+
+        var __pitchPreview = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            var note = noteValues[i];
+            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+
+            // FIX ME: get key signature if available
+            // FIX ME: get moveable if available
+            var obj = getNote('C', octave, note, 'C major', false, null, that.blocks.errorMsg);
+            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            console.log(obj[0] + obj[1]);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+
+            __selectionChanged();
+        };
+
+        // Set up handlers for pitch preview.
+        for (var i = 0; i < noteValues.length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        for (var i = 0; i < 8; i++) {
+            this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that._octavesWheel.removeWheel();
         };
     };
 
