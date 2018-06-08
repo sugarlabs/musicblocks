@@ -38,8 +38,36 @@ const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
-var currentMeterNumBeats = 0;
-var currentMeterNoteValues = 0;
+var currentMeterBeats = 0;
+var currentMeterNoteNum = 0;
+var currentMeterNoteDen = 0;
+var rhythmAndMeter = [];   // used to store value of rhythm with corresponding meter
+
+function find_rational(value) {
+  var best_numer = 1;
+  var best_denom = 1;
+  var best_err = Math.abs(value - best_numer / best_denom);
+  for (var denom = 1; best_err > 0 && denom <= 10000; denom++) {
+    var numer = Math.round(value * denom);
+    var err = Math.abs(value - numer / denom);
+    if (err < best_err) {
+      best_numer = numer;
+      best_denom = denom;
+      best_err = err;
+    }
+  }
+  return [best_numer, best_denom];
+}
+  
+function calc() {
+    try {
+      var value = parseFloat($("#myInput").val());
+      var rational = find_rational(value);
+      $("#myResult").val(rational.join(" / "));
+    }  catch(err) {
+      document.getElementById("result").val(err.message);
+    }
+}
 
 function Logo () {
 
@@ -3128,6 +3156,7 @@ function Logo () {
             break;
         case 'rhythmruler2':
         case 'rhythmruler':
+            rhythmAndMeter = []
             if (that.blocks.blockList[blk].name === 'rhythmruler') {
                 childFlow = args[1];
             } else {
@@ -4370,10 +4399,8 @@ function Logo () {
                 if (drumIndex !== -1) {
                     for (var i = 0; i < args[0]; i++) {   
                         that.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
-                        that.rhythmRuler.Rulers[drumIndex][1].push(currentMeterNumBeats*currentMeterNoteValues);
-                        console.log('Note value in rhythm ' +that.rhythmRuler.Rulers[drumIndex][0]);
-                		console.log('Corresponding product of Meter ' +that.rhythmRuler.Rulers[drumIndex][1]);
                     }
+                    rhythmAndMeter.push(currentMeterNoteNum, currentMeterNoteDen, find_rational(args[0]*args[1])[0], find_rational(args[0]*args[1])[1]);
                 }
             } else {
                 // Play rhythm block as if it were a drum.
@@ -4417,7 +4444,6 @@ function Logo () {
 
                 that._doWait(turtle, (args[0] - 1) * beatValue);
             }
-
             break;
 
             // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
@@ -4544,11 +4570,10 @@ function Logo () {
 
             if (that.inRhythmRuler) {
                 currentMeterNumBeats = args[0];
-            	currentMeterNoteValues = args[1];
+            	currentMeterNoteNum = find_rational(args[0]*args[1])[0];
+            	currentMeterNoteDen = find_rational(args[0]*args[1])[1];
             }
             break;
-
-
         case 'osctime':
         case 'newnote':
         case 'note':

@@ -17,22 +17,6 @@
 // rulerButtonsDiv is for the widget buttons
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
-function GCD (a, b) {
-    a = Math.abs(a);
-    b = Math.abs(b);
-
-    while(b) {
-        var n = b;
-        b = a % b;
-        a = n;
-    }
-    return a;
-};
-
-function LCD (a, b) {
-    return Math.abs((a * b) / GCD(a, b));
-};
-
 function lcmIter(arr,len){
     if(len === 2){
         return LCD(arr[0],arr[1])
@@ -41,6 +25,13 @@ function lcmIter(arr,len){
     }
 }
 
+function gcdIter(arr,len){
+    if(len === 2){
+        return GCD(arr[0],arr[1])
+    } else {
+        return GCD(arr[len-1],gcdIter(arr,len-1))
+    }
+}
 
 function RhythmRuler () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
@@ -1159,8 +1150,27 @@ function RhythmRuler () {
     };
 
     this._showRuler = function() {
-        // console.log(lcmIter(meterInRhythmRulerNoteValues, meterInRhythmRulerNoteValues.length)) ;
+         var evenIndexNumbers = [];
+         var oddIndexNumbers = [];
+         for (var z = 0; z < rhythmAndMeter.length; z++) {
+         	if (z%2 === 0) {
+         		evenIndexNumbers.push(rhythmAndMeter[z]);
+         	} else {
+         		oddIndexNumbers.push(rhythmAndMeter[z]);
+         	}
+         }
+         var lcmOfNumerator = lcmIter(evenIndexNumbers, evenIndexNumbers.length);
+         var gcdofDenominator = gcdIter(oddIndexNumbers, oddIndexNumbers.length);
+         var alignmentAfter = lcmOfNumerator/gcdofDenominator;
+         console.log('Alignment will happen after ' + alignmentAfter + ' Units.');
+         for (var k = 0; k < rhythmAndMeter.length; k=k+4) {
+         	console.log('Meter ' + ((k/4)+1) +' Should repeat for ' +alignmentAfter/(rhythmAndMeter[k]/rhythmAndMeter[k+1]));
+         }
 
+         // If alignment occurs after very long way 
+         if (alignmentAfter > 3) {
+         	alignmentAfter = 2;
+         }
     };
 
     this.init = function (logo) {
