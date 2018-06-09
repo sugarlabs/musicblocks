@@ -455,6 +455,7 @@ var OSCTYPES = [
 var TEMPERAMENTS = [
     [_('equal'), 'equal'],
     [_('just intonation'), 'just intonation'],
+    [_('Pythagorian'), 'Pythagorian'],
     [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
     [_('meantone') + ' (1/4)', '1/4 comma meantone'],
     [_('custom'), 'custom'],
@@ -508,6 +509,30 @@ const TEMPERAMENT = {
         'major 7': (15/8),
         'augmented 7': (2/1),
         'diminished 8': (15/8),
+        'perfect 8': (2/1)
+    },
+    'Pythagorian': {
+        'unison' : (1/1),
+        'minor 2' :  (256/243),
+        'augmented 1': (256/243),
+        'major 2': (9/8),
+        'augmented 2': (32/27),
+        'minor 3': (32/27),
+        'major 3': (81/64),
+        'augmented 3': (4/3),
+        'diminished 4': (81/64),
+        'perfect 4': (4/3),
+        'augmented 4': (729/512),
+        'diminished 5': (729/512),
+        'perfect 5': (3/2),
+        'augmented 5': (128/81),
+        'minor 6': (128/81),
+        'major 6': (27/16),
+        'augmented 6': (16/9),
+        'minor 7': (16/9),
+        'major 7': (243/128),
+        'augmented 7': (2/1),
+        'diminished 8': (243/128),
         'perfect 8': (2/1)
     },
     '1/3 comma meantone': { // 19-EDO
