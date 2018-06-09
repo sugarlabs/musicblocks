@@ -180,7 +180,7 @@ function TemperamentWidget () {
         }
     };
 
-    this._graphOfNotes = function (){
+    this._graphOfNotes = function (){  //TODO : Improve UI.
         this.circleIsVisible = true;
         this.toggleNotesButton();
         temperamentTable.remove();
@@ -193,7 +193,7 @@ function TemperamentWidget () {
         var notesGraph = docById('notesGraph');
         var headerNotes = notesGraph.createTHead();
         var rowNotes = headerNotes.insertRow(0);
-        var menuLabels = ['Pitch Number', 'Interval', 'Note', 'Ratio', 'Frequency'] //TODO: Add mode
+        var menuLabels = ['Pitch Number', 'Note', 'Frequency', 'Ratio', 'Interval'] //TODO: Add mode
         notesGraph.innerHTML = '<tbody id="tablebody"><tr id="menu"></tr></tbody>'
         docById('menu').innerHTML = '';
         
@@ -207,6 +207,33 @@ function TemperamentWidget () {
             menuItems[i].style.height = 30 + 'px';
             menuItems[i].style.textAlign = 'center';
             menuItems[i].style.fontWeight = 'bold';
+        }
+        var pitchNumberColumn = '';
+        for(var i = 0; i < this.pitchNumber; i++) {
+            pitchNumberColumn += '<tr id="notes_' + i + '"></tr>';
+        }
+        docById('tablebody').innerHTML += pitchNumberColumn;
+        var notesRow = [];
+        var notesCell = [];
+        for(var i = 0; i < this.pitchNumber; i++) {
+            notesRow[i] = docById('notes_' + i);
+            //Pitch Number
+            notesCell[i,0] = notesRow[i].insertCell(-1);
+            notesCell[i,0].innerHTML = i;
+            notesCell[i,0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,0].style.textAlign = 'center';
+
+            //Notes
+            notesCell[i,1] = notesRow[i].insertCell(-1);
+            notesCell[i,1].innerHTML = this.notes[i];
+            notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,1].style.textAlign = 'center';
+
+            //Frequency
+            notesCell[i,2] = notesRow[i].insertCell(-1);
+            notesCell[i,2].innerHTML = this.frequencies[i];
+            notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,2].style.textAlign = 'center';
         }
     };
 
