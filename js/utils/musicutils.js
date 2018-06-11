@@ -461,7 +461,7 @@ var TEMPERAMENTS = [
 
 const TEMPERAMENT = {
     'equal': {
-        'unison' : Math.pow(2, (0/12)),
+        'perfect 1' : Math.pow(2, (0/12)),
         'minor 2' :  Math.pow(2, (1/12)),
         'augmented 1': Math.pow(2, (1/12)),
         'major 2': Math.pow(2, (2/12)),
@@ -486,7 +486,7 @@ const TEMPERAMENT = {
         'pitchNumber': 12
     },
     'just intonation': {
-        'unison' : (1/1),
+        'perfect 1' : (1/1),
         'minor 2' :  (16/15),
         'augmented 1': (16/15),
         'major 2': (9/8),
@@ -511,7 +511,7 @@ const TEMPERAMENT = {
         'pitchNumber': 12
     },
     'Pythagorean': {
-        'unison' : (1/1),
+        'perfect 1' : (1/1),
         'minor 2' :  (256/243),
         'augmented 1': (256/243),
         'major 2': (9/8),
@@ -532,10 +532,11 @@ const TEMPERAMENT = {
         'major 7': (243/128),
         'augmented 7': (2/1),
         'diminished 8': (243/128),
-        'perfect 8': (2/1)
+        'perfect 8': (2/1),
+        'pitchNumber': 12
     },
     '1/3 comma meantone': { // 19-EDO
-        'unison' : (1/1),
+        'perfect 1' : (1/1),
         'minor 2' :  1.075693,
         'augmented 1': 1.037156,
         'major 2': 1.115656,
@@ -560,7 +561,7 @@ const TEMPERAMENT = {
         'pitchNumber': 19
     },
     '1/4 comma meantone': { // 21 notes per octave
-        'unison' : (1/1),
+        'perfect 1' : (1/1),
         'minor 2' :  (16/15),
         'augmented 1': (25/24),
         'major 2': (9/8),
@@ -585,7 +586,7 @@ const TEMPERAMENT = {
         'pitchNumber': 21 
     },
     'custom':{
-        'unison' : Math.pow(2, (0/12)),
+        'perfect 1' : Math.pow(2, (0/12)),
         'minor 2' :  Math.pow(2, (1/12)),
         'augmented 1': Math.pow(2, (1/12)),
         'major 2': Math.pow(2, (2/12)),
@@ -1278,6 +1279,48 @@ function getInterval (interval, keySignature, pitch) {
         return j;
     }
 };
+
+function getIntervalName(startingPitch, note, octave) {
+    var len = startingPitch.length;
+    var note1 = startingPitch.substring(0,len-1);
+    var octave1 = startingPitch.slice(-1);
+    var direction = 0;
+    var accidental = note.substring(1, note.length);
+    var halfSteps;
+
+    if (octave == octave1) {
+        halfSteps = getNumber(note,octave)-getNumber(note1,octave1);
+    } else {   
+        if (note1 == note) {
+            halfSteps = 12; 
+        } else {
+            halfSteps = getNumber(note,octave1)-getNumber(note1,octave1);
+        }       
+    }
+
+    if (halfSteps < 0) {
+        halfSteps = halfSteps + 12;
+    } 
+    
+    //For major 2, major 3, major 6 and major 7. 
+    if (halfSteps == 2 || halfSteps == 4 || halfSteps == 9 || halfSteps == 11) {
+        direction = 1;
+    }
+
+    if (accidental == FLAT || accidental == 'b') {
+        direction = -1;
+    } else if (accidental == SHARP || accidental == '#') {
+        direction = 1;
+    } else if (accidental == DOUBLEFLAT && halfSteps == 3 ||accidental == DOUBLEFLAT && halfSteps == 10) {
+        direction = -1;
+    }
+    
+    for (var interval in INTERVALVALUES) {
+        if (halfSteps == INTERVALVALUES[interval][0] && direction == INTERVALVALUES[interval][1]) {
+            return interval;
+        }
+    }
+}; 
 
 function calcNoteValueToDisplay(a, b, scale) {
     var noteValue = a / b;
