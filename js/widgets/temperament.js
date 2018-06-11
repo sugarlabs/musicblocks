@@ -10,6 +10,8 @@ function TemperamentWidget () {
     this.lastTriggered = null;
     this.notes = [];
     this.frequencies = [];
+    this.intervals = [];
+    this.ratios = [];
     this.pitchNumber = 0;
     this.circleIsVisible = true;
 
@@ -84,13 +86,14 @@ function TemperamentWidget () {
 
         for(var i=0; i < this.pitchNumber; i++) {
             str[i] = numberToPitch(number + i).toString();
-            this.notes[i] = str[i].replace(',', '');
-            if (this.notes[i].substring(1, this.notes[i].length-1) === FLAT || this.notes[i].substring(1, this.notes[i].length-1) === 'b' ) {
-                this.notes[i] = this.notes[i].replace(FLAT, 'b');
-            } else if (this.notes[i].substring(1, this.notes[i].length-1) === SHARP || this.notes[i].substring(1, this.notes[i].length-1) === '#' ) {
-                this.notes[i] = this.notes[i].replace(SHARP, '#'); 
+            this.notes[i] = str[i];
+            str[i] = str[i].replace(',', '');
+            if (str[i].substring(1, str[i].length-1) === FLAT || str[i].substring(1, str[i].length-1) === 'b' ) {
+                str[i] = str[i].replace(FLAT, 'b');
+            } else if (str[i].substring(1, str[i].length-1) === SHARP || str[i].substring(1, str[i].length-1) === '#' ) {
+                str[i] = str[i].replace(SHARP, '#'); 
             }
-            this.frequencies[i] = this._logo.synth._getFrequency(this.notes[i], true).toFixed(2);
+            this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);    
         }
 
         var labels = [];
@@ -149,7 +152,7 @@ function TemperamentWidget () {
                     if (docById('noteInfo') !== null) {
                         docById('noteInfo').remove();
                     }
-                    this._logo.synth.inTemperament = this.inTemperament;
+                    //this._logo.synth.inTemperament = this.inTemperament;
                     docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>'
                     docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px>';
                     docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px align="right" data-message="' + i + '"><br>';
@@ -213,10 +216,19 @@ function TemperamentWidget () {
             pitchNumberColumn += '<tr id="notes_' + i + '"></tr>';
         }
         docById('tablebody').innerHTML += pitchNumberColumn;
+
+        var startingPitch = this._logo.synth.startingPitch;
+        var t = TEMPERAMENT[this.inTemperament];
         var notesRow = [];
         var notesCell = [];
+        var noteObj = [];
         for(var i = 0; i < this.pitchNumber; i++) {
+            noteObj[i] = this.notes[i].split(',');
+            this.intervals[i] = getIntervalName(startingPitch, noteObj[i][0], noteObj[i][1]);
+            this.ratios[i] = t[this.intervals[i]];
+            this.ratios[i] = this.ratios[i].toFixed(2);
             notesRow[i] = docById('notes_' + i);
+
             //Pitch Number
             notesCell[i,0] = notesRow[i].insertCell(-1);
             notesCell[i,0].innerHTML = i;
@@ -234,6 +246,18 @@ function TemperamentWidget () {
             notesCell[i,2].innerHTML = this.frequencies[i];
             notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,2].style.textAlign = 'center';
+
+            //Ratio
+            notesCell[i,3] = notesRow[i].insertCell(-1);
+            notesCell[i,3].innerHTML = this.ratios[i];
+            notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,3].style.textAlign = 'center';
+
+            //Interval
+            notesCell[i,4] = notesRow[i].insertCell(-1);
+            notesCell[i,4].innerHTML = this.intervals[i];
+            notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,4].style.textAlign = 'center';
         }
     };
 

@@ -266,7 +266,13 @@ function Synth() {
 
     this._getFrequency = function(notes, changeInTemperament) {
         if (changeInTemperament) {
-            this.temperamentChanged(this.inTemperament, this.startingPitch);
+            if (temperament === undefined) {
+                this.temperamentChanged(this.inTemperament, this.startingPitch);
+            } else {
+                //To get frequencies in Temperament Widget.
+                this.temperamentChanged(temperament, this.startingPitch);
+            }
+            
         }
 
         if (this.inTemperament === 'equal') {
@@ -876,6 +882,7 @@ function Synth() {
                         console.log('cannot find oscillator to setNote');
                     }
                 } else {
+                    console.log(notes);
                     synth.triggerAttackRelease(notes, beatValue);
                 }
             }
