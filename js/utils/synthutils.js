@@ -882,7 +882,6 @@ function Synth() {
                         console.log('cannot find oscillator to setNote');
                     }
                 } else {
-                    console.log(notes);
                     synth.triggerAttackRelease(notes, beatValue);
                 }
             }
