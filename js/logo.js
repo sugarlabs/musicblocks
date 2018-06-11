@@ -38,9 +38,10 @@ const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
+var meterCount = 0;
 var currentMeterBeats = 0;
-var currentMeterNoteNum = 0;
-var currentMeterNoteDen = 0;
+var currentMeterNoteNum = 1;
+var currentMeterNoteDen = 1;
 var rhythmAndMeter = [];   // used to store value of rhythm with corresponding meter
 
 function find_rational(value) {
@@ -70,7 +71,6 @@ function calc() {
 }
 
 function Logo () {
-
     this.canvas = null;
     this.blocks = null;
     this.turtles = null;
@@ -4401,6 +4401,7 @@ function Logo () {
                         that.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
                     }
                     rhythmAndMeter.push(currentMeterNoteNum, currentMeterNoteDen, find_rational(args[0]*args[1])[0], find_rational(args[0]*args[1])[1]);
+                    console.log('rhythmAndMeter ' + rhythmAndMeter);
                 }
             } else {
                 // Play rhythm block as if it were a drum.
@@ -4569,9 +4570,11 @@ function Logo () {
             }
 
             if (that.inRhythmRuler) {
+                meterCount++;
                 currentMeterNumBeats = args[0];
             	currentMeterNoteNum = find_rational(args[0]*args[1])[0];
             	currentMeterNoteDen = find_rational(args[0]*args[1])[1];
+                console.log('meterCount ' + meterCount);;
             }
             break;
         case 'osctime':

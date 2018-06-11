@@ -1175,7 +1175,9 @@ function RhythmRuler () {
 
     this.init = function (logo) {
         console.log('init RhythmRuler');
-
+        meterCount = 0;
+        currentMeterNoteNum = 1;
+		currentMeterNoteDen = 1;
         this._logo = logo;
 
         this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
