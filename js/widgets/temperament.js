@@ -77,25 +77,6 @@ function TemperamentWidget () {
         docById('wheelDiv2').style.display = '';
         docById('wheelDiv2').style.background = 'none';
 
-        var t = TEMPERAMENT[this.inTemperament];
-        this.pitchNumber = t.pitchNumber;
-        var startingPitch = this._logo.synth.startingPitch;
-        var len = startingPitch.length;
-        var number = pitchToNumber(startingPitch.substring(0, len - 1), startingPitch.slice(-1), 'C major');
-        var str = [];
-
-        for(var i=0; i < this.pitchNumber; i++) {
-            str[i] = numberToPitch(number + i).toString();
-            this.notes[i] = str[i];
-            str[i] = str[i].replace(',', '');
-            if (str[i].substring(1, str[i].length-1) === FLAT || str[i].substring(1, str[i].length-1) === 'b' ) {
-                str[i] = str[i].replace(FLAT, 'b');
-            } else if (str[i].substring(1, str[i].length-1) === SHARP || str[i].substring(1, str[i].length-1) === '#' ) {
-                str[i] = str[i].replace(SHARP, '#'); 
-            }
-            this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);    
-        }
-
         var labels = [];
         for (var j = 0; j < this.pitchNumber; j++) {
             var label = j.toString();
@@ -196,7 +177,7 @@ function TemperamentWidget () {
         var notesGraph = docById('notesGraph');
         var headerNotes = notesGraph.createTHead();
         var rowNotes = headerNotes.insertRow(0);
-        var menuLabels = ['Pitch Number', 'Note', 'Frequency', 'Ratio', 'Interval'] //TODO: Add mode
+        var menuLabels = ['Pitch Number', 'Interval', 'Ratio', 'Note', 'Frequency'] //TODO: Add mode
         notesGraph.innerHTML = '<tbody id="tablebody"><tr id="menu"></tr></tbody>'
         docById('menu').innerHTML = '';
         
@@ -221,10 +202,8 @@ function TemperamentWidget () {
         var t = TEMPERAMENT[this.inTemperament];
         var notesRow = [];
         var notesCell = [];
-        var noteObj = [];
         for(var i = 0; i < this.pitchNumber; i++) {
-            noteObj[i] = this.notes[i].split(',');
-            this.intervals[i] = getIntervalName(startingPitch, noteObj[i][0], noteObj[i][1]);
+            this.intervals[i] = t.interval[i];
             this.ratios[i] = t[this.intervals[i]];
             this.ratios[i] = this.ratios[i].toFixed(2);
             notesRow[i] = docById('notes_' + i);
@@ -235,27 +214,27 @@ function TemperamentWidget () {
             notesCell[i,0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,0].style.textAlign = 'center';
 
-            //Notes
-            notesCell[i,1] = notesRow[i].insertCell(-1);
-            notesCell[i,1].innerHTML = this.notes[i];
-            notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            notesCell[i,1].style.textAlign = 'center';
-
-            //Frequency
+            //Ratio
             notesCell[i,2] = notesRow[i].insertCell(-1);
-            notesCell[i,2].innerHTML = this.frequencies[i];
+            notesCell[i,2].innerHTML = this.intervals[i];
             notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,2].style.textAlign = 'center';
 
-            //Ratio
+            //Interval
+            notesCell[i,1] = notesRow[i].insertCell(-1);
+            notesCell[i,1].innerHTML = this.ratios[i];
+            notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,1].style.textAlign = 'center';
+
+            //Notes
             notesCell[i,3] = notesRow[i].insertCell(-1);
-            notesCell[i,3].innerHTML = this.ratios[i];
+            notesCell[i,3].innerHTML = this.notes[i];
             notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,3].style.textAlign = 'center';
 
-            //Interval
+            //Frequency
             notesCell[i,4] = notesRow[i].insertCell(-1);
-            notesCell[i,4].innerHTML = this.intervals[i];
+            notesCell[i,4].innerHTML = this.frequencies[i];
             notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,4].style.textAlign = 'center';
         }
@@ -301,6 +280,23 @@ function TemperamentWidget () {
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         var noteCell = this._addButton(row, 'play-button.svg', ICONSIZE, _('table'));
+
+        var t = TEMPERAMENT[this.inTemperament];
+        this.pitchNumber = t.pitchNumber;
+        var startingPitch = this._logo.synth.startingPitch;
+        var str = [];
+
+        for(var i=0; i < this.pitchNumber; i++) {
+            str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
+            this.notes[i] = str[i];
+            if (str[i][0].substring(1, str[i][0].length) === FLAT || str[i][0].substring(1, str[i][0].length) === 'b' ) {
+                str[i][0] = str[i][0].replace(FLAT, 'b');
+            } else if (str[i][0].substring(1, str[i][0].length) === SHARP || str[i][0].substring(1, str[i][0].length) === '#' ) {
+                str[i][0] = str[i][0].replace(SHARP, '#'); 
+            }
+            str[i] = str[i][0] + str[i][1];
+            this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2); 
+        }
         
         this.toggleNotesButton = function () {
             if (this.circleIsVisible) {
