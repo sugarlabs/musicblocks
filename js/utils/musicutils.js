@@ -484,7 +484,8 @@ const TEMPERAMENT = {
         'augmented 7': Math.pow(2, (12/12)),
         'diminished 8': Math.pow(2, (11/12)),
         'perfect 8': Math.pow(2, (12/12)),
-        'pitchNumber': 12
+        'pitchNumber': 12,
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
     },
     'just intonation': {
         'perfect 1' : (1/1),
@@ -509,7 +510,8 @@ const TEMPERAMENT = {
         'augmented 7': (2/1),
         'diminished 8': (15/8),
         'perfect 8': (2/1),
-        'pitchNumber': 12
+        'pitchNumber': 12,
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
     },
     'Pythagorean': {
         'perfect 1' : (1/1),
@@ -534,7 +536,8 @@ const TEMPERAMENT = {
         'augmented 7': (2/1),
         'diminished 8': (243/128),
         'perfect 8': (2/1),
-        'pitchNumber': 12
+        'pitchNumber': 12,
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
     },
     '1/3 comma meantone': { // 19-EDO
         'perfect 1' : (1/1),
@@ -559,7 +562,8 @@ const TEMPERAMENT = {
         'augmented 7': 1.92835,
         'diminished 8': 1.92835,
         'perfect 8': (2/1), 
-        'pitchNumber': 19
+        'pitchNumber': 19,
+        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8']
     },
     '1/4 comma meantone': { // 21 notes per octave
         'perfect 1' : (1/1),
@@ -584,7 +588,8 @@ const TEMPERAMENT = {
         'augmented 7': (125/64),
         'diminished 8': (48/25),
         'perfect 8': (2/1),
-        'pitchNumber': 21 
+        'pitchNumber': 21,
+        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'augmented 3', 'diminished 4', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'augmented 7', 'diminished 8']
     },
     'custom':{
         'perfect 1' : Math.pow(2, (0/12)),
@@ -609,7 +614,8 @@ const TEMPERAMENT = {
         'augmented 7': Math.pow(2, (12/12)),
         'diminished 8': Math.pow(2, (11/12)),
         'perfect 8': Math.pow(2, (12/12)),
-        'pitchNumber': 12
+        'pitchNumber': 12,
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
     }
 };
 
@@ -1281,47 +1287,99 @@ function getInterval (interval, keySignature, pitch) {
     }
 };
 
-function getIntervalName(startingPitch, note, octave) {
-    var len = startingPitch.length;
-    var note1 = startingPitch.substring(0,len-1);
-    var octave1 = startingPitch.slice(-1);
-    var direction = 0;
-    var accidental = note.substring(1, note.length);
-    var halfSteps;
+function getNoteFromInterval (pitch, interval) {
+    var len = pitch.length;
+    var pitch1 = pitch.substring(0, 1);
+    var note1 = pitch.substring(0,len-1);
+    var octave1 = Number(pitch.slice(-1));
+    var number = pitchToNumber(note1, octave1, 'C major');
+    var pitches = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    var priorAttrs = [DOUBLEFLAT, FLAT, '', SHARP, DOUBLESHARP];
+    var majorintervalNote;
 
-    if (octave == octave1) {
-        halfSteps = getNumber(note,octave)-getNumber(note1,octave1);
-    } else {   
-        if (note1 == note) {
-            halfSteps = 12; 
-        } else {
-            halfSteps = getNumber(note,octave1)-getNumber(note1,octave1);
-        }       
-    }
-
-    if (halfSteps < 0) {
-        halfSteps = halfSteps + 12;
-    } 
-    
-    //For major 2, major 3, major 6 and major 7. 
-    if (halfSteps == 2 || halfSteps == 4 || halfSteps == 9 || halfSteps == 11) {
-        direction = 1;
-    }
-
-    if (accidental == FLAT || accidental == 'b') {
-        direction = -1;
-    } else if (accidental == SHARP || accidental == '#') {
-        direction = 1;
-    } else if (accidental == DOUBLEFLAT && halfSteps == 3 ||accidental == DOUBLEFLAT && halfSteps == 10) {
-        direction = -1;
-    }
-    
-    for (var interval in INTERVALVALUES) {
-        if (halfSteps == INTERVALVALUES[interval][0] && direction == INTERVALVALUES[interval][1]) {
-            return interval;
+    function findMajorInterval (interval) {
+        var halfSteps = INTERVALVALUES[interval][0];
+        var direction = INTERVALVALUES[interval][1];
+        var note = numberToPitch(number + halfSteps);
+        var num = interval.split(' ');
+        var pitchIndex = pitches.indexOf(pitch1);
+        var index = pitchIndex + Number(num[1]) - 1;
+        var octave = octave1;
+        if (index > 6) {
+            index = index - 7;
+            octave = octave1 + 1;
+        }
+        var id = pitches[index];
+        if (note[0].substring(0, 1) === id) {
+            return [note[0], octave];
+        } else if (note[0].substring(0, 1) !== id) {
+            note = numberToPitchSharp(number + halfSteps);
+            if (note[0] === id) {
+                return [note[0], octave];
+            } else {
+                var steps = getNumber(id,octave) - getNumber(note1,octave1);
+                var naturalIndex = priorAttrs.indexOf('');
+                var attr = priorAttrs[naturalIndex + halfSteps - steps];
+                note = id + attr + '';
+                return [note, octave];
+            }
         }
     }
-}; 
+
+    function findOtherIntervals(interval) {
+        var num = interval.split(' ');
+
+        if (interval == 'minor 2' || interval == 'minor 3' || interval == 'minor 6' || interval == 'minor 7') {
+            var majorNote = findMajorInterval('major ' + num[1]);
+            var accidental = majorNote[0].substring(1, majorNote[0].length);
+            var index1 = priorAttrs.indexOf(accidental);
+            if (index1 == 0) {
+                accidental = priorAttrs[index1] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 1];   
+            }    
+        }
+        if (interval == 'diminished 4' || interval == 'diminished 5' || interval == 'diminished 8') {
+            var majorNote = findMajorInterval('perfect ' + num[1]);
+            var accidental = majorNote[0].substring(1, majorNote[0].length);
+            var index1 = priorAttrs.indexOf(accidental);
+            if (index1 == 0) {
+                accidental = priorAttrs[index1] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 1];   
+            }
+        }
+        if (interval == 'augmented 2' || interval == 'augmented 3' || interval == 'augmented 6' || interval == 'augmented 7') {
+            var majorNote = findMajorInterval('major ' + num[1]);
+            var accidental = majorNote[0].substring(1, majorNote[0].length);
+            var index1 = priorAttrs.indexOf(accidental);
+            if (index1 == 4) {
+                accidental = priorAttrs[index1] + SHARP;
+            } else {
+                accidental = priorAttrs[index1 + 1];   
+            }
+        }
+        if (interval == 'augmented 1' || interval == 'augmented 4' || interval == 'augmented 5' || interval == 'augmented 8') {
+            var majorNote = findMajorInterval('perfect ' + num[1]);
+            var accidental = majorNote[0].substring(1, majorNote[0].length);
+            var index1 = priorAttrs.indexOf(accidental);
+            if (index1 == 4) {
+                accidental = priorAttrs[index1] + SHARP;
+            } else {
+                accidental = priorAttrs[index1 + 1];   
+            }
+        }
+
+        var Note = majorNote[0].substring(0, 1) + accidental + '';
+        var octave = majorNote[1];
+        return [Note, octave];  
+    }
+    if (interval == 'major 2' || interval == 'major 3' || interval == 'major 6' || interval == 'major 7'|| interval == 'perfect 4'|| interval == 'perfect 5' || interval == 'perfect 8' || interval == 'perfect 1') {
+        return findMajorInterval(interval);
+    } else {
+        return findOtherIntervals(interval);
+    }
+};
 
 function calcNoteValueToDisplay(a, b, scale) {
     var noteValue = a / b;
@@ -1523,22 +1581,21 @@ function pitchToNumber(pitch, octave, keySignature) {
     if (pitch.toUpperCase() === 'R') {
         return 0;
     }
-
     // Check for flat, sharp, double flat, or double sharp.
     var transposition = 0;
     var len = pitch.length;
     if (len > 1) {
         if (len > 2) {
             var lastTwo = pitch.slice(len - 2);
-            var lastOne=pitch.slice(len-1);
+            var lastOne = pitch.substring(1, len);
             if (lastTwo === 'bb') {
-                pitch = pitch.slice(0, len - 2);
+                pitch = pitch.substring(0, 1);
                 transposition -= 2;
             } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.substring(0, 1);
                 transposition -= 2;
             } else if (lastTwo === '*' || lastTwo === DOUBLESHARP) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.substring(0, 1);
                 transposition += 2;
             } else if (lastTwo === '#b' || lastTwo === SHARP + FLAT || lastTwo === 'b#' || lastTwo === FLAT + SHARP) {
                 // Not sure this could occur... but just in case.
@@ -1571,7 +1628,6 @@ function pitchToNumber(pitch, octave, keySignature) {
             pitchNumber = 0;
         }
     }
-
     // We start at A0.
     return octave * 12 + pitchNumber - PITCHES.indexOf('A') + transposition;
 };
