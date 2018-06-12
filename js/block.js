@@ -3446,7 +3446,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(['x', ' ']);
+        this._exitWheel.createWheel(['x', '▶']); // imgsrc:header-icons/play-button.svg']);
 
         var that = this;
 
@@ -3456,11 +3456,19 @@ function Block(protoblock, blocks, overrideName) {
                 that._modeNameWheel.navigateWheel((that._modeNameWheel.selectedNavItemIndex + 1) % that._modeNameWheel.navItems.length);
             } else {
                 that.text.text = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
-                for (var i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
-                    var modename = MODE_PIE_MENUS[modeGroup][i];
-                    if (_(modename) === that.text.text) {
-                        that.value = modename;
-                        break;
+
+                if (that.text.text === _('major') + ' / ' + _('ionian')) {
+                    that.value = 'major';
+                } else if (that.text.text === _('minor') + ' / ' + _('aeolian')) {
+                    that.value = 'aeolian';
+                } else {
+                    for (var i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
+                        var modename = MODE_PIE_MENUS[modeGroup][i];
+
+                        if (_(modename) === that.text.text) {
+                            that.value = modename;
+                            break;
+                        }
                     }
                 }
 
@@ -3634,6 +3642,30 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
         };
 
+        var __playScale = function (i) {
+            var activeTabs = [0];
+            console.log(that.value);
+            var mode = MUSICALMODES[that.value];
+            for (var k = 0; k < mode.length - 1; k++) {
+                activeTabs.push(last(activeTabs) + mode[k]);
+            }
+
+            if (i === undefined) {
+                var idx = 0;
+            } else {
+                var idx = i;
+            }
+
+            // loop through selecting modeWheel slices with a delay.
+            if (idx < activeTabs.length) {
+                that._modeWheel.navigateWheel(activeTabs[idx]);
+
+                setTimeout(function () {
+                    __playScale(idx + 1);
+                }, 1000 / 6); // slight delay between notes
+            }
+        };
+
         // position widget
         var x = this.container.x;
         var y = this.container.y;
@@ -3689,6 +3721,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._exitWheel.navItems[0].navigateFunction = __exitMenu;
+        this._exitWheel.navItems[1].navigateFunction = __playScale;
     };
 
     this._labelChanged = function () {
