@@ -3378,6 +3378,7 @@ function Block(protoblock, blocks, overrideName) {
         // Look for a key block
         var key = 'C';
         var modeGroup = '7';  // default mode group
+        var octave = false;
 
         var c = this.connections[0];
         if (c !== null) {
@@ -3621,9 +3622,14 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var __playNote = function () {
+            var o = 0;
+            if (octave) {
+                var o = 12;
+            }
+
             var i = that._modeWheel.selectedNavItemIndex;
             // The mode doesn't matter here, since we are using semi-tones.
-            var obj = getNote(key, 4, i, key + ' chromatic', false, null, null);
+            var obj = getNote(key, 4, i + o, key + ' chromatic', false, null, null);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
             console.log(obj[0]);
 
@@ -3639,31 +3645,40 @@ function Block(protoblock, blocks, overrideName) {
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
             that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, 'default', null, null);
         };
 
-        var __playScale = function (i) {
+        var __playScale = function (activeTabs, idx) {
+            // loop through selecting modeWheel slices with a delay.
+            if (idx < activeTabs.length) {
+                if (activeTabs[idx] < 12) {
+                    octave = false;
+                    that._modeWheel.navigateWheel(activeTabs[idx]);
+                } else {
+                    octave = true;
+                    that._modeWheel.navigateWheel(0);
+                }
+
+                setTimeout(function () {
+                    __playScale(activeTabs, idx + 1);
+                }, 1000 / 10); // slight delay between notes
+            }
+        };
+
+        var __prepScale = function () {
             var activeTabs = [0];
-            console.log(that.value);
             var mode = MUSICALMODES[that.value];
             for (var k = 0; k < mode.length - 1; k++) {
                 activeTabs.push(last(activeTabs) + mode[k]);
             }
 
-            if (i === undefined) {
-                var idx = 0;
-            } else {
-                var idx = i;
+            activeTabs.push(12);
+            
+            for (var k = mode.length - 1; k >= 0; k--) {
+                activeTabs.push(last(activeTabs) - mode[k]);
             }
 
-            // loop through selecting modeWheel slices with a delay.
-            if (idx < activeTabs.length) {
-                that._modeWheel.navigateWheel(activeTabs[idx]);
-
-                setTimeout(function () {
-                    __playScale(idx + 1);
-                }, 1000 / 6); // slight delay between notes
-            }
+            __playScale(activeTabs, 0);
         };
 
         // position widget
@@ -3721,7 +3736,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._exitWheel.navItems[0].navigateFunction = __exitMenu;
-        this._exitWheel.navItems[1].navigateFunction = __playScale;
+        this._exitWheel.navItems[1].navigateFunction = __prepScale;
     };
 
     this._labelChanged = function () {
