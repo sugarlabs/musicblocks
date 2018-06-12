@@ -3377,6 +3377,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Look for a key block
         var key = 'C';
+        var modeGroup = '7';  // default mode group
 
         var c = this.connections[0];
         if (c !== null) {
@@ -3393,78 +3394,13 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.display = '';
 
         //Use advanced constructor for more wheelnav on same div
-        this._modeNameWheel = new wheelnav('wheelDiv', null, 1200, 1200);
-        this._modeWheel = new wheelnav('this._modeWheel', this._modeNameWheel.raphael);
+        this._modeWheel = new wheelnav('wheelDiv', null, 1200, 1200);
+        this._modeGroupWheel = new wheelnav('_modeGroupWheel', this._modeWheel.raphael);
+        this._modeNameWheel = null;  // We build this wheel based on the group selection.
         // exit button
-        this._exitWheel = new wheelnav('_exitWheel', this._modeNameWheel.raphael);
+        this._exitWheel = new wheelnav('_exitWheel', this._modeWheel.raphael);
 
         wheelnav.cssMode = true;
-
-        this._modeNameWheel.keynavigateEnabled = true;
-
-        // Customize slicePaths
-        var colors = [];
-        for (var modename in MUSICALMODES_SHORTLIST) {
-            var mode = MUSICALMODES[modename];
-            switch (mode.length % 2) {
-            case 0:
-                colors.push('#5ba900');
-                break;
-            case 1:
-                colors.push('#77c428');
-                break;
-            /*
-            case 2:
-                colors.push('#93e042');
-                break;
-            case 3:
-                colors.push('#3d8d00');
-                break;
-            case 4:
-            default:
-                colors.push('#adfd55');
-                break;
-            */
-            }
-        }
-
-        this._modeNameWheel.colors = colors;
-        this._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
-        this._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._modeNameWheel.slicePathCustom.minRadiusPercent = 0.15;
-        this._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.85;
-        this._modeNameWheel.sliceSelectedPathCustom = this._modeNameWheel.slicePathCustom;
-        this._modeNameWheel.sliceInitPathCustom = this._modeNameWheel.slicePathCustom;
-        this._modeNameWheel.titleRotateAngle = 0;
-        // this._modeNameWheel.clickModeRotate = false;
-        var labels = [];
-        for (var modename in MUSICALMODES_SHORTLIST) {
-            switch (modename) {
-            case 'ionian':
-            case 'major':
-                labels.push(_('major') + ' / ' + _('ionian'));
-                break;
-            case 'aeolian':
-            case 'minor':
-                labels.push(_('minor') + ' / ' + _('aeolian'));
-                break;
-            default:
-                labels.push(_(modename));
-                break;
-            }
-        }
-
-        this._modeNameWheel.animatetime = 300;
-        this._modeNameWheel.createWheel(labels);
-
-        // Special case for Japanese
-        var language = localStorage.languagePreference;
-        if (language === 'ja') {
-            for (var i = 0; i < this._modeNameWheel.navItems.length; i++) {
-                this._modeNameWheel.navItems[i].titleAttr.font = "30 30px Impact, Black, sans-serif";
-                this._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px Impact, Black, sans-serif";
-            }
-        }
 
         this._modeWheel.colors = ['#77c428', '#93e042'];
         this._modeWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3481,6 +3417,27 @@ function Block(protoblock, blocks, overrideName) {
         this._modeWheel.animatetime = 300;
         this._modeWheel.createWheel(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
 
+        this._modeGroupWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+        this._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
+        this._modeGroupWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._modeGroupWheel.slicePathCustom.minRadiusPercent = 0.15;
+        this._modeGroupWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this._modeGroupWheel.sliceSelectedPathCustom = this._modeGroupWheel.slicePathCustom;
+        this._modeGroupWheel.sliceInitPathCustom = this._modeGroupWheel.slicePathCustom;
+
+        // Disable rotation, set navAngle and create the menus
+        // this._modeGroupWheel.clickModeRotate = false;
+        this._modeGroupWheel.navAngle = -90;
+        // this._modeGroupWheel.selectedNavItemIndex = 2;
+        this._modeGroupWheel.animatetime = 300;
+
+        var xlabels = [];
+        for (modegroup in MODE_PIE_MENUS) {
+            xlabels.push(modegroup);
+        }
+
+        this._modeGroupWheel.createWheel(xlabels);
+
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -3493,10 +3450,166 @@ function Block(protoblock, blocks, overrideName) {
 
         var that = this;
 
+        var __selectionChanged = function () {
+            var title = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
+            if (title === ' ') {
+                that._modeNameWheel.navigateWheel((that._modeNameWheel.selectedNavItemIndex + 1) % that._modeNameWheel.navItems.length);
+            } else {
+                that.text.text = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
+                for (var i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
+                    var modename = MODE_PIE_MENUS[modeGroup][i];
+                    if (_(modename) === that.text.text) {
+                        that.value = modename;
+                        break;
+                    }
+                }
+
+                // Make sure text is on top.
+                var z = that.container.children.length - 1;
+                that.container.setChildIndex(that.text, z);
+                that.updateCache();
+            }
+        };
+
+        // Add function to each main menu for show/hide sub menus
+        var __setupAction = function (i, activeTabs) {
+            that._modeNameWheel.navItems[i].navigateFunction = function () {
+                for (var j = 0; j < 12; j++) {
+                    if (activeTabs.indexOf(j) === -1) {
+                        that._modeWheel.navItems[j].navItem.hide();
+                    } else {
+                        that._modeWheel.navItems[j].navItem.show();
+                    }
+                }
+
+                __selectionChanged();
+            };
+        };
+
+        // Build a pie menu of modes based on the current mode group.
+        var __buildModeNameWheel = function (grp) {
+            console.log('BUILDING ' + grp);
+            var newWheel = false;
+            if (that._modeNameWheel === null) {
+                that._modeNameWheel = new wheelnav('_modeNameWheel', that._modeWheel.raphael);
+                newWheel = true;
+            }
+
+            that._modeNameWheel.keynavigateEnabled = true;
+
+            // Customize slicePaths
+            var colors = [];
+            for (var i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+                var modename = MODE_PIE_MENUS[grp][i];
+                if (modename === ' ') {
+                    colors.push('#4b8b0e');
+                } else {
+                    colors.push('#66a62d');
+                }
+            }
+
+            that._modeNameWheel.colors = colors;
+            that._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
+            that._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            that._modeNameWheel.slicePathCustom.minRadiusPercent = 0.3; //0.15;
+            that._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.85;
+            that._modeNameWheel.sliceSelectedPathCustom = that._modeNameWheel.slicePathCustom;
+            that._modeNameWheel.sliceInitPathCustom = that._modeNameWheel.slicePathCustom;
+            that._modeNameWheel.titleRotateAngle = 0;
+            // that._modeNameWheel.clickModeRotate = false;
+            that._modeNameWheel.navAngle = -90;
+            var labels = new Array();
+            for (var i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+                var modename = MODE_PIE_MENUS[grp][i];
+                switch (modename) {
+                case 'ionian':
+                case 'major':
+                    labels.push(_('major') + ' / ' + _('ionian'));
+                    break;
+                case 'aeolian':
+                case 'minor':
+                    labels.push(_('minor') + ' / ' + _('aeolian'));
+                    break;
+                default:
+                    if (modename === ' ') {
+                        labels.push(' ');
+                    } else {
+                        labels.push(_(modename));
+                    }
+                    break;
+                }
+            }
+
+            that._modeNameWheel.animatetime = 300;
+            if (newWheel) {
+                that._modeNameWheel.createWheel(labels);
+            } else {
+                for (var i = 0; i < that._modeNameWheel.navItems.length; i++) {
+                    // Maybe there is a method that does this.
+                    that._modeNameWheel.navItems[i].title = labels[i];
+                    that._modeNameWheel.navItems[i].basicNavTitleMax.title = labels[i];
+                    that._modeNameWheel.navItems[i].basicNavTitleMin.title = labels[i];
+                    that._modeNameWheel.navItems[i].hoverNavTitleMax.title = labels[i];
+                    that._modeNameWheel.navItems[i].hoverNavTitleMin.title = labels[i];
+                    that._modeNameWheel.navItems[i].selectedNavTitleMax.title = labels[i];
+                    that._modeNameWheel.navItems[i].selectedNavTitleMin.title = labels[i];
+                    that._modeNameWheel.navItems[i].initNavTitle.title = labels[i];
+                    that._modeNameWheel.navItems[i].fillAttr = colors[i];
+                    that._modeNameWheel.navItems[i].sliceHoverAttr.fill = colors[i];
+                    that._modeNameWheel.navItems[i].slicePathAttr.fill = colors[i];
+                    that._modeNameWheel.navItems[i].sliceSelectedAttr.fill = colors[i];
+                }
+
+                that._modeNameWheel.refreshWheel();
+            }
+
+            // Special case for Japanese
+            var language = localStorage.languagePreference;
+            if (language === 'ja') {
+                for (var i = 0; i < that._modeNameWheel.navItems.length; i++) {
+                    that._modeNameWheel.navItems[i].titleAttr.font = "30 30px Impact, Black, sans-serif";
+                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px Impact, Black, sans-serif";
+                }
+            }
+
+            // Set up tabs for each mode.
+            var i = 0;
+            for (var j = 0; j < MODE_PIE_MENUS[grp].length; j++) {
+                var modename = MODE_PIE_MENUS[grp][j];
+                var activeTabs = [0];
+                if (modename !== ' ') {
+                    var mode = MUSICALMODES[modename];
+                    for (var k = 0; k < mode.length; k++) {
+                        activeTabs.push(last(activeTabs) + mode[k]);
+                    }
+                }
+
+                __setupAction(i, activeTabs);
+                i += 1;
+            }
+
+            // Look for the selected mode.
+            for (var i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+                if (MODE_PIE_MENUS[grp][i] === selectedMode) {
+                    break;
+                }
+            }
+
+            // if we didn't find the mode, use a default
+            if (i === labels.length) {
+                i = 0; // major/ionian
+            }
+
+            that._modeNameWheel.navigateWheel(i);
+        };
+
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
+            if (that._modeNameWheel !== null) {
+                that._modeNameWheel.removeWheel();
+            }
         };
 
         var __playNote = function () {
@@ -3521,21 +3634,6 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
         };
 
-        var __selectionChanged = function () {
-            that.text.text = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
-            for (modename in MUSICALMODES_SHORTLIST) {
-                if (_(modename) === that.text.text) {
-                    that.value = modename;
-                    break;
-                }
-            }
-
-            // Make sure text is on top.
-            var z = that.container.children.length - 1;
-            that.container.setChildIndex(that.text, z);
-            that.updateCache();
-        };
-
         // position widget
         var x = this.container.x;
         var y = this.container.y;
@@ -3551,53 +3649,44 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 600, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
         docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 650, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
 
-        // Add function to each main menu for show/hide sub menus
-        var __setupAction = function (i, activeTabs) {
-            that._modeNameWheel.navItems[i].navigateFunction = function () {
-                for (var j = 0; j < 12; j++) {
-                    if (activeTabs.indexOf(j) === -1) {
-                        that._modeWheel.navItems[j].navItem.hide();
-                    } else {
-                        that._modeWheel.navItems[j].navItem.show();
-                    }
-                }
-
-                __selectionChanged();
-            };
-        };
-
         for (var i = 0; i < 12; i++) {
             that._modeWheel.navItems[i].navigateFunction = __playNote;
         }
 
-        var i = 0;
-        for (var modename in MUSICALMODES_SHORTLIST) {
-            var mode = MUSICALMODES[modename];
-            var activeTabs = [0];
-            for (var j = 0; j < mode.length; j++) {
-                activeTabs.push(last(activeTabs) + mode[j]);
+        // navigate to a specific starting point
+        for (modeGroup in MODE_PIE_MENUS) {
+            for (var j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
+                var modename = MODE_PIE_MENUS[modeGroup][j];
+                if (modename === selectedMode) {
+                    break;
+                }
             }
 
-            __setupAction(i, activeTabs);
-            i += 1;
-        }
-
-        // navigate to a specific starting point
-        var i = 0;
-        for (var modename in MUSICALMODES_SHORTLIST) {
-            if (modename === selectedMode) {
+            if (j < MODE_PIE_MENUS[modeGroup].length) {
                 break;
             }
-
-            i += 1;
         }
 
-        // if we didn't find the mode, use a default
-        if (i === labels.length) {
-            i = 0; // major/ionian
+        if (selectedMode === 'major') {
+            modeGroup = '7';
         }
 
-        this._modeNameWheel.navigateWheel(i);
+        var __buildModeWheel = function () {
+            var i = that._modeGroupWheel.selectedNavItemIndex;
+            modeGroup = that._modeGroupWheel.navItems[i].title;
+            __buildModeNameWheel(modeGroup);
+        };
+
+        for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
+            this._modeGroupWheel.navItems[i].navigateFunction = __buildModeWheel;
+        }
+
+        for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
+            if (this._modeGroupWheel.navItems[i].title === modeGroup) {
+                this._modeGroupWheel.navigateWheel(i);
+                break;
+            }
+        }
 
         this._exitWheel.navItems[0].navigateFunction = __exitMenu;
     };

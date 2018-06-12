@@ -348,18 +348,15 @@ const INTERVALVALUES = {
 // This list of modes is used in the pie menu associated with the mode
 // name block. The complete list of modes is available from the Mode
 // Widget.
-const MUSICALMODES_SHORTLIST = {
-    'ionian': [2, 2, 1, 2, 2, 2, 1],
-    'dorian': [2, 1, 2, 2, 2, 1, 2],
-    'phrygian': [1, 2, 2, 2, 1, 2, 2],
-    'lydian': [2, 2, 2, 1, 2, 2, 1],
-    'mixolydian': [2, 2, 1, 2, 2, 1, 2],
-    'aeolian': [2, 1, 2, 2, 1, 2, 2],
-    'locrian': [1, 2, 2, 1, 2, 2, 2],
-     // User definition overrides this constant
-    'custom': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+const MODE_PIE_MENUS = {
+    '5': ['minor pentatonic', ' ', 'chinese', ' ', 'egyptian', ' ', 'hirajoshi', 'in', 'minyo', ' ', 'fibonacci', ' '],
+    '6': ['minor blues', ' ', ' ', ' ', 'major blues', ' ', ' ', ' ', 'whole tone', ' ', ' ', ' '],
+    '7': ['ionian', ' ', 'dorian', ' ', 'phrygian', 'lydian', ' ', 'mixolydian',  ' ', 'aeolian', ' ', 'locrian'],
+    '7a': ['major', ' ', 'harmonic major', ' ', 'natural minor', ' ', 'harmonic minor', ' ', 'melodic minor', ' ', ' ', ' '],
+    '7b': ['jazz minor', 'bebop', 'arabic', 'byzantine', 'enigmatic', 'ethiopian', 'geez', 'hindu', 'hungarian', 'maqam', 'romanian minor', 'spanish gypsy'],
+    '8': ['octatonic', ' ', ' ', 'diminished', ' ', ' ', 'spanish', ' ', ' ', 'algerian', ' ', ' '],
+    '12': ['chromatic', ' ', ' ', ' ', ' ', ' ', 'custom', ' ', ' ', ' ', ' ', ' '],
 }
-
 
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
