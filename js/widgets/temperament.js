@@ -1,6 +1,6 @@
 function TemperamentWidget () {
 	
-	const BUTTONDIVWIDTH = 430;
+	const BUTTONDIVWIDTH = 560;
     const OUTERWINDOWWIDTH = 685;
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
@@ -323,13 +323,9 @@ function TemperamentWidget () {
 
         var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
 
-        /*var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
-        for (var i = 0; i < MODENAMES.length; i++) {
-            if (MODENAMES[i][0].length === 0) {
-                modeselector += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
-            } else {
-                modeselector += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
-            }
+        var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
+        for (var mode in MUSICALMODES) {
+            modeselector += '<option value="' + mode + '">' + mode + '</option>';
         }
         modeselector += '</select>';
 
@@ -341,7 +337,7 @@ function TemperamentWidget () {
         cell.style.height = BUTTONSIZE + 'px';
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;*/
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick = function () {
