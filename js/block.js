@@ -3673,6 +3673,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             activeTabs.push(12);
+            activeTabs.push(12);
             
             for (var k = mode.length - 1; k >= 0; k--) {
                 activeTabs.push(last(activeTabs) - mode[k]);
