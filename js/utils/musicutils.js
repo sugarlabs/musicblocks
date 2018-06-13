@@ -1298,6 +1298,12 @@ function getNoteFromInterval (pitch, interval) {
     var majorintervalNote;
 
     function findMajorInterval (interval) {
+        //For eg. If you are asked to write a major 3rd then the letters must be 3 apart.
+        //Eg Ab - C or D - F. This is irrelevant of whether the first note is a sharp or flat, eg G# - B.
+        //Then need to work out if you need a sharp or flat on the second note.
+        //A Major 3rd is 4 semitones. So, Ab - C needs to be Ab - C; D - F is D- F#; G# - B is G# - B#.
+        //Same technique is used to code the findMajorInterval.
+
         var halfSteps = INTERVALVALUES[interval][0];
         var direction = INTERVALVALUES[interval][1];
         var note = numberToPitch(number + halfSteps);
@@ -1330,6 +1336,7 @@ function getNoteFromInterval (pitch, interval) {
         var num = interval.split(' ');
 
         if (interval == 'minor 2' || interval == 'minor 3' || interval == 'minor 6' || interval == 'minor 7') {
+            //Major intervals lowered by a half step become minor.
             var majorNote = findMajorInterval('major ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
@@ -1340,6 +1347,7 @@ function getNoteFromInterval (pitch, interval) {
             }    
         }
         if (interval == 'diminished 4' || interval == 'diminished 5' || interval == 'diminished 8') {
+            //Perfect intervals lowered by a half step are called diminished.
             var majorNote = findMajorInterval('perfect ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
@@ -1350,6 +1358,7 @@ function getNoteFromInterval (pitch, interval) {
             }
         }
         if (interval == 'augmented 2' || interval == 'augmented 3' || interval == 'augmented 6' || interval == 'augmented 7') {
+            //Major intervals raised by a half step are called augmented.
             var majorNote = findMajorInterval('major ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
@@ -1360,6 +1369,7 @@ function getNoteFromInterval (pitch, interval) {
             }
         }
         if (interval == 'augmented 1' || interval == 'augmented 4' || interval == 'augmented 5' || interval == 'augmented 8') {
+            //Perfect intervals raised by a half step are called augmented.
             var majorNote = findMajorInterval('perfect ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
@@ -1587,6 +1597,7 @@ function pitchToNumber(pitch, octave, keySignature) {
     if (len > 1) {
         if (len > 2) {
             var lastTwo = pitch.slice(len - 2);
+            //Unsure why slice is not working for double flats and double sharps.
             var lastOne = pitch.substring(1, len);
             if (lastTwo === 'bb') {
                 pitch = pitch.substring(0, 1);
