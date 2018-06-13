@@ -54,6 +54,7 @@ function PitchTimeMatrix () {
 
     this.sorted = false;
     this._notesToPlay = [];
+    this._outputAsTuplet = [];  // do we output 1/12 or 1/(3x4)?
     this._matrixHasTuplets = false;
     this._notesCounter = 0;
     this._noteStored = [];
@@ -435,7 +436,6 @@ function PitchTimeMatrix () {
         // Sort the if there are note blocks.
         this._lookForNoteBlocks();
         if (!this.sorted && this._noteBlocks) {
-            console.log('SHALL WE SORT?');
             setTimeout(function () {
                 console.log('sorting');
                 that._sort();
@@ -595,6 +595,7 @@ function PitchTimeMatrix () {
                 for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
                     tupletParam[1].push(this._logo.tupletRhythms[i][j]);
                 }
+
                 this.addTuplet(tupletParam);
                 break;
             default:
@@ -777,6 +778,7 @@ function PitchTimeMatrix () {
             } else {
                 var lcd = LCD(lcd, param[1][i]);
             }
+
             totalNoteInterval += 32 / param[1][i];
         }
 
@@ -792,6 +794,7 @@ function PitchTimeMatrix () {
         var colCount = firstRow.cells.length;
 
         var noteValue = param[0][1] / param[0][0];
+        // The tuplet is note value is calculated as #notes x note value
         var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0], this._cellScale);
 
         // Set the cells to "rest"
@@ -799,6 +802,7 @@ function PitchTimeMatrix () {
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
             this._notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][i])]);
+            this._outputAsTuplet.push([numberOfNotes, noteValue]);
         }
 
         // First, ensure that the matrix is set up for tuplets.
@@ -951,6 +955,7 @@ function PitchTimeMatrix () {
 
         for (var i = 0; i < numBeats; i++) {
             this._notesToPlay.push([['R'], noteValue]);
+            this._outputAsTuplet.push([numBeats, noteValue]);
         }
 
         var rowCount = this.rowLabels.length - this._rests;
@@ -1594,6 +1599,12 @@ function PitchTimeMatrix () {
 
             // note value is saved as a fraction
             newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+
+            // The note block might be generated from a tuplet in
+            // which case we output 1 / (3 x 4) instead of 1 / 12.
+            if (this._outputAsTuplet[i][0] !== 1) {
+                console.log(i + ': ' + this._outputAsTuplet[i][0] + 'x' + this._outputAsTuplet[i][1]);
+            }
 
             if (parseInt(note[1]) < note[1]) {
                 // dotted note
