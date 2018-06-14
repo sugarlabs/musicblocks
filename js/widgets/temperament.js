@@ -87,6 +87,8 @@ function TemperamentWidget () {
         this.notesCircle.wheelRadius = 230;
         this.notesCircle.navItemsEnabled = false;
         this.notesCircle.navAngle = 270;
+        this.notesCircle.navItemsContinuous = true;
+        this.notesCircle.navItemsCentered = false;
         this.notesCircle.slicePathFunction = slicePath().MenuSliceWithoutLine;
         this.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
         this.notesCircle.sliceSelectedPathCustom = this.notesCircle.slicePathCustom;
@@ -94,14 +96,26 @@ function TemperamentWidget () {
         var menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 3; 
         this.notesCircle.slicePathCustom.menuRadius = menuRadius;
         this.notesCircle.initWheel(labels);
+        var angle = [];
+        var baseAngle = [];
+        var sliceAngle = [];
 
         for (var i = 0; i < this.notesCircle.navItemCount; i++) {
             this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
             this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
             this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
+            angle[i] = 270 + (360 * (Math.log10(this.ratios[i]) / Math.log10(2)));
+            if (i === 0) {
+                sliceAngle[i] = 360 / this.pitchNumber;
+                baseAngle[i] = this.notesCircle.navAngle - (sliceAngle[0] / 2);
+            } else {
+                baseAngle[i] = baseAngle[i-1] + sliceAngle[i-1];
+                sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
+            }
+            this.notesCircle.navItems[i].sliceAngle = sliceAngle[i];
         }
-
         this.notesCircle.createWheel();
+
         var that = this;
         docById('wheelDiv2').style.position = 'absolute';
         docById('wheelDiv2').style.height = height + 'px';
@@ -199,13 +213,9 @@ function TemperamentWidget () {
         docById('tablebody').innerHTML += pitchNumberColumn;
 
         var startingPitch = this._logo.synth.startingPitch;
-        var t = TEMPERAMENT[this.inTemperament];
         var notesRow = [];
         var notesCell = [];
         for(var i = 0; i < this.pitchNumber; i++) {
-            this.intervals[i] = t.interval[i];
-            this.ratios[i] = t[this.intervals[i]];
-            this.ratios[i] = this.ratios[i].toFixed(2);
             notesRow[i] = docById('notes_' + i);
 
             //Pitch Number
@@ -295,7 +305,10 @@ function TemperamentWidget () {
                 str[i][0] = str[i][0].replace(SHARP, '#'); 
             }
             str[i] = str[i][0] + str[i][1];
-            this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2); 
+            this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);
+            this.intervals[i] = t.interval[i];
+            this.ratios[i] = t[this.intervals[i]];
+            this.ratios[i] = this.ratios[i].toFixed(2); 
         }
         
         this.toggleNotesButton = function () {
