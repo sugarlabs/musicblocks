@@ -573,8 +573,8 @@ const TEMPERAMENT = {
         'augmented 2': (75/64),
         'minor 3': (6/5),
         'major 3': (5/4),
-        'augmented 3': (125/96),
         'diminished 4': (32/25),
+        'augmented 3': (125/96),
         'perfect 4': (4/3),
         'augmented 4': (25/18),
         'diminished 5': (36/25),
@@ -585,11 +585,11 @@ const TEMPERAMENT = {
         'augmented 6': (125/72),
         'minor 7': (9/5),
         'major 7': (15/8),
-        'augmented 7': (125/64),
         'diminished 8': (48/25),
+        'augmented 7': (125/64),
         'perfect 8': (2/1),
         'pitchNumber': 21,
-        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'augmented 3', 'diminished 4', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'augmented 7', 'diminished 8']
+        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'augmented 3', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8', 'augmented 7']
     },
     'custom':{
         'perfect 1' : Math.pow(2, (0/12)),
