@@ -191,7 +191,7 @@ function TemperamentWidget () {
         var notesGraph = docById('notesGraph');
         var headerNotes = notesGraph.createTHead();
         var rowNotes = headerNotes.insertRow(0);
-        var menuLabels = ['Pitch Number', 'Interval', 'Ratio', 'Note', 'Frequency'] //TODO: Add mode
+        var menuLabels = ['Play Note', 'Pitch Number', 'Interval', 'Ratio', 'Note', 'Frequency'] //TODO: Add mode
         notesGraph.innerHTML = '<tbody id="tablebody"><tr id="menu"></tr></tbody>'
         docById('menu').innerHTML = '';
         
@@ -213,16 +213,43 @@ function TemperamentWidget () {
         docById('tablebody').innerHTML += pitchNumberColumn;
 
         var startingPitch = this._logo.synth.startingPitch;
+        var that = this;
         var notesRow = [];
         var notesCell = [];
+        var noteToPlay = [];
         for(var i = 0; i < this.pitchNumber; i++) {
             notesRow[i] = docById('notes_' + i);
 
-            //Pitch Number
             notesCell[i,0] = notesRow[i].insertCell(-1);
-            notesCell[i,0].innerHTML = i;
-            notesCell[i,0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            //notesCell[i,0].id = this.notes[i];
+            notesCell[i,0].innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' + i + '" data-id="' + i + '">&nbsp;&nbsp;';
+            notesCell[i,0].style.backgroundColor = MATRIXBUTTONCOLOR;
             notesCell[i,0].style.textAlign = 'center';
+
+            notesCell[i,0].onmouseover=function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            };
+
+            notesCell[i,0].onmouseout=function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            };
+
+            var playImage = docById('play_' + i);
+
+            playImage.onmouseover = function(event) {
+                this.style.cursor = 'pointer';
+            };
+
+            playImage.onclick = function(event) {
+                var pitchNumber = event.target.dataset.id;
+                that.playNote(pitchNumber);
+            };
+
+            //Pitch Number
+            notesCell[i,1] = notesRow[i].insertCell(-1);
+            notesCell[i,1].innerHTML = i;
+            notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,1].style.textAlign = 'center';
 
             //Ratio
             notesCell[i,2] = notesRow[i].insertCell(-1);
@@ -231,24 +258,31 @@ function TemperamentWidget () {
             notesCell[i,2].style.textAlign = 'center';
 
             //Interval
-            notesCell[i,1] = notesRow[i].insertCell(-1);
-            notesCell[i,1].innerHTML = this.ratios[i];
-            notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            notesCell[i,1].style.textAlign = 'center';
-
-            //Notes
             notesCell[i,3] = notesRow[i].insertCell(-1);
-            notesCell[i,3].innerHTML = this.notes[i];
+            notesCell[i,3].innerHTML = this.ratios[i];
             notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,3].style.textAlign = 'center';
 
-            //Frequency
+            //Notes
             notesCell[i,4] = notesRow[i].insertCell(-1);
-            notesCell[i,4].innerHTML = this.frequencies[i];
+            notesCell[i,4].innerHTML = this.notes[i];
             notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,4].style.textAlign = 'center';
+
+            //Frequency
+            notesCell[i,5] = notesRow[i].insertCell(-1);
+            notesCell[i,5].innerHTML = this.frequencies[i];
+            notesCell[i,5].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,5].style.textAlign = 'center';
         }
     };
+
+    this.playNote = function(pitchNumber) {
+        this._logo.resetSynth(0);
+        var duration = 1 / 2;
+        var notes = this.frequencies[pitchNumber];
+        this._logo.synth.trigger(0, notes, this._logo.defaultBPMFactor * duration, 'default', null, null);
+    }
 
     this.init = function(logo) {
     	this._logo = logo;
@@ -335,6 +369,10 @@ function TemperamentWidget () {
         }
 
         var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
+
+        addButtonCell.onclick = function(event) {
+            
+        }
 
         var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
         for (var mode in MUSICALMODES) {
