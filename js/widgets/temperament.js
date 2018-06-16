@@ -221,7 +221,6 @@ function TemperamentWidget () {
             notesRow[i] = docById('notes_' + i);
 
             notesCell[i,0] = notesRow[i].insertCell(-1);
-            //notesCell[i,0].id = this.notes[i];
             notesCell[i,0].innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' + i + '" data-id="' + i + '">&nbsp;&nbsp;';
             notesCell[i,0].style.backgroundColor = MATRIXBUTTONCOLOR;
             notesCell[i,0].style.textAlign = 'center';
@@ -247,6 +246,7 @@ function TemperamentWidget () {
 
             //Pitch Number
             notesCell[i,1] = notesRow[i].insertCell(-1);
+            notesCell[i,1].id = 'pitchNumber_' + i;
             notesCell[i,1].innerHTML = i;
             notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,1].style.textAlign = 'center';
@@ -282,7 +282,82 @@ function TemperamentWidget () {
         var duration = 1 / 2;
         var notes = this.frequencies[pitchNumber];
         this._logo.synth.trigger(0, notes, this._logo.defaultBPMFactor * duration, 'default', null, null);
-    }
+    };
+
+    this.playAll = function() {
+        this._playing = !this._playing;
+
+        this._logo.resetSynth(0);
+
+        var cell = docById('buttonsRow').cells[1];
+        if (this._playing) {
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        } else {
+            this._logo.synth.setMasterVolume(0);
+            this._logo.synth.stop();
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        }
+
+        var duration = 1 / 2;
+        var startingPitchOctave = this.notes[0][1];
+        var octaveDown = Number(startingPitchOctave) - 1;
+        var note = this.notes[0][0] + octaveDown;
+        var startPitch = this._logo.synth._getFrequency(note, true, this.inTemperament).toFixed(2);
+        var that = this;
+
+        __playLoop = function (i) {
+            if (that._playing) {
+                that._logo.synth.trigger(0, startPitch, that._logo.defaultBPMFactor * duration, 'default', null, null);
+                that.playNote(i);
+            }
+
+            if (!that.circleIsVisible) {
+                that.notesCircle.navItems[i].fillAttr = '#808080';
+                that.notesCircle.navItems[i].sliceHoverAttr.fill = '#808080';
+                that.notesCircle.navItems[i].slicePathAttr.fill = '#808080';
+                that.notesCircle.navItems[i].sliceSelectedAttr.fill = '#808080';
+                if (i !== 0) {
+                    that.notesCircle.navItems[i-1].fillAttr = '#c8C8C8';
+                    that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
+                    that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
+                    that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
+                }
+                that.notesCircle.refreshWheel();
+            } else {
+                docById('pitchNumber_' + i).style.background = MATRIXLABELCOLOR;
+                if (i !== 0) {
+                    var j = i - 1;
+                    docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                } 
+            }
+
+            i += 1;
+            if (i < that.pitchNumber && that._playing) {
+                setTimeout(function () {
+                    __playLoop(i);
+                }, that._logo.defaultBPMFactor * 1000 * duration);
+            } else {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                setTimeout(function () {
+                    if (!that.circleIsVisible) {
+                        that.notesCircle.navItems[i-1].fillAttr = '#c8C8C8';
+                        that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
+                        that.notesCircle.refreshWheel();
+                    } else {
+                        var j = i - 1;
+                        docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                    }
+                }, that._logo.defaultBPMFactor * 1000 * duration);
+                
+                that._playing = false;
+            }
+        }
+        if (this._playing) {
+            __playLoop(0);
+        }
+    };
 
     this.init = function(logo) {
     	this._logo = logo;
@@ -307,8 +382,10 @@ function TemperamentWidget () {
         var buttonTable = docById('temperamentButtonTable');
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
+        row.id = 'buttonsRow';
 
         var that = this;
+        this._playing = false;
 
         var cell = row.insertCell();
         cell.innerHTML = this.inTemperament;
@@ -322,6 +399,11 @@ function TemperamentWidget () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+
+        cell.onclick = function(event) {
+            that.playAll();
+        };
+
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         var noteCell = this._addButton(row, 'play-button.svg', ICONSIZE, _('table'));
 
@@ -372,7 +454,7 @@ function TemperamentWidget () {
 
         addButtonCell.onclick = function(event) {
             
-        }
+        };
 
         var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
         for (var mode in MUSICALMODES) {
@@ -392,6 +474,8 @@ function TemperamentWidget () {
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick = function () {
+            that._logo.synth.setMasterVolume(0);
+            that._logo.synth.stop();
             docById('temperamentDiv').style.visibility = 'hidden';
             docById('temperamentButtonsDiv').style.visibility = 'hidden';
             docById('temperamentTableDiv').style.visibility = 'hidden';
