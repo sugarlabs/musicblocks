@@ -1,6 +1,6 @@
 function TemperamentWidget () {
 	
-	const BUTTONDIVWIDTH = 560;
+	const BUTTONDIVWIDTH = 430;
     const OUTERWINDOWWIDTH = 685;
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
@@ -455,22 +455,6 @@ function TemperamentWidget () {
         addButtonCell.onclick = function(event) {
             
         };
-
-        var modeselector = '<select name="mode" id="modeLabel" style="background-color: ' + MATRIXBUTTONCOLOR + '; width: 130px; height: ' + BUTTONSIZE +'px; ">';
-        for (var mode in MUSICALMODES) {
-            modeselector += '<option value="' + mode + '">' + mode + '</option>';
-        }
-        modeselector += '</select>';
-
-        var cell = row.insertCell();
-        cell.innerHTML = modeselector;
-        cell.style.width = (2*BUTTONSIZE) + 'px';
-        cell.style.minWidth = 130 + 'px';
-        cell.style.maxWidth = 130 + 'px';
-        cell.style.height = BUTTONSIZE + 'px';
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick = function () {
