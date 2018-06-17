@@ -13,6 +13,7 @@ function TemperamentWidget () {
     this.intervals = [];
     this.ratios = [];
     this.scale = [];
+    this.scaleNotes = [];
     this.pitchNumber = 0;
     this.circleIsVisible = true;
 
@@ -188,17 +189,20 @@ function TemperamentWidget () {
             this.notesCircle.removeWheel();
         }
 
-        temperamentTableDiv.innerHTML = '<table id="notesGraph" width=' + BUTTONDIVWIDTH + '></table>'
+        temperamentTableDiv.innerHTML = '<table id="notesGraph"></table>'
         var notesGraph = docById('notesGraph');
         var headerNotes = notesGraph.createTHead();
         var rowNotes = headerNotes.insertRow(0);
-        var menuLabels = ['Play Note', 'Pitch Number', 'Interval', 'Ratio', 'Note', 'Frequency'] //TODO: Add mode
-        notesGraph.innerHTML = '<tbody id="tablebody"><tr id="menu"></tr></tbody>'
-        docById('menu').innerHTML = '';
+        var menuLabels = ['Play', 'Pitch Number', 'Interval', 'Ratio', 'Note', 'Frequency'] //TODO: Add mode
+        menuLabels.push(this.scale);
+        notesGraph.innerHTML = '<thead id="tablehead"><tr id="menu"></tr></thead><tbody id="tablebody"></tbody>'
+        var menus = '';
         
         for(var i = 0; i < menuLabels.length; i++) {
-            docById('menu').innerHTML += '<td id="menuLabels">'+ menuLabels[i] + '</td>';
+            menus += '<th id="menuLabels">'+ menuLabels[i] + '</th>';
         }
+
+        docById('menu').innerHTML = menus;
         
         var menuItems =  document.querySelectorAll("#menuLabels");
         for(var i = 0; i < menuLabels.length; i++) {
@@ -206,12 +210,21 @@ function TemperamentWidget () {
             menuItems[i].style.height = 30 + 'px';
             menuItems[i].style.textAlign = 'center';
             menuItems[i].style.fontWeight = 'bold';
+            menuItems[0].style.width = 40 + 'px';
+            menuItems[1].style.width = 40 + 'px';
+            menuItems[2].style.width = 120 + 'px';
+            menuItems[3].style.width = 60 + 'px';
+            menuItems[4].style.width = 50 + 'px';
+            menuItems[5].style.width = 80 + 'px';
+            menuItems[6].style.width = 120 + 'px';
         }
         var pitchNumberColumn = '';
         for(var i = 0; i < this.pitchNumber; i++) {
             pitchNumberColumn += '<tr id="notes_' + i + '"></tr>';
         }
-        docById('tablebody').innerHTML += pitchNumberColumn;
+
+        docById('tablebody').innerHTML += '<tr><td colspan="7"><div id="graph"><table id="tableOfNotes"></table></div></td></tr>'
+        docById('tableOfNotes').innerHTML = pitchNumberColumn;
 
         var startingPitch = this._logo.synth.startingPitch;
         var that = this;
@@ -222,6 +235,7 @@ function TemperamentWidget () {
             notesRow[i] = docById('notes_' + i);
             notesCell[i,0] = notesRow[i].insertCell(-1);
             notesCell[i,0].innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' + i + '" data-id="' + i + '">&nbsp;&nbsp;';
+            notesCell[i,0].style.width = 40 + 'px';
             notesCell[i,0].style.backgroundColor = MATRIXBUTTONCOLOR;
             notesCell[i,0].style.textAlign = 'center';
 
@@ -247,6 +261,7 @@ function TemperamentWidget () {
             //Pitch Number
             notesCell[i,1] = notesRow[i].insertCell(-1);
             notesCell[i,1].id = 'pitchNumber_' + i;
+            notesCell[i,1].style.width = 60 + 'px';
             notesCell[i,1].innerHTML = i;
             notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,1].style.textAlign = 'center';
@@ -254,26 +269,45 @@ function TemperamentWidget () {
             //Ratio
             notesCell[i,2] = notesRow[i].insertCell(-1);
             notesCell[i,2].innerHTML = this.intervals[i];
+            notesCell[i,2].style.width = 120 + 'px';
             notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,2].style.textAlign = 'center';
 
             //Interval
             notesCell[i,3] = notesRow[i].insertCell(-1);
             notesCell[i,3].innerHTML = this.ratios[i];
+            notesCell[i,3].style.width = 60 + 'px';
             notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,3].style.textAlign = 'center';
 
             //Notes
             notesCell[i,4] = notesRow[i].insertCell(-1);
             notesCell[i,4].innerHTML = this.notes[i];
+            notesCell[i,4].style.width = 50 + 'px';
             notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,4].style.textAlign = 'center';
 
             //Frequency
             notesCell[i,5] = notesRow[i].insertCell(-1);
             notesCell[i,5].innerHTML = this.frequencies[i];
+            notesCell[i,5].style.width = 80 + 'px';
             notesCell[i,5].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,5].style.textAlign = 'center';
+
+            //Mode
+            notesCell[i,6] = notesRow[i].insertCell(-1);
+            for(var j=0; j < this.scaleNotes.length; j++) {
+                if (this.notes[i][0] == this.scaleNotes[j]) {
+                    notesCell[i,6].innerHTML = j;
+                    break;
+                }
+            }
+            if (notesCell[i,6].innerHTML === '') {
+                notesCell[i,6].innerHTML = 'Non Scalar';
+            }
+            notesCell[i,6].style.width = 100 + 'px';
+            notesCell[i,6].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,6].style.textAlign = 'center';
         }
     };
 
@@ -410,24 +444,28 @@ function TemperamentWidget () {
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
         this.scale = this.scale[0] + " " + this.scale[1];
-        this.scale = _buildScale(this.scale);
-        this.scale = this.scale[0];
+        this.scaleNotes = _buildScale(this.scale);
+        this.scaleNotes = this.scaleNotes[0];
         var startingPitch = this._logo.synth.startingPitch;
         var str = [];
+        var note = [];
 
         for(var i=0; i < this.pitchNumber; i++) {
             str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
             this.notes[i] = str[i];
+            note[i] = str[i][0];
+
             if (str[i][0].substring(1, str[i][0].length) === FLAT || str[i][0].substring(1, str[i][0].length) === 'b' ) {
-                str[i][0] = str[i][0].replace(FLAT, 'b');
+                note[i] = str[i][0].replace(FLAT, 'b');
             } else if (str[i][0].substring(1, str[i][0].length) === SHARP || str[i][0].substring(1, str[i][0].length) === '#' ) {
-                str[i][0] = str[i][0].replace(SHARP, '#'); 
+                note[i] = str[i][0].replace(SHARP, '#'); 
             }
-            str[i] = str[i][0] + str[i][1];
+
+            str[i] = note[i] + str[i][1];
             this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);
             this.intervals[i] = t.interval[i];
             this.ratios[i] = t[this.intervals[i]];
-            this.ratios[i] = this.ratios[i].toFixed(2); 
+            this.ratios[i] = this.ratios[i].toFixed(2);
         }
         
         this.toggleNotesButton = function () {
