@@ -12,6 +12,7 @@ function TemperamentWidget () {
     this.frequencies = [];
     this.intervals = [];
     this.ratios = [];
+    this.scale = [];
     this.pitchNumber = 0;
     this.circleIsVisible = true;
 
@@ -219,7 +220,6 @@ function TemperamentWidget () {
         var noteToPlay = [];
         for(var i = 0; i < this.pitchNumber; i++) {
             notesRow[i] = docById('notes_' + i);
-
             notesCell[i,0] = notesRow[i].insertCell(-1);
             notesCell[i,0].innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' + i + '" data-id="' + i + '">&nbsp;&nbsp;';
             notesCell[i,0].style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -409,6 +409,9 @@ function TemperamentWidget () {
 
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
+        this.scale = this.scale[0] + " " + this.scale[1];
+        this.scale = _buildScale(this.scale);
+        this.scale = this.scale[0];
         var startingPitch = this._logo.synth.startingPitch;
         var str = [];
 

@@ -3338,12 +3338,17 @@ function Logo () {
 
             that.insideTemperament = true;
             that.temperament.inTemperament = args[0];
+            var scale = [];
 
             if (that.blocks.blockList[that.blocks.blockList[blk].connections[2]].name === 'pitch') {
                 var pitchBlock = that.blocks.blockList[that.blocks.blockList[blk].connections[2]];
                 var note = that.blocks.blockList[pitchBlock.connections[1]].value;
                 var octave = that.blocks.blockList[pitchBlock.connections[2]].value;
+                var setKey = that.blocks.blockList[pitchBlock.connections[3]];
+                scale[0] = that.blocks.blockList[setKey.connections[1]].value;
+                scale[1] = that.blocks.blockList[setKey.connections[2]].value;
                 that.synth.startingPitch = note + octave;
+                that.temperament.scale = scale;
             }
 
             var listenerName = '_temperament_' + turtle;
