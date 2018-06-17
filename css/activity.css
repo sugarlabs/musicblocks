@@ -769,6 +769,11 @@ input.timbreName {
     margin-left: 53px;
 }
 
+#graph {
+    overflow-y: scroll;
+    height: 340px;
+}
+
 .popup {
     position: absolute;
     -webkit-user-select: none;
