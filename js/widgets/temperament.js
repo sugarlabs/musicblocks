@@ -16,6 +16,7 @@ function TemperamentWidget () {
     this.scaleNotes = [];
     this.pitchNumber = 0;
     this.circleIsVisible = true;
+    this.playbackForward = true;
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -219,7 +220,7 @@ function TemperamentWidget () {
             menuItems[6].style.width = 120 + 'px';
         }
         var pitchNumberColumn = '';
-        for(var i = 0; i < this.pitchNumber; i++) {
+        for(var i = 0; i <= this.pitchNumber; i++) {
             pitchNumberColumn += '<tr id="notes_' + i + '"></tr>';
         }
 
@@ -231,7 +232,7 @@ function TemperamentWidget () {
         var notesRow = [];
         var notesCell = [];
         var noteToPlay = [];
-        for(var i = 0; i < this.pitchNumber; i++) {
+        for(var i = 0; i <= this.pitchNumber; i++) {
             notesRow[i] = docById('notes_' + i);
             notesCell[i,0] = notesRow[i].insertCell(-1);
             notesCell[i,0].innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' + i + '" data-id="' + i + '">&nbsp;&nbsp;';
@@ -266,59 +267,102 @@ function TemperamentWidget () {
             notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
             notesCell[i,1].style.textAlign = 'center';
 
-            //Ratio
-            notesCell[i,2] = notesRow[i].insertCell(-1);
-            notesCell[i,2].innerHTML = this.intervals[i];
-            notesCell[i,2].style.width = 120 + 'px';
-            notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            notesCell[i,2].style.textAlign = 'center';
+            if (i === this.pitchNumber) {
+                //Ratio
+                notesCell[i,2] = notesRow[i].insertCell(-1);
+                notesCell[i,2].innerHTML = 'perfect 8';
+                notesCell[i,2].style.width = 120 + 'px';
+                notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,2].style.textAlign = 'center';
 
-            //Interval
-            notesCell[i,3] = notesRow[i].insertCell(-1);
-            notesCell[i,3].innerHTML = this.ratios[i];
-            notesCell[i,3].style.width = 60 + 'px';
-            notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            notesCell[i,3].style.textAlign = 'center';
+                //Interval
+                notesCell[i,3] = notesRow[i].insertCell(-1);
+                notesCell[i,3].innerHTML = 2;
+                notesCell[i,3].style.width = 60 + 'px';
+                notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,3].style.textAlign = 'center';
 
-            //Notes
-            notesCell[i,4] = notesRow[i].insertCell(-1);
-            notesCell[i,4].innerHTML = this.notes[i];
-            notesCell[i,4].style.width = 50 + 'px';
-            notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            notesCell[i,4].style.textAlign = 'center';
+                //Notes
+                notesCell[i,4] = notesRow[i].insertCell(-1);
+                notesCell[i,4].innerHTML = this.notes[0][0] + (Number(this.notes[0][1]) + 1);
+                notesCell[i,4].style.width = 50 + 'px';
+                notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,4].style.textAlign = 'center';
 
-            //Frequency
-            notesCell[i,5] = notesRow[i].insertCell(-1);
-            notesCell[i,5].innerHTML = this.frequencies[i];
-            notesCell[i,5].style.width = 80 + 'px';
-            notesCell[i,5].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            notesCell[i,5].style.textAlign = 'center';
+                //Frequency
+                notesCell[i,5] = notesRow[i].insertCell(-1);
+                notesCell[i,5].innerHTML = this.frequencies[0] * 2;
+                notesCell[i,5].style.width = 80 + 'px';
+                notesCell[i,5].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,5].style.textAlign = 'center'; 
 
-            //Mode
-            notesCell[i,6] = notesRow[i].insertCell(-1);
-            for(var j=0; j < this.scaleNotes.length; j++) {
-                if (this.notes[i][0] == this.scaleNotes[j]) {
-                    notesCell[i,6].innerHTML = j;
-                    break;
+                //Mode
+                notesCell[i,5] = notesRow[i].insertCell(-1);
+                notesCell[i,5].innerHTML = 7;
+                notesCell[i,5].style.width = 80 + 'px';
+                notesCell[i,5].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,5].style.textAlign = 'center'; 
+            } else {
+               //Ratio
+                notesCell[i,2] = notesRow[i].insertCell(-1);
+                notesCell[i,2].innerHTML = this.intervals[i];
+                notesCell[i,2].style.width = 120 + 'px';
+                notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,2].style.textAlign = 'center';
+
+                //Interval
+                notesCell[i,3] = notesRow[i].insertCell(-1);
+                notesCell[i,3].innerHTML = this.ratios[i];
+                notesCell[i,3].style.width = 60 + 'px';
+                notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,3].style.textAlign = 'center';
+
+                //Notes
+                notesCell[i,4] = notesRow[i].insertCell(-1);
+                notesCell[i,4].innerHTML = this.notes[i];
+                notesCell[i,4].style.width = 50 + 'px';
+                notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,4].style.textAlign = 'center';
+
+                //Frequency
+                notesCell[i,5] = notesRow[i].insertCell(-1);
+                notesCell[i,5].innerHTML = this.frequencies[i];
+                notesCell[i,5].style.width = 80 + 'px';
+                notesCell[i,5].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,5].style.textAlign = 'center'; 
+
+                //Mode
+                notesCell[i,6] = notesRow[i].insertCell(-1);
+                for(var j=0; j < this.scaleNotes.length; j++) {
+                    if (this.notes[i][0] == this.scaleNotes[j]) {
+                        notesCell[i,6].innerHTML = j;
+                        break;
+                    }
                 }
+                if (notesCell[i,6].innerHTML === '') {
+                    notesCell[i,6].innerHTML = 'Non Scalar';
+                }
+                notesCell[i,6].style.width = 100 + 'px';
+                notesCell[i,6].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,6].style.textAlign = 'center';
             }
-            if (notesCell[i,6].innerHTML === '') {
-                notesCell[i,6].innerHTML = 'Non Scalar';
-            }
-            notesCell[i,6].style.width = 100 + 'px';
-            notesCell[i,6].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            notesCell[i,6].style.textAlign = 'center';
         }
     };
 
     this.playNote = function(pitchNumber) {
         this._logo.resetSynth(0);
         var duration = 1 / 2;
-        var notes = this.frequencies[pitchNumber];
+        if (pitchNumber === this.pitchNumber) {
+            var notes = this.frequencies[0] * 2;
+        } else {
+            var notes = this.frequencies[pitchNumber];
+        }
         this._logo.synth.trigger(0, notes, this._logo.defaultBPMFactor * duration, 'default', null, null);
     };
 
     this.playAll = function() {
+        var p = 0;
+        this.playbackForward = true;
         this._playing = !this._playing;
 
         this._logo.resetSynth(0);
@@ -340,51 +384,91 @@ function TemperamentWidget () {
         var that = this;
 
         __playLoop = function (i) {
+            if (i === that.pitchNumber) {
+                that.playbackForward = false;
+            }
+            if (i === 0) {
+                p++;
+            }
             if (that._playing) {
                 that._logo.synth.trigger(0, startPitch, that._logo.defaultBPMFactor * duration, 'default', null, null);
                 that.playNote(i);
             }
 
             if (!that.circleIsVisible) {
-                that.notesCircle.navItems[i].fillAttr = '#808080';
-                that.notesCircle.navItems[i].sliceHoverAttr.fill = '#808080';
-                that.notesCircle.navItems[i].slicePathAttr.fill = '#808080';
-                that.notesCircle.navItems[i].sliceSelectedAttr.fill = '#808080';
-                if (i !== 0) {
-                    that.notesCircle.navItems[i-1].fillAttr = '#c8C8C8';
-                    that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
-                    that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
-                    that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
+                if (i === that.pitchNumber) {
+                    that.notesCircle.navItems[0].fillAttr = '#808080';
+                    that.notesCircle.navItems[0].sliceHoverAttr.fill = '#808080';
+                    that.notesCircle.navItems[0].slicePathAttr.fill = '#808080';
+                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = '#808080';
+                } else {
+                    that.notesCircle.navItems[i].fillAttr = '#808080';
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill = '#808080';
+                    that.notesCircle.navItems[i].slicePathAttr.fill = '#808080';
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = '#808080';
                 }
+                
+                if (that.playbackForward == false && i < that.pitchNumber) {
+                    if (i === that.pitchNumber - 1) {
+                        that.notesCircle.navItems[0].fillAttr = '#c8C8C8';
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[0].slicePathAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = '#c8C8C8';
+                    } else {
+                        that.notesCircle.navItems[i+1].fillAttr = '#c8C8C8';
+                        that.notesCircle.navItems[i+1].sliceHoverAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[i+1].slicePathAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[i+1].sliceSelectedAttr.fill = '#c8C8C8';
+                    }
+                } else {
+                    if (i !== 0) {
+                        that.notesCircle.navItems[i-1].fillAttr = '#c8C8C8';
+                        that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
+                        that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
+                    }
+                }  
+
                 that.notesCircle.refreshWheel();
             } else {
                 docById('pitchNumber_' + i).style.background = MATRIXLABELCOLOR;
-                if (i !== 0) {
-                    var j = i - 1;
+                if (that.playbackForward == false && i < that.pitchNumber) {
+                    var j = i + 1;
                     docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
-                } 
+                } else {
+                    if (i !== 0) {
+                        var j = i - 1;
+                        docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                    }
+                }     
             }
 
-            i += 1;
-            if (i < that.pitchNumber && that._playing) {
+            if (that.playbackForward) {
+                i += 1;
+            } else {
+                i -= 1;
+            }
+
+            if (i <= that.pitchNumber && i >= 0 && that._playing && p < 2) {
                 setTimeout(function () {
                     __playLoop(i);
                 }, that._logo.defaultBPMFactor * 1000 * duration);
             } else {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                setTimeout(function () {
-                    if (!that.circleIsVisible) {
-                        that.notesCircle.navItems[i-1].fillAttr = '#c8C8C8';
-                        that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
-                        that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
-                        that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
-                        that.notesCircle.refreshWheel();
-                    } else {
-                        var j = i - 1;
-                        docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
-                    }
-                }, that._logo.defaultBPMFactor * 1000 * duration);
-                
+                if (i !== -1) {
+                    setTimeout(function () {
+                        if (!that.circleIsVisible) {
+                            that.notesCircle.navItems[i-1].fillAttr = '#c8C8C8';
+                            that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
+                            that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
+                            that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
+                            that.notesCircle.refreshWheel();   
+                        } else {
+                            var j = i - 1;
+                            docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                        }
+                    }, that._logo.defaultBPMFactor * 1000 * duration); 
+                }
                 that._playing = false;
             }
         }
