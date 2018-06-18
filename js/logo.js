@@ -9698,8 +9698,10 @@ function Logo () {
                 var x = that.turtles.turtleList[turtle].container.x;
                 var y = that.turtles.turtleList[turtle].container.y;
                 that.refreshCanvas();
-                var ctx = that.canvas.getContext('2d');
-                var imgData = ctx.getImageData(x, y, 1, 1).data;
+                var canvas = docById('myCanvas');
+                var ctx = canvas.getContext('2d');  // that.canvas.getContext('2d');
+                var imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;// (x - 27, y - 27, 1, 1).data;
+                console.log('(' + Math.floor(x) + ', ' + Math.floor(y) + '): ' + imgData[0] + ', ' + imgData[1] + ', ' + imgData[2] + ' ' + imgData[3]);
                 var color = searchColors(imgData[0], imgData[1], imgData[2]);
                 if (imgData[3] === 0) {
                     color = body.style.background.substring(body.style.background.indexOf('(') + 1, body.style.background.lastIndexOf(')')).split(/,\s*/),
@@ -10519,31 +10521,30 @@ function Logo () {
     };
 
     this.updateNotation = function (note, duration, turtle, insideChord, drum, split) {
+        // Note: At this point, the note of duration "duration" has
+        // already been added to notesPlayed.
+
         // Don't split the note if we are already splitting the note.
         if (split == undefined) {
             split = true;
         }
 
+
         // Check to see if this note straddles a measure boundary.
-        if (this.pickupPOW2[turtle]) {
-            var a = this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] - this.pickup[turtle];
-        } else {
-            var a = this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] + (1 - this.pickup[turtle]);
-        }
+	var durationTime = 1 / duration;
+        var beatsIntoMeasure = (((this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] - this.pickup[turtle] - (durationTime)) * this.noteValuePerBeat[turtle]) % this.beatsPerMeasure[turtle]);
+        var timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
+        var timeLeftInMeasure = (this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle]) - timeIntoMeasure;
 
-        var b = this.noteValuePerBeat[turtle] / this.beatsPerMeasure[turtle];
-        var c = a * b;
-        var measureValue = Math.floor(a * b) + 1;
-        var d = (a * b) + 1 - measureValue;
-        var d2 = (1 / duration) - d;
-
-        // If the note won't fit in this measure, split it with a tie.
-        if (split && d > 0.000000001 && d2 > 0.000000001 && b > 0 && duration > 0 && 1 / duration > d) {
+        if (split && durationTime > timeLeftInMeasure) {
+            var d = durationTime - timeLeftInMeasure;
+            var d2 = timeLeftInMeasure;        
+            var b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
             console.log('splitting note across measure boundary.');
             var obj = rationalToFraction(d);
-            var obj2 = rationalToFraction(d2);
 
-            if (obj2[0] > 0) {
+            if (d2 > 0) {
+		// Check to see if the note straddles multiple measures.
                 var i = 0;
                 while (d2 > b) {
                     i += 1;
@@ -10551,32 +10552,33 @@ function Logo () {
                 }
 
                 var obj2 = rationalToFraction(d2);
-                console.log(obj2[0] + '/' + obj2[1]);
+                // console.log(obj2[0] + '/' + obj2[1]);
                 this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 if (i > 0 || obj[0] > 0) {
                     this.notationInsertTie(turtle);
                     this.notationDrumStaging[turtle].push('tie');
-                    var obj2 = rationalToFraction(b);
+                    var obj2 = rationalToFraction(1 / b);
                 }
 
+                // Add any measures we straddled.
                 while (i > 0) {
                     i -= 1;
-                    console.log(obj2[0] + '/' + obj2[1]);
+                    // console.log(obj2[0] + '/' + obj2[1]);
                     this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                     if (obj[0] > 0) {
                         this.notationInsertTie(turtle);
                         this.notationDrumStaging[turtle].push('tie');
                     }
                 }
-
             }
 
             if (obj[0] > 0) {
-                console.log(obj[0] + '/' + obj[1]);
+                // console.log(obj[0] + '/' + obj[1]);
                 this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
             }
 
-            this.notesPlayed[turtle]  = rationalSum(this.notesPlayed[turtle], [-obj2[0], obj2[1]]);
+            // console.log(rationalSum(this.notesPlayed[turtle], [-obj2[1], obj2[0]]) + ' [' + -obj2[1] + ', ' + obj2[0] + ']');
+            this.notesPlayed[turtle]  = rationalSum(this.notesPlayed[turtle], [-obj2[1], obj2[0]]);
             return;
         }
 
