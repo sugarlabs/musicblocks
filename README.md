@@ -82,4 +82,4 @@ Please consider contributing to the project, with your ideas, your
 music, your lesson plans, your artwork, and your code.
 
 Programmers, please follow these general
-[guidelines for contributions](https://github.com/sugarlabs/sugar-docs/blob/master/contributing.md).
+[guidelines for contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
