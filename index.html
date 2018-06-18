@@ -7,7 +7,9 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
     <link rel="stylesheet" href="css/activity.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/keyboard.css">
 
+    
     <noscript>
     Javascript is required to view this page.
     </noscript>
@@ -65,6 +67,9 @@
     </script>
 
     <script src="lib/tweenjs.min.js">
+    </script>
+
+    <script src="js/widgets/musickeyboard.js">
     </script>
 
     <!--
@@ -294,6 +299,50 @@
       <div id="sliderInCell">
       </div>
 
+        <!--Keyboard stuff (it's pretty ugly) -->
+    <input type="button" style="position: fixed; bottom: 0px; right: 0px; height: 50px; width: 100px; font-size: 18pt; z-index: 100;" value="Toggle Keyboard" onclick="toggleKeyboard()" />
+    <div id="keyboardHolder" onload="setupKeyboard ()" style="position: fixed; bottom: 0px; left: 0px; height:150px; width: 100%; background-color: white; margin: 0px;">
+        <span>Starting Note</span>
+        <select id="firstNote" class="keySelect" onchange="changeKeys()">
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="A" selected>A</option>
+            <option value="B">B</option>
+        </select>
+        <input type="number" min="0" max="7" step="1" id="firstOctave" onchange="changeKeys()" value="0"/>
+        <span>Ending Note</span>
+        <select id="secondNote" class="keySelect" onchange="changeKeys()">
+            <option value="C" selected>C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+        </select>
+        <input type="number" min="2" max="8" step="1" id="secondOctave" onchange="changeKeys()" value="7"/>
+        <input type="button" value="Deselect all notes" onclick="deselect();" />
+        <input type="button" value="Generate Pitch Blocks!" onclick="handleKeyboardPitches(selected); deselect();" /><br>
+        <!--Actual Keyboard-->
+        <div id="keyboard">
+            
+            <table class="white">
+                <tr id="white">
+                     
+                </tr>
+            </table>
+            <table class="black">
+                <tr id="black">
+                        
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+
       <div id="BPMInput">
       </div>
 
@@ -318,9 +367,9 @@
       </div>
 
       <div id="pastecode">
-	<input type="text" name="paste" id="paste" class="ui-autocomplete" placeholder="Paste Music Blocks code here">
-	<ul class="matches"></ul>
-	<input onkeypress="doPaste()" type="submit" value="">
+  <input type="text" name="paste" id="paste" class="ui-autocomplete" placeholder="Paste Music Blocks code here">
+  <ul class="matches"></ul>
+  <input onkeypress="doPaste()" type="submit" value="">
       </div>
       
       <div id="myProgress">
@@ -343,6 +392,9 @@
     </div>
 
     </div> <!-- hideContents -->
+
+
+
 
   </body>
 

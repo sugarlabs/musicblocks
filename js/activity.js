@@ -123,6 +123,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         'widgets/pitchstaircase',
         'widgets/tempo',
         'widgets/pitchslider',
+        'widgets/musickeyboard',
         'widgets/timbre',
         'activity/lilypond',
         'activity/abc'
@@ -3319,6 +3320,7 @@ define(MYDEFINES, function (compatibility) {
                     case 'pitchstaircase':
                     case 'tempo':
                     case 'pitchslider':
+                    case 'musickeyboard':
                     case 'modewidget':
                     case 'status':
                         var args = {
