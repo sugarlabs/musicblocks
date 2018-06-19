@@ -7306,6 +7306,7 @@ function Logo () {
 
                 if (that.inNoteBlock[turtle].length === that.whichNoteToCount[turtle]) {
                     that.notesPlayed[turtle] = rationalSum(that.notesPlayed[turtle], [1, noteValue]);
+                    console.log('notes played so far = ' + that.notesPlayed[turtle][0] + '/' + that.notesPlayed[turtle][1]);
                 }
 
                 var notes = [];
@@ -10529,7 +10530,6 @@ function Logo () {
             split = true;
         }
 
-
         // Check to see if this note straddles a measure boundary.
 	var durationTime = 1 / duration;
         var beatsIntoMeasure = (((this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] - this.pickup[turtle] - (durationTime)) * this.noteValuePerBeat[turtle]) % this.beatsPerMeasure[turtle]);
@@ -10552,7 +10552,6 @@ function Logo () {
                 }
 
                 var obj2 = rationalToFraction(d2);
-                // console.log(obj2[0] + '/' + obj2[1]);
                 this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 if (i > 0 || obj[0] > 0) {
                     this.notationInsertTie(turtle);
@@ -10563,7 +10562,6 @@ function Logo () {
                 // Add any measures we straddled.
                 while (i > 0) {
                     i -= 1;
-                    // console.log(obj2[0] + '/' + obj2[1]);
                     this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                     if (obj[0] > 0) {
                         this.notationInsertTie(turtle);
@@ -10573,12 +10571,9 @@ function Logo () {
             }
 
             if (obj[0] > 0) {
-                // console.log(obj[0] + '/' + obj[1]);
                 this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
             }
 
-            // console.log(rationalSum(this.notesPlayed[turtle], [-obj2[1], obj2[0]]) + ' [' + -obj2[1] + ', ' + obj2[0] + ']');
-            this.notesPlayed[turtle]  = rationalSum(this.notesPlayed[turtle], [-obj2[1], obj2[0]]);
             return;
         }
 
