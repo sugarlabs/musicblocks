@@ -3225,7 +3225,17 @@ function Logo () {
         case 'musickeyboard':
             if (that.musicKeyboard == null) {
                 that.musicKeyboard = new MusicKeyboard();
+        
             }
+
+            
+            var x = document.getElementById("keyboardHolder");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+
             break;
         case 'pitchdrummatrix':
             if (args.length === 1) {
