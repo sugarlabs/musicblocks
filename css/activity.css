@@ -774,6 +774,14 @@ input.timbreName {
     height: 340px;
 }
 
+#userEdit input {
+    height: 40px;
+    width: 40px; 
+    background: rgb(195, 116, 233);
+    border: 1px solid black;
+    text-align: center; 
+}
+
 .popup {
     position: absolute;
     -webkit-user-select: none;

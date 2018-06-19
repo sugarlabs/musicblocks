@@ -184,7 +184,7 @@ function TemperamentWidget () {
     this._graphOfNotes = function (){  //TODO : Improve UI.
         this.circleIsVisible = true;
         this.toggleNotesButton();
-        temperamentTable.remove();
+        temperamentTableDiv.innerHTML = '';
         if (docById('wheelDiv2') != null) {
             docById('wheelDiv2').style.display = 'none';
             this.notesCircle.removeWheel();
@@ -347,6 +347,59 @@ function TemperamentWidget () {
                 notesCell[i,6].style.textAlign = 'center';
             }
         }
+    };
+
+    this.edit = function() {
+        this._logo.synth.setMasterVolume(0);
+        this._logo.synth.stop();
+        var that = this;
+        if (docById('wheelDiv2') != null) {
+            docById('wheelDiv2').style.display = 'none';
+            this.notesCircle.removeWheel();
+        }
+        temperamentTableDiv.innerHTML = '';
+        temperamentTableDiv.innerHTML = '<table id="editOctave" width="' + BUTTONDIVWIDTH + '"><tbody><tr id="menu"></tr></tbody></table>';
+        var editMenus = ['Equal', 'Ratios', 'Arbitrary', 'Ocatve Space'];
+        var menus = '';
+
+        for(var i = 0; i < editMenus.length; i++) {
+            menus += '<td id="editMenus">'+ editMenus[i] + '</td>';
+        }
+
+        docById('menu').innerHTML = menus;
+        docById('editOctave').innerHTML += '<tr><td colspan="4" id="userEdit"></td></tr>';
+        var menuItems =  document.querySelectorAll("#editMenus");
+        for(var i = 0; i < editMenus.length; i++) {
+            menuItems[i].style.background = MATRIXBUTTONCOLOR; 
+            menuItems[i].style.height = 30 + 'px';
+            menuItems[i].style.textAlign = 'center';
+            menuItems[i].style.fontWeight = 'bold';
+        }
+
+        menuItems[0].onclick = function(event) {
+            menuItems[0].style.background = '#c8C8C8';
+            that.equalEdit();
+        }
+    }
+
+    this.equalEdit = function() {
+        var equalEdit = docById('userEdit');
+        equalEdit.style.backgroundColor = '#c8C8C8';
+        equalEdit.innerHTML = '<br>Pitch Number &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" value="0"></input> &nbsp;&nbsp; To &nbsp;&nbsp; <input type="text" value="0"></input><br><br>';
+        equalEdit.innerHTML += 'Number of Divisions &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" value="' + this.pitchNumber + '"></input>';
+        equalEdit.style.paddingLeft = '80px';
+        
+        var divAppend = document.createElement('div');
+        divAppend.id = 'divAppend';
+        divAppend.innerHTML = 'Done';
+        divAppend.style.textAlign = 'center';
+        divAppend.style.paddingTop = '5px';
+        divAppend.style.marginLeft = '-80px';
+        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        divAppend.style.height = '25px';
+        divAppend.style.marginTop = '40px';
+        divAppend.style.overflow = 'auto';
+        equalEdit.append(divAppend);
     };
 
     this.playNote = function(pitchNumber) {
@@ -578,7 +631,7 @@ function TemperamentWidget () {
         var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
 
         addButtonCell.onclick = function(event) {
-            
+            that.edit();
         };
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
