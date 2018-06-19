@@ -636,7 +636,10 @@ saveLilypondOutput = function(logo) {
             // logo.notationOutput += '\n   \\remove "Note_heads_engraver"\n   \\consists "Completion_heads_engraver"\n   \\remove "Rest_engraver"\n   \\consists "Completion_rest_engraver"\n'
 
             logo.notationOutput += '\n} { \\clef "' + last(clef) + '" \\' + instrumentName.replace(/ /g, '_').replace('.', '') + ' }\n\n';
+        } else {
+            clef.push('');
         }
+
         c += 1;
     }
 
