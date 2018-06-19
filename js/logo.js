@@ -7306,7 +7306,6 @@ function Logo () {
 
                 if (that.inNoteBlock[turtle].length === that.whichNoteToCount[turtle]) {
                     that.notesPlayed[turtle] = rationalSum(that.notesPlayed[turtle], [1, noteValue]);
-                    console.log('notes played so far = ' + that.notesPlayed[turtle][0] + '/' + that.notesPlayed[turtle][1]);
                 }
 
                 var notes = [];
@@ -10531,7 +10530,7 @@ function Logo () {
         }
 
         // Check to see if this note straddles a measure boundary.
-	var durationTime = 1 / duration;
+        var durationTime = 1 / duration;
         var beatsIntoMeasure = (((this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] - this.pickup[turtle] - (durationTime)) * this.noteValuePerBeat[turtle]) % this.beatsPerMeasure[turtle]);
         var timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
         var timeLeftInMeasure = (this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle]) - timeIntoMeasure;
@@ -10544,7 +10543,7 @@ function Logo () {
             var obj = rationalToFraction(d);
 
             if (d2 > 0) {
-		// Check to see if the note straddles multiple measures.
+                // Check to see if the note straddles multiple measures.
                 var i = 0;
                 while (d2 > b) {
                     i += 1;
@@ -10554,8 +10553,10 @@ function Logo () {
                 var obj2 = rationalToFraction(d2);
                 this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 if (i > 0 || obj[0] > 0) {
-                    this.notationInsertTie(turtle);
-                    this.notationDrumStaging[turtle].push('tie');
+                    if (note[0] !== 'R') {  // Don't tie rests
+                        this.notationInsertTie(turtle);
+                        this.notationDrumStaging[turtle].push('tie');
+                    }
                     var obj2 = rationalToFraction(1 / b);
                 }
 
@@ -10564,8 +10565,10 @@ function Logo () {
                     i -= 1;
                     this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                     if (obj[0] > 0) {
-                        this.notationInsertTie(turtle);
-                        this.notationDrumStaging[turtle].push('tie');
+                        if (note[0] !== 'R') {  // Don't tie rests
+                            this.notationInsertTie(turtle);
+                            this.notationDrumStaging[turtle].push('tie');
+                        }
                     }
                 }
             }
