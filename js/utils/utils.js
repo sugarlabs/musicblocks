@@ -403,6 +403,11 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
     }
 
     // Create the plugin protoblocks.
+    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
+    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
+    // Maybe:
+    // var g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
+
     if ('BLOCKPLUGINS' in obj) {
         for (var block in obj['BLOCKPLUGINS']) {
             console.log('adding plugin block ' + block);
