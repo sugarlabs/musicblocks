@@ -1,5 +1,5 @@
 #keyboard {
-    height: 125px;
+    height: 135px;
     overflow-x: scroll;
     overflow-y: hidden;
     white-space: nowrap;
@@ -15,14 +15,14 @@ table.white {
     position: absolute;
     top: 0px;
     left: 0px;
-    height: 100px;
+    height: 120px;
     border-spacing: 0px 0px;
 }
 table.black {
     position: absolute;
     border-collapse: separate;
     border-spacing: 20px 0px;
-    height: 50px;
+    height: 60px;
     top: 0px;
     left: 30px;
 }
