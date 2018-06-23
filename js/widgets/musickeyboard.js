@@ -107,7 +107,7 @@ function MusicKeyboard() {
         console.log(note1+oct1+"-"+note2+oct2);
     }
 
-    keyboard.addEventListener("click", function (e) {
+    keyboard.addEventListener("mousedown", function (e) {
         var target = e.target;
         if(target.tagName == "TD") {
             if((target.style.backgroundColor != "lightblue") && (target.style.backgroundColor != "pink")) {
@@ -160,10 +160,13 @@ function MusicKeyboard() {
      
     function handleKeyboard (key) {
         //Tone can't do special sharps, need # isntead of ♯
+        console.log('IIIInside handleKeyboard function... value of key ' +key);
         var noSharp = key;
         if(key[1] == "♯") {
             noSharp = key[0]+"#"+key[2];
         }
+
+
         synth.triggerAttackRelease(noSharp, "8n");
     }
      
