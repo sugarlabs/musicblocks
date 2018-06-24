@@ -147,7 +147,7 @@ function TemperamentWidget () {
         docById('wheelDiv2').style.left = canvas.style.x + 'px';
         docById('wheelDiv2').style.top = canvas.style.y + 'px';
 
-        docById('wheelDiv2').addEventListener('mouseover', function(e) {
+        docById('wheelDiv2').addEventListener('click', function(e) {
             if (that.inTemperament !== 'custom') {
                 that.showNoteInfo(e);
             }   
@@ -162,44 +162,38 @@ function TemperamentWidget () {
 
     this.showNoteInfo = function(event) {
         for(var i=0; i< this.notesCircle.navItemCount; i++) {
-            if(event.target.id == 'wheelnav-wheelDiv2-slice-' + i){
-                if (this.lastTriggered === i) {
-                    event.preventDefault();
-                } else {
-                    var x = event.clientX - docById('wheelDiv2').getBoundingClientRect().left;
-                    var y = event.clientY - docById('wheelDiv2').getBoundingClientRect().top;
-                    var frequency = this.frequencies[i];
-                    var that = this;
-                    if (docById('noteInfo') !== null) {
-                        docById('noteInfo').remove();
-                    }
-                    //this._logo.synth.inTemperament = this.inTemperament;
-                    docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>' 
-                    docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' + i + '">';
-                    docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
-                    docById('noteInfo').innerHTML += '&nbsp Note : ' + this.notes[i] + '<br>';
-                    docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
+            if(event.target.id == 'wheelnav-wheelDiv2-slice-' + i || event.target.innerHTML == i && event.target.innerHTML !== ''){
+                var x = event.clientX - docById('wheelDiv2').getBoundingClientRect().left;
+                var y = event.clientY - docById('wheelDiv2').getBoundingClientRect().top;
+                var frequency = this.frequencies[i];
+                var that = this;
+                if (docById('noteInfo') !== null) {
+                    docById('noteInfo').remove();
+                }
+                //this._logo.synth.inTemperament = this.inTemperament;
+                docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>' 
+                docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' + i + '">';
+                docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
+                docById('noteInfo').innerHTML += '&nbsp Note : ' + this.notes[i] + '<br>';
+                docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
 
-                    docById('close').onclick = function() {
-                        docById('noteInfo').remove();
-                    }
+                docById('close').onclick = function() {
+                    docById('noteInfo').remove();
+                }
 
-                    docById('edit').onclick = function(event) {
-                        var index = event.target.dataset.message;
-                        docById('frequency').innerHTML = '&nbsp Frequency : &nbsp<input type = "text" id="changedFrequency" value=' + frequency + ' style="position:absolute; width:52px;" data-message= ' + index + '></input>'
-                        docById('changedFrequency').addEventListener ("mouseout", changeFrequency, false);
-                    }
+                docById('edit').onclick = function(event) {
+                    var index = event.target.dataset.message;
+                    docById('frequency').innerHTML = '&nbsp Frequency : &nbsp<input type = "text" id="changedFrequency" value=' + frequency + ' style="position:absolute; width:52px;" data-message= ' + index + '></input>'
+                    docById('changedFrequency').addEventListener ("mouseout", changeFrequency, false);
+                }
 
-                    function changeFrequency(event) {
-                        var j = event.target.dataset.message;
-                        frequency = docById('changedFrequency').value;
-                        docById('changedFrequency').remove();
-                        docById('frequency').innerHTML = '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';   
-                        that.frequencies[j] = frequency;
-                    }
-
-                    this.lastTriggered = i;
-                }   
+                function changeFrequency(event) {
+                    var j = event.target.dataset.message;
+                    frequency = docById('changedFrequency').value;
+                    docById('changedFrequency').remove();
+                    docById('frequency').innerHTML = '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';   
+                    that.frequencies[j] = frequency;
+                }  
             }
         }
     };
@@ -427,13 +421,24 @@ function TemperamentWidget () {
             menuItems[i].style.fontWeight = 'bold';
         }
 
+        menuItems[0].style.background = '#c8C8C8';
+        that.equalEdit();
+
         menuItems[0].onclick = function(event) {
+            menuItems[1].style.background = MATRIXBUTTONCOLOR;
             menuItems[0].style.background = '#c8C8C8';
             that.equalEdit();
-        }
+        };
+
+        menuItems[1].onclick = function(event) {
+            menuItems[0].style.background = MATRIXBUTTONCOLOR;
+            menuItems[1].style.background = '#c8C8C8';
+            that.ratioEdit();
+        };
     }
 
     this.equalEdit = function() {
+        docById('userEdit').innerHTML = '';
         var equalEdit = docById('userEdit');
         equalEdit.style.backgroundColor = '#c8C8C8';
         equalEdit.innerHTML = '<br>Pitch Number &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; To &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
@@ -528,6 +533,28 @@ function TemperamentWidget () {
             that._circleOfNotes();
 
         };
+    };
+
+    this.ratioEdit = function() {
+        docById('userEdit').innerHTML = '';
+        var ratioEdit = docById('userEdit');
+        ratioEdit.style.backgroundColor = '#c8C8C8';
+        ratioEdit.innerHTML = '<br>Ratio &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
+        ratioEdit.innerHTML += 'Recursion &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="' + this.pitchNumber + '"></input>';
+        ratioEdit.style.paddingLeft = '100px';
+        var that = this;
+        
+        var divAppend = document.createElement('div');
+        divAppend.id = 'divAppend';
+        divAppend.innerHTML = 'Done';
+        divAppend.style.textAlign = 'center';
+        divAppend.style.paddingTop = '5px';
+        divAppend.style.marginLeft = '-100px';
+        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        divAppend.style.height = '25px';
+        divAppend.style.marginTop = '40px';
+        divAppend.style.overflow = 'auto';
+        ratioEdit.append(divAppend);
     };
 
     this.playNote = function(pitchNumber) {
