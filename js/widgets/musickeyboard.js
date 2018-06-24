@@ -110,27 +110,32 @@ function MusicKeyboard() {
     keyboard.addEventListener("mousedown", function (e) {
         var target = e.target;
         if(target.tagName == "TD") {
-            if((target.style.backgroundColor != "lightblue") && (target.style.backgroundColor != "pink")) {
+            if((target.style.backgroundColor != "lightgrey") && (target.style.backgroundColor != "rgb(72,72,72)")) {
                 selected.push(target.textContent);
                 if(target.parentNode == whiteKeys) {
-                    target.style.backgroundColor = "lightblue";
+                    target.style.backgroundColor = "lightgrey";
                 }
                 else {
-                    target.style.backgroundColor = "pink";
+                    target.style.backgroundColor = "rgb(72,72,72)";
                 }
             }
-            else if(target.style.backgroundColor == "lightblue" || target.style.backgroundColor == "pink")  {
-                selected.splice(selected.indexOf(target.textContent), 1);
+            handleKeyboard(target.textContent);
+        }
+    });
+
+    keyboard.addEventListener("mouseup", function (f) {
+        var target = f.target;
+        if(target.tagName == "TD") {   
                 if(target.parentNode == whiteKeys) {
                     target.style.backgroundColor = "white";
                 }
                 else {
                     target.style.backgroundColor = "black";
                 }
-            }
-            handleKeyboard(target.textContent);
         }
+        
     });
+
 
     function deselect () {
         for(var i = 0; i < selected.length; i++) {
