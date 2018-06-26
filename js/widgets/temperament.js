@@ -427,6 +427,7 @@ function TemperamentWidget () {
         menuItems[0].onclick = function(event) {
             menuItems[1].style.background = MATRIXBUTTONCOLOR;
             menuItems[2].style.background = MATRIXBUTTONCOLOR;
+            menuItems[3].style.background = MATRIXBUTTONCOLOR;
             menuItems[0].style.background = '#c8C8C8';
             that.equalEdit();
         };
@@ -434,6 +435,7 @@ function TemperamentWidget () {
         menuItems[1].onclick = function(event) {
             menuItems[0].style.background = MATRIXBUTTONCOLOR;
             menuItems[2].style.background = MATRIXBUTTONCOLOR;
+            menuItems[3].style.background = MATRIXBUTTONCOLOR;
             menuItems[1].style.background = '#c8C8C8';
             that.ratioEdit();
         };
@@ -441,8 +443,17 @@ function TemperamentWidget () {
         menuItems[2].onclick = function(event) {
             menuItems[0].style.background = MATRIXBUTTONCOLOR;
             menuItems[1].style.background = MATRIXBUTTONCOLOR;
+            menuItems[3].style.background = MATRIXBUTTONCOLOR;
             menuItems[2].style.background = '#c8C8C8';
             that.arbitraryEdit();
+        };
+
+        menuItems[3].onclick = function(event) {
+            menuItems[0].style.background = MATRIXBUTTONCOLOR;
+            menuItems[1].style.background = MATRIXBUTTONCOLOR;
+            menuItems[2].style.background = MATRIXBUTTONCOLOR;
+            menuItems[3].style.background = '#c8C8C8';
+            that.octaveSpaceEdit();
         };
     }
 
@@ -662,6 +673,32 @@ function TemperamentWidget () {
             that.checkTemperament(compareRatios);
             that._circleOfNotes();
         };
+    };
+
+    this.octaveSpaceEdit = function() {
+        docById('userEdit').innerHTML = '';
+        var octaveSpaceEdit = docById('userEdit');
+        octaveSpaceEdit.style.backgroundColor = '#c8C8C8';
+        octaveSpaceEdit.innerHTML = '<br><br>Ocatve Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="'+ this.frequencies[0] + '" style="width:50px;"></input> &nbsp;&nbsp; To &nbsp;&nbsp; <input type="text" id="ratioOut" value="'+ this.frequencies[0] * 2 + '" style="width:50px;"></input><br><br>';
+        octaveSpaceEdit.style.paddingLeft = '70px';
+        var that = this;
+        
+        var divAppend = document.createElement('div');
+        divAppend.id = 'divAppend';
+        divAppend.innerHTML = 'Done';
+        divAppend.style.textAlign = 'center';
+        divAppend.style.paddingTop = '5px';
+        divAppend.style.marginLeft = '-70px';
+        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        divAppend.style.height = '25px';
+        divAppend.style.marginTop = '40px';
+        divAppend.style.overflow = 'auto';
+        octaveSpaceEdit.append(divAppend);
+
+        divAppend.onmouseover = function() {
+            this.style.cursor = 'pointer';
+        };
+        
     };
 
     this.checkTemperament = function(ratios) {
