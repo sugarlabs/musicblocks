@@ -602,7 +602,7 @@ function TemperamentWidget () {
         docById('userEdit').innerHTML = '';
         var arbitraryEdit = docById('userEdit');
         arbitraryEdit.style.backgroundColor = '#c8C8C8';
-        arbitraryEdit.innerHTML = '<br>Frequency :<br><br><input type="range" class="sliders" id = "frequencySlider" style="width:300px; background:rgb(200, 200, 200); border:0;" min="' + this.frequencies[0] + '" max="' + this.frequencies[0] * 2 + '" value="30"><span class="rangeslidervalue" id="frequencydiv"></span>';
+        arbitraryEdit.innerHTML = '<br>Frequency :<br><br><input type="range" class="sliders" id = "frequencySlider" style="width:300px; background:rgb(200, 200, 200); border:0;" min="' + this.frequencies[0] + '" max="' + this.frequencies[0] * 2 + '" value="30"><span class="rangeslidervalue" id="frequencydiv">' + this.frequencies[0] + '</span>';
         arbitraryEdit.style.paddingLeft = '20px';
         docById('frequencySlider').oninput = function() {
             docById('frequencydiv').innerHTML = docById('frequencySlider').value;
@@ -623,6 +623,44 @@ function TemperamentWidget () {
 
         divAppend.onmouseover = function() {
             this.style.cursor = 'pointer';
+        };
+
+        divAppend.onclick = function() {
+            var frequency = docById('frequencySlider').value;
+            var ratio = frequency / that.frequencies[0];
+            var ratioDifference = [];
+            var compareRatios = [];
+
+            for (var j = 0; j < that.ratios.length ; j++) {
+                ratioDifference[j] = ratio - that.ratios[j];
+                ratioDifference[j] = ratioDifference[j].toFixed(2);
+                    if (ratioDifference[j] < 0) {
+                        var index = j;
+                        that.ratios.splice(index, 0, ratio);
+                        break;
+                    }
+                    if (ratioDifference[j] == 0) {
+                        var index = j;
+                        that.ratios.splice(index, 1, ratio);
+                        break;
+                    }
+            }
+
+            that.pitchNumber = that.ratios.length;
+            var frequency1 = that.frequencies[0];
+            that.frequencies = [];
+            for (var i = 0; i < that.pitchNumber; i++) {
+                that.frequencies[i] = that.ratios[i] * frequency1;
+                that.frequencies[i] = that.frequencies[i].toFixed(2);
+            }
+
+            for (var i = 0; i < that.ratios.length; i++) {
+                compareRatios[i] = that.ratios[i];
+                compareRatios[i] = compareRatios[i].toFixed(2);
+            }
+
+            that.checkTemperament(compareRatios);
+            that._circleOfNotes();
         };
     };
 
