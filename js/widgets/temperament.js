@@ -493,7 +493,6 @@ function TemperamentWidget () {
                     compareRatios[i] = compareRatios[i].toFixed(2); 
                 }
             }
-
             var frequency = that.frequencies[0];
             that.frequencies = [];
             for (var i = 0; i < pitchNumber; i++) {
@@ -502,34 +501,7 @@ function TemperamentWidget () {
             }
 
             that.pitchNumber = pitchNumber;
-            var intervals = [];
-            var selectedTemperament;
-
-            for (var temperament in TEMPERAMENT) {
-                var t = TEMPERAMENT[temperament];
-                var temperamentRatios = [];
-                for (var j = 0; j < t.interval.length; j++) {
-                    intervals[j] = t.interval[j];
-                    temperamentRatios[j] = t[intervals[j]];
-                    temperamentRatios[j] = temperamentRatios[j].toFixed(2);
-                }   
-                var ratiosEqual = (compareRatios.length == temperamentRatios.length) && compareRatios.every(function(element, index) {
-                    return element === temperamentRatios[index]; 
-                });
-
-                if (ratiosEqual) {
-                    selectedTemperament = temperament;
-                    that.inTemperament = temperament;
-                    temperamentCell.innerHTML = that.inTemperament;
-                    break;
-                }
-            }
-
-            if (selectedTemperament === undefined) {
-                that.inTemperament = 'custom';
-                temperamentCell.innerHTML = that.inTemperament;
-            }
-
+            that.checkTemperament(compareRatios);
             that._circleOfNotes();
 
         };
@@ -539,8 +511,8 @@ function TemperamentWidget () {
         docById('userEdit').innerHTML = '';
         var ratioEdit = docById('userEdit');
         ratioEdit.style.backgroundColor = '#c8C8C8';
-        ratioEdit.innerHTML = '<br>Ratio &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
-        ratioEdit.innerHTML += 'Recursion &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="' + this.pitchNumber + '"></input>';
+        ratioEdit.innerHTML = '<br>Ratio &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>';
+        ratioEdit.innerHTML += 'Recursion &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>';
         ratioEdit.style.paddingLeft = '100px';
         var that = this;
         
@@ -555,6 +527,96 @@ function TemperamentWidget () {
         divAppend.style.marginTop = '40px';
         divAppend.style.overflow = 'auto';
         ratioEdit.append(divAppend);
+
+        divAppend.onmouseover = function() {
+            this.style.cursor = 'pointer';
+        };
+        
+        divAppend.onclick = function() {
+            var input1 = docById('ratioIn').value;
+            var input2 = docById('ratioOut').value;
+            var recursion = docById('recursion').value;
+            var ratio1 = input1 / input2;
+            var ratio = [];
+            var frequency = [];
+            var ratioDifference = [];
+            var index = [];
+            var compareRatios = [];
+
+            calculateRatios = function (i) {
+                if (frequency[i] < that.frequencies[0] * 2) {
+                    for (var j = 0; j < that.ratios.length ; j++) {
+                        ratioDifference[j] = ratio[i] - that.ratios[j];
+                        if (ratioDifference[j] < 0) {
+                            index.push(j);
+                            that.ratios.splice(index[i], 0, ratio[i]);
+                            break;
+                        }
+                        if (ratioDifference[j] == 0) {
+                            index.push(j);
+                            that.ratios.splice(index[i], 1, ratio[i]);
+                            break;
+                        }
+                    } 
+                } else {
+                    ratio[i] = ratio[i] / 2;
+                    frequency[i] = that.frequencies[0] * ratio[i];
+                    calculateRatios(i);
+                }
+            }
+
+            for (var i = 0; i < recursion; i++) {
+                ratio[i] = Math.pow(ratio1, i + 1);
+                frequency[i] = that.frequencies[0] * ratio[i];
+                calculateRatios(i);      
+            }
+
+            that.pitchNumber = that.ratios.length;
+            var frequency1 = that.frequencies[0];
+            that.frequencies = [];
+            for (var i = 0; i < that.pitchNumber; i++) {
+                that.frequencies[i] = that.ratios[i] * frequency1;
+                that.frequencies[i] = that.frequencies[i].toFixed(2);
+            }
+
+            for (var i = 0; i < that.ratios.length; i++) {
+                compareRatios[i] = that.ratios[i];
+                compareRatios[i] = compareRatios[i].toFixed(2);
+            }
+
+            that.checkTemperament(compareRatios);
+            that._circleOfNotes();
+        };
+    };
+
+    this.checkTemperament = function(ratios) {
+        var intervals = [];
+        var selectedTemperament;
+
+        for (var temperament in TEMPERAMENT) {
+            var t = TEMPERAMENT[temperament];
+            var temperamentRatios = [];
+            for (var j = 0; j < t.interval.length; j++) {
+                intervals[j] = t.interval[j];
+                temperamentRatios[j] = t[intervals[j]];
+                temperamentRatios[j] = temperamentRatios[j].toFixed(2);
+            }   
+            var ratiosEqual = (ratios.length == temperamentRatios.length) && ratios.every(function(element, index) {
+                return element === temperamentRatios[index]; 
+            });
+
+            if (ratiosEqual) {
+                selectedTemperament = temperament;
+                this.inTemperament = temperament;
+                temperamentCell.innerHTML = this.inTemperament;
+                break;
+            }
+        }
+
+        if (selectedTemperament === undefined) {
+            this.inTemperament = 'custom';
+            temperamentCell.innerHTML = this.inTemperament;
+        }
     };
 
     this.playNote = function(pitchNumber) {
@@ -741,8 +803,12 @@ function TemperamentWidget () {
         var startingPitch = this._logo.synth.startingPitch;
         var str = [];
         var note = [];
+        this.notes = [];
+        this.frequencies = [];
+        this.intervals = [];
+        this.ratios = [];
 
-        for(var i=0; i < this.pitchNumber; i++) {
+        for(var i = 0; i < this.pitchNumber; i++) {
             str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
             this.notes[i] = str[i];
             note[i] = str[i][0];
