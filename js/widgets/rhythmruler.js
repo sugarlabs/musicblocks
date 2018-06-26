@@ -872,6 +872,7 @@ function RhythmRuler () {
     };
 
     this._playOne = function () {
+    	console.log('this._rulerSelected '+this._rulerSelected );
         this._logo.synth.stop();
         this._logo.resetSynth(0);
         if (this._startingTime == null) {
@@ -890,6 +891,7 @@ function RhythmRuler () {
         }
 
         var ruler = docById('ruler' + rulerNo);
+        console.log('ruler '  +ruler );
         if (ruler == null) {
             console.log('Cannot find ruler ' + rulerNo + '. Widget closed?');
             return;
@@ -901,7 +903,9 @@ function RhythmRuler () {
         }
 
         var cell = ruler.cells[colIndex];
+        console.log('cell ' +cell);
         var noteValues = this.Rulers[rulerNo][0];
+        console.log('noteValues ' +noteValues);
         var noteValue = noteValues[colIndex];
 
         noteTime = Math.abs(1 / noteValue);
@@ -921,6 +925,7 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
+            	console.log('8 of 8');
                 that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
             }
 
@@ -1224,7 +1229,6 @@ function RhythmRuler () {
 
 
         this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
-
         this._playAllCell.onclick = function () {
             if (that._playing) {
                 that.__pause();
@@ -1430,7 +1434,10 @@ function RhythmRuler () {
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
         var rhythmRulerTable = docById('rhythmRulerTable');
+        console.log('rhythmRulerTable ' +rhythmRulerTable);
         for (var i = 0; i < this.Rulers.length; i++) {
+        	console.log('AAAding ruler number ' +i);
+            var rhythmRulerTableRow1 = rhythmRulerTable.insertRow();
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
             var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'), '<br>');
             drumcell.setAttribute('id', i);
@@ -1469,6 +1476,7 @@ function RhythmRuler () {
                 }
             };
 
+            var rulerCell = rhythmRulerTableRow1.insertCell();
             var rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
             rulerCell.innerHTML = '<table id="rulerCellTable' + i + '"></table>';
@@ -1514,6 +1522,14 @@ function RhythmRuler () {
             }
 
             // Match the play button height to the ruler height.
+            rhythmRulerTableRow1.cells[0].style.width = BUTTONSIZE + 'px';
+            rhythmRulerTableRow1.cells[0].style.minWidth = BUTTONSIZE + 'px';
+            rhythmRulerTableRow1.cells[0].style.maxWidth = BUTTONSIZE + 'px';
+            rhythmRulerTableRow1.cells[0].style.height = rulerRow.offsetHeight + 'px';
+            rhythmRulerTableRow1.cells[0].style.minHeight = rulerRow.offsetHeight + 'px';
+            rhythmRulerTableRow1.cells[0].style.maxHeight = rulerRow.offsetHeight + 'px';
+            rhythmRulerTableRow1.cells[0].style.verticalAlign = 'middle';
+
             rhythmRulerTableRow.cells[0].style.width = BUTTONSIZE + 'px';
             rhythmRulerTableRow.cells[0].style.minWidth = BUTTONSIZE + 'px';
             rhythmRulerTableRow.cells[0].style.maxWidth = BUTTONSIZE + 'px';
