@@ -426,14 +426,23 @@ function TemperamentWidget () {
 
         menuItems[0].onclick = function(event) {
             menuItems[1].style.background = MATRIXBUTTONCOLOR;
+            menuItems[2].style.background = MATRIXBUTTONCOLOR;
             menuItems[0].style.background = '#c8C8C8';
             that.equalEdit();
         };
 
         menuItems[1].onclick = function(event) {
             menuItems[0].style.background = MATRIXBUTTONCOLOR;
+            menuItems[2].style.background = MATRIXBUTTONCOLOR;
             menuItems[1].style.background = '#c8C8C8';
             that.ratioEdit();
+        };
+
+        menuItems[2].onclick = function(event) {
+            menuItems[0].style.background = MATRIXBUTTONCOLOR;
+            menuItems[1].style.background = MATRIXBUTTONCOLOR;
+            menuItems[2].style.background = '#c8C8C8';
+            that.arbitraryEdit();
         };
     }
 
@@ -586,6 +595,34 @@ function TemperamentWidget () {
 
             that.checkTemperament(compareRatios);
             that._circleOfNotes();
+        };
+    };
+
+    this.arbitraryEdit = function() {
+        docById('userEdit').innerHTML = '';
+        var arbitraryEdit = docById('userEdit');
+        arbitraryEdit.style.backgroundColor = '#c8C8C8';
+        arbitraryEdit.innerHTML = '<br>Frequency :<br><br><input type="range" class="sliders" id = "frequencySlider" style="width:300px; background:rgb(200, 200, 200); border:0;" min="' + this.frequencies[0] + '" max="' + this.frequencies[0] * 2 + '" value="30"><span class="rangeslidervalue" id="frequencydiv"></span>';
+        arbitraryEdit.style.paddingLeft = '20px';
+        docById('frequencySlider').oninput = function() {
+            docById('frequencydiv').innerHTML = docById('frequencySlider').value;
+        };
+        var that = this;
+        
+        var divAppend = document.createElement('div');
+        divAppend.id = 'divAppend';
+        divAppend.innerHTML = 'Done';
+        divAppend.style.textAlign = 'center';
+        divAppend.style.paddingTop = '5px';
+        divAppend.style.marginLeft = '-20px';
+        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        divAppend.style.height = '25px';
+        divAppend.style.marginTop = '40px';
+        divAppend.style.overflow = 'auto';
+        arbitraryEdit.append(divAppend);
+
+        divAppend.onmouseover = function() {
+            this.style.cursor = 'pointer';
         };
     };
 
