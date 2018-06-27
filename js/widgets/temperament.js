@@ -148,16 +148,8 @@ function TemperamentWidget () {
         docById('wheelDiv2').style.top = canvas.style.y + 'px';
 
         docById('wheelDiv2').addEventListener('click', function(e) {
-            if (that.inTemperament !== 'custom') {
-                that.showNoteInfo(e);
-            }   
+            that.showNoteInfo(e);  
         });
-
-        docById('wheelDiv2').onmouseout = function(event) {
-            if (docById('noteInfo') === null) {
-                that.lastTriggered = null;
-            }
-        }; 
     };
 
     this.showNoteInfo = function(event) {
@@ -174,7 +166,9 @@ function TemperamentWidget () {
                 docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>' 
                 docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' + i + '">';
                 docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
-                docById('noteInfo').innerHTML += '&nbsp Note : ' + this.notes[i] + '<br>';
+                if (this.inTemperament !== 'custom') {
+                    docById('noteInfo').innerHTML += '&nbsp Note : ' + this.notes[i] + '<br>';
+                }
                 docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
 
                 docById('close').onclick = function() {
