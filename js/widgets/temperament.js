@@ -483,15 +483,32 @@ function TemperamentWidget () {
             var divisions = Number(docById('divisions').value);
             var ratio = [];
             var compareRatios = [];
+            var ratio1 = [];
+            var ratio2 = [];
+            var ratio3 = [];
+            var index = [];
 
             if (pitchNumber1 === pitchNumber2) {
-                pitchNumber = divisions;
-                that.ratios = [];
                 for (var i = 0; i < divisions; i++) {
-                    that.ratios[i] = Math.pow(2, i/divisions); 
-                    compareRatios[i] = that.ratios[i];
-                    compareRatios[i] = compareRatios[i].toFixed(2); 
+                    ratio[i] = Math.pow(2, i/divisions);
+                    ratio1[i] = ratio[i].toFixed(2);
+                    ratio2[i] = that.ratios[i];
+                    ratio2[i] = ratio2[i].toFixed(2); 
                 }
+                var ratio4 = ratio1.filter(function(val) {
+                    return ratio2.indexOf(val) == -1;
+                });
+
+                for (var i = 0; i < ratio4.length; i++) {
+                    index[i] = ratio1.indexOf(ratio4[i]);
+                    ratio3[i] = ratio[index[i]];
+                }
+
+                that.ratios = that.ratios.concat(ratio3);
+                that.ratios.sort(function(a, b){
+                    return a-b;
+                });
+                pitchNumber = that.ratios.length;
             } else {
                 pitchNumber = divisions + Number(pitchNumber) - (Math.abs(pitchNumber1 - pitchNumber2));
                 var angle1 = 270 + (360 * (Math.log10(that.ratios[pitchNumber1]) / Math.log10(2)));
@@ -584,7 +601,9 @@ function TemperamentWidget () {
                 frequency[i] = that.frequencies[0] * ratio[i];
                 calculateRatios(i);      
             }
-
+            that.ratios.sort(function(a, b){
+                return a-b;
+            });
             that.pitchNumber = that.ratios.length;
             var frequency1 = that.frequencies[0];
             that.frequencies = [];
