@@ -485,7 +485,7 @@ const TEMPERAMENT = {
         'diminished 8': Math.pow(2, (11/12)),
         'perfect 8': Math.pow(2, (12/12)),
         'pitchNumber': 12,
-        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
     },
     'just intonation': {
         'perfect 1' : (1/1),
@@ -511,7 +511,7 @@ const TEMPERAMENT = {
         'diminished 8': (15/8),
         'perfect 8': (2/1),
         'pitchNumber': 12,
-        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
     },
     'Pythagorean': {
         'perfect 1' : (1/1),
@@ -537,7 +537,7 @@ const TEMPERAMENT = {
         'diminished 8': (243/128),
         'perfect 8': (2/1),
         'pitchNumber': 12,
-        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
     },
     '1/3 comma meantone': { // 19-EDO
         'perfect 1' : (1/1),
@@ -563,7 +563,7 @@ const TEMPERAMENT = {
         'diminished 8': 1.92835,
         'perfect 8': (2/1), 
         'pitchNumber': 19,
-        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8']
+        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8', 'perfect 8']
     },
     '1/4 comma meantone': { // 21 notes per octave
         'perfect 1' : (1/1),
@@ -589,7 +589,7 @@ const TEMPERAMENT = {
         'augmented 7': (125/64),
         'perfect 8': (2/1),
         'pitchNumber': 21,
-        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'augmented 3', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8', 'augmented 7']
+        'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'augmented 3', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8', 'augmented 7', 'perfect 8']
     },
     'custom':{
         'perfect 1' : Math.pow(2, (0/12)),
@@ -615,7 +615,7 @@ const TEMPERAMENT = {
         'diminished 8': Math.pow(2, (11/12)),
         'perfect 8': Math.pow(2, (12/12)),
         'pitchNumber': 12,
-        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7']
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
     }
 };
 
