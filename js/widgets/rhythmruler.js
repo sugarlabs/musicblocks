@@ -80,6 +80,7 @@ function RhythmRuler () {
     };
 
     this._calculateZebraStripes = function(rulerno) {
+        console.log('IIInside calculateZebraStripes');
         var ruler = docById('ruler' + rulerno);
         if (this._rulerSelected % 2 === 0) {
             var evenColor = MATRIXNOTECELLCOLOR;
@@ -872,7 +873,7 @@ function RhythmRuler () {
     };
 
     this._playOne = function () {
-    	console.log('this._rulerSelected '+this._rulerSelected );
+        console.log('this._rulerSelected '+this._rulerSelected );
         this._logo.synth.stop();
         this._logo.resetSynth(0);
         if (this._startingTime == null) {
@@ -925,7 +926,7 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-            	console.log('8 of 8');
+                console.log('8 of 8');
                 that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
             }
 
@@ -1158,18 +1159,18 @@ function RhythmRuler () {
          var evenIndexNumbers = [];
          var oddIndexNumbers = [];
          for (var z = 0; z < rhythmAndMeter.length; z++) {
-         	if (z%2 === 0) {
-         		evenIndexNumbers.push(rhythmAndMeter[z]);
-         	} else {
-         		oddIndexNumbers.push(rhythmAndMeter[z]);
-         	}
+            if (z%2 === 0) {
+                evenIndexNumbers.push(rhythmAndMeter[z]);
+            } else {
+                oddIndexNumbers.push(rhythmAndMeter[z]);
+            }
          }
          var lcmOfNumerator = lcmIter(evenIndexNumbers, evenIndexNumbers.length);
          var gcdofDenominator = gcdIter(oddIndexNumbers, oddIndexNumbers.length);
          var alignmentAfter = lcmOfNumerator/gcdofDenominator;
          console.log('Alignment will happen after ' + alignmentAfter + ' Units.');
          for (var k = 0; k < rhythmAndMeter.length; k=k+4) {
-         	console.log('Meter ' + ((k/4)+1) +' Should repeat for ' +alignmentAfter/(rhythmAndMeter[k]/rhythmAndMeter[k+1]));
+            console.log('Meter ' + ((k/4)+1) +' Should repeat for ' +alignmentAfter/(rhythmAndMeter[k]/rhythmAndMeter[k+1]));
          }
 
     };
@@ -1178,7 +1179,7 @@ function RhythmRuler () {
         console.log('init RhythmRuler');
         meterCount = 0;
         currentMeterNoteNum = 1;
-		currentMeterNoteDen = 1;
+        currentMeterNoteDen = 1;
         this._logo = logo;
 
         this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
@@ -1438,17 +1439,18 @@ function RhythmRuler () {
 
 
 
-        for (var i = 0; i < this.Rulers.length; i++) {
-        	console.log('AAAding ruler number ' +i);
-            
-            console.log('TTType of rhythmRulerTableRow1 '+typeof(rhythmRulerTableRow1));
+        for (var i = 0, v = 100; i < this.Rulers.length; i++, v++) {
+            console.log('AAAding ruler number ' +i);
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
             var rhythmRulerTableRow1 = rhythmRulerTable.insertRow();
             var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'), '<br>');
+        //    var drumcell = this._addButton(rhythmRulerTableRow1, 'play-button.svg', iconSize, _('play'), '<br>');
             drumcell.setAttribute('id', i);
             drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
+            
 
             drumcell.onclick = function () {
+                console.log('IIInside Onclick');
                 var id = Number(this.getAttribute('id'));
                 if (that._playing) {
                     if (that._rulerPlaying === id) {
@@ -1483,24 +1485,35 @@ function RhythmRuler () {
 
             var rulerCell1 = rhythmRulerTableRow1.insertCell();
             var rulerCell = rhythmRulerTableRow.insertCell();
+
             // Create individual rulers as tables.
 
 
             rulerCell.innerHTML = '<table id="rulerCellTable' + i + '"></table>';
-            rulerCell1.innerHTML +=  'meter ' + rhythmAndMeter[4*i] +'/'+ rhythmAndMeter[(4*i)+1];; 
+
+
+           // rulerCell1.innerHTML +=  'meter ' + rhythmAndMeter[4*i] +'/'+ rhythmAndMeter[(4*i)+1];; 
 
 
             var rulerCellTable = docById('rulerCellTable' + i);
+            var rulerCellTablev = docById('rulerCellTable' + v);
             rulerCellTable.style.textAlign = 'center';
             rulerCellTable.style.border = '0px';
             rulerCellTable.style.borderCollapse = 'collapse';
             rulerCellTable.cellSpacing = '0px';
             rulerCellTable.cellPadding = '0px';
+
+            
+
             var rulerRow = rulerCellTable.insertRow();
             rulerRow.setAttribute('id', 'ruler' + i);
+            var rulerRowv = rulerCellTable.insertRow();
+            rulerRowv.setAttribute('id', 'ruler' + v);
+
             for (var j = 0; j < this.Rulers[i][0].length; j++) {
                 var noteValue = this.Rulers[i][0][j];
                 var rulerSubCell = rulerRow.insertCell(-1);
+                var rulerSubCellv = rulerRowv.insertCell(-1);
                 rulerSubCell.innerHTML = calcNoteValueToDisplay(noteValue, 1, this._cellScale);
                 rulerSubCell.style.height = RULERHEIGHT + 'px';
                 rulerSubCell.style.minHeight = rulerSubCell.style.height;
@@ -1527,19 +1540,21 @@ function RhythmRuler () {
                     }
                 }
 
+                rulerSubCellv.style.backgroundColor = 'grey';
+                console.log('NNNoteValue ' + noteValue);                
                 this.__addCellEventHandlers(rulerSubCell, this._noteWidth(noteValue), noteValue);
+                this.__addCellEventHandlers(rulerSubCellv, this._noteWidth(4), 4);
+
             }
-
-
 
 
             // Match the play button height to the ruler height.
             rhythmRulerTableRow1.cells[0].style.width = BUTTONSIZE + 'px';
             rhythmRulerTableRow1.cells[0].style.minWidth = BUTTONSIZE + 'px';
             rhythmRulerTableRow1.cells[0].style.maxWidth = BUTTONSIZE + 'px';
-            rhythmRulerTableRow1.cells[0].style.height = 30 + 'px';
-            rhythmRulerTableRow1.cells[0].style.minHeight = 30 + 'px';
-            rhythmRulerTableRow1.cells[0].style.maxHeight = 30 + 'px';
+            rhythmRulerTableRow1.cells[0].style.height = 50 + 'px';
+            rhythmRulerTableRow1.cells[0].style.minHeight = rulerRow.offsetHeight + 'px';
+            rhythmRulerTableRow1.cells[0].style.maxHeight = rulerRow.offsetHeight + 'px';
             rhythmRulerTableRow1.cells[0].style.verticalAlign = 'middle';
 
             rhythmRulerTableRow.cells[0].style.width = BUTTONSIZE + 'px';
