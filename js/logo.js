@@ -9698,15 +9698,16 @@ function Logo () {
                 var x = that.turtles.turtleList[turtle].container.x;
                 var y = that.turtles.turtleList[turtle].container.y;
                 that.refreshCanvas();
-                var canvas = docById('myCanvas');
-                var ctx = canvas.getContext('2d');  // that.canvas.getContext('2d');
-                var imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;// (x - 27, y - 27, 1, 1).data;
-                console.log('(' + Math.floor(x) + ', ' + Math.floor(y) + '): ' + imgData[0] + ', ' + imgData[1] + ', ' + imgData[2] + ' ' + imgData[3]);
+
+                var canvas = docById('overlayCanvas');
+                var ctx = canvas.getContext('2d');
+                var imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
                 var color = searchColors(imgData[0], imgData[1], imgData[2]);
                 if (imgData[3] === 0) {
                     color = body.style.background.substring(body.style.background.indexOf('(') + 1, body.style.background.lastIndexOf(')')).split(/,\s*/),
                     color = searchColors(color[0], color[1], color[2]);
                 }
+
                 that.blocks.blockList[blk].value = color;
                 if (wasVisible) {
                     that.turtles.turtleList[turtle].container.visible = true;
