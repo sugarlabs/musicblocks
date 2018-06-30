@@ -105,12 +105,14 @@ function SaveInterface(PlanetInterface) {
     }
 
     this.saveHTMLNoPrompt = function(){
-        var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
-        if (this.PlanetInterface !== undefined) {
-            this.downloadURL(this.PlanetInterface.getCurrentProjectName() + '.html', html);
-        } else {
-            this.downloadURL(_('My Project').replace(' ', '_') + '.html', html);
-        }
+        setTimeout(function(){
+            var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
+            if (this.PlanetInterface !== undefined) {
+                this.downloadURL(this.PlanetInterface.getCurrentProjectName() + '.html', html);
+            } else {
+                this.downloadURL(_('My Project').replace(' ', '_') + '.html', html);
+            }
+        }.bind(this),500);
     }
 
     this.saveSVG = function(filename){
@@ -330,13 +332,15 @@ function SaveInterface(PlanetInterface) {
         window.onbeforeunload = function() {
             if (this.PlanetInterface !== undefined && this.PlanetInterface.getTimeLastSaved() != this.timeLastSaved){
                 this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
-                unloadTimer = window.setTimeout(this.saveHTMLNoPrompt.bind(this), 500);
+                unloadTimer2 = null;
+                unloadTimer = window.requestAnimationFrame(function(){unloadTimer2=window.requestAnimationFrame(this.saveHTMLNoPrompt.bind(this),1000)}.bind(this), 500);
                 return _('Do you want to save your project?');
             }
         }.bind(this);
 
         window.onunload = function(){
-            clearTimeout(unloadTimer);
+            cancelAnimationFrame(unloadTimer);
+            cancelAnimationFrame(unloadTimer2);
         }
     }
 }
