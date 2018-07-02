@@ -25,7 +25,7 @@ getLilypondHeader = function () {
 };
 
 
-processLilypondNotes = function (logo, turtle) {
+processLilypondNotes = function (lilypond, logo, turtle) {
     // obj = [instructions] or
     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
 
@@ -112,18 +112,70 @@ processLilypondNotes = function (logo, turtle) {
                 logo.notationNotes[turtle] += '~';
                 break;
             case 'key':
+                var keySignature = logo.notationStaging[turtle][i + 1] + ' ' + logo.notationStaging[turtle][i + 2];
                 var key = logo.notationStaging[turtle][i + 1].toLowerCase();
-                var mode = logo.notationStaging[turtle][i + 2]
-                // var obj = modeMapper(key, mode);
-                // if (['major', 'minor'].indexOf(obj[1]) !== -1) {
-                //     logo.notationNotes[turtle] += ' \\key ' + __toLilynote(obj[0]) + ' \\' + obj[1] + '\n';
-
+                var mode = logo.notationStaging[turtle][i + 2];
                 // Lilypond knows about common modes.
                 if (['major', 'minor', 'ionian', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian'].indexOf(mode) !== -1) {
 
                     logo.notationNotes[turtle] += ' \\key ' + key + ' \\' + mode + '\n';
                 } else {
-                    logo.errorMsg(_('Lilypond ignoring mode') + ' ' + logo.notationStaging[turtle][i + 2]);
+                    var obj = getScaleAndHalfSteps(keySignature)
+                    // Check to see if it is possible to construct the mode.
+                    // freygish = #`((0 . ,NATURAL) (1 . ,FLAT) (2 . ,NATURAL)
+		    // (3 . ,NATURAL) (4 . ,NATURAL) (5 . ,FLAT) (6 . ,FLAT))
+                    var modeDef = '\n' + mode.replace(/ /g, '_') + " = #`(";
+                    var prevNote = '';
+                    var nn = -1;
+                    for (var ii = 0; ii < obj[1].length; ii++) {
+                        if (obj[1][ii] !== '') {
+                            // Are we repeating notes, e.g., Db and D?
+                            if (obj[0][ii].substr(0, 1) === prevNote) {
+				modeDef = '';
+				break;
+                            } else {
+				prevNote = obj[0][ii].substr(0, 1);
+			    }
+
+                            var n = ['C', 'D', 'E', 'F', 'G', 'A', 'B'].indexOf(obj[0][ii].substr(0, 1));
+
+                            // Did we skip any notes?
+                            if (n > nn) {
+				if ((n - nn) > 1) {
+                                    for (var j = nn + 1; j < n; j++) {
+					modeDef += '(' + j + ' . ,NATURAL) ';
+				    }
+				}
+
+				nn = n;
+
+				if (obj[0][ii].length === 1) {
+				    modeDef += '(' + n + ' . ,NATURAL) ';
+				} else {
+				    if (obj[0][ii].substr(1, 1) === FLAT) {
+					modeDef += '(' + n + ' . ,FLAT) ';
+				    } else {
+					modeDef += '(' + n + ' . ,SHARP) ';
+				    }
+				}
+			    }
+			}
+                    }
+
+		    if (modeDef !== '') {
+			if (n < 6) {
+                            for (var j = n + 1; j < 7; j++) {
+				modeDef += '(' + j + ' . ,NATURAL) ';
+			    }
+			}
+
+                        modeDef += ')\n';
+                        console.log(modeDef);
+			lilypond.freygish += modeDef;
+			logo.notationNotes[turtle] += ' \\key ' + key + ' \\' + mode.replace(/ /g,'_') + '\n';
+		    } else {
+			logo.errorMsg(_('Lilypond ignoring mode') + ' ' + mode);
+		    }
                 }
                 i += 2;
                 break;
@@ -425,6 +477,8 @@ saveLilypondOutput = function(logo) {
     const NUMBERNAMES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     var turtleCount = 0;
     var clef = [];
+    var freygish = '';  // A place to store custom mode definitions
+
     for (var t in logo.notationStaging) {
         turtleCount += 1;
     }
@@ -504,7 +558,12 @@ saveLilypondOutput = function(logo) {
                 clef.push('treble');
             }
 
-            processLilypondNotes(logo, t);
+            this.freygish = '';
+            processLilypondNotes(this, logo, t);
+
+            if (this.freygish !== '') {
+		logo.notationOutput += this.freygish;
+	    }
 
             if (tNumber > startDrums - 1) {
                 instrumentName = _('drum') + NUMBERNAMES[tNumber - startDrums];

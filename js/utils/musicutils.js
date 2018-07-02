@@ -1780,7 +1780,7 @@ function reducedFraction(a, b) {
 };
 
 
-getNote = function (noteArg, octave, transposition, keySignature, movable, direction, errorMsg) {
+function getNote(noteArg, octave, transposition, keySignature, movable, direction, errorMsg) {
     var sharpFlat = false;
     var rememberFlat = false;
     var rememberSharp = false;    
