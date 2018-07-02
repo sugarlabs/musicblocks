@@ -653,8 +653,8 @@ function TemperamentWidget () {
 
     this.octaveSpaceEdit = function() {
         docById('userEdit').innerHTML = '';
-        var len = this.frequencies.length;
-        var octaveRatio = TEMPERAMENT[this.inTemperament]['perfect 8'];
+        var len = this.ratios.length;
+        var octaveRatio = this.ratios[len-1];
         var octaveSpaceEdit = docById('userEdit');
         octaveSpaceEdit.style.backgroundColor = '#c8C8C8';
         octaveSpaceEdit.innerHTML = '<br><br>Ocatve Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="'+ octaveRatio + '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
@@ -681,6 +681,11 @@ function TemperamentWidget () {
             var startRatio = docById('startNote').value;
             var endRatio = docById('endNote').value;
             var ratio = startRatio / endRatio;
+            var len1 = that.frequencies.length;
+            that.powerBase = ratio;
+            that.ratios[len-1] = ratio;
+            that.frequencies[len1-1] = that.frequencies[0] * ratio;
+            that._circleOfNotes();
         };
         
     };
