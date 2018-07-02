@@ -14,6 +14,7 @@ function TemperamentWidget () {
     this.intervals = [];
     this.ratios = [];
     this.scale = [];
+    this.cents = [];
     this.scaleNotes = [];
     this.pitchNumber = 0;
     this.circleIsVisible = true;
@@ -166,8 +167,32 @@ function TemperamentWidget () {
                 docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>' 
                 docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' + i + '">';
                 docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
-                if (this.inTemperament !== 'custom') {
-                    docById('noteInfo').innerHTML += '&nbsp Note : ' + this.notes[i] + '<br>';
+                var noteDefined = false;
+                for (var j = 0; j < this.ratiosNotesPair.length; j++) {
+                    if(this.ratios[i] == this.ratiosNotesPair[j][0]) {
+                        noteDefined = true;
+                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[j][1] + '<br>';
+                        break;
+                    }     
+                }
+                if (!noteDefined) {
+                    var cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                    var centsDiff = [];
+                    var centsDiff1 = [];
+                    for (var j = 0; j < this.cents.length; j++) {
+                        centsDiff[j] = cents - this.cents[j];
+                        centsDiff1[j] = Math.abs(cents - this.cents[j]);
+                    }
+                    var min = centsDiff1.reduce(function(a, b) {
+                        return Math.min(a, b);
+                    });
+                    var index = centsDiff1.indexOf(min);
+
+                    if (centsDiff[index] < 0) {
+                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + " - " + centsDiff1[index].toFixed(2) + '<br>';
+                    } else {
+                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + " + " + centsDiff1[index].toFixed(2) + '<br>';
+                    }
                 }
                 docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
 
@@ -905,6 +930,7 @@ function TemperamentWidget () {
         this.frequencies = [];
         this.intervals = [];
         this.ratios = [];
+        this.ratiosNotesPair = [];
 
         for(var i = 0; i <= this.pitchNumber; i++) {
             str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
@@ -921,8 +947,9 @@ function TemperamentWidget () {
             this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);
             this.intervals[i] = t.interval[i];
             this.ratios[i] = t[this.intervals[i]];
+            this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+            this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
         }
-        
         this.toggleNotesButton = function () {
             if (this.circleIsVisible) {
                 noteCell.getElementsByTagName("img")[0].src = 'header-icons/circle.svg';
