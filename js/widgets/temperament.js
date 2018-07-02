@@ -175,7 +175,7 @@ function TemperamentWidget () {
                         break;
                     }     
                 }
-                if (!noteDefined) {
+                if (noteDefined == false && this.octaveChanged == false) {
                     var cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     var centsDiff = [];
                     var centsDiff1 = [];
@@ -706,13 +706,29 @@ function TemperamentWidget () {
             var startRatio = docById('startNote').value;
             var endRatio = docById('endNote').value;
             var ratio = startRatio / endRatio;
-            var len1 = that.frequencies.length;
+            if (ratio != 2) {
+                var msg = 'Octave Space has changed. This changes temperament significantly';
+                if (!confirm(msg)) {
+                    return;
+                }
+            }
+            var powers = [];
+            var compareRatios = [];
+            var frequency = that.frequencies[0];
+            that.frequencies = [];
+
+            for (var i = 0; i < len; i++) {
+                powers[i] = 12 * (Math.log10(that.ratios[i]) / Math.log10(2));
+                that.ratios[i] = Math.pow(ratio, powers[i] / 12);
+                compareRatios[i] = that.ratios[i].toFixed(2);
+                that.frequencies[i] = that.ratios[i] * frequency;
+                that.frequencies[i] = that.frequencies[i].toFixed(2);
+            }
             that.powerBase = ratio;
-            that.ratios[len-1] = ratio;
-            that.frequencies[len1-1] = that.frequencies[0] * ratio;
+            that.checkTemperament(compareRatios);
+            that.octaveChanged = true;
             that._circleOfNotes();
-        };
-        
+        };   
     };
 
     this.checkTemperament = function(ratios) {
@@ -919,6 +935,7 @@ function TemperamentWidget () {
 
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
+        this.octaveChanged = false;
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = _buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
@@ -947,7 +964,7 @@ function TemperamentWidget () {
             this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);
             this.intervals[i] = t.interval[i];
             this.ratios[i] = t[this.intervals[i]];
-            this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+            this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
             this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
         }
         this.toggleNotesButton = function () {
