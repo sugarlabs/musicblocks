@@ -68,6 +68,7 @@ function Logo () {
     this.temperament = null;
     this.tempo = null;
     this.pitchSlider = null;
+    this.musicKeyboard = null;
     this.modeWidget = null;
     this.statusMatrix = null;
     this.playbackWidget = null;
@@ -140,6 +141,7 @@ function Logo () {
     this.inPitchStaircase = false;
     this.inTempo = false;
     this.inPitchSlider = false;
+    this.inMusicKeyboard = false;
     this._currentDrumlock = null;
     this.inTimbre = false;
     this.inSetTimbre = {};
@@ -3220,6 +3222,21 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'musickeyboard':
+            if (that.musicKeyboard == null) {
+                that.musicKeyboard = new MusicKeyboard();
+        
+            }
+
+            
+            var x = document.getElementById("keyboardHolder");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+
+            break;
         case 'pitchdrummatrix':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -6162,6 +6179,8 @@ function Logo () {
                 that.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (that.inPitchSlider) {
                 that.pitchSlider.Sliders.push([args[0], 0, 0]);
+            } else if (that.inMusicKeyboard) {
+                that.musicKeyboard.Sliders.push([args[0], 0, 0]);
             } else {
                 that.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
             }
@@ -6183,6 +6202,8 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inPitchSlider) {
                     that.pitchSlider.Sliders.push([args[0], 0, 0]);
+                } else if (that.inMusicKeyboard) {
+                    that.musicKeyboard.Sliders.push([args[0], 0, 0]);
                 } else {
                     that.oscList[turtle][last(that.inNoteBlock[turtle])].push(that.blocks.blockList[blk].name);
 
