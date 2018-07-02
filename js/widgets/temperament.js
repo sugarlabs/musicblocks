@@ -107,7 +107,7 @@ function TemperamentWidget () {
             this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
             this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
             this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
-            angle[i] = 270 + (360 * (Math.log10(this.ratios[i]) / Math.log10(2)));
+            angle[i] = 270 + (360 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase)));
             if (i !== 0) {
                 if (i == this.pitchNumber - 1) {
                     angleDiff[i-1] = angle[0] + 360 - angle[i];
@@ -452,7 +452,7 @@ function TemperamentWidget () {
 
             if (pitchNumber1 === pitchNumber2) {
                 for (var i = 0; i < divisions; i++) {
-                    ratio[i] = Math.pow(2, i/divisions);
+                    ratio[i] = Math.pow(that.powerBase, i/divisions);
                     ratio1[i] = ratio[i].toFixed(2);
                     ratio2[i] = that.ratios[i];
                     ratio2[i] = ratio2[i].toFixed(2); 
@@ -473,14 +473,14 @@ function TemperamentWidget () {
                 pitchNumber = that.ratios.length - 1;
             } else {
                 pitchNumber = divisions + Number(pitchNumber) - (Math.abs(pitchNumber1 - pitchNumber2));
-                var angle1 = 270 + (360 * (Math.log10(that.ratios[pitchNumber1]) / Math.log10(2)));
-                var angle2 = 270 + (360 * (Math.log10(that.ratios[pitchNumber2]) / Math.log10(2)));
+                var angle1 = 270 + (360 * (Math.log10(that.ratios[pitchNumber1]) / Math.log10(that.powerBase)));
+                var angle2 = 270 + (360 * (Math.log10(that.ratios[pitchNumber2]) / Math.log10(that.powerBase)));
                 var divisionAngle = Math.abs(angle2 - angle1) / divisions;
                 that.ratios.splice(pitchNumber1 + 1, Math.abs(pitchNumber1 - pitchNumber2) - 1);
 
                 for (var i = 0; i < divisions - 1; i++) {
                     var power = (Math.min(angle1, angle2) + (divisionAngle * (i + 1)) - 270) / 360;
-                    ratio[i] = Math.pow(2 , power);
+                    ratio[i] = Math.pow(that.powerBase , power);
                     that.ratios.splice(pitchNumber1 + 1 + i, 0, ratio[i]);
                     compareRatios[i] = that.ratios[i];
                     compareRatios[i] = compareRatios[i].toFixed(2); 
@@ -654,9 +654,10 @@ function TemperamentWidget () {
     this.octaveSpaceEdit = function() {
         docById('userEdit').innerHTML = '';
         var len = this.frequencies.length;
+        var octaveRatio = TEMPERAMENT[this.inTemperament]['perfect 8'];
         var octaveSpaceEdit = docById('userEdit');
         octaveSpaceEdit.style.backgroundColor = '#c8C8C8';
-        octaveSpaceEdit.innerHTML = '<br><br>Ocatve Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="'+ this.frequencies[0] + '" style="width:50px;"></input> &nbsp;&nbsp; To &nbsp;&nbsp; <input type="text" id="endNote" value="'+ this.frequencies[len - 1] + '" style="width:50px;"></input><br><br>';
+        octaveSpaceEdit.innerHTML = '<br><br>Ocatve Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="'+ octaveRatio + '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
         octaveSpaceEdit.style.paddingLeft = '70px';
         var that = this;
         
@@ -677,8 +678,9 @@ function TemperamentWidget () {
         };
 
         divAppend.onclick = function() {
-            var startNote = docById('startNote').value;
-            var endNote = docById('endNote').value;
+            var startRatio = docById('startNote').value;
+            var endRatio = docById('endNote').value;
+            var ratio = startRatio / endRatio;
         };
         
     };
@@ -890,6 +892,7 @@ function TemperamentWidget () {
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = _buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
+        this.powerBase = 2;
         var startingPitch = this._logo.synth.startingPitch;
         var str = [];
         var note = [];
