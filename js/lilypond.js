@@ -112,11 +112,16 @@ processLilypondNotes = function (logo, turtle) {
                 logo.notationNotes[turtle] += '~';
                 break;
             case 'key':
-                var key = logo.notationStaging[turtle][i + 1];
+                var key = logo.notationStaging[turtle][i + 1].toLowerCase();
                 var mode = logo.notationStaging[turtle][i + 2]
-                var obj = modeMapper(key, mode);
-                if (['major', 'minor'].indexOf(obj[1]) !== -1) {
-                    logo.notationNotes[turtle] += ' \\key ' + __toLilynote(obj[0]) + ' \\' + obj[1] + '\n';
+                // var obj = modeMapper(key, mode);
+                // if (['major', 'minor'].indexOf(obj[1]) !== -1) {
+                //     logo.notationNotes[turtle] += ' \\key ' + __toLilynote(obj[0]) + ' \\' + obj[1] + '\n';
+
+                // Lilypond knows about common modes.
+                if (['major', 'minor', 'ionian', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian'].indexOf(mode) !== -1) {
+
+                    logo.notationNotes[turtle] += ' \\key ' + key + ' \\' + mode + '\n';
                 } else {
                     logo.errorMsg(_('Lilypond ignoring mode') + ' ' + logo.notationStaging[turtle][i + 2]);
                 }
