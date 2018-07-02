@@ -385,7 +385,7 @@ function TemperamentWidget () {
         }
         temperamentTableDiv.innerHTML = '';
         temperamentTableDiv.innerHTML = '<table id="editOctave" width="' + BUTTONDIVWIDTH + '"><tbody><tr id="menu"></tr></tbody></table>';
-        var editMenus = ['Equal', 'Ratios', 'Arbitrary', 'Ocatve Space'];
+        var editMenus = ['Equal', 'Ratios', 'Arbitrary', 'Octave Space'];
         var menus = '';
 
         for(var i = 0; i < editMenus.length; i++) {
@@ -682,7 +682,7 @@ function TemperamentWidget () {
         var octaveRatio = this.ratios[len-1];
         var octaveSpaceEdit = docById('userEdit');
         octaveSpaceEdit.style.backgroundColor = '#c8C8C8';
-        octaveSpaceEdit.innerHTML = '<br><br>Ocatve Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="'+ octaveRatio + '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
+        octaveSpaceEdit.innerHTML = '<br><br>Octave Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="'+ octaveRatio + '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
         octaveSpaceEdit.style.paddingLeft = '70px';
         var that = this;
         
