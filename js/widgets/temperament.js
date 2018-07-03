@@ -217,9 +217,9 @@ function TemperamentWidget () {
                     var index = centsDiff1.indexOf(min);
 
                     if (centsDiff[index] < 0) {
-                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + " - " + centsDiff1[index].toFixed(2) + '<br>';
+                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + "(- " + centsDiff1[index].toFixed(2) + ")" + '<br>';
                     } else {
-                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + " + " + centsDiff1[index].toFixed(2) + '<br>';
+                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + "(+ " + centsDiff1[index].toFixed(2) + ")" + '<br>';
                     }
                 }
                 docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
