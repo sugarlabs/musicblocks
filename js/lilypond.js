@@ -113,7 +113,7 @@ processLilypondNotes = function (lilypond, logo, turtle) {
                 break;
             case 'key':
                 var keySignature = logo.notationStaging[turtle][i + 1] + ' ' + logo.notationStaging[turtle][i + 2];
-                var key = logo.notationStaging[turtle][i + 1].toLowerCase();
+                var key = logo.notationStaging[turtle][i + 1].toLowerCase().replace(FLAT, 'es').replace(SHARP, 'is').replace(NATURAL, '').replace(DOUBLESHARP, 'isis').replace(DOUBLEFLAT, 'eses');
                 var mode = logo.notationStaging[turtle][i + 2];
                 // Lilypond knows about common modes.
                 if (['major', 'minor', 'ionian', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian'].indexOf(mode) !== -1) {
