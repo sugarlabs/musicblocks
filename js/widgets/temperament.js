@@ -139,7 +139,6 @@ function TemperamentWidget () {
         }
         this.notesCircle.slicePathCustom.menuRadius = menuRadius;
         this.notesCircle.createWheel();
-        this.notesCircle.refreshWheel();
 
         var that = this;
         docById('wheelDiv2').style.position = 'absolute';
@@ -147,6 +146,35 @@ function TemperamentWidget () {
         docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
         docById('wheelDiv2').style.left = canvas.style.x + 'px';
         docById('wheelDiv2').style.top = canvas.style.y + 'px';
+
+        if (this.equallyEdit) {
+            var divAppend1 = document.createElement('div');
+            divAppend1.id = 'divAppend';
+            divAppend1.innerHTML = 'Clear';
+            divAppend1.style.textAlign = 'center';
+            divAppend1.style.position = 'absolute';
+            divAppend1.style.paddingTop = '5px';
+            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.height = '25px';
+            divAppend1.style.width = docById('wheelDiv2').style.width;
+            divAppend1.style.marginTop = docById('wheelDiv2').style.height;
+            divAppend1.style.overflow = 'auto';
+            docById('temperamentTable').append(divAppend1);
+
+            divAppend1.onclick = function() {
+                var ratio = that.ratios[0];
+                that.ratios = [];
+                that.ratios[0] = ratio;
+                that.ratios[1] = that.powerBase;
+                var frequency = that.frequencies[0];
+                that.frequencies = [];
+                that.frequencies[0] = frequency;
+                that.frequencies[1] = frequency * that.powerBase;
+                that.pitchNumber = 1;
+                that.equallyEdit = false;
+                that._circleOfNotes();
+            };
+        }
 
         docById('wheelDiv2').addEventListener('click', function(e) {
             that.showNoteInfo(e);  
@@ -479,6 +507,8 @@ function TemperamentWidget () {
                 for (var i = 0; i < divisions; i++) {
                     ratio[i] = Math.pow(that.powerBase, i/divisions);
                     ratio1[i] = ratio[i].toFixed(2);
+                }
+                for (var i = 0; i < that.ratios.length; i++) {
                     ratio2[i] = that.ratios[i];
                     ratio2[i] = ratio2[i].toFixed(2); 
                 }
@@ -520,6 +550,7 @@ function TemperamentWidget () {
 
             that.pitchNumber = pitchNumber;
             that.checkTemperament(compareRatios);
+            that.equallyEdit = true;
             that._circleOfNotes();
 
         };
@@ -936,6 +967,7 @@ function TemperamentWidget () {
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
         this.octaveChanged = false;
+        this.equallyEdit = false;
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = _buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
