@@ -1581,7 +1581,7 @@ function Block(protoblock, blocks, overrideName) {
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
                 if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._usePieNumber()) {
-                    this._labelChanged();
+                    this._labelChanged(true);
                     hideDOMLabel();
                 }
 
@@ -1887,7 +1887,6 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
                     break;
                 case 'scaledegree':
-                    console.log('SCALE DEGREE');
                     this._piemenuScaleDegree([1, 2, 3, 4, 5, 6, 7], this.value);
                     break;
                 case 'meter':
@@ -1914,12 +1913,11 @@ function Block(protoblock, blocks, overrideName) {
                 // Not sure why the change in the input is not available
                 // immediately in FireFox. We need a workaround if hardware
                 // acceleration is enabled.
-
                 if (!focused) {
                     return;
                 }
 
-                that._labelChanged();
+                that._labelChanged(true);
 
                 event.preventDefault();
 
@@ -1934,8 +1932,14 @@ function Block(protoblock, blocks, overrideName) {
                 }
             };
 
+
+            var __input = function (event) {
+                that._labelChanged(false);
+            };
+
             if (this.name === 'text' || this.name === 'number') {
                 this.label.addEventListener('blur', __blur);
+                this.label.addEventListener('input', __input);
             }
 
             var __keypress = function (event) {
@@ -1947,7 +1951,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label.addEventListener('keypress', __keypress);
 
             this.label.addEventListener('change', function () {
-                that._labelChanged();
+                that._labelChanged(true);
             });
 
             this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
@@ -2305,7 +2309,6 @@ function Block(protoblock, blocks, overrideName) {
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
             that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            console.log(obj[0] + obj[1]);
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
 
             __selectionChanged();
@@ -2459,7 +2462,6 @@ function Block(protoblock, blocks, overrideName) {
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
             that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            console.log(obj[0] + obj[1]);
             that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
 
             __selectionChanged();
@@ -2535,8 +2537,6 @@ function Block(protoblock, blocks, overrideName) {
             var i = labels.indexOf(label);
             that.value = accidentalValues[i];
             that.text.text = accidentalLabels[i];
-
-            console.log(accidentalLabels[i] + ' ' + accidentalValues[i]); 
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
@@ -2685,7 +2685,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged();
+            that._labelChanged(true);
         });
 
         // Position the widget over the note block.
@@ -2852,7 +2852,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged();
+            that._labelChanged(true);
         });
 
         // Position the widget over the note block.
@@ -3153,7 +3153,6 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             setTimeout(function () {
-                console.log(voice);
                 that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
                 that.blocks.logo.setSynthVolume(0, voice, DEFAULTVOLUME);
                 that.blocks.logo.synth.trigger(0, 'G4', 1 / 4, voice, null, null, false);
@@ -3497,7 +3496,6 @@ function Block(protoblock, blocks, overrideName) {
 
         // Build a pie menu of modes based on the current mode group.
         var __buildModeNameWheel = function (grp) {
-            console.log('BUILDING ' + grp);
             var newWheel = false;
             if (that._modeNameWheel === null) {
                 that._modeNameWheel = new wheelnav('_modeNameWheel', that._modeWheel.raphael);
@@ -3631,7 +3629,6 @@ function Block(protoblock, blocks, overrideName) {
             // The mode doesn't matter here, since we are using semi-tones.
             var obj = getNote(key, 4, i + o, key + ' chromatic', false, null, null);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
-            console.log(obj[0]);
 
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
@@ -3740,7 +3737,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.navItems[1].navigateFunction = __prepScale;
     };
 
-    this._labelChanged = function () {
+    this._labelChanged = function (closeInput) {
         // Update the block values as they change in the DOM label.
         if (this === null || this.label === null) {
             this._labelLock = false;
@@ -3749,9 +3746,11 @@ function Block(protoblock, blocks, overrideName) {
 
         this._labelLock = true;
 
-        this.label.style.display = 'none';
-        if (this.labelattr != null) {
-            this.labelattr.style.display = 'none';
+        if (closeInput) {
+            this.label.style.display = 'none';
+            if (this.labelattr != null) {
+                this.labelattr.style.display = 'none';
+            }
         }
 
         // The pie menu may be visible too, so hide it.
@@ -3774,10 +3773,14 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
+        var c = this.connections[0];
+
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
-            return;
+            if (this.name !== 'text' || c === null || this.blocks.blockList[c].name !== 'storein') {
+                return;
+            }
         }
 
         var c = this.connections[0];
@@ -3787,9 +3790,9 @@ function Block(protoblock, blocks, overrideName) {
             case 'action':
                 var that = this;
 
-                setTimeout(function () {
+                // setTimeout(function () {
                     that.blocks.palettes.removeActionPrototype(oldValue);
-                }, 1000);
+                // }, 1000);
 
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
@@ -3812,7 +3815,12 @@ function Block(protoblock, blocks, overrideName) {
 
         // Update the block value and block text.
         if (this.name === 'number') {
-            this.value = Number(newValue);
+            if (this.value === '-') {
+                this.value = -1;
+            } else {
+                this.value = Number(newValue);
+            }
+
             if (isNaN(this.value)) {
                 var thisBlock = this.blocks.blockList.indexOf(this);
                 this.blocks.errorMsg(newValue + ': Not a number', thisBlock);
@@ -3862,15 +3870,16 @@ function Block(protoblock, blocks, overrideName) {
 
         this.text.text = label;
 
-        // and hide the DOM textview...
-        this.label.style.display = 'none';
+        if (closeInput) {
+            // and hide the DOM textview...
+            this.label.style.display = 'none';
+        }
 
         // Make sure text is on top.
         var z = this.container.children.length - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
 
-        var c = this.connections[0];
         if (this.name === 'text' && c != null) {
             var cblock = this.blocks.blockList[c];
             switch (cblock.name) {
@@ -3893,8 +3902,7 @@ function Block(protoblock, blocks, overrideName) {
                         if (block.name === 'nameddo' && block.defaults.length === 0) {
                             block.hidden = true;
                         }
-                    }
-                    else {
+                    } else {
                         if (block.name === 'nameddo' && block.defaults[0] === oldValue) {
                             blockPalette.remove(block, oldValue);
                         }
@@ -3911,6 +3919,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.palettes.show();
                 break;
             case 'storein':
+                if (closeInput) {
                 // If the label was the name of a storein, update the
                 // associated box this.blocks and the palette buttons.
                 if (this.value !== 'box') {
@@ -3928,6 +3937,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('boxes');
                 this.blocks.palettes.show();
+                }
                 break;
             case 'setdrum':
             case 'playdrum':
