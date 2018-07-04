@@ -147,7 +147,7 @@ function TemperamentWidget () {
         docById('wheelDiv2').style.left = canvas.style.x + 'px';
         docById('wheelDiv2').style.top = canvas.style.y + 'px';
 
-        if (this.equallyEdit) {
+        if (this.equallyEdit == true && this.octaveChanged == false) {
             var divAppend1 = document.createElement('div');
             divAppend1.id = 'divAppend';
             divAppend1.innerHTML = 'Clear';
@@ -161,6 +161,50 @@ function TemperamentWidget () {
             divAppend1.style.overflow = 'auto';
             docById('temperamentTable').append(divAppend1);
 
+        }
+
+        if (this.equallyEdit == false && this.octaveChanged == true) {
+            var divAppend2 = document.createElement('div');
+            divAppend2.id = 'divAppend';
+            divAppend2.innerHTML = 'Back to 2:1 Octave Space';
+            divAppend2.style.textAlign = 'center';
+            divAppend2.style.position = 'absolute';
+            divAppend2.style.paddingTop = '5px';
+            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend2.style.height = '25px';
+            divAppend2.style.width = docById('wheelDiv2').style.width;
+            divAppend2.style.marginTop = docById('wheelDiv2').style.height;
+            divAppend2.style.overflow = 'auto';
+            docById('temperamentTable').append(divAppend2);
+        }
+
+        if (this.equallyEdit == true && this.octaveChanged == true) {
+            var divAppend = document.createElement('div');
+            divAppend.id = 'divAppend';
+            divAppend.innerHTML = '<div id="clearNotes" style="float:left;">Clear</div><div id="standardOctave" style="float:right;">Back to 2:1 Octave Space</div>';
+            divAppend.style.textAlign = 'center';
+            divAppend.style.position = 'absolute';
+            divAppend.style.height = '33px';
+            divAppend.style.width = docById('wheelDiv2').style.width;
+            divAppend.style.marginTop = height + 'px';
+            divAppend.style.background = 'rgba(255, 255, 255, 0.85)';
+            divAppend.style.overflow = 'auto';
+            docById('temperamentTable').append(divAppend);
+
+            var divAppend1 = docById('clearNotes');
+            divAppend1.style.height = '30px';
+            divAppend1.style.marginLeft = '3px';
+            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.width = '212px';
+
+            var divAppend2 = docById('standardOctave');
+            divAppend2.style.height = '30px';
+            divAppend2.style.marginRight = '3px';
+            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend2.style.width = (BUTTONDIVWIDTH / 2) - 8 + 'px';
+        }
+
+        if (divAppend1 !== undefined) {
             divAppend1.onclick = function() {
                 var ratio = that.ratios[0];
                 that.ratios = [];
@@ -172,6 +216,27 @@ function TemperamentWidget () {
                 that.frequencies[1] = frequency * that.powerBase;
                 that.pitchNumber = 1;
                 that.equallyEdit = false;
+                that._circleOfNotes();   
+            };
+        }
+
+        if (divAppend2 !== undefined) {
+            divAppend2.onclick = function() {
+                var powers = [];
+                var compareRatios = [];
+                var frequency = that.frequencies[0];
+                that.frequencies = [];
+
+                for (var i = 0; i < that.ratios.length; i++) {
+                    powers[i] = 12 * (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
+                    that.ratios[i] = Math.pow(2, powers[i] / 12);
+                    compareRatios[i] = that.ratios[i].toFixed(2);
+                    that.frequencies[i] = that.ratios[i] * frequency;
+                    that.frequencies[i] = that.frequencies[i].toFixed(2);
+                }
+                that.powerBase = 2;
+                that.checkTemperament(compareRatios);
+                that.octaveChanged = false;
                 that._circleOfNotes();
             };
         }
@@ -525,6 +590,7 @@ function TemperamentWidget () {
                 that.ratios.sort(function(a, b){
                     return a-b;
                 });
+                that.equallyEdit = true;
                 pitchNumber = that.ratios.length - 1;
             } else {
                 pitchNumber = divisions + Number(pitchNumber) - (Math.abs(pitchNumber1 - pitchNumber2));
@@ -550,7 +616,6 @@ function TemperamentWidget () {
 
             that.pitchNumber = pitchNumber;
             that.checkTemperament(compareRatios);
-            that.equallyEdit = true;
             that._circleOfNotes();
 
         };
@@ -749,7 +814,7 @@ function TemperamentWidget () {
             that.frequencies = [];
 
             for (var i = 0; i < len; i++) {
-                powers[i] = 12 * (Math.log10(that.ratios[i]) / Math.log10(2));
+                powers[i] = 12 * (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
                 that.ratios[i] = Math.pow(ratio, powers[i] / 12);
                 compareRatios[i] = that.ratios[i].toFixed(2);
                 that.frequencies[i] = that.ratios[i] * frequency;
@@ -757,7 +822,9 @@ function TemperamentWidget () {
             }
             that.powerBase = ratio;
             that.checkTemperament(compareRatios);
-            that.octaveChanged = true;
+            if (ratio != 2) {
+                that.octaveChanged = true;
+            }
             that._circleOfNotes();
         };   
     };
@@ -773,7 +840,7 @@ function TemperamentWidget () {
                 intervals[j] = t.interval[j];
                 temperamentRatios[j] = t[intervals[j]];
                 temperamentRatios[j] = temperamentRatios[j].toFixed(2);
-            }   
+            } 
             var ratiosEqual = (ratios.length == temperamentRatios.length) && ratios.every(function(element, index) {
                 return element === temperamentRatios[index]; 
             });
