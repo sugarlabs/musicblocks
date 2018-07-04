@@ -41,6 +41,7 @@ function RhythmRuler () {
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
     const DEL = 46;
+    var alignmentAfter = 0;
 
     // There is one ruler per drum.
     this.Drums = [];
@@ -1156,7 +1157,30 @@ function RhythmRuler () {
     };
 
     this._showRuler = function() {
-         var evenIndexNumbers = [];
+         // var evenIndexNumbers = [];
+         // var oddIndexNumbers = [];
+         // for (var z = 0; z < rhythmAndMeter.length; z++) {
+         //    if (z%2 === 0) {
+         //        evenIndexNumbers.push(rhythmAndMeter[z]);
+         //    } else {
+         //        oddIndexNumbers.push(rhythmAndMeter[z]);
+         //    }
+         // }
+         // var lcmOfNumerator = lcmIter(evenIndexNumbers, evenIndexNumbers.length);
+         // var gcdofDenominator = gcdIter(oddIndexNumbers, oddIndexNumbers.length);
+         // alignmentAfter = lcmOfNumerator/gcdofDenominator;
+         // console.log('Alignment will happen after ' + alignmentAfter + ' Units.');
+         // for (var k = 0; k < rhythmAndMeter.length; k=k+4) {
+         //    console.log('Meter ' + ((k/4)+1) +' Should repeat for ' +alignmentAfter/(rhythmAndMeter[k]/rhythmAndMeter[k+1]));
+         // }
+
+    };
+
+    this.init = function (logo) {
+        console.log('init RhythmRuler');
+
+
+        var evenIndexNumbers = [];
          var oddIndexNumbers = [];
          for (var z = 0; z < rhythmAndMeter.length; z++) {
             if (z%2 === 0) {
@@ -1167,16 +1191,14 @@ function RhythmRuler () {
          }
          var lcmOfNumerator = lcmIter(evenIndexNumbers, evenIndexNumbers.length);
          var gcdofDenominator = gcdIter(oddIndexNumbers, oddIndexNumbers.length);
-         var alignmentAfter = lcmOfNumerator/gcdofDenominator;
+         alignmentAfter = lcmOfNumerator/gcdofDenominator;
          console.log('Alignment will happen after ' + alignmentAfter + ' Units.');
          for (var k = 0; k < rhythmAndMeter.length; k=k+4) {
             console.log('Meter ' + ((k/4)+1) +' Should repeat for ' +alignmentAfter/(rhythmAndMeter[k]/rhythmAndMeter[k+1]));
          }
 
-    };
 
-    this.init = function (logo) {
-        console.log('init RhythmRuler');
+
         meterCount = 0;
         currentMeterNoteNum = 1;
         currentMeterNoteDen = 1;
@@ -1507,7 +1529,7 @@ function RhythmRuler () {
             rulerCellTable.cellSpacing = '0px';
             rulerCellTable.cellPadding = '0px';
 
-            rulerCellTable1.style.textAlign = 'right';
+            rulerCellTable1.style.textAlign = 'left';
             rulerCellTable1.style.border = '0px';
             rulerCellTable1.style.borderCollapse = 'collapse';
             rulerCellTable1.cellSpacing = '0px';
@@ -1560,21 +1582,27 @@ function RhythmRuler () {
 
             }
 
-            for (var j = 0; j < this.Rulers[i][0].length; j++) {
+            for (var j = 0; j < 1; j++) {
                 var rulerSubCell1 = rulerRow1.insertCell(-1);
 
-                rulerSubCell1.innerHTML = calcNoteValueToDisplay(4, 1, this._cellScale);
+            //    rulerSubCell1.innerHTML = calcNoteValueToDisplay(1.5, 2, 4/4);
+            //    rulerSubCell1.innerHTML = " hi \u00A0 friends";
+                rulerSubCell1.innerHTML = rhythmAndMeter[4*i];
+                rulerSubCell1.innerHTML += "/" ;
+                rulerSubCell1.innerHTML += rhythmAndMeter[4*i+1];
+                rulerSubCell1.innerHTML += " meter and repititon after ";
+                rulerSubCell1.innerHTML += alignmentAfter;
                 rulerSubCell1.style.height = RULERHEIGHT + 'px';
                 rulerSubCell1.style.minHeight = rulerSubCell1.style.height;
                 rulerSubCell1.style.maxHeight = rulerSubCell1.style.height;
-                rulerSubCell1.style.width = this._noteWidth(4) + 'px';      // length of color strip
+                rulerSubCell1.style.width = this._noteWidth(1/alignmentAfter) + 'px';      // 1/length of color strip
                 rulerSubCell1.style.minWidth = rulerSubCell1.style.width;
                 rulerSubCell1.style.maxWidth = rulerSubCell1.style.width;
                 rulerSubCell1.style.border = '0px';
                 rulerSubCell1.border = '0px';
                 rulerSubCell1.padding = '0px';
                 rulerSubCell1.style.padding = '0px';
-                rulerSubCell1.style.lineHeight = 60 + ' % ';
+                rulerSubCell1.style.lineHeight = 30 + ' % ';
 
                 
 
@@ -1593,7 +1621,7 @@ function RhythmRuler () {
                 }
 
                // rulerSubCell1.style.backgroundColor = 'grey';
-                this.__addCellEventHandlers(rulerSubCell1, this._noteWidth(4), 4);
+              //  this.__addCellEventHandlers(rulerSubCell1, this._noteWidth(3), 3);
 
             }
 
@@ -1602,9 +1630,9 @@ function RhythmRuler () {
             rhythmRulerTableRow1.cells[0].style.width = BUTTONSIZE + 'px';
             rhythmRulerTableRow1.cells[0].style.minWidth = BUTTONSIZE + 'px';
             rhythmRulerTableRow1.cells[0].style.maxWidth = BUTTONSIZE + 'px';
-            rhythmRulerTableRow1.cells[0].style.height = 20 + 'px';
-            rhythmRulerTableRow1.cells[0].style.minHeight = 20 + 'px';
-            rhythmRulerTableRow1.cells[0].style.maxHeight = 20 + 'px';
+            rhythmRulerTableRow1.cells[0].style.height = 10 + 'px';
+            rhythmRulerTableRow1.cells[0].style.minHeight = 10 + 'px';
+            rhythmRulerTableRow1.cells[0].style.maxHeight = 10 + 'px';
             rhythmRulerTableRow1.cells[0].style.verticalAlign = 'middle';
 
             rhythmRulerTableRow.cells[0].style.width = BUTTONSIZE + 'px';
