@@ -709,12 +709,107 @@ function TemperamentWidget () {
     this.arbitraryEdit = function() {
         docById('userEdit').innerHTML = '';
         var arbitraryEdit = docById('userEdit');
-        arbitraryEdit.style.backgroundColor = '#c8C8C8';
-        arbitraryEdit.innerHTML = '<br>Frequency :<br><br><input type="range" class="sliders" id = "frequencySlider" style="width:300px; background:rgb(200, 200, 200); border:0;" min="' + this.frequencies[0] + '" max="' + this.frequencies[0] * 2 + '" value="30"><span class="rangeslidervalue" id="frequencydiv">' + this.frequencies[0] + '</span>';
-        arbitraryEdit.style.paddingLeft = '20px';
-        docById('frequencySlider').oninput = function() {
-            docById('frequencydiv').innerHTML = docById('frequencySlider').value;
-        };
+        arbitraryEdit.innerHTML = '<br><div id="wheelDiv3" class="wheelNav"></div>';
+        arbitraryEdit.style.paddingLeft = '0px';
+
+        var radius = 132;
+        var height = 2 * radius;
+
+        arbitraryEdit.style.height = height + 100 + 'px';
+        arbitraryEdit.innerHTML += '<canvas id="circ1" width = ' + BUTTONDIVWIDTH + 'px height = ' + height + 'px></canvas>';
+
+        var canvas = docById('circ1');
+        canvas.style.position = 'absolute';
+        canvas.style.marginTop = '-305px';
+        var ctx = canvas.getContext("2d");
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+            
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        ctx.fillStyle = "rgba(204, 0, 102, 0)";
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#003300';
+        ctx.stroke();
+
+        docById('wheelDiv3').style.display = '';
+        docById('wheelDiv3').style.background = 'none';
+        this.wheel = new wheelnav('wheelDiv3', null, 600, 600);
+        this.wheel.slicePathFunction = slicePath().DonutSlice;
+        this.wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this.wheel.slicePathCustom.minRadiusPercent = 0.9;
+        this.wheel.slicePathCustom.maxRadiusPercent = 1.0;
+        this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
+        this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
+        this.wheel.colors = ['#c0c0c0', '#e0e0e0'];
+        this.wheel.titleRotateAngle = 90;
+        this.wheel.navAngle = 270;
+        this.wheel.navItemsEnabled = false;
+
+        var minutes = [];
+        var angle = [];
+        var angleDiff = [];
+        var angle1 = [];
+        var baseAngle1 = [];
+        var sliceAngle1 = [];
+
+        for (i=0; i <= this.pitchNumber; i++) {
+            if (i !== this.pitchNumber) {
+                minutes.push('|');
+            }
+            //Change angles of outer circle
+            angle[i] = 270 + (360 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase)));
+            if (i !== 0) {
+                if (i == this.pitchNumber - 1) {
+                    angleDiff[i-1] = angle[0] + 360 - angle[i];
+                } else {
+                    angleDiff[i-1] = angle[i] - angle[i-1];
+                }
+                angle1[i-1] = angle[i-1] + (angleDiff[i-1] / 2);       
+            }  
+        }
+        this.wheel.initWheel(minutes);
+        this.wheel.createWheel();
+
+        var labels = [];
+        for (var j = 0; j < this.pitchNumber; j++) {
+            var label = j.toString();
+            labels.push(label);
+        }
+
+        var wheel1 = new wheelnav('wheelDiv2', this.wheel.raphael);
+        wheel1.wheelRadius = 220;
+        wheel1.maxPercent = 1.6;
+        wheel1.navItemsEnabled = false;
+        wheel1.navAngle = 270;
+        wheel1.navItemsContinuous = true;
+        wheel1.navItemsCentered = false;
+        wheel1.slicePathFunction = slicePath().MenuSliceWithoutLine;
+        wheel1.slicePathCustom = slicePath().MenuSliceCustomization();
+        wheel1.sliceSelectedPathCustom = wheel1.slicePathCustom;
+        wheel1.sliceInitPathCustom = wheel1.slicePathCustom;
+        wheel1.initWheel(labels);
+
+        var baseAngle = [];
+        var sliceAngle = [];
+        for (var i = 0; i < wheel1.navItemCount; i++) {
+            wheel1.navItems[i].fillAttr = "#e0e0e0";
+            if (i === 0) {
+                sliceAngle[i] = 360 / this.pitchNumber;
+                baseAngle[i] = this.notesCircle.navAngle - (sliceAngle[0] / 2);
+            } else {
+                baseAngle[i] = baseAngle[i-1] + sliceAngle[i-1];
+                sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
+            }
+            wheel1.navItems[i].sliceAngle = sliceAngle[i];
+        }
+        var menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 3;
+        wheel1.slicePathCustom.menuRadius = menuRadius;
+        wheel1.createWheel();
+    
+        docById('wheelDiv3').style.position = 'relative';
+        docById('wheelDiv3').style.zIndex = 10;
         var that = this;
         
         var divAppend = document.createElement('div');
@@ -722,7 +817,6 @@ function TemperamentWidget () {
         divAppend.innerHTML = 'Done';
         divAppend.style.textAlign = 'center';
         divAppend.style.paddingTop = '5px';
-        divAppend.style.marginLeft = '-20px';
         divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
         divAppend.style.height = '25px';
         divAppend.style.marginTop = '40px';
@@ -734,41 +828,7 @@ function TemperamentWidget () {
         };
 
         divAppend.onclick = function() {
-            var frequency = docById('frequencySlider').value;
-            var ratio = frequency / that.frequencies[0];
-            var ratioDifference = [];
-            var compareRatios = [];
 
-            for (var j = 0; j < that.ratios.length ; j++) {
-                ratioDifference[j] = ratio - that.ratios[j];
-                ratioDifference[j] = ratioDifference[j].toFixed(2);
-                    if (ratioDifference[j] < 0) {
-                        var index = j;
-                        that.ratios.splice(index, 0, ratio);
-                        break;
-                    }
-                    if (ratioDifference[j] == 0) {
-                        var index = j;
-                        that.ratios.splice(index, 1, ratio);
-                        break;
-                    }
-            }
-
-            that.pitchNumber = that.ratios.length;
-            var frequency1 = that.frequencies[0];
-            that.frequencies = [];
-            for (var i = 0; i < that.pitchNumber; i++) {
-                that.frequencies[i] = that.ratios[i] * frequency1;
-                that.frequencies[i] = that.frequencies[i].toFixed(2);
-            }
-
-            for (var i = 0; i < that.ratios.length; i++) {
-                compareRatios[i] = that.ratios[i];
-                compareRatios[i] = compareRatios[i].toFixed(2);
-            }
-
-            that.checkTemperament(compareRatios);
-            that._circleOfNotes();
         };
     };
 
@@ -1104,8 +1164,12 @@ function TemperamentWidget () {
             docById('temperamentTableDiv').style.visibility = 'hidden';
             if (docById('wheelDiv2') != null) {
                 docById('wheelDiv2').style.display = 'none';
-                that.notesCircle.removeWheel(); 
-            }   
+                that.notesCircle.removeWheel();
+            }
+            if (docById('wheelDiv3') != null) {
+                docById('wheelDiv3').style.display = 'none';
+                that.wheel.removeWheel();  
+            }
         };
 
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
