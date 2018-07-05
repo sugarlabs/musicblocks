@@ -744,7 +744,6 @@ function TemperamentWidget () {
         this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
         this.wheel.colors = ['#c0c0c0', '#e0e0e0'];
         this.wheel.titleRotateAngle = 90;
-        this.wheel.navAngle = 270;
         this.wheel.navItemsEnabled = false;
 
         var minutes = [];
@@ -769,7 +768,20 @@ function TemperamentWidget () {
                 angle1[i-1] = angle[i-1] + (angleDiff[i-1] / 2);       
             }  
         }
+        this.wheel.navAngle = 270 + (angleDiff[0] / 2);
         this.wheel.initWheel(minutes);
+        for (var i = 0; i < this.pitchNumber; i++) {
+            if (i === 0) {
+                sliceAngle1[i] = (360 / this.pitchNumber);
+                baseAngle1[i] = this.wheel.navAngle - (sliceAngle1[0] / 2);
+            } else {
+                baseAngle1[i] = baseAngle1[i-1] + sliceAngle1[i-1];
+                sliceAngle1[i] = 2 * (angle1[i] - baseAngle1[i]);
+            }
+            this.wheel.navItems[i].sliceAngle = sliceAngle1[i];
+        }
+        console.log(this.wheel.navItems);
+        console.log(angle1);
         this.wheel.createWheel();
 
         var labels = [];
