@@ -211,12 +211,12 @@ def pluginify(data):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print HELP
+        print(HELP)
     elif sys.argv[1] in ('help', '-h', '--help'):
-        print HELP
+        print(HELP)
     elif sys.argv[1] == 'syntax':
-        print SYNTAX
+        print(SYNTAX)
     else:
         with open(sys.argv[1]) as f:
             data = f.read()
-        print pluginify(data)
+        print(pluginify(data))
