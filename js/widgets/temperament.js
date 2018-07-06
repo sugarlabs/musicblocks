@@ -715,7 +715,6 @@ function TemperamentWidget () {
         var radius = 132;
         var height = 2 * radius;
 
-        arbitraryEdit.style.height = height + 100 + 'px';
         arbitraryEdit.innerHTML += '<canvas id="circ1" width = ' + BUTTONDIVWIDTH + 'px height = ' + height + 'px></canvas>';
 
         var canvas = docById('circ1');
@@ -780,8 +779,6 @@ function TemperamentWidget () {
             }
             this.wheel.navItems[i].sliceAngle = sliceAngle1[i];
         }
-        console.log(this.wheel.navItems);
-        console.log(angle1);
         this.wheel.createWheel();
 
         var labels = [];
@@ -839,9 +836,37 @@ function TemperamentWidget () {
             this.style.cursor = 'pointer';
         };
 
+        docById('wheelDiv3').addEventListener('click', function(e) {
+            that.arbitraryEditSlider(e);  
+        });
+
         divAppend.onclick = function() {
 
         };
+    };
+
+    this.arbitraryEditSlider = function(event) {
+        for(var i = 0; i < this.pitchNumber; i++) {
+            if (event.target.parentNode.id == 'wheelnav-wheelDiv3-title-' + i){
+                var x = event.clientX - docById('wheelDiv3').getBoundingClientRect().left;
+                var y = event.clientY - docById('wheelDiv3').getBoundingClientRect().top;
+                var that = this;
+                if (docById('noteInfo1') !== null) {
+                    docById('noteInfo1').remove();
+                }
+                docById('wheelDiv3').innerHTML += '<div class="popup" id="noteInfo1" style="width:180px; height:100px; left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>' 
+                docById('noteInfo1').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right">';
+                docById('noteInfo1').innerHTML += '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' + this.frequencies[i] + '" max="' + this.frequencies[i+1] + '" value="30"></center>';
+                docById('noteInfo1').innerHTML += '&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv">' + this.frequencies[i] + '</span>';
+
+                docById('frequencySlider').oninput = function() {
+                   docById('frequencydiv').innerHTML = docById('frequencySlider').value;
+                };
+                docById('close').onclick = function() {
+                    docById('noteInfo1').remove();
+                }
+            }
+        }
     };
 
     this.octaveSpaceEdit = function() {
