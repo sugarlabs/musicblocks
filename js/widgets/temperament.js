@@ -837,7 +837,7 @@ function TemperamentWidget () {
         };
 
         docById('wheelDiv3').addEventListener('click', function(e) {
-            that.arbitraryEditSlider(e);  
+            that.arbitraryEditSlider(e, angle1);  
         });
 
         divAppend.onclick = function() {
@@ -845,7 +845,7 @@ function TemperamentWidget () {
         };
     };
 
-    this.arbitraryEditSlider = function(event) {
+    this.arbitraryEditSlider = function(event, angle) {
         for(var i = 0; i < this.pitchNumber; i++) {
             if (event.target.parentNode.id == 'wheelnav-wheelDiv3-title-' + i){
                 var x = event.clientX - docById('wheelDiv3').getBoundingClientRect().left;
@@ -854,10 +854,25 @@ function TemperamentWidget () {
                 if (docById('noteInfo1') !== null) {
                     docById('noteInfo1').remove();
                 }
-                docById('wheelDiv3').innerHTML += '<div class="popup" id="noteInfo1" style="width:180px; height:100px; left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>' 
+
+                docById('wheelDiv3').innerHTML += '<div class="popup" id="noteInfo1" style="width:180px; height:100px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById('noteInfo1').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right">';
                 docById('noteInfo1').innerHTML += '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' + this.frequencies[i] + '" max="' + this.frequencies[i+1] + '" value="30"></center>';
                 docById('noteInfo1').innerHTML += '&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv">' + this.frequencies[i] + '</span>';
+
+                if (angle[i] >= 270 && angle[i] <= 360) {
+                    docById('noteInfo1').style.top = y - 100 + 'px';
+                    docById('noteInfo1').style.left = x + 'px';
+                } else if (angle[i] > 360 && angle[i] <= 450 ) {
+                    docById('noteInfo1').style.top = y + 'px';
+                    docById('noteInfo1').style.left = x + 'px';
+                } else if (angle[i] > 450 && angle[i] <= 540 ) {
+                    docById('noteInfo1').style.top = y + 'px';
+                    docById('noteInfo1').style.left = x - 180 + 'px';
+                } else if (angle[i] > 540 && angle[i] <= 630 ) {
+                    docById('noteInfo1').style.top = y - 100 + 'px';
+                    docById('noteInfo1').style.left = x - 180 + 'px';
+                }
 
                 docById('frequencySlider').oninput = function() {
                    docById('frequencydiv').innerHTML = docById('frequencySlider').value;
