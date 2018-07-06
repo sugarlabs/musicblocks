@@ -1590,7 +1590,7 @@ function RhythmRuler () {
                 rulerSubCell1.innerHTML = rhythmAndMeter[4*i];
                 rulerSubCell1.innerHTML += "/" ;
                 rulerSubCell1.innerHTML += rhythmAndMeter[4*i+1];
-                rulerSubCell1.innerHTML += " meter and repititon after ";
+                rulerSubCell1.innerHTML += " meter and repetition after ";
                 rulerSubCell1.innerHTML += alignmentAfter;
                 rulerSubCell1.style.height = RULERHEIGHT + 'px';
                 rulerSubCell1.style.minHeight = rulerSubCell1.style.height;
