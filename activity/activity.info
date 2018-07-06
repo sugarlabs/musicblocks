@@ -2,7 +2,7 @@
 name = Mouse Music
 activity_version = 1
 bundle_id = org.sugarlabs.MusicBlocks
-exec = sugar-activity-web
+exec = sugar-activity3-web
 icon = activity-icon
 license = AGPL
 website = http://sugarlabs.github.io/musicblocks/guide/
