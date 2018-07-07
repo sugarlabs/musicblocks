@@ -268,8 +268,8 @@ function TemperamentWidget () {
                         break;
                     }     
                 }
-                if (noteDefined == false && this.octaveChanged == false) {
-                    var cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                if (noteDefined == false) {
+                    var cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
                     var centsDiff = [];
                     var centsDiff1 = [];
                     for (var j = 0; j < this.cents.length; j++) {
@@ -712,13 +712,85 @@ function TemperamentWidget () {
         arbitraryEdit.innerHTML = '<br><div id="wheelDiv3" class="wheelNav"></div>';
         arbitraryEdit.style.paddingLeft = '0px';
 
-        var radius = 132;
+        var radius = 128;
         var height = 2 * radius;
+        var minutes = [];
+        var angle = [];
+        var angleDiff = [];
+        var angle1 = [];
+        var baseAngle1 = [];
+        var sliceAngle1 = [];
+
+        this._createInnerWheel = function(ratios, pitchNumber) {
+            if (this.wheel1 !== undefined) {
+                docById('wheelDiv4').display = 'none';
+                this.wheel1.removeWheel();
+            }
+            if (ratios == undefined) {
+                ratios = this.ratios;
+            }
+            if (pitchNumber == undefined) {
+                pitchNumber = this.pitchNumber;
+            }
+            var labels = [];
+            for (var j = 0; j < pitchNumber; j++) {
+                var label = j.toString();
+                labels.push(label);
+            }
+            docById('wheelDiv4').style.display = '';
+            docById('wheelDiv4').style.background = 'none';
+            docById('wheelDiv4').style.position = 'relative';
+            docById('wheelDiv4').style.zIndex = 5;
+            this.wheel1 = new wheelnav('wheelDiv4');
+            this.wheel1.wheelRadius = 200;
+            this.wheel1.navItemsEnabled = false;
+            this.wheel1.navAngle = 270;
+            this.wheel1.navItemsContinuous = true;
+            this.wheel1.navItemsCentered = false;
+            this.wheel1.slicePathFunction = slicePath().MenuSliceWithoutLine;
+            this.wheel1.slicePathCustom = slicePath().MenuSliceCustomization();
+            this.wheel1.sliceSelectedPathCustom = this.wheel1.slicePathCustom;
+            this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
+            this.wheel1.initWheel(labels);
+
+            var baseAngle = [];
+            var sliceAngle = [];
+            var angle = [];
+            for (var i = 0; i < this.wheel1.navItemCount; i++) {
+                this.wheel1.navItems[i].fillAttr = "#e0e0e0";
+                this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                this.wheel1.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                angle[i] = 270 + (360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase)));
+                if (i === 0) {
+                    sliceAngle[i] = 360 / pitchNumber;
+                    baseAngle[i] = this.wheel1.navAngle - (sliceAngle[0] / 2);
+                } else {
+                    baseAngle[i] = baseAngle[i-1] + sliceAngle[i-1];
+                    sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
+                }
+                this.wheel1.navItems[i].sliceAngle = sliceAngle[i];
+            }
+            var menuRadius = (2 * Math.PI * radius / pitchNumber) / 3;
+            this.wheel1.slicePathCustom.menuRadius = menuRadius;
+            
+            docById('wheelDiv3').addEventListener('mouseover', function(e) {
+                that.arbitraryEditSlider(e, angle1);  
+            });
+            if (docById('frequencySlider') !== null) {
+                docById('frequencySlider').oninput = function() {
+                    that._refreshInnerWheel();
+                };
+            }
+            this.wheel1.createWheel();  
+        }
+        arbitraryEdit.innerHTML += '<div id="wheelDiv4" class="wheelNav"></div>';
+        this._createInnerWheel();
 
         arbitraryEdit.innerHTML += '<canvas id="circ1" width = ' + BUTTONDIVWIDTH + 'px height = ' + height + 'px></canvas>';
 
         var canvas = docById('circ1');
         canvas.style.position = 'absolute';
+        canvas.style.zIndex = 1;
         canvas.style.marginTop = '-305px';
         var ctx = canvas.getContext("2d");
         var centerX = canvas.width / 2;
@@ -735,6 +807,7 @@ function TemperamentWidget () {
         docById('wheelDiv3').style.display = '';
         docById('wheelDiv3').style.background = 'none';
         this.wheel = new wheelnav('wheelDiv3', null, 600, 600);
+        this.wheel.wheelRadius = 300;
         this.wheel.slicePathFunction = slicePath().DonutSlice;
         this.wheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this.wheel.slicePathCustom.minRadiusPercent = 0.9;
@@ -744,14 +817,6 @@ function TemperamentWidget () {
         this.wheel.colors = ['#c0c0c0', '#e0e0e0'];
         this.wheel.titleRotateAngle = 90;
         this.wheel.navItemsEnabled = false;
-
-        var minutes = [];
-        var angle = [];
-        var angleDiff = [];
-        var angle1 = [];
-        var baseAngle1 = [];
-        var sliceAngle1 = [];
-
         for (i=0; i <= this.pitchNumber; i++) {
             if (i !== this.pitchNumber) {
                 minutes.push('|');
@@ -780,45 +845,11 @@ function TemperamentWidget () {
             this.wheel.navItems[i].sliceAngle = sliceAngle1[i];
         }
         this.wheel.createWheel();
-
-        var labels = [];
-        for (var j = 0; j < this.pitchNumber; j++) {
-            var label = j.toString();
-            labels.push(label);
-        }
-
-        var wheel1 = new wheelnav('wheelDiv2', this.wheel.raphael);
-        wheel1.wheelRadius = 220;
-        wheel1.maxPercent = 1.6;
-        wheel1.navItemsEnabled = false;
-        wheel1.navAngle = 270;
-        wheel1.navItemsContinuous = true;
-        wheel1.navItemsCentered = false;
-        wheel1.slicePathFunction = slicePath().MenuSliceWithoutLine;
-        wheel1.slicePathCustom = slicePath().MenuSliceCustomization();
-        wheel1.sliceSelectedPathCustom = wheel1.slicePathCustom;
-        wheel1.sliceInitPathCustom = wheel1.slicePathCustom;
-        wheel1.initWheel(labels);
-
-        var baseAngle = [];
-        var sliceAngle = [];
-        for (var i = 0; i < wheel1.navItemCount; i++) {
-            wheel1.navItems[i].fillAttr = "#e0e0e0";
-            if (i === 0) {
-                sliceAngle[i] = 360 / this.pitchNumber;
-                baseAngle[i] = this.notesCircle.navAngle - (sliceAngle[0] / 2);
-            } else {
-                baseAngle[i] = baseAngle[i-1] + sliceAngle[i-1];
-                sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
-            }
-            wheel1.navItems[i].sliceAngle = sliceAngle[i];
-        }
-        var menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 3;
-        wheel1.slicePathCustom.menuRadius = menuRadius;
-        wheel1.createWheel();
-    
-        docById('wheelDiv3').style.position = 'relative';
+        docById('wheelDiv3').style.position = 'absolute';
         docById('wheelDiv3').style.zIndex = 10;
+        docById('wheelDiv3').style.marginTop = 15 + 'px';
+        docById('wheelDiv3').style.marginLeft = 37 + 'px';
+
         var that = this;
         
         var divAppend = document.createElement('div');
@@ -836,7 +867,7 @@ function TemperamentWidget () {
             this.style.cursor = 'pointer';
         };
 
-        docById('wheelDiv3').addEventListener('click', function(e) {
+        docById('wheelDiv3').addEventListener('mouseover', function(e) {
             that.arbitraryEditSlider(e, angle1);  
         });
 
@@ -875,7 +906,7 @@ function TemperamentWidget () {
                 }
 
                 docById('frequencySlider').oninput = function() {
-                   docById('frequencydiv').innerHTML = docById('frequencySlider').value;
+                    that._refreshInnerWheel();
                 };
                 docById('close').onclick = function() {
                     docById('noteInfo1').remove();
@@ -883,6 +914,31 @@ function TemperamentWidget () {
             }
         }
     };
+
+    this._refreshInnerWheel = function() {
+        docById('frequencydiv').innerHTML = docById('frequencySlider').value;
+        var frequency = docById('frequencySlider').value;
+        var ratio = frequency / this.frequencies[0];
+        var labels = [];
+        var ratioDifference = [];
+        var tempRatios = [];
+        tempRatios = this.ratios.slice();
+        for (var j = 0; j < tempRatios.length; j++) {
+            ratioDifference[j] = ratio - tempRatios[j];
+                if (ratioDifference[j] < 0) {
+                    var index = j;
+                    tempRatios.splice(index, 0, ratio);
+                    break;
+                }
+                if (ratioDifference[j] == 0) {
+                    var index = j;
+                    tempRatios.splice(index, 1, ratio);
+                    break;
+                }
+        }
+        var pitchNumber = tempRatios.length - 1;
+        this._createInnerWheel(tempRatios, pitchNumber);
+    }
 
     this.octaveSpaceEdit = function() {
         docById('userEdit').innerHTML = '';
@@ -1221,6 +1277,10 @@ function TemperamentWidget () {
             if (docById('wheelDiv3') != null) {
                 docById('wheelDiv3').style.display = 'none';
                 that.wheel.removeWheel();  
+            }
+            if (docById('wheelDiv4') != null) {
+                docById('wheelDiv4').style.display = 'none';
+                that.wheel1.removeWheel();  
             }
         };
 
