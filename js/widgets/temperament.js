@@ -147,38 +147,7 @@ function TemperamentWidget () {
         docById('wheelDiv2').style.left = canvas.style.x + 'px';
         docById('wheelDiv2').style.top = canvas.style.y + 'px';
 
-        if (this.equallyEdit == true && this.octaveChanged == false) {
-            var divAppend1 = document.createElement('div');
-            divAppend1.id = 'divAppend';
-            divAppend1.innerHTML = 'Clear';
-            divAppend1.style.textAlign = 'center';
-            divAppend1.style.position = 'absolute';
-            divAppend1.style.paddingTop = '5px';
-            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
-            divAppend1.style.height = '25px';
-            divAppend1.style.width = docById('wheelDiv2').style.width;
-            divAppend1.style.marginTop = docById('wheelDiv2').style.height;
-            divAppend1.style.overflow = 'auto';
-            docById('temperamentTable').append(divAppend1);
-
-        }
-
-        if (this.equallyEdit == false && this.octaveChanged == true) {
-            var divAppend2 = document.createElement('div');
-            divAppend2.id = 'divAppend';
-            divAppend2.innerHTML = 'Back to 2:1 Octave Space';
-            divAppend2.style.textAlign = 'center';
-            divAppend2.style.position = 'absolute';
-            divAppend2.style.paddingTop = '5px';
-            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
-            divAppend2.style.height = '25px';
-            divAppend2.style.width = docById('wheelDiv2').style.width;
-            divAppend2.style.marginTop = docById('wheelDiv2').style.height;
-            divAppend2.style.overflow = 'auto';
-            docById('temperamentTable').append(divAppend2);
-        }
-
-        if (this.equallyEdit == true && this.octaveChanged == true) {
+        if (this.octaveChanged) {
             var divAppend = document.createElement('div');
             divAppend.id = 'divAppend';
             divAppend.innerHTML = '<div id="clearNotes" style="float:left;">Clear</div><div id="standardOctave" style="float:right;">Back to 2:1 Octave Space</div>';
@@ -202,6 +171,19 @@ function TemperamentWidget () {
             divAppend2.style.marginRight = '3px';
             divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
             divAppend2.style.width = (BUTTONDIVWIDTH / 2) - 8 + 'px';
+        } else {
+            var divAppend1 = document.createElement('div');
+            divAppend1.id = 'divAppend';
+            divAppend1.innerHTML = 'Clear';
+            divAppend1.style.textAlign = 'center';
+            divAppend1.style.position = 'absolute';
+            divAppend1.style.paddingTop = '5px';
+            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.height = '25px';
+            divAppend1.style.width = docById('wheelDiv2').style.width;
+            divAppend1.style.marginTop = docById('wheelDiv2').style.height;
+            divAppend1.style.overflow = 'auto';
+            docById('temperamentTable').append(divAppend1);
         }
 
         if (divAppend1 !== undefined) {
@@ -215,7 +197,6 @@ function TemperamentWidget () {
                 that.frequencies[0] = frequency;
                 that.frequencies[1] = frequency * that.powerBase;
                 that.pitchNumber = 1;
-                that.equallyEdit = false;
                 that._circleOfNotes();   
             };
         }
@@ -310,7 +291,7 @@ function TemperamentWidget () {
         }
     };
 
-    this._graphOfNotes = function (){  //TODO : Improve UI.
+    this._graphOfNotes = function (){
         this.circleIsVisible = true;
         this.toggleNotesButton();
         temperamentTableDiv.innerHTML = '';
@@ -590,7 +571,6 @@ function TemperamentWidget () {
                 that.ratios.sort(function(a, b){
                     return a-b;
                 });
-                that.equallyEdit = true;
                 pitchNumber = that.ratios.length - 1;
             } else {
                 pitchNumber = divisions + Number(pitchNumber) - (Math.abs(pitchNumber1 - pitchNumber2));
@@ -1202,7 +1182,6 @@ function TemperamentWidget () {
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
         this.octaveChanged = false;
-        this.equallyEdit = false;
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = _buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
