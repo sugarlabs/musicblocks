@@ -197,6 +197,7 @@ function TemperamentWidget () {
                 that.frequencies[0] = frequency;
                 that.frequencies[1] = frequency * that.powerBase;
                 that.pitchNumber = 1;
+                that.checkTemperament(that.ratios);
                 that._circleOfNotes();   
             };
         }
@@ -694,12 +695,7 @@ function TemperamentWidget () {
 
         var radius = 128;
         var height = 2 * radius;
-        var minutes = [];
-        var angle = [];
-        var angleDiff = [];
         var angle1 = [];
-        var baseAngle1 = [];
-        var sliceAngle1 = [];
         this.tempRatios1 = this.ratios.slice();
 
         this._createInnerWheel = function(ratios, pitchNumber) {
@@ -737,11 +733,19 @@ function TemperamentWidget () {
             var baseAngle = [];
             var sliceAngle = [];
             var angle = [];
+            var angleDiff = [];
             for (var i = 0; i < this.wheel1.navItemCount; i++) {
                 this.wheel1.navItems[i].fillAttr = "#e0e0e0";
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + (360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase)));
+                if (i !== 0) {
+                    if (i == this.pitchNumber - 1) {
+                        angleDiff[i-1] = angle[0] + 360 - angle[i];
+                    } else {
+                        angleDiff[i-1] = angle[i] - angle[i-1];
+                    }    
+                }
                 if (i === 0) {
                     sliceAngle[i] = 360 / pitchNumber;
                     baseAngle[i] = this.wheel1.navAngle - (sliceAngle[0] / 2);
@@ -752,11 +756,19 @@ function TemperamentWidget () {
                 this.wheel1.navItems[i].sliceAngle = sliceAngle[i];
             }
             var menuRadius = (2 * Math.PI * radius / pitchNumber) / 3;
+            for (var i = 0; i < angleDiff.length; i++) {
+                if (angleDiff[i] < 11) {
+                    menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 6;
+                }
+            }
+            if (menuRadius > 29) {
+                menuRadius = (2 * Math.PI * radius) / 33;
+            }
             this.wheel1.slicePathCustom.menuRadius = menuRadius;
             
-            docById('wheelDiv3').addEventListener('mouseover', function(e) {
+            /*docById('wheelDiv3').addEventListener('mouseover', function(e) {
                 that.arbitraryEditSlider(e, angle1);  
-            });
+            });*/
             if (docById('frequencySlider') !== null) {
                 docById('frequencySlider').oninput = function() {
                     that._refreshInnerWheel();
@@ -785,51 +797,75 @@ function TemperamentWidget () {
         ctx.strokeStyle = '#003300';
         ctx.stroke();
 
-        docById('wheelDiv3').style.display = '';
-        docById('wheelDiv3').style.background = 'none';
-        this.wheel = new wheelnav('wheelDiv3', null, 600, 600);
-        this.wheel.wheelRadius = 300;
-        this.wheel.slicePathFunction = slicePath().DonutSlice;
-        this.wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.wheel.slicePathCustom.minRadiusPercent = 0.9;
-        this.wheel.slicePathCustom.maxRadiusPercent = 1.0;
-        this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
-        this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
-        this.wheel.colors = ['#c0c0c0', '#e0e0e0'];
-        this.wheel.titleRotateAngle = 90;
-        this.wheel.navItemsEnabled = false;
-        for (i=0; i <= this.pitchNumber; i++) {
-            if (i !== this.pitchNumber) {
-                minutes.push('|');
+        this._createOuterWheel = function(ratios, pitchNumber) {
+            if (this.wheel !== undefined) {
+                docById('wheelDiv3').display = 'none';
+                this.wheel.removeWheel();
             }
-            //Change angles of outer circle
-            angle[i] = 270 + (360 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase)));
-            if (i !== 0) {
-                if (i == this.pitchNumber - 1) {
-                    angleDiff[i-1] = angle[0] + 360 - angle[i];
-                } else {
-                    angleDiff[i-1] = angle[i] - angle[i-1];
+            if (pitchNumber == undefined) {
+                pitchNumber = this.pitchNumber;
+            }
+            if (ratios == undefined) {
+                ratios = this.ratios;
+            }
+            docById('wheelDiv3').style.display = '';
+            docById('wheelDiv3').style.background = 'none';
+            this.wheel = new wheelnav('wheelDiv3', null, 600, 600);
+            this.wheel.wheelRadius = 300;
+            this.wheel.slicePathFunction = slicePath().DonutSlice;
+            this.wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this.wheel.slicePathCustom.minRadiusPercent = 0.9;
+            this.wheel.slicePathCustom.maxRadiusPercent = 1.0;
+            this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
+            this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
+            this.wheel.colors = ['#c0c0c0', '#e0e0e0'];
+            this.wheel.titleRotateAngle = 90;
+            this.wheel.navItemsEnabled = false;
+
+            var minutes = [];
+            var angle = [];
+            var angleDiff1 = [];
+            var baseAngle1 = [];
+            var sliceAngle1 = [];
+            angle1 = [];
+            for (i=0; i <= pitchNumber; i++) {
+                if (i !== pitchNumber) {
+                    minutes.push('|');
                 }
-                angle1[i-1] = angle[i-1] + (angleDiff[i-1] / 2);       
-            }  
-        }
-        this.wheel.navAngle = 270 + (angleDiff[0] / 2);
-        this.wheel.initWheel(minutes);
-        for (var i = 0; i < this.pitchNumber; i++) {
-            if (i === 0) {
-                sliceAngle1[i] = (360 / this.pitchNumber);
-                baseAngle1[i] = this.wheel.navAngle - (sliceAngle1[0] / 2);
-            } else {
-                baseAngle1[i] = baseAngle1[i-1] + sliceAngle1[i-1];
-                sliceAngle1[i] = 2 * (angle1[i] - baseAngle1[i]);
+                //Change angles of outer circle
+                angle[i] = 270 + (360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase)));
+                if (i !== 0) {
+                    if (i == pitchNumber - 1) {
+                        angleDiff1[i-1] = angle[0] + 360 - angle[i];
+                    } else {
+                        angleDiff1[i-1] = angle[i] - angle[i-1];
+                    }
+                    angle1[i-1] = angle[i-1] + (angleDiff1[i-1] / 2);       
+                }  
             }
-            this.wheel.navItems[i].sliceAngle = sliceAngle1[i];
+            this.wheel.navAngle = 270 + (angleDiff1[0] / 2);
+            this.wheel.initWheel(minutes);
+            for (var i = 0; i < pitchNumber; i++) {
+                if (i === 0) {
+                    sliceAngle1[i] = (360 / pitchNumber);
+                    baseAngle1[i] = this.wheel.navAngle - (sliceAngle1[0] / 2);
+                } else {
+                    baseAngle1[i] = baseAngle1[i-1] + sliceAngle1[i-1];
+                    sliceAngle1[i] = 2 * (angle1[i] - baseAngle1[i]);
+                }
+                this.wheel.navItems[i].sliceAngle = sliceAngle1[i];
+            }
+            this.wheel.createWheel();
+            docById('wheelDiv3').style.position = 'absolute';
+            docById('wheelDiv3').style.zIndex = 10;
+            docById('wheelDiv3').style.marginTop = 15 + 'px';
+            docById('wheelDiv3').style.marginLeft = 37 + 'px';
+            docById('wheelDiv3').addEventListener('mouseover', function(e) {
+                that.arbitraryEditSlider(e, angle1, ratios, pitchNumber);  
+            });
         }
-        this.wheel.createWheel();
-        docById('wheelDiv3').style.position = 'absolute';
-        docById('wheelDiv3').style.zIndex = 10;
-        docById('wheelDiv3').style.marginTop = 15 + 'px';
-        docById('wheelDiv3').style.marginLeft = 37 + 'px';
+        
+        this._createOuterWheel();
 
         var that = this;
         
@@ -847,10 +883,6 @@ function TemperamentWidget () {
         divAppend.onmouseover = function() {
             this.style.cursor = 'pointer';
         };
-
-        docById('wheelDiv3').addEventListener('mouseover', function(e) {
-            that.arbitraryEditSlider(e, angle1);  
-        });
 
         divAppend.onclick = function() {
             that.ratios = that.tempRatios1.slice();
@@ -873,8 +905,14 @@ function TemperamentWidget () {
         };
     };
 
-    this.arbitraryEditSlider = function(event, angle) {
-        for(var i = 0; i < this.pitchNumber; i++) {
+    this.arbitraryEditSlider = function(event, angle, ratios, pitchNumber) {
+        var frequency = this.frequencies[0];
+        var frequencies = [];
+        for (var j = 0; j <= pitchNumber; j++) {
+            frequencies[j] = ratios[j] * frequency;
+            frequencies[j] = frequencies[j].toFixed(2);
+        }
+        for(var i = 0; i < pitchNumber; i++) {
             if (event.target.parentNode.id == 'wheelnav-wheelDiv3-title-' + i){
                 var x = event.clientX - docById('wheelDiv3').getBoundingClientRect().left;
                 var y = event.clientY - docById('wheelDiv3').getBoundingClientRect().top;
@@ -882,11 +920,10 @@ function TemperamentWidget () {
                 if (docById('noteInfo1') !== null) {
                     docById('noteInfo1').remove();
                 }
-
                 docById('wheelDiv3').innerHTML += '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById('noteInfo1').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right">';
-                docById('noteInfo1').innerHTML += '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' + this.frequencies[i] + '" max="' + this.frequencies[i+1] + '" value="30"></center>';
-                docById('noteInfo1').innerHTML += '&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv">' + this.frequencies[i] + '</span>';
+                docById('noteInfo1').innerHTML += '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' + frequencies[i] + '" max="' + frequencies[i+1] + '" value="30"></center>';
+                docById('noteInfo1').innerHTML += '&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv">' + frequencies[i] + '</span>';
                 docById('noteInfo1').innerHTML += '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
 
                 if (angle[i] >= 270 && angle[i] <= 360) {
@@ -908,7 +945,8 @@ function TemperamentWidget () {
                 };
                 docById('done').onclick = function() {
                     that.tempRatios1 = that.tempRatios.slice();
-                    docById('noteInfo1').remove();
+                    var pitchNumber = that.tempRatios1.length - 1;
+                    that._createOuterWheel(that.tempRatios1, pitchNumber);
                 }
                 docById('close').onclick = function() {
                     that.tempRatios = that.tempRatios1.slice();
