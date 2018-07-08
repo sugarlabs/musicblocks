@@ -12,6 +12,8 @@
 
 function MusicKeyboard() {
 
+    
+
     var keyboard = document.getElementById("keyboard");
     var keyboardHolder = document.getElementById("keyboardHolder");
     var firstOctave = document.getElementById("firstOctave");
@@ -25,6 +27,17 @@ function MusicKeyboard() {
     var blackNoteEnums = ['C♯', 'D♯', 'SKIP', 'F♯', 'G♯', 'A♯', 'SKIP'];
 
     var selected = [];
+
+    this._rowBlocks1 = [];
+    this.rowLabels1 = [];
+    
+    this.rowArgs1 = [];
+
+
+    var _rowBlocks1 = [];
+    var rowLabels1 = [];
+    
+    var rowArgs1 = [];
 
     //configure defaults
     changeKeys();
@@ -136,7 +149,6 @@ function MusicKeyboard() {
         
     });
 
-
     function deselect () {
         for(var i = 0; i < selected.length; i++) {
             var tmp = document.getElementById(selected[i]);
@@ -162,16 +174,26 @@ function MusicKeyboard() {
      
         keyboardShown = !keyboardShown;
     }
-     
+
+    this.addRowBlock = function(pitchBlock) {
+     //   this._rowBlocks1.push(pitchBlock);
+        _rowBlocks1.push(pitchBlock);
+    };
+
+
+
+ 
     function handleKeyboard (key) {
-        //Tone can't do special sharps, need # isntead of ♯
-        console.log('IIIInside handleKeyboard function... value of key ' +key);
+        //Tone can't do special sharps, need # instead of ♯
+        console.log('VVVValue of key ' +key);
         var noSharp = key;
         if(key[1] == "♯") {
             noSharp = key[0]+"#"+key[2];
         }
-
-
+        console.log('XXX' +_rowBlocks1);
+        console.log('YYY' +rowLabels1);
+        console.log('ZZZ' +rowArgs1);
+        
         synth.triggerAttackRelease(noSharp, "8n");
     }
      
@@ -224,6 +246,8 @@ function MusicKeyboard() {
     }
 
        //not sure if there's a synth already in the program
-       var synth = new Tone.Synth().toMaster();
+    var synth = new Tone.Synth().toMaster();
+    
+    
 }
      

@@ -750,7 +750,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'musickeyboard':
-                    that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('keyboarder'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'drum':
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');

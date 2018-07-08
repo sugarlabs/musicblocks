@@ -3223,20 +3223,28 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'musickeyboard':
-            if (that.musicKeyboard == null) {
-                that.musicKeyboard = new MusicKeyboard();
-        
+        	if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
             }
 
+            if (that.musicKeyboard == null) {
+                that.musicKeyboard = new MusicKeyboard();
+            }
+            
+            that.inMusicKeyboard = true;
+            that.musicKeyboard.rowLabels1 = [];
+            that.musicKeyboard.rowArgs1 = [];
+        //    that.musicKeyboard.clearBlocks();
             
             var x = document.getElementById("keyboardHolder");
             if (x.style.display === "none") {
                 x.style.display = "block";
             } else {
                 x.style.display = "none";
-            }
-
+            }            
             break;
+
         case 'pitchdrummatrix':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -4130,6 +4138,46 @@ function Logo () {
                     that.firstPitch[turtle].push(pitchNumber);
                 } else if (that.lastPitch[turtle].length < n) {
                     that.lastPitch[turtle].push(pitchNumber);
+                }
+            } else if (that.inMusicKeyboard) {
+            	if (note.toLowerCase() !== 'rest') {
+                    that.musicKeyboard.addRowBlock(blk);
+                    if (that.pitchBlocks.indexOf(blk) === -1) {
+                        that.pitchBlocks.push(blk);
+                    }
+                }
+
+                if (!(that.invertList[turtle].length === 0)) {
+                    delta += that._calculateInvert(turtle, note, octave);
+                }
+
+                if (that.duplicateFactor[turtle].length > 0) {
+                    var duplicateFactor = that.duplicateFactor[turtle];
+                } else {
+                    var duplicateFactor = 1;
+                }
+
+                for (var i = 0; i < duplicateFactor; i++) {
+                    // Apply transpositions
+                    var transposition = 2 * delta;
+                    if (turtle in that.transposition) {
+                        transposition += that.transposition[turtle];
+                    }
+
+                    var nnote = getNote(note, octave, transposition, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    if (noteIsSolfege(note)) {
+                        nnote[0] = getSolfege(nnote[0]);
+                    }
+
+                    if (that.drumStyle[turtle].length > 0) {
+                        console.log('IInside If');
+                    } else {
+                    	
+                        that.musicKeyboard.rowLabels1.push(nnote[0]);
+                        that.musicKeyboard.rowArgs1.push(nnote[1]);
+                        console.log('IInside else rowLabels1 = ' +that.musicKeyboard.rowLabels1);
+                        console.log('IInside else rowArgs1 = ' +that.musicKeyboard.rowArgs1);
+                    }
                 }
             } else if (that.inPitchDrumMatrix) {
                 if (note.toLowerCase() !== 'rest') {

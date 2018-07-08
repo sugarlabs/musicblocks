@@ -36,9 +36,9 @@ function PitchDrumMatrix() {
     const INNERWINDOWWIDTH = 50;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-
     this.rowLabels = [];
     this.rowArgs = [];
+
     this.drums = [];
     this._rests = 0;
 
@@ -93,8 +93,7 @@ function PitchDrumMatrix() {
         // Initializes the pitch/drum matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
-        this._logo = logo;
-
+        this._logo = logo;        
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
@@ -107,6 +106,10 @@ function PitchDrumMatrix() {
         pdmDiv.setAttribute('draggable', 'true');
         pdmDiv.style.left = '200px';
         pdmDiv.style.top = '150px';
+
+        console.log('PDMLABEL' +this.rowLabels);
+        console.log('PDMARGS' +this.rowArgs);
+
 
         // The pdm buttons
         var pdmButtonsDiv = docById('pdmButtonsDiv');

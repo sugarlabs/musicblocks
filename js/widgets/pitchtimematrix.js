@@ -48,6 +48,9 @@ function PitchTimeMatrix () {
     // rowArgs can contain an octave or the arg(s) to a graphics command
     this.rowArgs = [];
 
+    console.log('XX '+this.rowLabels);
+    console.log('YY '+this.rowArgs);
+
     // We need to treat note blocks differently since they have both
     // pitch and rhythm.
     this._noteBlocks = false;
@@ -134,6 +137,8 @@ function PitchTimeMatrix () {
     this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
+        console.log('XXX '+this.rowLabels);
+        console.log('YYY '+this.rowArgs);
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
