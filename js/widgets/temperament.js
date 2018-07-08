@@ -700,6 +700,7 @@ function TemperamentWidget () {
         var angle1 = [];
         var baseAngle1 = [];
         var sliceAngle1 = [];
+        this.tempRatios1 = this.ratios.slice();
 
         this._createInnerWheel = function(ratios, pitchNumber) {
             if (this.wheel1 !== undefined) {
@@ -852,7 +853,23 @@ function TemperamentWidget () {
         });
 
         divAppend.onclick = function() {
+            that.ratios = that.tempRatios1.slice();
+            that.pitchNumber = that.ratios.length - 1;
+            var compareRatios = [];
+            var frequency1 = that.frequencies[0];
+            that.frequencies = [];
+            for (var i = 0; i < that.pitchNumber; i++) {
+                that.frequencies[i] = that.ratios[i] * frequency1;
+                that.frequencies[i] = that.frequencies[i].toFixed(2);
+            }
 
+            for (var i = 0; i < that.ratios.length; i++) {
+                compareRatios[i] = that.ratios[i];
+                compareRatios[i] = compareRatios[i].toFixed(2);
+            }
+
+            that.checkTemperament(compareRatios);
+            that._circleOfNotes();
         };
     };
 
@@ -866,10 +883,11 @@ function TemperamentWidget () {
                     docById('noteInfo1').remove();
                 }
 
-                docById('wheelDiv3').innerHTML += '<div class="popup" id="noteInfo1" style="width:180px; height:100px;"><span class="popuptext" id="myPopup"></span></div>';
+                docById('wheelDiv3').innerHTML += '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById('noteInfo1').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right">';
                 docById('noteInfo1').innerHTML += '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' + this.frequencies[i] + '" max="' + this.frequencies[i+1] + '" value="30"></center>';
                 docById('noteInfo1').innerHTML += '&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv">' + this.frequencies[i] + '</span>';
+                docById('noteInfo1').innerHTML += '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
 
                 if (angle[i] >= 270 && angle[i] <= 360) {
                     docById('noteInfo1').style.top = y - 100 + 'px';
@@ -888,7 +906,14 @@ function TemperamentWidget () {
                 docById('frequencySlider').oninput = function() {
                     that._refreshInnerWheel();
                 };
+                docById('done').onclick = function() {
+                    that.tempRatios1 = that.tempRatios.slice();
+                    docById('noteInfo1').remove();
+                }
                 docById('close').onclick = function() {
+                    that.tempRatios = that.tempRatios1.slice();
+                    var pitchNumber = that.tempRatios.length - 1;
+                    that._createInnerWheel(that.tempRatios, pitchNumber);
                     docById('noteInfo1').remove();
                 }
             }
@@ -901,23 +926,24 @@ function TemperamentWidget () {
         var ratio = frequency / this.frequencies[0];
         var labels = [];
         var ratioDifference = [];
-        var tempRatios = [];
-        tempRatios = this.ratios.slice();
-        for (var j = 0; j < tempRatios.length; j++) {
-            ratioDifference[j] = ratio - tempRatios[j];
+        this.tempRatios = this.tempRatios1.slice();
+
+        for (var j = 0; j < this.tempRatios.length; j++) {
+            ratioDifference[j] = ratio - this.tempRatios[j];
+            ratioDifference[j] = ratioDifference[j].toFixed(2);
                 if (ratioDifference[j] < 0) {
                     var index = j;
-                    tempRatios.splice(index, 0, ratio);
+                    this.tempRatios.splice(index, 0, ratio);
                     break;
                 }
                 if (ratioDifference[j] == 0) {
                     var index = j;
-                    tempRatios.splice(index, 1, ratio);
+                    this.tempRatios.splice(index, 1, ratio);
                     break;
                 }
         }
-        var pitchNumber = tempRatios.length - 1;
-        this._createInnerWheel(tempRatios, pitchNumber);
+        var pitchNumber = this.tempRatios.length - 1;
+        this._createInnerWheel(this.tempRatios, pitchNumber);
     }
 
     this.octaveSpaceEdit = function() {
