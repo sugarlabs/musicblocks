@@ -765,10 +765,7 @@ function TemperamentWidget () {
                 menuRadius = (2 * Math.PI * radius) / 33;
             }
             this.wheel1.slicePathCustom.menuRadius = menuRadius;
-            
-            /*docById('wheelDiv3').addEventListener('mouseover', function(e) {
-                that.arbitraryEditSlider(e, angle1);  
-            });*/
+
             if (docById('frequencySlider') !== null) {
                 docById('frequencySlider').oninput = function() {
                     that._refreshInnerWheel();
@@ -1074,7 +1071,13 @@ function TemperamentWidget () {
     this.playNote = function(pitchNumber) {
         this._logo.resetSynth(0);
         var duration = 1 / 2;
-        var notes = this.frequencies[pitchNumber];
+
+        if (docById('wheelDiv4') == null) {
+            var notes = this.frequencies[pitchNumber];
+        } else {
+            var notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
+        }
+        
         this._logo.synth.trigger(0, notes, this._logo.defaultBPMFactor * duration, 'default', null, null);
     };
 
@@ -1100,9 +1103,13 @@ function TemperamentWidget () {
         var note = this.notes[0][0] + octaveDown;
         var startPitch = this._logo.synth._getFrequency(note, true, this.inTemperament).toFixed(2);
         var that = this;
+        var pitchNumber = this.pitchNumber;
+        if (docById('wheelDiv4') !== null) {
+            pitchNumber = this.tempRatios1.length - 1;
+        }
 
         __playLoop = function (i) {
-            if (i === that.pitchNumber) {
+            if (i === pitchNumber) {
                 that.playbackForward = false;
             }
             if (i === 0) {
@@ -1113,8 +1120,8 @@ function TemperamentWidget () {
                 that.playNote(i);
             }
 
-            if (!that.circleIsVisible) {
-                if (i === that.pitchNumber) {
+            if (that.circleIsVisible == false && docById('wheelDiv4') == null) {
+                if (i === pitchNumber) {
                     that.notesCircle.navItems[0].fillAttr = '#808080';
                     that.notesCircle.navItems[0].sliceHoverAttr.fill = '#808080';
                     that.notesCircle.navItems[0].slicePathAttr.fill = '#808080';
@@ -1126,8 +1133,8 @@ function TemperamentWidget () {
                     that.notesCircle.navItems[i].sliceSelectedAttr.fill = '#808080';
                 }
                 
-                if (that.playbackForward == false && i < that.pitchNumber) {
-                    if (i === that.pitchNumber - 1) {
+                if (that.playbackForward == false && i < pitchNumber) {
+                    if (i === pitchNumber - 1) {
                         that.notesCircle.navItems[0].fillAttr = '#c8C8C8';
                         that.notesCircle.navItems[0].sliceHoverAttr.fill = '#c8C8C8';
                         that.notesCircle.navItems[0].slicePathAttr.fill = '#c8C8C8';
@@ -1148,9 +1155,9 @@ function TemperamentWidget () {
                 }  
 
                 that.notesCircle.refreshWheel();
-            } else {
+            } else if (that.circleIsVisible == true && docById('wheelDiv4') == null) {
                 docById('pitchNumber_' + i).style.background = MATRIXLABELCOLOR;
-                if (that.playbackForward == false && i < that.pitchNumber) {
+                if (that.playbackForward == false && i < pitchNumber) {
                     var j = i + 1;
                     docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
                 } else {
@@ -1159,6 +1166,41 @@ function TemperamentWidget () {
                         docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
                     }
                 }     
+            } else if (docById('wheelDiv4') !== null) {
+                if (i === pitchNumber) {
+                    that.wheel1.navItems[0].fillAttr = '#808080';
+                    that.wheel1.navItems[0].sliceHoverAttr.fill = '#808080';
+                    that.wheel1.navItems[0].slicePathAttr.fill = '#808080';
+                    that.wheel1.navItems[0].sliceSelectedAttr.fill = '#808080';
+                } else {
+                    that.wheel1.navItems[i].fillAttr = '#808080';
+                    that.wheel1.navItems[i].sliceHoverAttr.fill = '#808080';
+                    that.wheel1.navItems[i].slicePathAttr.fill = '#808080';
+                    that.wheel1.navItems[i].sliceSelectedAttr.fill = '#808080';
+                }
+                
+                if (that.playbackForward == false && i < pitchNumber) {
+                    if (i === pitchNumber - 1) {
+                        that.wheel1.navItems[0].fillAttr = '#e0e0e0';
+                        that.wheel1.navItems[0].sliceHoverAttr.fill = '#e0e0e0';
+                        that.wheel1.navItems[0].slicePathAttr.fill = '#e0e0e0';
+                        that.wheel1.navItems[0].sliceSelectedAttr.fill = '#e0e0e0';
+                    } else {
+                        that.wheel1.navItems[i+1].fillAttr = '#e0e0e0';
+                        that.wheel1.navItems[i+1].sliceHoverAttr.fill = '#e0e0e0';
+                        that.wheel1.navItems[i+1].slicePathAttr.fill = '#e0e0e0';
+                        that.wheel1.navItems[i+1].sliceSelectedAttr.fill = '#e0e0e0';
+                    }
+                } else {
+                    if (i !== 0) {
+                        that.wheel1.navItems[i-1].fillAttr = '#e0e0e0';
+                        that.wheel1.navItems[i-1].sliceHoverAttr.fill = '#e0e0e0';
+                        that.wheel1.navItems[i-1].slicePathAttr.fill = '#e0e0e0';
+                        that.wheel1.navItems[i-1].sliceSelectedAttr.fill = '#e0e0e0';
+                    }
+                }  
+
+                that.wheel1.refreshWheel();
             }
 
             if (that.playbackForward) {
@@ -1167,7 +1209,7 @@ function TemperamentWidget () {
                 i -= 1;
             }
 
-            if (i <= that.pitchNumber && i >= 0 && that._playing && p < 2) {
+            if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
                 setTimeout(function () {
                     __playLoop(i);
                 }, that._logo.defaultBPMFactor * 1000 * duration);
@@ -1175,15 +1217,21 @@ function TemperamentWidget () {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 if (i !== -1) {
                     setTimeout(function () {
-                        if (!that.circleIsVisible) {
+                        if (that.circleIsVisible == false && docById('wheelDiv4') == null) {
                             that.notesCircle.navItems[i-1].fillAttr = '#c8C8C8';
                             that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
                             that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
                             that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
                             that.notesCircle.refreshWheel();   
-                        } else {
+                        } else if (that.circleIsVisible == true && docById('wheelDiv4') == null) {
                             var j = i - 1;
                             docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                        } else if (docById('wheelDiv4') !== null) {
+                            that.wheel1.navItems[i-1].fillAttr = '#e0e0e0';
+                            that.wheel1.navItems[i-1].sliceHoverAttr.fill = '#e0e0e0';
+                            that.wheel1.navItems[i-1].slicePathAttr.fill = '#e0e0e0';
+                            that.wheel1.navItems[i-1].sliceSelectedAttr.fill = '#e0e0e0';
+                            that.wheel1.refreshWheel();
                         }
                     }, that._logo.defaultBPMFactor * 1000 * duration); 
                 }
