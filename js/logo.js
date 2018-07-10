@@ -3235,14 +3235,42 @@ function Logo () {
             that.inMusicKeyboard = true;
             that.musicKeyboard.rowLabels1 = [];
             that.musicKeyboard.rowArgs1 = [];
-        //    that.musicKeyboard.clearBlocks();
+            that.musicKeyboard.clearBlocks();
             
-            var x = document.getElementById("keyboardHolder");
-            if (x.style.display === "none") {
-                x.style.display = "block";
-            } else {
-                x.style.display = "none";
-            }            
+            // var x = document.getElementById("keyboardHolder");
+            // if (x.style.display === "none") {
+            //     x.style.display = "block";
+            // } else {
+            //     x.style.display = "none";
+            // }
+
+
+
+            var listenerName = '_musickeyboard_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                if (0) {
+                    that.errorMsg(_('You must have at least one pitch block and one drum block in the matrix.'), blk);
+                } else {
+                    console.log('IIInside else55')
+                    
+                    var x = document.getElementById("keyboardHolder");
+                    if (x.style.display === "none") {
+                        x.style.display = "block";
+                    } else {
+                        x.style.display = "none";
+                    }
+                    that.musicKeyboard.init(that);
+                //    that.musicKeyboard.makeClickable();
+                }
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+
+
+
+
             break;
 
         case 'pitchdrummatrix':

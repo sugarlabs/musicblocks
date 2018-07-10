@@ -11,7 +11,12 @@
 
 
 function MusicKeyboard() {
-
+    const BUTTONDIVWIDTH = 295;  // 5 buttons
+    const DRUMNAMEWIDTH = 50;
+    const OUTERWINDOWWIDTH = 128;
+    const INNERWINDOWWIDTH = 50;
+    const BUTTONSIZE = 53;
+    const ICONSIZE = 32;
     
 
     var keyboard = document.getElementById("keyboard");
@@ -175,14 +180,104 @@ function MusicKeyboard() {
         keyboardShown = !keyboardShown;
     }
 
+    this.clearBlocks = function() {
+        this._rowBlocks1 = [];
+        this._colBlocks1 = [];
+    };
+
     this.addRowBlock = function(pitchBlock) {
      //   this._rowBlocks1.push(pitchBlock);
         _rowBlocks1.push(pitchBlock);
     };
 
+    this.init = function(logo) {
+        // Initializes the pitch/drum matrix. First removes the
+        // previous matrix and them make another one in DOM (document
+        // object model)
+        this._logo = logo;        
+        var w = window.innerWidth;
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
+
+        var canvas = docById('myCanvas');
+
+        // Position the widget and make it visible.
+        var mkbDiv = docById('mkbDiv');
+        mkbDiv.style.visibility = 'visible';
+        mkbDiv.setAttribute('draggable', 'true');
+        mkbDiv.style.left = '200px';
+        mkbDiv.style.top = '150px';
+
+    
 
 
- 
+        // The mkb buttons
+        var mkbButtonsDiv = docById('mkbButtonsDiv');
+        mkbButtonsDiv.style.display = 'inline';
+        mkbButtonsDiv.style.visibility = 'visible';
+        mkbButtonsDiv.style.width = BUTTONDIVWIDTH;
+        mkbButtonsDiv.innerHTML = '<table cellpadding="0px" id="mkbButtonTable"></table>';
+
+        var buttonTable = docById('mkbButtonTable');
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
+
+        // For the button callbacks
+        var that = this;
+
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+
+        cell.onclick=function() {
+            that._logo.setTurtleDelay(0);
+            that._playAll();
+        }
+
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+
+        cell.onclick=function() {
+            that._save();
+        }
+
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+
+        cell.onclick=function() {
+            that._clear();
+        }
+
+        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('close'));
+
+        cell.onclick=function() {
+            mkbDiv.style.visibility = 'hidden';
+            mkbButtonsDiv.style.visibility = 'hidden';
+            mkbTableDiv.style.visibility = 'hidden';
+        }
+
+        
+
+    };
+
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = cell.style.width;
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
+    };
+
     function handleKeyboard (key) {
         //Tone can't do special sharps, need # instead of ♯
         console.log('VVVValue of key ' +key);
@@ -190,9 +285,9 @@ function MusicKeyboard() {
         if(key[1] == "♯") {
             noSharp = key[0]+"#"+key[2];
         }
-        console.log('XXX' +_rowBlocks1);
-        console.log('YYY' +rowLabels1);
-        console.log('ZZZ' +rowArgs1);
+        console.log('XXX' +this._rowBlocks1);
+        console.log('YYY' +this.rowLabels1);
+        console.log('ZZZ' +this.rowArgs1);
         
         synth.triggerAttackRelease(noSharp, "8n");
     }
