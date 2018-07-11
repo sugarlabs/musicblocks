@@ -1301,6 +1301,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    // macro
+    var defineFrequencyBlock = new ProtoBlock('definefrequency');
+    defineFrequencyBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['definefrequency'] = defineFrequencyBlock;
+    defineFrequencyBlock.staticLabels.push(_('define Frequency'));
+    defineFrequencyBlock.adjustWidthToLabel();
+    defineFrequencyBlock.flowClampOneArgBlock();
+
     // METER PALETTE
 
     var newblock = new ProtoBlock('beatfactor');
