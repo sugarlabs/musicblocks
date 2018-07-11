@@ -1072,6 +1072,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     newnoteBlock.flowClampOneArgBlock();
     newnoteBlock.defaults.push(1 / 4);
 
+    // macro
+    var defineFrequencyBlock = new ProtoBlock('definefrequency');
+    defineFrequencyBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['definefrequency'] = defineFrequencyBlock;
+    defineFrequencyBlock.staticLabels.push(_('define Frequency'));
+    defineFrequencyBlock.adjustWidthToLabel();
+    defineFrequencyBlock.flowClampOneArgBlock();
+
     // METER PALETTE
 
     var beatfactor = new ProtoBlock('beatfactor');
