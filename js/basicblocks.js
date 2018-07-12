@@ -1870,26 +1870,29 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var newblock = new ProtoBlock('settemperament');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['settemperament'] = newblock;
-    newblock.staticLabels.push(_('set temperament'));
-    newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
-    if (beginnerMode && !beginnerBlock('settemperament')) {
-        newblock.hidden = true;
-    }
+    var setTemperamentBlock = new ProtoBlock('settemperament');
+    setTemperamentBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
+    setTemperamentBlock.staticLabels.push(_('set temperament'));
+    setTemperamentBlock.adjustWidthToLabel();
+    setTemperamentBlock.oneArgBlock();
 
-    var newblock = new ProtoBlock('temperamentname');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['temperamentname'] = newblock;
-    newblock.valueBlock();
-    newblock.hidden = true; 
-    newblock.extraWidth = 50;
-    newblock.dockTypes[0] = 'anyout';   
-    if (beginnerMode && !beginnerBlock('temperamentname')) {
-        newblock.hidden = true;
-    }
+    var temperamentNameBlock = new ProtoBlock('temperamentname');
+    temperamentNameBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['temperamentname'] = temperamentNameBlock;
+    temperamentNameBlock.valueBlock();
+    temperamentNameBlock.hidden = true; 
+    temperamentNameBlock.extraWidth = 50;
+    temperamentNameBlock.dockTypes[0] = 'anyout';
+
+    var temperament1Block = new ProtoBlock('temperament1');
+    temperament1Block.palette = palettes.dict['action'];
+    blocks.protoBlockDict['temperament1'] = temperament1Block;
+    temperament1Block.staticLabels.push(_('temperament'));
+    temperament1Block.hidden = true; 
+    temperament1Block.extraWidth = 20;
+    temperament1Block.adjustWidthToLabel();
+    temperament1Block.stackClampOneArgBlock();   
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 

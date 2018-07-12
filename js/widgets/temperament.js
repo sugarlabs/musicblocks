@@ -1068,6 +1068,33 @@ function TemperamentWidget () {
         }
     };
 
+    this._save = function() {
+        var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]]];
+        var previousBlock = 2;
+
+        for (var i = 0; i < this.pitchNumber; i++) {
+            var idx = newStack.length;
+            newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
+            newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
+            newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
+            newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
+            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+            newStack.push([idx + 5, ['pitch'], 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
+            newStack.push([idx + 6, ['notename',{'value':'C'}], 0, 0, [idx + 5]]);
+            newStack.push([idx + 7, ['number',{'value':4}], 0, 0, [idx + 5]]);
+            if (i == this.pitchNumber - 1) {
+                newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
+            } else {
+                newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
+            }
+            previousBlock = idx + 8;  
+        }
+        this._logo.blocks.loadNewBlocks(newStack);  
+
+        var newStack1 = [[0,'settemperament', 100, 100, [null, 1, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]]];        
+        this._logo.blocks.loadNewBlocks(newStack1);  
+    }
+
     this.playNote = function(pitchNumber) {
         this._logo.resetSynth(0);
         var duration = 1 / 2;
@@ -1289,6 +1316,11 @@ function TemperamentWidget () {
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+
+        cell.onclick = function() {
+            that._save();
+        };
+
         var noteCell = this._addButton(row, 'play-button.svg', ICONSIZE, _('table'));
 
         var t = TEMPERAMENT[this.inTemperament];
