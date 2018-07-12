@@ -48,9 +48,6 @@ function PitchTimeMatrix () {
     // rowArgs can contain an octave or the arg(s) to a graphics command
     this.rowArgs = [];
 
-    console.log('XX '+this.rowLabels);
-    console.log('YY '+this.rowArgs);
-
     // We need to treat note blocks differently since they have both
     // pitch and rhythm.
     this._noteBlocks = false;
@@ -137,8 +134,6 @@ function PitchTimeMatrix () {
     this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
-        console.log('XXX '+this.rowLabels);
-        console.log('YYY '+this.rowArgs);
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
@@ -1599,38 +1594,54 @@ function PitchTimeMatrix () {
 
             var endOfStackIdx = idx;
 
-            // Add a vspace to prevent divide block from obscuring the pitch block.
-            newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + 5]]);
-
-            // note value is saved as a fraction
-            newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
-
             // The note block might be generated from a tuplet in
             // which case we output 1 / (3 x 4) instead of 1 / 12.
-            if (this._outputAsTuplet[i][0] !== 1) {
-                console.log(i + ': ' + this._outputAsTuplet[i][0] + 'x' + this._outputAsTuplet[i][1]);
-            }
+            if (this._outputAsTuplet[i][0] !== 1 && parseInt(this._outputAsTuplet[i][1]) === this._outputAsTuplet[i][1]) {
+                // We don't reformat dotted tuplets since they are too complicated.
+                // We are adding 6 blocks: vspace, divide, number, multiply, number, number
+                var delta = 7;
 
-            if (parseInt(note[1]) < note[1]) {
-                // dotted note
-                var obj = toFraction(note[1]);
-                newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
-                newStack.push([idx + 4, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
-            } else {
+                // Add a vspace to prevent divide block from obscuring the pitch block.
+                newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + delta]]);
+
+                // note value is saved as a fraction
+                newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+
                 newStack.push([idx + 3, ['number', {'value': 1}], 0, 0, [idx + 2]]);
-                newStack.push([idx + 4, ['number', {'value': note[1]}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, 'multiply', 0, 0, [idx + 2, idx + 5, idx + 6]]);
+                newStack.push([idx + 5, ['number', {'value': this._outputAsTuplet[i][0]}], 0, 0, [idx + 4]]);
+                newStack.push([idx + 6, ['number', {'value': this._outputAsTuplet[i][1]}], 0, 0, [idx + 4]]);
+            } else {
+                // We are adding 4 blocks: vspace, divide, number, number
+                var delta = 5;
+
+                // Add a vspace to prevent divide block from obscuring the pitch block.
+                newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + delta]]);
+
+                // note value is saved as a fraction
+                newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+
+                if (parseInt(note[1]) < note[1]) {
+                    // dotted note
+                    var obj = toFraction(note[1]);
+                    newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 4, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+                } else {
+                    newStack.push([idx + 3, ['number', {'value': 1}], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 4, ['number', {'value': note[1]}], 0, 0, [idx + 2]]);
+                }
             }
 
             // Connect the Note block flow to the divide and vspace blocks.
-            newStack[idx][4][1] = idx + 2;
-            newStack[idx][4][2] = idx + 1;
+            newStack[idx][4][1] = idx + 2;  // divide block
+            newStack[idx][4][2] = idx + 1;  // vspace block
 
-            var delta = 5;
+            var x = idx + delta;
 
             if (note[0][0] === 'R' || note[0][0] == undefined) {
                 // The last connection in last pitch block is null.
                 var lastConnection = null;
-                if (delta === 5) {
+                if (delta === 5 || delta === 7) {
                     var previousBlock = idx + 1;  // Vspace block
                 } else {
                     var previousBlock = idx;  // Note block
@@ -1647,7 +1658,7 @@ function PitchTimeMatrix () {
 
                     // We need to point to the previous note or pitch block.
                     if (j === 0) {
-                        if (delta === 5) {
+                        if (delta === 5 || delta === 7) {
                             var previousBlock = idx + 1;  // Vspace block
                         } else {
                             var previousBlock = idx;  // Note block
@@ -1730,7 +1741,6 @@ function PitchTimeMatrix () {
                         previousBlock = thisBlock - 2;
                     } else {
                         // add a pitch block
-
                         // The last connection in last pitch block is null.
                         if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
@@ -1777,7 +1787,6 @@ function PitchTimeMatrix () {
         }
 
         // Create a new stack for the chunk.
-        console.log(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
     };
 };
