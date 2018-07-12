@@ -35,14 +35,7 @@ function MusicKeyboard() {
 
     this._rowBlocks1 = [];
     this.rowLabels1 = [];
-    
     this.rowArgs1 = [];
-
-
-    var _rowBlocks1 = [];
-    var rowLabels1 = [];
-    
-    var rowArgs1 = [];
 
     //configure defaults
     changeKeys();
@@ -186,15 +179,17 @@ function MusicKeyboard() {
     };
 
     this.addRowBlock = function(pitchBlock) {
-     //   this._rowBlocks1.push(pitchBlock);
-        _rowBlocks1.push(pitchBlock);
+        this._rowBlocks1.push(pitchBlock);
     };
 
     this.init = function(logo) {
         // Initializes the pitch/drum matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
-        this._logo = logo;        
+        this._logo = logo; 
+
+        document.getElementById("keyboardHolder").style.display = "block";
+
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
@@ -250,9 +245,11 @@ function MusicKeyboard() {
             mkbDiv.style.visibility = 'hidden';
             mkbButtonsDiv.style.visibility = 'hidden';
             mkbTableDiv.style.visibility = 'hidden';
+            document.getElementById("keyboardHolder").style.display = "none"
         }
 
-        
+        console.log('rowLabels1 = ' +this.rowLabels1);
+        console.log('rowArgs1 = ' +this.rowArgs1);
 
     };
 
@@ -280,14 +277,12 @@ function MusicKeyboard() {
 
     function handleKeyboard (key) {
         //Tone can't do special sharps, need # instead of ♯
-        console.log('VVVValue of key ' +key);
+        console.log('Key pressed ' +key);
         var noSharp = key;
         if(key[1] == "♯") {
             noSharp = key[0]+"#"+key[2];
         }
-        console.log('XXX' +this._rowBlocks1);
-        console.log('YYY' +this.rowLabels1);
-        console.log('ZZZ' +this.rowArgs1);
+        
         
         synth.triggerAttackRelease(noSharp, "8n");
     }

@@ -3223,10 +3223,8 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'musickeyboard':
-        	if (args.length === 1) {
-                childFlow = args[0];
-                childFlowCount = 1;
-            }
+        	childFlow = args[0];
+            childFlowCount = 1;
 
             if (that.musicKeyboard == null) {
                 that.musicKeyboard = new MusicKeyboard();
@@ -3236,41 +3234,19 @@ function Logo () {
             that.musicKeyboard.rowLabels1 = [];
             that.musicKeyboard.rowArgs1 = [];
             that.musicKeyboard.clearBlocks();
-            
             // var x = document.getElementById("keyboardHolder");
             // if (x.style.display === "none") {
             //     x.style.display = "block";
             // } else {
             //     x.style.display = "none";
             // }
-
-
-
             var listenerName = '_musickeyboard_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function (event) {
-                if (0) {
-                    that.errorMsg(_('You must have at least one pitch block and one drum block in the matrix.'), blk);
-                } else {
-                    console.log('IIInside else55')
-                    
-                    var x = document.getElementById("keyboardHolder");
-                    if (x.style.display === "none") {
-                        x.style.display = "block";
-                    } else {
-                        x.style.display = "none";
-                    }
+            var __listener = function (event) {   
                     that.musicKeyboard.init(that);
-                //    that.musicKeyboard.makeClickable();
-                }
             };
-
             that._setListener(turtle, listenerName, __listener);
-
-
-
-
             break;
 
         case 'pitchdrummatrix':
@@ -4203,8 +4179,6 @@ function Logo () {
                     	
                         that.musicKeyboard.rowLabels1.push(nnote[0]);
                         that.musicKeyboard.rowArgs1.push(nnote[1]);
-                        console.log('IInside else rowLabels1 = ' +that.musicKeyboard.rowLabels1);
-                        console.log('IInside else rowArgs1 = ' +that.musicKeyboard.rowArgs1);
                     }
                 }
             } else if (that.inPitchDrumMatrix) {
