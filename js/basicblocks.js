@@ -1537,7 +1537,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     temperamentNameBlock.valueBlock();
     temperamentNameBlock.hidden = true; 
     temperamentNameBlock.extraWidth = 50;
-    temperamentNameBlock.dockTypes[0] = 'anyout';   
+    temperamentNameBlock.dockTypes[0] = 'anyout';
+
+    var temperament1Block = new ProtoBlock('temperament1');
+    temperament1Block.palette = palettes.dict['action'];
+    blocks.protoBlockDict['temperament1'] = temperament1Block;
+    temperament1Block.staticLabels.push(_('temperament'));
+    temperament1Block.hidden = true; 
+    temperament1Block.extraWidth = 20;
+    temperament1Block.adjustWidthToLabel();
+    temperament1Block.stackClampOneArgBlock();   
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
