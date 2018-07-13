@@ -778,7 +778,17 @@ function Synth() {
 
     this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
         if (this.inTemperament !== 'equal') {
+            var notes1 = notes;
             notes = this._getFrequency(notes, this.changeInTemperament);
+            if (notes === undefined) {
+                if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
+                    notes = notes1.substring(0, 1) + '' + 'bb' + notes1.substring(notes1.length - 1, notes1.length);
+                } else if (notes1.substring(1, notes1.length - 1) == DOUBLESHARP) {
+                    notes = notes1.substring(0, 1) + '' + 'x' + notes1.substring(notes1.length - 1, notes1.length);
+                } else {
+                    notes = notes1;
+                }
+            }
         }
 
         if (paramsEffects === null && paramsFilters === null) {
