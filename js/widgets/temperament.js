@@ -1069,6 +1069,15 @@ function TemperamentWidget () {
     };
 
     this._save = function() {
+        /*this.pitches = [];
+        for (var i = 0; i < this.pitchNumber.length; i++) {
+            for (var j = 0; j < this.ratiosNotesPair.length; j++) {
+                if(this.ratios[i] == this.ratiosNotesPair[j][0]) {
+                    this.pitches[i] =  this.ratiosNotesPair[j][0];
+                }    
+            }
+        }*/
+        
         var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]]];
         var previousBlock = 2;
 
