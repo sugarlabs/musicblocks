@@ -28,6 +28,15 @@ function MusicKeyboard() {
     var whiteKeys = document.getElementById("white");
     var blackKeys = document.getElementById("black");
 
+    var keyboard2 = document.getElementById("keyboard2");
+    var keyboardHolder2 = document.getElementById("keyboardHolder2");
+    var firstOctave2 = document.getElementById("firstOctave2");
+    var firstNote2 = document.getElementById("firstNote2");
+    var secondOctave2 = document.getElementById("secondOctave2");
+    var secondNote2 = document.getElementById("secondNote2");
+    var whiteKeys2 = document.getElementById("white2");
+    var blackKeys2 = document.getElementById("black2");
+
     var whiteNoteEnums = ['C','D','E','F','G','A','B'];
     var blackNoteEnums = ['C♯', 'D♯', 'SKIP', 'F♯', 'G♯', 'A♯', 'SKIP'];
 
@@ -187,8 +196,14 @@ function MusicKeyboard() {
         // previous matrix and them make another one in DOM (document
         // object model)
         this._logo = logo; 
-
-        document.getElementById("keyboardHolder").style.display = "block";
+        console.log('rowLabels1 = ' +this.rowLabels1);
+        console.log('rowArgs1 = ' +this.rowArgs1);
+        if(this.rowLabels1.length == 0){
+            document.getElementById("keyboardHolder").style.display = "block";
+        } else {
+            document.getElementById("keyboardHolder2").style.display = "block";
+        }
+        
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -213,43 +228,42 @@ function MusicKeyboard() {
         mkbButtonsDiv.style.width = BUTTONDIVWIDTH;
         mkbButtonsDiv.innerHTML = '<table cellpadding="0px" id="mkbButtonTable"></table>';
 
-        var buttonTable = docById('mkbButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var buttonTable1 = docById('mkbButtonTable');           //doubt
+        var header1 = buttonTable1.createTHead();
+        var row1 = header1.insertRow(0);
 
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+        var cell1 = this._addButton(row1, 'play-button.svg', ICONSIZE, _('play'));
 
-        cell.onclick=function() {
+        cell1.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell1 = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('save'));
 
-        cell.onclick=function() {
+        cell1.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell1 = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('clear'));
 
-        cell.onclick=function() {
+        cell1.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('close'));
+        var cell1 = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
 
-        cell.onclick=function() {
+        cell1.onclick=function() {
             mkbDiv.style.visibility = 'hidden';
             mkbButtonsDiv.style.visibility = 'hidden';
             mkbTableDiv.style.visibility = 'hidden';
-            document.getElementById("keyboardHolder").style.display = "none"
+            document.getElementById("keyboardHolder").style.display = "none";
+            document.getElementById("keyboardHolder2").style.display = "none";
         }
 
-        console.log('rowLabels1 = ' +this.rowLabels1);
-        console.log('rowArgs1 = ' +this.rowArgs1);
 
     };
 
@@ -277,12 +291,12 @@ function MusicKeyboard() {
 
     function handleKeyboard (key) {
         //Tone can't do special sharps, need # instead of ♯
-        console.log('Key pressed ' +key);
+        console.log('Key pressed ' +key[0]+ ' ' +key[1]+ ' ' +key[2]);
         var noSharp = key;
         if(key[1] == "♯") {
             noSharp = key[0]+"#"+key[2];
         }
-        
+        console.log('noSharp after ' +noSharp[0]+ ' ' +noSharp[1]+ ' ' +noSharp[2]);
         
         synth.triggerAttackRelease(noSharp, "8n");
     }

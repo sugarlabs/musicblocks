@@ -347,6 +347,52 @@
             </table>
         </div>
     </div>
+
+
+
+    <div id="keyboardHolder2" onload="setupKeyboard ()" style="display:none; position: fixed; bottom: 10px; left: 0px; height:155px; width: 55%; background-color: white; margin-left: 80px; margin-bottom: 90px;">
+        
+        <select id="firstNote2" class="keySelect" style="display: none; onchange="changeKeys()">
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="A" selected>A</option>
+            <option value="B">B</option>
+        </select>
+        <input type="number" style="display: none; min="0" max="7" step="1" id="firstOctave2" onchange="changeKeys()" value="0"/>
+        <select id="secondNote2" class="keySelect" style="display: none; onchange="changeKeys()">
+            <option value="C" selected>C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+        </select>
+        <input type="number" style="display: none; min="2" max="8" step="1" id="secondOctave2" onchange="changeKeys()" value="7"/>
+        <input type="button" style="display: none; value="Deselect all notes" onclick="deselect();" />
+        <input type="button" style="display: none; value="Generate Pitch Blocks!" onclick="handleKeyboardPitches(selected); deselect();" /><br>
+        <!--Actual Keyboard-->
+        <div id="keyboard2">
+            
+            <table class="white">
+                <tr id="white2">
+                     
+                </tr>
+            </table>
+            <table class="black">
+                <tr id="black2">
+                        
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+
+       
     
 
 
