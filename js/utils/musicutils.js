@@ -2244,6 +2244,42 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                 break;
         }
         var note = noteArg;
+
+        if (transposition && transposition !== 0) {
+            if (transposition < 0) {
+                var deltaOctave = -Math.floor(-transposition / 12);
+                var deltaNote = -(-transposition % 12);
+            } else {
+                var deltaOctave = Math.floor(transposition / 12);
+                var deltaNote = transposition % 12;
+            }
+
+            octave += deltaOctave;
+            
+            if (deltaNote > 0) {
+                var pitch = note + '' + octave;
+                for (var interval in INTERVALVALUES) {
+                    if (deltaNote === INTERVALVALUES[interval][0]) {
+                        var note1 = getNoteFromInterval(pitch, interval);
+                        break;
+                    }
+                }
+            } else if (deltaNote < 0) {
+                var octave1 = octave - 1;
+                var pitch = note + '' + octave1;
+                for (var interval in INTERVALVALUES) {
+                    if ((12 + deltaNote) === INTERVALVALUES[interval][0]) {
+                        var note1 = getNoteFromInterval(pitch, interval);
+                        break;
+                    }
+                }
+            } else if (deltaNote == 0) {
+                var pitch = note + '' + octave;
+                var note1 = getNoteFromInterval(pitch, 'perfect 1');
+            }
+            note = note1[0];
+            octave = note1[1];
+        }
     }
 
     if (octave < 1) {
