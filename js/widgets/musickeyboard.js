@@ -45,7 +45,7 @@ function MusicKeyboard() {
     this._rowBlocks1 = [];
     this.rowLabels1 = [];
     this.rowArgs1 = [];
-
+    console.log('Hello friends');
     //configure defaults
     changeKeys();
 
@@ -124,7 +124,7 @@ function MusicKeyboard() {
         for(var i = 0; i < blackKeys.children.length; i++) {
             blackKeys.children[i].id = blackKeys.children[i].textContent;
         }
-        console.log(note1+oct1+"-"+note2+oct2);
+        console.log('HHHiii ' +note1+oct1+"-"+note2+oct2);
     }
 
     keyboard.addEventListener("mousedown", function (e) {
