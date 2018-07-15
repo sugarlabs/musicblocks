@@ -28,15 +28,6 @@ function MusicKeyboard() {
     var whiteKeys = document.getElementById("white");
     var blackKeys = document.getElementById("black");
 
-    var keyboard2 = document.getElementById("keyboard2");
-    var keyboardHolder2 = document.getElementById("keyboardHolder2");
-    var firstOctave2 = document.getElementById("firstOctave2");
-    var firstNote2 = document.getElementById("firstNote2");
-    var secondOctave2 = document.getElementById("secondOctave2");
-    var secondNote2 = document.getElementById("secondNote2");
-    var whiteKeys2 = document.getElementById("white2");
-    var blackKeys2 = document.getElementById("black2");
-
     var whiteNoteEnums = ['C','D','E','F','G','A','B'];
     var blackNoteEnums = ['C♯', 'D♯', 'SKIP', 'F♯', 'G♯', 'A♯', 'SKIP'];
 
@@ -47,6 +38,82 @@ function MusicKeyboard() {
     this.rowArgs1 = [];
     console.log('Hello friends');
     //configure defaults
+
+    this.init = function(logo) {
+        // Initializes the pitch/drum matrix. First removes the
+        // previous matrix and them make another one in DOM (document
+        // object model)
+        this._logo = logo; 
+        console.log('rowLabels1 = ' +this.rowLabels1);
+        console.log('rowArgs1 = ' +this.rowArgs1);
+        if(this.rowLabels1.length == 0){
+            document.getElementById("keyboardHolder").style.display = "block";
+        } else {
+            document.getElementById("keyboardHolder2").style.display = "block";
+        }
+        
+
+        var w = window.innerWidth;
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
+
+        var canvas = docById('myCanvas');
+
+        // Position the widget and make it visible.
+        var mkbDiv = docById('mkbDiv');
+        mkbDiv.style.visibility = 'visible';
+        mkbDiv.setAttribute('draggable', 'true');
+        mkbDiv.style.left = '200px';
+        mkbDiv.style.top = '150px';
+
+    
+
+
+        // The mkb buttons
+        var mkbButtonsDiv = docById('mkbButtonsDiv');
+        mkbButtonsDiv.style.display = 'inline';
+        mkbButtonsDiv.style.visibility = 'visible';
+        mkbButtonsDiv.style.width = BUTTONDIVWIDTH;
+        mkbButtonsDiv.innerHTML = '<table cellpadding="0px" id="mkbButtonTable"></table>';
+
+        var buttonTable1 = docById('mkbButtonTable');           //doubt
+        var header1 = buttonTable1.createTHead();
+        var row1 = header1.insertRow(0);
+
+        // For the button callbacks
+        var that = this;
+
+        var cell1 = this._addButton(row1, 'play-button.svg', ICONSIZE, _('play'));
+
+        cell1.onclick=function() {
+            that._logo.setTurtleDelay(0);
+            that._playAll();
+        }
+
+        var cell1 = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('save'));
+
+        cell1.onclick=function() {
+            that._save1(selected);
+      //      handleKeyboardPitches (selected);
+        }
+
+        var cell1 = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('clear'));
+
+        cell1.onclick=function() {
+            that._clear();
+        }
+
+        var cell1 = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
+
+        cell1.onclick=function() {
+            mkbDiv.style.visibility = 'hidden';
+            mkbButtonsDiv.style.visibility = 'hidden';
+            mkbTableDiv.style.visibility = 'hidden';
+            document.getElementById("keyboardHolder").style.display = "none";
+        //    document.getElementById("keyboardHolder2").style.display = "none";
+        }
+    };
+
     changeKeys();
 
     function changeKeys() {
@@ -182,128 +249,20 @@ function MusicKeyboard() {
         keyboardShown = !keyboardShown;
     }
 
-    this.clearBlocks = function() {
-        this._rowBlocks1 = [];
-        this._colBlocks1 = [];
-    };
-
-    this.addRowBlock = function(pitchBlock) {
-        this._rowBlocks1.push(pitchBlock);
-    };
-
-    this.init = function(logo) {
-        // Initializes the pitch/drum matrix. First removes the
-        // previous matrix and them make another one in DOM (document
-        // object model)
-        this._logo = logo; 
-        console.log('rowLabels1 = ' +this.rowLabels1);
-        console.log('rowArgs1 = ' +this.rowArgs1);
-        if(this.rowLabels1.length == 0){
-            document.getElementById("keyboardHolder").style.display = "block";
-        } else {
-            document.getElementById("keyboardHolder2").style.display = "block";
-        }
-        
-
-        var w = window.innerWidth;
-        this._cellScale = w / 1200;
-        var iconSize = ICONSIZE * this._cellScale;
-
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var mkbDiv = docById('mkbDiv');
-        mkbDiv.style.visibility = 'visible';
-        mkbDiv.setAttribute('draggable', 'true');
-        mkbDiv.style.left = '200px';
-        mkbDiv.style.top = '150px';
-
-    
-
-
-        // The mkb buttons
-        var mkbButtonsDiv = docById('mkbButtonsDiv');
-        mkbButtonsDiv.style.display = 'inline';
-        mkbButtonsDiv.style.visibility = 'visible';
-        mkbButtonsDiv.style.width = BUTTONDIVWIDTH;
-        mkbButtonsDiv.innerHTML = '<table cellpadding="0px" id="mkbButtonTable"></table>';
-
-        var buttonTable1 = docById('mkbButtonTable');           //doubt
-        var header1 = buttonTable1.createTHead();
-        var row1 = header1.insertRow(0);
-
-        // For the button callbacks
-        var that = this;
-
-        var cell1 = this._addButton(row1, 'play-button.svg', ICONSIZE, _('play'));
-
-        cell1.onclick=function() {
-            that._logo.setTurtleDelay(0);
-            that._playAll();
-        }
-
-        var cell1 = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('save'));
-
-        cell1.onclick=function() {
-            that._save();
-        }
-
-        var cell1 = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('clear'));
-
-        cell1.onclick=function() {
-            that._clear();
-        }
-
-        var cell1 = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
-
-        cell1.onclick=function() {
-            mkbDiv.style.visibility = 'hidden';
-            mkbButtonsDiv.style.visibility = 'hidden';
-            mkbTableDiv.style.visibility = 'hidden';
-            document.getElementById("keyboardHolder").style.display = "none";
-            document.getElementById("keyboardHolder2").style.display = "none";
-        }
-
-
-    };
-
-    this._addButton = function(row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
-
-        return cell;
-    };
-
     function handleKeyboard (key) {
-        //Tone can't do special sharps, need # instead of ♯
-        console.log('Key pressed ' +key[0]+ ' ' +key[1]+ ' ' +key[2]);
+        //Tone can't do special sharps, need # isntead of ♯
         var noSharp = key;
         if(key[1] == "♯") {
             noSharp = key[0]+"#"+key[2];
         }
-        console.log('noSharp after ' +noSharp[0]+ ' ' +noSharp[1]+ ' ' +noSharp[2]);
-        
         synth.triggerAttackRelease(noSharp, "8n");
-    }
-     
-    function handleKeyboardPitches (pitches) {
+    }   
+
+ //   function handleKeyboardPitches (pitches) {
+
+    this._save1 = function(pitches){
+
         console.log("generating keyboard pitches for: " + pitches);
-        //copy and pasted from matrix.saveMatrix (), the original had too many array dimensions so the forloop has been removed
         var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk"}], 0, 0, [0]]];
         var endOfStackIdx = 0;
@@ -346,12 +305,47 @@ function MusicKeyboard() {
             }
         }
         console.log(newStack);
-        blocks.logo.blocks.loadNewBlocks(newStack);
+        this._logo.blocks.loadNewBlocks(newStack);
     }
 
+    this.clearBlocks = function() {
+        this._rowBlocks1 = [];
+        this._colBlocks1 = [];
+    };
+
+    this.addRowBlock = function(pitchBlock) {
+        this._rowBlocks1.push(pitchBlock);
+    };
+
+    
+
+
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = cell.style.width;
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
+    };
+     
        //not sure if there's a synth already in the program
     var synth = new Tone.Synth().toMaster();
     
     
 }
-     
+
+
