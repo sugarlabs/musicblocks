@@ -110,7 +110,7 @@ function MusicKeyboard() {
             mkbButtonsDiv.style.visibility = 'hidden';
             mkbTableDiv.style.visibility = 'hidden';
             document.getElementById("keyboardHolder").style.display = "none";
-        //    document.getElementById("keyboardHolder2").style.display = "none";
+            document.getElementById("keyboardHolder2").style.display = "none";
         }
     };
 
