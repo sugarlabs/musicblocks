@@ -1076,20 +1076,36 @@ function TemperamentWidget () {
 
         for (var i = 0; i < this.pitchNumber; i++) {
             var idx = newStack.length;
-            newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
-            newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
-            newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
-            newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
-            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
-            newStack.push([idx + 5, ['pitch'], 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
-            newStack.push([idx + 6, ['notename',{'value':'C'}], 0, 0, [idx + 5]]);
-            newStack.push([idx + 7, ['number',{'value':4}], 0, 0, [idx + 5]]);
-            if (i == this.pitchNumber - 1) {
-                newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
+            if (this.inTemperament !== 'custom') {
+                newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
+                newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
+                newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
+                newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
+                newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                newStack.push([idx + 5, ['pitch'], 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
+                newStack.push([idx + 6, ['notename',{'value':this.ratiosNotesPair[i][1][0]}], 0, 0, [idx + 5]]);
+                newStack.push([idx + 7, ['number',{'value':this.ratiosNotesPair[i][1][1]}], 0, 0, [idx + 5]]);
+                if (i == this.pitchNumber - 1) {
+                    newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
+                } else {
+                    newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
+                }
+                previousBlock = idx + 8; 
             } else {
-                newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
-            }
-            previousBlock = idx + 8;  
+                newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
+                newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
+                newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
+                newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
+                newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                newStack.push([idx + 5, ['hertz'], 0, 0, [idx + 4, idx + 6, null]]);
+                newStack.push([idx + 6, ['number',{'value':this.frequencies[i]}], 0, 0, [idx + 5]]);
+                if (i == this.pitchNumber - 1) {
+                    newStack.push([idx + 7, 'hidden', 0, 0, [idx, null]]);
+                } else {
+                    newStack.push([idx + 7, 'hidden', 0, 0, [idx, idx + 8]]);
+                }
+                previousBlock = idx + 7;
+            }     
         }
         this._logo.blocks.loadNewBlocks(newStack);  
 
