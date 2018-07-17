@@ -1071,7 +1071,7 @@ function TemperamentWidget () {
     };
 
     this._save = function() {
-        var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]]];
+        var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['text', {'value': this.inTemperament}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]]];
         var previousBlock = 2;
 
         for (var i = 0; i < this.pitchNumber; i++) {
