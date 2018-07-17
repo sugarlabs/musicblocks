@@ -592,30 +592,20 @@ const TEMPERAMENT = {
         'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'augmented 3', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8', 'augmented 7', 'perfect 8']
     },
     'custom':{
-        'perfect 1' : Math.pow(2, (0/12)),
-        'minor 2' :  Math.pow(2, (1/12)),
-        'augmented 1': Math.pow(2, (1/12)),
-        'major 2': Math.pow(2, (2/12)),
-        'augmented 2': Math.pow(2, (3/12)),
-        'minor 3': Math.pow(2, (3/12)),
-        'major 3': Math.pow(2, (4/12)),
-        'augmented 3': Math.pow(2, (5/12)),
-        'diminished 4': Math.pow(2, (4/12)),
-        'perfect 4': Math.pow(2, (5/12)),
-        'augmented 4': Math.pow(2, (6/12)),
-        'diminished 5': Math.pow(2, (6/12)),
-        'perfect 5': Math.pow(2, (7/12)),
-        'augmented 5': Math.pow(2, (8/12)),
-        'minor 6': Math.pow(2, (8/12)),
-        'major 6': Math.pow(2, (9/12)),
-        'augmented 6': Math.pow(2, (10/12)),
-        'minor 7': Math.pow(2, (10/12)),
-        'major 7': Math.pow(2, (11/12)),
-        'augmented 7': Math.pow(2, (12/12)),
-        'diminished 8': Math.pow(2, (11/12)),
-        'perfect 8': Math.pow(2, (12/12)),
-        'pitchNumber': 12,
-        'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
+        '0': Math.pow(2, (0/12)),
+        '1': Math.pow(2, (1/12)),
+        '2': Math.pow(2, (2/12)),
+        '3': Math.pow(2, (3/12)),
+        '4': Math.pow(2, (4/12)),
+        '5': Math.pow(2, (5/12)),
+        '6': Math.pow(2, (6/12)),
+        '7': Math.pow(2, (7/12)),
+        '8': Math.pow(2, (8/12)),
+        '9': Math.pow(2, (9/12)),
+        '10': Math.pow(2, (10/12)),
+        '11': Math.pow(2, (11/12)),
+        'pitchNumber': 12
+        //'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
     }
 };
 
@@ -1526,19 +1516,45 @@ function frequencyToPitch(hz) {
 };
 
 
-function numberToPitch(i) {
+function numberToPitch(i, temperament, startPitch) {
     // Calculate the pitch and octave based on index.
     // We start at A0.
+    if (temperament === undefined) {
+        temperament = 'equal';
+    }
+    var t = TEMPERAMENT[temperament];
     if (i < 0) {
         var n = 0;
         while (i < 0) {
             i += 12;
             n += 1;  // Count octave bump ups.
         }
-
-        return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
+        if (temperament == 'equal') {
+            return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
+        } else if (temperament == 'custom') {
+            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            pitchNumber = pitchNumber - 1;
+            pitchNumber = pitchNumber + '';
+            return Number(TEMPERAMENT['custom'][pitchNumber]);
+        } else {
+            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber - 1];
+            return getNoteFromInterval(startPitch, interval);                        
+        }
+        
     } else {
-        return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
+        if (temperament == 'equal') {
+            return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
+        } else if (temperament == 'custom') {
+            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            pitchNumber = pitchNumber - 1;
+            pitchNumber = pitchNumber + '';
+            return Number(TEMPERAMENT['custom'][pitchNumber]);
+        } else {
+            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber - 1];
+            return getNoteFromInterval(startPitch, interval); 
+        }
     }
 };
 

@@ -1043,23 +1043,25 @@ function TemperamentWidget () {
         var selectedTemperament;
 
         for (var temperament in TEMPERAMENT) {
-            var t = TEMPERAMENT[temperament];
-            var temperamentRatios = [];
-            for (var j = 0; j < t.interval.length; j++) {
-                intervals[j] = t.interval[j];
-                temperamentRatios[j] = t[intervals[j]];
-                temperamentRatios[j] = temperamentRatios[j].toFixed(2);
-            } 
-            var ratiosEqual = (ratios.length == temperamentRatios.length) && ratios.every(function(element, index) {
-                return element === temperamentRatios[index]; 
-            });
+            if (temperament !== 'custom') {
+                var t = TEMPERAMENT[temperament];
+                var temperamentRatios = [];
+                for (var j = 0; j < t.interval.length; j++) {
+                    intervals[j] = t.interval[j];
+                    temperamentRatios[j] = t[intervals[j]];
+                    temperamentRatios[j] = temperamentRatios[j].toFixed(2);
+                } 
+                var ratiosEqual = (ratios.length == temperamentRatios.length) && ratios.every(function(element, index) {
+                    return element === temperamentRatios[index]; 
+                });
 
-            if (ratiosEqual) {
-                selectedTemperament = temperament;
-                this.inTemperament = temperament;
-                temperamentCell.innerHTML = this.inTemperament;
-                break;
-            }
+                if (ratiosEqual) {
+                    selectedTemperament = temperament;
+                    this.inTemperament = temperament;
+                    temperamentCell.innerHTML = this.inTemperament;
+                    break;
+                }
+            }   
         }
 
         if (selectedTemperament === undefined) {
@@ -1069,15 +1071,6 @@ function TemperamentWidget () {
     };
 
     this._save = function() {
-        /*this.pitches = [];
-        for (var i = 0; i < this.pitchNumber.length; i++) {
-            for (var j = 0; j < this.ratiosNotesPair.length; j++) {
-                if(this.ratios[i] == this.ratiosNotesPair[j][0]) {
-                    this.pitches[i] =  this.ratiosNotesPair[j][0];
-                }    
-            }
-        }*/
-        
         var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]]];
         var previousBlock = 2;
 
@@ -1101,7 +1094,13 @@ function TemperamentWidget () {
         this._logo.blocks.loadNewBlocks(newStack);  
 
         var newStack1 = [[0,'settemperament', 100, 100, [null, 1, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]]];        
-        this._logo.blocks.loadNewBlocks(newStack1);  
+        this._logo.blocks.loadNewBlocks(newStack1);
+        TEMPERAMENT['custom'] = [];
+        TEMPERAMENT['custom']['pitchNumber'] = this.pitchNumber;
+        for (var i = 0; i < this.pitchNumber; i++) {
+            var number = '' + i;
+            TEMPERAMENT['custom'][number] = this.ratios[i];
+        }
     }
 
     this.playNote = function(pitchNumber) {

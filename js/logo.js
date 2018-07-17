@@ -4165,12 +4165,23 @@ function Logo () {
                 } else {
                     // In number to pitch we assume A0 == 0. Here we
                     // assume that C4 == 0, so we need an offset of 39.
-                    var obj = numberToPitch(Math.floor(arg0 + that.pitchNumberOffset[turtle]));
+
+                    var obj = numberToPitch(Math.floor(arg0 + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch);
 
                     note = obj[0];
                     octave = obj[1];
                     cents = 0;
                     that.currentNote = note;
+            
+                    if (typeof(obj) === 'number') {
+                        var pitch = that.synth.startingPitch;
+                        var pitchFrequency = pitchToFrequency(pitch.substring(0, pitch.length - 1), pitch.slice(-1), 0, 'C Major');
+                        that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(obj * pitchFrequency);
+                        var obj = frequencyToPitch(obj * pitchFrequency);
+                        note = obj[0];
+                        octave = obj[1];
+                        cents = obj[2];
+                    }
                 }
             } else {
                 if (args[0] === null) {
