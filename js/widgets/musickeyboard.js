@@ -9,7 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
 function MusicKeyboard() {
     const BUTTONDIVWIDTH = 295;  // 5 buttons
     const DRUMNAMEWIDTH = 50;
@@ -36,21 +35,66 @@ function MusicKeyboard() {
     this._rowBlocks1 = [];
     this.rowLabels1 = [];
     this.rowArgs1 = [];
-    console.log('Hello friends');
     //configure defaults
+
+
+    
 
     this.init = function(logo) {
         // Initializes the pitch/drum matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
         this._logo = logo; 
-        console.log('rowLabels1 = ' +this.rowLabels1);
-        console.log('rowArgs1 = ' +this.rowArgs1);
+        
         if(this.rowLabels1.length == 0){
             document.getElementById("keyboardHolder").style.display = "block";
         } else {
             document.getElementById("keyboardHolder2").style.display = "block";
+
+            console.log('rowLabels1 = ' +this.rowLabels1);
+            console.log('rowArgs1 = ' +this.rowArgs1);
+
+
+            for(var p = 0; p<this.rowLabels1.length;p++){
+                if(this.rowLabels1[p][1] != '♯' & this.rowLabels1[p][2] != '♯'){
+                    var parenttbl = document.getElementById("myrow");
+                    var newel = document.createElement('td');
+                    var elementid = document.getElementsByTagName("td").length
+                    newel.setAttribute('id',elementid);
+                    newel.innerHTML = this.rowLabels1[p] + this.rowArgs1[p];
+                    parenttbl.appendChild(newel);
+                }
+            }
+
+            for(var p = 0; p<this.rowLabels1.length;p++){
+                console.log("0 index " +this.rowLabels1[p][0]);
+                console.log("1 index " +this.rowLabels1[p][1]);
+                console.log("2 index " +this.rowLabels1[p][2]);
+                if(this.rowLabels1[p][1] == '♯' || this.rowLabels1[p][2] == '♯'){
+
+                    console.log("Hiii " +p );
+                    var parenttbl2 = document.getElementById("myrow2");
+                    var newel2 = document.createElement('td');
+                    var elementid2 = document.getElementsByTagName("td").length
+                    newel2.setAttribute('id',elementid);
+                    newel2.innerHTML = this.rowLabels1[p] + this.rowArgs1[p];
+                    parenttbl2.appendChild(newel2);
+                }
+                
+    
+            }
+            
+
+
+
+            //console.log('D4 is ' +document.getElementById("D♯4").innerText);
+            // document.getElementById("D4").style.display == "none";
+            // document.getElementById("F4").style.visibility == "hidden";
+            //document.getElementById("V♯5").style.display == "none";
+
+
         }
+
         
 
         var w = window.innerWidth;
@@ -111,6 +155,10 @@ function MusicKeyboard() {
             mkbTableDiv.style.visibility = 'hidden';
             document.getElementById("keyboardHolder").style.display = "none";
             document.getElementById("keyboardHolder2").style.display = "none";
+            var myNode = document.getElementById("myrow");
+            myNode.innerHTML = '';
+            var myNode = document.getElementById("myrow2");
+            myNode.innerHTML = '';
         }
     };
 
@@ -258,8 +306,6 @@ function MusicKeyboard() {
         synth.triggerAttackRelease(noSharp, "8n");
     }   
 
- //   function handleKeyboardPitches (pitches) {
-
     this._save1 = function(pitches){
 
         console.log("generating keyboard pitches for: " + pitches);
@@ -317,9 +363,6 @@ function MusicKeyboard() {
         this._rowBlocks1.push(pitchBlock);
     };
 
-    
-
-
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
@@ -342,7 +385,6 @@ function MusicKeyboard() {
         return cell;
     };
      
-       //not sure if there's a synth already in the program
     var synth = new Tone.Synth().toMaster();
     
     
