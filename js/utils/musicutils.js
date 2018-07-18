@@ -1533,12 +1533,12 @@ function numberToPitch(i, temperament, startPitch, offset) {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
         } else if (temperament == 'custom') {
             var pitchNumber = Math.floor(i - offset);
-            pitchNumber = pitchNumber - 1;
+            pitchNumber = pitchNumber;
             pitchNumber = pitchNumber + '';
             return Number(TEMPERAMENT['custom'][pitchNumber]);
         } else {
             var pitchNumber = Math.floor(i - offset);
-            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber - 1];
+            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber];
             return getNoteFromInterval(startPitch, interval);                        
         }
         
@@ -1547,12 +1547,12 @@ function numberToPitch(i, temperament, startPitch, offset) {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
         } else if (temperament == 'custom') {
             var pitchNumber = Math.floor(i - offset);
-            pitchNumber = pitchNumber - 1;
+            pitchNumber = pitchNumber;
             pitchNumber = pitchNumber + '';
             return Number(TEMPERAMENT['custom'][pitchNumber]);
         } else {
             var pitchNumber = Math.floor(i - offset);
-            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber - 1];
+            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber];
             return getNoteFromInterval(startPitch, interval); 
         }
     }

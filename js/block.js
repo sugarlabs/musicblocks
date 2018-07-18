@@ -1917,7 +1917,7 @@ function Block(protoblock, blocks, overrideName) {
                     } else {
                         var pitchNumbers = [];
                         for (var i = 0; i < TEMPERAMENT[temperament]['pitchNumber']; i++) {
-                            pitchNumbers.push(i + 1);
+                            pitchNumbers.push(i);
                         }
                         this._piemenuNumber(pitchNumbers, this.value);
                     }
