@@ -312,7 +312,7 @@ function StatusMatrix() {
                     if (this._logo.noteStatus[turtle] != null) {
                         var notes = this._logo.noteStatus[turtle][0];
                         for (var j = 0; j < notes.length; j++) {
-                            value += this._logo.synth.getFrequency(notes[j], this._logo.synth.changeInTemperament).toFixed(2);
+                            value += this._logo.synth._getFrequency(notes[j], this._logo.synth.changeInTemperament).toFixed(2);
                             value += ' ';
                         }
                     }

@@ -3998,7 +3998,7 @@ function Logo () {
                 } else {
                     // In number to pitch we assume A0 == 0. Here we
                     // assume that C4 == 0, so we need an offset of 39.
-                    var obj = numberToPitch(Math.floor(args[0] + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch);
+                    var obj = numberToPitch(Math.floor(args[0] + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch, that.pitchNumberOffset[turtle]);
 
                     note = obj[0];
                     octave = obj[1];
@@ -9375,7 +9375,7 @@ function Logo () {
                     that.statusFields.push([blk, 'pitchinhertz']);
                 } else {
                     if (that.lastNotePlayed[turtle] !== null) {
-                        that.blocks.blockList[blk].value = that.synth.getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
+                        that.blocks.blockList[blk].value = that.synth._getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
                     }
                 }
                 break;
