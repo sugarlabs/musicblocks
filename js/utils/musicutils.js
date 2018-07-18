@@ -1516,7 +1516,7 @@ function frequencyToPitch(hz) {
 };
 
 
-function numberToPitch(i, temperament, startPitch) {
+function numberToPitch(i, temperament, startPitch, offset) {
     // Calculate the pitch and octave based on index.
     // We start at A0.
     if (temperament === undefined) {
@@ -1532,12 +1532,12 @@ function numberToPitch(i, temperament, startPitch) {
         if (temperament == 'equal') {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
         } else if (temperament == 'custom') {
-            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            var pitchNumber = Math.floor(i - offset);
             pitchNumber = pitchNumber - 1;
             pitchNumber = pitchNumber + '';
             return Number(TEMPERAMENT['custom'][pitchNumber]);
         } else {
-            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            var pitchNumber = Math.floor(i - offset);
             var interval = TEMPERAMENT[temperament]['interval'][pitchNumber - 1];
             return getNoteFromInterval(startPitch, interval);                        
         }
@@ -1546,12 +1546,12 @@ function numberToPitch(i, temperament, startPitch) {
         if (temperament == 'equal') {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
         } else if (temperament == 'custom') {
-            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            var pitchNumber = Math.floor(i - offset);
             pitchNumber = pitchNumber - 1;
             pitchNumber = pitchNumber + '';
             return Number(TEMPERAMENT['custom'][pitchNumber]);
         } else {
-            var pitchNumber = (i + PITCHES.indexOf('A')) % 12;
+            var pitchNumber = Math.floor(i - offset);
             var interval = TEMPERAMENT[temperament]['interval'][pitchNumber - 1];
             return getNoteFromInterval(startPitch, interval); 
         }

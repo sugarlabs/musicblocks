@@ -10001,7 +10001,7 @@ function Logo () {
                     that.statusFields.push([blk, 'pitchinhertz']);
                 } else {
                     if (that.lastNotePlayed[turtle] !== null) {
-                        that.blocks.blockList[blk].value = that.synth.getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
+                        that.blocks.blockList[blk].value = that.synth._getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
                     }
                 }
                 break;
