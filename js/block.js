@@ -1903,8 +1903,9 @@ function Block(protoblock, blocks, overrideName) {
                         temperament = 'equal';
                     }
                     var pitchNumbers = [];
+                    console.log(temperament);
                     for (var i = 0; i < TEMPERAMENT[temperament]['pitchNumber']; i++) {
-                        pitchNumbers.push(i + 1);
+                        pitchNumbers.push(i);
                     }
                     this._piemenuNumber(pitchNumbers, this.value);
                     break;
