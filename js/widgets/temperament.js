@@ -337,6 +337,8 @@ function TemperamentWidget () {
             var ratioDifference = [];
             that.temporaryRatios = that.ratios.slice();
             that.temporaryRatios[i] = ratio;
+            that._logo.resetSynth(0);
+            that._logo.synth.trigger(0, frequency, that._logo.defaultBPMFactor * 0.01, 'default', null, null);
             that.createMainWheel(that.temporaryRatios);
         };
 
@@ -1045,6 +1047,8 @@ function TemperamentWidget () {
                 }
         }
         var pitchNumber = this.tempRatios.length - 1;
+        this._logo.resetSynth(0);
+        this._logo.synth.trigger(0, frequency, this._logo.defaultBPMFactor * 0.01, 'default', null, null);
         this._createInnerWheel(this.tempRatios, pitchNumber);
     }
 
