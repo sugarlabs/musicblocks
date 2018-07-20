@@ -60,12 +60,14 @@ function TemperamentWidget () {
 
         var html = '<canvas id="circ" width = ' + BUTTONDIVWIDTH + 'px height = ' + height + 'px></canvas>';
         html += '<div id="wheelDiv2" class="wheelNav"></div>';
+        html += '<div id ="information"></div>';
 
         temperamentTable.innerHTML = html;
         temperamentTable.style.width = temperamentDiv.width;
 
         var canvas = docById('circ');
         canvas.style.position = 'absolute';
+        canvas.style.zIndex = 1;
         canvas.style.background = 'rgba(255, 255, 255, 0.85)';
         var ctx = canvas.getContext("2d");
         var centerX = canvas.width / 2;
@@ -79,73 +81,85 @@ function TemperamentWidget () {
         ctx.strokeStyle = '#003300';
         ctx.stroke();
 
-        docById('wheelDiv2').style.display = '';
-        docById('wheelDiv2').style.background = 'none';
-
+        var angle = [];
         var labels = [];
         for (var j = 0; j < this.pitchNumber; j++) {
             var label = j.toString();
             labels.push(label);
-        } 
-
-        this.notesCircle = new wheelnav('wheelDiv2');
-        this.notesCircle.wheelRadius = 230;
-        this.notesCircle.navItemsEnabled = false;
-        this.notesCircle.navAngle = 270;
-        this.notesCircle.navItemsContinuous = true;
-        this.notesCircle.navItemsCentered = false;
-        this.notesCircle.slicePathFunction = slicePath().MenuSliceWithoutLine;
-        this.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
-        this.notesCircle.sliceSelectedPathCustom = this.notesCircle.slicePathCustom;
-        this.notesCircle.sliceInitPathCustom = this.notesCircle.slicePathCustom;
-        this.notesCircle.initWheel(labels);
-        var angle = [];
-        var baseAngle = [];
-        var sliceAngle = [];
-        var angleDiff = [];
-
-        for (var i = 0; i < this.notesCircle.navItemCount; i++) {
-            this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
-            this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
-            this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
-            angle[i] = 270 + (360 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase)));
-            if (i !== 0) {
-                if (i == this.pitchNumber - 1) {
-                    angleDiff[i-1] = angle[0] + 360 - angle[i];
-                } else {
-                    angleDiff[i-1] = angle[i] - angle[i-1];
-                }    
-            }
-            if (i === 0) {
-                sliceAngle[i] = 360 / this.pitchNumber;
-                baseAngle[i] = this.notesCircle.navAngle - (sliceAngle[0] / 2);
-            } else {
-                baseAngle[i] = baseAngle[i-1] + sliceAngle[i-1];
-                sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
-            }
-            this.notesCircle.navItems[i].sliceAngle = sliceAngle[i];
         }
 
-        var menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 3;
-        if (this.inTemperament == 'custom') {
-            for (var i = 0; i < angleDiff.length; i++) {
-                if (angleDiff[i] < 11) {
-                    menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 6;
+        this.createMainWheel = function (ratios) {
+            if (this.notesCircle !== undefined) {
+                docById('wheelDiv2').style.display = '';
+                this.notesCircle.removeWheel();
+            }
+            if (ratios === undefined) {
+                ratios = this.ratios;
+            }
+
+            docById('wheelDiv2').style.display = '';
+            docById('wheelDiv2').style.background = 'none';
+
+            this.notesCircle = new wheelnav('wheelDiv2');
+            this.notesCircle.wheelRadius = 230;
+            this.notesCircle.navItemsEnabled = false;
+            this.notesCircle.navAngle = 270;
+            this.notesCircle.navItemsContinuous = true;
+            this.notesCircle.navItemsCentered = false;
+            this.notesCircle.slicePathFunction = slicePath().MenuSliceWithoutLine;
+            this.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
+            this.notesCircle.sliceSelectedPathCustom = this.notesCircle.slicePathCustom;
+            this.notesCircle.sliceInitPathCustom = this.notesCircle.slicePathCustom;
+            this.notesCircle.initWheel(labels);
+            angle = [];
+            var baseAngle = [];
+            var sliceAngle = [];
+            var angleDiff = [];
+            for (var i = 0; i < this.notesCircle.navItemCount; i++) {
+                this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
+                this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                angle[i] = 270 + (360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase)));
+                if (i !== 0) {
+                    if (i == this.pitchNumber - 1) {
+                        angleDiff[i-1] = angle[0] + 360 - angle[i];
+                    } else {
+                        angleDiff[i-1] = angle[i] - angle[i-1];
+                    }       
+                }   
+                if (i === 0) {
+                    sliceAngle[i] = 360 / this.pitchNumber;
+                    baseAngle[i] = this.notesCircle.navAngle - (sliceAngle[0] / 2);
+                } else {
+                    baseAngle[i] = baseAngle[i-1] + sliceAngle[i-1];
+                    sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
+                }
+                this.notesCircle.navItems[i].sliceAngle = sliceAngle[i];
+            }
+
+            var menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 3;
+            if (this.inTemperament == 'custom') {
+                for (var i = 0; i < angleDiff.length; i++) {
+                    if (angleDiff[i] < 11) {
+                        menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 6;
+                    }
                 }
             }
+            if (menuRadius > 29) {
+                menuRadius = (2 * Math.PI * radius) / 33;
+            }
+            this.notesCircle.slicePathCustom.menuRadius = menuRadius;
+            this.notesCircle.createWheel();
+
+            docById('wheelDiv2').style.position = 'absolute';
+            docById('wheelDiv2').style.height = height + 'px';
+            docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
+            docById('wheelDiv2').style.zIndex = 5;
         }
-        if (menuRadius > 29) {
-            menuRadius = (2 * Math.PI * radius) / 33;
-        }
-        this.notesCircle.slicePathCustom.menuRadius = menuRadius;
-        this.notesCircle.createWheel();
+       
+        this.createMainWheel();
 
         var that = this;
-        docById('wheelDiv2').style.position = 'absolute';
-        docById('wheelDiv2').style.height = height + 'px';
-        docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
-        docById('wheelDiv2').style.left = canvas.style.x + 'px';
-        docById('wheelDiv2').style.top = canvas.style.y + 'px';
 
         if (this.octaveChanged) {
             var divAppend = document.createElement('div');
@@ -153,6 +167,7 @@ function TemperamentWidget () {
             divAppend.innerHTML = '<div id="clearNotes" style="float:left;">Clear</div><div id="standardOctave" style="float:right;">Back to 2:1 Octave Space</div>';
             divAppend.style.textAlign = 'center';
             divAppend.style.position = 'absolute';
+            divAppend.style.zIndex = 2;
             divAppend.style.height = '33px';
             divAppend.style.width = docById('wheelDiv2').style.width;
             divAppend.style.marginTop = height + 'px';
@@ -177,6 +192,7 @@ function TemperamentWidget () {
             divAppend1.innerHTML = 'Clear';
             divAppend1.style.textAlign = 'center';
             divAppend1.style.position = 'absolute';
+            divAppend1.style.zIndex = 2;
             divAppend1.style.paddingTop = '5px';
             divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
             divAppend1.style.height = '25px';
@@ -223,12 +239,12 @@ function TemperamentWidget () {
             };
         }
 
-        docById('wheelDiv2').addEventListener('click', function(e) {
-            that.showNoteInfo(e);  
+        docById('temperamentTable').addEventListener('click', function(e) {
+            that.showNoteInfo(e, angle);  
         });
     };
 
-    this.showNoteInfo = function(event) {
+    this.showNoteInfo = function(event, angle) {
         for(var i=0; i< this.notesCircle.navItemCount; i++) {
             if(event.target.id == 'wheelnav-wheelDiv2-slice-' + i || event.target.innerHTML == i && event.target.innerHTML !== ''){
                 var x = event.clientX - docById('wheelDiv2').getBoundingClientRect().left;
@@ -238,15 +254,17 @@ function TemperamentWidget () {
                 if (docById('noteInfo') !== null) {
                     docById('noteInfo').remove();
                 }
-                //this._logo.synth.inTemperament = this.inTemperament;
-                docById('wheelDiv2').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>' 
-                docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' + i + '">';
+
+                docById('information').innerHTML += '<div class="popup" id="noteInfo" style=" left: ' + x + 'px; top: ' + y + 'px;"><span class="popuptext" id="myPopup"></span></div>';
+                if (i !== 0) {
+                    docById('noteInfo').innerHTML += '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' + i + '">';
+                }
                 docById('noteInfo').innerHTML += '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
                 var noteDefined = false;
                 for (var j = 0; j < this.ratiosNotesPair.length; j++) {
                     if(this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         noteDefined = true;
-                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[j][1] + '<br>';
+                        docById('noteInfo').innerHTML += '<div id="note">&nbsp; Note : ' + this.ratiosNotesPair[j][1] + '</div>';
                         break;
                     }     
                 }
@@ -264,33 +282,82 @@ function TemperamentWidget () {
                     var index = centsDiff1.indexOf(min);
 
                     if (centsDiff[index] < 0) {
-                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + "(- " + centsDiff1[index].toFixed(2) + ")" + '<br>';
+                        docById('noteInfo').innerHTML += '<div id="note">&nbsp; Note : ' + this.ratiosNotesPair[index][1] + "(- " + centsDiff1[index].toFixed(2) + ")" + '</div>';
                     } else {
-                        docById('noteInfo').innerHTML += '&nbsp Note : ' + this.ratiosNotesPair[index][1] + "(+ " + centsDiff1[index].toFixed(2) + ")" + '<br>';
+                        docById('noteInfo').innerHTML += '<div id="note">&nbsp; Note : ' + this.ratiosNotesPair[index][1] + "(+ " + centsDiff1[index].toFixed(2) + ")" + '</div>';
                     }
                 }
                 docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
 
+                if (angle[i] >= 270 && angle[i] <= 360) {
+                    docById('noteInfo').style.top = y - 100 + 'px';
+                    docById('noteInfo').style.left = x + 'px';
+                } else if (angle[i] > 360 && angle[i] <= 450 ) {
+                    docById('noteInfo').style.top = y + 'px';
+                    docById('noteInfo').style.left = x + 'px';
+                } else if (angle[i] > 450 && angle[i] <= 540 ) {
+                    docById('noteInfo').style.top = y + 'px';
+                    docById('noteInfo').style.left = x - 180 + 'px';
+                } else if (angle[i] > 540 && angle[i] <= 630 ) {
+                    docById('noteInfo').style.top = y - 100 + 'px';
+                    docById('noteInfo').style.left = x - 180 + 'px';
+                }
+                docById('noteInfo').style.position = 'absolute';
+                docById('noteInfo').style.zIndex = 10;
                 docById('close').onclick = function() {
                     docById('noteInfo').remove();
                 }
 
-                docById('edit').onclick = function(event) {
-                    var index = event.target.dataset.message;
-                    docById('frequency').innerHTML = '&nbsp Frequency : &nbsp<input type = "text" id="changedFrequency" value=' + frequency + ' style="position:absolute; width:52px;" data-message= ' + index + '></input>'
-                    docById('changedFrequency').addEventListener ("mouseout", changeFrequency, false);
-                }
-
-                function changeFrequency(event) {
-                    var j = event.target.dataset.message;
-                    frequency = docById('changedFrequency').value;
-                    docById('changedFrequency').remove();
-                    docById('frequency').innerHTML = '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';   
-                    that.frequencies[j] = frequency;
-                }  
+                if (docById('edit') !== null) {
+                    docById('edit').addEventListener('click', function(e) {
+                        that.editFrequency(e);  
+                    });
+                }   
             }
         }
     };
+
+    this.editFrequency = function(event) {
+        var i = Number(event.target.dataset.message);
+        var that = this;
+
+        docById('noteInfo').style.width = '180px';
+        docById('noteInfo').style.height = '130px';
+        docById('note').innerHTML = '';
+        docById('frequency').innerHTML = '';
+        docById('noteInfo').innerHTML += '<center><input type="range" class="sliders" id = "frequencySlider1" style="width:170px; background:white; border:0;" min="' + this.frequencies[i-1] + '" max="' + this.frequencies[i+1] + '"></center>';
+        docById('noteInfo').innerHTML += '<br>&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv1">' + this.frequencies[i] + '</span>';
+        docById('noteInfo').innerHTML += '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
+        
+        docById('frequencySlider1').oninput = function() {
+            docById('frequencydiv1').innerHTML = docById('frequencySlider1').value;
+            var frequency = docById('frequencySlider1').value;
+            var ratio = frequency / that.frequencies[0];
+            var labels = [];
+            var ratioDifference = [];
+            that.temporaryRatios = that.ratios.slice();
+            that.temporaryRatios[i] = ratio;
+            that.createMainWheel(that.temporaryRatios);
+        };
+
+        docById('done').onclick = function() {
+            that.ratios = that.temporaryRatios.slice();
+            that.createMainWheel();
+            var frequency1 = that.frequencies[0];
+            that.frequencies = [];
+            for (var j = 0; j < that.ratios.length; j++) {
+                that.frequencies[j] = that.ratios[j] * frequency1;
+                that.frequencies[j] = that.frequencies[j].toFixed(2);
+            }
+            that.checkTemperament(that.ratios);
+            docById('noteInfo').remove();
+        }
+        docById('close').onclick = function() {
+            that.temporaryRatios = that.ratios.slice();
+            that.createMainWheel();
+            docById('noteInfo').remove();
+        }              
+    }
 
     this._graphOfNotes = function (){
         this.circleIsVisible = true;
@@ -887,7 +954,7 @@ function TemperamentWidget () {
             var compareRatios = [];
             var frequency1 = that.frequencies[0];
             that.frequencies = [];
-            for (var i = 0; i < that.pitchNumber; i++) {
+            for (var i = 0; i < that.ratios.length; i++) {
                 that.frequencies[i] = that.ratios[i] * frequency1;
                 that.frequencies[i] = that.frequencies[i].toFixed(2);
             }
@@ -1149,10 +1216,10 @@ function TemperamentWidget () {
         }
 
         var duration = 1 / 2;
-        var startingPitchOctave = this.notes[0][1];
-        var octaveDown = Number(startingPitchOctave) - 1;
-        var note = this.notes[0][0] + octaveDown;
-        var startPitch = this._logo.synth._getFrequency(note, true, this.inTemperament).toFixed(2);
+        var startingPitch = this._logo.synth.startingPitch;
+        var startingPitchOcatve = Number(startingPitch.slice(-1));
+        var octave = startingPitchOcatve - 1;
+        var startPitch = pitchToFrequency(startingPitch.substring(0, startingPitch.length - 1), octave, 0, 'C Major');
         var that = this;
         var pitchNumber = this.pitchNumber;
         if (docById('wheelDiv4') !== null) {
