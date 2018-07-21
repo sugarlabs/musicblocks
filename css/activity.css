@@ -627,8 +627,8 @@ table {
 
 #mkbDiv {
     position: absolute;
-    top: 20%;
-    left: 20%;
+    top: 0px;
+    left: 0px;
     background: rgba(255, 255, 255, 0.85) !important;
 }
 
