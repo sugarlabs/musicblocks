@@ -100,7 +100,7 @@ function TemperamentWidget () {
             docById('wheelDiv2').style.display = '';
             docById('wheelDiv2').style.background = 'none';
 
-            this.notesCircle = new wheelnav('wheelDiv2');
+            this.notesCircle = new wheelnav('wheelDiv2', null, 350, 350);
             this.notesCircle.wheelRadius = 230;
             this.notesCircle.navItemsEnabled = false;
             this.notesCircle.navAngle = 270;
