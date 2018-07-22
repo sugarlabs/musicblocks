@@ -82,23 +82,22 @@ function TemperamentWidget () {
         ctx.stroke();
 
         var angle = [];
-        var labels = [];
-        for (var j = 0; j < this.pitchNumber; j++) {
-            var label = j.toString();
-            labels.push(label);
-        }
+        docById('wheelDiv2').style.display = '';
+        docById('wheelDiv2').style.background = 'none';
 
-        this.createMainWheel = function (ratios) {
-            if (this.notesCircle !== undefined) {
-                docById('wheelDiv2').style.display = '';
-                this.notesCircle.removeWheel();
-            }
+        this.createMainWheel = function (ratios, pitchNumber) {
             if (ratios === undefined) {
                 ratios = this.ratios;
             }
+            if (pitchNumber === undefined) {
+                pitchNumber = this.pitchNumber;
+            }
 
-            docById('wheelDiv2').style.display = '';
-            docById('wheelDiv2').style.background = 'none';
+            var labels = [];
+            for (var j = 0; j < pitchNumber; j++) {
+                var label = j.toString();
+                labels.push(label);
+            }
 
             this.notesCircle = new wheelnav('wheelDiv2', null, 350, 350);
             this.notesCircle.wheelRadius = 230;
@@ -121,14 +120,14 @@ function TemperamentWidget () {
                 this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + (360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase)));
                 if (i !== 0) {
-                    if (i == this.pitchNumber - 1) {
+                    if (i == pitchNumber - 1) {
                         angleDiff[i-1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff[i-1] = angle[i] - angle[i-1];
                     }       
                 }   
                 if (i === 0) {
-                    sliceAngle[i] = 360 / this.pitchNumber;
+                    sliceAngle[i] = 360 / pitchNumber;
                     baseAngle[i] = this.notesCircle.navAngle - (sliceAngle[0] / 2);
                 } else {
                     baseAngle[i] = baseAngle[i-1] + sliceAngle[i-1];
@@ -137,12 +136,10 @@ function TemperamentWidget () {
                 this.notesCircle.navItems[i].sliceAngle = sliceAngle[i];
             }
 
-            var menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 3;
-            if (this.inTemperament == 'custom') {
-                for (var i = 0; i < angleDiff.length; i++) {
-                    if (angleDiff[i] < 11) {
-                        menuRadius = (2 * Math.PI * radius / this.pitchNumber) / 6;
-                    }
+            var menuRadius = (2 * Math.PI * radius / pitchNumber) / 3;
+            for (var i = 0; i < angleDiff.length; i++) {
+                if (angleDiff[i] < 11) {
+                    menuRadius = (2 * Math.PI * radius / pitchNumber) / 6;
                 }
             }
             if (menuRadius > 29) {
@@ -590,42 +587,70 @@ function TemperamentWidget () {
         equalEdit.innerHTML += 'Number of Divisions &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="' + this.pitchNumber + '"></input>';
         equalEdit.style.paddingLeft = '80px';
         var that = this;
-        
-        var divAppend = document.createElement('div');
-        divAppend.id = 'divAppend';
-        divAppend.innerHTML = 'Done';
-        divAppend.style.textAlign = 'center';
-        divAppend.style.paddingTop = '5px';
-        divAppend.style.marginLeft = '-80px';
-        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
-        divAppend.style.height = '25px';
-        divAppend.style.marginTop = '40px';
-        divAppend.style.overflow = 'auto';
-        equalEdit.append(divAppend);
+
+        function addDivision (preview) {
+            // Add Buttons
+            var divAppend = document.createElement('div');
+            divAppend.id = 'divAppend';
+            if (preview) {
+                divAppend.innerHTML = '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
+            } else {
+                divAppend.innerHTML = '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
+            }       
+            divAppend.style.textAlign = 'center';
+            divAppend.style.marginLeft = '-80px';
+            divAppend.style.height = '32px';
+            divAppend.style.marginTop = '40px';
+            divAppend.style.overflow = 'auto';
+            equalEdit.append(divAppend);
+
+            var divAppend1 = docById('preview');
+            divAppend1.style.height = '30px';
+            divAppend1.style.marginLeft = '3px';
+            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.width = '215px';
+
+            var divAppend2 = docById('done_');
+            divAppend2.style.height = '30px';
+            divAppend2.style.marginRight = '3px';
+            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend2.style.width = '205px';
+        }
+
+        addDivision(false);
 
         divAppend.onmouseover = function() {
             this.style.cursor = 'pointer';
         };
-        
-        divAppend.onclick = function() {
-            var pitchNumber = that.pitchNumber;
-            var pitchNumber1 = Number(docById('octaveIn').value);
-            var pitchNumber2 = Number(docById('octaveOut').value);
-            var divisions = Number(docById('divisions').value);
-            var ratio = [];
-            var compareRatios = [];
-            var ratio1 = [];
-            var ratio2 = [];
-            var ratio3 = [];
-            var index = [];
 
+        var pitchNumber = this.pitchNumber;
+        var pitchNumber1 = Number(docById('octaveIn').value);
+        var pitchNumber2 = Number(docById('octaveOut').value);
+        var divisions = Number(docById('divisions').value);
+        var ratio = [];
+        var compareRatios = [];
+        var ratio1 = [];
+        var ratio2 = [];
+        var ratio3 = [];
+        var index = [];
+        this.tempRatios = [];
+
+        divAppend.addEventListener('click', function(event) {
+            that.performEqualEdit(event);  
+        });
+
+        this.performEqualEdit = function(event) {
+            pitchNumber1 = Number(docById('octaveIn').value);
+            pitchNumber2 = Number(docById('octaveOut').value);
+            divisions = Number(docById('divisions').value);
+            this.tempRatios = this.ratios.slice();
             if (pitchNumber1 === pitchNumber2) {
                 for (var i = 0; i < divisions; i++) {
-                    ratio[i] = Math.pow(that.powerBase, i/divisions);
+                    ratio[i] = Math.pow(this.powerBase, i/divisions);
                     ratio1[i] = ratio[i].toFixed(2);
                 }
-                for (var i = 0; i < that.ratios.length; i++) {
-                    ratio2[i] = that.ratios[i];
+                for (var i = 0; i < this.tempRatios.length; i++) {
+                    ratio2[i] = this.tempRatios[i];
                     ratio2[i] = ratio2[i].toFixed(2); 
                 }
                 var ratio4 = ratio1.filter(function(val) {
@@ -637,37 +662,74 @@ function TemperamentWidget () {
                     ratio3[i] = ratio[index[i]];
                 }
 
-                that.ratios = that.ratios.concat(ratio3);
-                that.ratios.sort(function(a, b){
+                this.tempRatios = this.tempRatios.concat(ratio3);
+                this.tempRatios.sort(function(a, b){
                     return a-b;
                 });
-                pitchNumber = that.ratios.length - 1;
+                pitchNumber = this.tempRatios.length - 1;
             } else {
                 pitchNumber = divisions + Number(pitchNumber) - (Math.abs(pitchNumber1 - pitchNumber2));
-                var angle1 = 270 + (360 * (Math.log10(that.ratios[pitchNumber1]) / Math.log10(that.powerBase)));
-                var angle2 = 270 + (360 * (Math.log10(that.ratios[pitchNumber2]) / Math.log10(that.powerBase)));
+                var angle1 = 270 + (360 * (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase)));
+                var angle2 = 270 + (360 * (Math.log10(this.tempRatios[pitchNumber2]) / Math.log10(this.powerBase)));
                 var divisionAngle = Math.abs(angle2 - angle1) / divisions;
-                that.ratios.splice(pitchNumber1 + 1, Math.abs(pitchNumber1 - pitchNumber2) - 1);
-
+                this.tempRatios.splice(pitchNumber1 + 1, Math.abs(pitchNumber1 - pitchNumber2) - 1);
                 for (var i = 0; i < divisions - 1; i++) {
                     var power = (Math.min(angle1, angle2) + (divisionAngle * (i + 1)) - 270) / 360;
-                    ratio[i] = Math.pow(that.powerBase , power);
-                    that.ratios.splice(pitchNumber1 + 1 + i, 0, ratio[i]);
-                    compareRatios[i] = that.ratios[i];
+                    ratio[i] = Math.pow(this.powerBase , power);
+                    this.tempRatios.splice(pitchNumber1 + 1 + i, 0, ratio[i]);
+                    compareRatios[i] = this.tempRatios[i];
                     compareRatios[i] = compareRatios[i].toFixed(2); 
                 }
             }
-            var frequency = that.frequencies[0];
-            that.frequencies = [];
-            for (var i = 0; i <= pitchNumber; i++) {
-                that.frequencies[i] = that.ratios[i] * frequency;
-                that.frequencies[i] = that.frequencies[i].toFixed(2);
+
+            if (event.target.innerHTML === 'Done') {
+                //Go to main Circle of Notes
+                this.ratios = this.tempRatios.slice();
+                var frequency = this.frequencies[0];
+                this.frequencies = [];
+                for (var i = 0; i <= pitchNumber; i++) {
+                    this.frequencies[i] = this.ratios[i] * frequency;
+                    this.frequencies[i] = this.frequencies[i].toFixed(2);
+                }
+
+                this.pitchNumber = pitchNumber;
+                this.checkTemperament(compareRatios);
+                this._circleOfNotes();
+            } else if (event.target.innerHTML === 'Preview') {
+                //Preview Notes
+                docById('userEdit').innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
+                this.createMainWheel(this.tempRatios, pitchNumber);
+                for (var i = 0; i < pitchNumber; i++) {
+                    this.notesCircle.navItems[i].fillAttr = '#e0e0e0';
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = '#e0e0e0';
+                    this.notesCircle.navItems[i].slicePathAttr.fill = '#e0e0e0';
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = '#e0e0e0';
+                }
+                this.notesCircle.refreshWheel();
+                docById('userEdit').style.paddingLeft = '0px';
+                addDivision(true);
+                divAppend.style.marginTop = docById('wheelDiv2').style.height;
+                docById('preview').style.marginLeft = '80px';
+
+                docById('done_').onclick = function() {
+                    //Go to main Circle of Notes
+                    that.ratios = that.tempRatios.slice();
+                    var frequency = that.frequencies[0];
+                    that.frequencies = [];
+                    for (var i = 0; i <= pitchNumber; i++) {
+                        that.frequencies[i] = that.ratios[i] * frequency;
+                        that.frequencies[i] = that.frequencies[i].toFixed(2);
+                    }
+
+                    that.pitchNumber = pitchNumber;
+                    that.checkTemperament(compareRatios);
+                    that._circleOfNotes();
+                };
+
+                docById('preview').onclick = function() {
+                    that.equalEdit();
+                };
             }
-
-            that.pitchNumber = pitchNumber;
-            that.checkTemperament(compareRatios);
-            that._circleOfNotes();
-
         };
     };
 
