@@ -2704,7 +2704,7 @@ function MusicKeyboard() {
         cell1.onclick=function() {
             mkbDiv.style.visibility = 'hidden';
             mkbButtonsDiv.style.visibility = 'hidden';
-            mkbTableDiv.style.visibility = 'hidden';
+        //    mkbTableDiv.style.visibility = 'hidden';
             document.getElementById("keyboardHolder").style.display = "none";
             document.getElementById("keyboardHolder2").style.display = "none";
             var myNode = document.getElementById("myrow");
@@ -2712,6 +2712,74 @@ function MusicKeyboard() {
             var myNode = document.getElementById("myrow2");
             myNode.innerHTML = '';
         }
+
+
+
+
+        var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('drag'));
+        dragCell.style.cursor = 'move';
+
+        this._dx = dragCell.getBoundingClientRect().left - mkbDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - mkbDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = dragCell.innerHTML;
+
+        dragCell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            dragCell.innerHTML = '';
+        };
+
+        dragCell.onmouseout = function(e) {
+            if (!that._dragging) {
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                mkbDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                mkbDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        mkbDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        mkbDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                mkbDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                mkbDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        mkbDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        mkbDiv.ondragstart = function(e) {
+            if (dragCell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
     };
 
     changeKeys();
