@@ -742,23 +742,41 @@ function TemperamentWidget () {
         ratioEdit.style.paddingLeft = '100px';
         var that = this;
         
-        var divAppend = document.createElement('div');
-        divAppend.id = 'divAppend';
-        divAppend.innerHTML = 'Done';
-        divAppend.style.textAlign = 'center';
-        divAppend.style.paddingTop = '5px';
-        divAppend.style.marginLeft = '-100px';
-        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
-        divAppend.style.height = '25px';
-        divAppend.style.marginTop = '40px';
-        divAppend.style.overflow = 'auto';
-        ratioEdit.append(divAppend);
+        function addButtons (preview) {
+            var divAppend = document.createElement('div');
+            divAppend.id = 'divAppend';
+            if (preview) {
+                divAppend.innerHTML = '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
+            } else {
+                divAppend.innerHTML = '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
+            }       
+            divAppend.style.textAlign = 'center';
+            divAppend.style.marginLeft = '-100px';
+            divAppend.style.height = '32px';
+            divAppend.style.marginTop = '40px';
+            divAppend.style.overflow = 'auto';
+            ratioEdit.append(divAppend);
+
+            var divAppend1 = docById('preview');
+            divAppend1.style.height = '30px';
+            divAppend1.style.marginLeft = '3px';
+            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.width = '215px';
+
+            var divAppend2 = docById('done_');
+            divAppend2.style.height = '30px';
+            divAppend2.style.marginRight = '3px';
+            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend2.style.width = '205px';
+        }
+
+        addButtons(false);
 
         divAppend.onmouseover = function() {
             this.style.cursor = 'pointer';
         };
         
-        divAppend.onclick = function() {
+        divAppend.onclick = function (event) {
             var input1 = docById('ratioIn').value;
             var input2 = docById('ratioOut').value;
             var recursion = docById('recursion').value;
@@ -769,19 +787,20 @@ function TemperamentWidget () {
             var ratioDifference = [];
             var index = [];
             var compareRatios = [];
+            that.tempRatios = that.ratios.slice();
 
             calculateRatios = function (i) {
                 if (frequency[i] < that.frequencies[len - 1]) {
-                    for (var j = 0; j < that.ratios.length ; j++) {
-                        ratioDifference[j] = ratio[i] - that.ratios[j];
+                    for (var j = 0; j < that.tempRatios.length ; j++) {
+                        ratioDifference[j] = ratio[i] - that.tempRatios[j];
                         if (ratioDifference[j] < 0) {
                             index.push(j);
-                            that.ratios.splice(index[i], 0, ratio[i]);
+                            that.tempRatios.splice(index[i], 0, ratio[i]);
                             break;
                         }
                         if (ratioDifference[j] == 0) {
                             index.push(j);
-                            that.ratios.splice(index[i], 1, ratio[i]);
+                            that.tempRatios.splice(index[i], 1, ratio[i]);
                             break;
                         }
                     } 
@@ -797,24 +816,68 @@ function TemperamentWidget () {
                 frequency[i] = that.frequencies[0] * ratio[i];
                 calculateRatios(i);      
             }
-            that.ratios.sort(function(a, b){
+            that.tempRatios.sort(function(a, b){
                 return a-b;
             });
-            that.pitchNumber = that.ratios.length - 1;
-            var frequency1 = that.frequencies[0];
-            that.frequencies = [];
-            for (var i = 0; i <= that.pitchNumber; i++) {
-                that.frequencies[i] = that.ratios[i] * frequency1;
-                that.frequencies[i] = that.frequencies[i].toFixed(2);
-            }
+            var pitchNumber = that.tempRatios.length - 1;
 
-            for (var i = 0; i < that.ratios.length; i++) {
-                compareRatios[i] = that.ratios[i];
-                compareRatios[i] = compareRatios[i].toFixed(2);
-            }
+            if (event.target.innerHTML == 'Done') {
+                that.ratios = that.tempRatios.slice();
+                that.pitchNumber = that.ratios.length - 1;
+                var frequency1 = that.frequencies[0];
+                that.frequencies = [];
+                for (var i = 0; i <= that.pitchNumber; i++) {
+                    that.frequencies[i] = that.ratios[i] * frequency1;
+                    that.frequencies[i] = that.frequencies[i].toFixed(2);
+                }
 
-            that.checkTemperament(compareRatios);
-            that._circleOfNotes();
+                for (var i = 0; i < that.ratios.length; i++) {
+                    compareRatios[i] = that.ratios[i];
+                    compareRatios[i] = compareRatios[i].toFixed(2);
+                }
+
+                that.checkTemperament(compareRatios);
+                that._circleOfNotes();
+            } else if (event.target.innerHTML == 'Preview') {
+                //Preview Notes
+                docById('userEdit').innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
+                that.createMainWheel(that.tempRatios, pitchNumber);
+                for (var i = 0; i < pitchNumber; i++) {
+                    that.notesCircle.navItems[i].fillAttr = '#e0e0e0';
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill = '#e0e0e0';
+                    that.notesCircle.navItems[i].slicePathAttr.fill = '#e0e0e0';
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = '#e0e0e0';
+                }
+                that.notesCircle.refreshWheel();
+                docById('userEdit').style.paddingLeft = '0px';
+                addButtons(true);
+                divAppend.style.marginTop = docById('wheelDiv2').style.height;
+                docById('preview').style.marginLeft = '100px';
+
+                docById('done_').onclick = function() {
+                    //Go to main Circle of Notes
+                    that.ratios = that.tempRatios.slice();
+                    that.pitchNumber = that.ratios.length - 1;
+                    var frequency1 = that.frequencies[0];
+                    that.frequencies = [];
+                    for (var i = 0; i <= that.pitchNumber; i++) {
+                        that.frequencies[i] = that.ratios[i] * frequency1;
+                        that.frequencies[i] = that.frequencies[i].toFixed(2);
+                    }
+
+                    for (var i = 0; i < that.ratios.length; i++) {
+                        compareRatios[i] = that.ratios[i];
+                        compareRatios[i] = compareRatios[i].toFixed(2);
+                    }
+
+                    that.checkTemperament(compareRatios);
+                    that._circleOfNotes();
+                };
+
+                docById('preview').onclick = function() {
+                    that.ratioEdit();
+                };                   
+            }
         };
     };
 
