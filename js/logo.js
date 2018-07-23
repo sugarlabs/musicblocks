@@ -4006,6 +4006,10 @@ function Logo () {
                     that.currentNote = note;
             
                     if (typeof(obj) === 'number') {
+                        if (that.transposition[turtle] + that.scalarTransposition[turtle] !== 0) {
+                            var transposition = that.transposition[turtle] + that.scalarTransposition[turtle];
+                            obj = numberToPitch(Math.floor(args[0] + transposition + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch, that.pitchNumberOffset[turtle]);
+                        }
                         var pitch = that.synth.startingPitch;
                         var pitchFrequency = pitchToFrequency(pitch.substring(0, pitch.length - 1), pitch.slice(-1), 0, 'C Major');
                         that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(obj * pitchFrequency);

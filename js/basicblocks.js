@@ -397,7 +397,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     scalarTranspositionBlock.adjustWidthToLabel();
     scalarTranspositionBlock.defaults.push('1');
     scalarTranspositionBlock.flowClampOneArgBlock();
-    scalarTranspositionBlock.hidden = true;
+    //scalarTranspositionBlock.hidden = true;
 
     // macro
     var accidentalBlock = new ProtoBlock('accidental');
