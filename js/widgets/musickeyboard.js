@@ -33,7 +33,12 @@ function MusicKeyboard() {
     var whiteNoteEnums = ['C','D','E','F','G','A','B'];
     var blackNoteEnums = ['C♯', 'D♯', 'SKIP', 'F♯', 'G♯', 'A♯', 'SKIP'];
 
+    var noteConversion2 = {'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'ti': 'B', 'do♯': 'C♯', 're♯': 'D♯', 'mi♯': 'E♯', 'fa♯': 'F♯', 'sol♯': 'G♯', 'la♯': 'A♯', 'ti♯': 'B♯', 'rest': 'R'};
+
     var selected = [];
+    var selected1 = [];
+    var customKeyboard = 0;
+    var standardKeyboard = 0;
 
     this._rowBlocks1 = [];
     this.rowLabels1 = [];
@@ -51,9 +56,10 @@ function MusicKeyboard() {
         
         if(this.rowLabels1.length == 0){
             document.getElementById("keyboardHolder").style.display = "block";
+            standardKeyboard = 1;
         } else {
             document.getElementById("keyboardHolder2").style.display = "block";
-
+            customKeyboard = 1;
 
             var idContainer = [];
             var idContainer2 = [];
@@ -147,7 +153,10 @@ function MusicKeyboard() {
         //    document.getElementById(idContainer[0]).onclick = function(){synth.triggerAttackRelease('C4', '8n')};
 
             document.getElementById(idContainer[0]).onclick = function(){
-
+                var temp1 = afaf[0];
+                var temp2 = noteConversion2[temp1]+bfbf[0];
+                console.log("onkeypress " +temp2) ;
+                selected1.push(temp2);
                 if(afaf[0] == "do" & bfbf[0] == 1){
                     synth.triggerAttackRelease('C1', '8n');
                 } if(afaf[0] == "do" & bfbf[0] == 2){
@@ -404,6 +413,10 @@ function MusicKeyboard() {
             if(idContainer.length > 1){
 
                 document.getElementById(idContainer[1]).onclick = function(){
+                    var temp1 = afaf[1];
+                    var temp2 = noteConversion2[temp1]+bfbf[1];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
 
                     if(afaf[1] == "do" & bfbf[1] == 1){
                         synth.triggerAttackRelease('C1', '8n');
@@ -665,6 +678,10 @@ function MusicKeyboard() {
 
                 document.getElementById(idContainer[2]).onclick = function(){
 
+                    var temp1 = afaf[2];
+                    var temp2 = noteConversion2[temp1]+bfbf[2];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
                     
                     if(afaf[2] == "do" & bfbf[2] == 1){
                         synth.triggerAttackRelease('C1', '8n');
@@ -914,6 +931,11 @@ function MusicKeyboard() {
 
                 document.getElementById(idContainer[3]).onclick = function(){
 
+                    var temp1 = afaf[3];
+                    var temp2 = noteConversion2[temp1]+bfbf[3];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
                     if(afaf[3] == "do" & bfbf[3] == 1){
                         synth.triggerAttackRelease('C1', '8n');
                     } if(afaf[3] == "do" & bfbf[3] == 2){
@@ -1160,6 +1182,12 @@ function MusicKeyboard() {
             if(idContainer.length > 4){
 
                 document.getElementById(idContainer[4]).onclick = function(){
+
+
+                    var temp1 = afaf[4];
+                    var temp2 = noteConversion2[temp1]+bfbf[4];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
 
                     if(afaf[4] == "do" & bfbf[4] == 1){
                         synth.triggerAttackRelease('C1', '8n');
@@ -1408,6 +1436,11 @@ function MusicKeyboard() {
 
                 document.getElementById(idContainer[5]).onclick = function(){
 
+                    var temp1 = afaf[5];
+                    var temp2 = noteConversion2[temp1]+bfbf[5];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
                     if(afaf[5] == "do" & bfbf[5] == 1){
                         synth.triggerAttackRelease('C1', '8n');
                     } if(afaf[5] == "do" & bfbf[5] == 2){
@@ -1654,6 +1687,11 @@ function MusicKeyboard() {
             if(idContainer.length > 6){
 
                 document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[6];
+                    var temp2 = noteConversion2[temp1]+bfbf[6];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
 
                     if(afaf[6] == "do" & bfbf[6] == 1){
                         synth.triggerAttackRelease('C1', '8n');
@@ -1902,6 +1940,11 @@ function MusicKeyboard() {
 
                 document.getElementById(idContainer[7]).onclick = function(){
 
+                    var temp1 = afaf[7];
+                    var temp2 = noteConversion2[temp1]+bfbf[7];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
                     if(afaf[7] == "do" & bfbf[7] == 1){
                         synth.triggerAttackRelease('C1', '8n');
                     } if(afaf[7] == "do" & bfbf[7] == 2){
@@ -2149,6 +2192,11 @@ function MusicKeyboard() {
 
                 document.getElementById(idContainer[8]).onclick = function(){
 
+                    var temp1 = afaf[8];
+                    var temp2 = noteConversion2[temp1]+bfbf[8];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
                     if(afaf[8] == "do" & bfbf[8] == 1){
                         synth.triggerAttackRelease('C1', '8n');
                     } if(afaf[8] == "do" & bfbf[8] == 2){
@@ -2395,6 +2443,11 @@ function MusicKeyboard() {
             if(idContainer.length > 9){
 
                 document.getElementById(idContainer[9]).onclick = function(){
+
+                    var temp1 = afaf[9];
+                    var temp2 = noteConversion2[temp1]+bfbf[9];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
 
                     if(afaf[9] == "do" & bfbf[9] == 1){
                         synth.triggerAttackRelease('C1', '8n');
@@ -2689,14 +2742,20 @@ function MusicKeyboard() {
         var cell1 = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('save'));
 
         cell1.onclick=function() {
-            that._save1(selected);
+            if(standardKeyboard == 1){
+                that._save1(selected);    
+            } else if(customKeyboard == 1){
+                that._save1(selected1);
+            }
+            console.log("Selected " +selected);
       //      handleKeyboardPitches (selected);
         }
 
         var cell1 = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('clear'));
 
         cell1.onclick=function() {
-            that._clear();
+            selected = [];
+            selected1 = [];
         }
 
         var cell1 = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
@@ -2711,6 +2770,8 @@ function MusicKeyboard() {
             myNode.innerHTML = '';
             var myNode = document.getElementById("myrow2");
             myNode.innerHTML = '';
+            selected = [];
+            selected1 = [];
         }
 
 
@@ -2977,6 +3038,7 @@ function MusicKeyboard() {
     this.clearBlocks = function() {
         this._rowBlocks1 = [];
         this._colBlocks1 = [];
+
     };
 
     this.addRowBlock = function(pitchBlock) {
@@ -3006,7 +3068,6 @@ function MusicKeyboard() {
     };
      
     var synth = new Tone.Synth().toMaster();
-    
     
 }
 
