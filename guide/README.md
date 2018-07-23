@@ -58,6 +58,7 @@ also available.
     7. [Generating Arbitrary Pitches](#slider)
     8. [Changing Tempo](#tempo)
     9. [Custom Timbres](#timbre)
+    10. [Changing Temperament](#temperament)
  5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
@@ -1379,6 +1380,24 @@ custom timbre.
 As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
+
+###  <a name="temperament"></a>4.10 Changing Temperament
+*Tempering* is the process of altering the size of an interval by making it narrower or wider than pure. It is also possible to change and create different tuning systems.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament1.svg "the Temperament block")
+
+The *Temperament* block is used to launch a widget that enables the user to
+visualize and edit notes within an octave. 
+
+User can select a temperament system from the pie menu which is passed as an argument to the block. This name is passed to the *Set temperament* block in order to play the notes in selected temperament system.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament2.svg "the Temperament widget")
+
+In the above example, selected temperament is *Just Intonation*. Notes within an octave can be viewed in the form of circle. Note that the pitches that are closer together in selected temperament system are visually closer and pitches that are farther apart looks farther. 
+
+The information regarding any note can be viewed by clicking on the respective circle.
+
+*Play all* button will play through all the pitches in an octave and then it will play backwards down the pitches.
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
 

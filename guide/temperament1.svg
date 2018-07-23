@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="544.72119"
-   height="420"
-   viewBox="0 0 144.12415 111.125"
+   id="svg1070"
    version="1.1"
-   id="svg1070">
+   viewBox="0 0 144.12415 111.125"
+   height="420"
+   width="544.72119">
   <defs
      id="defs1064" />
   <metadata
@@ -25,535 +25,537 @@
     </rdf:RDF>
   </metadata>
   <text
-     id="text20"
+     y="10.430286"
      style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:0.39687499"
-     y="10.430286">
+     id="text20">
     <tspan
-       id="tspan18"
-       y="12.51388"
+       style="stroke-width:0.39687499"
        x="21.960417"
-       style="stroke-width:0.39687499" />
+       y="12.51388"
+       id="tspan18" />
   </text>
   <text
-     id="text68"
-     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:0.39687499"
+     y="21.14591"
      x="30.741146"
-     y="21.14591">
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:0.39687499"
+     id="text68">
     <tspan
-       id="tspan66"
-       y="26.636013"
+       style="stroke-width:0.39687499"
        x="36.032814"
-       style="stroke-width:0.39687499" />
+       y="26.636013"
+       id="tspan66" />
   </text>
   <text
-     id="text120"
-     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:0.39687499"
+     y="37.814663"
      x="26.987499"
-     y="37.814663">
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:0.39687499"
+     id="text120">
     <tspan
-       id="tspan118"
-       y="43.304768"
+       style="stroke-width:0.39687499"
        x="32.279167"
-       style="stroke-width:0.39687499" />
+       y="43.304768"
+       id="tspan118" />
   </text>
   <g
-     transform="translate(-3.7041616,8.1113103)"
-     id="g2576">
+     id="g2576"
+     transform="translate(-3.7041616,8.1113103)">
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,72.363542,10.541816)"
-       id="g1690">
+       id="g1690"
+       transform="matrix(0.26458333,0,0,0.26458333,72.363542,10.541816)">
       <g
-         transform="scale(1.5)"
-         id="g1688">
+         id="g1688"
+         transform="scale(1.5)">
         <path
-           d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 9.333333 v 2 H 18.5 v -2 h 9 36.147461 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 42 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z"
+           id="path1678"
            style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1678" />
+           d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 9.333333 v 2 H 18.5 v -2 h 9 36.147461 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 42 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1682">
+           id="text1682"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="5.3333335"
+             id="tspan1680"
              y="15.25"
-             id="tspan1680">note value</tspan>
+             x="5.3333335">note value</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1686">
+           id="text1686"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="61.480793"
+             id="tspan1684"
              y="11.25"
-             id="tspan1684" />
+             x="61.480793" />
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,97.822065,10.541816)"
-       id="g1708">
+       id="g1708"
+       transform="matrix(0.26458333,0,0,0.26458333,97.822065,10.541816)">
       <g
-         transform="scale(1.5)"
-         id="g1706">
+         id="g1706"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           id="path1692"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1692" />
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
         <text
-           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1696">
+           id="text1696"
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="54.333332"
+             id="tspan1694"
              y="23.799999"
-             id="tspan1694">/</tspan>
+             x="54.333332">/</tspan>
         </text>
         <text
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1700">
+           id="text1700"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="54.333332"
+             id="tspan1698"
              y="10.75"
-             id="tspan1698" />
+             x="54.333332" />
         </text>
         <text
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1704">
+           id="text1704"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="54.333332"
+             id="tspan1702"
              y="31.75"
-             id="tspan1702" />
+             x="54.333332" />
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,120.44394,10.541816)"
-       id="g1718">
+       id="g1718"
+       transform="matrix(0.26458333,0,0,0.26458333,120.44394,10.541816)">
       <g
-         transform="scale(1.5)"
-         id="g1716">
+         id="g1716"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1710"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1710" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1714">
+           id="text1714"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1712"
              y="13.833333"
-             id="tspan1712">1</tspan>
+             x="13.333333">1</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,120.44394,18.876191)"
-       id="g1728">
+       id="g1728"
+       transform="matrix(0.26458333,0,0,0.26458333,120.44394,18.876191)">
       <g
-         transform="scale(1.5)"
-         id="g1726">
+         id="g1726"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1720"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1720" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1724">
+           id="text1724"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1722"
              y="13.833333"
-             id="tspan1722">8</tspan>
+             x="13.333333">8</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,75.935417,18.876191)"
-       id="g1738">
+       id="g1738"
+       transform="matrix(0.26458333,0,0,0.26458333,75.935417,18.876191)">
       <g
-         transform="scale(1.5)"
-         id="g1736">
+         id="g1736"
+         transform="scale(1.5)">
         <path
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           id="path1730"
            style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1730" />
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1734">
+           id="text1734"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="36.333332"
+             id="tspan1732"
              y="13.5"
-             id="tspan1732">↓</tspan>
+             x="36.333332">↓</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.27280188,0,0,0.28318707,6.7793271,2.8546592)"
-       id="g1756">
+       id="g1756"
+       transform="matrix(0.27280188,0,0,0.28318707,6.7793271,2.8546592)">
       <g
-         transform="scale(1.5)"
-         id="g1754">
+         id="g1754"
+         transform="scale(1.5)">
         <path
-           d="m 3.1008115,5.881225 v -4 c 0,-2.20913912 1.7908612,-4.0000002 4.0000003,-4 l 8.0000002,0.00188 v 0.7523807 h 6.000001 V -2.118775 h 30 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4.0000012 c -2.2091391,0 -4.0000003,-1.790861 -4.0000003,-4 v -4 -21 z"
+           id="path1740"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1740" />
+           d="m 3.1008115,5.881225 v -4 c 0,-2.20913912 1.7908612,-4.0000002 4.0000003,-4 l 8.0000002,0.00188 v 0.7523807 h 6.000001 V -2.118775 h 30 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4.0000012 c -2.2091391,0 -4.0000003,-1.790861 -4.0000003,-4 v -4 -21 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1744">
+           id="text1744"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1742"
              y="24"
-             id="tspan1742">pitch</tspan>
+             x="46.333332">pitch</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1748">
+           id="text1748"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1746"
              y="11.25"
-             id="tspan1746">name</tspan>
+             x="46.333332">name</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1752">
+           id="text1752"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1750"
              y="32.25"
-             id="tspan1750">octave</tspan>
+             x="46.333332">octave</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.2702181,0,0,0.31002734,29.437753,18.800897)"
-       id="g1766">
+       id="g1766"
+       transform="matrix(0.2702181,0,0,0.31002734,29.437753,18.800897)">
       <g
-         transform="scale(1.5)"
-         id="g1764">
+         id="g1764"
+         transform="scale(1.5)">
         <path
-           d="M 8.1024429,0.51100876 H 68.488991 V 21.408171 H 8.1024429 V 13.049306 12.004448 H 2.063788 v 3.134574 H 0.05090305 V 6.7801574 H 2.063788 V 9.9147318 H 8.1024429 V 8.8698737 Z"
+           id="path1758"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1.02547038;stroke-linecap:round;stroke-opacity:1"
-           id="path1758" />
+           d="M 8.1024429,0.51100876 H 68.488991 V 21.408171 H 8.1024429 V 13.049306 12.004448 H 2.063788 v 3.134574 H 0.05090305 V 6.7801574 H 2.063788 V 9.9147318 H 8.1024429 V 8.8698737 Z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1762">
+           id="text1762"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1760"
              y="13.833333"
-             id="tspan1760">C</tspan>
+             x="13.333333">C</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26590061,0,0,0.26325126,27.777296,10.741382)"
-       id="g1776">
+       id="g1776"
+       transform="matrix(0.26590061,0,0,0.26325126,27.777296,10.741382)">
       <g
-         transform="scale(1.5)"
-         id="g1774">
+         id="g1774"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 0.34008 h -6 v 3 h -2 V 6.5 h 2 v 3 h 6 v -1 z"
+           id="path1768"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1768" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 0.34008 h -6 v 3 h -2 V 6.5 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1772">
+           id="text1772"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1770"
              y="13.833333"
-             id="tspan1770">4</tspan>
+             x="13.333333">4</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,72.363542,52.213691)"
-       id="g1790">
+       id="g1790"
+       transform="matrix(0.26458333,0,0,0.26458333,72.363542,52.213691)">
       <g
-         transform="scale(1.5)"
-         id="g1788">
+         id="g1788"
+         transform="scale(1.5)">
         <path
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           id="path1778"
            style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1778" />
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1782">
+           id="text1782"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="5.3333335"
+             id="tspan1780"
              y="15.25"
-             id="tspan1780">note value</tspan>
+             x="5.3333335">note value</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1786">
+           id="text1786"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="61.480793"
+             id="tspan1784"
              y="11.25"
-             id="tspan1784" />
+             x="61.480793" />
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,97.822065,52.213691)"
-       id="g1808">
+       id="g1808"
+       transform="matrix(0.26458333,0,0,0.26458333,97.822065,52.213691)">
       <g
-         transform="scale(1.5)"
-         id="g1806">
+         id="g1806"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           id="path1792"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1792" />
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
         <text
-           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1796">
+           id="text1796"
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="54.333332"
+             id="tspan1794"
              y="23.799999"
-             id="tspan1794">/</tspan>
+             x="54.333332">/</tspan>
         </text>
         <text
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1800">
+           id="text1800"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="54.333332"
+             id="tspan1798"
              y="10.75"
-             id="tspan1798" />
+             x="54.333332" />
         </text>
         <text
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1804">
+           id="text1804"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="54.333332"
+             id="tspan1802"
              y="31.75"
-             id="tspan1802" />
+             x="54.333332" />
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,120.44394,52.213691)"
-       id="g1818">
+       id="g1818"
+       transform="matrix(0.26458333,0,0,0.26458333,120.44394,52.213691)">
       <g
-         transform="scale(1.5)"
-         id="g1816">
+         id="g1816"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1810"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1810" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1814">
+           id="text1814"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1812"
              y="13.833333"
-             id="tspan1812">1</tspan>
+             x="13.333333">1</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,120.44394,60.548066)"
-       id="g1828">
+       id="g1828"
+       transform="matrix(0.26458333,0,0,0.26458333,120.44394,60.548066)">
       <g
-         transform="scale(1.5)"
-         id="g1826">
+         id="g1826"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1820"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1820" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1824">
+           id="text1824"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1822"
              y="13.833333"
-             id="tspan1822">8</tspan>
+             x="13.333333">8</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,75.935417,60.548066)"
-       id="g1838">
+       id="g1838"
+       transform="matrix(0.26458333,0,0,0.26458333,75.935417,60.548066)">
       <g
-         transform="scale(1.5)"
-         id="g1836">
+         id="g1836"
+         transform="scale(1.5)">
         <path
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           id="path1830"
            style="fill:#d57e6f;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1830" />
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1834">
+           id="text1834"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="36.333332"
+             id="tspan1832"
              y="13.5"
-             id="tspan1832">↓</tspan>
+             x="36.333332">↓</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,75.935417,68.882441)"
-       id="g1856">
+       id="g1856"
+       transform="matrix(0.26458333,0,0,0.26458333,75.935417,68.882441)">
       <g
-         transform="scale(1.5)"
-         id="g1854">
+         id="g1854"
+         transform="scale(1.5)">
         <path
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           id="path1840"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1840" />
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1844">
+           id="text1844"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1842"
              y="24"
-             id="tspan1842">pitch</tspan>
+             x="46.333332">pitch</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1848">
+           id="text1848"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1846"
              y="11.25"
-             id="tspan1846">name</tspan>
+             x="46.333332">name</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1852">
+           id="text1852"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1850"
              y="32.25"
-             id="tspan1850">octave</tspan>
+             x="46.333332">octave</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,95.382292,68.882441)"
-       id="g1866">
+       id="g1866"
+       transform="matrix(0.26458333,0,0,0.26458333,95.382292,68.882441)">
       <g
-         transform="scale(1.5)"
-         id="g1864">
+         id="g1864"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1858"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1858" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1862">
+           id="text1862"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1860"
              y="13.833333"
-             id="tspan1860">mi</tspan>
+             x="13.333333">mi</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,95.382292,77.216816)"
-       id="g1876">
+       id="g1876"
+       transform="matrix(0.26458333,0,0,0.26458333,95.382292,77.216816)">
       <g
-         transform="scale(1.5)"
-         id="g1874">
+         id="g1874"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1868"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1868" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1872">
+           id="text1872"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1870"
              y="13.833333"
-             id="tspan1870">5</tspan>
+             x="13.333333">5</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.99105374,0,0,0.85185185,9.3637759,3.4976506)"
-       id="g2371-3">
+       id="g2371-3"
+       transform="matrix(0.99105374,0,0,0.85185185,9.3637759,3.4976506)">
       <g
-         id="g34-6"
-         transform="matrix(0.26458333,0,0,0.26458333,23.018745,2.4927861)">
+         transform="matrix(0.26458333,0,0,0.26458333,23.018745,2.4927861)"
+         id="g34-6">
         <g
-           id="g32-7"
-           transform="scale(1.5)">
+           transform="scale(1.5)"
+           id="g32-7">
           <path
-             id="path26-5"
-             style="fill:#3ea4a3;fill-opacity:1;stroke:#003b41;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m 8.5,-32.36956 h 60 v 19.999997 h -60 v -8 0.565217 h -6 v 3 h -3.34536938 v -9.565215 H 2.5 v 2.999999 h 6 v -1 z" />
+             d="M 8.4407823,-32.36956 H 77.081402 v 19.999997 H 8.4407823 v -8 0.565217 H 1.5767204 v 3 h -3.8271372 v -9.565215 h 3.8271372 v 2.999999 h 6.8640619 v -1 z"
+             style="fill:#3ea4a3;fill-opacity:1;stroke:#003b41;stroke-width:1.06958413;stroke-linecap:round;stroke-opacity:1"
+             id="path26-5" />
           <text
-             x="8.6564541"
-             y="-32.589188"
+             transform="scale(0.81083995,1.233289)"
+             style="font-size:10.26010609px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:1.02601063"
              id="text30-3"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+             y="-29.095377"
+             x="1.8695498">
             <tspan
-               id="tspan28-5"
-               y="-18.75585"
-               x="21.989786">equal</tspan>
+               style="stroke-width:1.02601063"
+               x="15.54969"
+               y="-14.902226"
+               id="tspan28-5">Just Intonation</tspan>
           </text>
           <g
-             transform="matrix(0.67583119,0,0,0.71281071,93.779655,-38.09866)"
-             id="g166">
+             id="g166"
+             transform="matrix(0.67583119,0,0,0.71281071,93.779655,-38.09866)">
             <g
-               transform="scale(1.5)"
-               id="g164">
+               id="g164"
+               transform="scale(1.5)">
               <path
-                 d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 30 4 c 2.209139,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -22.037246 0.327126 v 2 H 22.481377 v -2 h -1 H 13.5 c -2.761424,0 -5,2.238576 -5,5 v 4 4 231 4 c 0,2.76142 2.238576,5 5,5 h 4 v 2 h 8.672874 v -2 H 35.5 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z"
+                 id="path158"
                  style="fill:#ffe05c;fill-opacity:1;stroke:#644300;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-                 id="path158" />
+                 d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 30 4 c 2.209139,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -22.037246 0.327126 v 2 H 22.481377 v -2 h -1 H 13.5 c -2.761424,0 -5,2.238576 -5,5 v 4 4 231 4 c 0,2.76142 2.238576,5 5,5 h 4 v 2 h 8.672874 v -2 H 35.5 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z" />
               <text
-                 style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-                 id="text162">
+                 id="text162"
+                 style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
                 <tspan
-                   x="5.3333335"
+                   id="tspan160"
                    y="21.5"
-                   id="tspan160">start</tspan>
+                   x="5.3333335">start</tspan>
               </text>
             </g>
           </g>
           <g
-             transform="matrix(1.0524728,0,0,0.8145961,101.80568,-10.002997)"
-             id="g1601">
+             id="g1601"
+             transform="matrix(1.0524728,0,0,0.8145961,101.80568,-10.002997)">
             <g
-               transform="scale(1.5)"
-               id="g1599">
+               id="g1599"
+               transform="scale(1.5)">
               <path
-                 d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 30 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 L 50.543219,5.6528784 50.524985,15.5 H 52.5 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z"
+                 id="path1589"
                  style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-                 id="path1589" />
+                 d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 30 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 L 50.543219,5.6528784 50.524985,15.5 H 52.5 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z" />
               <text
-                 transform="scale(0.70429186,1.4198659)"
-                 x="36.634697"
+                 id="text1593"
                  style="font-size:7.04291868px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:0.70429182"
-                 id="text1593">
+                 x="36.634697"
+                 transform="scale(0.70429186,1.4198659)">
                 <tspan
-                   style="stroke-width:0.70429182"
-                   x="69.266899"
+                   id="tspan1591"
                    y="9.5079403"
-                   id="tspan1591">Set Temperament</tspan>
+                   x="69.266899"
+                   style="stroke-width:0.70429182">Set Temperament</tspan>
               </text>
               <text
-                 style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-                 id="text1597">
+                 id="text1597"
+                 style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
                 <tspan
-                   x="46.333332"
+                   id="tspan1595"
                    y="11.25"
-                   id="tspan1595" />
+                   x="46.333332" />
               </text>
             </g>
           </g>
           <g
-             transform="matrix(0.79736061,0,0,0.77386321,180.84933,-9.6255679)"
-             id="g1611">
+             id="g1611"
+             transform="matrix(0.79736061,0,0,0.77386321,180.84933,-9.6255679)">
             <g
-               transform="scale(1.5)"
-               id="g1609">
+               id="g1609"
+               transform="scale(1.5)">
               <path
-                 d="m 8.5,0.5 h 60 v 20 h -60 v -8 L 8.489187,13.019891 H 3.2094037 v 3.128535 H 0.6024908 L 0.62655833,6.6356878 3.2094032,5.7199752 V 8.8485104 L 8.5,8.5 8.4891865,8.8485104 Z"
+                 id="path1603"
                  style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-                 id="path1603" />
+                 d="m 8.5,0.5 h 60 v 20 h -60 v -8 L 8.489187,13.019891 H 3.2094037 v 3.128535 H 0.6024908 L 0.62655833,6.6356878 3.2094032,5.7199752 V 8.8485104 L 8.5,8.5 8.4891865,8.8485104 Z" />
               <text
-                 transform="scale(0.76605511,1.3053891)"
-                 y="-1.9001839"
-                 x="4.3232398"
+                 id="text1607"
                  style="font-size:9.22552299px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:0.92255229"
-                 id="text1607">
+                 x="4.3232398"
+                 y="-1.9001839"
+                 transform="scale(0.76605511,1.3053891)">
                 <tspan
-                   style="stroke-width:0.92255229"
-                   x="16.623938"
+                   id="tspan1605"
                    y="10.861791"
-                   id="tspan1605">Just Intonation</tspan>
+                   x="16.623938"
+                   style="stroke-width:0.92255229">Just Intonation</tspan>
               </text>
             </g>
           </g>
@@ -561,182 +563,182 @@
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.27559389,7.8305111,18.980571)"
-       id="g1321">
+       id="g1321"
+       transform="matrix(0.26458333,0,0,0.27559389,7.8305111,18.980571)">
       <g
-         transform="scale(1.5)"
-         id="g1319">
+         id="g1319"
+         transform="scale(1.5)">
         <path
-           d="m 0.44020998,9.8333334 v -4 c 0,-2.209139 1.91691092,-4 4.28154042,-4 L 9.8280387,0.94358715 9.8107266,3.8333346 19.70714,3.8333334 v -2 h 33.909465 4.281541 c 2.364629,0 4.28154,1.790861 4.28154,4 v 4 h -4.28154 v -3 h -4.281541 v 9.9999996 h 4.281541 v -3 h 4.28154 v 17 h -4.28154 v -3 h -4.281541 v 10 h 4.281541 v -3 h 4.28154 v 4 c 0,2.209139 -1.916911,4 -4.28154,4 h -4.281541 -31.242799 0.262949 v 2 h -12.56308 v -2 H 9.0032905 4.7217504 c -2.3646295,0 -4.28154042,-1.790861 -4.28154042,-4 v -4 -21 z"
+           id="path1305"
            style="fill:#93e042;fill-opacity:1;stroke:#000000;stroke-width:1.03459418;stroke-linecap:round;stroke-opacity:1"
-           id="path1305" />
+           d="m 0.44020998,9.8333334 v -4 c 0,-2.209139 1.91691092,-4 4.28154042,-4 L 9.8280387,0.94358715 9.8107266,3.8333346 19.70714,3.8333334 v -2 h 33.909465 4.281541 c 2.364629,0 4.28154,1.790861 4.28154,4 v 4 h -4.28154 v -3 h -4.281541 v 9.9999996 h 4.281541 v -3 h 4.28154 v 17 h -4.28154 v -3 h -4.281541 v 10 h 4.281541 v -3 h 4.28154 v 4 c 0,2.209139 -1.916911,4 -4.28154,4 h -4.281541 -31.242799 0.262949 v 2 h -12.56308 v -2 H 9.0032905 4.7217504 c -2.3646295,0 -4.28154042,-1.790861 -4.28154042,-4 v -4 -21 z" />
         <text
-           y="-0.30639341"
+           id="text1309"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
            x="2.1752589e-006"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1309">
+           y="-0.30639341">
           <tspan
-             x="48.01302"
+             id="tspan1307"
              y="23.693609"
-             id="tspan1307">set key</tspan>
+             x="48.01302">set key</tspan>
         </text>
         <text
-           y="1.5319659"
+           id="text1313"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
            x="-3.6767213"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1313">
+           y="1.5319659">
           <tspan
-             x="44.3363"
+             id="tspan1311"
              y="12.781967"
-             id="tspan1311">key</tspan>
+             x="44.3363">key</tspan>
         </text>
         <text
-           y="1.5319662"
+           id="text1317"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
            x="-2.7575424"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1317">
+           y="1.5319662">
           <tspan
-             x="45.255482"
+             id="tspan1315"
              y="33.781967"
-             id="tspan1315">mode</tspan>
+             x="45.255482">mode</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26675325,0,0,0.29228646,27.980825,1.5718528)"
-       id="g1331">
+       id="g1331"
+       transform="matrix(0.26675325,0,0,0.29228646,27.980825,1.5718528)">
       <g
-         transform="scale(1.5)"
-         id="g1329">
+         id="g1329"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1323"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1323" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1327">
+           id="text1327"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1325"
              y="13.833333"
-             id="tspan1325">C</tspan>
+             x="13.333333">C</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26968648,0,0,0.2709762,29.487914,28.553342)"
-       id="g1341">
+       id="g1341"
+       transform="matrix(0.26968648,0,0,0.2709762,29.487914,28.553342)">
       <g
-         transform="scale(1.5)"
-         id="g1339">
+         id="g1339"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 H -0.80810332 L -0.93517099,4.7563187 2.5,5.1981226 v 3 h 6 V 8.5 Z"
+           id="path1333"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1333" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 H -0.80810332 L -0.93517099,4.7563187 2.5,5.1981226 v 3 h 6 V 8.5 Z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1337">
+           id="text1337"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1335"
              y="13.833333"
-             id="tspan1335">major</tspan>
+             x="13.333333">major</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.27606404,0,0,0.26631665,75.534141,27.081183)"
-       id="g1856-7">
+       id="g1856-7"
+       transform="matrix(0.27606404,0,0,0.26631665,75.534141,27.081183)">
       <g
-         transform="scale(1.5)"
-         id="g1854-0">
+         id="g1854-0"
+         transform="scale(1.5)">
         <path
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           id="path1840-9"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1840-9" />
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1844-0">
+           id="text1844-0"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1842-9"
              y="24"
-             id="tspan1842-9">pitch</tspan>
+             x="46.333332">pitch</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1848-7">
+           id="text1848-7"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1846-8"
              y="11.25"
-             id="tspan1846-8">name</tspan>
+             x="46.333332">name</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1852-8">
+           id="text1852-8"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="46.333332"
+             id="tspan1850-3"
              y="32.25"
-             id="tspan1850-3">octave</tspan>
+             x="46.333332">octave</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,106.8694,32.9394)"
-       id="g1866-1">
+       id="g1866-1"
+       transform="matrix(0.26458333,0,0,0.26458333,106.8694,32.9394)">
       <g
-         transform="matrix(1.5127712,0,0,1.589734,-41.651899,-22.541486)"
-         id="g1864-8">
+         id="g1864-8"
+         transform="matrix(1.5127712,0,0,1.589734,-41.651899,-22.541486)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1858-5"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1858-5" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1862-5">
+           id="text1862-5"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1860-3"
              y="13.833333"
-             id="tspan1860-3">do</tspan>
+             x="13.333333">do</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.2668932,0,0,0.27208455,95.843128,35.393886)"
-       id="g1876-5">
+       id="g1876-5"
+       transform="matrix(0.2668932,0,0,0.27208455,95.843128,35.393886)">
       <g
-         transform="scale(1.5)"
-         id="g1874-8">
+         id="g1874-8"
+         transform="scale(1.5)">
         <path
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path1868-6"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path1868-6" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1872-2">
+           id="text1872-2"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13.333333"
+             id="tspan1870-6"
              y="13.833333"
-             id="tspan1870-6">5</tspan>
+             x="13.333333">5</tspan>
         </text>
       </g>
     </g>
   </g>
   <g
-     transform="matrix(1.2532282,0,0,1.0526008,-0.05180976,0.77670543)"
-     id="g1198">
+     id="g1198"
+     transform="matrix(1.2532282,0,0,1.0526008,-0.05180976,0.77670543)">
     <path
-       d="M 0.22002269,4.7753814 V 3.5089713 A 1.5399107,1.2664101 0 0 1 1.7599335,2.2425611 H 3.299844 L 5.2247324,0.34294581 7.1496207,2.2425611 h 3.4647993 11.54933 1.53991 a 1.5399107,1.2664101 0 0 1 1.539911,1.2664102 V 4.7753814 H 23.70366 V 3.8255739 h -1.53991 v 3.1660253 h 1.53991 V 6.0417916 h 1.539911 V 7.3082017 A 1.5399107,1.2664101 0 0 1 23.70366,8.5746122 H 22.16375 10.61442 10.229441 V 9.2078173 H 7.1496207 V 8.5746122 H 6.7646431 5.2247324 A 1.9248883,1.5830126 0 0 0 3.299844,10.157625 v 1.266409 1.266411 26.594614 1.26641 a 1.9248883,1.5830126 0 0 0 1.9248884,1.583014 h 1.5399107 v 0.633204 H 10.61442 v -0.633204 h 3.079821 v 1.899614 1.899615 1.26641 a 1.5399107,1.2664101 0 0 1 -1.539911,1.26641 H 10.61442 7.1496207 L 5.2247324,50.366148 3.299844,48.466532 H 1.7599335 a 1.5399107,1.2664101 0 0 1 -1.53991081,-1.26641 v -1.26641 z"
+       id="path12"
        style="fill:#9ddd5f;fill-opacity:1;stroke:#003e00;stroke-width:0.3491202;stroke-linecap:round;stroke-opacity:1"
-       id="path12" />
+       d="M 0.22002269,4.7753814 V 3.5089713 A 1.5399107,1.2664101 0 0 1 1.7599335,2.2425611 H 3.299844 L 5.2247324,0.34294581 7.1496207,2.2425611 h 3.4647993 11.54933 1.53991 a 1.5399107,1.2664101 0 0 1 1.539911,1.2664102 V 4.7753814 H 23.70366 V 3.8255739 h -1.53991 v 3.1660253 h 1.53991 V 6.0417916 h 1.539911 V 7.3082017 A 1.5399107,1.2664101 0 0 1 23.70366,8.5746122 H 22.16375 10.61442 10.229441 V 9.2078173 H 7.1496207 V 8.5746122 H 6.7646431 5.2247324 A 1.9248883,1.5830126 0 0 0 3.299844,10.157625 v 1.266409 1.266411 26.594614 1.26641 a 1.9248883,1.5830126 0 0 0 1.9248884,1.583014 h 1.5399107 v 0.633204 H 10.61442 v -0.633204 h 3.079821 v 1.899614 1.899615 1.26641 a 1.5399107,1.2664101 0 0 1 -1.539911,1.26641 H 10.61442 7.1496207 L 5.2247324,50.366148 3.299844,48.466532 H 1.7599335 a 1.5399107,1.2664101 0 0 1 -1.53991081,-1.26641 v -1.26641 z" />
     <text
-       transform="scale(0.86757538,1.1526376)"
-       x="0.089058101"
-       y="-1.4231851"
+       id="text16"
        style="font-size:3.32640195px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:0.33264017"
-       id="text16">
+       y="-1.4231851"
+       x="0.089058101"
+       transform="scale(0.86757538,1.1526376)">
       <tspan
-         style="stroke-width:0.33264017"
-         x="1.8631393"
+         id="tspan14"
          y="5.7285795"
-         id="tspan14">temperament</tspan>
+         x="1.8631393"
+         style="stroke-width:0.33264017">temperament</tspan>
     </text>
   </g>
 </svg>
