@@ -1393,11 +1393,15 @@ User can select a temperament system from the pie menu which is passed as an arg
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament2.svg "the Temperament widget")
 
-In the above example, selected temperament is *Just Intonation*. Notes within an octave can be viewed in the form of circle. Note that the pitches that are closer together in selected temperament system are visually closer and pitches that are farther apart looks farther. 
+In the above example, selected temperament is *Just Intonation*. Notes within an octave can be viewed in the form of circle. These circles represent *pitch numbers*. Note that the pitches that are closer together in selected temperament system are visually closer and pitches that are farther apart looks farther. 
 
-The information regarding any note can be viewed by clicking on the respective circle.
+The information regarding any note can be viewed by clicking on the respective circle. In the above example, circle (pitch number) `2` is `D4`. The frequency of note can be changed through edit button (left hand side corner of note information popup).
 
 *Play all* button will play through all the pitches in an octave and then it will play backwards down the pitches.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament3.svg "the Temperament widget")
+
+Information regarding notes can also be viewed in the form of a table as shown in the above example. The table will show all the information about pitches that lie within an octave. This information includes *pitch number*, *interval*, *ratio*, *note*, *frequency* and *mode*.
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
 
