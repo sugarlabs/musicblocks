@@ -5,7 +5,7 @@ Frequently Asked Questions
 2. [Music Questions](#MUSIC)
 3. [Coding Questions](#CODE)
 4. [Education Questions](#EDUCATION)
-5. [Social Impact and Free/Libre] (#SOCIAL)
+5. [Social Impact and Free/Libre](#SOCIAL)
 
 ## <a name="BASIC"></a>1. Basic Questions
 
@@ -65,7 +65,7 @@ There are some concepts that are readily available in a computer programing lang
 
 As for “replacing training”, I have found that it is helpful to use MB in the classroom when learning general music (i.e. basic music theory). Too often, I think, music teachers rely on the same teaching techniques. Using some of the representations in music blocks can be helpful in the classroom. As for what it specifically “replaces”, I do not know. We do not intend to replace anything, just to add something new to the current curriculum.
 
-## <a name="SOCIAL"></a> Social Impact and Free/Libre
+## <a name="SOCIAL"></a>5. Social Impact and Free/Libre
 
 ### What opportunities does Music Blocks provide for social aspects of learning?
 
