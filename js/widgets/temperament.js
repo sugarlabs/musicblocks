@@ -1267,41 +1267,66 @@ function TemperamentWidget () {
     };
 
     this._save = function() {
+        var notesMatch = false;
+        var index = [];
+        this.notes = [];
+        if (this.inTemperament == 'custom') {
+            for (var i = 0; i < this.ratios.length; i++) {
+                for (var j = 0; j < this.ratiosNotesPair.length; j++) {
+                    notesMatch = false;
+                    if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
+                        notesMatch = true;
+                        this.notes[i] = this.ratiosNotesPair[j][1][0];
+                        break;
+                    }
+                }
+                if (!notesMatch) {
+                    var cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                    var centsDiff = [];
+                    var centsDiff1 = [];
+                    for (var j = 0; j < this.cents.length; j++) {
+                        centsDiff[j] = cents - this.cents[j];
+                        centsDiff1[j] = Math.abs(cents - this.cents[j]);
+                    }
+                    var min = centsDiff1.reduce(function(a, b) {
+                        return Math.min(a, b);
+                    });
+                    var index = centsDiff1.indexOf(min);
+
+                    if (centsDiff[index] < 0) {
+                        this.notes[i] =  this.ratiosNotesPair[index][1][0] + "(-" + centsDiff1[index].toFixed(2) + ")";
+                    } else {
+                        this.notes[i] =  this.ratiosNotesPair[index][1][0] + "(+" + centsDiff1[index].toFixed(2) + ")";
+                    }
+                }
+            }
+        }
+        
         var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['text', {'value': this.inTemperament}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]]];
         var previousBlock = 2;
 
         for (var i = 0; i < this.pitchNumber; i++) {
             var idx = newStack.length;
+            newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
+            newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
+            newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
+            newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
+            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+            newStack.push([idx + 5, ['pitch'], 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
+            
             if (this.inTemperament !== 'custom') {
-                newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
-                newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
-                newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
-                newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
-                newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
-                newStack.push([idx + 5, ['pitch'], 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
                 newStack.push([idx + 6, ['notename',{'value':this.ratiosNotesPair[i][1][0]}], 0, 0, [idx + 5]]);
-                newStack.push([idx + 7, ['number',{'value':this.ratiosNotesPair[i][1][1]}], 0, 0, [idx + 5]]);
-                if (i == this.pitchNumber - 1) {
-                    newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
-                } else {
-                    newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
-                }
-                previousBlock = idx + 8; 
             } else {
-                newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
-                newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
-                newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
-                newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
-                newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
-                newStack.push([idx + 5, ['hertz'], 0, 0, [idx + 4, idx + 6, null]]);
-                newStack.push([idx + 6, ['number',{'value':this.frequencies[i]}], 0, 0, [idx + 5]]);
-                if (i == this.pitchNumber - 1) {
-                    newStack.push([idx + 7, 'hidden', 0, 0, [idx, null]]);
-                } else {
-                    newStack.push([idx + 7, 'hidden', 0, 0, [idx, idx + 8]]);
-                }
-                previousBlock = idx + 7;
-            }     
+                newStack.push([idx + 6, ['text',{'value':this.notes[i]}], 0, 0, [idx + 5]]);
+            }
+            
+            newStack.push([idx + 7, ['number',{'value':this.ratiosNotesPair[i][1][1]}], 0, 0, [idx + 5]]);
+            if (i == this.pitchNumber - 1) {
+                newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
+            } else {
+                newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
+            }
+            previousBlock = idx + 8;       
         }
         this._logo.blocks.loadNewBlocks(newStack);  
 
