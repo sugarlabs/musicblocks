@@ -777,6 +777,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchsliderBlock.adjustWidthToLabel();
     pitchsliderBlock.stackClampZeroArgBlock();
 
+    var pitchtrackerBlock = new ProtoBlock('pitchtracker');
+    pitchtrackerBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['pitchtracker'] = pitchtrackerBlock;
+    //.TRANS: widget to generate pitches from microphone input
+    pitchtrackerBlock.staticLabels.push(_('pitch tracker'));
+    pitchtrackerBlock.adjustWidthToLabel();
+    pitchtrackerBlock.stackClampZeroArgBlock();
+
     // macro
     var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
     pitchstaircaseBlock.palette = palettes.dict['widgets'];

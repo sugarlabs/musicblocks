@@ -14,7 +14,7 @@
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'pitchtracker', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename'];
@@ -749,6 +749,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'pitchslider':
                     that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
                     break;
+                case 'pitchtracker':
+                    that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
+                    break;    
                 case 'drum':
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
                     break;

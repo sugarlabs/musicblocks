@@ -68,6 +68,7 @@ function Logo () {
     this.temperament = null;
     this.tempo = null;
     this.pitchSlider = null;
+    this.pitchTracker = null;
     this.modeWidget = null;
     this.statusMatrix = null;
     this.playbackWidget = null;
@@ -140,6 +141,7 @@ function Logo () {
     this.inPitchStaircase = false;
     this.inTempo = false;
     this.inPitchSlider = false;
+    this.inPitchTracker = false;
     this._currentDrumlock = null;
     this.inTimbre = false;
     this.inSetTimbre = {};
@@ -3220,6 +3222,29 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+
+        case 'pitchtracker':
+            if (that.pitchTracker == null) {
+                that.pitchTracker = new PitchTracker();
+            }
+
+            that.pitchTracker.Sliders = [];
+
+            childFlow = args[0];
+            childFlowCount = 1;
+            that.inPitchTracker = true;
+
+            var listenerName = '_pitchtracker_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.pitchTracker.init(that);
+                that.inPitchTracker = false;
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
+             
         case 'pitchdrummatrix':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -6161,7 +6186,9 @@ function Logo () {
 
                 that.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (that.inPitchSlider) {
-                that.pitchSlider.Sliders.push([args[0], 0, 0]);
+                that.pitchSlider.Sliders.push([args[0], 0, 0]); 
+            } else if (that.inPitchTracker) {
+                that.pitchTracker.Sliders.push([args[0], 0, 0]); 
             } else {
                 that.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
             }
@@ -6183,6 +6210,8 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inPitchSlider) {
                     that.pitchSlider.Sliders.push([args[0], 0, 0]);
+                } else if (that.inPitchTracker) {
+                    that.pitchTracker.Sliders.push([args[0], 0, 0]);
                 } else {
                     that.oscList[turtle][last(that.inNoteBlock[turtle])].push(that.blocks.blockList[blk].name);
 

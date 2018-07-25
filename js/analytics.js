@@ -91,6 +91,7 @@ const TACAT = {
     'tempo': 'ignore',
     'pitchdrummatrix': 'ignore',
     'pitchslider': 'ignore',
+    'pitchtracker': 'ignore',
     'pitchstaircase': 'ignore',
     'rhythmruler2': 'ignore',
     'matrix': 'ignore',
