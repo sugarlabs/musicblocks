@@ -99,6 +99,8 @@ const TWELTHROOT2 = 1.0594630943592953;
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 const A0 = 27.5;
 const C8 = 4186.01;
+var OCTAVERATIO = 2;
+var STARTINGPITCH = 'C4';
 
 const RHYTHMRULERHEIGHT = 100;
 
@@ -945,13 +947,13 @@ function keySignatureToMode(keySignature) {
 };
 
 
-function getStepSizeUp(keySignature, pitch) {
-    return _getStepSize(keySignature, pitch, 'up');
+function getStepSizeUp(keySignature, pitch, transposition, temperament) {
+    return _getStepSize(keySignature, pitch, 'up', transposition, temperament);
 };
 
 
-function getStepSizeDown(keySignature, pitch) {
-    return _getStepSize(keySignature, pitch, 'down');
+function getStepSizeDown(keySignature, pitch, transposition, temperament) {
+    return _getStepSize(keySignature, pitch, 'down', transposition, temperament);
 };
 
 
@@ -961,8 +963,16 @@ function getModeLength(keySignature) {
 };
 
 
-function _getStepSize(keySignature, pitch, direction) {
+function _getStepSize(keySignature, pitch, direction, transposition, temperament) {
     // Returns how many half-steps to the next note in this key.
+    if (temperament === undefined) {
+        temperament = 'equal';
+    }
+    if (temperament == 'custom') {
+        //Scalar = Semitone for custom Temperament.
+        return transposition;
+    }
+
     var thisPitch = pitch;
     var obj = _buildScale(keySignature);
     var scale = obj[0];
@@ -1522,7 +1532,7 @@ function numberToPitch(i, temperament, startPitch, offset) {
     if (temperament === undefined) {
         temperament = 'equal';
     }
-    var t = TEMPERAMENT[temperament];
+
     if (i < 0) {
         var n = 0;
         while (i < 0) {
@@ -1531,30 +1541,33 @@ function numberToPitch(i, temperament, startPitch, offset) {
         }
         if (temperament == 'equal') {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
-        } else if (temperament == 'custom') {
-            var pitchNumber = Math.floor(i - offset);
-            pitchNumber = pitchNumber;
-            pitchNumber = pitchNumber + '';
-            return Number(TEMPERAMENT['custom'][pitchNumber]);
         } else {
             var pitchNumber = Math.floor(i - offset);
-            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber];
-            return getNoteFromInterval(startPitch, interval);                        
         }
         
     } else {
         if (temperament == 'equal') {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
-        } else if (temperament == 'custom') {
-            var pitchNumber = Math.floor(i - offset);
-            pitchNumber = pitchNumber;
-            pitchNumber = pitchNumber + '';
-            return Number(TEMPERAMENT['custom'][pitchNumber]);
         } else {
             var pitchNumber = Math.floor(i - offset);
-            var interval = TEMPERAMENT[temperament]['interval'][pitchNumber];
-            return getNoteFromInterval(startPitch, interval); 
         }
+    }
+    if (temperament == 'custom') {
+        pitchNumber = pitchNumber + '';
+        if (TEMPERAMENT['custom'][pitchNumber][1] === undefined) {
+            //If custom temperament is not defined, then it will store equal temperament notes.
+            for (var i = 0; i < 12; i++) {
+                var number = '' + i;
+                var interval = TEMPERAMENT['equal']['interval'][i];
+                TEMPERAMENT['custom'][number] = [Math.pow(2, i/12), getNoteFromInterval(startPitch, interval)[0], getNoteFromInterval(startPitch, interval)[1]];
+            }
+            return [TEMPERAMENT['custom'][pitchNumber][1], TEMPERAMENT['custom'][pitchNumber][2]];
+        } else {
+            return [TEMPERAMENT['custom'][pitchNumber][1], TEMPERAMENT['custom'][pitchNumber][2]];
+        }
+    } else {
+        var interval = TEMPERAMENT[temperament]['interval'][pitchNumber];
+        return getNoteFromInterval(startPitch, interval);
     }
 };
 
@@ -1919,9 +1932,10 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
     var sharpFlat = false;
     var rememberFlat = false;
     var rememberSharp = false;    
-
-    if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
-        return ['R', ''];
+    if (typeof(noteArg) !== 'number') {
+        if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
+            return ['R', ''];
+        }
     }
 
     octave = Math.round(octave);
@@ -2225,6 +2239,40 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                 note = EQUIVALENTFLATS[note];
             }
         }
+    } else if (temperament == 'custom') {
+        var note = noteArg;
+        var pitchNumber = 0;
+        for (var number in TEMPERAMENT['custom']) {
+            if (number !== 'pitchNumber') {
+                if (note == TEMPERAMENT['custom'][number][1]) {
+                    pitchNumber = Number(number);
+                    break;
+                }
+            }   
+        }
+        var inOctave = octave;
+        var octaveLength = TEMPERAMENT['custom']['pitchNumber'];
+        if (transposition !== 0) {
+            if (transposition < 0) {
+                var deltaOctave = -Math.floor(-transposition / octaveLength);
+                var deltaNote = -(-transposition % octaveLength);
+            } else {
+                var deltaOctave = Math.floor(transposition / octaveLength);
+                var deltaNote = transposition % octaveLength;
+            }
+            inOctave += deltaOctave;
+            pitchNumber += deltaNote;
+        }
+        if (pitchNumber < 0) {
+            pitchNumber = pitchNumber + octaveLength;
+            inOctave = inOctave - 1;
+        } else if (pitchNumber >= octaveLength){
+            pitchNumber = pitchNumber - octaveLength;
+            inOctave = inOctave + 1;
+        }
+        pitchNumber = pitchNumber + '';
+        note = TEMPERAMENT['custom'][pitchNumber][1];
+        octave = inOctave;
     } else {
         //Return E# as E#, Fb as Fb etc. for different temperament systems.
         var articulation = noteArg.replace('do', '').replace('re', '').replace('mi', '').replace('fa', '').replace('sol', '').replace('la', '').replace('ti', '').replace('A', '').replace('B', '').replace('C', '').replace('D', '').replace('E', '').replace('F', '').replace('G', '');

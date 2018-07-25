@@ -1336,8 +1336,9 @@ function TemperamentWidget () {
         TEMPERAMENT['custom']['pitchNumber'] = this.pitchNumber;
         for (var i = 0; i < this.pitchNumber; i++) {
             var number = '' + i;
-            TEMPERAMENT['custom'][number] = this.ratios[i];
+            TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i], this.ratiosNotesPair[i][1][1]];
         }
+        OCTAVERATIO = this.powerBase;
     }
 
     this.playNote = function(pitchNumber) {
