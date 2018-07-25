@@ -1079,6 +1079,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     defineFrequencyBlock.staticLabels.push(_('define Frequency'));
     defineFrequencyBlock.adjustWidthToLabel();
     defineFrequencyBlock.flowClampOneArgBlock();
+    defineFrequencyBlock.hidden = true;
 
     // METER PALETTE
 
@@ -1525,7 +1526,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.defaults.push(_('custom'));   
 
     var setTemperamentBlock = new ProtoBlock('settemperament');
-    setTemperamentBlock.palette = palettes.dict['tone'];
+    setTemperamentBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
     setTemperamentBlock.staticLabels.push(_('set temperament'));
     setTemperamentBlock.adjustWidthToLabel();
