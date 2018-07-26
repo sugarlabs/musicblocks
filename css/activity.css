@@ -1064,6 +1064,27 @@ input.timbreName {
   font-weight: bold;
 }
 
+#togglePlaybackBTN {
+    color: black;
+    padding: 100px;
+    text-align: center;
+    z-index: -1;
+}
+
+#toggleLiveInputBTN {
+    color: black;
+    padding: 40px;
+    text-align: center;
+    z-index: -2;
+}
+
+#toggleOscillatorBTN {
+    color: black;
+    padding: 40px;
+    text-align: center;
+    z-index: -3;
+}
+
 .wheelNav {
     height: 350px;
     width: 350px;

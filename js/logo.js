@@ -3238,7 +3238,7 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                that.pitchTracker.init(that);
+     //           that.pitchTracker.init(that);
                 that.inPitchTracker = false;
             };
 
