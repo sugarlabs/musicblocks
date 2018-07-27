@@ -1068,21 +1068,21 @@ input.timbreName {
     color: black;
     padding: 100px;
     text-align: center;
-    z-index: -1;
+    z-index:99999;
 }
 
 #toggleLiveInputBTN {
     color: black;
     padding: 40px;
     text-align: center;
-    z-index: -2;
+    z-index:99999;
 }
 
 #toggleOscillatorBTN {
     color: black;
     padding: 40px;
     text-align: center;
-    z-index: -3;
+    z-index:99999;
 }
 
 .wheelNav {

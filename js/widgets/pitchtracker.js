@@ -14,14 +14,7 @@
 // in continuous manner.
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-function PitchTracker() {
-    console.log("Hiii");
-
-
-
-    
-
-    var audioContext = null;
+var audioContext = null;
     var isPlaying = false;
     var sourceNode = null;
     var analyser = null;
@@ -36,7 +29,7 @@ function PitchTracker() {
         detuneElem,
         detuneAmount;
 
-    window.onload = function() {
+    
         audioContext = new AudioContext();
         MAX_SIZE = Math.max(4,Math.floor(audioContext.sampleRate/5000));    // corresponds to a 5kHz signal
         var request = new XMLHttpRequest();
@@ -87,7 +80,287 @@ function PitchTracker() {
 
 
 
-    }
+    
+
+function PitchTracker() {
+    console.log("Hiii");
+
+
+    const BUTTONDIVWIDTH = 118;  // 2 buttons (55 + 4) * 2
+    const BUTTONSIZE = 51;
+    const ICONSIZE = 32;
+    const SEMITONE = Math.pow(2, 1 / 12);
+
+    this.Sliders = [];
+    this._focusedCellIndex = 0;
+    this._isKeyPressed = 0;
+    this._delta = 0;
+
+
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = cell.style.width;
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
+    };
+
+    this.init = function (logo) {
+        this._logo = logo;
+
+        var w = window.innerWidth;
+        this._cellScale = 1.0;
+        var iconSize = ICONSIZE;
+
+        var canvas = docById('myCanvas');
+
+        // Position the widget and make it visible.
+        var sliderDiv = docById('sliderDiv');
+
+        sliderDiv.style.visibility = 'visible';
+        sliderDiv.setAttribute('draggable', 'true');
+        sliderDiv.style.left = '200px';
+        sliderDiv.style.top = '150px';
+
+        // The widget buttons
+        var widgetButtonsDiv = docById('sliderButtonsDiv');
+        widgetButtonsDiv.style.display = 'inline';
+        widgetButtonsDiv.style.visibility = 'visible';
+        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
+        widgetButtonsDiv.innerHTML = '<table id="sliderButtonTable"></table>';
+
+        var buttonTable = docById('sliderButtonTable');
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
+
+        // For the button callbacks
+        var that = this;
+
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
+
+        cell.onclick = function() {
+            sliderDiv.style.visibility = 'hidden';
+            widgetButtonsDiv.style.visibility = 'hidden';
+            sliderTableDiv.style.visibility = 'hidden';
+        };
+
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
+        cell.onclick = function () {
+            toggleLiveInput();
+        };
+
+        cell.onmouseover = function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        };
+
+        cell.onmouseout = function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
+        // We use this cell as a handle for dragging.
+        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'));
+
+        cell.style.cursor = 'move';
+
+        this._dx = cell.getBoundingClientRect().left - sliderDiv.getBoundingClientRect().left;
+        this._dy = cell.getBoundingClientRect().top - sliderDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = cell.innerHTML;
+
+        cell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            cell.innerHTML = '';
+        };
+
+        cell.onmouseout = function(e) {
+            if (!that._dragging) {
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                sliderDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                sliderDiv.style.top = y + 'px';
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        sliderDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        sliderDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                sliderDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                sliderDiv.style.top = y + 'px';
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        sliderDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        sliderDiv.ondragstart = function(e) {
+            if (cell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
+
+        // The slider table
+        var sliderTableDiv = docById('sliderTableDiv');
+        sliderTableDiv.style.display = 'inline';
+        sliderTableDiv.style.visibility = 'visible';
+        sliderTableDiv.style.border = '2px';
+        sliderTableDiv.innerHTML = '';
+
+        // We use an outer div to scroll vertically and an inner div to
+        // scroll horizontally.
+        sliderTableDiv.innerHTML = '<div id="sliderOuterDiv"><div id="sliderInnerDiv"><table id="sliderSliderTable"></table></div></div>';
+
+        var sliderOuterDiv = docById('sliderOuterDiv');
+        sliderOuterDiv.style.width = Math.min((11 + this.Sliders.length * SLIDERWIDTH), w / 2) + 'px';
+        sliderOuterDiv.style.height = (11 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
+
+        var sliderInnerDiv = docById('sliderInnerDiv');
+        sliderInnerDiv.style.width = (10 + this.Sliders.length * SLIDERWIDTH)+ 'px';
+        sliderInnerDiv.style.height = (10 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
+
+        // Each column in the table has a slider row, and up row, and a down row.
+        var sliderTable = docById('sliderSliderTable');
+        var sliderRow = sliderTable.insertRow();
+        sliderRow.setAttribute('id', 'slider');
+        var upRow = sliderTable.insertRow();
+        var downRow = sliderTable.insertRow();
+
+        for (var i = 0; i < this.Sliders.length; i++) {
+            var sliderCell = sliderRow.insertCell();
+
+            sliderCell.style.width = SLIDERWIDTH * this._cellScale + 'px';
+            sliderCell.style.minWidth = sliderCell.style.width;
+            sliderCell.style.maxWidth = sliderCell.style.width;
+            sliderCell.style.height = (BUTTONSIZE + SLIDERHEIGHT) * this._cellScale + 'px';
+            sliderCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            sliderCell.setAttribute('tabIndex', 1);
+
+            // Add a div to hold the slider.
+            var cellDiv = document.createElement('div');
+            cellDiv.setAttribute('id', 'sliderInCell');
+            cellDiv.setAttribute('position', 'absolute');
+            cellDiv.style.height = Math.floor(w / SLIDERHEIGHT) + 'px';
+            cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
+            cellDiv.style.top = SLIDERHEIGHT + 'px';
+            cellDiv.style.backgroundColor = MATRIXBUTTONCOLOR;
+            sliderCell.appendChild(cellDiv);
+
+            // Add a paragraph element for the slider value.
+            var slider = document.createElement('P');
+            slider.innerHTML = this.Sliders[i][0].toFixed(2);
+            cellDiv.appendChild(slider);
+
+            sliderCell.onmouseover = function(event) {
+                that._addKeyboardInput(this);
+            };
+
+            sliderCell.onmouseout = function() {
+                this.blur();
+            };
+
+            sliderCell.onmousemove = function(event) {
+                var cellDiv = this.childNodes[0];
+
+                // Using event.offsetY was too noisy. This is more robust.
+                var offset = event.pageY - this.getBoundingClientRect().top;
+                if (offset > SLIDERHEIGHT) {
+                    var offset = SLIDERHEIGHT;
+                } else if (offset < 0) {
+                    var offset = 0;
+                }
+
+                var cellIndex = this.cellIndex;
+                var sliderrow = docById('slider');
+                var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
+                cellDiv.style.top = offset + 'px';
+
+                var distanceFromBottom = Math.max(SLIDERHEIGHT - offset, 0);
+                var frequencyOffset = parseFloat(that.Sliders[cellIndex][0]) / SLIDERHEIGHT * distanceFromBottom;
+
+                that.Sliders[cellIndex][1] = parseInt(Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffset) / that.Sliders[cellIndex][0]) * 12);
+                that.Sliders[cellIndex][2] = frequencyOffset - that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
+
+                var frequencyDiv = cellDiv.childNodes[0];
+                var frequency = that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
+                frequencyDiv.innerHTML = frequency.toFixed(2);
+                that._play(this);
+            };
+
+            sliderCell.onclick = function() {
+                that._save(this);
+            };
+
+            var upCell = this._addButton(upRow, 'up.svg', iconSize, _('move up'));
+
+            upCell.onclick = function() {
+                that._moveSlider(this, 1);
+            };
+
+            upCell.onmouseover = function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            };
+
+            upCell.onmouseout = function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            };
+
+            var downCell = this._addButton(downRow, 'down.svg', iconSize, _('move down'));
+
+            downCell.onclick = function() {
+                that._moveSlider(this, -1);
+            };
+
+            downCell.onmouseover = function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            };
+
+            downCell.onmouseout = function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            };
+        }
+    };
+    
+
+    
 
     function error() {
         alert('Stream generation failed.');
@@ -116,8 +389,6 @@ function PitchTracker() {
         updatePitch();
     }
 
-
-    toggleOscillator();
 
     function toggleOscillator() {
         if (isPlaying) {
@@ -271,10 +542,10 @@ function PitchTracker() {
             lastCorrelation = correlation;
         }
         if (best_correlation > 0.01) {
-            console.log("f ");
+            console.log("f = " + sampleRate/best_offset + "Hz (rms: " + rms + " confidence: " + best_correlation + ")");
             return sampleRate/best_offset;
         }
-        console.log("g ");
+        console.log("f = " + sampleRate/best_offset + "Hz (rms: " + rms + " confidence: " + best_correlation + ")");
         return -1;
 
        //   var best_frequency = sampleRate/best_offset;
@@ -321,6 +592,7 @@ function PitchTracker() {
             pitch = ac;
             pitchElem.innerText = Math.round( pitch ) ;
             var note =  noteFromPitch( pitch );
+            console.log(pitch);
             noteElem.innerHTML = noteStrings[note%12];
             var detune = centsOffFromPitch( pitch, note );
             if (detune == 0 ) {
@@ -339,5 +611,7 @@ function PitchTracker() {
             window.requestAnimationFrame = window.webkitRequestAnimationFrame;
         rafID = window.requestAnimationFrame( updatePitch );
     }
+
+    
 
 };
