@@ -290,6 +290,8 @@ function Logo () {
     this.recording = false;
     this.lastNote = {};
     this.restartPlayback = true;
+    this.customTemperamentDefined = false;
+
     //variables for progress bar
     var progressBar = docById('myBar');
     var width = 0;

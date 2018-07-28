@@ -227,6 +227,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
+    var customNoteBlock = new ProtoBlock('customNote');
+    customNoteBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['customNote'] = customNoteBlock;
+    customNoteBlock.valueBlock();
+
     // Transposition blocks
     // macro
     var invertBlock = new ProtoBlock('invert1');

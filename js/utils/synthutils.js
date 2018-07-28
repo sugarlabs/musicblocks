@@ -326,10 +326,6 @@ function Synth() {
         var articulation = notes.replace('do', '').replace('re', '').replace('mi', '').replace('fa', '').replace('sol', '').replace('la', '').replace('ti', '').replace('A', '').replace('B', '').replace('C', '').replace('D', '').replace('E', '').replace('F', '').replace('G', '');
         notes = notes.replace(articulation, '');
 
-        if (articulation === '') {
-            notes = notes + centsInfo;
-        }
-
         switch(articulation) {
             case 'bb':
             case DOUBLEFLAT:
@@ -349,6 +345,7 @@ function Synth() {
                 notes = notes + '♯' + centsInfo;
                 break;
             default:
+                notes = notes + articulation + centsInfo;
                 break;
         }
 
