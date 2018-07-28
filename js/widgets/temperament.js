@@ -1338,11 +1338,14 @@ function TemperamentWidget () {
             var number = '' + i;
             TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i], this.ratiosNotesPair[i][1][1]];
         }
+        OCTAVERATIO = this.powerBase;
+
         if (this.inTemperament == 'custom') {
             this._logo.customTemperamentDefined = true;
+            this._logo.blocks.protoBlockDict['custompitch'].hidden = false;
+            this._logo.blocks.palettes.updatePalettes('pitch');
             //var newStack2 = [[0, 'pitch', 100, 100, [null, 1, 2, null]], [1, ['notename', {'value': 'G'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]];
         }
-        OCTAVERATIO = this.powerBase;
     }
 
     this.playNote = function(pitchNumber) {

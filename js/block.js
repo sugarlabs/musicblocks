@@ -3853,6 +3853,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
                 break;
             case 'pitch':
+                // In case of custom temperament
                 var uniqueValue = this.blocks.findUniqueCustomName(newValue);
                 newValue = uniqueValue;
                 for (var pitchNumber in TEMPERAMENT['custom']) {
