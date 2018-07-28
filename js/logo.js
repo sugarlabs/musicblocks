@@ -4143,6 +4143,16 @@ function Logo () {
             var octave = Math.floor(calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], arg0));
             that.pitchNumberOffset[turtle] = pitchToNumber(arg0, octave, that.keySignature[turtle]);
             break;
+        case 'custompitch':
+            if (args[0] == null || args[1] == null) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            } else {
+                note = args[0];
+                octave = args[1];
+            }
+            break;
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
@@ -4171,6 +4181,15 @@ function Logo () {
                     octave = obj[1];
                     cents = 0;
                     that.currentNote = note;
+                }
+            } else if (that.blocks.blockList[blk].name === 'customNote') {
+                if (args[0] == null || args[1] == null) {
+                    that.errorMsg(NOINPUTERRORMSG, blk);
+                    that.stopTurtle = true;
+                    break;
+                } else {
+                    note = args[0];
+                    octave = args[1];
                 }
             } else {
                 if (args[0] === null) {

@@ -366,6 +366,15 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var customPitchBlock = new ProtoBlock('custompitch');
+    customPitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['custompitch'] = customPitchBlock;
+    //.TRANS: unison means the note is the same as the current note
+    customPitchBlock.staticLabels.push(_('custom note'));
+    customPitchBlock.adjustWidthToLabel();
+    customPitchBlock.zeroArgBlock();
+    customPitchBlock.hidden = true;
+
     // macro
     var newblock = new ProtoBlock('downsixth');
     newblock.palette = palettes.dict['pitch'];
