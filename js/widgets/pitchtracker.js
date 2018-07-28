@@ -618,7 +618,7 @@ function PitchTracker() {
             if (!window.requestAnimationFrame)
                 window.requestAnimationFrame = window.webkitRequestAnimationFrame;
             rafID = window.requestAnimationFrame( updatePitch );
-        }, 250);
+        }, 100);
 
         
     }
