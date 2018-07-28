@@ -1338,6 +1338,10 @@ function TemperamentWidget () {
             var number = '' + i;
             TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i], this.ratiosNotesPair[i][1][1]];
         }
+        if (this.inTemperament == 'custom') {
+            this._logo.customTemperamentDefined = true;
+            //var newStack2 = [[0, 'pitch', 100, 100, [null, 1, 2, null]], [1, ['notename', {'value': 'G'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]];
+        }
         OCTAVERATIO = this.powerBase;
     }
 

@@ -269,6 +269,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var customNoteBlock = new ProtoBlock('customNote');
+    customNoteBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['customNote'] = customNoteBlock;
+    customNoteBlock.valueBlock();
+
     // Transposition blocks
     // macro
     var newblock = new ProtoBlock('invert1');

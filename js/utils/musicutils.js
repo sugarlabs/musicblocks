@@ -2241,14 +2241,16 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
         }
     } else if (temperament == 'custom') {
         var note = noteArg;
-        var pitchNumber = 0;
         for (var number in TEMPERAMENT['custom']) {
             if (number !== 'pitchNumber') {
                 if (note == TEMPERAMENT['custom'][number][1]) {
-                    pitchNumber = Number(number);
+                    var pitchNumber = Number(number);
                     break;
                 }
             }   
+        }
+        if (pitchNumber == undefined) {
+            return getNote(noteArg, octave, transposition, keySignature, movable, direction, errorMsg);
         }
         var inOctave = octave;
         var octaveLength = TEMPERAMENT['custom']['pitchNumber'];

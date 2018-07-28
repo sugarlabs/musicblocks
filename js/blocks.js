@@ -2610,6 +2610,25 @@ function Blocks () {
         return value;
     };
 
+    this.findUniqueCustomName = function (name) {
+        var noteNames = [];
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'text' && !this.blockList[blk].trash) {
+                var c = this.blockList[blk].connections[0];
+                if (c != null && this.blockList[c].name === 'pitch' && !this.blockList[c].trash) {
+                    noteNames.push(this.blockList[blk].value);
+                }
+            }
+        }
+        var i = 1;
+        var value = name;
+        while (noteNames.indexOf(value) !== -1) {
+            value = name + i.toString();
+            i += 1;
+        }
+        return value;
+    }
+
     this._findDrumURLs = function () {
         // Make sure we initialize any drum with a URL name.
         for (var blk = 0; blk < this.blockList.length; blk++) {
