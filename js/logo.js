@@ -3333,6 +3333,8 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'temperament1':
+            break;
         case 'temperament':
             if (that.temperament == null) {
                 that.temperament = new TemperamentWidget();
