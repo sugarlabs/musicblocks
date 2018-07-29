@@ -1068,13 +1068,15 @@ function Turtle (name, turtles, drum) {
             this.skinChanged = this._isSkinChanged;
             var bounds = this.container.getBounds();
             this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            this.container.visible = true;
+            this.turtles.refreshCanvas();
             this.blinkFinished = true;
         }
     };
 
     this.blink = function(duration, volume) {
         var that = this;
-        this._sizeInUse;
+        this._sizeInUse = that.bitmap.scaleX;
         this._blinkTimeout = null;
 
         if (this.beforeBlinkSize == null) {
@@ -1089,7 +1091,7 @@ function Turtle (name, turtles, drum) {
 
         this.stopBlink();
         this.blinkFinished = false;
-        that.container.uncache();
+        this.container.uncache();
         var scalefactor = 60 / 55;
         var volumescalefactor = 4 * (volume + 200) / 1000;
         // Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
@@ -1111,7 +1113,9 @@ function Turtle (name, turtles, drum) {
             var bounds = that.container.getBounds();
             that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             that.blinkFinished = true;
+            that.turtles.refreshCanvas();
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
+
     };
 };
 
@@ -1314,6 +1318,7 @@ function Turtles () {
         });
 
         document.getElementById('loader').className = '';
+
         setTimeout(function () {
             if (blkInfoAvailable) {
                 newTurtle.doSetHeading(infoDict['heading']);
@@ -1323,6 +1328,7 @@ function Turtles () {
                 newTurtle.doSetColor(infoDict['color']);
             }
         }, 1000);
+
         this.refreshCanvas();
     };
 
@@ -1365,8 +1371,10 @@ function Turtles () {
         for (var turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
             // Make sure the blink is really stopped.
-            this.turtleList[turtle].stopBlink();
+            // this.turtleList[turtle].stopBlink();
         }
+
+        this.refreshCanvas();
     };
 
     this.running = function () {
