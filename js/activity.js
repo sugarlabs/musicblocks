@@ -821,6 +821,11 @@ define(MYDEFINES, function (compatibility) {
             myRadarChart = new Chart(ctx).Radar(data, options);
         };
 
+        function doOptimize (state) {
+            console.log('Setting optimize to ' + state);
+            logo.setOptimize(state);
+        };
+
         function doBiggerFont() {
             hideDOMLabel();
 
@@ -953,7 +958,7 @@ define(MYDEFINES, function (compatibility) {
 
             createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
             createjs.Ticker.setFPS(30);
-            createjs.Ticker.addEventListener('tick', stage);
+            // createjs.Ticker.addEventListener('tick', stage);
             createjs.Ticker.addEventListener('tick', __tick);
 
             _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
@@ -1070,6 +1075,7 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas);
 
             utilityBox = new UtilityBox();
+            console.log(utilityBox);
             utilityBox
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
@@ -1080,7 +1086,8 @@ define(MYDEFINES, function (compatibility) {
                 .setStats(doAnalytics)
                 .setSearch(showSearchWidget, hideSearchWidget)
                 .setScroller(toggleScroller)
-                .setLanguage(doLanguageBox, languageBox);
+                .setLanguage(doLanguageBox, languageBox)
+                .setOptimize(doOptimize);
 
             playbackBox = new PlaybackBox();
             playbackBox
@@ -2871,7 +2878,7 @@ define(MYDEFINES, function (compatibility) {
         function __tick(event) {
             // This set makes it so the stage only re-renders when an
             // event handler indicates a change has happened.
-            if (update) {
+            if (update || createjs.Tween.hasActiveTweens) {
                 update = false; // Only update once
                 stage.update(event);
             }
@@ -3954,19 +3961,26 @@ handleComplete);
 
             text.visible = false;
 
+            var circles;
             container.on('mouseover', function (event) {
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = true;
+                        stage.update();
                         break;
                     }
                 }
+
+                var r = size / 2;
+                circles = showButtonHighlight(container.x, container.y, r, event, palettes.scale, stage);
             });
 
             container.on('mouseout', function (event) {
+                hideButtonHighlight(circles, stage);
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = false;
+                        stage.update();
                         break;
                     }
                 }
