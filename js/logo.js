@@ -8097,7 +8097,6 @@ function Logo () {
     this._dispatchTurtleSignals = function (turtle, beatValue, blk, delay) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
-        console.log(this.embeddedGraphics[turtle][blk].length);
         if (this.embeddedGraphics[turtle][blk].length === 0) {
             return;
         }
