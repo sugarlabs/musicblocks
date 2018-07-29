@@ -8097,6 +8097,7 @@ function Logo () {
     this._dispatchTurtleSignals = function (turtle, beatValue, blk, delay) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
+        console.log(this.embeddedGraphics[turtle][blk].length);
         if (this.embeddedGraphics[turtle][blk].length === 0) {
             return;
         }
@@ -8366,11 +8367,11 @@ function Logo () {
         // Cheat by 15% so that the mouse has time to complete its work.
         // var stepTime = beatValue * 1000 / NOTEDIV;
         var stepTime = (beatValue - delay) * 850 / NOTEDIV;
-        if (stepTime >= 0) {
+        if (stepTime < 0) {
             stepTime = 0;
         }
 
-        // We do each graphics action sequentially, so we need to
+	// We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
         // array.
         if (extendedGraphicsCounter > 0) {
