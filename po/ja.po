@@ -4089,7 +4089,7 @@ msgstr "シンプル・シンセ４"
 #: js/synthutils.js:72
 #.TRANS: musical instrument
 msgid "floor-tom-tom"
-msgstr ""
+msgstr "フロアタムタム"
 
 #: js/musicutils.js:134
 #.TRANS: sharp, flat, and natural are music terms related to pitch
@@ -4117,16 +4117,16 @@ msgstr "この前の"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
-msgstr ""
+msgstr "詳細"
 
 #: js/GlobalCard.js:32
 msgid "Like project"
-msgstr ""
+msgstr "プロジェクトに「いいね」をする"
 
 #: js/GlobalCard.js:34
 #: js/LocalCard.js:34
 msgid "Share project"
-msgstr ""
+msgstr "プロジェクトをシェアする"
 
 #: js/GlobalCard.js:37
 #: js/LocalCard.js:37
@@ -4136,93 +4136,93 @@ msgstr "シェア"
 #: js/GlobalCard.js:40
 #: js/LocalCard.js:40
 msgid "Flags"
-msgstr ""
+msgstr "旗"
 
 #: js/GlobalCard.js:41
 #: js/LocalCard.js:41
 msgid "Run project on startup."
-msgstr "アプリがロードした際、プロジェクトをすぐ再生"
+msgstr "スタートしたらプロジェクトを再生する"
 
 #: js/GlobalCard.js:42
 #: js/LocalCard.js:42
 msgid "Show code blocks on startup."
-msgstr "アプリがロードした際、ブロックをすぐ表示"
+msgstr "スタートしたら、コードブロックを表示する"
 
 #: js/GlobalCard.js:43
 #: js/LocalCard.js:43
 msgid "Collapse code blocks on startup."
-msgstr "アプリがロードした際、ブロックをつぶす"
+msgstr "スタートしたら、コードブロックを消す"
 
 #: js/GlobalCard.js:47
 #: js/LocalCard.js:47
 msgid "Advanced Options"
-msgstr ""
+msgstr "上級オプション"
 
 #: js/ProjectStorage.js:221
 msgid "anonymous"
-msgstr ""
+msgstr "匿名"
 
 #: js/ProjectViewer.js:20
 msgid "Report description required"
-msgstr ""
+msgstr "レポート表記が必要です"
 
 #: js/ProjectViewer.js:21
 msgid "Report description too long"
-msgstr ""
+msgstr "レポート表記が長すぎます"
 
 #: js/Publisher.js:16
 #: js/GlobalPlanet.js:14
 msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
-msgstr ""
+msgstr "エラー：サーバに接続できません。ミュージック・ブロックスをリロードし、再度試して下さい。"
 
 #: js/Publisher.js:121
 msgid "Republish Project"
-msgstr ""
+msgstr "プロジェクトを再度公開する"
 
 #: js/Publisher.js:125
 msgid "Publish Project"
-msgstr ""
+msgstr "プロジェクトを公開する"
 
 #: js/Publisher.js:163
 #: js/Publisher.js:179
 msgid "This field is required"
-msgstr ""
+msgstr "この項目は必須項目です"
 
 #: js/Publisher.js:170
 msgid "Title too long"
-msgstr ""
+msgstr "タイトルが長すぎます"
 
 #: js/Publisher.js:186
 msgid "Description too long"
-msgstr ""
+msgstr "表記が長すぎます"
 
 #: js/Publisher.js:263
 msgid "Server Error"
-msgstr ""
+msgstr "サーバーエラー"
 
 #: js/Publisher.js:263
 msgid "Try Again"
-msgstr ""
+msgstr "もう一度使い直してください。"
 
 #: js/LocalCard.js:21
 msgid "View published project"
-msgstr ""
+msgstr "公開されたプロジェクトを見る"
 
 #: js/LocalCard.js:24
 msgid "Publish project"
-msgstr ""
+msgstr "プロジェクトを公開する"
 
 #: js/LocalCard.js:31
 msgid "Edit project"
-msgstr ""
+msgstr "プロジェクトを編集する"
 
 #: js/LocalCard.js:32
 msgid "Delete project"
-msgstr ""
+msgstr "プロジェクトを消す"
 
 #: js/LocalCard.js:51
 msgid "Download project"
-msgstr ""
+msgstr "プロジェクトをダウンロードする"
 
 #: js/LocalCard.js:52
 msgid "Merge with current project"
@@ -4230,19 +4230,19 @@ msgstr "現在のプロジェクトに組み合わせます。"
 
 #: js/LocalCard.js:53
 msgid "Duplicate project"
-msgstr ""
+msgstr "プロジェクトをコピーする"
 
 #: js/GlobalPlanet.js:15
 msgid "No results found."
-msgstr ""
+msgstr "検索の結果に何もはありません"
 
 #: js/GlobalPlanet.js:30
 msgid "Remix of"
-msgstr ""
+msgstr "~プロジェクトのリミックス"
 
 #: js/GlobalPlanet.js:366
 msgid "Cannot connect to server"
-msgstr ""
+msgstr "サーバに接続できません"
 
 #: plugins/finance.rtp:28
 ## http://jisho.org/word/%E9%80%9A%E8%B2%A8 通貨＝つうか
@@ -4273,11 +4273,11 @@ msgstr "こんにちは"
 #: plugins/translate.rtp:84
 ## 検出=けんしゅつ http://jisho.org/word/%E3%82%AD%E3%83%A3%E3%83%AA%E3%82%A2%E6%A4%9C%E5%87%BA 
 msgid "detect lang"
-msgstr "国語を検出"
+msgstr "言語を検出"
 
 #: plugins/translate.rtp:95
 msgid "set lang"
-msgstr "国語を設定"
+msgstr "言語を設定"
 
 #: plugins/gmap.rtp:30
 msgid "city latitude"
@@ -4286,7 +4286,7 @@ msgstr "市の緯度"
 #: plugins/gmap.rtp:40
 ## http://jisho.org/word/%E7%B5%8C%E5%BA%A6 軽度＝けいど
 msgid "city longitude"
-msgstr "シの軽度"
+msgstr "市の経度"
 
 #: plugins/gmap.rtp:71
 #: plugins/gmap.rtp:74
@@ -4294,7 +4294,7 @@ msgstr "シの軽度"
 #: plugins/gmap.rtp:107
 ## 座標＝ざひょうhttp://jisho.org/word/%E5%BA%A7%E6%A8%99 ; I literately wrote "Cannot find coordinate data"
 msgid "Coordinate data not available."
-msgstr "座標のデータが見つかりません"
+msgstr "座標データが見つかりません"
 
 #: plugins/gmap.rtp:116
 ## To verify
@@ -4314,7 +4314,7 @@ msgstr "ズームの因子"
 
 #: plugins/gmap.rtp:144
 msgid "zoom"
-msgstr "ズーム"
+msgstr "ズームファクター"
 
 #: plugins/gmap.rtp:160
 ## ひらがな＝いど
@@ -4329,26 +4329,26 @@ msgstr "経度"
 #: plugins/maths.rtp:47
 ## ひらがな＝じょうべき
 msgid "power"
-msgstr "乗冪"
+msgstr "指数"
 
 #: plugins/maths.rtp:47
 msgid "base"
-msgstr "根拠地"
+msgstr "ベース"
 
 #: plugins/maths.rtp:47
 ## I will assume "exponent" http://jisho.org/word/%E5%86%AA 羃
 msgid "exp"
-msgstr "羃"
+msgstr "exp"
 
 #: plugins/maths.rtp:69
 ## I have no idea; maybe 層=そう http://jisho.org/word/%E5%B1%A4 ...最低限度is promising
 msgid "floor"
-msgstr "最低限度"
+msgstr "床"
 
 #: plugins/maths.rtp:71
 ## http://jisho.org/word/%E6%9C%80%E9%AB%98%E9%99%90%E5%BA%A6 
 msgid "ceiling"
-msgstr "最高限度"
+msgstr "天井"
 
 #: plugins/maths.rtp:74
 msgid "degrees"
@@ -4357,7 +4357,7 @@ msgstr "温度"
 #: plugins/maths.rtp:74
 ## I don't really understand context. This says "what degree". Maybe just leave second character, which means "degree".
 msgid "to degrees"
-msgstr "何度"
+msgstr "度数法へ変換"
 
 #: plugins/maths.rtp:76
 ## also ラディアン
@@ -4366,19 +4366,19 @@ msgstr "ラジアン"
 
 #: plugins/maths.rtp:76
 msgid "to radians"
-msgstr "ラジアンへ"
+msgstr "ラジアンへ変換"
 
 #: plugins/accelerometer.rtp:48
 msgid "motion x"
-msgstr "xの動き"
+msgstr "x座標の動き"
 
 #: plugins/accelerometer.rtp:56
 msgid "motion y"
-msgstr "yの動き"
+msgstr "y座標の動き"
 
 #: plugins/accelerometer.rtp:64
 msgid "motion z"
-msgstr "zの動き"
+msgstr "z座標の動き"
 
 #: plugins/dictionary.rtp:25
 ## 定義＝ていぎ；http://jisho.org/word/%E6%9C%80%E9%AB%98%E9%99%90%E5%BA%A6 
@@ -4391,7 +4391,7 @@ msgstr "カロリーをとる"
 
 #: plugins/nutrition.rtp:107
 msgid "get protein"
-msgstr "たんぱくをとる"
+msgstr "たんぱく質をとる"
 
 #: plugins/nutrition.rtp:110
 ## たんすいかぶ\E3\81"
@@ -4409,11 +4409,11 @@ msgstr "太る"
 
 #: plugins/nutrition.rtp:119
 msgid "get name"
-msgstr "名前をゲットする"
+msgstr "名前を獲得する"
 
 #: plugins/nutrition.rtp:122
 msgid "calories"
-msgstr "キロカロリー"
+msgstr "カロリー"
 
 #: plugins/nutrition.rtp:128
 msgid "protein"
@@ -4426,7 +4426,7 @@ msgstr "炭水化物"
 
 #: plugins/nutrition.rtp:140
 msgid "fiber"
-msgstr "食物繊維をと"
+msgstr "食物繊維"
 
 #: plugins/nutrition.rtp:146
 ## Only for the noun; not adjective.
@@ -4473,7 +4473,7 @@ msgstr "トマト"
 
 #: plugins/nutrition.rtp:182
 msgid "broccoli"
-msgstr "ブロッコリ"
+msgstr "ブロッコリー"
 
 #: plugins/nutrition.rtp:185
 msgid "rice and beans"
@@ -4522,30 +4522,30 @@ msgstr "プロジェクトをフェースブックにアップロードする"
 
 #: plugins/turtle.rtp:42
 msgid "turtle x"
-msgstr "タートルのx"
+msgstr "ネズミのx座標"
 
 #: plugins/turtle.rtp:52
 msgid "turtle y"
-msgstr "タートルのy"
+msgstr "ネズミののy座標"
 
 #: plugins/turtle.rtp:62
 msgid "start turtle"
-msgstr "タートルのスタート"
+msgstr "ネズミをスタートする"
 
 #: plugins/turtle.rtp:72
 msgid "stop turtle"
-msgstr "タートルを止める"
+msgstr "ネズミを止める"
 
 #: plugins/turtle.rtp:82
 ## check this
 msgid "turtle name"
-msgstr "タートルの名前"
+msgstr "ネズミの名前"
 
 #: plugins/weather.rtp:62
 #: plugins/weather.rtp:86
 ## This needs to be corrected
 msgid "Days ahead must be in the range of -1 to 5."
-msgstr "日にち後は-１から５までの中の必要があります"
+msgstr "日にちは -１から５までの数でなくてはなりません"
 
 #: plugins/weather.rtp:107
 msgid "forecast"
@@ -4584,7 +4584,7 @@ msgstr "期間の設定"
 #: plugins/rodi.rtp:250
 ## 発光＝はっこう　Pretty sure most people would understand "LED" as well http://jisho.org/word/%EF%BC%AC%EF%BC%A5%EF%BC%A4 
 msgid "led"
-msgstr "発光ダイオド"
+msgstr "発光ダイオード"
 
 #: plugins/rodi.rtp:269
 msgid "light intensity"
@@ -4593,11 +4593,11 @@ msgstr "光の強さ"
 #: plugins/rodi.rtp:286
 ## http://jisho.org/word/%E8%B5%A4%E5%A4%96　赤外＝せきがい 
 msgid "infrared light (left)"
-msgstr "赤外　(左）"
+msgstr "赤外光　(左）"
 
 #: plugins/rodi.rtp:300
 msgid "infrared light (right)"
-msgstr "赤外　(右）"
+msgstr "赤外光　(右）"
 
 #: plugins/rodi.rtp:314
 msgid "distance"
@@ -4631,17 +4631,17 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:81
 
 #~msgid "Click to run the project in slow mode."
-#~msgstr "プロジェクトをゆっくりなペースで再生するため、ここでクリック。"
+#~msgstr "プロジェクトをスロー再生するには、ここをクリック。"
 
 #: js/turtledefs.js:79
 
 #~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
-#~msgstr "このツールバーはリズム、音高、音色、動作、ネズミ、その他のパレットボタンがあります。"
+#~msgstr "このツールバーには、リズム、ピッチ、音色、タートル、その他のパレットボタンがあります。"
 
 #: js/basicblocks.js:893
 
 #~msgid "divide note value"
-#~msgstr "音価を割る数値"
+#~msgstr "音価を割る"
 
 #~msgid "play backward"
 #~msgstr "逆に再生"
@@ -4649,23 +4649,23 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:87
 
 #~msgid "Hide or show the block palettes."
-#~msgstr "ブロックのパレットを表示する / 隠す アイコンです。"
+#~msgstr "ブロックのパレットを表示する / 隠す"
 
 #: js/activity.js:2712
 
 #~msgid "Run fast / long press to run slowly"
-#~msgstr "速いスピードで再生します・長く押すとゆっくりなペースで再生"
+#~msgstr "速いスピードで再生します・長押しでスロー再生"
 
 #~msgid "vspace"
 #~msgstr "縦のスペース"
 
 #~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "このツールバーはマトリックス、チャンク、演奏、音色、タートル、その他もあります。ブロックのパレットを表示するため、パレットをクリックしてブロックをキャンバスにドラッグしてください。"
+#~msgstr "このツールバーには、音高・時刻行列、チャンク、演奏、音色、タートル、その他を含むパレットボタンがあります。ここをクリックすると、ブロックスのパレットが表示されます。パレットからブロックスをキャンバスへドラッグすると、ブロックスを使うことができます。"
 
 #: js/basicblocks.js:153
 
 #~msgid "consonant step up"
-#~msgstr "上がりのコンソナントのステップ音高"
+#~msgstr "コンソナントステップアップ"
 
 #~msgid "sing"
 #~msgstr "歌う"
@@ -4700,7 +4700,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "タートルが見つかりませんでした。"
 
 #~msgid "cloud"
-#~msgstr "クロード"
+#~msgstr "クラウド"
 
 #: js/lilypond.js:21
 
@@ -4714,10 +4714,10 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "ロデイ"
 
 #~msgid "Save your project to a server."
-#~msgstr "サバーにプロジェクトを保存"
+#~msgstr "サーバーにプロジェクトを保存"
 
 #~msgid "pentatonic"
-#~msgstr "五音音階"
+#~msgstr "五音音階（ペンタトニック）"
 
 #: js/lilypond.js:21
 
@@ -4725,7 +4725,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "鼯"
 
 #~msgid "blocks"
-#~msgstr "ブロック"
+#~msgstr "ブロックス"
 
 #: js/basicblocks.js:1652
 
@@ -4733,13 +4733,13 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "移動ド？"
 
 #~msgid "Click to run just the music in slow mode."
-#~msgstr "音楽をゆっくりに、ここでクリック。"
+#~msgstr "音楽をゆっくり再生したい時は、ここをクリック。"
 
 #~msgid "1/16 note ♬"
-#~msgstr "16部音符"
+#~msgstr "16分音符♬"
 
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
-#~msgstr "速いスピードで再生します・長く押すとゆっくりに再生・もと長く押すと音楽はゆっくりなペースで再生"
+#~msgstr "速いスピードで再生します／長押しでスロー再生／より長押しでさらにスロー再生"
 
 #~msgid "mashape"
 #~msgstr ""
@@ -4769,7 +4769,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "数学"
 
 #~msgid "Click to run the project in fast mode."
-#~msgstr "速いスピードで再生するためにここでクリック。"
+#~msgstr "速いスピードで再生するためにはここをクリック。"
 
 #: js/samplesviewer.js:74
 
@@ -4782,7 +4782,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "全音符"
 
 #~msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
-#~msgstr "このツールバーはリズム、音高、音色、鼠動き、ウィジット、ネズミ、またその他のパレットボタンがあります。"
+#~msgstr "このツールバーには、パレットボタンやリズム、ピッチなどが含まれています。"
 
 #~msgid "Welcome to Turtle Blocks"
 #~msgstr "タートル・ブロックへようこそ"
@@ -4790,12 +4790,12 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:282
 
 #~msgid "adjust transposition"
-#~msgstr "移調をアジャスト"
+#~msgstr "移調を変える"
 
 #: js/basicblocks.js:145
 
 #~msgid "consonant step down"
-#~msgstr "下がりのコンソナントのステップ音高"
+#~msgstr "コンソナントステップダウン"
 
 #: js/basicblocks.js:3142
 
@@ -4808,16 +4808,16 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr ""
 
 #~msgid "This button opens and closes the primary toolbar."
-#~msgstr "ツールバーを開くためにここでクリック"
+#~msgstr "ツールバーを開いたり閉じたりするにはこのボタンをクリックしてください"
 
 #~msgid "numerator"
 #~msgstr "分子"
 
 #~msgid "set beats per minute"
-#~msgstr "BPM(一分当たりの拍数)を設定"
+#~msgstr "BPM(一分あたりの拍数)を設定"
 
 #~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
-#~msgstr "ネズミさんが私たちのミュージック・ブロックスの指揮者.ネズミさんは音楽のブロック、マトリックス、音符・演奏の色々をたのしんでほしいです。ツアーを始まりましょう!"
+#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
 
 #~msgid "Undo"
 #~msgstr "元に戻す"
@@ -4831,10 +4831,10 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "クロックなし"
 
 #~msgid "Input to Major Block must be 2, 3, 6, or 7"
-#~msgstr "長のブロックに 2, 3, 6, 7からの数価の必要があります。"
+#~msgstr "メジャーブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
 
 #~msgid "Expand/collapse toolbar"
-#~msgstr "ツールバーを開き隠し"
+#~msgstr "ツールバーを開く/隠す"
 
 #: js/samplesviewer.js:75
 
@@ -4846,7 +4846,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/logo.js:4259
 
 #~msgid "Rhythm Block: Did you mean to use a Matrix block?"
-#~msgstr "リズムブロック：音高・時刻行列と一緒に使うつもりですか"
+#~msgstr "リズムブロックと：音高・時刻行列と一緒に使いますか？"
 
 #: js/activity.js:2433
 
@@ -4863,13 +4863,13 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "世界中のプロジェクト"
 
 #~msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-#~msgstr "増のブロックに 1, 2, 3, 4, 5, 6, 7, 8 からの数価の必要があります。"
+#~msgstr "オーギュメントブロックには 1, 2, 3, 4, 5, 6, 7, 8 のいずれかの数をいれて下さい。"
 
 #~msgid "logic"
 #~msgstr "論理"
 
 #~msgid "1/64 note 𝅘𝅥𝅱"
-#~msgstr "６４部音符"
+#~msgstr "６４分音符𝅘𝅥𝅱"
 
 #: js/lilypond.js:21
 
@@ -4879,7 +4879,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/samplesviewer.js:80
 
 #~msgid "Copy this link to share your project."
-#~msgstr "シェアするため、このリンクをコピーしてください。"
+#~msgstr "あなたのプロジェクトをシェアしたい時は、このリンクをコピーしてください。"
 
 #: js/lilypond.js:21
 
@@ -4902,7 +4902,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "ヌ"
 
 #~msgid "end hollow line"
-#~msgstr "真空の線を外れ"
+#~msgstr "（中空の）線を終わらせる"
 
 #: js/logo.js:3705
 
@@ -4910,7 +4910,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "ステップ音高ブロックは音符ブロックの中にある必要があります。"
 
 #~msgid "begin hollow line"
-#~msgstr "真空の線を初め"
+#~msgstr "（中空の）線を始める"
 
 #: js/samplesviewer.js:73
 
@@ -4922,17 +4922,17 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:118
 
 #~msgid "Remove all content on the canvas, including the blocks."
-#~msgstr "表示されているものを、ブロックスを含め、全て取り消します。"
+#~msgstr "画面上に表示されているもの（ブロックスを含む）を全て消します。"
 
 #: js/turtledefs.js:99
 
 #~msgid "The save-stack button saves a stack onto a custom palette."
-#~msgstr "スタック保存ボタンはを押すと、スタックはカスタムパレットの下に保存されます。"
+#~msgstr "スタック保存ボタンを押すと、スタックはカスタムパレットの下に保存されます。"
 
 #: js/samplesviewer.js:699
 
 #~msgid "On my device"
-#~msgstr "自分のデバイスにあるファイル"
+#~msgstr "自分のPCにあるファイル"
 
 #: js/lilypond.js:21
 
@@ -4940,24 +4940,24 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "鼠"
 
 #~msgid "quarter note ♩"
-#~msgstr "4部音符"
+#~msgstr "4分音符　♩"
 
 #~msgid "Load project from file"
-#~msgstr "ファイルからロード"
+#~msgstr "ファイルからプロジェクトをロードする"
 
 #: js/logo.js:6101
 
 #: js/logo.js:6125
 
 #~msgid "Tuplet Block: Did you mean to use a Matrix block?"
-#~msgstr "タプル・ブロック：音高・時刻行列のブロックを使うつもりですか？"
+#~msgstr "タプル・ブロック：音高・時刻行列ブロックを使うつもりですか？"
 
 #: js/logo.js:4898
 
 #: js/logo.js:4919
 
 #~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-#~msgstr "減のブロックに 1, 2, 3, 4, 5, 6, 7, 8 からの数価の必要があります。"
+#~msgstr "ディミニッシュブロックには 1, 2, 3, 4, 5, 6, 7, 8 いずれかの数をいれて下さい"
 
 #: js/basicblocks.js:1299
 
@@ -4965,24 +4965,24 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "ステップ音高"
 
 #~msgid "Long press on block(s) to copy. Click here to paste."
-#~msgstr "ブロックでマウスの長いクリック押しでコピー。ペーストをするためにここでクリック。"
+#~msgstr "ブロックを長押しするとコピーできます。貼り付けるにはここをクリック。"
 
 #: js/logo.js:4851
 
 #: js/logo.js:4872
 
 #~msgid "Input to Perfect Block must be 1, 4, 5, or 8"
-#~msgstr "完全のブロックに 1, 4, 5, 8 からの数価の必要があります。"
+#~msgstr "完全ブロックには 1, 4, 5, 8 いずれかの数をいれて下さい"
 
 #~msgid "eighth note ♪"
-#~msgstr "８分音符"
+#~msgstr "８分音符　♪"
 
 #: js/logo.js:5040
 
 #: js/logo.js:5061
 
 #~msgid "Input to Minor Block must be 2, 3, 6, or 7"
-#~msgstr "短のブロックに 2, 3, 6, 7からの数価の必要があります。"
+#~msgstr "「短（マイナー）」ブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
 
 #: js/basicblocks.js:3078
 
@@ -4990,7 +4990,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "音符の音量"
 
 #~msgid "current pitch octave"
-#~msgstr "この音高のオクターブ"
+#~msgstr "今の音が属するオクターブ"
 
 #~msgid "hours ago"
 #~msgstr "時間前"
@@ -4998,7 +4998,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:1457
 
 #~msgid "relative interval"
-#~msgstr "相対的の音程"
+#~msgstr "相対的な音と音の間の間隔"
 
 #: js/lilypond.js:21
 
@@ -5031,7 +5031,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "茶"
 
 #~msgid "multiply beat"
-#~msgstr "拍を倍に"
+#~msgstr "１拍の速さを倍に"
 
 #~msgid "turtle"
 #~msgstr "タートル"
@@ -5052,7 +5052,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:1668
 
 #~msgid "interval"
-#~msgstr "音程"
+#~msgstr "音と音の間の間隔"
 
 #~msgid "UID"
 #~msgstr "ユーザの名前"
@@ -5060,12 +5060,12 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:134
 
 #~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "直交座標グリッドを隠し表示"
+#~msgstr "直交座標を表示する/隠す"
 
 #: js/activity.js:2527
 
 #~msgid "My Music Blocks Creation"
-#~msgstr "私のミュージック・ブロックスの開発"
+#~msgstr "私のミュージック・ブロックス作品"
 
 #: js/lilypond.js:21
 
@@ -5073,11 +5073,11 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "赤"
 
 #~msgid "field"
-#~msgstr "フィルド"
+#~msgstr "場"
 
 #~msgid "current pitch name"
-#~msgstr "現在の音高の音名"
+#~msgstr "現在の音高の名前"
 
 #~msgid "half note 𝅗𝅥"
-#~msgstr "4部音符"
+#~msgstr "半音符 𝅗𝅥"
 
