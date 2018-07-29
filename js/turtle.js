@@ -41,6 +41,9 @@ function Turtle (name, turtles, drum) {
     this.skinChanged = false;  // Should we reskin the turtle on clear?
     this.shellSize = 55;
     this.blinkFinished = true;
+    this.isSkinChanged = false;
+    this._sizeInUse = 1;
+    this._isSkinChanged = false;
     this.beforeBlinkSize = null;
 
     // Which start block is assocated with this turtle?
@@ -1052,56 +1055,59 @@ function Turtle (name, turtles, drum) {
         }
     };
 
+    this.stopBlink = function() {
+        if (this._blinkTimeout != null || !this.blinkFinished) {
+            clearTimeout(this._blinkTimeout);
+            this._blinkTimeout = null;
+
+            this.bitmap.alpha = 1.0;
+            this.bitmap.scaleX = this._sizeInUse;
+            this.bitmap.scaleY = this.bitmap.scaleX;
+            this.bitmap.scale = this.bitmap.scaleX;
+            this.bitmap.rotation = this.orientation;
+            this.skinChanged = this._isSkinChanged;
+            var bounds = this.container.getBounds();
+            this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            this.blinkFinished = true;
+        }
+    };
+
     this.blink = function(duration, volume) {
         var that = this;
-        var sizeInUse;
+        this._sizeInUse;
         this._blinkTimeout = null;
 
         if (this.beforeBlinkSize == null) {
             this.beforeBlinkSize = that.bitmap.scaleX;
         }
 
-        if (this.blinkFinished){
-            sizeInUse = that.bitmap.scaleX;
+        if (this.blinkFinished) {
+            this._sizeInUse = that.bitmap.scaleX;
         } else {
-            sizeInUse = this.beforeBlinkSize;
+            this._sizeInUse = this.beforeBlinkSize;
         }
 
-        if (this._blinkTimeout != null || !this.blinkFinished) {
-            clearTimeout(this._blinkTimeout);
-            this._blinkTimeout = null;
-
-            that.bitmap.alpha = 1.0;
-            that.bitmap.scaleX = sizeInUse;
-            that.bitmap.scaleY = that.bitmap.scaleX;
-            that.bitmap.scale = that.bitmap.scaleX;
-            that.bitmap.rotation = that.orientation;
-            that.skinChanged = isSkinChanged;
-            var bounds = that.container.getBounds();
-            that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.blinkFinished = true;
-        }
-
+        this.stopBlink();
         this.blinkFinished = false;
         that.container.uncache();
         var scalefactor = 60 / 55;
         var volumescalefactor = 4 * (volume + 200) / 1000;
         // Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
-        that.bitmap.alpha = 0.5;
-        that.bitmap.scaleX *= scalefactor * volumescalefactor;  // sizeInUse * scalefactor * volumescalefactor;
-        that.bitmap.scaleY = that.bitmap.scaleX;
-        that.bitmap.scale = that.bitmap.scaleX;
-        var isSkinChanged = that.skinChanged;
-        that.skinChanged = true;
-        createjs.Tween.get(that.bitmap).to({alpha: 1, scaleX: sizeInUse, scaleY: sizeInUse, scale: sizeInUse}, 500 / duration);
+        this.bitmap.alpha = 0.5;
+        this.bitmap.scaleX *= scalefactor * volumescalefactor;  // sizeInUse * scalefactor * volumescalefactor;
+        this.bitmap.scaleY = this.bitmap.scaleX;
+        this.bitmap.scale = this.bitmap.scaleX;
+        this._isSkinChanged = this.skinChanged;
+        this.skinChanged = true;
+        createjs.Tween.get(this.bitmap).to({alpha: 1, scaleX: this._sizeInUse, scaleY: this._sizeInUse, scale: this._sizeInUse}, 500 / duration);
 
         this._blinkTimeout = setTimeout(function () {
             that.bitmap.alpha = 1.0;
-            that.bitmap.scaleX = sizeInUse;
+            that.bitmap.scaleX = that._sizeInUse;
             that.bitmap.scaleY = that.bitmap.scaleX;
             that.bitmap.scale = that.bitmap.scaleX;
             that.bitmap.rotation = that.orientation;
-            that.skinChanged = isSkinChanged;
+            that.skinChanged = that._isSkinChanged;
             var bounds = that.container.getBounds();
             that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             that.blinkFinished = true;
@@ -1358,6 +1364,8 @@ function Turtles () {
     this.markAsStopped = function () {
         for (var turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
+            // Make sure the blink is really stopped.
+            this.turtleList[turtle].stopBlink();
         }
     };
 
