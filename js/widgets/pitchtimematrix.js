@@ -393,9 +393,9 @@ function PitchTimeMatrix () {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 this._noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
-                if (noteIsSolfege(this.rowLabels[i])) {
+                if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                    var noteObj = getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false, null, this._logo.errorMsg);
+                    var noteObj = getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false, null, this._logo.errorMsg, this._logo.synth.inTemperament);
                 } else {
                     cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
@@ -1223,6 +1223,7 @@ function PitchTimeMatrix () {
 
             // We have an array of pitches and note values.
             var note = this._notesToPlay[this._notesCounter][0];
+            console.log(this._noteStored);
             var pitchNotes = [];
             var synthNotes = [];
             var drumNotes = [];
@@ -1779,8 +1780,13 @@ function PitchTimeMatrix () {
                             thisBlock += 6;
                         } else {
                             newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
+                            if (this._logo.synth.inTemperament == 'custom') {
+                                newStack.push([thisBlock + 1, ['customNote', {'value': note[0][j].substring(0, note[0].length - 1)}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock]]);
+                            } else {
+                                newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
+                            }
                             previousBlock = thisBlock;
                             thisBlock += 3;
                         }
