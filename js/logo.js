@@ -307,6 +307,9 @@ function Logo () {
     this._saveOrientation = {};
     this._savePenState = {};
 
+    // Things we turn off to optimize performance
+    this.blinkState = true;
+
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
         this.synth = new Synth();
@@ -340,6 +343,19 @@ function Logo () {
     this.mic = null;
     this.volumeAnalyser = null;
     this.pitchAnalyser = null;
+
+    this.setOptimize = function (state) {
+        if (state) {
+	    this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
+            createjs.Ticker.setFPS(10);
+
+	} else {
+	    this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
+            createjs.Ticker.setFPS(30);
+	}
+
+	this.blinkState = !state;
+    };
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
         this.setPlaybackStatus = setPlaybackStatus;
@@ -7486,7 +7502,7 @@ function Logo () {
                         }
                     }
 
-                    if (!that.suppressOutput[turtle]) {
+                    if (!that.suppressOutput[turtle] && that.blinkState) {
                         that.turtles.turtleList[turtle].blink(duration, last(that.masterVolume));
                     }
 
@@ -7668,7 +7684,7 @@ function Logo () {
                             }
                         }
 
-                        if (!that.suppressOutput[turtle]) {
+                        if (!that.suppressOutput[turtle] && that.blinkState) {
                             that.turtles.turtleList[turtle].blink(duration, last(that.masterVolume));
                         }
                     }
@@ -7886,7 +7902,10 @@ function Logo () {
                     break;
                 case 'notes':
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
+			if (that.blinkState) {
+                            that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
+			}
+
                         that.lastNote[turtle] = that.playbackQueue[turtle][idx][3];
                         that.synth.trigger(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
                     }
