@@ -35,38 +35,42 @@ function getAuxToolbarButtonNames(name) {
 
 function createDefaultStack() {
     DATAOBJS =
-        [[0, 'start', screen.width / 3, 75, [null, 1, null]],
+	[[0, 'start', screen.width / 3, 75, [null, 1, null]],
 
-         [1, 'newnote', 0, 0, [0, 2, 5, 9]],
-         [2, 'divide', 0, 0, [1, 3, 4]],
-         [3, ['number', {'value': 1}], 0, 0, [2]],
-         [4, ['number', {'value': 4}], 0, 0, [2]],
-         [5, 'vspace', 0, 0, [1, 6]],
-         [6, 'pitch', 0, 0, [5, 7, 8, null]],
-         [7, ['solfege', {'value': 'sol'}], 0, 0, [6]],
-         [8, ['number', {'value': 4}], 0, 0, [6]],
-         [9, 'hidden', 0, 0, [1, 10]],
+	 [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
+	 [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
+	 [3, 'hidden', 0, 0, [1, null]],
 
-         [10, 'newnote', 0, 0, [9, 11, 14, 18]],
-         [11, 'divide', 0, 0, [10, 12, 13]],
-         [12, ['number', {'value': 1}], 0, 0, [11]],
-         [13, ['number', {'value': 4}], 0, 0, [11]],
-         [14, 'vspace', 0, 0, [10, 15]],
-         [15, 'pitch', 0, 0, [14, 16, 17, null]],
-         [16, ['solfege', {'value': 'mi'}], 0, 0, [15]],
-         [17, ['number', {'value': 4}], 0, 0, [15]],
-         [18, 'hidden', 0, 0, [10, 19]],
+	 [4, 'newnote', 0, 0, [1, 5, 8, 12]],
+	 [5, 'divide', 0, 0, [4, 6, 7]],
+	 [6, ['number', {'value': 1}], 0, 0, [5]],
+	 [7, ['number', {'value': 4}], 0, 0, [5]],
+	 [8, 'vspace', 0, 0, [4, 9]],
+	 [9, 'pitch', 0, 0, [8, 10, 11, null]],
+	 [10, ['solfege', {'value': 'sol'}], 0, 0, [9]],
+	 [11, ['number', {'value': 4}], 0, 0, [9]],
+	 [12, 'hidden', 0, 0, [4, 13]],
 
-         [19, 'newnote', 0, 0, [18, 20, 23, 27]],
-         [20, 'divide', 0, 0, [19, 21, 22]],
-         [21, ['number', {'value': 1}], 0, 0, [20]],
-         [22, ['number', {'value': 2}], 0, 0, [20]],
-         [23, 'vspace', 0, 0, [19, 24]],
-         [24, 'pitch', 0, 0, [23, 25, 26, null]],
-         [25, ['solfege', {'value': 'sol'}], 0, 0, [24]],
-         [26, ['number', {'value': 4}], 0, 0, [24]],
-         [27, 'hidden', 0, 0, [19, null]],
-        ];
+	 [13, 'newnote', 0, 0, [12, 14, 17, 21]],
+	 [14, 'divide', 0, 0, [13, 15, 16]],
+	 [15, ['number', {'value': 1}], 0, 0, [14]],
+	 [16, ['number', {'value': 4}], 0, 0, [14]],
+	 [17, 'vspace', 0, 0, [13, 18]],
+	 [18, 'pitch', 0, 0, [17, 19, 20, null]],
+	 [19, ['solfege', {'value': 'mi'}], 0, 0, [18]],
+	 [20, ['number', {'value': 4}], 0, 0, [18]],
+	 [21, 'hidden', 0, 0, [13, 22]],
+
+	 [22, 'newnote', 0, 0, [21, 23, 26, 30]],
+	 [23, 'divide', 0, 0, [22, 24, 25]],
+	 [24, ['number', {'value': 1}], 0, 0, [23]],
+	 [25, ['number', {'value': 2}], 0, 0, [23]],
+	 [26, 'vspace', 0, 0, [22, 27]],
+	 [27, 'pitch', 0, 0, [26, 28, 29, null]],
+	 [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
+	 [29, ['number', {'value': 4}], 0, 0, [27]],
+	 [30, 'hidden', 0, 0, [22, null]]
+	];
 };
 
 
