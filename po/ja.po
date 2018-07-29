@@ -599,7 +599,7 @@ msgstr "BPM(一分当たりの拍数)は３０より大きい必要がありま�
 #: js/logo.js:3374
 #: js/logo.js:3397
 msgid "Maximum beats per minute is 1000."
-msgstr "BPM(一分当たりの泊数)は最大　１０００　とします。"
+msgstr "BPM(一分当たりの拍数)は最大　１０００　とします。"
 
 #: js/logo.js:3467
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
@@ -2411,7 +2411,7 @@ msgstr "ピッチの階段"
 #: js/basicblocks.js:804
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm ruler"
-msgstr "リズムの物指"
+msgstr "リズムのルーラー"
 
 #: js/basicblocks.js:812
 msgid "G major scale"
@@ -2495,14 +2495,14 @@ msgstr "３９２ハーツ"
 #.TRANS: number of beats per minute
 ## probably a little wrong. This is just multiply, I think...
 msgid "beat factor"
-msgstr "泊の倍"
+msgstr "拍の倍"
 
 #: js/basicblocks.js:1081
 #: js/basicblocks.js:1185
 #: js/basicblocks.js:1197
 #.TRANS: number of beats played per minute
 msgid "beats per minute"
-msgstr "BPM(一分当たりの泊数)"
+msgstr "BPM(一分当たりの拍数)"
 
 #: js/basicblocks.js:1089
 #.TRANS: count of current measure in meter
@@ -2513,7 +2513,7 @@ msgstr "小節の数字"
 #.TRANS: count of current beat in meter
 ## trying "what beat"
 msgid "beat count"
-msgstr "何泊"
+msgstr "何拍"
 
 #: js/basicblocks.js:1105
 #.TRANS: count the number of notes
@@ -3235,7 +3235,7 @@ msgstr "百"
 #: js/basicblocks.js:2857
 ## 経産＝けいさん; p69 Collins Shubun
 msgid "calculate"
-msgstr "経産"
+msgstr "計算"
 
 #: js/basicblocks.js:2886
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
@@ -5031,7 +5031,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "茶"
 
 #~msgid "multiply beat"
-#~msgstr "泊を倍に"
+#~msgstr "拍を倍に"
 
 #~msgid "turtle"
 #~msgstr "タートル"
