@@ -16,8 +16,8 @@ function UtilityBox () {
     const BOXBUTTONOFFSET = 40;
     const BOXBUTTONSPACING = 65;
 
-    // 8 buttons, 7 intrabuttons spaces, 2 extrabutton spaces
-    var boxwidth = 8 * 55 + 7 * 10 + 2 * 20;
+    // 9 buttons, 8 intrabuttons spaces, 2 extrabutton spaces
+    var boxwidth = 9 * 55 + 8 * 10 + 2 * 20;
     var boxwidth2 = boxwidth - 1.5;
     var boxclose = boxwidth - 55;
 
@@ -38,6 +38,8 @@ function UtilityBox () {
     this._scrollStatus = false;
     this._increaseStatus = true;
     this._decreaseStatus = true;
+    this._optimize = null;
+    this._optimizeState = false;
     this._container = null;
     this._scale = 1;
 
@@ -49,6 +51,10 @@ function UtilityBox () {
     this.setRefreshCanvas = function (refreshCanvas) {
         this._refreshCanvas = refreshCanvas;
         return this;
+    };
+
+    this.setOptimize = function (optimize) {
+        this._optimize = optimize;
     };
 
     this.setBigger = function (bigger) {
@@ -102,6 +108,30 @@ function UtilityBox () {
             this._createBox(scale, x, y);
             var that = this;
             var dx = BOXBUTTONOFFSET;
+
+            this._optimizeOnButton = makeButton('optimize-on-button', _('Optimize performance'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._optimizeOffButton = makeButton('optimize-off-button', _('Optimize feedback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._optimizeOnButton.visible = true;
+            this._optimizeOffButton.visible = false;
+            this._positionHoverText(this._optimizeOnButton);
+            this._positionHoverText(this._optimizeOffButton);
+            this._optimizeOnButton.on('click', function (event) {
+		that._optimizeState = true;
+                that._optimize(that._optimizeState);
+		that._optimizeOnButton.visible = false;
+		that._optimizeOffButton.visible = true;
+                that.hide();
+            });
+
+            this._optimizeOffButton.on('click', function (event) {
+		that._optimizeState = false;
+                that._optimize(that._optimizeState);
+		that._optimizeOnButton.visible = true;
+		that._optimizeOffButton.visible = false;
+                that.hide();
+            });
+
+            dx += BOXBUTTONSPACING;
 
             this._languageButton = makeButton('language-button', _('Select language'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._languageButton.visible = true;
@@ -234,6 +264,8 @@ function UtilityBox () {
 
     this.hide = function () {
         if (this._container !== null) {
+            this._optimizeOnButton.visible = false;
+            this._optimizeOffButton.visible = false;
             this._languageButton.visible = false;
             this._smallerButton.visible = false;
             this._smallerButton2.visible = false;
@@ -254,6 +286,8 @@ function UtilityBox () {
 
     this._show = function (status) {
         if (this._container !== null) {
+            this._optimizeOnButton.visible = !this._optimizeState;
+            this._optimizeOffButton.visible = this._optimizeState;
             this._languageButton.visible = true;
             this._smallerButton.visible = this._decreaseStatus;
             this._smallerButton2.visible = !this._decreaseStatus;
