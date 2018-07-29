@@ -2431,7 +2431,7 @@ msgstr "音高・時刻行列"
 #.TRANS: factor used in determining how many duplications to make
 ## Probably incorrect/misleading. PLEASE CHECK!
 msgid "duplicate factor"
-msgstr "～回繰り返す"
+msgstr "～回繰り返すファクター"
 
 #: js/basicblocks.js:874
 #.TRANS: oscillator time (in micro seconds)
@@ -2471,7 +2471,7 @@ msgstr "繰り返す"
 #: js/basicblocks.js:948
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 msgid "multiply note value"
-msgstr "音価を～倍にする"
+msgstr "音価を～倍にするファクター"
 
 #: js/basicblocks.js:958
 #.TRANS: tie notes together into one longer note
@@ -2495,7 +2495,7 @@ msgstr "３９２ヘルツ"
 #.TRANS: number of beats per minute
 ## probably a little wrong. This is just multiply, I think...
 msgid "beat factor"
-msgstr "拍を～倍にする"
+msgstr "拍を～倍にするファクター"
 
 #: js/basicblocks.js:1081
 #: js/basicblocks.js:1185
@@ -2595,12 +2595,12 @@ msgstr "拍の数"
 #.TRANS: the duration of a note played as staccato
 ## ジーニアス英和辞典
 msgid "staccato factor"
-msgstr "スタッカートの長さ"
+msgstr "スタッカートの長さファクター"
 
 #: js/basicblocks.js:1239
 #.TRANS: the degree of overlap of notes played as legato
 msgid "slur factor"
-msgstr "スラーの長さ"
+msgstr "スラーの長さファクター"
 
 #: js/basicblocks.js:1247
 #: js/timbre.js:968
@@ -4310,11 +4310,11 @@ msgstr "座標"
 #: plugins/gmap.rtp:116
 ## 因子＝いんし http://jisho.org/word/%E5%9B%A0%E5%AD%90 
 msgid "zoom factor"
-msgstr "ズームの因子"
+msgstr "ズームファクター"
 
 #: plugins/gmap.rtp:144
 msgid "zoom"
-msgstr "ズームファクター"
+msgstr "ズーム"
 
 #: plugins/gmap.rtp:160
 ## ひらがな＝いど
