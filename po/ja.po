@@ -128,7 +128,7 @@ msgstr "ドラム"
 #: js/block.js:704
 ## ひらがな＝じょうぎ
 msgid "ruler"
-msgstr "定規"
+msgstr "ルーラー"
 
 #: js/block.js:707
 #: js/basicblocks.js:738
@@ -153,7 +153,7 @@ msgstr "テンポ"
 #.TRANS: mode, e.g., Major in C Major
 ## 旋法＝せんぽう；https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%BC%E3%83%89_(%E6%97%8B%E6%B3%95)
 msgid "mode"
-msgstr "モード(旋法)"
+msgstr "モード（音階）"
 
 #: js/block.js:719
 msgid "slider"
@@ -196,7 +196,7 @@ msgstr "偽"
 #.TRANS: hide Polar coordinate overlay grid
 ## need to verify
 msgid "hide grid"
-msgstr "行列を隠す"
+msgstr "グリッド（座標）"
 
 #: js/activity.js:732
 #: js/activity.js:738
@@ -216,7 +216,7 @@ msgstr "カーテシアン"
 #.TRANS: show Polar coordinate overlay grid
 ## ひらがな＝きょくいき；http://jisho.org/word/%E6%A5%B5%E5%9F%9F；http://jisho.org/word/%E6%A5%B5%E7%B7%9A
 msgid "Polar"
-msgstr "極域"
+msgstr "極"
 
 #: js/activity.js:762
 ## ひらがな＝しゅうりょう
@@ -241,22 +241,22 @@ msgstr "ブロックが見つかりません。"
 #: js/activity.js:2963
 ## check verb
 msgid "Please set browser zoom level to 100%"
-msgstr "ブラウザーのズームを１００%に設定してください。"
+msgstr "ブラウザ表示を100%に設定してください。"
 
 #: js/activity.js:3449
 #: js/activity.js:3463
 #: js/turtledefs.js:89
 msgid "Run fast"
-msgstr "速いスピードで再生します"
+msgstr "速いスピードで再生"
 
 #: js/activity.js:3449
 #: js/activity.js:3463
 msgid "long press to run slowly"
-msgstr "長く押すとゆっくり再生されます"
+msgstr "長押しでスロー再生"
 
 #: js/activity.js:3449
 msgid "extra-long press to run music slowly"
-msgstr "もっと長く押すと、音楽はさらにゆっくりになります"
+msgstr "より長押しで、よりスロー再生になります"
 
 #: js/activity.js:3450
 #: js/activity.js:3464
@@ -300,7 +300,7 @@ msgstr "ブロックを表示する / 隠す"
 #: js/activity.js:3469
 #: js/turtledefs.js:97
 msgid "Expand/collapse collapsable blocks"
-msgstr "つぶせるブロックを増やす / つぶす"
+msgstr "ブロックを増やす / つぶす"
 
 #: js/activity.js:3458
 #: js/activity.js:3470
@@ -318,12 +318,12 @@ msgstr "ヘルプ"
 #: js/activity.js:3552
 #: js/turtledefs.js:101
 msgid "Load samples from server"
-msgstr "「プラネット」のサーバからサンプルをダウンロードする"
+msgstr "サーバからサンプルをダウンロードする"
 
 #: js/activity.js:3554
 #: js/savebox.js:113
 msgid "The Planet is unavailable."
-msgstr ""
+msgstr "プラネットは今使えません"
 
 #: js/activity.js:3560
 #: js/activity.js:3572
@@ -340,16 +340,16 @@ msgstr "プロジェクトを保存する"
 
 #: js/activity.js:3562
 msgid "Long press on blocks to copy."
-msgstr "ブロックでマウスの長いクリック押しでコピー"
+msgstr "ブロック長押しでコピー"
 
 #: js/activity.js:3562
 msgid "Click here to paste."
-msgstr "ペーストをするためにここでクリック"
+msgstr "貼り付けるにはここをクリック"
 
 #: js/activity.js:3564
 #: js/activity.js:3576
 msgid "playback"
-msgstr "コンパイルされているコードを再生"
+msgstr "コンパイルされた音楽を再生"
 
 #: js/activity.js:3565
 #: js/activity.js:3577
@@ -360,7 +360,7 @@ msgstr "設定"
 #: js/activity.js:3566
 #: js/turtledefs.js:118
 msgid "New Project"
-msgstr ""
+msgstr "新しいプロジェクト"
 
 #: js/activity.js:3567
 #: js/activity.js:3579
@@ -399,7 +399,7 @@ msgstr "リズム"
 #: js/basicblocks.js:3580
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
-msgstr "ピッチ"
+msgstr "音高"
 
 #: js/analytics.js:475
 #: js/turtledefs.js:23
@@ -425,7 +425,7 @@ msgstr "ペン"
 #: js/turtledefs.js:23
 #: js/basicblocks.js:454
 msgid "number"
-msgstr "数字・算数"
+msgstr "数字"
 
 #: js/analytics.js:475
 #: js/turtledefs.js:23
@@ -447,12 +447,12 @@ msgstr "メディア"
 #: js/turtledefs.js:23
 ## Literally means "mouse relations"
 msgid "mice"
-msgstr "鼠の関係"
+msgstr "ネズミ達の関係"
 
 #: js/logo.js:31
 ## http://jisho.org/word/%E5%A6%A5%E5%BD%93 ; 妥当=だとう; maybe just ヴァリッド(http://jisho.org/word/%E3%83%B4%E3%82%A1%E3%83%AA%E3%83%83%E3%83%89 )
 msgid "Not a valid pitch name"
-msgstr "選ばれた音名が妥当ではありません。"
+msgstr "選ばれた音名が適切ではありません。"
 
 #: js/logo.js:1015
 #: js/turtledefs.js:29
@@ -556,7 +556,7 @@ msgstr "インデクス番号は 0 より大きい必要があります。"
 #: js/logo.js:2937
 #: js/logo.js:9732
 msgid "Maximum heap size is 1000."
-msgstr "ヒープの最大は1000です。"
+msgstr "ヒープの最大値は1000です。"
 
 #: js/logo.js:2961
 #: js/logo.js:2985
@@ -572,34 +572,34 @@ msgstr "マイナスの数値をいれることはできません。"
 
 #: js/logo.js:3080
 msgid "Adding missing pitch number 0."
-msgstr "行方不明な「０」のピッチ番号が入れられました。"
+msgstr "音高「0」を加える"
 
 #: js/logo.js:3090
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
-msgstr "０より小さいか１１より大きい番号を捨て置きます。"
+msgstr "音高の数のうち、0未満あるいは11より大きい数は無視します。"
 
 #: js/logo.js:3095
 ## check verb
 msgid "Ignoring duplicate pitch numbers."
-msgstr "重複ピッチ番号を捨て置きます"
+msgstr "重複している音高は無視します"
 
 #: js/logo.js:3228
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "音楽グラフは一つのピッチブロックと一つのドラムブロックを使う必要があります"
+msgstr "音高・時刻行列では、少なくとも一つの音高ブロックとドラムブロックを使う必要があります。"
 
 #: js/logo.js:3321
 #: js/logo.js:3343
 #: js/logo.js:3371
 #: js/logo.js:3394
 msgid "Beats per minute must be > 30."
-msgstr "BPM(一分当たりの拍数)は３０より大きい必要があります。"
+msgstr "BPM(一分あたりの拍数)は30より大きい必要があります。"
 
 #: js/logo.js:3324
 #: js/logo.js:3346
 #: js/logo.js:3374
 #: js/logo.js:3397
 msgid "Maximum beats per minute is 1000."
-msgstr "BPM(一分当たりの拍数)は最大　１０００　とします。"
+msgstr "BPM(一分あたりの拍数)は最大1000とします。"
 
 #: js/logo.js:3467
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
