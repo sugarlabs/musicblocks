@@ -227,6 +227,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
+    var customNoteBlock = new ProtoBlock('customNote');
+    customNoteBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['customNote'] = customNoteBlock;
+    customNoteBlock.valueBlock();
+
     // Transposition blocks
     // macro
     var invertBlock = new ProtoBlock('invert1');
@@ -306,6 +311,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     octaveBlock.staticLabels.push(_('octave'));
     octaveBlock.adjustWidthToLabel();
     octaveBlock.zeroArgBlock();
+
+    // macro
+    var customPitchBlock = new ProtoBlock('custompitch');
+    customPitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['custompitch'] = customPitchBlock;
+    //.TRANS: unison means the note is the same as the current note
+    customPitchBlock.staticLabels.push(_('custom note'));
+    customPitchBlock.adjustWidthToLabel();
+    customPitchBlock.zeroArgBlock();
+    customPitchBlock.hidden = true;
 
     // macro
     var downsixthBlock = new ProtoBlock('downsixth');
@@ -397,7 +412,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     scalarTranspositionBlock.adjustWidthToLabel();
     scalarTranspositionBlock.defaults.push('1');
     scalarTranspositionBlock.flowClampOneArgBlock();
-    scalarTranspositionBlock.hidden = true;
+    //scalarTranspositionBlock.hidden = true;
 
     // macro
     var accidentalBlock = new ProtoBlock('accidental');
@@ -729,6 +744,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm2.twoArgBlock();
     rhythm2.dockTypes[1] = 'anyin';
     rhythm2.dockTypes[2] = 'anyin';
+
+    var temperamentBlock = new ProtoBlock('temperament');
+    temperamentBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['temperament'] = temperamentBlock;
+    temperamentBlock.staticLabels.push(_('temperament'));
+    temperamentBlock.extraWidth = 20;
+    temperamentBlock.adjustWidthToLabel();
+    temperamentBlock.stackClampOneArgBlock();
 
     // macro
     var timbreBlock = new ProtoBlock('timbre');
@@ -1063,6 +1086,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     newnoteBlock.adjustWidthToLabel();
     newnoteBlock.flowClampOneArgBlock();
     newnoteBlock.defaults.push(1 / 4);
+
+    // macro
+    var defineFrequencyBlock = new ProtoBlock('definefrequency');
+    defineFrequencyBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['definefrequency'] = defineFrequencyBlock;
+    defineFrequencyBlock.staticLabels.push(_('define Frequency'));
+    defineFrequencyBlock.adjustWidthToLabel();
+    defineFrequencyBlock.flowClampOneArgBlock();
+    defineFrequencyBlock.hidden = true;
 
     // METER PALETTE
 
@@ -1509,7 +1541,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.defaults.push(_('custom'));   
 
     var setTemperamentBlock = new ProtoBlock('settemperament');
-    setTemperamentBlock.palette = palettes.dict['tone'];
+    setTemperamentBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
     setTemperamentBlock.staticLabels.push(_('set temperament'));
     setTemperamentBlock.adjustWidthToLabel();
@@ -1521,7 +1553,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     temperamentNameBlock.valueBlock();
     temperamentNameBlock.hidden = true; 
     temperamentNameBlock.extraWidth = 50;
-    temperamentNameBlock.dockTypes[0] = 'anyout';   
+    temperamentNameBlock.dockTypes[0] = 'anyout';
+
+    var temperament1Block = new ProtoBlock('temperament1');
+    temperament1Block.palette = palettes.dict['action'];
+    blocks.protoBlockDict['temperament1'] = temperament1Block;
+    temperament1Block.staticLabels.push(_('temperament'));
+    temperament1Block.hidden = true; 
+    temperament1Block.extraWidth = 20;
+    temperament1Block.adjustWidthToLabel();
+    temperament1Block.stackClampOneArgBlock();   
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 

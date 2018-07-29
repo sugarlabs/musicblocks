@@ -214,32 +214,45 @@ function Synth() {
     this.noteFrequencies = {};
 
     this.temperamentChanged = function(temperament, startingPitch) {
+        var startPitch = startingPitch;
         var t = TEMPERAMENT[temperament];
-        var len = startingPitch.length;
-        // Calculate number for starting pitch.
-        var number = pitchToNumber(startingPitch.substring(0, len - 1), startingPitch.slice(-1), 'C major');
-        var frequency = Tone.Frequency(startingPitch).toFrequency();
+        var len = startPitch.length;
+        var number = pitchToNumber(startPitch.substring(0, len - 1), startPitch.slice(-1), 'C major');
+        startPitchObj = numberToPitch(number);
+        startPitch = (startPitchObj[0] + startPitchObj[1]).toString();
+
+        if (startPitch.substring(1, len - 1) === FLAT || startPitch.substring(1, len - 1) === 'b' ) {
+            startPitch = startPitch.replace(FLAT, 'b');
+        } else if (startPitch.substring(1, len - 1) === SHARP || startPitch.substring(1, len - 1) === '#' ) {
+            startPitch = startPitch.replace(SHARP, '#');
+        }
+        
+        var frequency = Tone.Frequency(startPitch).toFrequency();
 
         this.noteFrequencies = {
             // note: [octave, Frequency]
             [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency],
-            [numberToPitch(number + 1)[0]]: [numberToPitch(number + 1)[1], t['minor 2'] * frequency],
-            [numberToPitchSharp(number + 1)[0]]: [numberToPitchSharp(number + 1)[1], t['augmented 1'] * frequency],
-            [numberToPitch(number + 2)[0]]: [numberToPitch(number + 2)[1], t['major 2'] * frequency],
-            [numberToPitch(number + 3)[0]]: [numberToPitch(number + 3)[1], t['minor 3'] * frequency],
-            [numberToPitchSharp(number + 3)[0]]: [numberToPitchSharp(number + 3)[1], t['augmented 2'] * frequency],
-            [numberToPitch(number + 4)[0]]: [numberToPitch(number + 4)[1], t['major 3'] * frequency],
-            [numberToPitch(number + 5)[0]]: [numberToPitch(number + 5)[1], t['perfect 4'] * frequency],
-            [numberToPitchSharp(number + 6)[0]]: [numberToPitchSharp(number + 6)[1], t['augmented 4'] * frequency],
-            [numberToPitch(number + 6)[0]]: [numberToPitch(number + 6)[1], t['diminished 5'] * frequency],
-            [numberToPitch(number + 7)[0]]: [numberToPitch(number + 7)[1], t['perfect 5'] * frequency],
-            [numberToPitchSharp(number + 8)[0]]: [numberToPitchSharp(number + 8)[1], t['augmented 5'] * frequency],
-            [numberToPitch(number + 8)[0]]: [numberToPitch(number + 8)[1], t['minor 6'] * frequency],
-            [numberToPitch(number + 9)[0]]: [numberToPitch(number + 9)[1], t['major 6'] * frequency],
-            [numberToPitchSharp(number + 10)[0]]: [numberToPitchSharp(number + 10)[1], t['augmented 6'] * frequency],
-            [numberToPitch(number + 10)[0]]: [numberToPitch(number + 10)[1], t['minor 7'] * frequency],
-            [numberToPitch(number + 11)[0]]: [numberToPitch(number + 11)[1], t['major 7'] * frequency],
-            [numberToPitch(number + 12)[0] + '' + numberToPitch(number + 12)[1]]: [numberToPitch(number + 12)[1], t['perfect 8'] * frequency]
+            [getNoteFromInterval(startingPitch, 'minor 2')[0]]: [getNoteFromInterval(startingPitch, 'minor 2')[1], t['minor 2'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 1')[0]]: [getNoteFromInterval(startingPitch, 'augmented 1')[1], t['augmented 1'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 2')[0]]: [getNoteFromInterval(startingPitch, 'major 2')[1], t['major 2'] * frequency],
+            [getNoteFromInterval(startingPitch, 'minor 3')[0]]: [getNoteFromInterval(startingPitch, 'minor 3')[1], t['minor 3'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 2')[0]]: [getNoteFromInterval(startingPitch, 'augmented 2')[1], t['augmented 2'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 3')[0]]: [getNoteFromInterval(startingPitch, 'major 3')[1], t['major 3'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 3')[0]]: [getNoteFromInterval(startingPitch, 'augmented 3')[1], t['augmented 3'] * frequency],
+            [getNoteFromInterval(startingPitch, 'diminished 4')[0]]: [getNoteFromInterval(startingPitch, 'diminished 4')[1], t['diminished 4'] * frequency],
+            [getNoteFromInterval(startingPitch, 'perfect 4')[0]]: [getNoteFromInterval(startingPitch, 'perfect 4')[1], t['perfect 4'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 4')[0]]: [getNoteFromInterval(startingPitch, 'augmented 4')[1], t['augmented 4'] * frequency],
+            [getNoteFromInterval(startingPitch, 'diminished 5')[0]]: [getNoteFromInterval(startingPitch, 'diminished 5')[1], t['diminished 5'] * frequency],
+            [getNoteFromInterval(startingPitch, 'perfect 5')[0]]: [getNoteFromInterval(startingPitch, 'perfect 5')[1], t['perfect 5'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 5')[0]]: [getNoteFromInterval(startingPitch, 'augmented 5')[1], t['augmented 5'] * frequency],
+            [getNoteFromInterval(startingPitch, 'minor 6')[0]]: [getNoteFromInterval(startingPitch, 'minor 6')[1], t['minor 6'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 6')[0]]: [getNoteFromInterval(startingPitch, 'major 6')[1], t['major 6'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 6')[0]]: [getNoteFromInterval(startingPitch, 'augmented 6')[1], t['augmented 6'] * frequency],
+            [getNoteFromInterval(startingPitch, 'minor 7')[0]]: [getNoteFromInterval(startingPitch, 'minor 7')[1], t['minor 7'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 7')[0]]: [getNoteFromInterval(startingPitch, 'major 7')[1], t['major 7'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 7')[0]]: [getNoteFromInterval(startingPitch, 'augmented 7')[1], t['augmented 7'] * frequency],
+            [getNoteFromInterval(startingPitch, 'diminished 8')[0]]: [getNoteFromInterval(startingPitch, 'diminished 8')[1], t['diminished 8'] * frequency],
+            [getNoteFromInterval(startingPitch, 'perfect 8')[0]]: [getNoteFromInterval(startingPitch, 'perfect 8')[1], t['perfect 8'] * frequency]
         };
 
         for (var key in this.noteFrequencies) {
@@ -257,9 +270,15 @@ function Synth() {
         this.changeInTemperament = false;
     };
 
-    this._getFrequency = function(notes, changeInTemperament) {
+    this._getFrequency = function(notes, changeInTemperament, temperament) {
         if (changeInTemperament) {
-            this.temperamentChanged(this.inTemperament, this.startingPitch);
+            if (temperament === undefined) {
+                this.temperamentChanged(this.inTemperament, this.startingPitch);
+            } else {
+                //To get frequencies in Temperament Widget.
+                this.temperamentChanged(temperament, this.startingPitch);
+            }
+            
         }
 
         var that = this;
@@ -292,6 +311,59 @@ function Synth() {
 	    return results;
 	}
     };
+
+    this.getCustomFrequency = function (notes) {
+        if (notes instanceof Array) {
+            notes = notes[0];
+        }
+        var octave = notes.slice(-1);
+        if (notes.indexOf('(') !== -1) {
+            var centsInfo = notes.substring(notes.indexOf('('), notes.length);
+        } else {
+            var centsInfo = octave;
+        }
+        notes = notes.replace(centsInfo, '');
+        var articulation = notes.replace('do', '').replace('re', '').replace('mi', '').replace('fa', '').replace('sol', '').replace('la', '').replace('ti', '').replace('A', '').replace('B', '').replace('C', '').replace('D', '').replace('E', '').replace('F', '').replace('G', '');
+        notes = notes.replace(articulation, '');
+
+        switch(articulation) {
+            case 'bb':
+            case DOUBLEFLAT:
+                notes = notes + '𝄫' + centsInfo;
+                break;
+            case 'b':
+            case FLAT:
+                notes = notes + '♭' + centsInfo;
+                break;
+            case '##':
+            case '*':
+            case DOUBLESHARP:
+                notes = notes + '𝄪' + centsInfo;
+                break;
+            case '#':
+            case SHARP:
+                notes = notes + '♯' + centsInfo;
+                break;
+            default:
+                notes = notes + articulation + centsInfo;
+                break;
+        }
+
+        var pitch = this.startingPitch;
+        var startPitchFrequency = pitchToFrequency(pitch.substring(0, pitch.length - 1), pitch.slice(-1), 0, 'C Major');
+        if (typeof(notes) === 'number'){
+            notes = notes;
+        } else {
+            for (var pitchNumber in TEMPERAMENT['custom']) {
+                if (pitchNumber !== 'pitchNumber') {
+                    if (notes.substring(0, notes.length - 1) == TEMPERAMENT['custom'][pitchNumber][1]) {
+                        var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
+                        return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
+                    }
+                }   
+            }
+        }
+    }
 
     this.resume = function () {
         this.tone.context.resume();
@@ -721,8 +793,27 @@ function Synth() {
     }
 
     this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
-        if (this.inTemperament !== 'equal') {
-            notes = this._getFrequency(notes, this.changeInTemperament);
+        if (this.inTemperament !== 'equal' && this.inTemperament !== 'custom') {
+            if (typeof(notes) === 'number') {
+                notes = notes;
+            } else {
+                var notes1 = notes;
+                notes = this._getFrequency(notes, this.changeInTemperament);
+                if (notes === undefined) {
+                    if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
+                        notes = notes1.substring(0, 1) + '' + 'bb' + notes1.substring(notes1.length - 1, notes1.length);
+                    } else if (notes1.substring(1, notes1.length - 1) == DOUBLESHARP) {
+                        notes = notes1.substring(0, 1) + '' + 'x' + notes1.substring(notes1.length - 1, notes1.length);
+                    } else {
+                        notes = notes1;
+                    }
+                }
+            }
+        }
+
+        if (this.inTemperament == 'custom') {
+            notes = this.getCustomFrequency(notes); 
+            console.log(notes);   
         }
 
         if (paramsEffects === null && paramsFilters === null) {

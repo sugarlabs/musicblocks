@@ -16,10 +16,10 @@ const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'customNote', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename'];
 const EXTRAWIDENAMES = [];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname'];
+const PIEMENUS = ['solfege', 'customNote', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -587,6 +587,10 @@ function Block(protoblock, blocks, overrideName) {
                 case 'solfege':
                 case 'eastindiansolfege':
                     this.value = 'sol';
+                    break;
+                case 'customNote':
+                    var len = this.blocks.logo.synth.startingPitch.length;
+                    this.value = this.blocks.logo.synth.startingPitch.substring(0, len - 1);
                     break;
                 case 'notename':
                     this.value = 'G';
@@ -1664,6 +1668,33 @@ function Block(protoblock, blocks, overrideName) {
             if (this.piemenuOKtoLaunch()) {
                 this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
+        } else if (this.name === 'customNote') {
+            if (!this.blocks.logo.customTemperamentDefined) {
+                // If custom temperament is not defined by user, 
+                // then custom temperament is supposed to be equal temperament.
+                var obj = splitSolfege(this.value);
+                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+
+                if (this.piemenuOKtoLaunch()) {
+                    this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+                }
+            } else {
+                if (this.value != null) {
+                    var selectedNote = this.value;
+                } else {
+                    var selectedNote = TEMPERAMENT['custom']['0'][1];
+                }
+
+                var noteLabels = [];
+                var noteValues = [];
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        noteLabels.push(TEMPERAMENT['custom'][pitchNumber][1]);
+                        noteValues.push(TEMPERAMENT['custom'][pitchNumber][1]);
+                    }   
+                }
+                this._piemenuBasic(noteLabels, noteValues, selectednote);
+            }
         } else if (this.name === 'eastindiansolfege') {
             var obj = splitSolfege(this.value);
             var selectednote = obj[0];
@@ -1893,7 +1924,20 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
                     break;
                 case 'pitchnumber':
-                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    for (var i = 0; i < this.blocks.blockList.length; i++) {
+                        if (this.blocks.blockList[i].name == 'settemperament') {
+                            var index = this.blocks.blockList[i].connections[1];
+                            var temperament = this.blocks.blockList[index].value;
+                        }
+                    }
+                    if (temperament === undefined) {
+                        temperament = 'equal';
+                    }
+                    var pitchNumbers = [];
+                    for (var i = 0; i < TEMPERAMENT[temperament]['pitchNumber']; i++) {
+                        pitchNumbers.push(i);
+                    }
+                    this._piemenuNumber(pitchNumbers, this.value);
                     break;
                 case 'steppitch':
                     this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
@@ -1917,7 +1961,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                that._labelChanged(true);
+                that._labelChanged(true, true);
 
                 event.preventDefault();
 
@@ -1951,7 +1995,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label.addEventListener('keypress', __keypress);
 
             this.label.addEventListener('change', function () {
-                that._labelChanged(true);
+                that._labelChanged(true, true);
             });
 
             this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
@@ -3737,7 +3781,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.navItems[1].navigateFunction = __prepScale;
     };
 
-    this._labelChanged = function (closeInput) {
+    this._labelChanged = function (closeInput, change) {
         // Update the block values as they change in the DOM label.
         if (this === null || this.label === null) {
             this._labelLock = false;
@@ -3807,6 +3851,26 @@ function Block(protoblock, blocks, overrideName) {
                     this.label.value = newValue;
                     this.updateCache();
                 }
+                break;
+            case 'pitch':
+                // In case of custom temperament
+                var uniqueValue = this.blocks.findUniqueCustomName(newValue);
+                newValue = uniqueValue;
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        if (oldValue == TEMPERAMENT['custom'][pitchNumber][1]) {
+                         TEMPERAMENT['custom'][pitchNumber][1] = newValue;   
+                        }
+                    }   
+                }
+                this.value = newValue;
+                var label = this.value.toString();
+                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {  
+                    label = label.substr(0, STRINGLEN) + '...';
+                }
+                this.text.text = label;
+                this.label.value = newValue;
+                this.updateCache();
                 break;
             default:
                 break;

@@ -730,6 +730,94 @@ input.timbreName {
     height: 100% !important;
 }
 
+#temperamentDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#temperamentTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(204, 0, 102, 0) !important;
+    width: 560px;
+}
+
+#temperamentButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#temperamentOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y: auto;
+    overflow-x: none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#temperamentInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
+#graph {
+    overflow-y: scroll;
+    height: 340px;
+}
+
+#userEdit input {
+    height: 40px;
+    width: 40px; 
+    background: rgb(195, 116, 233);
+    border: 1px solid black;
+    text-align: center; 
+}
+
+.popup {
+    position: absolute;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: white;
+    height: 68px;
+    width: 160px;
+    border: 1px solid black;
+}
+
+.popup .popuptext {
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+}
+
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+}
+
 #download {
     position: absolute;
     top :100px;

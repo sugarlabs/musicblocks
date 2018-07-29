@@ -248,6 +248,7 @@ var urlsToCache = [
     'js/widgets/pitchtimematrix.js',
     'js/widgets/rhythmruler.js',
     'js/widgets/status.js',
+    'js/widgets/temperament.js',
     'js/widgets/tempo.js',
     'js/widgets/timbre.js',
 
