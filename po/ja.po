@@ -86,7 +86,7 @@ msgstr "休符"
 #: js/blocks.js:4182
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
-msgstr "動作"
+msgstr "アクション"
 
 #: js/block.js:692
 #: js/logo.js:1306
@@ -102,7 +102,7 @@ msgstr "スタート"
 
 #: js/block.js:695
 msgid "matrix"
-msgstr "ピッチ時刻行列"
+msgstr "音高・時刻行列"
 
 #: js/block.js:698
 #: js/basicblocks.js:837
@@ -603,7 +603,7 @@ msgstr "BPM(一分当たりの拍数)は最大　１０００　とします。"
 
 #: js/logo.js:3467
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "「ピッチ時刻行列」には、一つ以上のピッチブロックと一つ以上のドラムブロックが必要です。"
+msgstr "「音高・時刻行列」には、一つ以上のピッチブロックと一つ以上のドラムブロックが必要です。"
 
 #: js/logo.js:3504
 msgid "Attack value should be from 0 to 100."
@@ -4846,7 +4846,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/logo.js:4259
 
 #~msgid "Rhythm Block: Did you mean to use a Matrix block?"
-#~msgstr "リズムブロック：ピッチ時刻行列と一緒に使うつもりですか"
+#~msgstr "リズムブロック：音高・時刻行列と一緒に使うつもりですか"
 
 #: js/activity.js:2433
 
@@ -4950,7 +4950,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/logo.js:6125
 
 #~msgid "Tuplet Block: Did you mean to use a Matrix block?"
-#~msgstr "タプル・ブロック：ピッチ時刻行列のブロックを使うつもりですか？"
+#~msgstr "タプル・ブロック：音高・時刻行列のブロックを使うつもりですか？"
 
 #: js/logo.js:4898
 
