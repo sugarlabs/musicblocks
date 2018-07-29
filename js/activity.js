@@ -1516,7 +1516,9 @@ define(MYDEFINES, function (compatibility) {
 
             var __clearFunction = function () {
                 sendAllToTrash(true, false);
-                planet.initialiseNewProject.bind(planet);
+                if (planet !== undefined) {
+                    planet.initialiseNewProject.bind(planet);
+		}
             };
 
             clearBox = new ClearBox();
