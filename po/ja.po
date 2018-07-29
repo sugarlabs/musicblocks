@@ -585,7 +585,7 @@ msgstr "重複している音高は無視します"
 
 #: js/logo.js:3228
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "音高・時刻行列では、少なくとも一つの音高ブロックとドラムブロックを使う必要があります。"
+msgstr "「音高・時刻行列」には、一つ以上の音高ブロックと一つ以上のドラムブロックが必要です。"
 
 #: js/logo.js:3321
 #: js/logo.js:3343
@@ -603,7 +603,7 @@ msgstr "BPM(一分あたりの拍数)は最大1000とします。"
 
 #: js/logo.js:3467
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "「音高・時刻行列」には、一つ以上のピッチブロックと一つ以上のドラムブロックが必要です。"
+msgstr "「音高・時刻行列」には、一つ以上の音高ブロックと一つ以上のドラムブロックが必要です。"
 
 #: js/logo.js:3504
 msgid "Attack value should be from 0 to 100."
@@ -668,15 +668,15 @@ msgstr "ケースブロックはスイッチブロックの中にある必要が
 
 #: js/logo.js:3761
 msgid "The Scalar Step Block must be used inside of a Note Block."
-msgstr "音階的ステップ"
+msgstr "音階ステップブロックは音符ブロックの中にある必要があります。"
 
 #: js/logo.js:3914
 msgid "Drum Block: Did you mean to use a Note block?"
-msgstr "ドラムブロック：音符ブロックと一緒に使うつもりですか。"
+msgstr "ドラムブロック：音符ブロックと一緒に使いますか？"
 
 #: js/logo.js:4308
 msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr "ピッチブロック：音符ブロックと一緒に使うつもりですか。"
+msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
 
 #: js/logo.js:4340
 msgid "polyphonic rhythm"
@@ -693,15 +693,15 @@ msgstr "ー１は０の音価にします"
 
 #: js/logo.js:4913
 msgid "Vibrato intensity must be between 1 and 100."
-msgstr "ビブラートの強度の数価が０より100までの必要あります。"
+msgstr "ビブラートの「強度」は０と100の間である必要があります。"
 
 #: js/logo.js:4918
 msgid "Vibrato rate must be greater than 0."
-msgstr "ビブラートのレートの数価が０より大きい必要あります。"
+msgstr "ビブラートの「レート」数字は０より大きい必要があります。"
 
 #: js/logo.js:4950
 msgid "Distortion must be from 0 to 100."
-msgstr "ディストーションの数価が０より100までの必要あります。"
+msgstr "ディストーションの数字は０と100の間である必要があります。"
 
 #: js/logo.js:4980
 #: js/logo.js:5048
@@ -709,17 +709,17 @@ msgstr "ディストーションの数価が０より100までの必要ありま
 #.TRANS: Depth is the intesity of the chorus effect.
 ## http://jisho.org/word/%E5%A4%89%E5%9F%9F ; 変域＝へんいき
 msgid "Depth is out of range."
-msgstr "大きさが変域外です。"
+msgstr "（エフェクタの）深さの数字が変域外です。"
 
 #: js/logo.js:5084
 #.TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
-msgstr "倍音が０より大きい必要あります。"
+msgstr "倍音が０以上である必要があります。"
 
 #: js/logo.js:5134
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
-msgstr "倍音のウェートが０より大きくて、１より小さい必要があります。"
+msgstr "倍音のウェートは０と１の間である必要があります。"
 
 #: js/logo.js:5144
 #.TRANS: partials are weighted components in a harmonic series
@@ -772,24 +772,24 @@ msgstr "デフォルト"
 
 #: js/logo.js:6135
 msgid "Hertz Block: Did you mean to use a Note block?"
-msgstr "ハーツ・ブロック：音符ブロックを使うつもりですか？"
+msgstr "ヘルツ・ブロック：音符ブロックを使いますか？"
 
 #: js/logo.js:6708
 msgid "Playback is ready."
-msgstr "コンパイルが完了です。"
+msgstr "コンパイル完了"
 
 #: js/logo.js:6962
 #.TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
-msgstr "「倍音ウェート」ブロックの中に倍音ブロックが入っている必要があります。"
+msgstr "「倍音ウェート」ブロックの中に一つ以上の倍音ブロックが入っている必要があります。"
 
 #: js/logo.js:7093
 msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-msgstr "同じピッチの音符だけタイすることが可能です。"
+msgstr "同じ高さの音だけタイで繋げることが可能です。"
 
 #: js/logo.js:7526
 msgid "synth cannot play chords."
-msgstr "このシンセは和音ができません"
+msgstr "このシンセでは和音ができません"
 
 #: js/logo.js:9687
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
@@ -806,7 +806,7 @@ msgstr "ヒープを捨てる"
 #: js/logo.js:9806
 #: js/logo.js:9880
 msgid "You must use two pitch blocks when measuring an interval."
-msgstr "音程を計るため、二つのピッチのブロックを使う必要があります。"
+msgstr "音程を計るため、二つの音高のブロックを使う必要があります。"
 
 #: js/logo.js:10009
 #: js/basicblocks.js:257
@@ -1733,7 +1733,7 @@ msgstr "パレット・ボタン"
 #: js/turtledefs.js:87
 #.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
-msgstr "このツールバーはリズム、ピッチ、音色、動作、ネズミ、またその他のパレットボタンがあります。"
+msgstr "このツールバーはリズム、音高、音色、動作、ネズミ、またその他のパレットボタンがあります。"
 
 #: js/turtledefs.js:87
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
@@ -1959,7 +1959,7 @@ msgstr "ショートカット・キー"
 
 #: js/turtledefs.js:120
 msgid "You can type \"d\" to create a \"do\" block, \"r\" to create a \"re\" block, etc."
-msgstr "「d」を打つと「ド」のブロックが作られ、「r」を打つと「レ」のブロックが作られのようにそれぞれのピッチが出ます"
+msgstr "「d」を打つと「ド」のブロックが作られ、「r」を打つと「レ」のブロックが作られのようにそれぞれの音高が出ます"
 
 #: js/turtledefs.js:121
 msgid "Guide"
@@ -2084,13 +2084,13 @@ msgstr "音程の違い"
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr "ピッチ数字"
+msgstr "音高数字"
 
 #: js/basicblocks.js:177
 #.TRANS: MIDI is a technical standard for electronic music
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
-msgstr "ピッチ数字のゼロを設定"
+msgstr "音高数字のゼロを設定"
 
 #: js/basicblocks.js:178
 #: js/basicblocks.js:237
@@ -2117,7 +2117,7 @@ msgstr "オクターブ"
 #: js/basicblocks.js:190
 #.TRANS: convert piano key number (1-88) to pitch
 msgid "number to pitch"
-msgstr "数字をピッチに"
+msgstr "数字を音高に"
 
 #: js/basicblocks.js:199
 #.TRANS: convert piano key number (1-88) to octave
@@ -2226,7 +2226,7 @@ msgstr "音度"
 #: js/basicblocks.js:466
 #.TRANS: step some number of notes in current musical scale
 msgid "scalar step"
-msgstr "音階的のステップピッチ"
+msgstr "音階的のステップ音高"
 
 #: js/basicblocks.js:499
 #: js/timbre.js:611
@@ -2395,7 +2395,7 @@ msgstr "カスタム音階"
 #: js/basicblocks.js:767
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
-msgstr "ピッチ-ドラム・マッパー"
+msgstr "音高-ドラム・マッパー"
 
 #: js/basicblocks.js:776
 #.TRANS: widget to generate pitches using a slider
@@ -2405,7 +2405,7 @@ msgstr "調子スライダー"
 #: js/basicblocks.js:785
 #.TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
-msgstr "ピッチの階段"
+msgstr "音高の階段"
 
 #: js/basicblocks.js:794
 #: js/basicblocks.js:804
@@ -2423,9 +2423,9 @@ msgstr "C メジャー"
 
 #: js/basicblocks.js:829
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
-## ピッチと時刻のグラフ is about equally as good
+## 音高と時刻のグラフ is about equally as good
 msgid "pitch-time matrix"
-msgstr "ピッチ・タイム行列"
+msgstr "音高・タイム行列"
 
 #: js/basicblocks.js:856
 #.TRANS: factor used in determining how many duplications to make
@@ -3658,7 +3658,7 @@ msgstr "ネズミの演奏した音符"
 #.TRANS: convert current note for this turtle to piano key (1-88)
 ## Is there a Japanese technical word for "pitch number"; below is literal
 msgid "mouse pitch number"
-msgstr "ネズミのピッチ数字"
+msgstr "ネズミの音高数字"
 
 #: js/basicblocks.js:3778
 #: js/basicblocks.js:3788
@@ -4636,7 +4636,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/turtledefs.js:79
 
 #~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
-#~msgstr "このツールバーはリズム、ピッチ、音色、動作、ネズミ、その他のパレットボタンがあります。"
+#~msgstr "このツールバーはリズム、音高、音色、動作、ネズミ、その他のパレットボタンがあります。"
 
 #: js/basicblocks.js:893
 
@@ -4665,7 +4665,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:153
 
 #~msgid "consonant step up"
-#~msgstr "上がりのコンソナントのステップピッチ"
+#~msgstr "上がりのコンソナントのステップ音高"
 
 #~msgid "sing"
 #~msgstr "歌う"
@@ -4782,7 +4782,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "全音符"
 
 #~msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
-#~msgstr "このツールバーはリズム、ピッチ、音色、鼠動き、ウィジット、ネズミ、またその他のパレットボタンがあります。"
+#~msgstr "このツールバーはリズム、音高、音色、鼠動き、ウィジット、ネズミ、またその他のパレットボタンがあります。"
 
 #~msgid "Welcome to Turtle Blocks"
 #~msgstr "タートル・ブロックへようこそ"
@@ -4795,7 +4795,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:145
 
 #~msgid "consonant step down"
-#~msgstr "下がりのコンソナントのステップピッチ"
+#~msgstr "下がりのコンソナントのステップ音高"
 
 #: js/basicblocks.js:3142
 
@@ -4907,7 +4907,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/logo.js:3705
 
 #~msgid "The Step Pitch Block must be used inside of a Note Block."
-#~msgstr "ステップピッチブロックは音符ブロックの中にある必要があります。"
+#~msgstr "ステップ音高ブロックは音符ブロックの中にある必要があります。"
 
 #~msgid "begin hollow line"
 #~msgstr "真空の線を初め"
@@ -4962,7 +4962,7 @@ msgstr "ファイルを選ぶ必要があります"
 #: js/basicblocks.js:1299
 
 #~msgid "step pitch"
-#~msgstr "ステップピッチ"
+#~msgstr "ステップ音高"
 
 #~msgid "Long press on block(s) to copy. Click here to paste."
 #~msgstr "ブロックでマウスの長いクリック押しでコピー。ペーストをするためにここでクリック。"
@@ -4990,7 +4990,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "音符の音量"
 
 #~msgid "current pitch octave"
-#~msgstr "このピッチのオクターブ"
+#~msgstr "この音高のオクターブ"
 
 #~msgid "hours ago"
 #~msgstr "時間前"
@@ -5076,7 +5076,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "フィルド"
 
 #~msgid "current pitch name"
-#~msgstr "現在のピッチの音名"
+#~msgstr "現在の音高の音名"
 
 #~msgid "half note 𝅗𝅥"
 #~msgstr "4部音符"
