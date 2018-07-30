@@ -289,13 +289,14 @@ function Logo () {
     this.recording = false;
     this.lastNote = {};
     this.restartPlayback = true;
+
     //variables for progress bar
-    var progressBar = docById('myBar');
-    var width = 0;
-    var turtleLength = 0;
-    var inLoop = 0;
-    var progressBarDivision;
-    var temperamentSelected = [];
+    this.progressBar = docById('myBar');
+    this.progressBarWidth = 0;
+    this.progressBarDivision;
+
+    this.temperamentSelected = [];
+
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
     this._saveY = {};
@@ -346,15 +347,15 @@ function Logo () {
 
     this.setOptimize = function (state) {
         if (state) {
-	    this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
+            this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
             createjs.Ticker.setFPS(10);
 
-	} else {
-	    this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
+        } else {
+            this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
             createjs.Ticker.setFPS(30);
-	}
+        }
 
-	this.blinkState = !state;
+        this.blinkState = !state;
     };
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
@@ -7785,8 +7786,10 @@ function Logo () {
     };
 
     this.playback = function (whichMouse, recording) {
+        var that = this;
+
         if (this.restartPlayback) {
-            width = 0;
+            this.progressBarWidth = 0;
         }
 
         if (recording === undefined) {
@@ -7795,7 +7798,7 @@ function Logo () {
 
         this.recording = recording;
 
-        if (recording){
+        if (recording) {
             this.playbackTime = 0;
         }
 
@@ -7817,7 +7820,6 @@ function Logo () {
         // We need to sort the playback queue by time (as graphics
         // embedded in embedded notes can be out of order)
         if (this.turtles.turtleList.length > 0) {
-            var that = this;
             for (t in this.turtles.turtleList) {
                 if (t in this.playbackQueue) {
                     var playbackList = [];
@@ -7843,42 +7845,47 @@ function Logo () {
         var d = new Date();
         this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
 
-        var that = this;
         var l = 0;
-        if (width >= 100) {
-            width = 0;
+        if (this.progressBarWidth >= 100) {
+            this.progressBarWidth = 0;
         }
 
         for (var turtle in this.playbackQueue) {  // For multiple voices
             l += this.playbackQueue[turtle].length;
         }
 
-        if (t in that.playbackQueue && l > 0) {
-            progressBarDivision = 100 / (that.playbackQueue[t].length);
+        if (t in this.playbackQueue && l > 0) {
+            this.progressBarDivision = 100 / (this.playbackQueue[t].length);
         } else {
             // nothing to do...
-            progressBarDivision = 100;
+            this.progressBarDivision = 100;
         }
 
-        turtleLength = 0;
-        inLoop = 0;
+        var turtleCount = 0;
+        var inLoop = 0;
 
         __playbackLoop = function (turtle, idx) {
             inLoop++;
             that.playbackTime = that.playbackQueue[turtle][idx][0];
-            width = width + (progressBarDivision/turtleLength)
 
-            if (inLoop == l || width > 100) {
-                width = 100;
+            if (turtleCount === 0) {
+                //Not sure if that happens...but just in case
+                turtleCount = 1;
             }
 
-            if (width == NaN) {
-                //Not sure if this happens...but just in case
-                progressBar.style.visibility = 'hidden';
+            that.progressBarWidth = that.progressBarWidth + (that.progressBarDivision / turtleCount)
+
+            if (inLoop === l || that.progressBarWidth > 100) {
+                that.progressBarWidth = 100;
             }
 
-            progressBar.style.width = width + '%';
-            progressBar.innerHTML = parseInt(width * 1)  + '%';
+            if (that.progressBarWidth === NaN) {
+                //Not sure if that happens...but just in case
+                that.progressBar.style.visibility = 'hidden';
+            }
+
+            that.progressBar.style.width = that.progressBarWidth + '%';
+            that.progressBar.innerHTML = parseInt(that.progressBarWidth * 1)  + '%';
 
             if (!that.stopTurtle) {
                 switch(that.playbackQueue[turtle][idx][1]) {
@@ -7902,9 +7909,9 @@ function Logo () {
                     break;
                 case 'notes':
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-			if (that.blinkState) {
+                        if (that.blinkState) {
                             that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
-			}
+                        }
 
                         that.lastNote[turtle] = that.playbackQueue[turtle][idx][3];
                         that.synth.trigger(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
@@ -8036,14 +8043,14 @@ function Logo () {
         };
 
         __playback = function (turtle) {
-            turtleLength++;
+            turtleCount++;
             setTimeout(function () {
                 __playbackLoop(turtle, 0);
             }, that.playbackQueue[turtle][0][0] * 1000);
         };
 
         __resumePlayback = function (turtle) {
-            turtleLength++;
+            turtleCount++;
             for (var idx = 0; idx < that.playbackQueue[turtle].length; idx++) {
                 if (that.playbackQueue[turtle][idx][0] >= that.playbackTime) {
                     break;
@@ -8064,7 +8071,7 @@ function Logo () {
         this.onRunTurtle();
         this.stopTurtle = false;
 
-        if (recording){
+        if (recording) {
             this.synth.recorder.clear();
             this.synth.recorder.record();
         }
@@ -8370,7 +8377,7 @@ function Logo () {
             stepTime = 0;
         }
 
-	// We do each graphics action sequentially, so we need to
+        // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
         // array.
         if (extendedGraphicsCounter > 0) {
