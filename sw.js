@@ -26,6 +26,7 @@ var urlsToCache = [
     'header-icons/down.svg',
     'header-icons/edit.svg',
     'header-icons/effects.svg',
+    'header-icons/new-button.svg',
     'header-icons/new-project-button.svg',
     'header-icons/envelope.svg',
     'header-icons/erase-button.svg',

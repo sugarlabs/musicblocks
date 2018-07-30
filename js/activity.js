@@ -3627,7 +3627,7 @@ handleComplete);
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['new-project', _deleteBlocksBox, _('New Project'), null, null, null, null],
+                    ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
                     ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
                 ];
             } else {
@@ -3639,7 +3639,7 @@ handleComplete);
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['new-project', _deleteBlocksBox, _('Delete all'), null, null, null, null],
+                    ['new', _deleteBlocksBox, _('Delete all'), null, null, null, null],
                     ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
                 ];
             }
@@ -3687,7 +3687,7 @@ handleComplete);
                     saveButton = container;
                 } else if (menuNames[i][0] === 'compile') {
                     playbackButton = container;
-                } else if (menuNames[i][0] === 'new-project') {
+                } else if (menuNames[i][0] === 'new') {
                     deleteAllButton = container;
                 }
 
