@@ -2567,7 +2567,7 @@ define(MYDEFINES, function (compatibility) {
 
             var smallSide = Math.min(w, h);
 
-            if (smallSide < cellSize * 11) {
+            if (smallSide < cellSize * 9) {
                 var mobileSize = true;
                 if (w < cellSize * 10) {
                     turtleBlocksScale = smallSide / (cellSize * 11);
