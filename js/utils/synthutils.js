@@ -85,7 +85,7 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('finger-cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
-    [_('chime'), 'chine', 'images/chine.svg', 'cymca', 'bell'],
+    [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
     //.TRANS: sound effect
     [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
@@ -117,7 +117,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/hihat", "samples/splash", "samples/bubbles", "samples/cowbell",
     "samples/dog", "samples/kick", "samples/tom", "samples/cat",
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
-    "samples/chine", "samples/cricket", "samples/fingercymbal",
+    "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare"
 ]
@@ -326,7 +326,7 @@ function Synth() {
                 {'name': 'duck', 'data': DUCK_SAMPLE},
                 {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
                 {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
-                {'name': 'chine', 'data': CHINE_SAMPLE},
+                {'name': 'chime', 'data': CHIME_SAMPLE},
                 {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},

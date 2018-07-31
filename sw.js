@@ -135,7 +135,7 @@ var urlsToCache = [
     'images/camera.svg',
     'images/Cartesian.svg',
     'images/cat.svg',
-    'images/chine.svg',
+    'images/chime.svg',
     'images/clang.svg',
     'images/clap.svg',
     'images/close.svg',
