@@ -132,6 +132,9 @@ function Logo () {
     this.playbackQueue = {};
     this.playbackTime = 0;
 
+    // Optimize for runtime speed
+    this.optimize = false;
+
     // Widget-related attributes
     this.showPitchDrumMatrix = false;
     this.inPitchDrumMatrix = false;
@@ -349,10 +352,11 @@ function Logo () {
         if (state) {
             this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
             createjs.Ticker.framerate = 10;
-
+            this.optimize = true;
         } else {
             this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
             createjs.Ticker.framerate = 30;
+            this.optimize = false;
         }
 
         this.blinkState = !state;
@@ -7780,7 +7784,8 @@ function Logo () {
     };
 
     this._playbackPush = function (turtle, obj) {
-        if (_THIS_IS_MUSIC_BLOCKS_) {
+        // Don't record in optimize mode or Turtle Blocks.
+        if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
             this.playbackQueue[turtle].push(obj);
         }
     };
