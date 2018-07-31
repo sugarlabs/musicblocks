@@ -33,19 +33,19 @@ var VOICENAMES = [
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-1'), 'mono1', 'images/synth.svg', 'electronic'],
+    [_('simple 1'), 'mono1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-2'), 'mono2', 'images/synth.svg', 'electronic'],
+    // [_('simple-2'), 'mono2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-3'), 'mono3', 'images/synth.svg', 'electronic'],
+    // [_('simple-3'), 'mono3', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple-4'), 'mono4', 'images/synth.svg', 'electronic'],
+    // [_('simple-4'), 'mono4', 'images/synth.svg', 'electronic'],
     //.TRANS: white noise synthesizer
-    [_('white-noise'), 'noise1', 'images/synth.svg', 'electronic'],
+    [_('white noise'), 'noise1', 'images/synth.svg', 'electronic'],
     //.TRANS: brown noise synthesizer
-    [_('brown-noise'), 'noise2', 'images/synth.svg', 'electronic'],
+    [_('brown noise'), 'noise2', 'images/synth.svg', 'electronic'],
     //.TRANS: pink noise synthesizer
-    [_('pink-noise'), 'noise3', 'images/synth.svg', 'electronic'],
+    [_('pink noise'), 'noise3', 'images/synth.svg', 'electronic'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg', 'electronic'],
     //.TRANS: square wave
