@@ -865,22 +865,29 @@ function Turtle (name, turtles, drum) {
     };
 
     this.doShowText = function(size, myText) {
-        // Add a text or image object to the canvas
+        // Add a text object to the canvas
+        if (typeof(myText) !== 'string') {
+            var textList = [myText.toString()];
+        } else {
+            var textList = myText.split('\\n');
+        }
 
         var textSize = size.toString() + 'px ' + this.font;
-        var text = new createjs.Text(myText.toString(), textSize, this.canvasColor);
-        text.textAlign = 'left';
-        text.textBaseline = 'alphabetic';
-        this.turtles.stage.addChild(text);
-        this.media.push(text);
-        text.x = this.container.x;
-        text.y = this.container.y;
-        text.rotation = this.orientation;
-        var xScaled = text.x * this.turtles.scale;
-        var yScaled = text.y * this.turtles.scale;
-        var sizeScaled = size * this.turtles.scale;
-        this.svgOutput += '<text x="' + xScaled + '" y = "' + yScaled + '" fill="' + this.canvasColor + '" font-family = "' + this.font + '" font-size = "' + sizeScaled + '">' + myText + '</text>';
-        this.turtles.refreshCanvas();
+        for (i = 0; i < textList.length; i++) {
+            var text = new createjs.Text(textList[i], textSize, this.canvasColor);
+            text.textAlign = 'left';
+            text.textBaseline = 'alphabetic';
+            this.turtles.stage.addChild(text);
+            this.media.push(text);
+            text.x = this.container.x;
+            text.y = this.container.y + i * size;
+            text.rotation = this.orientation;
+            var xScaled = text.x * this.turtles.scale;
+            var yScaled = text.y * this.turtles.scale;
+            var sizeScaled = size * this.turtles.scale;
+            this.svgOutput += '<text x="' + xScaled + '" y = "' + yScaled + '" fill="' + this.canvasColor + '" font-family = "' + this.font + '" font-size = "' + sizeScaled + '">' + myText + '</text>';
+            this.turtles.refreshCanvas();
+        }
     };
 
     this.doRight = function(degrees) {
