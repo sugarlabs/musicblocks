@@ -551,11 +551,11 @@ msgstr "選ばれた音名が適切ではありません。"
 
 #: js/logo.js:350
 msgid "Turning off mouse blink; setting FPS to 10."
-msgstr ""
+msgstr "ネズミの点滅をオフにされ、FPSを１０にされている"
 
 #: js/logo.js:354
 msgid "Turning on mouse blink; setting FPS to 30."
-msgstr ""
+msgstr "ネズミの点滅をオンにされ、FPSを３０にされている；"
 
 #: js/logo.js:1501
 #: js/logo-test.js:1484
@@ -1041,7 +1041,7 @@ msgstr "音名"
 
 #: js/palette.js:743
 msgid "temperament"
-msgstr ""
+msgstr "音律"
 
 #: js/palette.js:747
 #: js/basicblocks.js:407
@@ -2061,7 +2061,7 @@ msgstr "再生された音符の数"
 #: js/basicblocks.js:1130
 #.TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
-msgstr ""
+msgstr "音高をヘルツにする"
 
 #: js/basicblocks.js:1138
 #.TRANS: don't lock notes to master clock
@@ -2305,7 +2305,7 @@ msgstr "音色の設定"
 
 #: js/basicblocks.js:1514
 msgid "set temperament"
-msgstr ""
+msgstr "音律を設定"
 
 #: js/basicblocks.js:1539
 msgid "doubly"
@@ -3341,11 +3341,11 @@ msgstr "ネズミを同期させる"
 
 #: js/basicblocks.js:3829
 msgid "found mouse"
-msgstr ""
+msgstr "ネズミを見つけた"
 
 #: js/basicblocks.js:3839
 msgid "new mouse"
-msgstr ""
+msgstr "新しいネズミ"
 
 #: js/basicblocks.js:3848
 msgid "mouse name"
@@ -3405,11 +3405,11 @@ msgstr "クレッシェンド"
 
 #: js/utilitybox.js:112
 msgid "Optimize performance"
-msgstr ""
+msgstr "パーフォマンスを最大限にする"
 
 #: js/utilitybox.js:113
 msgid "Optimize feedback"
-msgstr ""
+msgstr "フィードバックを最大限にする"
 
 #: js/utilitybox.js:154
 msgid "Cannot be further decreased"
@@ -3586,7 +3586,7 @@ msgstr "スタックを保存"
 
 #: js/blocks.js:1156
 msgid "Consider breaking this stack into parts."
-msgstr ""
+msgstr "この長いスタックを別々のスタックにしたほうがいい"
 
 #: js/blocks.js:3131
 #: js/blocks.js:3157
@@ -3621,7 +3621,7 @@ msgstr "プレイバック用の音楽を準備（コンパイル）します"
 
 #: js/logo-test.js:9708
 msgid "Cannot read pixel color"
-msgstr ""
+msgstr "ピクセルの色が読めません"
 
 #: js/languagebox.js:57
 ## Check
@@ -3863,17 +3863,17 @@ msgstr "ピンクノイズ"
 #: js/synthutils.js:66
 #.TRANS: musical instrument
 msgid "snare-drum"
-msgstr ""
+msgstr "スネアドラム"
 
 #: js/synthutils.js:68
 #.TRANS: musical instrument
 msgid "kick-drum"
-msgstr ""
+msgstr "キックドラム"
 
 #: js/synthutils.js:70
 #.TRANS: musical instrument
 msgid "tom-tom"
-msgstr ""
+msgstr "タムタム"
 
 #: js/synthutils.js:72
 #.TRANS: musical instrument
@@ -3883,32 +3883,32 @@ msgstr "フロアタムタム"
 #: js/synthutils.js:74
 #.TRANS: a drum made from an inverted cup
 msgid "cup-drum"
-msgstr ""
+msgstr "カップドラム"
 
 #: js/synthutils.js:76
 #.TRANS: musical instrument
 msgid "darbuka-drum"
-msgstr ""
+msgstr "ダラブッカ"
 
 #: js/synthutils.js:78
 #.TRANS: musical instrument
 msgid "hi-hat"
-msgstr ""
+msgstr "ハイハット"
 
 #: js/synthutils.js:80
 #.TRANS: a small metal bell
 msgid "ride-bell"
-msgstr ""
+msgstr "ライド"
 
 #: js/synthutils.js:82
 #.TRANS: musical instrument
 msgid "cow-bell"
-msgstr ""
+msgstr "カウベル"
 
 #: js/synthutils.js:84
 #.TRANS: musical instrument
 msgid "triangle-bell"
-msgstr ""
+msgstr "トライアングル"
 
 #: js/synthutils.js:86
 #.TRANS: musical instrument
@@ -4161,26 +4161,26 @@ msgstr "フロアタム"
 #: js/musicutils.js:453
 #.TRANS: musical temperament
 msgid "equal"
-msgstr ""
+msgstr "平均律"
 
 #: js/musicutils.js:285
 #: js/musicutils.js:455
 #.TRANS: musical temperament
 msgid "Pythagorean"
-msgstr ""
+msgstr "ピタゴラス音律 "
 
 #: js/musicutils.js:287
 #: js/musicutils.js:454
 #.TRANS: musical temperament
 msgid "just intonation"
-msgstr ""
+msgstr "純正律"
 
 #: js/musicutils.js:289
 #: js/musicutils.js:456
 #: js/musicutils.js:457
 #.TRANS: musical temperament
 msgid "meantone"
-msgstr ""
+msgstr "中全音律"
 
 #: js/musicutils.js:1709
 #: js/musicutils.js:1743
