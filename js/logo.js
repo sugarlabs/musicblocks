@@ -300,6 +300,7 @@ function Logo () {
     this.progressBarDivision;
 
     this.temperamentSelected = [];
+    this.customTemperamentDefined = false;
 
     // A place to save turtle state in order to store it after a compile
     this._saveX = {};
