@@ -1599,7 +1599,7 @@ msgstr "音高の数字を初期化"
 #: js/basicblocks.js:3740
 #: js/blocks.js:2817
 msgid "name"
-msgstr "音名"
+msgstr "名前"
 
 #: js/basicblocks.js:178
 #: js/basicblocks.js:237
@@ -3241,7 +3241,7 @@ msgstr "ミュージック・ブロックス"
 
 #: js/basicblocks.js:3592
 msgid "print"
-msgstr "印刷" #This is like "print a piece of paper"
+msgstr "表示" 
 
 #: js/basicblocks.js:3611
 ## 音量＝おんりょう
