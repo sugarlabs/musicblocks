@@ -13,13 +13,18 @@ var afaf = [];
 var bfbf = [];
 
 function MusicKeyboard() {
+    var synth = new Tone.Synth().toMaster();
+
     const BUTTONDIVWIDTH = 295;  // 5 buttons
     const DRUMNAMEWIDTH = 50;
     const OUTERWINDOWWIDTH = 128;
     const INNERWINDOWWIDTH = 50;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    
+
+    this._rowBlocks1 = [];
+    this.rowLabels1 = [];
+    this.rowArgs1 = [];
 
     var keyboard = document.getElementById("keyboard");
     var keyboardHolder = document.getElementById("keyboardHolder");
@@ -40,19 +45,45 @@ function MusicKeyboard() {
     var customKeyboard = 0;
     var standardKeyboard = 0;
 
-    this._rowBlocks1 = [];
-    this.rowLabels1 = [];
-    this.rowArgs1 = [];
+    
     //configure defaults
 
 
     
 
     this.init = function(logo) {
-        // Initializes the pitch/drum matrix. First removes the
-        // previous matrix and them make another one in DOM (document
-        // object model)
+        console.log("INside init");
         this._logo = logo; 
+
+        var w = window.innerWidth;
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
+
+        var canvas = docById('myCanvas');
+
+        // Position the widget and make it visible.
+        var mkbDiv = docById('mkbDiv');
+        mkbDiv.style.visibility = 'visible';
+        mkbDiv.setAttribute('draggable', 'true');
+        mkbDiv.style.left = '200px';
+        mkbDiv.style.top = '150px';
+
+    
+
+
+        // The mkb buttons
+        var mkbButtonsDiv = docById('mkbButtonsDiv');
+        mkbButtonsDiv.style.display = 'inline';
+        mkbButtonsDiv.style.visibility = 'visible';
+        mkbButtonsDiv.style.width = BUTTONDIVWIDTH;
+        mkbButtonsDiv.innerHTML = '<table cellpadding="0px" id="mkbButtonTable"></table>';
+
+        var buttonTable1 = docById('mkbButtonTable');           //doubt
+        var header1 = buttonTable1.createTHead();
+        var row1 = header1.insertRow(0);
+
+        // For the button callbacks
+        var that = this;
         
         if(this.rowLabels1.length == 0){
             document.getElementById("keyboardHolder").style.display = "block";
@@ -109,33 +140,7 @@ function MusicKeyboard() {
                 }
             }
 
-            // for(var p = 0; p<this.rowLabels1.length;p++){
-            //     if(this.rowLabels1[p][1] == '♯' || this.rowLabels1[p][2] == '♯'){
-            //         var parenttbl2 = document.getElementById("myrow2");
-            //         var newel2 = document.createElement('td');
-            //         var elementid2 = document.getElementsByTagName("td").length
-            //         idContainer2.push(elementid2);
-            //         newel2.setAttribute('id',elementid);
-            //         newel2.innerHTML = this.rowLabels1[p] + this.rowArgs1[p];
-            //         parenttbl2.appendChild(newel2);
-            //     }
-            // }
-
-
-
-            // var caremn = [440, 493, 554, 587, 659, 739, 830, 880];
-            // console.log( "Converted note \x5BMini\x5D");
-            // console.log("B "+this.rowLabels1[0]);
-            // console.log("C "+this.rowArgs1[0]);
-            //       // console.log("D "+document.getElementById(this.rowLabels1[0]+this.rowArgs1[0]).id);
-            // console.log("E "+document.getElementById(this.rowLabels1[1]+this.rowArgs1[1]));
-            //       //  console.log("F " +noteConversion2['do']);
-            //       //    console.log("G " +getTheValues("do4");
-            //       //  console.log("H " +noteConversion2['sol']);
-            // var yy = caremn[6];
-            // console.log(yy);
-            // console.log(idContainer);
-            // newel.onclick = function(){synth.triggerAttackRelease(yy, '8n')};
+            
 
 
 
@@ -157,6 +162,7 @@ function MusicKeyboard() {
                 var temp2 = noteConversion2[temp1]+bfbf[0];
                 console.log("onkeypress " +temp2) ;
                 selected1.push(temp2);
+
                 if(afaf[0] == "do" & bfbf[0] == 1){
                     synth.triggerAttackRelease('C1', '8n');
                 } if(afaf[0] == "do" & bfbf[0] == 2){
@@ -409,6 +415,8 @@ function MusicKeyboard() {
                     synth.triggerAttackRelease('B#8', '8n');
                 }
             };
+
+
 
             if(idContainer.length > 1){
 
@@ -2702,35 +2710,7 @@ function MusicKeyboard() {
 
         
 
-        var w = window.innerWidth;
-        this._cellScale = w / 1200;
-        var iconSize = ICONSIZE * this._cellScale;
-
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var mkbDiv = docById('mkbDiv');
-        mkbDiv.style.visibility = 'visible';
-        mkbDiv.setAttribute('draggable', 'true');
-        mkbDiv.style.left = '200px';
-        mkbDiv.style.top = '150px';
-
-    
-
-
-        // The mkb buttons
-        var mkbButtonsDiv = docById('mkbButtonsDiv');
-        mkbButtonsDiv.style.display = 'inline';
-        mkbButtonsDiv.style.visibility = 'visible';
-        mkbButtonsDiv.style.width = BUTTONDIVWIDTH;
-        mkbButtonsDiv.innerHTML = '<table cellpadding="0px" id="mkbButtonTable"></table>';
-
-        var buttonTable1 = docById('mkbButtonTable');           //doubt
-        var header1 = buttonTable1.createTHead();
-        var row1 = header1.insertRow(0);
-
-        // For the button callbacks
-        var that = this;
+        
 
         var cell1 = this._addButton(row1, 'play-button.svg', ICONSIZE, _('play'));
 
@@ -2742,12 +2722,17 @@ function MusicKeyboard() {
         var cell1 = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('save'));
 
         cell1.onclick=function() {
-            if(standardKeyboard == 1){
-                that._save1(selected);    
-            } else if(customKeyboard == 1){
+            // if(standardKeyboard == 1){
+            //     that._save1(selected);    
+            // } else if(customKeyboard == 1){
+            //     that._save1(selected1);
+            // }
+
+            if(selected.length > 0){
+                that._save1(selected);
+            } else {
                 that._save1(selected1);
             }
-            console.log("Selected " +selected);
       //      handleKeyboardPitches (selected);
         }
 
@@ -2846,6 +2831,7 @@ function MusicKeyboard() {
     changeKeys();
 
     function changeKeys() {
+        console.log("INside changeKeys");
         whiteKeys.innerHTML = "";
         blackKeys.innerHTML = "";
         var note1 = firstNote.value;
@@ -2920,10 +2906,10 @@ function MusicKeyboard() {
         for(var i = 0; i < blackKeys.children.length; i++) {
             blackKeys.children[i].id = blackKeys.children[i].textContent;
         }
-        console.log('HHHiii ' +note1+oct1+"-"+note2+oct2);
     }
 
     keyboard.addEventListener("mousedown", function (e) {
+        console.log("INside mousedown");
         var target = e.target;
         if(target.tagName == "TD") {
             if((target.style.backgroundColor != "lightgrey") && (target.style.backgroundColor != "rgb(72,72,72)")) {
@@ -2940,6 +2926,7 @@ function MusicKeyboard() {
     });
 
     keyboard.addEventListener("mouseup", function (f) {
+        console.log("INside mouseup");
         var target = f.target;
         if(target.tagName == "TD") {   
                 if(target.parentNode == whiteKeys) {
@@ -2953,6 +2940,7 @@ function MusicKeyboard() {
     });
 
     function deselect () {
+        console.log("INside deselect");
         for(var i = 0; i < selected.length; i++) {
             var tmp = document.getElementById(selected[i]);
             if (tmp.parentElement == whiteKeys) {
@@ -2968,6 +2956,7 @@ function MusicKeyboard() {
     var keyboardShown = true;
 
     function toggleKeyboard() {
+        console.log("INside togglekeyboard");
         if(keyboardShown) {
             keyboardHolder.style.display = 'none';
         }
@@ -2979,6 +2968,7 @@ function MusicKeyboard() {
     }
 
     function handleKeyboard (key) {
+        console.log("INside handleKeyboard");
         //Tone can't do special sharps, need # isntead of ♯
         var noSharp = key;
         if(key[1] == "♯") {
@@ -2988,7 +2978,7 @@ function MusicKeyboard() {
     }   
 
     this._save1 = function(pitches){
-
+        console.log("INside save1");
         console.log("generating keyboard pitches for: " + pitches);
         var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk"}], 0, 0, [0]]];
@@ -3036,16 +3026,19 @@ function MusicKeyboard() {
     }
 
     this.clearBlocks = function() {
-        this._rowBlocks1 = [];
-        this._colBlocks1 = [];
+        console.log("INside clearblocks");
+              this._rowBlocks1 = [];
+              this._colBlocks1 = [];
 
     };
 
     this.addRowBlock = function(pitchBlock) {
+        console.log("INside addRowBlock");
         this._rowBlocks1.push(pitchBlock);
     };
 
     this._addButton = function(row, icon, iconSize, label) {
+        console.log("INside addbutton");
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         cell.style.width = BUTTONSIZE + 'px';
@@ -3067,7 +3060,7 @@ function MusicKeyboard() {
         return cell;
     };
      
-    var synth = new Tone.Synth().toMaster();
+
     
 }
 

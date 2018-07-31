@@ -3223,13 +3223,15 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'musickeyboard':
-        	childFlow = args[0];
-            childFlowCount = 1;
+        	if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
 
-            if (that.musicKeyboard == null) {
+          	if (that.musicKeyboard == null) {
                 that.musicKeyboard = new MusicKeyboard();
             }
-            
+
             that.inMusicKeyboard = true;
             that.musicKeyboard.rowLabels1 = [];
             that.musicKeyboard.rowArgs1 = [];
@@ -3956,7 +3958,7 @@ function Logo () {
                     that.crescendoInitialVolume[turtle][drumname] = [DEFAULTVOLUME];
                 }
             } else {
-                that.errorMsg(_('Drum Block: Did you mean to use a Note block?'), blk);
+                that.errorMsg(_('Drum Block: Did you mean to use a Note block1?'), blk);
                 break;
             }
 
@@ -4143,45 +4145,9 @@ function Logo () {
                 } else if (that.lastPitch[turtle].length < n) {
                     that.lastPitch[turtle].push(pitchNumber);
                 }
-            } else if (that.inMusicKeyboard) {
-            	if (note.toLowerCase() !== 'rest') {
-                    that.musicKeyboard.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                }
-
-                if (!(that.invertList[turtle].length === 0)) {
-                    delta += that._calculateInvert(turtle, note, octave);
-                }
-
-                if (that.duplicateFactor[turtle].length > 0) {
-                    var duplicateFactor = that.duplicateFactor[turtle];
-                } else {
-                    var duplicateFactor = 1;
-                }
-
-                for (var i = 0; i < duplicateFactor; i++) {
-                    // Apply transpositions
-                    var transposition = 2 * delta;
-                    if (turtle in that.transposition) {
-                        transposition += that.transposition[turtle];
-                    }
-
-                    var nnote = getNote(note, octave, transposition, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
-                    if (noteIsSolfege(note)) {
-                        nnote[0] = getSolfege(nnote[0]);
-                    }
-
-                    if (that.drumStyle[turtle].length > 0) {
-                        console.log('IInside If');
-                    } else {
-                    	
-                        that.musicKeyboard.rowLabels1.push(nnote[0]);
-                        that.musicKeyboard.rowArgs1.push(nnote[1]);
-                    }
-                }
-            } else if (that.inPitchDrumMatrix) {
+            }
+           
+            else if (that.inPitchDrumMatrix) {
                 if (note.toLowerCase() !== 'rest') {
                     that.pitchDrumMatrix.addRowBlock(blk);
                     if (that.pitchBlocks.indexOf(blk) === -1) {
@@ -4349,7 +4315,49 @@ function Logo () {
                 }
 
                 that.pitchStaircase.stairPitchBlocks.push(blk);
-            } else {
+            } 
+
+            else if (that.inMusicKeyboard) {
+            	if (note.toLowerCase() !== 'rest') {
+                    that.musicKeyboard.addRowBlock(blk);
+                    if (that.pitchBlocks.indexOf(blk) === -1) {
+                        that.pitchBlocks.push(blk);
+                    }
+                }
+
+                if (!(that.invertList[turtle].length === 0)) {
+                    delta += that._calculateInvert(turtle, note, octave);
+                }
+
+                if (that.duplicateFactor[turtle].length > 0) {
+                    var duplicateFactor = that.duplicateFactor[turtle];
+                } else {
+                    var duplicateFactor = 1;
+                }
+
+                for (var i = 0; i < duplicateFactor; i++) {
+                    // Apply transpositions
+                    var transposition = 2 * delta;
+                    if (turtle in that.transposition) {
+                        transposition += that.transposition[turtle];
+                    }
+
+                    var nnote = getNote(note, octave, transposition, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    if (noteIsSolfege(note)) {
+                        nnote[0] = getSolfege(nnote[0]);
+                    }
+
+                    if (that.drumStyle[turtle].length > 0) {
+                        console.log('IInside If');
+                    } else {
+                    	
+                        that.musicKeyboard.rowLabels1.push(nnote[0]);
+                        that.musicKeyboard.rowArgs1.push(nnote[1]);
+                    }
+                }
+           	}
+
+            else {
                 if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
                     // Play a stand-alone pitch block as a quarter note.
                     that.clearNoteParams(turtle, blk, []);
@@ -4388,7 +4396,7 @@ function Logo () {
 
                     that._processNote(noteBeatValue, blk, turtle, __callback);
                 } else {
-                    that.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
+                    that.errorMsg(_('Pitch Block: Did you mean to use a Note block2?'), blk);
                 }
             }
             break;
@@ -6229,10 +6237,12 @@ function Logo () {
                 that.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (that.inPitchSlider) {
                 that.pitchSlider.Sliders.push([args[0], 0, 0]);
-            } else if (that.inMusicKeyboard) {
-                that.musicKeyboard.Sliders.push([args[0], 0, 0]);
-            } else {
-                that.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
+            } 
+            // else if (that.inMusicKeyboard) {
+            //     that.musicKeyboard.Sliders.push([args[0], 0, 0]);
+            // }
+             else {
+                that.errorMsg(_('Hertz Block: Did you mean to use a Note block3?'), blk);
             }
             break;
             // deprecated
@@ -6252,9 +6262,11 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inPitchSlider) {
                     that.pitchSlider.Sliders.push([args[0], 0, 0]);
-                } else if (that.inMusicKeyboard) {
+                } 
+                else if (that.inMusicKeyboard) {
                     that.musicKeyboard.Sliders.push([args[0], 0, 0]);
-                } else {
+                } 
+                else {
                     that.oscList[turtle][last(that.inNoteBlock[turtle])].push(that.blocks.blockList[blk].name);
 
                     // We keep track of pitch and octave for notation purposes.
