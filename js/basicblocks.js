@@ -3338,7 +3338,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     ifthenelseBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['ifthenelse'] = ifthenelseBlock;
     ifthenelseBlock.staticLabels.push(_('if'), _('then'), _('else'));
-    // ifthenelseBlock.extraWidth = 15;
+    ifthenelseBlock.extraWidth = 15;
     ifthenelseBlock.adjustWidthToLabel();
     ifthenelseBlock.doubleFlowClampBooleanArgBlock();
 

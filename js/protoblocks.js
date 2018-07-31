@@ -605,7 +605,8 @@ function ProtoBlock(name) {
         return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     };
 
-    // E.g., tuplet, which takes two args plus an interior flow. There is a flow above and below.
+    // E.g., tuplet, which takes two args plus an interior flow.
+    // There is a flow above and below.
     this.flowClampTwoArgBlock = function () {
         this.style = 'clamp';
         this.expandable = true;

@@ -924,6 +924,7 @@ function SVG() {
 
         for (var clamp = 0; clamp < this._clampCount; clamp++) {
             if (clamp > 0) {
+                svg += this._rLineTo(this._expandX, 0);
                 svg += this._rLineTo(0, 3 * this._padding);
             }
             svg += this._corner(-1, 1, 90, 0, 1, true, true, false);
@@ -948,7 +949,7 @@ function SVG() {
             svg += this._rLineTo(this._radius, 0);
         }
 
-	if (this._clampCount > 0) {
+        if (this._clampCount > 0) {
             svg += this._rLineTo(0, this._innieY1 * 2);
             // Add a bit of padding to make multiple of standard block height.
             svg += this._rLineTo(0, this._innieY1 + 3 * this._strokeWidth);
