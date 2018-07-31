@@ -1397,13 +1397,21 @@ In the above example, selected temperament is *Just Intonation*. Notes within an
 
 The information regarding any note can be viewed by clicking on the respective circle. In the above example, circle (pitch number) `2` is `D4`. The frequency of note can be changed through edit button (left hand side corner of note information popup).
 
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament3.svg "the Temperament widget")
+
+Information regarding notes can also be viewed in the form of a *table* as shown in the above example. The table will show all the information about pitches that lie within an octave. This information includes *pitch number*, *interval*, *ratio*, *note*, *frequency* and *mode*.
+
+Frequency of any note is given by `Starting Pitch Frequency` * `Ratio`.
+
+The widget controls are as follows:
+
 *Clear* button at the bottom of the widget will clear all pitches except for a single `0` from which the user may add pitches.
 
 *Play all* button will play through all the pitches in an octave and then it will play backwards down the pitches.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament3.svg "the Temperament widget")
+*Save* button will save custom temperament for use in program. It will create a *set temperament* block. This block will tune the notes attached to it according to the selected temperament. 
 
-Information regarding notes can also be viewed in the form of a table as shown in the above example. The table will show all the information about pitches that lie within an octave. This information includes *pitch number*, *interval*, *ratio*, *note*, *frequency* and *mode*.
+*Table* button is used to toggle between circular and tabular representation of notes.
 
 *Add* button is used to edit notes through different tools:
 
@@ -1422,7 +1430,11 @@ Information regarding notes can also be viewed in the form of a table as shown i
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4.svg "Octave Space Edit tool")
 
-`Octave Space` edit tool is used to edit octave ratio. Standard Octave Space is 2:1. In the above example, octave space will be changed to 3:1 after clicking on *Done*.
+`Octave Space` edit tool is used to edit octave ratio. Standard Octave Space is 2:1. In the above example, octave space will be changed to 3:1 after clicking on Done.
+
+*Drag* button will drag the widget.
+
+*Close* button will close the widget.
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
 
