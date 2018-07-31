@@ -3322,6 +3322,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     untilBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['until'] = untilBlock;
     untilBlock.staticLabels.push(_('until'), _('do'));
+    untilBlock.extraWidth = 15;
     untilBlock.adjustWidthToLabel();
     untilBlock.flowClampBooleanArgBlock();
 
@@ -3329,6 +3330,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     whileBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['while'] = whileBlock;
     whileBlock.staticLabels.push(_('while'), _('do'));
+    whileBlock.extraWidth = 15;
     whileBlock.adjustWidthToLabel();
     whileBlock.flowClampBooleanArgBlock();
 
@@ -3336,6 +3338,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     ifthenelseBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['ifthenelse'] = ifthenelseBlock;
     ifthenelseBlock.staticLabels.push(_('if'), _('then'), _('else'));
+    // ifthenelseBlock.extraWidth = 15;
     ifthenelseBlock.adjustWidthToLabel();
     ifthenelseBlock.doubleFlowClampBooleanArgBlock();
 
@@ -3343,6 +3346,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     ifBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['if'] = ifBlock;
     ifBlock.staticLabels.push(_('if'), _('then'));
+    ifBlock.extraWidth = 15;
     ifBlock.adjustWidthToLabel();
     ifBlock.flowClampBooleanArgBlock();
 
