@@ -1216,6 +1216,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pickupBlock.staticLabels.push(_('pickup'));
     pickupBlock.oneArgBlock();
     pickupBlock.defaults.push(0);
+    pickupBlock.extraWidth = 15;
 
     // macro
     var meter = new ProtoBlock('meter');
