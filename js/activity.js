@@ -957,7 +957,7 @@ define(MYDEFINES, function (compatibility) {
             createjs.Touch.enable(stage);
 
             createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-            createjs.Ticker.setFPS(30);
+            createjs.Ticker.framerate = 30;
             // createjs.Ticker.addEventListener('tick', stage);
             createjs.Ticker.addEventListener('tick', __tick);
 

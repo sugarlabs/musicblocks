@@ -348,11 +348,11 @@ function Logo () {
     this.setOptimize = function (state) {
         if (state) {
             this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
-            createjs.Ticker.setFPS(10);
+            createjs.Ticker.framerate = 10;
 
         } else {
             this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
-            createjs.Ticker.setFPS(30);
+            createjs.Ticker.framerate = 30;
         }
 
         this.blinkState = !state;
