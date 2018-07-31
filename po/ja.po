@@ -2071,12 +2071,12 @@ msgstr "クロックなし"
 #: js/basicblocks.js:1146
 ## structure of grammar makes this awkward;http://musical-grammar.com/time005.html
 msgid "on offbeat do"
-msgstr "オフビートにて"
+msgstr "弱拍にて"
 
 #: js/basicblocks.js:1156
 ## Need a little context, but I am guessing this is "on *this* beat (do...)
 msgid "on beat"
-msgstr "オンビートにて"
+msgstr "強拍にて"
 
 #: js/basicblocks.js:1156
 ## http://musical-grammar.com/time004.html
