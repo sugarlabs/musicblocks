@@ -3919,24 +3919,28 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.palettes.show();
                 break;
             case 'storein':
-                if (closeInput) {
-                // If the label was the name of a storein, update the
-                // associated box this.blocks and the palette buttons.
-                if (this.value !== 'box') {
-                    this.blocks.newStoreinBlock(this.value);
-                    this.blocks.newStorein2Block(this.value);
-                    this.blocks.newNamedboxBlock(this.value);
-                }
+		// Check to see which connection we are using in
+                // cblock.  We only do something if blk is attached to
+                // the name connection (1).
+                blk = this.blocks.blockList.indexOf(this);
+                if (cblock.connections[1] === blk && closeInput) {
+                    // If the label was the name of a storein, update the
+                    // associated box this.blocks and the palette buttons.
+                    if (this.value !== 'box') {
+			this.blocks.newStoreinBlock(this.value);
+			this.blocks.newStorein2Block(this.value);
+			this.blocks.newNamedboxBlock(this.value);
+                    }
 
-                // Rename both box <- name and namedbox blocks.
-                this.blocks.renameBoxes(oldValue, newValue);
-                this.blocks.renameNamedboxes(oldValue, newValue);
-                this.blocks.renameStoreinBoxes(oldValue, newValue);
-                this.blocks.renameStorein2Boxes(oldValue, newValue);
+                    // Rename both box <- name and namedbox blocks.
+                    this.blocks.renameBoxes(oldValue, newValue);
+                    this.blocks.renameNamedboxes(oldValue, newValue);
+                    this.blocks.renameStoreinBoxes(oldValue, newValue);
+                    this.blocks.renameStorein2Boxes(oldValue, newValue);
 
-                this.blocks.palettes.hide();
-                this.blocks.palettes.updatePalettes('boxes');
-                this.blocks.palettes.show();
+                    this.blocks.palettes.hide();
+                    this.blocks.palettes.updatePalettes('boxes');
+                    this.blocks.palettes.show();
                 }
                 break;
             case 'setdrum':
