@@ -2399,7 +2399,7 @@ function Logo () {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
                 } else {
                     if (!that.suppressOutput[turtle]) {
-                        that._processShow(turtle, args[0], args[1]);
+                        that._processShow(turtle, blk, args[0], args[1]);
                     }
 
                     if (that.justCounting[turtle].length === 0) {
@@ -7929,7 +7929,7 @@ function Logo () {
                     that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
                 case 'show':
-                    that._processShow(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
+                    that._processShow(turtle, null, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
                 case 'speak':
                     that._processSpeak(that.playbackQueue[turtle][idx][2]);
@@ -8232,7 +8232,7 @@ function Logo () {
             }
 
             setTimeout(function () {
-                that._processShow(turtle, arg1, arg2);
+                that._processShow(turtle, null, arg1, arg2);
             }, timeout);
         };
 
@@ -8623,7 +8623,7 @@ function Logo () {
         this.meSpeak.speak(new_text);
     };
 
-    this._processShow = function (turtle, arg0, arg1) {
+    this._processShow = function (turtle, blk, arg0, arg1) {
         if (typeof(arg1) === 'string') {
             var len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
@@ -8641,7 +8641,7 @@ function Logo () {
             } else {
                 this.turtles.turtleList[turtle].doShowText(arg0, arg1);
             }
-        } else if (typeof(arg1) === 'object' && this.blocks.blockList[this.blocks.blockList[blk].connections[2]].name === 'loadFile') {
+        } else if (typeof(arg1) === 'object' && blk !== null && this.blocks.blockList[this.blocks.blockList[blk].connections[2]].name === 'loadFile') {
             if (arg1) {
                 this.turtles.turtleList[turtle].doShowText(arg0, arg1[1]);
             } else {

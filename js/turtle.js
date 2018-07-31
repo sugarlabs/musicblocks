@@ -866,6 +866,10 @@ function Turtle (name, turtles, drum) {
 
     this.doShowText = function(size, myText) {
         // Add a text object to the canvas
+        if (myText === null) {
+            return;
+        }
+
         if (typeof(myText) !== 'string') {
             var textList = [myText.toString()];
         } else {
