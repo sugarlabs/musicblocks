@@ -1131,7 +1131,7 @@ msgstr "拍子記号"
 
 #: js/turtledefs.js:23
 msgid "intervals"
-msgstr "インタバール"
+msgstr "音程"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:3953
@@ -2878,7 +2878,7 @@ msgstr "～へ"
 #: plugins/bitcoin.rtp:27
 ## assuming "monetary value" ; many more values 価格、評価
 msgid "value"
-msgstr "数値（バリュー）"
+msgstr "値"
 
 #: js/basicblocks.js:2813
 #.TRANS: return value from a function
