@@ -3012,7 +3012,7 @@ function Block(protoblock, blocks, overrideName) {
         this._booleanWheel.slicePathCustom.maxRadiusPercent = 0.6;
         this._booleanWheel.sliceSelectedPathCustom = this._booleanWheel.slicePathCustom;
         this._booleanWheel.sliceInitPathCustom = this._booleanWheel.slicePathCustom;
-        this._booleanWheel.titleRotateAngle = 0;
+        // this._booleanWheel.titleRotateAngle = 0;
         this._booleanWheel.animatetime = 300;
         this._booleanWheel.createWheel(labels);
 
