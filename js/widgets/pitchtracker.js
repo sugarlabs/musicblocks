@@ -21,13 +21,7 @@ var analyser = null;
 var theBuffer = null;
 var DEBUGCANVAS = null;
 var mediaStreamSource = null;
-var detectorElem, 
-    canvasElem,
-    waveCanvas,
-    pitchElem,
-    noteElem,
-    detuneElem,
-    detuneAmount;
+var detectorElem, canvasElem, waveCanvas, pitchElem, noteElem, detuneElem, detuneAmount;
 
     
 audioContext = new AudioContext();
@@ -94,7 +88,7 @@ function PitchTracker() {
     this._focusedCellIndex = 0;
     this._isKeyPressed = 0;
     this._delta = 0;
-
+    var frequencyContainer = [];
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -149,17 +143,28 @@ function PitchTracker() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
 
+
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
         cell.onclick = function() {
             sliderDiv.style.visibility = 'hidden';
             widgetButtonsDiv.style.visibility = 'hidden';
-            sliderTableDiv.style.visibility = 'hidden';
+            sliderTableDiv.style.visibility = 'hidden'; 
+        };
+
+        var cell = this._addButton(row, 'tap-button.svg', iconSize, _('record sound'), '');
+        cell.onclick = function () {
+            toggleLiveInput();
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
         cell.onclick = function () {
-            toggleLiveInput();
+            console.log("frequencyContainer " +frequencyContainer);
+        };
+
+        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
+        cell.onclick = function () {
+       //     that._clear();
         };
 
         cell.onmouseover = function() {
@@ -209,33 +214,33 @@ function PitchTracker() {
             }
         };
 
-        // sliderDiv.ondragover = function(e) {
-        //     e.preventDefault();
-        // };
+        sliderDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
 
-        // sliderDiv.ondrop = function(e) {
-        //     if (that._dragging) {
-        //         that._dragging = false;
-        //         var x = e.clientX - that._dx;
-        //         sliderDiv.style.left = x + 'px';
-        //         var y = e.clientY - that._dy;
-        //         sliderDiv.style.top = y + 'px';
-        //         cell.innerHTML = that._dragCellHTML;
-        //     }
-        // };
+        sliderDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                sliderDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                sliderDiv.style.top = y + 'px';
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
 
-        // sliderDiv.onmousedown = function(e) {
-        //     that._dragging = true;
-        //     that._target = e.target;
-        // };
+        sliderDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
 
-        // sliderDiv.ondragstart = function(e) {
-        //     if (cell.contains(that._target)) {
-        //         e.dataTransfer.setData('text/plain', '');
-        //     } else {
-        //         e.preventDefault();
-        //     }
-        // };
+        sliderDiv.ondragstart = function(e) {
+            if (cell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
 
         // // The slider table
         // var sliderTableDiv = docById('sliderTableDiv');
@@ -359,6 +364,194 @@ function PitchTracker() {
     };
     
     
+    function noteProvider(frequen){
+
+        if(frequen < 63){
+            return "B2";    //too low frequency to be detected by laptop microphone
+        } else if(63 <= frequen < 67){
+            return "C2";
+        } else if(67 <= frequen < 71){
+            return "C#2";
+        } else if(71 <= frequen < 75){
+            return "D2" ;
+        } else if(75 <= frequen < 79){
+            return "D#2";
+        } else if(79 <= frequen < 84){
+            return "E2";
+        } else if(84 <= frequen < 89){
+            return "F2";
+        } else if(89 <= frequen < 95){
+            return "F#2";
+        } else if(95 <= frequen < 100){
+            return "G2";
+        } else if(100 <= frequen < 107){
+            return "G#2";
+        } else if(107 <= frequen < 113){
+            return "A2";
+        } else if(113 <= frequen < 120){
+            return "A#2";
+        } else if(120 <= frequen < 127){
+            return "B2";
+        }
+
+        else if(127 <= frequen < 134){
+            return "C3";
+        } else if(134 <= frequen < 142){
+            return "C#3";
+        } else if(142 <= frequen < 150){
+            return "D3" ;
+        } else if(150 <= frequen < 160){
+            return "D#3";
+        } else if(160 <= frequen < 170){
+            return "E3";
+        } else if(170 <= frequen < 180){
+            return "F3";
+        } else if(180 <= frequen < 190){
+            return "F#3";
+        } else if(190 <= frequen < 201){
+            return "G3";
+        } else if(201 <= frequen < 213){
+            return "G#3";
+        } else if(213 <= frequen < 226){
+            return "A3";
+        } else if(226 <= frequen < 239){
+            return "A#3";
+        } else if(239 <= frequen < 254){
+            return "B3";
+        }
+
+        else if(253 <= frequen < 269){
+            return "C4";
+        } else if(269 <= frequen < 285){
+            return "C#4";
+        } else if(285 <= frequen < 302){
+            return "D4" ;
+        } else if(302 <= frequen < 320){
+            return "D#4";
+        } else if(320 <= frequen < 340){
+            return "E4";
+        } else if(340 <= frequen < 360){
+            return "F4";
+        } else if(360 <= frequen < 381){
+            return "F#4";
+        } else if(381 <= frequen < 403){
+            return "G4";
+        } else if(403 <= frequen < 427){
+            return "G#4";
+        } else if(427 <= frequen < 453){
+            return "A4";
+        } else if(453 <= frequen < 480){
+            return "A#4";
+        } else if(480 <= frequen < 508){
+            return "B4";
+        }
+
+        else if(508 <= frequen < 538){
+            return "C5";
+        } else if(538 <= frequen < 570){
+            return "C#5";
+        } else if(570 <= frequen < 604){
+            return "D5" ;
+        } else if(604 <= frequen < 640){
+            return "D#5";
+        } else if(640 <= frequen < 680){
+            return "E5";
+        } else if(680 <= frequen < 720){
+            return "F5";
+        } else if(720 <= frequen < 762){
+            return "F#5";
+        } else if(762 <= frequen < 806){
+            return "G5";
+        } else if(806 <= frequen < 854){
+            return "G#5";
+        } else if(854 <= frequen < 906){
+            return "A5";
+        } else if(906 <= frequen < 960){
+            return "A#5";
+        } else if(960 <= frequen < 1016){
+            return "B5";
+        }
+
+        else if(1016 <= frequen < 1076){
+            return "C6";
+        } else if(1076 <= frequen < 1130){
+            return "C#6";
+        } else if(1130 <= frequen < 1208){
+            return "D6" ;
+        } else if(1208 <= frequen < 1280){
+            return "D#6";
+        } else if(1280 <= frequen < 1360){
+            return "E6";
+        } else if(1360 <= frequen < 1440){
+            return "F6";
+        } else if(1440 <= frequen < 1524){
+            return "F#6";
+        } else if(1524 <= frequen < 1612){
+            return "G6";
+        } else if(1612 <= frequen < 1708){
+            return "G#6";
+        } else if(1708 <= frequen < 1812){
+            return "A6";
+        } else if(1812 <= frequen < 1920){
+            return "A#6";
+        } else if(1920 <= frequen < 2032){
+            return "B6";
+        }
+
+        else if(2032 <= frequen < 2152){
+            return "C7";
+        } else if(2152 <= frequen < 2260){
+            return "C#7";
+        } else if(2260 <= frequen < 2416){
+            return "D7" ;
+        } else if(2416 <= frequen < 2560){
+            return "D#7";
+        } else if(2560 <= frequen < 2720){
+            return "E7";
+        } else if(2720 <= frequen < 2880){
+            return "F7";
+        } else if(2880 <= frequen < 3048){
+            return "F#7";
+        } else if(3048 <= frequen < 3224){
+            return "G7";
+        } else if(3224 <= frequen < 3416){
+            return "G#7";
+        } else if(3416 <= frequen < 3624){
+            return "A7";
+        } else if(3624 <= frequen < 3840){
+            return "A#7";
+        } else if(3840 <= frequen < 4064){
+            return "B7";
+        }
+
+        else if(4064 <= frequen < 4304){
+            return "C8";
+        } else if(4304 <= frequen < 4320){
+            return "C#8";
+        } else if(4320 <= frequen < 4832){
+            return "D8" ;
+        } else if(4832 <= frequen < 5120){
+            return "D#8";
+        } else if(5120 <= frequen < 5440){
+            return "E8";
+        } else if(5440 <= frequen < 5760){
+            return "F8";
+        } else if(5760 <= frequen < 6096){
+            return "F#8";
+        } else if(6096 <= frequen < 6448){
+            return "G8";
+        } else if(6448 <= frequen < 6832){
+            return "G#8";
+        } else if(6832 <= frequen < 7248){
+            return "A8";
+        } else if(7248 <= frequen < 7680){
+            return "A#8";
+        } else if(7680 <= frequen < 8128){
+            return "B8";
+        } else{
+            return "C8"
+        }
+    }
 
     function error() {
         alert('Stream generation failed.');
@@ -554,8 +747,6 @@ function PitchTracker() {
 
 
 
-
-
     function updatePitch( time ) {
 
         setTimeout(function(){
@@ -601,6 +792,7 @@ function PitchTracker() {
                 var note =  noteFromPitch( pitch );
                 console.log(pitch);
                 noteElem.innerHTML = noteStrings[note%12];
+                frequencyContainer.push(pitch);
                 var detune = centsOffFromPitch( pitch, note );
                 console.log("noteStrings[note%12] " + noteStrings[note%12]);
                 if (detune == 0 ) {
@@ -618,7 +810,7 @@ function PitchTracker() {
             if (!window.requestAnimationFrame)
                 window.requestAnimationFrame = window.webkitRequestAnimationFrame;
             rafID = window.requestAnimationFrame( updatePitch );
-        }, 100);
+        }, 1000);
 
         
     }
