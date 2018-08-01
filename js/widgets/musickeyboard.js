@@ -2716,7 +2716,43 @@ function MusicKeyboard() {
 
         cell1.onclick=function() {
             that._logo.setTurtleDelay(0);
-            that._playAll();
+            if(selected.length > 0 ){
+   
+		    	for(var q = 0; q<selected.length ; q++){
+				            
+		    		var zx = selected[q];
+
+		    		if(zx.charAt(1) == '♯'){
+		    			console.log("hash found");
+		    			var res = zx.replace("♯", "#");
+		    		} else {
+		    			res = zx;
+		    		}
+		    		console.log("res "  +res);
+		        	synth.triggerAttackRelease(res, '8n');
+		        	sleep(500);
+
+		    	}
+    		} else {
+    			for(var q = 0; q<selected1.length ; q++){
+				            
+		    		var zx = selected1[q];
+
+		    		if(zx.charAt(1) == '♯'){
+		    			console.log("hash found");
+		    			var res = zx.replace("♯", "#");
+		    		} else {
+		    			res = zx;
+		    		}
+		    		console.log("res "  +res);
+		        	synth.triggerAttackRelease(res, '8n');
+		        	sleep(500);
+
+		    	}
+
+    		}
+    	
+ 
         }
 
         var cell1 = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('save'));
@@ -2909,7 +2945,6 @@ function MusicKeyboard() {
     }
 
     keyboard.addEventListener("mousedown", function (e) {
-        console.log("INside mousedown");
         var target = e.target;
         if(target.tagName == "TD") {
             if((target.style.backgroundColor != "lightgrey") && (target.style.backgroundColor != "rgb(72,72,72)")) {
@@ -2926,7 +2961,6 @@ function MusicKeyboard() {
     });
 
     keyboard.addEventListener("mouseup", function (f) {
-        console.log("INside mouseup");
         var target = f.target;
         if(target.tagName == "TD") {   
                 if(target.parentNode == whiteKeys) {
@@ -2974,6 +3008,7 @@ function MusicKeyboard() {
         if(key[1] == "♯") {
             noSharp = key[0]+"#"+key[2];
         }
+
         synth.triggerAttackRelease(noSharp, "8n");
     }   
 
@@ -3036,6 +3071,15 @@ function MusicKeyboard() {
         console.log("INside addRowBlock");
         this._rowBlocks1.push(pitchBlock);
     };
+
+    function sleep(milliseconds) {
+	  var start = new Date().getTime();
+	  for (var i = 0; i < 1e7; i++) {
+	    if ((new Date().getTime() - start) > milliseconds){
+	      break;
+	    }
+	  }
+	}
 
     this._addButton = function(row, icon, iconSize, label) {
         console.log("INside addbutton");
