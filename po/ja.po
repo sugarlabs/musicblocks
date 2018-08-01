@@ -2833,16 +2833,16 @@ msgstr "絶対値"
 #: js/basicblocks.js:2713
 ## Literally "this or that"
 msgid "one of"
-msgstr "これかそれ"
+msgstr "どちらかを選ぶ"
 
 #: js/basicblocks.js:2713
 ## need context
 msgid "this"
-msgstr "この"
+msgstr "これか"
 
 #: js/basicblocks.js:2713
 msgid "that"
-msgstr "その"
+msgstr "それか"
 
 #: js/basicblocks.js:2724
 ## Scratch po (L247)
@@ -2997,7 +2997,7 @@ msgstr "ポップ"
 #.TRANS: push a value onto the top of the heap
 ## more guessing
 msgid "push"
-msgstr "押す"
+msgstr "プッシュ"
 
 #: js/basicblocks.js:3120
 ## 上端＝じょうたん;http://jisho.org/search/%E4%B8%8A%E7%AB%AF 
@@ -3219,11 +3219,11 @@ msgstr "ブロックを表示"
 
 #: js/basicblocks.js:3544
 msgid "hide blocks"
-msgstr "ブロックを非表示にする"
+msgstr "ブロックを非表示"
 
 #: js/basicblocks.js:3551
 msgid "open project"
-msgstr "プロジェクトを開き"
+msgstr "プロジェクトを開く"
 
 #: js/basicblocks.js:3575
 msgid "wait"
@@ -3298,7 +3298,7 @@ msgstr "ネズミの色"
 #.TRANS: heading (compass direction) for this mouse
 ## http://jisho.org/word/%E6%96%B9%E4%BD%8D ; 方位＝ほうい
 msgid "mouse heading"
-msgstr "ネズミの向かう方向"
+msgstr "ネズミの進む角度"
 
 #: js/basicblocks.js:3740
 #: js/basicblocks.js:3752
@@ -3321,7 +3321,7 @@ msgstr "ネズミのx座標"
 #.TRANS: notes played by this mouse
 ## To be verified
 msgid "mouse notes played"
-msgstr "ネズミの演奏した音符"
+msgstr "ネズミの演奏した音符の数"
 
 #: js/basicblocks.js:3792
 #.TRANS: convert current note for this turtle to piano key (1-88)
