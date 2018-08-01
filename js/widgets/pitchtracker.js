@@ -74,7 +74,7 @@ detectorElem.ondrop = function (e) {
 
 
 
-    
+var keepRecording = 1;
 
 function PitchTracker() {
 
@@ -113,6 +113,7 @@ function PitchTracker() {
     };
 
     this.init = function (logo) {
+
         this._logo = logo;
 
         var w = window.innerWidth;
@@ -120,6 +121,7 @@ function PitchTracker() {
         var iconSize = ICONSIZE;
 
         var canvas = docById('myCanvas');
+        keepRecording = 1;
 
         // Position the widget and make it visible.
         var sliderDiv = docById('sliderDiv');
@@ -143,24 +145,101 @@ function PitchTracker() {
         // For the button callbacks
         var that = this;
 
-
-
         var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
         cell.onclick = function() {
             sliderDiv.style.visibility = 'hidden';
             widgetButtonsDiv.style.visibility = 'hidden';
             sliderTableDiv.style.visibility = 'hidden'; 
+            keepRecording = 0;
         };
 
-        var cell = this._addButton(row, 'tap-button.svg', iconSize, _('record sound'), '');
+        var cell = this._addButton(row, 'tap-button.svg', iconSize, _('Start Recording'), '');
         cell.onclick = function () {
             toggleLiveInput();
         };
 
+
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Stop Recording'), '');
+        cell.onclick = function () {
+            keepRecording = 0;
+        };
+
+
+
+
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
         cell.onclick = function () {
+            
+            var noteContainer = [];
+            noteContainer.push("C4");
+            noteContainer.push("D♯4");
+            noteContainer.push("E4");            
+
+            var pitches = [];
+
+            console.log("OOOOOutput of noteProvider " +noteProvider(3310));
+
+            for(var f = 0;f<5;f++){
+                var temp3 = frequencyContainer[f];
+                pitches.push(noteProvider(temp3));
+            }
+
             console.log("frequencyContainer " +frequencyContainer);
+            console.log("pitches " +pitches);
+
+
+
+            console.log("generating keyboard pitches for: " + pitches);
+            //copy and pasted from matrix.saveMatrix (), the original had too many array dimensions so the forloop has been removed
+            var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
+            var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk"}], 0, 0, [0]]];
+            var endOfStackIdx = 0;
+            for (var i = 0; i < pitches.length; i++) {
+            // We want all of the notes in a column.
+            // console.log(this.notesToPlay[i]);
+                var note = pitches[i].slice(0);
+         
+            // Add the Note block and its value
+                var idx = newStack.length;
+                newStack.push([idx, 'note', 0, 0, [endOfStackIdx, idx + 1, idx + 2, null]]);
+                var n = newStack[idx][4].length;
+                if (i == 0) {  // the action block
+                    newStack[endOfStackIdx][4][n - 2] = idx;
+                } 
+                else { // the previous note block
+                    newStack[endOfStackIdx][4][n - 1] = idx;
+                }
+                var endOfStackIdx = idx;
+                newStack.push([idx + 1, ['number', {'value': "4"}], 0, 0, [idx]]);
+                // Add the pitch blocks to the Note block
+                var  notePitch = note.substring(0,note.length-1);  //i.e. D or D# not D#1
+                var thisBlock = idx + 2;
+         
+                // We need to point to the previous note or pitch block.
+                var previousBlock = idx;  // Note block
+          
+          
+                // The last connection in last pitch block is null.
+                var lastConnection = null;
+
+                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                if(['♯', '♭'].indexOf(notePitch[1]) != -1) {
+                    newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0]] + note[1]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 2, ['number', {'value': note[note.length-1]}], 0, 0, [thisBlock]]);
+                } 
+                else {
+                    newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[notePitch[0]]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 2, ['number', {'value': note[note.length-1]}], 0, 0, [thisBlock]]);
+                }
+            }
+            console.log(newStack);
+            logo.blocks.loadNewBlocks(newStack);
+
+
         };
+
+
+
 
         var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
         cell.onclick = function () {
@@ -367,191 +446,195 @@ function PitchTracker() {
     function noteProvider(frequen){
 
         if(frequen < 63){
-            return "B2";    //too low frequency to be detected by laptop microphone
-        } else if(63 <= frequen < 67){
+            return "B2";    
+        } else if(frequen >= 63 && frequen < 67){
             return "C2";
-        } else if(67 <= frequen < 71){
-            return "C#2";
-        } else if(71 <= frequen < 75){
+        } else if(frequen >= 67 && frequen < 71){
+            return "C♯2";
+        } else if(frequen >= 71 && frequen < 75){
             return "D2" ;
-        } else if(75 <= frequen < 79){
-            return "D#2";
-        } else if(79 <= frequen < 84){
+        } else if(frequen >= 75 && frequen < 79){
+            return "D♯2";
+        } else if(frequen >= 79 && frequen < 84){
             return "E2";
-        } else if(84 <= frequen < 89){
+        } else if(frequen >= 84 && frequen < 89){
             return "F2";
-        } else if(89 <= frequen < 95){
-            return "F#2";
-        } else if(95 <= frequen < 100){
+        } else if(frequen >= 89 && frequen < 95){
+            return "F♯2";
+        } else if(frequen >= 95 && frequen < 100){
             return "G2";
-        } else if(100 <= frequen < 107){
-            return "G#2";
-        } else if(107 <= frequen < 113){
+        } else if(frequen >= 100 && frequen < 107){
+            return "G♯2";
+        } else if(frequen >= 107 && frequen < 113){
             return "A2";
-        } else if(113 <= frequen < 120){
-            return "A#2";
-        } else if(120 <= frequen < 127){
+        } else if(frequen >= 113 && frequen < 120){
+            return "A♯2";
+        } else if(frequen >= 120 && frequen < 127){
             return "B2";
         }
 
-        else if(127 <= frequen < 134){
+        else if(frequen >= 127 && frequen < 134){
             return "C3";
-        } else if(134 <= frequen < 142){
-            return "C#3";
-        } else if(142 <= frequen < 150){
+        } else if(frequen >= 134 && frequen < 142){
+            return "C♯3";
+        } else if(frequen >= 142 && frequen < 150){
             return "D3" ;
-        } else if(150 <= frequen < 160){
-            return "D#3";
-        } else if(160 <= frequen < 170){
+        } else if(frequen >= 150 && frequen < 160){
+            return "D♯3";
+        } else if(frequen >= 160 && frequen < 170){
             return "E3";
-        } else if(170 <= frequen < 180){
+        } else if(frequen >= 170 && frequen < 180){
             return "F3";
-        } else if(180 <= frequen < 190){
-            return "F#3";
-        } else if(190 <= frequen < 201){
+        } else if(frequen >= 180 && frequen < 190){
+            return "F♯3";
+        } else if(frequen >= 190 && frequen < 201){
             return "G3";
-        } else if(201 <= frequen < 213){
-            return "G#3";
-        } else if(213 <= frequen < 226){
+        } else if(frequen >= 201 && frequen < 213){
+            return "G♯3";
+        } else if(frequen >= 213 && frequen < 226){
             return "A3";
-        } else if(226 <= frequen < 239){
-            return "A#3";
-        } else if(239 <= frequen < 254){
+        } else if(frequen >= 226 && frequen < 239){
+            return "A♯3";
+        } else if(frequen >= 239 && frequen < 253){
             return "B3";
         }
 
-        else if(253 <= frequen < 269){
+        else if(frequen >= 253 && frequen < 269){
             return "C4";
-        } else if(269 <= frequen < 285){
-            return "C#4";
-        } else if(285 <= frequen < 302){
+        } else if(frequen >= 269 && frequen < 285){
+            return "C♯4";
+        } else if(frequen >= 285 && frequen < 302){
             return "D4" ;
-        } else if(302 <= frequen < 320){
-            return "D#4";
-        } else if(320 <= frequen < 340){
+        } else if(frequen >= 302 && frequen < 320){
+            return "D♯4";
+        } else if(frequen >= 320 && frequen < 340){
             return "E4";
-        } else if(340 <= frequen < 360){
+        } else if(frequen >= 340 && frequen < 360){
             return "F4";
-        } else if(360 <= frequen < 381){
-            return "F#4";
-        } else if(381 <= frequen < 403){
+        } else if(frequen >= 360 && frequen < 381){
+            return "F♯4";
+        } else if(frequen >= 381 && frequen < 403){
             return "G4";
-        } else if(403 <= frequen < 427){
-            return "G#4";
-        } else if(427 <= frequen < 453){
+        } else if(frequen >= 403 && frequen < 427){
+            return "G♯4";
+        } else if(frequen >= 427 && frequen < 453){
             return "A4";
-        } else if(453 <= frequen < 480){
-            return "A#4";
-        } else if(480 <= frequen < 508){
+        } else if(frequen >= 453 && frequen < 480){
+            return "A♯4";
+        } else if(frequen >= 453 && frequen < 480){
             return "B4";
         }
 
-        else if(508 <= frequen < 538){
+        else if(frequen >= 480 && frequen < 538){
             return "C5";
-        } else if(538 <= frequen < 570){
-            return "C#5";
-        } else if(570 <= frequen < 604){
+        } else if(frequen >= 538 && frequen < 570){
+            return "C♯5";
+        } else if(frequen >= 570 && frequen < 604){
             return "D5" ;
-        } else if(604 <= frequen < 640){
-            return "D#5";
-        } else if(640 <= frequen < 680){
+        } else if(frequen >= 604 && frequen < 640){
+            return "D♯5";
+        } else if(frequen >= 640 && frequen < 680){
             return "E5";
-        } else if(680 <= frequen < 720){
+        } else if(frequen >= 680 && frequen < 720){
             return "F5";
-        } else if(720 <= frequen < 762){
-            return "F#5";
-        } else if(762 <= frequen < 806){
+        } else if(frequen >= 720 && frequen < 762){
+            return "F♯5";
+        } else if(frequen >= 762 && frequen < 806){
             return "G5";
-        } else if(806 <= frequen < 854){
-            return "G#5";
-        } else if(854 <= frequen < 906){
+        } else if(frequen >= 806 && frequen < 854){
+            return "G♯5";
+        } else if(frequen >= 854 && frequen < 906){
             return "A5";
-        } else if(906 <= frequen < 960){
-            return "A#5";
-        } else if(960 <= frequen < 1016){
+        } else if(frequen >= 906 && frequen < 960){
+            return "A♯5";
+        } else if(frequen >= 960 && frequen < 1016){
             return "B5";
         }
 
-        else if(1016 <= frequen < 1076){
+        else if(frequen >= 1016 && frequen < 1076){
             return "C6";
-        } else if(1076 <= frequen < 1130){
-            return "C#6";
-        } else if(1130 <= frequen < 1208){
+        } else if(frequen >= 1076 && frequen < 1130){
+            return "C♯6";
+        } else if(frequen >= 1130 && frequen < 1208){
             return "D6" ;
-        } else if(1208 <= frequen < 1280){
-            return "D#6";
-        } else if(1280 <= frequen < 1360){
+        } else if(frequen >= 1208 && frequen < 1280){
+            return "D♯6";
+        } else if(frequen >= 1280 && frequen < 1360){
             return "E6";
-        } else if(1360 <= frequen < 1440){
+        } else if(frequen >= 1360 && frequen < 1440){
             return "F6";
-        } else if(1440 <= frequen < 1524){
-            return "F#6";
-        } else if(1524 <= frequen < 1612){
+        } else if(frequen >= 1440 && frequen < 1524){
+            return "F♯6";
+        } else if(frequen >= 1524 && frequen < 1612){
             return "G6";
-        } else if(1612 <= frequen < 1708){
-            return "G#6";
-        } else if(1708 <= frequen < 1812){
+        } else if(frequen >= 1612 && frequen < 1708){
+            return "G♯6";
+        } else if(frequen >= 1708 && frequen < 1812){
             return "A6";
-        } else if(1812 <= frequen < 1920){
-            return "A#6";
-        } else if(1920 <= frequen < 2032){
+        } else if(frequen >= 1812 && frequen < 1920){
+            return "A♯6";
+        } else if(frequen >= 1920 && frequen < 2032){
             return "B6";
         }
 
-        else if(2032 <= frequen < 2152){
+        else if(frequen >= 2032 && frequen < 2152){
             return "C7";
-        } else if(2152 <= frequen < 2260){
-            return "C#7";
-        } else if(2260 <= frequen < 2416){
+        } else if(frequen >= 2152 && frequen < 2260){
+            return "C♯7";
+        } else if(frequen >= 2260 && frequen < 2416){
             return "D7" ;
-        } else if(2416 <= frequen < 2560){
-            return "D#7";
-        } else if(2560 <= frequen < 2720){
+        } else if(frequen >= 2416 && frequen < 2560){
+            return "D♯7";
+        } else if(frequen >= 2560 && frequen < 2720){
             return "E7";
-        } else if(2720 <= frequen < 2880){
+        } else if(frequen >= 2720 && frequen < 2880){
             return "F7";
-        } else if(2880 <= frequen < 3048){
-            return "F#7";
-        } else if(3048 <= frequen < 3224){
+        } else if(frequen >= 2880 && frequen < 3048){
+            return "F♯7";
+        } else if(frequen >= 3048 && frequen < 3224){
             return "G7";
-        } else if(3224 <= frequen < 3416){
-            return "G#7";
-        } else if(3416 <= frequen < 3624){
+        } else if(frequen >= 3224 && frequen < 3416){
+            return "G♯7";
+        } else if(frequen >= 3416 && frequen < 3624){
             return "A7";
-        } else if(3624 <= frequen < 3840){
-            return "A#7";
-        } else if(3840 <= frequen < 4064){
+        } else if(frequen >= 3624 && frequen < 3840){
+            return "A♯7";
+        } else if(frequen >= 3840 && frequen < 4064){
             return "B7";
         }
 
-        else if(4064 <= frequen < 4304){
+        else if(frequen >= 4064 && frequen < 4304){
             return "C8";
-        } else if(4304 <= frequen < 4320){
-            return "C#8";
-        } else if(4320 <= frequen < 4832){
+        } else if(frequen >= 4304 && frequen < 4520){
+            return "C♯8";
+        } else if(frequen >= 4520 && frequen < 4832){
             return "D8" ;
-        } else if(4832 <= frequen < 5120){
-            return "D#8";
-        } else if(5120 <= frequen < 5440){
+        } else if(frequen >= 4832 && frequen < 5120){
+            return "D♯8";
+        } else if(frequen >= 5120 && frequen < 5440){
             return "E8";
-        } else if(5440 <= frequen < 5760){
+        } else if(frequen >= 5440 && frequen < 5760){
             return "F8";
-        } else if(5760 <= frequen < 6096){
-            return "F#8";
-        } else if(6096 <= frequen < 6448){
+        } else if(frequen >= 5760 && frequen < 6096){
+            return "F♯8";
+        } else if(frequen >= 6096 && frequen < 6448){
             return "G8";
-        } else if(6448 <= frequen < 6832){
-            return "G#8";
-        } else if(6832 <= frequen < 7248){
+        } else if(frequen >= 6448 && frequen < 6832){
+            return "G♯8";
+        } else if(frequen >= 6832 && frequen < 7248){
             return "A8";
-        } else if(7248 <= frequen < 7680){
-            return "A#8";
-        } else if(7680 <= frequen < 8128){
+        } else if(frequen >= 7248 && frequen < 7680){
+            return "A♯8";
+        } else if(frequen >= 7680 && frequen < 8128){
             return "B8";
-        } else{
-            return "C8"
+        } else {
+            return "C8";
         }
+        
     }
+
+
+
 
     function error() {
         alert('Stream generation failed.');
@@ -610,6 +693,7 @@ function PitchTracker() {
     }
 
     function toggleLiveInput() {
+        console.log("Inside toggleLiveInput");
         if (isPlaying) {
             //stop playing and return
             sourceNode.stop( 0 );
@@ -619,7 +703,9 @@ function PitchTracker() {
             if (!window.cancelAnimationFrame)
                 window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
             window.cancelAnimationFrame( rafID );
+            return "use live input";
         }
+        
         getUserMedia(
             {
                 "audio": {
@@ -632,6 +718,8 @@ function PitchTracker() {
                     "optional": []
                 },
             }, gotStream);
+        
+        
     }
 
     function togglePlayback() {
@@ -748,7 +836,9 @@ function PitchTracker() {
 
 
     function updatePitch( time ) {
-
+        if(keepRecording == 0){
+            return;    
+        }
         setTimeout(function(){
             var cycles = new Array;
             analyser.getFloatTimeDomainData( buf );
@@ -790,9 +880,9 @@ function PitchTracker() {
                 pitch = ac;
                 pitchElem.innerText = Math.round( pitch ) ;
                 var note =  noteFromPitch( pitch );
-                console.log(pitch);
+                console.log(Math.round( pitch ));
                 noteElem.innerHTML = noteStrings[note%12];
-                frequencyContainer.push(pitch);
+                frequencyContainer.push(Math.round( pitch ));
                 var detune = centsOffFromPitch( pitch, note );
                 console.log("noteStrings[note%12] " + noteStrings[note%12]);
                 if (detune == 0 ) {
