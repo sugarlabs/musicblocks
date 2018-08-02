@@ -297,7 +297,7 @@ msgstr "グリッド（座標）"
 #: js/turtledefs.js:104
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
-msgstr "カーテシアン"
+msgstr "カーテシアン/極域"
 
 #: js/activity.js:742
 #: js/activity.js:749
@@ -364,13 +364,13 @@ msgstr "音符を一つずつ再生"
 #: js/activity.js:3516
 #: js/activity.js:3529
 msgid "Hard stop"
-msgstr "すぐ止めます"
+msgstr "すぐストップ"
 
 #: js/activity.js:3517
 #: js/activity.js:3530
 #: js/turtledefs.js:91
 msgid "Stop"
-msgstr "止めます"
+msgstr "ストップ"
 
 #: js/activity.js:3518
 #: js/activity.js:3531
@@ -386,13 +386,13 @@ msgstr "パレットを表示する / 隠す"
 #: js/activity.js:3532
 #: js/turtledefs.js:93
 msgid "Show/hide blocks"
-msgstr "ブロックを表示する / 隠す"
+msgstr "ブロックの表示"
 
 #: js/activity.js:3521
 #: js/activity.js:3533
 #: js/turtledefs.js:94
 msgid "Expand/collapse collapsable blocks"
-msgstr "ブロックを増やす / つぶす"
+msgstr "チャンクの最小化"
 
 #: js/activity.js:3522
 #: js/activity.js:3534
@@ -410,18 +410,18 @@ msgstr "ヘルプ"
 #: js/activity.js:3616
 #: js/turtledefs.js:98
 msgid "Load samples from server"
-msgstr "サーバからサンプルをダウンロードする"
+msgstr "「プラネット」サーバからサンプルをダウンロードする"
 
 #: js/activity.js:3618
 #: js/savebox.js:113
 msgid "The Planet is unavailable."
-msgstr "プラネットは今使えません"
+msgstr "「プラネット」サーバは今使えません"
 
 #: js/activity.js:3624
 #: js/activity.js:3636
 #: js/turtledefs.js:99
 msgid "Load project from files"
-msgstr "プロジェクトをファイルからダウンロードする"
+msgstr "ローカルフォルダ"
 
 #: js/activity.js:3625
 #: js/activity.js:3637
@@ -452,7 +452,7 @@ msgstr "設定"
 #: js/activity.js:3630
 #: js/turtledefs.js:115
 msgid "New Project"
-msgstr "新しいプロジェクト"
+msgstr "新規作成"
 
 #: js/activity.js:3631
 #: js/activity.js:3643
@@ -1271,11 +1271,11 @@ msgstr "これらのメッセージを表示します。"
 
 #: js/turtledefs.js:97
 msgid "Expand/collapse option toolbar"
-msgstr "オプションツールバーを増やします / 減らします。"
+msgstr "オプションツールバー表示"
 
 #: js/turtledefs.js:97
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "脇にあるツールバーを増やします / 減らします。"
+msgstr "オプションツールバー表示するため、ここでクリック。"
 
 #: js/turtledefs.js:98
 msgid "This button opens a viewer for loading example projects."
@@ -2594,7 +2594,7 @@ msgstr "x座標"
 #.TRANS: erase the screen and return the mice to the center position
 #.TRANS: clear all subdivisions from the ruler.
 msgid "clear"
-msgstr "クリア"
+msgstr "消去"
 
 #: js/basicblocks.js:2231
 #.TRANS: control point in a bezier curve
