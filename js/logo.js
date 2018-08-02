@@ -4800,6 +4800,12 @@ function Logo () {
                 };
 
                 that._setListener(turtle, listenerName, __listener);
+
+                if (that.inRhythmRuler) {
+                    that._currentDrumBlock = blk;
+                    that.rhythmRuler.Drums.push(blk);
+                    that.rhythmRuler.Rulers.push([[],[]]);
+                }
             }
             break;
         case 'crescendo':

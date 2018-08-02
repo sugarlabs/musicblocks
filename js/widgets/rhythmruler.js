@@ -892,11 +892,24 @@ function RhythmRuler () {
         var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
         var drum = this._logo.blocks.blockList[drumblockno].value;
 
+        var foundDrum = false;
         // Convert i18n drum name to English.
         for (var d = 0; d < DRUMNAMES.length; d++) {
             if (DRUMNAMES[d][0] === drum) {
                 drum = DRUMNAMES[d][1];
+                foundDrum = true;
                 break;
+            }
+        }
+
+        var foundVoice = false;
+        if (!foundDrum) {
+            for (var d = 0; d < VOICENAMES.length; d++) {
+                if (VOICENAMES[d][0] === drum) {
+                    drum = VOICENAMES[d][1];
+                    foundVoice = true;
+                    break;
+                }
             }
         }
 
@@ -905,7 +918,11 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-                that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
+                if (foundDrum) {
+                    that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
+                } else if (foundVoice) {
+                    that._logo.synth.trigger(0, 'C4', that._logo.defaultBPMFactor / noteValue, drum, null, null, false);
+                }                
             }
 
             // And highlight its cell.
@@ -1040,9 +1057,28 @@ function RhythmRuler () {
                 that._saveTuplets(selectedRuler + 1);
             }
         }, 500);
-    }
+    };
 
-    this._saveDrumMachine = function(selectedRuler) {
+    this._saveMachine = function(selectedRuler) {
+        // We are either saving a drum machine or a voice machine.
+        var drumBlockNo = this._logo.blocks.blockList[this.Drums[selectedRuler]].connections[1];
+        var drum = this._logo.blocks.blockList[drumBlockNo].value;
+        for (var d = 0; d < DRUMNAMES.length; d++) {
+            if (DRUMNAMES[d][1] === drum) {
+                this._saveDrumMachine(selectedRuler, drum);
+                return;
+            }
+        }
+
+        for (var d = 0; d < VOICENAMES.length; d++) {
+            if (VOICENAMES[d][1] === drum) {
+                this._saveVoiceMachine(selectedRuler, drum);
+                return;
+            }
+        }
+    };
+
+    this._saveDrumMachine = function(selectedRuler, drum) {
         var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1056,6 +1092,7 @@ function RhythmRuler () {
 
             var delta = selectedRuler * 42;
             var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
+
             newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
             var previousBlock = 1;
             var sameNoteValue = 1;
@@ -1068,9 +1105,6 @@ function RhythmRuler () {
                     var noteValue = noteValues[i];
 
                     var obj = rationalToFraction(1 / Math.abs(noteValue));
-
-                    var drumBlockNo = that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1];
-                    var drum = that._logo.blocks.blockList[drumBlockNo].value;
 
                     if (sameNoteValue === 1) {
                         // Add a note block.
@@ -1128,14 +1162,126 @@ function RhythmRuler () {
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {
-                that._saveDrumMachine(selectedRuler + 1);
+                that._saveMachine(selectedRuler + 1);
+            }
+        }, 500);
+    };
+
+    this._saveVoiceMachine = function(selectedRuler, voice) {
+        var that = this;
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        this._logo.refreshCanvas();
+
+        setTimeout(function () {
+            var ruler = docById('ruler' + selectedRuler);
+            var noteValues = that.Rulers[selectedRuler][0];
+
+            var delta = selectedRuler * 42;
+
+            var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
+            newStack.push([1, 'settimbre', 0, 0, [0, 2, 4, 3]]);
+
+            newStack.push([2, ['voicename', {'value': voice}], 0, 0, [1]]);
+            newStack.push([3, 'hidden', 0, 0, [1, null]]);
+            newStack.push([4, 'forever', 0, 0, [1, 6, 5]]);
+            newStack.push([5, 'hidden', 0, 0, [4, null]]);
+
+            var previousBlock = 4;
+            var sameNoteValue = 1;
+            for (var i = 0; i < ruler.cells.length; i++) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
+                    sameNoteValue += 1;
+                    continue;
+                } else {
+                    var idx = newStack.length;
+                    var noteValue = noteValues[i];
+
+                    var obj = rationalToFraction(1 / Math.abs(noteValue));
+
+                    var drumBlockNo = that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1];
+                    var drum = that._logo.blocks.blockList[drumBlockNo].value;
+
+                    if (sameNoteValue === 1) {
+                        // Add a note block.
+                        if (noteValue < 0) {
+                            newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
+                            newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
+                            newStack.push([idx + 2, ['number', {'value': obj[0]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                            newStack.push([idx + 5, 'rest2', 0, 0, [idx + 4, idx + 6]]);
+                            newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
+                            if (i == ruler.cells.length - 1) {
+                                newStack.push([idx + 7, 'hidden', 0, 0, [idx, null]]);
+                            } else {
+                                newStack.push([idx + 7, 'hidden', 0, 0, [idx, idx + 8]]);
+                                previousBlock = idx + 7;
+                            }
+                        } else {
+                            newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
+                            newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
+                            newStack.push([idx + 2, ['number', {'value': obj[0]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                            newStack.push([idx + 5, 'pitch', 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
+                            newStack.push([idx + 6, ['notename', {'value': 'C'}], 0, 0, [idx + 5]]);
+                            newStack.push([idx + 7, ['number', {'value': 4}], 0, 0, [idx + 5]]);
+                            if (i == ruler.cells.length - 1) {
+                                newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
+                            } else {
+                                newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
+                                previousBlock = idx + 8;
+                            }
+                        }
+                    } else {
+                        // Add a note block inside a repeat block.
+                        if (i == ruler.cells.length - 1) {
+                            newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, null]]);
+                        } else {
+                            newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 11]]);
+                            previousBlock = idx;
+                        }
+                        newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
+                        if (noteValue < 0) {
+                            newStack.push([idx + 2, 'newnote', 0, 0, [idx, idx + 3, idx + 6, idx + 9]]);
+                            newStack.push([idx + 3, 'divide', 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                            newStack.push([idx + 4, ['number', {'value': 1}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 5, ['number', {'value': -noteValue}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 6, 'vspace', 0, 0, [idx + 2, idx + 7]]);
+                            newStack.push([idx + 7, 'rest2', 0, 0, [idx + 6, idx + 8]]);
+                            newStack.push([idx + 8, 'hidden', 0, 0, [idx + 7, null]]);
+                            newStack.push([idx + 9, 'hidden', 0, 0, [idx + 2, null]]);
+                        } else {
+                            newStack.push([idx + 2, 'newnote', 0, 0, [idx, idx + 3, idx + 6, idx + 10]]);
+                            newStack.push([idx + 3, 'divide', 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                            newStack.push([idx + 4, ['number', {'value': 1}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 5, ['number', {'value': noteValue}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 6, 'vspace', 0, 0, [idx + 2, idx + 7]]);
+                            newStack.push([idx + 7, 'pitch', 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
+                            newStack.push([idx + 8, ['notename', {'value': 'C'}], 0, 0, [idx + 7]]);
+                            newStack.push([idx + 9, ['number', {'value': 4}], 0, 0, [idx + 7]]);
+                            newStack.push([idx + 10, 'hidden', 0, 0, [idx + 2, null]]);
+                        }
+                    }
+
+                    sameNoteValue = 1;
+                }
+            }
+
+            that._logo.blocks.loadNewBlocks(newStack);
+            if (selectedRuler > that.Rulers.length - 2) {
+                return;
+            } else {
+                that._saveMachine(selectedRuler + 1);
             }
         }, 500);
     };
 
     this.init = function (logo) {
         console.log('init RhythmRuler');
-
         this._logo = logo;
 
         this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
@@ -1199,7 +1345,7 @@ function RhythmRuler () {
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
         cell.onclick = function () {
-            that._saveDrumMachine(0);
+            that._saveMachine(0);
         };
 
         // An input for setting the dissect number
