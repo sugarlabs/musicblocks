@@ -65,8 +65,6 @@ msgstr ""
 #: js/lilypond.js:586
 #: js/lilypond.js:737
 #: js/lilypond.js:775
-#: js/logo-test.js:1322
-#: js/logo-test.js:10097
 msgid "start"
 msgstr ""
 
@@ -136,8 +134,6 @@ msgstr ""
 #: js/palette.js:756
 #: js/blocks.js:1717
 #: js/blocks.js:2165
-#: js/logo-test.js:695
-#: js/logo-test.js:8746
 msgid "true"
 msgstr ""
 
@@ -145,7 +141,6 @@ msgstr ""
 #: js/logo.js:714
 #: js/blocks.js:1719
 #: js/blocks.js:2167
-#: js/logo-test.js:697
 msgid "false"
 msgstr ""
 
@@ -159,7 +154,6 @@ msgstr ""
 #: js/block.js:2180
 #: js/logo.js:5764
 #: js/basicblocks.js:426
-#: js/logo-test.js:5747
 #: js/ptm.js:1738
 #: js/pitchtimematrix.js:1753
 #: js/musicutils.js:298
@@ -179,7 +173,6 @@ msgstr ""
 #: js/block.js:2180
 #: js/logo.js:5767
 #: js/basicblocks.js:417
-#: js/logo-test.js:5750
 #: js/ptm.js:1751
 #: js/pitchtimematrix.js:1766
 #: js/musicutils.js:294
@@ -496,7 +489,6 @@ msgid "mice"
 msgstr ""
 
 #: js/logo.js:31
-#: js/logo-test.js:31
 msgid "Not a valid pitch name"
 msgstr ""
 
@@ -509,7 +501,6 @@ msgid "Turning on mouse blink; setting FPS to 30."
 msgstr ""
 
 #: js/logo.js:1501
-#: js/logo-test.js:1484
 msgid "Block does not support incrementing."
 msgstr ""
 
@@ -524,17 +515,6 @@ msgstr ""
 #: js/logo.js:9443
 #: js/logo.js:9581
 #: js/logo.js:9609
-#: js/logo-test.js:1879
-#: js/logo-test.js:2427
-#: js/logo-test.js:2444
-#: js/logo-test.js:2481
-#: js/logo-test.js:2498
-#: js/logo-test.js:6561
-#: js/logo-test.js:9206
-#: js/logo-test.js:9357
-#: js/logo-test.js:9417
-#: js/logo-test.js:9555
-#: js/logo-test.js:9583
 msgid "Cannot find mouse"
 msgstr ""
 
@@ -549,122 +529,87 @@ msgstr ""
 #: js/logo.js:9445
 #: js/logo.js:9583
 #: js/logo.js:9611
-#: js/logo-test.js:1881
-#: js/logo-test.js:2429
-#: js/logo-test.js:2446
-#: js/logo-test.js:2483
-#: js/logo-test.js:2500
-#: js/logo-test.js:6563
-#: js/logo-test.js:9208
-#: js/logo-test.js:9359
-#: js/logo-test.js:9419
-#: js/logo-test.js:9557
-#: js/logo-test.js:9585
 msgid "Cannot find turtle"
 msgstr ""
 
 #: js/logo.js:2468
-#: js/logo-test.js:2451
 msgid "Mouse is already running."
 msgstr ""
 
 #: js/logo.js:2470
-#: js/logo-test.js:2453
 msgid "Turtle is already running."
 msgstr ""
 
 #: js/logo.js:2490
-#: js/logo-test.js:2473
 msgid "Cannot find start block"
 msgstr ""
 
 #: js/logo.js:2808
-#: js/logo-test.js:2791
 msgid "Please enter a valid URL."
 msgstr ""
 
 #: js/logo.js:2897
 #: js/logo.js:8648
-#: js/logo-test.js:2880
-#: js/logo-test.js:8622
 msgid "You must select a file."
 msgstr ""
 
 #: js/logo.js:2906
-#: js/logo-test.js:2889
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
 msgstr ""
 
 #: js/logo.js:2910
-#: js/logo-test.js:2893
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
 msgstr ""
 
 #: js/logo.js:2926
-#: js/logo-test.js:2909
 msgid "Error parsing JSON data:"
 msgstr ""
 
 #: js/logo.js:2931
-#: js/logo-test.js:2914
 msgid "404: Page not found"
 msgstr ""
 
 #: js/logo.js:2955
-#: js/logo-test.js:2938
 msgid "Cannot find a valid heap for"
 msgstr ""
 
 #: js/logo.js:2965
 #: js/logo.js:9808
-#: js/logo-test.js:2948
-#: js/logo-test.js:9788
 msgid "Index must be > 0."
 msgstr ""
 
 #: js/logo.js:2970
 #: js/logo.js:9813
-#: js/logo-test.js:2953
-#: js/logo-test.js:9793
 msgid "Maximum heap size is 1000."
 msgstr ""
 
 #: js/logo.js:2994
 #: js/logo.js:3018
 #: js/logo.js:3042
-#: js/logo-test.js:2977
-#: js/logo-test.js:3001
-#: js/logo-test.js:3025
 #: js/timbre.js:607
 msgid "Unable to use synth due to existing oscillator"
 msgstr ""
 
 #: js/logo.js:3000
 #: js/logo.js:3024
-#: js/logo-test.js:2983
-#: js/logo-test.js:3007
 msgid "The input cannot be negative."
 msgstr ""
 
 #: js/logo.js:3113
-#: js/logo-test.js:3096
 msgid "Adding missing pitch number 0."
 msgstr ""
 
 #: js/logo.js:3123
-#: js/logo-test.js:3106
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
 msgstr ""
 
 #: js/logo.js:3128
-#: js/logo-test.js:3111
 msgid "Ignoring duplicate pitch numbers."
 msgstr ""
 
 #: js/logo.js:3261
-#: js/logo-test.js:3244
 msgid "You must have at least one pitch block and one drum block in the matrix."
 msgstr ""
 
@@ -672,10 +617,6 @@ msgstr ""
 #: js/logo.js:3376
 #: js/logo.js:3404
 #: js/logo.js:3427
-#: js/logo-test.js:3337
-#: js/logo-test.js:3359
-#: js/logo-test.js:3387
-#: js/logo-test.js:3410
 msgid "Beats per minute must be > 30."
 msgstr ""
 
@@ -683,58 +624,45 @@ msgstr ""
 #: js/logo.js:3379
 #: js/logo.js:3407
 #: js/logo.js:3430
-#: js/logo-test.js:3340
-#: js/logo-test.js:3362
-#: js/logo-test.js:3390
-#: js/logo-test.js:3413
 msgid "Maximum beats per minute is 1000."
 msgstr ""
 
 #: js/logo.js:3500
-#: js/logo-test.js:3483
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
 msgstr ""
 
 #: js/logo.js:3537
-#: js/logo-test.js:3520
 msgid "Attack value should be from 0 to 100."
 msgstr ""
 
 #: js/logo.js:3540
-#: js/logo-test.js:3523
 msgid "Decay value should be from 0 to 100."
 msgstr ""
 
 #: js/logo.js:3543
-#: js/logo-test.js:3526
 msgid "Sustain value should be from 0 to 100."
 msgstr ""
 
 #: js/logo.js:3546
-#: js/logo-test.js:3529
 msgid "Release value should be from 0-100."
 msgstr ""
 
 #: js/logo.js:3562
-#: js/logo-test.js:3545
 msgid "You are adding multiple envelope blocks."
 msgstr ""
 
 #: js/logo.js:3591
-#: js/logo-test.js:3574
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
 msgstr ""
 
 #: js/logo.js:3629
-#: js/logo-test.js:3612
 msgid "You are adding multiple oscillator blocks."
 msgstr ""
 
 #: js/logo.js:3649
 #: js/basicblocks.js:239
 #: js/basicblocks.js:246
-#: js/logo-test.js:3632
 #: js/musicutils.js:237
 #: js/musicutils.js:307
 #.TRANS: invert based on even or odd number or musical scale
@@ -744,7 +672,6 @@ msgstr ""
 
 #: js/logo.js:3651
 #: js/basicblocks.js:239
-#: js/logo-test.js:3634
 #: js/musicutils.js:239
 #: js/musicutils.js:307
 #.TRANS: odd numbers
@@ -753,87 +680,71 @@ msgstr ""
 
 #: js/logo.js:3653
 #: js/basicblocks.js:239
-#: js/logo-test.js:3636
 #: js/musicutils.js:240
 #: js/musicutils.js:307
 msgid "scalar"
 msgstr ""
 
 #: js/logo.js:3724
-#: js/logo-test.js:3707
 msgid "The Case Block must be used inside of a Switch Block."
 msgstr ""
 
 #: js/logo.js:3794
-#: js/logo-test.js:3777
 msgid "The Scalar Step Block must be used inside of a Note Block."
 msgstr ""
 
 #: js/logo.js:3947
-#: js/logo-test.js:3930
 msgid "Drum Block: Did you mean to use a Note block?"
 msgstr ""
 
 #: js/logo.js:4341
-#: js/logo-test.js:4324
 msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr ""
 
 #: js/logo.js:4373
-#: js/logo-test.js:4356
 msgid "polyphonic rhythm"
 msgstr ""
 
 #: js/logo.js:4646
-#: js/logo-test.js:4629
 #.TRANS: Note value is the note duration.
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
 msgstr ""
 
 #: js/logo.js:4722
-#: js/logo-test.js:4705
 msgid "An argument of -1 results in a note value of 0."
 msgstr ""
 
 #: js/logo.js:4951
-#: js/logo-test.js:4934
 msgid "Vibrato intensity must be between 1 and 100."
 msgstr ""
 
 #: js/logo.js:4956
-#: js/logo-test.js:4939
 msgid "Vibrato rate must be greater than 0."
 msgstr ""
 
 #: js/logo.js:4988
-#: js/logo-test.js:4971
 msgid "Distortion must be from 0 to 100."
 msgstr ""
 
 #: js/logo.js:5018
 #: js/logo.js:5086
-#: js/logo-test.js:5001
-#: js/logo-test.js:5069
 #.TRANS: Depth is the intesity of the tremolo effect.
 #.TRANS: Depth is the intesity of the chorus effect.
 msgid "Depth is out of range."
 msgstr ""
 
 #: js/logo.js:5122
-#: js/logo-test.js:5105
 #.TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
 msgstr ""
 
 #: js/logo.js:5172
-#: js/logo-test.js:5155
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
 msgstr ""
 
 #: js/logo.js:5182
-#: js/logo-test.js:5165
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partials block."
 msgstr ""
@@ -843,10 +754,6 @@ msgstr ""
 #: js/logo.js:5983
 #: js/logo.js:5985
 #: js/basicblocks.js:3278
-#: js/logo-test.js:5901
-#: js/logo-test.js:5903
-#: js/logo-test.js:5966
-#: js/logo-test.js:5968
 #: js/synthutils.js:34
 #: js/musicutils.js:250
 #.TRANS: the default case used in a switch statement in programming
@@ -855,39 +762,32 @@ msgid "default"
 msgstr ""
 
 #: js/logo.js:6183
-#: js/logo-test.js:6166
 msgid "Hertz Block: Did you mean to use a Note block?"
 msgstr ""
 
 #: js/logo.js:6756
-#: js/logo-test.js:6739
 msgid "Playback is ready."
 msgstr ""
 
 #: js/logo.js:7010
-#: js/logo-test.js:6993
 #.TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
 msgstr ""
 
 #: js/logo.js:7141
-#: js/logo-test.js:7124
 msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
 msgstr ""
 
 #: js/logo.js:7574
-#: js/logo-test.js:7557
 msgid "synth cannot play chords."
 msgstr ""
 
 #: js/logo.js:9768
-#: js/logo-test.js:9748
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
 msgstr ""
 
 #: js/logo.js:9794
 #: js/basicblocks.js:3030
-#: js/logo-test.js:9774
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 #.TRANS: empty the heap
@@ -896,8 +796,6 @@ msgstr ""
 
 #: js/logo.js:9887
 #: js/logo.js:9961
-#: js/logo-test.js:9867
-#: js/logo-test.js:9941
 msgid "You must use two pitch blocks when measuring an interval."
 msgstr ""
 
@@ -905,7 +803,6 @@ msgstr ""
 #: js/basicblocks.js:257
 #: js/basicblocks.js:274
 #: js/basicblocks.js:3489
-#: js/logo-test.js:10070
 #: js/status.js:211
 #: plugins/rodi.rtp:196
 #.TRANS: a musical note consisting of pitch and duration
@@ -914,31 +811,25 @@ msgstr ""
 
 #: js/logo.js:10121
 #: js/basicblocks.js:988
-#: js/logo-test.js:10101
 #: js/rhythmruler.js:303
 #: js/rhythmruler.js:416
 msgid "silence"
 msgstr ""
 
 #: js/logo.js:10130
-#: js/logo-test.js:10110
 msgid "Cannot find block"
 msgstr ""
 
 #: js/logo.js:10138
 #: js/logo.js:10143
-#: js/logo-test.js:10118
-#: js/logo-test.js:10123
 msgid "Warning: block argument type mismatch"
 msgstr ""
 
 #: js/logo.js:10716
-#: js/logo-test.js:10696
 msgid "Lilypond cannot process tempo of "
 msgstr ""
 
 #: js/logo.js:10737
-#: js/logo-test.js:10717
 msgid "Lilypond cannot process pickup of "
 msgstr ""
 
@@ -3441,7 +3332,6 @@ msgstr ""
 msgid "prepare music for playback"
 msgstr ""
 
-#: js/logo-test.js:9708
 msgid "Cannot read pixel color"
 msgstr ""
 
