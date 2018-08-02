@@ -6139,6 +6139,7 @@ function Logo () {
                     that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(noteObj[1]);
                     that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
                     that.noteHertz[turtle][last(that.inNoteBlock[turtle])].push(frequency);
+                    return noteObj;
                 }
 
                 if (!(that.invertList[turtle].length === 0)) {
@@ -9497,15 +9498,23 @@ function Logo () {
                 } else {
                     var value = null;
                     if (that.lastNotePlayed[turtle] !== null) {
-                        var len = that.lastNotePlayed[turtle][0].length;
-                        var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
-                        var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
-                        var obj = [pitch, octave];
+                        if (typeof(that.lastNotePlayed[turtle][0]) === 'string') {
+                            var len = that.lastNotePlayed[turtle][0].length;
+                            var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
+                            var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
+                            var obj = [pitch, octave];
+                        } else {
+                            // Hertz?
+                            var obj = frequencyToPitch(that.lastNotePlayed[turtle][0]);
+                        }
                     } else if (that.inNoteBlock[turtle] in that.notePitches[turtle] && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         var obj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     } else {
-                        console.log('Cannot find a note ');
-                        that.errorMsg(INVALIDPITCH, blk);
+                        if (that.lastNotePlayed[turtle] !== null) {
+                            console.log('Cannot find a note ');
+                            that.errorMsg(INVALIDPITCH, blk);
+                        }
+
                         var obj = ['G', 4];
                     }
 

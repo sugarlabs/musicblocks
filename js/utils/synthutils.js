@@ -257,6 +257,10 @@ function Synth() {
         this.changeInTemperament = false;
     };
 
+    this.getFrequency = function(notes, changeInTemperament) {
+        return this._getFrequency(notes, changeInTemperament);
+    };
+
     this._getFrequency = function(notes, changeInTemperament) {
         if (changeInTemperament) {
             this.temperamentChanged(this.inTemperament, this.startingPitch);
@@ -268,29 +272,39 @@ function Synth() {
             var len = oneNote.length;
 
             for (var note in that.noteFrequencies) {
-		if (note === oneNote.substring(0, len - 1)) { 
+                if (note === oneNote.substring(0, len - 1)) { 
                     if (that.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
-			//Note to be played is in the same octave.
-			return that.noteFrequencies[note][1];
+                        //Note to be played is in the same octave.
+                        return that.noteFrequencies[note][1];
                     } else { 
-			//Note to be played is not in the same octave.
-			var power = Number(oneNote.slice(-1)) - that.noteFrequencies[note][0];
-			return that.noteFrequencies[note][1] * Math.pow(2, power);
+                        //Note to be played is not in the same octave.
+                        var power = Number(oneNote.slice(-1)) - that.noteFrequencies[note][0];
+                        return that.noteFrequencies[note][1] * Math.pow(2, power);
                     }
-		}
+                }
             }
+
+            console.log('WARNING: ' + oneNote + ' not found');
         };
 
         if (typeof(notes) === 'string') {
-	    return __getFrequency(notes);
-	} else {
+            return __getFrequency(notes);
+        } else if (typeof(notes) === 'obj') {
             var results = [];
             for (var i = 0; i < notes.length; i++) {
-		results.push(__getFrequency(notes[i]));
-	    }
+                if (typeof(notes[i]) === 'string') {
+                    results.push(__getFrequency(notes[i]));
+                } else {
+                    // Hertz?
+                    results.push(notes[i]);
+                }
+            }
 
-	    return results;
-	}
+            return results;
+        } else {
+            // Hertz?
+            return notes;
+        }
     };
 
     this.resume = function () {
@@ -938,7 +952,6 @@ function Synth() {
             // var obj = noteToPitchOctave(notes);
             // var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
             // tempNotes = noteNum - centerNo;
-
             this._performNotes(tempSynth.toMaster(), notes, beatValue, null, null, setNote);
             break;
         case 3:  // builtin synth
