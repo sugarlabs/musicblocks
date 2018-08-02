@@ -9,9 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// This widget enable us to create pitches of different frequency varying
-// from given frequency to nextoctave frequency(two times the given frequency)
-// in continuous manner.
+// This widget enable us to create pitches of different frequency
+// using picrophone input
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 var audioContext = null;
@@ -124,21 +123,21 @@ function PitchTracker() {
         keepRecording = 1;
 
         // Position the widget and make it visible.
-        var sliderDiv = docById('sliderDiv');
+        var trackerDiv = docById('trackerDiv');
 
-        sliderDiv.style.visibility = 'visible';
-        sliderDiv.setAttribute('draggable', 'true');
-        sliderDiv.style.left = '200px';
-        sliderDiv.style.top = '150px';
+        trackerDiv.style.visibility = 'visible';
+        trackerDiv.setAttribute('draggable', 'true');
+        trackerDiv.style.left = '200px';
+        trackerDiv.style.top = '150px';
 
         // The widget buttons
-        var widgetButtonsDiv = docById('sliderButtonsDiv');
+        var widgetButtonsDiv = docById('trackerButtonsDiv');
         widgetButtonsDiv.style.display = 'inline';
         widgetButtonsDiv.style.visibility = 'visible';
         widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table id="sliderButtonTable"></table>';
+        widgetButtonsDiv.innerHTML = '<table id="trackerButtonTable"></table>';
 
-        var buttonTable = docById('sliderButtonTable');
+        var buttonTable = docById('trackerButtonTable');
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
 
@@ -147,9 +146,9 @@ function PitchTracker() {
 
         var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
         cell.onclick = function() {
-            sliderDiv.style.visibility = 'hidden';
+            trackerDiv.style.visibility = 'hidden';
             widgetButtonsDiv.style.visibility = 'hidden';
-            sliderTableDiv.style.visibility = 'hidden'; 
+            trackerTableDiv.style.visibility = 'hidden'; 
             keepRecording = 0;
             frequencyContainer = [];
         };
@@ -255,8 +254,8 @@ function PitchTracker() {
 
         cell.style.cursor = 'move';
 
-        this._dx = cell.getBoundingClientRect().left - sliderDiv.getBoundingClientRect().left;
-        this._dy = cell.getBoundingClientRect().top - sliderDiv.getBoundingClientRect().top;
+        this._dx = cell.getBoundingClientRect().left - trackerDiv.getBoundingClientRect().left;
+        this._dy = cell.getBoundingClientRect().top - trackerDiv.getBoundingClientRect().top;
         this._dragging = false;
         this._target = false;
         this._dragCellHTML = cell.innerHTML;
@@ -282,34 +281,34 @@ function PitchTracker() {
             if (that._dragging) {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
-                sliderDiv.style.left = x + 'px';
+                trackerDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
-                sliderDiv.style.top = y + 'px';
+                trackerDiv.style.top = y + 'px';
                 cell.innerHTML = that._dragCellHTML;
             }
         };
 
-        sliderDiv.ondragover = function(e) {
+        trackerDiv.ondragover = function(e) {
             e.preventDefault();
         };
 
-        sliderDiv.ondrop = function(e) {
+        trackerDiv.ondrop = function(e) {
             if (that._dragging) {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
-                sliderDiv.style.left = x + 'px';
+                trackerDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
-                sliderDiv.style.top = y + 'px';
+                trackerDiv.style.top = y + 'px';
                 cell.innerHTML = that._dragCellHTML;
             }
         };
 
-        sliderDiv.onmousedown = function(e) {
+        trackerDiv.onmousedown = function(e) {
             that._dragging = true;
             that._target = e.target;
         };
 
-        sliderDiv.ondragstart = function(e) {
+        trackerDiv.ondragstart = function(e) {
             if (cell.contains(that._target)) {
                 e.dataTransfer.setData('text/plain', '');
             } else {
@@ -318,15 +317,15 @@ function PitchTracker() {
         };
 
         // // The slider table
-        // var sliderTableDiv = docById('sliderTableDiv');
-        // sliderTableDiv.style.display = 'inline';
-        // sliderTableDiv.style.visibility = 'visible';
-        // sliderTableDiv.style.border = '2px';
-        // sliderTableDiv.innerHTML = '';
+        // var trackerTableDiv = docById('trackerTableDiv');
+        // trackerTableDiv.style.display = 'inline';
+        // trackerTableDiv.style.visibility = 'visible';
+        // trackerTableDiv.style.border = '2px';
+        // trackerTableDiv.innerHTML = '';
 
         // // We use an outer div to scroll vertically and an inner div to
         // // scroll horizontally.
-        // sliderTableDiv.innerHTML = '<div id="sliderOuterDiv"><div id="sliderInnerDiv"><table id="sliderSliderTable"></table></div></div>';
+        // trackerTableDiv.innerHTML = '<div id="sliderOuterDiv"><div id="sliderInnerDiv"><table id="sliderSliderTable"></table></div></div>';
 
         // var sliderOuterDiv = docById('sliderOuterDiv');
         // sliderOuterDiv.style.width = Math.min((11 + this.Sliders.length * SLIDERWIDTH), w / 2) + 'px';
@@ -896,7 +895,7 @@ function PitchTracker() {
             if (!window.requestAnimationFrame)
                 window.requestAnimationFrame = window.webkitRequestAnimationFrame;
             rafID = window.requestAnimationFrame( updatePitch );
-        }, 1000);
+        },500);
 
         
     }

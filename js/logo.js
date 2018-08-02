@@ -3228,7 +3228,7 @@ function Logo () {
                 that.pitchTracker = new PitchTracker();
             }
 
-            that.pitchTracker.Sliders = [];
+            that.pitchTracker.Trackers = [];
 
             childFlow = args[0];
             childFlowCount = 1;
@@ -6188,7 +6188,7 @@ function Logo () {
             } else if (that.inPitchSlider) {
                 that.pitchSlider.Sliders.push([args[0], 0, 0]); 
             } else if (that.inPitchTracker) {
-                that.pitchTracker.Sliders.push([args[0], 0, 0]); 
+                that.pitchTracker.Trackers.push([args[0], 0, 0]); 
             } else {
                 that.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
             }
@@ -6211,7 +6211,7 @@ function Logo () {
                 } else if (that.inPitchSlider) {
                     that.pitchSlider.Sliders.push([args[0], 0, 0]);
                 } else if (that.inPitchTracker) {
-                    that.pitchTracker.Sliders.push([args[0], 0, 0]);
+                    that.pitchTracker.Trackers.push([args[0], 0, 0]);
                 } else {
                     that.oscList[turtle][last(that.inNoteBlock[turtle])].push(that.blocks.blockList[blk].name);
 

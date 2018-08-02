@@ -1122,6 +1122,7 @@ define(MYDEFINES, function (compatibility) {
                         storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                         storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
                         storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
+                        storage.setItem('isTrackerHidden', docById('trackerDiv').style.visibility);
                         storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
                         if (docById('ptmDiv').style.visibility !== 'hidden') {
@@ -1164,6 +1165,12 @@ define(MYDEFINES, function (compatibility) {
                             docById('sliderDiv').style.visibility = 'hidden';
                             docById('sliderButtonsDiv').style.visibility = 'hidden';
                             docById('sliderTableDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('trackerDiv').style.visibility !== 'hidden') {
+                            docById('trackerDiv').style.visibility = 'hidden';
+                            docById('trackerButtonsDiv').style.visibility = 'hidden';
+                            docById('trackerTableDiv').style.visibility = 'hidden';
                         }
 
                         if (docById('modeDiv').style.visibility !== 'hidden') {
@@ -1211,6 +1218,9 @@ define(MYDEFINES, function (compatibility) {
                         docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
                         docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
                         docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
+                        docById('trackerDiv').style.visibility = storage.getItem('isTrackerHidden');
+                        docById('trackerButtonsDiv').style.visibility = storage.getItem('isTrackerHidden');
+                        docById('trackerTableDiv').style.visibility = storage.getItem('isTrackerHidden');
                         docById('pdmDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                         docById('pdmButtonsDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                         docById('pdmTableDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
