@@ -5878,10 +5878,10 @@ function Logo () {
             break;
         case 'settemperament':
             that.synth.inTemperament = args[0];
-            temperamentSelected.push(args[0]);
-            var len = temperamentSelected.length;
+            that.temperamentSelected.push(args[0]);
+            var len = that.temperamentSelected.length;
 
-            if (temperamentSelected[len-1] !== temperamentSelected[len-2]) {
+            if (that.temperamentSelected[len - 1] !== that.temperamentSelected[len - 2]) {
                 that.synth.changeInTemperament = true;        
             }
               
