@@ -349,6 +349,10 @@ function Synth() {
     };
 
     this.getCustomFrequency = function (notes) {
+        if (notes instanceof Array) {
+            notes = notes[0];
+        }
+
         var octave = notes.slice(-1);
         notes = getCustomNote(notes.substring(0, notes.length - 1));
         var pitch = this.startingPitch;
