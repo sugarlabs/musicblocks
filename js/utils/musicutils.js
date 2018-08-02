@@ -1924,6 +1924,45 @@ function reducedFraction(a, b) {
     }
 };
 
+function getCustomNote(notes) {
+    // For custom temperament notes
+    if (notes instanceof Array) {
+        notes = notes[0];
+    }
+
+    var centsInfo = ''
+    if (notes.indexOf('(') !== -1) {
+        centsInfo = notes.substring(notes.indexOf('('), notes.length);
+    }
+
+    notes = notes.replace(centsInfo, '');
+    var articulation = notes.replace('do', '').replace('re', '').replace('mi', '').replace('fa', '').replace('sol', '').replace('la', '').replace('ti', '').replace('A', '').replace('B', '').replace('C', '').replace('D', '').replace('E', '').replace('F', '').replace('G', '');
+    notes = notes.replace(articulation, '');
+
+    switch(articulation) {
+        case 'bb':
+        case DOUBLEFLAT:
+            notes = notes + '𝄫' + centsInfo;
+            break;
+        case 'b':
+        case FLAT:
+            notes = notes + '♭' + centsInfo;
+            break;
+        case '##':
+        case '*':
+        case DOUBLESHARP:
+            notes = notes + '𝄪' + centsInfo;
+            break;
+        case '#':
+        case SHARP:
+            notes = notes + '♯' + centsInfo;
+            break;
+        default:
+            notes = notes + articulation + centsInfo;
+            break;
+    }
+    return notes;
+};
 
 function getNote(noteArg, octave, transposition, keySignature, movable, direction, errorMsg, temperament) {
     if (temperament === undefined) {
@@ -2240,7 +2279,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
             }
         }
     } else if (temperament == 'custom') {
-        var note = noteArg;
+        var note = getCustomNote(noteArg);
         for (var number in TEMPERAMENT['custom']) {
             if (number !== 'pitchNumber') {
                 if (note == TEMPERAMENT['custom'][number][1]) {
@@ -2248,9 +2287,6 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                     break;
                 }
             }   
-        }
-        if (pitchNumber == undefined) {
-            return getNote(noteArg, octave, transposition, keySignature, movable, direction, errorMsg);
         }
         var inOctave = octave;
         var octaveLength = TEMPERAMENT['custom']['pitchNumber'];

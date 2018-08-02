@@ -349,42 +349,8 @@ function Synth() {
     };
 
     this.getCustomFrequency = function (notes) {
-        if (notes instanceof Array) {
-            notes = notes[0];
-        }
         var octave = notes.slice(-1);
-        if (notes.indexOf('(') !== -1) {
-            var centsInfo = notes.substring(notes.indexOf('('), notes.length);
-        } else {
-            var centsInfo = octave;
-        }
-        notes = notes.replace(centsInfo, '');
-        var articulation = notes.replace('do', '').replace('re', '').replace('mi', '').replace('fa', '').replace('sol', '').replace('la', '').replace('ti', '').replace('A', '').replace('B', '').replace('C', '').replace('D', '').replace('E', '').replace('F', '').replace('G', '');
-        notes = notes.replace(articulation, '');
-
-        switch(articulation) {
-            case 'bb':
-            case DOUBLEFLAT:
-                notes = notes + '𝄫' + centsInfo;
-                break;
-            case 'b':
-            case FLAT:
-                notes = notes + '♭' + centsInfo;
-                break;
-            case '##':
-            case '*':
-            case DOUBLESHARP:
-                notes = notes + '𝄪' + centsInfo;
-                break;
-            case '#':
-            case SHARP:
-                notes = notes + '♯' + centsInfo;
-                break;
-            default:
-                notes = notes + articulation + centsInfo;
-                break;
-        }
-
+        notes = getCustomNote(notes.substring(0, notes.length - 1));
         var pitch = this.startingPitch;
         var startPitchFrequency = pitchToFrequency(pitch.substring(0, pitch.length - 1), pitch.slice(-1), 0, 'C Major');
         if (typeof(notes) === 'number'){
@@ -392,7 +358,7 @@ function Synth() {
         } else {
             for (var pitchNumber in TEMPERAMENT['custom']) {
                 if (pitchNumber !== 'pitchNumber') {
-                    if (notes.substring(0, notes.length - 1) == TEMPERAMENT['custom'][pitchNumber][1]) {
+                    if (notes == TEMPERAMENT['custom'][pitchNumber][1]) {
                         var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
                         return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
                     }
