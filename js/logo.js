@@ -6295,6 +6295,9 @@ function Logo () {
             break;
         case 'settemperament':
             that.synth.inTemperament = args[0];
+            if (TEMPERAMENT['custom']['0'][1] === undefined) {
+                that.errorMsg('Custom temperament behaves like equal as it is not defined. You can define it using temperament widget.');
+            }
             that.temperamentSelected.push(args[0]);
             var len = that.temperamentSelected.length;
 
