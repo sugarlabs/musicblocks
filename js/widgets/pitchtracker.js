@@ -151,6 +151,7 @@ function PitchTracker() {
             widgetButtonsDiv.style.visibility = 'hidden';
             sliderTableDiv.style.visibility = 'hidden'; 
             keepRecording = 0;
+            frequencyContainer = [];
         };
 
         var cell = this._addButton(row, 'tap-button.svg', iconSize, _('Start Recording'), '');
@@ -170,22 +171,16 @@ function PitchTracker() {
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
         cell.onclick = function () {
             
-            var noteContainer = [];
-            noteContainer.push("C4");
-            noteContainer.push("D♯4");
-            noteContainer.push("E4");            
-
             var pitches = [];
 
             console.log("OOOOOutput of noteProvider " +noteProvider(3310));
 
-            for(var f = 0;f<5;f++){
+            for(var f = 0;f<frequencyContainer.length;f++){
                 var temp3 = frequencyContainer[f];
                 pitches.push(noteProvider(temp3));
             }
 
             console.log("frequencyContainer " +frequencyContainer);
-            console.log("pitches " +pitches);
 
 
 
@@ -243,6 +238,7 @@ function PitchTracker() {
 
         var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
         cell.onclick = function () {
+        	frequencyContainer = [];
        //     that._clear();
         };
 
