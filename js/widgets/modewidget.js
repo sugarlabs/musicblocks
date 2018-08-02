@@ -431,7 +431,8 @@ function ModeWidget() {
         var table = docById('modeTable');
         var n = table.rows.length - 1;
 
-        table.rows[n].cells[0].innerHTML = _(currentModeName[1]);
+        console.log(_(currentModeName[1]));
+        table.rows[n].cells[0].innerHTML = currentModeName[0] + ' ' + _(currentModeName[1]);
 
         var that = this;
         var k = 0;
@@ -773,6 +774,7 @@ function ModeWidget() {
         var table = docById('modeTable');
 	var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
+        var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
 
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
@@ -787,7 +789,7 @@ function ModeWidget() {
                     this._logo.refreshCanvas();
                 }
 
-                table.rows[n].cells[0].innerHTML = _(mode);
+                table.rows[n].cells[0].innerHTML = currentKey + ' ' + _(mode);
                 return;
             }
         }
