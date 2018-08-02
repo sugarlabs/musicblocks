@@ -4479,6 +4479,34 @@ function Logo () {
 
             that.notationPickup(turtle, that.pickup[turtle]);
             break;
+        case 'everybeatdo':
+            // Set up a listener for every beat for this turtle.
+            if (!(args[0] in that.actions)) {
+                that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+            } else {
+                var __listener = function (event) {
+                    if (that.turtles.turtleList[turtle].running) {
+                        var queueBlock = new Queue(that.actions[args[0]], 1, blk);
+                        that.parentFlowQueue[turtle].push(blk);
+                        that.turtles.turtleList[turtle].queue.push(queueBlock);
+                    } else {
+                        // Since the turtle has stopped
+                        // running, we need to run the stack
+                        // from here.
+                        if (isflow) {
+                            that._runFromBlockNow(that, turtle, that.actions[args[0]], isflow, receivedArg);
+                        } else {
+                            that._runFromBlock(that, turtle, that.actions[args[0]], isflow, receivedArg);
+                        }
+                    }
+                };
+
+                var eventName = '__everybeat_' + turtle + '__';
+                that._setListener(turtle, eventName, __listener);
+
+                that.beatList[turtle].push('everybeat');
+            }
+            break;
         case 'offbeatdo':
             // Set up a listener for this turtle/offbeat combo.
             if (!(args[0] in that.actions)) {
@@ -4600,6 +4628,16 @@ function Logo () {
                 // Put the childFlow into the queue before the beat action
                 // so that the beat action is at the end of the FILO.
                 // Note: The offbeat cannot be Beat 1.
+                if (that.beatList[turtle].indexOf('everybeat') !== -1) {
+                    var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
+                    that.parentFlowQueue[turtle].push(blk);
+                    that.turtles.turtleList[turtle].queue.push(queueBlock);
+                    childFlow = null;
+
+                    var eventName = '__everybeat_' + turtle + '__';
+                    that.stage.dispatchEvent(eventName);
+                }
+
                 if (that.beatList[turtle].indexOf(beatValue) !== -1) {
                     var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
                     that.parentFlowQueue[turtle].push(blk);

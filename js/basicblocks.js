@@ -1161,6 +1161,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     onBeatDoBlock.dockTypes[2] = 'textin';
     onBeatDoBlock.adjustWidthToLabel();
 
+    var everyBeatDoBlock = new ProtoBlock('everybeatdo');
+    everyBeatDoBlock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['everybeatdo'] = everyBeatDoBlock;
+    // #TRANS: on every musical 'beat' do some action
+    everyBeatDoBlock.staticLabels.push(_('on every beat do'));
+    everyBeatDoBlock.oneArgBlock();
+    everyBeatDoBlock.defaults.push(_('action'));
+    everyBeatDoBlock.adjustWidthToLabel();
+    everyBeatDoBlock.dockTypes[1] = 'textin';
+
     // macro
     var setMasterBPMBlock2 = new ProtoBlock('setmasterbpm2');
     setMasterBPMBlock2.palette = palettes.dict['meter'];
