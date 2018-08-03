@@ -277,7 +277,7 @@ function Synth() {
         return this._getFrequency(notes, changeInTemperament);
     };
 
-    this._getFrequency = function(notes, changeInTemperament) {
+    this._getFrequency = function(notes, changeInTemperament, temperament) {
         if (changeInTemperament) {
             if (temperament === undefined) {
                 this.temperamentChanged(this.inTemperament, this.startingPitch);
