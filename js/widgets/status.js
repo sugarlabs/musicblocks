@@ -312,8 +312,11 @@ function StatusMatrix() {
                     if (this._logo.noteStatus[turtle] != null) {
                         var notes = this._logo.noteStatus[turtle][0];
                         for (var j = 0; j < notes.length; j++) {
+                            if (j > 0) {
+                                value += ' ';
+                            }
+
                             value += this._logo.synth.getFrequency(notes[j], this._logo.synth.changeInTemperament).toFixed(2);
-                            value += ' ';
                         }
                     }
                     break;
@@ -361,7 +364,7 @@ function StatusMatrix() {
             activeTurtles += 1;
         }
 
-	this._logo.updatingStatusMatrix = false;
+        this._logo.updatingStatusMatrix = false;
     };
 
     this._addButton = function(row, icon, iconSize, label) {
