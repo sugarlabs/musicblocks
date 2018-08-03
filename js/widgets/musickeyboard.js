@@ -2699,6 +2699,2526 @@ function MusicKeyboard() {
                     }
                 };
             }
+
+            if(idContainer.length > 10){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[10];
+                    var temp2 = noteConversion2[temp1]+bfbf[10];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[10] == "do" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[10] == "do" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[10] == "do" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[10] == "do" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[10] == "do" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[10] == "do" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[10] == "do" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[10] == "do" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[10] == "re" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[10] == "re" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[10] == "re" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[10] == "re" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[10] == "re" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[10] == "re" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[10] == "re" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[10] == "re" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[10] == "mi" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[10] == "mi" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[10] == "mi" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[10] == "mi" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[10] == "mi" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[10] == "mi" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[10] == "mi" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[10] == "mi" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[10] == "fa" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[10] == "fa" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[10] == "fa" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[10] == "fa" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[10] == "fa" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[10] == "fa" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[10] == "fa" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[10] == "fa" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[10] == "sol" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[10] == "sol" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[10] == "sol" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[10] == "sol" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[10] == "sol" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[10] == "sol" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[10] == "sol" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[10] == "sol" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[10] == "la" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[10] == "la" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[10] == "la" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[10] == "la" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[10] == "la" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[10] == "la" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[10] == "la" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[10] == "la" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[10] == "ti" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[10] == "ti" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[10] == "ti" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[10] == "ti" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[10] == "ti" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[10] == "ti" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[10] == "ti" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[10] == "ti" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[10] == "do♯" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[10] == "do♯" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[10] == "do♯" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[10] == "do♯" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[10] == "do♯" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[10] == "do♯" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[10] == "do♯" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[10] == "do♯" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[10] == "re♯" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[10] == "re♯" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[10] == "re♯" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[10] == "re♯" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[10] == "re♯" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[10] == "re♯" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[10] == "re♯" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[10] == "re♯" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[10] == "mi♯" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[10] == "mi♯" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[10] == "mi♯" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[10] == "mi♯" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[10] == "mi♯" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[10] == "mi♯" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[10] == "mi♯" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[10] == "mi♯" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[10] == "fa♯" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[10] == "fa♯" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[10] == "fa♯" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[10] == "fa♯" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[10] == "fa♯" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[10] == "fa♯" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[10] == "fa♯" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[10] == "fa♯" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[10] == "sol♯" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[10] == "sol♯" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[10] == "sol♯" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[10] == "sol♯" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[10] == "sol♯" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[10] == "sol♯" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[10] == "sol♯" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[10] == "sol♯" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[10] == "la♯" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[10] == "la♯" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[10] == "la♯" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[10] == "la♯" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[10] == "la♯" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[10] == "la♯" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[10] == "la♯" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[10] == "la♯" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[10] == "ti♯" & bfbf[10] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[10] == "ti♯" & bfbf[10] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[10] == "ti♯" & bfbf[10] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[10] == "ti♯" & bfbf[10] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[10] == "ti♯" & bfbf[10] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[10] == "ti♯" & bfbf[10] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[10] == "ti♯" & bfbf[10] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[10] == "ti♯" & bfbf[10] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 11){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[11];
+                    var temp2 = noteConversion2[temp1]+bfbf[11];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[11] == "do" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[11] == "do" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[11] == "do" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[11] == "do" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[11] == "do" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[11] == "do" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[11] == "do" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[11] == "do" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[11] == "re" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[11] == "re" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[11] == "re" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[11] == "re" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[11] == "re" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[11] == "re" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[11] == "re" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[11] == "re" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[11] == "mi" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[11] == "mi" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[11] == "mi" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[11] == "mi" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[11] == "mi" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[11] == "mi" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[11] == "mi" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[11] == "mi" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[11] == "fa" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[11] == "fa" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[11] == "fa" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[11] == "fa" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[11] == "fa" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[11] == "fa" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[11] == "fa" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[11] == "fa" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[11] == "sol" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[11] == "sol" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[11] == "sol" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[11] == "sol" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[11] == "sol" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[11] == "sol" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[11] == "sol" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[11] == "sol" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[11] == "la" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[11] == "la" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[11] == "la" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[11] == "la" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[11] == "la" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[11] == "la" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[11] == "la" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[11] == "la" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[11] == "ti" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[11] == "ti" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[11] == "ti" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[11] == "ti" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[11] == "ti" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[11] == "ti" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[11] == "ti" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[11] == "ti" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[11] == "do♯" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[11] == "do♯" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[11] == "do♯" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[11] == "do♯" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[11] == "do♯" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[11] == "do♯" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[11] == "do♯" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[11] == "do♯" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[11] == "re♯" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[11] == "re♯" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[11] == "re♯" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[11] == "re♯" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[11] == "re♯" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[11] == "re♯" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[11] == "re♯" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[11] == "re♯" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[11] == "mi♯" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[11] == "mi♯" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[11] == "mi♯" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[11] == "mi♯" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[11] == "mi♯" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[11] == "mi♯" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[11] == "mi♯" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[11] == "mi♯" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[11] == "fa♯" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[11] == "fa♯" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[11] == "fa♯" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[11] == "fa♯" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[11] == "fa♯" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[11] == "fa♯" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[11] == "fa♯" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[11] == "fa♯" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[11] == "sol♯" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[11] == "sol♯" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[11] == "sol♯" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[11] == "sol♯" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[11] == "sol♯" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[11] == "sol♯" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[11] == "sol♯" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[11] == "sol♯" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[11] == "la♯" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[11] == "la♯" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[11] == "la♯" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[11] == "la♯" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[11] == "la♯" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[11] == "la♯" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[11] == "la♯" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[11] == "la♯" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[11] == "ti♯" & bfbf[11] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[11] == "ti♯" & bfbf[11] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[11] == "ti♯" & bfbf[11] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[11] == "ti♯" & bfbf[11] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[11] == "ti♯" & bfbf[11] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[11] == "ti♯" & bfbf[11] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[11] == "ti♯" & bfbf[11] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[11] == "ti♯" & bfbf[11] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 12){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[12];
+                    var temp2 = noteConversion2[temp1]+bfbf[12];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[12] == "do" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[12] == "do" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[12] == "do" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[12] == "do" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[12] == "do" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[12] == "do" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[12] == "do" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[12] == "do" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[12] == "re" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[12] == "re" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[12] == "re" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[12] == "re" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[12] == "re" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[12] == "re" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[12] == "re" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[12] == "re" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[12] == "mi" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[12] == "mi" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[12] == "mi" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[12] == "mi" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[12] == "mi" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[12] == "mi" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[12] == "mi" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[12] == "mi" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[12] == "fa" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[12] == "fa" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[12] == "fa" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[12] == "fa" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[12] == "fa" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[12] == "fa" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[12] == "fa" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[12] == "fa" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[12] == "sol" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[12] == "sol" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[12] == "sol" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[12] == "sol" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[12] == "sol" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[12] == "sol" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[12] == "sol" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[12] == "sol" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[12] == "la" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[12] == "la" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[12] == "la" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[12] == "la" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[12] == "la" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[12] == "la" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[12] == "la" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[12] == "la" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[12] == "ti" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[12] == "ti" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[12] == "ti" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[12] == "ti" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[12] == "ti" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[12] == "ti" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[12] == "ti" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[12] == "ti" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[12] == "do♯" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[12] == "do♯" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[12] == "do♯" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[12] == "do♯" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[12] == "do♯" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[12] == "do♯" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[12] == "do♯" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[12] == "do♯" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[12] == "re♯" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[12] == "re♯" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[12] == "re♯" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[12] == "re♯" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[12] == "re♯" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[12] == "re♯" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[12] == "re♯" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[12] == "re♯" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[12] == "mi♯" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[12] == "mi♯" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[12] == "mi♯" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[12] == "mi♯" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[12] == "mi♯" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[12] == "mi♯" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[12] == "mi♯" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[12] == "mi♯" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[12] == "fa♯" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[12] == "fa♯" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[12] == "fa♯" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[12] == "fa♯" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[12] == "fa♯" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[12] == "fa♯" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[12] == "fa♯" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[12] == "fa♯" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[12] == "sol♯" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[12] == "sol♯" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[12] == "sol♯" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[12] == "sol♯" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[12] == "sol♯" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[12] == "sol♯" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[12] == "sol♯" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[12] == "sol♯" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[12] == "la♯" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[12] == "la♯" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[12] == "la♯" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[12] == "la♯" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[12] == "la♯" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[12] == "la♯" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[12] == "la♯" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[12] == "la♯" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[12] == "ti♯" & bfbf[12] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[12] == "ti♯" & bfbf[12] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[12] == "ti♯" & bfbf[12] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[12] == "ti♯" & bfbf[12] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[12] == "ti♯" & bfbf[12] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[12] == "ti♯" & bfbf[12] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[12] == "ti♯" & bfbf[12] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[12] == "ti♯" & bfbf[12] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 13){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[13];
+                    var temp2 = noteConversion2[temp1]+bfbf[13];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[13] == "do" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[13] == "do" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[13] == "do" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[13] == "do" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[13] == "do" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[13] == "do" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[13] == "do" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[13] == "do" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[13] == "re" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[13] == "re" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[13] == "re" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[13] == "re" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[13] == "re" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[13] == "re" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[13] == "re" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[13] == "re" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[13] == "mi" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[13] == "mi" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[13] == "mi" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[13] == "mi" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[13] == "mi" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[13] == "mi" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[13] == "mi" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[13] == "mi" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[13] == "fa" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[13] == "fa" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[13] == "fa" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[13] == "fa" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[13] == "fa" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[13] == "fa" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[13] == "fa" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[13] == "fa" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[13] == "sol" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[13] == "sol" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[13] == "sol" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[13] == "sol" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[13] == "sol" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[13] == "sol" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[13] == "sol" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[13] == "sol" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[13] == "la" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[13] == "la" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[13] == "la" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[13] == "la" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[13] == "la" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[13] == "la" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[13] == "la" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[13] == "la" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[13] == "ti" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[13] == "ti" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[13] == "ti" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[13] == "ti" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[13] == "ti" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[13] == "ti" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[13] == "ti" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[13] == "ti" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[13] == "do♯" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[13] == "do♯" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[13] == "do♯" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[13] == "do♯" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[13] == "do♯" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[13] == "do♯" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[13] == "do♯" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[13] == "do♯" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[13] == "re♯" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[13] == "re♯" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[13] == "re♯" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[13] == "re♯" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[13] == "re♯" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[13] == "re♯" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[13] == "re♯" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[13] == "re♯" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[13] == "mi♯" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[13] == "mi♯" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[13] == "mi♯" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[13] == "mi♯" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[13] == "mi♯" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[13] == "mi♯" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[13] == "mi♯" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[13] == "mi♯" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[13] == "fa♯" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[13] == "fa♯" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[13] == "fa♯" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[13] == "fa♯" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[13] == "fa♯" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[13] == "fa♯" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[13] == "fa♯" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[13] == "fa♯" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[13] == "sol♯" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[13] == "sol♯" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[13] == "sol♯" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[13] == "sol♯" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[13] == "sol♯" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[13] == "sol♯" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[13] == "sol♯" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[13] == "sol♯" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[13] == "la♯" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[13] == "la♯" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[13] == "la♯" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[13] == "la♯" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[13] == "la♯" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[13] == "la♯" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[13] == "la♯" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[13] == "la♯" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[13] == "ti♯" & bfbf[13] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[13] == "ti♯" & bfbf[13] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[13] == "ti♯" & bfbf[13] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[13] == "ti♯" & bfbf[13] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[13] == "ti♯" & bfbf[13] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[13] == "ti♯" & bfbf[13] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[13] == "ti♯" & bfbf[13] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[13] == "ti♯" & bfbf[13] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 14){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[14];
+                    var temp2 = noteConversion2[temp1]+bfbf[14];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[14] == "do" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[14] == "do" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[14] == "do" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[14] == "do" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[14] == "do" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[14] == "do" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[14] == "do" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[14] == "do" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[14] == "re" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[14] == "re" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[14] == "re" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[14] == "re" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[14] == "re" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[14] == "re" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[14] == "re" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[14] == "re" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[14] == "mi" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[14] == "mi" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[14] == "mi" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[14] == "mi" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[14] == "mi" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[14] == "mi" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[14] == "mi" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[14] == "mi" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[14] == "fa" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[14] == "fa" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[14] == "fa" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[14] == "fa" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[14] == "fa" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[14] == "fa" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[14] == "fa" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[14] == "fa" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[14] == "sol" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[14] == "sol" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[14] == "sol" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[14] == "sol" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[14] == "sol" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[14] == "sol" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[14] == "sol" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[14] == "sol" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[14] == "la" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[14] == "la" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[14] == "la" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[14] == "la" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[14] == "la" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[14] == "la" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[14] == "la" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[14] == "la" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[14] == "ti" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[14] == "ti" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[14] == "ti" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[14] == "ti" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[14] == "ti" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[14] == "ti" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[14] == "ti" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[14] == "ti" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[14] == "do♯" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[14] == "do♯" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[14] == "do♯" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[14] == "do♯" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[14] == "do♯" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[14] == "do♯" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[14] == "do♯" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[14] == "do♯" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[14] == "re♯" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[14] == "re♯" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[14] == "re♯" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[14] == "re♯" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[14] == "re♯" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[14] == "re♯" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[14] == "re♯" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[14] == "re♯" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[14] == "mi♯" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[14] == "mi♯" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[14] == "mi♯" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[14] == "mi♯" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[14] == "mi♯" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[14] == "mi♯" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[14] == "mi♯" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[14] == "mi♯" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[14] == "fa♯" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[14] == "fa♯" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[14] == "fa♯" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[14] == "fa♯" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[14] == "fa♯" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[14] == "fa♯" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[14] == "fa♯" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[14] == "fa♯" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[14] == "sol♯" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[14] == "sol♯" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[14] == "sol♯" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[14] == "sol♯" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[14] == "sol♯" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[14] == "sol♯" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[14] == "sol♯" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[14] == "sol♯" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[14] == "la♯" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[14] == "la♯" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[14] == "la♯" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[14] == "la♯" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[14] == "la♯" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[14] == "la♯" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[14] == "la♯" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[14] == "la♯" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[14] == "ti♯" & bfbf[14] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[14] == "ti♯" & bfbf[14] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[14] == "ti♯" & bfbf[14] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[14] == "ti♯" & bfbf[14] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[14] == "ti♯" & bfbf[14] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[14] == "ti♯" & bfbf[14] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[14] == "ti♯" & bfbf[14] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[14] == "ti♯" & bfbf[14] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 15){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[15];
+                    var temp2 = noteConversion2[temp1]+bfbf[15];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[15] == "do" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[15] == "do" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[15] == "do" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[15] == "do" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[15] == "do" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[15] == "do" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[15] == "do" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[15] == "do" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[15] == "re" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[15] == "re" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[15] == "re" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[15] == "re" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[15] == "re" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[15] == "re" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[15] == "re" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[15] == "re" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[15] == "mi" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[15] == "mi" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[15] == "mi" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[15] == "mi" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[15] == "mi" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[15] == "mi" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[15] == "mi" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[15] == "mi" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[15] == "fa" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[15] == "fa" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[15] == "fa" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[15] == "fa" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[15] == "fa" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[15] == "fa" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[15] == "fa" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[15] == "fa" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[15] == "sol" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[15] == "sol" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[15] == "sol" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[15] == "sol" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[15] == "sol" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[15] == "sol" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[15] == "sol" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[15] == "sol" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[15] == "la" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[15] == "la" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[15] == "la" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[15] == "la" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[15] == "la" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[15] == "la" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[15] == "la" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[15] == "la" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[15] == "ti" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[15] == "ti" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[15] == "ti" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[15] == "ti" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[15] == "ti" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[15] == "ti" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[15] == "ti" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[15] == "ti" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[15] == "do♯" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[15] == "do♯" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[15] == "do♯" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[15] == "do♯" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[15] == "do♯" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[15] == "do♯" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[15] == "do♯" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[15] == "do♯" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[15] == "re♯" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[15] == "re♯" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[15] == "re♯" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[15] == "re♯" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[15] == "re♯" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[15] == "re♯" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[15] == "re♯" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[15] == "re♯" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[15] == "mi♯" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[15] == "mi♯" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[15] == "mi♯" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[15] == "mi♯" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[15] == "mi♯" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[15] == "mi♯" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[15] == "mi♯" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[15] == "mi♯" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[15] == "fa♯" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[15] == "fa♯" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[15] == "fa♯" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[15] == "fa♯" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[15] == "fa♯" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[15] == "fa♯" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[15] == "fa♯" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[15] == "fa♯" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[15] == "sol♯" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[15] == "sol♯" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[15] == "sol♯" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[15] == "sol♯" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[15] == "sol♯" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[15] == "sol♯" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[15] == "sol♯" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[15] == "sol♯" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[15] == "la♯" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[15] == "la♯" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[15] == "la♯" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[15] == "la♯" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[15] == "la♯" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[15] == "la♯" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[15] == "la♯" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[15] == "la♯" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[15] == "ti♯" & bfbf[15] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[15] == "ti♯" & bfbf[15] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[15] == "ti♯" & bfbf[15] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[15] == "ti♯" & bfbf[15] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[15] == "ti♯" & bfbf[15] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[15] == "ti♯" & bfbf[15] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[15] == "ti♯" & bfbf[15] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[15] == "ti♯" & bfbf[15] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 16){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[16];
+                    var temp2 = noteConversion2[temp1]+bfbf[16];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[16] == "do" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[16] == "do" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[16] == "do" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[16] == "do" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[16] == "do" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[16] == "do" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[16] == "do" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[16] == "do" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[16] == "re" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[16] == "re" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[16] == "re" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[16] == "re" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[16] == "re" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[16] == "re" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[16] == "re" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[16] == "re" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[16] == "mi" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[16] == "mi" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[16] == "mi" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[16] == "mi" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[16] == "mi" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[16] == "mi" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[16] == "mi" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[16] == "mi" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[16] == "fa" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[16] == "fa" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[16] == "fa" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[16] == "fa" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[16] == "fa" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[16] == "fa" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[16] == "fa" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[16] == "fa" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[16] == "sol" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[16] == "sol" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[16] == "sol" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[16] == "sol" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[16] == "sol" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[16] == "sol" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[16] == "sol" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[16] == "sol" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[16] == "la" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[16] == "la" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[16] == "la" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[16] == "la" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[16] == "la" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[16] == "la" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[16] == "la" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[16] == "la" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[16] == "ti" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[16] == "ti" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[16] == "ti" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[16] == "ti" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[16] == "ti" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[16] == "ti" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[16] == "ti" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[16] == "ti" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[16] == "do♯" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[16] == "do♯" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[16] == "do♯" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[16] == "do♯" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[16] == "do♯" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[16] == "do♯" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[16] == "do♯" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[16] == "do♯" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[16] == "re♯" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[16] == "re♯" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[16] == "re♯" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[16] == "re♯" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[16] == "re♯" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[16] == "re♯" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[16] == "re♯" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[16] == "re♯" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[16] == "mi♯" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[16] == "mi♯" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[16] == "mi♯" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[16] == "mi♯" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[16] == "mi♯" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[16] == "mi♯" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[16] == "mi♯" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[16] == "mi♯" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[16] == "fa♯" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[16] == "fa♯" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[16] == "fa♯" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[16] == "fa♯" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[16] == "fa♯" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[16] == "fa♯" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[16] == "fa♯" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[16] == "fa♯" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[16] == "sol♯" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[16] == "sol♯" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[16] == "sol♯" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[16] == "sol♯" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[16] == "sol♯" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[16] == "sol♯" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[16] == "sol♯" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[16] == "sol♯" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[16] == "la♯" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[16] == "la♯" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[16] == "la♯" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[16] == "la♯" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[16] == "la♯" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[16] == "la♯" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[16] == "la♯" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[16] == "la♯" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[16] == "ti♯" & bfbf[16] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[16] == "ti♯" & bfbf[16] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[16] == "ti♯" & bfbf[16] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[16] == "ti♯" & bfbf[16] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[16] == "ti♯" & bfbf[16] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[16] == "ti♯" & bfbf[16] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[16] == "ti♯" & bfbf[16] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[16] == "ti♯" & bfbf[16] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 17){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[17];
+                    var temp2 = noteConversion2[temp1]+bfbf[17];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[17] == "do" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[17] == "do" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[17] == "do" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[17] == "do" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[17] == "do" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[17] == "do" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[17] == "do" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[17] == "do" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[17] == "re" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[17] == "re" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[17] == "re" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[17] == "re" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[17] == "re" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[17] == "re" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[17] == "re" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[17] == "re" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[17] == "mi" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[17] == "mi" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[17] == "mi" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[17] == "mi" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[17] == "mi" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[17] == "mi" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[17] == "mi" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[17] == "mi" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[17] == "fa" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[17] == "fa" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[17] == "fa" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[17] == "fa" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[17] == "fa" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[17] == "fa" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[17] == "fa" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[17] == "fa" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[17] == "sol" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[17] == "sol" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[17] == "sol" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[17] == "sol" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[17] == "sol" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[17] == "sol" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[17] == "sol" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[17] == "sol" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[17] == "la" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[17] == "la" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[17] == "la" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[17] == "la" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[17] == "la" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[17] == "la" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[17] == "la" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[17] == "la" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[17] == "ti" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[17] == "ti" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[17] == "ti" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[17] == "ti" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[17] == "ti" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[17] == "ti" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[17] == "ti" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[17] == "ti" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[17] == "do♯" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[17] == "do♯" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[17] == "do♯" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[17] == "do♯" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[17] == "do♯" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[17] == "do♯" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[17] == "do♯" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[17] == "do♯" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[17] == "re♯" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[17] == "re♯" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[17] == "re♯" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[17] == "re♯" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[17] == "re♯" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[17] == "re♯" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[17] == "re♯" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[17] == "re♯" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[17] == "mi♯" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[17] == "mi♯" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[17] == "mi♯" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[17] == "mi♯" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[17] == "mi♯" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[17] == "mi♯" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[17] == "mi♯" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[17] == "mi♯" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[17] == "fa♯" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[17] == "fa♯" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[17] == "fa♯" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[17] == "fa♯" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[17] == "fa♯" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[17] == "fa♯" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[17] == "fa♯" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[17] == "fa♯" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[17] == "sol♯" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[17] == "sol♯" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[17] == "sol♯" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[17] == "sol♯" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[17] == "sol♯" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[17] == "sol♯" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[17] == "sol♯" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[17] == "sol♯" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[17] == "la♯" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[17] == "la♯" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[17] == "la♯" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[17] == "la♯" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[17] == "la♯" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[17] == "la♯" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[17] == "la♯" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[17] == "la♯" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[17] == "ti♯" & bfbf[17] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[17] == "ti♯" & bfbf[17] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[17] == "ti♯" & bfbf[17] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[17] == "ti♯" & bfbf[17] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[17] == "ti♯" & bfbf[17] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[17] == "ti♯" & bfbf[17] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[17] == "ti♯" & bfbf[17] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[17] == "ti♯" & bfbf[17] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 18){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[18];
+                    var temp2 = noteConversion2[temp1]+bfbf[18];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[18] == "do" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[18] == "do" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[18] == "do" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[18] == "do" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[18] == "do" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[18] == "do" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[18] == "do" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[18] == "do" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[18] == "re" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[18] == "re" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[18] == "re" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[18] == "re" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[18] == "re" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[18] == "re" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[18] == "re" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[18] == "re" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[18] == "mi" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[18] == "mi" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[18] == "mi" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[18] == "mi" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[18] == "mi" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[18] == "mi" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[18] == "mi" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[18] == "mi" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[18] == "fa" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[18] == "fa" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[18] == "fa" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[18] == "fa" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[18] == "fa" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[18] == "fa" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[18] == "fa" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[18] == "fa" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[18] == "sol" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[18] == "sol" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[18] == "sol" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[18] == "sol" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[18] == "sol" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[18] == "sol" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[18] == "sol" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[18] == "sol" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[18] == "la" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[18] == "la" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[18] == "la" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[18] == "la" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[18] == "la" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[18] == "la" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[18] == "la" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[18] == "la" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[18] == "ti" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[18] == "ti" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[18] == "ti" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[18] == "ti" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[18] == "ti" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[18] == "ti" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[18] == "ti" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[18] == "ti" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[18] == "do♯" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[18] == "do♯" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[18] == "do♯" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[18] == "do♯" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[18] == "do♯" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[18] == "do♯" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[18] == "do♯" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[18] == "do♯" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[18] == "re♯" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[18] == "re♯" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[18] == "re♯" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[18] == "re♯" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[18] == "re♯" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[18] == "re♯" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[18] == "re♯" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[18] == "re♯" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[18] == "mi♯" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[18] == "mi♯" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[18] == "mi♯" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[18] == "mi♯" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[18] == "mi♯" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[18] == "mi♯" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[18] == "mi♯" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[18] == "mi♯" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[18] == "fa♯" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[18] == "fa♯" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[18] == "fa♯" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[18] == "fa♯" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[18] == "fa♯" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[18] == "fa♯" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[18] == "fa♯" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[18] == "fa♯" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[18] == "sol♯" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[18] == "sol♯" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[18] == "sol♯" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[18] == "sol♯" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[18] == "sol♯" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[18] == "sol♯" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[18] == "sol♯" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[18] == "sol♯" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[18] == "la♯" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[18] == "la♯" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[18] == "la♯" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[18] == "la♯" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[18] == "la♯" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[18] == "la♯" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[18] == "la♯" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[18] == "la♯" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[18] == "ti♯" & bfbf[18] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[18] == "ti♯" & bfbf[18] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[18] == "ti♯" & bfbf[18] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[18] == "ti♯" & bfbf[18] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[18] == "ti♯" & bfbf[18] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[18] == "ti♯" & bfbf[18] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[18] == "ti♯" & bfbf[18] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[18] == "ti♯" & bfbf[18] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
+
+            if(idContainer.length > 19){
+
+                document.getElementById(idContainer[6]).onclick = function(){
+
+                    var temp1 = afaf[19];
+                    var temp2 = noteConversion2[temp1]+bfbf[19];
+                    console.log("onkeypress " +temp2) ;
+                    selected1.push(temp2);
+
+                    if(afaf[19] == "do" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('C1', '8n');
+                    } if(afaf[19] == "do" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('C2', '8n');
+                    } if(afaf[19] == "do" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('C3', '8n');
+                    } if(afaf[19] == "do" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('C4', '8n');
+                    } if(afaf[19] == "do" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('C5', '8n');
+                    } if(afaf[19] == "do" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('C6', '8n');
+                    } if(afaf[19] == "do" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('C7', '8n');
+                    } if(afaf[19] == "do" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('C8', '8n');
+                    }
+                    if(afaf[19] == "re" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('D1', '8n');
+                    } if(afaf[19] == "re" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('D2', '8n');
+                    } if(afaf[19] == "re" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('D3', '8n');
+                    } if(afaf[19] == "re" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('D4', '8n');
+                    } if(afaf[19] == "re" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('D5', '8n');
+                    } if(afaf[19] == "re" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('D6', '8n');
+                    } if(afaf[19] == "re" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('D7', '8n');
+                    } if(afaf[19] == "re" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('D8', '8n');
+                    }
+                    if(afaf[19] == "mi" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('E1', '8n');
+                    } if(afaf[19] == "mi" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('E2', '8n');
+                    } if(afaf[19] == "mi" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('E3', '8n');
+                    } if(afaf[19] == "mi" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('E4', '8n');
+                    } if(afaf[19] == "mi" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('E5', '8n');
+                    } if(afaf[19] == "mi" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('E6', '8n');
+                    } if(afaf[19] == "mi" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('E7', '8n');
+                    } if(afaf[19] == "mi" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('E8', '8n');
+                    }
+                    if(afaf[19] == "fa" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('F1', '8n');
+                    } if(afaf[19] == "fa" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('F2', '8n');
+                    } if(afaf[19] == "fa" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('F3', '8n');
+                    } if(afaf[19] == "fa" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('F4', '8n');
+                    } if(afaf[19] == "fa" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('F5', '8n');
+                    } if(afaf[19] == "fa" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('F6', '8n');
+                    } if(afaf[19] == "fa" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('F7', '8n');
+                    } if(afaf[19] == "fa" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('8', '8n');
+                    }
+                    if(afaf[19] == "sol" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('G1', '8n');
+                    } if(afaf[19] == "sol" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('G2', '8n');
+                    } if(afaf[19] == "sol" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('G3', '8n');
+                    } if(afaf[19] == "sol" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('G4', '8n');
+                    } if(afaf[19] == "sol" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('G5', '8n');
+                    } if(afaf[19] == "sol" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('G6', '8n');
+                    } if(afaf[19] == "sol" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('G7', '8n');
+                    } if(afaf[19] == "sol" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('G8', '8n');
+                    }
+                    if(afaf[19] == "la" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('A1', '8n');
+                    } if(afaf[19] == "la" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('A2', '8n');
+                    } if(afaf[19] == "la" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('A3', '8n');
+                    } if(afaf[19] == "la" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('A4', '8n');
+                    } if(afaf[19] == "la" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('A5', '8n');
+                    } if(afaf[19] == "la" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('A6', '8n');
+                    } if(afaf[19] == "la" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('A7', '8n');
+                    } if(afaf[19] == "la" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('A8', '8n');
+                    }
+                    if(afaf[19] == "ti" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('B1', '8n');
+                    } if(afaf[19] == "ti" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('B2', '8n');
+                    } if(afaf[19] == "ti" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('B3', '8n');
+                    } if(afaf[19] == "ti" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('B4', '8n');
+                    } if(afaf[19] == "ti" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('B5', '8n');
+                    } if(afaf[19] == "ti" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('B6', '8n');
+                    } if(afaf[19] == "ti" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('B7', '8n');
+                    } if(afaf[19] == "ti" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('B8', '8n');
+                    }
+
+
+                    if(afaf[19] == "do♯" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('C#1', '8n');
+                    } if(afaf[19] == "do♯" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('C#2', '8n');
+                    } if(afaf[19] == "do♯" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('C#3', '8n');
+                    } if(afaf[19] == "do♯" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('C#4', '8n');
+                    } if(afaf[19] == "do♯" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('C#5', '8n');
+                    } if(afaf[19] == "do♯" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('C#6', '8n');
+                    } if(afaf[19] == "do♯" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('C#7', '8n');
+                    } if(afaf[19] == "do♯" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('C#8', '8n');
+                    }
+                    if(afaf[19] == "re♯" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('D#1', '8n');
+                    } if(afaf[19] == "re♯" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('D#2', '8n');
+                    } if(afaf[19] == "re♯" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('D#3', '8n');
+                    } if(afaf[19] == "re♯" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('D#4', '8n');
+                    } if(afaf[19] == "re♯" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('D#5', '8n');
+                    } if(afaf[19] == "re♯" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('D#6', '8n');
+                    } if(afaf[19] == "re♯" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('D#7', '8n');
+                    } if(afaf[19] == "re♯" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('D#8', '8n');
+                    }
+                    if(afaf[19] == "mi♯" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('E#1', '8n');
+                    } if(afaf[19] == "mi♯" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('E#2', '8n');
+                    } if(afaf[19] == "mi♯" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('E#3', '8n');
+                    } if(afaf[19] == "mi♯" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('E#4', '8n');
+                    } if(afaf[19] == "mi♯" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('E#5', '8n');
+                    } if(afaf[19] == "mi♯" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('E#6', '8n');
+                    } if(afaf[19] == "mi♯" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('E#7', '8n');
+                    } if(afaf[19] == "mi♯" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('E#8', '8n');
+                    }
+                    if(afaf[19] == "fa♯" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('F#1', '8n');
+                    } if(afaf[19] == "fa♯" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('F#2', '8n');
+                    } if(afaf[19] == "fa♯" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('F#3', '8n');
+                    } if(afaf[19] == "fa♯" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('F#4', '8n');
+                    } if(afaf[19] == "fa♯" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('F#5', '8n');
+                    } if(afaf[19] == "fa♯" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('F#6', '8n');
+                    } if(afaf[19] == "fa♯" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('F#7', '8n');
+                    } if(afaf[19] == "fa♯" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('F#8', '8n');
+                    }
+                    if(afaf[19] == "sol♯" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('G#1', '8n');
+                    } if(afaf[19] == "sol♯" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('G#2', '8n');
+                    } if(afaf[19] == "sol♯" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('G#3', '8n');
+                    } if(afaf[19] == "sol♯" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('G#4', '8n');
+                    } if(afaf[19] == "sol♯" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('G#5', '8n');
+                    } if(afaf[19] == "sol♯" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('G#6', '8n');
+                    } if(afaf[19] == "sol♯" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('G#7', '8n');
+                    } if(afaf[19] == "sol♯" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('G#8', '8n');
+                    }
+                    if(afaf[19] == "la♯" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('A#1', '8n');
+                    } if(afaf[19] == "la♯" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('A#2', '8n');
+                    } if(afaf[19] == "la♯" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('A#3', '8n');
+                    } if(afaf[19] == "la♯" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('A#4', '8n');
+                    } if(afaf[19] == "la♯" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('A#5', '8n');
+                    } if(afaf[19] == "la♯" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('A#6', '8n');
+                    } if(afaf[19] == "la♯" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('A#7', '8n');
+                    } if(afaf[19] == "la♯" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('A#8', '8n');
+                    }
+                    if(afaf[19] == "ti♯" & bfbf[19] == 1){
+                        synth.triggerAttackRelease('B#1', '8n');
+                    } if(afaf[19] == "ti♯" & bfbf[19] == 2){
+                        synth.triggerAttackRelease('B#2', '8n');
+                    } if(afaf[19] == "ti♯" & bfbf[19] == 3){
+                        synth.triggerAttackRelease('B#3', '8n');
+                    } if(afaf[19] == "ti♯" & bfbf[19] == 4){
+                        synth.triggerAttackRelease('B#4', '8n');
+                    } if(afaf[19] == "ti♯" & bfbf[19] == 5){
+                        synth.triggerAttackRelease('B#5', '8n');
+                    } if(afaf[19] == "ti♯" & bfbf[19] == 6){
+                        synth.triggerAttackRelease('B#6', '8n');
+                    } if(afaf[19] == "ti♯" & bfbf[19] == 7){
+                        synth.triggerAttackRelease('B#7', '8n');
+                    } if(afaf[19] == "ti♯" & bfbf[19] == 8){
+                        synth.triggerAttackRelease('B#8', '8n');
+                    }
+                };
+            }
             
 
             
