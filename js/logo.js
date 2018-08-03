@@ -317,6 +317,7 @@ function Logo () {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
         this.synth = new Synth();
+        this.synth.changeInTemperament = false;
     }
     else {
         this.turtleOscs = {};
@@ -353,6 +354,7 @@ function Logo () {
             this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
             createjs.Ticker.framerate = 10;
             this.optimize = true;
+
         } else {
             this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
             createjs.Ticker.framerate = 30;
@@ -1159,6 +1161,8 @@ function Logo () {
         this._masterBPM = TARGETBPM;
         this.defaultBPMFactor = TONEBPM / this._masterBPM;
         this.masterVolume = [DEFAULTVOLUME];
+        this.synth.changeInTemperament = false;
+
         this.checkingCompletionState = false;
 
         this.embeddedGraphicsFinished = {};
@@ -1680,6 +1684,8 @@ function Logo () {
                     if (that.justCounting[turtle].length === 0) {
                         that.notationLineBreak(turtle);
                     }
+
+                    console.log('action: ' + args[0]);
                     childFlow = that.actions[args[0]];
                     childFlowCount = 1;
                 } else {
@@ -5920,7 +5926,7 @@ function Logo () {
             var len = that.temperamentSelected.length;
 
             if (that.temperamentSelected[len - 1] !== that.temperamentSelected[len - 2]) {
-                that.synth.changeInTemperament = true;        
+                that.synth.changeInTemperament = true;
             }
               
             break;
@@ -7352,6 +7358,11 @@ function Logo () {
             var that = this;
             __playnote = function () {
                 var thisBlk = last(that.inNoteBlock[turtle]);
+
+                if (that.notePitches[turtle][thisBlk] === undefined) {
+		    console.log('no note found');
+		    return;
+		}
 
                 // If there are multiple notes, remove the rests.
                 if (that.notePitches[turtle][thisBlk].length > 1) {
@@ -10606,6 +10617,10 @@ function Logo () {
     };
 
     this.updateNotation = function (note, duration, turtle, insideChord, drum, split) {
+        if (this.optimize) {
+	    return;
+	}
+
         // Note: At this point, the note of duration "duration" has
         // already been added to notesPlayed.
 

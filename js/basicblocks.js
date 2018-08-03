@@ -3108,6 +3108,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pushBlk.adjustWidthToLabel();
     pushBlk.oneArgBlock();
     pushBlk.dockTypes[1] = 'anyin';
+    pushBlk.defaults.push(1);
 
     // MEDIA PALETTE
 
