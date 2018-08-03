@@ -3125,6 +3125,10 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function errorMsg(msg, blk, text, timeout) {
+            if (logo.optimize) {
+		return;
+	    }
+
             if (errorMsgTimeoutID != null) {
                 clearTimeout(errorMsgTimeoutID);
             }
