@@ -15,7 +15,8 @@ function GlobalPlanet(Planet) {
     this.noProjects = '<div class="container center-align">' + _('No results found.') + '</div>';
     this.tags = [];
     this.specialTags = null;
-    this.defaultTag = null;
+    this.defaultTag = false;
+    this.defaultMainTags = [];
     this.searchMode = null;
     this.index = 0;
     this.page = 24;
@@ -39,15 +40,28 @@ function GlobalPlanet(Planet) {
             }
         }
 
+        var tagsToInitialise = [];
+
         var keys = Object.keys(Planet.TagsManifest);
         for (var i = 0; i < keys.length; i++) {
             var t = new GlobalTag(Planet);
             t.init({'id': keys[i]});
             this.tags.push(t);
+            if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName)!=-1){
+                t.selected=true;  
+                tagsToInitialise.push(t);
+            }
         }
 
         this.sortBy = document.getElementById('sort-select').value;
-        this.selectSpecialTag(this.defaultTag);
+        if (this.defaultTag!=false){
+            this.selectSpecialTag(this.defaultTag);
+        }
+
+        for (var i = 0; i<tagsToInitialise.length; i++){
+            tagsToInitialise[i].select();
+        }
+        this.refreshTagList();
     };
 
     this.selectSpecialTag = function(tag) {
@@ -373,9 +387,19 @@ function GlobalPlanet(Planet) {
                 that.refreshProjects();
             });
 
-            this.specialTags = 
+
+            if (Planet.IsMusicBlocks){
+                this.defaultMainTags = ["Music"];
+                this.specialTags = 
+                [{'name': 'All Projects', 'func': this.searchAllProjects.bind(this), 'defaultTag': false}, 
+                 {'name': 'My Projects', 'func': this.searchMyProjects.bind(this), 'defaultTag': false}];
+            } else {
+                this.defaultMainTags = [];
+                this.specialTags = 
                 [{'name': 'All Projects', 'func': this.searchAllProjects.bind(this), 'defaultTag': true}, 
-                 {'name': 'My Projects', 'func': this.searchMyProjects.bind(this)}];
+                 {'name': 'My Projects', 'func': this.searchMyProjects.bind(this), 'defaultTag': false}];
+            }
+
             this.initTagList();
 
             document.getElementById('load-more-projects').addEventListener('click',  function (evt) {
