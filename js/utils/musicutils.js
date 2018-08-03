@@ -2288,6 +2288,9 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                 }
             }   
         }
+        if (pitchNumber === undefined) {
+            return getNote(noteArg, octave, transposition, keySignature, movable, direction, errorMsg);
+        }
         var inOctave = octave;
         var octaveLength = TEMPERAMENT['custom']['pitchNumber'];
         if (transposition !== 0) {

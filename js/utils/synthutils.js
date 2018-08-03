@@ -819,7 +819,11 @@ function Synth() {
         }
 
         if (this.inTemperament == 'custom') {
-            notes = this.getCustomFrequency(notes); 
+            var notes1 = notes;    
+            notes = this.getCustomFrequency(notes);
+            if (notes === undefined) {
+                notes = notes1;
+            } 
             console.log(notes);   
         }
 
