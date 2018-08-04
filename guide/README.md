@@ -58,6 +58,7 @@ also available.
     7. [Generating Arbitrary Pitches](#slider)
     8. [Changing Tempo](#tempo)
     9. [Custom Timbres](#timbre)
+    10. [Pitch Tracker](#tracker)
  5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
@@ -1379,6 +1380,16 @@ custom timbre.
 As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
+
+
+### <a name="timbre"></a>4.9 Custom Timbres
+
+It records audio from microphone and gives output of blocks which correspond to sound recorded.
+Click on record button and allow microphone access to start recording sound. When done with recording
+click stop recording button. Currently autocoorelation is used to find out most dominant frequency present at 
+a particular time. Then a note which is closest to that frequency is choosen. This is done from start to end of recording.
+Clicking on save, gives output of blocks corresponding to input. Click on clear to delete input till now and 
+start again. Close is used to close the widget and Move is used to move the widget. 
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
 
