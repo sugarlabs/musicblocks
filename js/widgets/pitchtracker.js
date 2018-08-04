@@ -144,22 +144,15 @@ function PitchTracker() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
-        cell.onclick = function() {
-            trackerDiv.style.visibility = 'hidden';
-            widgetButtonsDiv.style.visibility = 'hidden';
-            trackerTableDiv.style.visibility = 'hidden'; 
-            keepRecording = 0;
-            frequencyContainer = [];
-        };
+        
 
-        var cell = this._addButton(row, 'tap-button.svg', iconSize, _('Start Recording'), '');
+        var cell = this._addButton(row, 'speak.svg', iconSize, _('Start Recording'), '');
         cell.onclick = function () {
             toggleLiveInput();
         };
 
 
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Stop Recording'), '');
+        var cell = this._addButton(row, 'pause-button.svg', iconSize, _('Stop Recording'), '');
         cell.onclick = function () {
             keepRecording = 0;
         };
@@ -233,13 +226,22 @@ function PitchTracker() {
         };
 
 
-
-
         var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
         cell.onclick = function () {
         	frequencyContainer = [];
        //     that._clear();
         };
+
+
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
+        cell.onclick = function() {
+            trackerDiv.style.visibility = 'hidden';
+            widgetButtonsDiv.style.visibility = 'hidden';
+            trackerTableDiv.style.visibility = 'hidden'; 
+            keepRecording = 0;
+            frequencyContainer = [];
+        };
+
 
         cell.onmouseover = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
