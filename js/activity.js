@@ -2267,6 +2267,14 @@ define(MYDEFINES, function (compatibility) {
                     return;
                 }
 
+                if (docById('BPMTracker').classList.contains('hasKeyboard')) {
+                    return;
+                }
+
+                if (docById('NoteSizeTracker').classList.contains('hasKeyboard')) {
+                    return;
+                }
+
                 if (docById('timbreName') !== null) {
                     if (docById('timbreName').classList.contains('hasKeyboard')) {
                         return;

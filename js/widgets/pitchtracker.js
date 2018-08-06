@@ -82,6 +82,10 @@ function PitchTracker() {
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
     const SEMITONE = Math.pow(2, 1 / 12);
+    const DEL = 46;
+
+    var numberGInput = 2;
+    var numberHInput = 4;
 
     this.Sliders = [];
     this._focusedCellIndex = 0;
@@ -156,6 +160,71 @@ function PitchTracker() {
         cell.onclick = function () {
             keepRecording = 0;
         };
+
+
+        // An input for setting BPM of pitch tracker
+        var cell = row.insertCell();
+        cell.innerHTML = '<input id="BPMTracker" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMTracker" type="BPMTracker" value="' + 120 + '" />';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        var numberInput = docById('BPMTracker');
+
+        numberInput.onkeydown = function (event) {
+            if (event.keyCode === DEL) {
+                numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
+            }   
+        };
+
+        numberInput.oninput = function (event) {
+            // Put a limit on the size (60 <--> 240).
+            numberInput.onmouseout = function(){
+                if (numberInput.value < 60) {
+                    numberInput.value = 60;
+                } 
+            };
+
+            if (numberInput.value > 240) {
+                numberInput.value = 240;
+            }
+        };
+        numberGInput = numberInput;
+
+
+
+        // An input for setting note size of pitch tracker
+        var cell = row.insertCell();
+        cell.innerHTML = '<input id="NoteSizeTracker" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="NoteSizeTracker" type="NoteSizeTracker" value="' + 2 + '" />';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        var numberInp = docById('NoteSizeTracker');
+
+        numberInp.onkeydown = function (event) {
+            if (event.keyCode === DEL) {
+                numberInp.value = numberInp.value.substring(0, numberInp.value.length - 1);
+            }   
+        };
+
+        numberInp.oninput = function (event) {
+            // Put a limit on the size (2 <--> 128).
+            numberInp.onmouseout = function(){
+                if (numberInp.value < 1) {
+                    numberInp.value = 1;
+                } 
+            };
+
+            if (numberInp.value > 16) {
+                numberInp.value = 16;
+            }
+        };
+        numberHInput = numberInp;
 
 
 
@@ -240,6 +309,10 @@ function PitchTracker() {
             trackerTableDiv.style.visibility = 'hidden'; 
             keepRecording = 0;
             frequencyContainer = [];
+       //     docById('BPMTracker').classList.add('hasKeyboard');
+            console.log("numberGInput " +numberGInput.value);
+            console.log("numberInput " +numberInput.value);
+            console.log("numberHInput " +numberHInput.value);
         };
 
 
@@ -318,125 +391,7 @@ function PitchTracker() {
             }
         };
 
-        // // The slider table
-        // var trackerTableDiv = docById('trackerTableDiv');
-        // trackerTableDiv.style.display = 'inline';
-        // trackerTableDiv.style.visibility = 'visible';
-        // trackerTableDiv.style.border = '2px';
-        // trackerTableDiv.innerHTML = '';
-
-        // // We use an outer div to scroll vertically and an inner div to
-        // // scroll horizontally.
-        // trackerTableDiv.innerHTML = '<div id="sliderOuterDiv"><div id="sliderInnerDiv"><table id="sliderSliderTable"></table></div></div>';
-
-        // var sliderOuterDiv = docById('sliderOuterDiv');
-        // sliderOuterDiv.style.width = Math.min((11 + this.Sliders.length * SLIDERWIDTH), w / 2) + 'px';
-        // sliderOuterDiv.style.height = (11 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
-
-        // var sliderInnerDiv = docById('sliderInnerDiv');
-        // sliderInnerDiv.style.width = (10 + this.Sliders.length * SLIDERWIDTH)+ 'px';
-        // sliderInnerDiv.style.height = (10 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
-
-        // // Each column in the table has a slider row, and up row, and a down row.
-        // var sliderTable = docById('sliderSliderTable');
-        // var sliderRow = sliderTable.insertRow();
-        // sliderRow.setAttribute('id', 'slider');
-        // var upRow = sliderTable.insertRow();
-        // var downRow = sliderTable.insertRow();
-
-        // for (var i = 0; i < this.Sliders.length; i++) {
-        //     var sliderCell = sliderRow.insertCell();
-
-        //     sliderCell.style.width = SLIDERWIDTH * this._cellScale + 'px';
-        //     sliderCell.style.minWidth = sliderCell.style.width;
-        //     sliderCell.style.maxWidth = sliderCell.style.width;
-        //     sliderCell.style.height = (BUTTONSIZE + SLIDERHEIGHT) * this._cellScale + 'px';
-        //     sliderCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        //     sliderCell.setAttribute('tabIndex', 1);
-
-        //     // Add a div to hold the slider.
-        //     var cellDiv = document.createElement('div');
-        //     cellDiv.setAttribute('id', 'sliderInCell');
-        //     cellDiv.setAttribute('position', 'absolute');
-        //     cellDiv.style.height = Math.floor(w / SLIDERHEIGHT) + 'px';
-        //     cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-        //     cellDiv.style.top = SLIDERHEIGHT + 'px';
-        //     cellDiv.style.backgroundColor = MATRIXBUTTONCOLOR;
-        //     sliderCell.appendChild(cellDiv);
-
-        //     // Add a paragraph element for the slider value.
-        //     var slider = document.createElement('P');
-        //     slider.innerHTML = this.Sliders[i][0].toFixed(2);
-        //     cellDiv.appendChild(slider);
-
-        //     sliderCell.onmouseover = function(event) {
-        //         that._addKeyboardInput(this);
-        //     };
-
-        //     sliderCell.onmouseout = function() {
-        //         this.blur();
-        //     };
-
-        //     sliderCell.onmousemove = function(event) {
-        //         var cellDiv = this.childNodes[0];
-
-        //         // Using event.offsetY was too noisy. This is more robust.
-        //         var offset = event.pageY - this.getBoundingClientRect().top;
-        //         if (offset > SLIDERHEIGHT) {
-        //             var offset = SLIDERHEIGHT;
-        //         } else if (offset < 0) {
-        //             var offset = 0;
-        //         }
-
-        //         var cellIndex = this.cellIndex;
-        //         var sliderrow = docById('slider');
-        //         var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
-        //         cellDiv.style.top = offset + 'px';
-
-        //         var distanceFromBottom = Math.max(SLIDERHEIGHT - offset, 0);
-        //         var frequencyOffset = parseFloat(that.Sliders[cellIndex][0]) / SLIDERHEIGHT * distanceFromBottom;
-
-        //         that.Sliders[cellIndex][1] = parseInt(Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffset) / that.Sliders[cellIndex][0]) * 12);
-        //         that.Sliders[cellIndex][2] = frequencyOffset - that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
-
-        //         var frequencyDiv = cellDiv.childNodes[0];
-        //         var frequency = that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
-        //         frequencyDiv.innerHTML = frequency.toFixed(2);
-        //         that._play(this);
-        //     };
-
-        //     sliderCell.onclick = function() {
-        //         that._save(this);
-        //     };
-
-        //     var upCell = this._addButton(upRow, 'up.svg', iconSize, _('move up'));
-
-        //     upCell.onclick = function() {
-        //         that._moveSlider(this, 1);
-        //     };
-
-        //     upCell.onmouseover = function() {
-        //         this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        //     };
-
-        //     upCell.onmouseout = function() {
-        //         this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        //     };
-
-        //     var downCell = this._addButton(downRow, 'down.svg', iconSize, _('move down'));
-
-        //     downCell.onclick = function() {
-        //         that._moveSlider(this, -1);
-        //     };
-
-        //     downCell.onmouseover = function() {
-        //         this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        //     };
-
-        //     downCell.onmouseout = function() {
-        //         this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        //     };
-        // }
+        
     };
     
     
@@ -897,7 +852,7 @@ function PitchTracker() {
             if (!window.requestAnimationFrame)
                 window.requestAnimationFrame = window.webkitRequestAnimationFrame;
             rafID = window.requestAnimationFrame( updatePitch );
-        },500);
+        },240000/(numberGInput.value * numberHInput.value));
 
         
     }

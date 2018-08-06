@@ -404,6 +404,30 @@ input.dissectNumber {
     height: 100% !important;
 }
 
+input.BPMTracker {
+    background-color: #c374e9 !important;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold !important;
+    resize: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+input.NoteSizeTracker {
+    background-color: #c374e9 !important;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold !important;
+    resize: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 input.musicratio1, input.musicratio2   {
     background-color: #c374e9 !important;
     text-align: center;
