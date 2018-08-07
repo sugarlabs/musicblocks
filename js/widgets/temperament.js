@@ -1276,7 +1276,7 @@ function TemperamentWidget () {
                     notesMatch = false;
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         notesMatch = true;
-                        this.notes[i] = this.ratiosNotesPair[j][1][0];
+                        this.notes[i] = this.ratiosNotesPair[j][1][0] + '' + this.ratiosNotesPair[j][1][1];
                         break;
                     }
                 }
@@ -1294,9 +1294,9 @@ function TemperamentWidget () {
                     var index = centsDiff1.indexOf(min);
 
                     if (centsDiff[index] < 0) {
-                        this.notes[i] =  this.ratiosNotesPair[index][1][0] + "(-" + centsDiff1[index].toFixed(2) + ")";
+                        this.notes[i] =  this.ratiosNotesPair[index][1][0] + "(-" + centsDiff1[index].toFixed(2) + ")" + this.ratiosNotesPair[index][1][1];
                     } else {
-                        this.notes[i] =  this.ratiosNotesPair[index][1][0] + "(+" + centsDiff1[index].toFixed(2) + ")";
+                        this.notes[i] =  this.ratiosNotesPair[index][1][0] + "(+" + centsDiff1[index].toFixed(2) + ")" + this.ratiosNotesPair[index][1][1];
                     }
                 }
             }
@@ -1317,10 +1317,10 @@ function TemperamentWidget () {
             if (this.inTemperament !== 'custom') {
                 newStack.push([idx + 6, ['notename',{'value':this.ratiosNotesPair[i][1][0]}], 0, 0, [idx + 5]]);
             } else {
-                newStack.push([idx + 6, ['text',{'value':this.notes[i]}], 0, 0, [idx + 5]]);
+                newStack.push([idx + 6, ['text',{'value':this.notes[i].substring(0, this.notes[i].length - 1)}], 0, 0, [idx + 5]]);
             }
             
-            newStack.push([idx + 7, ['number',{'value':this.ratiosNotesPair[i][1][1]}], 0, 0, [idx + 5]]);
+            newStack.push([idx + 7, ['number',{'value':this.notes[i].slice(-1)}], 0, 0, [idx + 5]]);
             if (i == this.pitchNumber - 1) {
                 newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
             } else {
@@ -1336,7 +1336,7 @@ function TemperamentWidget () {
         TEMPERAMENT['custom']['pitchNumber'] = this.pitchNumber;
         for (var i = 0; i < this.pitchNumber; i++) {
             var number = '' + i;
-            TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i], this.ratiosNotesPair[i][1][1]];
+            TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i].substring(0, this.notes[i].length - 1), this.notes[i].slice(-1)];
         }
         OCTAVERATIO = this.powerBase;
 
@@ -1344,7 +1344,6 @@ function TemperamentWidget () {
             this._logo.customTemperamentDefined = true;
             this._logo.blocks.protoBlockDict['custompitch'].hidden = false;
             this._logo.blocks.palettes.updatePalettes('pitch');
-            //var newStack2 = [[0, 'pitch', 100, 100, [null, 1, 2, null]], [1, ['notename', {'value': 'G'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]];
         }
     }
 
