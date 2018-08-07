@@ -2880,7 +2880,7 @@ define(MYDEFINES, function (compatibility) {
         function __tick(event) {
             // This set makes it so the stage only re-renders when an
             // event handler indicates a change has happened.
-            if (update || createjs.Tween.hasActiveTweens) {
+            if (update || createjs.Tween.hasActiveTweens()) {
                 update = false; // Only update once
                 stage.update(event);
             }
