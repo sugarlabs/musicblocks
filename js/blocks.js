@@ -1690,6 +1690,9 @@ function Blocks () {
                 label += attr;
             }
             break;
+        case 'customNote':
+            var label = _(myBlock.value);
+            break;
         case 'eastindiansolfege':
             var obj = splitSolfege(myBlock.value);
             var label = WESTERN2EISOLFEGENAMES[obj[0]];
@@ -2211,6 +2214,9 @@ function Blocks () {
             postProcessArg = [thisBlock, true];
         } else if (name === 'solfege') {
             postProcessArg = [thisBlock, 'sol'];
+        } else if (name === 'customNote') {
+            var len = this.blocks.logo.synth.startingPitch.length;
+            postProcessArg = [thisBlock, this.blocks.logo.synth.startingPitch.substring(0, len - 1)];
         } else if (name === 'notename') {
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
@@ -2623,6 +2629,25 @@ function Blocks () {
         var i = 1;
         var value = name;
         while (noteNames.indexOf(value) !== -1) {
+            value = name + i.toString();
+            i += 1;
+        }
+        return value;
+    }
+
+    this.findUniqueTemperamentName = function (name) {
+        var temperamentNames = [];
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'text' && !this.blockList[blk].trash) {
+                var c = this.blockList[blk].connections[0];
+                if (c != null && this.blockList[c].name === 'temperament1' && !this.blockList[c].trash) {
+                    temperamentNames.push(this.blockList[blk].value);
+                }
+            }
+        }
+        var i = 1;
+        var value = name;
+        while (temperamentNames.indexOf(value) !== -1) {
             value = name + i.toString();
             i += 1;
         }
@@ -4015,6 +4040,7 @@ function Blocks () {
                 break;
             case 'text':
             case 'solfege':
+            case 'customNote':
             case 'eastindiansolfege':
             case 'notename':
             case 'modename':

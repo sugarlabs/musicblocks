@@ -6295,14 +6295,14 @@ function Logo () {
             break;
         case 'settemperament':
             that.synth.inTemperament = args[0];
-            if (that.synth.inTemperament === 'custom' && TEMPERAMENT['custom']['0'][1] === undefined) {
+            if (that.synth.inTemperament === 'custom') {
                 //If temperament block with define frequency blocks are present..
                 var notes = [];
                 var ratios = [];
                 for (var blk in that.blocks.blockList) {
                     if (that.blocks.blockList[blk].name === 'pitch' && that.blocks.blockList[that.blocks.blockList[blk].connections[1]].name === 'text') {
                         var a = that.blocks.findTopBlock(blk);
-                        if (that.blocks.blockList[a].name === 'temperament1' && that.blocks.blockList[that.blocks.blockList[a].connections[1]].value === args[0]) {
+                        if (that.blocks.blockList[a].name === 'temperament1' && that.blocks.blockList[that.blocks.blockList[a].connections[1]].value === args[0] && !that.blocks.blockList[a].trash) {
                             var note = that.blocks.blockList[that.blocks.blockList[blk].connections[1]].value;
                             var octave = that.blocks.blockList[that.blocks.blockList[blk].connections[2]].value;
                             notes.push(note + '' + octave);
@@ -6310,7 +6310,7 @@ function Logo () {
                     }
                     if (that.blocks.blockList[blk].name === 'definefrequency') {
                         var a = that.blocks.findTopBlock(blk);
-                        if (that.blocks.blockList[a].name === 'temperament1' && that.blocks.blockList[that.blocks.blockList[a].connections[1]].value === args[0]) {
+                        if (that.blocks.blockList[a].name === 'temperament1' && that.blocks.blockList[that.blocks.blockList[a].connections[1]].value === args[0] && !that.blocks.blockList[a].trash) {
                             var b = that.blocks.blockList[blk].connections[1];
                             var c = that.blocks.blockList[b].connections[2];
                             var r = that.blocks.blockList[c].value;
