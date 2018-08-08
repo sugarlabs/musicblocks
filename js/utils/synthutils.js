@@ -349,6 +349,7 @@ function Synth() {
     };
 
     this.getCustomFrequency = function (notes) {
+        console.log(notes);
         if (notes instanceof Array) {
             notes = notes[0];
         }

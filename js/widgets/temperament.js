@@ -1592,22 +1592,39 @@ function TemperamentWidget () {
         this.ratiosNotesPair = [];
 
         for(var i = 0; i <= this.pitchNumber; i++) {
-            str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
-            this.notes[i] = str[i];
-            note[i] = str[i][0];
+            if (this.inTemperament == 'custom' && TEMPERAMENT['custom']['0'][1] !== undefined) {
+                var pitchNumber = i + '';
+                if (i === this.pitchNumber) {
+                    this.notes[i] =  [TEMPERAMENT['custom']['0'][1], Number(TEMPERAMENT['custom']['0'][2]) + 1];
+                    this.ratios[i] = this.powerBase;
+                } else {
+                    this.notes[i] = [TEMPERAMENT['custom'][pitchNumber][1], TEMPERAMENT['custom'][pitchNumber][2]];
+                    this.ratios[i] = TEMPERAMENT['custom'][pitchNumber][0];
+                }
+                this.frequencies[i] = this._logo.synth.getCustomFrequency(this.notes[i][0] + this.notes[i][1] + '').toFixed(2);
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
+            } else {
+                if (this.inTemperament == 'custom' ) {
+                    t = TEMPERAMENT['equal'];
+                }
+                str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
+                this.notes[i] = str[i];
+                note[i] = str[i][0];
 
-            if (str[i][0].substring(1, str[i][0].length) === FLAT || str[i][0].substring(1, str[i][0].length) === 'b' ) {
-                note[i] = str[i][0].replace(FLAT, 'b');
-            } else if (str[i][0].substring(1, str[i][0].length) === SHARP || str[i][0].substring(1, str[i][0].length) === '#' ) {
-                note[i] = str[i][0].replace(SHARP, '#'); 
+                if (str[i][0].substring(1, str[i][0].length) === FLAT || str[i][0].substring(1, str[i][0].length) === 'b' ) {
+                    note[i] = str[i][0].replace(FLAT, 'b');
+                } else if (str[i][0].substring(1, str[i][0].length) === SHARP || str[i][0].substring(1, str[i][0].length) === '#' ) {
+                    note[i] = str[i][0].replace(SHARP, '#'); 
+                }
+
+                str[i] = note[i] + str[i][1];
+                this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);
+                this.intervals[i] = t.interval[i];
+                this.ratios[i] = t[this.intervals[i]];
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             }
-
-            str[i] = note[i] + str[i][1];
-            this.frequencies[i] = this._logo.synth._getFrequency(str[i], true, this.inTemperament).toFixed(2);
-            this.intervals[i] = t.interval[i];
-            this.ratios[i] = t[this.intervals[i]];
-            this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
-            this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
         }
         this.toggleNotesButton = function () {
             if (this.circleIsVisible) {
