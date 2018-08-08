@@ -591,7 +591,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'customNote':
                     var len = this.blocks.logo.synth.startingPitch.length;
-                    this.value = this.blocks.logo.synth.startingPitch.substring(0, len - 1);
+                    this.value = this.blocks.logo.synth.startingPitch.substring(0, len - 1) + '(+0)';
                     break;
                 case 'notename':
                     this.value = 'G';

@@ -1276,7 +1276,7 @@ function TemperamentWidget () {
                     notesMatch = false;
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         notesMatch = true;
-                        this.notes[i] = this.ratiosNotesPair[j][1][0] + '' + this.ratiosNotesPair[j][1][1];
+                        this.notes[i] = this.ratiosNotesPair[j][1][0] + "(+0)" + this.ratiosNotesPair[j][1][1];
                         break;
                     }
                 }

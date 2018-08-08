@@ -2215,8 +2215,8 @@ function Blocks () {
         } else if (name === 'solfege') {
             postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'customNote') {
-            var len = this.blocks.logo.synth.startingPitch.length;
-            postProcessArg = [thisBlock, this.blocks.logo.synth.startingPitch.substring(0, len - 1)];
+            var len = this.logo.synth.startingPitch.length;
+            postProcessArg = [thisBlock, this.logo.synth.startingPitch.substring(0, len - 1) + '(+0)'];
         } else if (name === 'notename') {
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
