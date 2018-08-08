@@ -569,7 +569,12 @@ function Palettes () {
             }, 500);
 
             that.dict[name]._moveMenu(that.initial_x, that.initial_y);
-            that.showPalette(name);
+            
+            if (!that.dict[name].visible) {
+                that.showPalette(name);
+            } else {
+                that.dict[name].hide();
+            }
             that.refreshCanvas();
         });
     };
