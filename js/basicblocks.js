@@ -370,7 +370,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     customPitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['custompitch'] = customPitchBlock;
     //.TRANS: unison means the note is the same as the current note
-    customPitchBlock.staticLabels.push(_('custom note'));
+    customPitchBlock.staticLabels.push(_('custom pitch'));
     customPitchBlock.adjustWidthToLabel();
     customPitchBlock.zeroArgBlock();
     customPitchBlock.hidden = true;
