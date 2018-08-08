@@ -851,6 +851,8 @@ input.timbreName {
     border: 0 !important;
     background: rgba(255, 255, 255, 0.85) !important;
     width: 680px;
+    font-size: 25px;
+
 }
 
 #trackerButtonsDiv {

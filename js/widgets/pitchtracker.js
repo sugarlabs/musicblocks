@@ -1,5 +1,5 @@
 // Copyright (c) 2016-18 Walter Bender
-// Copyright (c) 2016 Hemant Kasat
+// Copyright (c) 2018 Ritwik Abhishek
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
 // License as published by the Free Software Foundation; either
@@ -10,7 +10,8 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 // This widget enable us to create pitches of different frequency
-// using picrophone input
+// using microphone input
+
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 var audioContext = null;
@@ -21,6 +22,13 @@ var theBuffer = null;
 var DEBUGCANVAS = null;
 var mediaStreamSource = null;
 var detectorElem, canvasElem, waveCanvas, pitchElem, noteElem, detuneElem, detuneAmount;
+
+const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
+const OUTERWINDOWWIDTH = 675;
+const INNERWINDOWWIDTH = 600;
+const RULERHEIGHT = 70;
+const BUTTONSIZE = 51;
+const ICONSIZE = 32;
 
     
 audioContext = new AudioContext();
@@ -159,6 +167,7 @@ function PitchTracker() {
         var cell = this._addButton(row, 'pause-button.svg', iconSize, _('Stop Recording'), '');
         cell.onclick = function () {
             keepRecording = 0;
+            
         };
 
 
@@ -234,14 +243,12 @@ function PitchTracker() {
             
             var pitches = [];
 
-            console.log("OOOOOutput of noteProvider " +noteProvider(3310));
 
             for(var f = 0;f<frequencyContainer.length;f++){
                 var temp3 = frequencyContainer[f];
                 pitches.push(noteProvider(temp3));
             }
 
-            console.log("frequencyContainer " +frequencyContainer);
 
 
 
@@ -252,7 +259,6 @@ function PitchTracker() {
             var endOfStackIdx = 0;
             for (var i = 0; i < pitches.length; i++) {
             // We want all of the notes in a column.
-            // console.log(this.notesToPlay[i]);
                 var note = pitches[i].slice(0);
          
             // Add the Note block and its value
@@ -391,7 +397,24 @@ function PitchTracker() {
             }
         };
 
+
+
+
+
+
         
+        var trackerTableDiv = docById('trackerTableDiv');
+        trackerTableDiv.style.display = 'inline';
+        trackerTableDiv.style.visibility = 'visible';
+        trackerTableDiv.style.border = '2px';
+        trackerTableDiv.innerHTML = 'Click on record';
+
+
+        
+    };
+
+    this._noteWidth = function (noteValue) {
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 3);
     };
     
     
@@ -836,7 +859,6 @@ function PitchTracker() {
                 noteElem.innerHTML = noteStrings[note%12];
                 frequencyContainer.push(Math.round( pitch ));
                 var detune = centsOffFromPitch( pitch, note );
-                console.log("noteStrings[note%12] " + noteStrings[note%12]);
                 if (detune == 0 ) {
                     detuneElem.className = "";
                     detuneAmount.innerHTML = "--";
@@ -853,7 +875,7 @@ function PitchTracker() {
                 window.requestAnimationFrame = window.webkitRequestAnimationFrame;
             rafID = window.requestAnimationFrame( updatePitch );
         },240000/(numberGInput.value * numberHInput.value));
-
+        trackerTableDiv.innerHTML = noteProvider(Math.round( pitch ));
         
     }
 
