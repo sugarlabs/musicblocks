@@ -324,8 +324,6 @@ function Synth() {
                 }
             }
 
-            console.log('WARNING: ' + oneNote + ' not found');
-            return 392;
         };
 
         if (typeof(notes) === 'string') {
@@ -349,7 +347,6 @@ function Synth() {
     };
 
     this.getCustomFrequency = function (notes) {
-        console.log(notes);
         if (notes instanceof Array) {
             notes = notes[0];
         }

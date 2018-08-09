@@ -108,6 +108,7 @@ function Blocks () {
 
     // We need to know if we are processing a copy or save stack command.
     this.inLongPress = false;
+    this.customTemperamentDefined = false;
 
     // We stage deletion of prototype action blocks on the palette so
     // as to avoid palette refresh race conditions.
@@ -3377,6 +3378,16 @@ function Blocks () {
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
     };
 
+    this.findBlockInstance = function (blkName) {
+        // Returns true if block of name blkName is loaded.
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     this.loadNewBlocks = function (blockObjs) {
         var playbackQueueStartsHere = null;
 
@@ -3827,6 +3838,10 @@ function Blocks () {
             }
 
             var that = this;
+
+            if (this.findBlockInstance('temperament1')) {
+                this.customTemperamentDefined = true;
+            }
 
             // A few special cases.
             switch (name) {

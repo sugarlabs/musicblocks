@@ -1593,6 +1593,7 @@ function TemperamentWidget () {
 
         for(var i = 0; i <= this.pitchNumber; i++) {
             if (this.inTemperament == 'custom' && TEMPERAMENT['custom']['0'][1] !== undefined) {
+                //If temperament selected is custom and it is defined by user.
                 var pitchNumber = i + '';
                 if (i === this.pitchNumber) {
                     this.notes[i] =  [TEMPERAMENT['custom']['0'][1], Number(TEMPERAMENT['custom']['0'][2]) + 1];
@@ -1606,6 +1607,8 @@ function TemperamentWidget () {
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             } else {
                 if (this.inTemperament == 'custom' ) {
+                    // If temperament selected is custom and it is not defined by user
+                    // then custom temperament behaves like equal temperament.
                     t = TEMPERAMENT['equal'];
                 }
                 str[i] = getNoteFromInterval(startingPitch, t.interval[i]);

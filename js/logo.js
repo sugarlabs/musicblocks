@@ -6295,7 +6295,7 @@ function Logo () {
             break;
         case 'settemperament':
             that.synth.inTemperament = args[0];
-            if (that.synth.inTemperament === 'custom') {
+            /*if (that.synth.inTemperament === 'custom') {
                 //If temperament block with define frequency blocks are present..
                 var notes = [];
                 var ratios = [];
@@ -6328,7 +6328,7 @@ function Logo () {
                     }
                     that.customTemperamentDefined = true;
                 }
-            }
+            }*/
             
             that.temperamentSelected.push(args[0]);
             var len = that.temperamentSelected.length;
