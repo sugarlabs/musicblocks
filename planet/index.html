@@ -16,6 +16,7 @@
         <script type="text/javascript" src="libs/materialize.min.js"></script>
 
         <script type="text/javascript" src="js/helper.js"></script>
+        <script type="text/javascript" src="js/StringHelper.js"></script>
         <script type="text/javascript" src="js/ProjectStorage.js"></script>
         <script type="text/javascript" src="js/ServerInterface.js"></script>
         <script type="text/javascript" src="js/Converter.js"></script>
@@ -37,19 +38,19 @@
     <body>
         <nav class="nav-extended light-green lighten-1" role="navigation">
             <div class="nav-wrapper container">
-                <a id="logo-container" href="#" class="brand-logo"><i class="material-icons" id="planeticon">public</i>Planet</a>
-                <ul class="right"><li><a id="close-planet" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Close Planet"><i class="material-icons">close</i></a></li></ul>
-                <ul class="right"><li><a id="planet-open-file" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Open project from file"><i class="material-icons">folder_open</i></a></li></ul>
-                <ul class="right"><li><a id="planet-new-project" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="New project"><i class="material-icons">note_add</i></a></li></ul>
+                <a id="logo-container" href="#" class="brand-logo"><i class="material-icons" id="planeticon">public</i></a>
+                <ul class="right"><li><a id="close-planet" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">close</i></a></li></ul>
+                <ul class="right"><li><a id="planet-open-file" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">folder_open</i></a></li></ul>
+                <ul class="right"><li><a id="planet-new-project" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">note_add</i></a></li></ul>
                 <ul class="right tabs tabs-transparent" id="localglobal">
-                    <li class="tab"><a class="active" id="local-tab" href="#local">Local</a></li>
-                    <li class="tab"><a id="global-tab" href="#global">Global</a></li>
+                    <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
+                    <li class="tab"><a id="global-tab" href="#global"></a></li>
                 </ul>
             </div>
             <div class="nav-content" id="searchcontainer" style="display: none;">
                 <div class="container">
                     <div class="input-field search">
-                        <i class="material-icons prefix" id="searchicon">search</i><input placeholder="Search for a project" id="global-search" type="text"><span><i class="material-icons" id="search-close">clear</i></span>
+                        <i class="material-icons prefix" id="searchicon">search</i><input placeholder="" id="global-search" type="text"><span><i class="material-icons" id="search-close">clear</i></span>
                     </div>
                 </div>
             </div>
@@ -58,7 +59,7 @@
         <div id="local">
             <div class="section no-pad-bot">
                 <div class="container">
-                    <h3 class="header center light-green-text" id="localtitle">My Projects</h3>
+                    <h3 class="header center light-green-text" id="localtitle"></h3>
                 </div>
             </div>
             <div class="container">
@@ -74,7 +75,7 @@
             <div id="publisher" class="modal modal-fixed-footer">
                 <div class="modal-content" id="publisher-content">
                     <a class="modal-close close-button"><i class="material-icons">close</i></a>
-                    <h4 id="publisher-ptitle">Publish Project</h4>
+                    <h4 id="publisher-ptitle"></h4>
                     <div class="progress" id="publisher-progress" style="visibility: hidden;">
                         <div class="indeterminate"></div>
                     </div>
@@ -86,13 +87,13 @@
                                 <div class="row">
                                     <div class="input-field">
                                         <input id="publish-title" type="text" class="validate" data-length="50" required>
-                                        <label for="publish-title" id="publish-title-label">Project title</label>
+                                        <label for="publish-title" id="publish-title-label"></label>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="input-field">
                                         <div class="chips chips-autocomplete" id="tagsadd"></div>
-                                        <label for="publish-tags">Tags (max 5)</label>
+                                        <label for="publish-tags" id="publish-tags-label"></label>
                                     </div>
                                 </div>
                             </div>
@@ -103,32 +104,32 @@
                         <div class="row">
                             <div class="input-field col no-margin-left s12">
                                 <textarea id="publish-description" class="materialize-textarea validate" data-length="1000" required></textarea>
-                                <label for="publish-description" id="publish-description-label">Description</label>
+                                <label for="publish-description" id="publish-description-label"></label>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <a class="modal-action waves-effect waves-green btn-flat" id="publisher-submit">Submit</a>
-                    <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+                    <a class="modal-action waves-effect waves-green btn-flat" id="publisher-submit"></a>
+                    <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat" id="publisher-cancel"></a>
                 </div>
             </div>
             <div id="deleter" class="modal">
                 <div class="modal-content">
                     <a class="modal-close close-button"><i class="material-icons">close</i></a>
-                    <h4>Delete "<span id="deleter-title"></span>"?</h4>
-                    <p>Permanently delete project "<span id="deleter-name"></span>"?</p>
+                    <h4 id="deleter-confirm"></h4>
+                    <p id="deleter-paragraph"></p>
                 </div>
                 <div class="modal-footer">
-                    <a href="#!" id="deleter-button" class="modal-action modal-close waves-effect waves-red btn-flat">Delete</a>
-                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                    <a href="#!" id="deleter-button" class="modal-action modal-close waves-effect waves-red btn-flat"></a>
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" id="deleter-cancel"></a>
                 </div>
           </div>
         </div>
         <div id="global">
             <div class="section no-pad-bot">
                 <div class="container">
-                    <h3 class="header center light-green-text" id="globaltitle">Explore Projects</h3>
+                    <h3 class="header center light-green-text" id="globaltitle"></h3>
                 </div>
             </div>
             <div id="globalcontents">
@@ -138,7 +139,7 @@
                         </div>
                         <div class="flexchips", id="morechips">
                         </div>
-                        <a class="waves-effect btn-flat centre-button" id="view-more-chips">View More</a>
+                        <a class="waves-effect btn-flat centre-button" id="view-more-chips"></a>
                     </div>
                 </div>
                 <div class="container">
@@ -147,19 +148,19 @@
                         <div class="row">
                             <div class="input-field col s3 offset-s9">
                                 <select id="sort-select">
-                                    <option value="RECENT" selected>Most recent</option>
-                                    <option value="LIKED">Most liked</option>
-                                    <option value="DOWNLOADED">Most downloaded</option>
-                                    <option value="ALPHABETICAL">A-Z</option>
+                                    <option value="RECENT" id="option-recent" selected></option>
+                                    <option value="LIKED" id="option-liked"></option>
+                                    <option value="DOWNLOADED" id="option-downloaded"></option>
+                                    <option value="ALPHABETICAL" id="option-alphabetical"></option>
                                 </select>
-                                <label>Sort by</label>
+                                <label id="option-sort-by"></label>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col no-margin-left s12">
                                 <div class="section projectscontainer" id="global-projects">
                                 </div>
-                                <a class="waves-effect btn-flat centre-button absolute" id="load-more-projects" style="display: none;">Load More Projects</a>
+                                <a class="waves-effect btn-flat centre-button absolute" id="load-more-projects" style="display: none;"></a>
                             </div>
                         </div>
                         <div class="row">
@@ -217,19 +218,19 @@
                             <div class="col no-margin-left s6">
                                 <div class="row no-margin-bottom">
                                     <p>
-                                        <div class="subheading">Last Updated</div><div id="projectviewer-last-updated"></div>
+                                        <div class="subheading" id="projectviewer-last-updated-heading"></div><div id="projectviewer-last-updated"></div>
                                     </p>
                                     <p>
-                                        <div class="subheading">Creation Date</div><div id="projectviewer-date"></div>
+                                        <div class="subheading" id="projectviewer-date-heading"></div><div id="projectviewer-date"></div>
                                     </p>
                                     <p>
-                                        <div class="subheading">Number of Downloads:</div><div id="projectviewer-downloads"></div>
+                                        <div class="subheading" id="projectviewer-downloads-heading"></div><div id="projectviewer-downloads"></div>
                                     </p>
                                     <p>
-                                        <div class="subheading">Number of Likes:</div><div id="projectviewer-likes"></div>
+                                        <div class="subheading" id="projectviewer-likes-heading"></div><div id="projectviewer-likes"></div>
                                     </p>
                                     <p>
-                                        <div class="subheading">Tags:</div><div id="projectviewer-tags"></div>
+                                        <div class="subheading" id="projectviewer-tags-heading"></div><div id="projectviewer-tags"></div>
                                     </p>
                                 </div>
                             </div>
@@ -240,7 +241,7 @@
                         <div class="row">
                             <div class="col no-margin-left s12">
                                 <p>
-                                    <div class="subheading">Description</div>
+                                    <div class="subheading" id="projectviewer-description-heading"></div>
                                     <div id="projectviewer-description"></div>
                                 </p>
                             </div>
@@ -249,40 +250,38 @@
                 </div>
                 <div class="modal-footer">
                     <div class="report-project-div">
-                        <a class="btn-flat left modal-action waves-effect waves-red" id="projectviewer-report-project">Report Project</a>
+                        <a class="btn-flat left modal-action waves-effect waves-red" id="projectviewer-report-project"></a>
                         <div class="card report-card" id="projectviewer-report-card" style="display: none;">
                             <div id="projectviewer-report-content" style="display: none;">
                                 <div class="card-content">
-                                    <div class="reporttitle">Report Project</div>
+                                    <div class="reporttitle" id="projectviewer-report-title"></div>
                                     <div class="progress" id="projectviewer-report-progress" style="visibility: hidden;">
                                         <div class="indeterminate"></div>
                                     </div>
-                                    <p>
-                                        Report projects which violate the <a href="https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md" target="_blank">Sugar Labs Code of Conduct</a>.
-                                    </p>
+                                    <p id="projectviewer-report-conduct"></p>
                                     <div class="error-message" id="report-error" style="display: none;"></div>
                                     <div class="input-field">
                                         <textarea id="reportdescription" class="materialize-textarea" data-length="1000"></textarea>
-                                        <label for="reportdescription">Reason for reporting project</label>
+                                        <label for="reportdescription" id="projectviewer-report-reason"></label>
                                     </div>
                                 </div>
                                 <div class="card-action">
-                                    <a id="projectviewer-report-submit">Submit</a>
+                                    <a id="projectviewer-report-submit"></a>
                                 </div>
                             </div>
                             <div id="projectviewer-reportsubmit-content" style="display: none;">
                                 <div class="card-content">
-                                    <div class="reporttitle">Report Project</div>
+                                    <div class="reporttitle" id="projectviewer-reportsubmit-title"></div>
                                     <p id="submittext"></p>
                                 </div>
                                 <div class="card-action">
-                                    <a id="projectviewer-report-close">Close</a>
+                                    <a id="projectviewer-report-close"></a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <a class="modal-action waves-effect waves-green btn-flat" id="projectviewer-download-file">Download as File</a>
-                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" id="projectviewer-open-mb">Open in Music Blocks</a>
+                    <a class="modal-action waves-effect waves-green btn-flat" id="projectviewer-download-file"></a>
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" id="projectviewer-open-mb"></a>
                 </div>
             </div>
         </div>
