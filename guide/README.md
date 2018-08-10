@@ -531,7 +531,7 @@ rotation.
 
 The above example code has an *even* inversion for two notes `F5` and `D5` around the reference pitch of `C5`. We would expect the following results:
 
-Even mode
+Even inversion
 
 | Starting pitch | Distance from `C5`    | Inverse distance from `C5` | Ending pitch |
 | :------------: | :-------------------: | :------------------------: | :----------: |
@@ -548,7 +548,7 @@ In standard notation the result of this *even* inversion operation is depicted i
 
 Underneath the *even* inversion in the example code is an *odd* inversion for the same two notes of `F5` and `D5` around the same reference pitch of `C5`. We would expect the following results:
 
-Odd mode
+Odd inversion
 
 | Starting pitch | Distance from midway-point between `C5` and `C♯5` | Inverse distance from midway-point between `C5` and `C♯5` | Ending pitch |
 | :------------: | :-----------------------------------------------: | :-------------------------------------------------------: | :----------: |
@@ -563,7 +563,7 @@ In standard notation the result of this *odd* inversion operation is depicted in
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/invert-odd.png "odd invert example")
 
-Scalar mode
+Scalar inversion
 
 Underneath the *even* and *odd* inversion blocks in the example code is an inversion block set to *scalar*. We would expect the following results:
 
