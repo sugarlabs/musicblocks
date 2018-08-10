@@ -61,9 +61,9 @@ function StringHelper(Planet) {
             var obj = this.strings[i];
             var elem = document.getElementById(obj[0]);
             if (this.strings[i].length==3){
-                elem.setAttribute(obj[2],obj[1]);
+                elem.setAttribute(obj[2],_(obj[1]));
             } else {
-                elem.innerHTML+=obj[1];
+                elem.innerHTML+=_(obj[1]);
             }
         }
     };

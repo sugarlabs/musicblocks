@@ -13,10 +13,10 @@ function ProjectViewer(Planet) {
     this.ProjectCache = Planet.GlobalPlanet.cache;
     this.PlaceholderMBImage = 'images/mbgraphic.png';
     this.PlaceholderTBImage = 'images/tbgraphic.png';
-    this.ReportError = 'Error: Report could not be submitted. Try again later.';
-    this.ReportSuccess = 'Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct.';
-    this.ReportEnabledButton = 'Report Project';
-    this.ReportDisabledButton = 'Project Reported';
+    this.ReportError = _('Error: Report could not be submitted. Try again later.');
+    this.ReportSuccess = _('Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct.');
+    this.ReportEnabledButton = _('Report Project');
+    this.ReportDisabledButton = _('Project Reported');
     this.ReportDescriptionError = _('Report description required');
     this.ReportDescriptionTooLongError = _('Report description too long');
     this.id = null;
