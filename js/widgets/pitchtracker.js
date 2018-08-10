@@ -161,6 +161,7 @@ function PitchTracker() {
         var cell = this._addButton(row, 'speak.svg', iconSize, _('Start Recording'), '');
         cell.onclick = function () {
             beep();
+            beep();
             toggleLiveInput();
         };
 
@@ -168,6 +169,7 @@ function PitchTracker() {
         var cell = this._addButton(row, 'pause-button.svg', iconSize, _('Stop Recording'), '');
         cell.onclick = function () {
             keepRecording = 0;
+            
             
         };
 
@@ -621,10 +623,7 @@ function PitchTracker() {
 
     function getUserMedia(dictionary, callback) {
         try {
-            navigator.getUserMedia = 
-                navigator.getUserMedia ||
-                navigator.webkitGetUserMedia ||
-                navigator.mozGetUserMedia;
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
             navigator.getUserMedia(dictionary, callback, error);
         } catch (e) {
             alert('getUserMedia threw exception :' + e);
