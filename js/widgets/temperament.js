@@ -1309,7 +1309,7 @@ function TemperamentWidget () {
             var idx = newStack.length;
             newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
             newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
-            newStack.push([idx + 2, ['text', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
+            newStack.push([idx + 2, ['namedbox', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
             newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
             newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
             newStack.push([idx + 5, ['pitch'], 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
