@@ -3498,7 +3498,7 @@ define(MYDEFINES, function (compatibility) {
                         break;
                     case 'temperament1':
                         if (blocks.customTemperamentDefined) {
-                            // If temperament block is present.
+                            // If temperament block is present
                             var args = {
                                 'customTemperamentNotes': TEMPERAMENT['custom']
                             };

@@ -341,6 +341,7 @@ function TemperamentWidget () {
 
         docById('done').onclick = function() {
             that.ratios = that.temporaryRatios.slice();
+            that.typeOfEdit = 'nonequal';
             that.createMainWheel();
             var frequency1 = that.frequencies[0];
             that.frequencies = [];
@@ -667,6 +668,8 @@ function TemperamentWidget () {
                     return a-b;
                 });
                 pitchNumber = this.tempRatios.length - 1;
+                this.typeOfEdit = 'equal';
+                this.divisions = divisions;
             } else {
                 pitchNumber = divisions + Number(pitchNumber) - (Math.abs(pitchNumber1 - pitchNumber2));
                 var angle1 = 270 + (360 * (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase)));
@@ -680,6 +683,7 @@ function TemperamentWidget () {
                     compareRatios[i] = this.tempRatios[i];
                     compareRatios[i] = compareRatios[i].toFixed(2); 
                 }
+                this.typeOfEdit = 'nonequal';
             }
 
             if (event.target.innerHTML === 'Done') {
@@ -823,6 +827,7 @@ function TemperamentWidget () {
 
             if (event.target.innerHTML == 'Done') {
                 that.ratios = that.tempRatios.slice();
+                that.typeOfEdit = 'nonequal';
                 that.pitchNumber = that.ratios.length - 1;
                 var frequency1 = that.frequencies[0];
                 that.frequencies = [];
@@ -1077,6 +1082,7 @@ function TemperamentWidget () {
 
         divAppend.onclick = function() {
             that.ratios = that.tempRatios1.slice();
+            that.typeOfEdit = 'nonequal';
             that.pitchNumber = that.ratios.length - 1;
             var compareRatios = [];
             var frequency1 = that.frequencies[0];
@@ -1226,6 +1232,7 @@ function TemperamentWidget () {
                 that.frequencies[i] = that.frequencies[i].toFixed(2);
             }
             that.powerBase = ratio;
+            that.typeOfEdit = 'nonequal';
             that.checkTemperament(compareRatios);
             if (ratio != 2) {
                 that.octaveChanged = true;
@@ -1270,6 +1277,7 @@ function TemperamentWidget () {
         var notesMatch = false;
         var index = [];
         this.notes = [];
+        
         if (this.inTemperament == 'custom') {
             for (var i = 0; i < this.ratios.length; i++) {
                 for (var j = 0; j < this.ratiosNotesPair.length; j++) {
@@ -1307,37 +1315,72 @@ function TemperamentWidget () {
 
         for (var i = 0; i < this.pitchNumber; i++) {
             var idx = newStack.length;
-            newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
-            newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
-            newStack.push([idx + 2, ['namedbox', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
-            newStack.push([idx + 3, ['number', {'value': this.ratios[i].toFixed(2)}], 0, 0, [idx + 1]]);
-            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
-            newStack.push([idx + 5, ['pitch'], 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
+            if (this.inTemperament === 'equal' || this.inTemperament === '1/3 meantone' || (this.typeOfEdit === 'equal' && this.divisions === this.pitchNumber)) {
+                newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 8, idx + 12]]);
+                newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
+                newStack.push([idx + 2, ['namedbox', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
+                newStack.push([idx + 3, ['power'], 0, 0, [idx + 1, idx + 4, idx + 5]]);
+                newStack.push([idx + 4, ['number',{'value': this.powerBase}], 0, 0, [idx + 3]]);
+                newStack.push([idx + 5, ['divide'], 0, 0, [idx + 3, idx + 6, idx + 7]]);
+                newStack.push([idx + 6, ['number',{'value': i}], 0, 0, [idx + 5]]);
+                newStack.push([idx + 7, ['number',{'value': this.pitchNumber}], 0, 0, [idx + 5]]);
+                newStack.push([idx + 8, 'vspace', 0, 0, [idx, idx + 9]]);
+                newStack.push([idx + 9, ['pitch'], 0, 0, [idx + 8, idx + 10, idx + 11, null]]);
+                if (this.inTemperament !== 'custom') {
+                    newStack.push([idx + 10, ['notename',{'value':this.ratiosNotesPair[i][1][0]}], 0, 0, [idx + 9]]);
+                    newStack.push([idx + 11, ['number',{'value':this.ratiosNotesPair[i][1][1]}], 0, 0, [idx + 9]]);
+                } else {
+                    newStack.push([idx + 10, ['text',{'value':this.notes[i].substring(0, this.notes[i].length - 1)}], 0, 0, [idx + 9]]);
+                    newStack.push([idx + 11, ['number',{'value':this.notes[i].slice(-1)}], 0, 0, [idx + 9]]);
+                }
             
-            if (this.inTemperament !== 'custom') {
-                newStack.push([idx + 6, ['notename',{'value':this.ratiosNotesPair[i][1][0]}], 0, 0, [idx + 5]]);
+                if (i == this.pitchNumber - 1) {
+                    newStack.push([idx + 12, 'hidden', 0, 0, [idx, null]]);
+                } else {
+                    newStack.push([idx + 12, 'hidden', 0, 0, [idx, idx + 13]]);
+                }
+                previousBlock = idx + 12;
+
             } else {
-                newStack.push([idx + 6, ['text',{'value':this.notes[i].substring(0, this.notes[i].length - 1)}], 0, 0, [idx + 5]]);
-            }
+                newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 6, idx + 10]]);
+                newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
+                newStack.push([idx + 2, ['namedbox', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
+                newStack.push([idx + 3, ['divide'], 0, 0, [idx + 1, idx + 4, idx + 5]]);
+                newStack.push([idx + 4, ['number',{'value': rationalToFraction(this.ratios[i])[0]}], 0, 0, [idx + 3]]);
+                newStack.push([idx + 5, ['number',{'value': rationalToFraction(this.ratios[i])[1]}], 0, 0, [idx + 3]]);
+                newStack.push([idx + 6, 'vspace', 0, 0, [idx, idx + 7]]);
+                newStack.push([idx + 7, ['pitch'], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
             
-            newStack.push([idx + 7, ['number',{'value':this.notes[i].slice(-1)}], 0, 0, [idx + 5]]);
-            if (i == this.pitchNumber - 1) {
-                newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
-            } else {
-                newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
-            }
-            previousBlock = idx + 8;       
+                if (this.inTemperament !== 'custom') {
+                    newStack.push([idx + 8, ['notename',{'value':this.ratiosNotesPair[i][1][0]}], 0, 0, [idx + 7]]);
+                    newStack.push([idx + 9, ['number',{'value':this.ratiosNotesPair[i][1][1]}], 0, 0, [idx + 7]]);
+                } else {
+                    newStack.push([idx + 8, ['text',{'value':this.notes[i].substring(0, this.notes[i].length - 1)}], 0, 0, [idx + 7]]);
+                    newStack.push([idx + 9, ['number',{'value':this.notes[i].slice(-1)}], 0, 0, [idx + 7]]);
+                }
+            
+                if (i == this.pitchNumber - 1) {
+                    newStack.push([idx + 10, 'hidden', 0, 0, [idx, null]]);
+                } else {
+                    newStack.push([idx + 10, 'hidden', 0, 0, [idx, idx + 11]]);
+                }
+                previousBlock = idx + 10;
+            }  
         }
         this._logo.blocks.loadNewBlocks(newStack);  
 
         var newStack1 = [[0,'settemperament', 100, 100, [null, 1, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]]];        
         this._logo.blocks.loadNewBlocks(newStack1);
-        TEMPERAMENT['custom'] = [];
-        TEMPERAMENT['custom']['pitchNumber'] = this.pitchNumber;
-        for (var i = 0; i < this.pitchNumber; i++) {
-            var number = '' + i;
-            TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i].substring(0, this.notes[i].length - 1), this.notes[i].slice(-1)];
+
+        if (this.inTemperament === 'custom') {
+            TEMPERAMENT['custom'] = [];
+            TEMPERAMENT['custom']['pitchNumber'] = this.pitchNumber;
+            for (var i = 0; i < this.pitchNumber; i++) {
+                var number = '' + i;
+                TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i].substring(0, this.notes[i].length - 1), this.notes[i].slice(-1)];
+            }
         }
+        
         OCTAVERATIO = this.powerBase;
 
         if (this.inTemperament == 'custom') {
