@@ -1308,8 +1308,10 @@ function RhythmRuler () {
         var rulerDiv = docById('rulerDiv');
         rulerDiv.style.visibility = 'visible';
         rulerDiv.setAttribute('draggable', 'true');
-        rulerDiv.style.left = '200px';
-        rulerDiv.style.top = '150px';
+        this._left = 200;
+        this._top = 150;
+        rulerDiv.style.left = this._left + 'px';
+        rulerDiv.style.top = this._top + 'px';
 
         // The widget buttons
         var widgetButtonsDiv = docById('rulerButtonsDiv');
@@ -1359,6 +1361,10 @@ function RhythmRuler () {
 
         var numberInput = docById('dissectNumber');
 
+        numberInput.onfocus = function (event) {
+            that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
+        };
+
         numberInput.onkeydown = function (event) {
             if (event.keyCode === DEL) {
                 numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
@@ -1398,6 +1404,9 @@ function RhythmRuler () {
         var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'), '');
 
         cell.onclick = function () {
+            // If the piemenu was open, close it.
+            docById('wheelDiv').style.display = 'none';
+
             // Save the new dissect history.
             var dissectHistory = [];
             var drums = [];
@@ -1463,10 +1472,10 @@ function RhythmRuler () {
         canvas.ondrop = function (e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - that._dx;
-                rulerDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                rulerDiv.style.top = y + 'px';
+                that._left = e.clientX - that._dx;
+                that._top = e.clientY - that._dy;
+                rulerDiv.style.left = that._left + 'px';
+                rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
@@ -1478,10 +1487,10 @@ function RhythmRuler () {
         rulerDiv.ondrop = function (e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - that._dx;
-                rulerDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                rulerDiv.style.top = y + 'px';
+                that._left = e.clientX - that._dx;
+                that._top = e.clientY - that._dy;
+                rulerDiv.style.left = that._left + 'px';
+                rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
@@ -1692,5 +1701,112 @@ function RhythmRuler () {
         }
 
         return cell;
+    };
+
+    this._piemenuNumber = function (wheelValues, selectedValue) {
+        // input form and  wheelNav pie menu for number selection
+        docById('wheelDiv').style.display = '';
+
+        // the number selector
+        this._numberWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._numberWheel.raphael);
+
+        var wheelLabels = [];
+        for (var i = 0; i < wheelValues.length; i++) {
+            wheelLabels.push(wheelValues[i].toString());
+        }
+
+        // spacer
+        wheelLabels.push(null);
+
+        wheelnav.cssMode = true;
+
+        this._numberWheel.keynavigateEnabled = true;
+
+        this._numberWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
+        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+        if (wheelValues.length > 16) {
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        } else {
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        }
+
+        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
+        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
+        // this._numberWheel.titleRotateAngle = 0;
+        this._numberWheel.animatetime = 300;
+        this._numberWheel.createWheel(wheelLabels);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var numberInput = docById('dissectNumber');
+            numberInput.value = wheelValues[that._numberWheel.selectedNavItemIndex];
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._numberWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var numberInput = docById('dissectNumber');
+        // Position the widget over the note block.
+        var x = this._left + 100;
+        var y = this._top + 100;
+
+        var canvasLeft = this._logo.blocks.canvas.offsetLeft + 28 * this._logo.blocks.blockScale;
+        var canvasTop = this._logo.blocks.canvas.offsetTop + 6 * this._logo.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+
+        var selectorWidth = 150;
+        var left = Math.round((x + this._logo.blocks.stage.x) * this._logo.blocks.getStageScale() + canvasLeft);
+        var top = Math.round((y + this._logo.blocks.stage.y) * this._logo.blocks.getStageScale() + canvasTop);
+
+        docById('wheelDiv').style.left = Math.min(Math.max((left - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';
+        if (top - 300 < 0) {
+            docById('wheelDiv').style.top = (top + 40) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (top - 300) + 'px';
+        }
+
+        // Navigate to a the current number value.
+        var i = wheelValues.indexOf(selectedValue);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._numberWheel.navigateWheel(i);
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < wheelLabels.length; i++) {
+            this._numberWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            __exitMenu();
+        };
     };
 };
