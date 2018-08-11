@@ -529,6 +529,8 @@ rotation.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform13.svg "inversion")
 
+NOTE: The initial `C5` pitch (as a half note) remains unchanged (in all of the examples) as it is outside of the invert block.
+
 The above example code has an *even* inversion for two notes `F5` and `D5` around the reference pitch of `C5`. We would expect the following results:
 
 Even inversion
@@ -559,7 +561,7 @@ This operation can be visualized on a pitch clock similar to *even* inversion ex
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/odd-invert-chart.svg "odd invert chart")
 
-In standard notation the result of this *odd* inversion operation is depicted in second measure of the following example. The first measure is the original reference. NOTE: THE C PITCH REMAINS UNCHANGED AS IT IS NOT OPERATED UPON IN THE EXAMPLE BLOCK CODE (ABOVE). IF IT WERE CONTAINED IN THE OPERATION IT WOULD BE CHANGED TO `C♯5` (i.e. `C5` is 0.5 half steps *below* the axis of rotation, so the result of an inversion around `C5` and `odd` would be 0.5 half steps *above* the axis of rotation).
+In standard notation the result of this *odd* inversion operation is depicted in second measure of the following example. The first measure is the original reference. NOTE: The `C5` pitch remains unchanged as it is not operated upon in the example block code (above). If it were contained in the operation it would be changed to `C♯5` (i.e. `C5` is 0.5 half steps *below* the axis of rotation, so the result of an inversion around `C5` and `odd` would be 0.5 half steps *above* the axis of rotation).
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/invert-odd.png "odd invert example")
 
@@ -572,7 +574,7 @@ Underneath the *even* and *odd* inversion blocks in the example code is an inver
 | `F5`           | 3 above (C5 --> D5 --> E5 --> F5)    | 3 below (C5 --> B4 --> A4 --> G4)            | `G4`         |
 | `D5`           | 1 above (C5 --> D5)                  | 1 below (C5 --> B4)                          | `B4`         |
 
-This operation can be visualized on a pitch clock similar to *odd* and *even* except that all non-scalar pitches (i.e. pitches outside the chosen key) are skipped. NOTE: The scalar pitches are slightly more bold in the following pitch clock diagram.
+This operation can be visualized on a pitch clock similar to *odd* and *even* except that all non-scalar pitches (i.e. pitches outside the chosen key) are skipped. NOTE: The scalar pitches are shown in bold in the following pitch clock diagram.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/scalar-invert-chart.svg "scalar invert chart")
 
