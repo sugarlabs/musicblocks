@@ -14,12 +14,12 @@ function StringHelper(Planet) {
     // append to innerhtml
     this.strings = [
         ["logo-container",_("Planet")],
-        ["close-planet",_("Close Planet",_("data-tooltip")],
-        ["planet-open-file",_("Open project from file",_("data-tooltip")],
-        ["planet-new-project",_("New project",_("data-tooltip")],
+        ["close-planet",_("Close Planet"),"data-tooltip"],
+        ["planet-open-file",_("Open project from file"),"data-tooltip"],
+        ["planet-new-project",_("New project"),"data-tooltip"],
         ["local-tab",_("Local")],
         ["global-tab",_("Global")],
-        ["global-search",_("Search for a project",_("placeholder")],
+        ["global-search",_("Search for a project"),"placeholder"],
         ["localtitle",_("My Projects")],
         ["publisher-ptitle",_("Publish Project")],
         ["publish-title-label",_("Project title")],
