@@ -7993,9 +7993,14 @@ function Logo () {
                             that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                         }
                     }
-
+                    if (that.synth.inTemperament === 'custom') {
+                        var notesFrequency = that.synth.getCustomFrequency(notes);
+                    } else {
+                        var notesFrequency = that.synth.getFrequency(notes, that.synth.changeInTemperament);
+                    }
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
+                        console.log('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
                         if (that.justCounting[turtle].length === 0) {
                             if (notes.length === 0) {
                                 console.log('notes to play: R ' + obj[0] + '/' + obj[1]);

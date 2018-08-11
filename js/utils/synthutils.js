@@ -328,7 +328,7 @@ function Synth() {
 
         if (typeof(notes) === 'string') {
             return __getFrequency(notes);
-        } else if (typeof(notes) === 'obj') {
+        } else if (typeof(notes) === 'object') {
             var results = [];
             for (var i = 0; i < notes.length; i++) {
                 if (typeof(notes[i]) === 'string') {
