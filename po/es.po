@@ -115,6 +115,42 @@
 #: js/blocks.js:2940
 #: js/blocks.js:3514
 #: js/blocks.js:4319
+#: js/block.js:720
+#: js/block.js:3892
+#: js/block.js:3901
+#: js/block.js:3912
+#: js/activity.js:2732
+#: js/analytics.js:475
+#: js/palette.js:681
+#: js/palette.js:690
+#: js/palette.js:699
+#: js/palette.js:708
+#: js/palette.js:1983
+#: js/palette.js:1994
+#: js/palette.js:2005
+#: js/palette.js:2016
+#: js/turtledefs.js:23
+#: js/basicblocks.js:1148
+#: js/basicblocks.js:1159
+#: js/basicblocks.js:1170
+#: js/basicblocks.js:2817
+#: js/basicblocks.js:2848
+#: js/basicblocks.js:2855
+#: js/basicblocks.js:2884
+#: js/basicblocks.js:2894
+#: js/basicblocks.js:2926
+#: js/basicblocks.js:2971
+#: js/basicblocks.js:2975
+#: js/basicblocks.js:2981
+#: js/macros.js:44
+#: js/blocks.js:784
+#: js/blocks.js:2385
+#: js/blocks.js:2386
+#: js/blocks.js:2578
+#: js/blocks.js:2784
+#: js/blocks.js:2940
+#: js/blocks.js:3514
+#: js/blocks.js:4319
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "acción"
@@ -3957,21 +3993,15 @@ msgid "Planet"
 msgstr "Planeta"
 
 #: js/StringHelper.js:17
-msgid "Close Planet\","
-msgstr ""
-
-#: js/StringHelper.js:17
-#: js/StringHelper.js:18
-#: js/StringHelper.js:19
-msgid "data-tooltip"
+msgid "Close Planet"
 msgstr ""
 
 #: js/StringHelper.js:18
-msgid "Open project from file\","
+msgid "Open project from file"
 msgstr ""
 
 #: js/StringHelper.js:19
-msgid "New project\","
+msgid "New project"
 msgstr ""
 
 #: js/StringHelper.js:20
@@ -3983,11 +4013,7 @@ msgid "Global"
 msgstr ""
 
 #: js/StringHelper.js:22
-msgid "Search for a project\","
-msgstr ""
-
-#: js/StringHelper.js:22
-msgid "placeholder"
+msgid "Search for a project"
 msgstr ""
 
 #: js/StringHelper.js:23
@@ -4603,10 +4629,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Click to run the project in slow mode."
 #~msgstr "Haz click para ejecutar el proyecto en modo lento."
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "cuartas"
+#~msgid "fifths"
+#~msgstr "quintos"
 
 #: js/turtledefs.js:79
 
@@ -4653,6 +4679,11 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "sing"
 #~msgstr "cantar"
 
+#: js/StringHelper.js:22
+
+#~msgid "placeholder"
+#~msgstr ""
+
 #: js/lilypond.js:21
 
 #~msgid "bt"
@@ -4686,10 +4717,15 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Impact UID not found."
 #~msgstr ""
 
-#: js/basicblocks.js:612
+#: js/samplesviewer.js:80
 
-#~msgid "fifths"
-#~msgstr "quintos"
+#~msgid "Copy this link to share your project."
+#~msgstr "Copia este enlace para compartir tu proyecto."
+
+#: js/basicblocks.js:596
+
+#~msgid "fourths"
+#~msgstr "cuartas"
 
 #: js/lilypond.js:21
 
@@ -4714,6 +4750,11 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "rodi"
 #~msgstr "RoDi"
 
+#: js/StringHelper.js:18
+
+#~msgid "Open project from file\","
+#~msgstr ""
+
 #~msgid "Save your project to a server."
 #~msgstr "Guarde proyecto en el servidor."
 
@@ -4735,15 +4776,28 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "movable"
 #~msgstr "móvil"
 
+#: js/turtledefs.js:134
+
+#~msgid "Show or hide a Cartesian-coordinate grid."
+#~msgstr "Mostrar u ocultar cuadrícula en coordenadas cartesianas."
+
 #: js/turtledefs.js:82
 
 #~msgid "Click to run just the music in slow mode."
 #~msgstr "Haga clic para ejecutar sólo la música en modo lento."
 
+#: plugins/impact.rtp:69
+
+#~msgid "Cannot parse Impact data."
+#~msgstr ""
+
 #: js/activity.js:2699
 
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 #~msgstr "Ejecutar rápido / largo presione para ejecutar lento / extra-largo presione para ejecutar música lenta"
+
+#~msgid "eatme"
+#~msgstr "cómeme"
 
 #~msgid "mashape"
 #~msgstr "mashape"
@@ -4770,9 +4824,6 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "turtle note"
 #~msgstr "nota de tortugas"
-
-#~msgid "eatme"
-#~msgstr "cómeme"
 
 #: js/musicutils.js:286
 
@@ -4814,9 +4865,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "adjust transposition"
 #~msgstr "ajustar transposición"
 
-#~msgid "legato factor"
-#~msgstr "factor de legato"
-
 #: js/basicblocks.js:145
 
 #~msgid "consonant step down"
@@ -4835,6 +4883,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "hspace"
 #~msgstr "espacio horizontal"
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Este botón abre y cierra la barra de herramientas principal."
+
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -4844,6 +4895,11 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "numerator"
 #~msgstr "numerador"
+
+#: js/basicblocks.js:1457
+
+#~msgid "relative interval"
+#~msgstr "intervalo relativa"
 
 #~msgid "Japan""
 #~msgstr "Japonés"
@@ -4856,6 +4912,15 @@ msgstr "Debe seleccionar un archivo."
 #: plugins/impact.rtp:127
 
 #~msgid "Impact data not available."
+#~msgstr ""
+
+#: js/StringHelper.js:17
+
+#: js/StringHelper.js:18
+
+#: js/StringHelper.js:19
+
+#~msgid "data-tooltip"
 #~msgstr ""
 
 #: js/basicblocks.js:589
@@ -4883,11 +4948,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "actions"
 #~msgstr ""
 
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "octava actual"
-
 #: js/logo.js:4992
 
 #: js/logo.js:5014
@@ -4910,19 +4970,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Publish"
 #~msgstr "Publicar"
 
-#: js/logo.js:4259
+#: js/StringHelper.js:17
 
-#~msgid "Rhythm Block: Did you mean to use a Matrix block?"
-#~msgstr "Bloque de ritmo: Quizás quiso decir utilizar un bloque de matrix?"
-
-#: js/activity.js:2433
-
-#: js/activity.js:2444
-
-#: js/activity.js:2459
-
-#~msgid "untitled"
-#~msgstr "intitulado"
+#~msgid "Close Planet\","
+#~msgstr ""
 
 #: js/samplesviewer.js:700
 
@@ -4949,10 +5000,8 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "ch"
 #~msgstr "a"
 
-#: js/samplesviewer.js:80
-
-#~msgid "Copy this link to share your project."
-#~msgstr "Copia este enlace para compartir tu proyecto."
+#~msgid "legato factor"
+#~msgstr "factor de legato"
 
 #: js/lilypond.js:21
 
@@ -4987,6 +5036,15 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "UID"
 #~msgstr "id único"
 
+#: js/activity.js:2433
+
+#: js/activity.js:2444
+
+#: js/activity.js:2459
+
+#~msgid "untitled"
+#~msgstr "intitulado"
+
 #: plugins/rodi.rtp:110
 
 #~msgid "blink (ms)"
@@ -5016,11 +5074,6 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "pluck"
 #~msgstr "puntear"
-
-#: js/basicblocks.js:3816
-
-#~msgid "new turtle"
-#~msgstr "nueva tortuga"
 
 #: js/turtledefs.js:118
 
@@ -5080,6 +5133,11 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Advanced options"
 #~msgstr "Opciones avanzadas"
 
+#: js/StringHelper.js:19
+
+#~msgid "New project\","
+#~msgstr ""
+
 #: js/logo.js:4851
 
 #: js/logo.js:4872
@@ -5111,18 +5169,20 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "note volume"
 #~msgstr "volumen nota"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Este botón abre y cierra la barra de herramientas principal."
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "octava actual"
 
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
 #~msgstr "hace *X* hora(s)"
 
-#: js/basicblocks.js:1457
+#: js/basicblocks.js:3816
 
-#~msgid "relative interval"
-#~msgstr "intervalo relativa"
+#~msgid "new turtle"
+#~msgstr "nueva tortuga"
 
 #: js/lilypond.js:21
 
@@ -5183,15 +5243,15 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "interval"
 #~msgstr "intervalo"
 
-#: plugins/impact.rtp:69
+#: js/logo.js:4259
 
-#~msgid "Cannot parse Impact data."
+#~msgid "Rhythm Block: Did you mean to use a Matrix block?"
+#~msgstr "Bloque de ritmo: Quizás quiso decir utilizar un bloque de matrix?"
+
+#: js/StringHelper.js:22
+
+#~msgid "Search for a project\","
 #~msgstr ""
-
-#: js/turtledefs.js:134
-
-#~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "Mostrar u ocultar cuadrícula en coordenadas cartesianas."
 
 #: js/activity.js:2527
 

@@ -117,6 +117,42 @@
 #: js/blocks.js:2940
 #: js/blocks.js:3514
 #: js/blocks.js:4319
+#: js/block.js:720
+#: js/block.js:3892
+#: js/block.js:3901
+#: js/block.js:3912
+#: js/activity.js:2732
+#: js/analytics.js:475
+#: js/palette.js:681
+#: js/palette.js:690
+#: js/palette.js:699
+#: js/palette.js:708
+#: js/palette.js:1983
+#: js/palette.js:1994
+#: js/palette.js:2005
+#: js/palette.js:2016
+#: js/turtledefs.js:23
+#: js/basicblocks.js:1148
+#: js/basicblocks.js:1159
+#: js/basicblocks.js:1170
+#: js/basicblocks.js:2817
+#: js/basicblocks.js:2848
+#: js/basicblocks.js:2855
+#: js/basicblocks.js:2884
+#: js/basicblocks.js:2894
+#: js/basicblocks.js:2926
+#: js/basicblocks.js:2971
+#: js/basicblocks.js:2975
+#: js/basicblocks.js:2981
+#: js/macros.js:44
+#: js/blocks.js:784
+#: js/blocks.js:2385
+#: js/blocks.js:2386
+#: js/blocks.js:2578
+#: js/blocks.js:2784
+#: js/blocks.js:2940
+#: js/blocks.js:3514
+#: js/blocks.js:4319
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "アクション"
@@ -4134,21 +4170,15 @@ msgid "Planet"
 msgstr "プラネット"
 
 #: js/StringHelper.js:17
-msgid "Close Planet\","
-msgstr ""
-
-#: js/StringHelper.js:17
-#: js/StringHelper.js:18
-#: js/StringHelper.js:19
-msgid "data-tooltip"
+msgid "Close Planet"
 msgstr ""
 
 #: js/StringHelper.js:18
-msgid "Open project from file\","
+msgid "Open project from file"
 msgstr ""
 
 #: js/StringHelper.js:19
-msgid "New project\","
+msgid "New project"
 msgstr ""
 
 #: js/StringHelper.js:20
@@ -4160,11 +4190,7 @@ msgid "Global"
 msgstr ""
 
 #: js/StringHelper.js:22
-msgid "Search for a project\","
-msgstr ""
-
-#: js/StringHelper.js:22
-msgid "placeholder"
+msgid "Search for a project"
 msgstr ""
 
 #: js/StringHelper.js:23
@@ -4787,7 +4813,6 @@ msgstr "動き出し"
 msgid "You need to select a file."
 msgstr "ファイルを選ぶ必要があります"
 
-## All the strings that follow are deprecated.
 #~msgid "gp"
 #~msgstr "ギ"
 
@@ -4866,6 +4891,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "movable"
 #~msgstr "移動ド？"
 
+#~msgid "Show or hide a Cartesian-coordinate grid."
+#~msgstr "直交座標を表示する/隠す"
+
 #~msgid "Click to run just the music in slow mode."
 #~msgstr "音楽をゆっくり再生したい時は、ここをクリック。"
 
@@ -4875,14 +4903,17 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 #~msgstr "速いスピードで再生します／長押しでスロー再生／より長押しでさらにスロー再生"
 
+#~msgid "free time"
+#~msgstr "クロックなし"
+
+#~msgid "eatme"
+#~msgstr "私を食べろ"
+
 #~msgid "mashape"
 #~msgstr ""
 
 #~msgid "food"
 #~msgstr "食べ物"
-
-#~msgid "eatme"
-#~msgstr "私を食べろ"
 
 #~msgid "blues"
 #~msgstr "ブルース"
@@ -4923,14 +4954,17 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "hspace"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "ツールバーを開いたり閉じたりするにはこのボタンをクリックしてください"
+
 #~msgid "numerator"
 #~msgstr "分子"
 
+#~msgid "relative interval"
+#~msgstr "相対的な音と音の間の間隔"
+
 #~msgid "set beats per minute"
 #~msgstr "BPM(一分あたりの拍数)を設定"
-
-#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
-#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
 
 #~msgid "Undo"
 #~msgstr "元に戻す"
@@ -4938,11 +4972,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "graphical notation matrix"
 #~msgstr "簡単なビジュアル・マトリックス"
 
-#~msgid "free time"
-#~msgstr "クロックなし"
-
-#~msgid "current pitch octave"
-#~msgstr "今の音が属するオクターブ"
+#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
+#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
 
 #~msgid "Input to Major Block must be 2, 3, 6, or 7"
 #~msgstr "メジャーブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
@@ -4952,12 +4983,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "Publish"
 #~msgstr "サーバにアップロードして発表する"
-
-#~msgid "Rhythm Block: Did you mean to use a Matrix block?"
-#~msgstr "リズムブロックと：音高・時刻行列と一緒に使いますか？"
-
-#~msgid "untitled"
-#~msgstr "無題"
 
 #~msgid "Worldwide"
 #~msgstr "世界中のプロジェクト"
@@ -4995,6 +5020,12 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "The Step Pitch Block must be used inside of a Note Block."
 #~msgstr "ステップ音高ブロックは音符ブロックの中にある必要があります。"
 
+#~msgid "UID"
+#~msgstr "ユーザの名前"
+
+#~msgid "untitled"
+#~msgstr "無題"
+
 #~msgid "begin hollow line"
 #~msgstr "（中空の）線を始める"
 
@@ -5003,9 +5034,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "consonant step up"
 #~msgstr "コンソナントステップアップ"
-
-#~msgid "new turtle"
-#~msgstr "新しいネズミ"
 
 #~msgid "Remove all content on the canvas, including the blocks."
 #~msgstr "画面上に表示されているもの（ブロックスを含む）を全て消します。"
@@ -5055,14 +5083,14 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "note volume"
 #~msgstr "音符の音量"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "ツールバーを開いたり閉じたりするにはこのボタンをクリックしてください"
+#~msgid "current pitch octave"
+#~msgstr "今の音が属するオクターブ"
 
 #~msgid "hours ago"
 #~msgstr "時間前"
 
-#~msgid "relative interval"
-#~msgstr "相対的な音と音の間の間隔"
+#~msgid "new turtle"
+#~msgstr "新しいネズミ"
 
 #~msgid "Could not find mouse"
 #~msgstr "ネズミが見つかりません"
@@ -5082,11 +5110,11 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "interval"
 #~msgstr "音と音の間の間隔"
 
-#~msgid "UID"
-#~msgstr "ユーザの名前"
+#~msgid "Rhythm Block: Did you mean to use a Matrix block?"
+#~msgstr "リズムブロックと：音高・時刻行列と一緒に使いますか？"
 
-#~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "直交座標を表示する/隠す"
+#~msgid "Search for a project\","
+#~msgstr ""
 
 #~msgid "My Music Blocks Creation"
 #~msgstr "私のミュージック・ブロックス作品"

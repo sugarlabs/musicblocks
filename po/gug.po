@@ -105,6 +105,42 @@
 #: js/blocks.js:2940
 #: js/blocks.js:3514
 #: js/blocks.js:4319
+#: js/block.js:720
+#: js/block.js:3892
+#: js/block.js:3901
+#: js/block.js:3912
+#: js/activity.js:2732
+#: js/analytics.js:475
+#: js/palette.js:681
+#: js/palette.js:690
+#: js/palette.js:699
+#: js/palette.js:708
+#: js/palette.js:1983
+#: js/palette.js:1994
+#: js/palette.js:2005
+#: js/palette.js:2016
+#: js/turtledefs.js:23
+#: js/basicblocks.js:1148
+#: js/basicblocks.js:1159
+#: js/basicblocks.js:1170
+#: js/basicblocks.js:2817
+#: js/basicblocks.js:2848
+#: js/basicblocks.js:2855
+#: js/basicblocks.js:2884
+#: js/basicblocks.js:2894
+#: js/basicblocks.js:2926
+#: js/basicblocks.js:2971
+#: js/basicblocks.js:2975
+#: js/basicblocks.js:2981
+#: js/macros.js:44
+#: js/blocks.js:784
+#: js/blocks.js:2385
+#: js/blocks.js:2386
+#: js/blocks.js:2578
+#: js/blocks.js:2784
+#: js/blocks.js:2940
+#: js/blocks.js:3514
+#: js/blocks.js:4319
 #.TRANS: a stack of blocks to run (an action to take)
 #.TRANS: acción
 msgid "action"
@@ -2286,6 +2322,7 @@ msgid "do"
 msgstr "japo"
 
 #: js/basicblocks.js:1168
+#.TRANS: 
 msgid "on every beat do"
 msgstr ""
 
@@ -4647,44 +4684,38 @@ msgid "previous"
 msgstr "mboyvegua"
 
 #: js/StringHelper.js:16
+#.TRANS: Planeta
 msgid "Planet"
 msgstr "Mbyja kuarahyre ojereva"
 
 #: js/StringHelper.js:17
-msgid "Close Planet\","
-msgstr ""
-
-#: js/StringHelper.js:17
-#: js/StringHelper.js:18
-#: js/StringHelper.js:19
-msgid "data-tooltip"
+msgid "Close Planet"
 msgstr ""
 
 #: js/StringHelper.js:18
-msgid "Open project from file\","
+msgid "Open project from file"
 msgstr ""
 
 #: js/StringHelper.js:19
-msgid "New project\","
+msgid "New project"
 msgstr ""
 
 #: js/StringHelper.js:20
+#.TRANS: 
 msgid "Local"
 msgstr ""
 
 #: js/StringHelper.js:21
+#.TRANS: 
 msgid "Global"
 msgstr ""
 
 #: js/StringHelper.js:22
-msgid "Search for a project\","
-msgstr ""
-
-#: js/StringHelper.js:22
-msgid "placeholder"
+msgid "Search for a project"
 msgstr ""
 
 #: js/StringHelper.js:23
+#.TRANS: 
 msgid "My Projects"
 msgstr ""
 
@@ -4695,85 +4726,105 @@ msgid "Publish Project"
 msgstr ""
 
 #: js/StringHelper.js:26
+#.TRANS: 
 msgid "Tags (max 5)"
 msgstr ""
 
 #: js/StringHelper.js:27
 #: js/StringHelper.js:47
+#.TRANS: 
 msgid "Description"
 msgstr ""
 
 #: js/StringHelper.js:28
 #: js/StringHelper.js:52
+#.TRANS: 
 msgid "Submit"
 msgstr ""
 
 #: js/StringHelper.js:29
 #: js/StringHelper.js:33
+#.TRANS: 
 msgid "Cancel"
 msgstr ""
 
 #: js/StringHelper.js:30
+#.TRANS: 
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
 msgstr ""
 
 #: js/StringHelper.js:31
+#.TRANS: 
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
 msgstr ""
 
 #: js/StringHelper.js:32
+#.TRANS: Borrar
 msgid "Delete"
 msgstr "mbogue"
 
 #: js/StringHelper.js:34
+#.TRANS: 
 msgid "Explore Projects"
 msgstr ""
 
 #: js/StringHelper.js:35
+#.TRANS: 
 msgid "View More"
 msgstr ""
 
 #: js/StringHelper.js:36
+#.TRANS: 
 msgid "Most recent"
 msgstr ""
 
 #: js/StringHelper.js:37
+#.TRANS: 
 msgid "Most liked"
 msgstr ""
 
 #: js/StringHelper.js:38
+#.TRANS: 
 msgid "Most downloaded"
 msgstr ""
 
 #: js/StringHelper.js:39
+#.TRANS: 
 msgid "A-Z"
 msgstr ""
 
 #: js/StringHelper.js:40
+#.TRANS: 
 msgid "Sort by"
 msgstr ""
 
 #: js/StringHelper.js:41
+#.TRANS: 
 msgid "Load More Projects"
 msgstr ""
 
 #: js/StringHelper.js:42
+#.TRANS: 
 msgid "Last Updated"
 msgstr ""
 
 #: js/StringHelper.js:43
+#.TRANS: 
 msgid "Creation Date"
 msgstr ""
 
 #: js/StringHelper.js:44
+#.TRANS: 
 msgid "Number of Downloads:"
 msgstr ""
 
 #: js/StringHelper.js:45
+#.TRANS: 
 msgid "Number of Likes:"
 msgstr ""
 
 #: js/StringHelper.js:46
+#.TRANS: 
 msgid "Tags:"
 msgstr ""
 
@@ -4781,22 +4832,27 @@ msgstr ""
 #: js/StringHelper.js:49
 #: js/StringHelper.js:53
 #: js/ProjectViewer.js:18
+#.TRANS: 
 msgid "Report Project"
 msgstr ""
 
 #: js/StringHelper.js:50
+#.TRANS: 
 msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
 msgstr ""
 
 #: js/StringHelper.js:51
+#.TRANS: 
 msgid "Reason for reporting project"
 msgstr ""
 
 #: js/StringHelper.js:55
+#.TRANS: 
 msgid "Download as File"
 msgstr ""
 
 #: js/StringHelper.js:56
+#.TRANS: 
 msgid "Open in Music Blocks"
 msgstr ""
 
@@ -4858,14 +4914,17 @@ msgid "anonymous"
 msgstr ""
 
 #: js/ProjectViewer.js:16
+#.TRANS: 
 msgid "Error: Report could not be submitted. Try again later."
 msgstr ""
 
 #: js/ProjectViewer.js:17
+#.TRANS: 
 msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
 msgstr ""
 
 #: js/ProjectViewer.js:19
+#.TRANS: 
 msgid "Project Reported"
 msgstr ""
 
@@ -5437,6 +5496,12 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Fibonacci"
 #~msgstr "Fibonacci"
 
+#: js/StringHelper.js:22
+
+#.TRANS: 
+#~msgid "placeholder"
+#~msgstr ""
+
 #: js/lilypond.js:21
 
 #~msgid "bt"
@@ -5540,6 +5605,12 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "set voice"
 #~msgstr "emoĩ ñe’ẽ"
 
+#: js/StringHelper.js:18
+
+#.TRANS: 
+#~msgid "Open project from file\","
+#~msgstr ""
+
 #: js/basicblocks.js:664
 
 #~msgid "multiply beat value"
@@ -5576,6 +5647,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #~msgid "Japanese"
 #~msgstr "Japonés"
+
+#: js/basicblocks.js:655
+
+#~msgid "duplicate notes"
+#~msgstr "emomokoĩ notas"
 
 #: js/musicutils.js:246
 
@@ -5652,6 +5728,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "simple-1"
 #~msgstr ""
 
+#: js/activity.js:2527
+
+#~msgid "My Music Blocks Creation"
+#~msgstr ""
+
 #: js/musicutils.js:254
 
 #~msgid "Custom"
@@ -5664,7 +5745,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #: js/logo-test.js:9708
 
-#.TRANS: 
 #~msgid "Cannot read pixel color"
 #~msgstr ""
 
@@ -5677,6 +5757,26 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #~msgid "Algerian"
 #~msgstr "Argelino"
+
+#: js/basicblocks.js:1229
+
+#~msgid "relative interval"
+#~msgstr "interval relativa"
+
+#: js/musicutils.js:207
+
+#~msgid "Ionian"
+#~msgstr "Jónico"
+
+#: js/StringHelper.js:17
+
+#: js/StringHelper.js:18
+
+#: js/StringHelper.js:19
+
+#.TRANS: 
+#~msgid "data-tooltip"
+#~msgstr ""
 
 #: js/activity.js:3483
 
@@ -5691,6 +5791,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #~msgid "free time"
 #~msgstr "ára sãso"
+
+#: js/musicutils.js:237
+
+#~msgid "Spanish Gypsy"
+#~msgstr "Gitano español"
 
 #: js/musicutils.js:213
 
@@ -5723,10 +5828,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Publish"
 #~msgstr "mbojekuaa"
 
-#: js/basicblocks.js:655
+#: js/StringHelper.js:17
 
-#~msgid "duplicate notes"
-#~msgstr "emomokoĩ notas"
+#.TRANS: 
+#~msgid "Close Planet\","
+#~msgstr ""
 
 #: js/samplesviewer.js:700
 
@@ -5825,11 +5931,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Chromatic"
 #~msgstr "Cromático"
 
-#: js/musicutils.js:211
-
-#~msgid "Phrygian"
-#~msgstr "Frigio"
-
 #: js/samplesviewer.js:73
 
 #: js/samplesviewer.js:73
@@ -5854,11 +5955,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "pluck"
 #~msgstr "motenonde"
 
-#: js/basicblocks.js:3816
-
-#~msgid "new turtle"
-#~msgstr ""
-
 #: js/turtledefs.js:118
 
 #~msgid "Remove all content on the canvas, including the blocks."
@@ -5868,11 +5964,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #~msgid "The save-stack button saves a stack onto a custom palette."
 #~msgstr "Votõ Eñongatu aty oñongatu peteĩ aty yvyra pe ári"
-
-#: js/musicutils.js:237
-
-#~msgid "Spanish Gypsy"
-#~msgstr "Gitano español"
 
 #: js/samplesviewer.js:699
 
@@ -5915,10 +6006,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 #~msgstr "Eikeha vore michĩha ha’e vaerã peteĩ, mokoĩ, mbohapy, irundy, po, poteĩ, pokoĩ terã poapy"
 
-#: js/musicutils.js:207
+#: js/musicutils.js:211
 
-#~msgid "Ionian"
-#~msgstr "Jónico"
+#~msgid "Phrygian"
+#~msgstr "Frigio"
 
 #: js/basicblocks.js:317
 
@@ -5943,6 +6034,17 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #~msgid "Hindu"
 #~msgstr "Hindú"
+
+#: js/turtledefs.js:134
+
+#~msgid "Show or hide a Cartesian-coordinate grid."
+#~msgstr "Ehechauka tera eñongatu cuadrí­cula en coordenadas cartesianas"
+
+#: js/StringHelper.js:19
+
+#.TRANS: 
+#~msgid "New project\","
+#~msgstr ""
 
 #: js/logo.js:3424
 
@@ -5980,10 +6082,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "current pitch octave"
 #~msgstr "Octava ko’ãgagua"
 
-#: js/basicblocks.js:1229
+#: js/basicblocks.js:3816
 
-#~msgid "relative interval"
-#~msgstr "interval relativa"
+#~msgid "new turtle"
+#~msgstr ""
 
 #: js/musicutils.js:239
 
@@ -5994,11 +6096,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #~msgid "Aeolian"
 #~msgstr "Eólico"
-
-#: js/musicutils.js:243
-
-#~msgid "Major Blues"
-#~msgstr "Blues guasuve"
 
 #: js/turtledefs.js:29
 
@@ -6080,15 +6177,16 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Rhythm Block: Did you mean to use a Matrix block?"
 #~msgstr " Vore rítmo: He’ise mo’ã eipuru vore moñepyrũmbygua"
 
-#: js/turtledefs.js:134
+#: js/StringHelper.js:22
 
-#~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "Ehechauka tera eñongatu cuadrí­cula en coordenadas cartesianas"
-
-#: js/activity.js:2527
-
-#~msgid "My Music Blocks Creation"
+#.TRANS: 
+#~msgid "Search for a project\","
 #~msgstr ""
+
+#: js/musicutils.js:243
+
+#~msgid "Major Blues"
+#~msgstr "Blues guasuve"
 
 #: js/lilypond.js:21
 

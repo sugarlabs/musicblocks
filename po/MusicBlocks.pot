@@ -3895,21 +3895,15 @@ msgid "Planet"
 msgstr ""
 
 #: js/StringHelper.js:17
-msgid "Close Planet\","
-msgstr ""
-
-#: js/StringHelper.js:17
-#: js/StringHelper.js:18
-#: js/StringHelper.js:19
-msgid "data-tooltip"
+msgid "Close Planet"
 msgstr ""
 
 #: js/StringHelper.js:18
-msgid "Open project from file\","
+msgid "Open project from file"
 msgstr ""
 
 #: js/StringHelper.js:19
-msgid "New project\","
+msgid "New project"
 msgstr ""
 
 #: js/StringHelper.js:20
@@ -3921,11 +3915,7 @@ msgid "Global"
 msgstr ""
 
 #: js/StringHelper.js:22
-msgid "Search for a project\","
-msgstr ""
-
-#: js/StringHelper.js:22
-msgid "placeholder"
+msgid "Search for a project"
 msgstr ""
 
 #: js/StringHelper.js:23

@@ -207,6 +207,42 @@
 #: js/blocks.js:2940
 #: js/blocks.js:3514
 #: js/blocks.js:4319
+#: js/block.js:720
+#: js/block.js:3892
+#: js/block.js:3901
+#: js/block.js:3912
+#: js/activity.js:2732
+#: js/analytics.js:475
+#: js/palette.js:681
+#: js/palette.js:690
+#: js/palette.js:699
+#: js/palette.js:708
+#: js/palette.js:1983
+#: js/palette.js:1994
+#: js/palette.js:2005
+#: js/palette.js:2016
+#: js/turtledefs.js:23
+#: js/basicblocks.js:1148
+#: js/basicblocks.js:1159
+#: js/basicblocks.js:1170
+#: js/basicblocks.js:2817
+#: js/basicblocks.js:2848
+#: js/basicblocks.js:2855
+#: js/basicblocks.js:2884
+#: js/basicblocks.js:2894
+#: js/basicblocks.js:2926
+#: js/basicblocks.js:2971
+#: js/basicblocks.js:2975
+#: js/basicblocks.js:2981
+#: js/macros.js:44
+#: js/blocks.js:784
+#: js/blocks.js:2385
+#: js/blocks.js:2386
+#: js/blocks.js:2578
+#: js/blocks.js:2784
+#: js/blocks.js:2940
+#: js/blocks.js:3514
+#: js/blocks.js:4319
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "Aktion"
@@ -4049,21 +4085,15 @@ msgid "Planet"
 msgstr "Planet"
 
 #: js/StringHelper.js:17
-msgid "Close Planet\","
-msgstr ""
-
-#: js/StringHelper.js:17
-#: js/StringHelper.js:18
-#: js/StringHelper.js:19
-msgid "data-tooltip"
+msgid "Close Planet"
 msgstr ""
 
 #: js/StringHelper.js:18
-msgid "Open project from file\","
+msgid "Open project from file"
 msgstr ""
 
 #: js/StringHelper.js:19
-msgid "New project\","
+msgid "New project"
 msgstr ""
 
 #: js/StringHelper.js:20
@@ -4075,11 +4105,7 @@ msgid "Global"
 msgstr ""
 
 #: js/StringHelper.js:22
-msgid "Search for a project\","
-msgstr ""
-
-#: js/StringHelper.js:22
-msgid "placeholder"
+msgid "Search for a project"
 msgstr ""
 
 #: js/StringHelper.js:23
@@ -4722,10 +4748,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Jazz Minor"
 #~msgstr "melodisch Moll aufwärts"
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "Viertel"
+#~msgid "fifths"
+#~msgstr "Fünftel"
 
 #: js/turtledefs.js:79
 
@@ -4736,6 +4762,11 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "divide note value"
 #~msgstr "Schläge erniedrigen"
+
+#: plugins/rodi.rtp:203
+
+#~msgid "see distance"
+#~msgstr "Strecke anzeigen"
 
 #: js/basicblocks.js:519
 
@@ -4777,6 +4808,11 @@ msgstr "Wähle eine Datei aus"
 #~msgid "sing"
 #~msgstr "Singe"
 
+#: js/StringHelper.js:22
+
+#~msgid "placeholder"
+#~msgstr ""
+
 #: js/lilypond.js:21
 
 #~msgid "bt"
@@ -4792,10 +4828,12 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Chinese"
 #~msgstr "Chinesisch"
 
-#: js/turtledefs.js:77
+#: js/samplesviewer.js:73
 
-#~msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "Diese Toolbar enthält Matrix, Noten, Töne, Schildkröten und mehr. Klicke um die Paletten der Blöcke anzuzeigen und ziehe die Blöcke von der Palette auf die Arbeitsfläche."
+#: js/samplesviewer.js:73
+
+#~msgid "Open"
+#~msgstr "Öffnen"
 
 #: js/activity.js:2166
 
@@ -4913,10 +4951,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Enigmatic"
 #~msgstr "rätselhaft"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "Fünftel"
+#~msgid "fourths"
+#~msgstr "Viertel"
 
 #: js/lilypond.js:21
 
@@ -4939,6 +4977,11 @@ msgstr "Wähle eine Datei aus"
 #~msgstr ""
 
 #~msgid "rodi"
+#~msgstr ""
+
+#: js/StringHelper.js:18
+
+#~msgid "Open project from file\","
 #~msgstr ""
 
 #~msgid "Save your project to a server."
@@ -4989,6 +5032,11 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Japanese"
 #~msgstr "Japanisch"
 
+#: plugins/impact.rtp:69
+
+#~msgid "Cannot parse Impact data."
+#~msgstr ""
+
 #: js/activity.js:2699
 
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
@@ -5003,6 +5051,9 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Romanian Minor"
 #~msgstr "Mi Sheberach"
+
+#~msgid "eatme"
+#~msgstr ""
 
 #~msgid "mashape"
 #~msgstr ""
@@ -5047,9 +5098,6 @@ msgstr "Wähle eine Datei aus"
 #: js/musicutils.js:336
 
 #~msgid "minyo (Japan)"
-#~msgstr ""
-
-#~msgid "eatme"
 #~msgstr ""
 
 #: js/musicutils.js:286
@@ -5149,6 +5197,11 @@ msgstr "Wähle eine Datei aus"
 #~msgid "simple-1"
 #~msgstr ""
 
+#: js/activity.js:2527
+
+#~msgid "My Music Blocks Creation"
+#~msgstr ""
+
 #: js/musicutils.js:254
 
 #~msgid "Custom"
@@ -5172,6 +5225,9 @@ msgstr "Wähle eine Datei aus"
 #~msgid "hspace"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Hier kannst du die Haupt-Toolbar öffnen und schließen"
+
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -5187,6 +5243,16 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Algerian"
 #~msgstr "Algerisch"
 
+#: js/basicblocks.js:1457
+
+#~msgid "relative interval"
+#~msgstr "vorraussichtliches Intervall"
+
+#: js/musicutils.js:207
+
+#~msgid "Ionian"
+#~msgstr "Ionisch"
+
 #~msgid "set beats per minute"
 #~msgstr "Bestimme die Schläge pro Minute (BPM)"
 
@@ -5195,6 +5261,15 @@ msgstr "Wähle eine Datei aus"
 #: plugins/impact.rtp:127
 
 #~msgid "Impact data not available."
+#~msgstr ""
+
+#: js/StringHelper.js:17
+
+#: js/StringHelper.js:18
+
+#: js/StringHelper.js:19
+
+#~msgid "data-tooltip"
 #~msgstr ""
 
 #: js/basicblocks.js:589
@@ -5210,6 +5285,11 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Undo"
 #~msgstr "Rückgängig machen"
+
+#: js/musicutils.js:237
+
+#~msgid "Spanish Gypsy"
+#~msgstr "Zigeunertonleiter"
 
 #: js/musicutils.js:213
 
@@ -5227,11 +5307,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "actions"
 #~msgstr "Aktionen"
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "Oktave der aktuellen Tonlage"
 
 #: js/logo.js:4992
 
@@ -5262,18 +5337,9 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Publish"
 #~msgstr "Veröffentlichen"
 
-#: js/logo.js:4259
+#: js/StringHelper.js:17
 
-#~msgid "Rhythm Block: Did you mean to use a Matrix block?"
-#~msgstr "Rhythmus-Block: Willst du einen Matrix-Block benutzen?"
-
-#: js/activity.js:2433
-
-#: js/activity.js:2444
-
-#: js/activity.js:2459
-
-#~msgid "untitled"
+#~msgid "Close Planet\","
 #~msgstr ""
 
 #: js/samplesviewer.js:700
@@ -5314,11 +5380,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "ch"
 #~msgstr ""
-
-#: plugins/rodi.rtp:203
-
-#~msgid "see distance"
-#~msgstr "Strecke anzeigen"
 
 #: js/samplesviewer.js:80
 
@@ -5365,6 +5426,15 @@ msgstr "Wähle eine Datei aus"
 #~msgid "UID"
 #~msgstr ""
 
+#: js/activity.js:2433
+
+#: js/activity.js:2444
+
+#: js/activity.js:2459
+
+#~msgid "untitled"
+#~msgstr ""
+
 #: plugins/rodi.rtp:30
 
 #~msgid "blink (ms)"
@@ -5396,17 +5466,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Chromatic"
 #~msgstr "farbig"
 
-#: js/musicutils.js:211
+#: js/turtledefs.js:77
 
-#~msgid "Phrygian"
-#~msgstr "Phrygisch"
-
-#: js/samplesviewer.js:73
-
-#: js/samplesviewer.js:73
-
-#~msgid "Open"
-#~msgstr "Öffnen"
+#~msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#~msgstr "Diese Toolbar enthält Matrix, Noten, Töne, Schildkröten und mehr. Klicke um die Paletten der Blöcke anzuzeigen und ziehe die Blöcke von der Palette auf die Arbeitsfläche."
 
 #: js/turtledefs.js:29
 
@@ -5430,11 +5493,6 @@ msgstr "Wähle eine Datei aus"
 #~msgid "The Step Pitch Block must be used insdie of a Note Block."
 #~msgstr ""
 
-#: js/basicblocks.js:3816
-
-#~msgid "new turtle"
-#~msgstr ""
-
 #: js/turtledefs.js:118
 
 #~msgid "Remove all content on the canvas, including the blocks."
@@ -5444,11 +5502,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "The save-stack button saves a stack onto a custom palette."
 #~msgstr "Stapel speichern speichert Stapel in der benutzerdefinierten Palette"
-
-#: js/musicutils.js:237
-
-#~msgid "Spanish Gypsy"
-#~msgstr "Zigeunertonleiter"
 
 #: js/samplesviewer.js:699
 
@@ -5486,10 +5539,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 #~msgstr "Eingabe im verminderten Block muss 1, 2, 3, 4, 5, 6, 7 oder 8 sein"
 
-#: js/musicutils.js:207
+#: js/musicutils.js:211
 
-#~msgid "Ionian"
-#~msgstr "Ionisch"
+#~msgid "Phrygian"
+#~msgstr "Phrygisch"
 
 #: js/basicblocks.js:1299
 
@@ -5519,6 +5572,16 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Hindu"
 #~msgstr "Hinduistisch"
+
+#: js/turtledefs.js:134
+
+#~msgid "Show or hide a Cartesian-coordinate grid."
+#~msgstr "Zeige oder verberge das kartesische Koordinatensystem"
+
+#: js/StringHelper.js:19
+
+#~msgid "New project\","
+#~msgstr ""
 
 #: js/logo.js:4851
 
@@ -5563,18 +5626,20 @@ msgstr "Wähle eine Datei aus"
 #~msgid "turtle pitch number"
 #~msgstr "Nummer für Tonlage der Schildkröte festlegen"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Hier kannst du die Haupt-Toolbar öffnen und schließen"
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "Oktave der aktuellen Tonlage"
 
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
 #~msgstr "Vor Stunden"
 
-#: js/basicblocks.js:1457
+#: js/basicblocks.js:3816
 
-#~msgid "relative interval"
-#~msgstr "vorraussichtliches Intervall"
+#~msgid "new turtle"
+#~msgstr ""
 
 #: js/musicutils.js:239
 
@@ -5585,11 +5650,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Aeolian"
 #~msgstr "Äolisch"
-
-#: js/musicutils.js:243
-
-#~msgid "Major Blues"
-#~msgstr ""
 
 #: js/logo.js:2175
 
@@ -5708,19 +5768,19 @@ msgstr "Wähle eine Datei aus"
 #~msgid "interval"
 #~msgstr "Interval"
 
-#: plugins/impact.rtp:69
+#: js/logo.js:4259
 
-#~msgid "Cannot parse Impact data."
+#~msgid "Rhythm Block: Did you mean to use a Matrix block?"
+#~msgstr "Rhythmus-Block: Willst du einen Matrix-Block benutzen?"
+
+#: js/StringHelper.js:22
+
+#~msgid "Search for a project\","
 #~msgstr ""
 
-#: js/turtledefs.js:134
+#: js/musicutils.js:243
 
-#~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "Zeige oder verberge das kartesische Koordinatensystem"
-
-#: js/activity.js:2527
-
-#~msgid "My Music Blocks Creation"
+#~msgid "Major Blues"
 #~msgstr ""
 
 #: js/lilypond.js:21
