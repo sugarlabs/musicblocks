@@ -83,7 +83,7 @@ function Tempo () {
     };
 
     this._speedUp = function (i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPM[i]);
+        this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
@@ -94,7 +94,7 @@ function Tempo () {
     };
 
     this._slowDown = function (i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPM[i]);
+        this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
         }
