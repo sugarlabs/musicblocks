@@ -7998,6 +7998,26 @@ function Logo () {
                     } else {
                         var notesFrequency = that.synth.getFrequency(notes, that.synth.changeInTemperament);
                     }
+                    var startingPitch = that.synth.startingPitch;
+                    var frequency = pitchToFrequency(startingPitch.substring(0, startingPitch.length - 1), Number(startingPitch.slice(-1)), 0, null);
+                    var t = TEMPERAMENT[that.synth.inTemperament]
+                    var pitchNumber = t.pitchNumber;
+                    var ratio = [];
+                    var number = [];
+                    var numerator = [];
+                    var denominator = [];
+                    for (var k = 0; k < notesFrequency.length; k++) {
+                        ratio[k] = notesFrequency[k] / frequency;
+                        number[k] = pitchNumber * (Math.log10(ratio[k]) / Math.log10(OCTAVERATIO));
+                        number[k] = number[k].toFixed(0);
+                        numerator[k] = rationalToFraction(ratio[k])[0];
+                        denominator[k] = rationalToFraction(ratio[k])[1];
+                    }
+                    if (that.synth.inTemperament === 'equal' || that.synth.inTemperament === '1/3 comma meantone') {
+                        var notesInfo = ' ( ' + startingPitch + '*' + OCTAVERATIO + ' ^ ' + '(' + number + ' / ' + pitchNumber + ')' + ' )'; 
+                    } else {
+                        var notesInfo = ' ( ' + startingPitch + ' * ' + numerator + '/' + denominator + ' )'; 
+                    }
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
                         console.log('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
@@ -8005,13 +8025,13 @@ function Logo () {
                             if (notes.length === 0) {
                                 console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1] + notesInfo);
                             }
                         } else {
                             if (notes.length === 0) {
                                 console.log('notes to count: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                                console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1] + notesInfo);
                             }
                         }
                     }

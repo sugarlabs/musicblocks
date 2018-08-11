@@ -1315,7 +1315,7 @@ function TemperamentWidget () {
 
         for (var i = 0; i < this.pitchNumber; i++) {
             var idx = newStack.length;
-            if (this.inTemperament === 'equal' || this.inTemperament === '1/3 meantone' || (this.typeOfEdit === 'equal' && this.divisions === this.pitchNumber)) {
+            if (this.inTemperament === 'equal' || this.inTemperament === '1/3 comma meantone' || (this.typeOfEdit === 'equal' && this.divisions === this.pitchNumber)) {
                 newStack.push([idx, 'definefrequency', 0, 0, [previousBlock, idx + 1, idx + 8, idx + 12]]);
                 newStack.push([idx + 1, 'multiply', 0, 0, [idx, idx + 2, idx + 3]]);
                 newStack.push([idx + 2, ['namedbox', {'value': this._logo.synth.startingPitch}], 0, 0, [idx + 1]]);
