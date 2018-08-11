@@ -24,7 +24,7 @@ function SaveInterface(Planet) {
     this.prepareHTML = function(name, data, image, description, projectid) {
         var file = this.htmlSaveTemplate;
         if (description === null || description === undefined){
-            description = 'No description provided';
+            description = _('No description provided');
         }
 
         var id = '';

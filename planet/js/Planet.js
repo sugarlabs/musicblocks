@@ -29,101 +29,104 @@ function Planet(isMusicBlocks, storage) {
     this.loadProjectFromFile = null;
 
     this.prepareUserID = function() {
-	var id = getCookie(this.UserIDCookie);
-	if (id === ''){
-	    id = this.ProjectStorage.generateID();
-	    setCookie(this.UserIDCookie, id, 3650);
-	}
-	this.UserID = id;
+        var id = getCookie(this.UserIDCookie);
+        if (id === ''){
+            id = this.ProjectStorage.generateID();
+            setCookie(this.UserIDCookie, id, 3650);
+        }
+        this.UserID = id;
     };
 
     this.open = function(image) {
-	this.LocalPlanet.setCurrentProjectImage(image);
-	this.LocalPlanet.updateProjects();
-	this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
+        this.LocalPlanet.setCurrentProjectImage(image);
+        this.LocalPlanet.updateProjects();
+        this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
     };
 
     this.saveLocally = function(data, image) {
-	this.ProjectStorage.saveLocally(data, image);
+        this.ProjectStorage.saveLocally(data, image);
     };
 
     this.setLoadProjectFromData = function(func) {
-	this.loadProjectFromData = func;
+        this.loadProjectFromData = func;
     };
 
     this.setPlanetClose = function(func) {
-	this.planetClose = func;
+        this.planetClose = func;
     };
 
     this.setLoadNewProject = function(func) {
-	this.loadNewProject = func;
+        this.loadNewProject = func;
     };
 
     this.setLoadProjectFromFile = function(func) {
-	this.loadProjectFromFile = func;
+        this.loadProjectFromFile = func;
     };
 
     this.setOnConverterLoad = function(func) {
-	this.onConverterLoad = func;
+        this.onConverterLoad = func;
     };
 
     this.openProjectFromPlanet = function(id,error) {
-	this.GlobalPlanet.openGlobalProject(id,error);
+        this.GlobalPlanet.openGlobalProject(id,error);
     };
 
     this.init = function() {
-	this.ProjectStorage = new ProjectStorage(this);
-	this.ProjectStorage.init();
-	this.prepareUserID();
-	this.ServerInterface = new ServerInterface(this);
-	this.ServerInterface.init();
+        this.StringHelper = new StringHelper(this);
+        this.StringHelper.init();
 
-	var that = this;
+        this.ProjectStorage = new ProjectStorage(this);
+        this.ProjectStorage.init();
+        this.prepareUserID();
+        this.ServerInterface = new ServerInterface(this);
+        this.ServerInterface.init();
 
-	document.getElementById('close-planet').addEventListener('click', function (evt) {
-	    that.closeButton();
-	});
+        var that = this;
 
-	document.getElementById('planet-open-file').addEventListener('click', function (evt) {
-	    that.loadProjectFromFile();
-	});
+        document.getElementById('close-planet').addEventListener('click', function (evt) {
+            that.closeButton();
+        });
 
-	document.getElementById('planet-new-project').addEventListener('click', function (evt) {
-	    that.loadNewProject();
-	})
+        document.getElementById('planet-open-file').addEventListener('click', function (evt) {
+            that.loadProjectFromFile();
+        });
 
-	this.ServerInterface.getTagManifest(function(data){this.initPlanets(data)}.bind(this));
+        document.getElementById('planet-new-project').addEventListener('click', function (evt) {
+            that.loadNewProject();
+        })
+
+        this.ServerInterface.getTagManifest(function(data){this.initPlanets(data)}.bind(this));
     };
 
     this.closeButton = function() {
-	if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-	    var d = this.ProjectStorage.getCurrentProjectData();
-	    if (d === null){
-		this.loadNewProject();
-	    } else {
-		this.loadProjectFromData(d);
-	    }
-	} else {
-	    this.planetClose();
-	}
+        if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
+            var d = this.ProjectStorage.getCurrentProjectData();
+            if (d === null){
+            this.loadNewProject();
+            } else {
+            this.loadProjectFromData(d);
+            }
+        } else {
+            this.planetClose();
+        }
     };
 
     this.initPlanets = function(tags) {
-	if (!tags.success){
-	    this.ConnectedToServer = false;
-	} else {
-	    this.ConnectedToServer = true;
-	    this.TagsManifest = tags.data;
-	}
+        if (!tags.success){
+            this.ConnectedToServer = false;
+        } else {
+            this.ConnectedToServer = true;
+            this.TagsManifest = tags.data;
+        }
 
-	this.Converter = new Converter(this);
-	this.Converter.init();
-	this.onConverterLoad();
-	this.SaveInterface = new SaveInterface(this);
-	this.SaveInterface.init();
-	this.LocalPlanet = new LocalPlanet(this);
-	this.LocalPlanet.init();
-	this.GlobalPlanet = new GlobalPlanet(this);
-	this.GlobalPlanet.init();
+        this.Converter = new Converter(this);
+        this.Converter.init();
+        this.onConverterLoad();
+        this.SaveInterface = new SaveInterface(this);
+        this.SaveInterface.init();
+        this.LocalPlanet = new LocalPlanet(this);
+        this.LocalPlanet.init();
+        this.GlobalPlanet = new GlobalPlanet(this);
+        this.GlobalPlanet.init();
     };
 };
