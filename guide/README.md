@@ -529,39 +529,58 @@ rotation.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform13.svg "inversion")
 
+NOTE: The initial `C5` pitch (as a half note) remains unchanged (in all of the examples) as it is outside of the invert block.
+
+The above example code has an *even* inversion for two notes `F5` and `D5` around the reference pitch of `C5`. We would expect the following results:
+
+Even inversion
+
+| Starting pitch | Distance from `C5`    | Inverse distance from `C5` | Ending pitch |
+| :------------: | :-------------------: | :------------------------: | :----------: |
+| `F5`           | 5 half steps *above*  | 5 half steps *below*       | `G4`         |
+| `D5`           | 2 half steps *above*  | 2 half steps *below*       | `B♭4`        |
+
+This operation can also be visualized on a pitch clock. The arrows on the following diagram point from the starting pitch, around the axis of the reference pitch, to its destination ending pitch.
+
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/even-invert-chart.svg "even invert chart")
+
+In standard notation the result of this *even* inversion operation is depicted in the second measure of the following example. The first measure is the original reference. 
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/invert-even.png "even invert example")
 
-Even mode
+Underneath the *even* inversion in the example code is an *odd* inversion for the same two notes of `F5` and `D5` around the same reference pitch of `C5`. We would expect the following results:
 
-| Starting note | Half steps above `C5` | Half steps below `C5` | Ending note |
-| :-----------: | :-------------------: | :-------------------: | :---------: |
-| `F5`          | 5                     | 5                     | `G4`        |
-| `D5`          | 2                     | 2                     | `B♭4`       |
+Odd inversion
 
+| Starting pitch | Distance from midway-point between `C5` and `C♯5` | Inverse distance from midway-point between `C5` and `C♯5` | Ending pitch |
+| :------------: | :-----------------------------------------------: | :-------------------------------------------------------: | :----------: |
+| `F5`           | 4.5 half steps *above*                            | 4.5 half steps *below*                                    | `A♭4`        |
+| `D5`           | 1.5 half steps *below*                            | 1.5 half steps *above*                                    | `B4`         |
+
+This operation can be visualized on a pitch clock similar to *even* inversion except offset in-between `C5` and `C♯5` (i.e. quarter step *above* `C5`).
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/odd-invert-chart.svg "odd invert chart")
 
+In standard notation the result of this *odd* inversion operation is depicted in second measure of the following example. The first measure is the original reference. NOTE: The `C5` pitch remains unchanged as it is not operated upon in the example block code (above). If it were contained in the operation it would be changed to `C♯5` (i.e. `C5` is 0.5 half steps *below* the axis of rotation, so the result of an inversion around `C5` and `odd` would be 0.5 half steps *above* the axis of rotation).
+
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/invert-odd.png "odd invert example")
 
-Odd mode
+Scalar inversion
 
-| Starting note | Half steps above point midway between `C5` and `C♯5` | Half steps below point midway between `C5` and `C♯5` | Ending note |
-| :-----------: | :--------------------------------------------------: | :--------------------------------------------------: | :---------: |
-| `F5`          | 4.5                                                  | 4.5                                                  | `A♭4`       |
-| `D5`          | 1.5                                                  | 1.5                                                  | `B4`        |
+Underneath the *even* and *odd* inversion blocks in the example code is an inversion block set to *scalar*. We would expect the following results:
+
+| Starting pitch | Scalar distance from `C5` (in steps) | Inverse scalar distance from `C5` (in steps) | Ending pitch |
+| :------------: | :----------------------------------: | :------------------------------------------: | :----------: |
+| `F5`           | 3 above (C5 --> D5 --> E5 --> F5)    | 3 below (C5 --> B4 --> A4 --> G4)            | `G4`         |
+| `D5`           | 1 above (C5 --> D5)                  | 1 below (C5 --> B4)                          | `B4`         |
+
+This operation can be visualized on a pitch clock similar to *odd* and *even* except that all non-scalar pitches (i.e. pitches outside the chosen key) are skipped. NOTE: The scalar pitches are shown in bold in the following pitch clock diagram.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/scalar-invert-chart.svg "scalar invert chart")
 
+In standard notation the result of *scalar* inversion operation is depicted in the second measure of the following example. The first measure is the original reference. 
+
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/invert-scalar.png "scalar invert example")
-
-Scalar mode
-
-| Starting note | Scalar steps above `C5` | Scalar steps below `C5` | Ending note |
-| :-----------: | :---------------------: | :---------------------: | :---------: |
-| `F5`          | 3                       | 3                       | `G4`        |
-| `D5`          | 1                       | 1                       | `B4`        |
 
 In the *invert (even)* example above, notes are inverted around `C5`.
 In the *invert (odd)* example, notes are inverted around a point
