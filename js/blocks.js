@@ -3083,6 +3083,17 @@ function Blocks () {
         }
     };
 
+    this.findBlockInstance = function (blkName) {
+        // Returns true if block of name blkName is loaded.
+        for (blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
     this.findPitchOctave = function (blk) {
         // Returns octave associated with pitch block.
         if (blk === null) {
