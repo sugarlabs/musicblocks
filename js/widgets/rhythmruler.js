@@ -1477,6 +1477,8 @@ function RhythmRuler () {
                 rulerDiv.style.left = that._left + 'px';
                 rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
+
+		that._positionWheel();
             }
         };
 
@@ -1492,6 +1494,8 @@ function RhythmRuler () {
                 rulerDiv.style.left = that._left + 'px';
                 rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
+
+		that._positionWheel();
             }
         };
 
@@ -1766,21 +1770,8 @@ function RhythmRuler () {
         };
 
         var numberInput = docById('dissectNumber');
-        // Position the widget over the note block.
-        var x = this._left + 100;
-        var y = this._top;
 
-        docById('wheelDiv').style.position = 'absolute';
-        docById('wheelDiv').style.height = '300px';
-        docById('wheelDiv').style.width = '300px';
-
-        var selectorWidth = 150;
-        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';	
-        if (y - 300 < 0) { // if (top - 300 < 0) {
-	    docById('wheelDiv').style.top = (y + 60) + 'px';
-        } else {
-            docById('wheelDiv').style.top = (y - 300) + 'px';
-        }
+        this._positionWheel();
 
         // Navigate to a the current number value.
         var i = wheelValues.indexOf(selectedValue);
@@ -1802,5 +1793,27 @@ function RhythmRuler () {
         this._exitWheel.navItems[0].navigateFunction = function () {
             __exitMenu();
         };
+    };
+
+    this._positionWheel = function() {
+        if (docById('wheelDiv').style.display == 'none') {
+	    return;
+	}
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+
+        // Position the widget over the note block.
+        var x = this._left + 100;
+        var y = this._top;
+        var selectorWidth = 150;
+
+        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';	
+        if (y - 300 < 0) {
+	    docById('wheelDiv').style.top = (y + 60) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (y - 300) + 'px';
+        }
     };
 };
