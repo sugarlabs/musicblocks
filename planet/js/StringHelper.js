@@ -13,47 +13,47 @@ function StringHelper(Planet) {
     //[id, string, property (if present)]
     // append to innerhtml
     this.strings = [
-        ["logo-container","Planet"],
-        ["close-planet","Close Planet","data-tooltip"],
-        ["planet-open-file","Open project from file","data-tooltip"],
-        ["planet-new-project","New project","data-tooltip"],
-        ["local-tab","Local"],
-        ["global-tab","Global"],
-        ["global-search","Search for a project","placeholder"],
-        ["localtitle","My Projects"],
-        ["publisher-ptitle","Publish Project"],
-        ["publish-title-label","Project title"],
-        ["publish-tags-label","Tags (max 5)"],
-        ["publish-description-label","Description"],
-        ["publisher-submit","Submit"],
-        ["publisher-cancel","Cancel"],
-        ["deleter-confirm","Delete \"<span id=\"deleter-title\"></span>\"?"],
-        ["deleter-paragraph","Permanently delete project \"<span id=\"deleter-name\"></span>\"?"],
-        ["deleter-button","Delete"],
-        ["deleter-cancel","Cancel"],
-        ["globaltitle","Explore Projects"],
-        ["view-more-chips","View More"],
-        ["option-recent","Most recent"],
-        ["option-liked","Most liked"],
-        ["option-downloaded","Most downloaded"],
-        ["option-alphabetical","A-Z"],
-        ["option-sort-by","Sort by"],
-        ["load-more-projects","Load More Projects"],
-        ["projectviewer-last-updated-heading","Last Updated"],
-        ["projectviewer-date-heading","Creation Date"],
-        ["projectviewer-downloads-heading","Number of Downloads:"],
-        ["projectviewer-likes-heading","Number of Likes:"],
-        ["projectviewer-tags-heading","Tags:"],
-        ["projectviewer-description-heading","Description"],
-        ["projectviewer-report-project","Report Project"],
-        ["projectviewer-report-title","Report Project"],
-        ["projectviewer-report-conduct","Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\">Sugar Labs Code of Conduct</a>."],
-        ["projectviewer-report-reason","Reason for reporting project"],
-        ["projectviewer-report-submit","Submit"],
-        ["projectviewer-reportsubmit-title","Report Project"],
-        ["projectviewer-report-close","Close"],
-        ["projectviewer-download-file","Download as File"],
-        ["projectviewer-open-mb","Open in Music Blocks"]    
+        ["logo-container",_("Planet")],
+        ["close-planet",_("Close Planet",_("data-tooltip")],
+        ["planet-open-file",_("Open project from file",_("data-tooltip")],
+        ["planet-new-project",_("New project",_("data-tooltip")],
+        ["local-tab",_("Local")],
+        ["global-tab",_("Global")],
+        ["global-search",_("Search for a project",_("placeholder")],
+        ["localtitle",_("My Projects")],
+        ["publisher-ptitle",_("Publish Project")],
+        ["publish-title-label",_("Project title")],
+        ["publish-tags-label",_("Tags (max 5)")],
+        ["publish-description-label",_("Description")],
+        ["publisher-submit",_("Submit")],
+        ["publisher-cancel",_("Cancel")],
+        ["deleter-confirm",_("Delete \"<span id=\"deleter-title\"></span>\"?")],
+        ["deleter-paragraph",_("Permanently delete project \"<span id=\"deleter-name\"></span>\"?")],
+        ["deleter-button",_("Delete")],
+        ["deleter-cancel",_("Cancel")],
+        ["globaltitle",_("Explore Projects")],
+        ["view-more-chips",_("View More")],
+        ["option-recent",_("Most recent")],
+        ["option-liked",_("Most liked")],
+        ["option-downloaded",_("Most downloaded")],
+        ["option-alphabetical",_("A-Z")],
+        ["option-sort-by",_("Sort by")],
+        ["load-more-projects",_("Load More Projects")],
+        ["projectviewer-last-updated-heading",_("Last Updated")],
+        ["projectviewer-date-heading",_("Creation Date")],
+        ["projectviewer-downloads-heading",_("Number of Downloads:")],
+        ["projectviewer-likes-heading",_("Number of Likes:")],
+        ["projectviewer-tags-heading",_("Tags:")],
+        ["projectviewer-description-heading",_("Description")],
+        ["projectviewer-report-project",_("Report Project")],
+        ["projectviewer-report-title",_("Report Project")],
+        ["projectviewer-report-conduct",_("Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\">Sugar Labs Code of Conduct</a>.")],
+        ["projectviewer-report-reason",_("Reason for reporting project")],
+        ["projectviewer-report-submit",_("Submit")],
+        ["projectviewer-reportsubmit-title",_("Report Project")],
+        ["projectviewer-report-close",_("Close")],
+        ["projectviewer-download-file",_("Download as File")],
+        ["projectviewer-open-mb",_("Open in Music Blocks")]
     ]
 
     this.init = function(){
@@ -61,9 +61,9 @@ function StringHelper(Planet) {
             var obj = this.strings[i];
             var elem = document.getElementById(obj[0]);
             if (this.strings[i].length==3){
-                elem.setAttribute(obj[2],_(obj[1]));
+                elem.setAttribute(obj[2],obj[1]);
             } else {
-                elem.innerHTML+=_(obj[1]);
+                elem.innerHTML+=obj[1];
             }
         }
     };
