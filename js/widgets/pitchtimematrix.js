@@ -1753,41 +1753,45 @@ function PitchTimeMatrix () {
                         }
 
                         if (note[0][j][1] === '♯') {
-                            newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
-                            newStack.push([thisBlock + 1, ['accidentalname', {value: _('sharp') + ' ♯'}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
                             if (this._logo.synth.inTemperament == 'custom') {
-                                newStack.push([thisBlock + 3, ['customNote', {'value': note[0][j].substring(0, note[0][j].length - 1)}], 0, 0, [thisBlock + 2]]);
-                                newStack.push([thisBlock + 4, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock + 2]]);
+                                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                                newStack.push([thisBlock + 1, ['customNote', {'value': note[0][j].substring(0, note[0][j].length - 1)}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock]]);
+                                previousBlock = thisBlock;
+                                thisBlock += 3;
                             } else {
+                                newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
+                                newStack.push([thisBlock + 1, ['accidentalname', {value: _('sharp') + ' ♯'}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
                                 newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
                                 newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
+                                if (lastConnection != null) {
+                                    lastConnection += 3;
+                                }
+                                newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                                previousBlock = thisBlock + 5;
+                                thisBlock += 6;
                             }
-                            if (lastConnection != null) {
-                                lastConnection += 3;
-                            }
-
-                            newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
-                            previousBlock = thisBlock + 5;
-                            thisBlock += 6;
                         } else if (note[0][j][1] === '♭') {
-                            newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
-                            newStack.push([thisBlock + 1, ['accidentalname', {value: _('flat') + ' ♭'}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
                             if (this._logo.synth.inTemperament == 'custom') {
-                                newStack.push([thisBlock + 3, ['customNote', {'value': note[0][j].substring(0, note[0][j].length - 1)}], 0, 0, [thisBlock + 2]]);
-                                newStack.push([thisBlock + 4, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock + 2]]);
+                                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                                newStack.push([thisBlock + 1, ['customNote', {'value': note[0][j].substring(0, note[0][j].length - 1)}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock]]);
+                                previousBlock = thisBlock;
+                                thisBlock += 3;
                             } else {
+                                newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
+                                newStack.push([thisBlock + 1, ['accidentalname', {value: _('flat') + ' ♭'}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);    
                                 newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
                                 newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
-                            }
-                            if (lastConnection != null) {
-                                lastConnection += 3;
-                            }
-
-                            newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
-                            previousBlock = thisBlock + 5;
-                            thisBlock += 6;
+                                if (lastConnection != null) {
+                                    lastConnection += 3;
+                                }
+                                newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                                previousBlock = thisBlock + 5;
+                                thisBlock += 6;
+                            }    
                         } else {
                             newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
                             if (this._logo.synth.inTemperament == 'custom') {

@@ -4148,7 +4148,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
-            case 'temperament1':
+            /*case 'temperament1':
                 var postProcess = function (args) {
                     console.log(args);
                     var thisBlock = args[0];
@@ -4157,7 +4157,7 @@ function Blocks () {
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
+                break;*/
                 // Define some constants for legacy blocks for
                 // backward compatibility with Python projects.
             case 'red':
