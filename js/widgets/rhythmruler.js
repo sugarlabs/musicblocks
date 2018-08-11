@@ -1768,24 +1768,18 @@ function RhythmRuler () {
         var numberInput = docById('dissectNumber');
         // Position the widget over the note block.
         var x = this._left + 100;
-        var y = this._top + 100;
-
-        var canvasLeft = this._logo.blocks.canvas.offsetLeft + 28 * this._logo.blocks.blockScale;
-        var canvasTop = this._logo.blocks.canvas.offsetTop + 6 * this._logo.blocks.blockScale;
+        var y = this._top;
 
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
         docById('wheelDiv').style.width = '300px';
 
         var selectorWidth = 150;
-        var left = Math.round((x + this._logo.blocks.stage.x) * this._logo.blocks.getStageScale() + canvasLeft);
-        var top = Math.round((y + this._logo.blocks.stage.y) * this._logo.blocks.getStageScale() + canvasTop);
-
-        docById('wheelDiv').style.left = Math.min(Math.max((left - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';
-        if (top - 300 < 0) {
-            docById('wheelDiv').style.top = (top + 40) + 'px';
+        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';	
+        if (y - 300 < 0) { // if (top - 300 < 0) {
+	    docById('wheelDiv').style.top = (y + 60) + 'px';
         } else {
-            docById('wheelDiv').style.top = (top - 300) + 'px';
+            docById('wheelDiv').style.top = (y - 300) + 'px';
         }
 
         // Navigate to a the current number value.
