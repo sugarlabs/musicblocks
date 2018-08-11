@@ -347,25 +347,44 @@ function Synth() {
     };
 
     this.getCustomFrequency = function (notes) {
-        if (notes instanceof Array) {
-            notes = notes[0];
+
+        var __getCustomFrequency = function (oneNote) {
+            var octave = oneNote.slice(-1);
+            oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
+            var pitch = that.startingPitch;
+            var startPitchFrequency = pitchToFrequency(pitch.substring(0, pitch.length - 1), pitch.slice(-1), 0, 'C Major');
+            if (typeof(oneNote) === 'number') {
+                oneNote = oneNote;
+            } else {
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        if (oneNote == TEMPERAMENT['custom'][pitchNumber][1]) {
+                            var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
+                            return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
+                        }
+                    }   
+                }
+            }
+
         }
 
-        var octave = notes.slice(-1);
-        notes = getCustomNote(notes.substring(0, notes.length - 1));
-        var pitch = this.startingPitch;
-        var startPitchFrequency = pitchToFrequency(pitch.substring(0, pitch.length - 1), pitch.slice(-1), 0, 'C Major');
-        if (typeof(notes) === 'number'){
-            notes = notes;
-        } else {
-            for (var pitchNumber in TEMPERAMENT['custom']) {
-                if (pitchNumber !== 'pitchNumber') {
-                    if (notes == TEMPERAMENT['custom'][pitchNumber][1]) {
-                        var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
-                        return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
-                    }
-                }   
+        if (typeof(notes) === 'string') {
+            return __getCustomFrequency(notes);
+        } else if (typeof(notes) === 'object') {
+            var results = [];
+            for (var i = 0; i < notes.length; i++) {
+                if (typeof(notes[i]) === 'string') {
+                    results.push(__getCustomFrequency(notes[i]));
+                } else {
+                    // Hertz?
+                    results.push(notes[i]);
+                }
             }
+
+            return results;
+        } else {
+            // Hertz?
+            return notes;
         }
     }
 

@@ -8006,17 +8006,24 @@ function Logo () {
                     var number = [];
                     var numerator = [];
                     var denominator = [];
+
                     for (var k = 0; k < notesFrequency.length; k++) {
-                        ratio[k] = notesFrequency[k] / frequency;
-                        number[k] = pitchNumber * (Math.log10(ratio[k]) / Math.log10(OCTAVERATIO));
-                        number[k] = number[k].toFixed(0);
-                        numerator[k] = rationalToFraction(ratio[k])[0];
-                        denominator[k] = rationalToFraction(ratio[k])[1];
+                        if (notesFrequency[k] !== undefined) {
+                            ratio[k] = notesFrequency[k] / frequency;
+                            number[k] = pitchNumber * (Math.log10(ratio[k]) / Math.log10(OCTAVERATIO));
+                            number[k] = number[k].toFixed(0);
+                            numerator[k] = rationalToFraction(ratio[k])[0];
+                            denominator[k] = rationalToFraction(ratio[k])[1];
+                        }
                     }
                     if (that.synth.inTemperament === 'equal' || that.synth.inTemperament === '1/3 comma meantone') {
                         var notesInfo = ' ( ' + startingPitch + '*' + OCTAVERATIO + ' ^ ' + '(' + number + ' / ' + pitchNumber + ')' + ' )'; 
                     } else {
-                        var notesInfo = ' ( ' + startingPitch + ' * ' + numerator + '/' + denominator + ' )'; 
+                        if (numerator.length !== 0) {
+                            var notesInfo = ' ( ' + startingPitch + ' * ' + numerator + '/' + denominator + ' )'; 
+                        } else {
+                            var notesInfo = '';
+                        }   
                     }
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
