@@ -3889,6 +3889,7 @@ function Blocks () {
                     if (value.customTemperamentNotes !== undefined) {
                         TEMPERAMENT['custom'] = value.customTemperamentNotes;
                         TEMPERAMENT['custom']['pitchNumber'] = value.customTemperamentNotes.length;
+                        that.logo.synth.startingPitch = value.startingPitch;
                         console.log(TEMPERAMENT['custom']);
                         that.logo.customTemperamentDefined = true;     //This is for custom pitch pie menu
                     }

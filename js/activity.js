@@ -3500,7 +3500,8 @@ define(MYDEFINES, function (compatibility) {
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
                             var args = {
-                                'customTemperamentNotes': TEMPERAMENT['custom']
+                                'customTemperamentNotes': TEMPERAMENT['custom'],
+                                'startingPitch': logo.synth.startingPitch
                             };
                         }
                         break;
