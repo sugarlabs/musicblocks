@@ -3882,6 +3882,21 @@ function Blocks () {
                 this._makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
                 break;
 
+             case 'temperament1':
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    if (value.customTemperamentNotes !== undefined) {
+                        TEMPERAMENT['custom'] = value.customTemperamentNotes;
+                        TEMPERAMENT['custom']['pitchNumber'] = value.customTemperamentNotes.length;
+                        console.log(TEMPERAMENT['custom']);
+                        that.logo.customTemperamentDefined = true;     //This is for custom pitch pie menu
+                    }
+                   
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
+                break;
+
                 // Named boxes and dos need private data.
             case 'storein2':
                 var postProcess = function (args) {
@@ -4148,16 +4163,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
-            /*case 'temperament1':
-                var postProcess = function (args) {
-                    console.log(args);
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    TEMPERAMENT['custom'] = value;
-                };
 
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;*/
                 // Define some constants for legacy blocks for
                 // backward compatibility with Python projects.
             case 'red':
