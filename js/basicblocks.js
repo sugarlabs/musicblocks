@@ -1889,8 +1889,10 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     setTemperamentBlock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
     setTemperamentBlock.staticLabels.push(_('set temperament'));
+    setTemperamentBlock.staticLabels.push(_('temperament'));
+    setTemperamentBlock.staticLabels.push(_('reference note'), _('octave'));
     setTemperamentBlock.adjustWidthToLabel();
-    setTemperamentBlock.oneArgBlock();
+    setTemperamentBlock.threeArgBlock();
 
     var temperamentNameBlock = new ProtoBlock('temperamentname');
     temperamentNameBlock.palette = palettes.dict['tone'];

@@ -166,7 +166,7 @@ function getMacroExpansion (blkname, x, y) {
     const SETSCALARTRANSPOBJ = [[0, 'setscalartransposition', x, y, [null, 1, null, 2]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SETSYNTHVOLUMEOBJ = [[0, 'setsynthvolume', x, y, [null, 1, 2, null]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0, null]]];
     const SETTIMBREOBJ = [[0, 'settimbre', x, y, [null, 1, null, 2]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const SETTEMPERAMENTOBJ = [[0,'settemperament',x,y,[null,1,null]],[1,['temperamentname',{'value':'equal'}],0,0,[0]]];
+    const SETTEMPERAMENTOBJ = [[0,'settemperament',x,y,[null,1,2,3,null]],[1,['temperamentname',{'value':'equal'}],0,0,[0]],[2,['notename',{'value':'C'}],0,0,[0]],[1,['number',{'value':4}],0,0,[0]]];
     const SETTRANSPOSITIONOBJ = [[0, 'settransposition', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const SETVOICEOBJ = [[0, 'setvoice', x, y, [null, 1, null, 2]], [1, ['voicename', {'value': 'violin'}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const SEVENTHOBJ = [[0, 'setscalartransposition', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 6}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, 'modelength', 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];

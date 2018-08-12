@@ -1369,7 +1369,10 @@ function TemperamentWidget () {
         }
         this._logo.blocks.loadNewBlocks(newStack);  
 
-        var newStack1 = [[0,'settemperament', 100, 100, [null, 1, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]]];        
+        var len = this._logo.synth.startingPitch.length;
+        var note = this._logo.synth.startingPitch.substring(0, len - 1);
+        var octave = this._logo.synth.startingPitch.slice(-1);
+        var newStack1 = [[0,'settemperament', 100, 100, [null, 1, 2, 3, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['notename', {'value': note}], 0, 0, [0]], [2, ['number', {'value': octave}], 0, 0, [0]]];        
         this._logo.blocks.loadNewBlocks(newStack1);
 
         if (this.inTemperament === 'custom') {

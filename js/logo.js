@@ -6295,40 +6295,7 @@ function Logo () {
             break;
         case 'settemperament':
             that.synth.inTemperament = args[0];
-            /*if (that.synth.inTemperament === 'custom') {
-                //If temperament block with define frequency blocks are present..
-                var notes = [];
-                var ratios = [];
-                for (var blk in that.blocks.blockList) {
-                    if (that.blocks.blockList[blk].name === 'pitch' && that.blocks.blockList[that.blocks.blockList[blk].connections[1]].name === 'text') {
-                        var a = that.blocks.findTopBlock(blk);
-                        if (that.blocks.blockList[a].name === 'temperament1' && that.blocks.blockList[that.blocks.blockList[a].connections[1]].value === args[0] && !that.blocks.blockList[a].trash) {
-                            var note = that.blocks.blockList[that.blocks.blockList[blk].connections[1]].value;
-                            var octave = that.blocks.blockList[that.blocks.blockList[blk].connections[2]].value;
-                            notes.push(note + '' + octave);
-                        }
-                    }
-                    if (that.blocks.blockList[blk].name === 'definefrequency') {
-                        var a = that.blocks.findTopBlock(blk);
-                        if (that.blocks.blockList[a].name === 'temperament1' && that.blocks.blockList[that.blocks.blockList[a].connections[1]].value === args[0] && !that.blocks.blockList[a].trash) {
-                            var b = that.blocks.blockList[blk].connections[1];
-                            var c = that.blocks.blockList[b].connections[2];
-                            var r = that.blocks.blockList[c].value;
-                            ratios.push(r);
-                        }
-                    }
-                }
-
-                if (ratios.length !== 0 && notes.length !== 0) {
-                    TEMPERAMENT['custom'] = [];
-                    TEMPERAMENT['custom']['pitchNumber'] = ratios.length;
-                    for (var i = 0; i < ratios.length; i++) {
-                        var number = '' + i;
-                        TEMPERAMENT['custom'][number] = [ratios[i], notes[i].substring(0, notes[i].length - 1), notes[i].slice(-1)];
-                    }
-                    that.customTemperamentDefined = true;
-                }
-            }*/
+            that.synth.startingPitch = args[1] + '' + args[2];
             
             that.temperamentSelected.push(args[0]);
             var len = that.temperamentSelected.length;
