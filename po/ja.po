@@ -490,7 +490,7 @@ msgstr "「プラネット」サーバは今使えません"
 #: js/activity.js:3640
 #: js/turtledefs.js:99
 msgid "Load project from files"
-msgstr "ローカルフォルダ"
+msgstr "ファイルをロードする"
 
 #: js/activity.js:3629
 #: js/activity.js:3641
@@ -1235,11 +1235,11 @@ msgstr "これらのメッセージを表示します。"
 
 #: js/turtledefs.js:97
 msgid "Expand/collapse option toolbar"
-msgstr "オプションツールバー表示"
+msgstr "オプションツールバーを表示"
 
 #: js/turtledefs.js:97
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "オプションツールバー表示するため、ここでクリック。"
+msgstr "ここをクリックして、オプションツールバーを表示"
 
 #: js/turtledefs.js:98
 msgid "This button opens a viewer for loading example projects."
