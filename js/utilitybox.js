@@ -16,10 +16,17 @@ function UtilityBox () {
     const BOXBUTTONOFFSET = 40;
     const BOXBUTTONSPACING = 65;
 
-    // 9 buttons, 8 intrabuttons spaces, 2 extrabutton spaces
-    var boxwidth = 9 * 55 + 8 * 10 + 2 * 20;
-    var boxwidth2 = boxwidth - 1.5;
-    var boxclose = boxwidth - 55;
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        // 9 buttons, 8 intrabuttons spaces, 2 extrabutton spaces
+        var boxwidth = 9 * 55 + 8 * 10 + 2 * 20;
+        var boxwidth2 = boxwidth - 1.5;
+        var boxclose = boxwidth - 55;
+    } else {
+        // 8 buttons, 7 intrabuttons spaces, 2 extrabutton spaces
+        var boxwidth = 8 * 55 + 7 * 10 + 2 * 20;
+        var boxwidth2 = boxwidth - 1.5;
+        var boxclose = boxwidth - 55;
+    }
 
     const UTILITYBOXSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="133" width="' + boxwidth + '" version="1.1"> <rect style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" y="0" x="0" height="133" width="' + boxwidth + '" /> <g style="fill:#000000;display:block" transform="translate(' + boxclose + ',-1)"> <path style="fill:#000000;display:inline" d="m 27.5,5.0 c -12.43,0 -22.5,10.0 -22.5,22.5 0,12.5 10.0,22.5 22.5,22.5 12.5,0 22.5,-10.0 22.5,-22.5 0,-12.5 -10.0,-22.5 -22.5,-22.5 z m 10.0,28.0 c 1.25,1.25 1.25,3.25 0,4.5 -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 l -5.75,-5.75 -5.75,5.75 c -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 -1.25,-1.25 -1.25,-3.25 0.0,-4.5 l 5.75,-5.75 -5.75,-5.75 c -1.25,-1.25 -1.25,-3.25 -0.0,-4.5 1.25,-1.25 3.25,-1.25 4.5,0 l 5.75,5.75 5.75,-5.75 c 1.25,-1.25 3.25,-1.25 4.5,0 1.25,1.25 1.25,3.25 0,4.5 l -5.75,5.75 5.75,5.75 z" /> </g> <rect style="fill:#92b5c8;fill-opacity:1;stroke:none" y="51" x="0" height="82" width="' + boxwidth + '" /> <rect y="0.75" x="0.75" height="131.5" width="' + boxwidth2 + '" style="display:inline;visibility:visible;opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;" /></svg>';
 
@@ -109,33 +116,37 @@ function UtilityBox () {
             var that = this;
             var dx = BOXBUTTONOFFSET;
 
-            this._optimizeOnButton = makeButton('optimize-on-button', _('Optimize performance'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this._optimizeOffButton = makeButton('optimize-off-button', _('Optimize feedback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this._optimizeOnButton.visible = true;
-            this._optimizeOffButton.visible = false;
-            this._positionHoverText(this._optimizeOnButton);
-            this._positionHoverText(this._optimizeOffButton);
-            this._optimizeOnButton.on('click', function (event) {
-		that._optimizeState = true;
-                that._optimize(that._optimizeState);
-		that._optimizeOnButton.visible = false;
-		that._optimizeOffButton.visible = true;
-                that.hide();
-            });
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this._optimizeOnButton = makeButton('optimize-on-button', _('Optimize performance'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._optimizeOffButton = makeButton('optimize-off-button', _('Optimize feedback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._optimizeOnButton.visible = true;
+                this._optimizeOffButton.visible = false;
+                this._positionHoverText(this._optimizeOnButton);
+                this._positionHoverText(this._optimizeOffButton);
 
-            this._optimizeOffButton.on('click', function (event) {
-		that._optimizeState = false;
-                that._optimize(that._optimizeState);
-		that._optimizeOnButton.visible = true;
-		that._optimizeOffButton.visible = false;
-                that.hide();
-            });
+                this._optimizeOnButton.on('click', function (event) {
+                    that._optimizeState = true;
+                    that._optimize(that._optimizeState);
+                    that._optimizeOnButton.visible = false;
+                    that._optimizeOffButton.visible = true;
+                    that.hide();
+                });
 
-            dx += BOXBUTTONSPACING;
+                this._optimizeOffButton.on('click', function (event) {
+                    that._optimizeState = false;
+                    that._optimize(that._optimizeState);
+                    that._optimizeOnButton.visible = true;
+                    that._optimizeOffButton.visible = false;
+                    that.hide();
+                });
+
+                dx += BOXBUTTONSPACING;
+            }
 
             this._languageButton = makeButton('language-button', _('Select language'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._languageButton.visible = true;
             this._positionHoverText(this._languageButton);
+
             this._languageButton.on('click', function (event) {
                 that._doLanguageBox();
                 that.hide();
@@ -146,6 +157,7 @@ function UtilityBox () {
             this._smallerButton = makeButton('smaller-button', _('Decrease block size'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._smallerButton.visible = true;
             this._positionHoverText(this._smallerButton);
+
             this._smallerButton.on('click', function (event) {
                 that._doSmaller();
                 that.hide();
@@ -154,6 +166,7 @@ function UtilityBox () {
             this._smallerButton2 = makeButton('smaller-disable-button', _('Cannot be further decreased'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._smallerButton2.visible = false;
             this._positionHoverText(this._smallerButton2);
+
             this._smallerButton2.on('click', function (event) {
                 that._doSmaller();
                 that.hide();
@@ -164,6 +177,7 @@ function UtilityBox () {
             this._biggerButton = makeButton('bigger-button', _('Increase block size'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._biggerButton.visible = true;
             this._positionHoverText(this._biggerButton);
+
             this._biggerButton.on('click', function (event) {
                 that._doBigger();
                 that.hide();
@@ -172,6 +186,7 @@ function UtilityBox () {
             this._biggerButton2 = makeButton('bigger-disable-button', _('Cannot be further increased'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._biggerButton2.visible = false;
             this._positionHoverText(this._biggerButton2);
+
             this._biggerButton2.on('click', function (event) {
                 that._doBigger();
                 that.hide();
@@ -182,6 +197,7 @@ function UtilityBox () {
             this._statsButton = makeButton('stats-button', _('Display statistics'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._statsButton.visible = true;
             this._positionHoverText(this._statsButton);
+
             this._statsButton.on('click', function (event) {
                 that._doStats();
                 that.hide();
@@ -192,6 +208,7 @@ function UtilityBox () {
             this._pluginsButton = makeButton('plugins-button', _('Load plugin from file'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._pluginsButton.visible = true;
             this._positionHoverText(this._pluginsButton);
+
             this._pluginsButton.on('click', function (event) {
                 that._doPlugins();
                 that.hide();
@@ -206,6 +223,7 @@ function UtilityBox () {
             this._pluginsDeleteButton2 = makeButton('plugins-delete-button', _('Delete plugin'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._pluginsDeleteButton2.visible = status;
             this._positionHoverText(this._pluginsDeleteButton2);
+
             this._pluginsDeleteButton2.on('click', function (event) {
                 that._deletePlugin();
                 that.hide();
@@ -216,6 +234,7 @@ function UtilityBox () {
             this._scrollButton = makeButton('scroll-unlock-button', _('Enable scrolling'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
             this._scrollButton.visible = true;
             this._positionHoverText(this._scrollButton);
+
             this._scrollButton.on('click', function (event) {
                 that._doScroller();
                 that.hide();
@@ -264,8 +283,11 @@ function UtilityBox () {
 
     this.hide = function () {
         if (this._container !== null) {
-            this._optimizeOnButton.visible = false;
-            this._optimizeOffButton.visible = false;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this._optimizeOnButton.visible = false;
+                this._optimizeOffButton.visible = false;
+            }
+
             this._languageButton.visible = false;
             this._smallerButton.visible = false;
             this._smallerButton2.visible = false;
@@ -286,8 +308,11 @@ function UtilityBox () {
 
     this._show = function (status) {
         if (this._container !== null) {
-            this._optimizeOnButton.visible = !this._optimizeState;
-            this._optimizeOffButton.visible = this._optimizeState;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this._optimizeOnButton.visible = !this._optimizeState;
+                this._optimizeOffButton.visible = this._optimizeState;
+            }
+
             this._languageButton.visible = true;
             this._smallerButton.visible = this._decreaseStatus;
             this._smallerButton2.visible = !this._decreaseStatus;
