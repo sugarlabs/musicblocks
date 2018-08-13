@@ -1903,6 +1903,8 @@ define(MYDEFINES, function (compatibility) {
                 } else {
                     event.preventDefault();
                 } 
+
+                refreshCanvas();
             };
 
             docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
@@ -1936,14 +1938,15 @@ define(MYDEFINES, function (compatibility) {
 
                     if (scrollBlockContainer) {
                         blocksContainer.x += event.stageX - lastCords.x;
-                        blocksContainer.y += event.stageY - lastCords.y;
-                        lastCords = {
-                            x: event.stageX,
-                            y: event.stageY
-                        };
-
-                        refreshCanvas();
                     }
+
+                    blocksContainer.y += event.stageY - lastCords.y;
+                    lastCords = {
+                        x: event.stageX,
+                        y: event.stageY
+                    };
+
+                    refreshCanvas();
                 });
 
                 stage.removeAllEventListeners('stagemouseup');
@@ -2409,9 +2412,11 @@ define(MYDEFINES, function (compatibility) {
                         break;
                     case PAGE_UP:
                         blocksContainer.y += logo.canvas.height / 2;
+			stage.update();
                         break;
                     case PAGE_DOWN:
                         blocksContainer.y -= logo.canvas.height / 2;
+			stage.update();
                         break;
                     case DEL:
                         blocks.extract();
@@ -2430,6 +2435,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.y -= 20;
                         }
+			stage.update();
                         break;
                     case KEYCODE_DOWN:
                         if (disableArrowKeys) {
@@ -2445,6 +2451,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.y += 20;
                         }
+			stage.update();
                         break;
                     case KEYCODE_LEFT:
                         if (disableArrowKeys) {
@@ -2455,6 +2462,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.x -= 20;
                         }
+			stage.update();
                         break;
                     case KEYCODE_RIGHT:
                         if (disableArrowKeys) {
@@ -2465,6 +2473,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.x += 20;
                         }
+			stage.update();
                         break;
                     case HOME:
                         if (palettes.mouseOver) {
@@ -2476,6 +2485,7 @@ define(MYDEFINES, function (compatibility) {
                         } else {
                             _findBlocks();
                         }
+			stage.update();
                         break;
                     case TAB:
                         break;
