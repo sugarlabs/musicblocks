@@ -82,6 +82,7 @@ function Block(protoblock, blocks, overrideName) {
     // Lock on label change
     this._labelLock = false;
     this._piemenuExitTime = null;
+    this._triggerLongPress = false;
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -1341,7 +1342,11 @@ function Block(protoblock, blocks, overrideName) {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
                     if (!that.trash) {
-                        that._changeLabel();
+                        if (that._triggerLongPress) {
+                            that._triggerLongPress = false;
+                        } else {
+                            that._changeLabel();
+                        }
                     }
                 } else {
                     if (!that.blocks.getLongPressStatus()) {
@@ -1374,6 +1379,7 @@ function Block(protoblock, blocks, overrideName) {
 
                 that.blocks.longPressTimeout = setTimeout(function () {
                     that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                    that._triggerLongPress = true;
                     that.blocks.triggerLongPress();
                 }, LONGPRESSTIME);
             }
@@ -1650,6 +1656,7 @@ function Block(protoblock, blocks, overrideName) {
 
         var labelElem = docById('labelDiv');
 
+        console.log('CHANGE LABEL');
         if (this.name === 'text') {
             labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
@@ -3919,7 +3926,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.palettes.show();
                 break;
             case 'storein':
-		// Check to see which connection we are using in
+                // Check to see which connection we are using in
                 // cblock.  We only do something if blk is attached to
                 // the name connection (1).
                 blk = this.blocks.blockList.indexOf(this);
@@ -3927,9 +3934,9 @@ function Block(protoblock, blocks, overrideName) {
                     // If the label was the name of a storein, update the
                     // associated box this.blocks and the palette buttons.
                     if (this.value !== 'box') {
-			this.blocks.newStoreinBlock(this.value);
-			this.blocks.newStorein2Block(this.value);
-			this.blocks.newNamedboxBlock(this.value);
+                        this.blocks.newStoreinBlock(this.value);
+                        this.blocks.newStorein2Block(this.value);
+                        this.blocks.newNamedboxBlock(this.value);
                     }
 
                     // Rename both box <- name and namedbox blocks.
