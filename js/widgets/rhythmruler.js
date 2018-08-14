@@ -895,7 +895,7 @@ function RhythmRuler () {
         var foundDrum = false;
         // Convert i18n drum name to English.
         for (var d = 0; d < DRUMNAMES.length; d++) {
-            if (DRUMNAMES[d][0] === drum) {
+            if (DRUMNAMES[d][0].replace('-', ' ') === drum) {
                 drum = DRUMNAMES[d][1];
                 foundDrum = true;
                 break;
