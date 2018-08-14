@@ -1309,9 +1309,10 @@ function TemperamentWidget () {
                 }
             }
         }
+        OCTAVERATIO = this.powerBase;
         var value = this._logo.blocks.findUniqueTemperamentName(this.inTemperament);
-        var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['text', {'value': value}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]]];
-        var previousBlock = 2;
+        var newStack = [[0, 'temperament1', 100, 100, [null, 1, 2, null]], [1, ['text', {'value': value}], 0, 0, [0]], [2, ['storein'], 0, 0, [0, 3, 4, 5]], [3, ['text',{'value': this._logo.synth.startingPitch}], 0, 0, [2]], [4, ['number',{'value': this.frequencies[0]}], 0, 0, [2]], [5, ['octavespace'], 0, 0, [2, 6, 9]], [6, ['divide'], 0, 0, [5, 7, 8]], [7, ['number',{'value': rationalToFraction(OCTAVERATIO)[0]}], 0, 0, [6]], [8, ['number',{'value': rationalToFraction(OCTAVERATIO)[1]}], 0, 0, [6]], [9, 'vspace', 0, 0, [5, 10]]];
+        var previousBlock = 9;
 
         for (var i = 0; i < this.pitchNumber; i++) {
             var idx = newStack.length;
@@ -1383,8 +1384,6 @@ function TemperamentWidget () {
                 TEMPERAMENT['custom'][number] = [this.ratios[i], this.notes[i].substring(0, this.notes[i].length - 1), this.notes[i].slice(-1)];
             }
         }
-        
-        OCTAVERATIO = this.powerBase;
 
         if (this.inTemperament == 'custom') {
             this._logo.customTemperamentDefined = true;

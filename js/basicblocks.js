@@ -1894,6 +1894,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     setTemperamentBlock.adjustWidthToLabel();
     setTemperamentBlock.threeArgBlock();
 
+    var octaveSpaceBlock = new ProtoBlock('octavespace');
+    octaveSpaceBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['octavespace'] = octaveSpaceBlock;
+    octaveSpaceBlock.staticLabels.push(_('Octave Space'));
+    octaveSpaceBlock.adjustWidthToLabel();
+    octaveSpaceBlock.oneArgBlock();
+    octaveSpaceBlock.hidden = true; 
+
     var temperamentNameBlock = new ProtoBlock('temperamentname');
     temperamentNameBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['temperamentname'] = temperamentNameBlock;
