@@ -158,20 +158,39 @@ function PitchTracker() {
 
         
 
-        var cell = this._addButton(row, 'speak.svg', iconSize, _('Start Recording'), '');
-        cell.onclick = function () {
-            beep();
-            beep();
-            toggleLiveInput();
-        };
+        // var cell = this._addButton(row, 'speak.svg', iconSize, _('Start Recording'), '');
+        // cell.onclick = function () {
+        //     beep();
+        //     beep();
+        //     toggleLiveInput();
+        // };
 
 
-        var cell = this._addButton(row, 'pause-button.svg', iconSize, _('Stop Recording'), '');
-        cell.onclick = function () {
-            keepRecording = 0;
+        // var cell = this._addButton(row, 'pause-button.svg', iconSize, _('Stop Recording'), '');
+        // cell.onclick = function () {
+        //     keepRecording = 0;
             
             
+        // };
+
+        this.isRecording = false;
+
+
+        var cell = this._addButton(row, 'speak.svg', ICONSIZE, _('pause'));
+
+        cell.onclick=function() {
+            if (that.isRecording) {
+                keepRecording = 0;
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/speak.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                that.isRecording = false;
+            } else {
+                beep();
+        	    toggleLiveInput();
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                that.isRecording = true;
+            }
         };
+
 
 
         // An input for setting BPM of pitch tracker
