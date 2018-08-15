@@ -137,8 +137,12 @@ function RhythmRuler () {
                 // Play a count off before starting tapping.
                 var interval = this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
 
-                var drumBlockNo = this._logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
-                var drum = this._logo.blocks.blockList[drumBlockNo].value;
+                if (this.Drums[this._rulerSelected] === null) {
+                    var drum = 'snare drum';
+                } else {
+                    var drumBlockNo = this._logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
+                    var drum = this._logo.blocks.blockList[drumBlockNo].value;
+                }
 
                 var that = this;
                 // FIXME: Should be based on meter
@@ -889,8 +893,12 @@ function RhythmRuler () {
         var noteValue = noteValues[colIndex];
 
         noteTime = Math.abs(1 / noteValue);
-        var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
-        var drum = this._logo.blocks.blockList[drumblockno].value;
+        if (this.Drums[rulerNo] === null) {
+            var drum = 'snare drum';
+        } else {
+            var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
+            var drum = this._logo.blocks.blockList[drumblockno].value;
+        }
 
         var foundDrum = false;
         // Convert i18n drum name to English.
@@ -961,7 +969,11 @@ function RhythmRuler () {
             var noteValues = that.Rulers[selectedRuler][0];
             // Get the first word of drum's name (ignore the word 'drum' itself)
             // and add 'rhythm'.
-            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('rhythm');
+            if (that.Drums[selectedRuler] === null) {
+                var stack_value = _('snare drum') + ' ' + _('rhythm');
+            } else {
+                var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('rhythm');
+            }
             var delta = selectedRuler * 42;
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
@@ -1013,7 +1025,11 @@ function RhythmRuler () {
         setTimeout( function() {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('rhythm');
+            if (that.Drums[selectedRuler] === null) {
+                var stack_value = _('snare drum') + ' ' + _('rhythm');
+            } else {
+                var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('rhythm');
+            }
             var delta = selectedRuler * 42;
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
@@ -1064,8 +1080,13 @@ function RhythmRuler () {
 
     this._saveMachine = function(selectedRuler) {
         // We are either saving a drum machine or a voice machine.
-        var drumBlockNo = this._logo.blocks.blockList[this.Drums[selectedRuler]].connections[1];
-        var drum = this._logo.blocks.blockList[drumBlockNo].value;
+        if (this.Drums[selectedRuler] === null) {
+            var drum = 'snare drum';
+        } else {
+            var drumBlockNo = this._logo.blocks.blockList[this.Drums[selectedRuler]].connections[1];
+            var drum = this._logo.blocks.blockList[drumBlockNo].value;
+        }
+
         for (var d = 0; d < DRUMNAMES.length; d++) {
             if (DRUMNAMES[d][1] === drum) {
                 this._saveDrumMachine(selectedRuler, drum);
@@ -1097,7 +1118,12 @@ function RhythmRuler () {
             // Just save the action, not the drum machine itself.
             // var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
             // newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
-            var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('action');
+            if (that.Drums[selectedRuler] === null) {
+                var action_name = _('snare drum') + ' ' + _('action');
+            } else {
+                var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('action');
+            }
+
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
             var previousBlock = 0; // 1
             var sameNoteValue = 1;
@@ -1192,7 +1218,14 @@ function RhythmRuler () {
             // newStack.push([3, 'hidden', 0, 0, [1, null]]);
             // newStack.push([4, 'forever', 0, 0, [1, 6, 5]]);
             // newStack.push([5, 'hidden', 0, 0, [4, null]]);
-            var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('action');
+
+            // This should never happen.
+            if (that.Drums[selectedRuler] === null) {
+                var action_name = _('guitar') + ' ' + _('action');
+            } else {
+                var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('action');
+            }
+
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
             newStack.push([2, 'settimbre', 0, 0, [0, 3, 5, 4]]);
             newStack.push([3, ['voicename', {'value': voice}], 0, 0, [2]]);
@@ -1208,9 +1241,6 @@ function RhythmRuler () {
                     var noteValue = noteValues[i];
 
                     var obj = rationalToFraction(1 / Math.abs(noteValue));
-
-                    var drumBlockNo = that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1];
-                    var drum = that._logo.blocks.blockList[drumBlockNo].value;
 
                     if (sameNoteValue === 1) {
                         // Add a note block.
@@ -1299,6 +1329,13 @@ function RhythmRuler () {
         this._playingAll = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
+
+        // If there are no drums, add one.
+        if (this.Drums.length === 0) {
+            this.Drums.push(null);
+            this.Rulers.push([[1], []]);
+        }
+
         this._elapsedTimes = [];
         this._offsets = [];
         for (var i = 0; i < this.Rulers.length; i++) {
@@ -1419,6 +1456,10 @@ function RhythmRuler () {
             var dissectHistory = [];
             var drums = [];
             for (var i = 0; i < that.Rulers.length; i++) {
+                if (that.Drums[i] === null) {
+                    continue;
+                }
+
                 var history = [];
                 for (var j = 0; j < that.Rulers[i][1].length; j++) {
                     history.push(that.Rulers[i][1][j]);
@@ -1645,6 +1686,10 @@ function RhythmRuler () {
 
         // Restore dissect history.
         for (var drum = 0; drum < this.Drums.length; drum++) {
+            if (this.Drums[i] === null) {
+                continue;
+            }
+
             for (var i = 0; i < this._dissectHistory.length; i++) {
                 if (this._dissectHistory[i][1] !== this.Drums[drum]) {
                     continue;
