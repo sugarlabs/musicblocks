@@ -948,6 +948,7 @@ function RhythmRuler () {
     };
 
     this._save = function(selectedRuler) {
+        // Deprecated -- replaced by save tuplets code
         var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1008,6 +1009,7 @@ function RhythmRuler () {
         }
 
         this._logo.refreshCanvas();
+
         setTimeout( function() {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
@@ -1050,6 +1052,7 @@ function RhythmRuler () {
                     sameNoteValue = 1;
                 }
             }
+
             that._logo.blocks.loadNewBlocks(newStack);
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
@@ -1089,12 +1092,14 @@ function RhythmRuler () {
         setTimeout(function () {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-
             var delta = selectedRuler * 42;
-            var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
 
-            newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
-            var previousBlock = 1;
+            // Just save the action, not the drum machine itself.
+            // var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
+            // newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
+            var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('action');
+            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
+            var previousBlock = 0; // 1
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
                 if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
@@ -1178,18 +1183,21 @@ function RhythmRuler () {
         setTimeout(function () {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-
             var delta = selectedRuler * 42;
 
-            var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
-            newStack.push([1, 'settimbre', 0, 0, [0, 2, 4, 3]]);
-
-            newStack.push([2, ['voicename', {'value': voice}], 0, 0, [1]]);
-            newStack.push([3, 'hidden', 0, 0, [1, null]]);
-            newStack.push([4, 'forever', 0, 0, [1, 6, 5]]);
-            newStack.push([5, 'hidden', 0, 0, [4, null]]);
-
-            var previousBlock = 4;
+            // Just save the action, not the drum machine itself.
+            // var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
+            // newStack.push([1, 'settimbre', 0, 0, [0, 2, 4, 3]]);
+            // newStack.push([2, ['voicename', {'value': voice}], 0, 0, [1]]);
+            // newStack.push([3, 'hidden', 0, 0, [1, null]]);
+            // newStack.push([4, 'forever', 0, 0, [1, 6, 5]]);
+            // newStack.push([5, 'hidden', 0, 0, [4, null]]);
+            var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('action');
+            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
+            newStack.push([2, 'settimbre', 0, 0, [0, 3, 5, 4]]);
+            newStack.push([3, ['voicename', {'value': voice}], 0, 0, [2]]);
+            newStack.push([4, 'hidden', 0, 0, [2, null]]);
+            var previousBlock = 2;
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
                 if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
@@ -1341,7 +1349,7 @@ function RhythmRuler () {
 
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
         cell.onclick = function () {
-            that._save(0);
+            // that._save(0);
             that._saveTuplets(0);
         };
 
@@ -1478,7 +1486,7 @@ function RhythmRuler () {
                 rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
 
-		that._positionWheel();
+                that._positionWheel();
             }
         };
 
@@ -1495,7 +1503,7 @@ function RhythmRuler () {
                 rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
 
-		that._positionWheel();
+                that._positionWheel();
             }
         };
 
@@ -1797,8 +1805,8 @@ function RhythmRuler () {
 
     this._positionWheel = function() {
         if (docById('wheelDiv').style.display == 'none') {
-	    return;
-	}
+            return;
+        }
 
         docById('wheelDiv').style.position = 'absolute';
         docById('wheelDiv').style.height = '300px';
@@ -1809,9 +1817,9 @@ function RhythmRuler () {
         var y = this._top;
         var selectorWidth = 150;
 
-        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';	
+        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';        
         if (y - 300 < 0) {
-	    docById('wheelDiv').style.top = (y + 60) + 'px';
+            docById('wheelDiv').style.top = (y + 60) + 'px';
         } else {
             docById('wheelDiv').style.top = (y - 300) + 'px';
         }
