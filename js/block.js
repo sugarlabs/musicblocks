@@ -1656,7 +1656,6 @@ function Block(protoblock, blocks, overrideName) {
 
         var labelElem = docById('labelDiv');
 
-        console.log('CHANGE LABEL');
         if (this.name === 'text') {
             labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
