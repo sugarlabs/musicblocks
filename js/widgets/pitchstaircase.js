@@ -119,7 +119,7 @@ function PitchStaircase () {
     this._undo = function () {
         if (this._history.length === 0) {
             console.log('nothing for undo to undo');
-            return;
+            return false;
         }
 
         // Remove the last entry...
@@ -129,14 +129,33 @@ function PitchStaircase () {
         // Remove the last block added to the tempo widget
         var blk = this.stairPitchBlocks.pop();
         console.log('removing block ' + blk);
+        // Find the block above
         var c0 = this._logo.blocks.blockList[blk].connections[0];
+        // And the block below, if any
         var c1 = last(this._logo.blocks.blockList[blk].connections);
-        var i = this._logo.blocks.blockList[c0].connections.indexOf(blk);
-        this._logo.blocks.blockList[c0].connections[i] = c1;
 
+        // Check for vspaces below the hertz block
+        if (c1 !== null) {
+            if (this._logo.blocks.blockList[c1].name === 'vspace') {
+		var c2 = last(this._logo.blocks.blockList[c1].connections);
+		if (this._logo.blocks.blockList[c2].name === 'vspace') {
+		    var c = last(this._logo.blocks.blockList[c2].connections);
+		    this._logo.blocks.blockList[c2].connections[1] = null;
+		} else {
+		    var c = last(this._logo.blocks.blockList[c1].connections);
+		    this._logo.blocks.blockList[c1].connections[1] = null;
+		}
+	    }
+	} else {
+	    var c = c1;
+	}
+
+        // Disconnect from the block above
+        var i = this._logo.blocks.blockList[c0].connections.indexOf(blk);
+        this._logo.blocks.blockList[c0].connections[i] = c;
         this._logo.blocks.blockList[blk].connections[0] = null;
-        var i = this._logo.blocks.blockList[blk].connections.length - 1;
-        this._logo.blocks.blockList[blk].connections[i] = null;
+
+        // And send the blocks to the trash
         this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blk]);
 
         // Force the clamp to adjust.
@@ -147,6 +166,8 @@ function PitchStaircase () {
 
         // And rebuild the stairs.
         this._refresh();
+
+	return true;
     };
 
     this._dissectStair = function (event) {
@@ -224,7 +245,7 @@ function PitchStaircase () {
         var b = this._logo.blocks.findBottomBlock(bb);
         var c = last(this._logo.blocks.blockList[b].connections);
 
-        if (pitch[2] === 0) {
+        if (pitch[2] === 0) {  // 0 cents means we have an exact match to a named pitch
             var newStack = [[0, 'pitch', 0, 0, [null, 1, 2, c]], [1, ['notename', {'value': pitch[1]}], 0, 0, [0]], [2, ['number', {'value': pitch[1]}], 0, 0, [0]]];
         } else {
             // var newStack = [[0, 'hertz', 0, 0, [null, 1, c]], [1, ['number', {'value': frequency.toFixed(2)}], 0, 0, [0]]];
@@ -513,6 +534,12 @@ function PitchStaircase () {
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
         cell.onclick=function() {
             that._undo();
+        };
+
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        cell.onclick=function() {
+	    while (that._undo()) {
+	    }
         };
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
