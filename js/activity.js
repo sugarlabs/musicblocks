@@ -1518,7 +1518,7 @@ define(MYDEFINES, function (compatibility) {
                 sendAllToTrash(true, false);
                 if (planet !== undefined) {
                     planet.initialiseNewProject.bind(planet);
-		}
+                }
             };
 
             clearBox = new ClearBox();
@@ -2046,8 +2046,10 @@ define(MYDEFINES, function (compatibility) {
                     if (errorMsgArrow != null) {
                         errorMsgArrow.removeAllChildren(); // Hide the error arrow.
                     }
+
                     update = true;
                 });
+
                 callback(text);
                 blocks.setMsgText(text);
             };
@@ -2412,11 +2414,11 @@ define(MYDEFINES, function (compatibility) {
                         break;
                     case PAGE_UP:
                         blocksContainer.y += logo.canvas.height / 2;
-			stage.update();
+                        stage.update();
                         break;
                     case PAGE_DOWN:
                         blocksContainer.y -= logo.canvas.height / 2;
-			stage.update();
+                        stage.update();
                         break;
                     case DEL:
                         blocks.extract();
@@ -2435,7 +2437,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.y -= 20;
                         }
-			stage.update();
+                        stage.update();
                         break;
                     case KEYCODE_DOWN:
                         if (disableArrowKeys) {
@@ -2451,7 +2453,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.y += 20;
                         }
-			stage.update();
+                        stage.update();
                         break;
                     case KEYCODE_LEFT:
                         if (disableArrowKeys) {
@@ -2462,7 +2464,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.x -= 20;
                         }
-			stage.update();
+                        stage.update();
                         break;
                     case KEYCODE_RIGHT:
                         if (disableArrowKeys) {
@@ -2473,7 +2475,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (scrollBlockContainer) {
                             blocksContainer.x += 20;
                         }
-			stage.update();
+                        stage.update();
                         break;
                     case HOME:
                         if (palettes.mouseOver) {
@@ -2485,7 +2487,7 @@ define(MYDEFINES, function (compatibility) {
                         } else {
                             _findBlocks();
                         }
-			stage.update();
+                        stage.update();
                         break;
                     case TAB:
                         break;
@@ -3110,6 +3112,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function hideMsgs() {
+            console.log('hiding messages');
             errorMsgText.parent.visible = false;
             if (errorMsgArrow != null) {
                 errorMsgArrow.removeAllChildren();
@@ -3120,6 +3123,8 @@ define(MYDEFINES, function (compatibility) {
             for (var i in errorArtwork) {
                 errorArtwork[i].visible = false;
             }
+
+            refreshCanvas();
         };
 
         function textMsg(msg) {
@@ -3136,8 +3141,8 @@ define(MYDEFINES, function (compatibility) {
 
         function errorMsg(msg, blk, text, timeout) {
             if (logo.optimize) {
-		return;
-	    }
+                return;
+            }
 
             if (errorMsgTimeoutID != null) {
                 clearTimeout(errorMsgTimeoutID);
