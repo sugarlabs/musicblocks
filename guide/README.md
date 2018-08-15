@@ -1390,7 +1390,7 @@ the widget clamp, keyboard with all keys between C4 and G5 is shown.
 
 When there are pitch blocks inside the widget clamp, only those pitches are shown as keys in the keyboard. 
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard1.png "keyboard with pitch block in clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard2.png "keyboard with pitch block in clamp")
 
 Click on the keys to hear the sound. Clicking on play button plays all the the notes. To get the output
 as pitch blocks click on save button. Clear is pressed to delete all keys pressed till now and start afresh. 
