@@ -176,17 +176,17 @@ function PitchTracker() {
         this.isRecording = false;
 
 
-        var cell = this._addButton(row, 'speak.svg', ICONSIZE, _('pause'));
+        var cell = this._addButton(row, 'speak.svg', ICONSIZE, _('Start Recording'));
 
         cell.onclick=function() {
             if (that.isRecording) {
                 keepRecording = 0;
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/speak.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/speak.svg" title="' + _('Start Recording') + '" alt="' + _('Start Recording') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                 that.isRecording = false;
             } else {
                 beep();
         	    toggleLiveInput();
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Stop Recording') + '" alt="' + _('Stop Recording') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                 that.isRecording = true;
             }
         };
