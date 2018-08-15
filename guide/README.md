@@ -1382,14 +1382,20 @@ corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
 
 
-### <a name="timbre"></a>4.10 Pitch tracker
+### <a name="tracker"></a>4.10 Pitch tracker
 
 It records audio from microphone and gives output of blocks which correspond to sound recorded.
 Click on record button and allow microphone access to start recording sound. When done with recording
 click stop recording button. Currently autocoorelation is used to find out most dominant frequency present at 
 a particular time. Then a note which is closest to that frequency is choosen. This is done from start to end of recording.
 Clicking on save, gives output of blocks corresponding to input. Click on clear to delete input till now and 
-start again. Close is used to close the widget and Move is used to move the widget. 
+start again. Close is used to close the widget and Move is used to move the widget. While recording is going on just below widget buttons 
+you can see which notes are identified from input audio.
+Given below is picture when pitch is ready to record
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/tracker1.png "Ready to record")
+
+and when it is recording
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/tracker2.png "Recording in progress")
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
 
