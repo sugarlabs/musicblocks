@@ -1382,7 +1382,7 @@ corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
 
 
-### <a name="timbre"></a>4.9 Custom Timbres
+### <a name="timbre"></a>4.10 Pitch tracker
 
 It records audio from microphone and gives output of blocks which correspond to sound recorded.
 Click on record button and allow microphone access to start recording sound. When done with recording
