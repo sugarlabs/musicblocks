@@ -522,6 +522,7 @@ function PitchStaircase () {
             docById('pscTableDiv').style.visibility = 'hidden';
             docById('musicratio1').classList.remove('hasKeyboard');
             docById('musicratio2').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
         };
 
         cell.onmouseover=function() {
@@ -607,6 +608,8 @@ function PitchStaircase () {
 
         pscTableDiv.innerHTML = '<div id="pscOuterDiv"><div id="pscInnerDiv"><table cellpadding="0px" id="pscTable"></table></div></div>';
         this._refresh();
+
+        this._logo.textMsg(_('Click on a note to create a new step.'));
     };
 
     this._resizeWidget = function() {

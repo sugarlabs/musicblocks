@@ -752,6 +752,7 @@ function TimbreWidget () {
             docById('timbreButtonsDiv').style.visibility = 'hidden';
             docById('timbreTableDiv').style.visibility = 'hidden';
             docById('timbreName').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
         };
 
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
@@ -815,6 +816,8 @@ function TimbreWidget () {
                 e.preventDefault();
             }
         };
+
+        this._logo.textMsg(_('Click on buttons to open the timbre design tools.'));
     };
 
     this.clampConnection = function (n, clamp, topOfClamp) {

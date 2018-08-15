@@ -216,6 +216,7 @@ function PitchSlider() {
             sliderDiv.style.visibility = 'hidden';
             widgetButtonsDiv.style.visibility = 'hidden';
             sliderTableDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
         };
 
         cell.onmouseover = function() {
@@ -412,5 +413,7 @@ function PitchSlider() {
                 this.style.backgroundColor = MATRIXBUTTONCOLOR;
             };
         }
+
+        this._logo.textMsg(_('Use the slider to change the pitch.'));
     };
 };

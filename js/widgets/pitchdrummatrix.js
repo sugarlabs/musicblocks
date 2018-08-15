@@ -147,6 +147,7 @@ function PitchDrumMatrix() {
             pdmDiv.style.visibility = 'hidden';
             pdmButtonsDiv.style.visibility = 'hidden';
             pdmTableDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
         }
 
         // We use this cell as a handle for dragging.
@@ -308,6 +309,8 @@ function PitchDrumMatrix() {
         for (var i = 0; i < this.drums.length; i++) {
             this._addDrum(i);
         }
+
+	this._logo.textMsg(_('Click in the grid to map notes to drums.'));
     };
 
     this._addButton = function(row, icon, iconSize, label) {

@@ -249,6 +249,7 @@ function Tempo () {
 
         cell.onclick=function() {
             that.hide();
+            that._logo.hideMsgs();
         };
 
         cell.onmouseover=function() {
@@ -427,6 +428,7 @@ function Tempo () {
             });
         }
 
+        this._logo.textMsg(_('Adjust the tempo with the buttons.'));
         this.resume();
     };
 

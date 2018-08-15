@@ -1447,6 +1447,7 @@ function RhythmRuler () {
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
+            that._logo.hideMsgs();
         };
 
         // We use this cell as a handle for dragging.
@@ -1691,6 +1692,8 @@ function RhythmRuler () {
                 }
             }
         }
+
+        this._logo.textMsg(_('Click on the ruler to divide it.'));
     };
 
     this._addButton = function(row, icon, iconSize, label, extras) {

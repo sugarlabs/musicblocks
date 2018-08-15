@@ -104,6 +104,7 @@ function ModeWidget() {
             docById('modeDiv').style.visibility = 'hidden';
             docById('modeButtonsDiv').style.visibility = 'hidden';
             docById('modeTableDiv').style.visibility = 'hidden';
+            that._logo.hideMsgs();
         }
 
         // We use this cell as a handle for dragging.
@@ -195,6 +196,8 @@ function ModeWidget() {
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
         this._makeClickable();
+        //.TRANS: A circle of notes represents the musical mode.
+        this._logo.textMsg(_('Click in the circle to select notes for the mode.'));
     };
 
     this._addButton = function(row, icon, iconSize, label) {

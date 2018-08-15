@@ -217,6 +217,7 @@ function PitchTimeMatrix () {
             ptmTableDiv.style.visibility = 'hidden';
             ptmButtonsDiv.style.visibility = 'hidden';
             ptmDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
         }
 
         // We use this cell as a handle for dragging.
@@ -443,6 +444,8 @@ function PitchTimeMatrix () {
         } else {
             this.sorted = false;
         }
+
+        this._logo.textMsg(_('Click on the table to add notes.'));
     };
 
     this._addButton = function(row, icon, iconSize, label) {
