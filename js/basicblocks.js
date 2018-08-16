@@ -787,20 +787,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchstaircaseBlock.stackClampZeroArgBlock();
 
     // macro
-    var rhythmrulerBlock = new ProtoBlock('rhythmruler');
-    rhythmrulerBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['rhythmruler'] = rhythmrulerBlock;
-    //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-    rhythmrulerBlock.staticLabels.push(_('rhythm ruler'));
-    rhythmrulerBlock.adjustWidthToLabel();
-    rhythmrulerBlock.stackClampOneArgBlock();
-    rhythmrulerBlock.defaults.push(1);
-    rhythmrulerBlock.hidden = true;
-
-    // macro
     var rhythmruler2Block = new ProtoBlock('rhythmruler2');
     rhythmruler2Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['rhythmruler2'] = rhythmruler2Block;
+    //.TRANS: widget for subdividing a measure into distinct rhythmic elements
     rhythmruler2Block.staticLabels.push(_('rhythm ruler'));
     rhythmruler2Block.adjustWidthToLabel();
     rhythmruler2Block.stackClampZeroArgBlock();
@@ -1143,7 +1133,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     offBeatDoBlock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['offbeatdo'] = offBeatDoBlock;
     // #TRANS: on musical 'offbeat' do some action
-    offBeatDoBlock.staticLabels.push(_('on offbeat do'));
+    offBeatDoBlock.staticLabels.push(_('on weak beat do'));
     offBeatDoBlock.oneArgBlock();
     offBeatDoBlock.defaults.push(_('action'));
     offBeatDoBlock.adjustWidthToLabel();
@@ -1153,7 +1143,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     onBeatDoBlock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['onbeatdo'] = onBeatDoBlock;
     // #TRANS: 'on' musical 'beat' 'do' some action
-    onBeatDoBlock.staticLabels.push(_('on beat'), _('beat'), _('do'));
+    onBeatDoBlock.staticLabels.push(_('on strong beat'), _('beat'), _('do'));
     onBeatDoBlock.twoArgBlock();
     onBeatDoBlock.defaults.push(1);
     onBeatDoBlock.defaults.push(_('action'));
