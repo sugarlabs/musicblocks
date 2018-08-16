@@ -4178,8 +4178,12 @@ function Logo () {
                 } else {
                     // In number to pitch we assume A0 == 0. Here we
                     // assume that C4 == 0, so we need an offset of 39.
-                    var obj = numberToPitch(Math.floor(arg0 + that.pitchNumberOffset[turtle]));
+                    var obj = numberToPitch(Math.floor(arg0 + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch, that.pitchNumberOffset[turtle]);
 
+                    if (that.synth.inTemperament == 'custom' && (that.scalarTransposition[turtle] + that.transposition[turtle]) !== 0) {
+                        that.errorMsg('Scalar transpositions are equal to Semitone transpositions for custom temperament.');
+                    }
+                    
                     note = obj[0];
                     octave = obj[1];
                     cents = 0;
