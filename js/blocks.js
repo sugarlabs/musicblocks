@@ -39,6 +39,7 @@ function Blocks () {
     this.trashcan = null;
     this.updateStage = null;
     this.getStageScale = null;
+    this.contextMenu = null;
 
     // We keep a list of stacks in the trash.
     this.trashStacks = [];
@@ -115,9 +116,14 @@ function Blocks () {
     };
 
     this.clearLongPressButtons = function () {
-        this.saveStackButton.visible = false;
-        this.dismissButton.visible = false;
+        // this.saveStackButton.visible = false;
+        // this.dismissButton.visible = false;
         this.inLongPress = false;
+    };
+
+    this.setContextMenu = function (contextMenu) {
+	this.contextMenu = contextMenu;
+        return this;
     };
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
@@ -328,6 +334,7 @@ function Blocks () {
         var that = this;
         this.updatePasteButton = updatePasteButton;
 
+        /*
         this.dismissButton = makeButton('cancel-button', '', 0, 0, 55, 0, this.stage);
         this.dismissButton.visible = false;
 
@@ -351,6 +358,7 @@ function Blocks () {
             that.saveStack();
             that.refreshCanvas();
         });
+        */
     };
 
     this._actionBlock = function (name) {
@@ -3164,7 +3172,7 @@ function Blocks () {
             this.longPressTimeout = null;
         }
 
-        if (this.activeBlock == null) {
+        if (this.activeBlock === null) {
             this.errorMsg(_('There is no block selected.'));
             console.log('No block associated with long press.');
             return;
@@ -3176,7 +3184,9 @@ function Blocks () {
         // (1) we don't trigger a click and
         // (2) we later remove the additional buttons for the action stack.
         this.inLongPress = true;
+        this.contextMenu(this.activeBlock);
 
+        /*
         // We display some extra buttons when we long-press an action block.
         var myBlock = this.blockList[this.activeBlock];
         if (myBlock.name === 'action') {
@@ -3190,7 +3200,7 @@ function Blocks () {
             this.saveStackButton.y = myBlock.container.y - 27;
             this.stage.setChildIndex(this.saveStackButton, z - 2);
         }
-
+        */
         this.refreshCanvas();
     };
 

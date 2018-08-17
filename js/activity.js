@@ -243,6 +243,77 @@ define(MYDEFINES, function (compatibility) {
         var paste = docById('paste');
         paste.style.visibility = 'hidden';
 
+        piemenuContext = function (activeBlock) {
+            if (activeBlock === null) {
+                return;
+            }
+
+            // piemenu version of ruler
+            docById('contextWheelDiv').style.display = '';
+            docById('contextWheelDiv').style.position = 'absolute';
+            docById('contextWheelDiv').style.left = ((blocks.getStageScale() * blocks.blockList[activeBlock].container.x) - 150) + 'px';
+            docById('contextWheelDiv').style.top = ((blocks.getStageScale() * blocks.blockList[activeBlock].container.y) - 150) + 'px';
+            labels = ['imgsrc:header-icons/copy-button.svg',
+                    'imgsrc:header-icons/paste-disabled-button.svg',
+                    'imgsrc:header-icons/empty-trash-button.svg',
+                    'imgsrc:header-icons/cancel-button.svg'];
+
+            if (blocks.blockList[activeBlock].name === 'action') {
+                labels.push('imgsrc:header-icons/save-blocks-button.svg');
+            }
+
+            var wheel = new wheelnav('contextWheelDiv', null, 150, 150);
+            wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
+            wheel.slicePathFunction = slicePath().DonutSlice;
+            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            wheel.slicePathCustom.minRadiusPercent = 0.4;
+            wheel.slicePathCustom.maxRadiusPercent = 1.0;
+            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+            wheel.sliceInitPathCustom = wheel.slicePathCustom;
+            wheel.clickModeRotate = false;
+            wheel.initWheel(labels);
+            wheel.createWheel(labels);
+
+            wheel.navItems[0].navigateFunction = function () {
+                blocks.activeBlock = activeBlock;
+                blocks.prepareStackForCopy();
+            };
+
+            wheel.navItems[1].navigateFunction = function () {
+                blocks.pasteStack();
+            };
+
+            wheel.navItems[2].navigateFunction = function () {
+                blocks.sendStackToTrash(blocks.blockList[activeBlock]);
+                docById('contextWheelDiv').style.display = 'none';
+            };
+
+            wheel.navItems[3].navigateFunction = function () {
+                docById('contextWheelDiv').style.display = 'none';
+            };
+
+            if (blocks.blockList[activeBlock].name === 'action') {
+                wheel.navItems[4].navigateFunction = function () {
+                    blocks.activeBlock = activeBlock;
+                    blocks.saveStack();
+                };
+            }
+        };
+
+        // Do something on right click
+        document.addEventListener("contextmenu", function(e) {
+            if (blocks.activeBlocks === null) {
+                return;
+            }
+
+            var activeBlock = blocks.activeBlock;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            piemenuContext(activeBlock);
+        }, false);
+
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
             PALETTEFILLCOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1], PALETTECOLORS[p][2]);
@@ -1042,7 +1113,8 @@ define(MYDEFINES, function (compatibility) {
                 .setGetStageScale(getStageScale)
                 .setTurtles(turtles)
                 .setSetPlaybackStatus(setPlaybackStatus)
-                .setErrorMsg(errorMsg);
+                .setErrorMsg(errorMsg)
+                .setContextMenu(piemenuContext);
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             turtles.setBlocks(blocks);
@@ -2627,14 +2699,14 @@ define(MYDEFINES, function (compatibility) {
             console.log('=====================');
             console.log(turtleBlocksScale);
             if (turtleBlocksScale < 0.5) {
-		turtleBlocksScale = 0.5;
-	    } else if (turtleBlocksScale < 1) {
-		turtleBlocksScale = 1;
-	    } else if (turtleBlocksScale < 1,5) {
-		turtleBlocksScale = 1.5;
-	    } else {
-		turtleBlocksScale = 2;
-	    }
+              turtleBlocksScale = 0.5;
+           } else if (turtleBlocksScale < 1) {
+              turtleBlocksScale = 1;
+           } else if (turtleBlocksScale < 1,5) {
+              turtleBlocksScale = 1.5;
+           } else {
+              turtleBlocksScale = 2;
+           }
 
             stage.scaleX = turtleBlocksScale;
             stage.scaleY = turtleBlocksScale;
@@ -3541,9 +3613,9 @@ handleComplete);
 
                 img.src = 'header-icons/paste-button.svg';
             } else {
-                pasteContainer.addChild(bitmapActivePaste);
+                // pasteContainer.addChild(bitmapActivePaste);
                 console.log('Blinking paste button');
-                blinkPasteButton(pasteImage);
+                // blinkPasteButton(pasteImage);
             }
         };
 
