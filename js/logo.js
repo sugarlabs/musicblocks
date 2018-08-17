@@ -5954,7 +5954,7 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
+            if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var factor = 2;
             } else {
