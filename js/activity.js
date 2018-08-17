@@ -2624,8 +2624,22 @@ define(MYDEFINES, function (compatibility) {
                 }
             }
 
+            console.log('=====================');
+            console.log(turtleBlocksScale);
+            if (turtleBlocksScale < 0.5) {
+		turtleBlocksScale = 0.5;
+	    } else if (turtleBlocksScale < 1) {
+		turtleBlocksScale = 1;
+	    } else if (turtleBlocksScale < 1,5) {
+		turtleBlocksScale = 1.5;
+	    } else {
+		turtleBlocksScale = 2;
+	    }
+
             stage.scaleX = turtleBlocksScale;
             stage.scaleY = turtleBlocksScale;
+            console.log(turtleBlocksScale);
+            console.log('=====================')
 
             stage.canvas.width = w;
             stage.canvas.height = h;
