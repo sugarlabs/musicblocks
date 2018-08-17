@@ -7,8 +7,10 @@ var urlsToCache = [
 
     'header-icons/a-button.svg',
     'header-icons/add.svg',
+    'header-icons/advanced.svg',
     'header-icons/apply.svg',
     'header-icons/b-button.svg',
+    'header-icons/beginner.svg',
     'header-icons/bigger-button.svg',
     'header-icons/bigger-disable-button.svg',
     'header-icons/cancel-button.svg',
@@ -18,6 +20,7 @@ var urlsToCache = [
     'header-icons/close-button.svg',
     'header-icons/close-toolbar-button.svg',
     'header-icons/collapse-blocks-button.svg',
+    'header-icons/copy-button.svg',
     'header-icons/compile-button.svg',
     'header-icons/delete.svg',
     'header-icons/download-button.svg',
