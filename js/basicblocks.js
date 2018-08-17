@@ -122,7 +122,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'textout';
     newblock.extraWidth = 50;
     if (beginnerMode && !beginnerBlock('invertmode')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('transpositionfactor');
@@ -133,7 +133,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('transpositionfactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('consonantstepsizedown');
@@ -144,7 +144,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('consonantstepsizedown')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('consonantstepsizeup');
@@ -155,7 +155,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('consonantstepsizeup')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('deltapitch');
@@ -166,7 +166,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('deltapitch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('mypitch');
@@ -177,7 +177,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('mypitch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('midi');
@@ -188,7 +188,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('midi')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setpitchnumberoffset');
@@ -204,7 +204,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'notein';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('setpitchnumberoffset')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('number2pitch');
@@ -216,7 +216,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.defaults.push(48);
     if (beginnerMode && !beginnerBlock('number2pitch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('number2octave');
@@ -228,7 +228,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.defaults.push(48);
     if (beginnerMode && !beginnerBlock('number2octave')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Value blocks
@@ -239,7 +239,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'textout';
     newblock.extraWidth = 50;
     if (beginnerMode && !beginnerBlock('accidentalname')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('eastindiansolfege');
@@ -248,7 +248,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.dockTypes[0] = 'solfegeout';
     if (beginnerMode && !beginnerBlock('eastindiansolfege')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('notename');
@@ -257,7 +257,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.dockTypes[0] = 'noteout';
     if (beginnerMode && !beginnerBlock('notename')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('solfege');
@@ -266,7 +266,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.dockTypes[0] = 'solfegeout';
     if (beginnerMode && !beginnerBlock('solfege')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Transposition blocks
@@ -290,7 +290,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'anyin';
     newblock.dockTypes[3] = 'anyin';
     if (beginnerMode && !beginnerBlock('invert1')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // deprecated
@@ -335,7 +335,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('register')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('settransposition');
@@ -347,7 +347,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('1');
     newblock.flowClampOneArgBlock();
     if (beginnerMode && !beginnerBlock('settransposition')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('octave');
@@ -358,7 +358,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('octave')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -370,7 +370,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downsixth')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -382,7 +382,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downthird')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -394,7 +394,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('seventh')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -406,7 +406,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('sixth')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -418,7 +418,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('fifth')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -430,7 +430,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('fourth')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -442,7 +442,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('third')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -454,7 +454,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('second')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -466,7 +466,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('unison')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -479,7 +479,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('1');
     newblock.flowClampOneArgBlock();
     if (!beginnerMode || !beginnerBlock('setscalartransposition')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -492,7 +492,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('accidental')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -504,7 +504,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('flat')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -516,7 +516,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('sharp')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('hertz');
@@ -528,7 +528,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(392);
     if (beginnerMode && !beginnerBlock('hertz')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('pitchnumber');
@@ -541,7 +541,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(7);
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('pitchnumber')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('scaledegree');
@@ -557,7 +557,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('scaledegree')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('steppitch');
@@ -570,7 +570,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(1);
     if (beginnerMode && !beginnerBlock('steppitch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -581,7 +581,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('pitch2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('pitch');
@@ -597,7 +597,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'solfegein';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('pitch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // MATRIX PALETTE
@@ -690,7 +690,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('sixtyfourthNote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -701,7 +701,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('thirtysecondNote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -712,7 +712,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('sixteenthNote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -723,7 +723,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('eighthNote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -734,7 +734,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('quarterNote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -745,7 +745,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('halfNote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -756,7 +756,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('wholeNote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('tuplet2');
@@ -797,7 +797,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(1 / 4);
     if (beginnerMode && !beginnerBlock('tuplet4')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('stuplet7');
@@ -808,7 +808,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('stuplet7')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('stuplet5');
@@ -819,7 +819,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('stuplet5')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('stuplet3');
@@ -830,7 +830,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('stuplet3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('stuplet');
@@ -843,7 +843,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(3);
     newblock.defaults.push(1 / 2);
     if (beginnerMode && !beginnerBlock('stuplet')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // deprecated
@@ -876,7 +876,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('rhythm2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -890,7 +890,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.stackClampOneArgBlock();
     newblock.defaults.push(_('custom'));
     if (beginnerMode && !beginnerBlock('timbre')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('modewidget');
@@ -901,7 +901,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('modewidget')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -914,7 +914,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('tempo')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -926,7 +926,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('pitchdrummatrix')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -938,7 +938,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('pitchslider')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -950,7 +950,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('pitchstaircase')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -962,7 +962,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('rhythmruler2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -973,7 +973,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('matrixgmajor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -984,7 +984,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('matrixcmajor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -996,7 +996,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('matrix')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1008,7 +1008,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('status')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // RHYTHM PALETTE
@@ -1021,7 +1021,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('mynotevalue')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('duplicatefactor');
@@ -1032,7 +1032,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('duplicatefactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('skipfactor');
@@ -1053,7 +1053,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(200);
     if (beginnerMode && !beginnerBlock('osctime')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1092,7 +1092,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(1 / 24);
     newblock.defaults.push(1 / 8);
     if (beginnerMode && !beginnerBlock('newswing2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1104,7 +1104,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('backward')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1117,7 +1117,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(2);
     if (beginnerMode && !beginnerBlock('skipnotes')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1130,7 +1130,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(2);
     if (beginnerMode && !beginnerBlock('duplicatenotes')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('multiplybeatfactor');
@@ -1142,7 +1142,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(2);
     if (beginnerMode && !beginnerBlock('multiplybeatfactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1154,7 +1154,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('tie')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Deprecated
@@ -1179,7 +1179,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(1);
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('rhythmicdot2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1190,7 +1190,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('rest2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1201,7 +1201,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note4')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1212,7 +1212,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1223,7 +1223,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note5')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1234,7 +1234,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note7')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1245,7 +1245,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note6')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1256,7 +1256,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1267,7 +1267,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note1')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1290,7 +1290,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(1 / 4);
     if (beginnerMode && !beginnerBlock('newnote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // METER PALETTE
@@ -1303,7 +1303,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('beatfactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('bpmfactor');
@@ -1314,7 +1314,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('bpmfactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('measurevalue');
@@ -1325,7 +1325,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('measurevalue')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('beatvalue');
@@ -1336,7 +1336,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('beatvalue')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('notecounter');
@@ -1347,7 +1347,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.argFlowClampBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('notecounter')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('elapsednotes');
@@ -1358,7 +1358,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('elapsednotes')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('elapsednotes2');
@@ -1369,7 +1369,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgMathBlock();
     if (beginnerMode && !beginnerBlock('elapsednotes2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('pitchinhertz');
@@ -1380,7 +1380,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('pitchinhertz')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('drift');
@@ -1391,7 +1391,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('drift')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('offbeatdo');
@@ -1404,7 +1404,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('offbeatdo')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('onbeatdo');
@@ -1419,7 +1419,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'textin';
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('onbeatdo')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('everybeatdo');
@@ -1432,7 +1432,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('everybeatdo')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1448,7 +1448,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(1 / 4);
     newblock.twoArgBlock();
     if (beginnerMode && !beginnerBlock('setmasterbpm2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1474,7 +1474,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(90);
     newblock.defaults.push(1 / 4);
     if (beginnerMode && !beginnerBlock('setbpm2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1498,7 +1498,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(0);
     newblock.extraWidth = 15;
     if (beginnerMode && !beginnerBlock('pickup')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1514,7 +1514,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(0.25);
     newblock.twoArgBlock();
     if (beginnerMode && !beginnerBlock('meter')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // TONE (ARTICULATION) PALETTE
@@ -1527,7 +1527,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('staccatofactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('slurfactor');
@@ -1538,7 +1538,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('slurfactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('amsynth');
@@ -1552,7 +1552,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('amsynth')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('fmsynth');
@@ -1566,7 +1566,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('fmsynth')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('duosynth');
@@ -1583,7 +1583,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
     if (beginnerMode && !beginnerBlock('duosynth')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var partialBlock = new ProtoBlock('partial');
@@ -1595,7 +1595,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(1);
     if (beginnerMode && !beginnerBlock('partial')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1607,7 +1607,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('harmonic')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1621,7 +1621,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.defaults.push(1);
     if (beginnerMode && !beginnerBlock('harmonic2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1639,7 +1639,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(1);
     newblock.defaults.push(1 / 16);
     if (beginnerMode && !beginnerBlock('neighbor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1657,7 +1657,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(1);
     newblock.defaults.push(1 / 16);
     if (beginnerMode && !beginnerBlock('neighbor2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('dis');
@@ -1670,7 +1670,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.defaults.push(40);
     if (beginnerMode && !beginnerBlock('dis')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('tremolo');
@@ -1689,7 +1689,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(10);
     newblock.defaults.push(50);
     if (beginnerMode && !beginnerBlock('tremolo')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('phaser');
@@ -1708,7 +1708,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(3);
     newblock.defaults.push(350);
     if (beginnerMode && !beginnerBlock('phaser')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('chorus');
@@ -1726,7 +1726,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(3.5);
     newblock.defaults.push(70);
     if (beginnerMode && !beginnerBlock('chorus')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1741,7 +1741,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(5);
     newblock.defaults.push(1 / 16);
     if (beginnerMode && !beginnerBlock('vibrato')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // deprecated by set timbre block
@@ -1757,7 +1757,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('violin');
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('setvoice')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1803,7 +1803,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(1 / 16);
     if (beginnerMode && !beginnerBlock('newslur')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1816,7 +1816,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(1 / 32);
     if (beginnerMode && !beginnerBlock('newstaccato')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // deprecated
@@ -1836,7 +1836,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'textout';
     newblock.extraWidth = 50;
     if (beginnerMode && !beginnerBlock('voicename')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1851,7 +1851,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: user-defined
     newblock.defaults.push(_('custom'));   
     if (beginnerMode && !beginnerBlock('settimbre')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('settemperament');
@@ -1861,7 +1861,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('settemperament')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('temperamentname');
@@ -1872,7 +1872,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.extraWidth = 50;
     newblock.dockTypes[0] = 'anyout';   
     if (beginnerMode && !beginnerBlock('temperamentname')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
@@ -1884,7 +1884,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'textout';
     newblock.extraWidth = 50;  // 150;
     if (beginnerMode && !beginnerBlock('modename')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('doubly');
@@ -1896,7 +1896,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'anyout';
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('doubly')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('intervalname');
@@ -1907,7 +1907,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.dockTypes[0] = 'numberout';
     if (beginnerMode && !beginnerBlock('intervalname')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('measureintervalsemitones');
@@ -1918,7 +1918,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.argFlowClampBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('measureintervalsemitones')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('measureintervalscalar');
@@ -1929,7 +1929,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.argFlowClampBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('measureintervalscalar')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1940,7 +1940,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('diminished8')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1951,7 +1951,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('diminished7')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1962,7 +1962,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('diminished6')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1973,7 +1973,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('diminished5')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1984,7 +1984,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('diminished4')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -1995,7 +1995,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('diminished3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2006,7 +2006,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('diminished2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2017,7 +2017,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented8')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2028,7 +2028,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented7')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2039,7 +2039,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented6')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2050,7 +2050,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented5')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2061,7 +2061,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented4')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2072,7 +2072,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2083,7 +2083,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2094,7 +2094,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('augmented1')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2105,7 +2105,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('perfect8')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2116,7 +2116,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('perfect5')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2127,7 +2127,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('perfect4')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('perfect');
@@ -2139,7 +2139,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(5);
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('perfect')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2150,7 +2150,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downminor6')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2161,7 +2161,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downminor3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2172,7 +2172,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('minor7')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2183,7 +2183,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('minor6')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2194,7 +2194,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('minor3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2205,7 +2205,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('minor2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2216,7 +2216,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downmajor6')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2227,7 +2227,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downmajor3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2238,7 +2238,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('major7')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2249,7 +2249,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('major6')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2260,7 +2260,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('major3')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2271,7 +2271,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('major2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2284,7 +2284,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);
     if (!beginnerMode && !beginnerBlock('semitoneinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2296,7 +2296,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downsixthinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2308,7 +2308,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('downthirdinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2320,7 +2320,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('seventhinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2332,7 +2332,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('sixthinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2344,7 +2344,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('fifthinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2356,7 +2356,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('fourthinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2368,7 +2368,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('thirdinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2380,7 +2380,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('secondinterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2392,7 +2392,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('unisoninterval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2405,7 +2405,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);
     if (!beginnerMode && !beginnerBlock('interval')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2419,7 +2419,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('custom'));
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('definemode')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2430,7 +2430,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('movable')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('modelength');
@@ -2441,7 +2441,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('modelength')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('key');
@@ -2452,7 +2452,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('key')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Deprecated
@@ -2481,7 +2481,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('setkey2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // DRUM PALETTE
@@ -2492,7 +2492,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.extraWidth = 50;
     newblock.dockTypes[0] = 'textout';
     if (beginnerMode && !beginnerBlock('drumname')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2503,7 +2503,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('duck')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2514,7 +2514,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('cat')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2525,7 +2525,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('cricket')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2536,7 +2536,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('dog')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2547,7 +2547,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('bottle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2558,7 +2558,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('bubbles')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2569,7 +2569,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('chine')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2580,7 +2580,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('clang')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2591,7 +2591,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('clap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2602,7 +2602,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('slap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2613,7 +2613,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('crash')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2624,7 +2624,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('tom')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2635,7 +2635,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('cowbell')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2646,7 +2646,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('ridebell')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2657,7 +2657,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('fingercymbals')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2668,7 +2668,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('trianglebell')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2679,7 +2679,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('hihat')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2690,7 +2690,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('darbuka')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2701,7 +2701,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('cup')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2712,7 +2712,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('floortom')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2723,7 +2723,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('tom')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2734,7 +2734,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('kick')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2745,7 +2745,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('snare')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2758,7 +2758,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('setdrum')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2770,7 +2770,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('playdrum')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // TURTLE PALETTE
@@ -2783,7 +2783,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('heading')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('y');
@@ -2794,7 +2794,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('y')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('x');
@@ -2805,7 +2805,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('x')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('clear');
@@ -2816,7 +2816,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('clear')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('controlpoint2');
@@ -2832,7 +2832,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
     if (beginnerMode && !beginnerBlock('controlpoint2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('controlpoint1');
@@ -2848,7 +2848,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
     if (beginnerMode && !beginnerBlock('controlpoint1')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('bezier');
@@ -2864,7 +2864,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
     if (beginnerMode && !beginnerBlock('bezier')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('arc');
@@ -2879,7 +2879,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(100);
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('arc')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setheading');
@@ -2891,7 +2891,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(0);
     if (beginnerMode && !beginnerBlock('setheading')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setxy');
@@ -2906,7 +2906,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(0);
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('setxy')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('right');
@@ -2918,7 +2918,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(90);
     if (beginnerMode && !beginnerBlock('right')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('left');
@@ -2930,7 +2930,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(90);
     if (beginnerMode && !beginnerBlock('left')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('back');
@@ -2942,7 +2942,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(100);
     if (beginnerMode && !beginnerBlock('back')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('forward');
@@ -2954,7 +2954,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(100);
     if (beginnerMode && !beginnerBlock('forward')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // PEN PALETTE
@@ -2966,7 +2966,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('purple'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('purple')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2976,7 +2976,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('blue'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('blue')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2986,7 +2986,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('green'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('green')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -2996,7 +2996,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('yellow'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('yellow')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3006,7 +3006,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('orange'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('orange')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3016,7 +3016,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('red'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('red')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3026,7 +3026,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('white'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('white')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3036,7 +3036,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('black'));
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('black')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('beginfill');
@@ -3047,7 +3047,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.zeroArgBlock();
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('beginfill')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('endfill');
@@ -3074,7 +3074,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('grey')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('shade');
@@ -3084,7 +3084,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('shade')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('color');
@@ -3094,7 +3094,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('color')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('pensize');
@@ -3104,7 +3104,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('pensize')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setfont');
@@ -3116,7 +3116,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(DEFAULTFONT);
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('setfont')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('background');
@@ -3126,7 +3126,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('background')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3138,7 +3138,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('hollowline')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3150,7 +3150,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('fill')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('penup');
@@ -3161,7 +3161,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('penup')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('pendown');
@@ -3172,7 +3172,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('pendown')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setpensize');
@@ -3184,7 +3184,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(5);
     if (beginnerMode && !beginnerBlock('setpensize')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('settranslucency');
@@ -3196,7 +3196,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(50);
     if (beginnerMode && !beginnerBlock('settranslucency')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('sethue');
@@ -3207,7 +3207,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(0);
     if (beginnerMode && !beginnerBlock('sethue')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setshade');
@@ -3218,7 +3218,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(50);
     if (beginnerMode && !beginnerBlock('setshade')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setgrey');
@@ -3230,7 +3230,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(100);
     if (beginnerMode && !beginnerBlock('setgrey')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setcolor');
@@ -3241,7 +3241,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(0);
     if (beginnerMode && !beginnerBlock('setcolor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // NUMBERS PALETTE
@@ -3255,7 +3255,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgMathBlock();
     newblock.defaults.push(100)
     if (beginnerMode && !beginnerBlock('int')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('not');
@@ -3265,7 +3265,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('not'));
     newblock.booleanOneBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('not')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('and');
@@ -3275,7 +3275,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('and'));
     newblock.booleanTwoBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('and')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('or');
@@ -3285,7 +3285,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('or'));
     newblock.booleanTwoBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('or')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('greater');
@@ -3296,7 +3296,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.extraWidth = 20;
     newblock.booleanTwoArgBlock();
     if (beginnerMode && !beginnerBlock('greater')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('less');
@@ -3307,7 +3307,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.extraWidth = 20;
     newblock.booleanTwoArgBlock();
     if (beginnerMode && !beginnerBlock('less')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('equal');
@@ -3321,7 +3321,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('equal')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('boolean');
@@ -3329,7 +3329,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['boolean'] = newblock;
     newblock.booleanZeroArgBlock();
     if (beginnerMode && !beginnerBlock('boolean')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Only used to excute methods in the Math library
@@ -3357,7 +3357,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.twoArgMathBlock();
     newblock.defaults.push(100, 10)
     if (beginnerMode && !beginnerBlock('mod')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('power');
@@ -3368,7 +3368,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.twoArgMathBlock();
     newblock.defaults.push(2, 4)
     if (beginnerMode && !beginnerBlock('power')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('sqrt');
@@ -3380,7 +3380,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgMathBlock();
     newblock.defaults.push(64)
     if (beginnerMode && !beginnerBlock('sqrt')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('abs');
@@ -3391,7 +3391,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgMathBlock();
     if (beginnerMode && !beginnerBlock('abs')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('divide');
@@ -3402,7 +3402,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.twoArgMathBlock();
     newblock.defaults.push(1, 4)
     if (beginnerMode && !beginnerBlock('divide')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('multiply');
@@ -3415,7 +3415,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'anyin';
     newblock.defaults.push(1, 12)
     if (beginnerMode && !beginnerBlock('multiply')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('neg');
@@ -3427,7 +3427,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'anyout';
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('neg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('minus');
@@ -3440,7 +3440,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'anyin';
     newblock.defaults.push(8, 4)
     if (beginnerMode && !beginnerBlock('minus')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('plus');
@@ -3454,7 +3454,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'anyin';
     newblock.defaults.push(2, 2)
     if (beginnerMode && !beginnerBlock('plus')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3469,7 +3469,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'anyin';
     newblock.defaults.push(-90, 90);
     if (beginnerMode && !beginnerBlock('oneOf')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('random');
@@ -3480,7 +3480,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.twoArgMathBlock();
     newblock.defaults.push(0, 12);
     if (beginnerMode && !beginnerBlock('random')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('number');
@@ -3488,7 +3488,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['number'] = newblock;
     newblock.valueBlock();
     if (beginnerMode && !beginnerBlock('number')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // BLOCKS PALETTE
@@ -3500,7 +3500,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('incrementOne')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('increment');
@@ -3512,7 +3512,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('increment')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('box');
@@ -3529,7 +3529,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameter = true;
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('box')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('namedbox');
@@ -3541,7 +3541,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.dockTypes[0] = 'anyout';
     if (beginnerMode && !beginnerBlock('namedbox')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('storein2');
@@ -3553,7 +3553,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(4);
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('storein2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('storein');
@@ -3569,7 +3569,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('storein')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // ACTIONS PALETTE
@@ -3584,7 +3584,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('action'));
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('do')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('return');
@@ -3598,7 +3598,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(100);
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('return')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('returnToUrl');
@@ -3612,7 +3612,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('100'));
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('returnToUrl')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('calc');
@@ -3625,7 +3625,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'anyout';
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('calc')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('namedcalc');
@@ -3636,7 +3636,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('namedcalc')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('nameddoArg');
@@ -3648,7 +3648,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.argClampBlock();
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('nameddoArg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('namedcalcArg');
@@ -3660,7 +3660,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'anyout';
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('namedcalcArg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('doArg');
@@ -3673,7 +3673,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('doArg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('calcArg');
@@ -3687,7 +3687,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('calcArg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('arg');
@@ -3700,7 +3700,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'anyout';
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('arg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('namedarg');
@@ -3710,7 +3710,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('namedarg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('listen');
@@ -3727,7 +3727,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     newblock.dockTypes[2] = 'textin';
     if (beginnerMode && !beginnerBlock('listen')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('dispatch');
@@ -3740,7 +3740,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('event'));
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('dispatch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -3753,7 +3753,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('startdrum')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Deprecated
@@ -3792,7 +3792,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.zeroArgBlock();
     // nameddo stays hidden until first action block is used.
     if (!beginnerMode) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // HEAP PALETTE
@@ -3809,7 +3809,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('appName')
     newblock.defaults.push('localhost');
     if (beginnerMode && !beginnerBlock('loadHeapFromApp')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('saveHeapToApp');
@@ -3824,7 +3824,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('appName')
     newblock.defaults.push('localhost');
     if (beginnerMode && !beginnerBlock('saveHeapToApp')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('showHeap');
@@ -3835,7 +3835,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('showHeap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('heapLength');
@@ -3847,7 +3847,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.dockTypes[0] = 'numberout';
     if (beginnerMode && !beginnerBlock('heapLength')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('heapEmpty');
@@ -3858,7 +3858,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.booleanZeroArgBlock();
     if (beginnerMode && !beginnerBlock('heapEmpty')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('emptyHeap');
@@ -3869,7 +3869,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('emptyHeap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('saveHeap');
@@ -3882,7 +3882,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('heap.json');
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('saveHeap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('loadHeap');
@@ -3895,7 +3895,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'filein';
     newblock.defaults = [[null, null]];
     if (beginnerMode && !beginnerBlock('loadHeap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('reverseHeap');
@@ -3906,7 +3906,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('reverseHeap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('indexHeap');
@@ -3919,7 +3919,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.defaults.push(1);
     if (beginnerMode && !beginnerBlock('indexHeap')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setHeapEntry');
@@ -3934,7 +3934,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(1);
     newblock.defaults.push(100);
     if (beginnerMode && !beginnerBlock('setHeapEntry')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('pop');
@@ -3945,7 +3945,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('pop')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('push');
@@ -3958,7 +3958,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(1);
     if (beginnerMode && !beginnerBlock('push')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // MEDIA PALETTE
@@ -3970,7 +3970,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('rightpos')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('leftpos');
@@ -3980,7 +3980,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('leftpos')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('toppos');
@@ -3990,7 +3990,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('toppos')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('bottompos');
@@ -4000,7 +4000,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('bottompos')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('width');
@@ -4010,7 +4010,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('width')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('height');
@@ -4020,7 +4020,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('height')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('stopplayback');
@@ -4031,7 +4031,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('stopplayback')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('playback');
@@ -4044,7 +4044,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'mediain';
     if (beginnerMode && !beginnerBlock('playback')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('speak');
@@ -4056,7 +4056,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('hello');
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('speak')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('camera');
@@ -4065,7 +4065,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.image = 'images/camera.svg'
     newblock.mediaBlock();
     if (beginnerMode && !beginnerBlock('camera')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('video');
@@ -4074,7 +4074,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.image = 'images/video.svg'
     newblock.mediaBlock();
     if (beginnerMode && !beginnerBlock('video')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('loadFile');
@@ -4084,7 +4084,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.dockTypes[0] = 'fileout';
     if (beginnerMode && !beginnerBlock('loadFile')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('stopvideocam');
@@ -4094,7 +4094,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('stopvideocam')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('tone');
@@ -4107,7 +4107,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
     if (beginnerMode && !beginnerBlock('tone')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('tofrequency');
@@ -4122,7 +4122,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'notein';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('tofrequency')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtleshell');
@@ -4137,7 +4137,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'mediain';
     if (beginnerMode && !beginnerBlock('turtleshell')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('show');
@@ -4152,7 +4152,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('show')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('media');
@@ -4162,7 +4162,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.mediaBlock();
     newblock.dockTypes[0] = 'mediaout';
     if (beginnerMode && !beginnerBlock('media')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('text');
@@ -4172,7 +4172,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.dockTypes[0] = 'textout';
     if (beginnerMode && !beginnerBlock('text')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // FLOW PALETTE
@@ -4198,7 +4198,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampBlock();
     if (beginnerMode && !beginnerBlock('defaultcase')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('case');
@@ -4210,7 +4210,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('case')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('switch');
@@ -4222,7 +4222,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('switch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('clamp');
@@ -4231,7 +4231,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampBlock();
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('clamp')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('break');
@@ -4241,7 +4241,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.basicBlockNoFlow();
     if (beginnerMode && !beginnerBlock('break')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('waitFor');
@@ -4251,7 +4251,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('waitFor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('until');
@@ -4262,7 +4262,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('until')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('while');
@@ -4273,7 +4273,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('while')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('ifthenelse');
@@ -4284,7 +4284,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.doubleFlowClampBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('ifthenelse')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('if');
@@ -4295,7 +4295,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('if')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('forever');
@@ -4305,7 +4305,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('forever')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('repeat');
@@ -4316,7 +4316,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(4);
     if (beginnerMode && !beginnerBlock('repeat')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // EXTRAS PALETTE
@@ -4398,7 +4398,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     newblock.defaults.push(_('Rhythm'));
     if (beginnerMode && !beginnerBlock('openpalette')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('deleteblock');
@@ -4410,7 +4410,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('deleteblock')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('moveblock');
@@ -4424,7 +4424,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'numberin';
     newblock.dockTypes[3] = 'numberin';
     if (beginnerMode && !beginnerBlock('moveblock')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('runblock');
@@ -4436,7 +4436,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('runblock')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('dockblock');
@@ -4450,7 +4450,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[2] = 'numberin';
     newblock.dockTypes[3] = 'numberin';
     if (beginnerMode && !beginnerBlock('dockblock')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('makeblock');
@@ -4465,7 +4465,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('makeblock')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // deprecated in favor of save button
@@ -4479,7 +4479,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('saveabc')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // deprecated in favor of save button
@@ -4493,7 +4493,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('savelilypond')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // deprecated in favor of save button
@@ -4507,7 +4507,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('savesvg')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('nobackground');
@@ -4517,7 +4517,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('nobackground')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('showblocks');
@@ -4527,7 +4527,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('showblocks')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('hideblocks');
@@ -4537,7 +4537,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('hideblocks')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('openProject');
@@ -4549,7 +4549,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('url');
     newblock.dockTypes[1] = 'textin';
     if (beginnerMode && !beginnerBlock('openProject')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('vspace');
@@ -4559,7 +4559,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.extraWidth = -10;
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('vspace')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('hspace');
@@ -4570,7 +4570,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'anyout';
     newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('hspace')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('wait');
@@ -4581,7 +4581,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(1);
     if (beginnerMode && !beginnerBlock('wait')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('comment');
@@ -4593,7 +4593,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Music Blocks'));
     if (beginnerMode && !beginnerBlock('comment')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('print');
@@ -4605,7 +4605,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Music Blocks'));
     if (beginnerMode && !beginnerBlock('print')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // SENSORS PALETTE
@@ -4617,7 +4617,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('pitchness')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
     newblock.hidden = true;
 
@@ -4628,7 +4628,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('loudness')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Turtle-specific click event
@@ -4640,7 +4640,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.dockTypes[0] = 'textout';
     if (beginnerMode && !beginnerBlock('myclick')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('getblue');
@@ -4650,7 +4650,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('getblue')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('getgreen');
@@ -4660,7 +4660,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('getgreen')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('getred');
@@ -4670,7 +4670,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('getred')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('getcolorpixel');
@@ -4680,7 +4680,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('getcolorpixel')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('time');
@@ -4690,7 +4690,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('time')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('mousey');
@@ -4701,7 +4701,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('mousey')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('mousex');
@@ -4712,7 +4712,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('mousex')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('mousebutton');
@@ -4722,7 +4722,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.booleanZeroArgBlock();
     if (beginnerMode && !beginnerBlock('mousebutton')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('toascii');
@@ -4732,7 +4732,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(65);
     newblock.oneArgMathBlock();
     if (beginnerMode && !beginnerBlock('toascii')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('keyboard');
@@ -4742,7 +4742,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('keyboard')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Mice palette (blocks for interacting between mice)
@@ -4756,7 +4756,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('stopTurtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('startTurtle');
@@ -4768,7 +4768,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('startTurtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtlecolor');
@@ -4781,7 +4781,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('turtlecolor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtleheading');
@@ -4794,7 +4794,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('turtleheading')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setxyturtle');
@@ -4810,7 +4810,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('Mr. Mouse'), 0, 0);
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('setxyturtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setturtle');
@@ -4822,7 +4822,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('setturtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('yturtle');
@@ -4835,7 +4835,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('yturtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('xturtle');
@@ -4848,7 +4848,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('xturtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtleelapsednotes');
@@ -4861,7 +4861,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('turtleelapsednotes')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtlepitch');
@@ -4874,7 +4874,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('turtlepitch')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtlenote');
@@ -4887,7 +4887,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.hidden = true;
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('turtlenote')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtlenote2');
@@ -4899,7 +4899,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('turtlenote2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtlesync');
@@ -4911,7 +4911,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('turtlesync')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('foundturtle');
@@ -4924,7 +4924,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('foundturtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('newturtle');
@@ -4936,7 +4936,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('newturtle')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('turtlename');
@@ -4947,7 +4947,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.dockTypes[0] = 'textout';
     if (beginnerMode && !beginnerBlock('turtlename')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setturtlename');
@@ -4964,7 +4964,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('Mr. Mouse'));
     newblock.hidden = true;
     if (beginnerMode && !beginnerBlock('setturtlename')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setturtlename2');
@@ -4976,7 +4976,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.defaults.push(_('Mr. Mouse'));
     if (beginnerMode && !beginnerBlock('setturtlename2')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Volume palette
@@ -4988,7 +4988,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('notevolumefactor')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -4999,7 +4999,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('ppp')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5010,7 +5010,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('pp')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5021,7 +5021,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('p')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5032,7 +5032,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('mp')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5043,7 +5043,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('mf')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5054,7 +5054,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('f')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5065,7 +5065,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('ff')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5076,7 +5076,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('fff')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setsynthvolume2');
@@ -5102,7 +5102,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push('default');
     newblock.defaults.push(50);
     if (beginnerMode && !beginnerBlock('setsynthvolume')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setnotevolume');
@@ -5114,7 +5114,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(50);
     if (beginnerMode && !beginnerBlock('setnotevolume')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     var newblock = new ProtoBlock('setnotevolume2');
@@ -5137,7 +5137,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(25);
     if (beginnerMode && !beginnerBlock('articulation')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // macro
@@ -5150,7 +5150,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);
     if (beginnerMode && !beginnerBlock('crescendo')) {
-	newblock.hidden = true;
+        newblock.hidden = true;
     }
 
     // Push protoblocks onto their palettes.
