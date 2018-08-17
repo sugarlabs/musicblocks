@@ -3571,9 +3571,9 @@ handleComplete);
                 ];
 
                 if (beginnerMode) {
-                    buttonNames.push(['beginner', _doSwitchMode, _('switch to advanced mode'), null, null, null, null]);
+                    buttonNames.push(['beginner', _doSwitchMode, _('Switch to advanced mode'), null, null, null, null]);
                 } else {
-                    buttonNames.push(['advanced', _doSwitchMode, _('switch to beginner mode'), null, null, null, null]);
+                    buttonNames.push(['advanced', _doSwitchMode, _('Switch to beginner mode'), null, null, null, null]);
                 }
 
                 buttonNames.push(['help', _showHelp, _('Help'), null, null, null, null]);
