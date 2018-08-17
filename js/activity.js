@@ -1528,7 +1528,8 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 .setClear(__clearFunction);
 
-            initBasicProtoBlocks(palettes, blocks);
+            // FIXME: Third arg indicates beginner mode
+            initBasicProtoBlocks(palettes, blocks, false);
 
             // Load any macros saved in local storage.
             macroData = storage.macros;

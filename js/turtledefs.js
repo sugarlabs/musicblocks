@@ -30,47 +30,72 @@ function getMainToolbarButtonNames(name) {
 
 function getAuxToolbarButtonNames(name) {
     return (['planet', 'planet-disabled', 'open', 'save', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'new', 'restore-trash'].indexOf(name) > -1);
-}
+};
 
+
+function beginnerBlock(name) {
+    // Only these blocks appear on the palette in beginner mode.
+    return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
+            'meter', 'setmasterbpm2', 'everybeatdo', 'onbeatdo', 'offbeatdo', 'drift', // meter palette
+            'pitch', 'pitch2', 'steppitch', 'hertz', 'flat', 'sharp', 'setscalartransposition', 'settransposition', 'deltapitch', // pitch palette
+            'setkey2', 'modelength', 'movable', 'definemode', 'interval', 'semitoneinterval', // interval palette
+            'settimbre', 'newstaccato', 'newslur', // tone palette
+            'crescendo', 'setsynthvolume', // volume palette
+            'playdrum', 'setdrum', // drum palette
+            'if', 'ifthenelse', 'repeat', 'forever', // flow palette
+            'action', 'start', 'dispatch', 'listen', // action palette
+            'storein', 'storein2', 'namedbox', 'box', 'increment', 'incrementOne',  // boxes palette
+            'status', 'matrix', 'rhythmruler2', 'tempo', 'modewidget', 'rhythm2', 'stuplet', // widgets palette
+            'forward', 'left', 'right', 'setxy', 'setheading', 'arc', 'clear', 'x', 'y', 'heading', // mouse palette
+            'setcolor', 'setshade', 'setpensize', 'penup', 'pendown', 'fill', 'background', 'color', 'shade', 'pensize', // pen palette
+            'number', 'random', 'oneOf', 'plus', 'minus', 'multiply', 'divide', // number palette
+            'equal', 'less', 'greater', // boolean palette
+            'text', 'media', 'show', 'turtleshell', 'speak', 'height', 'width', 'bottompos', 'toppos', 'leftpos', 'rightpos', // media palette
+            'mousebutton', 'mousex', 'mousey', 'time', 'myclick', 'loudness', // sensor palette
+            'push', 'pop', 'setHeapEntry', 'indexHeap', 'reverseHeap', 'emptyHeap', 'heapEmpty', 'heapLength', 'showHeap', // heap palette
+            'setturtlename2', 'turtlename', 'turtlesync', // mice palette
+            'print', 'hspace', 'vspace' // extras palette
+           ].indexOf(name) !== -1
+};
 
 function createDefaultStack() {
     DATAOBJS =
-	[[0, 'start', screen.width / 3, 75, [null, 1, null]],
+        [[0, 'start', screen.width / 3, 75, [null, 1, null]],
 
-	 [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
-	 [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
-	 [3, 'hidden', 0, 0, [1, null]],
+         [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
+         [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
+         [3, 'hidden', 0, 0, [1, null]],
 
-	 [4, 'newnote', 0, 0, [1, 5, 8, 12]],
-	 [5, 'divide', 0, 0, [4, 6, 7]],
-	 [6, ['number', {'value': 1}], 0, 0, [5]],
-	 [7, ['number', {'value': 4}], 0, 0, [5]],
-	 [8, 'vspace', 0, 0, [4, 9]],
-	 [9, 'pitch', 0, 0, [8, 10, 11, null]],
-	 [10, ['solfege', {'value': 'sol'}], 0, 0, [9]],
-	 [11, ['number', {'value': 4}], 0, 0, [9]],
-	 [12, 'hidden', 0, 0, [4, 13]],
+         [4, 'newnote', 0, 0, [1, 5, 8, 12]],
+         [5, 'divide', 0, 0, [4, 6, 7]],
+         [6, ['number', {'value': 1}], 0, 0, [5]],
+         [7, ['number', {'value': 4}], 0, 0, [5]],
+         [8, 'vspace', 0, 0, [4, 9]],
+         [9, 'pitch', 0, 0, [8, 10, 11, null]],
+         [10, ['solfege', {'value': 'sol'}], 0, 0, [9]],
+         [11, ['number', {'value': 4}], 0, 0, [9]],
+         [12, 'hidden', 0, 0, [4, 13]],
 
-	 [13, 'newnote', 0, 0, [12, 14, 17, 21]],
-	 [14, 'divide', 0, 0, [13, 15, 16]],
-	 [15, ['number', {'value': 1}], 0, 0, [14]],
-	 [16, ['number', {'value': 4}], 0, 0, [14]],
-	 [17, 'vspace', 0, 0, [13, 18]],
-	 [18, 'pitch', 0, 0, [17, 19, 20, null]],
-	 [19, ['solfege', {'value': 'mi'}], 0, 0, [18]],
-	 [20, ['number', {'value': 4}], 0, 0, [18]],
-	 [21, 'hidden', 0, 0, [13, 22]],
+         [13, 'newnote', 0, 0, [12, 14, 17, 21]],
+         [14, 'divide', 0, 0, [13, 15, 16]],
+         [15, ['number', {'value': 1}], 0, 0, [14]],
+         [16, ['number', {'value': 4}], 0, 0, [14]],
+         [17, 'vspace', 0, 0, [13, 18]],
+         [18, 'pitch', 0, 0, [17, 19, 20, null]],
+         [19, ['solfege', {'value': 'mi'}], 0, 0, [18]],
+         [20, ['number', {'value': 4}], 0, 0, [18]],
+         [21, 'hidden', 0, 0, [13, 22]],
 
-	 [22, 'newnote', 0, 0, [21, 23, 26, 30]],
-	 [23, 'divide', 0, 0, [22, 24, 25]],
-	 [24, ['number', {'value': 1}], 0, 0, [23]],
-	 [25, ['number', {'value': 2}], 0, 0, [23]],
-	 [26, 'vspace', 0, 0, [22, 27]],
-	 [27, 'pitch', 0, 0, [26, 28, 29, null]],
-	 [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
-	 [29, ['number', {'value': 4}], 0, 0, [27]],
-	 [30, 'hidden', 0, 0, [22, null]]
-	];
+         [22, 'newnote', 0, 0, [21, 23, 26, 30]],
+         [23, 'divide', 0, 0, [22, 24, 25]],
+         [24, ['number', {'value': 1}], 0, 0, [23]],
+         [25, ['number', {'value': 2}], 0, 0, [23]],
+         [26, 'vspace', 0, 0, [22, 27]],
+         [27, 'pitch', 0, 0, [26, 28, 29, null]],
+         [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
+         [29, ['number', {'value': 4}], 0, 0, [27]],
+         [30, 'hidden', 0, 0, [22, null]]
+        ];
 };
 
 
@@ -78,10 +103,10 @@ function createHelpContent() {
     HELPCONTENT = [
         [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
         [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'activity/activity-icon-mouse-color.svg'],
-	//.TRANS: the buttons used to open various palettes of blocks
+        //.TRANS: the buttons used to open various palettes of blocks
         [_('Palette buttons'),
         //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
-	 _('This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+         _('This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
         [_('Play music'), _('Click to run the music note by note.') + ' ' + _('Alternatively, you can hit the ENTER or RETURN key.'), 'header-icons/play-button.svg'],
         [_('Run fast'), _('Click the run button to run the project in fast mode.'), 'header-icons/run-button.svg'],
         [_('Run slow'), _('Long press the run button to run the project in slow mode.'), 'header-icons/slow-button.svg'],
