@@ -451,13 +451,17 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
         }
     }
 
-    // Push the protoblocks onto their palettes.
-    for (var protoblock in blocks.protoBlockDict) {
-        if (blocks.protoBlockDict[protoblock].palette === undefined) {
-            console.log('Cannot find palette for protoblock ' + protoblock);
-        } else {
-            blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
-        }
+    try {
+	// Push the protoblocks onto their palettes.
+	for (var protoblock in blocks.protoBlockDict) {
+            if (blocks.protoBlockDict[protoblock].palette === undefined) {
+		console.log('Cannot find palette for protoblock ' + protoblock);
+            } else {
+		blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
+            }
+	}
+    } catch (e) {
+	console.log(e);
     }
 
     palettes.updatePalettes();
