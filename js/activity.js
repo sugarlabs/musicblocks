@@ -1529,7 +1529,7 @@ define(MYDEFINES, function (compatibility) {
                 .setClear(__clearFunction);
 
             // FIXME: Third arg indicates beginner mode
-            initBasicProtoBlocks(palettes, blocks, false);
+            initBasicProtoBlocks(palettes, blocks, true);
 
             // Load any macros saved in local storage.
             macroData = storage.macros;
