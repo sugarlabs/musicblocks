@@ -50,7 +50,21 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     };
 }
 
-try{
+try {
+    console.log(localStorage.beginnerMode);
+
+    if (localStorage.beginnerMode !== null) {
+        console.log('setting mode from local storage');
+        beginnerMode = (localStorage.beginnerMode == 'true');
+    } else {
+        beginnerMode = true;
+    }
+} catch (e) {
+    console.log(e);
+    beginnerMode = true;
+}
+
+try {
     console.log(localStorage.languagePreference);
 
     if (localStorage.languagePreference) {
@@ -700,6 +714,16 @@ define(MYDEFINES, function (compatibility) {
                 if (logo.tempo.isMoving) {
                     logo.tempo.pause();
                 }
+            }
+        };
+
+        function _doSwitchMode() {
+            if (beginnerMode) {
+                textMsg(_('Refresh your browser to change to advanced mode.'));
+                localStorage.setItem('beginnerMode', false);
+            } else {
+                textMsg(_('Refresh your browser to change to beginner mode.'));
+                localStorage.setItem('beginnerMode', true);
             }
         };
 
@@ -1529,7 +1553,11 @@ define(MYDEFINES, function (compatibility) {
                 .setClear(__clearFunction);
 
             // FIXME: Third arg indicates beginner mode
-            initBasicProtoBlocks(palettes, blocks, false);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                initBasicProtoBlocks(palettes, blocks, beginnerMode);
+            } else {
+                initBasicProtoBlocks(palettes, blocks);
+            }
 
             // Load any macros saved in local storage.
             macroData = storage.macros;
@@ -3540,8 +3568,15 @@ handleComplete);
                     ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                     ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
                     ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-                    ['help', _showHelp, _('Help'), null, null, null, null]
                 ];
+
+                if (beginnerMode) {
+                    buttonNames.push(['beginner', _doSwitchMode, _('switch to advanced mode'), null, null, null, null]);
+                } else {
+                    buttonNames.push(['advanced', _doSwitchMode, _('switch to beginner mode'), null, null, null, null]);
+                }
+
+                buttonNames.push(['help', _showHelp, _('Help'), null, null, null, null]);
             } else {
                 var buttonNames = [
                     ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' [ENTER]', _doSlowButton, null, 'slow-button', null],

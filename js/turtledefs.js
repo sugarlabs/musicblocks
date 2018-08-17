@@ -24,7 +24,7 @@ const BUILTINPALETTESFORL23N = [_('rhythm'), _('meter'), _('pitch'), _('interval
 
 
 function getMainToolbarButtonNames(name) {
-    return (['popdown-palette', 'run', 'step', 'step-music', 'stop-turtle', 'hard-stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help', 'sugarizer-stop'].indexOf(name) > -1);
+    return (['popdown-palette', 'run', 'step', 'step-music', 'stop-turtle', 'hard-stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help', 'sugarizer-stop', 'beginner', 'advanced'].indexOf(name) > -1);
 };
 
 
@@ -118,6 +118,7 @@ function createHelpContent() {
         [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
         [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
         [_('Home'), _('Return all blocks to the center of the screen.'), 'header-icons/go-home-button.svg'],
+        [_('Switch mode'), _('Switch between beginner and advance modes.'), 'header-icons/advanced-button.svg'],
         [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
         [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
         [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
