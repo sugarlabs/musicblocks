@@ -3501,7 +3501,8 @@ define(MYDEFINES, function (compatibility) {
                             // If temperament block is present
                             var args = {
                                 'customTemperamentNotes': TEMPERAMENT['custom'],
-                                'startingPitch': logo.synth.startingPitch
+                                'startingPitch': logo.synth.startingPitch,
+                                'octaveSpace': OCTAVERATIO
                             };
                         }
                         break;
