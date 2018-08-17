@@ -1055,6 +1055,7 @@ define(MYDEFINES, function (compatibility) {
                 .setSize(cellSize)
                 .setTrashcan(trashcan)
                 .setBlocks(blocks)
+                .setSearch(showSearchWidget, hideSearchWidget)
                 .init();
 
             initPalettes(palettes);
@@ -2161,7 +2162,10 @@ define(MYDEFINES, function (compatibility) {
             doSearch();
         };
 
-        function hideSearchWidget() {
+        function hideSearchWidget(ispalette) {
+            if (ispalette===undefined){
+                ispalette=false;
+            }
             // Hide the jQuery search results widget
             var obj = docByClass('ui-menu');
             if (obj.length > 0) {
@@ -2171,7 +2175,10 @@ define(MYDEFINES, function (compatibility) {
             searchWidget.style.visibility = 'hidden';
         };
 
-        function showSearchWidget() {
+        function showSearchWidget(ispalette) {
+            if (ispalette===undefined){
+                ispalette=false;
+            }
             if (searchWidget.style.visibility === 'visible') {
                 hideSearchWidget();
             } else {
@@ -2183,8 +2190,14 @@ define(MYDEFINES, function (compatibility) {
                 searchWidget.value = null;
                 docById('searchResults').style.visibility = 'visible';
                 searchWidget.style.visibility = 'visible';
-                searchWidget.style.left = (utilityBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
-                searchWidget.style.top = (utilityBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
+                var searchpos;
+                if (ispalette){
+                    searchpos = palettes.getSearchPos();
+                } else {
+                    searchpos = utilityBox.getPos();
+                }
+                searchWidget.style.left = (searchpos[0] + 10) * turtleBlocksScale + 'px';
+                searchWidget.style.top = (searchpos[1] + 10) * turtleBlocksScale + 'px';
 
                 searchBlockPosition = [100, 100];
 
