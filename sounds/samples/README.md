@@ -1,19 +1,27 @@
-== How to add a new sample sound ==
+How to add a new sample sound
+=============================
 
-1. Find a sample under a FOSS license.
+* Find a sample under a free/libre open-source (FOSS) license.
 
-2. `base64` encode the sample data
+* `base64` encode the sample data
 
-3. Embedded the sample data into a .js file as per:
+  ```
+  base64 piano.wav > piano.b64encoded
+  ```
 
+* Embedded the sample data into a .js file as per:
+
+   ```
    piano.js
 
    PIANO_SAMPLE = function () {
     return "data:audio/wav;base64,BASE64ENCODEDSAMPLEDATA";
    };
+   ```
 
-4. Add you new sample to `js/utils/synthutils.js`
+* Add you new sample to `js/utils/synthutils.js`
 
+   ```
    var VOICENAMES = [
     //.TRANS: musical instrument
     [_('piano'), 'piano', 'images/voices.svg', 'string'],
@@ -28,11 +36,13 @@
        this.samplesManifest = {
            'voice': [
                {'name': 'piano', 'data': PIANO_SAMPLE},
+   ```
 
-5. Add you new sample name to the list of string that need translation
+* Add you new sample name to the list of string that need translation
 in `js/utils/musicutils.js`
 
+   ```
    // Musical terms that need translations
    const SELECTORSTRINGS = [
        _('piano'),
-
+   ```
