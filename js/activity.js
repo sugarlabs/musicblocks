@@ -286,12 +286,14 @@ define(MYDEFINES, function (compatibility) {
                 wheel.navItems[4].setTooltip(_('Save stack'));
             }
 
-	    wheel.navItems[0].selected = false;
-            // wheel.refreshWheel();
+            wheel.navItems[0].selected = false;
 
             wheel.navItems[0].navigateFunction = function () {
                 blocks.activeBlock = activeBlock;
                 blocks.prepareStackForCopy();
+                wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
+                wheel.navItems[1].refreshNavItem(true);
+                wheel.refreshWheel();
             };
 
             wheel.navItems[1].navigateFunction = function () {
