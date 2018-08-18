@@ -238,6 +238,7 @@ const SELECTORSTRINGS = [
     //.TRANS: odd numbers
     _('odd'),
     _('scalar'),
+    _('piano'),
     _('violin'),
     _('cello'),
     _('bass'),
