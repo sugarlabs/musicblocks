@@ -272,7 +272,17 @@ define(MYDEFINES, function (compatibility) {
             wheel.sliceInitPathCustom = wheel.slicePathCustom;
             wheel.clickModeRotate = false;
             wheel.initWheel(labels);
-            wheel.createWheel(labels);
+            wheel.createWheel();
+
+            wheel.navItems[0].setTooltip(_('Copy'));
+            wheel.navItems[1].setTooltip(_('Paste'));
+            wheel.navItems[2].setTooltip(_('Move to trash'));
+            wheel.navItems[3].setTooltip(_('Close'));
+            if (blocks.blockList[activeBlock].name === 'action') {
+                wheel.navItems[4].setTooltip(_('Save stack'));
+            }
+
+            // wheel.refreshWheel();
 
             wheel.navItems[0].navigateFunction = function () {
                 blocks.activeBlock = activeBlock;
@@ -3613,9 +3623,9 @@ handleComplete);
 
                 img.src = 'header-icons/paste-button.svg';
             } else {
-                // pasteContainer.addChild(bitmapActivePaste);
+                pasteContainer.addChild(bitmapActivePaste);
                 console.log('Blinking paste button');
-                // blinkPasteButton(pasteImage);
+                blinkPasteButton(pasteImage);
             }
         };
 
