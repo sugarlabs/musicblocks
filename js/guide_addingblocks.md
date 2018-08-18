@@ -87,7 +87,7 @@ block is defined.
  (4) add an entry to the BUILTINMACROS dictionary.  
 
 #### Example
-  ```
+
     var newblock = new ProtoBlock('square');
     newblock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['square'] = newblock;
@@ -97,7 +97,6 @@ block is defined.
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(440);
-  ```
 
 ## Making your block do something.
 
@@ -121,49 +120,49 @@ switch statement.
           Here the uniquename is the same as the one in basicblocks.js.
 	  `break;`
 
-#### Example
-       
-The `status` block is a flow block.
+#### Examples
 
-Its code:
-       ```
-       case 'status':
-          if (that.statusMatrix == null) {
-            that.statusMatrix = new StatusMatrix();
-          }
+Several flow blocks associated with the heap are shown below. Many
+take arguments as inputs, e.g., `push`, which takes an argument to
+push onto the heap.
 
-          that.statusMatrix.init(that);
-          that.statusFields = [];
-          if (args.length === 1) {
-              childFlow = args[0];
-              childFlowCount = 1;
-          }
+        case 'showHeap':
+            if (!(turtle in that.turtleHeaps)) {
+                that.turtleHeaps[turtle] = [];
+            }
+            that.textMsg(JSON.stringify(that.turtleHeaps[turtle]));
+            break;
+        case 'emptyHeap':
+            that.turtleHeaps[turtle] = [];
+            break;
+        case 'reverseHeap':
+            that.turtleHeaps[turtle] = that.turtleHeaps[turtle].reverse();
+            break;
+        case 'push':
+            if (args[0] === null) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                break;
+            }
 
-          that.inStatusMatrix = true;
-          var listenerName = '_status_' + turtle;
-          that._setDispatchBlock(blk, turtle, listenerName);
-          var __listener = function (event) {
-            that.statusMatrix.init(that);
-            that.inStatusMatrix = false;
-         }
+            if (!(turtle in that.turtleHeaps)) {
+                that.turtleHeaps[turtle] = [];
+            }
 
-         that._setListener(turtle, listenerName, __listener);
-         break;
-     ```
+            that.turtleHeaps[turtle].push(args[0]);
+            break;
 
+`pop` is an arg block. Arg blocks assign their results to the block
+`value`.
 
-An arg block is 'key' , it is mentioned in the  (that.blocks.blockList[blk].name) switch statement.
-
-Its code:
-     ```
-     case 'key':
-        if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-            that.statusFields.push([blk, 'key']);
-        } else {
-            that.blocks.blockList[blk].value = that.keySignature[turtle];
-        } 
-        break;
-    ```
+            case 'pop':
+                var block = that.blocks.blockList[blk];
+                if (turtle in that.turtleHeaps && that.turtleHeaps[turtle].length > 0) {
+                    block.value = that.turtleHeaps[turtle].pop();
+                } else {
+                    that.errorMsg(_('empty heap'));
+                    block.value = 0;
+                }
+                break;
 
 ## Assigning your block in [analytics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/analytics.js)
 
