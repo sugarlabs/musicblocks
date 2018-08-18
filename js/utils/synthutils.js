@@ -13,6 +13,8 @@ const POLYCOUNT = 3;
 
 var VOICENAMES = [
     //.TRANS: musical instrument
+    [_('piano'), 'piano', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
@@ -119,12 +121,13 @@ var SOUNDSAMPLESDEFINES = [
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare"
+    "samples/snare", "samples/piano"
 ]
 
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
 const SAMPLECENTERNO = {
+    'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'violin': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'cello': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'basse': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
@@ -333,6 +336,7 @@ function Synth() {
     this.loadSamples = function () {
         this.samplesManifest = {
             'voice': [
+                {'name': 'piano', 'data': PIANO_SAMPLE},
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
                 {'name': 'flute', 'data': FLUTE_SAMPLE},
@@ -914,6 +918,8 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
+	console.log(instrumentName);
+        console.log(notes);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
