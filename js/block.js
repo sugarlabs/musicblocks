@@ -1306,6 +1306,8 @@ function Block(protoblock, blocks, overrideName) {
         this._calculateBlockHitArea();
 
         this.container.on('mouseover', function (event) {
+            docById('contextWheelDiv').style.display = 'none';
+
             if (!that.blocks.logo.runningLilypond) {
                 document.body.style.cursor = 'pointer';
             }
@@ -1371,6 +1373,8 @@ function Block(protoblock, blocks, overrideName) {
         });
 
         this.container.on('mousedown', function (event) {
+            docById('contextWheelDiv').style.display = 'none';
+
             // Track time for detecting long pause...
             // but only for top block in stack.
             if (that.connections[0] == null) {
