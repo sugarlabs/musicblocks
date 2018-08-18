@@ -243,6 +243,10 @@ define(MYDEFINES, function (compatibility) {
         var paste = docById('paste');
         paste.style.visibility = 'hidden';
 
+        closeContextWheel = function () {
+            // docById('contextWheelDiv').style.display = 'none';
+        };
+
         piemenuContext = function (activeBlock) {
             if (activeBlock === null) {
                 return;
@@ -282,6 +286,7 @@ define(MYDEFINES, function (compatibility) {
                 wheel.navItems[4].setTooltip(_('Save stack'));
             }
 
+	    wheel.navItems[0].selected = false;
             // wheel.refreshWheel();
 
             wheel.navItems[0].navigateFunction = function () {
