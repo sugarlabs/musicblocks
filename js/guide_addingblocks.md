@@ -1,157 +1,190 @@
 # __How To Add BLocks__
-This document describes for developers how to add new blocks in support
-of additional functionality by changes to the
-core code of Turtle Blocks. 
 
+This document describes for developers how to add new blocks in
+support of additional functionality by changes to the core code of
+Music and Turtle Blocks.
 
-A complete block is made in two steps.
-Defining the new block in basicblocks.js  and the corresponding code to be run when the block is run in logo.js.
-
+A complete block is made in two steps: (1) defining the new block in
+basicblocks.js; and (2) and writing the corresponding code to be run
+when the block is run in logo.js.
 
 ## How to make your block a part of the main repository
 
- Make your own copy by cloning the official [respository](https://github.com/sugarlabs/musicblocks.git) 
- Create your block and make a pull request.
+1. Make your own copy of the musicblocks git repository by cloning the
+official [respository](https://github.com/sugarlabs/musicblocks.git)
 
+2. Create your block and make a pull request.
 
 ## How to create new blocks
 All blocks are present in a simple format.
 
-For most blocks, there are two files that need to be edited in order to add a block: `[basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)` and `[logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)`. `basicblocks.js` is where the block is defined, its palette assigned, its shape and label defined, and any default arguments assigned. logo.js is where the code associated with running the block is defined.
+For most blocks, there are two files that need to be edited in order
+to add a block:
+[basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
+and
+[logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js).
+`basicblocks.js` is where the block is defined, its palette assigned,
+its shape and label defined, and any default arguments
+assigned. `logo.js` is where the code associated with running the
+block is defined.
 
-1) Define the type of block
+1. Define the type of block.
   
-   `var uniquenameBlock = new protoBlock('uniquename');`
+   `var newblock = new protoBlock('uniquename');`
   
-   This creates a new instance of the class protoBlock which is used to create a new block.
+   This creates a new instance of the class protoBlock which is used
+   to create a new block. Unique name cannot match the name of any
+   other block.
    
-2)  Assign a palette to the block
+2. Assign the block to a palette.
   
-    `uniquenameBlock.palette = palettes.dict['character'];`
-    Here character can be pitch,tone,rythm etc.. Colour of the block is decided by the palette used.
+   `newlock.palette = palettes.dict['palettename'];`
 
+   Palettename can be pitch, tone, rythm, etc. The color of the block
+   is determined by the palette to which it is assigned. A complete
+   list of available palettes is found in
+   [turtledef.js](https://github.com/sugarlabs/musicblocks/blob/master/js/turtledefs.js).
 
-3)  To add block to the protoblock dictionary
+3. To add block to the protoblock dictionary.
     
-    `blocks.protoBlockDict['uniquename'] = uniquenameBlock;`
+    `blocks.protoBlockDict['uniquename'] = newblock;`
 
-
-4)  Decide whether the block should appear on the palette. 
+4. Decide whether the block should appear on the palette. 
    
-     `uniquenameBlock.hidden = true;`
+     `newblock.hidden = true;`
      
-     This is a hidden flag used to hide such a block.
+     When true, the block is not shown on the palette. (Generally, you
+     would not use this feature.)
   
-  
-5)  Define the required properties of the block
+5. Define the required properties of the block.
      
      Here are some examples of properties you can add to the block:
      
-     1. Add static labels to the block
-        `uniquenameBlock.staticLabels.push(_('label'));` 
-     2. Adjust width of block to label size
-        `uniquenameBlock.adjustWidthToLabel()`
+     * Add static labels to the block with `newblock.staticLabels.push(_('label'));` 
+     * Adjust width of block to label size with `newblock.adjustWidthToLabel()`
 
-  
-  check the available properties on [protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js)
-  and depending on your needs you can add more features and properties.
+  You can check the available properties on
+  [protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js).
+  Depending on your needs, you can add more features and properties.
 
- Macro expansions
+6. Macro expansions
+
+ Sometimes it is desirable to expand a block into a stack of blocks
+ upon loading. For example, when you load a `note value` block, you
+ also get a pitch block included. We do this by defining `macros`.
 
  To add a macro:
+
  (1) you need to ensure that there is a block defined in
- basicblocks.js;
+ `basicblocks.js`;
+ 
  (2) add an entry in BLOCKISMACRO array in the blockIsMacro function
  below with the block name from basicblocks.js;
+
  (3) define the macro (the JSON representation of the blocks that
  the macro expands to, where the position is specified as x, y); and
- (4) add an entry to the BUILTINMACROS dictionary.  
 
+ (4) add an entry to the BUILTINMACROS dictionary.  
 
 #### Example
   ```
-    var squareBlock = new ProtoBlock('square');
-    squareBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['square'] = squareBlock;
-    squareBlock.hidden = true;
+    var newblock = new ProtoBlock('square');
+    newblock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['square'] = newblock;
+    newblock.hidden = true;
     //.TRANS: square wave
-    squareBlock.staticLabels.push(_('square'));
-    squareBlock.adjustWidthToLabel();
-    squareBlock.oneArgBlock();
-    squareBlock.defaults.push(440);
+    newblock.staticLabels.push(_('square'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.defaults.push(440);
   ```
 
-## Functioning of the block in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
+## Making your block do something.
+
+Once you create a block, you will want to associate some functionality
+to it. This is done in
+[logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js).
      
-      
-    Now here you expalin how your block works.
-    First decide which way your block goes , horizontally or vertically; foe ex: the 'setcolor' block joins the code vertically wand the the no. which represents a color goes horizontally.
-    Now find a switch statement which is appropriate for your block then add the case statement .In the case add the code realted to your block.
+There are two different places to add your code, depending upon
+whether you block is a `flow` block, with in-flow and out-flow
+connections for vertical connections, or an `arg` block, which only
+connects horizonally into flow blocks or other arg blocks. For
+example, the `setcolor' block is a flow block that can connect
+veritcally in a stack of blocks. The number block that connects to it
+horizontally is an arg block.
+
+There are two switch statements in `logo.js`, one for flow blocks
+and one for arg blocks. Be sure to add your code to the proper
+switch statement.
+
      `case 'uniquename':`
-     Here the uniquename is the same as the one in basicblocks.js.
+          Here the uniquename is the same as the one in basicblocks.js.
+	  `break;`
 
 #### Example
        
-       A flow block is 'status' , it is mentioned in the (that.blocks.blockList[blk].name) switch statement
+The `status` block is a flow block.
 
-       Its code-
-        ```
+Its code:
+       ```
        case 'status':
-      if (that.statusMatrix == null) {
-        that.statusMatrix = new StatusMatrix();
-      }
-      that.statusMatrix.init(that);
-      that.statusFields = [];
-      if (args.length === 1) {
-        childFlow = args[0];
-        childFlowCount = 1;
-      }
-      that.inStatusMatrix = true;
-      var listenerName = '_status_' + turtle;
-      that._setDispatchBlock(blk, turtle, listenerName);
-      var __listener = function (event) {
-        that.statusMatrix.init(that);
-        that.inStatusMatrix = false;
-      }
-      that._setListener(turtle, listenerName, __listener);
-      break;
-        ```
+          if (that.statusMatrix == null) {
+            that.statusMatrix = new StatusMatrix();
+          }
+
+          that.statusMatrix.init(that);
+          that.statusFields = [];
+          if (args.length === 1) {
+              childFlow = args[0];
+              childFlowCount = 1;
+          }
+
+          that.inStatusMatrix = true;
+          var listenerName = '_status_' + turtle;
+          that._setDispatchBlock(blk, turtle, listenerName);
+          var __listener = function (event) {
+            that.statusMatrix.init(that);
+            that.inStatusMatrix = false;
+         }
+
+         that._setListener(turtle, listenerName, __listener);
+         break;
+     ```
 
 
-       An arg block is 'key' , it is mentioned in the  (that.blocks.blockList[blk].name) switch statement.
+An arg block is 'key' , it is mentioned in the  (that.blocks.blockList[blk].name) switch statement.
 
-        Its code -
-         ```
-          case 'key':
+Its code:
+     ```
+     case 'key':
         if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-          that.statusFields.push([blk, 'key']);
+            that.statusFields.push([blk, 'key']);
         } else {
-          that.blocks.blockList[blk].value = that.keySignature[turtle];
+            that.blocks.blockList[blk].value = that.keySignature[turtle];
         } 
         break;
-        ```
-
+    ```
 
 ## Assigning your block in [analytics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/analytics.js)
 
-    Here you assign a block according to its bin.
-    Check which bin belongs to which pallete, and then according to assign your block to the bin
-    Example  
-            ```
-              'forward': 'forward',
-              'back': 'forward','
-            ``` 
-    Here both forward and backward blocks are mentioned together,they are both responsible for movement;sos 
-     
+Here you assign a block according to its bin.
 
+Check which bin belongs to which pallete, and then according to assign your block to the bin.
+
+Example:
+    ```
+    'forward': 'forward', 'back': 'forward','
+    ```
+
+Here both forward and backward blocks are mentioned together,they are
+both responsible for movement;sos
+     
 ## References
 Sample block artwork
-![Empty block](https://github.com/sugarlabs/musicblocks/blob/master/images/emptybox.svg)
 
-![Current pitch name](https://github.com/sugarlabs/musicblocks/blob/master/documentation/currentpitchname.svg)												
+![pitch name](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/pitchname.svg)
 
-![Note](https://github.com/sugarlabs/musicblocks/blob/master/documentation/note.svg)																	
-
+![note value](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/notevalue.svg)
 
 Valid blocks styles in turtleblocksjs:
 * `zeroArgBlock`: E.g., penup, pendown
@@ -162,7 +195,7 @@ Valid blocks styles in turtleblocksjs:
 * `oneArgMathWithLabelBlock`: E.g., box
 * `twoArgMathBlock`: E.g., plus, minus, multiply, divide. These are also expandable.
 * `valueBlock`: E.g., number, string. Value blocks get DOM textareas associated with them so their values can be edited by the user.
-* `mediuniquenameBlock`: E.g., media. Media blocks invoke a chooser and a thumbnail image is overlayed to represent the data associated with the block.
+* `mediaBlock`: E.g., media. Media blocks invoke a chooser and a thumbnail image is overlayed to represent the data associated with the block.
 * `flowClampZeroArgBlock`: E.g., start. A "child" flow is docked in an expandable clamp. There are no additional arguments and no flow above or below.
 * `flowClampOneArgBlock`: E.g., repeat. Unlike action, there is a flow above and below.
 * `flowClampBooleanArgBlock`: E.g., if.  A "child" flow is docked in an expandable clamp. The additional argument is a boolean. There is flow above and below.
