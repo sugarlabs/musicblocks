@@ -1349,7 +1349,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 } else {
-                    if (!that.blocks.getLongPressStatus()) {
+                    if (!that.blocks.getLongPressStatus() && !that.blocks.rightClick) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
                         if (_THIS_IS_MUSIC_BLOCKS_) {

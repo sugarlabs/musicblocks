@@ -315,14 +315,20 @@ define(MYDEFINES, function (compatibility) {
                     blocks.saveStack();
                 };
             }
+
+            setTimeout(function () {
+                blocks.rightClick = false;
+            }, 500);
         };
 
         // Do something on right click
         document.addEventListener("contextmenu", function(e) {
             if (blocks.activeBlocks === null) {
+                blocks.rightClick = false;
                 return;
             }
 
+            blocks.rightClick = true;
             var activeBlock = blocks.activeBlock;
 
             e.preventDefault();

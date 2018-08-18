@@ -40,6 +40,8 @@ function Blocks () {
     this.updateStage = null;
     this.getStageScale = null;
     this.contextMenu = null;
+    // Did the user right cick?
+    this.rightClick = false;
 
     // We keep a list of stacks in the trash.
     this.trashStacks = [];
@@ -122,7 +124,7 @@ function Blocks () {
     };
 
     this.setContextMenu = function (contextMenu) {
-	this.contextMenu = contextMenu;
+        this.contextMenu = contextMenu;
         return this;
     };
 
@@ -1715,17 +1717,17 @@ function Blocks () {
             var label = _(TEMPERAMENTS[0][1]);  // equal by default
             for (var i = 0; i < TEMPERAMENTS.length; i++) {
                 if (TEMPERAMENTS[i][1] === myBlock.value) {
-		    label = TEMPERAMENTS[i][0];
-		    break;
-		}
-	    }
+                    label = TEMPERAMENTS[i][0];
+                    break;
+                }
+            }
             break;
         case 'boolean':
             if (myBlock.value) {
                 var label = _('true');
-	    } else {
+            } else {
                 var label = _('false');
-	    }
+            }
 
             break;
         default:
@@ -2160,22 +2162,22 @@ function Blocks () {
                 that.blockList[thisBlock].text.text = _(value);
                 break;
             case 'temperamentname':
-		that.blockList[thisBlock].text.text = _(TEMPERAMENTS[0][1]);
-		for (var i = 0; i < TEMPERAMENTS.length; i++) {
+                that.blockList[thisBlock].text.text = _(TEMPERAMENTS[0][1]);
+                for (var i = 0; i < TEMPERAMENTS.length; i++) {
                     if (TEMPERAMENTS[i][1] === value) {
-			that.blockList[thisBlock].text.text = TEMPERAMENTS[i][0];
-			break;
-		    }
-		}
-		break;
+                        that.blockList[thisBlock].text.text = TEMPERAMENTS[i][0];
+                        break;
+                    }
+                }
+                break;
             case 'boolean':
                 if (value) {
                     that.blockList[thisBlock].text.text = _('true');
-		} else {
+                } else {
                     that.blockList[thisBlock].text.text = _('false');
-		}
+                }
 
-		break;
+                break;
             default:
                 that.blockList[thisBlock].text.text = value;
                 break;
