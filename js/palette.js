@@ -1283,8 +1283,9 @@ function Palette(palettes, name) {
                         bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / image.height * (b.scale / 2);
                     }
                     that.protoContainers[modname].addChild(bitmap);
-                    bitmap.x = MEDIASAFEAREA[0] * (b.scale / 2);
-                    bitmap.y = MEDIASAFEAREA[1] * (b.scale / 2);
+                    bitmap.x = Math.floor((MEDIASAFEAREA[0] * (b.scale / 2)) + 0.5);
+		    
+                    bitmap.y = Math.floor((MEDIASAFEAREA[1] * (b.scale / 2)) + 0.5);
                     __calculateBounds(palette, blk, modname, protoListBlk);
                 };
 
@@ -1324,8 +1325,8 @@ function Palette(palettes, name) {
                 this.protoContainers[b.modname] = new createjs.Container();
                 this.protoContainers[b.modname].snapToPixelEnabled = true;
 
-                this.protoContainers[b.modname].x = this.menuContainer.x;
-                this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
+                this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
+                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT + 0.5);
                 this.palettes.stage.addChild(this.protoContainers[b.modname]);
                 this.protoContainers[b.modname].visible = false;
 
@@ -1339,8 +1340,8 @@ function Palette(palettes, name) {
                 // argument.
                 makePaletteBitmap(this, PALETTEFILLER.replace(/filler_height/g, b.height.toString()), b.modname, __processFiller, [b, blk, this.protoList[blk]]);
             } else {
-                this.protoContainers[b.modname].x = this.menuContainer.x;
-                this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
+                this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
+                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT + 0.5);
                 this.protoHeights[b.modname] = b.actualHeight;
                 this.y += Math.ceil(b.actualHeight * PROTOBLOCKSCALE);
             }

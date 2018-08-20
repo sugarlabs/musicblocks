@@ -576,8 +576,8 @@ function Blocks () {
                 var lastDock = last(thisBlock.docks);
                 var dx = lastDock[0] - vspaceBlock.docks[0][0];
                 var dy = lastDock[1] - vspaceBlock.docks[0][1];
-                vspaceBlock.container.x = thisBlock.container.x + dx;
-                vspaceBlock.container.y = thisBlock.container.y + dy;
+                vspaceBlock.container.x = Math.floor(thisBlock.container.x + dx + 0.5);
+                vspaceBlock.container.y = Math.floor(thisBlock.container.y + dy + 0.5);
                 vspaceBlock.connections[0] = that.blockList.indexOf(thisBlock);
                 vspaceBlock.connections[1] = nextBlock;
                 thisBlock.connections[thisBlock.connections.length - 1] = vspace;
@@ -753,16 +753,16 @@ function Blocks () {
                 if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
                 } else {
-                    var nx = myBlock.container.x + dx;
-                    var ny = myBlock.container.y + dy;
+                    var nx = Math.floor(myBlock.container.x + dx + 0.5);
+                    var ny = Math.floor(myBlock.container.y + dy + 0.5);
                 }
                 this._moveBlock(cblk, nx, ny);
             } else {
                 // or it's parent.
                 var dx = cdock[0] - bdock[0];
                 var dy = cdock[1] - bdock[1];
-                var nx = this.blockList[cblk].container.x + dx;
-                var ny = this.blockList[cblk].container.y + dy;
+                var nx = Math.floor(this.blockList[cblk].container.x + dx + 0.5);
+                var ny = Math.floor(this.blockList[cblk].container.y + dy + 0.5);
                 this._moveBlock(blk, nx, ny);
             }
 
