@@ -1617,12 +1617,12 @@ function Blocks () {
         // Move a block (and its label) to x, y.
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
-            myBlock.container.x = x;
-            myBlock.container.y = y;
+            myBlock.container.x = Math.floor(x + 0.5);
+            myBlock.container.y = Math.floor(y + 0.5);
 
             if (myBlock.collapseContainer != null) {
-                myBlock.collapseContainer.x = x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
-                myBlock.collapseContainer.y = y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
+                myBlock.collapseContainer.x = Math.floor(x + 0.5) + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
+                myBlock.collapseContainer.y = Math.floor(y + 0.5) + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
 
             this.checkBounds();
@@ -1639,12 +1639,12 @@ function Blocks () {
 
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
-            myBlock.container.x += dx;
-            myBlock.container.y += dy;
+            myBlock.container.x += Math.floor(dx + 0.5);
+            myBlock.container.y += Math.floor(dy + 0.5);
 
             if (myBlock.collapseContainer != null) {
-                myBlock.collapseContainer.x += dx;
-                myBlock.collapseContainer.y += dy;
+                myBlock.collapseContainer.x += Math.floor(dx + 0.5);
+                myBlock.collapseContainer.y += Math.floor(dy + 0.5);
             }
 
             this.checkBounds();
@@ -4245,8 +4245,8 @@ function Blocks () {
 
             if (thisBlock === this.blockList.length - 1) {
                 if (this.blockList[thisBlock].connections[0] == null) {
-                    this.blockList[thisBlock].container.x = blkData[2];
-                    this.blockList[thisBlock].container.y = blkData[3];
+                    this.blockList[thisBlock].container.x = Math.floor(blkData[2] + 0.5);
+                    this.blockList[thisBlock].container.y = Math.floor(blkData[3] + 0.5);
                     this._adjustTheseDocks.push(thisBlock);
                     if (blkData[4][0] == null) {
                         this._adjustTheseStacks.push(thisBlock);
@@ -4314,8 +4314,8 @@ function Blocks () {
 
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].collapseContainer != null) {
-                this.blockList[blk].collapseContainer.x = this.blockList[blk].container.x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
-                this.blockList[blk].collapseContainer.y = this.blockList[blk].container.y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
+                this.blockList[blk].collapseContainer.x = Math.floor((this.blockList[blk].container.x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2)) + 0.5);
+                this.blockList[blk].collapseContainer.y = Math.floor((this.blockList[blk].container.y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2)) + 0.5);
             }
         }
 

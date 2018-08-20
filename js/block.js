@@ -1057,30 +1057,30 @@ function Block(protoblock, blocks, overrideName) {
         this.text.textAlign = 'right';
         var fontSize = 10 * blockScale;
         this.text.font = fontSize + 'px Sans';
-        this.text.x = TEXTX * blockScale / 2.;
-        this.text.y = TEXTY * blockScale / 2.;
+        this.text.x = Math.floor((TEXTX * blockScale / 2.) + 0.5);
+        this.text.y = Math.floor((TEXTY * blockScale / 2.) + 0.5);
 
         // Some special cases
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
-            this.text.x = VALUETEXTX * blockScale / 2.;
+            this.text.x = Math.floor((VALUETEXTX * blockScale / 2.) + 0.5);
             if (EXTRAWIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 3.0;
             } else if (WIDENAMES.indexOf(this.name) !== -1) {
-                this.text.x *= 1.75;
+                this.text.x = Math.floor((this.text.x * 1.75) + 0.5);
             } else if (this.name === 'text') {
-                this.text.x = this.width / 2;
+                this.text.x = Math.floor((this.width / 2) + 0.5);
             }
         } else if (this.name === 'nameddo') {
             this.text.textAlign = 'center';
-            this.text.x = this.width / 2;
+            this.text.x = Math.floor((this.width / 2) + 0.5);
         } else if (this.protoblock.args === 0) {
             var bounds = this.container.getBounds();
-            this.text.x = this.width - 25;
+            this.text.x = Math.floor(this.width - 25 + 0.5);
         } else {
             this.text.textAlign = 'left';
             if (this.docks[0][2] === 'booleanout') {
-                this.text.y = this.docks[0][1];
+                this.text.y = Math.floor(this.docks[0][1] + 0.5);
             }
         }
 
@@ -1112,8 +1112,8 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._positionCollapseLabel = function (blockScale) {
-        this.collapseText.x = COLLAPSETEXTX * blockScale / 2;
-        this.collapseText.y = COLLAPSETEXTY * blockScale / 2;
+        this.collapseText.x = Math.floor((COLLAPSETEXTX * blockScale / 2) + 0.5);
+        this.collapseText.y = Math.floor((COLLAPSETEXTY * blockScale / 2) + 0.5);
 
         // Ensure text is on top.
         z = this.container.children.length - 1;
@@ -1121,8 +1121,8 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._positionCollapseContainer = function (blockScale) {
-        this.collapseContainer.x = this.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2);
-        this.collapseContainer.y = this.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2);
+        this.collapseContainer.x = Math.floor((this.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2)) + 0.5);
+        this.collapseContainer.y = Math.floor((this.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2)) + 0.5);
     };
 
     // These are the event handlers for collapsible blocks.
