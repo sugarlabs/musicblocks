@@ -262,7 +262,8 @@ define(MYDEFINES, function (compatibility) {
                     'imgsrc:header-icons/empty-trash-button.svg',
                     'imgsrc:header-icons/cancel-button.svg'];
 
-            if (blocks.blockList[activeBlock].name === 'action') {
+            var topBlock = blocks.findTopBlock(activeBlock);
+            if (blocks.blockList[topBlock].name === 'action') {
                 labels.push('imgsrc:header-icons/save-blocks-button.svg');
             }
 
@@ -282,7 +283,7 @@ define(MYDEFINES, function (compatibility) {
             wheel.navItems[1].setTooltip(_('Paste'));
             wheel.navItems[2].setTooltip(_('Move to trash'));
             wheel.navItems[3].setTooltip(_('Close'));
-            if (blocks.blockList[activeBlock].name === 'action') {
+            if (blocks.blockList[topBlock].name === 'action') {
                 wheel.navItems[4].setTooltip(_('Save stack'));
             }
 
