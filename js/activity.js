@@ -258,9 +258,10 @@ define(MYDEFINES, function (compatibility) {
             docById('contextWheelDiv').style.left = ((blocks.getStageScale() * blocks.blockList[activeBlock].container.x) - 150) + 'px';
             docById('contextWheelDiv').style.top = ((blocks.getStageScale() * blocks.blockList[activeBlock].container.y) - 150) + 'px';
             labels = ['imgsrc:header-icons/copy-button.svg',
-                    'imgsrc:header-icons/paste-disabled-button.svg',
-                    'imgsrc:header-icons/empty-trash-button.svg',
-                    'imgsrc:header-icons/cancel-button.svg'];
+                      'imgsrc:header-icons/paste-disabled-button.svg',
+                      'imgsrc:header-icons/extract-button.svg',
+                      'imgsrc:header-icons/empty-trash-button.svg',
+                      'imgsrc:header-icons/cancel-button.svg'];
 
             var topBlock = blocks.findTopBlock(activeBlock);
             if (blocks.blockList[topBlock].name === 'action') {
@@ -281,10 +282,11 @@ define(MYDEFINES, function (compatibility) {
 
             wheel.navItems[0].setTooltip(_('Copy'));
             wheel.navItems[1].setTooltip(_('Paste'));
-            wheel.navItems[2].setTooltip(_('Move to trash'));
-            wheel.navItems[3].setTooltip(_('Close'));
+            wheel.navItems[2].setTooltip(_('Extract'));
+            wheel.navItems[3].setTooltip(_('Move to trash'));
+            wheel.navItems[4].setTooltip(_('Close'));
             if (blocks.blockList[topBlock].name === 'action') {
-                wheel.navItems[4].setTooltip(_('Save stack'));
+                wheel.navItems[5].setTooltip(_('Save stack'));
             }
 
             wheel.navItems[0].selected = false;
@@ -302,16 +304,21 @@ define(MYDEFINES, function (compatibility) {
             };
 
             wheel.navItems[2].navigateFunction = function () {
+                blocks.activeBlock = activeBlock;
+		blocks.extract();
+	    };
+
+            wheel.navItems[3].navigateFunction = function () {
                 blocks.sendStackToTrash(blocks.blockList[activeBlock]);
                 docById('contextWheelDiv').style.display = 'none';
             };
 
-            wheel.navItems[3].navigateFunction = function () {
+            wheel.navItems[4].navigateFunction = function () {
                 docById('contextWheelDiv').style.display = 'none';
             };
 
             if (blocks.blockList[activeBlock].name === 'action') {
-                wheel.navItems[4].navigateFunction = function () {
+                wheel.navItems[5].navigateFunction = function () {
                     blocks.activeBlock = activeBlock;
                     blocks.saveStack();
                 };

@@ -254,6 +254,7 @@ function Blocks () {
 
             blkObj.connections[0] = null;
             blkObj.connections[blkObj.connections.length - 1] = null;
+
             if (firstConnection != null) {
                 this.blockList[firstConnection].connections[connectionIdx] = lastConnection;
             }
@@ -269,7 +270,7 @@ function Blocks () {
                 this.blockMoved(firstConnection);
                 this.adjustDocks(firstConnection, true);
                 if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
-                    this.clampThisToCheck = [[firstConnection, 0]];
+		    this.clampBlocksToCheck = [[firstConnection, 0]];
                     this.adjustExpandableClampBlock();
                 }
             }
