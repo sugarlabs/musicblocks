@@ -81,6 +81,8 @@ function Palettes () {
     this.x = null;
     this.y = null;
     this.container = null;
+    this.showSearchWidget = null;
+    this.hideSearchWidget = null;
 
     this.pluginMacros = {};  // some macros are defined in plugins
 
@@ -159,6 +161,29 @@ function Palettes () {
         this.macroDict = obj;
 
         return this;
+    };
+
+    this.setSearch = function (show, hide) {
+        this.showSearchWidget = show;
+        this.hideSearchWidget = hide;
+
+        return this;
+    }
+
+    this.getSearchPos = function () {
+        var hkey = "";
+        var hy = null;
+        for (var key in this.dict["action"].protoContainers){
+            if (!this.dict["action"].protoContainers.hasOwnProperty(key)) continue;
+            if (hy==null){
+                hy=this.dict["action"].protoContainers[key].y;
+                hkey=key;
+            } else if (this.dict["action"].protoContainers[key].y<hy){
+                hy=this.dict["action"].protoContainers[key].y;
+                hkey = key;
+            }
+        }
+        return [this.dict["action"].protoContainers[hkey].x, this.dict["action"].protoContainers[hkey].y-40];
     };
 
     this.getPluginMacroExpansion = function (blkname, x, y) {
@@ -330,6 +355,19 @@ function Palettes () {
             return;
         }
 
+        if (name=="search"&&this.showSearchWidget!=null){
+            for (var i in this.dict) {
+                if (this.dict[i].visible) {
+                    this.dict[i].hideMenu();
+                    this.dict[i]._hideMenuItems();
+                }
+            }
+            console.log('searching');
+            this.dict[name].visible=true;
+            this.showSearchWidget(true);
+            return;
+        }
+        this.hideSearchWidget(true);
         for (var i in this.dict) {
             if (this.dict[i] === this.dict[name]) {
                 this.dict[name]._resetLayout();
@@ -379,6 +417,8 @@ function Palettes () {
         for (var name in this.dict) {
             this.dict[name].hideMenu();
         }
+
+        this.hideSearchWidget(true);
 
         if (this.upIndicator != null) {
             this.upIndicator.visible = false;
@@ -1391,6 +1431,9 @@ function Palette(palettes, name) {
     };
 
     this.hideMenu = function () {
+        if (this.name == 'search'&&this.hideSearchWidget!=null){
+            this.hideSearchWidget(true);
+        }
         this.palettes.paletteVisible = false;
         if (this.menuContainer != null) {
             this.menuContainer.visible = false;
@@ -1418,6 +1461,10 @@ function Palette(palettes, name) {
     };
 
     this._hideMenuItems = function () {
+        if (this.name == 'search'&&this.hideSearchWidget!=null){
+            this.hideSearchWidget(true);
+        }
+
         for (var i in this.protoContainers) {
             this.protoContainers[i].visible = false;
         }
