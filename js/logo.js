@@ -5451,7 +5451,7 @@ function Logo () {
                 arg = args[0];
             }
 
-            if (args0 > 0) {
+            if (args > 0) {
                 var i = Math.floor(arg);
             } else {
                 var i = Math.ceil(arg);
