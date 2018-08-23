@@ -1319,7 +1319,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var defineFrequencyBlock = new ProtoBlock('definefrequency');
     defineFrequencyBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['definefrequency'] = defineFrequencyBlock;
-    defineFrequencyBlock.staticLabels.push(_('define Frequency'));
+    defineFrequencyBlock.staticLabels.push(_('define frequency'));
     defineFrequencyBlock.adjustWidthToLabel();
     defineFrequencyBlock.flowClampOneArgBlock();
     defineFrequencyBlock.hidden = true;
@@ -1890,14 +1890,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
     setTemperamentBlock.staticLabels.push(_('set temperament'));
     setTemperamentBlock.staticLabels.push(_('temperament'));
-    setTemperamentBlock.staticLabels.push(_('reference note'), _('octave'));
+    setTemperamentBlock.staticLabels.push(_('reference pitch'), _('octave'));
     setTemperamentBlock.adjustWidthToLabel();
     setTemperamentBlock.threeArgBlock();
 
     var octaveSpaceBlock = new ProtoBlock('octavespace');
     octaveSpaceBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['octavespace'] = octaveSpaceBlock;
-    octaveSpaceBlock.staticLabels.push(_('Octave Space'));
+    octaveSpaceBlock.staticLabels.push(_('octave space'));
     octaveSpaceBlock.adjustWidthToLabel();
     octaveSpaceBlock.oneArgBlock();
     octaveSpaceBlock.hidden = true; 
