@@ -196,6 +196,10 @@ function Block(protoblock, blocks, overrideName) {
                 this.highlightBitmap.visible = false;
             }
         } else {
+            if (this.bitmap === null) {
+		return;
+	    }
+
             this.bitmap.visible = true;
             this.highlightBitmap.visible = false;
             if (COLLAPSABLES.indexOf(this.name) !== -1) {

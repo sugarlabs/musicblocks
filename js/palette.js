@@ -174,7 +174,7 @@ function Palettes () {
     }
 
     this.getSearchPos = function () {
-        return [50, 55];
+        return [50 * PALETTE_SCALE_FACTOR, 55];
     };
 
     this.getPluginMacroExpansion = function (blkname, x, y) {

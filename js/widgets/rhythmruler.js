@@ -1782,6 +1782,7 @@ function RhythmRuler () {
     };
 
     this._piemenuRuler = function (selectedRuler) {
+	return;  // In progress
         // piemenu version of ruler
         docById('wheelDiv2').style.display = '';
         docById('wheelDiv2').style.position = 'absolute';
