@@ -13,7 +13,8 @@
 
 const PROTOBLOCKSCALE = 1.0;
 const PALETTELEFTMARGIN = 10;
-
+const PALETTE_SCALE_FACTOR = 1.0;
+const PALETTE_WIDTH_FACTOR = 3;
 
 function maxPaletteHeight(menuSize, scale) {
     // Palettes don't start at the top of the screen and the last
@@ -56,10 +57,11 @@ function Palettes () {
     this.refreshCanvas = null;
     this.stage = null;
     this.cellSize = null;
+    this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
     this.scrollDiff = 0;
     this.originalSize = 55;  // this is the original svg size
     this.trashcan = null;
-    this.initial_x = 55;
+    this.initial_x = 55 * PALETTE_WIDTH_FACTOR;
     this.initial_y = 55;
     this.firstTime = true;
     this.background = null;
@@ -68,7 +70,8 @@ function Palettes () {
     this.downIndicator = null;
     this.downIndicatorStatus = true;
     this.circles = {};
-    this.palette_text = new createjs.Text('', '20px Arial', '#ff7700');
+    // paletteText is used for the highlighted tooltip
+    this.paletteText = new createjs.Text('', '20px Arial', '#ff7700');
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
@@ -93,11 +96,12 @@ function Palettes () {
     // The collection of palettes.
     this.dict = {};
     this.buttons = {};  // The toolbar button for each palette.
+    this.labels = {};  // The label for each button.
 
     this.init = function () {
         this.halfCellSize = Math.floor(this.cellSize / 2);
         this.x = 0;
-        this.y = this.cellSize;
+        this.y = this.cellSize / PALETTE_SCALE_FACTOR;
 
         this.container = new createjs.Container();
         this.container.snapToPixelEnabled = true;
@@ -125,7 +129,7 @@ function Palettes () {
     };
 
     this.setSize = function (size) {
-        this.cellSize = size;
+        this.cellSize = Math.floor((size * PALETTE_SCALE_FACTOR) + 0.5);
         return this;
     };
 
@@ -175,7 +179,8 @@ function Palettes () {
     this.menuScrollEvent = function (direction, scrollSpeed) {
         var keys = Object.keys(this.buttons);
         var diff = direction * scrollSpeed;
-        if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
+        // if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
+        if (this.buttons[keys[0]].y + diff > 55 && direction > 0) {
             this.upIndicator.visible = false;
             this.upIndicatorStatus = this.upIndicator.visible;
             this.refreshCanvas();
@@ -185,7 +190,8 @@ function Palettes () {
             this.upIndicator.visible = true;
         }
 
-        if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
+        // if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
+	if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - 55 && direction < 0) {
             this.downIndicator.visible = false;
             this.downIndicatorStatus = this.downIndicator.visible;
             this.refreshCanvas();
@@ -200,6 +206,8 @@ function Palettes () {
         for (var name in this.buttons) {
             this.buttons[name].y += diff;
             this.buttons[name].visible = true;
+            this.labels[name].y += diff;
+            this.labels[name].visible = true;
         }
 
         this._updateButtonMasks();
@@ -217,9 +225,9 @@ function Palettes () {
     };
 
     this.hidePaletteIconCircles = function () {
-        // palette_text might not be defined yet.
+        // paletteText might not be defined yet.
         if (!sugarizerCompatibility.isInsideSugarizer()) {
-            hidePaletteNameDisplay(this.palette_text, this.stage);
+            hidePaletteNameDisplay(this.paletteText, this.stage);
         }
 
         hideButtonHighlight(this.circles, this.stage);
@@ -239,8 +247,8 @@ function Palettes () {
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            shape.graphics.f('#a2c5d8').r(0, 0, 55, windowHeight()).ef();
-            shape.width = 55;
+            shape.graphics.f('#a2c5d8').r(0, 0, this.paletteWidth, windowHeight()).ef();
+            shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
             this.background = shape;
@@ -249,7 +257,7 @@ function Palettes () {
         function __processUpIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
-            bitmap.x = 55;
+            bitmap.x = 55 * PALETTE_WIDTH_FACTOR - 55 * bitmap.scale;
             bitmap.y = 55;
             bitmap.visible = false;
             palettes.upIndicator = bitmap;
@@ -263,7 +271,7 @@ function Palettes () {
         function __processDownIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
-            bitmap.x = 55;
+            bitmap.x = 55 * PALETTE_WIDTH_FACTOR - 55 * bitmap.scale;
             bitmap.y = (windowHeight() / palettes.scale) - 27;
 
             bitmap.visible = true;
@@ -306,6 +314,14 @@ function Palettes () {
             that.dict[name].makeMenu(true);
             that.dict[name]._moveMenu(that.cellSize, that.cellSize);
             that.dict[name]._updateMenu(false);
+
+            /*add tooltip for palette buttons*/
+            that.labels[name] = new createjs.Text(_(name), '20px Arial', '#808080');
+            var r = that.cellSize / 2;
+            that.labels[name].x = that.buttons[name].x + 2.2 * r;
+            that.labels[name].y = that.buttons[name].y + r / 2;
+            that.stage.addChild(that.labels[name]);
+
             that._loadPaletteButtonHandler(name);
         };
 
@@ -352,6 +368,9 @@ function Palettes () {
 
         for (var name in this.buttons) {
             this.buttons[name].visible = true;
+            if (name in this.labels) {
+		this.labels[name].visible = true;
+	    }
         }
 
         if (this.background != null) {
@@ -374,6 +393,7 @@ function Palettes () {
         // Hide the menu buttons and the palettes themselves.
         for (var name in this.buttons) {
             this.buttons[name].visible = false;
+            this.labels[name].visible = false;
         }
 
         for (var name in this.dict) {
@@ -459,11 +479,13 @@ function Palettes () {
         }
 
         this.buttons[name].removeAllChildren();
+        this.labels[name].removeAllChildren();
         var btnKeys = Object.keys(this.dict);
         for (var btnKey = btnKeys.indexOf(name) + 1; btnKey < btnKeys.length; btnKey++) {
             this.buttons[btnKeys[btnKey]].y -= this.cellSize;
         }
         delete this.buttons[name];
+        delete this.labels[name];
         delete this.dict[name];
         this.y -= this.cellSize;
         this.makePalettes(true);
@@ -532,17 +554,17 @@ function Palettes () {
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
             /*add tooltip for palette buttons*/
-            that.palette_text = new createjs.Text(_(name), '20px Arial', 'black');
-            that.palette_text.x = that.buttons[name].x + 2.2 * r;
-            that.palette_text.y = that.buttons[name].y + 5 * r / 8;
-            that.stage.addChild(that.palette_text);
+            that.paletteText = new createjs.Text(_(name), '20px Arial', 'black');
+            that.paletteText.x = that.buttons[name].x + 2.2 * r;
+            that.paletteText.y = that.buttons[name].y + r / 2;
+            that.stage.addChild(that.paletteText);
         });
 
         this.buttons[name].on('pressup', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
             if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.palette_text, that.stage);
+                hidePaletteNameDisplay(that.paletteText, that.stage);
             }
 
             hideButtonHighlight(that.circles, that.stage);
@@ -552,7 +574,7 @@ function Palettes () {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
             if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.palette_text, that.stage);
+                hidePaletteNameDisplay(that.paletteText, that.stage);
             }
 
             hideButtonHighlight(that.circles, that.stage);
