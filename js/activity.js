@@ -305,8 +305,8 @@ define(MYDEFINES, function (compatibility) {
 
             wheel.navItems[2].navigateFunction = function () {
                 blocks.activeBlock = activeBlock;
-		blocks.extract();
-	    };
+                blocks.extract();
+            };
 
             wheel.navItems[3].navigateFunction = function () {
                 blocks.sendStackToTrash(blocks.blockList[activeBlock]);
@@ -423,8 +423,8 @@ define(MYDEFINES, function (compatibility) {
             palettes.initial_x = 55;
             palettes.initial_y = 55;
             palettes.updatePalettes();
-            var x = 100 * turtleBlocksScale;
-            var y = 50 * turtleBlocksScale;
+            var x = Math.floor(155 * turtleBlocksScale);
+            var y = Math.floor(55 * turtleBlocksScale);
             var even = true;
 
             // First start blocks
@@ -448,16 +448,17 @@ define(MYDEFINES, function (compatibility) {
                                 }
                             }
                         }
-                        x += 150 * turtleBlocksScale;
+
+                        x += Math.floor(150 * turtleBlocksScale);
                         if (x > (canvas.width - 200) / (turtleBlocksScale)) {
                             even = !even;
                             if (even) {
-                                x = 100 * turtleBlocksScale;
+                                x = Math.floor(155 * turtleBlocksScale);
                             } else {
-                                x = 150 * turtleBlocksScale;
+                                x = Math.floor(182 * turtleBlocksScale);
                             }
 
-                            y += 50 * turtleBlocksScale;
+                            y += Math.floor(42 * turtleBlocksScale);
                         }
                     }
                 }
@@ -1157,6 +1158,7 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 .setSize(cellSize)
                 .setTrashcan(trashcan)
+                .setSearch(showSearchWidget, hideSearchWidget)
                 .setBlocks(blocks)
                 .init();
 
@@ -1211,7 +1213,6 @@ define(MYDEFINES, function (compatibility) {
                 .setPlugins(doOpenPlugin)
                 .deletePlugins(deletePlugin)
                 .setStats(doAnalytics)
-                .setSearch(showSearchWidget, hideSearchWidget)
                 .setScroller(toggleScroller)
                 .setLanguage(doLanguageBox, languageBox)
                 .setOptimize(doOptimize);
@@ -2286,8 +2287,8 @@ define(MYDEFINES, function (compatibility) {
                 searchWidget.value = null;
                 docById('searchResults').style.visibility = 'visible';
                 searchWidget.style.visibility = 'visible';
-                searchWidget.style.left = (utilityBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
-                searchWidget.style.top = (utilityBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
+                searchWidget.style.left = (palettes.getSearchPos()[0] + 10) * turtleBlocksScale + 'px';
+                searchWidget.style.top = (palettes.getSearchPos()[1] + 10) * turtleBlocksScale + 'px';
 
                 searchBlockPosition = [100, 100];
 
@@ -2320,7 +2321,7 @@ define(MYDEFINES, function (compatibility) {
             if (searchInput.length > 0) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
-                        blocks.moveBlock(newBlock, searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
+                        blocks.moveBlock(newBlock, 100 + searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
                     });
 
                     // Move the position of the next newly created block.

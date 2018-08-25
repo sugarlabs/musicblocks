@@ -84,6 +84,8 @@ function Palettes () {
     this.x = null;
     this.y = null;
     this.container = null;
+    this.showSearchWidget = null;
+    this.hideSearchWidget = null;
 
     this.pluginMacros = {};  // some macros are defined in plugins
 
@@ -165,6 +167,16 @@ function Palettes () {
         return this;
     };
 
+    this.setSearch = function (show, hide) {
+        this.showSearchWidget = show;
+        this.hideSearchWidget = hide;
+        return this;
+    }
+
+    this.getSearchPos = function () {
+        return [50, 55];
+    };
+
     this.getPluginMacroExpansion = function (blkname, x, y) {
         console.log(this.pluginMacros[blkname]);
         var obj = this.pluginMacros[blkname];
@@ -191,7 +203,7 @@ function Palettes () {
         }
 
         // if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
-	if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - 55 && direction < 0) {
+        if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - 55 && direction < 0) {
             this.downIndicator.visible = false;
             this.downIndicatorStatus = this.downIndicator.visible;
             this.refreshCanvas();
@@ -346,6 +358,22 @@ function Palettes () {
             return;
         }
 
+        if (name=='search' && this.showSearchWidget !== null) {
+            for (var i in this.dict) {
+                if (this.dict[i].visible) {
+                    this.dict[i].hideMenu();
+                    this.dict[i]._hideMenuItems();
+                }
+            }
+
+            console.log('searching');
+            this.dict[name].visible = true;
+            this.showSearchWidget(true);
+            return;
+        }
+
+        this.hideSearchWidget(true);
+
         for (var i in this.dict) {
             if (this.dict[i] === this.dict[name]) {
                 this.dict[name]._resetLayout();
@@ -369,8 +397,8 @@ function Palettes () {
         for (var name in this.buttons) {
             this.buttons[name].visible = true;
             if (name in this.labels) {
-		this.labels[name].visible = true;
-	    }
+                this.labels[name].visible = true;
+            }
         }
 
         if (this.background != null) {
@@ -399,6 +427,9 @@ function Palettes () {
         for (var name in this.dict) {
             this.dict[name].hideMenu();
         }
+
+
+        this.hideSearchWidget(true);
 
         if (this.upIndicator != null) {
             this.upIndicator.visible = false;
@@ -1306,7 +1337,7 @@ function Palette(palettes, name) {
                     }
                     that.protoContainers[modname].addChild(bitmap);
                     bitmap.x = Math.floor((MEDIASAFEAREA[0] * (b.scale / 2)) + 0.5);
-		    
+                    
                     bitmap.y = Math.floor((MEDIASAFEAREA[1] * (b.scale / 2)) + 0.5);
                     __calculateBounds(palette, blk, modname, protoListBlk);
                 };
@@ -1413,6 +1444,10 @@ function Palette(palettes, name) {
     };
 
     this.hideMenu = function () {
+        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+            this.palettes.hideSearchWidget(true);
+        }
+
         this.palettes.paletteVisible = false;
         if (this.menuContainer != null) {
             this.menuContainer.visible = false;
@@ -1440,6 +1475,10 @@ function Palette(palettes, name) {
     };
 
     this._hideMenuItems = function () {
+        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+            this.palettes.hideSearchWidget(true);
+        }
+
         for (var i in this.protoContainers) {
             this.protoContainers[i].visible = false;
         }

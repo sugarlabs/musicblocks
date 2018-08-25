@@ -17,13 +17,13 @@ function UtilityBox () {
     const BOXBUTTONSPACING = 65;
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        // 9 buttons, 8 intrabuttons spaces, 2 extrabutton spaces
-        var boxwidth = 9 * 55 + 8 * 10 + 2 * 20;
+        // 8 buttons, 7 intrabuttons spaces, 2 extrabutton spaces
+	var boxwidth = 8 * 55 + 7 * 10 + 2 * 20;
         var boxwidth2 = boxwidth - 1.5;
         var boxclose = boxwidth - 55;
     } else {
-        // 8 buttons, 7 intrabuttons spaces, 2 extrabutton spaces
-        var boxwidth = 8 * 55 + 7 * 10 + 2 * 20;
+        // 7 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
+        var boxwidth = 7 * 55 + 6 * 10 + 2 * 20;
         var boxwidth2 = boxwidth - 1.5;
         var boxclose = boxwidth - 55;
     }
@@ -40,8 +40,6 @@ function UtilityBox () {
     this._doScroller = null;
     this._doLanguageBox = null;
     this._languageBox = null;
-    this._toggleSearch = null;
-    this._hideSearch = null;
     this._scrollStatus = false;
     this._increaseStatus = true;
     this._decreaseStatus = true;
@@ -97,12 +95,6 @@ function UtilityBox () {
 
     this.setScroller = function (scroller) {
         this._doScroller = scroller;
-        return this;
-    };
-
-    this.setSearch = function (toggleSearch, hideSearch) {
-        this._toggleSearch = toggleSearch;
-        this._hideSearch = hideSearch;
         return this;
     };
 
@@ -252,15 +244,6 @@ function UtilityBox () {
                 that.hide();
                 that._scrollStatus = !that._scrollStatus;
             });
-
-            dx += BOXBUTTONSPACING;;
-
-            this._searchButton = makeButton('search-button', _('Search'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-            this._searchButton.visible = true;
-            this._positionHoverText(this._searchButton);
-            this._searchButton.on('click', function (event) {
-                that._toggleSearch();
-            });
         } else {
             this._show(status);
         }
@@ -299,8 +282,6 @@ function UtilityBox () {
             this._pluginsDeleteButton2.visible = false;
             this._scrollButton.visible = false;
             this._scrollButton2.visible = false;
-            this._searchButton.visible = false;
-            this._hideSearch();
             this._container.visible = false;
             this._refreshCanvas();
         }
@@ -324,7 +305,6 @@ function UtilityBox () {
             this._pluginsDeleteButton2.visible = status;
             this._scrollButton.visible = !this._scrollStatus;
             this._scrollButton2.visible = this._scrollStatus;
-            this._searchButton.visible = true;
             this._container.visible = true;
             this._refreshCanvas();
         }

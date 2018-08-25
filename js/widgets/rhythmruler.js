@@ -59,6 +59,8 @@ function RhythmRuler () {
     this._mouseDownCell = null;
     this._mouseUpCell = null;
 
+    this._wheel = null;
+
     this._noteWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 3);
     };
@@ -171,6 +173,8 @@ function RhythmRuler () {
             this._rulerSelected = cell.parentNode.id[5];
             this.__dissectByNumber(cell, inputNum, true);
         }
+
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this.__startTapping = function (noteValues, interval) {
@@ -455,6 +459,8 @@ function RhythmRuler () {
 
             divisionHistory.push(cell.cellIndex);
         }
+
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this.__divideFromList = function (cell, newNoteValues, addToUndoList) {
@@ -503,6 +509,8 @@ function RhythmRuler () {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
+
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this.__dissectByNumber = function (cell, inputNum, addToUndoList) {
@@ -553,6 +561,8 @@ function RhythmRuler () {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
+
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this._tieRuler = function (event) {
@@ -571,6 +581,8 @@ function RhythmRuler () {
             this._rulerSelected = cell.parentNode.id[5];
             this.__tie(true);
         }
+
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this.__tie = function (addToUndoList) {
@@ -778,6 +790,8 @@ function RhythmRuler () {
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
+
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this._tap = function () {
@@ -793,6 +807,8 @@ function RhythmRuler () {
                 this._undo();
             }
         }
+
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this.__pause = function () {
@@ -1451,6 +1467,7 @@ function RhythmRuler () {
         cell.onclick = function () {
             // If the piemenu was open, close it.
             docById('wheelDiv').style.display = 'none';
+            docById('contextWheelDiv').style.display = 'none';
 
             // Save the new dissect history.
             var dissectHistory = [];
@@ -1739,6 +1756,7 @@ function RhythmRuler () {
         }
 
         this._logo.textMsg(_('Click on the ruler to divide it.'));
+        this._piemenuRuler(this._rulerSelected);
     };
 
     this._addButton = function(row, icon, iconSize, label, extras) {
@@ -1761,6 +1779,52 @@ function RhythmRuler () {
         }
 
         return cell;
+    };
+
+    this._piemenuRuler = function (selectedRuler) {
+        // piemenu version of ruler
+        docById('wheelDiv2').style.display = '';
+        docById('wheelDiv2').style.position = 'absolute';
+        docById('wheelDiv2').style.left = '600px';
+        docById('wheelDiv2').style.top = '300px';
+
+        if (selectedRuler === undefined) {
+	    selectedRuler = 0;
+	}
+
+        if (this._wheel !== null) {
+            this._wheel.removeWheel();
+	}
+
+        console.log(this.Rulers[selectedRuler]);
+        this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
+	this._wheel.wheelRadius = 200;
+	this._wheel.maxPercent = 1.6;
+        this._wheel.colors = [MATRIXNOTECELLCOLOR, MATRIXNOTECELLCOLORHOVER];
+	this._wheel.navItemsContinuous = true;
+	this._wheel.markerPathFunction = markerPath().PieLineMarker;
+	this._wheel.clickModeRotate = false;
+	this._wheel.markerEnable = true;
+	this._wheel.slicePathFunction = slicePath().DonutSlice;
+	this._wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+
+        var labels = [];
+        for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
+            if (this.Rulers[selectedRuler][0][i] < 17 && this.Rulers[selectedRuler][0][i] > 0) {
+		labels.push('1/' + this.Rulers[selectedRuler][0][i]);
+	    } else {
+		labels.push(' ');
+	    }
+	}
+
+        console.log(labels);
+	this._wheel.initWheel(labels);
+
+        for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
+	    this._wheel.navItems[i].sliceAngle = 360 / Math.abs(this.Rulers[selectedRuler][0][i]);
+	}
+
+	this._wheel.createWheel();
     };
 
     this._piemenuNumber = function (wheelValues, selectedValue) {
@@ -1872,4 +1936,6 @@ function RhythmRuler () {
             docById('wheelDiv').style.top = (y - 300) + 'px';
         }
     };
+
+
 };
