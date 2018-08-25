@@ -13,7 +13,7 @@
 
 const PROTOBLOCKSCALE = 1.0;
 const PALETTELEFTMARGIN = 10;
-const PALETTE_SCALE_FACTOR = 1.0;
+const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
 function maxPaletteHeight(menuSize, scale) {
