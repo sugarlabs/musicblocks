@@ -1076,9 +1076,9 @@ function Palette(palettes, name) {
 
             var hitArea = new createjs.Shape();
             // hitArea.graphics.beginFill('#FFF').drawEllipse(-paletteWidth / 2, -STANDARDBLOCKHEIGHT / 2, paletteWidth, STANDARDBLOCKHEIGHT);
-	    hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth / 4, STANDARDBLOCKHEIGHT / 2);
-            hitArea.x = paletteWidth * 3 / 4;
-            hitArea.y = 0;// STANDARDBLOCKHEIGHT / 2;
+	    hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth, STANDARDBLOCKHEIGHT / 2);
+            hitArea.x = 0;  // paletteWidth * 3 / 4;
+            hitArea.y = 0;  // STANDARDBLOCKHEIGHT / 2;
             that.menuContainer.hitArea = hitArea;
             that.menuContainer.visible = false;
 
@@ -1408,7 +1408,10 @@ function Palette(palettes, name) {
 
     this._moveMenu = function (x, y) {
         // :sigh: race condition on iOS 7.1.2
-        if (this.menuContainer == null) return;
+        if (this.menuContainer === null) {
+	    return;
+	}
+
         var dx = x - this.menuContainer.x;
         var dy = y - this.menuContainer.y;
         this.menuContainer.x = x;
