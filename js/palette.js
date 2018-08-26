@@ -326,7 +326,7 @@ function Palettes () {
             that.dict[name]._updateMenu(false);
 
             /*add tooltip for palette buttons*/
-            that.labels[name] = new createjs.Text(_(name), '16px Arial', '#808080');
+            that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Arial', '#808080');
             var r = that.cellSize / 2;
             that.labels[name].x = that.buttons[name].x + 2.2 * r;
             that.labels[name].y = that.buttons[name].y + r / 2;
@@ -583,7 +583,7 @@ function Palettes () {
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
             /*add tooltip for palette buttons*/
-            that.paletteText = new createjs.Text(_(name), '16px Arial', 'black');
+            that.paletteText = new createjs.Text(toTitleCase(_(name)), '16px Arial', 'black');
             that.paletteText.x = that.buttons[name].x + 2.2 * r;
             that.paletteText.y = that.buttons[name].y + r / 2;
             that.stage.addChild(that.paletteText);
