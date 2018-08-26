@@ -326,7 +326,7 @@ function Palettes () {
             that.dict[name]._updateMenu(false);
 
             /*add tooltip for palette buttons*/
-            that.labels[name] = new createjs.Text(_(name), '20px Arial', '#808080');
+            that.labels[name] = new createjs.Text(_(name), '16px Arial', '#808080');
             var r = that.cellSize / 2;
             that.labels[name].x = that.buttons[name].x + 2.2 * r;
             that.labels[name].y = that.buttons[name].y + r / 2;
@@ -583,7 +583,7 @@ function Palettes () {
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
             /*add tooltip for palette buttons*/
-            that.paletteText = new createjs.Text(_(name), '20px Arial', 'black');
+            that.paletteText = new createjs.Text(_(name), '16px Arial', 'black');
             that.paletteText.x = that.buttons[name].x + 2.2 * r;
             that.paletteText.y = that.buttons[name].y + r / 2;
             that.stage.addChild(that.paletteText);
@@ -1063,21 +1063,22 @@ function Palette(palettes, name) {
         var that = this;
 
         function __processButtonIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.8;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4; // 0.8;
             that.menuContainer.addChild(bitmap);
             that.palettes.container.addChild(that.menuContainer);
         };
 
         function __processCloseIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.35; // 0.7;
             that.menuContainer.addChild(bitmap);
-            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT;
+            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT / 2;
             bitmap.y = 0;
 
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(-paletteWidth / 2, -STANDARDBLOCKHEIGHT / 2, paletteWidth, STANDARDBLOCKHEIGHT);
-            hitArea.x = paletteWidth / 2;
-            hitArea.y = STANDARDBLOCKHEIGHT / 2;
+            // hitArea.graphics.beginFill('#FFF').drawEllipse(-paletteWidth / 2, -STANDARDBLOCKHEIGHT / 2, paletteWidth, STANDARDBLOCKHEIGHT);
+	    hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth / 4, STANDARDBLOCKHEIGHT / 2);
+            hitArea.x = paletteWidth * 3 / 4;
+            hitArea.y = 0;// STANDARDBLOCKHEIGHT / 2;
             that.menuContainer.hitArea = hitArea;
             that.menuContainer.visible = false;
 
@@ -1241,7 +1242,7 @@ function Palette(palettes, name) {
         this.background.addChild(shape);
 
         this.background.x = this.menuContainer.x;
-        this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
+        this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT / 2;
     };
 
     this._resetLayout = function () {
@@ -1255,7 +1256,7 @@ function Palette(palettes, name) {
             this.protoContainers[i].y -= this.scrollDiff;
         }
 
-        this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
+        this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT / 2;
         var items = [];
         var heights = [];
         // Reverse order
