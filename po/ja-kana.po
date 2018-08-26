@@ -2357,17 +2357,17 @@ msgstr "ちょう３どした"
 #.TRANS: define a custom mode
 ## http://jisho.org/word/%E5%AE%9A%E7%BE%A9 
 msgid "define mode"
-msgstr "モードを定義する"
+msgstr "モードをていぎする"
 
 #: js/basicblocks.js:1946
 ## https://ja.wikipedia.org/wiki/%E7%A7%BB%E5%8B%95%E3%83%89
 msgid "moveable"
-msgstr "移動の「ド、レ、ミ」"
+msgstr "いどうの「ド、レ、ミ」"
 
 #: js/basicblocks.js:1954
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
-msgstr "おんかいの音数"
+msgstr "おんかいのおんすう"
 
 #: js/basicblocks.js:1962
 #: js/basicblocks.js:1985
@@ -2418,7 +2418,7 @@ msgstr "いぬ"
 #: js/musicutils.js:273
 #.TRANS: sound effect
 msgid "bottle"
-msgstr "空き瓶のおと"
+msgstr "あきびんのおと"
 
 #: js/basicblocks.js:2045
 #: js/synthutils.js:102
@@ -2426,7 +2426,7 @@ msgstr "空き瓶のおと"
 #.TRANS: sound effect
 ## http://jisho.org/word/%E3%81%97%E3%82%85%E3%82%8F%E3%81%97%E3%82%85%E3%82%8F 
 msgid "bubbles"
-msgstr "泡のおと"
+msgstr "あわのおと"
 
 #: js/basicblocks.js:2053
 #: js/synthutils.js:88
@@ -2791,24 +2791,24 @@ msgstr "または"
 
 #: js/basicblocks.js:2628
 #.TRANS: evaluate some math functions, e.g., absolute value, sine, exponential, etc.
-## ひらがな＝ひょうす
+## ひらがな＝ひょうか
 msgid "eval"
-msgstr "評価"
+msgstr "ひょうか"
 
 #: js/basicblocks.js:2642
 ## Based on Scratch po (L40) 
 msgid "mod"
-msgstr "～で割った余り(mod)"
+msgstr "～でわったあまり(mod)"
 
 #: js/basicblocks.js:2659
 ## 平方根＝へいほうこん http://jisho.org/word/%E5%B9%B3%E6%96%B9%E6%A0%B9 
 msgid "sqrt"
-msgstr "平方根"
+msgstr "へいほうこん"
 
 #: js/basicblocks.js:2668
 ## http://jisho.org/word/%E7%B5%B6%E5%AF%BE%E5%80%A4 
 msgid "abs"
-msgstr "絶対値"
+msgstr "ぜったいち"
 
 #: js/basicblocks.js:2724
 ## Literally "this or that"
@@ -2827,11 +2827,11 @@ msgstr "それか"
 #: js/basicblocks.js:2735
 ## Scratch po (L247)
 msgid "random"
-msgstr "乱数"
+msgstr "らんすう"
 
 #: js/basicblocks.js:2735
 msgid "min"
-msgstr "最小値"
+msgstr "さいしょうち"
 
 #: js/basicblocks.js:2735
 msgid "max"
@@ -2840,7 +2840,7 @@ msgstr "さいだいち"
 #: js/basicblocks.js:2750
 ## check this
 msgid "add 1 to"
-msgstr "～に１を足す"
+msgstr "～に１をたす"
 
 #: js/basicblocks.js:2757
 msgid "add"
@@ -2869,24 +2869,24 @@ msgstr "リターン"
 #: js/basicblocks.js:2835
 #.TRANS: return value from a function to a URL
 msgid "return to URL"
-msgstr "URLに戻ります"
+msgstr "URLにもどります"
 
 #: js/basicblocks.js:2839
 msgid "100"
-msgstr "百"
+msgstr "ひゃく"
 
 #: js/basicblocks.js:2845
 #: js/basicblocks.js:2872
 #: js/basicblocks.js:2891
 ## 計算＝けいさん; p69 Collins Shubun
 msgid "calculate"
-msgstr "計算する"
+msgstr "けいさんする"
 
 #: js/basicblocks.js:2920
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
 ## I need some context...
 msgid "on"
-msgstr "の時に"
+msgstr "のときに"
 
 #: js/basicblocks.js:2921
 #: js/basicblocks.js:2925
@@ -3233,19 +3233,19 @@ msgstr "クリック"
 #: js/basicblocks.js:3664
 #: plugins/rodi.rtp:220
 msgid "pixel color"
-msgstr "ピクセルの色"
+msgstr "ピクセルのいろ"
 
 #: js/basicblocks.js:3671
 msgid "time"
-msgstr "時間"
+msgstr "じかん"
 
 #: js/basicblocks.js:3678
 msgid "cursor y"
-msgstr "yざひょうにカーソルを置く"
+msgstr "yざひょうにカーソルをおく"
 
 #: js/basicblocks.js:3686
 msgid "cursor x"
-msgstr "xざひょうにカーソルを置く"
+msgstr "xざひょうにカーソルをおく"
 
 #: js/basicblocks.js:3694
 msgid "mouse button"
@@ -3270,7 +3270,7 @@ msgstr "ネズミをスタート"
 #: js/basicblocks.js:3736
 #.TRANS: pen color for this mouse
 msgid "mouse color"
-msgstr "ネズミの色"
+msgstr "ネズミのいろ"
 
 #: js/basicblocks.js:3746
 #.TRANS: heading (compass direction) for this mouse
@@ -3399,7 +3399,7 @@ msgstr "これよりふやすことはできません"
 
 #: js/utilitybox.js:228
 msgid "Disable scrolling"
-msgstr "スクロールを無効にする"
+msgstr "スクロールをむこうにする"
 
 #: js/playback.js:28
 #: js/playback.js:28
@@ -3512,11 +3512,11 @@ msgstr "ブロックのアートをほぞん"
 
 #: js/lilypond.js:18
 msgid "brown rat"
-msgstr "茶色のドブネズミ"
+msgstr "ちゃいろのドブネズミ"
 
 #: js/lilypond.js:18
 msgid "mole"
-msgstr "土竜"
+msgstr "もぐら"
 
 #: js/lilypond.js:18
 msgid "chipmunk"
@@ -3524,7 +3524,7 @@ msgstr "リス"
 
 #: js/lilypond.js:18
 msgid "red squirrel"
-msgstr "赤いリス"
+msgstr "あかいリス"
 
 #: js/lilypond.js:18
 msgid "guinea pig"
@@ -3540,11 +3540,11 @@ msgstr "ヌートリア"
 
 #: js/lilypond.js:18
 msgid "black rat"
-msgstr "黒い鼠"
+msgstr "くろいねずみ"
 
 #: js/lilypond.js:18
 msgid "grey squirrel"
-msgstr "灰色のリス"
+msgstr "はいいろのリス"
 
 #: js/lilypond.js:18
 msgid "flying squirrel"
@@ -3564,7 +3564,7 @@ msgstr "スタックをほぞん"
 
 #: js/blocks.js:1156
 msgid "Consider breaking this stack into parts."
-msgstr "このながいスタックを別々のスタックにしたほうがいい"
+msgstr "このながいスタックをべつべつのスタックにしたほうがいい"
 
 #: js/blocks.js:3142
 #: js/blocks.js:3168
@@ -4890,7 +4890,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "ブロックス"
 
 #~msgid "movable"
-#~msgstr "移動ド？"
+#~msgstr "いどうド？"
 
 #~msgid "Show or hide a Cartesian-coordinate grid."
 #~msgstr "直交ざひょうをひょうじする/かくす"
