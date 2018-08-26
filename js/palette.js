@@ -317,9 +317,7 @@ function Palettes () {
             }
 
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(-that.halfCellSize, -that.halfCellSize, that.cellSize, that.cellSize);
-            hitArea.x = that.halfCellSize;
-            hitArea.y = that.halfCellSize;
+            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, that.cellSize * PALETTE_WIDTH_FACTOR, that.cellSize);
             that.buttons[name].hitArea = hitArea;
             that.buttons[name].visible = false;
 
