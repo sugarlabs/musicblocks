@@ -1542,12 +1542,12 @@ msgstr "いちょう"
 #: js/basicblocks.js:137
 #.TRANS: step down one note in current musical scale
 msgid "scalar step down"
-msgstr "おんかいないで~どさがる:"
+msgstr "おんかいないで～どさがる:"
 
 #: js/basicblocks.js:145
 #.TRANS: step up one note in current musical scale
 msgid "scalar step up"
-msgstr "おんかいないで~どあがる:"
+msgstr "おんかいないで～どあがる:"
 
 #: js/basicblocks.js:153
 #.TRANS: the change meaused in half-steps between the current pitch and the previous pitch
@@ -1989,7 +1989,7 @@ msgstr "タイ"
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 ##　I need to look this up.
 msgid "dot"
-msgstr "付点おんぷ"
+msgstr "ふてんおんぷ"
 
 #: js/basicblocks.js:1004
 msgid "392 hertz"
@@ -2006,12 +2006,13 @@ msgstr "はくを～ばいにするファクター"
 #: js/basicblocks.js:1215
 #.TRANS: number of beats played per minute
 msgid "beats per minute"
-msgstr "BPM(いっぷん当たりのはくすう)"
+msgstr "BPM(いっぷんあたりのはくすう)"
 
 #: js/basicblocks.js:1089
 #.TRANS: count of current measure in meter
+## https://ja.wikipedia.org/wiki/%E5%B0%8F%E7%AF%80
 msgid "measure count"
-msgstr "小節のかず"
+msgstr "しょうせつのかず"
 
 #: js/basicblocks.js:1097
 #.TRANS: count of current beat in meter
@@ -2023,12 +2024,12 @@ msgstr "はくのかず"
 #.TRANS: count the number of notes
 ## ^^Should say "calculate the total note value";http://jisho.org/word/%E5%85%A8%E9%A1%8D ;全額＝ぜんがく
 msgid "note counter"
-msgstr "おんぷの合計数"
+msgstr "おんぷのごうけいすう"
 
 #: js/basicblocks.js:1114
 #.TRANS: number of whole notes that have been played
 msgid "whole notes played"
-msgstr "さいせいされた全おんぷのかず"
+msgstr "さいせいされたぜんおんぷのかず"
 
 #: js/basicblocks.js:1122
 #.TRANS: number of notes that have been played
@@ -2048,12 +2049,12 @@ msgstr "クロックなし"
 #: js/basicblocks.js:1146
 ## structure of grammar makes this awkward;http://musical-grammar.com/time005.html
 msgid "on offbeat do"
-msgstr "弱拍にて"
+msgstr "じゃくはくにて～する"
 
 #: js/basicblocks.js:1156
 ## Need a little context, but I am guessing this is "on *this* beat (do...)
 msgid "on beat"
-msgstr "強拍にて"
+msgstr "きょうはくにて～する"
 
 #: js/basicblocks.js:1156
 ## http://musical-grammar.com/time004.html
@@ -2074,7 +2075,7 @@ msgstr "する"
 
 #: js/basicblocks.js:1168
 msgid "on every beat do"
-msgstr ""
+msgstr "ぜんぶのはくに～する"
 
 #: js/basicblocks.js:1179
 #: js/basicblocks.js:1192
@@ -2165,19 +2166,19 @@ msgstr "ハーモニックス"
 #.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
 ## This seems to have a lot of great stuff: https://ja.wikipedia.org/wiki/%E9%9D%9E%E5%92%8C%E5%A3%B0%E9%9F%B3#%E5%88%BA%E7%B9%8D%E9%9F%B3
 msgid "neighbor"
-msgstr "隣接音"
+msgstr "ししゅうおん"
 
 #: js/basicblocks.js:1334
 #: js/basicblocks.js:1833
 #.TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
-msgstr "はんおん間隔"
+msgstr "はんおんかんかく"
 
 #: js/basicblocks.js:1349
 #: js/basicblocks.js:1925
 #.TRANS: calculate a relative step between notes based on the current musical scale
 msgid "scalar interval"
-msgstr "おんかい：音間の間隔"
+msgstr "おんかい：おとまのかんかく"
 
 #: js/basicblocks.js:1362
 #: js/timbre.js:1583
@@ -2227,7 +2228,7 @@ msgstr "オクターヴ"
 #: js/timbre.js:1826
 ## guessing...
 msgid "base frequency"
-msgstr "基本周波数"
+msgstr "きほんしゅうはすう"
 
 #: js/basicblocks.js:1404
 #: js/timbre.js:1583
@@ -2290,18 +2291,18 @@ msgstr "おんりつをせってい"
 
 #: js/basicblocks.js:1550
 msgid "doubly"
-msgstr "重"
+msgstr "じゅう"
 
 #: js/basicblocks.js:1567
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr "はんおんで数える"
+msgstr "はんおんでかぞえる"
 
 #: js/basicblocks.js:1575
 #.TRANS: measure the distance between two pitches in steps of musical scale
 ## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
-msgstr "おんかい同志のおとの間隔"
+msgstr "おんかいどうしのおとのかんかく"
 
 #: js/basicblocks.js:1583
 #: js/basicblocks.js:1591
@@ -2316,7 +2317,7 @@ msgstr "おんかい同志のおとの間隔"
 ## for scale, it would be ディミニッシュト・スケール
 ## 減=げん
 msgid "diminished"
-msgstr "ディミニッシュ（減）"
+msgstr "ディミニッシュ（げん）"
 
 #: js/basicblocks.js:1639
 #: js/basicblocks.js:1647
@@ -2331,7 +2332,7 @@ msgstr "ディミニッシュ（減）"
 #.TRANS: augmented is a music term related to intervals
 ## 増=ぞう
 msgid "augmented"
-msgstr "オーギュメント（増）"
+msgstr "オーギュメント（ぞう）"
 
 #: js/basicblocks.js:1703
 #: js/basicblocks.js:1711
@@ -2341,7 +2342,7 @@ msgstr "オーギュメント（増）"
 #: js/musicutils.js:310
 #.TRANS: perfect is a music term related to intervals
 msgid "perfect"
-msgstr "パーフェクト（完全）"
+msgstr "パーフェクト（かんぜん）"
 
 #: js/basicblocks.js:1736
 #: js/basicblocks.js:1744
@@ -2449,7 +2450,7 @@ msgstr "カチャカチャのおと"
 #: js/musicutils.js:274
 #.TRANS: sound effect
 msgid "clap"
-msgstr "手を叩くおと"
+msgstr "てをたたくおと"
 
 #: js/basicblocks.js:2077
 #: js/synthutils.js:98
@@ -2457,14 +2458,14 @@ msgstr "手を叩くおと"
 #.TRANS: sound effect
 ## http://jisho.org/word/%E5%B9%B3%E6%89%8B%E6%89%93%E3%81%A1 
 msgid "slap"
-msgstr "手をスラップするおと"
+msgstr "てをスラップするおと"
 
 #: js/basicblocks.js:2085
 #: js/synthutils.js:92
 #: js/musicutils.js:272
 #.TRANS: sound effect
 msgid "crash"
-msgstr "壊れるおと（クラッシュ）"
+msgstr "こわれるおと（クラッシュ）"
 
 #: js/basicblocks.js:2093
 #: js/synthutils.js:100
@@ -2553,7 +2554,7 @@ msgstr "むき"
 #: js/basicblocks.js:3756
 #.TRANS: y coordinate
 msgid "y"
-msgstr "yざひょう"
+msgstr "「y」ざひょう"
 
 #: js/basicblocks.js:2226
 #: js/basicblocks.js:2243
@@ -2564,7 +2565,7 @@ msgstr "yざひょう"
 #: js/basicblocks.js:3756
 #.TRANS: x coordinate
 msgid "x"
-msgstr "xざひょう"
+msgstr "「x」ざひょう"
 
 #: js/basicblocks.js:2234
 #: js/pitchdrummatrix.js:138
@@ -2580,24 +2581,24 @@ msgstr "しょうきょ"
 #: js/basicblocks.js:2242
 #.TRANS: control point in a bezier curve
 msgid "control point 2"
-msgstr "コントロール点２"
+msgstr "コントロールてん２"
 
 #: js/basicblocks.js:2255
 #.TRANS: control point in a Bezier curve
 msgid "control point 1"
-msgstr "コントロール点１"
+msgstr "コントロールてん１"
 
 #: js/basicblocks.js:2268
 #.TRANS: Bézier curves employ at least three points to define a curve
 ## https://ja.wikipedia.org/wiki/%E3%83%99%E3%82%B8%E3%82%A7%E6%9B%B2%E7%B7%9A
 msgid "bezier"
-msgstr "ベジェ曲線"
+msgstr "ベジェきょくせん"
 
 #: js/basicblocks.js:2281
 #.TRANS: draws a part of the circumference of a circle
-## ひらがな＝えん\E3\81"
+## ひらがな＝えんこ
 msgid "arc"
-msgstr "円弧"
+msgstr "えんこ"
 
 #: js/basicblocks.js:2282
 ## 角度＝かくど；ジーニアス英和辞典
@@ -2605,9 +2606,9 @@ msgid "angle"
 msgstr "かくど"
 
 #: js/basicblocks.js:2282
-## ひらがな＝はんけ\E3\81"
+## ひらがな＝はんけい
 msgid "radius"
-msgstr "半径"
+msgstr "はんけい"
 
 #: js/basicblocks.js:2293
 #.TRANS: set compass heading
@@ -2617,7 +2618,7 @@ msgstr "むきをせってい"
 #: js/basicblocks.js:2302
 #.TRANS: set xy position
 msgid "set xy"
-msgstr "xyざひょうのせってい"
+msgstr "「xy」ざひょうのせってい"
 
 #: js/basicblocks.js:2314
 #: js/basicblocks.js:3118
@@ -2626,7 +2627,7 @@ msgstr "xyざひょうのせってい"
 #: plugins/rodi.rtp:379
 #.TRANS: turn right (clockwise)
 msgid "right"
-msgstr "右を向く"
+msgstr "みぎにまがる"
 
 #: js/basicblocks.js:2323
 #: js/basicblocks.js:3125
@@ -2635,7 +2636,7 @@ msgstr "右を向く"
 #: plugins/rodi.rtp:366
 #.TRANS: turn left (counter-clockwise)
 msgid "left"
-msgstr "左を向く"
+msgstr "ひだりにまがる"
 
 #: js/basicblocks.js:2341
 #: plugins/rodi.rtp:73
@@ -2646,23 +2647,23 @@ msgstr "まえへすすむ"
 
 #: js/basicblocks.js:2352
 msgid "purple"
-msgstr "紫"
+msgstr "むらさき"
 
 #: js/basicblocks.js:2359
 #: js/basicblocks.js:3643
 #: plugins/rodi.rtp:223
 msgid "blue"
-msgstr "青"
+msgstr "あお"
 
 #: js/basicblocks.js:2366
 #: js/basicblocks.js:3650
 #: plugins/rodi.rtp:222
 msgid "green"
-msgstr "緑"
+msgstr "みどり"
 
 #: js/basicblocks.js:2373
 msgid "yellow"
-msgstr "黄色"
+msgstr "きいろ"
 
 #: js/basicblocks.js:2380
 #: plugins/nutrition.rtp:164
@@ -2673,15 +2674,15 @@ msgstr "オレンジ"
 #: js/basicblocks.js:3657
 #: plugins/rodi.rtp:221
 msgid "red"
-msgstr "赤"
+msgstr "あか"
 
 #: js/basicblocks.js:2394
 msgid "white"
-msgstr "白"
+msgstr "しろ"
 
 #: js/basicblocks.js:2401
 msgid "black"
-msgstr "黒"
+msgstr "くろ"
 
 #: js/basicblocks.js:2408
 msgid "begin fill"
@@ -2689,18 +2690,18 @@ msgstr "きにゅうをはじめる"
 
 #: js/basicblocks.js:2416
 msgid "end fill"
-msgstr "きにゅうを終わらせる"
+msgstr "きにゅうをおわらせる"
 
 #: js/basicblocks.js:2425
 #: js/basicblocks.js:2469
 #.TRANS: set the background color
 msgid "background"
-msgstr "背景"
+msgstr "はいけい"
 
 #: js/basicblocks.js:2432
 ## グレー okay too
 msgid "grey"
-msgstr "灰色"
+msgstr "はいいろ"
 
 #: js/basicblocks.js:2439
 ## 暗がり＝くらがり
@@ -2722,7 +2723,7 @@ msgstr "フォントのせってい"
 #: js/basicblocks.js:2478
 #.TRANS: draw a line that has a hollow space down its center
 msgid "hollow line"
-msgstr "（中空の）線"
+msgstr "（ちゅうくうの）せん"
 
 #: js/basicblocks.js:2487
 #.TRANS: fill in as a solid color
@@ -2732,12 +2733,12 @@ msgstr "きにゅうする"
 #: js/basicblocks.js:2495
 #.TRANS: riase up the pen so that it does not draw when it is moved
 msgid "pen up"
-msgstr "ペンを上げる"
+msgstr "ペンをあげる"
 
 #: js/basicblocks.js:2503
 #.TRANS: put down the pen so that it draws when it is moved
 msgid "pen down"
-msgstr "ペン下ろす"
+msgstr "ペンおろす"
 
 #: js/basicblocks.js:2511
 #.TRANS: set the width of the line drawn by the pen
@@ -2748,33 +2749,33 @@ msgstr "ペンのおおきさのせってい"
 #.TRANS: set degree of translucence of the pen color
 ## 透明=とうめい　https://ja.wikipedia.org/wiki/%E9%80%8F%E6%98%8E
 msgid "set translucency"
-msgstr "透明どをせってい"
+msgstr "とうめいどをせってい"
 
 #: js/basicblocks.js:2528
 ## 色相=しきそうhttps://ja.wikipedia.org/wiki/%E8%89%B2%E7%9B%B8
 msgid "set hue"
-msgstr "色相をせってい"
+msgstr "しきそうをせってい"
 
 #: js/basicblocks.js:2536
 ## ひらがな＝のうたん
 msgid "set shade"
-msgstr "濃淡をせってい"
+msgstr "のうたんをせってい"
 
 #: js/basicblocks.js:2545
 #.TRANS: set the level of vividness of the pen color
 msgid "set grey"
-msgstr "灰色をせってい"
+msgstr "はいいろをせってい"
 
 #: js/basicblocks.js:2553
 ## 色のせってい
 msgid "set color"
-msgstr "色をせってい"
+msgstr "いろをせってい"
 
 #: js/basicblocks.js:2564
 #.TRANS: convert a real number to an integer
 ## 整数=せいすうhttps://ja.wikipedia.org/wiki/%E6%95%B4%E6%95%B0
 msgid "int"
-msgstr "整数に"
+msgstr "けいすうに"
 
 #: js/basicblocks.js:2573
 ## trying a simple "is not"; need to verify
@@ -2898,7 +2899,7 @@ msgstr "イベント"
 #: js/basicblocks.js:2934
 #.TRANS: dispatch an event to trigger a listener
 msgid "broadcast"
-msgstr "送る"
+msgstr "おくる"
 
 #: js/basicblocks.js:2992
 #.TRANS: load the heap contents from a URL
@@ -2981,27 +2982,27 @@ msgstr "プッシュ"
 #: js/basicblocks.js:3132
 ## 上端＝じょうたん;http://jisho.org/search/%E4%B8%8A%E7%AB%AF 
 msgid "top"
-msgstr "上端"
+msgstr "じょうたん"
 
 #: js/basicblocks.js:3139
 ## 下端＝かたん；http://jisho.org/word/%E4%B8%8B%E7%AB%AF 
 msgid "bottom"
-msgstr "下端"
+msgstr "かたん"
 
 #: js/basicblocks.js:3146
 ## 幅=はば；http://jisho.org/word/%E5%B9%85 
 msgid "width"
-msgstr "幅(横)"
+msgstr "はば(よこ)"
 
 #: js/basicblocks.js:3153
 ## 縦;http://jisho.org/word/%E7%B8%A6 and https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q119659291 
 msgid "height"
-msgstr "たかさ(縦)"
+msgstr "たかさ(たて)"
 
 #: js/basicblocks.js:3161
 #.TRANS: stops playback of an audio recording
 msgid "stop play"
-msgstr "さいせいを停止"
+msgstr "さいせいをていし"
 
 #: js/basicblocks.js:3170
 #.TRANS: play an audio recording
@@ -3011,12 +3012,12 @@ msgstr "プレーバック"
 #: js/basicblocks.js:3178
 ## Maybe 話す
 msgid "speak"
-msgstr "声を出す"
+msgstr "こえをだす"
 
 #: js/basicblocks.js:3206
 ## A/Vを停止
 msgid "stop media"
-msgstr "メデイアを停止"
+msgstr "メデイアをていし"
 
 #: js/basicblocks.js:3213
 msgid "duration (ms)"
@@ -3026,7 +3027,7 @@ msgstr "ながさ（1秒間の1000ぶんの1）"
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 ## 周波数=しゅうはすう　https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
 msgid "note to frequency"
-msgstr "おんぷのたかさを周波数ひょうじへ"
+msgstr "おんぷのたかさをしゅうはすうひょうじへ"
 
 #: js/basicblocks.js:3236
 #.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
@@ -3073,7 +3074,7 @@ msgstr "とめます"
 
 #: js/basicblocks.js:3328
 msgid "wait for"
-msgstr "を待つ"
+msgstr "をまつ"
 
 #: js/basicblocks.js:3335
 ## There is two types of until in Japanese, but think we want this one.
@@ -3105,7 +3106,7 @@ msgstr "ずっと"
 #: js/basicblocks.js:3374
 ## Scrath po (L268)
 msgid "repeat"
-msgstr "~かいくりかえす"
+msgstr "～かいくりかえす"
 
 #: js/basicblocks.js:3386
 #: js/basicblocks.js:3396
@@ -3116,7 +3117,7 @@ msgstr "~かいくりかえす"
 #: js/basicblocks.js:3441
 ## fushou
 msgid "unknown"
-msgstr "不詳"
+msgstr "ふしょう"
 
 #: js/basicblocks.js:3452
 #.TRANS: Open a palette of blocks.
@@ -3152,17 +3153,17 @@ msgstr "ブロックをさいせい"
 #.TRANS: We can connect a block to another block.
 ## Check
 msgid "connect blocks"
-msgstr "ブロックを繋ぐ"
+msgstr "ブロックをつなぐ"
 
 #: js/basicblocks.js:3491
 ## check
 msgid "target block"
-msgstr "目標のブロック"
+msgstr "もくひょうのブロック"
 
 #: js/basicblocks.js:3491
 ## check; http://jisho.org/word/%E6%8E%A5%E7%B6%9A 
 msgid "connection number"
-msgstr "接続のばんごう"
+msgstr "せつぞくのばんごう"
 
 #: js/basicblocks.js:3502
 #.TRANS: Create a new block programmatically.
@@ -3171,7 +3172,7 @@ msgstr "ブロックをつくる"
 
 #: js/basicblocks.js:3514
 msgid "save as ABC"
-msgstr "ABCのほぞん"
+msgstr "「ABC」でほぞん"
 
 #: js/basicblocks.js:3517
 #: js/basicblocks.js:3528
@@ -3197,7 +3198,7 @@ msgstr "ブロックをひょうじ"
 
 #: js/basicblocks.js:3560
 msgid "hide blocks"
-msgstr "ブロックを非ひょうじ"
+msgstr "ブロックをかくす"
 
 #: js/basicblocks.js:3567
 msgid "open project"
@@ -3205,7 +3206,7 @@ msgstr "プロジェクトをひらく"
 
 #: js/basicblocks.js:3591
 msgid "wait"
-msgstr "待つ"
+msgstr "まつ"
 
 #: js/basicblocks.js:3599
 #: plugins/facebook.rtp:30
@@ -3299,7 +3300,7 @@ msgstr "ネズミのxざひょう"
 #.TRANS: notes played by this mouse
 ## To be verified
 msgid "mouse notes played"
-msgstr "ネズミの演奏したおんぷのかず"
+msgstr "ネズミのえんそうしたおんぷのかず"
 
 #: js/basicblocks.js:3808
 #.TRANS: convert current note for this turtle to piano key (1-88)
@@ -3374,7 +3375,7 @@ msgstr "マスターおんりょうをせってい"
 #: js/basicblocks.js:4012
 #.TRANS: set an articulation (change in volume)
 msgid "set relative volume"
-msgstr "相対おんりょうをせってい"
+msgstr "あいたいおんりょうをせってい"
 
 #: js/basicblocks.js:4022
 #.TRANS: a gradual increase in loudness
@@ -3391,7 +3392,7 @@ msgstr "フィードバックをさいだいげんにする"
 
 #: js/utilitybox.js:154
 msgid "Cannot be further decreased"
-msgstr "これより減らすことはできません"
+msgstr "これよりへらすことはできません"
 
 #: js/utilitybox.js:172
 msgid "Cannot be further increased"
@@ -3411,7 +3412,7 @@ msgstr "スクロールをむこうにする"
 #: js/rhythmruler.js:1562
 #: js/rhythmruler.js:1562
 msgid "pause"
-msgstr "休止"
+msgstr "きゅうし"
 
 #: js/playback.js:31
 #: js/playback.js:31
@@ -3421,7 +3422,7 @@ msgstr "休止"
 #: js/rhythmruler.js:1329
 #: js/modewidget.js:59
 msgid "play all"
-msgstr "全てさいせいする"
+msgstr "すべてさいせいする"
 
 #: js/playback.js:77
 #: js/status.js:57
@@ -3552,7 +3553,7 @@ msgstr "モモンガ"
 
 #: js/lilypond.js:18
 msgid "bat"
-msgstr "蝙蝠"
+msgstr "こうもり"
 
 #: js/lilypond.js:177
 msgid "Lilypond ignoring mode"
@@ -3580,7 +3581,7 @@ msgstr "コンパイルされたおんがく"
 #: js/playbackbox.js:96
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "pause playback"
-msgstr "コンパイルされたおんがくを停止"
+msgstr "コンパイルされたおんがくをていし"
 
 #: js/playbackbox.js:107
 #: js/playbackbox.js:116
@@ -3592,12 +3593,12 @@ msgstr "コンパイルされたおんがくをさいせい"
 #: js/playbackbox.js:123
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "prepare music for playback"
-msgstr "プレイバック用のおんがくを準備（コンパイル）します"
+msgstr "プレイバックようのおんがくをじゅんび（コンパイル）します"
 
 #: js/languagebox.js:57
 ## Check
 msgid "Refresh your browser to change your language preference."
-msgstr "げんごを変更するにはブラウザを再起動するひつようがあります。"
+msgstr "げんごをへんこうするにはブラウザをさいきどうするひつようがあります。"
 
 #: js/pitchdrummatrix.js:132
 #: js/ptm.js:187
@@ -3630,7 +3631,7 @@ msgstr "エクスポート"
 #: js/ptm.js:202
 #: js/pitchtimematrix.js:202
 msgid "sort"
-msgstr "整理"
+msgstr "せいり"
 
 #: js/ptm.js:704
 #: js/ptm.js:836
@@ -3646,8 +3647,9 @@ msgstr "シンセサイザー"
 
 #: js/timbre.js:682
 ## http://jisho.org/word/%E9%9F%B3%E9%9F%BF%E5%8A%B9%E6%9E%9C ; 音響効果＝おんきょうこうか
+## https://ja.wikipedia.org/wiki/%E5%8A%B9%E6%9E%9C%E9%9F%B3
 msgid "effects"
-msgstr "音響効果"
+msgstr "こうかおん"
 
 #: js/timbre.js:727
 ## http://jisho.org/word/%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC ; 加える＝くわえるhttp://jisho.org/word/%E5%8A%A0%E3%81%88%E3%82%8B 
@@ -3660,7 +3662,7 @@ msgstr "フィルターをくわえる"
 #: js/pitchstaircase.js:513
 ## Uses the Katakana version for computer terminology according to http://jisho.org/word/%E3%82%A2%E3%83%B3%E3%83%89%E3%82%A5 
 msgid "undo"
-msgstr "元にもどす"
+msgstr "もとにもどす"
 
 #: js/timbre.js:1015
 ## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
@@ -3721,11 +3723,11 @@ msgstr "ドラムマシーンをほぞん"
 
 #: js/modewidget.js:77
 msgid "rotate counter clockwise"
-msgstr "反時計かいり"
+msgstr "はんとけいかいり"
 
 #: js/modewidget.js:83
 msgid "rotate clockwise"
-msgstr "時計かいり"
+msgstr "とけいかいり"
 
 #: js/pitchstaircase.js:454
 msgid "play chord"
@@ -3884,7 +3886,7 @@ msgstr "トライアングル"
 #: js/synthutils.js:86
 #.TRANS: musical instrument
 msgid "finger-cymbals"
-msgstr ""
+msgstr "ゆびのシンバル"
 
 #: js/musicutils.js:148
 #.TRANS: twelve semi-tone scale for music
@@ -4210,25 +4212,25 @@ msgstr "タッグ（さいだい５こ）"
 #: js/StringHelper.js:27
 #: js/StringHelper.js:47
 msgid "Description"
-msgstr ""
+msgstr "きにゅう"
 
 #: js/StringHelper.js:28
 #: js/StringHelper.js:52
 msgid "Submit"
-msgstr ""
+msgstr "かくにん"
 
 #: js/StringHelper.js:29
 #: js/StringHelper.js:33
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: js/StringHelper.js:30
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr ""
+msgstr "けす　\\"<span id=\\"deleter-title\\"></span>\\"？"
 
 #: js/StringHelper.js:31
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr ""
+msgstr "プロジェクトをかんぜんけす"
 
 #: js/StringHelper.js:32
 msgid "Delete"
@@ -4236,51 +4238,51 @@ msgstr "けす"
 
 #: js/StringHelper.js:34
 msgid "Explore Projects"
-msgstr ""
+msgstr "プロジェクトをたんきゅう"
 
 #: js/StringHelper.js:35
 msgid "View More"
-msgstr ""
+msgstr "もっとみる"
 
 #: js/StringHelper.js:36
 msgid "Most recent"
-msgstr ""
+msgstr "いちばんさいきん"
 
 #: js/StringHelper.js:37
 msgid "Most liked"
-msgstr ""
+msgstr "「いいね」のいちばんある"
 
 #: js/StringHelper.js:38
 msgid "Most downloaded"
-msgstr ""
+msgstr "ダウンロードのいちばんある"
 
 #: js/StringHelper.js:39
 msgid "A-Z"
-msgstr ""
+msgstr "「A-Z」のじゅんばん"
 
 #: js/StringHelper.js:40
 msgid "Sort by"
-msgstr ""
+msgstr "～でせいりする"
 
 #: js/StringHelper.js:41
 msgid "Load More Projects"
-msgstr ""
+msgstr "プロジェクトをもっとロードする"
 
 #: js/StringHelper.js:42
 msgid "Last Updated"
-msgstr ""
+msgstr "さいきんアップデート"
 
 #: js/StringHelper.js:43
 msgid "Creation Date"
-msgstr ""
+msgstr "さいきんこうかい"
 
 #: js/StringHelper.js:44
 msgid "Number of Downloads:"
-msgstr ""
+msgstr "ダウンロードのすう"
 
 #: js/StringHelper.js:45
 msgid "Number of Likes:"
-msgstr ""
+msgstr "「いいね」のすう"
 
 #: js/StringHelper.js:46
 msgid "Tags:"
@@ -4291,15 +4293,16 @@ msgstr "タッグ"
 #: js/StringHelper.js:53
 #: js/ProjectViewer.js:18
 msgid "Report Project"
-msgstr ""
+msgstr "プロジェクトをつうほうする"
 
 #: js/StringHelper.js:50
 msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr ""
+msgstr "<a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">シュガー・ラボ \
+こうどうこうりょう</a>をまもらないプロジェクトをつうほうする"
 
 #: js/StringHelper.js:51
 msgid "Reason for reporting project"
-msgstr ""
+msgstr "プロジェクトをつうほうするりゆう"
 
 #: js/StringHelper.js:55
 msgid "Download as File"
@@ -4358,15 +4361,15 @@ msgstr "とくめい"
 
 #: js/ProjectViewer.js:16
 msgid "Error: Report could not be submitted. Try again later."
-msgstr ""
+msgstr "エラー：つうほうができませんでした。あとでさいどためしてください。"
 
 #: js/ProjectViewer.js:17
 msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
-msgstr ""
+msgstr "このプロジェクトをつうほうしてくださってありがとうございます。モデレータがまもなく、プロジェクトをみます。"
 
 #: js/ProjectViewer.js:19
 msgid "Project Reported"
-msgstr ""
+msgstr "プロジェクトつうほうされました"
 
 #: js/ProjectViewer.js:20
 msgid "Report description required"
@@ -4440,7 +4443,7 @@ msgstr "けんさくのけっかになにもはありません"
 
 #: js/GlobalPlanet.js:31
 msgid "Remix of"
-msgstr "~プロジェクトのリミックス"
+msgstr "～プロジェクトのリミックス"
 
 #: js/GlobalPlanet.js:380
 msgid "Cannot connect to server"
@@ -4458,9 +4461,9 @@ msgid "from"
 msgstr "から"
 
 #: plugins/finance.rtp:69
-## かぶ\E3\81"
+## かぶか
 msgid "stock price"
-msgstr "かぶ"
+msgstr "かぶか"
 
 #: plugins/translate.rtp:73
 msgid "translate"
@@ -4580,7 +4583,7 @@ msgstr "「y」ざひょうのうごき"
 
 #: plugins/accelerometer.rtp:64
 msgid "motion z"
-msgstr "zざひょうのうごき"
+msgstr "「z」ざひょうのうごき"
 
 #: plugins/dictionary.rtp:25
 ## 定義＝ていぎ；http://jisho.org/word/%E6%9C%80%E9%AB%98%E9%99%90%E5%BA%A6 
@@ -4768,11 +4771,11 @@ msgstr "ようぶ"
 
 #: plugins/weather.rtp:121
 msgid "high"
-msgstr "高"
+msgstr "こう"
 
 #: plugins/weather.rtp:134
 msgid "low"
-msgstr "低"
+msgstr "てい"
 
 #: plugins/rodi.rtp:176
 ## Blinking light is てんめつする
@@ -4830,7 +4833,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "このツールバーには、リズム、ピッチ、ねいろ、タートル、そのたのパレットボタンがあります。"
 
 #~msgid "divide note value"
-#~msgstr "おんかを割る"
+#~msgstr "おんかをわる"
 
 #~msgid "play backward"
 #~msgstr "ぎゃくにさいせい"
@@ -4842,10 +4845,10 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "32ぶんおんぷ　𝅘𝅥𝅰"
 
 #~msgid "vspace"
-#~msgstr "縦のスペース"
+#~msgstr "たてのスペース"
 
 #~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "このツールバーには、ピッチ・じこくぎょうれつ、チャンク、演奏、ねいろ、タートル、そのたをふくむパレットボタンがあります。ここをクリックすると、ブロックスのパレットがひょうじされます。パレットからブロックスをキャンバスへドラッグすると、ブロックスをつかうことができます。"
+#~msgstr "このツールバーには、ピッチ・じこくぎょうれつ、チャンク、えんそう、ねいろ、タートル、そのたをふくむパレットボタンがあります。ここをクリックすると、ブロックスのパレットがひょうじされます。パレットからブロックスをキャンバスへドラッグすると、ブロックスをつかうことができます。"
 
 #~msgid "sing"
 #~msgstr "歌う"
@@ -4926,7 +4929,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "はやいスピードでさいせいするためにはここをクリック。"
 
 #~msgid "whole note 𝅝"
-#~msgstr "全おんぷ　𝅝"
+#~msgstr "ぜんおんぷ　𝅝"
 
 #~msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
 #~msgstr "このツールバーには、パレットボタンやリズム、ピッチなどがふくまれています。"
@@ -4962,13 +4965,13 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "分子"
 
 #~msgid "relative interval"
-#~msgstr "相対てきなおととおとのあいだの間隔"
+#~msgstr "相対てきなおととおとのあいだのかんかく"
 
 #~msgid "set beats per minute"
 #~msgstr "BPM(いっぷんあたりのはくすう)をせってい"
 
 #~msgid "Undo"
-#~msgstr "元に戻す"
+#~msgstr "もとに戻す"
 
 #~msgid "graphical notation matrix"
 #~msgstr "簡単なビジュアル・マトリックス"
@@ -5037,7 +5040,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "コンソナントステップアップ"
 
 #~msgid "Remove all content on the canvas, including the blocks."
-#~msgstr "がめんうえにひょうじ（ブロックスをふくむ）を全てけします。"
+#~msgstr "がめんうえにひょうじ（ブロックスをふくむ）をすべてけします。"
 
 #~msgid "The save-stack button saves a stack onto a custom palette."
 #~msgstr "スタックほぞんボタンを押すと、スタックはカスタムパレットのしたにほぞんされます。"
@@ -5070,7 +5073,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "上級オプション"
 
 #~msgid "Input to Perfect Block must be 1, 4, 5, or 8"
-#~msgstr "完全ブロックには 1, 4, 5, 8 いずれかのかずをいれてください"
+#~msgstr "かんぜんブロックには 1, 4, 5, 8 いずれかのかずをいれてください"
 
 #~msgid "eighth note ♪"
 #~msgstr "８ぶんおんぷ　♪"
@@ -5109,7 +5112,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "ポリリズム"
 
 #~msgid "interval"
-#~msgstr "おととおとのあいだの間隔"
+#~msgstr "おととおとのあいだのかんかく"
 
 #~msgid "Rhythm Block: Did you mean to use a Matrix block?"
 #~msgstr "リズムブロックと：ピッチ・じこくぎょうれつといっしょにつかいますか？"
