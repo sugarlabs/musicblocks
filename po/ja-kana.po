@@ -1999,7 +1999,7 @@ msgstr "３９２ヘルツ"
 #.TRANS: number of beats per minute
 ## probably a little wrong. This is just multiply, I think...
 msgid "beat factor"
-msgstr "拍を～ばいにするファクター"
+msgstr "はくを～ばいにするファクター"
 
 #: js/basicblocks.js:1081
 #: js/basicblocks.js:1203
@@ -2017,7 +2017,7 @@ msgstr "小節のかず"
 #.TRANS: count of current beat in meter
 ## trying "what beat"
 msgid "beat count"
-msgstr "拍のかず"
+msgstr "はくのかず"
 
 #: js/basicblocks.js:1105
 #.TRANS: count the number of notes
@@ -2102,7 +2102,7 @@ msgstr "ピックアップ"
 #: js/basicblocks.js:1237
 ## https://ja.wikipedia.org/wiki/%E6%8B%8D%E5%AD%90
 msgid "number of beats"
-msgstr "拍のかず"
+msgstr "はくのかず"
 
 #: js/basicblocks.js:1250
 #.TRANS: the duration of a note played as staccato
@@ -2411,7 +2411,7 @@ msgstr "こおろぎ"
 #: js/musicutils.js:280
 #.TRANS: animal sound effect
 msgid "dog"
-msgstr "犬"
+msgstr "いぬ"
 
 #: js/basicblocks.js:2037
 #: js/synthutils.js:94
@@ -3909,25 +3909,25 @@ msgstr "オクタトニック・スケール"
 #.TRANS: harmonic major scale in music
 ## https://en.wikipedia.org/wiki/Harmonic_major_scale
 msgid "harmonic major"
-msgstr "ハーモニック・メジャー（和声ちょうおんかい）"
+msgstr "ハーモニック・メジャー（わせいちょうおんかい）"
 
 #: js/musicutils.js:156
 #.TRANS: natural minor scales in music
 ## https://cyta.jp/composition/c/entry/6542
 msgid "natural minor"
-msgstr "自然短おんかい"
+msgstr "しぜんたんおんかい"
 
 #: js/musicutils.js:158
 #.TRANS: harmonic minor scale in music
-## 和声短おんかい=わせいたのんかい； https://ja.wikipedia.org/wiki/%E9%9F%B3%E9%9A%8E
+## 和声短おんかい=わせいたんおんかい； https://ja.wikipedia.org/wiki/%E9%9F%B3%E9%9A%8E
 msgid "harmonic minor"
-msgstr "和声短おんかい"
+msgstr "わせいたんおんかい"
 
 #: js/musicutils.js:160
 #.TRANS: melodic minor scale in music
-## 旋律短音階=せんりつたのんかい；http://jisho.org/word/%E6%97%8B%E5%BE%8B%E7%9A%84%E7%9F%AD%E9%9F%B3%E9%9A%8E 
+## 旋律短音階=せんりつたんおんかい；http://jisho.org/word/%E6%97%8B%E5%BE%8B%E7%9A%84%E7%9F%AD%E9%9F%B3%E9%9A%8E 
 msgid "melodic minor"
-msgstr "旋律短おんかい"
+msgstr "せんりつたんおんかい"
 
 #: js/musicutils.js:164
 #.TRANS: modal scale for music
@@ -3999,7 +3999,7 @@ msgstr "ハンガリーおんかい"
 #: js/musicutils.js:189
 #.TRANS: minor Romanian scale for music
 msgid "romanian minor"
-msgstr "ルーマニアのマイナーおんかい"
+msgstr "ルーマニア・マイナーおんかい"
 
 #: js/musicutils.js:190
 msgid "spanish gypsy"
@@ -4051,13 +4051,13 @@ msgstr "にほん"
 #.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
 ## https://kotobank.jp/word/%E9%99%B0%E9%9F%B3%E9%9A%8E-32775
 msgid "in"
-msgstr "陰おんかい"
+msgstr "いんおんかい"
 
 #: js/musicutils.js:208
 #.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
 ## I cannot find the Japanese translation on Wikipedia and therefore cannot guess the Kanji
 msgid "minyo"
-msgstr "民謡おんかい"
+msgstr "みんよおんかい"
 
 #: js/musicutils.js:210
 #.TRANS: Italian mathematician
@@ -4130,7 +4130,7 @@ msgstr "フロアタム"
 #: js/musicutils.js:453
 #.TRANS: musical temperament
 msgid "equal"
-msgstr "平均律"
+msgstr "へいきんりつ"
 
 #: js/musicutils.js:285
 #: js/musicutils.js:455
@@ -4142,14 +4142,14 @@ msgstr "ピタゴラスおんりつ "
 #: js/musicutils.js:454
 #.TRANS: musical temperament
 msgid "just intonation"
-msgstr "純正律"
+msgstr "じゅんせいりつ"
 
 #: js/musicutils.js:289
 #: js/musicutils.js:456
 #: js/musicutils.js:457
 #.TRANS: musical temperament
 msgid "meantone"
-msgstr "中全おんりつ"
+msgstr "ちゅうぜんおんりつ"
 
 #: js/musicutils.js:1709
 #: js/musicutils.js:1743
@@ -4159,7 +4159,7 @@ msgstr "げんざいの"
 #: js/musicutils.js:1712
 #: js/musicutils.js:1734
 msgid "next"
-msgstr "この次の"
+msgstr "このつぎの"
 
 #: js/musicutils.js:1715
 #: js/musicutils.js:1739
@@ -4205,7 +4205,7 @@ msgstr "プロジェクトをこうかいする"
 
 #: js/StringHelper.js:26
 msgid "Tags (max 5)"
-msgstr "タッグ　（さいだい５こ）"
+msgstr "タッグ（さいだい５こ）"
 
 #: js/StringHelper.js:27
 #: js/StringHelper.js:47
@@ -4284,7 +4284,7 @@ msgstr ""
 
 #: js/StringHelper.js:46
 msgid "Tags:"
-msgstr ""
+msgstr "タッグ"
 
 #: js/StringHelper.js:48
 #: js/StringHelper.js:49
@@ -4303,11 +4303,11 @@ msgstr ""
 
 #: js/StringHelper.js:55
 msgid "Download as File"
-msgstr ""
+msgstr "ファイルでダウンロードする"
 
 #: js/StringHelper.js:56
 msgid "Open in Music Blocks"
-msgstr ""
+msgstr "ミュージック・ブロックすでひらきます"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
@@ -4330,7 +4330,7 @@ msgstr "シェア"
 #: js/GlobalCard.js:40
 #: js/LocalCard.js:40
 msgid "Flags"
-msgstr "旗"
+msgstr "はた"
 
 #: js/GlobalCard.js:41
 #: js/LocalCard.js:41
@@ -4350,11 +4350,11 @@ msgstr "スタートしたら、コードブロックをけす"
 #: js/GlobalCard.js:47
 #: js/LocalCard.js:47
 msgid "Advanced Options"
-msgstr "上級オプション"
+msgstr "じょうきゅうオプション"
 
 #: js/ProjectStorage.js:221
 msgid "anonymous"
-msgstr "匿名"
+msgstr "とくめい"
 
 #: js/ProjectViewer.js:16
 msgid "Error: Report could not be submitted. Try again later."
@@ -4379,16 +4379,16 @@ msgstr "レポートひょうきがながすぎます"
 #: js/Publisher.js:16
 #: js/GlobalPlanet.js:14
 msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
-msgstr "エラー：サーバに接続できません。ミュージック・ブロックスをリロードし、再度試してください。"
+msgstr "エラー：サーバにせつぞくできません。ミュージック・ブロックスをリロードし、さいどためしてください。"
 
 #: js/Publisher.js:121
 msgid "Republish Project"
-msgstr "プロジェクトを再度こうかいする"
+msgstr "プロジェクトをさいどこうかいする"
 
 #: js/Publisher.js:163
 #: js/Publisher.js:179
 msgid "This field is required"
-msgstr "この項目は必須項目です"
+msgstr "このこうもくはひっすこうもくです"
 
 #: js/Publisher.js:170
 msgid "Title too long"
@@ -4404,11 +4404,11 @@ msgstr "サーバーエラー"
 
 #: js/Publisher.js:263
 msgid "Try Again"
-msgstr "もう一度つかい直してください。"
+msgstr "もういちどつかいなおしてください。"
 
 #: js/LocalCard.js:21
 msgid "View published project"
-msgstr "こうかいされたプロジェクトを見る"
+msgstr "こうかいされたプロジェクトをみる"
 
 #: js/LocalCard.js:24
 msgid "Publish project"
@@ -4416,7 +4416,7 @@ msgstr "プロジェクトをこうかいする"
 
 #: js/LocalCard.js:31
 msgid "Edit project"
-msgstr "プロジェクトを編集する"
+msgstr "プロジェクトをへんしゅうする"
 
 #: js/LocalCard.js:32
 msgid "Delete project"
@@ -4436,7 +4436,7 @@ msgstr "プロジェクトをコピーする"
 
 #: js/GlobalPlanet.js:15
 msgid "No results found."
-msgstr "けんさくのけっかに何もはありません"
+msgstr "けんさくのけっかになにもはありません"
 
 #: js/GlobalPlanet.js:31
 msgid "Remix of"
@@ -4444,12 +4444,12 @@ msgstr "~プロジェクトのリミックス"
 
 #: js/GlobalPlanet.js:380
 msgid "Cannot connect to server"
-msgstr "サーバに接続できません"
+msgstr "サーバにせつぞくできません"
 
 #: plugins/finance.rtp:28
 ## http://jisho.org/word/%E9%80%9A%E8%B2%A8 通貨＝つうか
 msgid "currency"
-msgstr "通貨"
+msgstr "つうか"
 
 #: plugins/finance.rtp:28
 #: plugins/bitcoin.rtp:27
@@ -4460,7 +4460,7 @@ msgstr "から"
 #: plugins/finance.rtp:69
 ## かぶ\E3\81"
 msgid "stock price"
-msgstr "株価"
+msgstr "かぶ"
 
 #: plugins/translate.rtp:73
 msgid "translate"
@@ -4475,7 +4475,7 @@ msgstr "こんにちは"
 #: plugins/translate.rtp:84
 ## 検出=けんしゅつ http://jisho.org/word/%E3%82%AD%E3%83%A3%E3%83%AA%E3%82%A2%E6%A4%9C%E5%87%BA 
 msgid "detect lang"
-msgstr "げんごを検出"
+msgstr "げんごをけんしゅつ"
 
 #: plugins/translate.rtp:95
 msgid "set lang"
@@ -4483,12 +4483,12 @@ msgstr "げんごをせってい"
 
 #: plugins/gmap.rtp:30
 msgid "city latitude"
-msgstr "市の緯度"
+msgstr "しのいど"
 
 #: plugins/gmap.rtp:40
 ## http://jisho.org/word/%E7%B5%8C%E5%BA%A6 軽度＝けいど
 msgid "city longitude"
-msgstr "市の経度"
+msgstr "しのけいど"
 
 #: plugins/gmap.rtp:71
 #: plugins/gmap.rtp:74
@@ -4521,17 +4521,17 @@ msgstr "ズーム"
 #: plugins/gmap.rtp:160
 ## ひらがな＝いど
 msgid "latitude"
-msgstr "緯度"
+msgstr "いど"
 
 #: plugins/gmap.rtp:160
 ## ひらがな＝けいど
 msgid "longitude"
-msgstr "経度"
+msgstr "けいど"
 
 #: plugins/maths.rtp:47
 ## ひらがな＝じょうべき
 msgid "power"
-msgstr "指数"
+msgstr "じょうべき"
 
 #: plugins/maths.rtp:47
 msgid "base"
@@ -4545,21 +4545,21 @@ msgstr "exp"
 #: plugins/maths.rtp:69
 ## I have no idea; maybe 層=そう http://jisho.org/word/%E5%B1%A4 ...最低限度is promising
 msgid "floor"
-msgstr "床"
+msgstr "ゆか"
 
 #: plugins/maths.rtp:71
 ## http://jisho.org/word/%E6%9C%80%E9%AB%98%E9%99%90%E5%BA%A6 
 msgid "ceiling"
-msgstr "天井"
+msgstr "てんじょう"
 
 #: plugins/maths.rtp:74
 msgid "degrees"
-msgstr "温度"
+msgstr "おんど"
 
 #: plugins/maths.rtp:74
 ## I don't really understand context. This says "what degree". Maybe just leave second character, which means "degree".
 msgid "to degrees"
-msgstr "度数法へ変換"
+msgstr "どすうほうへへんかん"
 
 #: plugins/maths.rtp:76
 ## also ラディアン
@@ -4568,15 +4568,15 @@ msgstr "ラジアン"
 
 #: plugins/maths.rtp:76
 msgid "to radians"
-msgstr "ラジアンへ変換"
+msgstr "ラジアンへへんかん"
 
 #: plugins/accelerometer.rtp:48
 msgid "motion x"
-msgstr "xざひょうのうごき"
+msgstr "「x」ざひょうのうごき"
 
 #: plugins/accelerometer.rtp:56
 msgid "motion y"
-msgstr "yざひょうのうごき"
+msgstr "「y」ざひょうのうごき"
 
 #: plugins/accelerometer.rtp:64
 msgid "motion z"
@@ -4585,7 +4585,7 @@ msgstr "zざひょうのうごき"
 #: plugins/dictionary.rtp:25
 ## 定義＝ていぎ；http://jisho.org/word/%E6%9C%80%E9%AB%98%E9%99%90%E5%BA%A6 
 msgid "define"
-msgstr "定義"
+msgstr "ていぎ"
 
 #: plugins/nutrition.rtp:104
 msgid "get calories"
@@ -4593,25 +4593,25 @@ msgstr "カロリーをとる"
 
 #: plugins/nutrition.rtp:107
 msgid "get protein"
-msgstr "たんぱく質をとる"
+msgstr "たんぱくしつをとる"
 
 #: plugins/nutrition.rtp:110
-## たんすいかぶ\E3\81"
+## たんすいかぶつ"
 msgid "get carbs"
-msgstr "炭水化物"
+msgstr "たんすいかぶつ"
 
 #: plugins/nutrition.rtp:113
 ##　Get is ambiguous English word. Translates to "Take Dietary Fiber"
 msgid "get fiber"
-msgstr "食物繊維をとる"
+msgstr "せんいしつをとる"
 
 #: plugins/nutrition.rtp:116
 msgid "get fat"
-msgstr "太る"
+msgstr "ふとる"
 
 #: plugins/nutrition.rtp:119
 msgid "get name"
-msgstr "なまえを獲得する"
+msgstr "なまえをかくとくする"
 
 #: plugins/nutrition.rtp:122
 msgid "calories"
@@ -4624,25 +4624,25 @@ msgstr "たんぱく"
 #: plugins/nutrition.rtp:134
 ## 炭水化物=たんすいかぶつ
 msgid "carbs"
-msgstr "炭水化物"
+msgstr "たんすいかぶつ"
 
 #: plugins/nutrition.rtp:140
 msgid "fiber"
-msgstr "食物繊維"
+msgstr "しょくぶつせんいしつ"
 
 #: plugins/nutrition.rtp:146
 ## Only for the noun; not adjective.
 msgid "fat"
-msgstr "脂肪"
+msgstr "しぼう"
 
 #: plugins/nutrition.rtp:152
 msgid "eat"
-msgstr "食べる"
+msgstr "たべる"
 
 #: plugins/nutrition.rtp:155
 ## ひらがな＝こな\E3\81"
 msgid "digest meal"
-msgstr "食事を熟す"
+msgstr "しょくじをじゅくす"
 
 #: plugins/nutrition.rtp:158
 msgid "apple"
@@ -4654,7 +4654,7 @@ msgstr "バナナ"
 
 #: plugins/nutrition.rtp:167
 msgid "wheat bread"
-msgstr "麦パン"
+msgstr "むぎパン"
 
 #: plugins/nutrition.rtp:170
 msgid "corn"
@@ -4663,7 +4663,7 @@ msgstr "コーン"
 #: plugins/nutrition.rtp:173
 ## Western potatoe only?
 msgid "potato"
-msgstr "芋"
+msgstr "いも"
 
 #: plugins/nutrition.rtp:176
 msgid "sweet potato"
@@ -4679,7 +4679,7 @@ msgstr "ブロッコリー"
 
 #: plugins/nutrition.rtp:185
 msgid "rice and beans"
-msgstr "飯と豆"
+msgstr "ごはんとまめ"
 
 #: plugins/nutrition.rtp:188
 msgid "tamale"
@@ -4691,15 +4691,15 @@ msgstr "チーズ"
 
 #: plugins/nutrition.rtp:194
 msgid "chicken"
-msgstr "鶏肉"
+msgstr "とりにく"
 
 #: plugins/nutrition.rtp:197
 msgid "fish"
-msgstr "魚"
+msgstr "さかな"
 
 #: plugins/nutrition.rtp:200
 msgid "beef"
-msgstr "牛肉"
+msgstr "ぎゅうにく"
 
 #: plugins/nutrition.rtp:203
 msgid "cake"
@@ -4711,7 +4711,7 @@ msgstr "クッキー"
 
 #: plugins/nutrition.rtp:209
 msgid "water"
-msgstr "水"
+msgstr "みず"
 
 #: plugins/bitcoin.rtp:27
 msgid "bitcoin"
@@ -4747,24 +4747,24 @@ msgstr "ネズミのなまえ"
 #: plugins/weather.rtp:86
 ## This needs to be corrected
 msgid "Days ahead must be in the range of -1 to 5."
-msgstr "日にちは -１から５までのかずでなくてはなりません"
+msgstr "ひにちは -１から５までのかずでなくてはなりません"
 
 #: plugins/weather.rtp:107
 msgid "forecast"
-msgstr "天気予報"
+msgstr "てんきよほう"
 
 #: plugins/weather.rtp:108
 #: plugins/weather.rtp:122
 #: plugins/weather.rtp:135
 msgid "city"
-msgstr "市"
+msgstr "し"
 
 #: plugins/weather.rtp:109
 #: plugins/weather.rtp:123
 #: plugins/weather.rtp:136
 ## I am assuming "day of the week". 期日 for "date"
 msgid "day"
-msgstr "曜日"
+msgstr "ようぶ"
 
 #: plugins/weather.rtp:121
 msgid "high"
@@ -4781,33 +4781,33 @@ msgstr "てんめつする"
 
 #: plugins/rodi.rtp:197
 msgid "duration"
-msgstr "期間のせってい"
+msgstr "きかんのせってい"
 
 #: plugins/rodi.rtp:250
 ## 発光＝はっこう　Pretty sure most people would understand "LED" as well http://jisho.org/word/%EF%BC%AC%EF%BC%A5%EF%BC%A4 
 msgid "led"
-msgstr "発光ダイオード"
+msgstr "はっこうダイオード"
 
 #: plugins/rodi.rtp:269
 msgid "light intensity"
-msgstr "光のつよさ"
+msgstr "ひかりのつよさ"
 
 #: plugins/rodi.rtp:286
 ## http://jisho.org/word/%E8%B5%A4%E5%A4%96　赤外＝せきがい 
 msgid "infrared light (left)"
-msgstr "赤外光　(左）"
+msgstr "せきがい(ひだり）"
 
 #: plugins/rodi.rtp:300
 msgid "infrared light (right)"
-msgstr "赤外光　(右）"
+msgstr "せきがい(みぎ）"
 
 #: plugins/rodi.rtp:314
 msgid "distance"
-msgstr "距離"
+msgstr "きょり"
 
 #: plugins/rodi.rtp:342
 msgid "move"
-msgstr "うごき出し"
+msgstr "うごきだし"
 
 #: plugins/heap.rtp:81
 #: plugins/heap.rtp:85
@@ -4815,10 +4815,10 @@ msgid "You need to select a file."
 msgstr "ファイルをえらぶひつようがあります"
 
 #~msgid "gp"
-#~msgstr "ギ"
+#~msgstr "ギニ…"
 
 #~msgid "gs"
-#~msgstr "灰"
+#~msgstr "はい…"
 
 #~msgid "Stop the current project."
 #~msgstr "プロジェクトをとめます"
@@ -5100,7 +5100,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "茶"
 
 #~msgid "multiply beat"
-#~msgstr "１拍の速さをばいに"
+#~msgstr "はくをばいに"
 
 #~msgid "turtle"
 #~msgstr "タートル"
