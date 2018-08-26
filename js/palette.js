@@ -1063,15 +1063,15 @@ function Palette(palettes, name) {
         var that = this;
 
         function __processButtonIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4; // 0.8;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.6; // 0.4; // 0.8;
             that.menuContainer.addChild(bitmap);
             that.palettes.container.addChild(that.menuContainer);
         };
 
         function __processCloseIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.35; // 0.7;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.5 // 0.35; // 0.7;
             that.menuContainer.addChild(bitmap);
-            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT / 2;
+            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT * 2 / 3;
             bitmap.y = 0;
 
             var hitArea = new createjs.Shape();
@@ -1256,7 +1256,7 @@ function Palette(palettes, name) {
             this.protoContainers[i].y -= this.scrollDiff;
         }
 
-        this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT / 2;
+        this.y = this.menuContainer.y + 40;  // STANDARDBLOCKHEIGHT / 2;
         var items = [];
         var heights = [];
         // Reverse order
