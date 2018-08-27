@@ -1108,7 +1108,14 @@ function Block(protoblock, blocks, overrideName) {
                 if (p === '' && v === '') {
                     that.collapseText.text = 'note value';
                 } else {
-                    that.collapseText.text = p + ' ' + v;
+		    // Are there more pitch blocks in this note?
+                    c = that.blocks.findFirstPitchBlock(last(that.blocks.blockList[c].connections));
+		    // Update the collapsed-block label.
+                    if (c === null) {
+                        that.collapseText.text = p + ' ' + v;
+                    } else {
+                        that.collapseText.text = p + '... ' + v;
+                    }
                 }
             }
 
