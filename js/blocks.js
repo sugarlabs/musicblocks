@@ -3120,6 +3120,20 @@ function Blocks () {
         return false;
     };
 
+    this.findFirstPitchBlock = function (blk) {
+        // Returns first pitch block found.
+        if (blk === null) {
+            return null;
+        }
+
+        if (['pitch', 'hertz', 'pitchnumber', 'scaledegree', 'steppitch'].indexOf(this.blockList[blk].name) !== -1) {
+            return blk;
+        }
+
+        var c = last(this.blockList[blk].connections);
+        return this.findFirstPitchBlock(c);
+    };
+
     this.findPitchOctave = function (blk) {
         // Returns octave associated with pitch block.
         if (blk === null) {

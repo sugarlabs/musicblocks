@@ -197,8 +197,8 @@ function Block(protoblock, blocks, overrideName) {
             }
         } else {
             if (this.bitmap === null) {
-		return;
-	    }
+                return;
+            }
 
             this.bitmap.visible = true;
             this.highlightBitmap.visible = false;
@@ -276,10 +276,10 @@ function Block(protoblock, blocks, overrideName) {
                 if (that.name === 'newnote') {
                     that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 4;
                     that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 4;
-		} else {
+                } else {
                     that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 2;
                     that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 2;
-		}
+                }
 
                 that._positionCollapseContainer(that.protoblock.scale);
 
@@ -294,7 +294,7 @@ function Block(protoblock, blocks, overrideName) {
             var fontSize = 10 * scale;
             this.collapseText.font = fontSize + 'px Sans';
             this._positionCollapseLabel(scale);
-	}
+        }
     };
 
     this._newArtwork = function (plusMinus) {
@@ -698,12 +698,12 @@ function Block(protoblock, blocks, overrideName) {
                 proto.scale = this.protoblock.scale;
                 proto.extraWidth = 40;
                 proto.zeroArgBlock();
-	    } else {
+            } else {
                 var proto = new ProtoBlock('collapse');
                 proto.scale = this.protoblock.scale;
                 proto.extraWidth = 40;
                 proto.basicBlockCollapsed();
-	    }
+            }
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
             var postProcess = function (that) {
@@ -793,9 +793,9 @@ function Block(protoblock, blocks, overrideName) {
                 that.collapseBitmap = new createjs.Bitmap(image);
                 if (that.name === 'newnote') {
                     that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 3;
-		} else {
+                } else {
                     that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 2;
-		}
+                }
                 that.collapseContainer.addChild(that.collapseBitmap);
                 that.collapseBitmap.y = 2;
                 that.collapseBitmap.visible = !that.collapsed;
@@ -809,10 +809,10 @@ function Block(protoblock, blocks, overrideName) {
                 image.onload = function () {
                     that.expandBitmap = new createjs.Bitmap(image);
                     if (that.name === 'newnote') {
-			that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 3;
-		    } else {
-			that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 2;
-		    }
+                        that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 3;
+                    } else {
+                        that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 2;
+                    }
                     that.collapseContainer.addChild(that.expandBitmap);
                     that.expandBitmap.y = 2;
                     that.expandBitmap.visible = that.collapsed;
@@ -1041,9 +1041,76 @@ function Block(protoblock, blocks, overrideName) {
             that.highlightCollapseBlockBitmap.visible = false;
             that.collapseText.visible = !collapse;
 
-            if (that.name === 'newnote' && that.collpaseText.visible) {
-		console.log('update collapseText');
-	    }
+            if (that.name === 'newnote' && that.collapseText.visible) {
+                // Find note value
+                v = '';
+                c = that.connections[1];
+                if (c !== null) {
+                    // Only look for standard form: / 1 4
+                    if (that.blocks.blockList[c].name === 'divide') { 
+                        c1 = that.blocks.blockList[c].connections[1];
+                        c2 = that.blocks.blockList[c].connections[2];
+                        if (that.blocks.blockList[c1].name === 'number' && that.blocks.blockList[c2].name === 'number') {
+                            v = that.blocks.blockList[c1].value + '/' + that.blocks.blockList[c2].value;
+                        }
+                    }
+                }
+
+                p = '';
+                c = that.connections[2];
+                c = that.blocks.findFirstPitchBlock(c);
+                if (c !== null) {
+                    console.log(that.blocks.blockList[c].name);
+                    switch(that.blocks.blockList[c].name) {
+                    case 'pitch':
+                        c1 = that.blocks.blockList[c].connections[1];
+                        c2 = that.blocks.blockList[c].connections[2];
+                        if (that.blocks.blockList[c2].name === 'number') {
+                            if (that.blocks.blockList[c1].name === 'solfege') {
+                                p = _(that.blocks.blockList[c1].value) + ' ' + that.blocks.blockList[c2].value;
+                            } else if (that.blocks.blockList[c1].name === 'notename') {
+                                p = that.blocks.blockList[c1].value + ' ' + that.blocks.blockList[c2].value;
+                            }
+                        }
+                        break;
+                    case 'scaledegree':
+                        c1 = that.blocks.blockList[c].connections[1];
+                        c2 = that.blocks.blockList[c].connections[2];
+                        if (that.blocks.blockList[c2].name === 'number') {
+                            if (that.blocks.blockList[c1].name === 'number') {
+                                p = 'scale degree ' + _(that.blocks.blockList[c1].value) + ' ' + that.blocks.blockList[c2].value;
+                            }
+                        }
+                        break;
+                    case 'hertz':
+                        c1 = that.blocks.blockList[c].connections[1];
+                        if (that.blocks.blockList[c1].name === 'number') {
+                            p = that.blocks.blockList[c2].value + 'HZ';
+                        }
+                        break;
+                    case 'steppitch':
+                        c1 = that.blocks.blockList[c].connections[1];
+                        if (that.blocks.blockList[c1].name === 'number') {
+                            p = 'scalar step ' + that.blocks.blockList[c2].value;
+                        }
+                        break;
+                    case 'pitchnumber':
+                        c1 = that.blocks.blockList[c].connections[1];
+                        if (that.blocks.blockList[c1].name === 'number') {
+                            p = 'pitch number ' + that.blocks.blockList[c2].value;
+                        }
+                        break;
+                    default:
+                        p = '';
+                    }
+                }
+
+                if (p === '' && v === '') {
+                    that.collapseText.text = 'note value';
+                } else {
+                    that.collapseText.text = p + ' ' + v;
+                }
+            }
 
             if (collapse) {
                 that.bitmap.visible = true;
@@ -1113,7 +1180,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (blk !== null) {
                     that.blocks.clampBlocksToCheck = [[blk, 0]];
                     that.blocks.adjustExpandableClampBlock();
-		}
+                }
 
                 that.blocks.refreshCanvas();
             } else {
@@ -1209,8 +1276,8 @@ function Block(protoblock, blocks, overrideName) {
 
     this._positionCollapseContainer = function (blockScale) {
         if (this.collapseContainer === null) {
-	    return;
-	}
+            return;
+        }
 
         if (this.name === 'newnote') {
             this.collapseContainer.x = this.container.x;
