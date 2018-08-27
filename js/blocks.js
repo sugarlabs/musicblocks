@@ -412,7 +412,6 @@ function Blocks () {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
-
             if (myBlock.isArgFlowClampBlock()) {
                 var c = 1;  // 0: outie; and 1: child flow
             } else if (clamp === 0) {
@@ -449,6 +448,10 @@ function Blocks () {
     // Returns the block size.
     this._getBlockSize = function (blk) {
         var myBlock = this.blockList[blk];
+        if (myBlock.name === 'newnote' && myBlock.collapsed) {
+	    return 1;
+	}
+
         return myBlock.size;
     };
 
@@ -621,8 +624,9 @@ function Blocks () {
             if (c > 0) {
                 var cblk = myBlock.connections[c];
                 if (cblk != null) {
-                    csize = this._getStackSize(cblk);
+		    csize = this._getStackSize(cblk);
                 }
+
                 if (csize === 0) {
                     size = 1; // minimum of 1 slot in clamp
                 } else {
@@ -653,6 +657,11 @@ function Blocks () {
             size = myBlock.size;
         }
 
+        // If the note value block is collapsed, spoof size.
+        if (myBlock.name === 'newnote' && myBlock.collapsed) {
+	    size = 1
+	}
+
         // check on any connected block
         if (myBlock.connections.length > 1) {
             var cblk = last(myBlock.connections);
@@ -660,6 +669,7 @@ function Blocks () {
                 size += this._getStackSize(cblk);
             }
         }
+
         return size;
     };
 
@@ -668,6 +678,9 @@ function Blocks () {
         // of all of the blocks connected to it
 
         var myBlock = this.blockList[blk];
+        if (myBlock.name === 'newnote' && myBlock.collapsed) {
+	    return;
+	}
 
         // For when we come in from makeBlock
         if (resetLoopCounter != null) {
@@ -1029,7 +1042,7 @@ function Blocks () {
             return;
         }
 
-        var blk = this._insideExpandableBlock(thisBlock);
+        var blk = this.insideExpandableBlock(thisBlock);
         var expandableLoopCounter = 0;
 
         var parentblk = null;
@@ -1047,7 +1060,7 @@ function Blocks () {
             }
 
             this.clampBlocksToCheck.push([blk, 0]);
-            blk = this._insideExpandableBlock(blk);
+            blk = this.insideExpandableBlock(blk);
         }
 
         this._checkTwoArgBlocks = [];
@@ -1466,7 +1479,7 @@ function Blocks () {
 
         // Next, recheck if the connection is inside of a
         // expandable block.
-        var blk = this._insideExpandableBlock(thisBlock);
+        var blk = this.insideExpandableBlock(thisBlock);
         var expandableLoopCounter = 0;
         while (blk != null) {
             // Extra check for malformed data.
@@ -1484,7 +1497,7 @@ function Blocks () {
                 this.clampBlocksToCheck.push([blk, 0]);
             }
 
-            blk = this._insideExpandableBlock(blk);
+            blk = this.insideExpandableBlock(blk);
         }
 
         this.adjustExpandableClampBlock();
@@ -1621,11 +1634,13 @@ function Blocks () {
             myBlock.container.x = Math.floor(x + 0.5);
             myBlock.container.y = Math.floor(y + 0.5);
 
+            myBlock._positionCollapseContainer(this.blockList[blk].protoblock.scale);
+            /*
             if (myBlock.collapseContainer != null) {
                 myBlock.collapseContainer.x = Math.floor(x + 0.5) + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
                 myBlock.collapseContainer.y = Math.floor(y + 0.5) + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
-
+            */
             this.checkBounds();
         } else {
             console.log('No container yet for block ' + myBlock.name);
@@ -3040,7 +3055,7 @@ function Blocks () {
         }
     };
 
-    this._insideExpandableBlock = function (blk) {
+    this.insideExpandableBlock = function (blk) {
         // Returns a containing expandable block or null
         if (this.blockList[blk] == null) {
             // race condition?
@@ -3055,12 +3070,12 @@ function Blocks () {
                 if (this.blockList[cblk].isArgFlowClampBlock()) {
                     return cblk;
                 } else if (blk === last(this.blockList[cblk].connections)) {
-                    return this._insideExpandableBlock(cblk);
+                    return this.insideExpandableBlock(cblk);
                 } else {
                     return cblk;
                 }
             } else {
-                return this._insideExpandableBlock(cblk);
+                return this.insideExpandableBlock(cblk);
             }
         }
     };

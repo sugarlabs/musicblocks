@@ -14,7 +14,7 @@
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename'];
@@ -273,8 +273,13 @@ function Block(protoblock, blocks, overrideName) {
         if (this.collapseContainer !== null) {
             this.collapseContainer.uncache();
             var _postProcess = function (that) {
-                that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 2;
-                that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 2;
+                if (that.name === 'newnote') {
+                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 4;
+                    that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 4;
+		} else {
+                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 2;
+                    that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 2;
+		}
 
                 that._positionCollapseContainer(that.protoblock.scale);
 
@@ -289,7 +294,7 @@ function Block(protoblock, blocks, overrideName) {
             var fontSize = 10 * scale;
             this.collapseText.font = fontSize + 'px Sans';
             this._positionCollapseLabel(scale);
-        }
+	}
     };
 
     this._newArtwork = function (plusMinus) {
@@ -686,12 +691,19 @@ function Block(protoblock, blocks, overrideName) {
                 this.collapseText.visible = false;
             }
         } else {
-            // Start blocks and Action blocks can collapse, so add an
-            // event handler.
-            var proto = new ProtoBlock('collapse');
-            proto.scale = this.protoblock.scale;
-            proto.extraWidth = 40;
-            proto.basicBlockCollapsed();
+            // Some blocks, e.g., Start blocks and Action blocks can
+            // collapse, so add an event handler.
+            if (this.name == 'newnote') {
+                var proto = new ProtoBlock('collapse-note');
+                proto.scale = this.protoblock.scale;
+                proto.extraWidth = 40;
+                proto.zeroArgBlock();
+	    } else {
+                var proto = new ProtoBlock('collapse');
+                proto.scale = this.protoblock.scale;
+                proto.extraWidth = 40;
+                proto.basicBlockCollapsed();
+	    }
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
             var postProcess = function (that) {
@@ -757,6 +769,8 @@ function Block(protoblock, blocks, overrideName) {
                 case 'drum':
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
                     break;
+                case 'newnote':
+                    that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', '#000000');
                 }
 
                 that.collapseText.textAlign = 'left';
@@ -771,12 +785,19 @@ function Block(protoblock, blocks, overrideName) {
 
             that.collapseContainer = new createjs.Container();
             that.collapseContainer.snapToPixelEnabled = true;
+            that.collapseContainer.x = that.container.x;
+            that.collapseContainer.y = Math.floor((that.container.y + ((COLLAPSEBUTTONYOFF - 8) * that.protoblock.scale / 2)) + 0.5);
 
             var image = new Image();
             image.onload = function () {
                 that.collapseBitmap = new createjs.Bitmap(image);
-                that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 2;
+                if (that.name === 'newnote') {
+                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 3;
+		} else {
+                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 2;
+		}
                 that.collapseContainer.addChild(that.collapseBitmap);
+                that.collapseBitmap.y = 2;
                 that.collapseBitmap.visible = !that.collapsed;
                 finishCollapseButton(that);
             };
@@ -787,8 +808,13 @@ function Block(protoblock, blocks, overrideName) {
                 var image = new Image();
                 image.onload = function () {
                     that.expandBitmap = new createjs.Bitmap(image);
-                    that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 2;
+                    if (that.name === 'newnote') {
+			that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 3;
+		    } else {
+			that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 2;
+		    }
                     that.collapseContainer.addChild(that.expandBitmap);
+                    that.expandBitmap.y = 2;
                     that.expandBitmap.visible = that.collapsed;
 
                     var bounds = that.collapseContainer.getBounds();
@@ -1003,6 +1029,7 @@ function Block(protoblock, blocks, overrideName) {
                 console.log('collapse bitmap not ready');
                 return;
             }
+
             that.collapsed = !collapse;
 
             // These are the buttons to collapse/expand the stack.
@@ -1014,12 +1041,17 @@ function Block(protoblock, blocks, overrideName) {
             that.highlightCollapseBlockBitmap.visible = false;
             that.collapseText.visible = !collapse;
 
+            if (that.name === 'newnote' && that.collpaseText.visible) {
+		console.log('update collapseText');
+	    }
+
             if (collapse) {
                 that.bitmap.visible = true;
             } else {
                 that.bitmap.visible = false;
                 that.updateCache();
             }
+
             that.highlightBitmap.visible = false;
 
             if (that.name === 'action') {
@@ -1040,12 +1072,58 @@ function Block(protoblock, blocks, overrideName) {
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.collapseText, z);
 
-            // Set collapsed state of blocks in drag group.
-            if (that.blocks.dragGroup.length > 0) {
-                for (var b = 1; b < that.blocks.dragGroup.length; b++) {
-                    var blk = that.blocks.dragGroup[b];
-                    that.blocks.blockList[blk].collapsed = !collapse;
-                    that.blocks.blockList[blk].container.visible = collapse;
+            if (that.name == 'newnote') {
+                // Set collapsed state of note value arg blocks
+                if (that.connections[1] !== null) {
+                    that.blocks.findDragGroup(that.connections[1]);
+                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
+                        var blk = that.blocks.dragGroup[b];
+                        that.blocks.blockList[blk].collapsed = !collapse;
+                        that.blocks.blockList[blk].container.visible = collapse;
+                    }
+                }
+
+                // blocks inside the clamp
+                if (that.connections[2] !== null) {
+                    that.blocks.findDragGroup(that.connections[2]);
+                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
+                        var blk = that.blocks.dragGroup[b];
+                        that.blocks.blockList[blk].collapsed = !collapse;
+                        that.blocks.blockList[blk].container.visible = collapse;
+                    }
+                }
+
+                // Reposition the blocks below
+                if (that.connections[3] != null) {
+                    if (collapse) {
+                        var dy = that.blocks.blockList[thisBlock].docks[3][1] - that.blocks.blockList[thisBlock].docks[2][1];
+                    } else {
+                        var dy = that.blocks.blockList[thisBlock].docks[2][1] - that.blocks.blockList[thisBlock].docks[3][1];
+                    }
+
+                    that.blocks.findDragGroup(that.connections[3]);
+                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
+                        var blk = that.blocks.dragGroup[b];
+                        that.blocks.moveBlockRelative(blk, 0, dy);
+                    }
+                }
+
+                // Look to see if we are in a clamp block. If so, readjust.
+                blk = that.blocks.insideExpandableBlock(thisBlock);
+                if (blk !== null) {
+                    that.blocks.clampBlocksToCheck = [[blk, 0]];
+                    that.blocks.adjustExpandableClampBlock();
+		}
+
+                that.blocks.refreshCanvas();
+            } else {
+                // Set collapsed state of blocks in drag group.
+                if (that.blocks.dragGroup.length > 0) {
+                    for (var b = 1; b < that.blocks.dragGroup.length; b++) {
+                        var blk = that.blocks.dragGroup[b];
+                        that.blocks.blockList[blk].collapsed = !collapse;
+                        that.blocks.blockList[blk].container.visible = collapse;
+                    }
                 }
             }
 
@@ -1116,8 +1194,13 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._positionCollapseLabel = function (blockScale) {
-        this.collapseText.x = Math.floor((COLLAPSETEXTX * blockScale / 2) + 0.5);
-        this.collapseText.y = Math.floor((COLLAPSETEXTY * blockScale / 2) + 0.5);
+        if (this.name === 'newnote') {
+            this.collapseText.x = Math.floor(((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale / 2) + 0.5);
+            this.collapseText.y = Math.floor(((COLLAPSETEXTY - 8) * blockScale / 2) + 0.5);
+        } else {
+            this.collapseText.x = Math.floor((COLLAPSETEXTX * blockScale / 2) + 0.5);
+            this.collapseText.y = Math.floor((COLLAPSETEXTY * blockScale / 2) + 0.5);
+        }
 
         // Ensure text is on top.
         z = this.container.children.length - 1;
@@ -1125,8 +1208,17 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._positionCollapseContainer = function (blockScale) {
-        this.collapseContainer.x = Math.floor((this.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2)) + 0.5);
-        this.collapseContainer.y = Math.floor((this.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2)) + 0.5);
+        if (this.collapseContainer === null) {
+	    return;
+	}
+
+        if (this.name === 'newnote') {
+            this.collapseContainer.x = this.container.x;
+            this.collapseContainer.y = Math.floor((this.container.y + ((COLLAPSEBUTTONYOFF - 8) * blockScale / 2)) + 0.5);
+        } else {
+            this.collapseContainer.x = Math.floor((this.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2)) + 0.5);
+            this.collapseContainer.y = Math.floor((this.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2)) + 0.5);
+        }
     };
 
     // These are the event handlers for collapsible blocks.

@@ -1004,7 +1004,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['status'] = newblock;
     newblock.staticLabels.push(_('status'));
-    newblock.extraWidth = 10;
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('status')) {
@@ -1286,7 +1286,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newnote'] = newblock;
     newblock.staticLabels.push(_('note value'));
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(1 / 4);
     if (beginnerMode && !beginnerBlock('newnote')) {

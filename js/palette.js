@@ -1063,22 +1063,24 @@ function Palette(palettes, name) {
         var that = this;
 
         function __processButtonIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.6; // 0.4; // 0.8;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.6;
             that.menuContainer.addChild(bitmap);
             that.palettes.container.addChild(that.menuContainer);
         };
 
         function __processCloseIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.5 // 0.35; // 0.7;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.5;
             that.menuContainer.addChild(bitmap);
             bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT * 2 / 3;
             bitmap.y = 0;
 
+            // Define the hit area for the entire header area; the
+            // left half is for draggging, the right half is for the
+            // close button.
             var hitArea = new createjs.Shape();
-            // hitArea.graphics.beginFill('#FFF').drawEllipse(-paletteWidth / 2, -STANDARDBLOCKHEIGHT / 2, paletteWidth, STANDARDBLOCKHEIGHT);
 	    hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth, STANDARDBLOCKHEIGHT / 2);
-            hitArea.x = 0;  // paletteWidth * 3 / 4;
-            hitArea.y = 0;  // STANDARDBLOCKHEIGHT / 2;
+            hitArea.x = 0;
+            hitArea.y = 0;
             that.menuContainer.hitArea = hitArea;
             that.menuContainer.visible = false;
 
