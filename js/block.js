@@ -32,7 +32,8 @@ function Block(protoblock, blocks, overrideName) {
     this.name = protoblock.name;
     this.overrideName = overrideName;
     this.blocks = blocks;
-    this.collapsed = false;  // Is this block in a collapsed stack?
+    this.collapsed = false;  // Is this collapsible block collapsed?
+    this.inCollapsed = false;  // Is this block in a collapsed stack?
     this.trash = false;  // Is this block in the trash?
     this.loadComplete = false;  // Has the block finished loading?
     this.label = null;  // Editable textview in DOM.
@@ -61,8 +62,8 @@ function Block(protoblock, blocks, overrideName) {
     // Start and Action blocks has a collapse button (in a separate
     // container).
     this.collapseContainer = null;
-    this.collapseBitmap = null;
-    this.expandBitmap = null;
+    this.collapseButtonBitmap = null;
+    this.expandButtonBitmap = null;
     this.collapseBlockBitmap = null;
     this.highlightCollapseBlockBitmap = null;
     this.collapseText = null;
@@ -154,64 +155,131 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.highlight = function () {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
-            // We may have a race condition.
-            if (this.highlightCollapseBlockBitmap) {
-                this.highlightCollapseBlockBitmap.visible = true;
-                this.collapseBlockBitmap.visible = false;
-                this.collapseText.visible = true;
-                this.bitmap.visible = false;
-                this.highlightBitmap.visible = false;
+        if (this.inCollapsed) {
+	    // In collapsed, so do nothing.
+	    return;
+	}
+
+	// Always hide the non-highlighted artwork.
+        this.bitmap.visible = false;
+
+        // If it is a collapsed collaspable, hightlight the collapsed state.
+        if (this.collapsed) {
+	    // Show the highlighted collapsed artwork.
+
+            // We may have a race condition...
+            if (this.collapseContainer !== null) {
+                this.collapseContainer.visible = true;
+
+                if (this.highlightCollapseBlockBitmap !== null) {
+                    this.highlightCollapseBlockBitmap.visible = true;
+		}
+
+                if (this.collapseText !== null) {
+                    this.collapseText.visible = true;
+		}
+
+                // and hide the unhighlighted collapsed artwork...
+                if (this.collapseBlockBitmap !== null) {
+                    this.collapseBlockBitmap.visible = false;
+		}
             }
+
+	    // but not the uncollapsed highlighted artwork.
+	    this.highlightBitmap.visible = false;
         } else {
-            this.bitmap.visible = false;
+	    // Show the highlighted artwork.
             this.highlightBitmap.visible = true;
+            this.container.visible = true;
+
+            // If it is an uncollapsed collapsable, make sure the
+            // collapsed artwork is hidden.
             if (COLLAPSABLES.indexOf(this.name) !== -1) {
                 // There could be a race condition when making a
                 // new action block.
-                if (this.highlightCollapseBlockBitmap) {
-                    if (this.collapseText !== null) {
-                        this.collapseText.visible = false;
-                    }
-                    if (this.collapseBlockBitmap.visible !== null) {
-                        this.collapseBlockBitmap.visible = false;
-                    }
-                    if (this.highlightCollapseBlockBitmap.visible !== null) {
-                        this.highlightCollapseBlockBitmap.visible = false;
-                    }
+                if (this.collapseText !== null) {
+                    this.collapseText.visible = false;
+                }
+
+                if (this.collapseBlockBitmap !== null) {
+                    this.collapseBlockBitmap.visible = false;
+                }
+
+                if (this.highlightCollapseBlockBitmap !== null) {
+                    this.highlightCollapseBlockBitmap.visible = false;
                 }
             }
         }
 
-        this.updateCache();
+        this.container.updateCache();
+        if (this.collapseContainer !== null) {
+            this.collapseContainer.updateCache();
+	}
     };
 
     this.unhighlight = function () {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
-            if (this.highlightCollapseBlockBitmap) {
-                this.highlightCollapseBlockBitmap.visible = false;
-                this.collapseBlockBitmap.visible = true;
-                this.collapseText.visible = true;
-                this.bitmap.visible = false;
-                this.highlightBitmap.visible = false;
-            }
-        } else {
-            if (this.bitmap === null) {
-                return;
+        if (this.inCollapsed) {
+	    // In collapsed, so do nothing.
+	    return;
+	}
+
+        if (this.bitmap === null) {
+	    console.log('bitmap not ready');
+            return;
+        }
+
+	// Always hide the highlighted artwork.
+        this.highlightBitmap.visible = false;
+
+        // If it is a collapsed collaspable, unhightlight the collapsed state.
+        if (this.collapsed) {
+	    // Show the unhighlighted collapsed artwork.'
+            // We may have a race condition...
+            if (this.collapseContainer !== null) {
+                this.collapseContainer.visible = true;
+
+                if (this.collapseBlockBitmap !== null) {
+                    this.collapseBlockBitmap.visible = true;
+		}
+
+                if (this.collapseText !== null) {
+                    this.collapseText.visible = true;
+		}
+
+		// but not the highlighted collapsed artwork...
+                if (this.highlightCollapseBlockBitmap !== null) {
+                    this.highlightCollapseBlockBitmap.visible = false;
+		}
             }
 
+	    // and not the uncollapsed artwork.
+            this.bitmap.visible = false;
+
+        } else {
             this.bitmap.visible = true;
-            this.highlightBitmap.visible = false;
+            this.container.visible = true;
+
             if (COLLAPSABLES.indexOf(this.name) !== -1) {
-                if (this.highlightCollapseBlockBitmap) {
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseBlockBitmap.visible = false;
+                // There could be a race condition when making a
+                // new action block.
+                if (this.collapseText !== null) {
                     this.collapseText.visible = false;
+                }
+
+                if (this.collapseBlockBitmap !== null) {
+                    this.collapseBlockBitmap.visible = false;
+                }
+
+                if (this.highlightCollapseBlockBitmap !== null) {
+                    this.highlightCollapseBlockBitmap.visible = false;
                 }
             }
         }
 
-        this.updateCache();
+        this.container.updateCache();
+        if (this.collapseContainer !== null) {
+            this.collapseContainer.updateCache();
+	}
     };
 
     this.updateArgSlots = function (slotList) {
@@ -274,11 +342,11 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseContainer.uncache();
             var _postProcess = function (that) {
                 if (that.name === 'newnote') {
-                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 4;
-                    that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 4;
+                    that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 4;
+                    that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 4;
                 } else {
-                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 2;
-                    that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 2;
+                    that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 2;
+                    that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 2;
                 }
 
                 that._positionCollapseContainer(that.protoblock.scale);
@@ -432,9 +500,9 @@ function Block(protoblock, blocks, overrideName) {
             this.container.removeChild(this.highlightBitmap);
         }
 
-        if (collapse && this.collapseBitmap !== null) {
-            this.collapseContainer.removeChild(this.collapseBitmap);
-            this.collapseContainer.removeChild(this.expandBitmap);
+        if (collapse && this.collapseBlockBitmap !== null) {
+            this.collapseContainer.removeChild(this.collapseButtonBitmap);
+            this.collapseContainer.removeChild(this.expandButtonBitmap);
             this.container.removeChild(this.collapseBlockBitmap);
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
@@ -790,15 +858,16 @@ function Block(protoblock, blocks, overrideName) {
 
             var image = new Image();
             image.onload = function () {
-                that.collapseBitmap = new createjs.Bitmap(image);
+                that.collapseButtonBitmap = new createjs.Bitmap(image);
                 if (that.name === 'newnote') {
-                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 3;
+                    that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = that.protoblock.scale / 3;
                 } else {
-                    that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 2;
+                    that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = that.protoblock.scale / 2;
                 }
-                that.collapseContainer.addChild(that.collapseBitmap);
-                that.collapseBitmap.y = 2;
-                that.collapseBitmap.visible = !that.collapsed;
+
+                that.collapseContainer.addChild(that.collapseButtonBitmap);
+                that.collapseButtonBitmap.y = 2;
+                that.collapseButtonBitmap.visible = !that.collapsed;
                 finishCollapseButton(that);
             };
 
@@ -807,15 +876,16 @@ function Block(protoblock, blocks, overrideName) {
             finishCollapseButton = function (that) {
                 var image = new Image();
                 image.onload = function () {
-                    that.expandBitmap = new createjs.Bitmap(image);
+                    that.expandButtonBitmap = new createjs.Bitmap(image);
                     if (that.name === 'newnote') {
-                        that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 3;
+                        that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = that.protoblock.scale / 3;
                     } else {
-                        that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 2;
+                        that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = that.protoblock.scale / 2;
                     }
-                    that.collapseContainer.addChild(that.expandBitmap);
-                    that.expandBitmap.y = 2;
-                    that.expandBitmap.visible = that.collapsed;
+
+                    that.collapseContainer.addChild(that.expandButtonBitmap);
+                    that.expandButtonBitmap.y = 2;
+                    that.expandButtonBitmap.visible = that.collapsed;
 
                     var bounds = that.collapseContainer.getBounds();
                     that.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -856,19 +926,41 @@ function Block(protoblock, blocks, overrideName) {
         if (this.collapseContainer !== null) {
             this.collapseContainer.visible = false;
             this.collapseText.visible = false;
+	    this.expandButtonBitmap.visible = false;
+	    this.collapseButtonBitmap.visible = false;
         }
+
+        this.blocks.refreshCanvas();
     };
 
     this.show = function () {
-        if (!this.trash) {
-            // If it is an action block or it is not collapsed then show it.
-            if (!(COLLAPSABLES.indexOf(this.name) === -1 && this.collapsed)) {
-                this.container.visible = true;
+        // If it is not in the trash ans not collapsed then show it.
+        if (!this.trash && !this.inCollapsed) {
+            if (this.collapsed) {
                 if (this.collapseContainer !== null) {
+                    this.container.visible = false;
                     this.collapseContainer.visible = true;
+                    this.collapseBlockBitmap.visible = true;
+		    this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseText.visible = true;
-                }
-            }
+		    this.expandButtonBitmap.visible = true;
+		    this.collapseContainer.updateCache();
+		}
+	    } else {
+                this.container.visible = true;
+		if (!(COLLAPSABLES.indexOf(this.name) === -1)) {
+                    this.collapseContainer.visible = true;
+                    this.collapseBlockBitmap.visible = false;
+		    this.highlightCollapseBlockBitmap.visible = false;
+                    this.collapseText.visible = false;
+		    this.expandButtonBitmap.visible = false;
+		    this.collapseButtonBitmap.visible = true;
+		    this.bitmap.visible = true;
+		    this.collapseContainer.updateCache();
+		}
+	    }
+
+            this.updateCache();
         }
     };
 
@@ -1017,195 +1109,284 @@ function Block(protoblock, blocks, overrideName) {
         window.scroll(0, 0)
     };
 
+    this.setCollapsedState = function () {
+	// Mark it as in a collapsed block and hide it.
+	this.inCollapsed = true;
+	this.hide();
+    };
+
+    this.setUncollapsedState = function (nblk) {
+        // It could be a block inside a note block, which may or may
+	// not be hidden depending on the collapsed state of the
+	// containing note block.
+	if (nblk === null) {
+	    this.inCollapsed = false;
+	    // There is a weird race condition? that prevents the
+	    // newnote blocks from appearing in their collapsed
+	    // state. This "brute force" opening and closing of the
+	    // block seems to fix the problem.
+            if (this.name === 'newnote' && this.collapsed) {
+		// Remember the current state.
+		var isCollapsed = this.collapsed;
+		// Toggle the state.
+		this.collapsed = !isCollapsed;
+
+		// These are the buttons to collapse/expand the stack.
+		this.collapseButtonBitmap.visible = isCollapsed;
+		this.expandButtonBitmap.visible = !isCollapsed;
+
+		// These are the collpase-state bitmaps.
+		// console.log('setting collapse bitmap to ' + !isCollapsed);
+		this.collapseBlockBitmap.visible = !isCollapsed;
+		this.highlightCollapseBlockBitmap.visible = false;
+		this.collapseText.visible = !isCollapsed;
+		this.unhighlight();
+		this.blocks.refreshCanvas();
+
+		// Remember the current state.
+		var isCollapsed = this.collapsed;
+		// Toggle the state.
+		this.collapsed = !isCollapsed;
+
+		// These are the buttons to collapse/expand the stack.
+		this.collapseButtonBitmap.visible = isCollapsed;
+		this.expandButtonBitmap.visible = !isCollapsed;
+
+		// These are the collpase-state bitmaps.
+		this.collapseBlockBitmap.visible = !isCollapsed;
+		this.highlightCollapseBlockBitmap.visible = false;
+		this.collapseText.visible = !isCollapsed;
+		this.unhighlight();
+		this.blocks.refreshCanvas();
+	    } else {
+		this.show();
+	    }
+	} else {
+	    // if we are inside of a collapsed note block, do nothing.
+	    if (this.blocks.blockList[nblk].collapsed) {
+	    } else {
+		this.inCollapsed = false;
+		this.show();
+	    }
+	}
+    };
+
     this.collapseToggle = function () {
-        // Find the blocks to collapse/expand
-        var that = this;
+        // Find the blocks to collapse/expand inside of a collapable
+        // block.
         var thisBlock = this.blocks.blockList.indexOf(this);
         this.blocks.findDragGroup(thisBlock);
 
-        var __toggle = function () {
-            var collapse = that.collapsed;
-            if (that.collapseBitmap === null) {
-                console.log('collapse bitmap not ready');
-                return;
-            }
-
-            that.collapsed = !collapse;
-
-            // These are the buttons to collapse/expand the stack.
-            that.collapseBitmap.visible = collapse;
-            that.expandBitmap.visible = !collapse;
-
-            // These are the collpase-state bitmaps.
-            that.collapseBlockBitmap.visible = !collapse;
-            that.highlightCollapseBlockBitmap.visible = false;
-            that.collapseText.visible = !collapse;
-
-            if (that.name === 'newnote' && that.collapseText.visible) {
-                // Find note value
-                v = '';
-                c = that.connections[1];
-                if (c !== null) {
-                    // Only look for standard form: / 1 4
-                    if (that.blocks.blockList[c].name === 'divide') { 
-                        c1 = that.blocks.blockList[c].connections[1];
-                        c2 = that.blocks.blockList[c].connections[2];
-                        if (that.blocks.blockList[c1].name === 'number' && that.blocks.blockList[c2].name === 'number') {
-                            v = that.blocks.blockList[c1].value + '/' + that.blocks.blockList[c2].value;
-                        }
-                    }
-                }
-
-                p = '';
-                c = that.connections[2];
-                c = that.blocks.findFirstPitchBlock(c);
-                if (c !== null) {
-                    console.log(that.blocks.blockList[c].name);
-                    switch(that.blocks.blockList[c].name) {
-                    case 'pitch':
-                        c1 = that.blocks.blockList[c].connections[1];
-                        c2 = that.blocks.blockList[c].connections[2];
-                        if (that.blocks.blockList[c2].name === 'number') {
-                            if (that.blocks.blockList[c1].name === 'solfege') {
-                                p = _(that.blocks.blockList[c1].value) + ' ' + that.blocks.blockList[c2].value;
-                            } else if (that.blocks.blockList[c1].name === 'notename') {
-                                p = that.blocks.blockList[c1].value + ' ' + that.blocks.blockList[c2].value;
-                            }
-                        }
-                        break;
-                    case 'scaledegree':
-                        c1 = that.blocks.blockList[c].connections[1];
-                        c2 = that.blocks.blockList[c].connections[2];
-                        if (that.blocks.blockList[c2].name === 'number') {
-                            if (that.blocks.blockList[c1].name === 'number') {
-                                p = 'scale degree ' + _(that.blocks.blockList[c1].value) + ' ' + that.blocks.blockList[c2].value;
-                            }
-                        }
-                        break;
-                    case 'hertz':
-                        c1 = that.blocks.blockList[c].connections[1];
-                        if (that.blocks.blockList[c1].name === 'number') {
-                            p = that.blocks.blockList[c2].value + 'HZ';
-                        }
-                        break;
-                    case 'steppitch':
-                        c1 = that.blocks.blockList[c].connections[1];
-                        if (that.blocks.blockList[c1].name === 'number') {
-                            p = 'scalar step ' + that.blocks.blockList[c2].value;
-                        }
-                        break;
-                    case 'pitchnumber':
-                        c1 = that.blocks.blockList[c].connections[1];
-                        if (that.blocks.blockList[c1].name === 'number') {
-                            p = 'pitch number ' + that.blocks.blockList[c2].value;
-                        }
-                        break;
-                    default:
-                        p = '';
-                    }
-                }
-
-                if (p === '' && v === '') {
-                    that.collapseText.text = 'note value';
-                } else {
-		    // Are there more pitch blocks in this note?
-                    c = that.blocks.findFirstPitchBlock(last(that.blocks.blockList[c].connections));
-		    // Update the collapsed-block label.
-                    if (c === null) {
-                        that.collapseText.text = p + ' ' + v;
-                    } else {
-                        that.collapseText.text = p + '... ' + v;
-                    }
-                }
-            }
-
-            if (collapse) {
-                that.bitmap.visible = true;
-            } else {
-                that.bitmap.visible = false;
-                that.updateCache();
-            }
-
-            that.highlightBitmap.visible = false;
-
-            if (that.name === 'action') {
-                // Label the collapsed block with the action label
-                if (that.connections[1] !== null) {
-                    var text = that.blocks.blockList[that.connections[1]].value;
-                    if (getTextWidth(text, 'bold 20pt Sans') > TEXTWIDTH) {
-                        text = text.substr(0, STRINGLEN) + '...';
-                    }
-
-                    that.collapseText.text = text;
-                } else {
-                    that.collapseText.text = '';
-                }
-            }
-
-            // Make sure the text is on top.
-            var z = that.container.children.length - 1;
-            that.container.setChildIndex(that.collapseText, z);
-
-            if (that.name == 'newnote') {
-                // Set collapsed state of note value arg blocks
-                if (that.connections[1] !== null) {
-                    that.blocks.findDragGroup(that.connections[1]);
-                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
-                        var blk = that.blocks.dragGroup[b];
-                        that.blocks.blockList[blk].collapsed = !collapse;
-                        that.blocks.blockList[blk].container.visible = collapse;
-                    }
-                }
-
-                // blocks inside the clamp
-                if (that.connections[2] !== null) {
-                    that.blocks.findDragGroup(that.connections[2]);
-                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
-                        var blk = that.blocks.dragGroup[b];
-                        that.blocks.blockList[blk].collapsed = !collapse;
-                        that.blocks.blockList[blk].container.visible = collapse;
-                    }
-                }
-
-                // Reposition the blocks below
-                if (that.connections[3] != null) {
-                    if (collapse) {
-                        var dy = that.blocks.blockList[thisBlock].docks[3][1] - that.blocks.blockList[thisBlock].docks[2][1];
-                    } else {
-                        var dy = that.blocks.blockList[thisBlock].docks[2][1] - that.blocks.blockList[thisBlock].docks[3][1];
-                    }
-
-                    that.blocks.findDragGroup(that.connections[3]);
-                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
-                        var blk = that.blocks.dragGroup[b];
-                        that.blocks.moveBlockRelative(blk, 0, dy);
-                    }
-                }
-
-                // Look to see if we are in a clamp block. If so, readjust.
-                blk = that.blocks.insideExpandableBlock(thisBlock);
-                if (blk !== null) {
-                    that.blocks.clampBlocksToCheck = [[blk, 0]];
-                    that.blocks.adjustExpandableClampBlock();
-                }
-
-                that.blocks.refreshCanvas();
-            } else {
-                // Set collapsed state of blocks in drag group.
-                if (that.blocks.dragGroup.length > 0) {
-                    for (var b = 1; b < that.blocks.dragGroup.length; b++) {
-                        var blk = that.blocks.dragGroup[b];
-                        that.blocks.blockList[blk].collapsed = !collapse;
-                        that.blocks.blockList[blk].container.visible = collapse;
-                    }
-                }
-            }
-
-            that.collapseContainer.updateCache();
-            that.updateCache();
+        if (this.collapseBlockBitmap === null) {
+            console.log('collapse bitmap not ready');
+            return;
         }
 
-        __toggle();
+        // Remember the current state.
+        var isCollapsed = this.collapsed;
+	// Toggle the state.
+        this.collapsed = !isCollapsed;
+
+        // These are the buttons to collapse/expand the stack.
+        this.collapseButtonBitmap.visible = isCollapsed;
+        this.expandButtonBitmap.visible = !isCollapsed;
+
+        // These are the collpase-state bitmaps.
+        this.collapseBlockBitmap.visible = !isCollapsed;
+        this.highlightCollapseBlockBitmap.visible = false;
+        this.collapseText.visible = !isCollapsed;
+
+        if (this.name === 'newnote' && this.collapseText.visible) {
+	    this._newNoteLabel();
+        }
+
+        this.bitmap.visible = this.collapsed;
+        this.highlightBitmap.visible = false;
+        this.updateCache();
+
+        if (this.name === 'action') {
+            // Label the collapsed block with the action label.
+            if (this.connections[1] !== null) {
+                var text = this.blocks.blockList[this.connections[1]].value;
+                if (getTextWidth(text, 'bold 20pt Sans') > TEXTWIDTH) {
+                    text = text.substr(0, STRINGLEN) + '...';
+                }
+
+                this.collapseText.text = text;
+            } else {
+                this.collapseText.text = '';
+            }
+        }
+
+        // Make sure the text is on top.
+        var z = this.container.children.length - 1;
+        this.container.setChildIndex(this.collapseText, z);
+
+        if (this.name == 'newnote') {
+            // Only collapse the contents of the note block.
+	    this._toggle_newnote(thisBlock, isCollapsed);
+        } else {
+            // Set collapsed state of all of the blocks in the drag group.
+            if (this.blocks.dragGroup.length > 0) {
+                for (var b = 1; b < this.blocks.dragGroup.length; b++) {
+                    var blk = this.blocks.dragGroup[b];
+		    if (this.collapsed) { // if (this.blocks.blockList[blk].inCollapsed) {
+			this.blocks.blockList[blk].setCollapsedState();
+		    } else {
+			this.blocks.blockList[blk].setUncollapsedState(this.blocks.insideNoteBlock(blk));
+		    }
+                }
+            }
+        }
+
+        this.collapseContainer.updateCache();
+        this.updateCache();
+	this.unhighlight();
+        this.blocks.refreshCanvas();
+    };
+
+    this._newNoteLabel = function () {
+        // Find pitch and value to display on the collapsed note value
+        // block.
+        v = '';
+        c = this.connections[1];
+        if (c !== null) {
+            // Only look for standard form: / 1 4
+            if (this.blocks.blockList[c].name === 'divide') { 
+                c1 = this.blocks.blockList[c].connections[1];
+                c2 = this.blocks.blockList[c].connections[2];
+                if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
+                    v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+                }
+            }
+        }
+
+        p = '';
+        c = this.connections[2];
+        c = this.blocks.findFirstPitchBlock(c);
+        if (c !== null) {
+            switch(this.blocks.blockList[c].name) {
+            case 'pitch':
+                c1 = this.blocks.blockList[c].connections[1];
+                c2 = this.blocks.blockList[c].connections[2];
+                if (this.blocks.blockList[c2].name === 'number') {
+                    if (this.blocks.blockList[c1].name === 'solfege') {
+                        p = _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
+                    } else if (this.blocks.blockList[c1].name === 'notename') {
+                        p = this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
+                    }
+                }
+                break;
+            case 'scaledegree':
+                c1 = this.blocks.blockList[c].connections[1];
+                c2 = this.blocks.blockList[c].connections[2];
+                if (this.blocks.blockList[c2].name === 'number') {
+                    if (this.blocks.blockList[c1].name === 'number') {
+                        p = _('scale degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
+                    }
+                }
+                break;
+            case 'hertz':
+                c1 = this.blocks.blockList[c].connections[1];
+                if (this.blocks.blockList[c1].name === 'number') {
+                    p = this.blocks.blockList[c2].value + 'HZ';
+                }
+                break;
+            case 'steppitch':
+                c1 = this.blocks.blockList[c].connections[1];
+                if (this.blocks.blockList[c1].name === 'number') {
+                    p = _('scalar step') + ' ' + this.blocks.blockList[c2].value;
+                }
+                break;
+            case 'pitchnumber':
+                c1 = this.blocks.blockList[c].connections[1];
+                if (this.blocks.blockList[c1].name === 'number') {
+                    p = _('pitch number') + ' ' + this.blocks.blockList[c2].value;
+                }
+                break;
+	    case 'playdrum':
+		p = _('drum');
+                break;
+	    case 'rest2':
+		p = _('silence');
+                break;
+            default:
+                p = '';
+            }
+        }
+
+        if (p === '' && v === '') {
+            this.collapseText.text = 'note value';
+        } else {
+	    // Are there more pitch blocks in this note?
+            c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
+	    // Update the collapsed-block label.
+            if (c === null) {
+                this.collapseText.text = p + ' | ' + v;
+            } else {
+                this.collapseText.text = p + '... | ' + v;
+            }
+        }
+    };
+
+    this._toggle_newnote = function (thisBlock, collapse) {
+        // Toggle the collapsed state of blocks inside of a note block
+        // and reposition any blocks below it. Finally, resize any
+        // surrounding clamps.
+
+        // Set collapsed state of note value arg blocks...
+        if (this.connections[1] !== null) {
+            this.blocks.findDragGroup(this.connections[1]);
+            for (var b = 0; b < this.blocks.dragGroup.length; b++) {
+                var blk = this.blocks.dragGroup[b];
+                this.blocks.blockList[blk].container.visible = collapse;
+		if (collapse) {
+		    this,blocks.blockList[blk].inCollapsed = false;
+		    this.blocks.blockList[blk].highlight();
+		} else {
+		    this,blocks.blockList[blk].inCollapsed = true;
+		}
+            }
+        }
+
+        // and the blocks inside the clamp.
+        if (this.connections[2] !== null) {
+            this.blocks.findDragGroup(this.connections[2]);
+            for (var b = 0; b < this.blocks.dragGroup.length; b++) {
+                var blk = this.blocks.dragGroup[b];
+                this.blocks.blockList[blk].container.visible = collapse;
+		if (collapse) {
+		    this,blocks.blockList[blk].inCollapsed = false;
+		    this.blocks.blockList[blk].highlight();
+		} else {
+		    this,blocks.blockList[blk].inCollapsed = true;
+		}
+            }
+        }
+
+        // Reposition the blocks below.
+        if (this.connections[3] != null) {
+            if (collapse) {
+                var dy = this.blocks.blockList[thisBlock].docks[3][1] - this.blocks.blockList[thisBlock].docks[2][1];
+            } else {
+                var dy = this.blocks.blockList[thisBlock].docks[2][1] - this.blocks.blockList[thisBlock].docks[3][1];
+            }
+
+            this.blocks.findDragGroup(this.connections[3]);
+            for (var b = 0; b < this.blocks.dragGroup.length; b++) {
+                var blk = this.blocks.dragGroup[b];
+                this.blocks.moveBlockRelative(blk, 0, dy);
+            }
+        }
+
+        // Look to see if we are in a clamp block. If so, readjust.
+        blk = this.blocks.insideExpandableBlock(thisBlock);
+        if (blk !== null) {
+            this.blocks.clampBlocksToCheck = [[blk, 0]];
+            this.blocks.adjustExpandableClampBlock();
+        }
+
+        this.blocks.refreshCanvas();
     };
 
     this._positionText = function (blockScale) {
@@ -1258,7 +1439,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._calculateCollapseHitArea = function () {
         var hitArea = new createjs.Shape();
-        var w2 = STANDARDBLOCKHEIGHT * this.collapseBitmap.scaleX;
+        var w2 = STANDARDBLOCKHEIGHT * this.collapseButtonBitmap.scaleX;
         var h2 = this.hitHeight;
 
         hitArea.graphics.beginFill('#FFF').drawRect(0, 0, w2, h2);
@@ -1306,6 +1487,7 @@ function Block(protoblock, blocks, overrideName) {
             if (!that.blocks.logo.runningLilypond) {
                 document.body.style.cursor = 'pointer';
             }
+
             that.blocks.highlight(thisBlock, true);
             that.blocks.activeBlock = thisBlock;
             that.blocks.refreshCanvas();
@@ -1333,7 +1515,6 @@ function Block(protoblock, blocks, overrideName) {
 
             if (!moved) {
                 that.collapseToggle();
-                // haveClick = false;
             }
         });
 
@@ -1675,11 +1856,6 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 that.blocks.refreshCanvas();
-
-                // } else {
-                    // Didn't really move enough to be considered a move.
-                    // moved = false;
-                // }
             });
         });
 
@@ -1786,6 +1962,7 @@ function Block(protoblock, blocks, overrideName) {
         for (var child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === 'decoration') {
                 // Drum block in collapsed state is less wide.
+		// Deprecated
                 var dx = 0;
                 if (this.name === 'drum' && this.collapsed) {
                     var dx = 25 * this.protoblock.scale / 2;

@@ -288,12 +288,17 @@ function Blocks () {
         return maxy;
     };
 
-    // Toggle state of collapsible blocks.
+    // Toggle state of collapsible blocks, except note blocks, which
+    // are handled separately.
     this.toggleCollapsibles = function () {
         var allCollapsed = true;
         var someCollapsed = false;
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
+	    if (myBlock.name === 'newnote') {
+		continue;
+	    }
+
             if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 if (myBlock.collapsed) {
                     someCollapsed = true;
@@ -308,6 +313,10 @@ function Blocks () {
             // If any blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
+		if (myBlock.name === 'newnote') {
+		    continue;
+		}
+
                 if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     myBlock.collapseToggle();
                 }
@@ -316,6 +325,10 @@ function Blocks () {
             // If no blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
+		if (myBlock.name === 'newnote') {
+		    continue;
+		}
+
                 if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     if (!myBlock.collapsed) {
                         myBlock.collapseToggle();
@@ -1125,7 +1138,7 @@ function Blocks () {
             }
 
             // Don't connect to a collapsed block.
-            if (this.blockList[b].collapsed) {
+            if (this.blockList[b].inCollapsed) {
                 continue;
             }
 
@@ -2044,10 +2057,12 @@ function Blocks () {
         } else {
             var thisBlock = this.highlightedBlock;
         }
+
         if (thisBlock != null) {
 
             this.blockList[thisBlock].unhighlight();
         }
+
         if (this.highlightedBlock = thisBlock) {
             this.highlightedBlock = null;
         }
@@ -3120,15 +3135,38 @@ function Blocks () {
         return false;
     };
 
+    this.insideNoteBlock = function (blk) {
+	// Return the first containing note block, if any.
+	if (blk === null) {
+	    return null;
+	}
+
+	c0 = this.blockList[blk].connections[0];
+	if (c0 === null) {
+	    return null;
+	}
+
+        // If we are connected to a note block arg or child flow,
+        // return the note block. If we are connected to the flow, we
+        // are not inside, so keep looking.
+	if (this.blockList[c0].name === 'newnote' && blk !== last(this.blockList[c0].connections)) {
+	    return c0;
+	}
+
+	return this.insideNoteBlock(c0);
+    };
+
     this.findFirstPitchBlock = function (blk) {
         // Returns first pitch block found.
         if (blk === null) {
             return null;
         }
 
-        if (['pitch', 'hertz', 'pitchnumber', 'scaledegree', 'steppitch'].indexOf(this.blockList[blk].name) !== -1) {
+        if (PITCHBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
             return blk;
-        }
+        } else if (this.blockList[blk].name === 'rest2') {
+	    return blk;
+	}
 
         var c = last(this.blockList[blk].connections);
         return this.findFirstPitchBlock(c);
