@@ -195,7 +195,6 @@ msgid "drum"
 msgstr "ドラム"
 
 #: js/block.js:735
-## ひらがな＝じょうぎ
 msgid "ruler"
 msgstr "ルーラー"
 
@@ -246,7 +245,7 @@ msgstr "シ ラ ソ ファ ミ レ ド"
 #: js/blocks.js:2165
 ## http://jisho.org/word/%E7%9C%9F 
 msgid "true"
-msgstr "そうだ"
+msgstr "ほんとうか"
 
 #: js/block.js:1858
 #: js/logo.js:720
@@ -254,7 +253,7 @@ msgstr "そうだ"
 #: js/blocks.js:2167
 ## https://ja.wikipedia.org/wiki/If%E6%96%87#.E7.9C.9F.E5.81.BD.E5.80.A4
 msgid "false"
-msgstr "ではない"
+msgstr "うそか"
 
 #: js/block.js:2180
 #: js/musicutils.js:300
@@ -409,16 +408,16 @@ msgstr "ブラウザひょうじを100%にせっていしてください。"
 #: js/activity.js:3531
 #: js/turtledefs.js:86
 msgid "Run fast"
-msgstr "はやいスピードでさくせい"
+msgstr "はやくさいせい"
 
 #: js/activity.js:3517
 #: js/activity.js:3531
 msgid "long press to run slowly"
-msgstr "ながおしでスローさいせい"
+msgstr "ながおしでゆっくりさいせい"
 
 #: js/activity.js:3517
 msgid "extra-long press to run music slowly"
-msgstr "よりながおしでおんがくのスローさいせいになります"
+msgstr "もっとながおしでおんがくをゆっくりさいせい"
 
 #: js/activity.js:3518
 #: js/activity.js:3532
@@ -450,19 +449,19 @@ msgstr "しょうきょ"
 
 #: js/activity.js:3523
 msgid "Show/hide palettes"
-msgstr "パレットをひょうじする / かくす"
+msgstr "パレットをひょうじする/かくす"
 
 #: js/activity.js:3524
 #: js/activity.js:3536
 #: js/turtledefs.js:93
 msgid "Show/hide blocks"
-msgstr "ブロックのひょうじ"
+msgstr "ブロックのひょうじ/ひひょうじ"
 
 #: js/activity.js:3525
 #: js/activity.js:3537
 #: js/turtledefs.js:94
 msgid "Expand/collapse collapsable blocks"
-msgstr "チャンクのさいしょか"
+msgstr "かたまりをひらく/とじる"
 
 #: js/activity.js:3526
 #: js/activity.js:3538
@@ -528,7 +527,7 @@ msgstr "しんきさくせい"
 #: js/activity.js:3647
 #: js/turtledefs.js:116
 msgid "Restore"
-msgstr "リストア"
+msgstr "もとにもどす"
 
 #: js/activity.js:3642
 #: js/turtledefs.js:103
@@ -537,7 +536,7 @@ msgstr "はりつけ"
 
 #: js/activity.js:3646
 msgid "Delete all"
-msgstr "ブロックをぜんぶすてる"
+msgstr "ブロックをぜんぶけす"
 
 #: js/activity.js:4165
 msgid "Could not parse JSON input."
@@ -994,7 +993,7 @@ msgstr "テキスト"
 #: js/palette.js:738
 ## To be checked
 msgid "mode name"
-msgstr "モードめい"
+msgstr "モードのなまえ"
 
 #: js/palette.js:741
 msgid "invert mode"
@@ -1179,7 +1178,7 @@ msgstr "おんぷをひとつずつさいせいするにはここをクリック
 
 #: js/turtledefs.js:85
 msgid "Alternatively, you can hit the ENTER or RETURN key."
-msgstr "ENTERまたRETURNでもかのうです"
+msgstr "もしくは、エンターキー、リターンキーのどちらかをおしてください。"
 
 #: js/turtledefs.js:86
 msgid "Click the run button to run the project in fast mode."
@@ -2166,7 +2165,7 @@ msgstr "ハーモニックス"
 #.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
 ## This seems to have a lot of great stuff: https://ja.wikipedia.org/wiki/%E9%9D%9E%E5%92%8C%E5%A3%B0%E9%9F%B3#%E5%88%BA%E7%B9%8D%E9%9F%B3
 msgid "neighbor"
-msgstr "ししゅうおん"
+msgstr "となりのおと"
 
 #: js/basicblocks.js:1334
 #: js/basicblocks.js:1833
@@ -3117,7 +3116,7 @@ msgstr "～かいくりかえす"
 #: js/basicblocks.js:3441
 ## fushou
 msgid "unknown"
-msgstr "ふしょう"
+msgstr "ふめい"
 
 #: js/basicblocks.js:3452
 #.TRANS: Open a palette of blocks.
@@ -3412,7 +3411,7 @@ msgstr "スクロールをむこうにする"
 #: js/rhythmruler.js:1562
 #: js/rhythmruler.js:1562
 msgid "pause"
-msgstr "きゅうし"
+msgstr "いちじていし"
 
 #: js/playback.js:31
 #: js/playback.js:31
@@ -3723,11 +3722,11 @@ msgstr "ドラムマシーンをほぞん"
 
 #: js/modewidget.js:77
 msgid "rotate counter clockwise"
-msgstr "はんとけいかいり"
+msgstr "はんとけいまわり"
 
 #: js/modewidget.js:83
 msgid "rotate clockwise"
-msgstr "とけいかいり"
+msgstr "とけいまわり"
 
 #: js/pitchstaircase.js:454
 msgid "play chord"
@@ -4238,7 +4237,7 @@ msgstr "けす"
 
 #: js/StringHelper.js:34
 msgid "Explore Projects"
-msgstr "プロジェクトをたんきゅう"
+msgstr "プロジェクトをさがす"
 
 #: js/StringHelper.js:35
 msgid "View More"
@@ -4270,19 +4269,19 @@ msgstr "プロジェクトをもっとロードする"
 
 #: js/StringHelper.js:42
 msgid "Last Updated"
-msgstr "さいきんアップデート"
+msgstr "さいごのこうしん"
 
 #: js/StringHelper.js:43
 msgid "Creation Date"
-msgstr "さいきんこうかい"
+msgstr "さくせいび"
 
 #: js/StringHelper.js:44
 msgid "Number of Downloads:"
-msgstr "ダウンロードのすう"
+msgstr "ダウンロードすう"
 
 #: js/StringHelper.js:45
 msgid "Number of Likes:"
-msgstr "「いいね」のすう"
+msgstr "「いいね」のかず"
 
 #: js/StringHelper.js:46
 msgid "Tags:"
@@ -4369,7 +4368,7 @@ msgstr "このプロジェクトをつうほうしてくださってありがと
 
 #: js/ProjectViewer.js:19
 msgid "Project Reported"
-msgstr "プロジェクトつうほうされました"
+msgstr "プロジェクトはつうほうされました"
 
 #: js/ProjectViewer.js:20
 msgid "Report description required"
@@ -4771,11 +4770,11 @@ msgstr "ようぶ"
 
 #: plugins/weather.rtp:121
 msgid "high"
-msgstr "こう"
+msgstr "こうきあつ"
 
 #: plugins/weather.rtp:134
 msgid "low"
-msgstr "てい"
+msgstr "ていきあつ"
 
 #: plugins/rodi.rtp:176
 ## Blinking light is てんめつする
