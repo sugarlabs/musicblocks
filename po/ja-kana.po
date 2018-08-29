@@ -356,7 +356,7 @@ msgstr "エオリアンおんかい"
 #.TRANS: hide Polar coordinate overlay grid
 ## need to verify
 msgid "hide grid"
-msgstr "ざひょうをかくす"
+msgstr "ざひょうをひひょうじ"
 
 #: js/activity.js:736
 #: js/activity.js:742
@@ -448,7 +448,7 @@ msgstr "しょうきょ"
 
 #: js/activity.js:3523
 msgid "Show/hide palettes"
-msgstr "パレットをひょうじする/かくす"
+msgstr "パレットをひょうじ/ひひょうじする"
 
 #: js/activity.js:3524
 #: js/activity.js:3536
@@ -1055,7 +1055,7 @@ msgstr "うしろへすすむ"
 #: js/palette.js:907
 #.TRANS: popout: to detach as a separate window
 msgid "hide"
-msgstr "かくす"
+msgstr "ひひょうじ"
 
 #: js/palette.js:909
 #: js/palette.js:910
@@ -1217,7 +1217,7 @@ msgstr "がめんにあるものをぜんぶけして、しょきじょうたい
 
 #: js/turtledefs.js:93
 msgid "Hide or show the blocks and the palettes."
-msgstr "ブロックとパレットをひょうじする / かくす アイコンです。"
+msgstr "ブロックとパレットをひょうじする / ひひょうじ アイコンです。"
 
 #: js/turtledefs.js:94
 msgid "Expand or collapse start and action stacks."
@@ -1288,12 +1288,12 @@ msgstr "Alt+Vでブロックスをはりつけることもできます。"
 
 #: js/turtledefs.js:104
 msgid "Show or hide a coordinate grid."
-msgstr "グリッドをひょうじする/かくす"
+msgstr "グリッドをひょうじ/ひひょうじする"
 
 #: js/turtledefs.js:105
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "きょくざひょうをひょうじする/かくす"
+msgstr "きょくざひょうをひょうじ/ひひょうじする"
 
 #: js/turtledefs.js:106
 msgid "Open a panel for configuring Music Blocks."
@@ -3196,7 +3196,7 @@ msgstr "ブロックをひょうじ"
 
 #: js/basicblocks.js:3560
 msgid "hide blocks"
-msgstr "ブロックをかくす"
+msgstr "ブロックをひひょうじ"
 
 #: js/basicblocks.js:3567
 msgid "open project"
@@ -4837,7 +4837,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "ぎゃくにさいせい"
 
 #~msgid "Hide or show the block palettes."
-#~msgstr "ブロックのパレットをひょうじする / かくす"
+#~msgstr "ブロックのパレットをひょうじする / ひひょうじ"
 
 #~msgid "1/32 note 𝅘𝅥𝅰"
 #~msgstr "32ぶんおんぷ　𝅘𝅥𝅰"
@@ -4894,7 +4894,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "いどうド？"
 
 #~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "直交ざひょうをひょうじする/かくす"
+#~msgstr "直交ざひょうをひょうじ/ひひょうじする"
 
 #~msgid "Click to run just the music in slow mode."
 #~msgstr "おんがくをゆっくりさいせいしたい時は、ここをクリック。"
@@ -4981,7 +4981,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "メジャーブロックには 2, 3, 6, 7いずれかのかずをいれてください。"
 
 #~msgid "Expand/collapse toolbar"
-#~msgstr "ツールバーを開く/かくす"
+#~msgstr "ツールバーを開く/ひひょうじ"
 
 #~msgid "Publish"
 #~msgstr "サーバにアップロードして発表する"
