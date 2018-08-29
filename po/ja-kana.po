@@ -245,7 +245,7 @@ msgstr "シ ラ ソ ファ ミ レ ド"
 #: js/blocks.js:2165
 ## http://jisho.org/word/%E7%9C%9F 
 msgid "true"
-msgstr "ほんとうか"
+msgstr "オン"
 
 #: js/block.js:1858
 #: js/logo.js:720
@@ -253,7 +253,7 @@ msgstr "ほんとうか"
 #: js/blocks.js:2167
 ## https://ja.wikipedia.org/wiki/If%E6%96%87#.E7.9C.9F.E5.81.BD.E5.80.A4
 msgid "false"
-msgstr "うそか"
+msgstr "オフ"
 
 #: js/block.js:2180
 #: js/musicutils.js:300
@@ -380,9 +380,8 @@ msgstr "きょくいき"
 
 #: js/activity.js:766
 #: js/StringHelper.js:54
-## ひらがな＝しゅうりょう
 msgid "Close"
-msgstr "しゅうりょう"
+msgstr "とじる"
 
 #: js/activity.js:1573
 #: js/activity.js:1614
@@ -2362,7 +2361,7 @@ msgstr "モードをていぎする"
 #: js/basicblocks.js:1946
 ## https://ja.wikipedia.org/wiki/%E7%A7%BB%E5%8B%95%E3%83%89
 msgid "moveable"
-msgstr "いどうの「ド、レ、ミ」"
+msgstr "いどうド"
 
 #: js/basicblocks.js:1954
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
