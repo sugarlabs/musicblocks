@@ -3240,11 +3240,11 @@ msgstr "じかん"
 
 #: js/basicblocks.js:3678
 msgid "cursor y"
-msgstr "yざひょうにカーソルをおく"
+msgstr "yざひょうカーソル"
 
 #: js/basicblocks.js:3686
 msgid "cursor x"
-msgstr "xざひょうにカーソルをおく"
+msgstr "xざひょうカーソル"
 
 #: js/basicblocks.js:3694
 msgid "mouse button"
@@ -4172,7 +4172,7 @@ msgstr "プラネット"
 
 #: js/StringHelper.js:17
 msgid "Close Planet"
-msgstr ""
+msgstr "プラネットをとじる"
 
 #: js/StringHelper.js:18
 msgid "Open project from file"
@@ -4224,11 +4224,11 @@ msgstr "キャンセル"
 
 #: js/StringHelper.js:30
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr "けす　\\"<span id=\\"deleter-title\\"></span>\\"？"
+msgstr "\\"<span id=\\"deleter-title\\"></span>\\"をけしますか？"
 
 #: js/StringHelper.js:31
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr "プロジェクトをかんぜんけす"
+msgstr "\\"<span id=\\"deleter-name\\"></span>\\"をかんぜんけしますか？"
 
 #: js/StringHelper.js:32
 msgid "Delete"
@@ -4308,7 +4308,7 @@ msgstr "ファイルでダウンロードする"
 
 #: js/StringHelper.js:56
 msgid "Open in Music Blocks"
-msgstr "ミュージック・ブロックすでひらきます"
+msgstr "ミュージック・ブロックスでひらきます"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
