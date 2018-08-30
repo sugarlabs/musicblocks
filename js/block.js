@@ -1276,7 +1276,9 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        if (p === '' && v === '') {
+        if (c === null) {
+            this.collapseText.text = _('silence') + ' | ' + v;
+        } else if (p === '' && v === '') {
             this.collapseText.text = 'note value';
         } else {
             // Are there more pitch blocks in this note?
