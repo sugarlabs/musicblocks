@@ -3486,6 +3486,7 @@ define(MYDEFINES, function (compatibility) {
                             };
                         }
                         break;
+                    case 'newnote':
                     case 'action':
                     case 'matrix':
                     case 'pitchdrummatrix':
