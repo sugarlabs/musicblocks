@@ -3472,29 +3472,29 @@ function Logo () {
             break;
         // Deprecated
         case 'setmasterbpm':
-          if (args.length === 1 && typeof(args[0] === 'number')) {
-              if (args[0] < 30) {
-                  that.errorMsg(_('Beats per minute must be > 30.'))
-                  that._masterBPM = 30;
-              } else if (args[0] > 1000) {
-                  that.errorMsg(_('Maximum beats per minute is 1000.'))
-                  that._masterBPM = 1000;
-              } else {
-                  that._masterBPM = args[0];
-              }
+            if (args.length === 1 && typeof(args[0]) === 'number') {
+		if (args[0] < 30) {
+                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    that._masterBPM = 30;
+		} else if (args[0] > 1000) {
+                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    that._masterBPM = 1000;
+		} else {
+                    that._masterBPM = args[0];
+		}
 
-              that.defaultBPMFactor = TONEBPM / that._masterBPM;
-          }
+		that.defaultBPMFactor = TONEBPM / that._masterBPM;
+            }
 
-          if (that.inTempo) {
-              that.tempo.BPMBlocks.push(blk);
-              var bpmnumberblock = that.blocks.blockList[blk].connections[1]
-              that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
-          }
-          break;
-        // Deprecated
+            if (that.inTempo) {
+		that.tempo.BPMBlocks.push(blk);
+		var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+		that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
+            }
+            break;
+            // Deprecated
         case 'setbpm':
-            if (args.length === 2 && typeof(args[0] === 'number')) {
+            if (args.length === 2 && typeof(args[0]) === 'number') {
                 if (args[0] < 30) {
                     that.errorMsg(_('Beats per minute must be > 30.'))
                     var bpm = 30;
@@ -3521,7 +3521,7 @@ function Logo () {
             }
             break;
         case 'setmasterbpm2':
-            if (args.length === 2 && typeof(args[0] === 'number') && typeof(args[1] === 'number')) {
+            if (args.length === 2 && typeof(args[0]) === 'number' && typeof(args[1]) === 'number') {
                 var bpm  = args[0] * args[1] / 0.25
                 if (bpm < 30) {
                     that.errorMsg(_('Beats per minute must be > 30.'))
@@ -3544,7 +3544,7 @@ function Logo () {
             }
             break;
         case 'setbpm2':
-            if (args.length === 3 && typeof(args[0] === 'number' && typeof(args[1] == 'number'))) {
+            if (args.length === 3 && typeof(args[0]) === 'number' && typeof(args[1]) == 'number') {
                 var bpm  = args[0] * args[1] / 0.25
                 if (args[0] < 30) {
                     that.errorMsg(_('Beats per minute must be > 30.'))
@@ -3655,7 +3655,7 @@ function Logo () {
             break;
         case 'envelope':
             var synth_source = "sine";
-            if (args.length === 4 && typeof(args[0] === 'number')) {
+            if (args.length === 4 && typeof(args[0]) === 'number') {
                 if (args[0] < 0 || args[0] > 100) {
                     that.errorMsg(_('Attack value should be from 0 to 100.'));
                 }
@@ -3700,7 +3700,7 @@ function Logo () {
             var freq ;
             var rollOff ;
 
-            if (args.length === 3 && typeof(args[1] === 'number')) {
+            if (args.length === 3 && typeof(args[1]) === 'number') {
                 for (var ftype in FILTERTYPES) {
                     if (FILTERTYPES[ftype][0] === args[0]) {
                         filtertype = FILTERTYPES[ftype][1];
@@ -3735,7 +3735,7 @@ function Logo () {
             var oscillatorType = DEFAULTOSCILLATORTYPE;
             var partials ;
 
-            if (args.length === 2 && typeof(args[1] === 'number')) {
+            if (args.length === 2 && typeof(args[1]) === 'number') {
                 for (var otype in OSCTYPES) {
                     if (OSCTYPES[otype][0] === args[0]) {
                         oscillatorType = OSCTYPES[otype][1];
@@ -6257,7 +6257,7 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0] !== 'number')) {
+            if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 50;
             } else {
@@ -6290,14 +6290,14 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'setsynthvolume':
-            if (args[0] === null || typeof(args[0] !== 'string')) {
+            if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 'default';
             } else {
                 arg0 = args[0];
             }
 
-            if (args[1] === null || typeof(args[1] !== 'number')) {
+            if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
@@ -6367,14 +6367,14 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0] !== 'string')) {
+            if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 'default';
             } else {
                 arg0 = args[0];
             }
 
-            if (args[1] === null || typeof(args[1] !== 'number')) {
+            if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
