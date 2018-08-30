@@ -270,7 +270,9 @@ function Blocks () {
                 this.blockMoved(firstConnection);
                 this.adjustDocks(firstConnection, true);
                 if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
-                    this.clampBlocksToCheck = [[firstConnection, 0]];
+		    clampList = [];
+		    this.findNestedClampBlocks(firstConnection, clampList);
+		    this.clampBlocksToCheck = clampList;
                     this.adjustExpandableClampBlock();
                 }
             }
