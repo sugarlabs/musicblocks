@@ -270,7 +270,7 @@ function Blocks () {
                 this.blockMoved(firstConnection);
                 this.adjustDocks(firstConnection, true);
                 if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
-		    this.clampBlocksToCheck = [[firstConnection, 0]];
+                    this.clampBlocksToCheck = [[firstConnection, 0]];
                     this.adjustExpandableClampBlock();
                 }
             }
@@ -295,9 +295,9 @@ function Blocks () {
         var someCollapsed = false;
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-	    if (myBlock.name === 'newnote') {
-		continue;
-	    }
+            if (myBlock.name === 'newnote') {
+                continue;
+            }
 
             if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 if (myBlock.collapsed) {
@@ -313,9 +313,9 @@ function Blocks () {
             // If any blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-		if (myBlock.name === 'newnote') {
-		    continue;
-		}
+                if (myBlock.name === 'newnote') {
+                    continue;
+                }
 
                 if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     myBlock.collapseToggle();
@@ -325,9 +325,9 @@ function Blocks () {
             // If no blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-		if (myBlock.name === 'newnote') {
-		    continue;
-		}
+                if (myBlock.name === 'newnote') {
+                    continue;
+                }
 
                 if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     if (!myBlock.collapsed) {
@@ -462,8 +462,8 @@ function Blocks () {
     this._getBlockSize = function (blk) {
         var myBlock = this.blockList[blk];
         if (myBlock.name === 'newnote' && myBlock.collapsed) {
-	    return 1;
-	}
+            return 1;
+        }
 
         return myBlock.size;
     };
@@ -637,7 +637,7 @@ function Blocks () {
             if (c > 0) {
                 var cblk = myBlock.connections[c];
                 if (cblk != null) {
-		    csize = this._getStackSize(cblk);
+                    csize = this._getStackSize(cblk);
                 }
 
                 if (csize === 0) {
@@ -672,8 +672,8 @@ function Blocks () {
 
         // If the note value block is collapsed, spoof size.
         if (myBlock.name === 'newnote' && myBlock.collapsed) {
-	    size = 1
-	}
+            size = 1
+        }
 
         // check on any connected block
         if (myBlock.connections.length > 1) {
@@ -731,8 +731,8 @@ function Blocks () {
         // last connection of collapsed blocks.
         if (myBlock.isTwoArgBooleanBlock()) {
             var start = 0;
-	} else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
-	    start === myBlock.connections.length -1;
+        } else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
+            start === myBlock.connections.length -1;
         } else {
             var start = 1;
         }
@@ -777,23 +777,23 @@ function Blocks () {
                 // Move the connected block...
                 var dx = bdock[0] - cdock[0];
 
-		if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
-		    // If the block is collapsed, determine the new
-		    // dock position.
-		    var n = myBlock.docks.length;
+                if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
+                    // If the block is collapsed, determine the new
+                    // dock position.
+                    var n = myBlock.docks.length;
                     var dd = myBlock.docks[n - 1][1] - myBlock.docks[n - 2][1];
                     var dy = bdock[1] - dd - cdock[1];
-		    console.log('adjust inline connection: ' + n + ' ' + dd + ' ' + dy);
-		} else {
+                    console.log('adjust inline connection: ' + n + ' ' + dd + ' ' + dy);
+                } else {
                     var dy = bdock[1] - cdock[1];
-		}
+                }
 
                 if (myBlock.container == null) {
-		    console.log('Does this ever happen any more?')
+                    console.log('Does this ever happen any more?')
                 } else {
-		    var nx = Math.floor(myBlock.container.x + dx + 0.5);
-		    var ny = Math.floor(myBlock.container.y + dy + 0.5);
-		}
+                    var nx = Math.floor(myBlock.container.x + dx + 0.5);
+                    var ny = Math.floor(myBlock.container.y + dy + 0.5);
+                }
 
                 this._moveBlock(cblk, nx, ny);
             } else {
@@ -1163,15 +1163,15 @@ function Blocks () {
                 continue;
             }
 
-	    // Does this every happen? Or is there always a hidden
-	    // block below?
+            // Does this every happen? Or is there always a hidden
+            // block below?
             if (this.blockList[b].isInlineCollapsible() && this.blockList[b].collapsed) {
-		// Only try docking to last connection of inline
-		// collapsed blocks.
-		var start = this.blockList[b].connections.length - 1;
-	    } else {
-		var start = 1;
-	    }
+                // Only try docking to last connection of inline
+                // collapsed blocks.
+                var start = this.blockList[b].connections.length - 1;
+            } else {
+                var start = 1;
+            }
 
             for (var i = start; i < this.blockList[b].connections.length; i++) {
                 // When converting from Python projects to JS format,
@@ -2373,7 +2373,6 @@ function Blocks () {
         } else if (name === 'newnote') {
             var postProcess = function (args) {
                 var thisBlock = args[0];
-		that.blockList[thisBlock]._positionCollapseContainer(that.blockList[thisBlock].protoblock.scale);
             };
 
             postProcessArg = [thisBlock, null];
@@ -3149,24 +3148,24 @@ function Blocks () {
     };
 
     this.insideNoteBlock = function (blk) {
-	// Return the first containing note block, if any.
-	if (blk === null) {
-	    return null;
-	}
+        // Return the first containing note block, if any.
+        if (blk === null) {
+            return null;
+        }
 
-	c0 = this.blockList[blk].connections[0];
-	if (c0 === null) {
-	    return null;
-	}
+        c0 = this.blockList[blk].connections[0];
+        if (c0 === null) {
+            return null;
+        }
 
         // If we are connected to a note block arg or child flow,
         // return the note block. If we are connected to the flow, we
         // are not inside, so keep looking.
-	if (this.blockList[c0].name === 'newnote' && blk !== last(this.blockList[c0].connections)) {
-	    return c0;
-	}
+        if (this.blockList[c0].name === 'newnote' && blk !== last(this.blockList[c0].connections)) {
+            return c0;
+        }
 
-	return this.insideNoteBlock(c0);
+        return this.insideNoteBlock(c0);
     };
 
     this.findFirstPitchBlock = function (blk) {
@@ -3178,8 +3177,8 @@ function Blocks () {
         if (PITCHBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
             return blk;
         } else if (this.blockList[blk].name === 'rest2') {
-	    return blk;
-	}
+            return blk;
+        }
 
         var c = last(this.blockList[blk].connections);
         return this.findFirstPitchBlock(c);
@@ -3493,7 +3492,7 @@ function Blocks () {
         this.blocksToCollapse = [];
 
         // Newnote blocks that need their artwork adjusted
-	newNoteBlocks = [];
+        newNoteBlocks = [];
 
         // Scan for any new action and storein blocks to identify
         // duplicates. We also need to track start and action blocks
@@ -4231,13 +4230,13 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
-	    case 'newnote':
-		var postProcess = function (thisBlock) {
-		    newNoteBlocks.push(thisBlock);
-		};
+            case 'newnote':
+                var postProcess = function (thisBlock) {
+                    newNoteBlocks.push(thisBlock);
+                };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, thisBlock);
-		break;
+                break;
             default:
                 // Check that name is in the proto list
                 if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
@@ -4382,12 +4381,6 @@ function Blocks () {
                 that.setPlaybackStatus();
             }, 1500);
         }
-
-        // Adjust the newnote artwork.
-        for (i = 0; i < newNoteBlocks.length; i++) {
-	    var thisBlock = newNoteBlocks[i];
-	    that.blockList[thisBlock]._positionCollapseContainer(that.blockList[thisBlock].protoblock.scale);
-	}
     };
 
     this.cleanupAfterLoad = function (name) {
