@@ -3773,6 +3773,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['start'] = newblock;
     newblock.staticLabels.push(_('start'));
     newblock.extraWidth = 40;
+    newblock.labelOffset = 15;
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
 
@@ -3781,6 +3782,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['action'] = newblock;
     newblock.staticLabels.push(_('action'));
     newblock.extraWidth = 42;
+    newblock.labelOffset = 15;
     newblock.adjustWidthToLabel();
     newblock.stackClampOneArgBlock();
     newblock.defaults.push(_('action'));

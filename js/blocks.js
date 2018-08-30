@@ -299,7 +299,7 @@ function Blocks () {
 		continue;
 	    }
 
-            if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+            if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 if (myBlock.collapsed) {
                     someCollapsed = true;
                 } else {
@@ -317,7 +317,7 @@ function Blocks () {
 		    continue;
 		}
 
-                if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     myBlock.collapseToggle();
                 }
             }
@@ -329,7 +329,7 @@ function Blocks () {
 		    continue;
 		}
 
-                if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     if (!myBlock.collapsed) {
                         myBlock.collapseToggle();
                     }
@@ -691,9 +691,6 @@ function Blocks () {
         // of all of the blocks connected to it
 
         var myBlock = this.blockList[blk];
-        if (myBlock.name === 'newnote' && myBlock.collapsed) {
-	    return;
-	}
 
         // For when we come in from makeBlock
         if (resetLoopCounter != null) {
@@ -730,12 +727,16 @@ function Blocks () {
 
         // Walk through each connection except the parent block; the
         // exception being the parent block of boolean 2arg blocks,
-        // since the dock[0] position can change.
+        // since the dock[0] position can change; and only check the
+        // last connection of collapsed blocks.
         if (myBlock.isTwoArgBooleanBlock()) {
             var start = 0;
+	} else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
+	    start === myBlock.connections.length -1;
         } else {
             var start = 1;
         }
+
         for (var c = start; c < myBlock.connections.length; c++) {
             // Get the dock position for this connection.
             var bdock = myBlock.docks[c];
@@ -775,13 +776,25 @@ function Blocks () {
             if (c > 0) {
                 // Move the connected block...
                 var dx = bdock[0] - cdock[0];
-                var dy = bdock[1] - cdock[1];
+
+		if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
+		    // If the block is collapsed, determine the new
+		    // dock position.
+		    var n = myBlock.docks.length;
+                    var dd = myBlock.docks[n - 1][1] - myBlock.docks[n - 2][1];
+                    var dy = bdock[1] - dd - cdock[1];
+		    console.log('adjust inline connection: ' + n + ' ' + dd + ' ' + dy);
+		} else {
+                    var dy = bdock[1] - cdock[1];
+		}
+
                 if (myBlock.container == null) {
-                    console.log('Does this ever happen any more?')
+		    console.log('Does this ever happen any more?')
                 } else {
-                    var nx = Math.floor(myBlock.container.x + dx + 0.5);
-                    var ny = Math.floor(myBlock.container.y + dy + 0.5);
-                }
+		    var nx = Math.floor(myBlock.container.x + dx + 0.5);
+		    var ny = Math.floor(myBlock.container.y + dy + 0.5);
+		}
+
                 this._moveBlock(cblk, nx, ny);
             } else {
                 // or it's parent.
@@ -789,6 +802,7 @@ function Blocks () {
                 var dy = cdock[1] - bdock[1];
                 var nx = Math.floor(this.blockList[cblk].container.x + dx + 0.5);
                 var ny = Math.floor(this.blockList[cblk].container.y + dy + 0.5);
+
                 this._moveBlock(blk, nx, ny);
             }
 
@@ -1033,6 +1047,7 @@ function Blocks () {
     this.blockMoved = function (thisBlock) {
         // When a block is moved, we have lots of things to check:
         // (0) Is it inside of a expandable block?
+        //     Is it connected to a collapsed block?
         //     Is it an arg inside an arg clamp?
         // (1) Is it an arg block connected to a two-arg block?
         // (2) Disconnect its connection[0];
@@ -1113,6 +1128,7 @@ function Blocks () {
                     break;
                 }
             }
+
             myBlock.connections[0] = null;
             this.raiseStackToTop(thisBlock);
         }
@@ -1147,7 +1163,17 @@ function Blocks () {
                 continue;
             }
 
-            for (var i = 1; i < this.blockList[b].connections.length; i++) {
+	    // Does this every happen? Or is there always a hidden
+	    // block below?
+            if (this.blockList[b].isInlineCollapsible() && this.blockList[b].collapsed) {
+		// Only try docking to last connection of inline
+		// collapsed blocks.
+		var start = this.blockList[b].connections.length - 1;
+	    } else {
+		var start = 1;
+	    }
+
+            for (var i = start; i < this.blockList[b].connections.length; i++) {
                 // When converting from Python projects to JS format,
                 // sometimes extra null connections are added. We need
                 // to ignore them.
@@ -1595,14 +1621,6 @@ function Blocks () {
 
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            /*
-            this.stage.removeChild(myBlock.container);
-            this.stage.addChild(myBlock.container);
-            if (myBlock.collapseContainer != null) {
-                this.stage.removeChild(myBlock.collapseContainer);
-                this.stage.addChild(myBlock.collapseContainer);
-            }
-            */
             if (myBlock.connections[0] == null) {
                 this._adjustTheseStacks.push(blk);
             }
@@ -1647,13 +1665,6 @@ function Blocks () {
             myBlock.container.x = Math.floor(x + 0.5);
             myBlock.container.y = Math.floor(y + 0.5);
 
-            myBlock._positionCollapseContainer(this.blockList[blk].protoblock.scale);
-            /*
-            if (myBlock.collapseContainer != null) {
-                myBlock.collapseContainer.x = Math.floor(x + 0.5) + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
-                myBlock.collapseContainer.y = Math.floor(y + 0.5) + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
-            }
-            */
             this.checkBounds();
         } else {
             console.log('No container yet for block ' + myBlock.name);
@@ -1670,11 +1681,6 @@ function Blocks () {
         if (myBlock.container != null) {
             myBlock.container.x += Math.floor(dx + 0.5);
             myBlock.container.y += Math.floor(dy + 0.5);
-
-            if (myBlock.collapseContainer != null) {
-                myBlock.collapseContainer.x += Math.floor(dx + 0.5);
-                myBlock.collapseContainer.y += Math.floor(dy + 0.5);
-            }
 
             this.checkBounds();
         } else {
@@ -2364,6 +2370,13 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, arg];
+        } else if (name === 'newnote') {
+            var postProcess = function (args) {
+                var thisBlock = args[0];
+		that.blockList[thisBlock]._positionCollapseContainer(that.blockList[thisBlock].protoblock.scale);
+            };
+
+            postProcessArg = [thisBlock, null];
         } else {
             var postProcess = null;
         }
@@ -3479,6 +3492,9 @@ function Blocks () {
         // action and start blocks that need to be collapsed.
         this.blocksToCollapse = [];
 
+        // Newnote blocks that need their artwork adjusted
+	newNoteBlocks = [];
+
         // Scan for any new action and storein blocks to identify
         // duplicates. We also need to track start and action blocks
         // that may need to be collapsed.
@@ -3551,7 +3567,7 @@ function Blocks () {
                 break;
             }
 
-            if (COLLAPSABLES.indexOf(name) !== -1) {
+            if (COLLAPSIBLES.indexOf(name) !== -1) {
                 if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
                     if (blkData[1][1]['collapsed']) {
                         this.blocksToCollapse.push(this.blockList.length + b);
@@ -3814,7 +3830,7 @@ function Blocks () {
                     var blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) !== -1) {
                     var blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (COLLAPSABLES.indexOf(blkData[1][0]) !== -1) {
+                    if (COLLAPSIBLES.indexOf(blkData[1][0]) !== -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -3822,7 +3838,7 @@ function Blocks () {
                 }
             } else {
                 var blkInfo = [blkData[1], {'value': null}];
-                if (COLLAPSABLES.indexOf(blkData[1]) !== -1) {
+                if (COLLAPSIBLES.indexOf(blkData[1]) !== -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -3830,7 +3846,7 @@ function Blocks () {
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (COLLAPSABLES.indexOf(name) !== -1) {
+            if (COLLAPSIBLES.indexOf(name) !== -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
@@ -4215,6 +4231,13 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
+	    case 'newnote':
+		var postProcess = function (thisBlock) {
+		    newNoteBlocks.push(thisBlock);
+		};
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, thisBlock);
+		break;
             default:
                 // Check that name is in the proto list
                 if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
@@ -4359,6 +4382,12 @@ function Blocks () {
                 that.setPlaybackStatus();
             }, 1500);
         }
+
+        // Adjust the newnote artwork.
+        for (i = 0; i < newNoteBlocks.length; i++) {
+	    var thisBlock = newNoteBlocks[i];
+	    that.blockList[thisBlock]._positionCollapseContainer(that.blockList[thisBlock].protoblock.scale);
+	}
     };
 
     this.cleanupAfterLoad = function (name) {
@@ -4379,13 +4408,6 @@ function Blocks () {
         }
 
         this.blocksToCollapse = [];
-
-        for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].collapseContainer != null) {
-                this.blockList[blk].collapseContainer.x = Math.floor((this.blockList[blk].container.x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2)) + 0.5);
-                this.blockList[blk].collapseContainer.y = Math.floor((this.blockList[blk].container.y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2)) + 0.5);
-            }
-        }
 
         this.refreshCanvas();
 
@@ -4518,9 +4540,6 @@ function Blocks () {
         var z = this.stage.children.length - 1;
         for (var b = 0; b < this.dragGroup.length; b++) {
             this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
-            if (this.blockList[this.dragGroup[b]].collapseContainer !== null) {
-                this.stage.setChildIndex(this.blockList[this.dragGroup[b]].collapseContainer, z);
-            };
 
             z -= 1;
         }

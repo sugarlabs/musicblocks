@@ -520,6 +520,7 @@ function ProtoBlock(name) {
         svg.setCap(true);
         svg.setTail(true);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+        svg.setLabelOffset(this.labelOffset);
 
         if (slots) {
             svg.setClampSlots(0, slots);
@@ -998,6 +999,7 @@ function ProtoBlock(name) {
         svg.setTail(true);
         svg.setInnies([true]);
         svg.setExpand(10 + this.extraWidth, 0, 0, 0);
+        svg.setLabelOffset(this.labelOffset);
 
         if (slots) {
             svg.setClampSlots(0, slots);
