@@ -1340,6 +1340,8 @@ function Block(protoblock, blocks, overrideName) {
                 var blk = this.blocks.dragGroup[b];
                 this.blocks.moveBlockRelative(blk, 0, dy);
             }
+
+	    this.blocks.adjustDocks(thisBlock, true);
         }
 
         // Look to see if we are in a clamp block. If so, readjust.
