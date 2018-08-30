@@ -807,9 +807,9 @@ function Block(protoblock, blocks, overrideName) {
 
                 that.collapseButtonBitmap.x = 0;
                 if (that.isInlineCollapsible()) {
-                    that.collapseButtonBitmap.y = 2;
+                    that.collapseButtonBitmap.y = 2 * that.protoblock.scale;
                 } else {
-                    that.collapseButtonBitmap.y = 12;
+                    that.collapseButtonBitmap.y = 8 * that.protoblock.scale;
                 }
 
                 that.collapseButtonBitmap.visible = !that.collapsed;
@@ -831,9 +831,9 @@ function Block(protoblock, blocks, overrideName) {
 
                 that.expandButtonBitmap.x = 0;
                 if (that.isInlineCollapsible()) {
-                    that.expandButtonBitmap.y = 2;
+                    that.expandButtonBitmap.y = 2 * that.protoblock.scale;
                 } else {
-                    that.expandButtonBitmap.y = 12;
+                    that.expandButtonBitmap.y = 8 * that.protoblock.scale;
                 }
 
                 __processCollapseButton(that);
