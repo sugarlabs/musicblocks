@@ -3095,17 +3095,12 @@ function Blocks () {
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isClampBlock()) {
                 if (this.blockList[cblk].isDoubleClampBlock()) {
-		    var i = this.blockList[cblk].connections.indexOf(blk);
-		    if (i === this.blockList[cblk].connections.length - 2) {
-			var clamp = 1;
-		    } else {
-			var clamp = 0;
-		    }
+		    // Just check them both.
+		    clampList.push([cblk, 0]);
+		    clampList.push([cblk, 1]);
 		} else {
-		    var clamp = 0;
+		    clampList.push([cblk, 0]);
 		}
-
-		clampList.push([cblk, clamp]);
             }
 
 	    // Keep looking.
