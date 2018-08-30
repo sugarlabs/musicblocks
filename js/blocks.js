@@ -3082,6 +3082,27 @@ function Blocks () {
         }
     };
 
+    this.findNestedClampBlocks = function (blk, clampList) {
+        // Returns a list of containing clamp block or []
+        if (this.blockList[blk] == null) {
+            console.log('null block in blockList? ' + blk);
+            return [];
+        } else if (this.blockList[blk].connections[0] == null) {
+	    // We reached the end, so return the list.
+            return clampList;
+        } else {
+	    // If we find a clamp block, add it to the list.
+            var cblk = this.blockList[blk].connections[0];
+            if (this.blockList[cblk].isClampBlock()) {
+		// FIXME: Figure out which clamp.
+		clampList.push([cblk, 0]);
+            }
+
+	    // Keep looking.
+            return this.findNestedClampBlocks(cblk, clampList);
+        }
+    };
+
     this.insideExpandableBlock = function (blk) {
         // Returns a containing expandable block or null
         if (this.blockList[blk] == null) {
@@ -3491,9 +3512,6 @@ function Blocks () {
         // action and start blocks that need to be collapsed.
         this.blocksToCollapse = [];
 
-        // Newnote blocks that need their artwork adjusted
-        newNoteBlocks = [];
-
         // Scan for any new action and storein blocks to identify
         // duplicates. We also need to track start and action blocks
         // that may need to be collapsed.
@@ -3767,7 +3785,7 @@ function Blocks () {
                         extraBlocksLength += 2;
                     }
 
-                    // (3) create a newnote block instead.
+                    // (3) create a "newnote" block instead.
                     if (typeof(blockObjs[b][1]) === 'object') {
                         blockObjs[b][1][0] = 'new' + name;
                     } else {
@@ -4229,13 +4247,6 @@ function Blocks () {
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                break;
-            case 'newnote':
-                var postProcess = function (thisBlock) {
-                    newNoteBlocks.push(thisBlock);
-                };
-
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             default:
                 // Check that name is in the proto list
