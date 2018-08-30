@@ -3094,8 +3094,18 @@ function Blocks () {
 	    // If we find a clamp block, add it to the list.
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isClampBlock()) {
-		// FIXME: Figure out which clamp.
-		clampList.push([cblk, 0]);
+                if (this.blockList[cblk].isDoubleClampBlock()) {
+		    var i = this.blockList[cblk].connections.indexOf(blk);
+		    if (i === this.blockList[cblk].connections.length - 2) {
+			var clamp = 1;
+		    } else {
+			var clamp = 0;
+		    }
+		} else {
+		    var clamp = 0;
+		}
+
+		clampList.push([cblk, clamp]);
             }
 
 	    // Keep looking.

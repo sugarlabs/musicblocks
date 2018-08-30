@@ -1344,6 +1344,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Look to see if we are in a clamp block. If so, readjust.
 	clampList = [];
+	this.blocks.findNestedClampBlocks(thisBlock, clampList);
 	if (clampList.length > 0) {
             this.blocks.clampBlocksToCheck = clampList;
             this.blocks.adjustExpandableClampBlock();
