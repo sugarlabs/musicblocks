@@ -234,7 +234,10 @@ function Blocks () {
 
     this.extract = function () {
         if (this.activeBlock != null) {
-            this._extractBlock(this.activeBlock, true);
+	    // Don't extract silence blocks.
+            if (this.blockList[this.activeBlock].name !== 'rest2') {
+		this._extractBlock(this.activeBlock, true);
+	    }
         }
     };
 
@@ -734,7 +737,7 @@ function Blocks () {
         if (myBlock.isTwoArgBooleanBlock()) {
             var start = 0;
         } else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
-            start === myBlock.connections.length -1;
+            var start = myBlock.connections.length - 1;
         } else {
             var start = 1;
         }
@@ -775,6 +778,15 @@ function Blocks () {
 
             var cdock = this.blockList[cblk].docks[b];
 
+            /*
+	    if (this.blockList[blk].name === 'newnote' || this.blockList[cblk].name === 'newnote') {
+		console.log(this.blockList[blk].name);
+		console.log(bdock);
+		console.log(this.blockList[cblk].name);
+		console.log(cdock);
+	    }
+            */
+
             if (c > 0) {
                 // Move the connected block...
                 var dx = bdock[0] - cdock[0];
@@ -790,6 +802,10 @@ function Blocks () {
                     var dy = bdock[1] - cdock[1];
                 }
 
+		console.log('child');
+                console.log('dx ' + dx);
+                console.log('dy ' + dy);
+
                 if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
                 } else {
@@ -802,6 +818,9 @@ function Blocks () {
                 // or it's parent.
                 var dx = cdock[0] - bdock[0];
                 var dy = cdock[1] - bdock[1];
+		console.log('parent');
+                console.log('dx ' + dx);
+                console.log('dy ' + dy);
                 var nx = Math.floor(this.blockList[cblk].container.x + dx + 0.5);
                 var ny = Math.floor(this.blockList[cblk].container.y + dy + 0.5);
 
