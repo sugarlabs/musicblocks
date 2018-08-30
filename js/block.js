@@ -339,10 +339,12 @@ function Block(protoblock, blocks, overrideName) {
 		that._calculateBlockHitArea();
             };
 
-            this._generateCollapseArtwork(_postProcess);
-            var fontSize = 10 * scale;
-            this.collapseText.font = fontSize + 'px Sans';
-            this._positionCollapseLabel(scale);
+            if (this.isCollapsible()) {
+		this._generateCollapseArtwork(_postProcess);
+		var fontSize = 10 * scale;
+		this.collapseText.font = fontSize + 'px Sans';
+		this._positionCollapseLabel(scale);
+	    }
         }
     };
 
@@ -757,8 +759,10 @@ function Block(protoblock, blocks, overrideName) {
                 proto.extraWidth = 40;
                 proto.basicBlockCollapsed();
             }
+
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
+
             var postProcess = function (that) {
                 // that._loadCollapsibleEventHandlers();
                 that.loadComplete = true;
@@ -1756,6 +1760,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
 	this.container.setChildIndex(this.bitmap, 0);
+	this.container.setChildIndex(this.highlightBitmap, 0);
 	this.updateCache();
     };
 
