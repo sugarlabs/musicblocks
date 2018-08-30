@@ -234,10 +234,10 @@ function Blocks () {
 
     this.extract = function () {
         if (this.activeBlock != null) {
-	    // Don't extract silence blocks.
+            // Don't extract silence blocks.
             if (this.blockList[this.activeBlock].name !== 'rest2') {
-		this._extractBlock(this.activeBlock, true);
-	    }
+                this._extractBlock(this.activeBlock, true);
+            }
         }
     };
 
@@ -273,9 +273,9 @@ function Blocks () {
                 this.blockMoved(firstConnection);
                 this.adjustDocks(firstConnection, true);
                 if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
-		    clampList = [];
-		    this.findNestedClampBlocks(firstConnection, clampList);
-		    this.clampBlocksToCheck = clampList;
+                    clampList = [];
+                    this.findNestedClampBlocks(firstConnection, clampList);
+                    this.clampBlocksToCheck = clampList;
                     this.adjustExpandableClampBlock();
                 }
             }
@@ -779,12 +779,12 @@ function Blocks () {
             var cdock = this.blockList[cblk].docks[b];
 
             /*
-	    if (this.blockList[blk].name === 'newnote' || this.blockList[cblk].name === 'newnote') {
-		console.log(this.blockList[blk].name);
-		console.log(bdock);
-		console.log(this.blockList[cblk].name);
-		console.log(cdock);
-	    }
+            if (this.blockList[blk].name === 'newnote' || this.blockList[cblk].name === 'newnote') {
+                console.log(this.blockList[blk].name);
+                console.log(bdock);
+                console.log(this.blockList[cblk].name);
+                console.log(cdock);
+            }
             */
 
             if (c > 0) {
@@ -802,9 +802,11 @@ function Blocks () {
                     var dy = bdock[1] - cdock[1];
                 }
 
-		console.log('child');
+                /*
+                console.log('child');
                 console.log('dx ' + dx);
                 console.log('dy ' + dy);
+                */
 
                 if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
@@ -818,9 +820,13 @@ function Blocks () {
                 // or it's parent.
                 var dx = cdock[0] - bdock[0];
                 var dy = cdock[1] - bdock[1];
-		console.log('parent');
+
+                /*
+                console.log('parent');
                 console.log('dx ' + dx);
                 console.log('dy ' + dy);
+                */
+
                 var nx = Math.floor(this.blockList[cblk].container.x + dx + 0.5);
                 var ny = Math.floor(this.blockList[cblk].container.y + dy + 0.5);
 
@@ -3109,22 +3115,22 @@ function Blocks () {
             console.log('null block in blockList? ' + blk);
             return [];
         } else if (this.blockList[blk].connections[0] == null) {
-	    // We reached the end, so return the list.
+            // We reached the end, so return the list.
             return clampList;
         } else {
-	    // If we find a clamp block, add it to the list.
+            // If we find a clamp block, add it to the list.
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isClampBlock()) {
                 if (this.blockList[cblk].isDoubleClampBlock()) {
-		    // Just check them both.
-		    clampList.push([cblk, 0]);
-		    clampList.push([cblk, 1]);
-		} else {
-		    clampList.push([cblk, 0]);
-		}
+                    // Just check them both.
+                    clampList.push([cblk, 0]);
+                    clampList.push([cblk, 1]);
+                } else {
+                    clampList.push([cblk, 0]);
+                }
             }
 
-	    // Keep looking.
+            // Keep looking.
             return this.findNestedClampBlocks(cblk, clampList);
         }
     };
