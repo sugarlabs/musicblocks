@@ -1285,7 +1285,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('newnote');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newnote'] = newblock;
-    newblock.staticLabels.push(_('note value'));
+    newblock.staticLabels.push(_('note'));
+    newblock.staticLabels.push(_('value'));
     newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;

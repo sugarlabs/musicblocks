@@ -164,7 +164,7 @@ push onto the heap.
                 }
                 break;
 
-## Assigning your block in [analytics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/analytics.js)
+## Assigning your block in [rubrics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/rubrics.js)
 
 Here you assign a block according to its bin.
 

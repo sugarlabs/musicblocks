@@ -117,7 +117,7 @@ var MYDEFINES = [
     'activity/utilitybox',
     'activity/basicblocks',
     'activity/blockfactory',
-    'activity/analytics',
+    'activity/rubrics',
     'activity/macros',
     'activity/SaveInterface',
     'utils/musicutils',

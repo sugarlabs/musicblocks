@@ -32,7 +32,7 @@ Export utilities
 * `lilypond.js` -- save in Lilypond format
 
 Other utilities
-* `analytics.js` -- analyse blocks in project
+* `rubrics.js` -- analyse blocks in project
 * `background.js` -- extenstion utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
@@ -355,8 +355,8 @@ In order to set up a new synth effect:
 
 ## Odds and ends
 
-* You should add your new block to the analytics found in
-  [analytics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/analytics.js)
+* You should add your new block to the rubrics found in
+  [rubrics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/rubrics.js)
 
 * As mentioned above, if you are adding user-facing strings, be sure
   to add them in this format: `_('string')` This allows the string to
