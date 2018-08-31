@@ -2253,6 +2253,9 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
         // wheelNav pie menu for pitch selection
+        if (this.blocks.rightClick) {
+	    return;
+	}
 
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
@@ -2494,6 +2497,10 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuScaleDegree = function (noteValues, note) {
         // wheelNav pie menu for scale degree pitch selection
 
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         var noteLabels = [];
         for (var i = 0; i < noteValues.length; i++) {
             noteLabels.push(noteValues[i].toString());
@@ -2637,6 +2644,11 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuAccidentals = function (accidentalLabels, accidentalValues, accidental) {
         // wheelNav pie menu for accidental selection
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         docById('wheelDiv').style.display = '';
 
         // the accidental selector
@@ -2737,6 +2749,11 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuNoteValue = function (noteValue) {
         // input form and  wheelNav pie menu for note value selection
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         docById('wheelDiv').style.display = '';
 
         // We want powers of two on the bottom, nearest the input box
@@ -2926,6 +2943,11 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuNumber = function (wheelValues, selectedValue) {
         // input form and  wheelNav pie menu for number selection
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         docById('wheelDiv').style.display = '';
 
         // the number selector
@@ -3057,6 +3079,11 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuBasic = function (menuLabels, menuValues, selectedValue, colors) {
         // basic wheelNav pie menu
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         if (colors === undefined) {
             colors = ['#77c428', '#93e042', '#5ba900'];
         }
@@ -3139,6 +3166,11 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuBoolean = function (booleanLabels, booleanValues, boolean) {
         // wheelNav pie menu for boolean selection
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         docById('wheelDiv').style.display = '';
 
         // the booleanh selector
@@ -3220,6 +3252,11 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice) {
         // wheelNav pie menu for voice selection
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         const COLORS = ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'];
         var colors = [];
 
@@ -3347,6 +3384,11 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuIntervals = function (selectedInterval) {
         // pie menu for interval selection
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
+
         docById('wheelDiv').style.display = '';
 
         // Use advanced constructor for more wheelnav on same div
@@ -3521,6 +3563,10 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuModes = function (selectedMode) {
         // pie menu for mode selection
+
+        if (this.blocks.rightClick) {
+	    return;
+	}
 
         // Look for a key block
         var key = 'C';
