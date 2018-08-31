@@ -161,6 +161,10 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.highlight = function () {
+	if (this.trash) {
+	    return;
+	}
+
         if (this.inCollapsed) {
             // In collapsed, so do nothing.
             return;
@@ -215,6 +219,10 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.unhighlight = function () {
+	if (this.trash) {
+	    return;
+	}
+
         if (this.inCollapsed) {
             // In collapsed, so do nothing.
             return;

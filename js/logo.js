@@ -1912,9 +1912,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                var arg = 1;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             childFlow = args[1];
@@ -2642,11 +2642,11 @@ function Logo () {
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
             } else {
-                args[0] %= 101;
-                var alpha = 1.0 - (args[0] / 100);
+                var arg = args[0] % 101;
+                var alpha = 1.0 - (arg / 100);
                 that.turtles.turtleList[turtle].doSetPenAlpha(alpha);
                 if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'settranslucency', args[0]]);
+                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'settranslucency', arg]);
                 }
             }
             break;
@@ -3084,9 +3084,9 @@ function Logo () {
 
             if (args[0] === null ||  typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                var arg = 1;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (arg < 0) {
@@ -3115,9 +3115,9 @@ function Logo () {
 
             if (args[0] === null ||  typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 10;
+                var arg = 10;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (arg < 0) {
@@ -3148,16 +3148,16 @@ function Logo () {
 
             if (args[0] === null ||  typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 10;
+                var arg0 = 10;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null ||  typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 6;
+                var arg1 = 6;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             synthVibratoRate = arg0;
@@ -3733,7 +3733,7 @@ function Logo () {
             break;
         case 'oscillator':
             var oscillatorType = DEFAULTOSCILLATORTYPE;
-            var partials ;
+            var partials = 0;
 
             if (args.length === 2 && typeof(args[1]) === 'number') {
                 for (var otype in OSCTYPES) {
@@ -3768,23 +3768,23 @@ function Logo () {
 
             if (args[0] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'sol';
+                var arg0 = 'sol';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 4;
+                var arg1 = 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             if (args[2] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg2 = 'even';
+                var arg2 = 'even';
             } else {
-                arg2 = args[2];
+                var arg2 = args[2];
             }
 
             if (typeof(arg2) === 'number') {
@@ -4038,9 +4038,9 @@ function Logo () {
         case 'playdrum':
             if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 'kick';
+                var arg = 'kick';
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             var drumname = 'kick';
@@ -4098,16 +4098,16 @@ function Logo () {
             console.log(args[0] + ' ' + args[1]);
             if (args[0] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'C';
+                var arg0 = 'C';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 4;
+                var arg1 = 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             var octave = Math.floor(calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], arg0));
@@ -4119,9 +4119,9 @@ function Logo () {
             if (that.blocks.blockList[blk].name === 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg0 = 7;
+                    var arg0 = 7;
                 } else {
-                    arg0 = args[0];
+                    var arg0 = args[0];
                 }
 
                 if (typeof(arg0) !== 'number') {
@@ -4145,16 +4145,16 @@ function Logo () {
             } else {
                 if (args[0] === null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg0 = 'sol';
+                    var arg0 = 'sol';
                 } else {
-                    arg0 = args[0];
+                    var arg0 = args[0];
                 }
 
                 if (args[1] === null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg1 = 4;
+                    var arg1 = 4;
                 } else {
-                    arg1 = args[1];
+                    var arg1 = args[1];
                 }
 
                 if (typeof(arg0) === 'number' && that.blocks.blockList[blk].name === 'pitch') {
@@ -4504,16 +4504,16 @@ function Logo () {
         case 'rhythm':
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
+                var arg0 = 3;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number' || args[1] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 4;
+                var arg1 = 1 / 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             if (that.blocks.blockList[blk].name === 'rhythm2') {
@@ -4629,10 +4629,9 @@ function Logo () {
         case 'pickup':
             if (args.length !== 1 || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 0;
                 break;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (arg0 < 0) {
@@ -4736,16 +4735,16 @@ function Logo () {
         case 'meter':
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 4;
+                var arg0 = 4;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 4;
+                var arg1 = 1 / 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             if (arg0 <= 0) {
@@ -4853,9 +4852,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk)
-                arg = 1 / 4;
+                var arg = 1 / 4;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             // Ensure that note duration is positive.
@@ -5446,9 +5445,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                var arg = 1;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (args > 0) {
@@ -5516,9 +5515,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 32;
+                var arg = 1 / 32;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (that.blocks.blockList[blk].name === 'newstaccato') {
@@ -5548,9 +5547,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 16;
+                var arg = 1 / 16;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (that.blocks.blockList[blk].name === 'slur') {
@@ -5590,9 +5589,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 16;
+                var arg = 1 / 16;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             that.glide[turtle].push(arg);
@@ -5734,16 +5733,16 @@ function Logo () {
 
                 if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg0 = 1 / 24;
+                    var arg0 = 1 / 24;
                 } else {
-                    arg0 = args[0];
+                    var arg0 = args[0];
                 }
 
                 if (args[1] === null || typeof(args[1]) !== 'number' || args[1] <= 0) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg1 = 1 / 8;
+                    var arg1 = 1 / 8;
                 } else {
-                    arg1 = args[1];
+                    var arg1 = args[1];
                 }
 
                 if (that.suppressOutput[turtle]) {
@@ -5790,9 +5789,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 2;
+                var arg0 = 2;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             var factor = Math.floor(arg0);
@@ -6117,9 +6116,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0] !== 'string')) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 'sharp';
+                var arg = 'sharp';
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             var i = ACCIDENTALNAMES.indexOf(arg);
@@ -6169,9 +6168,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0] !== 'number')) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 0;
+                var arg = 0;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             for (var synth in that.synthVolume[turtle]) {
@@ -6228,13 +6227,25 @@ function Logo () {
                 if (typeof(args[0]) !== 'number') {
                     that.errorMsg(NANERRORMSG, blk);
                 } else {
-                    that.masterVolume.push(args[0]);
+                    if (args[0] < 0) {
+			var arg = 0;
+		    } else if (args[0] > 100) {
+			var arg = 100;
+		    } else {
+			var arg = args[0];
+		    }
+
+		    if (arg === 0) {
+			that.errorMsg(_('Setting volume to 0.'), blk);
+		    }
+
+                    that.masterVolume.push(arg);
                     if (!this.suppressOutput[turtle]) {
-                        that._setMasterVolume(args[0]);
+                        that._setMasterVolume(arg);
                     }
 
                     if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setvolume', args[0]]);
+                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setvolume', arg]);
                     }
                 }
             }
@@ -6259,9 +6270,19 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 50;
+                var arg = 50;
             } else {
-                arg = args[0];
+		if (args[0] < 0) {
+		    var arg = 0;
+		} else if (args[0] > 100) {
+		    var arg = 100;
+		} else {
+                    var arg = args[0];
+		}
+
+		if (arg === 0) {
+		    that.errorMsg(_('Setting volume to 0.'), blk);
+		}
             }
 
             that.masterVolume.push(arg);
@@ -6292,16 +6313,26 @@ function Logo () {
         case 'setsynthvolume':
             if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'default';
+                var arg0 = 'default';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 50;
+                var arg1 = 50;
             } else {
-                arg1 = args[1];
+		if (args[1] < 0) {
+		    var arg1 = 0;
+		} else if (args[1] > 100) {
+		    var arg1 = 100;
+		} else {
+                    var arg1 = args[1];
+		}
+
+		if (arg1 === 0) {
+		    that.errorMsg(_('Setting volume to 0.'), blk);
+		}
             }
 
             var synth = null;
@@ -6369,16 +6400,26 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'default';
+                var arg0 = 'default';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 50;
+                var arg1 = 50;
             } else {
-                arg1 = args[1];
+		if (args[1] < 0) {
+		    var arg1 = 0;
+		} else if (args[1] > 100) {
+		    var arg1 = 100;
+		} else {
+                    var arg1 = args[1];
+		}
+
+		if (arg1 === 0) {
+		    that.errorMsg(_('Setting volume to 0.'), blk);
+		}
             }
 
             var synth = null;
@@ -6479,9 +6520,9 @@ function Logo () {
         case 'hertz':
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 392;
+                var arg = 392;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             var obj = frequencyToPitch(arg);
@@ -6629,16 +6670,16 @@ function Logo () {
         case 'stuplet':
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
+                var arg0 = 3;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number' || args[1] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 2;
+                var arg1 = 1 / 2;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             var noteBeatValue = (1 / arg1) * that.beatFactor[turtle];
@@ -6743,9 +6784,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 2;
+                var arg = 1 / 2;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (!that.inMatrix) {

@@ -797,7 +797,7 @@ function Blocks () {
                     var n = myBlock.docks.length;
                     var dd = myBlock.docks[n - 1][1] - myBlock.docks[n - 2][1];
                     var dy = bdock[1] - dd - cdock[1];
-                    console.log('adjust inline connection: ' + n + ' ' + dd + ' ' + dy);
+                    // console.log('adjust inline connection: ' + n + ' ' + dd + ' ' + dy);
                 } else {
                     var dy = bdock[1] - cdock[1];
                 }
@@ -4749,6 +4749,7 @@ function Blocks () {
                     this._checkArgClampBlocks.push(blk);
                 }
             }
+
             this._cleanupStacks();
             this.refreshCanvas();
         }
