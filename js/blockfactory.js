@@ -649,10 +649,11 @@ function SVG() {
         } else {
             var di = 0;
         }
+
         var count = 1;
         for (var i = 0; i < this._innies.length; i++) {
             if (this._innies[i]) {
-                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale));
+                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale)) +  this._scale;
                 svg += this.text(tx / this._scale, ty / this._scale, this._fontSize / 1.5, this._width, 'right', 'arg_label_' + count);
                 count += 1;
                 di += 1;
@@ -1030,7 +1031,7 @@ function SVG() {
         var tx = this._width - this._scale * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth;
         for (var i = 0; i < this._innies.length; i++) {
             if (this._innies[i]) {
-                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale));
+                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale)) +  this._scale;
                 svg += this.text(tx / this._scale, ty / this._scale, this._fontSize / 1.5, this._width, 'right', 'arg_label_' + count);
                 count += 1;
                 di += 1;
