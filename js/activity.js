@@ -309,6 +309,8 @@ define(MYDEFINES, function (compatibility) {
             };
 
             wheel.navItems[3].navigateFunction = function () {
+                blocks.activeBlock = activeBlock;
+                blocks.extract();
                 blocks.sendStackToTrash(blocks.blockList[activeBlock]);
                 docById('contextWheelDiv').style.display = 'none';
             };
