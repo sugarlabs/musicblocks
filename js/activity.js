@@ -247,113 +247,27 @@ define(MYDEFINES, function (compatibility) {
             // docById('contextWheelDiv').style.display = 'none';
         };
 
-        piemenuContext = function (activeBlock) {
-            if (activeBlock === null) {
-                return;
-            }
-
-            // piemenu version of ruler
-
-            // Position the widget over the note block.
-            var x = blocks.blockList[activeBlock].container.x;
-            var y = blocks.blockList[activeBlock].container.y;
-
-            var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.getStageScale();
-            var canvasTop = blocks.canvas.offsetTop + 6 * blocks.getStageScale();
-
-            docById('contextWheelDiv').style.position = 'absolute';
-            docById('contextWheelDiv').style.left = Math.min(blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150)) + 'px';
-            docById('contextWheelDiv').style.top = Math.min(blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150)) + 'px';
-            docById('contextWheelDiv').style.display = '';
-
-            labels = ['imgsrc:header-icons/copy-button.svg',
-                      'imgsrc:header-icons/paste-disabled-button.svg',
-                      'imgsrc:header-icons/extract-button.svg',
-                      'imgsrc:header-icons/empty-trash-button.svg',
-                      'imgsrc:header-icons/cancel-button.svg'];
-
-            var topBlock = blocks.findTopBlock(activeBlock);
-            if (blocks.blockList[topBlock].name === 'action') {
-                labels.push('imgsrc:header-icons/save-blocks-button.svg');
-            }
-
-            var wheel = new wheelnav('contextWheelDiv', null, 150, 150);
-            wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
-            wheel.slicePathFunction = slicePath().DonutSlice;
-            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            wheel.slicePathCustom.minRadiusPercent = 0.4;
-            wheel.slicePathCustom.maxRadiusPercent = 1.0;
-            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-            wheel.sliceInitPathCustom = wheel.slicePathCustom;
-            wheel.clickModeRotate = false;
-            wheel.initWheel(labels);
-            wheel.createWheel();
-
-            wheel.navItems[0].setTooltip(_('Copy'));
-            wheel.navItems[1].setTooltip(_('Paste'));
-            wheel.navItems[2].setTooltip(_('Extract'));
-            wheel.navItems[3].setTooltip(_('Move to trash'));
-            wheel.navItems[4].setTooltip(_('Close'));
-            if (blocks.blockList[topBlock].name === 'action') {
-                wheel.navItems[5].setTooltip(_('Save stack'));
-            }
-
-            wheel.navItems[0].selected = false;
-
-            wheel.navItems[0].navigateFunction = function () {
-                blocks.activeBlock = activeBlock;
-                blocks.prepareStackForCopy();
-                wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
-                wheel.navItems[1].refreshNavItem(true);
-                wheel.refreshWheel();
-            };
-
-            wheel.navItems[1].navigateFunction = function () {
-                blocks.pasteStack();
-            };
-
-            wheel.navItems[2].navigateFunction = function () {
-                blocks.activeBlock = activeBlock;
-                blocks.extract();
-            };
-
-            wheel.navItems[3].navigateFunction = function () {
-                blocks.activeBlock = activeBlock;
-                blocks.extract();
-                blocks.sendStackToTrash(blocks.blockList[activeBlock]);
-                docById('contextWheelDiv').style.display = 'none';
-            };
-
-            wheel.navItems[4].navigateFunction = function () {
-                docById('contextWheelDiv').style.display = 'none';
-            };
-
-            if (blocks.blockList[activeBlock].name === 'action') {
-                wheel.navItems[5].navigateFunction = function () {
-                    blocks.activeBlock = activeBlock;
-                    blocks.saveStack();
-                };
-            }
-
-            setTimeout(function () {
-                blocks.rightClick = false;
-            }, 500);
-        };
-
         // Do something on right click
-        document.addEventListener("contextmenu", function(e) {
-            if (blocks.activeBlocks === null) {
+        document.addEventListener("contextmenu", function(event) {
+            stageX = event.x;
+            stageY = event.y;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+	    console.log(blocks.activeBlock);
+            if (blocks.activeBlock === null) {
+		// Stage context menu
+		_piemenuStageContext();
                 blocks.rightClick = false;
-                return;
-            }
-
-            blocks.rightClick = true;
-            var activeBlock = blocks.activeBlock;
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            piemenuContext(activeBlock);
+            } else {
+		// Block context menu
+		// Would be better to trigger this from the block
+		// container, but it doesn't seem to work from there.
+		blocks.rightClick = true;
+		var activeBlock = blocks.activeBlock;
+		piemenuBlockContext(activeBlock);
+	    }
         }, false);
 
         // Calculate the palette colors.
@@ -427,6 +341,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _findBlocks() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
             logo.showBlocks();
             blocksContainer.x = 0;
@@ -518,6 +433,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _printBlockSVG() {
+	    blocks.activeBlock = null;
             var svg = '';
             var xMax = 0;
             var yMax = 0;
@@ -591,6 +507,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _allClear() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             if (chartBitmap != null) {
@@ -633,6 +550,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doFastButton(env) {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             stage.on('stagemousemove', function (event) {
@@ -710,6 +628,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doSlowButton() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             stage.on('stagemousemove', function (event) {
@@ -732,6 +651,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepButton() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             stage.on('stagemousemove', function (event) {
@@ -760,6 +680,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doSlowMusicButton() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             stage.on('stagemousemove', function (event) {
@@ -782,6 +703,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepMusicButton() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             stage.on('stagemousemove', function (event) {
@@ -810,6 +732,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doHardStopButton(onblur) {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             if (onblur == undefined) {
@@ -832,6 +755,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doSwitchMode() {
+	    blocks.activeBlock = null;
             if (beginnerMode) {
                 textMsg(_('Refresh your browser to change to advanced mode.'));
                 localStorage.setItem('beginnerMode', false);
@@ -842,6 +766,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doStopButton() {
+	    blocks.activeBlock = null;
             logo.doStopTurtle();
         };
 
@@ -850,6 +775,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _hideBoxes() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             pasteBox.hide();
@@ -861,6 +787,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doCartesianPolar() {
+	    blocks.activeBlock = null;
             if (cartesianBitmap.visible && polarBitmap.visible) {
                 _hideCartesian();
                 //.TRANS: hide Polar coordinate overlay grid
@@ -894,10 +821,12 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function toggleScroller() {
+	    blocks.activeBlock = null;
             scrollBlockContainer = !scrollBlockContainer;
         };
 
         function closeAnalytics(chartBitmap, ctx) {
+	    blocks.activeBlock = null;
             var button = this;
             button.x = (canvas.width / (2 * turtleBlocksScale))  + (300 / Math.sqrt(2));
             button.y = 300.00 - (300.00 / Math.sqrt(2));
@@ -920,6 +849,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doAnalytics() {
+	    blocks.activeBlock = null;
             var myChart = docById('myChart');
 
              if(_isCanvasBlank(myChart) == false) {
@@ -960,11 +890,13 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doOptimize (state) {
+	    blocks.activeBlock = null;
             console.log('Setting optimize to ' + state);
             logo.setOptimize(state);
         };
 
         function doBiggerFont() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             if (blockscale < BLOCKSCALES.length - 1) {
@@ -982,6 +914,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSmallerFont() {
+	    blocks.activeBlock = null;
             hideDOMLabel();
 
             if (blockscale > 0) {
@@ -999,6 +932,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function deletePlugin() {
+	    blocks.activeBlock = null;
             palettes.paletteObject._promptPaletteDelete();
         };
 
@@ -1013,6 +947,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doPausePlayback () {
+	    blocks.activeBlock = null;
             logo.restartPlayback = false;
             logo.playback(-1);
             playbackBox.playButton.visible = true;
@@ -1020,6 +955,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doPlayback() {
+	    blocks.activeBlock = null;
             progressBar.style.visibility = 'visible';
             progressBar.style.left = (playbackBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
             progressBar.style.top = (playbackBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
@@ -1031,6 +967,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doRestartPlayback() {
+	    blocks.activeBlock = null;
             logo.doStopTurtle();
             logo.restartPlayback = true;
             
@@ -1044,6 +981,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doCompile() {
+	    blocks.activeBlock = null;
             logo.restartPlayback = true;
             document.body.style.cursor = 'wait';
             console.log('Compiling music for playback');
@@ -1157,7 +1095,7 @@ define(MYDEFINES, function (compatibility) {
                 .setTurtles(turtles)
                 .setSetPlaybackStatus(setPlaybackStatus)
                 .setErrorMsg(errorMsg)
-                .setContextMenu(piemenuContext);
+                .setContextMenu(piemenuBlockContext);
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             turtles.setBlocks(blocks);
@@ -2080,6 +2018,9 @@ define(MYDEFINES, function (compatibility) {
                         return;
                     }
 
+		    // if we are moving the block container, deselect the active block.
+		    blocks.activeBlock = null;
+
                     if (scrollBlockContainer) {
                         blocksContainer.x += event.stageX - lastCords.x;
                     }
@@ -2109,6 +2050,9 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
                 if (palette) {
+		    // if we are moving the palettes, deselect the active block.
+		    blocks.activeBlock = null;
+
                     palette.scrollEvent(delta, scrollSpeed);
                 }
             }
@@ -2818,6 +2762,8 @@ define(MYDEFINES, function (compatibility) {
             for (var name in blocks.palettes.dict) {
                 blocks.palettes.dict[name].hideMenu(true);
             }
+
+	    blocks.activeBlock = null;
             refreshCanvas();
 
             var dx = 0;
@@ -3188,12 +3134,14 @@ define(MYDEFINES, function (compatibility) {
             // docById('canvas').style.display = 'none';
             docById('hideContents').style.display = 'block';
 
+            /*
             // Warn the user -- chrome only -- if the browser level is
             // not set to 100%
             if (window.innerWidth !== window.outerWidth) {
                 blocks.errorMsg(_('Please set browser zoom level to 100%'));
                 console.log('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
             }
+	    */
         };
 
         function _loadStart() {
@@ -4332,7 +4280,7 @@ handleComplete);
             });
         };
 
-        function pasted() {
+        function pasted () {
             var pasteinput = docById('paste').value;
             var rawData = pasteinput;
             if (rawData == null || rawData == '') {
@@ -4356,6 +4304,304 @@ handleComplete);
             blocks.loadNewBlocks(obj);
             pasteBox.hide();
        };
+
+	function _piemenuStageContext () {
+            // TODO: fix collapsibles spelling in PO files
+            // TODO: fix load project from file in PO files
+            //       TB vs MB
+	    //       handle icon changes for Cartesian
+	    //       handle icon changes for Paste
+	    //       handle icon changes for Stop
+
+	    // A context menu to replace the top and right toolbars
+            var x = stageX - 180;
+            var y = stageY - 180;
+
+            docById('contextWheelDiv').style.left = x + 'px';
+            docById('contextWheelDiv').style.top = y + 'px';
+            docById('contextWheelDiv').style.position = 'absolute';
+            docById('contextWheelDiv').style.display = '';
+
+	    // Main menu items, [submenu index], function
+            const WHEELVALUES = [
+                ['imgsrc:header-icons/cancel-button.svg', null, null],
+		['imgsrc:header-icons/run-button.svg', [0, 4], null],
+		['imgsrc:header-icons/stop-turtle-button.svg', null, doStopButton],
+		['imgsrc:header-icons/clear-button.svg', null, _allClear],
+		['imgsrc:header-icons/hide-blocks-button.svg', null, _changeBlockVisibility],
+		['imgsrc:header-icons/collapse-blocks-button.svg', null, _toggleCollapsibleStacks],
+		['imgsrc:header-icons/go-home-button.svg', null, _findBlocks],
+		['imgsrc:header-icons/menu-button.svg', [5, 15], null],
+		['imgsrc:header-icons/help-button.svg', null, _showHelp]
+	    ];
+
+	    // Sub-menu items, function
+            const SUBWHEELS = [
+		// play button submenu
+		['imgsrc:header-icons/step-button.svg', _doStepButton],
+		['imgsrc:header-icons/slow-button.svg', _doSlowButton],
+		['imgsrc:header-icons/run-button.svg', _doFastButton],
+		['imgsrc:header-icons/slow-music-button.svg', _doSlowMusicButton],
+		['imgsrc:header-icons/step-music-button.svg', _doStepMusicButton],
+
+		// submenu button submenu
+		['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
+		['imgsrc:header-icons/open-button.svg', doLoad],
+		['imgsrc:header-icons/open-merge-button.svg', _doMergeLoad],
+		['imgsrc:header-icons/save-button.svg', doSave],
+		['imgsrc:header-icons/paste-button.svg', pasteStack],
+		['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
+		['imgsrc:header-icons/compile-button.svg', _doPlaybackBox],
+		['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
+		['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
+		['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
+		['imgsrc:header-icons/beginner-button.svg', _doSwitchMode],
+		[null, null],
+		[null, null],
+            ];
+
+	    // Check to ensure index is correct.
+            if (!planet) {
+		SUBWHEELS[5] = ['imgsrc:header-icons/planet-disabled-button.svg', null];
+	    }
+
+	    if (!beginnerMode) {
+		SUBWHEELS[15] = ['imgsrc:header-icons/advanced-button.svg', _doSwitchMode];
+	    }
+
+            var wheelLabels = [];
+	    for (var i = 0; i < WHEELVALUES.length; i++) {
+		wheelLabels.push(WHEELVALUES[i][0]);
+	    }
+
+            var wheel = new wheelnav('contextWheelDiv', null, 300, 300);
+            // submenu wheel
+            var tabsWheel = new wheelnav('_tabsWheel', wheel.raphael);
+
+            wheelnav.cssMode = true;
+
+            wheel.keynavigateEnabled = true;
+
+            wheel.colors = ['#2584af'];
+            wheel.slicePathFunction = slicePath().DonutSlice;
+            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            wheel.slicePathCustom.minRadiusPercent = 0.2;
+            wheel.slicePathCustom.maxRadiusPercent = 0.6;
+            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+            wheel.sliceInitPathCustom = wheel.slicePathCustom;
+            wheel.animatetime = 300;
+            wheel.clickModeRotate = false;
+            wheel.createWheel(wheelLabels);
+
+            wheel.navItems[0].setTooltip(_('Close'));
+            wheel.navItems[1].setTooltip(_('Run'));
+	    wheel.navItems[2].setTooltip(_('Stop'));
+	    wheel.navItems[3].setTooltip(_('Clean'));
+	    wheel.navItems[4].setTooltip(_('Show/hide blocks'));
+	    wheel.navItems[5].setTooltip(_('Expand/collapse collapsible blocks'));
+	    wheel.navItems[6].setTooltip(_('Home'));
+	    wheel.navItems[7].setTooltip(_('More'));
+	    wheel.navItems[8].setTooltip(_('Help'));
+
+            var tabsLabels = [];
+	    for (var i = 0; i < SUBWHEELS.length; i++) {
+                tabsLabels.push(SUBWHEELS[i][0]);
+	    }
+
+            tabsWheel.colors = ['#489eca'];
+            tabsWheel.slicePathFunction = slicePath().DonutSlice;
+            tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
+            tabsWheel.slicePathCustom.maxRadiusPercent = 1.0;
+            tabsWheel.sliceSelectedPathCustom = tabsWheel.slicePathCustom;
+            tabsWheel.sliceInitPathCustom = tabsWheel.slicePathCustom;
+            tabsWheel.clickModeRotate = false;
+            tabsWheel.navAngle = -180 / WHEELVALUES.length + 180 / (WHEELVALUES.length * SUBWHEELS[0].length);
+            tabsWheel.createWheel(tabsLabels);
+        
+            tabsWheel.navItems[0].setTooltip(_('Run step by step'));
+            tabsWheel.navItems[1].setTooltip(_('Run slowly'));
+            tabsWheel.navItems[2].setTooltip(_('Run fast'));
+            tabsWheel.navItems[3].setTooltip(_('Run music slowly'));
+	    tabsWheel.navItems[4].setTooltip(_('Run music step by step'));
+
+            if (planet) {
+		tabsWheel.navItems[5].setTooltip(_('Load samples from server'));
+	    } else {
+		tabsWheel.navItems[5].setTooltip(_('The Planet is unavailable.'));
+	    }
+
+	    tabsWheel.navItems[6].setTooltip(_('Load project from file'));
+	    tabsWheel.navItems[7].setTooltip(_('Merge project from file'));
+	    tabsWheel.navItems[8].setTooltip(_('Save project'));
+	    tabsWheel.navItems[9].setTooltip(_('Click here to paste'));
+	    tabsWheel.navItems[10].setTooltip(_('Cartesian'));
+	    tabsWheel.navItems[11].setTooltip(_('playback'));
+	    tabsWheel.navItems[12].setTooltip(_('Settings'));
+	    tabsWheel.navItems[13].setTooltip(_('New Project'));
+	    tabsWheel.navItems[14].setTooltip(_('Restore'));
+
+            if (beginnerMode) {
+		tabsWheel.navItems[15].setTooltip(_('Switch to advanced mode'));
+	    } else {
+		tabsWheel.navItems[15].setTooltip(_('Switch to beginner mode'));
+	    }
+
+            var __selectionChanged = function () {
+		var i = tabsWheel.selectedNavItemIndex;
+		if (SUBWHEELS[i][1] !== null) {
+                    __exitMenu();
+		    SUBWHEELS[i][1]();
+		}
+            };
+
+            var __exitMenu = function () {
+		var d = new Date();
+		piemenuExitTime = d.getTime();
+		docById('contextWheelDiv').style.display = 'none';
+		wheel.removeWheel();
+            };
+
+            var __showHide = function () {
+		var i = wheel.selectedNavItemIndex;
+		var subitems = WHEELVALUES[i][1];
+		if (subitems === null) {
+		    for (var j = 0; j < SUBWHEELS.length; j++) {
+                        tabsWheel.navItems[j].navItem.hide();
+		    }
+		} else {
+		    for (var j = 0; j < SUBWHEELS.length; j++) {
+			if (j < subitems[0] || j > subitems[1]) {
+                            tabsWheel.navItems[j].navItem.hide();
+			} else {
+                            tabsWheel.navItems[j].navItem.show();
+			}
+                    }
+		}
+            };
+
+            wheel.navItems[0].navigateFunction = function () {
+		__exitMenu();
+            };
+
+            var __action = function () {
+		var i = wheel.selectedNavItemIndex;
+		console.log('action: ' + i);
+		__showHide();
+
+		if (WHEELVALUES[i][2] !== null) {
+		    __exitMenu();
+		    WHEELVALUES[i][2]();
+		}
+	    };
+
+            for (var i = 1; i < WHEELVALUES.length; i++) {
+		wheel.navItems[i].navigateFunction = __action;
+            }
+
+            // Hide the widget when the selection is made.
+            for (var i = 0; i < tabsLabels.length; i++) {
+		tabsWheel.navItems[i].navigateFunction = function () {
+                    __selectionChanged();
+                    __exitMenu();
+		};
+            }
+
+            wheel.navigateWheel(1);
+	};
+
+	function piemenuBlockContext (activeBlock) {
+            if (activeBlock === null) {
+                return;
+            }
+
+            // piemenu version of ruler
+
+            // Position the widget centered over the note block.
+            var x = blocks.blockList[activeBlock].container.x;
+            var y = blocks.blockList[activeBlock].container.y;
+
+            var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.getStageScale();
+            var canvasTop = blocks.canvas.offsetTop + 6 * blocks.getStageScale();
+
+            docById('contextWheelDiv').style.position = 'absolute';
+            docById('contextWheelDiv').style.left = Math.min(blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150)) + 'px';
+            docById('contextWheelDiv').style.top = Math.min(blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150)) + 'px';
+            docById('contextWheelDiv').style.display = '';
+
+            labels = ['imgsrc:header-icons/copy-button.svg',
+                      'imgsrc:header-icons/paste-disabled-button.svg',
+                      'imgsrc:header-icons/extract-button.svg',
+                      'imgsrc:header-icons/empty-trash-button.svg',
+                      'imgsrc:header-icons/cancel-button.svg'];
+
+            var topBlock = blocks.findTopBlock(activeBlock);
+            if (blocks.blockList[topBlock].name === 'action') {
+                labels.push('imgsrc:header-icons/save-blocks-button.svg');
+            }
+
+            var wheel = new wheelnav('contextWheelDiv', null, 150, 150);
+            wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
+            wheel.slicePathFunction = slicePath().DonutSlice;
+            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            wheel.slicePathCustom.minRadiusPercent = 0.4;
+            wheel.slicePathCustom.maxRadiusPercent = 1.0;
+            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+            wheel.sliceInitPathCustom = wheel.slicePathCustom;
+            wheel.clickModeRotate = false;
+            wheel.initWheel(labels);
+            wheel.createWheel();
+
+            wheel.navItems[0].setTooltip(_('Copy'));
+            wheel.navItems[1].setTooltip(_('Paste'));
+            wheel.navItems[2].setTooltip(_('Extract'));
+            wheel.navItems[3].setTooltip(_('Move to trash'));
+            wheel.navItems[4].setTooltip(_('Close'));
+            if (blocks.blockList[topBlock].name === 'action') {
+                wheel.navItems[5].setTooltip(_('Save stack'));
+            }
+
+            wheel.navItems[0].selected = false;
+
+            wheel.navItems[0].navigateFunction = function () {
+                blocks.activeBlock = activeBlock;
+                blocks.prepareStackForCopy();
+                wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
+                wheel.navItems[1].refreshNavItem(true);
+                wheel.refreshWheel();
+            };
+
+            wheel.navItems[1].navigateFunction = function () {
+                blocks.pasteStack();
+            };
+
+            wheel.navItems[2].navigateFunction = function () {
+                blocks.activeBlock = activeBlock;
+                blocks.extract();
+            };
+
+            wheel.navItems[3].navigateFunction = function () {
+                blocks.activeBlock = activeBlock;
+                blocks.extract();
+                blocks.sendStackToTrash(blocks.blockList[activeBlock]);
+                docById('contextWheelDiv').style.display = 'none';
+            };
+
+            wheel.navItems[4].navigateFunction = function () {
+                docById('contextWheelDiv').style.display = 'none';
+            };
+
+            if (blocks.blockList[activeBlock].name === 'action') {
+                wheel.navItems[5].navigateFunction = function () {
+                    blocks.activeBlock = activeBlock;
+                    blocks.saveStack();
+                };
+            }
+
+            setTimeout(function () {
+                blocks.rightClick = false;
+            }, 500);
+        };
 
     };
 });

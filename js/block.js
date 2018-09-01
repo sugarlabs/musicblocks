@@ -1560,6 +1560,9 @@ function Block(protoblock, blocks, overrideName) {
                     that._mouseoutCallback(event, moved, haveClick, false);
                 }
 
+		that.blocks.unhighlight(thisBlock, true);
+		that.blocks.activeBlock = null;
+
                 moved = false;
             });
 
@@ -1568,6 +1571,9 @@ function Block(protoblock, blocks, overrideName) {
                 if (!that.blocks.getLongPressStatus()) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
+
+		that.blocks.unhighlight(thisBlock, true);
+		that.blocks.activeBlock = null;
 
                 moved = false;
             });
@@ -1653,6 +1659,9 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.clearLongPressButtons();
             }
 
+	    that.blocks.unhighlight(thisBlock, true);
+	    that.blocks.activeBlock = null;
+
             moved = false;
         });
 
@@ -1662,6 +1671,9 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 that.blocks.clearLongPressButtons();
             }
+
+	    that.blocks.unhighlight(thisBlock, true);
+	    that.blocks.activeBlock = null;
 
             moved = false;
         });
