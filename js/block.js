@@ -307,7 +307,9 @@ function Block(protoblock, blocks, overrideName) {
                 that.container.setChildIndex(that.imageBitmap, z);
             }
 
-            if (that.name === 'start' || that.name === 'drum') {
+            if (that.name === 'action') {
+                that._ensureDecorationOnTop();
+            } else if (that.name === 'start' || that.name === 'drum') {
                 // Rescale the decoration on the start blocks.
                 for (var turtle = 0; turtle < that.blocks.turtles.turtleList.length; turtle++) {
                     if (that.blocks.turtles.turtleList[turtle].startBlock === that) {
@@ -543,9 +545,7 @@ function Block(protoblock, blocks, overrideName) {
 
                     that._finishImageLoad();
                 } else {
-                    if (that.name === 'start' || that.name === 'drum') {
-                        that._ensureDecorationOnTop();
-                    } else if (that.isInlineCollapsible()) {
+                    if (that.isCollapsible) {
                         that._ensureDecorationOnTop();
                     }
 
