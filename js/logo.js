@@ -4116,6 +4116,7 @@ function Logo () {
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
+	    console.log(that.blocks.blockList[blk].name + ' ' + args[0]);
             if (that.blocks.blockList[blk].name === 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
@@ -10174,16 +10175,20 @@ function Logo () {
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'mynotevalue']);
                 } else {
-                    var value = null;
-                    if (that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== null) {
-                        value = 1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])];
+                    var value = 0;
+                    if (that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== null && that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== undefined) {
+                        if (that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== 0) {
+                            value = 1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])];
+                        } else {
+                            value = 0;
+                        }
                     } else if (that.lastNotePlayed[turtle] !== null) {
                         value = that.lastNotePlayed[turtle][1];
-                    } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
+                    } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])] !== undefined && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         value = that.noteBeat[turtle][last(that.inNoteBlock[turtle])];
                     } else {
                         console.log('Cannot find a note for turtle ' + turtle);
-                        value = -1;
+                        value = 0;
                     }
 
                     if (value !== 0) {
@@ -10962,6 +10967,13 @@ function Logo () {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
+        }
+
+        // Check to see if min is > max.
+        if (a > b) {
+            var c = a;
+            a = b;
+            b = c;
         }
 
         return Math.floor(Math.random() * (Number(b) - Number(a) + 1) + Number(a));
