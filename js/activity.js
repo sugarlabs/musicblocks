@@ -745,13 +745,16 @@ define(MYDEFINES, function (compatibility) {
             }
 
             logo.doStopTurtle();
-            logo._setMasterVolume(0);
 
-            if (docById('tempoDiv') != null && docById('tempoDiv').style.visibility === 'visible') {
-                if (logo.tempo.isMoving) {
-                    logo.tempo.pause();
-                }
-            }
+	    if (_THIS_IS_MUSIC_BLOCKS_) {
+		logo._setMasterVolume(0);
+
+		if (docById('tempoDiv') != null && docById('tempoDiv').style.visibility === 'visible') {
+                    if (logo.tempo.isMoving) {
+			logo.tempo.pause();
+                    }
+		}
+	    }
         };
 
         function _doSwitchMode() {
@@ -1848,8 +1851,8 @@ define(MYDEFINES, function (compatibility) {
             // Enabled mouse over and mouse out events.
             stage.enableMouseOver(10); // default is 20
 
-            cartesianBitmap = _createGrid('images/Cartesian.svg');
-            polarBitmap = _createGrid('images/polar.svg');
+            cartesianBitmap = _createGrid('data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CARTESIAN))));
+            polarBitmap = _createGrid('data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(POLAR))));
 
             var URL = window.location.href;
             var projectID = null;
@@ -4326,7 +4329,7 @@ handleComplete);
             const WHEELVALUES = [
                 ['imgsrc:header-icons/cancel-button.svg', null, null],
 		['imgsrc:header-icons/run-button.svg', [0, 4], null],
-		['imgsrc:header-icons/stop-turtle-button.svg', null, doStopButton],
+		['imgsrc:header-icons/stop-turtle-button.svg', null, doHardStopButton],
 		['imgsrc:header-icons/clear-button.svg', null, _allClear],
 		['imgsrc:header-icons/hide-blocks-button.svg', null, _changeBlockVisibility],
 		['imgsrc:header-icons/collapse-blocks-button.svg', null, _toggleCollapsibleStacks],
