@@ -535,7 +535,7 @@ msgstr "Asehoy/Afeno ireo bolongana"
 #: js/activity.js:3525
 #: js/activity.js:3537
 #: js/turtledefs.js:94
-msgid "Expand/collapse collapsable blocks"
+msgid "Expand/collapse collapsible blocks"
 msgstr ""
 
 #: js/activity.js:3526
@@ -564,7 +564,7 @@ msgstr ""
 #: js/activity.js:3628
 #: js/activity.js:3640
 #: js/turtledefs.js:99
-msgid "Load project from files"
+msgid "Load project from file"
 msgstr ""
 
 #: js/activity.js:3629
