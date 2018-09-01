@@ -356,7 +356,7 @@ msgstr "エオリアン音階"
 #.TRANS: hide Polar coordinate overlay grid
 ## need to verify
 msgid "hide grid"
-msgstr "グリッド（座標）"
+msgstr "グリッド（座標）を非表示"
 
 #: js/activity.js:736
 #: js/activity.js:742
@@ -365,7 +365,7 @@ msgstr "グリッド（座標）"
 #: js/turtledefs.js:104
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
-msgstr "カーテシアン/極域"
+msgstr "カーテシアン/極域を表示"
 
 #: js/activity.js:742
 #: js/activity.js:749
@@ -380,9 +380,8 @@ msgstr "極"
 
 #: js/activity.js:766
 #: js/StringHelper.js:54
-## ひらがな＝しゅうりょう
 msgid "Close"
-msgstr "終了"
+msgstr "閉じる"
 
 #: js/activity.js:1573
 #: js/activity.js:1614
@@ -665,7 +664,7 @@ msgstr "タートルは既に動いています。"
 
 #: js/logo.js:2500
 msgid "Cannot find start block"
-msgstr "スタート用のブロックが見つかりません。"
+msgstr "「スタート」ブロックが見つかりません。"
 
 #: js/logo.js:2818
 msgid "Please enter a valid URL."
@@ -779,7 +778,7 @@ msgstr "封筒ブロックを複数追加しています。"
 #: js/logo.js:3601
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
-msgstr "ロールオフ値は -12, -24, -48, -98 デシベル / オクターブである必要があります。"
+msgstr "ロールオフ値は -12, -24, -48, -98 デシベル / オクターヴである必要があります。"
 
 #: js/logo.js:3639
 msgid "You are adding multiple oscillator blocks."
@@ -925,7 +924,7 @@ msgstr "空のヒープ"
 #: js/logo.js:9956
 #: js/logo.js:10030
 msgid "You must use two pitch blocks when measuring an interval."
-msgstr "インターバルを測る際は、２つの音符を使う必要があります。"
+msgstr "インターバルを計る際は、２つの音符を使う必要があります。"
 
 #: js/logo.js:10159
 #: js/basicblocks.js:257
@@ -1161,7 +1160,7 @@ msgstr "パレット・ボタン"
 #: js/turtledefs.js:84
 #.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
-msgstr "このツールバーにはリズム、ピッチ、音色、動作などを含むパレットボタンがあります。"
+msgstr "このツールバーにはリズム、ピッチ、音色、アクションなどを含むパレットボタンがあります。"
 
 #: js/turtledefs.js:84
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
@@ -1222,7 +1221,7 @@ msgstr "ブロックとパレットを表示する / 隠す アイコンです�
 
 #: js/turtledefs.js:94
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートと動作のスタックを増やす / つぶす アイコンです。"
+msgstr "スタートとアクションのスタックを増やす / つぶす アイコンです。"
 
 #: js/turtledefs.js:95
 ## 整理＝せいり; literally "organize"
@@ -1586,7 +1585,7 @@ msgstr "名前"
 #: js/basicblocks.js:3224
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr "オクターブ"
+msgstr "オクターヴ"
 
 #: js/basicblocks.js:190
 #.TRANS: convert piano key number (1-88) to pitch
@@ -1781,15 +1780,15 @@ msgstr "ハイパス・フィルター"
 
 #: js/basicblocks.js:579
 msgid "1/64 note"
-msgstr "６４分音付"
+msgstr "６４分音符"
 
 #: js/basicblocks.js:587
 msgid "1/32 note"
-msgstr "３２分音付"
+msgstr "３２分音符"
 
 #: js/basicblocks.js:595
 msgid "1/16 note"
-msgstr "１６分音付"
+msgstr "１６分音符"
 
 #: js/basicblocks.js:603
 msgid "eighth note"
@@ -2047,7 +2046,7 @@ msgstr "クロックなし"
 #: js/basicblocks.js:1146
 ## structure of grammar makes this awkward;http://musical-grammar.com/time005.html
 msgid "on offbeat do"
-msgstr "弱拍にて"
+msgstr "弱拍にて～する"
 
 #: js/basicblocks.js:1156
 ## Need a little context, but I am guessing this is "on *this* beat (do...)
@@ -2067,13 +2066,13 @@ msgstr "拍子"
 #: js/basicblocks.js:3335
 #: js/basicblocks.js:3343
 #.TRANS: take (do) some action
-## 動作is action and する is "to do"; taking liberties based on context
+## アクションis action and する is "to do"; taking liberties based on context
 msgid "do"
 msgstr "する"
 
 #: js/basicblocks.js:1168
 msgid "on every beat do"
-msgstr ""
+msgstr "全部の拍に～する"
 
 #: js/basicblocks.js:1179
 #: js/basicblocks.js:1192
@@ -2594,7 +2593,7 @@ msgstr "ベジェ曲線"
 
 #: js/basicblocks.js:2281
 #.TRANS: draws a part of the circumference of a circle
-## ひらがな＝えん\E3\81"
+## ひらがな＝えん\E3\81
 msgid "arc"
 msgstr "円弧"
 
@@ -2604,7 +2603,7 @@ msgid "angle"
 msgstr "角度"
 
 #: js/basicblocks.js:2282
-## ひらがな＝はんけ\E3\81"
+## ひらがな＝はんけ\E3\81
 msgid "radius"
 msgstr "半径"
 
@@ -2625,7 +2624,7 @@ msgstr "xy座標の設定"
 #: plugins/rodi.rtp:379
 #.TRANS: turn right (clockwise)
 msgid "right"
-msgstr "右を向く"
+msgstr "右に曲がる"
 
 #: js/basicblocks.js:2323
 #: js/basicblocks.js:3125
@@ -2634,7 +2633,7 @@ msgstr "右を向く"
 #: plugins/rodi.rtp:366
 #.TRANS: turn left (counter-clockwise)
 msgid "left"
-msgstr "左を向く"
+msgstr "左に曲がる"
 
 #: js/basicblocks.js:2341
 #: plugins/rodi.rtp:73
@@ -2790,7 +2789,7 @@ msgstr "または"
 
 #: js/basicblocks.js:2628
 #.TRANS: evaluate some math functions, e.g., absolute value, sine, exponential, etc.
-## ひらがな＝ひょうす
+## ひらがな＝ひょうか
 msgid "eval"
 msgstr "評価"
 
@@ -3104,7 +3103,7 @@ msgstr "ずっと"
 #: js/basicblocks.js:3374
 ## Scrath po (L268)
 msgid "repeat"
-msgstr "回繰り返す"
+msgstr "～回繰り返す"
 
 #: js/basicblocks.js:3386
 #: js/basicblocks.js:3396
@@ -3240,11 +3239,11 @@ msgstr "時間"
 
 #: js/basicblocks.js:3678
 msgid "cursor y"
-msgstr "y座標にカーソルを置く"
+msgstr "y座標カーソル"
 
 #: js/basicblocks.js:3686
 msgid "cursor x"
-msgstr "x座標にカーソルを置く"
+msgstr "x座標カーソル"
 
 #: js/basicblocks.js:3694
 msgid "mouse button"
@@ -3883,7 +3882,7 @@ msgstr "トライアングル"
 #: js/synthutils.js:86
 #.TRANS: musical instrument
 msgid "finger-cymbals"
-msgstr ""
+msgstr "指のシンバル"
 
 #: js/musicutils.js:148
 #.TRANS: twelve semi-tone scale for music
@@ -3998,7 +3997,7 @@ msgstr "ハンガリー音階"
 #: js/musicutils.js:189
 #.TRANS: minor Romanian scale for music
 msgid "romanian minor"
-msgstr "ルーマニアのマイナー音階"
+msgstr "ルーマニア・マイナー音階"
 
 #: js/musicutils.js:190
 msgid "spanish gypsy"
@@ -4171,31 +4170,31 @@ msgstr "プラネット"
 
 #: js/StringHelper.js:17
 msgid "Close Planet"
-msgstr ""
+msgstr "プラネットを閉じる"
 
 #: js/StringHelper.js:18
 msgid "Open project from file"
-msgstr ""
+msgstr "ファイルからプロジェクトを開く"
 
 #: js/StringHelper.js:19
 msgid "New project"
-msgstr ""
+msgstr "新しいプロジェクト"
 
 #: js/StringHelper.js:20
 msgid "Local"
-msgstr ""
+msgstr "ローカル"
 
 #: js/StringHelper.js:21
 msgid "Global"
-msgstr ""
+msgstr "グローバル"
 
 #: js/StringHelper.js:22
 msgid "Search for a project"
-msgstr ""
+msgstr "プロジェクト検索"
 
 #: js/StringHelper.js:23
 msgid "My Projects"
-msgstr ""
+msgstr "私のプロジェクト"
 
 #: js/StringHelper.js:24
 #: js/Publisher.js:125
@@ -4204,30 +4203,30 @@ msgstr "プロジェクトを公開する"
 
 #: js/StringHelper.js:26
 msgid "Tags (max 5)"
-msgstr ""
+msgstr "タッグ（最大5個）"
 
 #: js/StringHelper.js:27
 #: js/StringHelper.js:47
 msgid "Description"
-msgstr ""
+msgstr "記入"
 
 #: js/StringHelper.js:28
 #: js/StringHelper.js:52
 msgid "Submit"
-msgstr ""
+msgstr "確認"
 
 #: js/StringHelper.js:29
 #: js/StringHelper.js:33
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: js/StringHelper.js:30
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr ""
+msgstr "\\"<span id=\\"deleter-title\\"></span>\\"を消しますか？"
 
 #: js/StringHelper.js:31
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr ""
+msgstr "\\"<span id=\\"deleter-name\\"></span>\\"を完全消しますか？"
 
 #: js/StringHelper.js:32
 msgid "Delete"
@@ -4235,78 +4234,79 @@ msgstr "消す"
 
 #: js/StringHelper.js:34
 msgid "Explore Projects"
-msgstr ""
+msgstr "プロジェクトを探します"
 
 #: js/StringHelper.js:35
 msgid "View More"
-msgstr ""
+msgstr "もっと見ます"
 
 #: js/StringHelper.js:36
 msgid "Most recent"
-msgstr ""
+msgstr "一番最近"
 
 #: js/StringHelper.js:37
 msgid "Most liked"
-msgstr ""
+msgstr "「いいね」の一番ある"
 
 #: js/StringHelper.js:38
 msgid "Most downloaded"
-msgstr ""
+msgstr "ダウンロードの一番ある"
 
 #: js/StringHelper.js:39
 msgid "A-Z"
-msgstr ""
+msgstr "「A-Z」の順番"
 
 #: js/StringHelper.js:40
 msgid "Sort by"
-msgstr ""
+msgstr "～で整理する"
 
 #: js/StringHelper.js:41
 msgid "Load More Projects"
-msgstr ""
+msgstr "プロジェクトをもっとろーどする"
 
 #: js/StringHelper.js:42
 msgid "Last Updated"
-msgstr ""
+msgstr "最後の更新"
 
 #: js/StringHelper.js:43
 msgid "Creation Date"
-msgstr ""
+msgstr "作成日"
 
 #: js/StringHelper.js:44
 msgid "Number of Downloads:"
-msgstr ""
+msgstr "ダウンロード数"
 
 #: js/StringHelper.js:45
 msgid "Number of Likes:"
-msgstr ""
+msgstr "「いいね」の数"
 
 #: js/StringHelper.js:46
 msgid "Tags:"
-msgstr ""
+msgstr "タッグ"
 
 #: js/StringHelper.js:48
 #: js/StringHelper.js:49
 #: js/StringHelper.js:53
 #: js/ProjectViewer.js:18
 msgid "Report Project"
-msgstr ""
+msgstr "プロジェクトを通報する"
 
 #: js/StringHelper.js:50
 msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr ""
+msgstr "<a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">シュガー・ラボ \
+行動綱領</a>を守らないプロジェクトを通報する"
 
 #: js/StringHelper.js:51
 msgid "Reason for reporting project"
-msgstr ""
+msgstr "プロジェクトを通報する理由"
 
 #: js/StringHelper.js:55
 msgid "Download as File"
-msgstr ""
+msgstr "ファイルでダウンロードする"
 
 #: js/StringHelper.js:56
 msgid "Open in Music Blocks"
-msgstr ""
+msgstr "ミュージック・ブロックスで開きます"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
@@ -4457,7 +4457,7 @@ msgid "from"
 msgstr "から"
 
 #: plugins/finance.rtp:69
-## かぶ\E3\81"
+## かぶ\E3\81
 msgid "stock price"
 msgstr "株価"
 
@@ -4595,7 +4595,7 @@ msgid "get protein"
 msgstr "たんぱく質をとる"
 
 #: plugins/nutrition.rtp:110
-## たんすいかぶ\E3\81"
+## たんすいかぶ\E3\81
 msgid "get carbs"
 msgstr "炭水化物"
 
@@ -4639,7 +4639,7 @@ msgid "eat"
 msgstr "食べる"
 
 #: plugins/nutrition.rtp:155
-## ひらがな＝こな\E3\81"
+## ひらがな＝こな\E3\81
 msgid "digest meal"
 msgstr "食事を熟す"
 
@@ -4678,7 +4678,7 @@ msgstr "ブロッコリー"
 
 #: plugins/nutrition.rtp:185
 msgid "rice and beans"
-msgstr "飯と豆"
+msgstr "ご飯と豆"
 
 #: plugins/nutrition.rtp:188
 msgid "tamale"
@@ -4776,7 +4776,7 @@ msgstr "低"
 #: plugins/rodi.rtp:176
 ## Blinking light is 点滅する
 msgid "blink"
-msgstr "瞬く"
+msgstr "点滅する"
 
 #: plugins/rodi.rtp:197
 msgid "duration"
@@ -5084,7 +5084,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "音符の音量"
 
 #~msgid "current pitch octave"
-#~msgstr "今の音が属するオクターブ"
+#~msgstr "今の音が属するオクターヴ"
 
 #~msgid "hours ago"
 #~msgstr "時間前"
@@ -5099,7 +5099,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "茶"
 
 #~msgid "multiply beat"
-#~msgstr "１拍の速さを倍に"
+#~msgstr "拍を倍に"
 
 #~msgid "turtle"
 #~msgstr "タートル"
