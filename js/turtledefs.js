@@ -44,7 +44,7 @@ function beginnerBlock(name) {
             'playdrum', 'setdrum', // drum palette
             'if', 'ifthenelse', 'repeat', 'forever', // flow palette
             'action', 'start', 'dispatch', 'listen', // action palette
-            'storein', 'storein2', 'namedbox', 'box', 'increment', 'incrementOne',  // boxes palette
+            'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne',  // boxes palette
             'status', 'matrix', 'rhythmruler2', 'tempo', 'modewidget', 'rhythm2', 'stuplet', // widgets palette
             'forward', 'left', 'right', 'setxy', 'setheading', 'arc', 'clear', 'x', 'y', 'heading', // mouse palette
             'setcolor', 'setshade', 'setpensize', 'penup', 'pendown', 'fill', 'background', 'color', 'shade', 'pensize', // pen palette

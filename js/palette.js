@@ -2126,7 +2126,7 @@ function Palette(palettes, name) {
             // Move the drag group under the cursor.
             that.palettes.blocks.findDragGroup(newBlock);
             for (var i in that.palettes.blocks.dragGroup) {
-                that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - that.palettes.blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - that.palettes.blocks.stage.y);
+		that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - that.palettes.blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - that.palettes.blocks.stage.y);
             }
             // Dock with other blocks if needed
             that.palettes.blocks.blockMoved(newBlock);
@@ -2140,7 +2140,7 @@ function Palette(palettes, name) {
             var macroExpansion = null;
             if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1) {
                 var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
-                if (macroExpansion == null) {
+                if (macroExpansion === null) {
                     // Maybe it is a plugin macro?
                     if (blkname in this.palettes.pluginMacros) {
                         var macroExpansion = this.palettes.getPluginMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
