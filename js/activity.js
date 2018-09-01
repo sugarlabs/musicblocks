@@ -3581,9 +3581,10 @@ handleComplete);
                     update = true;
                 };
 
-                img.src = 'header-icons/paste-disabled-button.svg';
+                img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PASTEDISABLEDBUTTON)))
                 return;
             }
+
             if (pasteImage === null) {
                 console.log('Updating paste button');
                 var img = new Image();
@@ -3606,7 +3607,7 @@ handleComplete);
                     update = true;
                 };
 
-                img.src = 'header-icons/paste-button.svg';
+                img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PASTEBUTTON)))
             } else {
                 pasteContainer.addChild(bitmapActivePaste);
                 console.log('Blinking paste button');
