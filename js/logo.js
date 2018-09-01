@@ -1385,6 +1385,7 @@ function Logo () {
     this._blockSetter = function (blk, value, turtle) {
         var turtleObj = this.turtles.turtleList[turtle];
 
+        console.log(this.blocks.blockList[blk].name);
         switch (this.blocks.blockList[blk].name) {
         case 'x':
             turtleObj.doSetXY(value, turtleObj.y);
@@ -2074,9 +2075,22 @@ function Logo () {
             // If the 2nd arg is not set, default to 1.
             if (args.length === 2) {
                 var i = args[1];
+            } else {
+                var i = 1;
             }
 
-            if (args.length >= 1) {
+            if (args.length > 0) {
+                var cblk = that.blocks.blockList[blk].connections[1];
+                if (that.blocks.blockList[cblk].name === 'text') {
+                    // Work-around to #1302
+                    // Look for a namedbox with this text value.
+                    var name = this.blocks.blockList[cblk].value;
+                    if (name in this.boxes) {
+                        this.boxes[name] = this.boxes[name] + i;
+                        break;
+                    }
+                }
+
                 var settingBlk = that.blocks.blockList[blk].connections[1];
                 that._blockSetter(settingBlk, args[0] + i, turtle);
             }
@@ -3473,23 +3487,23 @@ function Logo () {
         // Deprecated
         case 'setmasterbpm':
             if (args.length === 1 && typeof(args[0]) === 'number') {
-		if (args[0] < 30) {
+                if (args[0] < 30) {
                     that.errorMsg(_('Beats per minute must be > 30.'))
                     that._masterBPM = 30;
-		} else if (args[0] > 1000) {
+                } else if (args[0] > 1000) {
                     that.errorMsg(_('Maximum beats per minute is 1000.'))
                     that._masterBPM = 1000;
-		} else {
+                } else {
                     that._masterBPM = args[0];
-		}
+                }
 
-		that.defaultBPMFactor = TONEBPM / that._masterBPM;
+                that.defaultBPMFactor = TONEBPM / that._masterBPM;
             }
 
             if (that.inTempo) {
-		that.tempo.BPMBlocks.push(blk);
-		var bpmnumberblock = that.blocks.blockList[blk].connections[1]
-		that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
+                that.tempo.BPMBlocks.push(blk);
+                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
             }
             break;
             // Deprecated
@@ -4116,7 +4130,7 @@ function Logo () {
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
-	    console.log(that.blocks.blockList[blk].name + ' ' + args[0]);
+            console.log(that.blocks.blockList[blk].name + ' ' + args[0]);
             if (that.blocks.blockList[blk].name === 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
@@ -4776,9 +4790,9 @@ function Logo () {
             // accuracy.
 
             if (args[1] === undefined) {
-		// Should never happen, but if it does, nothing to do.
-		break;
-	    }
+                // Should never happen, but if it does, nothing to do.
+                break;
+            }
 
             // Use the outer most note when nesting to determine the beat.
             if (that.inNoteBlock[turtle].length === 0) {
@@ -6229,16 +6243,16 @@ function Logo () {
                     that.errorMsg(NANERRORMSG, blk);
                 } else {
                     if (args[0] < 0) {
-			var arg = 0;
-		    } else if (args[0] > 100) {
-			var arg = 100;
-		    } else {
-			var arg = args[0];
-		    }
+                        var arg = 0;
+                    } else if (args[0] > 100) {
+                        var arg = 100;
+                    } else {
+                        var arg = args[0];
+                    }
 
-		    if (arg === 0) {
-			that.errorMsg(_('Setting volume to 0.'), blk);
-		    }
+                    if (arg === 0) {
+                        that.errorMsg(_('Setting volume to 0.'), blk);
+                    }
 
                     that.masterVolume.push(arg);
                     if (!this.suppressOutput[turtle]) {
@@ -6273,17 +6287,17 @@ function Logo () {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg = 50;
             } else {
-		if (args[0] < 0) {
-		    var arg = 0;
-		} else if (args[0] > 100) {
-		    var arg = 100;
-		} else {
+                if (args[0] < 0) {
+                    var arg = 0;
+                } else if (args[0] > 100) {
+                    var arg = 100;
+                } else {
                     var arg = args[0];
-		}
+                }
 
-		if (arg === 0) {
-		    that.errorMsg(_('Setting volume to 0.'), blk);
-		}
+                if (arg === 0) {
+                    that.errorMsg(_('Setting volume to 0.'), blk);
+                }
             }
 
             that.masterVolume.push(arg);
@@ -6323,17 +6337,17 @@ function Logo () {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg1 = 50;
             } else {
-		if (args[1] < 0) {
-		    var arg1 = 0;
-		} else if (args[1] > 100) {
-		    var arg1 = 100;
-		} else {
+                if (args[1] < 0) {
+                    var arg1 = 0;
+                } else if (args[1] > 100) {
+                    var arg1 = 100;
+                } else {
                     var arg1 = args[1];
-		}
+                }
 
-		if (arg1 === 0) {
-		    that.errorMsg(_('Setting volume to 0.'), blk);
-		}
+                if (arg1 === 0) {
+                    that.errorMsg(_('Setting volume to 0.'), blk);
+                }
             }
 
             var synth = null;
@@ -6410,17 +6424,17 @@ function Logo () {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg1 = 50;
             } else {
-		if (args[1] < 0) {
-		    var arg1 = 0;
-		} else if (args[1] > 100) {
-		    var arg1 = 100;
-		} else {
+                if (args[1] < 0) {
+                    var arg1 = 0;
+                } else if (args[1] > 100) {
+                    var arg1 = 100;
+                } else {
                     var arg1 = args[1];
-		}
+                }
 
-		if (arg1 === 0) {
-		    that.errorMsg(_('Setting volume to 0.'), blk);
-		}
+                if (arg1 === 0) {
+                    that.errorMsg(_('Setting volume to 0.'), blk);
+                }
             }
 
             var synth = null;
