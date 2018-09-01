@@ -4309,13 +4309,6 @@ handleComplete);
        };
 
 	function _piemenuStageContext () {
-            // TODO: fix collapsibles spelling in PO files
-            // TODO: fix load project from file in PO files
-            //       TB vs MB
-	    //       handle icon changes for Cartesian
-	    //       handle icon changes for Paste
-	    //       handle icon changes for Stop
-
 	    // A context menu to replace the top and right toolbars
             var x = stageX - 180;
             var y = stageY - 180;
@@ -4326,7 +4319,7 @@ handleComplete);
             docById('contextWheelDiv').style.display = '';
 
 	    // Main menu items, [submenu index], function
-            const WHEELVALUES = [
+            var wheelValues = [
                 ['imgsrc:header-icons/cancel-button.svg', null, null],
 		['imgsrc:header-icons/run-button.svg', [0, 4], null],
 		['imgsrc:header-icons/stop-turtle-button.svg', null, doHardStopButton],
@@ -4339,47 +4332,79 @@ handleComplete);
 	    ];
 
 	    // Sub-menu items, function
-            const SUBWHEELS = [
-		// play button submenu
-		['imgsrc:header-icons/step-button.svg', _doStepButton],
-		['imgsrc:header-icons/slow-button.svg', _doSlowButton],
-		['imgsrc:header-icons/run-button.svg', _doFastButton],
-		['imgsrc:header-icons/slow-music-button.svg', _doSlowMusicButton],
-		['imgsrc:header-icons/step-music-button.svg', _doStepMusicButton],
+	    if (_THIS_IS_MUSIC_BLOCKS_) {
+		var submenuWheelValues = [
+		    // play button submenu
+		    ['imgsrc:header-icons/step-button.svg', _doStepButton],
+		    ['imgsrc:header-icons/slow-button.svg', _doSlowButton],
+		    ['imgsrc:header-icons/run-button.svg', _doFastButton],
+		    ['imgsrc:header-icons/slow-music-button.svg', _doSlowMusicButton],
+		    ['imgsrc:header-icons/step-music-button.svg', _doStepMusicButton],
 
-		// submenu button submenu
-		['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
-		['imgsrc:header-icons/open-button.svg', doLoad],
-		['imgsrc:header-icons/open-merge-button.svg', _doMergeLoad],
-		['imgsrc:header-icons/save-button.svg', doSave],
-		['imgsrc:header-icons/paste-button.svg', pasteStack],
-		['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
-		['imgsrc:header-icons/compile-button.svg', _doPlaybackBox],
-		['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
-		['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
-		['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
-		['imgsrc:header-icons/beginner-button.svg', _doSwitchMode],
-		[null, null],
-		[null, null],
-            ];
+		    // submenu button submenu
+		    ['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
+		    ['imgsrc:header-icons/open-button.svg', doLoad],
+		    ['imgsrc:header-icons/open-merge-button.svg', _doMergeLoad],
+		    ['imgsrc:header-icons/save-button.svg', doSave],
+		    ['imgsrc:header-icons/paste-button.svg', pasteStack],
+		    ['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
+		    ['imgsrc:header-icons/compile-button.svg', _doPlaybackBox],
+		    ['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
+		    ['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
+		    ['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
+		    ['imgsrc:header-icons/beginner-button.svg', _doSwitchMode],
+		    [null, null],
+		    [null, null],
+		];
+
+		var planetIdx = 5;
+	    } else {
+		var submenuWheelValues = [
+		    // play button submenu
+		    ['imgsrc:header-icons/step-button.svg', _doStepButton],
+		    ['imgsrc:header-icons/slow-button.svg', _doSlowButton],
+		    ['imgsrc:header-icons/run-button.svg', _doFastButton],
+
+		    // submenu button submenu
+		    ['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
+		    ['imgsrc:header-icons/open-button.svg', doLoad],
+		    ['imgsrc:header-icons/open-merge-button.svg', _doMergeLoad],
+		    ['imgsrc:header-icons/save-button.svg', doSave],
+		    ['imgsrc:header-icons/paste-button.svg', pasteStack],
+		    ['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
+		    ['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
+		    ['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
+		    ['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
+		    [null, null],
+		    [null, null],
+		    [null, null],
+		    [null, null],
+		    [null, null],
+		    [null, null],
+		];
+
+		wheelValues[1][1] = [0, 2];
+		wheelValues[7][1] = [3, 11];
+		var planetIdx = 3;
+	    }
 
 	    // Check to ensure index is correct.
             if (!planet) {
-		SUBWHEELS[5] = ['imgsrc:header-icons/planet-disabled-button.svg', null];
+		submenuWheelValues[planetIdx] = ['imgsrc:header-icons/planet-disabled-button.svg', null];
 	    }
 
-	    if (!beginnerMode) {
-		SUBWHEELS[15] = ['imgsrc:header-icons/advanced-button.svg', _doSwitchMode];
+	    if (_THIS_IS_MUSIC_BLOCKS_ && !beginnerMode) {
+		submenuWheelValues[15] = ['imgsrc:header-icons/advanced-button.svg', _doSwitchMode];
 	    }
 
             var wheelLabels = [];
-	    for (var i = 0; i < WHEELVALUES.length; i++) {
-		wheelLabels.push(WHEELVALUES[i][0]);
+	    for (var i = 0; i < wheelValues.length; i++) {
+		wheelLabels.push(wheelValues[i][0]);
 	    }
 
             var wheel = new wheelnav('contextWheelDiv', null, 300, 300);
             // submenu wheel
-            var tabsWheel = new wheelnav('_tabsWheel', wheel.raphael);
+            var submenuWheel = new wheelnav('_submenuWheel', wheel.raphael);
 
             wheelnav.cssMode = true;
 
@@ -4407,54 +4432,98 @@ handleComplete);
 	    wheel.navItems[8].setTooltip(_('Help'));
 
             var tabsLabels = [];
-	    for (var i = 0; i < SUBWHEELS.length; i++) {
-                tabsLabels.push(SUBWHEELS[i][0]);
+	    for (var i = 0; i < submenuWheelValues.length; i++) {
+                tabsLabels.push(submenuWheelValues[i][0]);
 	    }
 
-            tabsWheel.colors = ['#489eca'];
-            tabsWheel.slicePathFunction = slicePath().DonutSlice;
-            tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
-            tabsWheel.slicePathCustom.maxRadiusPercent = 1.0;
-            tabsWheel.sliceSelectedPathCustom = tabsWheel.slicePathCustom;
-            tabsWheel.sliceInitPathCustom = tabsWheel.slicePathCustom;
-            tabsWheel.clickModeRotate = false;
-            tabsWheel.navAngle = -180 / WHEELVALUES.length + 180 / (WHEELVALUES.length * SUBWHEELS[0].length);
-            tabsWheel.createWheel(tabsLabels);
+            submenuWheel.colors = ['#489eca'];
+            submenuWheel.slicePathFunction = slicePath().DonutSlice;
+            submenuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            submenuWheel.slicePathCustom.minRadiusPercent = 0.6;
+            submenuWheel.slicePathCustom.maxRadiusPercent = 1.0;
+            submenuWheel.sliceSelectedPathCustom = submenuWheel.slicePathCustom;
+            submenuWheel.sliceInitPathCustom = submenuWheel.slicePathCustom;
+            submenuWheel.clickModeRotate = false;
+            submenuWheel.navAngle = -180 / wheelValues.length + 180 / (wheelValues.length * submenuWheelValues[0].length);
+            submenuWheel.createWheel(tabsLabels);
         
-            tabsWheel.navItems[0].setTooltip(_('Run step by step'));
-            tabsWheel.navItems[1].setTooltip(_('Run slowly'));
-            tabsWheel.navItems[2].setTooltip(_('Run fast'));
-            tabsWheel.navItems[3].setTooltip(_('Run music slowly'));
-	    tabsWheel.navItems[4].setTooltip(_('Run music step by step'));
+	    submenuWheel.navItems[0].setTooltip(_('Run step by step'));
+            submenuWheel.navItems[1].setTooltip(_('Run slowly'));
+            submenuWheel.navItems[2].setTooltip(_('Run fast'));
 
-            if (planet) {
-		tabsWheel.navItems[5].setTooltip(_('Load samples from server'));
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+		submenuWheel.navItems[3].setTooltip(_('Run music slowly'));
+		submenuWheel.navItems[4].setTooltip(_('Run music step by step'));
+
+		if (planet) {
+		    submenuWheel.navItems[5].setTooltip(_('Load samples from server'));
+		} else {
+		    submenuWheel.navItems[5].setTooltip(_('The Planet is unavailable.'));
+		}
+
+		submenuWheel.navItems[6].setTooltip(_('Load project from file'));
+		submenuWheel.navItems[7].setTooltip(_('Merge project from file'));
+		submenuWheel.navItems[8].setTooltip(_('Save project'));
+		submenuWheel.navItems[9].setTooltip(_('Click here to paste'));
+
+		if (cartesianBitmap.visible && polarBitmap.visible) {
+                    //.TRANS: show Polar coordinate overlay grid
+		    submenuWheel.navItems[10].setTooltip(_('Polar'));
+		} else if (!cartesianBitmap.visible && polarBitmap.visible) {
+                    //.TRANS: hide Polar coordinate overlay grid
+		    submenuWheel.navItems[10].setTooltip(_('hide grid'));
+		} else if (!cartesianBitmap.visible && !polarBitmap.visible) {
+		    submenuWheel.navItems[10].setTooltip(_('Cartesian'));
+		} else if (cartesianBitmap.visible && !polarBitmap.visible) {
+                    //.TRANS: show Cartesian coordinate overlay grid
+		    submenuWheel.navItems[10].setTooltip(_('Cartesian') + ' + ' + _('Polar'));
+		}
+
+		submenuWheel.navItems[11].setTooltip(_('playback'));
+		submenuWheel.navItems[12].setTooltip(_('Settings'));
+		submenuWheel.navItems[13].setTooltip(_('New Project'));
+		submenuWheel.navItems[14].setTooltip(_('Restore'));
+
+		if (beginnerMode) {
+		    submenuWheel.navItems[15].setTooltip(_('Switch to advanced mode'));
+		} else {
+		    submenuWheel.navItems[15].setTooltip(_('Switch to beginner mode'));
+		}
 	    } else {
-		tabsWheel.navItems[5].setTooltip(_('The Planet is unavailable.'));
-	    }
+		if (planet) {
+		    submenuWheel.navItems[3].setTooltip(_('Load samples from server'));
+		} else {
+		    submenuWheel.navItems[3].setTooltip(_('The Planet is unavailable.'));
+		}
 
-	    tabsWheel.navItems[6].setTooltip(_('Load project from file'));
-	    tabsWheel.navItems[7].setTooltip(_('Merge project from file'));
-	    tabsWheel.navItems[8].setTooltip(_('Save project'));
-	    tabsWheel.navItems[9].setTooltip(_('Click here to paste'));
-	    tabsWheel.navItems[10].setTooltip(_('Cartesian'));
-	    tabsWheel.navItems[11].setTooltip(_('playback'));
-	    tabsWheel.navItems[12].setTooltip(_('Settings'));
-	    tabsWheel.navItems[13].setTooltip(_('New Project'));
-	    tabsWheel.navItems[14].setTooltip(_('Restore'));
+		submenuWheel.navItems[4].setTooltip(_('Load project from file'));
+		submenuWheel.navItems[5].setTooltip(_('Merge project from file'));
+		submenuWheel.navItems[6].setTooltip(_('Save project'));
+		submenuWheel.navItems[7].setTooltip(_('Click here to paste'));
 
-            if (beginnerMode) {
-		tabsWheel.navItems[15].setTooltip(_('Switch to advanced mode'));
-	    } else {
-		tabsWheel.navItems[15].setTooltip(_('Switch to beginner mode'));
+		if (cartesianBitmap.visible && polarBitmap.visible) {
+                    //.TRANS: show Polar coordinate overlay grid
+		    submenuWheel.navItems[8].setTooltip(_('Polar'));
+		} else if (!cartesianBitmap.visible && polarBitmap.visible) {
+                    //.TRANS: hide Polar coordinate overlay grid
+		    submenuWheel.navItems[8].setTooltip(_('hide grid'));
+		} else if (!cartesianBitmap.visible && !polarBitmap.visible) {
+		    submenuWheel.navItems[8].setTooltip(_('Cartesian'));
+		} else if (cartesianBitmap.visible && !polarBitmap.visible) {
+                    //.TRANS: show Cartesian coordinate overlay grid
+		    submenuWheel.navItems[8].setTooltip(_('Cartesian') + ' + ' + _('Polar'));
+		}
+
+		submenuWheel.navItems[9].setTooltip(_('Settings'));
+		submenuWheel.navItems[10].setTooltip(_('New Project'));
+		submenuWheel.navItems[11].setTooltip(_('Restore'));
 	    }
 
             var __selectionChanged = function () {
-		var i = tabsWheel.selectedNavItemIndex;
-		if (SUBWHEELS[i][1] !== null) {
+		var i = submenuWheel.selectedNavItemIndex;
+		if (submenuWheelValues[i][1] !== null) {
                     __exitMenu();
-		    SUBWHEELS[i][1]();
+		    submenuWheelValues[i][1]();
 		}
             };
 
@@ -4467,17 +4536,17 @@ handleComplete);
 
             var __showHide = function () {
 		var i = wheel.selectedNavItemIndex;
-		var subitems = WHEELVALUES[i][1];
+		var subitems = wheelValues[i][1];
 		if (subitems === null) {
-		    for (var j = 0; j < SUBWHEELS.length; j++) {
-                        tabsWheel.navItems[j].navItem.hide();
+		    for (var j = 0; j < submenuWheelValues.length; j++) {
+                        submenuWheel.navItems[j].navItem.hide();
 		    }
 		} else {
-		    for (var j = 0; j < SUBWHEELS.length; j++) {
+		    for (var j = 0; j < submenuWheelValues.length; j++) {
 			if (j < subitems[0] || j > subitems[1]) {
-                            tabsWheel.navItems[j].navItem.hide();
+                            submenuWheel.navItems[j].navItem.hide();
 			} else {
-                            tabsWheel.navItems[j].navItem.show();
+                            submenuWheel.navItems[j].navItem.show();
 			}
                     }
 		}
@@ -4492,19 +4561,19 @@ handleComplete);
 		console.log('action: ' + i);
 		__showHide();
 
-		if (WHEELVALUES[i][2] !== null) {
+		if (wheelValues[i][2] !== null) {
 		    __exitMenu();
-		    WHEELVALUES[i][2]();
+		    wheelValues[i][2]();
 		}
 	    };
 
-            for (var i = 1; i < WHEELVALUES.length; i++) {
+            for (var i = 1; i < wheelValues.length; i++) {
 		wheel.navItems[i].navigateFunction = __action;
             }
 
             // Hide the widget when the selection is made.
             for (var i = 0; i < tabsLabels.length; i++) {
-		tabsWheel.navItems[i].navigateFunction = function () {
+		submenuWheel.navItems[i].navigateFunction = function () {
                     __selectionChanged();
                     __exitMenu();
 		};
