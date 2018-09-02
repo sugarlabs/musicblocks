@@ -2268,6 +2268,24 @@ function Logo () {
                 xmlHttp.send(json);
             }
             break;
+        case 'recenter':
+            if (!that.suppressOutput[turtle]) {
+                that.turtles.turtleList[turtle].recenter();
+            }
+	    break;
+        case 'scroll':
+            if (args.length === 1) {
+                if (typeof(args[0]) === 'string') {
+                    that.errorMsg(NANERRORMSG, blk);
+                } else if (that.inNoteBlock[turtle].length > 0) {
+                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
+                } else {
+                    if (!that.suppressOutput[turtle]) {
+                        that.turtles.turtleList[turtle].scroll(args[0]);
+                    }
+                }
+            }
+            break;
         case 'forward':
             if (args.length === 1) {
                 if (typeof(args[0]) === 'string') {
@@ -8425,6 +8443,9 @@ function Logo () {
                 case 'setxy':
                     that.turtles.turtleList[turtle].doSetXY(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
+                case 'scroll':
+                    that.turtles.turtleList[turtle].scroll(that.playbackQueue[turtle][idx][2]);
+		    break;
                 case 'forward':
                     that.turtles.turtleList[turtle].doForward(that.playbackQueue[turtle][idx][2]);
                     break;
@@ -8689,6 +8710,14 @@ function Logo () {
             }
         };
 
+        function __scroll(turtle, arg, timeout) {
+            if (!suppressOutput) {
+                setTimeout(function () {
+                    that.turtles.turtleList[turtle].scroll(arg);
+                }, timeout);
+            }
+        };
+
         function __setxy(turtle, arg1, arg2, timeout) {
             if (suppressOutput) {
                 var savedPenState = that.turtles.turtleList[turtle].penState;
@@ -8834,6 +8863,7 @@ function Logo () {
         for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
             var b = this.embeddedGraphics[turtle][blk][i];
             switch (this.blocks.blockList[b].name) {
+	    case 'scroll':
             case 'forward':
             case 'back':
             case 'right':
@@ -8963,6 +8993,17 @@ function Logo () {
                     var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
                     __right(turtle, -deltaArg, deltaTime);
                     that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'right', -deltaArg]);
+                }
+
+                waitTime += NOTEDIV * stepTime;
+                break;
+            case 'scroll':
+                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
+                    var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
+                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    __scroll(turtle, deltaArg, deltaTime);
+                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'scroll', deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;

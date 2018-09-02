@@ -2960,6 +2960,29 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('scroll');
+    newblock.palette = palettes.dict['mouse'];
+    blocks.protoBlockDict['scroll'] = newblock;
+    //.TRANS: scroll the screen vertically
+    newblock.staticLabels.push(_('scroll up/down'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.defaults.push(100);
+    if (beginnerMode && !beginnerBlock('scroll')) {
+        // newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('recenter');
+    newblock.palette = palettes.dict['mouse'];
+    blocks.protoBlockDict['recenter'] = newblock;
+    //.TRANS: scroll the screen vertically
+    newblock.staticLabels.push(_('recenter'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('scroll')) {
+        // newblock.hidden = true;
+    }
+
     // PEN PALETTE
 
     // macro
@@ -3502,6 +3525,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('add 1 to'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
+    newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('incrementOne')) {
         newblock.hidden = true;
     }

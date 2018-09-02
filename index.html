@@ -160,13 +160,13 @@
     <!--hidden at the beginning whilst everything loads-->
     <div id="hideContents" style="display: none;">
       <div class="canvasHolder" id="canvasHolder">
-        <canvas id="myCanvas" width="1200" height="900">
+        <canvas id="myCanvas" width="1200" height="1800">
         </canvas>
 
-        <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden;">
+        <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden">
         </canvas>
 
-        <canvas id="myChart" width="600" height="600">
+        <canvas id="myChart" width="600" height="600" style="display: none;">
         </canvas>
 
         <video id="camVideo" style="visibility:hidden;">
@@ -309,10 +309,10 @@
       <div id="helpElem">
       </div>
 
-      <div id="wheelDiv" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)">
+      <div id="wheelDiv" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg) display: none">
       </div>
 
-      <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)">
+      <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg) display: none">
       </div>
 
       <div id="contextWheelDiv" class="wheelNav">

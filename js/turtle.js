@@ -76,8 +76,19 @@ function Turtle (name, turtles, drum) {
     this.media = [];  // Media (text, images) we need to remove on clear.
     var canvas = document.getElementById('overlayCanvas');
     var ctx = canvas.getContext('2d');
+
+    this.recenter = function() {
+	window.scrollTo(0, 0);
+    };
+
+    // Scroll the window vertically
+    this.scroll = function(dy) {
+	window.scrollTo(window.scrollX, window.scrollY + dy);
+    };
+
     // Simulate an arc with line segments since Tinkercad cannot
     // import SVG arcs reliably.
+
     this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
         var a = sa;
         if (ea == null) {
@@ -612,6 +623,9 @@ function Turtle (name, turtles, drum) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.penstrokes.image = canvas;
         this.turtles.refreshCanvas();
+
+	// Reset window scroll position.
+	window.scrollTo(0, 0);
     };
 
     this.clearPenStrokes = function() {

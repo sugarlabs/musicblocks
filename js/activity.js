@@ -259,7 +259,8 @@ define(MYDEFINES, function (compatibility) {
 
             if (blocks.activeBlock === null) {
                 // Stage context menu
-                _piemenuStageContext();
+                // Commented out until we decide what to do.
+                // _piemenuStageContext();
             } else {
                 // Block context menu
                 // Would be better to trigger this from the block
@@ -2006,8 +2007,10 @@ define(MYDEFINES, function (compatibility) {
                 if (stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
                     stageX = event.stageX;
                     stageY = event.stageY;
-                    blocks.stageClick = true;
-                    _piemenuStageContext();
+                    // Commented out until we decide what to do.
+                    // blocks.stageClick = true;
+                    // _piemenuStageContext();
+		    // _piemenuPaletteContext();
                 }
 
             };
@@ -4338,14 +4341,13 @@ handleComplete);
 
             // Main menu items, [submenu index], function
             var wheelValues = [
-                ['imgsrc:header-icons/cancel-button.svg', null, null],
                 ['imgsrc:header-icons/run-button.svg', [0, 4], null],
                 ['imgsrc:header-icons/stop-turtle-button.svg', null, doHardStopButton],
                 ['imgsrc:header-icons/clear-button.svg', null, _allClear],
                 ['imgsrc:header-icons/hide-blocks-button.svg', null, _changeBlockVisibility],
                 ['imgsrc:header-icons/collapse-blocks-button.svg', null, _toggleCollapsibleStacks],
                 ['imgsrc:header-icons/go-home-button.svg', null, _findBlocks],
-                ['imgsrc:header-icons/menu-button.svg', [5, 15], null],
+                ['imgsrc:header-icons/utility-button.svg', [5, 15], null],
                 ['imgsrc:header-icons/help-button.svg', null, _showHelp]
             ];
 
@@ -4401,8 +4403,8 @@ handleComplete);
                     [null, null],
                 ];
 
-                wheelValues[1][1] = [0, 2];
-                wheelValues[7][1] = [3, 11];
+                wheelValues[0][1] = [0, 2];
+                wheelValues[6][1] = [3, 11];
                 var planetIdx = 3;
             }
 
@@ -4420,9 +4422,9 @@ handleComplete);
                 wheelLabels.push(wheelValues[i][0]);
             }
 
-            var wheel = new wheelnav('contextWheelDiv', null, 300, 300);
-            // submenu wheel
+            var wheel = new wheelnav('contextWheelDiv', null, 240, 240);
             var submenuWheel = new wheelnav('_submenuWheel', wheel.raphael);
+            var switchWheel = new wheelnav('_switchWheel', wheel.raphael);
 
             wheelnav.cssMode = true;
 
@@ -4431,39 +4433,38 @@ handleComplete);
             wheel.colors = ['#2584af'];
             wheel.slicePathFunction = slicePath().DonutSlice;
             wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            wheel.slicePathCustom.minRadiusPercent = 0.2;
-            wheel.slicePathCustom.maxRadiusPercent = 0.6;
+            wheel.slicePathCustom.minRadiusPercent = 0.3;
+            wheel.slicePathCustom.maxRadiusPercent = 0.65;
             wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
             wheel.sliceInitPathCustom = wheel.slicePathCustom;
             wheel.animatetime = 300;
-            wheel.clickModeRotate = false;
+            // wheel.clickModeRotate = false;
             wheel.createWheel(wheelLabels);
 
-            wheel.navItems[0].setTooltip(_('Close'));
-            wheel.navItems[1].setTooltip(_('Run'));
-            wheel.navItems[2].setTooltip(_('Stop'));
-            wheel.navItems[3].setTooltip(_('Clean'));
-            wheel.navItems[4].setTooltip(_('Show/hide blocks'));
-            wheel.navItems[5].setTooltip(_('Expand/collapse collapsible blocks'));
-            wheel.navItems[6].setTooltip(_('Home'));
-            wheel.navItems[7].setTooltip(_('More'));
-            wheel.navItems[8].setTooltip(_('Help'));
+            wheel.navItems[0].setTooltip(_('Run'));
+            wheel.navItems[1].setTooltip(_('Stop'));
+            wheel.navItems[2].setTooltip(_('Clean'));
+            wheel.navItems[3].setTooltip(_('Show/hide blocks'));
+            wheel.navItems[4].setTooltip(_('Expand/collapse collapsible blocks'));
+            wheel.navItems[5].setTooltip(_('Home'));
+            wheel.navItems[6].setTooltip(_('More'));
+            wheel.navItems[7].setTooltip(_('Help'));
 
-            var tabsLabels = [];
+            var submenuLabels = [];
             for (var i = 0; i < submenuWheelValues.length; i++) {
-                tabsLabels.push(submenuWheelValues[i][0]);
+                submenuLabels.push(submenuWheelValues[i][0]);
             }
 
             submenuWheel.colors = ['#489eca'];
             submenuWheel.slicePathFunction = slicePath().DonutSlice;
             submenuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            submenuWheel.slicePathCustom.minRadiusPercent = 0.6;
+            submenuWheel.slicePathCustom.minRadiusPercent = 0.65;
             submenuWheel.slicePathCustom.maxRadiusPercent = 1.0;
             submenuWheel.sliceSelectedPathCustom = submenuWheel.slicePathCustom;
             submenuWheel.sliceInitPathCustom = submenuWheel.slicePathCustom;
-            submenuWheel.clickModeRotate = false;
+            // submenuWheel.clickModeRotate = false;
             submenuWheel.navAngle = -180 / wheelValues.length + 180 / (wheelValues.length * submenuWheelValues[0].length);
-            submenuWheel.createWheel(tabsLabels);
+            submenuWheel.createWheel(submenuLabels);
         
             submenuWheel.navItems[0].setTooltip(_('Run step by step'));
             submenuWheel.navItems[1].setTooltip(_('Run slowly'));
@@ -4537,6 +4538,32 @@ handleComplete);
                 submenuWheel.navItems[11].setTooltip(_('Restore'));
             }
 
+	    switchLabels = [
+                'imgsrc:header-icons/cancel-button.svg',
+                'imgsrc:header-icons/menu-button.svg'
+	    ];
+
+            switchWheel.colors = ['#489eca'];
+            switchWheel.slicePathFunction = slicePath().DonutSlice;
+            switchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            switchWheel.slicePathCustom.minRadiusPercent = 0;
+            switchWheel.slicePathCustom.maxRadiusPercent = 0.3;
+            switchWheel.sliceSelectedPathCustom = switchWheel.slicePathCustom;
+            switchWheel.sliceInitPathCustom = switchWheel.slicePathCustom;
+            switchWheel.clickModeRotate = false;
+            switchWheel.createWheel(switchLabels);
+        
+            switchWheel.navItems[0].setTooltip(_('Close'));
+            switchWheel.navItems[1].setTooltip(_('Palette selector'));
+
+	    switchWheel.navItems[0].navigateFunction = function () {
+		__exitMenu();
+	    };
+
+	    switchWheel.navItems[1].navigateFunction = function () {
+		_piemenuPaletteContext();
+	    };
+
             var __selectionChanged = function () {
                 var i = submenuWheel.selectedNavItemIndex;
                 if (submenuWheelValues[i][1] !== null) {
@@ -4570,10 +4597,6 @@ handleComplete);
                 }
             };
 
-            wheel.navItems[0].navigateFunction = function () {
-                __exitMenu();
-            };
-
             var __action = function () {
                 var i = wheel.selectedNavItemIndex;
                 console.log('action: ' + i);
@@ -4585,19 +4608,19 @@ handleComplete);
                 }
             };
 
-            for (var i = 1; i < wheelValues.length; i++) {
+            for (var i = 0; i < wheelValues.length; i++) {
                 wheel.navItems[i].navigateFunction = __action;
             }
 
             // Hide the widget when the selection is made.
-            for (var i = 0; i < tabsLabels.length; i++) {
+            for (var i = 0; i < submenuLabels.length; i++) {
                 submenuWheel.navItems[i].navigateFunction = function () {
                     __selectionChanged();
                     __exitMenu();
                 };
             }
 
-            wheel.navigateWheel(1);
+            wheel.navigateWheel(0);
 
             setTimeout(function () {
                 blocks.stageClick = false;
@@ -4691,6 +4714,223 @@ handleComplete);
                     blocks.saveStack();
                 };
             }
+
+            setTimeout(function () {
+                blocks.stageClick = false;
+            }, 500);
+        };
+
+        function _piemenuPaletteContext () {
+            // A context menu to replace the palette menu
+            var x = stageX - 180;
+            var y = stageY - 180;
+
+            docById('contextWheelDiv').style.left = x + 'px';
+            docById('contextWheelDiv').style.top = y + 'px';
+            docById('contextWheelDiv').style.position = 'absolute';
+            docById('contextWheelDiv').style.display = '';
+
+            // Main menu items, [submenu index], function
+            var wheelValues = [
+		['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['search']))), null, null],
+		['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['widgets']))), null, null],
+		['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['rhythm']))), [0, 6], null],
+		['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['flow']))), [7, 9], null],
+		['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['mouse']))), [10, 14], null],
+		['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['number']))), [15, 18], null]
+            ];
+
+	    // Sub-menu items, function
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var submenuWheelValues = [
+		    // music submenu
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['rhythm']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['meter']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['pitch']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['intervals']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['tone']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['volume']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['drum']))), null],
+
+                    // flow submenu
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['flow']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['action']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['boxes']))), null],
+
+                    // mouse submenu
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['mouse']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['pen']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['media']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['sensors']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['mice']))), null],
+
+		    // extras submenu
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['number']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['boolean']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['heap']))), null],
+		    ['imgsrc:' + 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PALETTEICONS['extras']))), null]
+                ];
+            } else {
+                var submenuWheelValues = [
+		];
+            }
+
+            var wheelLabels = [];
+            for (var i = 0; i < wheelValues.length; i++) {
+                wheelLabels.push(wheelValues[i][0]);
+            }
+
+            var wheel = new wheelnav('contextWheelDiv', null, 240, 240);
+            var submenuWheel = new wheelnav('_submenuWheel', wheel.raphael);
+            var switchWheel = new wheelnav('_switchWheel', wheel.raphael);
+
+            wheelnav.cssMode = true;
+
+            wheel.keynavigateEnabled = true;
+
+            wheel.colors = ['#96d3f3'];
+            wheel.slicePathFunction = slicePath().DonutSlice;
+            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            wheel.slicePathCustom.minRadiusPercent = 0.3;
+            wheel.slicePathCustom.maxRadiusPercent = 0.65;
+            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+            wheel.sliceInitPathCustom = wheel.slicePathCustom;
+            wheel.animatetime = 300;
+            // wheel.clickModeRotate = false;
+            wheel.createWheel(wheelLabels);
+
+            wheel.navItems[0].setTooltip(_('search'));
+            wheel.navItems[1].setTooltip(_('widgets'));
+            wheel.navItems[2].setTooltip(_('music'));
+            wheel.navItems[3].setTooltip(_('flow'));
+            wheel.navItems[4].setTooltip(_('mouse'));
+            wheel.navItems[5].setTooltip(_('extras'));
+
+            var submenuLabels = [];
+            for (var i = 0; i < submenuWheelValues.length; i++) {
+                submenuLabels.push(submenuWheelValues[i][0]);
+            }
+
+            submenuWheel.colors = ['#d9e9f0'];
+            submenuWheel.slicePathFunction = slicePath().DonutSlice;
+            submenuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            submenuWheel.slicePathCustom.minRadiusPercent = 0.65;
+            submenuWheel.slicePathCustom.maxRadiusPercent = 1.0;
+            submenuWheel.sliceSelectedPathCustom = submenuWheel.slicePathCustom;
+            submenuWheel.sliceInitPathCustom = submenuWheel.slicePathCustom;
+            // submenuWheel.clickModeRotate = false;
+            submenuWheel.navAngle = -180 / wheelValues.length + 180 / (wheelValues.length * submenuWheelValues[0].length);
+            submenuWheel.createWheel(submenuLabels);
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+		submenuWheel.navItems[0].setTooltip(_('rhythm'));
+		submenuWheel.navItems[1].setTooltip(_('meter'));
+		submenuWheel.navItems[2].setTooltip(_('pitch'));
+                submenuWheel.navItems[3].setTooltip(_('intervals'));
+                submenuWheel.navItems[4].setTooltip(_('tone'));
+                submenuWheel.navItems[5].setTooltip(_('volume'));
+                submenuWheel.navItems[6].setTooltip(_('drum'));
+
+                submenuWheel.navItems[7].setTooltip(_('flow'));
+                submenuWheel.navItems[8].setTooltip(_('action'));
+                submenuWheel.navItems[9].setTooltip(_('boxes'));
+
+                submenuWheel.navItems[10].setTooltip(_('mouse'));
+                submenuWheel.navItems[11].setTooltip(_('pen'));
+                submenuWheel.navItems[12].setTooltip(_('media'));
+                submenuWheel.navItems[13].setTooltip(_('sensors'));
+                submenuWheel.navItems[14].setTooltip(_('mice'));
+
+                submenuWheel.navItems[15].setTooltip(_('number'));
+                submenuWheel.navItems[16].setTooltip(_('boolean'));
+                submenuWheel.navItems[17].setTooltip(_('heap'));
+                submenuWheel.navItems[18].setTooltip(_('extras'));
+            } else {
+            }
+
+	    switchLabels = [
+                'imgsrc:header-icons/cancel-button.svg',
+                'imgsrc:header-icons/menu-button.svg'
+	    ];
+
+            switchWheel.colors = ['#489eca'];
+            switchWheel.slicePathFunction = slicePath().DonutSlice;
+            switchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            switchWheel.slicePathCustom.minRadiusPercent = 0;
+            switchWheel.slicePathCustom.maxRadiusPercent = 0.3;
+            switchWheel.sliceSelectedPathCustom = switchWheel.slicePathCustom;
+            switchWheel.sliceInitPathCustom = switchWheel.slicePathCustom;
+            switchWheel.clickModeRotate = false;
+            switchWheel.createWheel(switchLabels);
+        
+            switchWheel.navItems[0].setTooltip(_('close'));
+            switchWheel.navItems[1].setTooltip(_('tool selector'));
+
+	    switchWheel.navItems[0].navigateFunction = function () {
+		__exitMenu();
+	    };
+
+	    switchWheel.navItems[1].navigateFunction = function () {
+		_piemenuStageContext();
+	    };
+
+            var __selectionChanged = function () {
+                var i = submenuWheel.selectedNavItemIndex;
+                if (submenuWheelValues[i][1] !== null) {
+                    __exitMenu();
+                    submenuWheelValues[i][1]();
+                }
+            };
+
+            var __exitMenu = function () {
+                var d = new Date();
+                piemenuExitTime = d.getTime();
+                docById('contextWheelDiv').style.display = 'none';
+                wheel.removeWheel();
+            };
+
+            var __showHide = function () {
+                var i = wheel.selectedNavItemIndex;
+                var subitems = wheelValues[i][1];
+                if (subitems === null) {
+                    for (var j = 0; j < submenuWheelValues.length; j++) {
+                        submenuWheel.navItems[j].navItem.hide();
+                    }
+                } else {
+                    for (var j = 0; j < submenuWheelValues.length; j++) {
+                        if (j < subitems[0] || j > subitems[1]) {
+                            submenuWheel.navItems[j].navItem.hide();
+                        } else {
+                            submenuWheel.navItems[j].navItem.show();
+                        }
+                    }
+                }
+            };
+
+            var __action = function () {
+                var i = wheel.selectedNavItemIndex;
+                console.log('action: ' + i);
+                __showHide();
+
+                if (wheelValues[i][2] !== null) {
+                    __exitMenu();
+                    wheelValues[i][2]();
+                }
+            };
+
+            for (var i = 0; i < wheelValues.length; i++) {
+                wheel.navItems[i].navigateFunction = __action;
+            }
+
+            // Hide the widget when the selection is made.
+            for (var i = 0; i < submenuLabels.length; i++) {
+                submenuWheel.navItems[i].navigateFunction = function () {
+                    __selectionChanged();
+                    __exitMenu();
+                };
+            }
+
+            wheel.navigateWheel(1);
 
             setTimeout(function () {
                 blocks.stageClick = false;
