@@ -118,7 +118,7 @@ function LanguageBox () {
             ['English (UK)', 'en-UK'],
             ['español', 'es'],
             ['日本語', 'ja'],
-            ['日本語 (kana)', 'kana'],  // This will be set to 'ja'. See below.
+            ['にほんご', 'kana'],
             ['中文', 'zh-CN'],
 	    ['ภาษาไทย', 'th'],
 	    ['aymara', 'ayc'],
