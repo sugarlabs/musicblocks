@@ -1004,7 +1004,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['status'] = newblock;
     newblock.staticLabels.push(_('status'));
-    newblock.extraWidth = 10;
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('status')) {
@@ -1285,8 +1285,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('newnote');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newnote'] = newblock;
-    newblock.staticLabels.push(_('note value'));
+    newblock.staticLabels.push(_('note'));
+    newblock.staticLabels.push(_('value'));
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(1 / 4);
     if (beginnerMode && !beginnerBlock('newnote')) {
@@ -3516,7 +3519,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('box');
-    newblock.palette = palettes.dict['boxes'];
+    if (beginnerMode && !beginnerBlock('box')) {
+	newblock.palette = palettes.dict['extras'];
+    } else {
+	newblock.palette = palettes.dict['boxes'];
+    }
     blocks.protoBlockDict['box'] = newblock;
     //.TRANS: a container into which to put something
     newblock.staticLabels.push(_('box'));
@@ -3528,36 +3535,39 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // Show the value in the box as if it were a parameter.
     newblock.parameter = true;
     newblock.dockTypes[1] = 'anyin';
-    if (beginnerMode && !beginnerBlock('box')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('namedbox');
-    newblock.palette = palettes.dict['boxes'];
+    if (beginnerMode && !beginnerBlock('namedbox')) {
+	newblock.palette = palettes.dict['extras'];
+    } else {
+	newblock.palette = palettes.dict['boxes'];
+    }
     blocks.protoBlockDict['namedbox'] = newblock;
     newblock.staticLabels.push(_('box'));
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     newblock.dockTypes[0] = 'anyout';
-    if (beginnerMode && !beginnerBlock('namedbox')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('storein2');
-    newblock.palette = palettes.dict['boxes'];
+    if (beginnerMode && !beginnerBlock('storein2')) {
+	newblock.palette = palettes.dict['extras'];
+    } else {
+	newblock.palette = palettes.dict['boxes'];
+    }
     blocks.protoBlockDict['storein2'] = newblock;
     newblock.staticLabels.push(_('store in box'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(4);
     newblock.dockTypes[1] = 'anyin';
-    if (beginnerMode && !beginnerBlock('storein2')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('storein');
-    newblock.palette = palettes.dict['boxes'];
+    if (beginnerMode && !beginnerBlock('storein')) {
+	newblock.palette = palettes.dict['extras'];
+    } else {
+	newblock.palette = palettes.dict['boxes'];
+    }
     blocks.protoBlockDict['storein'] = newblock;
     //.TRANS: put something into a container for later reference
     newblock.staticLabels.push(_('store in'));
@@ -3568,7 +3578,56 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(4);
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
-    if (beginnerMode && !beginnerBlock('storein')) {
+
+    // macro
+    var newblock = new ProtoBlock('box2');
+    newblock.palette = palettes.dict['boxes'];
+    blocks.protoBlockDict['box2'] = newblock;
+    newblock.staticLabels.push(_('box 2'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.parameterBlock();
+    newblock.dockTypes[0] = 'anyout';
+    if (beginnerMode && !beginnerBlock('box2')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('storebox2');
+    newblock.palette = palettes.dict['boxes'];
+    blocks.protoBlockDict['storebox2'] = newblock;
+    newblock.staticLabels.push(_('store in box 2'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.defaults.push(4);
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('storebox2')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('box1');
+    newblock.palette = palettes.dict['boxes'];
+    blocks.protoBlockDict['box1'] = newblock;
+    newblock.staticLabels.push(_('box 1'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.parameterBlock();
+    newblock.dockTypes[0] = 'anyout';
+    if (beginnerMode && !beginnerBlock('box1')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('storebox1');
+    newblock.palette = palettes.dict['boxes'];
+    blocks.protoBlockDict['storebox1'] = newblock;
+    newblock.staticLabels.push(_('store in box 1'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.defaults.push(4);
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('storebox1')) {
         newblock.hidden = true;
     }
 
@@ -3771,6 +3830,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['start'] = newblock;
     newblock.staticLabels.push(_('start'));
     newblock.extraWidth = 40;
+    newblock.labelOffset = 15;
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
 
@@ -3779,6 +3839,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['action'] = newblock;
     newblock.staticLabels.push(_('action'));
     newblock.extraWidth = 42;
+    newblock.labelOffset = 15;
     newblock.adjustWidthToLabel();
     newblock.stackClampOneArgBlock();
     newblock.defaults.push(_('action'));

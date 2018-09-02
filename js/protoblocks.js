@@ -56,6 +56,7 @@ function ProtoBlock(name) {
     this.disabled = false;
     //Stores the width of the text component
     this.textWidth = 0;
+    this.labelOffset = 0;
 
     this.adjustWidthToLabel = function () {
         if (this.staticLabels.length === 0) {
@@ -519,6 +520,7 @@ function ProtoBlock(name) {
         svg.setCap(true);
         svg.setTail(true);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+        svg.setLabelOffset(this.labelOffset);
 
         if (slots) {
             svg.setClampSlots(0, slots);
@@ -589,6 +591,7 @@ function ProtoBlock(name) {
         svg.setTab(true);
         svg.setSlot(true);
         svg.setInnies([true]);
+        svg.setLabelOffset(this.labelOffset);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
 
         if (slots) {
@@ -996,6 +999,7 @@ function ProtoBlock(name) {
         svg.setTail(true);
         svg.setInnies([true]);
         svg.setExpand(10 + this.extraWidth, 0, 0, 0);
+        svg.setLabelOffset(this.labelOffset);
 
         if (slots) {
             svg.setClampSlots(0, slots);

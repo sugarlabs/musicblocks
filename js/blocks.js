@@ -234,7 +234,10 @@ function Blocks () {
 
     this.extract = function () {
         if (this.activeBlock != null) {
-            this._extractBlock(this.activeBlock, true);
+            // Don't extract silence blocks.
+            if (this.blockList[this.activeBlock].name !== 'rest2') {
+                this._extractBlock(this.activeBlock, true);
+            }
         }
     };
 
@@ -270,7 +273,9 @@ function Blocks () {
                 this.blockMoved(firstConnection);
                 this.adjustDocks(firstConnection, true);
                 if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
-		    this.clampBlocksToCheck = [[firstConnection, 0]];
+                    clampList = [];
+                    this.findNestedClampBlocks(firstConnection, clampList);
+                    this.clampBlocksToCheck = clampList;
                     this.adjustExpandableClampBlock();
                 }
             }
@@ -288,13 +293,18 @@ function Blocks () {
         return maxy;
     };
 
-    // Toggle state of collapsible blocks.
+    // Toggle state of collapsible blocks, except note blocks, which
+    // are handled separately.
     this.toggleCollapsibles = function () {
         var allCollapsed = true;
         var someCollapsed = false;
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+            if (myBlock.name === 'newnote') {
+                continue;
+            }
+
+            if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 if (myBlock.collapsed) {
                     someCollapsed = true;
                 } else {
@@ -308,7 +318,11 @@ function Blocks () {
             // If any blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-                if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                if (myBlock.name === 'newnote') {
+                    continue;
+                }
+
+                if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     myBlock.collapseToggle();
                 }
             }
@@ -316,7 +330,11 @@ function Blocks () {
             // If no blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-                if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                if (myBlock.name === 'newnote') {
+                    continue;
+                }
+
+                if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                     if (!myBlock.collapsed) {
                         myBlock.collapseToggle();
                     }
@@ -412,7 +430,6 @@ function Blocks () {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
-
             if (myBlock.isArgFlowClampBlock()) {
                 var c = 1;  // 0: outie; and 1: child flow
             } else if (clamp === 0) {
@@ -449,6 +466,10 @@ function Blocks () {
     // Returns the block size.
     this._getBlockSize = function (blk) {
         var myBlock = this.blockList[blk];
+        if (myBlock.name === 'newnote' && myBlock.collapsed) {
+            return 1;
+        }
+
         return myBlock.size;
     };
 
@@ -623,6 +644,7 @@ function Blocks () {
                 if (cblk != null) {
                     csize = this._getStackSize(cblk);
                 }
+
                 if (csize === 0) {
                     size = 1; // minimum of 1 slot in clamp
                 } else {
@@ -653,6 +675,11 @@ function Blocks () {
             size = myBlock.size;
         }
 
+        // If the note value block is collapsed, spoof size.
+        if (myBlock.name === 'newnote' && myBlock.collapsed) {
+            size = 1
+        }
+
         // check on any connected block
         if (myBlock.connections.length > 1) {
             var cblk = last(myBlock.connections);
@@ -660,6 +687,7 @@ function Blocks () {
                 size += this._getStackSize(cblk);
             }
         }
+
         return size;
     };
 
@@ -704,12 +732,16 @@ function Blocks () {
 
         // Walk through each connection except the parent block; the
         // exception being the parent block of boolean 2arg blocks,
-        // since the dock[0] position can change.
+        // since the dock[0] position can change; and only check the
+        // last connection of collapsed blocks.
         if (myBlock.isTwoArgBooleanBlock()) {
             var start = 0;
+        } else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
+            var start = myBlock.connections.length - 1;
         } else {
             var start = 1;
         }
+
         for (var c = start; c < myBlock.connections.length; c++) {
             // Get the dock position for this connection.
             var bdock = myBlock.docks[c];
@@ -746,23 +778,58 @@ function Blocks () {
 
             var cdock = this.blockList[cblk].docks[b];
 
+            /*
+            if (this.blockList[blk].name === 'newnote' || this.blockList[cblk].name === 'newnote') {
+                console.log(this.blockList[blk].name);
+                console.log(bdock);
+                console.log(this.blockList[cblk].name);
+                console.log(cdock);
+            }
+            */
+
             if (c > 0) {
                 // Move the connected block...
                 var dx = bdock[0] - cdock[0];
-                var dy = bdock[1] - cdock[1];
+
+                if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
+                    // If the block is collapsed, determine the new
+                    // dock position.
+                    var n = myBlock.docks.length;
+                    var dd = myBlock.docks[n - 1][1] - myBlock.docks[n - 2][1];
+                    var dy = bdock[1] - dd - cdock[1];
+                    // console.log('adjust inline connection: ' + n + ' ' + dd + ' ' + dy);
+                } else {
+                    var dy = bdock[1] - cdock[1];
+                }
+
+                /*
+                console.log('child');
+                console.log('dx ' + dx);
+                console.log('dy ' + dy);
+                */
+
                 if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
                 } else {
                     var nx = Math.floor(myBlock.container.x + dx + 0.5);
                     var ny = Math.floor(myBlock.container.y + dy + 0.5);
                 }
+
                 this._moveBlock(cblk, nx, ny);
             } else {
                 // or it's parent.
                 var dx = cdock[0] - bdock[0];
                 var dy = cdock[1] - bdock[1];
+
+                /*
+                console.log('parent');
+                console.log('dx ' + dx);
+                console.log('dy ' + dy);
+                */
+
                 var nx = Math.floor(this.blockList[cblk].container.x + dx + 0.5);
                 var ny = Math.floor(this.blockList[cblk].container.y + dy + 0.5);
+
                 this._moveBlock(blk, nx, ny);
             }
 
@@ -1007,6 +1074,7 @@ function Blocks () {
     this.blockMoved = function (thisBlock) {
         // When a block is moved, we have lots of things to check:
         // (0) Is it inside of a expandable block?
+        //     Is it connected to a collapsed block?
         //     Is it an arg inside an arg clamp?
         // (1) Is it an arg block connected to a two-arg block?
         // (2) Disconnect its connection[0];
@@ -1029,7 +1097,7 @@ function Blocks () {
             return;
         }
 
-        var blk = this._insideExpandableBlock(thisBlock);
+        var blk = this.insideExpandableBlock(thisBlock);
         var expandableLoopCounter = 0;
 
         var parentblk = null;
@@ -1047,7 +1115,7 @@ function Blocks () {
             }
 
             this.clampBlocksToCheck.push([blk, 0]);
-            blk = this._insideExpandableBlock(blk);
+            blk = this.insideExpandableBlock(blk);
         }
 
         this._checkTwoArgBlocks = [];
@@ -1087,6 +1155,7 @@ function Blocks () {
                     break;
                 }
             }
+
             myBlock.connections[0] = null;
             this.raiseStackToTop(thisBlock);
         }
@@ -1112,7 +1181,7 @@ function Blocks () {
             }
 
             // Don't connect to a collapsed block.
-            if (this.blockList[b].collapsed) {
+            if (this.blockList[b].inCollapsed) {
                 continue;
             }
 
@@ -1121,7 +1190,17 @@ function Blocks () {
                 continue;
             }
 
-            for (var i = 1; i < this.blockList[b].connections.length; i++) {
+            // Does this every happen? Or is there always a hidden
+            // block below?
+            if (this.blockList[b].isInlineCollapsible() && this.blockList[b].collapsed) {
+                // Only try docking to last connection of inline
+                // collapsed blocks.
+                var start = this.blockList[b].connections.length - 1;
+            } else {
+                var start = 1;
+            }
+
+            for (var i = start; i < this.blockList[b].connections.length; i++) {
                 // When converting from Python projects to JS format,
                 // sometimes extra null connections are added. We need
                 // to ignore them.
@@ -1466,7 +1545,7 @@ function Blocks () {
 
         // Next, recheck if the connection is inside of a
         // expandable block.
-        var blk = this._insideExpandableBlock(thisBlock);
+        var blk = this.insideExpandableBlock(thisBlock);
         var expandableLoopCounter = 0;
         while (blk != null) {
             // Extra check for malformed data.
@@ -1484,7 +1563,7 @@ function Blocks () {
                 this.clampBlocksToCheck.push([blk, 0]);
             }
 
-            blk = this._insideExpandableBlock(blk);
+            blk = this.insideExpandableBlock(blk);
         }
 
         this.adjustExpandableClampBlock();
@@ -1569,14 +1648,6 @@ function Blocks () {
 
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            /*
-            this.stage.removeChild(myBlock.container);
-            this.stage.addChild(myBlock.container);
-            if (myBlock.collapseContainer != null) {
-                this.stage.removeChild(myBlock.collapseContainer);
-                this.stage.addChild(myBlock.collapseContainer);
-            }
-            */
             if (myBlock.connections[0] == null) {
                 this._adjustTheseStacks.push(blk);
             }
@@ -1621,11 +1692,6 @@ function Blocks () {
             myBlock.container.x = Math.floor(x + 0.5);
             myBlock.container.y = Math.floor(y + 0.5);
 
-            if (myBlock.collapseContainer != null) {
-                myBlock.collapseContainer.x = Math.floor(x + 0.5) + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
-                myBlock.collapseContainer.y = Math.floor(y + 0.5) + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
-            }
-
             this.checkBounds();
         } else {
             console.log('No container yet for block ' + myBlock.name);
@@ -1642,11 +1708,6 @@ function Blocks () {
         if (myBlock.container != null) {
             myBlock.container.x += Math.floor(dx + 0.5);
             myBlock.container.y += Math.floor(dy + 0.5);
-
-            if (myBlock.collapseContainer != null) {
-                myBlock.collapseContainer.x += Math.floor(dx + 0.5);
-                myBlock.collapseContainer.y += Math.floor(dy + 0.5);
-            }
 
             this.checkBounds();
         } else {
@@ -2029,10 +2090,12 @@ function Blocks () {
         } else {
             var thisBlock = this.highlightedBlock;
         }
+
         if (thisBlock != null) {
 
             this.blockList[thisBlock].unhighlight();
         }
+
         if (this.highlightedBlock = thisBlock) {
             this.highlightedBlock = null;
         }
@@ -2334,6 +2397,12 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, arg];
+        } else if (name === 'newnote') {
+            var postProcess = function (args) {
+                var thisBlock = args[0];
+            };
+
+            postProcessArg = [thisBlock, null];
         } else {
             var postProcess = null;
         }
@@ -3040,7 +3109,33 @@ function Blocks () {
         }
     };
 
-    this._insideExpandableBlock = function (blk) {
+    this.findNestedClampBlocks = function (blk, clampList) {
+        // Returns a list of containing clamp block or []
+        if (this.blockList[blk] == null) {
+            console.log('null block in blockList? ' + blk);
+            return [];
+        } else if (this.blockList[blk].connections[0] == null) {
+            // We reached the end, so return the list.
+            return clampList;
+        } else {
+            // If we find a clamp block, add it to the list.
+            var cblk = this.blockList[blk].connections[0];
+            if (this.blockList[cblk].isClampBlock()) {
+                if (this.blockList[cblk].isDoubleClampBlock()) {
+                    // Just check them both.
+                    clampList.push([cblk, 0]);
+                    clampList.push([cblk, 1]);
+                } else {
+                    clampList.push([cblk, 0]);
+                }
+            }
+
+            // Keep looking.
+            return this.findNestedClampBlocks(cblk, clampList);
+        }
+    };
+
+    this.insideExpandableBlock = function (blk) {
         // Returns a containing expandable block or null
         if (this.blockList[blk] == null) {
             // race condition?
@@ -3055,12 +3150,12 @@ function Blocks () {
                 if (this.blockList[cblk].isArgFlowClampBlock()) {
                     return cblk;
                 } else if (blk === last(this.blockList[cblk].connections)) {
-                    return this._insideExpandableBlock(cblk);
+                    return this.insideExpandableBlock(cblk);
                 } else {
                     return cblk;
                 }
             } else {
-                return this._insideExpandableBlock(cblk);
+                return this.insideExpandableBlock(cblk);
             }
         }
     };
@@ -3103,6 +3198,43 @@ function Blocks () {
         }
 
         return false;
+    };
+
+    this.insideNoteBlock = function (blk) {
+        // Return the first containing note block, if any.
+        if (blk === null) {
+            return null;
+        }
+
+        c0 = this.blockList[blk].connections[0];
+        if (c0 === null) {
+            return null;
+        }
+
+        // If we are connected to a note block arg or child flow,
+        // return the note block. If we are connected to the flow, we
+        // are not inside, so keep looking.
+        if (this.blockList[c0].name === 'newnote' && blk !== last(this.blockList[c0].connections)) {
+            return c0;
+        }
+
+        return this.insideNoteBlock(c0);
+    };
+
+    this.findFirstPitchBlock = function (blk) {
+        // Returns first pitch block found.
+        if (blk === null) {
+            return null;
+        }
+
+        if (PITCHBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
+            return blk;
+        } else if (this.blockList[blk].name === 'rest2') {
+            return blk;
+        }
+
+        var c = last(this.blockList[blk].connections);
+        return this.findFirstPitchBlock(c);
     };
 
     this.findPitchOctave = function (blk) {
@@ -3222,7 +3354,7 @@ function Blocks () {
         // Reposition the paste location relative to the stage position.
         console.log(this.selectedBlocksObj);
         if (this.selectedBlocksObj != null) {
-            this.selectedBlocksObj[0][2] = 75 - this.stage.x + this._pasteDX;
+            this.selectedBlocksObj[0][2] = 175 - this.stage.x + this._pasteDX;
             this.selectedBlocksObj[0][3] = 75 - this.stage.y + this._pasteDY;
             this._pasteDX += 21;
             this._pasteDY += 21;
@@ -3484,7 +3616,7 @@ function Blocks () {
                 break;
             }
 
-            if (COLLAPSABLES.indexOf(name) !== -1) {
+            if (COLLAPSIBLES.indexOf(name) !== -1) {
                 if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
                     if (blkData[1][1]['collapsed']) {
                         this.blocksToCollapse.push(this.blockList.length + b);
@@ -3685,7 +3817,7 @@ function Blocks () {
                         extraBlocksLength += 2;
                     }
 
-                    // (3) create a newnote block instead.
+                    // (3) create a "newnote" block instead.
                     if (typeof(blockObjs[b][1]) === 'object') {
                         blockObjs[b][1][0] = 'new' + name;
                     } else {
@@ -3747,7 +3879,7 @@ function Blocks () {
                     var blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) !== -1) {
                     var blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (COLLAPSABLES.indexOf(blkData[1][0]) !== -1) {
+                    if (COLLAPSIBLES.indexOf(blkData[1][0]) !== -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -3755,7 +3887,7 @@ function Blocks () {
                 }
             } else {
                 var blkInfo = [blkData[1], {'value': null}];
-                if (COLLAPSABLES.indexOf(blkData[1]) !== -1) {
+                if (COLLAPSIBLES.indexOf(blkData[1]) !== -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -3763,7 +3895,7 @@ function Blocks () {
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (COLLAPSABLES.indexOf(name) !== -1) {
+            if (COLLAPSIBLES.indexOf(name) !== -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
@@ -4313,13 +4445,6 @@ function Blocks () {
 
         this.blocksToCollapse = [];
 
-        for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].collapseContainer != null) {
-                this.blockList[blk].collapseContainer.x = Math.floor((this.blockList[blk].container.x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2)) + 0.5);
-                this.blockList[blk].collapseContainer.y = Math.floor((this.blockList[blk].container.y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2)) + 0.5);
-            }
-        }
-
         this.refreshCanvas();
 
         // Do a final check on the action and boxes palettes.
@@ -4451,9 +4576,6 @@ function Blocks () {
         var z = this.stage.children.length - 1;
         for (var b = 0; b < this.dragGroup.length; b++) {
             this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
-            if (this.blockList[this.dragGroup[b]].collapseContainer !== null) {
-                this.stage.setChildIndex(this.blockList[this.dragGroup[b]].collapseContainer, z);
-            };
 
             z -= 1;
         }
@@ -4627,6 +4749,7 @@ function Blocks () {
                     this._checkArgClampBlocks.push(blk);
                 }
             }
+
             this._cleanupStacks();
             this.refreshCanvas();
         }

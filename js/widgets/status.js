@@ -284,6 +284,7 @@ function StatusMatrix() {
                     break;
                 case 'mynotevalue':
                     var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
+		    break;
                 case 'elapsednotes2':
                     var blk = this._logo.statusFields[i][0];
                     var cblk = this._logo.blocks.blockList[blk].connections[1];

@@ -588,7 +588,7 @@ msgstr "wakichata siqinaka uñstayaña imantaña"
 #: js/activity.js:3537
 #: js/turtledefs.js:94
 #.TRANS: Expandir o colapsar los bloques colapsables
-msgid "Expand/collapse collapsable blocks"
+msgid "Expand/collapse collapsible blocks"
 msgstr "japhalla wakichata siqinaka jach’aptayaña jani uka chhaqtayaña"
 
 #: js/activity.js:3526
@@ -622,7 +622,7 @@ msgstr ""
 #: js/activity.js:3640
 #: js/turtledefs.js:99
 #.TRANS: Cargar proyecto de archivos
-msgid "Load project from files"
+msgid "Load project from file"
 msgstr "Wakichäwi taypina imata wakichatanaka qhantayaña"
 
 #: js/activity.js:3629

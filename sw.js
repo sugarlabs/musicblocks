@@ -223,7 +223,7 @@ var urlsToCache = [
 
     'js/abc.js',
     'js/activity.js',
-    'js/analytics.js',
+    'js/rubrics.js',
     'js/artwork.js',
     'js/background.js',
     'js/basicblocks.js',

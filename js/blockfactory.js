@@ -74,12 +74,17 @@ function SVG() {
         this._stroke = 'stroke_color';
         this.margins = [0, 0, 0, 0];
         this._fontSize = 10;
+        this._labelOffset = 0;
     }
 
     // Attribute methods
 
     this.setFontSize = function (fontSize) {
         this._fontSize = fontSize;
+    };
+
+    this.setLabelOffset = function (offset) {
+        this._labelOffset = offset;
     };
 
     this.setDrawInniess = function (flag) {
@@ -626,7 +631,7 @@ function SVG() {
         svg += this._style();
 
         // Add a block label
-        var tx = this._width - this._scale * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth;
+        var tx = this._width - this._scale * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth + this._labelOffset * this._scale;
         var ty = this._height / 2 + this._fontSize / (5 / this._scale);
 
         // If we have an odd number of innie slots, we need to avoid a
@@ -644,10 +649,11 @@ function SVG() {
         } else {
             var di = 0;
         }
+
         var count = 1;
         for (var i = 0; i < this._innies.length; i++) {
             if (this._innies[i]) {
-                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale));
+                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale)) +  this._scale;
                 svg += this.text(tx / this._scale, ty / this._scale, this._fontSize / 1.5, this._width, 'right', 'arg_label_' + count);
                 count += 1;
                 di += 1;
@@ -679,7 +685,7 @@ function SVG() {
         svg += this._style();
 
         // Add a block label
-        var tx = 2 * (this._innieX1 + this._innieX2) + 4 * this._strokeWidth;
+        var tx = 2 * (this._innieX1 + this._innieX2) + 4 * this._strokeWidth + this._labelOffset * this._scale;
         var ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(tx / this._scale, ty / this._scale, this._fontSize, this._width, 'left', 'block_label');
 
@@ -714,7 +720,7 @@ function SVG() {
         this.margins[3] = this._strokeWidth * this._scale;
 
         // Add a block label
-        var tx = this._width - this._scale * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth;
+        var tx = this._width - this._scale * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth + this._labelOffset * this._scale;
         var ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(tx / this._scale, ty / this._scale, this._fontSize, this._width, 'right', 'block_label');
 
@@ -788,7 +794,7 @@ function SVG() {
         this.margins[3] = this._strokeWidth * this._scale;
 
         // Add a block label
-        var tx = this._width - 2 * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth;
+        var tx = this._width - 2 * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth + this._labelOffset * this._scale;
         var ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(tx / this._scale, ty / this._scale, this._fontSize, this._width, 'right', 'block_label');
 
@@ -853,7 +859,7 @@ function SVG() {
         this.margins[2] = this._strokeWidth * this._scale;
 
         // Add a block label
-        var tx = this._width - 2 * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth;
+        var tx = this._width - 2 * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth + this._labelOffset * this._scale;
         var ty = this._height / 2 + this._fontSize / 2; // + this._radius * this._scale;
         svg += this.text(tx / this._scale, ty / this._scale, this._fontSize, this._width, 'right', 'block_label');
 
@@ -983,10 +989,11 @@ function SVG() {
 
         // Add a block label
         if (this._outie) {
-            var tx = 10 * this._strokeWidth + this._innieX1 + this._innieX2;
+            var tx = 10 * this._strokeWidth + this._innieX1 + this._innieX2 + this._labelOffset * this._scale;
         } else {
-            var tx = 8 * this._strokeWidth;
+            var tx = 8 * this._strokeWidth + this._labelOffset * this._scale;
         }
+
         if (this._cap) {
             var ty = (this._strokeWidth / 2.0 + this._radius + this._slotY) * this._scale;
         } else if (this._innies.length > 1) {
@@ -995,6 +1002,7 @@ function SVG() {
         } else {
             var ty = (this._strokeWidth / 2.0 + this._radius) * this._scale / 2;
         }
+
         ty += (this._fontSize + 1) * this._scale;
         if (this._bool) {
             ty += this._fontSize / 2;
@@ -1023,13 +1031,12 @@ function SVG() {
         var tx = this._width - this._scale * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth;
         for (var i = 0; i < this._innies.length; i++) {
             if (this._innies[i]) {
-                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale));
+                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale)) + this._scale;
                 svg += this.text(tx / this._scale, ty / this._scale, this._fontSize / 1.5, this._width, 'right', 'arg_label_' + count);
                 count += 1;
                 di += 1;
             }
         }
-
 
         svg += this._footer();
         return this._header(false) + svg;

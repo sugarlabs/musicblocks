@@ -13,7 +13,8 @@
 
 const PROTOBLOCKSCALE = 1.0;
 const PALETTELEFTMARGIN = 10;
-
+const PALETTE_SCALE_FACTOR = 0.5;
+const PALETTE_WIDTH_FACTOR = 3;
 
 function maxPaletteHeight(menuSize, scale) {
     // Palettes don't start at the top of the screen and the last
@@ -56,10 +57,11 @@ function Palettes () {
     this.refreshCanvas = null;
     this.stage = null;
     this.cellSize = null;
+    this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
     this.scrollDiff = 0;
     this.originalSize = 55;  // this is the original svg size
     this.trashcan = null;
-    this.initial_x = 55;
+    this.initial_x = 55 * PALETTE_WIDTH_FACTOR;
     this.initial_y = 55;
     this.firstTime = true;
     this.background = null;
@@ -68,7 +70,8 @@ function Palettes () {
     this.downIndicator = null;
     this.downIndicatorStatus = true;
     this.circles = {};
-    this.palette_text = new createjs.Text('', '20px Arial', '#ff7700');
+    // paletteText is used for the highlighted tooltip
+    this.paletteText = new createjs.Text('', '20px Arial', '#ff7700');
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
@@ -81,6 +84,8 @@ function Palettes () {
     this.x = null;
     this.y = null;
     this.container = null;
+    this.showSearchWidget = null;
+    this.hideSearchWidget = null;
 
     this.pluginMacros = {};  // some macros are defined in plugins
 
@@ -93,11 +98,12 @@ function Palettes () {
     // The collection of palettes.
     this.dict = {};
     this.buttons = {};  // The toolbar button for each palette.
+    this.labels = {};  // The label for each button.
 
     this.init = function () {
         this.halfCellSize = Math.floor(this.cellSize / 2);
         this.x = 0;
-        this.y = this.cellSize;
+        this.y = this.cellSize / PALETTE_SCALE_FACTOR;
 
         this.container = new createjs.Container();
         this.container.snapToPixelEnabled = true;
@@ -125,7 +131,7 @@ function Palettes () {
     };
 
     this.setSize = function (size) {
-        this.cellSize = size;
+        this.cellSize = Math.floor((size * PALETTE_SCALE_FACTOR) + 0.5);
         return this;
     };
 
@@ -161,6 +167,16 @@ function Palettes () {
         return this;
     };
 
+    this.setSearch = function (show, hide) {
+        this.showSearchWidget = show;
+        this.hideSearchWidget = hide;
+        return this;
+    }
+
+    this.getSearchPos = function () {
+        return [50 * PALETTE_SCALE_FACTOR, 55];
+    };
+
     this.getPluginMacroExpansion = function (blkname, x, y) {
         console.log(this.pluginMacros[blkname]);
         var obj = this.pluginMacros[blkname];
@@ -175,7 +191,8 @@ function Palettes () {
     this.menuScrollEvent = function (direction, scrollSpeed) {
         var keys = Object.keys(this.buttons);
         var diff = direction * scrollSpeed;
-        if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
+        // if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
+        if (this.buttons[keys[0]].y + diff > 55 && direction > 0) {
             this.upIndicator.visible = false;
             this.upIndicatorStatus = this.upIndicator.visible;
             this.refreshCanvas();
@@ -185,7 +202,8 @@ function Palettes () {
             this.upIndicator.visible = true;
         }
 
-        if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
+        // if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
+        if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - 55 && direction < 0) {
             this.downIndicator.visible = false;
             this.downIndicatorStatus = this.downIndicator.visible;
             this.refreshCanvas();
@@ -200,6 +218,8 @@ function Palettes () {
         for (var name in this.buttons) {
             this.buttons[name].y += diff;
             this.buttons[name].visible = true;
+            this.labels[name].y += diff;
+            this.labels[name].visible = true;
         }
 
         this._updateButtonMasks();
@@ -217,9 +237,9 @@ function Palettes () {
     };
 
     this.hidePaletteIconCircles = function () {
-        // palette_text might not be defined yet.
+        // paletteText might not be defined yet.
         if (!sugarizerCompatibility.isInsideSugarizer()) {
-            hidePaletteNameDisplay(this.palette_text, this.stage);
+            hidePaletteNameDisplay(this.paletteText, this.stage);
         }
 
         hideButtonHighlight(this.circles, this.stage);
@@ -239,8 +259,8 @@ function Palettes () {
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            shape.graphics.f('#a2c5d8').r(0, 0, 55, windowHeight()).ef();
-            shape.width = 55;
+            shape.graphics.f('#a2c5d8').r(0, 0, this.paletteWidth, windowHeight()).ef();
+            shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
             this.background = shape;
@@ -249,7 +269,7 @@ function Palettes () {
         function __processUpIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
-            bitmap.x = 55;
+            bitmap.x = 55 * PALETTE_WIDTH_FACTOR - 55 * bitmap.scale;
             bitmap.y = 55;
             bitmap.visible = false;
             palettes.upIndicator = bitmap;
@@ -263,7 +283,7 @@ function Palettes () {
         function __processDownIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
-            bitmap.x = 55;
+            bitmap.x = 55 * PALETTE_WIDTH_FACTOR - 55 * bitmap.scale;
             bitmap.y = (windowHeight() / palettes.scale) - 27;
 
             bitmap.visible = true;
@@ -297,15 +317,21 @@ function Palettes () {
             }
 
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(-that.halfCellSize, -that.halfCellSize, that.cellSize, that.cellSize);
-            hitArea.x = that.halfCellSize;
-            hitArea.y = that.halfCellSize;
+            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, that.cellSize * PALETTE_WIDTH_FACTOR, that.cellSize);
             that.buttons[name].hitArea = hitArea;
             that.buttons[name].visible = false;
 
             that.dict[name].makeMenu(true);
             that.dict[name]._moveMenu(that.cellSize, that.cellSize);
             that.dict[name]._updateMenu(false);
+
+            /*add tooltip for palette buttons*/
+            that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Arial', '#808080');
+            var r = that.cellSize / 2;
+            that.labels[name].x = that.buttons[name].x + 2.2 * r;
+            that.labels[name].y = that.buttons[name].y + r / 2;
+            that.stage.addChild(that.labels[name]);
+
             that._loadPaletteButtonHandler(name);
         };
 
@@ -330,6 +356,22 @@ function Palettes () {
             return;
         }
 
+        if (name=='search' && this.showSearchWidget !== null) {
+            for (var i in this.dict) {
+                if (this.dict[i].visible) {
+                    this.dict[i].hideMenu();
+                    this.dict[i]._hideMenuItems();
+                }
+            }
+
+            console.log('searching');
+            this.dict[name].visible = true;
+            this.showSearchWidget(true);
+            return;
+        }
+
+        this.hideSearchWidget(true);
+
         for (var i in this.dict) {
             if (this.dict[i] === this.dict[name]) {
                 this.dict[name]._resetLayout();
@@ -352,6 +394,9 @@ function Palettes () {
 
         for (var name in this.buttons) {
             this.buttons[name].visible = true;
+            if (name in this.labels) {
+                this.labels[name].visible = true;
+            }
         }
 
         if (this.background != null) {
@@ -374,11 +419,15 @@ function Palettes () {
         // Hide the menu buttons and the palettes themselves.
         for (var name in this.buttons) {
             this.buttons[name].visible = false;
+            this.labels[name].visible = false;
         }
 
         for (var name in this.dict) {
             this.dict[name].hideMenu();
         }
+
+
+        this.hideSearchWidget(true);
 
         if (this.upIndicator != null) {
             this.upIndicator.visible = false;
@@ -459,11 +508,13 @@ function Palettes () {
         }
 
         this.buttons[name].removeAllChildren();
+        this.labels[name].removeAllChildren();
         var btnKeys = Object.keys(this.dict);
         for (var btnKey = btnKeys.indexOf(name) + 1; btnKey < btnKeys.length; btnKey++) {
             this.buttons[btnKeys[btnKey]].y -= this.cellSize;
         }
         delete this.buttons[name];
+        delete this.labels[name];
         delete this.dict[name];
         this.y -= this.cellSize;
         this.makePalettes(true);
@@ -532,17 +583,17 @@ function Palettes () {
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
             /*add tooltip for palette buttons*/
-            that.palette_text = new createjs.Text(_(name), '20px Arial', 'black');
-            that.palette_text.x = that.buttons[name].x + 2.2 * r;
-            that.palette_text.y = that.buttons[name].y + 5 * r / 8;
-            that.stage.addChild(that.palette_text);
+            that.paletteText = new createjs.Text(toTitleCase(_(name)), '16px Arial', 'black');
+            that.paletteText.x = that.buttons[name].x + 2.2 * r;
+            that.paletteText.y = that.buttons[name].y + r / 2;
+            that.stage.addChild(that.paletteText);
         });
 
         this.buttons[name].on('pressup', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
             if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.palette_text, that.stage);
+                hidePaletteNameDisplay(that.paletteText, that.stage);
             }
 
             hideButtonHighlight(that.circles, that.stage);
@@ -552,7 +603,7 @@ function Palettes () {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
             if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.palette_text, that.stage);
+                hidePaletteNameDisplay(that.paletteText, that.stage);
             }
 
             hideButtonHighlight(that.circles, that.stage);
@@ -1012,21 +1063,24 @@ function Palette(palettes, name) {
         var that = this;
 
         function __processButtonIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.8;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.6;
             that.menuContainer.addChild(bitmap);
             that.palettes.container.addChild(that.menuContainer);
         };
 
         function __processCloseIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.5;
             that.menuContainer.addChild(bitmap);
-            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT;
+            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT * 2 / 3;
             bitmap.y = 0;
 
+            // Define the hit area for the entire header area; the
+            // left half is for draggging, the right half is for the
+            // close button.
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(-paletteWidth / 2, -STANDARDBLOCKHEIGHT / 2, paletteWidth, STANDARDBLOCKHEIGHT);
-            hitArea.x = paletteWidth / 2;
-            hitArea.y = STANDARDBLOCKHEIGHT / 2;
+	    hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth, STANDARDBLOCKHEIGHT / 2);
+            hitArea.x = 0;
+            hitArea.y = 0;
             that.menuContainer.hitArea = hitArea;
             that.menuContainer.visible = false;
 
@@ -1190,7 +1244,7 @@ function Palette(palettes, name) {
         this.background.addChild(shape);
 
         this.background.x = this.menuContainer.x;
-        this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
+        this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT / 2;
     };
 
     this._resetLayout = function () {
@@ -1204,7 +1258,7 @@ function Palette(palettes, name) {
             this.protoContainers[i].y -= this.scrollDiff;
         }
 
-        this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
+        this.y = this.menuContainer.y + 40;  // STANDARDBLOCKHEIGHT / 2;
         var items = [];
         var heights = [];
         // Reverse order
@@ -1284,7 +1338,7 @@ function Palette(palettes, name) {
                     }
                     that.protoContainers[modname].addChild(bitmap);
                     bitmap.x = Math.floor((MEDIASAFEAREA[0] * (b.scale / 2)) + 0.5);
-		    
+                    
                     bitmap.y = Math.floor((MEDIASAFEAREA[1] * (b.scale / 2)) + 0.5);
                     __calculateBounds(palette, blk, modname, protoListBlk);
                 };
@@ -1356,7 +1410,10 @@ function Palette(palettes, name) {
 
     this._moveMenu = function (x, y) {
         // :sigh: race condition on iOS 7.1.2
-        if (this.menuContainer == null) return;
+        if (this.menuContainer === null) {
+	    return;
+	}
+
         var dx = x - this.menuContainer.x;
         var dy = y - this.menuContainer.y;
         this.menuContainer.x = x;
@@ -1391,6 +1448,10 @@ function Palette(palettes, name) {
     };
 
     this.hideMenu = function () {
+        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+            this.palettes.hideSearchWidget(true);
+        }
+
         this.palettes.paletteVisible = false;
         if (this.menuContainer != null) {
             this.menuContainer.visible = false;
@@ -1418,6 +1479,10 @@ function Palette(palettes, name) {
     };
 
     this._hideMenuItems = function () {
+        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+            this.palettes.hideSearchWidget(true);
+        }
+
         for (var i in this.protoContainers) {
             this.protoContainers[i].visible = false;
         }
@@ -2061,7 +2126,7 @@ function Palette(palettes, name) {
             // Move the drag group under the cursor.
             that.palettes.blocks.findDragGroup(newBlock);
             for (var i in that.palettes.blocks.dragGroup) {
-                that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - that.palettes.blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - that.palettes.blocks.stage.y);
+		that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - that.palettes.blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - that.palettes.blocks.stage.y);
             }
             // Dock with other blocks if needed
             that.palettes.blocks.blockMoved(newBlock);
@@ -2075,7 +2140,7 @@ function Palette(palettes, name) {
             var macroExpansion = null;
             if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1) {
                 var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
-                if (macroExpansion == null) {
+                if (macroExpansion === null) {
                     // Maybe it is a plugin macro?
                     if (blkname in this.palettes.pluginMacros) {
                         var macroExpansion = this.palettes.getPluginMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);

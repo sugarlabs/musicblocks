@@ -18,9 +18,9 @@ const TITLESTRING = _('Music Blocks is a collection of tools for exploring music
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-BUILTINPALETTES = ['rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
+BUILTINPALETTES = ['search', 'rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
 
-const BUILTINPALETTESFORL23N = [_('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('mice'), _('extras')];
+const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('mice'), _('extras')];
 
 
 function getMainToolbarButtonNames(name) {
@@ -44,7 +44,7 @@ function beginnerBlock(name) {
             'playdrum', 'setdrum', // drum palette
             'if', 'ifthenelse', 'repeat', 'forever', // flow palette
             'action', 'start', 'dispatch', 'listen', // action palette
-            'storein', 'storein2', 'namedbox', 'box', 'increment', 'incrementOne',  // boxes palette
+            'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne',  // boxes palette
             'status', 'matrix', 'rhythmruler2', 'tempo', 'modewidget', 'rhythm2', 'stuplet', // widgets palette
             'forward', 'left', 'right', 'setxy', 'setheading', 'arc', 'clear', 'x', 'y', 'heading', // mouse palette
             'setcolor', 'setshade', 'setpensize', 'penup', 'pendown', 'fill', 'background', 'color', 'shade', 'pensize', // pen palette
@@ -57,6 +57,7 @@ function beginnerBlock(name) {
             'print', 'hspace', 'vspace' // extras palette
            ].indexOf(name) !== -1
 };
+
 
 function createDefaultStack() {
     DATAOBJS =

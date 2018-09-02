@@ -1385,6 +1385,7 @@ function Logo () {
     this._blockSetter = function (blk, value, turtle) {
         var turtleObj = this.turtles.turtleList[turtle];
 
+        console.log(this.blocks.blockList[blk].name);
         switch (this.blocks.blockList[blk].name) {
         case 'x':
             turtleObj.doSetXY(value, turtleObj.y);
@@ -1912,9 +1913,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                var arg = 1;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             childFlow = args[1];
@@ -2074,9 +2075,22 @@ function Logo () {
             // If the 2nd arg is not set, default to 1.
             if (args.length === 2) {
                 var i = args[1];
+            } else {
+                var i = 1;
             }
 
-            if (args.length >= 1) {
+            if (args.length > 0) {
+                var cblk = that.blocks.blockList[blk].connections[1];
+                if (that.blocks.blockList[cblk].name === 'text') {
+                    // Work-around to #1302
+                    // Look for a namedbox with this text value.
+                    var name = this.blocks.blockList[cblk].value;
+                    if (name in this.boxes) {
+                        this.boxes[name] = this.boxes[name] + i;
+                        break;
+                    }
+                }
+
                 var settingBlk = that.blocks.blockList[blk].connections[1];
                 that._blockSetter(settingBlk, args[0] + i, turtle);
             }
@@ -2642,11 +2656,11 @@ function Logo () {
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
             } else {
-                args[0] %= 101;
-                var alpha = 1.0 - (args[0] / 100);
+                var arg = args[0] % 101;
+                var alpha = 1.0 - (arg / 100);
                 that.turtles.turtleList[turtle].doSetPenAlpha(alpha);
                 if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'settranslucency', args[0]]);
+                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'settranslucency', arg]);
                 }
             }
             break;
@@ -3084,9 +3098,9 @@ function Logo () {
 
             if (args[0] === null ||  typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                var arg = 1;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (arg < 0) {
@@ -3115,9 +3129,9 @@ function Logo () {
 
             if (args[0] === null ||  typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 10;
+                var arg = 10;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (arg < 0) {
@@ -3148,16 +3162,16 @@ function Logo () {
 
             if (args[0] === null ||  typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 10;
+                var arg0 = 10;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null ||  typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 6;
+                var arg1 = 6;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             synthVibratoRate = arg0;
@@ -3472,29 +3486,29 @@ function Logo () {
             break;
         // Deprecated
         case 'setmasterbpm':
-          if (args.length === 1 && typeof(args[0] === 'number')) {
-              if (args[0] < 30) {
-                  that.errorMsg(_('Beats per minute must be > 30.'))
-                  that._masterBPM = 30;
-              } else if (args[0] > 1000) {
-                  that.errorMsg(_('Maximum beats per minute is 1000.'))
-                  that._masterBPM = 1000;
-              } else {
-                  that._masterBPM = args[0];
-              }
+            if (args.length === 1 && typeof(args[0]) === 'number') {
+                if (args[0] < 30) {
+                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    that._masterBPM = 30;
+                } else if (args[0] > 1000) {
+                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    that._masterBPM = 1000;
+                } else {
+                    that._masterBPM = args[0];
+                }
 
-              that.defaultBPMFactor = TONEBPM / that._masterBPM;
-          }
+                that.defaultBPMFactor = TONEBPM / that._masterBPM;
+            }
 
-          if (that.inTempo) {
-              that.tempo.BPMBlocks.push(blk);
-              var bpmnumberblock = that.blocks.blockList[blk].connections[1]
-              that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
-          }
-          break;
-        // Deprecated
+            if (that.inTempo) {
+                that.tempo.BPMBlocks.push(blk);
+                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
+            }
+            break;
+            // Deprecated
         case 'setbpm':
-            if (args.length === 2 && typeof(args[0] === 'number')) {
+            if (args.length === 2 && typeof(args[0]) === 'number') {
                 if (args[0] < 30) {
                     that.errorMsg(_('Beats per minute must be > 30.'))
                     var bpm = 30;
@@ -3521,7 +3535,7 @@ function Logo () {
             }
             break;
         case 'setmasterbpm2':
-            if (args.length === 2 && typeof(args[0] === 'number') && typeof(args[1] === 'number')) {
+            if (args.length === 2 && typeof(args[0]) === 'number' && typeof(args[1]) === 'number') {
                 var bpm  = args[0] * args[1] / 0.25
                 if (bpm < 30) {
                     that.errorMsg(_('Beats per minute must be > 30.'))
@@ -3544,7 +3558,7 @@ function Logo () {
             }
             break;
         case 'setbpm2':
-            if (args.length === 3 && typeof(args[0] === 'number' && typeof(args[1] == 'number'))) {
+            if (args.length === 3 && typeof(args[0]) === 'number' && typeof(args[1]) == 'number') {
                 var bpm  = args[0] * args[1] / 0.25
                 if (args[0] < 30) {
                     that.errorMsg(_('Beats per minute must be > 30.'))
@@ -3655,7 +3669,7 @@ function Logo () {
             break;
         case 'envelope':
             var synth_source = "sine";
-            if (args.length === 4 && typeof(args[0] === 'number')) {
+            if (args.length === 4 && typeof(args[0]) === 'number') {
                 if (args[0] < 0 || args[0] > 100) {
                     that.errorMsg(_('Attack value should be from 0 to 100.'));
                 }
@@ -3700,7 +3714,7 @@ function Logo () {
             var freq ;
             var rollOff ;
 
-            if (args.length === 3 && typeof(args[1] === 'number')) {
+            if (args.length === 3 && typeof(args[1]) === 'number') {
                 for (var ftype in FILTERTYPES) {
                     if (FILTERTYPES[ftype][0] === args[0]) {
                         filtertype = FILTERTYPES[ftype][1];
@@ -3733,9 +3747,9 @@ function Logo () {
             break;
         case 'oscillator':
             var oscillatorType = DEFAULTOSCILLATORTYPE;
-            var partials ;
+            var partials = 0;
 
-            if (args.length === 2 && typeof(args[1] === 'number')) {
+            if (args.length === 2 && typeof(args[1]) === 'number') {
                 for (var otype in OSCTYPES) {
                     if (OSCTYPES[otype][0] === args[0]) {
                         oscillatorType = OSCTYPES[otype][1];
@@ -3768,23 +3782,23 @@ function Logo () {
 
             if (args[0] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'sol';
+                var arg0 = 'sol';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 4;
+                var arg1 = 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             if (args[2] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg2 = 'even';
+                var arg2 = 'even';
             } else {
-                arg2 = args[2];
+                var arg2 = args[2];
             }
 
             if (typeof(arg2) === 'number') {
@@ -4038,9 +4052,9 @@ function Logo () {
         case 'playdrum':
             if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 'kick';
+                var arg = 'kick';
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             var drumname = 'kick';
@@ -4098,16 +4112,16 @@ function Logo () {
             console.log(args[0] + ' ' + args[1]);
             if (args[0] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'C';
+                var arg0 = 'C';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 4;
+                var arg1 = 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             var octave = Math.floor(calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], arg0));
@@ -4116,12 +4130,13 @@ function Logo () {
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
+            console.log(that.blocks.blockList[blk].name + ' ' + args[0]);
             if (that.blocks.blockList[blk].name === 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg0 = 7;
+                    var arg0 = 7;
                 } else {
-                    arg0 = args[0];
+                    var arg0 = args[0];
                 }
 
                 if (typeof(arg0) !== 'number') {
@@ -4145,16 +4160,16 @@ function Logo () {
             } else {
                 if (args[0] === null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg0 = 'sol';
+                    var arg0 = 'sol';
                 } else {
-                    arg0 = args[0];
+                    var arg0 = args[0];
                 }
 
                 if (args[1] === null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg1 = 4;
+                    var arg1 = 4;
                 } else {
-                    arg1 = args[1];
+                    var arg1 = args[1];
                 }
 
                 if (typeof(arg0) === 'number' && that.blocks.blockList[blk].name === 'pitch') {
@@ -4504,16 +4519,16 @@ function Logo () {
         case 'rhythm':
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
+                var arg0 = 3;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number' || args[1] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 4;
+                var arg1 = 1 / 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             if (that.blocks.blockList[blk].name === 'rhythm2') {
@@ -4629,10 +4644,9 @@ function Logo () {
         case 'pickup':
             if (args.length !== 1 || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 0;
                 break;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (arg0 < 0) {
@@ -4736,16 +4750,16 @@ function Logo () {
         case 'meter':
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 4;
+                var arg0 = 4;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 4;
+                var arg1 = 1 / 4;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             if (arg0 <= 0) {
@@ -4776,9 +4790,9 @@ function Logo () {
             // accuracy.
 
             if (args[1] === undefined) {
-		// Should never happen, but if it does, nothing to do.
-		break;
-	    }
+                // Should never happen, but if it does, nothing to do.
+                break;
+            }
 
             // Use the outer most note when nesting to determine the beat.
             if (that.inNoteBlock[turtle].length === 0) {
@@ -4853,9 +4867,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk)
-                arg = 1 / 4;
+                var arg = 1 / 4;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             // Ensure that note duration is positive.
@@ -5446,9 +5460,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                var arg = 1;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (args > 0) {
@@ -5516,9 +5530,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 32;
+                var arg = 1 / 32;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (that.blocks.blockList[blk].name === 'newstaccato') {
@@ -5548,9 +5562,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 16;
+                var arg = 1 / 16;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (that.blocks.blockList[blk].name === 'slur') {
@@ -5590,9 +5604,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 16;
+                var arg = 1 / 16;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             that.glide[turtle].push(arg);
@@ -5734,16 +5748,16 @@ function Logo () {
 
                 if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg0 = 1 / 24;
+                    var arg0 = 1 / 24;
                 } else {
-                    arg0 = args[0];
+                    var arg0 = args[0];
                 }
 
                 if (args[1] === null || typeof(args[1]) !== 'number' || args[1] <= 0) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
-                    arg1 = 1 / 8;
+                    var arg1 = 1 / 8;
                 } else {
-                    arg1 = args[1];
+                    var arg1 = args[1];
                 }
 
                 if (that.suppressOutput[turtle]) {
@@ -5790,9 +5804,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 2;
+                var arg0 = 2;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             var factor = Math.floor(arg0);
@@ -6117,9 +6131,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0] !== 'string')) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 'sharp';
+                var arg = 'sharp';
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             var i = ACCIDENTALNAMES.indexOf(arg);
@@ -6169,9 +6183,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0] !== 'number')) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 0;
+                var arg = 0;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             for (var synth in that.synthVolume[turtle]) {
@@ -6228,13 +6242,25 @@ function Logo () {
                 if (typeof(args[0]) !== 'number') {
                     that.errorMsg(NANERRORMSG, blk);
                 } else {
-                    that.masterVolume.push(args[0]);
+                    if (args[0] < 0) {
+                        var arg = 0;
+                    } else if (args[0] > 100) {
+                        var arg = 100;
+                    } else {
+                        var arg = args[0];
+                    }
+
+                    if (arg === 0) {
+                        that.errorMsg(_('Setting volume to 0.'), blk);
+                    }
+
+                    that.masterVolume.push(arg);
                     if (!this.suppressOutput[turtle]) {
-                        that._setMasterVolume(args[0]);
+                        that._setMasterVolume(arg);
                     }
 
                     if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setvolume', args[0]]);
+                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setvolume', arg]);
                     }
                 }
             }
@@ -6257,11 +6283,21 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0] !== 'number')) {
+            if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 50;
+                var arg = 50;
             } else {
-                arg = args[0];
+                if (args[0] < 0) {
+                    var arg = 0;
+                } else if (args[0] > 100) {
+                    var arg = 100;
+                } else {
+                    var arg = args[0];
+                }
+
+                if (arg === 0) {
+                    that.errorMsg(_('Setting volume to 0.'), blk);
+                }
             }
 
             that.masterVolume.push(arg);
@@ -6290,18 +6326,28 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'setsynthvolume':
-            if (args[0] === null || typeof(args[0] !== 'string')) {
+            if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'default';
+                var arg0 = 'default';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
-            if (args[1] === null || typeof(args[1] !== 'number')) {
+            if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 50;
+                var arg1 = 50;
             } else {
-                arg1 = args[1];
+                if (args[1] < 0) {
+                    var arg1 = 0;
+                } else if (args[1] > 100) {
+                    var arg1 = 100;
+                } else {
+                    var arg1 = args[1];
+                }
+
+                if (arg1 === 0) {
+                    that.errorMsg(_('Setting volume to 0.'), blk);
+                }
             }
 
             var synth = null;
@@ -6367,18 +6413,28 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0] !== 'string')) {
+            if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 'default';
+                var arg0 = 'default';
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
-            if (args[1] === null || typeof(args[1] !== 'number')) {
+            if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 50;
+                var arg1 = 50;
             } else {
-                arg1 = args[1];
+                if (args[1] < 0) {
+                    var arg1 = 0;
+                } else if (args[1] > 100) {
+                    var arg1 = 100;
+                } else {
+                    var arg1 = args[1];
+                }
+
+                if (arg1 === 0) {
+                    that.errorMsg(_('Setting volume to 0.'), blk);
+                }
             }
 
             var synth = null;
@@ -6479,9 +6535,9 @@ function Logo () {
         case 'hertz':
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 392;
+                var arg = 392;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             var obj = frequencyToPitch(arg);
@@ -6629,16 +6685,16 @@ function Logo () {
         case 'stuplet':
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
+                var arg0 = 3;
             } else {
-                arg0 = args[0];
+                var arg0 = args[0];
             }
 
             if (args[1] === null || typeof(args[1]) !== 'number' || args[1] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 2;
+                var arg1 = 1 / 2;
             } else {
-                arg1 = args[1];
+                var arg1 = args[1];
             }
 
             var noteBeatValue = (1 / arg1) * that.beatFactor[turtle];
@@ -6743,9 +6799,9 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1 / 2;
+                var arg = 1 / 2;
             } else {
-                arg = args[0];
+                var arg = args[0];
             }
 
             if (!that.inMatrix) {
@@ -10133,16 +10189,20 @@ function Logo () {
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'mynotevalue']);
                 } else {
-                    var value = null;
-                    if (that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== null) {
-                        value = 1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])];
+                    var value = 0;
+                    if (that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== null && that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== undefined) {
+                        if (that.noteValue[turtle][last(that.inNoteBlock[turtle])] !== 0) {
+                            value = 1 / that.noteValue[turtle][last(that.inNoteBlock[turtle])];
+                        } else {
+                            value = 0;
+                        }
                     } else if (that.lastNotePlayed[turtle] !== null) {
                         value = that.lastNotePlayed[turtle][1];
-                    } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
+                    } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])] !== undefined && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         value = that.noteBeat[turtle][last(that.inNoteBlock[turtle])];
                     } else {
                         console.log('Cannot find a note for turtle ' + turtle);
-                        value = -1;
+                        value = 0;
                     }
 
                     if (value !== 0) {
@@ -10921,6 +10981,13 @@ function Logo () {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
+        }
+
+        // Check to see if min is > max.
+        if (a > b) {
+            var c = a;
+            a = b;
+            b = c;
         }
 
         return Math.floor(Math.random() * (Number(b) - Number(a) + 1) + Number(a));
