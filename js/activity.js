@@ -101,6 +101,7 @@ var MYDEFINES = [
     'utils/utils',
     'activity/artwork',
     'widgets/status',
+    'widgets/help',
     'utils/munsell',
     'activity/trash',
     'activity/boundary',
@@ -2745,7 +2746,10 @@ define(MYDEFINES, function (compatibility) {
             update = true;
 
             // Setup help now that we have calculated turtleBlocksScale.
-            _showHelp(true);
+	    if (storage.doneTour) {
+	    } else {
+		_showHelp();
+	    }
 
             // Hide palette icons on mobile
             if (mobileSize) {
@@ -3888,148 +3892,9 @@ handleComplete);
             p.popdown();
         };
 
-        function _showHelp(firstTime) {
-            helpIdx = 0;
-
-            var __setHelpHTML = function (helpIdx, imageScale) {
-                if (HELPCONTENT[helpIdx].length > 4) {
-                    try {
-                        var helpLang = localStorage.languagePreference;
-                    } catch (e) {
-                        var helpLang = 'en';
-                    }
-
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        switch (helpLang) {
-                        case 'ja':
-                            docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p><p><a href="' + HELPCONTENT[helpIdx][3] + '-ja" target="_blank">' + HELPCONTENT[helpIdx][4] + '</a></p>';
-                            break;
-                        default:
-                            docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p><p><a href="' + HELPCONTENT[helpIdx][3] + '" target="_blank">' + HELPCONTENT[helpIdx][4] + '</a></p>';
-                            break;
-                        }
-                    } else {
-                        docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p><p><a href="' + HELPCONTENT[helpIdx][3] + '" target="_blank">' + HELPCONTENT[helpIdx][4] + '</a></p>';
-                    }
-                } else {
-
-                    docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
-                }
-            };
-
-            if (firstTime) {
-                if (helpContainer == null) {
-                    helpContainer = new createjs.Container();
-                    stage.addChild(helpContainer);
-                    helpContainer.x = 65;
-                    helpContainer.y = 65;
-
-                    helpContainer.on('click', function (event) {
-                        var bounds = helpContainer.getBounds();
-                        if (event.stageY < helpContainer.y + bounds.height / 2) {
-                            helpContainer.visible = false;
-                            docById('helpElem').style.visibility = 'hidden';
-                        } else {
-                            if (event.stageX < helpContainer.x + bounds.width / 2) {
-                                if (helpIdx === 0) {
-                                    helpIdx = 0;
-                                } else {
-                                    helpIdx -= 1;
-                                }
-                            } else {
-                                helpIdx += 1;
-                                if (helpIdx >= HELPCONTENT.length) {
-                                    helpIdx = 0;
-                                }
-                            }
-
-                            var imageScale = 55 * turtleBlocksScale;
-                            __setHelpHTML(helpIdx, imageScale);
-                        }
-
-                        update = true;
-                    });
-
-                    var img = new Image();
-                    img.onload = function () {
-                        console.log(turtleBlocksScale);
-                        var bitmap = new createjs.Bitmap(img);
-                        if (helpContainer.children.length > 0) {
-                            console.log('delete old help container');
-                            helpContainer.removeChild(helpContainer.children[0]);
-                        }
-
-                        helpContainer.addChild(bitmap)
-
-                        var bounds = helpContainer.getBounds();
-                        var hitArea = new createjs.Shape();
-                        hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-                        hitArea.x = 0;
-                        hitArea.y = 0;
-                        helpContainer.hitArea = hitArea;
-
-                        var imageScale = 55 * turtleBlocksScale;
-                        __setHelpHTML(helpIdx, imageScale);
-
-                        if (!doneTour) {
-                            docById('helpElem').style.visibility = 'visible';
-                        }
-
-                        update = true;
-                    };
-
-                    img.src = 'images/help-container.svg';
-                }
-
-                var helpElem = docById('helpElem');
-                helpElem.style.position = 'absolute';
-                helpElem.style.display = 'block';
-                helpElem.style.paddingLeft = 20 * turtleBlocksScale + 'px';
-                helpElem.style.paddingRight = 20 * turtleBlocksScale + 'px';
-                helpElem.style.paddingTop = '0px';
-                helpElem.style.paddingBottom = 20 * turtleBlocksScale + 'px';
-                helpElem.style.fontSize = 20 + 'px'; //  * turtleBlocksScale + 'px';
-                helpElem.style.color = '#000000';  // '#ffffff';
-                helpElem.style.left = 65 * turtleBlocksScale + 'px';
-                helpElem.style.top = 105 * turtleBlocksScale + 'px';
-                var w = Math.min(300, 300); //  * turtleBlocksScale);
-                var h = Math.min(300, 300); //  * turtleBlocksScale);
-                helpElem.style.width = w + 'px';
-                helpElem.style.height = h + 'px';
-
-                if (turtleBlocksScale > 1) {
-                    var bitmap = helpContainer.children[0];
-                    if (bitmap != undefined) {
-                        // bitmap.scaleX = bitmap.scaleY = bitmap.scale = turtleBlocksScale;
-                    }
-                }
-            }
-
-            doneTour = storage.doneTour === 'true';
-
-            if (firstTime && doneTour) {
-                docById('helpElem').style.visibility = 'hidden';
-                helpContainer.visible = false;
-            } else {
-                if (sugarizerCompatibility.isInsideSugarizer()) {
-                    sugarizerCompatibility.data.doneTour = 'true';
-                } else {
-                    storage.doneTour = 'true';
-                }
-
-                var imageScale = 55 * turtleBlocksScale;
-                __setHelpHTML(helpIdx, imageScale);
-                docById('helpElem').style.visibility = 'visible';
-                helpContainer.visible = true;
-                update = true;
-
-                // Make sure the palettes and the secondary menus are
-                // visible while help is shown.
-                palettes.show();
-                if (!menuButtonsVisible) {
-                    doMenuAnimation(1);
-                }
-            }
+        function _showHelp() {
+            var helpWidget = new HelpWidget();
+            helpWidget.init(null);
         };
 
         function _doMenuButton() {
@@ -4608,6 +4473,9 @@ handleComplete);
             if (activeBlock === null) {
                 return;
             }
+
+            // var helpWidget = new HelpWidget();
+            // helpWidget.init(blocks);
 
             // piemenu version of ruler
 

@@ -641,6 +641,30 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
+#helpDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    width: 300px;
+    height: 400px;
+    background: rgba(196, 196, 196, 1.0) !important;
+    -webkit-user-select: none;
+}
+
+#helpButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+}
+
+#helpBodyDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+}
+
 #pscDiv {
     position: absolute;
     top: 20%;

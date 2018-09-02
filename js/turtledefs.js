@@ -139,7 +139,7 @@ function createHelpContent() {
         [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugins-button.svg'],
         [_('Delete plugin'), _('Delete a selected plugin.'), 'header-icons/plugins-delete-button.svg'],
         [_('Select language'), _('Select your language preference.'), 'header-icons/language-button.svg'],
-        [_('New Project'), _('Initialise a new project.'), 'header-icons/new-project-button.svg'],
+        [_('New Project'), _('Initialise a new project.'), 'header-icons/new-button.svg'],
         [_('Restore'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
         [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
         [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
