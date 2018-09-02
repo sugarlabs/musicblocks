@@ -255,7 +255,7 @@ define(MYDEFINES, function (compatibility) {
             event.preventDefault();
             event.stopPropagation();
 
-            blocks.rightClick = true;
+            blocks.stageClick = true;
 
             if (blocks.activeBlock === null) {
                 // Stage context menu
@@ -1957,6 +1957,11 @@ define(MYDEFINES, function (compatibility) {
 
         function _setupBlocksContainerEvents() {
             var moving = false;
+            var lastCoords = {
+                x: 0,
+                y: 0,
+                delta: 0
+            };
 
             var __wheelHandler = function (event) {
                 // vertical scroll
@@ -1994,32 +1999,33 @@ define(MYDEFINES, function (compatibility) {
 
             docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
 
+            var __stageMouseUpHandler = function (event) {
+                stageMouseDown = false;
+                moving = false;
+
+                if (stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
+                    stageX = event.stageX;
+                    stageY = event.stageY;
+                    blocks.stageClick = true;
+                    _piemenuStageContext();
+                }
+
+            };
+
             stage.on('stagemousedown', function (event) {
-                moving = true;
-                var lastCoords = {
-                    x: event.stageX,
-                    y: event.stageY,
-                    delta: 0
-                };
-
-                var __stageMouseUpHandler = function (event) {
-                    stageMouseDown = false;
-                    moving = false;
-                    if (stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
-                        stageX = event.stageX;
-                        stageY = event.stageY;
-                        // It is really a left click...
-                        blocks.rightClick = true;
-                        _piemenuStageContext();
-                    }
-                };
-
                 stageMouseDown = true;
                 if (stage.getObjectUnderPoint() !== null | turtles.running()) {
                     stage.removeAllEventListeners('stagemouseup');
                     stage.on('stagemouseup', __stageMouseUpHandler);
                     return;
                 }
+
+                moving = true;
+                lastCoords = {
+                    x: event.stageX,
+                    y: event.stageY,
+                    delta: 0
+                };
 
                 hideDOMLabel();
 
@@ -4594,7 +4600,7 @@ handleComplete);
             wheel.navigateWheel(1);
 
             setTimeout(function () {
-                blocks.rightClick = false;
+                blocks.stageClick = false;
             }, 500);
         };
 
@@ -4687,7 +4693,7 @@ handleComplete);
             }
 
             setTimeout(function () {
-                blocks.rightClick = false;
+                blocks.stageClick = false;
             }, 500);
         };
 
