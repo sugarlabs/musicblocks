@@ -259,7 +259,7 @@ define(MYDEFINES, function (compatibility) {
 
             if (blocks.activeBlock === null) {
                 // Stage context menu
-                _piemenuStageContext();
+                // _piemenuStageContext();
             } else {
                 // Block context menu
                 // Would be better to trigger this from the block
@@ -2006,8 +2006,8 @@ define(MYDEFINES, function (compatibility) {
                 if (stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
                     stageX = event.stageX;
                     stageY = event.stageY;
-                    blocks.stageClick = true;
-                    _piemenuStageContext();
+                    // blocks.stageClick = true;
+                    // _piemenuStageContext();
                 }
 
             };
