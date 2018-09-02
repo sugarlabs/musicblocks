@@ -1491,7 +1491,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 } else {
-                    if (!that.blocks.getLongPressStatus() && !that.blocks.rightClick) {
+                    if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
                         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -2265,7 +2265,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
         // wheelNav pie menu for pitch selection
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -2509,7 +2509,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuScaleDegree = function (noteValues, note) {
         // wheelNav pie menu for scale degree pitch selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -2657,7 +2657,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuAccidentals = function (accidentalLabels, accidentalValues, accidental) {
         // wheelNav pie menu for accidental selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -2762,7 +2762,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuNoteValue = function (noteValue) {
         // input form and  wheelNav pie menu for note value selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -2956,7 +2956,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuNumber = function (wheelValues, selectedValue) {
         // input form and  wheelNav pie menu for number selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -3092,7 +3092,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuBasic = function (menuLabels, menuValues, selectedValue, colors) {
         // basic wheelNav pie menu
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -3179,7 +3179,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuBoolean = function (booleanLabels, booleanValues, boolean) {
         // wheelNav pie menu for boolean selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -3265,7 +3265,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice) {
         // wheelNav pie menu for voice selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -3397,7 +3397,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuIntervals = function (selectedInterval) {
         // pie menu for interval selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 
@@ -3576,7 +3576,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuModes = function (selectedMode) {
         // pie menu for mode selection
 
-        if (this.blocks.rightClick) {
+        if (this.blocks.stageClick) {
 	    return;
 	}
 

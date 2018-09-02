@@ -41,7 +41,7 @@ function Blocks () {
     this.getStageScale = null;
     this.contextMenu = null;
     // Did the user right cick?
-    this.rightClick = false;
+    this.stageClick = false;
 
     // We keep a list of stacks in the trash.
     this.trashStacks = [];
