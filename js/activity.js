@@ -259,8 +259,8 @@ define(MYDEFINES, function (compatibility) {
 
             if (blocks.activeBlock === null) {
                 // Stage context menu
-                // Commented out until we decide what to do.
-                // _piemenuStageContext();
+                Commented out until we decide what to do.
+                 _piemenuStageContext();
             } else {
                 // Block context menu
                 // Would be better to trigger this from the block
@@ -2008,9 +2008,9 @@ define(MYDEFINES, function (compatibility) {
                     stageX = event.stageX;
                     stageY = event.stageY;
                     // Commented out until we decide what to do.
-                    // blocks.stageClick = true;
+                    blocks.stageClick = true;
                     // _piemenuStageContext();
-		    // _piemenuPaletteContext();
+		    _piemenuPaletteContext();
                 }
 
             };
