@@ -13,7 +13,7 @@
 
 // A pop up for selecting language
 function LanguageBox () {
-    var LANGUAGEBOX = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="180" height="410"> <rect width="180" height="410" x="0" y="-3.5762787e-06" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" /> <g transform="translate(124.943,-0.053)" style="fill:#000000;display:block"> <path d="m 27.557,5.053 c -12.43,0 -22.5,10.076 -22.5,22.497 0,12.432 10.07,22.503 22.5,22.503 12.431,0 22.5,-10.071 22.5,-22.503 0,-12.421 -10.07,-22.497 -22.5,-22.497 z m 10.199,28.159 c 1.254,1.256 1.257,3.291 0,4.545 -0.628,0.629 -1.451,0.943 -2.274,0.943 -0.822,0 -1.644,-0.314 -2.27,-0.94 l -5.76,-5.761 -5.76,5.761 c -0.627,0.626 -1.449,0.94 -2.271,0.94 -0.823,0 -1.647,-0.314 -2.275,-0.943 -1.254,-1.254 -1.254,-3.289 0.004,-4.545 l 5.758,-5.758 -5.758,-5.758 c -1.258,-1.254 -1.258,-3.292 -0.004,-4.546 1.255,-1.254 3.292,-1.259 4.546,0 l 5.76,5.759 5.76,-5.759 c 1.252,-1.259 3.288,-1.254 4.544,0 1.257,1.254 1.254,3.292 0,4.546 l -5.758,5.758 5.758,5.758 z" style="fill:#000000;display:inline" /> </g> <rect width="174" height="350" x="3" y="57" style="fill:#92b5c8;fill-opacity:1;stroke:none" /> </svg>';
+    var LANGUAGEBOX = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="180" height="500"> <rect width="180" height="500" x="0" y="-3.5762787e-06" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" /> <g transform="translate(124.943,-0.053)" style="fill:#000000;display:block"> <path d="m 27.557,5.053 c -12.43,0 -22.5,10.076 -22.5,22.497 0,12.432 10.07,22.503 22.5,22.503 12.431,0 22.5,-10.071 22.5,-22.503 0,-12.421 -10.07,-22.497 -22.5,-22.497 z m 10.199,28.159 c 1.254,1.256 1.257,3.291 0,4.545 -0.628,0.629 -1.451,0.943 -2.274,0.943 -0.822,0 -1.644,-0.314 -2.27,-0.94 l -5.76,-5.761 -5.76,5.761 c -0.627,0.626 -1.449,0.94 -2.271,0.94 -0.823,0 -1.647,-0.314 -2.275,-0.943 -1.254,-1.254 -1.254,-3.289 0.004,-4.545 l 5.758,-5.758 -5.758,-5.758 c -1.258,-1.254 -1.258,-3.292 -0.004,-4.546 1.255,-1.254 3.292,-1.259 4.546,0 l 5.76,5.759 5.76,-5.759 c 1.252,-1.259 3.288,-1.254 4.544,0 1.257,1.254 1.254,3.292 0,4.546 l -5.758,5.758 5.758,5.758 z" style="fill:#000000;display:inline" /> </g> <rect width="174" height="350" x="3" y="57" style="fill:#92b5c8;fill-opacity:1;stroke:none" /> </svg>';
 
     this._canvas = null;
     this._stage = null;
@@ -133,13 +133,19 @@ function LanguageBox () {
         var selectOpt = '';
 
         var selected = localStorage.languagePreference;
+        console.log(selected);
+        console.log(localStorage.kanaPreference);
         if (selected == undefined || selected === '' || selected === 'en') {
             selected = 'en-US';
-        }
+        } else if (selected === 'ja' && localStorage.kanaPreference === 'kana') {
+	    console.log('kana');
+            selected = 'kana';
+	}
 
         selectOpt += '<p>';
         for (var i = 0; i < LANGS.length; i++) {
-            if (LANGS[i][1] === lang) {
+            if (LANGS[i][1] === selected) {
+		console.log('found selected: ' + LANGS[i][1]);
                 selectOpt += '<p><input type="radio" id="lang' + i + '" name="languageName" checked="checked" value="' + LANGS[i][1] + '"/>' + LANGS[i][0] + '</br>'
             } else {
                 selectOpt += '<p><input type="radio" id="lang' + i + '" name="languageName" value="' + LANGS[i][1] + '"/>' + LANGS[i][0] + '</br>'
