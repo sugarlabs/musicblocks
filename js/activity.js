@@ -2005,9 +2005,11 @@ define(MYDEFINES, function (compatibility) {
                 var __stageMouseUpHandler = function (event) {
                     stageMouseDown = false;
                     moving = false;
-                    if (lastCoords.delta < 4) {
+                    if (stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
                         stageX = event.stageX;
                         stageY = event.stageY;
+                        // It is really a left click...
+                        blocks.rightClick = true;
                         _piemenuStageContext();
                     }
                 };
