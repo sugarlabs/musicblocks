@@ -235,6 +235,13 @@ function _ (text) {
 
     replaced = replaced.replace(/ /g, '-');
 
+    if (localStorage.kanaPreference === 'kana') {
+        var lang = document.webL10n.getLanguage();
+	if (lang === 'ja') {
+	    replaced = 'kana-' + replaced;
+	}
+    }
+
     try {
         var translation = document.webL10n.get(replaced);
         if (translation === '') {

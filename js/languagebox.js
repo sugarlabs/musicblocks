@@ -57,6 +57,7 @@ function LanguageBox () {
 	    'default': _('Refresh your browser to change your language preference.'),
             'en': 'Refresh your browser to change your language preference.',
 	    'ja': '言語設定についた変化（日本語）をするため、ブラウザをリフレッシュしてください。',
+            'kana': '"げんごをへんこうするにはブラウザをさいきどうするひつようがあります。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
             'zh-CN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
@@ -117,6 +118,7 @@ function LanguageBox () {
             ['English (UK)', 'en-UK'],
             ['español', 'es'],
             ['日本語', 'ja'],
+            ['日本語 (kana)', 'kana'],  // This will be set to 'ja'. See below.
             ['中文', 'zh-CN'],
 	    ['ภาษาไทย', 'th'],
 	    ['aymara', 'ayc'],
@@ -160,7 +162,14 @@ function LanguageBox () {
                 var elem = event.target;
                 var n = Number(elem.id.replace('lang', ''));
                 console.log('resetting language preference to ' + LANGS[n][1]);
-                localStorage.setItem('languagePreference', LANGS[n][1]);
+		if (LANGS[n][1] === 'kana') {
+		    // Set kana spoof flag for ja.po
+                    localStorage.setItem('languagePreference', 'ja');
+                    localStorage.setItem('kanaPreference', 'kana');
+		} else {
+                    localStorage.setItem('languagePreference', LANGS[n][1]);
+                    localStorage.setItem('kanaPreference', null);
+		}
             };
         }
     };
