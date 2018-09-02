@@ -67,7 +67,7 @@
         <tspan
            x="20"
            y="15"
-           id="tspan38">note</tspan>
+           id="tspan38">音符</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -75,7 +75,7 @@
         <tspan
            x="85"
            y="12"
-           id="tspan42">value</tspan>
+           id="tspan42">値</tspan>
       </text>
     </g>
   </g>
@@ -196,7 +196,7 @@
         <tspan
            x="46"
            y="24"
-           id="tspan100">pitch</tspan>
+           id="tspan100">音高</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -204,7 +204,7 @@
         <tspan
            x="46"
            y="12"
-           id="tspan104">name</tspan>
+           id="tspan104">名前</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -212,7 +212,7 @@
         <tspan
            x="46"
            y="33"
-           id="tspan108">octave</tspan>
+           id="tspan108">オクターヴ</tspan>
       </text>
     </g>
   </g>

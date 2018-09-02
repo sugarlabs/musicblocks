@@ -145,4 +145,8 @@ function createHelpContent() {
         [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
         [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
     ];
+
+    BLOCKHELP = {
+	'newnote': [_('At the heart of Music Blocks is the <em>Note value</em> block. The <em>Note value</em> block is a container for a <em>Pitch</em> block that specifies the duration (note value) of the pitch.'), 'documentation', 'notevalue.svg'],
+    }
 };

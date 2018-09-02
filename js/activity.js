@@ -4474,9 +4474,6 @@ handleComplete);
                 return;
             }
 
-            // var helpWidget = new HelpWidget();
-            // helpWidget.init(blocks);
-
             // piemenu version of ruler
 
             // Position the widget centered over the note block.
@@ -4502,6 +4499,14 @@ handleComplete);
                 labels.push('imgsrc:header-icons/save-blocks-button.svg');
             }
 
+	    var name = blocks.blockList[blocks.activeBlock].name;
+	    if (name in BLOCKHELP) {
+                labels.push('imgsrc:header-icons/help-button.svg');
+		var helpButton = labels.length - 1;
+	    } else {
+		var helpButton = null;
+	    }
+
             var wheel = new wheelnav('contextWheelDiv', null, 150, 150);
             wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
             wheel.slicePathFunction = slicePath().DonutSlice;
@@ -4522,6 +4527,10 @@ handleComplete);
             if (blocks.blockList[topBlock].name === 'action') {
                 wheel.navItems[5].setTooltip(_('Save stack'));
             }
+
+	    if (helpButton !== null) {
+                wheel.navItems[helpButton].setTooltip(_('Help'));
+	    }
 
             wheel.navItems[0].selected = false;
 
@@ -4559,6 +4568,14 @@ handleComplete);
                     blocks.saveStack();
                 };
             }
+
+	    if (helpButton !== null) {
+                wheel.navItems[helpButton].navigateFunction = function () {
+                    blocks.activeBlock = activeBlock;
+		    var helpWidget = new HelpWidget();
+		    helpWidget.init(blocks);
+		};
+	    }
 
             setTimeout(function () {
                 blocks.stageClick = false;

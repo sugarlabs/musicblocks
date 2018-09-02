@@ -174,20 +174,43 @@ function HelpWidget () {
 	    this._showPage(0);
 	} else {
 	    // display help for this block
-	    var helpBody = docById('helpBodyDiv');
-	    helpBody.innerHTML = '<h1>' + blocks.blockList[blocks.activeBlock].name + '</h1>';
+	    if (blocks.activeBlock.name === null) {
+		helpDiv.style.display = 'none';
+	    } else {
+		var name = blocks.blockList[blocks.activeBlock].name;
+
+		if (name in BLOCKHELP) {
+		    var helpBody = docById('helpBodyDiv');
+
+		    body = '';
+		    if (BLOCKHELP[name].length > 1) {
+			var path = BLOCKHELP[name][1];
+			if (localStorage.languagePreference == 'ja') {
+			    path = path + '-ja';
+			}
+
+			body = body + '<p><img src="' + path + '/' + BLOCKHELP[name][2] + '"></p>';
+		    }
+
+		    body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
+		    helpBody.innerHTML = body;
+		} else {
+		    helpDiv.style.display = 'none';
+		}
+	    }
 	}
     };
 
     this._showPage = function(page) {
 	var helpBody = docById('helpBodyDiv');
 	var body = '';
-	body = body + '<img src="' + HELPCONTENT[page][2] + '">';
+	body = body + '<p><img src="' + HELPCONTENT[page][2] + '"></p>';
 	body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
 	body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
 
         if (HELPCONTENT[page].length > 3) {
 	    var link = HELPCONTENT[page][3];
+	    // FIXME
 	    if (localStorage.languagePreference == 'ja') {
 		link = link + '-ja';
 	    }
