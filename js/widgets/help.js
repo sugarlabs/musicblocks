@@ -186,7 +186,11 @@ function HelpWidget () {
 		    if (BLOCKHELP[name].length > 1) {
 			var path = BLOCKHELP[name][1];
 			if (localStorage.languagePreference == 'ja') {
-			    path = path + '-ja';
+			    if (localStorage.kanaPreference == 'kana') {
+				path = path + '-kana';
+			    } else {
+				path = path + '-ja';
+			    }
 			}
 
 			body = body + '<p><img src="' + path + '/' + BLOCKHELP[name][2] + '"></p>';
