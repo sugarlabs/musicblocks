@@ -15,7 +15,7 @@
    version="1.1"
    id="svg1430"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="pitch.svg">
+   sodipodi:docname="notename.svg">
   <defs
      id="defs1424" />
   <sodipodi:namedview
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="-759.82142"
-     inkscape:cy="-87.000013"
+     inkscape:cx="-479.64285"
+     inkscape:cy="383.14283"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -56,83 +56,83 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-139.04799,-108.35208)">
+     transform="translate(-64.917408,-232.74404)">
     <g
-       id="g28"
-       transform="matrix(0.26458333,0,0,0.26458333,139.04799,108.35208)">
+       id="g66"
+       transform="matrix(0.26458333,0,0,0.26458333,64.917408,232.74404)">
       <g
          transform="scale(1.5)"
-         id="g26">
+         id="g64">
         <path
            inkscape:connector-curvature="0"
            d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path12" />
+           id="path50" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text16">
+           id="text54">
           <tspan
              x="46"
              y="24"
-             id="tspan14">pitch</tspan>
+             id="tspan52">pitch</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text20">
+           id="text58">
           <tspan
              x="46"
              y="12"
-             id="tspan18">name</tspan>
+             id="tspan56">name</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text24">
+           id="text62">
           <tspan
              x="46"
              y="33"
-             id="tspan22">octave</tspan>
+             id="tspan60">octave</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,158.62716,108.35208)"
-       id="g38">
+       transform="matrix(0.26458333,0,0,0.26458333,84.496578,232.74404)"
+       id="g76">
       <g
          transform="scale(1.5)"
-         id="g36">
+         id="g74">
         <path
            inkscape:connector-curvature="0"
            d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path30" />
+           id="path68" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text34">
+           id="text72">
           <tspan
              x="13"
              y="14"
-             id="tspan32">sol</tspan>
+             id="tspan70">G</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,158.62716,116.81875)"
-       id="g48">
+       transform="matrix(0.26458333,0,0,0.26458333,84.496578,241.21071)"
+       id="g86">
       <g
          transform="scale(1.5)"
-         id="g46">
+         id="g84">
         <path
            inkscape:connector-curvature="0"
            d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path40" />
+           id="path78" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text44">
+           id="text82">
           <tspan
              x="13"
              y="14"
-             id="tspan42">4</tspan>
+             id="tspan80">4</tspan>
         </text>
       </g>
     </g>
