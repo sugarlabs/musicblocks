@@ -1,19 +1,47 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg1521"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="84.534378mm"
+   height="17.4625mm"
+   viewBox="0 0 84.534377 17.4625"
    version="1.1"
-   viewBox="0 0 76.886003 34.131252"
-   height="129"
-   width="290.59277">
+   id="svg1368"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="setsynthvolume.svg">
   <defs
-     id="defs1515" />
+     id="defs1362" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2"
+     inkscape:cx="229.26405"
+     inkscape:cy="202.20665"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
   <metadata
-     id="metadata1518">
+     id="metadata1365">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -25,81 +53,86 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(-41.159832,-274.86154)"
-     id="layer1">
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(256.17337,0.88303618)">
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,41.159832,274.86154)"
-       id="g1003">
+       id="g3153"
+       transform="matrix(0.26458333,0,0,0.26458333,-256.17337,-0.88303618)">
       <g
-         id="g1001"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g3151">
         <path
-           id="path987"
+           inkscape:connector-curvature="0"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 75.03418 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
            style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 65.03418 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           id="path3137" />
         <text
-           id="text991"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text3141">
           <tspan
-             id="tspan989"
-             y="21.916666"
-             x="5.3333335">set synth volume</tspan>
+             x="91"
+             y="24"
+             id="tspan3139">set synth volume</tspan>
         </text>
         <text
-           id="text995"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text3145">
           <tspan
-             id="tspan993"
-             y="11.25"
-             x="90.367516">synth</tspan>
+             x="91"
+             y="12"
+             id="tspan3143">synth</tspan>
         </text>
         <text
-           id="text999"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text3149">
           <tspan
-             id="tspan997"
-             y="32.25"
-             x="90.367516">volume</tspan>
+             x="91"
+             y="33"
+             id="tspan3147">volume</tspan>
         </text>
       </g>
     </g>
     <g
-       id="g1013"
-       transform="matrix(0.26458333,0,0,0.26458333,78.082772,274.86154)">
+       transform="matrix(0.26458333,0,0,0.26458333,-218.86712,-0.88303618)"
+       id="g3163">
       <g
-         id="g1011"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g3161">
         <path
-           id="path1005"
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 91.69434 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="path3155" />
         <text
-           id="text1009"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text3159">
           <tspan
-             id="tspan1007"
-             y="13.833333"
-             x="13.333333">synth name</tspan>
+             x="13"
+             y="14"
+             id="tspan3157">guitar</tspan>
         </text>
       </g>
     </g>
     <g
-       id="g1023"
-       transform="matrix(0.26458333,0,0,0.26458333,78.082772,283.19592)">
+       transform="matrix(0.26458333,0,0,0.26458333,-218.86712,7.5836308)"
+       id="g3173">
       <g
-         id="g1021"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g3171">
         <path
-           id="path1015"
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="path3165" />
         <text
-           id="text1019"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text3169">
           <tspan
-             id="tspan1017"
-             y="13.833333"
-             x="13.333333">85</tspan>
+             x="13"
+             y="14"
+             id="tspan3167">50</tspan>
         </text>
       </g>
     </g>

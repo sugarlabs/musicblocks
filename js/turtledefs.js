@@ -174,5 +174,11 @@ function createHelpContent() {
 	'movable': [_('???'), 'documentation', 'movable.svg'],
 	'interval': [_('The <em>Scalar interval</em> block calculates a relative interval based on the current mode, skipping all notes outside of the mode. In the figure, we add <em>la</em> to <em>sol</em>.'), 'documentation', 'interval.svg'],
 	'semitoneinterval': [_('The <em>Semi-tone interval</em> block calculates a relative interval based on half steps. In the figure, we add <em>sol#</em> to <em>sol</em>.'), 'documentation', 'semitoneinterval.svg'],
+        'settimbre': [_('The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello.'), 'documentation', 'settimbre.svg'],
+        'voicename': [_('The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello.'), 'documentation', 'settimbre.svg'],
+	'newstaccato': [_('The <em>Staccato</em> block shortens the length of the actual note—making them tighter bursts—while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato.svg'],
+	'newslur': [_('The <em>Slur</em> block lengthens the sustain of notes—running longer than the noted duration and blending it into the next note—while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur.svg'],
+        'crescendo': [_('The Crescendo block will increase (or decrease) the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo.svg'],
+	'setsynthvolume': [_('The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume).'), 'documentation', 'setsynthvolume.svg'],
     }
 };

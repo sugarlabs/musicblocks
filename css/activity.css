@@ -434,13 +434,6 @@ table {
     border-spacing: 1px 1px;
 }
 
-.helpDiv {
-    float: right;
-    position: absolute;
-    margin-top: 57px;
-    z-index: -1;
-}
-
 #canvas {
     overflow-y: visible;
 }
@@ -648,6 +641,7 @@ table {
     width: 350px;
     height: 400px;
     background: rgba(196, 196, 196, 1.0) !important;
+    overflow-y: auto;
     -webkit-user-select: none;
 }
 
@@ -664,7 +658,6 @@ table {
     top: 0px;
     border: 0 !important;
     overflow-x: auto;
-    overflow-y: auto;
 }
 
 #pscDiv {
