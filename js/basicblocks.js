@@ -2811,6 +2811,21 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('scrollxy');
+    newblock.palette = palettes.dict['mouse'];
+    blocks.protoBlockDict['scrollxy'] = newblock;
+    //.TRANS: scroll canvas image by x, y position
+    newblock.staticLabels.push(_('scroll xy'));
+    newblock.staticLabels.push(_('x'), _('y'));
+    newblock.adjustWidthToLabel();
+    newblock.twoArgBlock();
+    newblock.defaults.push(0);
+    newblock.defaults.push(0);
+    newblock.dockTypes[1] = 'numberin';
+    if (beginnerMode && !beginnerBlock('scrollxy')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('clear');
     newblock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['clear'] = newblock;

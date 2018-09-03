@@ -76,9 +76,17 @@ function Turtle (name, turtles, drum) {
     this.media = [];  // Media (text, images) we need to remove on clear.
     var canvas = document.getElementById('overlayCanvas');
     var ctx = canvas.getContext('2d');
-    // Simulate an arc with line segments since Tinkercad cannot
-    // import SVG arcs reliably.
+    console.log(ctx.canvas.width + ' x ' + ctx.canvas.height);
+
+    this.doScrollXY = function(dx, dy) {
+	// FIXME: how big?
+	var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
+	ctx.putImageData(imgData, dx, dy);
+    };
+
     this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
+	// Simulate an arc with line segments since Tinkercad cannot
+	// import SVG arcs reliably.
         var a = sa;
         if (ea == null) {
             var da = Math.PI / nsteps;
@@ -637,6 +645,7 @@ function Turtle (name, turtles, drum) {
     };
 
     this.doForward = function(steps) {
+
         this.processColor();
         if (!this.fillState) {
             ctx.lineWidth = this.stroke;
