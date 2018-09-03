@@ -37,8 +37,8 @@ function beginnerBlock(name) {
     // Only these blocks appear on the palette in beginner mode.
     return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
             'meter', 'setmasterbpm2', 'everybeatdo', 'onbeatdo', 'offbeatdo', 'drift', // meter palette
-            'pitch', 'pitch2', 'steppitch', 'hertz', 'flat', 'sharp', 'setscalartransposition', 'settransposition', 'deltapitch', // pitch palette
-            'setkey2', 'modelength', 'movable', 'definemode', 'interval', 'semitoneinterval', // interval palette
+            'pitch', 'pitch2', 'steppitch', 'hertz', 'flat', 'sharp', 'setscalartransposition', 'settransposition', 'mypitch', 'deltapitch', // pitch palette
+            'setkey2', 'modelength', 'movable', 'interval', 'semitoneinterval', // interval palette
             'settimbre', 'newstaccato', 'newslur', // tone palette
             'crescendo', 'setsynthvolume', // volume palette
             'playdrum', 'setdrum', // drum palette
@@ -147,6 +147,15 @@ function createHelpContent() {
     ];
 
     BLOCKHELP = {
-	'newnote': [_('At the heart of Music Blocks is the <em>Note value</em> block. The <em>Note value</em> block is a container for a <em>Pitch</em> block that specifies the duration (note value) of the pitch.'), 'documentation', 'notevalue.svg'],
+	'newnote': [_('At the heart of Music Blocks is the <em>Note</em> block. The <em>Note</em> block is a container for a <em>Pitch</em> block that specifies the duration (note value) of the pitch.'), 'documentation', 'notevalue.svg'],
+	'playdrum': [_('You can use multiple <em>Drum</em> blocks within a <em>Note</em> block.'), 'documentation', 'playdrum.svg'],
+	'rest2': [_('A rest of the specified note value duration can be constructed using a <em>Silence</em> block.'), 'documentation', 'silence.svg'],
+	'mynotevalue': [_('The <em>Note value</em> block always always the value of the note currently being played.'), 'documentation', 'mynotevalue.svg'],
+	'meter': [_('The beat of the music is determined by the <em>Meter</em> block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter.svg'],
+	'setmasterbpm2': [_('The <em>Beats per minute</em> block sets the number of 1/4 notes per minute.'), 'documentation', 'setmasterbpm.svg'],
+	'oneverybeatdo': [_('The <em>On-every-beat</em> block let you specify actions to take on every beat.'), 'documentation', 'oneverybeatdo.svg'],
+	'onbeatdo': [_('The <em>On-strong-beat</em> block let you specify actions to take on specified beats.'), 'documentation', 'onstrongbeatdo.svg'],
+	'offbeatdo': [_('The <em>On-weak-beat</em> block let you specify actions to take on weak (off) beats.'), 'documentation', 'onweakbeatdo.svg'],
+	'no-clock': [_('The <em>No clock</em> block decouples the notes from the master clock.'), 'documentation', 'no-clock.svg'],
     }
 };
