@@ -41,8 +41,8 @@
      id="namedview586"
      showgrid="false"
      inkscape:zoom="1.618746"
-     inkscape:cx="414.04946"
-     inkscape:cy="166.75"
+     inkscape:cx="276.90626"
+     inkscape:cy="164.27895"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
@@ -57,10 +57,11 @@
        transform="scale(1.5)"
        id="g146">
       <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 35.029297 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 84 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 9 41.695964 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 84 4 c 0,2.76142 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z"
          style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path136"
-         inkscape:connector-curvature="0" />
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cssccccccssccccccccsscccccccsscccsscccccccsscccccccsscc" />
       <text
          style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
          id="text140">
@@ -288,7 +289,7 @@
     </g>
   </g>
   <g
-     transform="translate(95)"
+     transform="translate(105)"
      id="g258">
     <g
        transform="scale(1.5)"

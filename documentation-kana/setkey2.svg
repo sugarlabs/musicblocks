@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="67.336456mm"
-   height="17.4625mm"
-   viewBox="0 0 67.336457 17.4625"
+   width="83.211555mm"
+   height="17.462498mm"
+   viewBox="0 0 83.211556 17.462498"
    version="1.1"
    id="svg1430"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="552.48856"
-     inkscape:cy="267.10652"
+     inkscape:cx="330.48855"
+     inkscape:cy="267.10651"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -57,45 +57,47 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(208.16736,-202.04276)">
+    <path
+       inkscape:connector-curvature="0"
+       d="m -207.96892,205.4162 v -1.5875 c 0,-0.87675 0.71075,-1.5875 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 28.44787 1.5875 c 0.87676,0 1.86476,0.75574 1.5875,1.5875 v 1.5875 h -1.5875 v -1.19063 h -1.5875 v 3.96875 h 1.5875 v -1.19062 h 1.5875 v 6.74687 h -1.5875 v -1.19062 h -1.5875 v 3.96875 h 1.5875 v -1.19063 h 1.5875 v 1.5875 c 0,0.87675 -0.71074,1.5875 -1.5875,1.5875 h -1.5875 -28.44787 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 c -0.87675,0 -1.5875,-0.71075 -1.5875,-1.5875 v -1.5875 -8.33437 z"
+       style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+       id="path3489"
+       sodipodi:nodetypes="csscccccssccccccccccccccccsscccccccssccc" />
+    <text
+       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:0.39687499"
+       id="text3493"
+       x="-192.29257"
+       y="202.04276">
+      <tspan
+         x="-173.24257"
+         y="211.56776"
+         id="tspan3491"
+         style="stroke-width:0.39687499">ちょうのせってい</tspan>
+    </text>
+    <text
+       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:0.39687499"
+       id="text3497"
+       x="-192.29257"
+       y="202.04276">
+      <tspan
+         x="-173.24257"
+         y="206.80527"
+         id="tspan3495"
+         style="stroke-width:0.39687499">ちょう</tspan>
+    </text>
+    <text
+       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:0.39687499"
+       id="text3501"
+       x="-192.29257"
+       y="202.04276">
+      <tspan
+         x="-173.24257"
+         y="215.13963"
+         id="tspan3499"
+         style="stroke-width:0.39687499">モード（おんかい）</tspan>
+    </text>
     <g
-       id="g3505"
-       transform="matrix(0.26458333,0,0,0.26458333,-208.16736,202.04276)">
-      <g
-         transform="scale(1.5)"
-         id="g3503">
-        <path
-           inkscape:connector-curvature="0"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 31.679687 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
-           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path3489" />
-        <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text3493">
-          <tspan
-             x="48"
-             y="24"
-             id="tspan3491">ちょうのせってい</tspan>
-        </text>
-        <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text3497">
-          <tspan
-             x="48"
-             y="12"
-             id="tspan3495">ちょう</tspan>
-        </text>
-        <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text3501">
-          <tspan
-             x="48"
-             y="33"
-             id="tspan3499">モード（おんかい）</tspan>
-        </text>
-      </g>
-    </g>
-    <g
-       transform="matrix(0.26458333,0,0,0.26458333,-188.05903,202.04276)"
+       transform="matrix(0.26458333,0,0,0.26458333,-172.18393,202.04276)"
        id="g3515">
       <g
          transform="scale(1.5)"
@@ -116,7 +118,7 @@
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,-188.05903,210.50943)"
+       transform="matrix(0.26458333,0,0,0.26458333,-172.18393,210.50943)"
        id="g3525">
       <g
          transform="scale(1.5)"
