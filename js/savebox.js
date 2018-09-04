@@ -155,7 +155,8 @@ function SaveBox () {
             this.positionHoverText(this.saveBlockArtwork, true);
             this.saveBlockArtwork.on('click', function(event) {
                 that.hide();
-                that._doSaveBlockArtwork();
+		//.TRANS: block artwork is a file name we use to save the program blocks as they appear on the screen.
+                that._doSaveBlockArtwork(_('block artwork'));
             });
 
         } else {

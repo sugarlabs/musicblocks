@@ -503,7 +503,7 @@ define(MYDEFINES, function (compatibility) {
 
             svg += '</svg>';
 
-            save.download('svg', 'data:image/svg+xml;utf8,' + '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + encodeURIComponent(svg), 'blockArtwork.svg', '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"', 'blockArtwork.svg');
+	    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + encodeURIComponent(svg);
         };
 
         function _allClear() {

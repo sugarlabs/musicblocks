@@ -307,9 +307,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.container.setChildIndex(that.imageBitmap, z);
             }
 
-            if (that.name === 'action') {
-                that._ensureDecorationOnTop();
-            } else if (that.name === 'start' || that.name === 'drum') {
+            if (that.name === 'start' || that.name === 'drum') {
                 // Rescale the decoration on the start blocks.
                 for (var turtle = 0; turtle < that.blocks.turtles.turtleList.length; turtle++) {
                     if (that.blocks.turtles.turtleList[turtle].startBlock === that) {
@@ -318,7 +316,9 @@ function Block(protoblock, blocks, overrideName) {
                         break;
                     }
                 }
-            }
+            } else if (that.isCollapsible()) {
+                that._ensureDecorationOnTop();
+	    }
 
             that.updateCache();
             that._calculateBlockHitArea();
