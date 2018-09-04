@@ -40,7 +40,7 @@ function beginnerBlock(name) {
             'pitch', 'pitch2', 'pitchnumber', 'hertz', 'fourth', 'fifth', 'mypitch',  // pitch palette
             'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chord35',  // interval palette
             'settimbre', 'newstaccato', 'newslur',  // tone palette
-            'crescendo', 'setsynthvolume',  // volume palette
+            'crescendo', 'decrescendo', 'setsynthvolume',  // volume palette
             'playdrum', 'setdrum', // drum palette
             'if', 'ifthenelse', 'repeat', 'forever', 'backward', 'duplicatenotes',  // flow palette
             'action', 'start', 'dispatch', 'listen',  // action palette

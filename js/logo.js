@@ -5071,9 +5071,15 @@ function Logo () {
                 }
             }
             break;
+        case 'decrescendo':
         case 'crescendo':
             if (args.length > 1 && args[0] !== 0) {
-                that.crescendoDelta[turtle].push(args[0]);
+                if (that.blocks.blockList[blk].name === 'crescendo') {
+                    that.crescendoDelta[turtle].push(args[0]);
+		} else {
+                    that.crescendoDelta[turtle].push(-args[0]);
+		}
+
                 for (var synth in that.synthVolume[turtle]) {
                     var vol = last(that.synthVolume[turtle][synth]);
                     that.synthVolume[turtle][synth].push(vol);

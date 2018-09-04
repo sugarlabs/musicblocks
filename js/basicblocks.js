@@ -5229,11 +5229,24 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
+    var newblock = new ProtoBlock('decrescendo');
+    newblock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['decrescendo'] = newblock;
+    //.TRANS: a gradual increase in loudness
+    newblock.staticLabels.push(_('decrescendo'));
+    newblock.adjustWidthToLabel();
+    newblock.flowClampOneArgBlock();
+    newblock.defaults.push(5);
+    if (beginnerMode && !beginnerBlock('decrescendo')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('crescendo');
     newblock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['crescendo'] = newblock;
     //.TRANS: a gradual increase in loudness
-    newblock.staticLabels.push(_('crescendo') + ' (+/–)');
+    newblock.staticLabels.push(_('crescendo'));
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);
