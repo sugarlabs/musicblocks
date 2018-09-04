@@ -898,6 +898,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('timbre'));
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampOneArgBlock();
     newblock.defaults.push(_('custom'));
     if (beginnerMode && !beginnerBlock('timbre')) {
@@ -909,7 +910,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['modewidget'] = newblock;
     //.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
     newblock.staticLabels.push(_('custom mode'));
+    newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('modewidget')) {
         newblock.hidden = true;
@@ -921,8 +924,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['tempo'] = newblock;
     //.TRANS: the speed at music is should be played.
     newblock.staticLabels.push(_('tempo'));
-    newblock.extraWidth = 20;
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('tempo')) {
         newblock.hidden = true;
@@ -935,6 +939,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: makes a mapping between pitches and drum sounds
     newblock.staticLabels.push(_('pitch-drum mapper'));
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('pitchdrummatrix')) {
         newblock.hidden = true;
@@ -946,7 +951,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['pitchslider'] = newblock;
     //.TRANS: widget to generate pitches using a slider
     newblock.staticLabels.push(_('pitch slider'));
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('pitchslider')) {
         newblock.hidden = true;
@@ -959,6 +966,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: generate a progressive sequence of pitches
     newblock.staticLabels.push(_('pitch staircase'));
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('pitchstaircase')) {
         newblock.hidden = true;
@@ -970,7 +978,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['rhythmruler2'] = newblock;
     //.TRANS: widget for subdividing a measure into distinct rhythmic elements
     newblock.staticLabels.push(_('rhythm ruler'));
+    newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('rhythmruler2')) {
         newblock.hidden = true;
@@ -1005,6 +1015,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: assigns pitch to a sequence of beats to generate a melody
     newblock.staticLabels.push(_('pitch-time matrix'));
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('matrix')) {
         newblock.hidden = true;
@@ -1017,6 +1028,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('status'));
     newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('status')) {
         newblock.hidden = true;
