@@ -898,7 +898,7 @@ function Blocks () {
                     that.adjustDocks(parentblk, true);
                 };
 
-                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock], false);
+                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock]);
             }
         } else if (this.blockList[parentblk].name === 'storein') {
             var cblk = this.blockList[parentblk].connections[1];
@@ -921,7 +921,7 @@ function Blocks () {
                     that.adjustDocks(parentblk, true);
                 };
 
-                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock], false);
+                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock]);
             }
         } else if (NOTEBLOCKS.indexOf(this.blockList[parentblk].name) !== -1) {
             var cblk = this.blockList[parentblk].connections[2];
@@ -2129,17 +2129,17 @@ function Blocks () {
         this.visible = true;
     };
 
-    this._makeNewBlockWithConnections = function (name, blockOffset, connections, postProcess, postProcessArg, collapsed) {
+    this._makeNewBlockWithConnections = function (name, blockOffset, connections, postProcess, postProcessArg) {
         if (typeof(collapsed) === 'undefined') {
             collapsed = false
         }
+
         myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
         if (myBlock == null) {
             console.log('could not make block ' + name);
             return;
         }
 
-        // myBlock.collapsed = !collapsed;
         for (var c = 0; c < connections.length; c++) {
             if (c === myBlock.docks.length) {
                 break;
@@ -3542,7 +3542,7 @@ function Blocks () {
         var storeinNames = {}; // storein block: label block
         var doNames = {}; // do block: label block, nameddo block value
 
-        // action and start blocks that need to be collapsed.
+        // widget, note, action, and start blocks that need to be collapsed.
         this.blocksToCollapse = [];
 
         // Scan for any new action and storein blocks to identify
@@ -3919,7 +3919,6 @@ function Blocks () {
 
             // A few special cases.
             switch (name) {
-                // Only add 'collapsed' arg to start, action blocks.
             case 'start':
                 blkData[4][0] = null;
                 blkData[4][2] = null;
@@ -3930,7 +3929,7 @@ function Blocks () {
                     that.turtles.addTurtle(that.blockList[thisBlock], blkInfo);
                 };
 
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
                 break;
             case 'drum':
                 blkData[4][0] = null;
@@ -3942,7 +3941,7 @@ function Blocks () {
                     that.turtles.addDrum(that.blockList[thisBlock], blkInfo);
                 };
 
-                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
@@ -3953,7 +3952,7 @@ function Blocks () {
             case 'hat':
                 blkData[4][0] = null;
                 blkData[4][3] = null;
-                this._makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
+                this._makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null);
                 break;
 
                 // Named boxes and dos need private data.
