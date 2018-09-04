@@ -3031,8 +3031,12 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSave() {
-            _hideBoxes();
-            saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+            if (beginnerMode) {
+		save.saveHTML(_('My Project'));
+	    } else {
+		_hideBoxes();
+		saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+	    }
         };
 
         function doUploadToPlanet() {
