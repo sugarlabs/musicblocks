@@ -6023,9 +6023,9 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
+            if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                var transValue = 2;
+                var transValue = 0;
             } else {
                 var transValue = args[0];
             }

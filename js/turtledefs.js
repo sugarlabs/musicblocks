@@ -36,25 +36,25 @@ function getAuxToolbarButtonNames(name) {
 function beginnerBlock(name) {
     // Only these blocks appear on the palette in beginner mode.
     return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
-            'meter', 'setmasterbpm2', 'everybeatdo', 'onbeatdo', 'offbeatdo', 'drift', // meter palette
-            'pitch', 'pitch2', 'steppitch', 'hertz', 'flat', 'sharp', 'setscalartransposition', 'settransposition', 'mypitch', 'deltapitch', // pitch palette
-            'setkey2', 'modelength', 'movable', 'interval', 'semitoneinterval', // interval palette
-            'settimbre', 'newstaccato', 'newslur', // tone palette
-            'crescendo', 'setsynthvolume', // volume palette
+            'meter', 'setmasterbpm2', 'everybeatdo', 'beatvalue',  // meter palette
+            'pitch', 'pitch2', 'pitchnumber', 'hertz', 'fourth', 'fifth', 'mypitch',  // pitch palette
+            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chord35',  // interval palette
+            'settimbre', 'newstaccato', 'newslur',  // tone palette
+            'crescendo', 'setsynthvolume',  // volume palette
             'playdrum', 'setdrum', // drum palette
-            'if', 'ifthenelse', 'repeat', 'forever', // flow palette
-            'action', 'start', 'dispatch', 'listen', // action palette
+            'if', 'ifthenelse', 'repeat', 'forever', 'backward', 'duplicatenotes',  // flow palette
+            'action', 'start', 'dispatch', 'listen',  // action palette
             'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne',  // boxes palette
-            'status', 'matrix', 'rhythmruler2', 'tempo', 'modewidget', 'rhythm2', 'stuplet', // widgets palette
-            'forward', 'left', 'right', 'setxy', 'setheading', 'arc', 'clear', 'x', 'y', 'heading', // mouse palette
-            'setcolor', 'setshade', 'setpensize', 'penup', 'pendown', 'fill', 'background', 'color', 'shade', 'pensize', // pen palette
-            'number', 'random', 'oneOf', 'plus', 'minus', 'multiply', 'divide', // number palette
-            'equal', 'less', 'greater', // boolean palette
-            'text', 'media', 'show', 'turtleshell', 'speak', 'height', 'width', 'bottompos', 'toppos', 'leftpos', 'rightpos', // media palette
-            'mousebutton', 'mousex', 'mousey', 'time', 'myclick', 'loudness', // sensor palette
-            'push', 'pop', 'setHeapEntry', 'indexHeap', 'reverseHeap', 'emptyHeap', 'heapEmpty', 'heapLength', 'showHeap', // heap palette
-            'setturtlename2', 'turtlename', 'turtlesync', // mice palette
-            'print', 'hspace', 'vspace' // extras palette
+            'status', 'matrix', 'rhythmruler2', 'tempo', 'modewidget', 'rhythm2', 'stuplet',  // widgets palette
+            'forward', 'back', 'left', 'right', 'setxy', 'setheading', 'arc', 'clear', 'x', 'y', 'heading', 'scrollxy',  // mouse palette
+            'setcolor', 'setshade', 'setpensize', 'penup', 'pendown', 'fill', 'background', 'color', 'shade', 'pensize',  // pen palette
+            'number', 'random', 'oneOf', 'plus', 'minus', 'multiply', 'divide',  // number palette
+            'equal', 'less', 'greater',  // boolean palette
+            'text', 'media', 'show', 'turtleshell', 'speak', 'height', 'width', 'bottompos', 'toppos', 'leftpos', 'rightpos',  // media palette
+            'mousebutton', 'mousex', 'mousey', 'time', 'myclick', 'loudness',  // sensor palette
+            'push', 'pop', 'setHeapEntry', 'indexHeap', 'reverseHeap', 'emptyHeap', 'heapEmpty', 'heapLength', 'showHeap',  // heap palette
+            'setturtlename2', 'turtlename', 'turtlesync',  // mice palette
+            'print', 'hspace', 'vspace'  // extras palette
            ].indexOf(name) !== -1
 };
 

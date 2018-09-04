@@ -180,6 +180,17 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('pitchinhertz');
+    newblock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['pitchinhertz'] = newblock;
+    //.TRANS: the current pitch expressed in Hertz
+    newblock.staticLabels.push(_('pitch in hertz'));
+    newblock.adjustWidthToLabel();
+    newblock.parameterBlock();
+    if (beginnerMode && !beginnerBlock('pitchinhertz')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('midi');
     newblock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['midi'] = newblock;
@@ -1047,8 +1058,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('osctime');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['osctime'] = newblock;
-    //.TRANS: oscillator time (in micro seconds)
-    newblock.staticLabels.push(_('osctime'));
+    //.TRANS: oscillator time (in milliseconds)
+    newblock.staticLabels.push(_('milliseconds'));
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(200);
@@ -1096,18 +1107,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
-    var newblock = new ProtoBlock('backward');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['backward'] = newblock;
-    //.TRANS: play music backward
-    newblock.staticLabels.push(_('backward'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('backward')) {
-        newblock.hidden = true;
-    }
-
-    // macro
     var newblock = new ProtoBlock('skipnotes');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['skipnotes'] = newblock;
@@ -1117,19 +1116,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(2);
     if (beginnerMode && !beginnerBlock('skipnotes')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('duplicatenotes');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['duplicatenotes'] = newblock;
-    //.TRANS: play each note more than once
-    newblock.staticLabels.push(_('duplicate'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(2);
-    if (beginnerMode && !beginnerBlock('duplicatenotes')) {
         newblock.hidden = true;
     }
 
@@ -1372,17 +1358,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgMathBlock();
     if (beginnerMode && !beginnerBlock('elapsednotes2')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('pitchinhertz');
-    newblock.palette = palettes.dict['meter'];
-    blocks.protoBlockDict['pitchinhertz'] = newblock;
-    //.TRANS: the current pitch expressed in Hertz
-    newblock.staticLabels.push(_('pitch in hertz'));
-    newblock.adjustWidthToLabel();
-    newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('pitchinhertz')) {
         newblock.hidden = true;
     }
 
@@ -2286,7 +2261,19 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);
-    if (!beginnerMode && !beginnerBlock('semitoneinterval')) {
+    if (beginnerMode && !beginnerBlock('semitoneinterval')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('chord35');
+    newblock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['chord35'] = newblock;
+    //.TRANS: a chord is a group fo three or more notes.
+    newblock.staticLabels.push(_('chord' + ' ' + '4+6'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('chord35')) {
         newblock.hidden = true;
     }
 
@@ -2407,7 +2394,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);
-    if (!beginnerMode && !beginnerBlock('interval')) {
+    if (beginnerMode && !beginnerBlock('interval')) {
         newblock.hidden = true;
     }
 
@@ -4265,6 +4252,31 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['hidden'] = newblock;
     newblock.hiddenBlockFlow();
     newblock.hidden = true;
+
+    // macro
+    var newblock = new ProtoBlock('backward');
+    newblock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['backward'] = newblock;
+    //.TRANS: play music backward
+    newblock.staticLabels.push(_('backward'));
+    newblock.adjustWidthToLabel();
+    newblock.flowClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('backward')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('duplicatenotes');
+    newblock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['duplicatenotes'] = newblock;
+    //.TRANS: play each note more than once
+    newblock.staticLabels.push(_('duplicate'));
+    newblock.adjustWidthToLabel();
+    newblock.flowClampOneArgBlock();
+    newblock.defaults.push(2);
+    if (beginnerMode && !beginnerBlock('duplicatenotes')) {
+        newblock.hidden = true;
+    }
 
     var newblock = new ProtoBlock('defaultcase');
     newblock.palette = palettes.dict['flow'];
