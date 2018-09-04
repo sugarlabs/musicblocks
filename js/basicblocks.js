@@ -2291,14 +2291,38 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
-    var newblock = new ProtoBlock('chord35');
+    var newblock = new ProtoBlock('chordV');
     newblock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['chord35'] = newblock;
+    blocks.protoBlockDict['chordV'] = newblock;
     //.TRANS: a chord is a group fo three or more notes.
-    newblock.staticLabels.push(_('chord' + ' ' + '4+6'));
+    newblock.staticLabels.push(_('chord' + ' ' + 'V'));
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('chord35')) {
+    if (beginnerMode && !beginnerBlock('chordV')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('chordIV');
+    newblock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['chordIV'] = newblock;
+    //.TRANS: a chord is a group fo three or more notes.
+    newblock.staticLabels.push(_('chord' + ' ' + 'IV'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('chordIV')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('chordI');
+    newblock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['chordI'] = newblock;
+    //.TRANS: a chord is a group fo three or more notes.
+    newblock.staticLabels.push(_('chord' + ' ' + 'I'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('chordI')) {
         newblock.hidden = true;
     }
 
@@ -3427,8 +3451,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('divide');
     newblock.palette = palettes.dict['number'];
     blocks.protoBlockDict['divide'] = newblock;
-    newblock.fontsize = 14;
-    newblock.staticLabels.push('/');
+    newblock.fontsize = 9;
+    newblock.staticLabels.push('➗');
     newblock.twoArgMathBlock();
     newblock.defaults.push(1, 4)
     if (beginnerMode && !beginnerBlock('divide')) {
