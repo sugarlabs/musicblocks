@@ -133,7 +133,11 @@ function Logo () {
     this.playbackTime = 0;
 
     // Optimize for runtime speed
-    this.optimize = false;
+    if (beginnerMode) {
+	this.optimize = true;
+    } else {
+	this.optimize = false;
+    }
 
     // Widget-related attributes
     this.showPitchDrumMatrix = false;

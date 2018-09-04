@@ -50,18 +50,22 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     };
 }
 
-try {
-    console.log(localStorage.beginnerMode);
+if (_THIS_IS_MUSIC_BLOCKS_) {
+    try {
+	console.log(localStorage.beginnerMode);
 
-    if (localStorage.beginnerMode !== null) {
-        console.log('setting mode from local storage');
-        beginnerMode = (localStorage.beginnerMode == 'true');
-    } else {
-        beginnerMode = true;
+	if (localStorage.beginnerMode !== null) {
+            console.log('setting mode from local storage');
+            beginnerMode = (localStorage.beginnerMode == 'true');
+	} else {
+            beginnerMode = true;
+	}
+    } catch (e) {
+	console.log(e);
+	beginnerMode = true;
     }
-} catch (e) {
-    console.log(e);
-    beginnerMode = true;
+} else {
+    beginnerMode = false;
 }
 
 try {
@@ -3723,23 +3727,30 @@ handleComplete);
             // on-long-press function, on-extra-long-press function,
             // on-long-press icon, on-extra-long-press icon
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var buttonNames = [
-                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly') + ' [ENTER]', _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
-                    ['step', _doStepButton, _('Run step by step'), null, null, null, null],
-                    ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
-                    ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
-                    ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                    ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
-                    // ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
-                    ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-                    ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                    ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-                ];
-
-                if (beginnerMode) {
-                    buttonNames.push(['beginner', _doSwitchMode, _('Switch to advanced mode'), null, null, null, null]);
-                } else {
-                    buttonNames.push(['advanced', _doSwitchMode, _('Switch to beginner mode'), null, null, null, null]);
+		if (beginnerMode) {
+                    var buttonNames = [
+			['run', _doFastButton, _('Play'), null, null, null, null],
+			['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
+			['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
+			['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
+			['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+			['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+			['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
+			['beginner', _doSwitchMode, _('Switch to advanced mode'), null, null, null, null],
+                    ];
+		} else {
+		    var buttonNames = [
+			['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly') + ' [ENTER]', _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+			['step', _doStepButton, _('Run step by step'), null, null, null, null],
+			['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
+			['hard-stop-turtle', doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
+			['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
+			['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
+			['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+			['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+			['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
+			['advanced', _doSwitchMode, _('Switch to beginner mode'), null, null, null, null],
+		    ];
                 }
 
                 buttonNames.push(['help', _showHelp, _('Help'), null, null, null, null]);
@@ -3840,17 +3851,30 @@ handleComplete);
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var menuNames = [
-                    planetMenuItem,
-                    ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                    ['save', doSave, _('Save project'), null, null, null, null],
-                    ['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
-                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                    ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
-                    ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                    ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
-                ];
+		if (beginnerMode) {
+                    var menuNames = [
+			planetMenuItem,
+			['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+			['save', doSave, _('Save project'), null, null, null, null],
+			['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
+			['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+			['utility', _doUtilityBox, _('Settings'), null, null, null, null],
+			['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
+			['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
+                    ];
+		} else {
+                    var menuNames = [
+			planetMenuItem,
+			['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+			['save', doSave, _('Save project'), null, null, null, null],
+			['paste-disabled', pasteStack, _('Long press on blocks to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
+			['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+			['compile', _doPlaybackBox, _('playback'), null, null, null, null],
+			['utility', _doUtilityBox, _('Settings'), null, null, null, null],
+			['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
+			['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
+                    ];
+		}
             } else {
                 var menuNames = [
                     planetMenuItem,
