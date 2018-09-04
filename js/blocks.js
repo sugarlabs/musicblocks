@@ -52,6 +52,7 @@ function Blocks () {
     this.blockList = [];
 
     this.blockArt = {};
+    this.blockCollapseArt = {};
 
     // Track the time with mouse down.
     this.mouseDownTime = 0;

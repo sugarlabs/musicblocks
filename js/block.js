@@ -161,9 +161,9 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.highlight = function () {
-	if (this.trash) {
-	    return;
-	}
+        if (this.trash) {
+            return;
+        }
 
         if (this.inCollapsed) {
             // In collapsed, so do nothing.
@@ -219,9 +219,9 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.unhighlight = function () {
-	if (this.trash) {
-	    return;
-	}
+        if (this.trash) {
+            return;
+        }
 
         if (this.inCollapsed) {
             // In collapsed, so do nothing.
@@ -318,7 +318,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             } else if (that.isCollapsible()) {
                 that._ensureDecorationOnTop();
-	    }
+            }
 
             that.updateCache();
             that._calculateBlockHitArea();
@@ -914,6 +914,10 @@ function Block(protoblock, blocks, overrideName) {
             that.collapseText.visible = that.collapsed;
             that._ensureDecorationOnTop();
 
+            // Save the collapsed block artwork for export.
+            var artwork = that.collapseArtwork.replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(that.collapseText.text));
+            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] = artwork;
+
             __processExpandButton(that);
         };
 
@@ -928,8 +932,8 @@ function Block(protoblock, blocks, overrideName) {
             _blockMakeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', ''), __processHighlightCollapseBitmap, that);
         };
 
-        var artwork = this.collapseArtwork;
-        _blockMakeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), __processCollapseBitmap, this);
+        var artwork = this.collapseArtwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', '');
+        _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
 
     this.hide = function () {
@@ -1354,13 +1358,13 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.moveBlockRelative(blk, 0, dy);
             }
 
-	    this.blocks.adjustDocks(thisBlock, true);
+            this.blocks.adjustDocks(thisBlock, true);
         }
 
         // Look to see if we are in a clamp block. If so, readjust.
-	clampList = [];
-	this.blocks.findNestedClampBlocks(thisBlock, clampList);
-	if (clampList.length > 0) {
+        clampList = [];
+        this.blocks.findNestedClampBlocks(thisBlock, clampList);
+        if (clampList.length > 0) {
             this.blocks.clampBlocksToCheck = clampList;
             this.blocks.adjustExpandableClampBlock();
         }
@@ -1563,8 +1567,8 @@ function Block(protoblock, blocks, overrideName) {
                     that._mouseoutCallback(event, moved, haveClick, false);
                 }
 
-		that.blocks.unhighlight(thisBlock, true);
-		that.blocks.activeBlock = null;
+                that.blocks.unhighlight(thisBlock, true);
+                that.blocks.activeBlock = null;
 
                 moved = false;
             });
@@ -1575,8 +1579,8 @@ function Block(protoblock, blocks, overrideName) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
 
-		that.blocks.unhighlight(thisBlock, true);
-		that.blocks.activeBlock = null;
+                that.blocks.unhighlight(thisBlock, true);
+                that.blocks.activeBlock = null;
 
                 moved = false;
             });
@@ -1662,8 +1666,8 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.clearLongPressButtons();
             }
 
-	    that.blocks.unhighlight(thisBlock, true);
-	    that.blocks.activeBlock = null;
+            that.blocks.unhighlight(thisBlock, true);
+            that.blocks.activeBlock = null;
 
             moved = false;
         });
@@ -1675,8 +1679,8 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.clearLongPressButtons();
             }
 
-	    that.blocks.unhighlight(thisBlock, true);
-	    that.blocks.activeBlock = null;
+            that.blocks.unhighlight(thisBlock, true);
+            that.blocks.activeBlock = null;
 
             moved = false;
         });
@@ -2269,8 +2273,8 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
         // wheelNav pie menu for pitch selection
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
@@ -2513,8 +2517,8 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for scale degree pitch selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         var noteLabels = [];
         for (var i = 0; i < noteValues.length; i++) {
@@ -2661,8 +2665,8 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for accidental selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         docById('wheelDiv').style.display = '';
 
@@ -2766,8 +2770,8 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for note value selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         docById('wheelDiv').style.display = '';
 
@@ -2960,8 +2964,8 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for number selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         docById('wheelDiv').style.display = '';
 
@@ -3096,8 +3100,8 @@ function Block(protoblock, blocks, overrideName) {
         // basic wheelNav pie menu
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         if (colors === undefined) {
             colors = ['#77c428', '#93e042', '#5ba900'];
@@ -3183,8 +3187,8 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for boolean selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         docById('wheelDiv').style.display = '';
 
@@ -3269,8 +3273,8 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for voice selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         const COLORS = ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'];
         var colors = [];
@@ -3401,8 +3405,8 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for interval selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         docById('wheelDiv').style.display = '';
 
@@ -3580,8 +3584,8 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for mode selection
 
         if (this.blocks.stageClick) {
-	    return;
-	}
+            return;
+        }
 
         // Look for a key block
         var key = 'C';

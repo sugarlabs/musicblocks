@@ -450,6 +450,10 @@ define(MYDEFINES, function (compatibility) {
                     continue;
                 }
 
+                if (blocks.blockList[i].inCollapsed) {
+                    continue;
+                }
+
                 if (blocks.blockList[i].container.x + blocks.blockList[i].width > xMax) {
                     xMax = blocks.blockList[i].container.x + blocks.blockList[i].width;
                 }
@@ -458,7 +462,12 @@ define(MYDEFINES, function (compatibility) {
                     yMax = blocks.blockList[i].container.y + blocks.blockList[i].height;
                 }
 
-                var parts = blocks.blockArt[i].split('><');
+                if (blocks.blockList[i].collapsed) {
+                    var parts = blocks.blockCollapseArt[i].split('><');
+                } else {
+                    var parts = blocks.blockArt[i].split('><');
+                }
+
                 svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
                 if (SPECIALINPUTS.indexOf(blocks.blockList[i].name) !== -1) { 
                     for (var p = 1; p < parts.length; p++) {
@@ -503,7 +512,7 @@ define(MYDEFINES, function (compatibility) {
 
             svg += '</svg>';
 
-	    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + encodeURIComponent(svg);
+            return '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + encodeURIComponent(svg);
         };
 
         function _allClear() {
@@ -2746,10 +2755,10 @@ define(MYDEFINES, function (compatibility) {
             update = true;
 
             // Setup help now that we have calculated turtleBlocksScale.
-	    if (storage.doneTour) {
-	    } else {
-		_showHelp();
-	    }
+            if (storage.doneTour) {
+            } else {
+                _showHelp();
+            }
 
             // Hide palette icons on mobile
             if (mobileSize) {
@@ -3032,11 +3041,11 @@ define(MYDEFINES, function (compatibility) {
 
         function doSave() {
             if (beginnerMode) {
-		save.saveHTML(_('My Project'));
-	    } else {
-		_hideBoxes();
-		saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
-	    }
+                save.saveHTML(_('My Project'));
+            } else {
+                _hideBoxes();
+                saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+            }
         };
 
         function doUploadToPlanet() {
@@ -4503,13 +4512,13 @@ handleComplete);
                 labels.push('imgsrc:header-icons/save-blocks-button.svg');
             }
 
-	    var name = blocks.blockList[blocks.activeBlock].name;
-	    if (name in BLOCKHELP) {
+            var name = blocks.blockList[blocks.activeBlock].name;
+            if (name in BLOCKHELP) {
                 labels.push('imgsrc:header-icons/help-button.svg');
-		var helpButton = labels.length - 1;
-	    } else {
-		var helpButton = null;
-	    }
+                var helpButton = labels.length - 1;
+            } else {
+                var helpButton = null;
+            }
 
             var wheel = new wheelnav('contextWheelDiv', null, 150, 150);
             wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
@@ -4532,9 +4541,9 @@ handleComplete);
                 wheel.navItems[5].setTooltip(_('Save stack'));
             }
 
-	    if (helpButton !== null) {
+            if (helpButton !== null) {
                 wheel.navItems[helpButton].setTooltip(_('Help'));
-	    }
+            }
 
             wheel.navItems[0].selected = false;
 
@@ -4573,13 +4582,13 @@ handleComplete);
                 };
             }
 
-	    if (helpButton !== null) {
+            if (helpButton !== null) {
                 wheel.navItems[helpButton].navigateFunction = function () {
                     blocks.activeBlock = activeBlock;
-		    var helpWidget = new HelpWidget();
-		    helpWidget.init(blocks);
-		};
-	    }
+                    var helpWidget = new HelpWidget();
+                    helpWidget.init(blocks);
+                };
+            }
 
             setTimeout(function () {
                 blocks.stageClick = false;
