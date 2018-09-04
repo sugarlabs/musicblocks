@@ -825,7 +825,7 @@ function Block(protoblock, blocks, overrideName) {
                 __finishCollapse(that);
             };
 
-            image.src = 'images/collapse.svg';
+            image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
 
         var __processExpandButton = function (that) {
@@ -847,7 +847,7 @@ function Block(protoblock, blocks, overrideName) {
                 __processCollapseButton(that);
             };
 
-            image.src = 'images/expand.svg';
+            image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 
         var __processHighlightCollapseBitmap = function (bitmap, that) {
