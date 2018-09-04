@@ -2416,7 +2416,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('movable');  // legacy typo
     newblock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['movable'] = newblock;
-    newblock.staticLabels.push(_('moveable'));
+    newblock.staticLabels.push(_('moveable Do'));
     newblock.adjustWidthToLabel();
     newblock.oneBooleanArgBlock();
     if (beginnerMode && !beginnerBlock('movable')) {
