@@ -434,6 +434,7 @@ define(MYDEFINES, function (compatibility) {
 
         function _printBlockSVG() {
             blocks.activeBlock = null;
+            var startCounter = 0;
             var svg = '';
             var xMax = 0;
             var yMax = 0;
@@ -466,6 +467,10 @@ define(MYDEFINES, function (compatibility) {
                     var parts = blocks.blockCollapseArt[i].split('><');
                 } else {
                     var parts = blocks.blockArt[i].split('><');
+                }
+
+                if (blocks.blockList[i].isCollapsible()) {
+                    svg += '<g>';
                 }
 
                 svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
@@ -507,7 +512,52 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }
                 }
+
                 svg += '</g>';
+
+                if (blocks.blockList[i].isCollapsible()) {
+                    if (INLINECOLLAPSIBLES.indexOf(blocks.blockList[i].name) !== -1) {
+                        var y = blocks.blockList[i].container.y + 4;
+                    } else {
+                        var y = blocks.blockList[i].container.y + 12;
+                    }
+
+                    svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + y + ') scale(0.5 0.5)">';
+                    if (blocks.blockList[i].collapsed) {
+                        var parts = EXPANDBUTTON.split('><');
+                    } else {
+                        var parts = COLLAPSEBUTTON.split('><');
+                    }
+
+                    for (var p = 2; p < parts.length - 1; p++) {
+                        svg += '<' +  parts[p] + '>';
+                    }
+
+                    svg += '</g>';
+                }
+
+                if (blocks.blockList[i].name === 'start') {
+                    var x = blocks.blockList[i].container.x + 110;
+                    var y = blocks.blockList[i].container.y + 12;
+                    svg += '<g transform="translate(' + x + ', ' + y + ') scale(0.4 0.4)">';
+
+                    var parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter]).replace(/stroke_color/g, STROKECOLORS[startCounter]).split('><');
+
+                    startCounter += 1;
+                    if (startCounter > 9) {
+                        startCounter = 0;
+                    }
+
+                    for (var p = 2; p < parts.length - 1; p++) {
+                        svg += '<' +  parts[p] + '>';
+                    }
+
+                    svg += '</g>';
+                }
+
+                if (blocks.blockList[i].isCollapsible()) {
+                    svg += '</g>';
+                }
             }
 
             svg += '</svg>';
