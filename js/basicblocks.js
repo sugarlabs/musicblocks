@@ -972,6 +972,19 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    if (beginnerMode) {
+        // macro
+        var newblock = new ProtoBlock('rhythmruler3');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['rhythmruler3'] = newblock;
+        //.TRANS: widget for subdividing a measure into distinct rhythmic elements
+        newblock.staticLabels.push(_('rhythm ruler'));
+        newblock.extraWidth = 20;
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+    }
+
     // macro
     var newblock = new ProtoBlock('rhythmruler2');
     newblock.palette = palettes.dict['widgets'];
@@ -982,7 +995,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('rhythmruler2')) {
+    if (beginnerMode) {
         newblock.hidden = true;
     }
 
@@ -3534,9 +3547,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     var newblock = new ProtoBlock('box');
     if (beginnerMode && !beginnerBlock('box')) {
-	newblock.palette = palettes.dict['extras'];
+        newblock.palette = palettes.dict['extras'];
     } else {
-	newblock.palette = palettes.dict['boxes'];
+        newblock.palette = palettes.dict['boxes'];
     }
     blocks.protoBlockDict['box'] = newblock;
     //.TRANS: a container into which to put something
@@ -3552,9 +3565,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     var newblock = new ProtoBlock('namedbox');
     if (beginnerMode && !beginnerBlock('namedbox')) {
-	newblock.palette = palettes.dict['extras'];
+        newblock.palette = palettes.dict['extras'];
     } else {
-	newblock.palette = palettes.dict['boxes'];
+        newblock.palette = palettes.dict['boxes'];
     }
     blocks.protoBlockDict['namedbox'] = newblock;
     newblock.staticLabels.push(_('box'));
@@ -3565,9 +3578,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     var newblock = new ProtoBlock('storein2');
     if (beginnerMode && !beginnerBlock('storein2')) {
-	newblock.palette = palettes.dict['extras'];
+        newblock.palette = palettes.dict['extras'];
     } else {
-	newblock.palette = palettes.dict['boxes'];
+        newblock.palette = palettes.dict['boxes'];
     }
     blocks.protoBlockDict['storein2'] = newblock;
     newblock.staticLabels.push(_('store in box'));
@@ -3578,9 +3591,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     var newblock = new ProtoBlock('storein');
     if (beginnerMode && !beginnerBlock('storein')) {
-	newblock.palette = palettes.dict['extras'];
+        newblock.palette = palettes.dict['extras'];
     } else {
-	newblock.palette = palettes.dict['boxes'];
+        newblock.palette = palettes.dict['boxes'];
     }
     blocks.protoBlockDict['storein'] = newblock;
     //.TRANS: put something into a container for later reference
