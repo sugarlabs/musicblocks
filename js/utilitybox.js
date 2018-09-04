@@ -17,17 +17,17 @@ function UtilityBox () {
     const BOXBUTTONSPACING = 65;
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
-	if (beginnerMode) {
-            // 3 buttons, 2 intrabuttons spaces, 2 extrabutton spaces
-	    var boxwidth = 3 * 55 + 2 * 10 + 2 * 20;
+        if (beginnerMode) {
+            // 4 buttons, 3 intrabuttons spaces, 2 extrabutton spaces
+            var boxwidth = 4 * 55 + 3 * 10 + 2 * 20;
             var boxwidth2 = boxwidth - 1.5;
             var boxclose = boxwidth - 55;
-	} else {
-            // 8 buttons, 7 intrabuttons spaces, 2 extrabutton spaces
-	    var boxwidth = 8 * 55 + 7 * 10 + 2 * 20;
+        } else {
+            // 9 buttons, 8 intrabuttons spaces, 2 extrabutton spaces
+            var boxwidth = 9 * 55 + 8 * 10 + 2 * 20;
             var boxwidth2 = boxwidth - 1.5;
             var boxclose = boxwidth - 55;
-	}
+        }
     } else {
         // 7 buttons, 6 intrabuttons spaces, 2 extrabutton spaces
         var boxwidth = 7 * 55 + 6 * 10 + 2 * 20;
@@ -50,6 +50,7 @@ function UtilityBox () {
     this._scrollStatus = false;
     this._increaseStatus = true;
     this._decreaseStatus = true;
+    this._switchMode = null;
     this._optimize = null;
     this._optimizeState = false;
     this._container = null;
@@ -94,6 +95,11 @@ function UtilityBox () {
         return this;
     };
 
+    this.setSwitchMode = function (switchmode) {
+        this._switchMode = switchmode;
+        return this;
+    };
+
     this.setLanguage = function (doLanguageBox, languageBox) {
         this._doLanguageBox = doLanguageBox;
         this._languageBox = languageBox;
@@ -110,10 +116,38 @@ function UtilityBox () {
     };
 
     this.init = function (scale, x, y, makeButton, status) {
+	console.log('INIT');
         if (this._container === null) {
             this._createBox(scale, x, y);
             var that = this;
             var dx = BOXBUTTONOFFSET;
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this._beginnerButton = makeButton('beginner-button', _('Switch to advanced mode'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._advancedButton = makeButton('advanced-button', _('Switch to beginner mode'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                if (beginnerMode) {
+                    this._beginnerButton.visible = true;
+                    this._advancedButton.visible = false;
+                } else {
+                    this._beginnerButton.visible = false;
+                    this._advancedButton.visible = true;
+                }
+
+                this._positionHoverText(this._beginnerButton);
+                this._positionHoverText(this._advancedButton);
+
+                this._beginnerButton.on('click', function (event) {
+                    that._switchMode();
+                    that.hide();
+                });
+
+                this._advancedButton.on('click', function (event) {
+                    that._switchMode();
+                    that.hide();
+                });
+
+                dx += BOXBUTTONSPACING;
+            }
 
             if (_THIS_IS_MUSIC_BLOCKS_ && !beginnerMode) {
                 this._optimizeOnButton = makeButton('optimize-on-button', _('Optimize performance'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
@@ -126,16 +160,16 @@ function UtilityBox () {
                 this._optimizeOnButton.on('click', function (event) {
                     that._optimizeState = true;
                     that._optimize(that._optimizeState);
-                    that._optimizeOnButton.visible = false;
-                    that._optimizeOffButton.visible = true;
+                    that._optimizeOnButton.visible = true;
+                    that._optimizeOffButton.visible = false;
                     that.hide();
                 });
 
                 this._optimizeOffButton.on('click', function (event) {
                     that._optimizeState = false;
                     that._optimize(that._optimizeState);
-                    that._optimizeOnButton.visible = true;
-                    that._optimizeOffButton.visible = false;
+                    that._optimizeOnButton.visible = false;
+                    that._optimizeOffButton.visible = true;
                     that.hide();
                 });
 
@@ -193,69 +227,69 @@ function UtilityBox () {
 
             dx += BOXBUTTONSPACING;;
 
-	    if (!beginnerMode) {
-		this._statsButton = makeButton('stats-button', _('Display statistics'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-		this._statsButton.visible = true;
-		this._positionHoverText(this._statsButton);
+            if (!beginnerMode) {
+                this._statsButton = makeButton('stats-button', _('Display statistics'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._statsButton.visible = true;
+                this._positionHoverText(this._statsButton);
 
-		this._statsButton.on('click', function (event) {
+                this._statsButton.on('click', function (event) {
                     that._doStats();
                     that.hide();
-		});
+                });
 
-		dx += BOXBUTTONSPACING;;
+                dx += BOXBUTTONSPACING;;
 
-		this._pluginsButton = makeButton('plugins-button', _('Load plugin from file'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-		this._pluginsButton.visible = true;
-		this._positionHoverText(this._pluginsButton);
+                this._pluginsButton = makeButton('plugins-button', _('Load plugin from file'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._pluginsButton.visible = true;
+                this._positionHoverText(this._pluginsButton);
 
-		this._pluginsButton.on('click', function (event) {
+                this._pluginsButton.on('click', function (event) {
                     that._doPlugins();
                     that.hide();
-		});
+                });
 
-		dx += BOXBUTTONSPACING;;
+                dx += BOXBUTTONSPACING;;
 
-		this._pluginsDeleteButton = makeButton('plugins-delete-disabled-button', '', this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-		this._pluginsDeleteButton.visible = !status;
-		this._positionHoverText(this._pluginsDeleteButton);
+                this._pluginsDeleteButton = makeButton('plugins-delete-disabled-button', '', this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._pluginsDeleteButton.visible = !status;
+                this._positionHoverText(this._pluginsDeleteButton);
 
-		this._pluginsDeleteButton2 = makeButton('plugins-delete-button', _('Delete plugin'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-		this._pluginsDeleteButton2.visible = status;
-		this._positionHoverText(this._pluginsDeleteButton2);
+                this._pluginsDeleteButton2 = makeButton('plugins-delete-button', _('Delete plugin'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._pluginsDeleteButton2.visible = status;
+                this._positionHoverText(this._pluginsDeleteButton2);
 
-		this._pluginsDeleteButton2.on('click', function (event) {
+                this._pluginsDeleteButton2.on('click', function (event) {
                     that._deletePlugin();
                     that.hide();
-		});
+                });
 
-		dx += BOXBUTTONSPACING;;
+                dx += BOXBUTTONSPACING;;
 
-		this._scrollButton = makeButton('scroll-unlock-button', _('Enable scrolling'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-		this._scrollButton.visible = true;
-		this._positionHoverText(this._scrollButton);
+                this._scrollButton = makeButton('scroll-unlock-button', _('Enable scrolling'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._scrollButton.visible = true;
+                this._positionHoverText(this._scrollButton);
 
-		this._scrollButton.on('click', function (event) {
+                this._scrollButton.on('click', function (event) {
                     that._doScroller();
                     that.hide();
                     that._scrollStatus = !that._scrollStatus;
-		});
+                });
 
-		// Don't increase dx since this button is placed on top of
-		// the previous button.
+                // Don't increase dx since this button is placed on top of
+                // the previous button.
 
-		this._scrollButton2 = makeButton('scroll-lock-button', _('Disable scrolling'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
-		this._scrollButton2.visible = false;
-		this._positionHoverText(this._scrollButton2);
-		this._scrollButton2.on('click', function (event) {
+                this._scrollButton2 = makeButton('scroll-lock-button', _('Disable scrolling'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+                this._scrollButton2.visible = false;
+                this._positionHoverText(this._scrollButton2);
+                this._scrollButton2.on('click', function (event) {
                     that._doScroller();
                     that.hide();
                     that._scrollStatus = !that._scrollStatus;
-		});
-            } else {
-		this._show(status);
+                });
             }
-	}
+        } else {
+            this._show(status);
+        }
     };
 
     this._positionHoverText = function (button, offset) {
@@ -275,51 +309,69 @@ function UtilityBox () {
 
     this.hide = function () {
         if (this._container !== null) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this._beginnerButton.visible = false;
+                this._advancedButton.visible = false;
+            }
+
             this._languageButton.visible = false;
             this._smallerButton.visible = false;
             this._smallerButton2.visible = false;
             this._biggerButton.visible = false;
             this._biggerButton2.visible = false;
-	    if (!beginnerMode) {
-		if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (!beginnerMode) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this._optimizeOnButton.visible = false;
                     this._optimizeOffButton.visible = false;
-		}
 
-		this._statsButton.visible = false;
-		this._pluginsButton.visible = false;
-		this._pluginsDeleteButton.visible = false;
-		this._pluginsDeleteButton2.visible = false;
-		this._scrollButton.visible = false;
-		this._scrollButton2.visible = false;
-	    }
+                }
 
-	    this._container.visible = false;
+                this._statsButton.visible = false;
+                this._pluginsButton.visible = false;
+                this._pluginsDeleteButton.visible = false;
+                this._pluginsDeleteButton2.visible = false;
+                this._scrollButton.visible = false;
+                this._scrollButton2.visible = false;
+            }
+
+            this._container.visible = false;
             this._refreshCanvas();
         }
     };
 
     this._show = function (status) {
+	console.log('SHOW');
         if (this._container !== null) {
+	    console.log('----');
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (beginnerMode) {
+                    this._beginnerButton.visible = true;
+                    this._advancedButton.visible = false;
+                } else {
+                    this._beginnerButton.visible = false;
+                    this._advancedButton.visible = true;
+                }
+            }
+
             this._languageButton.visible = true;
             this._smallerButton.visible = this._decreaseStatus;
             this._smallerButton2.visible = !this._decreaseStatus;
             this._biggerButton.visible = this._increaseStatus;
             this._biggerButton2.visible = !this._increaseStatus;
 
-	    if (!beginnerMode) {
-		if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (!beginnerMode) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this._optimizeOnButton.visible = !this._optimizeState;
                     this._optimizeOffButton.visible = this._optimizeState;
-		}
+                }
 
-		this._statsButton.visible = true;
-		this._pluginsButton.visible = true;
-		this._pluginsDeleteButton.visible = !status;
-		this._pluginsDeleteButton2.visible = status;
-		this._scrollButton.visible = !this._scrollStatus;
-		this._scrollButton2.visible = this._scrollStatus;
-	    }
+                this._statsButton.visible = true;
+                this._pluginsButton.visible = true;
+                this._pluginsDeleteButton.visible = !status;
+                this._pluginsDeleteButton2.visible = status;
+                this._scrollButton.visible = !this._scrollStatus;
+                this._scrollButton2.visible = this._scrollStatus;
+            }
 
             this._container.visible = true;
             this._refreshCanvas();

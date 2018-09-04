@@ -821,7 +821,7 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function _doSwitchMode() {
+        function doSwitchMode() {
             blocks.activeBlock = null;
             if (beginnerMode) {
                 textMsg(_('Refresh your browser to change to advanced mode.'));
@@ -1231,6 +1231,7 @@ define(MYDEFINES, function (compatibility) {
                 .setStats(doAnalytics)
                 .setScroller(toggleScroller)
                 .setLanguage(doLanguageBox, languageBox)
+	        .setSwitchMode(doSwitchMode)
                 .setOptimize(doOptimize);
 
             playbackBox = new PlaybackBox();
@@ -2955,6 +2956,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doUtilityBox() {
+	    console.log('PRESS');
             _hideBoxes();
             utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
         };
@@ -3736,7 +3738,7 @@ handleComplete);
 			['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
 			['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
 			['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-			['beginner', _doSwitchMode, _('Switch to advanced mode'), null, null, null, null],
+			// ['beginner', doSwitchMode, _('Switch to advanced mode'), null, null, null, null],
                     ];
 		} else {
 		    var buttonNames = [
@@ -3749,7 +3751,7 @@ handleComplete);
 			['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
 			['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
 			['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-			['advanced', _doSwitchMode, _('Switch to beginner mode'), null, null, null, null],
+			// ['advanced', doSwitchMode, _('Switch to beginner mode'), null, null, null, null],
 		    ];
                 }
 
@@ -4322,7 +4324,7 @@ handleComplete);
                     ['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
                     ['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
                     ['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
-                    ['imgsrc:header-icons/beginner-button.svg', _doSwitchMode],
+                    ['imgsrc:header-icons/beginner-button.svg', doSwitchMode],
                     [null, null],
                     [null, null],
                 ];
@@ -4364,7 +4366,7 @@ handleComplete);
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_ && !beginnerMode) {
-                submenuWheelValues[15] = ['imgsrc:header-icons/advanced-button.svg', _doSwitchMode];
+                submenuWheelValues[15] = ['imgsrc:header-icons/advanced-button.svg', doSwitchMode];
             }
 
             var wheelLabels = [];
