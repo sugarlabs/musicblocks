@@ -1519,6 +1519,23 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('duosynth');
+    newblock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['duosynth'] = newblock;
+    //.TRANS: a duo synthesizer combines a synth with a sequencer
+    newblock.staticLabels.push(_('duo synth'));
+    newblock.staticLabels.push(_('vibrato rate'), _('vibrato intensity'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    newblock.twoArgBlock();
+    newblock.defaults.push(10);
+    newblock.defaults.push(6);
+    newblock.dockTypes[1] = 'numberin';
+    newblock.dockTypes[2] = 'numberin';
+    if (beginnerMode && !beginnerBlock('duosynth')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('amsynth');
     newblock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['amsynth'] = newblock;
@@ -1547,26 +1564,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var newblock = new ProtoBlock('duosynth');
+    var newblock = new ProtoBlock('partial');
     newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['duosynth'] = newblock;
-    //.TRANS: a duo synthesizer combines a synth with a sequencer
-    newblock.staticLabels.push(_('duo synth'));
-    newblock.staticLabels.push(_('vibrato rate'), _('vibrato intensity'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(10);
-    newblock.defaults.push(6);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    if (beginnerMode && !beginnerBlock('duosynth')) {
-        newblock.hidden = true;
-    }
-
-    var partialBlock = new ProtoBlock('partial');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['partial'] = partialBlock;
+    blocks.protoBlockDict['partial'] = newblock;
     //.TRANS: partials are weighted components in a harmonic series
     newblock.staticLabels.push(_('partial'));
     newblock.adjustWidthToLabel();
