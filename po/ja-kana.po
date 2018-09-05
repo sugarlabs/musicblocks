@@ -3314,11 +3314,11 @@ msgstr "ネズミのおんか"
 #: js/basicblocks.js:3836
 ## http://jisho.org/word/%E5%90%8C%E6%9C%9F 
 msgid "mouse sync"
-msgstr "ネズミを同期させる"
+msgstr "ネズミをどうきさせる"
 
 #: js/basicblocks.js:3845
 msgid "found mouse"
-msgstr "ネズミを見つけた"
+msgstr "ネズミをみつけた"
 
 #: js/basicblocks.js:3855
 msgid "new mouse"
@@ -4867,7 +4867,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "クラウド"
 
 #~msgid "found turtle"
-#~msgstr "ネズミ見つかった"
+#~msgstr "ネズミみつかった"
 
 #~msgid "ml"
 #~msgstr "モ"
