@@ -52,12 +52,19 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     try {
-	console.log(localStorage.beginnerMode);
+	// console.log(localStorage.beginnerMode);
 
 	if (localStorage.beginnerMode !== null) {
-            console.log('setting mode from local storage');
-	    console.log(localStorage.beginnerMode);
+            // console.log('setting mode from local storage');
+	    // console.log(localStorage.beginnerMode);
             beginnerMode = localStorage.beginnerMode;
+	    if (typeof(beginnerMode) === 'string') {
+		if (beginnerMode === 'false') {
+		    beginnerMode = false;
+		} else {
+		    beginnerMode = truee;
+		}
+	    }
 	} else {
             beginnerMode = true;
 	}
@@ -67,6 +74,12 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     }
 } else {
     beginnerMode = false;
+}
+
+if (beginnerMode) {
+    console.log('BEGINNER MODE');
+} else {
+    console.log('ADVANCED MODE');
 }
 
 try {
