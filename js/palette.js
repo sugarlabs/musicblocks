@@ -2087,8 +2087,14 @@ function Palette(palettes, name) {
             var newBlk = protoblk.name;
             break;
         default:
+	    console.log(blkname);
+	    if (blkname === 'nameddo') {
+		var arg = _('action');
+	    } else {
+		var arg = '__NOARG__';
+	    }
+
             var newBlk = blkname;
-            var arg = '__NOARG__';
             break;
         }
 

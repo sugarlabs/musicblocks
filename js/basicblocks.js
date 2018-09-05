@@ -3903,9 +3903,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     // nameddo stays hidden until first action block is used.
-    if (!beginnerMode) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     // HEAP PALETTE
 

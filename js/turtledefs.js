@@ -43,7 +43,7 @@ function beginnerBlock(name) {
             'crescendo', 'decrescendo', 'setsynthvolume',  // volume palette
             'playdrum', 'setdrum', // drum palette
             'if', 'ifthenelse', 'repeat', 'forever', 'backward', 'duplicatenotes',  // flow palette
-            'action', 'start',  // action palette
+            'action', 'start', // 'listen', 'dispatch', // action palette
             'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne',  // boxes palette
             'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet',  // widgets palette
             'forward', 'back', 'left', 'right', 'setxy', 'arc', 'x', 'y', 'heading', 'scrollxy',  // mouse palette
@@ -51,7 +51,7 @@ function beginnerBlock(name) {
             'number', 'random', 'oneOf', 'plus', 'minus', 'multiply', 'divide',  // number palette
             'equal', 'less', 'greater',  // boolean palette
             'text', 'media', 'show', 'turtleshell', 'speak', 'height', 'width', 'bottompos', 'toppos', 'leftpos', 'rightpos',  // media palette
-            'mousebutton', 'mousex', 'mousey', 'time',  // sensor palette
+            'mousebutton', 'mousex', 'mousey', 'time', 'myclick', // sensor palette
             'push', 'pop', 'setHeapEntry', 'indexHeap', 'reverseHeap', 'emptyHeap', 'heapEmpty', 'heapLength', 'showHeap',  // heap palette
             'setturtlename2', 'turtlename', 'turtlesync',  // mice palette
             'print', 'hspace', 'vspace'  // extras palette
