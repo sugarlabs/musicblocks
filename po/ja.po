@@ -526,7 +526,7 @@ msgstr "新規作成"
 #: js/activity.js:3647
 #: js/turtledefs.js:116
 msgid "Restore"
-msgstr "ブロックをリストアする"
+msgstr "ブロックをリストア"
 
 #: js/activity.js:3642
 #: js/turtledefs.js:103
