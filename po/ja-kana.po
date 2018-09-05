@@ -742,7 +742,7 @@ msgstr "「ピッチ・じこくぎょうれつ」には、ひとついじょう
 #: js/logo.js:3414
 #: js/logo.js:3437
 msgid "Beats per minute must be > 30."
-msgstr "BPM(いっぷんあたりのはくすう)は30よりおおきいひつようがあります。"
+msgstr "BPM(いっぷんあたりのはくすう)は30よりおおきいひつようがあります。a"
 
 #: js/logo.js:3367
 #: js/logo.js:3389
@@ -2090,7 +2090,7 @@ msgstr "BPM"
 #: js/basicblocks.js:1180
 #: js/basicblocks.js:1204
 msgid "beat value"
-msgstr "びょうしのすうち"
+msgstr "びょうしのあたい"
 
 #: js/basicblocks.js:1226
 #.TRANS: anacrusis

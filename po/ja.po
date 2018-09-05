@@ -2089,7 +2089,7 @@ msgstr "BPM"
 #: js/basicblocks.js:1180
 #: js/basicblocks.js:1204
 msgid "beat value"
-msgstr "拍子の数"
+msgstr "拍子の値"
 
 #: js/basicblocks.js:1226
 #.TRANS: anacrusis
