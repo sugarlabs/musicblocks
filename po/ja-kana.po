@@ -526,7 +526,7 @@ msgstr "しんきさくせい"
 #: js/activity.js:3647
 #: js/turtledefs.js:116
 msgid "Restore"
-msgstr "もとにもどす"
+msgstr "ブロックをリストアする"
 
 #: js/activity.js:3642
 #: js/turtledefs.js:103
