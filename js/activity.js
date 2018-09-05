@@ -335,8 +335,6 @@ define(MYDEFINES, function (compatibility) {
         var saveButton = null;
         var deleteAllButton = null;
 
-        var helpContainer = null;
-        var helpIdx = 0;
         var firstRun = true;
 
         pluginsImages = {};
@@ -1333,7 +1331,6 @@ define(MYDEFINES, function (compatibility) {
 
                     storage.setItem('isStatusHidden', docById('statusDiv').style.visibility);
                     logo.doStopTurtle();
-                    helpContainer.visible = false;
                     docById('helpElem').style.visibility = 'hidden';
                     document.querySelector('.canvasHolder').classList.add('hide');
                     document.querySelector('#canvas').style.display = 'none';
