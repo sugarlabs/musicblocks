@@ -56,7 +56,8 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 
 	if (localStorage.beginnerMode !== null) {
             console.log('setting mode from local storage');
-            beginnerMode = (localStorage.beginnerMode == 'true');
+	    console.log(localStorage.beginnerMode);
+            beginnerMode = localStorage.beginnerMode;
 	} else {
             beginnerMode = true;
 	}
