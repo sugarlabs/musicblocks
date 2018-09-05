@@ -4308,7 +4308,7 @@ msgstr "ファイルでダウンロードする"
 
 #: js/StringHelper.js:56
 msgid "Open in Music Blocks"
-msgstr "ミュージック・ブロックスでひらきます"
+msgstr "ミュージック・ブロックスでひらく"
 
 #: js/GlobalCard.js:30
 msgid "More Details"

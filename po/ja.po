@@ -4234,11 +4234,11 @@ msgstr "消す"
 
 #: js/StringHelper.js:34
 msgid "Explore Projects"
-msgstr "プロジェクトを探します"
+msgstr "プロジェクトを探す"
 
 #: js/StringHelper.js:35
 msgid "View More"
-msgstr "もっと見ます"
+msgstr "もっと見る"
 
 #: js/StringHelper.js:36
 msgid "Most recent"
