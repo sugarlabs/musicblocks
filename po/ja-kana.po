@@ -1320,20 +1320,20 @@ msgstr "キャンバスうえのブロックスをスクロールできます。
 #: js/turtledefs.js:109
 #: js/utilitybox.js:146
 msgid "Decrease block size"
-msgstr "ブロックをちいさくします。"
+msgstr "ブロックをちいさくする"
 
 #: js/turtledefs.js:109
 msgid "Decrease the size of the blocks."
-msgstr "ブロックのおおきさをちいさくします。"
+msgstr "ブロックのおおきさをちいさくする"
 
 #: js/turtledefs.js:110
 #: js/utilitybox.js:164
 msgid "Increase block size"
-msgstr "ブロックをおおきくします。"
+msgstr "ブロックをおおきくする"
 
 #: js/turtledefs.js:110
 msgid "Increase the size of the blocks."
-msgstr "ブロックのおおきをおおきくします。"
+msgstr "ブロックのおおきさをおおきくする"
 
 #: js/turtledefs.js:111
 #: js/utilitybox.js:182
@@ -1933,7 +1933,7 @@ msgstr "ピッチ・じこくぎょうれつ"
 #.TRANS: factor used in determining how many duplications to make
 ## Probably incorrect/misleading. PLEASE CHECK!
 msgid "duplicate factor"
-msgstr "～かいくりかえすファクター"
+msgstr "ふくせいファクター"
 
 #: js/basicblocks.js:874
 #.TRANS: oscillator time (in micro seconds)
@@ -1966,9 +1966,9 @@ msgstr "おんぷのしょうりゃく"
 
 #: js/basicblocks.js:939
 #.TRANS: play each note more than once
-## This makes sense, I think, but only if 1=1 time, 2=2 times, etc
+## 複製
 msgid "duplicate"
-msgstr "おんぷを～かい"
+msgstr "ふくせいする"
 
 #: js/basicblocks.js:948
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
