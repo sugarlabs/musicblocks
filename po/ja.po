@@ -3217,7 +3217,7 @@ msgstr "ミュージック・ブロックス"
 
 #: js/basicblocks.js:3608
 msgid "print"
-msgstr "表示""
+msgstr "表示"
 
 #: js/basicblocks.js:3627
 ## 音量＝おんりょう
@@ -4357,15 +4357,15 @@ msgstr "匿名"
 
 #: js/ProjectViewer.js:16
 msgid "Error: Report could not be submitted. Try again later."
-msgstr ""
+msgstr "エラー：通報ができませんでした。後で再度試してください。"
 
 #: js/ProjectViewer.js:17
 msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
-msgstr ""
+msgstr "このプロジェクトを通報して下さってありがとうございます。モデレータが間もなく、プロジェクトを見ます。"
 
 #: js/ProjectViewer.js:19
 msgid "Project Reported"
-msgstr ""
+msgstr "プロジェクトは通報されました"
 
 #: js/ProjectViewer.js:20
 msgid "Report description required"
