@@ -3218,7 +3218,7 @@ msgstr "ミュージック・ブロックス"
 
 #: js/basicblocks.js:3608
 msgid "print"
-msgstr "ひょうじ""
+msgstr "ひょうじ"
 
 #: js/basicblocks.js:3627
 ## おんりょう＝おんりょう
