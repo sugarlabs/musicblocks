@@ -424,7 +424,7 @@ function Synth() {
         switch(sourceNameLC) {
         case 'amsynth':
             var synthOptions = {
-                'harmonicity': 3,
+                'harmonicity': 1,
                 'detune': 0,
                 'envelope': {
                     'attack': 0.01,
@@ -445,7 +445,7 @@ function Synth() {
             break;
         case'fmsynth':
             var synthOptions = {
-                'harmonicity': 3,
+                'harmonicity': 1,
                 'modulationIndex': 10,
                 'detune': 0,
                 'envelope': {

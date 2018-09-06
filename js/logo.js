@@ -3202,13 +3202,13 @@ function Logo () {
 
             if (args[1] === null ||  typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg1 = 6;
+                var arg1 = 50;
             } else {
                 var arg1 = args[1];
             }
 
-            synthVibratoRate = arg0;
-            synthVibratoAmount = arg1;
+            synthVibratoRate = Math.abs(arg0);
+            synthVibratoAmount = Math.abs(arg1) / 100;
 
             if (that.inTimbre) {
                 that.timbre.duoSynthParamVals['vibratoRate'] = synthVibratoRate;

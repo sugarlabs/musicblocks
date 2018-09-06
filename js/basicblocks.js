@@ -1554,7 +1554,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(10);
-    newblock.defaults.push(6);
+    newblock.defaults.push(5);
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
     if (beginnerMode && !beginnerBlock('duosynth')) {
