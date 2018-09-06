@@ -3339,7 +3339,13 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.display = '';
 
         // Use advanced constructor for more wheelnav on same div
-        this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
+        var language = localStorage.languagePreference;
+        if (language === 'ja') {
+            this._intervalNameWheel = new wheelnav('wheelDiv', null, 1500, 1500);
+	} else {
+            this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
+	}
+
         this._intervalWheel = new wheelnav('this._intervalWheel', this._intervalNameWheel.raphael);
         // exit button
         this._exitWheel = new wheelnav('_exitWheel', this._intervalNameWheel.raphael);
@@ -3715,8 +3721,8 @@ function Block(protoblock, blocks, overrideName) {
             var language = localStorage.languagePreference;
             if (language === 'ja') {
                 for (var i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                    that._modeNameWheel.navItems[i].titleAttr.font = "30 30px Impact, Black, sans-serif";
-                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px Impact, Black, sans-serif";
+                    that._modeNameWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
                 }
             }
 
