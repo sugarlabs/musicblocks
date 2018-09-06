@@ -1742,7 +1742,10 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._usePieNumber()) {
+                var blk = this.blocks.blockList.indexOf(this);
+                // There are lots of special cases where we want to
+                // use piemenus. Make sure this is not one of them.
+                if (PIEMENUS.indexOf(this.name) === -1 && !this.blocks.octaveNumber(blk) && !this.blocks.noteValueNumber(blk, 2) && !this.blocks.noteValueNumber(blk, 1) && !this.blocks.octaveModifierNumber(blk) && !this.blocks.intervalModifierNumber(blk) && !this._usePieNumber()) {
                     this._labelChanged(true);
                     hideDOMLabel();
                 }
@@ -2029,12 +2032,13 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
-            if (this._octaveNumber()) {
+            var blk = this.blocks.blockList.indexOf(this);
+            if (this.blocks.octaveNumber(blk)) {
                 this._piemenuNumber([8, 7, 6, 5, 4, 3, 2, 1], this.value);
-            } else if (this._noteValueNumber(2)) {
+            } else if (this.blocks.noteValueNumber(blk, 2)) {
                 this._piemenuNoteValue(this.value);
-            } else if (this._noteValueNumber(1)) {
-                var d = this._noteValueValue();
+            } else if (this.blocks.noteValueNumber(blk, 1)) {
+                var d = this.blocks.noteValueValue(blk);
                 if (d === 1) {
                     var values = [8, 7, 6, 5, 4, 3, 2, 1];
                 } else {
@@ -2045,6 +2049,20 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 this._piemenuNumber(values, this.value);
+            } else if (this.blocks.octaveModifierNumber(blk)) {
+                this._piemenuNumber([-2, -1, 0, 1, 2], this.value);
+            } else if (this.blocks.intervalModifierNumber(blk)) {
+                var name = this.blocks.blockList[this.blocks.blockList[this.connections[0]].connections[0]].name;
+                switch(name) {
+                case 'interval':
+                case 'setscalartransposition':
+                    this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
+                    break;
+                case 'semitoneinterval':
+                case 'settransposition':
+                    this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    break;
+                }
             } else if (this._usePieNumber()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
                 case 'rhythmicdot2':
@@ -2063,8 +2081,8 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
                     break;
                 case 'steppitch':
-		case 'interval':
-		case 'setscalartransposition':
+                case 'interval':
+                case 'setscalartransposition':
                     this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
                     break;
                 case 'decrescendo':
@@ -2074,10 +2092,10 @@ function Block(protoblock, blocks, overrideName) {
                 case 'harmonic2':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], this.value);
                     break;
-		case 'semitoneinterval':
-		case 'settransposition':
+                case 'semitoneinterval':
+                case 'settransposition':
                     this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
-		    break;
+                    break;
                 }
             } else {
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
@@ -2086,7 +2104,8 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        if (PIEMENUS.indexOf(this.name) === -1 && !this._octaveNumber() && !this._noteValueNumber(2) && !this._noteValueNumber(1) && !this._usePieNumber()) {
+        var blk = this.blocks.blockList.indexOf(this);
+        if (PIEMENUS.indexOf(this.name) === -1 && !this.blocks.octaveNumber(blk) && !this.blocks.noteValueNumber(blk, 2) && !this.blocks.noteValueNumber(blk, 1) && !this._usePieNumber()) {
             var focused = false;
 
             var __blur = function (event) {
@@ -2173,114 +2192,6 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             return false;
         }
-    };
-
-    this._noteValueNumber = function (c) {
-        // Is this a number block being used as a note value
-        // denominator argument?
-        var dblk = this.connections[0];
-        // Are we connected to a divide block?
-        if (this.name === 'number' && dblk !== null && this.blocks.blockList[dblk].name === 'divide') {
-            // Are we the denominator (c == 2) or numerator (c == 1)?
-            if (this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)) {
-                // Is the divide block connected to a note value block?
-                cblk = this.blocks.blockList[dblk].connections[0];
-                if (cblk !== null) {
-                    // Is it the first or second arg?
-                    switch (this.blocks.blockList[cblk].name) {
-                    case 'newnote':
-                    case 'pickup':
-                    case 'tuplet4':
-                    case 'newstaccato':
-                    case 'newslur':
-                    case 'elapsednotes2':
-                        if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                        break;
-                    case 'meter':
-                    case 'setbpm2':
-                    case 'setmasterbpm2':
-                    case 'stuplet':
-                    case 'rhythm2':
-                    case 'newswing2':
-                    case 'vibrato':
-                    case 'neighbor':
-                    case 'neighbor2':
-                        if (this.blocks.blockList[cblk].connections[2] === dblk) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                        break;
-                    default:
-                        return false;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return false;
-    };
-
-    this._noteValueValue = function () {
-        // Return the number block value being used as a note value
-        // denominator argument.
-        var dblk = this.connections[0];
-        // We are connected to a divide block.
-        // Is the divide block connected to a note value block?
-        cblk = this.blocks.blockList[dblk].connections[0];
-        if (cblk !== null) {
-            // Is it the first or second arg?
-            switch (this.blocks.blockList[cblk].name) {
-            case 'newnote':
-            case 'pickup':
-            case 'tuplet4':
-            case 'newstaccato':
-            case 'newslur':
-            case 'elapsednotes2':
-                if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                    cblk = this.blocks.blockList[dblk].connections[2];
-                    return this.blocks.blockList[cblk].value;
-                } else {
-                    return 1;
-                }
-                break;
-            case 'meter':
-            case 'setbpm2':
-            case 'setmasterbpm2':
-            case 'stuplet':
-            case 'rhythm2':
-            case 'newswing2':
-            case 'vibrato':
-            case 'neighbor':
-            case 'neighbor2':
-                if (this.blocks.blockList[cblk].connections[2] === dblk) {
-                    if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                        cblk = this.blocks.blockList[dblk].connections[2];
-                        return this.blocks.blockList[cblk].value;
-                    } else {
-                        return 1;
-                    }
-                } else {
-                    return 1;
-                }
-                break;
-            default:
-                return 1;
-                break;
-            }
-        }
-
-        return 1;
-    };
-
-    this._octaveNumber = function () {
-        // Is this a number block being used as an octave argument?
-        return (this.name === 'number' && this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
@@ -3006,12 +2917,12 @@ function Block(protoblock, blocks, overrideName) {
             this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
             this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
         } else if (wheelValues.length > 10) {
-	    this._numberWheel.slicePathCustom.minRadiusPercent = 0.4;
+            this._numberWheel.slicePathCustom.minRadiusPercent = 0.4;
             this._numberWheel.slicePathCustom.maxRadiusPercent = 0.8;
-	} else {
-	    this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+        } else {
+            this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-	}
+        }
 
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;

@@ -3279,6 +3279,188 @@ function Blocks () {
         }
     };
 
+    this.intervalModifierNumber = function (blk) {
+        // Is a number block being used as an addant to an
+        // interval (or transpose) block?
+
+        if (blk === null) {
+            return false;
+        }
+
+        var myBlock = this.blockList[blk];
+        var pblk = myBlock.connections[0];
+        // Are we connected to a plus block?
+        if (myBlock.name === 'number' && pblk !== null && this.blockList[pblk].name === 'plus') {
+            // Is the plus block connected to an interval block?
+            var c = this.blockList[pblk].connections[0];
+            if (c === null) {
+                return false;
+            }
+
+            if (['interval', 'setscalartransposition', 'semitoneinterval', 'settransposition'].indexOf(this.blockList[c].name) === -1) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    };
+
+    this.octaveModifierNumber = function (blk) {
+        // Is a number block being used as multipicant with a
+        // modelength block?
+
+        if (blk === null) {
+            return false;
+        }
+
+        var myBlock = this.blockList[blk];
+        var mblk = myBlock.connections[0];
+        // Are we connected to a multiply block?
+        if (myBlock.name === 'number' && mblk !== null && this.blockList[mblk].name === 'multiply') {
+            if (this.blockList[mblk].connections[1] === blk) {
+                var cblk = this.blockList[mblk].connections[2];
+            } else {
+                var cblk = this.blockList[mblk].connections[1];
+            }
+
+            if (this.blockList[cblk].name === 'modelength') {
+                return true;
+            }
+
+            // Special case: 1 / 12
+            if (this.blockList[cblk].name === 'number' && this.blockList[cblk].value === 12) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    this.noteValueNumber = function (blk, c) {
+        // Is a number block being used as a note value denominator
+        // argument?
+        if (blk === null) {
+            return false;
+        }
+
+        var myBlock = this.blockList[blk];
+        var dblk = myBlock.connections[0];
+        // Are we connected to a divide block?
+        if (myBlock.name === 'number' && dblk !== null && this.blockList[dblk].name === 'divide') {
+            // Are we the denominator (c == 2) or numerator (c == 1)?
+            if (this.blockList[dblk].connections[c] === this.blockList.indexOf(myBlock)) {
+                // Is the divide block connected to a note value block?
+                cblk = this.blockList[dblk].connections[0];
+                if (cblk !== null) {
+                    // Is it the first or second arg?
+                    switch (this.blockList[cblk].name) {
+                    case 'newnote':
+                    case 'pickup':
+                    case 'tuplet4':
+                    case 'newstaccato':
+                    case 'newslur':
+                    case 'elapsednotes2':
+                        if (this.blockList[cblk].connections[1] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case 'meter':
+                    case 'setbpm2':
+                    case 'setmasterbpm2':
+                    case 'stuplet':
+                    case 'rhythm2':
+                    case 'newswing2':
+                    case 'vibrato':
+                    case 'neighbor':
+                    case 'neighbor2':
+                        if (this.blockList[cblk].connections[2] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return false;
+    };
+
+    this.noteValueValue = function (blk) {
+        // Return the number block value being used as a note value
+        // denominator argument.
+        if (blk === null) {
+            return 1;
+        }
+
+        var myBlock = this.blockList[blk];
+        var dblk = myBlock.connections[0];
+        // We are connected to a divide block.
+        // Is the divide block connected to a note value block?
+        cblk = this.blockList[dblk].connections[0];
+        if (cblk !== null) {
+            // Is it the first or second arg?
+            switch (this.blockList[cblk].name) {
+            case 'newnote':
+            case 'pickup':
+            case 'tuplet4':
+            case 'newstaccato':
+            case 'newslur':
+            case 'elapsednotes2':
+                if (this.blockList[cblk].connections[1] === dblk) {
+                    cblk = this.blockList[dblk].connections[2];
+                    return this.blockList[cblk].value;
+                } else {
+                    return 1;
+                }
+                break;
+            case 'meter':
+            case 'setbpm2':
+            case 'setmasterbpm2':
+            case 'stuplet':
+            case 'rhythm2':
+            case 'newswing2':
+            case 'vibrato':
+            case 'neighbor':
+            case 'neighbor2':
+                if (this.blockList[cblk].connections[2] === dblk) {
+                    if (this.blockList[cblk].connections[1] === dblk) {
+                        cblk = this.blockList[dblk].connections[2];
+                        return this.blockList[cblk].value;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+                break;
+            }
+        }
+
+        return 1;
+    };
+
+    this.octaveNumber = function (blk) {
+        // Is this a number block being used as an octave argument?
+        if (blk === null) {
+            return false;
+        }
+
+        var myBlock = this.blockList[blk];
+        return (myBlock.name === 'number' && myBlock.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 && this.blockList[myBlock.connections[0]].connections[2] === blk);
+    };
+
     this.prepareStackForCopy = function () {
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
