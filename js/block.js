@@ -1742,10 +1742,9 @@ function Block(protoblock, blocks, overrideName) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
-                var blk = this.blocks.blockList.indexOf(this);
                 // There are lots of special cases where we want to
                 // use piemenus. Make sure this is not one of them.
-                if (PIEMENUS.indexOf(this.name) === -1 && !this.blocks.octaveNumber(blk) && !this.blocks.noteValueNumber(blk, 2) && !this.blocks.noteValueNumber(blk, 1) && !this.blocks.octaveModifierNumber(blk) && !this.blocks.intervalModifierNumber(blk) && !this._usePieNumber()) {
+		if (!this._usePiemenu()) {
                     this._labelChanged(true);
                     hideDOMLabel();
                 }
@@ -1764,6 +1763,47 @@ function Block(protoblock, blocks, overrideName) {
 
             this.blocks.activeBlock = null;
         }
+    };
+
+    this._usePiemenu = function () {
+	// Check on all the special cases were we want to use a pie menu.
+
+	// Special pie menus
+	if (PIEMENUS.indexOf(this.name) !== -1) {
+	    return true;
+	}
+
+	// Numeric pie menus
+        var blk = this.blocks.blockList.indexOf(this);
+
+	if (this.blocks.octaveNumber(blk)) {
+	    return true;
+	}
+
+	if (this.blocks.noteValueNumber(blk, 2)) {
+	    return true;
+	}
+
+	if (this.blocks.noteValueNumber(blk, 1)) {
+	    return true;
+	}
+
+	if (this.blocks.octaveModifierNumber(blk)) {
+	    return true;
+	}
+
+	if (this.blocks.intervalModifierNumber(blk)) {
+	    return true;
+	}
+
+	return this._usePieNumber();
+    };
+
+    this._usePieNumber = function () {
+        // Return true if this number block plugs into a block that
+        // uses a pie menu. Add block names to the list below and the
+        // switch statement in the _changeLabel function.
+        return this.connections[0] !== null && ['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
     };
 
     this._ensureDecorationOnTop = function () {
@@ -2105,7 +2145,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         var blk = this.blocks.blockList.indexOf(this);
-        if (PIEMENUS.indexOf(this.name) === -1 && !this.blocks.octaveNumber(blk) && !this.blocks.noteValueNumber(blk, 2) && !this.blocks.noteValueNumber(blk, 1) && !this._usePieNumber()) {
+        if (!this._usePiemenu()) {
             var focused = false;
 
             var __blur = function (event) {
@@ -2171,13 +2211,6 @@ function Block(protoblock, blocks, overrideName) {
                 focused = true;
             }, 100);
         }
-    };
-
-    this._usePieNumber = function () {
-        // Return true if this number block plugs into a block that
-        // uses a pie menu. Add block names to the list below and the
-        // switch statement about 80 lines above.
-        return this.connections[0] !== null && ['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
     };
 
     this.piemenuOKtoLaunch = function () {
