@@ -1796,6 +1796,10 @@ function Block(protoblock, blocks, overrideName) {
 	    return true;
 	}
 
+        if (this._usePieNumberC3()) {
+	    return true;
+	}
+
         if (this._usePieNumberC2()) {
 	    return true;
 	}
@@ -1814,7 +1818,7 @@ function Block(protoblock, blocks, overrideName) {
 	    return false;
 	}
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
 	    return false;
 	}
 
@@ -1837,7 +1841,7 @@ function Block(protoblock, blocks, overrideName) {
 	    return false;
 	}
 
-	if (['setsynthvolume'].indexOf(this.blocks.blockList[cblk].name) === -1) {
+	if (['setsynthvolume', 'tremolo', 'chorus', 'phaser'].indexOf(this.blocks.blockList[cblk].name) === -1) {
 	    return false;
 	}
 
@@ -1860,7 +1864,7 @@ function Block(protoblock, blocks, overrideName) {
 	    return false;
 	}
 
-	if ([].indexOf(this.blocks.blockList[cblk].name) === -1) {
+	if (['chorus'].indexOf(this.blocks.blockList[cblk].name) === -1) {
 	    return false;
 	}
 
@@ -2171,12 +2175,22 @@ function Block(protoblock, blocks, overrideName) {
                 }
 	    } else if (this._usePieNumberC3()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
+		case 'chorus':
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+		    break;
 		}
 	    } else if (this._usePieNumberC2()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
                 case 'setsynthvolume':
+		case 'tremolo':
                     this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
                     break;
+                case 'chorus':
+                    this._piemenuNumber([2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], this.value);
+		    break;
+                case 'phaser':
+                    this._piemenuNumber([1, 2, 3], this.value);
+		    break;
 		}
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
@@ -2217,6 +2231,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
                     break;
 		case 'setnotevolume':
+		case 'tremolo':
                     this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
                     break;
 		case 'dis':
