@@ -217,14 +217,14 @@ function getMacroExpansion (blkname, x, y) {
     const UNISONINTERVALOBJ = [[0, 'interval', x, y, [null, 1, 6, 8]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['number', {'value': 0}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, 'modelength', 0, 0, [3]], [6, 'vspace', 0, 0, [0, 7]], [7, 'vspace', 0, 0, [6, null]], [8, 'hidden', 0, 0, [0, null]]];
     const VIBRATOOBJ = [[0, 'vibrato', x, y, [null, 1, 3, 2, 6]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, 'vspace', 0, 0, [0, null]], [3, 'divide', 0, 0, [0, 4, 5]], [4, ['number', {'value': 1}], 0, 0, [3]], [5, ['number', {'value': 16}], 0, 0, [3]], [6, 'hidden', 0, 0, [0, null]]];
     const VOLOBJ = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ15 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 15}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ25 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 25}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ35 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 35}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ45 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 45}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ55 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 55}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ65 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 65}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ75 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 75}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const VOLOBJ85 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 85}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ10 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 10}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ20 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 20}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ30 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 30}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ40 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 40}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ50 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ60 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 60}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ80 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 80}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const VOLOBJ100 = [[0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]], [1, ['voicename', {'value': 'default'}], 0, 0, [0]], [2, ['number', {'value': 100}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
     const WHOLEOBJ = [[0, 'rhythm2', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 1}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const BLACKOBJ = [[0, 'setshade', x, y, [null, 1, null]], [1, ['number', {'value': 0}], 0, 0, [0]]];
     const WHITEOBJ = [[0, 'setshade', x, y, [null, 1, null]], [1, ['number', {'value': 100}], 0, 0, [0]]];
@@ -288,9 +288,9 @@ function getMacroExpansion (blkname, x, y) {
         'duplicatenotes': DUPOBJ,
         'eighthNote': EIGHTHOBJ,
         'elapsednotes2': ELAPSEDNOTESOBJ,
-        'f': VOLOBJ65,
-        'ff': VOLOBJ75,
-        'fff': VOLOBJ85,
+        'f': VOLOBJ60,
+        'ff': VOLOBJ80,
+        'fff': VOLOBJ100,
         'fifth': FIFTHOBJ,
         'fifthinterval': FIFTHINTERVALOBJ,
         'fill': FILLOBJ,
@@ -317,7 +317,7 @@ function getMacroExpansion (blkname, x, y) {
         'matrixcmajor': MATRIXCMAJOBJ,
         'matrixgmajor': MATRIXGMAJOBJ,
         'meter': METEROBJ,
-        'mf': VOLOBJ55,
+        'mf': VOLOBJ50,
         'midi': MIDIOBJ,
         'minor2': MINOR2OBJ,
         'minor3': MINOR3OBJ,
@@ -325,7 +325,7 @@ function getMacroExpansion (blkname, x, y) {
         'minor7': MINOR7OBJ,
         'modewidget': MODEWIDGETOBJ,
         'movable': MOVABLEOBJ,
-        'mp': VOLOBJ45,
+        'mp': VOLOBJ40,
         'multiplybeatfactor': MULTBEATOBJ,
         'neighbor': NEIGHBOROBJ,
         'neighbor2': NEIGHBOR2OBJ,
@@ -354,9 +354,9 @@ function getMacroExpansion (blkname, x, y) {
         'pitchslider': PITCHSLIDEROBJ,
         'pitchstaircase': PITCHSTAIRCASEOBJ,
         'playdrum': PLAYDRUMOBJ,
-        'ppp': VOLOBJ15,
-        'pp': VOLOBJ25,
-        'p': VOLOBJ35,
+        'ppp': VOLOBJ10,
+        'pp': VOLOBJ20,
+        'p': VOLOBJ30,
         'quarterNote': QUARTEROBJ,
         'rest2': RESTOBJ,
         'rhythm2': RHYTHMOBJ,

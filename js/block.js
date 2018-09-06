@@ -1818,7 +1818,7 @@ function Block(protoblock, blocks, overrideName) {
 	    return false;
 	}
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
 	    return false;
 	}
 
@@ -2146,7 +2146,17 @@ function Block(protoblock, blocks, overrideName) {
             if (this.blocks.octaveNumber(blk)) {
                 this._piemenuNumber([8, 7, 6, 5, 4, 3, 2, 1], this.value);
             } else if (this.blocks.noteValueNumber(blk, 2)) {
-                this._piemenuNoteValue(this.value);
+		var cblk = this.connections[0];
+		if (cblk !== null) {
+		    cblk = this.blocks.blockList[cblk].connections[0];
+		    if (cblk !== null && ['rhythm2', 'stuplet'].indexOf(this.blocks.blockList[cblk].name) !== -1) {
+			this._piemenuNumber([2, 4, 8, 16], this.value);
+		    } else {
+			this._piemenuNoteValue(this.value);
+		    }
+		} else {
+                    this._piemenuNoteValue(this.value);
+		}
             } else if (this.blocks.noteValueNumber(blk, 1)) {
                 var d = this.blocks.noteValueValue(blk);
                 if (d === 1) {
@@ -2157,6 +2167,14 @@ function Block(protoblock, blocks, overrideName) {
                         values.push(i + 1);
                     }
                 }
+
+		var cblk = this.connections[0];
+		if (cblk !== null) {
+		    cblk = this.blocks.blockList[cblk].connections[0];
+		    if (cblk !== null && ['neighbor', 'neighbor2', 'rhythm2', 'stuplet'].indexOf(this.blocks.blockList[cblk].name) !== -1) {
+			var values = [3, 2, 1];
+		    }
+		}
 
                 this._piemenuNumber(values, this.value);
             } else if (this.blocks.octaveModifierNumber(blk)) {
@@ -2197,6 +2215,9 @@ function Block(protoblock, blocks, overrideName) {
 		}
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
+		case 'duplicatenotes':
+		    this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
+		    break;
 		case 'rhythm2':
 		    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
 		    break;
@@ -2861,12 +2882,25 @@ function Block(protoblock, blocks, overrideName) {
         // We want powers of two on the bottom, nearest the input box
         // as it is most common.
         const WHEELVALUES = [3, 2, 7, 5];
-        const SUBWHEELS = {
+        var subWheelValues = {
             2: [1, 2, 4, 8, 16, 32],
             3: [1, 3, 6, 9, 12, 27],
             5: [1, 5, 10, 15, 20, 25],
             7: [1, 7, 14, 21, 28, 35],
         };
+
+	var cblk = this.connections[0];
+	if (cblk !== null) {
+	    cblk = this.blocks.blockList[cblk].connections[0];
+	    if (cblk !== null && ['neighbor', 'neighbor2'].indexOf(this.blocks.blockList[cblk].name) !== -1) {
+		var subWheelValues = {
+		    2: [8, 16, 32, 64],
+		    3: [9, 12, 27, 54],
+		    5: [10, 15, 20, 25],
+		    7: [14, 21, 28, 35],
+		};
+	    }
+	}
 
         // the noteValue selector
         this._noteValueWheel = new wheelnav('wheelDiv', null, 600, 600);
@@ -2907,8 +2941,8 @@ function Block(protoblock, blocks, overrideName) {
 
         var tabsLabels = [];
         for (var i = 0; i < WHEELVALUES.length; i++) {
-            for (var j = 0; j < SUBWHEELS[WHEELVALUES[i]].length; j++) {
-                tabsLabels.push(SUBWHEELS[WHEELVALUES[i]][j].toString());
+            for (var j = 0; j < subWheelValues[WHEELVALUES[i]].length; j++) {
+                tabsLabels.push(subWheelValues[WHEELVALUES[i]][j].toString());
             }
         }
 
@@ -2920,7 +2954,7 @@ function Block(protoblock, blocks, overrideName) {
         this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
         this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
         this._tabsWheel.clickModeRotate = false;
-        this._tabsWheel.navAngle = -180 / WHEELVALUES.length + 180 / (WHEELVALUES.length * SUBWHEELS[WHEELVALUES[0]].length);
+        this._tabsWheel.navAngle = -180 / WHEELVALUES.length + 180 / (WHEELVALUES.length * subWheelValues[WHEELVALUES[0]].length);
         this._tabsWheel.createWheel(tabsLabels);
         
         var that = this;
@@ -2984,8 +3018,8 @@ function Block(protoblock, blocks, overrideName) {
         var __showHide = function () {
             var i = that._noteValueWheel.selectedNavItemIndex;
             for (var k = 0; k < WHEELVALUES.length; k++) {
-                for (var j = 0; j < SUBWHEELS[WHEELVALUES[0]].length; j++) {
-                    var n = k * SUBWHEELS[WHEELVALUES[0]].length;
+                for (var j = 0; j < subWheelValues[WHEELVALUES[0]].length; j++) {
+                    var n = k * subWheelValues[WHEELVALUES[0]].length;
                     if (that._noteValueWheel.selectedNavItemIndex === k) {
                         that._tabsWheel.navItems[n + j].navItem.show();
                     } else {
@@ -3006,15 +3040,15 @@ function Block(protoblock, blocks, overrideName) {
             this._tabsWheel.navigateWheel(0);
         } else {
             for (var i = 0; i < WHEELVALUES.length; i++) {
-                for (var j = 0; j < SUBWHEELS[WHEELVALUES[i]].length; j++) {
-                    if (SUBWHEELS[WHEELVALUES[i]][j] === noteValue) {
+                for (var j = 0; j < subWheelValues[WHEELVALUES[i]].length; j++) {
+                    if (subWheelValues[WHEELVALUES[i]][j] === noteValue) {
                         this._noteValueWheel.navigateWheel(i);
-                        this._tabsWheel.navigateWheel(i * SUBWHEELS[WHEELVALUES[i]].length + j);
+                        this._tabsWheel.navigateWheel(i * subWheelValues[WHEELVALUES[i]].length + j);
                         break;
                     }
                 }
 
-                if (j < SUBWHEELS[WHEELVALUES[i]].length) {
+                if (j < subWheelValues[WHEELVALUES[i]].length) {
                     break;
                 }
             }
