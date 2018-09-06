@@ -2063,8 +2063,21 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
                     break;
                 case 'steppitch':
+		case 'interval':
+		case 'setscalartransposition':
                     this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
                     break;
+                case 'decrescendo':
+                case 'crescendo':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 10, 15, 20], this.value);
+                    break;
+                case 'harmonic2':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], this.value);
+                    break;
+		case 'semitoneinterval':
+		case 'settransposition':
+                    this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+		    break;
                 }
             } else {
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
@@ -2145,7 +2158,7 @@ function Block(protoblock, blocks, overrideName) {
         // Return true if this number block plugs into a block that
         // uses a pie menu. Add block names to the list below and the
         // switch statement about 80 lines above.
-        return this.connections[0] !== null && ['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
+        return this.connections[0] !== null && ['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
     };
 
     this.piemenuOKtoLaunch = function () {
@@ -2989,12 +3002,16 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.colors = ['#ffb2bc', '#ffccd6'];
         this._numberWheel.slicePathFunction = slicePath().DonutSlice;
         this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
         if (wheelValues.length > 16) {
+            this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
             this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
-        } else {
+        } else if (wheelValues.length > 10) {
+	    this._numberWheel.slicePathCustom.minRadiusPercent = 0.4;
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.8;
+	} else {
+	    this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        }
+	}
 
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
