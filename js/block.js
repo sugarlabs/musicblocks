@@ -1818,7 +1818,7 @@ function Block(protoblock, blocks, overrideName) {
 	    return false;
 	}
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
 	    return false;
 	}
 
@@ -2197,6 +2197,12 @@ function Block(protoblock, blocks, overrideName) {
 		}
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
+		case 'rhythm2':
+		    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
+		    break;
+		case 'stuplet':
+		    this._piemenuNumber([3, 5, 7, 11], this.value);
+		    break;
 		case 'amsynth':  // harmocity
                     this._piemenuNumber([1, 2], this.value);
 		    break;
