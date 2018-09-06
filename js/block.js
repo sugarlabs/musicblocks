@@ -1814,7 +1814,7 @@ function Block(protoblock, blocks, overrideName) {
 	    return false;
 	}
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
 	    return false;
 	}
 
@@ -2195,6 +2195,8 @@ function Block(protoblock, blocks, overrideName) {
                 case 'pitchnumber':
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
                     break;
+		case 'neighbor':
+		case 'neighbor2':
                 case 'steppitch':
                 case 'interval':
                 case 'setscalartransposition':
@@ -2207,12 +2209,18 @@ function Block(protoblock, blocks, overrideName) {
                 case 'harmonic2':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], this.value);
                     break;
+                case 'vibrato':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], this.value);
+                    break;
                 case 'semitoneinterval':
                 case 'settransposition':
                     this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
                     break;
 		case 'setnotevolume':
                     this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+		case 'dis':
+                    this._piemenuNumber([10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
                     break;
 		case 'articulation':
                     this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25], this.value);
