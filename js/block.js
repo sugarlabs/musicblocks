@@ -1814,7 +1814,7 @@ function Block(protoblock, blocks, overrideName) {
 	    return false;
 	}
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
 	    return false;
 	}
 
@@ -2213,6 +2213,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
 		case 'setnotevolume':
                     this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+		case 'articulation':
+                    this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25], this.value);
                     break;
                 }
             } else {
