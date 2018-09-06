@@ -1709,7 +1709,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[3] = 'numberin';
     newblock.defaults.push(0.5);
     newblock.defaults.push(3);
-    newblock.defaults.push(350);
+    newblock.defaults.push(392);
     if (beginnerMode && !beginnerBlock('phaser')) {
         newblock.hidden = true;
     }
@@ -5252,6 +5252,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    // deprecated
     var newblock = new ProtoBlock('setnotevolume2');
     newblock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['setnotevolume2'] = newblock;
