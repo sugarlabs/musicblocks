@@ -1796,14 +1796,80 @@ function Block(protoblock, blocks, overrideName) {
 	    return true;
 	}
 
-	return this._usePieNumber();
+        if (this._usePieNumberC2()) {
+	    return true;
+	}
+
+	return this._usePieNumberC1();
     };
 
-    this._usePieNumber = function () {
-        // Return true if this number block plugs into a block that
-        // uses a pie menu. Add block names to the list below and the
-        // switch statement in the _changeLabel function.
-        return this.connections[0] !== null && ['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1;
+    this._usePieNumberC1 = function () {
+        // Return true if this number block plugs into Connection 1 of
+        // a block that uses a pie menu. Add block names to the list
+        // below and the switch statement in the _changeLabel
+        // function.
+	var cblk = this.connections[0];
+
+        if (cblk === null) {
+	    return false;
+	}
+
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+	    return false;
+	}
+
+	var blk = this.blocks.blockList.indexOf(this);
+	if (this.blocks.blockList[cblk].connections[1] === blk) {
+	    return true;
+	}
+
+	return false;
+    };
+
+    this._usePieNumberC2 = function () {
+        // Return true if this number block plugs into Connection 2 of
+        // a block that uses a pie menu. Add block names to the list
+        // below and the switch statement in the _changeLabel
+        // function.
+	var cblk = this.connections[0];
+
+        if (cblk === null) {
+	    return false;
+	}
+
+	if (['setsynthvolume'].indexOf(this.blocks.blockList[cblk].name) === -1) {
+	    return false;
+	}
+
+	var blk = this.blocks.blockList.indexOf(this);
+	if (this.blocks.blockList[cblk].connections[2] === blk) {
+	    return true;
+	}
+
+	return false;
+    };
+
+    this._usePieNumberC3 = function () {
+        // Return true if this number block plugs into Connection 3 of
+        // a block that uses a pie menu. Add block names to the list
+        // below and the switch statement in the _changeLabel
+        // function.
+	var cblk = this.connections[0];
+
+        if (cblk === null) {
+	    return false;
+	}
+
+	if ([].indexOf(this.blocks.blockList[cblk].name) === -1) {
+	    return false;
+	}
+
+	var blk = this.blocks.blockList.indexOf(this);
+	if (this.blocks.blockList[cblk].connections[3] === blk) {
+	    return true;
+	}
+
+	return false;
     };
 
     this._ensureDecorationOnTop = function () {
@@ -2103,7 +2169,16 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
                     break;
                 }
-            } else if (this._usePieNumber()) {
+	    } else if (this._usePieNumberC3()) {
+                switch (this.blocks.blockList[this.connections[0]].name) {
+		}
+	    } else if (this._usePieNumberC2()) {
+                switch (this.blocks.blockList[this.connections[0]].name) {
+                case 'setsynthvolume':
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+		}
+            } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
                 case 'rhythmicdot2':
                     this._piemenuNumber([1, 2, 3], this.value);
@@ -2135,6 +2210,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'semitoneinterval':
                 case 'settransposition':
                     this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    break;
+		case 'setnotevolume':
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
                     break;
                 }
             } else {
