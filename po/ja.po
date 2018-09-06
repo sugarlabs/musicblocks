@@ -550,7 +550,7 @@ msgstr "ブラウザ表示を100%に設定してください。"
 #: js/activity.js:3732
 #: js/turtledefs.js:109
 msgid "Play"
-msgstr ""
+msgstr "再生"
 
 #: js/activity.js:3733
 #: js/activity.js:3761
@@ -673,7 +673,7 @@ msgstr "「プラネット」サーバは今使えません"
 #: js/turtledefs.js:118
 #: js/turtledefs.js:156
 msgid "Load project from files"
-msgstr ""
+msgstr "ファイルからロードする"
 
 #: js/activity.js:3858
 #: js/activity.js:3869
@@ -748,7 +748,7 @@ msgstr "JSONのインプットのパースができません。"
 
 #: js/activity.js:4395
 msgid "Run"
-msgstr ""
+msgstr "再生"
 
 #: js/activity.js:4399
 msgid "Expand/collapse collapsible blocks"
@@ -760,15 +760,15 @@ msgstr ""
 
 #: js/activity.js:4421
 msgid "Run slowly"
-msgstr ""
+msgstr "ゆっくり再生する"
 
 #: js/activity.js:4425
 msgid "Run music slowly"
-msgstr ""
+msgstr "音楽をゆっくり演奏する"
 
 #: js/activity.js:4426
 msgid "Run music step by step"
-msgstr ""
+msgstr "音楽を音符ずつ演奏する"
 
 #: js/activity.js:4434
 #: js/activity.js:4469
@@ -778,12 +778,12 @@ msgstr "ファイルからプロジェクトをロードする"
 #: js/activity.js:4435
 #: js/activity.js:4470
 msgid "Merge project from file"
-msgstr ""
+msgstr "ファイルからプロジェクトをマージする"
 
 #: js/activity.js:4437
 #: js/activity.js:4472
 msgid "Click here to paste"
-msgstr ""
+msgstr "貼り付けるため、ここでクリック"
 
 #: js/activity.js:4609
 #: js/turtledefs.js:120
@@ -798,7 +798,7 @@ msgstr ""
 
 #: js/activity.js:4612
 msgid "Move to trash"
-msgstr ""
+msgstr "ゴミに捨てる"
 
 #: js/activity.js:4615
 #: js/blocks.js:363
@@ -1077,7 +1077,7 @@ msgstr "倍音ブロックが「倍音ウェートブロック」の中にある
 #: js/logo.js:6388
 #: js/logo.js:6475
 msgid "Setting volume to 0."
-msgstr ""
+msgstr "音量を「0」に設定しています。"
 
 #: js/logo.js:6394
 #: js/logo.js:6481
@@ -1301,7 +1301,7 @@ msgstr "ミュージック・ブロックス：音楽と算数とコーディン
 
 #: js/turtledefs.js:23
 msgid "search"
-msgstr ""
+msgstr "検索"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:865
@@ -2332,7 +2332,7 @@ msgstr "複製ファクター"
 #: js/basicblocks.js:1087
 #.TRANS: oscillator time (in milliseconds)
 msgid "milliseconds"
-msgstr ""
+msgstr "ミリ秒"
 
 #: js/basicblocks.js:1100
 #: js/basicblocks.js:1111
@@ -2433,11 +2433,11 @@ msgstr "クロックなし"
 
 #: js/basicblocks.js:1404
 msgid "on weak beat do"
-msgstr ""
+msgstr "弱拍に～する"
 
 #: js/basicblocks.js:1417
 msgid "on strong beat"
-msgstr ""
+msgstr "強拍に"
 
 #: js/basicblocks.js:1417
 ## http://musical-grammar.com/time004.html
@@ -2454,7 +2454,7 @@ msgstr "拍子"
 #.TRANS: take (do) some action
 ## アクションis action and する is "to do"; taking liberties based on context
 msgid "do"
-msgstr "する"
+msgstr "～する"
 
 #: js/basicblocks.js:1432
 msgid "on every beat do"
@@ -2740,17 +2740,17 @@ msgstr "長３度下"
 #: js/basicblocks.js:2298
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'V"
-msgstr ""
+msgstr "和音' + ' ' + 'V"
 
 #: js/basicblocks.js:2310
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'IV"
-msgstr ""
+msgstr "和音' + ' ' + 'IV"
 
 #: js/basicblocks.js:2322
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'I"
-msgstr ""
+msgstr "和音' + ' ' + 'I"
 
 #: js/basicblocks.js:2455
 #.TRANS: define a custom mode
@@ -2760,7 +2760,7 @@ msgstr "モードを定義する"
 
 #: js/basicblocks.js:2468
 msgid "moveable Do"
-msgstr ""
+msgstr "移動ド"
 
 #: js/basicblocks.js:2479
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -2972,7 +2972,7 @@ msgstr "x座標"
 #: js/basicblocks.js:2854
 #.TRANS: scroll canvas image by x, y position
 msgid "scroll xy"
-msgstr ""
+msgstr "xyスクロール"
 
 #: js/basicblocks.js:2869
 #: js/pitchdrummatrix.js:138
@@ -3261,19 +3261,19 @@ msgstr "～へ"
 
 #: js/basicblocks.js:3637
 msgid "box 2"
-msgstr ""
+msgstr "ボックス２"
 
 #: js/basicblocks.js:3650
 msgid "store in box 2"
-msgstr ""
+msgstr "ボックス２に保存"
 
 #: js/basicblocks.js:3663
 msgid "box 1"
-msgstr ""
+msgstr "ボックス１に保存"
 
 #: js/basicblocks.js:3676
 msgid "store in box 1"
-msgstr ""
+msgstr "ボックス１に保存"
 
 #: js/basicblocks.js:3710
 #.TRANS: return value from a function
@@ -3803,7 +3803,7 @@ msgstr "相対音量を設定"
 #: js/basicblocks.js:5289
 #.TRANS: a gradual increase in loudness
 msgid "decrescendo"
-msgstr ""
+msgstr "デクレシェンド"
 
 #: js/basicblocks.js:5302
 #.TRANS: a gradual increase in loudness
@@ -3935,7 +3935,7 @@ msgstr "ブロックのアートを保存"
 #: js/savebox.js:159
 #.TRANS: block artwork is a file name we use to save the program blocks as they appear on the screen.
 msgid "block artwork"
-msgstr ""
+msgstr "ブロックのアート"
 
 #: js/lilypond.js:18
 msgid "brown rat"
@@ -4024,11 +4024,11 @@ msgstr "言語を変更するにはブラウザを再起動する必要があり
 
 #: js/help.js:53
 msgid "previous page"
-msgstr ""
+msgstr "前のページ"
 
 #: js/help.js:72
 msgid "next page"
-msgstr ""
+msgstr "次のページ"
 
 #: js/pitchdrummatrix.js:132
 #: js/pitchtimematrix.js:187
@@ -4070,7 +4070,7 @@ msgstr "整理"
 
 #: js/pitchtimematrix.js:448
 msgid "Click on the table to add notes."
-msgstr ""
+msgstr "行列にクリックすると音符やメロディが作れます"
 
 #: js/pitchtimematrix.js:707
 #: js/pitchtimematrix.js:839
@@ -4102,7 +4102,7 @@ msgstr "元にもどす"
 
 #: js/timbre.js:820
 msgid "Click on buttons to open the timbre design tools."
-msgstr ""
+msgstr "ボタンをクリックするとカスタム音色ツールが開きます。"
 
 #: js/timbre.js:1018
 ## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
@@ -4144,7 +4144,7 @@ msgstr "スローダウン"
 
 #: js/tempo.js:431
 msgid "Adjust the tempo with the buttons."
-msgstr ""
+msgstr "ボタンでテンポが設定できます。"
 
 #: js/rhythmruler.js:133
 #: js/rhythmruler.js:133
@@ -4174,7 +4174,7 @@ msgstr "ドラムマシーンを保存"
 
 #: js/rhythmruler.js:1758
 msgid "Click on the ruler to divide it."
-msgstr ""
+msgstr "ルーラーをクリックすると割ることができます。"
 
 #: js/modewidget.js:77
 msgid "rotate counter clockwise"
@@ -4187,7 +4187,7 @@ msgstr "時計回り"
 #: js/modewidget.js:200
 #.TRANS: A circle of notes represents the musical mode.
 msgid "Click in the circle to select notes for the mode."
-msgstr ""
+msgstr "円のなかでクリックして音階のピッチが選ばれます。"
 
 #: js/pitchstaircase.js:475
 msgid "play chord"
@@ -4199,13 +4199,13 @@ msgstr "音階を再生する"
 
 #: js/pitchstaircase.js:639
 msgid "Click on a note to create a new step."
-msgstr ""
+msgstr "ピッチをクリックすると新しい段が作れますよ。"
 
 #: js/synthutils.js:16
 #: js/musicutils.js:241
 #.TRANS: musical instrument
 msgid "piano"
-msgstr ""
+msgstr "ピアノ"
 
 #: js/synthutils.js:18
 #: js/musicutils.js:242
