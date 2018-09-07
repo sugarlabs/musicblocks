@@ -3407,7 +3407,12 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.display = '';
 
         // the voice selector
-        this._voiceWheel = new wheelnav('wheelDiv', null, 800, 800);
+	if (localStorage.kanaPreference === 'kana') {
+            this._voiceWheel = new wheelnav('wheelDiv', null, 1200, 1200);
+	} else {
+            this._voiceWheel = new wheelnav('wheelDiv', null, 800, 800);
+	}
+
         // exit button
         this._exitWheel = new wheelnav('_exitWheel', this._voiceWheel.raphael);
 
