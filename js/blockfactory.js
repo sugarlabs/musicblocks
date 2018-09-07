@@ -590,8 +590,16 @@ function SVG() {
         svg += this._doSlot();
         svg += this._rLineTo(this._expandX, 0);
         xx = this._x;
-        svg += this._corner(1, 1 , 90, 0, 1, true, true, false);
-        if (this._innies.length === 0) {
+        if (!this._bool) {
+            svg += this._corner(1, 1 , 90, 0, 1, true, true, false);
+        } else {
+            svg += this._rLineTo(3, 0);
+            svg += this._rLineTo(0, 2);
+        }
+
+        if (this._bool) {
+            svg += this._doBoolean();
+        } else if (this._innies.length === 0) {
         // To maintain standard block height
             svg += this._rLineTo(0, this._padding);
         } else {
@@ -611,7 +619,14 @@ function SVG() {
                 }
             }
         }
-        svg += this._corner(-1, 1 , 90, 0, 1, true, true, false);
+
+        if (!this._bool) {
+            svg += this._corner(-1, 1 , 90, 0, 1, true, true, false);
+        } else {
+            svg += this._rLineTo(0, 2);
+            svg += this._rLineTo(-3, 0);
+        }
+
         svg += this._lineTo(xx, this._y);
         svg += this._rLineTo(-this._expandX, 0);
         if (this._tab) {
@@ -738,6 +753,7 @@ function SVG() {
         } else {
             var svg = this._startBoolean(this._strokeWidth / 2.0, this._radius * 1.25 + this._strokeWidth / 2.0);
         }
+
         svg += this._rLineTo(0, -this._strokeWidth);
 
         if (this._innies[0]) {
@@ -747,6 +763,7 @@ function SVG() {
         } else {
             svg += this._rLineTo(0, -this._radius / 4.0);
         }
+
         svg += this._rLineTo(this._radius / 2.0 + this._expandX, 0);
         var xx = this._x;
 
@@ -759,12 +776,11 @@ function SVG() {
             svg += this._doBoolean();
             svg += this._rLineTo(0, this._radius / 2.0);
         } else {
-            svg += this._rLineTo(0, this._radius * 2.25);
+            svg += this._rLineTo(0, this._radius * 2);
         }
 
         svg += this._lineTo(xx, this._y);
 
-        // FIXME: Is this in the correct place?
         if (this._expandY2 > 0) {
             svg += this._rLineTo(0, this._expandY2);
         }
@@ -778,10 +794,12 @@ function SVG() {
             svg += this._rLineTo(-this._radius / 2.0 - this._expandX, 0);
         }
 
-        // FIXME: Is this in the correct place?
-        if (this._expandY2 > 0) {
+        if (this._expandY2 > 0 && !notnot) {
             svg += this._rLineTo(0, -this._expandY2);
+        } else if (notnot) {
+            svg += this._rLineTo(0, -2);
         }
+
         svg += this._endBoolean(notnot);
         if (notnot) {
             this.margins[0] = (this._radius + this._strokeWidth + 0.5) * this._scale;
@@ -790,6 +808,7 @@ function SVG() {
             this.margins[0] = (this._strokeWidth + 0.5) * this._scale;
             this.margins[2] = (this._strokeWidth + 0.5) * this._scale;
         }
+
         this.margins[1] = this._strokeWidth * this._scale;
         this.margins[3] = this._strokeWidth * this._scale;
 

@@ -213,7 +213,7 @@ function ProtoBlock(name) {
     // E.g., wait for
     this.oneBooleanArgBlock = function () {
         this.args = 1;
-        this.size = 2;
+        this.size = 1;
         this.dockTypes.push('out');
         this.dockTypes.push('booleanin');
         this.dockTypes.push('in');
@@ -234,7 +234,7 @@ function ProtoBlock(name) {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        var artwork = svg.basicClamp();
+        var artwork = svg.basicBlock();
         return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 

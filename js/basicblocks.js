@@ -3606,6 +3606,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     } else {
         newblock.palette = palettes.dict['boxes'];
     }
+
     blocks.protoBlockDict['storein2'] = newblock;
     newblock.staticLabels.push(_('store in box'));
     newblock.adjustWidthToLabel();
@@ -3619,6 +3620,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     } else {
         newblock.palette = palettes.dict['boxes'];
     }
+
     blocks.protoBlockDict['storein'] = newblock;
     //.TRANS: put something into a container for later reference
     newblock.staticLabels.push(_('store in'));
@@ -3824,7 +3826,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('listen');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('box')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['listen'] = newblock;
     //.TRANS: an event, such as user actions (mouse clicks, key presses)
     newblock.staticLabels.push(_('on'));
@@ -3841,7 +3848,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('dispatch');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('box')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['dispatch'] = newblock;
     //.TRANS: dispatch an event to trigger a listener
     newblock.staticLabels.push(_('broadcast'));
