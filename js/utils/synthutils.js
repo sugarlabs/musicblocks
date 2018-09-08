@@ -977,7 +977,8 @@ function Synth() {
             // var obj = noteToPitchOctave(notes);
             // var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
             // tempNotes = noteNum - centerNo;
-            this._performNotes(tempSynth.toMaster(), notes, beatValue, null, null, setNote);
+            // this._performNotes(tempSynth.toMaster(), notes, beatValue, null, null, setNote);
+            this._performNotes(tempSynth.toMaster(), notes, beatValue, paramsEffects, paramsFilters, setNote);
             break;
         case 3:  // builtin synth
             if (typeof(notes) === 'object') {
