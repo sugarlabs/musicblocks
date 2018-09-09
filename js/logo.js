@@ -4082,6 +4082,43 @@ function Logo () {
 
             that.pushedNote[turtle] = true;
             break;
+        case 'playnoise':
+            if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                var arg = 'noise1';
+            } else {
+                var arg = args[0];
+            }
+
+            var noisename = arg;
+            for (var noise in NOISENAMES) {
+                if (NOISENAMES[noise][0] === arg) {
+                    noisename = NOISENAMES[noise][1];
+                    break;
+                } else if (NOISENAMES[noise][1] === arg) {
+                    noisename = arg;
+                    break;
+                }
+            }
+
+            if (that.inNoteBlock[turtle].length > 0) {
+		// Add the noise sound as if it were a drum
+                that.noteDrums[turtle][last(that.inNoteBlock[turtle])].push(noisename);
+                if (that.synthVolume[turtle][noisename] == undefined) {
+                    that.synthVolume[turtle][noisename] = [DEFAULTVOLUME];
+                    that.crescendoInitialVolume[turtle][noisename] = [DEFAULTVOLUME];
+                }
+            } else {
+                that.errorMsg(_('Noise Block: Did you mean to use a Note block?'), blk);
+                break;
+            }
+
+            if (that.inNoteBlock[turtle].length > 0) {
+                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
+            }
+
+            that.pushedNote[turtle] = true;
+            break;
         case 'playdrum':
             if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -11409,9 +11446,9 @@ function Logo () {
         // line. Otherwise, add the drum.
         if (drum.length === 0) {
             this.notationDrumStaging[turtle].push([['R'], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
-        } else {
-            var drumSymbol = getDrumSymbol(drum[0]);
-            this.notationDrumStaging[turtle].push([[drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
+        } else if (['noise1', 'noise2', 'noise3'].indexOf(drum[0]) === -1) {
+		var drumSymbol = getDrumSymbol(drum[0]);
+		this.notationDrumStaging[turtle].push([[drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
         }
 
         this.pickupPoint[turtle] = null;

@@ -17,10 +17,10 @@ const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote'];
 const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename'];
 const EXTRAWIDENAMES = [];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -684,6 +684,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'voicename':
                     this.value = DEFAULTVOICE;
+                    break;
+                case 'noiseename':
+                    this.value = DEFAULTNOISE;
                     break;
                 case 'drumname':
                     this.value = DEFAULTDRUM;
@@ -2113,6 +2116,37 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
+        } else if (this.name === 'noisename') {
+            if (this.value != null) {
+                var selectednoisee = this.value;
+            } else {
+                var selectednoise = DEFAULTNOISE;
+            }
+
+            console.log(this.value + ' ' + DEFAULTNOISE + ' ' + selectednoise);
+
+            var noiseLabels = [];
+            var noiseValues = [];            
+            var categories = [];
+            var categoriesList = [];
+            for (var i = 0; i < NOISENAMES.length; i++) {
+                var label = NOISENAMES[i][0];
+                if (getTextWidth(label, 'bold 48pt Sans') > 600) {
+                    noiseLabels.push(label.substr(0, 16) + '...');
+                } else {
+                    noiseLabels.push(label);
+                }
+
+                noiseValues.push(NOISENAMES[i][1]);
+
+                if (categoriesList.indexOf(NOISENAMES[i][3]) === -1) {
+                    categoriesList.push(NOISENAMES[i][3]);
+                }
+
+                categories.push(categoriesList.indexOf(NOISENAMES[i][3]));
+            }
+
+            this._piemenuVoices(noiseLabels, noiseValues, categories, selectednoise, 90);
         } else if (this.name === 'temperamentname') {
             if (this.value != null) {
                 var selectedTemperament = this.value;
@@ -3390,7 +3424,7 @@ function Block(protoblock, blocks, overrideName) {
         };
     };
 
-    this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice) {
+    this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice, rotate) {
         // wheelNav pie menu for voice selection
 
         if (this.blocks.stageClick) {
@@ -3427,7 +3461,12 @@ function Block(protoblock, blocks, overrideName) {
         this._voiceWheel.slicePathCustom.maxRadiusPercent = 1;
         this._voiceWheel.sliceSelectedPathCustom = this._voiceWheel.slicePathCustom;
         this._voiceWheel.sliceInitPathCustom = this._voiceWheel.slicePathCustom;
-        this._voiceWheel.titleRotateAngle = 0;
+	if (rotate === undefined) {
+            this._voiceWheel.titleRotateAngle = 0;
+	} else {
+            this._voiceWheel.titleRotateAngle = rotate;
+	}
+
         this._voiceWheel.animatetime = 300;
         this._voiceWheel.createWheel(voiceLabels);
 
@@ -4310,6 +4349,8 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === 'voicename') {
                 this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
+            } else if (this.name === 'noisename') {
+                this.blocks.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
             }
         }
     };

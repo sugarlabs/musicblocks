@@ -2524,6 +2524,16 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // DRUM PALETTE
+    var newblock = new ProtoBlock('noisename');
+    newblock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['noisename'] = newblock;
+    newblock.valueBlock();
+    newblock.extraWidth = 50;
+    newblock.dockTypes[0] = 'textout';
+    if (beginnerMode && !beginnerBlock('noisename')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('drumname');
     newblock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['drumname'] = newblock;
@@ -2531,6 +2541,19 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.extraWidth = 50;
     newblock.dockTypes[0] = 'textout';
     if (beginnerMode && !beginnerBlock('drumname')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('playnoise');
+    newblock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['playnoise'] = newblock;
+    newblock.staticLabels.push(_('noise'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.defaults.push(_('white noise'));
+    if (beginnerMode && !beginnerBlock('playnoise')) {
         newblock.hidden = true;
     }
 

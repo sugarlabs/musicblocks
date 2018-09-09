@@ -1772,6 +1772,7 @@ function Blocks () {
         case 'filtertype':
         case 'drumname':
         case 'voicename':
+        case 'noisename':
         case 'oscillatortype':
         case 'invertmode':
             var label = _(myBlock.value);
@@ -2221,6 +2222,7 @@ function Blocks () {
             switch (that.blockList[thisBlock].name) {
             case 'drumname':
             case 'voicename':
+	    case 'noisename':
             case 'filtertype':
             case 'oscillatortype':
             case 'invertmode':
@@ -2285,6 +2287,8 @@ function Blocks () {
             postProcessArg = [thisBlock, DEFAULTOSCILLATORTYPE];
         } else if (name === 'voicename') {
             postProcessArg = [thisBlock, DEFAULTVOICE];
+        } else if (name === 'noisename') {
+            postProcessArg = [thisBlock, DEFAULTNOISE];
         } else if (name === 'eastindiansolfege') {
             var postProcess = function (args) {
                 var thisBlock = args[0];
@@ -4358,6 +4362,26 @@ function Blocks () {
                     // Load the synth for this voice
                     try {
                         this.logo.synth.loadSynth(0, getVoiceSynthName(value));
+                    } catch (e) {
+                        console.log(e)
+                    }
+                }
+                break;
+
+	    case 'noisename':
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    // Load the synth for this noise
+                    try {
+                        this.logo.synth.loadSynth(0, getNoiseSynthName(value));
                     } catch (e) {
                         console.log(e)
                     }
