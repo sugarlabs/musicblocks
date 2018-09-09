@@ -185,8 +185,8 @@ function HelpWidget () {
 		    body = '';
 		    if (BLOCKHELP[name].length > 1) {
 			var path = BLOCKHELP[name][1];
-			if (localStorage.languagePreference == 'ja') {
-			    if (localStorage.kanaPreference == 'kana') {
+			if (localStorageShim.languagePreference == 'ja') {
+			    if (localStorageShim.kanaPreference == 'kana') {
 				path = path + '-kana';
 			    } else {
 				path = path + '-ja';
@@ -215,7 +215,7 @@ function HelpWidget () {
         if (HELPCONTENT[page].length > 3) {
 	    var link = HELPCONTENT[page][3];
 	    // FIXME
-	    if (localStorage.languagePreference == 'ja') {
+	    if (localStorageShim.languagePreference == 'ja') {
 		link = link + '-ja';
 	    }
 

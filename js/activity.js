@@ -54,10 +54,10 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     try {
 	// console.log(localStorage.beginnerMode);
 
-	if (localStorage.beginnerMode !== null) {
+	if (localStorageShim.beginnerMode !== null) {
             // console.log('setting mode from local storage');
 	    // console.log(localStorage.beginnerMode);
-            beginnerMode = localStorage.beginnerMode;
+            beginnerMode = localStorageShim.beginnerMode;
 	    if (typeof(beginnerMode) === 'string') {
 		if (beginnerMode === 'false') {
 		    beginnerMode = false;
@@ -83,12 +83,12 @@ if (beginnerMode) {
 }
 
 try {
-    console.log(localStorage.languagePreference);
+    console.log(localStorageShim.languagePreference);
 
-    if (localStorage.languagePreference) {
+    if (localStorageShim.languagePreference) {
         console.log('setting language from local storage');
         try {
-            lang = localStorage.languagePreference;
+            lang = localStorageShim.languagePreference;
             document.webL10n.setLanguage(lang);
         } catch (e) {
             console.log(e);
@@ -837,10 +837,10 @@ define(MYDEFINES, function (compatibility) {
             blocks.activeBlock = null;
             if (beginnerMode) {
                 textMsg(_('Refresh your browser to change to advanced mode.'));
-                localStorage.setItem('beginnerMode', false);
+                localStorageShim.setItem('beginnerMode', false);
             } else {
                 textMsg(_('Refresh your browser to change to beginner mode.'));
-                localStorage.setItem('beginnerMode', true);
+                localStorageShim.setItem('beginnerMode', true);
             }
         };
 
@@ -1103,7 +1103,7 @@ define(MYDEFINES, function (compatibility) {
                 //sugarizerCompatibility.data.blocks = prepareExport();
                 storage = sugarizerCompatibility.data;
             } else {
-                storage = localStorage;
+                storage = localStorageShim;
             }
 
             docById('loader').className = 'loader';
@@ -1593,7 +1593,7 @@ define(MYDEFINES, function (compatibility) {
                         //sugarizerCompatibility.data.blocks = prepareExport();
                         storage = sugarizerCompatibility.data;
                     } else {
-                        storage = localStorage;
+                        storage = localStorageShim;
                     }
 
                     if (storage.currentProject === undefined) {

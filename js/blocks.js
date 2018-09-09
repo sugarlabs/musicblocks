@@ -30,7 +30,7 @@ function Blocks () {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
-        storage = localStorage;
+        storage = localStorageShim;
     }
 
     this.canvas = null;

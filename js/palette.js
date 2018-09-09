@@ -92,7 +92,7 @@ function Palettes () {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
-        storage = localStorage;
+        storage = localStorageShim;
     }
 
     // The collection of palettes.
