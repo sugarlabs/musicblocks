@@ -18,7 +18,7 @@ const INLINECOLLAPSIBLES = ['newnote'];
 const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename'];
-const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
 const EXTRAWIDENAMES = [];
 const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename'];
 

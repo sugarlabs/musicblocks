@@ -801,11 +801,10 @@ function getNoiseName(name) {
     }
 
     for (var i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][0] === name) {
+        if (NOISENAMES[i][1] === name) {
             if (NOISENAMES[i][0] != '') {
-		console.log(NOISENAMES[i]);
                 return NOISENAMES[i][0];
-            } else if (NOISENAMES[i][1] === name) {
+	    } else {
                 return NOISENAMES[i][1];
             }
         }

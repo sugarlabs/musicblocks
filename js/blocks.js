@@ -1772,10 +1772,12 @@ function Blocks () {
         case 'filtertype':
         case 'drumname':
         case 'voicename':
-        case 'noisename':
         case 'oscillatortype':
         case 'invertmode':
             var label = _(myBlock.value);
+            break;
+        case 'noisename':
+            var label = getNoiseName(myBlock.value);
             break;
         case 'temperamentname':
             var label = _(TEMPERAMENTS[0][1]);  // equal by default
@@ -2222,12 +2224,15 @@ function Blocks () {
             switch (that.blockList[thisBlock].name) {
             case 'drumname':
             case 'voicename':
-	    case 'noisename':
-            case 'filtertype':
             case 'oscillatortype':
             case 'invertmode':
+            case 'filtertype':
+		console.log(value + ' ' + _(value));
                 that.blockList[thisBlock].text.text = _(value);
                 break;
+	    case 'noisename':
+		var label = getNoiseName(value);
+		break;
             case 'temperamentname':
                 that.blockList[thisBlock].text.text = _(TEMPERAMENTS[0][1]);
                 for (var i = 0; i < TEMPERAMENTS.length; i++) {
@@ -2689,7 +2694,7 @@ function Blocks () {
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') {
                 var c = this.blockList[blk].connections[0];
-                if (c != null && ['playdrum', 'setdrum', 'setvoice'].indexOf(this.blockList[c].name) !== -1) {
+                if (c != null && ['playdrum', 'setdrum', 'playnoise', 'setvoice'].indexOf(this.blockList[c].name) !== -1) {
                     if (this.blockList[blk].value.slice(0, 4) === 'http') {
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             this.logo.synth.loadSynth(0, this.blockList[blk].value);
