@@ -73,16 +73,13 @@
     -->
 
     <script>
-      var canvas, stage, exportRoot;
+      var canvas, stage;
       function init() {
         canvas = document.getElementById("canvas");
-        // exportRoot = new lib.SugarAnimation();
         stage = new createjs.Stage(canvas);
-        // stage.addChild(exportRoot);
         stage.update();
-        // createjs.Ticker.setFPS(lib.properties.fps);
         createjs.Ticker.addEventListener("tick", stage);
-      }
+      };
     </script>
 
     <script>
@@ -154,7 +151,7 @@
       var isDragging = false;
     </script>
 
-    <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
+    <canvas id="canvas" width="3790" height="1743"style="background-color:#e0e0e0; width:100%">
     </canvas>
 
     <!--hidden at the beginning whilst everything loads-->

@@ -1192,6 +1192,21 @@ function Turtles () {
 
         var that = this;
 
+        function __makeBoundary() {
+            var img = new Image();
+            img.onload = function () {
+                bitmap = new createjs.Bitmap(img);
+                bitmap.x = 0;
+                bitmap.y = 55;
+                that._borderContainer.addChild(bitmap);
+            };
+
+            var dx = that.w - 20;
+            var dy = that.h - 130;
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', '#e0e0e0'))));
+        };
+
         function __makeExpandButton() {
             var img = new Image();
             img.onload = function () {
@@ -1212,8 +1227,6 @@ function Turtles () {
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(EXPANDBUTTON)));
         };
-
-        __makeExpandButton();
 
         function __makeCollapseButton() {
             var img = new Image();
@@ -1236,24 +1249,10 @@ function Turtles () {
                 unescape(encodeURIComponent(COLLAPSEBUTTON)))
         };
 
+        __makeBoundary();
+        __makeExpandButton();
         __makeCollapseButton();
 
-        function __makeBoundary() {
-            var img = new Image();
-            img.onload = function () {
-                bitmap = new createjs.Bitmap(img);
-                bitmap.x = 0;
-                bitmap.y = 55;
-                that._borderContainer.addChild(bitmap);
-            };
-
-            var dx = that.w - 20;
-            var dy = that.h - 130;
-            img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', '#e0e0e0'))));
-        };
-
-        __makeBoundary();
         return this;
     };
 
