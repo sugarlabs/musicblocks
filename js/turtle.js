@@ -1146,12 +1146,15 @@ function Turtles () {
     this.scale = 1.0;
     this.w = 1200;
     this.h = 900;
+    this.backgroundColor = '#acd0e4';
     this._canvas = null;
     this._rotating = false;
     this._drum = false;
 
     this._borderContainer = new createjs.Container();
+    this._expandedBoundary = null;
     this._expandButton = null;
+    this._collapsedBoundary = null;
     this._collapseButton = null;
 
     // The list of all of our turtles, one for each start block.
@@ -1181,11 +1184,16 @@ function Turtles () {
 
     this.setScale = function (w, h, scale) {
         this.scale = scale;
-        console.log(w + ' ' + h);
+        console.log(w + ' ' + h + ' ' + scale);
 
         this.w = 1200;
         this.h = 900;
 
+	this.makeBackground();
+    };
+
+    this.makeBackground = function () {
+	// Remove any old background containers.
         if (this._borderContainer.children.length > 0) {
             this._borderContainer.removeChild(this._borderContainer.children[0]);
         }
@@ -1195,29 +1203,50 @@ function Turtles () {
         function __makeBoundary() {
             var img = new Image();
             img.onload = function () {
-                bitmap = new createjs.Bitmap(img);
-                bitmap.x = 0;
-                bitmap.y = 55;
-                that._borderContainer.addChild(bitmap);
+                that._expandedBoundary = new createjs.Bitmap(img);
+                that._expandedBoundary.x = 0;
+                that._expandedBoundary.y = 55;
+                that._borderContainer.addChild(that._expandedBoundary);
             };
 
             var dx = that.w - 20;
             var dy = that.h - 130;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', '#e0e0e0'))));
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', '#e0e0e0').replace('fill_color', that.backgroundColor).replace('STROKE', 5))));
+        };
+
+        function __makeBoundary2() {
+            var img = new Image();
+            img.onload = function () {
+                that._collapsedBoundary = new createjs.Bitmap(img);
+                that._collapsedBoundary.x = 0;
+                that._collapsedBoundary.y = 55;
+                that._borderContainer.addChild(that._collapsedBoundary);
+		that._collapsedBoundary.visible = false;
+            };
+
+            var dx = that.w - 20;
+            var dy = that.h - 130;
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', '#e0e0e0').replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
         };
 
         function __makeExpandButton() {
             var img = new Image();
             img.onload = function () {
                 that._expandButton = new createjs.Bitmap(img);
-                that._expandButton.x = that.w - 65;
+                that._expandButton.x = that.w - 10 - 4 * 55;
                 that._expandButton.y = 65;
+		that._expandButton.scaleX = 4;
+		that._expandButton.scaleY = 4;
+		that._expandButton.visible = false;
                 that._borderContainer.addChild(that._expandButton);
 
                 that._expandButton.on('click', function (event) {
                     that.scaleStage(1.0);
+                    that._expandedBoundary.visible = true;
                     that._collapseButton.visible = true;
+                    that._collapsedBoundary.visible = false;
                     that._expandButton.visible = false;
                     that.stage.x = 0;
                     that.stage.y = 0;
@@ -1238,10 +1267,12 @@ function Turtles () {
 
                 that._collapseButton.on('click', function (event) {
                     that.scaleStage(0.25);
-                    that._collapseButton.visible = false;
+                    that._collapsedBoundary.visible = true;
                     that._expandButton.visible = true;
-                    that.stage.x = 100;
-                    that.stage.y = 300;
+                    that._expandedBoundary.visible = false;
+                    that._collapseButton.visible = false;
+                    that.stage.x = 890;
+                    that.stage.y = 50;
                 });
             };
 
@@ -1250,6 +1281,7 @@ function Turtles () {
         };
 
         __makeBoundary();
+        __makeBoundary2();
         __makeExpandButton();
         __makeCollapseButton();
 

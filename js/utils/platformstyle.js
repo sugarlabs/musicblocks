@@ -34,7 +34,8 @@ window.platformColor = {
     header: platform.FF? '#2584af' : '#2584af',  // 10B 5/8
     doHeaderShadow: !platform.FF,
     // background: platform.FF? '#00CAF2' : '#96D3F3'
-    background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
+    // background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
+    background: '#acd0e4'  // 2.5B 8/4
 };
 
 document.querySelector('meta[name=theme-color]')
