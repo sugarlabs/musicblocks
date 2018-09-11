@@ -79,14 +79,14 @@ function Turtle (name, turtles, drum) {
     console.log(ctx.canvas.width + ' x ' + ctx.canvas.height);
 
     this.doScrollXY = function(dx, dy) {
-	// FIXME: how big?
-	var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
-	ctx.putImageData(imgData, dx, dy);
+        // FIXME: how big?
+        var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
+        ctx.putImageData(imgData, dx, dy);
     };
 
     this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
-	// Simulate an arc with line segments since Tinkercad cannot
-	// import SVG arcs reliably.
+        // Simulate an arc with line segments since Tinkercad cannot
+        // import SVG arcs reliably.
         var a = sa;
         if (ea == null) {
             var da = Math.PI / nsteps;
@@ -1144,9 +1144,15 @@ function Turtles () {
     this.stage = null;
     this.refreshCanvas = null;
     this.scale = 1.0;
+    this.w = 1200;
+    this.h = 900;
     this._canvas = null;
     this._rotating = false;
     this._drum = false;
+
+    this._borderContainer = new createjs.Container();
+    this._expandButton = null;
+    this._collapseButton = null;
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
@@ -1158,7 +1164,14 @@ function Turtles () {
 
     this.setStage = function (stage) {
         this.stage = stage;
+        this.stage.addChild(this._borderContainer);
         return this;
+    };
+
+    this.scaleStage = function (scale) {
+        this.stage.scaleX = scale;
+        this.stage.scaleY = scale;
+        this.refreshCanvas();
     };
 
     this.setRefreshCanvas = function (refreshCanvas) {
@@ -1166,8 +1179,81 @@ function Turtles () {
         return this;
     };
 
-    this.setScale = function (scale) {
+    this.setScale = function (w, h, scale) {
         this.scale = scale;
+        console.log(w + ' ' + h);
+
+        this.w = 1200;
+        this.h = 900;
+
+        if (this._borderContainer.children.length > 0) {
+            this._borderContainer.removeChild(this._borderContainer.children[0]);
+        }
+
+        var that = this;
+
+        function __makeExpandButton() {
+            var img = new Image();
+            img.onload = function () {
+                that._expandButton = new createjs.Bitmap(img);
+                that._expandButton.x = that.w - 65;
+                that._expandButton.y = 65;
+                that._borderContainer.addChild(that._expandButton);
+
+                that._expandButton.on('click', function (event) {
+                    that.scaleStage(1.0);
+                    that._collapseButton.visible = true;
+                    that._expandButton.visible = false;
+                    that.stage.x = 0;
+                    that.stage.y = 0;
+                });
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(EXPANDBUTTON)));
+        };
+
+        __makeExpandButton();
+
+        function __makeCollapseButton() {
+            var img = new Image();
+            img.onload = function () {
+                that._collapseButton = new createjs.Bitmap(img);
+                that._borderContainer.addChild(that._collapseButton);
+                that._collapseButton.x = that.w - 65;
+                that._collapseButton.y = 65;
+
+                that._collapseButton.on('click', function (event) {
+                    that.scaleStage(0.25);
+                    that._collapseButton.visible = false;
+                    that._expandButton.visible = true;
+                    that.stage.x = 100;
+                    that.stage.y = 300;
+                });
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(COLLAPSEBUTTON)))
+        };
+
+        __makeCollapseButton();
+
+        function __makeBoundary() {
+            var img = new Image();
+            img.onload = function () {
+                bitmap = new createjs.Bitmap(img);
+                bitmap.x = 0;
+                bitmap.y = 55;
+                that._borderContainer.addChild(bitmap);
+            };
+
+            var dx = that.w - 20;
+            var dy = that.h - 130;
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', '#e0e0e0'))));
+        };
+
+        __makeBoundary();
         return this;
     };
 

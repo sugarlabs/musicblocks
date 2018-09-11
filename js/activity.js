@@ -221,6 +221,7 @@ define(MYDEFINES, function (compatibility) {
         // Are we running off of a server?
         var server = true;
         var turtleBlocksScale = 1;
+	var mousestage;
         var stage;
         var turtles;
         var palettes;
@@ -1138,8 +1139,15 @@ define(MYDEFINES, function (compatibility) {
             blocksContainer = new createjs.Container();
             trashContainer = new createjs.Container();
             turtleContainer = new createjs.Container();
-
-            stage.addChild(turtleContainer, trashContainer, blocksContainer, palettesContainer);
+            /*
+	    console.log(turtleContainer);
+	    turtleContainer.scaleX = 0.5;
+	    turtleContainer.scaleY = 0.5;
+	    turtleContainer.x = 100;
+	    turtleContainer.y = 100;
+            */
+            stage.addChild(turtleContainer);
+            stage.addChild(trashContainer, blocksContainer, palettesContainer);
             _setupBlocksContainerEvents();
 
             trashcan = new Trashcan();
@@ -1150,6 +1158,8 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 .init();
 
+            // Put the boundary in the turtles container so it scrolls
+            // with the blocks.
             turtles = new Turtles();
             turtles
                 .setCanvas(canvas)
@@ -2675,6 +2685,13 @@ define(MYDEFINES, function (compatibility) {
                         break;
                     case TAB:
                         break;
+                    case SPACE:
+                        if (turtleContainer.scaleX == 1) {
+			    turtles.scaleStage(0.5);
+			} else {
+			    turtles.scaleStage(1);
+			}
+                        break;
                     case ESC:
                         if (searchWidget.style.visibility === 'visible') {
                             searchWidget.style.visibility = 'hidden';
@@ -2806,11 +2823,15 @@ define(MYDEFINES, function (compatibility) {
             ', screenW ' + screen.width + ', screenH ' + screen.height);
             */
 
-            turtles.setScale(turtleBlocksScale);
+            turtles.setScale(w, h, turtleBlocksScale);
+
             blocks.setScale(turtleBlocksScale);
             boundary.setScale(w, h, turtleBlocksScale);
+
             palettes.setScale(turtleBlocksScale);
+
             trashcan.resizeEvent(turtleBlocksScale);
+
             _setupAndroidToolbar(mobileSize);
 
             // Reposition coordinate grids.
