@@ -118,6 +118,9 @@ const MSGBLOCK = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1
 // boundary for screen
 const BOUNDARY = '<svg xmlns="http://www.w3.org/2000/svg" height="HEIGHT" width="WIDTH"> <rect style="fill:none;stroke:stroke_color;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:9, 9;stroke-dashoffset:0;stroke-opacity:1" y="Y" x="X" height="DY" width="DX" /></svg>';
 
+// boundary for graphics (mouse) container
+const MBOUNDARY = '<svg xmlns="http://www.w3.org/2000/svg" height="HEIGHT" width="WIDTH"> <rect style="fill:none;stroke:stroke_color;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" y="Y" x="X" height="DY" width="DX" /></svg>';
+
 // border for trashcan
 const BORDER = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">' + '<rect width="115" height="115" x="2.5" y="2.5" style="fill:none;stroke:stroke_color;stroke-width:5.0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:15, 15;stroke-dashoffset:0" />' + '</svg>';
 
