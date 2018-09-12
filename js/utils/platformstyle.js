@@ -35,6 +35,7 @@ window.platformColor = {
     doHeaderShadow: !platform.FF,
     // background: platform.FF? '#00CAF2' : '#96D3F3'
     // background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
+    ruleColor: '#e3e3e3', // 2.5B 9/0
     background: '#acd0e4'  // 2.5B 8/4
 };
 
