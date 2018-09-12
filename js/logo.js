@@ -316,7 +316,7 @@ function Logo () {
     this._savePenState = {};
 
     // Things we turn off to optimize performance
-    this.blinkState = true;
+    this.blinkState = !this.optimize;
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
