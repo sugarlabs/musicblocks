@@ -315,8 +315,13 @@ function Logo () {
     this._saveOrientation = {};
     this._savePenState = {};
 
-    // Things we turn off to optimize performance
+    // Things we tweak to optimize performance
     this.blinkState = !this.optimize;
+    if (this.optimize) {
+	createjs.Ticker.framerate = 10;
+    } else {
+	createjs.Ticker.framerate = 30;
+    }
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
