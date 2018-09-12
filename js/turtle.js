@@ -1259,6 +1259,13 @@ function Turtles () {
                 that._expandButton.visible = false;
                 that._borderContainer.addChild(that._expandButton);
 
+                that._expandButton.on('pressmove', function (event) {
+                    var w = (that.w - 10 - 4 * 55) / 4;
+                    that.stage.x = event.stageX / that.scale - w;
+                    that.stage.y = event.stageY / that.scale - 16;
+                    that.refreshCanvas();
+                });
+
                 that._expandButton.on('click', function (event) {
                     that.scaleStage(1.0);
                     that._expandedBoundary.visible = true;
