@@ -3710,7 +3710,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // ACTIONS PALETTE
 
     var newblock = new ProtoBlock('do');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('do')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['do'] = newblock;
     newblock.staticLabels.push(_('do'));
     newblock.adjustWidthToLabel();
@@ -3723,7 +3728,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('return');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('return')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['return'] = newblock;
     //.TRANS: return value from a function
     newblock.staticLabels.push(_('return'));
@@ -3737,7 +3747,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('returnToUrl');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('returnToURL')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['returnToUrl'] = newblock;
     //.TRANS: return value from a function to a URL
     newblock.staticLabels.push(_('return to URL'));
@@ -3751,7 +3766,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('calc');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('calc')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['calc'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3764,7 +3784,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedcalc');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('namedcalc')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['namedcalc'] = newblock;
     newblock.staticLabels.push(_('action'));
     newblock.extraWidth = 10;
@@ -3775,7 +3800,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('nameddoArg');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('nameddoArg')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['nameddoArg'] = newblock;
     //.TRANS: take (do) some action
     newblock.staticLabels.push(_('do'));
@@ -3787,7 +3817,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedcalcArg');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('namedcalcArg')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['namedcalcArg'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3799,7 +3834,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('doArg');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('doArg')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['doArg'] = newblock;
     newblock.staticLabels.push(_('do'));
     newblock.adjustWidthToLabel();
@@ -3812,7 +3852,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('calcArg');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('calcArg')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['calcArg'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3826,7 +3871,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('arg');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('arg')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['arg'] = newblock;
     newblock.staticLabels.push('arg');
     newblock.adjustWidthToLabel();
@@ -3839,7 +3889,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedarg');
-    newblock.palette = palettes.dict['action'];
+    if (beginnerMode && !beginnerBlock('namedarg')) {
+        newblock.palette = palettes.dict['extras'];
+    } else {
+        newblock.palette = palettes.dict['action'];
+    }
+
     blocks.protoBlockDict['namedarg'] = newblock;
     newblock.staticLabels.push('arg ' + 1);
     newblock.adjustWidthToLabel();
