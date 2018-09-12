@@ -1216,10 +1216,10 @@ function Turtles () {
                 __makeBoundary2();
             };
 
-            var dx = that.w - 20;
-            var dy = that.h - 130;
+            var dx = that.w - 5;
+            var dy = that.h - 60;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 5))));
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 2.5).replace('X', 2.5).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 5))));
         };
 
         function __makeBoundary2() {
@@ -1239,7 +1239,7 @@ function Turtles () {
             };
 
             var dx = that.w - 20;
-            var dy = that.h - 130;
+            var dy = that.h - 65;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
         };
