@@ -114,7 +114,7 @@ function createHelpContent() {
             [_('Home'), _('Return all blocks to the center of the screen.'), 'header-icons/go-home-button.svg'],
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
-            [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
+            [_('Find and share projects'), _('This button opens a viewer for sharing projects and for finding example projects.'), 'header-icons/planet-button.svg'],
             [_('Load project from files'), _('You can also load projects from the file system.'), 'header-icons/open-button.svg'],
             [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
             [_('Copy'), _('To copy a stack to the clipboard, right-click on the stack.') + ' ' + _('You can also use Alt+C to copy a stack of blocks.') + ' ' + _('The Paste Button will highlight.'), 'header-icons/paste-button.svg'],
@@ -178,7 +178,7 @@ function createHelpContent() {
     }
 
     BLOCKHELP = {
-	'newnote': [_('At the heart of Music Blocks is the <em>Note</em> block. The <em>Note</em> block is a container for a <em>Pitch</em> block that specifies the duration (note value) of the pitch.'), 'documentation', 'notevalue.svg'],
+	'newnote': [_('At the heart of Music Blocks is the <em>Note</em> block. The <em>Note</em> block is a container for one or more <em>Pitch</em> blocks. The <em>Note</em> block specifies the duration (note value) of its contents.'), 'documentation', 'notevalue.svg'],
 	'playdrum': [_('You can use multiple <em>Drum</em> blocks within a <em>Note</em> block.'), 'documentation', 'playdrum.svg'],
 	'rest2': [_('A rest of the specified note value duration can be constructed using a <em>Silence</em> block.'), 'documentation', 'silence.svg'],
 	'mynotevalue': [_('The <em>Note value</em> block is the value of the duration of the note currently being played.'), 'documentation', 'mynotevalue.svg'],

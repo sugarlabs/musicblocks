@@ -3858,9 +3858,9 @@ handleComplete);
             // Misc. other buttons
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
             if (planet) {
-                var planetMenuItem = ['planet', _doOpenSamples, _('Load samples from server'), null, null, null, null];
+                var planetMenuItem = ['planet', _doOpenSamples, _('Find and share projects'), null, null, null, null];
             } else {
-                var planetMenuItem = ['planet-disabled', null, _('The Planet is unavailable.'), null, null, null, null];
+                var planetMenuItem = ['planet-disabled', null, _('Offline. Sharing is unavailable.'), null, null, null, null];
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
