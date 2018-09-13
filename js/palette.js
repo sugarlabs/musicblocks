@@ -426,7 +426,6 @@ function Palettes () {
             this.dict[name].hideMenu();
         }
 
-
         this.hideSearchWidget(true);
 
         if (this.upIndicator != null) {
@@ -686,9 +685,10 @@ function PaletteModel(palette, palettes, name) {
         for (var blk in this.palette.protoList) {
             var block = this.palette.protoList[blk];
             // Don't show hidden blocks on the menus
-            if (block.hidden) {
-                continue;
-            }
+	    // But we still make them.
+            // if (block.hidden) {
+	    //     continue;
+            // }
 
             // Create a proto block for each palette entry.
             var blkname = block.name;
@@ -929,7 +929,8 @@ function PaletteModel(palette, palettes, name) {
                 docks,
                 image: block.image,
                 scale: block.scale,
-                palettename: this.palette.name
+                palettename: this.palette.name,
+		hidden: block.hidden
             });
         }
     };
@@ -981,6 +982,7 @@ function PopdownPalette(palettes) {
             }
             html += '</div>';
         }
+
         document.querySelector('#popdown-palette').innerHTML = html;
 
         var that = this;
@@ -1374,6 +1376,11 @@ function Palette(palettes, name) {
 
         for (var blk in blocks) {
             var b = blocks[blk];
+
+	    if (b.hidden) {
+		continue;
+	    }
+
             if (!this.protoContainers[b.modname]) {
                 // create graphics for the palette entry for this block
                 this.protoContainers[b.modname] = new createjs.Container();
