@@ -538,7 +538,17 @@ function RhythmRuler () {
             ruler.deleteCell(newCellIndex);
 
             var noteValue = noteValues[newCellIndex];
-            var newNoteValue = inputNum * noteValue;
+            var newNoteValue = 0;
+            
+            if(inputNum * noteValue <= 2048) {
+                newNoteValue = inputNum * noteValue;
+                this._logo.hideMsgs();
+            } else {
+                console.log('Top max value exceeded');
+                this._logo.errorMsg(_('Your new note exceeds the maximum of 1/2048. It has been reverted to its previous value.'));
+                newNoteValue = inputNum;
+            }
+
             var tempwidth = this._noteWidth(newNoteValue);
             var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
             var difference = parseFloat(this._noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
