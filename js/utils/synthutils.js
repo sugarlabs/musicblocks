@@ -277,6 +277,8 @@ function Synth() {
                 var note = notes.substring(0, len - 1);
                 var octave = Number(notes.slice(-1));
                 return pitchToFrequency(note, octave, 0, null);
+	    } else if (typeof(notes) === 'number') {
+		return notes;
             } else {
                 var results = [];
                 for (i = 0; i < notes.length; i++) {

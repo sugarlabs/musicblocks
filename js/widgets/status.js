@@ -317,7 +317,10 @@ function StatusMatrix() {
                                 value += ' ';
                             }
 
-                            value += this._logo.synth.getFrequency(notes[j], this._logo.synth.changeInTemperament).toFixed(2);
+			    var freq = this._logo.synth.getFrequency(notes[j], this._logo.synth.changeInTemperament);
+			    if (typeof(freq) === 'number') {
+				value += freq.toFixed(2);
+			    }
                         }
                     }
                     break;
