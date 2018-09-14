@@ -610,6 +610,7 @@ const TEMPERAMENT = {
 const DEFAULTINVERT = 'even';
 const DEFAULTINTERVAL = 'perfect' + ' 5';
 const DEFAULTVOICE = 'default';
+const DEFAULTNOISE = 'noise1';
 const DEFAULTDRUM = 'kick drum';
 const DEFAULTMODE = 'major';
 const DEFAULTTEMPERAMENT = 'equal';
@@ -737,7 +738,7 @@ function getFilterTypes(name) {
 function getOscillatorTypes(name) {
     if (name === '') {
         console.log('getOscillatorType passed blank name. Returning ' + DEFAULTOSCILLATORTYPE);
-        name = DEFAULTOSCILLATORTYPE;
+        name = null;  // DEFAULTOSCILLATORTYPE;
     }
 
     for (var type = 0; type < OSCTYPES.length; type++) {
@@ -748,8 +749,7 @@ function getOscillatorTypes(name) {
         }
     }
 
-    console.log(name + ' not found in OSCTYPES');
-    return DEFAULTOSCILLATORTYPE;
+    return null;  // DEFAULTOSCILLATORTYPE;
 };
 
 
@@ -791,6 +791,66 @@ function getDrumSynthName(name) {
 
     console.log(name + ' not found in DRUMNAMES');
     return DEFAULTDRUM;
+};
+
+
+function getNoiseName(name) {
+    if (name === '') {
+        console.log('getNoiseName passed blank name. Returning ' + DEFAULTNOISE);
+        name = DEFAULTNOISE;
+    }
+
+    for (var i = 0; i < NOISENAMES.length; i++) {
+        if (NOISENAMES[i][1] === name) {
+            if (NOISENAMES[i][0] != '') {
+                return NOISENAMES[i][0];
+	    } else {
+                return NOISENAMES[i][1];
+            }
+        }
+    }
+
+    console.log(name + ' not found in NOISENAMES');
+    return DEFAULTNOISE;
+};
+
+
+function getNoiseIcon(name) {
+    if (name === '') {
+        console.log('getNoiseIcon passed blank name. Returning ' + DEFAULTNOISE);
+        name = DEFAULTNOISE;
+    } else if (name.slice(0, 4) == 'http') {
+        return 'images/noises.svg';
+    }
+
+    for (var i = 0; i < NOISENAMES.length; i++) {
+        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+            return NOISENAMES[i][2];
+        }
+    }
+
+    console.log(name + ' not found in NOISENAMES');
+    return 'images/synth.svg';
+};
+
+
+function getNoiseSynthName(name) {
+    if (name == null || name == undefined) {
+        console.log('getNoiseSynthName passed null name. Returning null');
+        return null;
+    } else if (name === '') {
+        console.log('getNoiseSynthName passed blank name. Returning ' + DEFAULTNOISE);
+        name = DEFAULTNOISE;
+    }
+
+    for (var i = 0; i < NOISENAMES.length; i++) {
+        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+            return NOISENAMES[i][1];
+        }
+    }
+
+    console.log(name + ' not found in NOISENAMES');
+    return DEFAULTNOISE;
 };
 
 
@@ -856,6 +916,7 @@ function getVoiceSynthName(name) {
     console.log(name + ' not found in VOICENAMES');
     return DEFAULTVOICE;
 };
+
 
 function getTemperamentName(name) {
     if (name === '') {

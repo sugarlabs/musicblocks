@@ -11,6 +11,15 @@
 
 const POLYCOUNT = 3;
 
+var NOISENAMES = [
+    //.TRANS: white noise synthesizer
+    [_('white noise'), 'noise1', 'images/synth.svg', 'electronic'],
+    //.TRANS: brown noise synthesizer
+    [_('brown noise'), 'noise2', 'images/synth.svg', 'electronic'],
+    //.TRANS: pink noise synthesizer
+    [_('pink noise'), 'noise3', 'images/synth.svg', 'electronic'],
+];
+
 var VOICENAMES = [
     //.TRANS: musical instrument
     [_('piano'), 'piano', 'images/voices.svg', 'string'],
@@ -42,12 +51,6 @@ var VOICENAMES = [
     // [_('simple-3'), 'mono3', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
     // [_('simple-4'), 'mono4', 'images/synth.svg', 'electronic'],
-    //.TRANS: white noise synthesizer
-    [_('white noise'), 'noise1', 'images/synth.svg', 'electronic'],
-    //.TRANS: brown noise synthesizer
-    [_('brown noise'), 'noise2', 'images/synth.svg', 'electronic'],
-    //.TRANS: pink noise synthesizer
-    [_('pink noise'), 'noise3', 'images/synth.svg', 'electronic'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg', 'electronic'],
     //.TRANS: square wave
@@ -59,7 +62,6 @@ var VOICENAMES = [
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
 ];
-
 
 // drum symbols are from
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
@@ -824,8 +826,6 @@ function Synth() {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].oscillator.partials = paramsEffects.partials;
                         }
-                    } else {
-                        console.log('cannot find oscillator to apply partials');
                     }
                 }
 
@@ -838,8 +838,6 @@ function Synth() {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].portamento = paramsEffects.portamento;
                         }
-                    } else {
-                        console.log('cannot find oscillator to apply portamento');
                     }
                 }
 
@@ -872,8 +870,6 @@ function Synth() {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].setNote(notes);
                         }
-                    } else {
-                        console.log('cannot find oscillator to setNote');
                     }
                 } else {
                     synth.triggerAttackRelease(notes, beatValue);
