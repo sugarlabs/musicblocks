@@ -69,7 +69,7 @@ function LanguageBox () {
             'gug': 'Actualice su navegador para cambiar su preferencia de idioma.',
 	};
 
-        var language = localStorage.languagePreference;
+        var language = localStorageShim.languagePreference;
         if (language == undefined || language === '' || language === 'en-US'  || language === 'en-US') {
             language = 'en';
         }
