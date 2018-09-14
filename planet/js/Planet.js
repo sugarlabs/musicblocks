@@ -16,7 +16,7 @@ function Planet(isMusicBlocks, storage) {
     this.ServerInterface = null;
     this.Converter = null;
     this.SaveInterface = null;
-    this.LocalStorage = storage;
+    this.localStorageShim = storage;
     this.ConnectedToServer = null;
     this.TagsManifest = null;
     this.IsMusicBlocks = isMusicBlocks;

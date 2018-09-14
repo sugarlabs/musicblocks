@@ -11,7 +11,7 @@
 
 function ProjectStorage(Planet) {
     this.defaultProjectName = _('My Project');
-    this.LocalStorage = null;
+    this.localStorageShim = null;
     this.data = null;
     this.LocalStorageKey = 'ProjectData';
     this.TimeLastSaved = -1;
@@ -174,11 +174,11 @@ function ProjectStorage(Planet) {
 
     this.set = function(key, obj) {
         var jsonobj = JSON.stringify(obj);
-        this.LocalStorage.setItem(key, jsonobj);
+        this.localStorageShim.setItem(key, jsonobj);
     };
 
     this.get = function(key) {
-        var jsonobj = this.LocalStorage.getItem(key);
+        var jsonobj = this.localStorageShim.getItem(key);
         if (jsonobj === null || jsonobj === '') {
             return null;
         }
@@ -228,7 +228,7 @@ function ProjectStorage(Planet) {
     };
 
     this.init = function() {
-        this.LocalStorage = Planet.LocalStorage;
+        this.localStorageShim = Planet.localStorageShim;
         this.restore();
         this.initialiseStorage();
     };

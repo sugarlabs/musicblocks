@@ -132,12 +132,12 @@ function LanguageBox () {
         var myDiv = docById('languageDiv');
         var selectOpt = '';
 
-        var selected = localStorage.languagePreference;
+        var selected = localStorageShim.languagePreference;
         console.log(selected);
-        console.log(localStorage.kanaPreference);
+        console.log(localStorageShim.kanaPreference);
         if (selected == undefined || selected === '' || selected === 'en') {
             selected = 'en-US';
-        } else if (selected === 'ja' && localStorage.kanaPreference === 'kana') {
+        } else if (selected === 'ja' && localStorageShim.kanaPreference === 'kana') {
 	    console.log('kana');
             selected = 'kana';
 	}
@@ -170,11 +170,11 @@ function LanguageBox () {
                 console.log('resetting language preference to ' + LANGS[n][1]);
 		if (LANGS[n][1] === 'kana') {
 		    // Set kana spoof flag for ja.po
-                    localStorage.setItem('languagePreference', 'ja');
-                    localStorage.setItem('kanaPreference', 'kana');
+                    localStorageShim.setItem('languagePreference', 'ja');
+                    localStorageShim.setItem('kanaPreference', 'kana');
 		} else {
-                    localStorage.setItem('languagePreference', LANGS[n][1]);
-                    localStorage.setItem('kanaPreference', null);
+                    localStorageShim.setItem('languagePreference', LANGS[n][1]);
+                    localStorageShim.setItem('kanaPreference', null);
 		}
             };
         }
