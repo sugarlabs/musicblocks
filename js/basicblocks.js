@@ -3710,12 +3710,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // ACTIONS PALETTE
 
     var newblock = new ProtoBlock('do');
-    if (beginnerMode && !beginnerBlock('do')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['do'] = newblock;
     newblock.staticLabels.push(_('do'));
     newblock.adjustWidthToLabel();
