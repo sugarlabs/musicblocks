@@ -540,12 +540,12 @@ function RhythmRuler () {
             var noteValue = noteValues[newCellIndex];
             var newNoteValue = 0;
             
-            if(inputNum * noteValue <= 2048) {
+            if(inputNum * noteValue <= 256) {
                 newNoteValue = inputNum * noteValue;
                 this._logo.hideMsgs();
             } else {
                 console.log('Top max value exceeded');
-                this._logo.errorMsg(_('Your new note exceeds the maximum of 1/2048. It has been reverted to its previous value.'));
+                this._logo.errorMsg(('Maximum value of 256 has been exceeded.'));
                 newNoteValue = inputNum;
             }
 
