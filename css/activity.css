@@ -347,6 +347,10 @@ body {
     overflow: hidden;
 }
 
+body.noScroll { 
+    overflow: hidden;
+}
+
 body.samples-shown {
     overflow-y: scroll;
     background: white !important;
