@@ -1060,17 +1060,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var newblock = new ProtoBlock('duplicatefactor');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['duplicatefactor'] = newblock;
-    //.TRANS: factor used in determining how many duplications to make
-    newblock.staticLabels.push(_('duplicate factor'));
-    newblock.adjustWidthToLabel();
-    newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('duplicatefactor')) {
-        newblock.hidden = true;
-    }
-
     var newblock = new ProtoBlock('skipfactor');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['skipfactor'] = newblock;
@@ -4371,6 +4360,15 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // FLOW PALETTE
+
+    var newblock = new ProtoBlock('duplicatefactor');
+    newblock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['duplicatefactor'] = newblock;
+    //.TRANS: factor used in determining how many duplications to make
+    newblock.staticLabels.push(_('duplicate factor'));
+    newblock.adjustWidthToLabel();
+    newblock.parameterBlock();
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('hiddennoflow');
     newblock.palette = palettes.dict['flow'];
