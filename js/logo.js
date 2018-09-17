@@ -4205,7 +4205,6 @@ function Logo () {
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
-            console.log(that.blocks.blockList[blk].name + ' ' + args[0]);
             if (that.blocks.blockList[blk].name === 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
@@ -4366,7 +4365,6 @@ function Logo () {
 
                 var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                 if (!that.validNote) {
-                    console.log(arg0);
                     that.errorMsg(INVALIDPITCH, blk);
                     that.stopTurtle = true;
                     break;
@@ -4554,7 +4552,13 @@ function Logo () {
                     if (that.currentCalculatedOctave[turtle] == undefined) {
                         that.currentCalculatedOctave[turtle] = 4;
                     }
-                    var noteObj = getNote(arg0, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], arg0), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+
+		    if (that.blocks.blockList[blk].name == 'scaledegree') {
+			var noteObj = getNote(that.currentNote, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], that.currentNote), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+		    } else {
+			var noteObj = getNote(arg0, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], arg0), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+		    }
+
                     if (!that.validNote) {
                         that.errorMsg(INVALIDPITCH, blk);
                         that.stopTurtle = true;
