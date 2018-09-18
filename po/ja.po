@@ -322,7 +322,7 @@ msgstr "音階内の動き"
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr "音高数値"
+msgstr "ピッチ数値"
 
 #: js/block.js:1287
 #: js/block.js:1295
@@ -918,16 +918,16 @@ msgstr "マイナスの数値をいれることはできません。"
 
 #: js/logo.js:3283
 msgid "Adding missing pitch number 0."
-msgstr "音高「0」を加える"
+msgstr "ピッチ数値「0」を加える"
 
 #: js/logo.js:3293
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
-msgstr "音高の数のうち、0未満あるいは11より大きい数は無視します。"
+msgstr "ピッチ数値の数のうち、0未満あるいは11より大きい数は無視します。"
 
 #: js/logo.js:3298
 ## check verb
 msgid "Ignoring duplicate pitch numbers."
-msgstr "重複している音高は無視します"
+msgstr "重複しているピッチ数値は無視します"
 
 #: js/logo.js:3431
 msgid "You must have at least one pitch block and one drum block in the matrix."
@@ -1742,59 +1742,59 @@ msgstr "ミュージック・ブロックスの一番基本なブロックは「
 
 #: js/turtledefs.js:182
 msgid "You can use multiple <em>Drum</em> blocks within a <em>Note</em> block."
-msgstr ""
+msgstr "<em>ドラム</em>ブロックは一つ以上<em>音符</em>ブロックに入れることができます。"
 
 #: js/turtledefs.js:183
 msgid "A rest of the specified note value duration can be constructed using a <em>Silence</em> block."
-msgstr "休符ブロックは音価ブロックの中に入れるとその音価の長さで入れられているネズミが音鳴らしを休みます。"
+msgstr "<em>休符</em>ブロックは音価ブロックの中に入れるとその音価の長さで入れられているネズミが音鳴らしを休みます。"
 
 #: js/turtledefs.js:184
 msgid "The <em>Note value</em> block is the value of the duration of the note currently being played."
-msgstr ""
+msgstr "<em>音価</em>"ブロックは音符の長さの値です。
 
 #: js/turtledefs.js:185
 msgid "The beat of the music is determined by the <em>Meter</em> block (by default, 4 1/4 notes per measure)."
-msgstr "拍子ブロックで音楽のビートを決めます。拍子ブロックは拍子記号ブロックと一緒に使ってデフォルトが4/4です。"
+msgstr "<em>拍子</em>ブロックで音楽のビートを決めます。拍子ブロックは拍子記号ブロックと一緒に使ってデフォルトが4/4です。"
 
 #: js/turtledefs.js:186
 msgid "The <em>Beats per minute</em> block sets the number of 1/4 notes per minute."
-msgstr ""
+msgstr "<em>BPM(一分あたりの拍数)</em>ブロックは決められている音価(例えば1/4)で拍にします。"
 
 #: js/turtledefs.js:187
 msgid "The <em>On-every-beat</em> block let you specify actions to take on every beat."
-msgstr ""
+msgstr "<em>全部の拍に～する</em>ブロックは全部の拍に特定されているアクションをします。"
 
 #: js/turtledefs.js:188
 msgid "The <em>On-strong-beat</em> block let you specify actions to take on specified beats."
-msgstr ""
+msgstr "<em>強拍に</em>ブロックは決められている拍子に対する強拍だけに特定されているアクションをします。"
 
 #: js/turtledefs.js:189
 msgid "The <em>On-weak-beat</em> block let you specify actions to take on weak (off) beats."
-msgstr ""
+msgstr "<em>弱拍</em>ブロックは決められている拍子に対する弱拍だけに特定されているアクションをします。"
 
 #: js/turtledefs.js:190
 msgid "The <em>No clock</em> block decouples the notes from the master clock."
-msgstr "クロックなし*ブロックはそれぞれの動作の順番をリズムより優先します。"
+msgstr "<em>クロックなし</em>ブロックはそれぞれの動作の順番をリズムより優先します。"
 
 #: js/turtledefs.js:192
 msgid "The <em>Pitch</em> block specifies the pitch name and pitch octave of a note that determine the frequency of the note."
-msgstr "ピッチブロックはピッチの名前とピッチのオクターヴを決めます。"
+msgstr "<em>ピッチブ</em>ロックはピッチの名前とピッチのオクターヴを決めます。"
 
 #: js/turtledefs.js:193
 msgid "Pitch can be specified in terms of <em>do re mi fa sol la ti<em>."
-msgstr "ソルフェージュの名前が「ド、レ、ミ、ファ、ソ、ラ、シ」から選ぶことができます。"
+msgstr "ソルフェージュの名前が<em>「ド、レ、ミ、ファ、ソ、ラ、シ」</em>から選ぶことができます。"
 
 #: js/turtledefs.js:194
 msgid "Pitch can be specified in terms of <em>C D E F G A B</em>."
-msgstr "ピッチ・アルファベットの名前が「C D E F G A B」から選ぶことができます。"
+msgstr "ピッチ・アルファベットの名前が<em>「C D E F G A B」</em>から選ぶことができます。"
 
 #: js/turtledefs.js:195
 msgid "The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>."
-msgstr ""
+msgstr "<em>ステップ<ピッチ</em>ブロックはメロディーの音符を音階的に上/下に動かすことができます。(例えば、もし<em>ステップピッチ</em>の前のブロックは<em>ソル</em>だったら<em>ステップピッチ＝１</em>は<em>ラ</em>を鳴らします。"
 
 #: js/turtledefs.js:196
 msgid "The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency."
-msgstr ""
+msgstr "<em>ヘルツ</em>ブロックは（）"
 
 #: js/turtledefs.js:197
 msgid "The <em>Accidental</em> block is used to create <em>sharps</em> and <em>flats</em>"
