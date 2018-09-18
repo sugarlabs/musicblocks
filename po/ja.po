@@ -2555,7 +2555,7 @@ msgstr "隣接音"
 #: js/basicblocks.js:2285
 #.TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
-msgstr "半音間隔"
+msgstr "半音階：音間の間隔"
 
 #: js/basicblocks.js:1654
 #: js/basicblocks.js:2442
@@ -2679,13 +2679,13 @@ msgstr "重"
 #: js/basicblocks.js:1920
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr "半音で数える"
+msgstr "半音の音の間隔"
 
 #: js/basicblocks.js:1931
 #.TRANS: measure the distance between two pitches in steps of musical scale
 ## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
-msgstr "音階同志の音の間隔"
+msgstr "音階同士の音の間隔"
 
 #: js/basicblocks.js:1942
 #: js/basicblocks.js:1953
