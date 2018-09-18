@@ -385,7 +385,7 @@ msgstr "シャープ(嬰)"
 #: js/musicutils.js:304
 #.TRANS: natural is a music term related to pitch
 msgid "natural"
-msgstr "本位(ナチュラル)"
+msgstr "ナチュラル(本位)"
 
 #: js/block.js:2350
 #: js/logo.js:6184
@@ -1794,43 +1794,43 @@ msgstr "<em>ステップ<ピッチ</em>ブロックはメロディーの音符�
 
 #: js/turtledefs.js:196
 msgid "The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency."
-msgstr "<em>ヘルツ</em>ブロックは（）"
+msgstr "<em>ヘルツ</em>ブロックは（<em>数字</em>ブロックと一緒）特定されている周波数でピッチを鳴らします。"
 
 #: js/turtledefs.js:197
 msgid "The <em>Accidental</em> block is used to create <em>sharps</em> and <em>flats</em>"
-msgstr ""
+msgstr "<em>変化記号</em>ブロックは <em>シャープ(嬰)</em>と<em>フラット(変)</em>を決める機能です。"
 
 #: js/turtledefs.js:198
 msgid "The <em>Accidental selector</em> block is used to choose between double-sharp, sharp, natural, flat, and double-flat."
-msgstr ""
+msgstr "<em>変化記号セレクター</em>ブロックはダブルシャープ（重嬰）、シャープ(嬰)、ナチュラル(本位)、フラット(変)、ダブルフラット（重変）から選ぶことができます。"
 
 #: js/turtledefs.js:199
 msgid "The <em>Scalar transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) the scale. In the example shown above, <em>sol</em> is shifted up to <em>la</em>."
-msgstr ""
+msgstr "<em>音階内の移調</em>ブロックは<em>音符</em>の中に入っている音高を上（また下）に、特定されている<em>数字</em>の値によって、音階の音高で移動します。例の画像に<em>ソル</em>が<em>ラ</em>に上に移動されています。"
 
 #: js/turtledefs.js:200
 msgid "The <em>Semi-tone transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) by half steps. In the example shown above, <em>sol</em> is shifted up to <em>sol#</em>."
-msgstr ""
+msgstr "<em>半音で移調</em>ブロックは<em>音符</em>の中に入っている音高を上（また下）に、特定されている<em>数字</em>の値によって、半音ずつ移動します。例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
 
 #: js/turtledefs.js:201
 msgid "The <em>Pitch number</em> block is the value of the pitch of the note currently being played."
-msgstr ""
+msgstr "<em>ピッチ数値</em>ブロックは音高を数字として（半音ずつ）の値です。"
 
 #: js/turtledefs.js:202
 msgid "The <em>Change in pitch</em> block is the difference (in half steps) between the current pitch being played and the previous pitch played."
-msgstr ""
+msgstr "<em>音程の違い</em>ブロックは現在に鳴らされている音高と現在のちょうど前に鳴らされている音高（半音の値で）の違いです。"
 
 #: js/turtledefs.js:203
 msgid "The <em>Set key</em> block is used to set the key and mode, e.g., <em>C Major</em>"
-msgstr ""
+msgstr "<em>音階の設定</em>ブロックは音階（キー、またモード）を設定するためです（例えば<em>「ド」　メージャー</em>）"
 
 #: js/turtledefs.js:204
 msgid "The <em>Mode length</em> block is the number of notes in the current scale. Most <em>Western</em> scales have 7 notes."
-msgstr ""
+msgstr "<em>音階の音数</em>ブロックは現在の音階の音高の数です。例えば「メージャー」は七つの音高です。"
 
 #: js/turtledefs.js:205
 msgid "???"
-msgstr ""
+msgstr "？？？"
 
 #: js/turtledefs.js:206
 msgid "The <em>Scalar interval</em> block calculates a relative interval based on the current mode, skipping all notes outside of the mode. In the figure, we add <em>la</em> to <em>sol</em>."
@@ -2140,7 +2140,7 @@ msgstr "音階で2度上"
 #: js/basicblocks.js:488
 #.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
-msgstr "音階の移調"
+msgstr "音階内の移調"
 
 #: js/basicblocks.js:537
 #: js/basicblocks.js:4219
