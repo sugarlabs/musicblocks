@@ -457,11 +457,11 @@ msgstr "エオリアン音階"
 
 #: js/activity.js:826
 msgid "Refresh your browser to change to advanced mode."
-msgstr ""
+msgstr "高度モードを設定するため、ブラウザーをリフレッシュして下さい。"
 
 #: js/activity.js:829
 msgid "Refresh your browser to change to beginner mode."
-msgstr ""
+msgstr "簡単モードを設定するため、ブラウザーをリフレッシュして下さい。"
 
 #: js/activity.js:860
 #: js/activity.js:4444
@@ -591,7 +591,7 @@ msgstr "ブロックの表示"
 #: js/turtledefs.js:113
 #: js/turtledefs.js:151
 msgid "Expand/collapse collapsable blocks"
-msgstr ""
+msgstr "潰せるブロックを表示/隠す"
 
 #: js/activity.js:3738
 #: js/activity.js:3751
@@ -607,7 +607,7 @@ msgstr "ホーム"
 #: js/activity.js:4458
 #: js/utilitybox.js:126
 msgid "Switch to advanced mode"
-msgstr ""
+msgstr "高度モードに設定する"
 
 #: js/activity.js:3743
 #: js/activity.js:3759
@@ -641,7 +641,7 @@ msgstr "音符を一つずつ再生"
 #: js/activity.js:4460
 #: js/utilitybox.js:127
 msgid "Switch to beginner mode"
-msgstr ""
+msgstr "簡単モードに設定"
 
 #: js/activity.js:3756
 #: js/activity.js:3767
@@ -756,7 +756,7 @@ msgstr "チャンクの最小化"
 
 #: js/activity.js:4401
 msgid "More"
-msgstr ""
+msgstr "その他"
 
 #: js/activity.js:4421
 msgid "Run slowly"
@@ -794,7 +794,7 @@ msgstr "コピー"
 
 #: js/activity.js:4611
 msgid "Extract"
-msgstr ""
+msgstr "取り出す"
 
 #: js/activity.js:4612
 msgid "Move to trash"
@@ -1566,12 +1566,12 @@ msgstr "ミュージック・ブロックスを設定するためのパネルを
 #: js/turtledefs.js:124
 #: js/turtledefs.js:164
 msgid "Switch mode"
-msgstr ""
+msgstr "モードを設定"
 
 #: js/turtledefs.js:124
 #: js/turtledefs.js:164
 msgid "Switch between beginner and advance modes."
-msgstr ""
+msgstr "簡単/高度モードを設定"
 
 #: js/turtledefs.js:125
 #: js/turtledefs.js:166
@@ -1738,7 +1738,7 @@ msgstr "選ばれているプラグインを消す"
 
 #: js/turtledefs.js:181
 msgid "At the heart of Music Blocks is the <em>Note</em> block. The <em>Note</em> block is a container for a <em>Pitch</em> block that specifies the duration (note value) of the pitch."
-msgstr ""
+msgstr "ミュージック・ブロックスの一番基本なブロックは「音符」ブロックです。「音符」ブロックの中にピッチブロックが入られることができます。「音符」ブロックはピッチの長さがどのぐらいか決めます。"
 
 #: js/turtledefs.js:182
 msgid "You can use multiple <em>Drum</em> blocks within a <em>Note</em> block."
@@ -1746,7 +1746,7 @@ msgstr ""
 
 #: js/turtledefs.js:183
 msgid "A rest of the specified note value duration can be constructed using a <em>Silence</em> block."
-msgstr ""
+msgstr "休符ブロックは音価ブロックの中に入れるとその音価の長さで入れられているネズミが音鳴らしを休みます。"
 
 #: js/turtledefs.js:184
 msgid "The <em>Note value</em> block is the value of the duration of the note currently being played."
@@ -1754,7 +1754,7 @@ msgstr ""
 
 #: js/turtledefs.js:185
 msgid "The beat of the music is determined by the <em>Meter</em> block (by default, 4 1/4 notes per measure)."
-msgstr ""
+msgstr "拍子ブロックで音楽のビートを決めます。拍子ブロックは拍子記号ブロックと一緒に使ってデフォルトが4/4です。"
 
 #: js/turtledefs.js:186
 msgid "The <em>Beats per minute</em> block sets the number of 1/4 notes per minute."
@@ -1774,19 +1774,19 @@ msgstr ""
 
 #: js/turtledefs.js:190
 msgid "The <em>No clock</em> block decouples the notes from the master clock."
-msgstr ""
+msgstr "クロックなし*ブロックはそれぞれの動作の順番をリズムより優先します。"
 
 #: js/turtledefs.js:192
 msgid "The <em>Pitch</em> block specifies the pitch name and pitch octave of a note that determine the frequency of the note."
-msgstr ""
+msgstr "ピッチブロックはピッチの名前とピッチのオクターヴを決めます。"
 
 #: js/turtledefs.js:193
 msgid "Pitch can be specified in terms of <em>do re mi fa sol la ti<em>."
-msgstr ""
+msgstr "ソルフェージュの名前が「ド、レ、ミ、ファ、ソ、ラ、シ」から選ぶことができます。"
 
 #: js/turtledefs.js:194
 msgid "Pitch can be specified in terms of <em>C D E F G A B</em>."
-msgstr ""
+msgstr "ピッチ・アルファベットの名前が「C D E F G A B」から選ぶことができます。"
 
 #: js/turtledefs.js:195
 msgid "The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>."
