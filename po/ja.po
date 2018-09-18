@@ -1834,49 +1834,50 @@ msgstr "？？？"
 
 #: js/turtledefs.js:206
 msgid "The <em>Scalar interval</em> block calculates a relative interval based on the current mode, skipping all notes outside of the mode. In the figure, we add <em>la</em> to <em>sol</em>."
-msgstr ""
+msgstr "<em>音階的音程</em>ブロックは音階にない音高を無視、特定されている値（音程）によって新しい音高を計算して鳴らします。例の画像には<em>ソル</em>が<em>ラ</em>になります。"
 
 #: js/turtledefs.js:207
 msgid "The <em>Semi-tone interval</em> block calculates a relative interval based on half steps. In the figure, we add <em>sol#</em> to <em>sol</em>."
-msgstr ""
+msgstr "<em>半音階的音程</em>ブロックは音階を無視、半音で新しい音高を計算して鳴らします。例の画像には<em>ソル</em>が<em>ソル#</em>に鳴ります。"
 
 #: js/turtledefs.js:208
 #: js/turtledefs.js:209
 msgid "The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello."
-msgstr ""
+msgstr "<em>音色を設定</em>ブロックで声部のシンセを決めます（例えば、ギター、ピアノ、バイオリン、チェロなど）。"
 
 #: js/turtledefs.js:210
 msgid "The <em>Staccato</em> block shortens the length of the actual note—making them tighter bursts—while maintaining the specified rhythmic value of the notes."
-msgstr ""
+msgstr "<em>スタッカート</em>ブロックは音符の鳴らす時刻を、特定されている値で、短くします。音符の音価は変わりません。"
 
 #: js/turtledefs.js:211
 msgid "The <em>Slur</em> block lengthens the sustain of notes—running longer than the noted duration and blending it into the next note—while maintaining the specified rhythmic value of the notes."
-msgstr ""
+msgstr "<em>スラー</em>ブロックは音符の鳴らす時刻を、特定されている値で、長くします。音符の音価は変わりません。"
 
 #: js/turtledefs.js:212
 msgid "The Crescendo block will increase (or decrease) the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume."
-msgstr ""
+msgstr "<em>クレシェンド</em>ブロックは重ねられている音符の音量を特定されている値で大きくしたり、小さくしたりします。例えば、もし七つの音符が<em>クレシェンド</em>ブロックに重ねられていたら、最後の音符の音量が最初の音符より３５％で大きく鳴らします。"
 
 #: js/turtledefs.js:213
 msgid "The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume)."
-msgstr ""
+msgstr "<em>シンセの音量を設定</em>ブロックは特定されているシンセ（ギター、バイオリン、スネアドラムなど）の音量を変えます。デフォルト音量が５０％です。０から１００まで設定できます。"
 
 #: js/turtledefs.js:214
 msgid "The <em>Set drum</em> block will select a drum sound to replace the pitch of any contained notes. In the example above, a <em>kick drum</em> sound will be played instead of <em>sol</em>."
-msgstr ""
+msgstr "<em>ドラムを設定</em>ブロックで重ねられている音符の音高をドラムの音に変えることができます。例の画像に<em>ソル</em>の代わりに<em>キックドラム</em>が鳴らします。"
 
 #: js/turtledefs.js:215
 #: js/turtledefs.js:216
+## 条件式=じょうけんしき https://jisho.org/word/%E6%9D%A1%E4%BB%B6%E5%BC%8F 
 msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
-msgstr ""
+msgstr "<em>条件式</em>のそれぞれのブロックで自分のプログラムをいろんな<em>条件式</em>によって再生するアクションが変わります。例の画像に<em>もし</em>ブロックでマウスクリックしたらスネアの音が鳴らします。"
 
 #: js/turtledefs.js:217
 msgid "The <em>Repeat</em> block will repeat the contained blocks. In this example, the note will be played 4 times."
-msgstr ""
+msgstr "<em>～回繰り返す</em>ブロックで重なれているブロックを繰り返せます。例の画像で重なれている音符が４回鳴らします。"
 
 #: js/turtledefs.js:218
 msgid "The <em>Forever</em> block will repeat the contained blocks forever. In this example, a simple drum machine, a kick drum will play 1/4 notes forever."
-msgstr ""
+msgstr "<em>ずっと</em>ブロックで重なれているブロックをずっと繰り返せます。例の画像に「ドラムループ」みたいにキックドラムが４分音符の音価でずっと鳴らします。"
 
 #: js/SaveInterface.js:74
 #: js/SaveInterface.js:78
@@ -4047,7 +4048,7 @@ msgstr "休符"
 
 #: js/pitchdrummatrix.js:313
 msgid "Click in the grid to map notes to drums."
-msgstr ""
+msgstr "グラフにクリックして音符をどちらのドラムに変えるか決めることができます。"
 
 #: js/pitchslider.js:388
 msgid "move up"
@@ -4059,7 +4060,7 @@ msgstr "下に動く"
 
 #: js/pitchslider.js:417
 msgid "Use the slider to change the pitch."
-msgstr ""
+msgstr "スライダーでピッチを変えます。"
 
 #: js/pitchtimematrix.js:197
 msgid "export"
