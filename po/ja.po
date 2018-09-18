@@ -1143,7 +1143,7 @@ msgstr "空のヒープ"
 #: js/logo.js:10653
 #: js/logo.js:10728
 msgid "You must use two pitch blocks when measuring an interval."
-msgstr "インターバルを計る際は、２つの音符を使う必要があります。"
+msgstr "音程を計る際は、２つの音符を使う必要があります。"
 
 #: js/logo.js:10867
 #: js/basicblocks.js:313
@@ -1226,9 +1226,9 @@ msgid "accidental"
 msgstr "変化記号"
 
 #: js/palette.js:813
-## 明確＝めいかく；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B 
+##  
 msgid "interval name"
-msgstr "インターバル"
+msgstr "音程名"
 
 #: js/palette.js:834
 #: js/palette.js:839
@@ -2554,14 +2554,16 @@ msgstr "隣接音"
 #: js/basicblocks.js:1636
 #: js/basicblocks.js:2285
 #.TRANS: calculate a relative step between notes based on semi-tones
+## https://ja.wikibooks.org/wiki/%E9%9F%B3%E7%A8%8B#%E5%8D%8A%E9%9F%B3%E9%9A%8E%E7%9A%84%E9%9F%B3%E7%A8%8B
 msgid "semi-tone interval"
-msgstr "半音階：音間の間隔"
+msgstr "半音階的音程"
 
 #: js/basicblocks.js:1654
 #: js/basicblocks.js:2442
 #.TRANS: calculate a relative step between notes based on the current musical scale
+## https://ja.wikibooks.org/wiki/%E9%9F%B3%E7%A8%8B#%E5%85%A8%E9%9F%B3%E9%9A%8E%E7%9A%84%E9%9F%B3%E7%A8%8B
 msgid "scalar interval"
-msgstr "音階：音間の間隔"
+msgstr "音階的音程"
 
 #: js/basicblocks.js:1670
 #: js/timbre.js:1586
@@ -2679,13 +2681,12 @@ msgstr "重"
 #: js/basicblocks.js:1920
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr "半音の音の間隔"
+msgstr "半音階的音程で計る"
 
 #: js/basicblocks.js:1931
 #.TRANS: measure the distance between two pitches in steps of musical scale
-## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
-msgstr "音階同士の音の間隔"
+msgstr "全音階的音程で計る"
 
 #: js/basicblocks.js:1942
 #: js/basicblocks.js:1953
