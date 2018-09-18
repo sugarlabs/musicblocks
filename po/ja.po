@@ -322,7 +322,7 @@ msgstr "音階内の動き"
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr "音高数値"
+msgstr "ピッチ数値"
 
 #: js/block.js:1287
 #: js/block.js:1295
@@ -385,7 +385,7 @@ msgstr "シャープ(嬰)"
 #: js/musicutils.js:304
 #.TRANS: natural is a music term related to pitch
 msgid "natural"
-msgstr "本位(ナチュラル)"
+msgstr "ナチュラル(本位)"
 
 #: js/block.js:2350
 #: js/logo.js:6184
@@ -457,11 +457,11 @@ msgstr "エオリアン音階"
 
 #: js/activity.js:826
 msgid "Refresh your browser to change to advanced mode."
-msgstr ""
+msgstr "高度モードを設定するため、ブラウザーをリフレッシュして下さい。"
 
 #: js/activity.js:829
 msgid "Refresh your browser to change to beginner mode."
-msgstr ""
+msgstr "簡単モードを設定するため、ブラウザーをリフレッシュして下さい。"
 
 #: js/activity.js:860
 #: js/activity.js:4444
@@ -550,7 +550,7 @@ msgstr "ブラウザ表示を100%に設定してください。"
 #: js/activity.js:3732
 #: js/turtledefs.js:109
 msgid "Play"
-msgstr ""
+msgstr "再生"
 
 #: js/activity.js:3733
 #: js/activity.js:3761
@@ -591,7 +591,7 @@ msgstr "ブロックの表示"
 #: js/turtledefs.js:113
 #: js/turtledefs.js:151
 msgid "Expand/collapse collapsable blocks"
-msgstr ""
+msgstr "潰せるブロックを表示/隠す"
 
 #: js/activity.js:3738
 #: js/activity.js:3751
@@ -607,7 +607,7 @@ msgstr "ホーム"
 #: js/activity.js:4458
 #: js/utilitybox.js:126
 msgid "Switch to advanced mode"
-msgstr ""
+msgstr "高度モードに設定する"
 
 #: js/activity.js:3743
 #: js/activity.js:3759
@@ -641,7 +641,7 @@ msgstr "音符を一つずつ再生"
 #: js/activity.js:4460
 #: js/utilitybox.js:127
 msgid "Switch to beginner mode"
-msgstr ""
+msgstr "簡単モードに設定"
 
 #: js/activity.js:3756
 #: js/activity.js:3767
@@ -673,7 +673,7 @@ msgstr "「プラネット」サーバは今使えません"
 #: js/turtledefs.js:118
 #: js/turtledefs.js:156
 msgid "Load project from files"
-msgstr ""
+msgstr "ファイルからロードする"
 
 #: js/activity.js:3858
 #: js/activity.js:3869
@@ -748,7 +748,7 @@ msgstr "JSONのインプットのパースができません。"
 
 #: js/activity.js:4395
 msgid "Run"
-msgstr ""
+msgstr "再生"
 
 #: js/activity.js:4399
 msgid "Expand/collapse collapsible blocks"
@@ -756,19 +756,19 @@ msgstr "チャンクの最小化"
 
 #: js/activity.js:4401
 msgid "More"
-msgstr ""
+msgstr "その他"
 
 #: js/activity.js:4421
 msgid "Run slowly"
-msgstr ""
+msgstr "ゆっくり再生する"
 
 #: js/activity.js:4425
 msgid "Run music slowly"
-msgstr ""
+msgstr "音楽をゆっくり演奏する"
 
 #: js/activity.js:4426
 msgid "Run music step by step"
-msgstr ""
+msgstr "音楽を音符ずつ演奏する"
 
 #: js/activity.js:4434
 #: js/activity.js:4469
@@ -778,12 +778,12 @@ msgstr "ファイルからプロジェクトをロードする"
 #: js/activity.js:4435
 #: js/activity.js:4470
 msgid "Merge project from file"
-msgstr ""
+msgstr "ファイルからプロジェクトをマージする"
 
 #: js/activity.js:4437
 #: js/activity.js:4472
 msgid "Click here to paste"
-msgstr ""
+msgstr "貼り付けるため、ここでクリック"
 
 #: js/activity.js:4609
 #: js/turtledefs.js:120
@@ -794,11 +794,11 @@ msgstr "コピー"
 
 #: js/activity.js:4611
 msgid "Extract"
-msgstr ""
+msgstr "取り出す"
 
 #: js/activity.js:4612
 msgid "Move to trash"
-msgstr ""
+msgstr "ゴミに捨てる"
 
 #: js/activity.js:4615
 #: js/blocks.js:363
@@ -918,16 +918,16 @@ msgstr "マイナスの数値をいれることはできません。"
 
 #: js/logo.js:3283
 msgid "Adding missing pitch number 0."
-msgstr "音高「0」を加える"
+msgstr "ピッチ数値「0」を加える"
 
 #: js/logo.js:3293
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
-msgstr "音高の数のうち、0未満あるいは11より大きい数は無視します。"
+msgstr "ピッチ数値の数のうち、0未満あるいは11より大きい数は無視します。"
 
 #: js/logo.js:3298
 ## check verb
 msgid "Ignoring duplicate pitch numbers."
-msgstr "重複している音高は無視します"
+msgstr "重複しているピッチ数値は無視します"
 
 #: js/logo.js:3431
 msgid "You must have at least one pitch block and one drum block in the matrix."
@@ -1077,7 +1077,7 @@ msgstr "倍音ブロックが「倍音ウェートブロック」の中にある
 #: js/logo.js:6388
 #: js/logo.js:6475
 msgid "Setting volume to 0."
-msgstr ""
+msgstr "音量を「0」に設定しています。"
 
 #: js/logo.js:6394
 #: js/logo.js:6481
@@ -1143,7 +1143,7 @@ msgstr "空のヒープ"
 #: js/logo.js:10653
 #: js/logo.js:10728
 msgid "You must use two pitch blocks when measuring an interval."
-msgstr "インターバルを計る際は、２つの音符を使う必要があります。"
+msgstr "音程を計る際は、２つの音符を使う必要があります。"
 
 #: js/logo.js:10867
 #: js/basicblocks.js:313
@@ -1226,9 +1226,9 @@ msgid "accidental"
 msgstr "変化記号"
 
 #: js/palette.js:813
-## 明確＝めいかく；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B 
+##  
 msgid "interval name"
-msgstr "インターバル"
+msgstr "音程名"
 
 #: js/palette.js:834
 #: js/palette.js:839
@@ -1301,7 +1301,7 @@ msgstr "ミュージック・ブロックス：音楽と算数とコーディン
 
 #: js/turtledefs.js:23
 msgid "search"
-msgstr ""
+msgstr "検索"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:865
@@ -1566,12 +1566,12 @@ msgstr "ミュージック・ブロックスを設定するためのパネルを
 #: js/turtledefs.js:124
 #: js/turtledefs.js:164
 msgid "Switch mode"
-msgstr ""
+msgstr "モードを設定"
 
 #: js/turtledefs.js:124
 #: js/turtledefs.js:164
 msgid "Switch between beginner and advance modes."
-msgstr ""
+msgstr "簡単/高度モードを設定"
 
 #: js/turtledefs.js:125
 #: js/turtledefs.js:166
@@ -1738,145 +1738,146 @@ msgstr "選ばれているプラグインを消す"
 
 #: js/turtledefs.js:181
 msgid "At the heart of Music Blocks is the <em>Note</em> block. The <em>Note</em> block is a container for a <em>Pitch</em> block that specifies the duration (note value) of the pitch."
-msgstr ""
+msgstr "ミュージック・ブロックスの一番基本なブロックは「音符」ブロックです。「音符」ブロックの中にピッチブロックが入られることができます。「音符」ブロックはピッチの長さがどのぐらいか決めます。"
 
 #: js/turtledefs.js:182
 msgid "You can use multiple <em>Drum</em> blocks within a <em>Note</em> block."
-msgstr ""
+msgstr "<em>ドラム</em>ブロックは一つ以上<em>音符</em>ブロックに入れることができます。"
 
 #: js/turtledefs.js:183
 msgid "A rest of the specified note value duration can be constructed using a <em>Silence</em> block."
-msgstr ""
+msgstr "<em>休符</em>ブロックは音価ブロックの中に入れるとその音価の長さで入れられているネズミが音鳴らしを休みます。"
 
 #: js/turtledefs.js:184
 msgid "The <em>Note value</em> block is the value of the duration of the note currently being played."
-msgstr ""
+msgstr "<em>音価</em>"ブロックは音符の長さの値です。
 
 #: js/turtledefs.js:185
 msgid "The beat of the music is determined by the <em>Meter</em> block (by default, 4 1/4 notes per measure)."
-msgstr ""
+msgstr "<em>拍子</em>ブロックで音楽のビートを決めます。拍子ブロックは拍子記号ブロックと一緒に使ってデフォルトが4/4です。"
 
 #: js/turtledefs.js:186
 msgid "The <em>Beats per minute</em> block sets the number of 1/4 notes per minute."
-msgstr ""
+msgstr "<em>BPM(一分あたりの拍数)</em>ブロックは決められている音価(例えば1/4)で拍にします。"
 
 #: js/turtledefs.js:187
 msgid "The <em>On-every-beat</em> block let you specify actions to take on every beat."
-msgstr ""
+msgstr "<em>全部の拍に～する</em>ブロックは全部の拍に特定されているアクションをします。"
 
 #: js/turtledefs.js:188
 msgid "The <em>On-strong-beat</em> block let you specify actions to take on specified beats."
-msgstr ""
+msgstr "<em>強拍に</em>ブロックは決められている拍子に対する強拍だけに特定されているアクションをします。"
 
 #: js/turtledefs.js:189
 msgid "The <em>On-weak-beat</em> block let you specify actions to take on weak (off) beats."
-msgstr ""
+msgstr "<em>弱拍</em>ブロックは決められている拍子に対する弱拍だけに特定されているアクションをします。"
 
 #: js/turtledefs.js:190
 msgid "The <em>No clock</em> block decouples the notes from the master clock."
-msgstr ""
+msgstr "<em>クロックなし</em>ブロックはそれぞれの動作の順番をリズムより優先します。"
 
 #: js/turtledefs.js:192
 msgid "The <em>Pitch</em> block specifies the pitch name and pitch octave of a note that determine the frequency of the note."
-msgstr ""
+msgstr "<em>ピッチブ</em>ロックはピッチの名前とピッチのオクターヴを決めます。"
 
 #: js/turtledefs.js:193
 msgid "Pitch can be specified in terms of <em>do re mi fa sol la ti<em>."
-msgstr ""
+msgstr "ソルフェージュの名前が<em>「ド、レ、ミ、ファ、ソ、ラ、シ」</em>から選ぶことができます。"
 
 #: js/turtledefs.js:194
 msgid "Pitch can be specified in terms of <em>C D E F G A B</em>."
-msgstr ""
+msgstr "ピッチ・アルファベットの名前が<em>「C D E F G A B」</em>から選ぶことができます。"
 
 #: js/turtledefs.js:195
 msgid "The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>."
-msgstr ""
+msgstr "<em>ステップ<ピッチ</em>ブロックはメロディーの音符を音階的に上/下に動かすことができます。(例えば、もし<em>ステップピッチ</em>の前のブロックは<em>ソル</em>だったら<em>ステップピッチ＝１</em>は<em>ラ</em>を鳴らします。"
 
 #: js/turtledefs.js:196
 msgid "The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency."
-msgstr ""
+msgstr "<em>ヘルツ</em>ブロックは（<em>数字</em>ブロックと一緒）特定されている周波数でピッチを鳴らします。"
 
 #: js/turtledefs.js:197
 msgid "The <em>Accidental</em> block is used to create <em>sharps</em> and <em>flats</em>"
-msgstr ""
+msgstr "<em>変化記号</em>ブロックは <em>シャープ(嬰)</em>と<em>フラット(変)</em>を決める機能です。"
 
 #: js/turtledefs.js:198
 msgid "The <em>Accidental selector</em> block is used to choose between double-sharp, sharp, natural, flat, and double-flat."
-msgstr ""
+msgstr "<em>変化記号セレクター</em>ブロックはダブルシャープ（重嬰）、シャープ(嬰)、ナチュラル(本位)、フラット(変)、ダブルフラット（重変）から選ぶことができます。"
 
 #: js/turtledefs.js:199
 msgid "The <em>Scalar transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) the scale. In the example shown above, <em>sol</em> is shifted up to <em>la</em>."
-msgstr ""
+msgstr "<em>音階内の移調</em>ブロックは<em>音符</em>の中に入っている音高を上（また下）に、特定されている<em>数字</em>の値によって、音階の音高で移動します。例の画像に<em>ソル</em>が<em>ラ</em>に上に移動されています。"
 
 #: js/turtledefs.js:200
 msgid "The <em>Semi-tone transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) by half steps. In the example shown above, <em>sol</em> is shifted up to <em>sol#</em>."
-msgstr ""
+msgstr "<em>半音で移調</em>ブロックは<em>音符</em>の中に入っている音高を上（また下）に、特定されている<em>数字</em>の値によって、半音ずつ移動します。例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
 
 #: js/turtledefs.js:201
 msgid "The <em>Pitch number</em> block is the value of the pitch of the note currently being played."
-msgstr ""
+msgstr "<em>ピッチ数値</em>ブロックは音高を数字として（半音ずつ）の値です。"
 
 #: js/turtledefs.js:202
 msgid "The <em>Change in pitch</em> block is the difference (in half steps) between the current pitch being played and the previous pitch played."
-msgstr ""
+msgstr "<em>音程の違い</em>ブロックは現在に鳴らされている音高と現在のちょうど前に鳴らされている音高（半音の値で）の違いです。"
 
 #: js/turtledefs.js:203
 msgid "The <em>Set key</em> block is used to set the key and mode, e.g., <em>C Major</em>"
-msgstr ""
+msgstr "<em>音階の設定</em>ブロックは音階（キー、またモード）を設定するためです（例えば<em>「ド」　メージャー</em>）"
 
 #: js/turtledefs.js:204
 msgid "The <em>Mode length</em> block is the number of notes in the current scale. Most <em>Western</em> scales have 7 notes."
-msgstr ""
+msgstr "<em>音階の音数</em>ブロックは現在の音階の音高の数です。例えば「メージャー」は七つの音高です。"
 
 #: js/turtledefs.js:205
 msgid "???"
-msgstr ""
+msgstr "？？？"
 
 #: js/turtledefs.js:206
 msgid "The <em>Scalar interval</em> block calculates a relative interval based on the current mode, skipping all notes outside of the mode. In the figure, we add <em>la</em> to <em>sol</em>."
-msgstr ""
+msgstr "<em>音階的音程</em>ブロックは音階にない音高を無視、特定されている値（音程）によって新しい音高を計算して鳴らします。例の画像には<em>ソル</em>が<em>ラ</em>になります。"
 
 #: js/turtledefs.js:207
 msgid "The <em>Semi-tone interval</em> block calculates a relative interval based on half steps. In the figure, we add <em>sol#</em> to <em>sol</em>."
-msgstr ""
+msgstr "<em>半音階的音程</em>ブロックは音階を無視、半音で新しい音高を計算して鳴らします。例の画像には<em>ソル</em>が<em>ソル#</em>に鳴ります。"
 
 #: js/turtledefs.js:208
 #: js/turtledefs.js:209
 msgid "The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello."
-msgstr ""
+msgstr "<em>音色を設定</em>ブロックで声部のシンセを決めます（例えば、ギター、ピアノ、バイオリン、チェロなど）。"
 
 #: js/turtledefs.js:210
 msgid "The <em>Staccato</em> block shortens the length of the actual note—making them tighter bursts—while maintaining the specified rhythmic value of the notes."
-msgstr ""
+msgstr "<em>スタッカート</em>ブロックは音符の鳴らす時刻を、特定されている値で、短くします。音符の音価は変わりません。"
 
 #: js/turtledefs.js:211
 msgid "The <em>Slur</em> block lengthens the sustain of notes—running longer than the noted duration and blending it into the next note—while maintaining the specified rhythmic value of the notes."
-msgstr ""
+msgstr "<em>スラー</em>ブロックは音符の鳴らす時刻を、特定されている値で、長くします。音符の音価は変わりません。"
 
 #: js/turtledefs.js:212
 msgid "The Crescendo block will increase (or decrease) the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume."
-msgstr ""
+msgstr "<em>クレシェンド</em>ブロックは重ねられている音符の音量を特定されている値で大きくしたり、小さくしたりします。例えば、もし七つの音符が<em>クレシェンド</em>ブロックに重ねられていたら、最後の音符の音量が最初の音符より３５％で大きく鳴らします。"
 
 #: js/turtledefs.js:213
 msgid "The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume)."
-msgstr ""
+msgstr "<em>シンセの音量を設定</em>ブロックは特定されているシンセ（ギター、バイオリン、スネアドラムなど）の音量を変えます。デフォルト音量が５０％です。０から１００まで設定できます。"
 
 #: js/turtledefs.js:214
 msgid "The <em>Set drum</em> block will select a drum sound to replace the pitch of any contained notes. In the example above, a <em>kick drum</em> sound will be played instead of <em>sol</em>."
-msgstr ""
+msgstr "<em>ドラムを設定</em>ブロックで重ねられている音符の音高をドラムの音に変えることができます。例の画像に<em>ソル</em>の代わりに<em>キックドラム</em>が鳴らします。"
 
 #: js/turtledefs.js:215
 #: js/turtledefs.js:216
+## 条件式=じょうけんしき https://jisho.org/word/%E6%9D%A1%E4%BB%B6%E5%BC%8F 
 msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
-msgstr ""
+msgstr "<em>条件式</em>のそれぞれのブロックで自分のプログラムをいろんな<em>条件式</em>によって再生するアクションが変わります。例の画像に<em>もし</em>ブロックでマウスクリックしたらスネアの音が鳴らします。"
 
 #: js/turtledefs.js:217
 msgid "The <em>Repeat</em> block will repeat the contained blocks. In this example, the note will be played 4 times."
-msgstr ""
+msgstr "<em>～回繰り返す</em>ブロックで重なれているブロックを繰り返せます。例の画像で重なれている音符が４回鳴らします。"
 
 #: js/turtledefs.js:218
 msgid "The <em>Forever</em> block will repeat the contained blocks forever. In this example, a simple drum machine, a kick drum will play 1/4 notes forever."
-msgstr ""
+msgstr "<em>ずっと</em>ブロックで重なれているブロックをずっと繰り返せます。例の画像に「ドラムループ」みたいにキックドラムが４分音符の音価でずっと鳴らします。"
 
 #: js/SaveInterface.js:74
 #: js/SaveInterface.js:78
@@ -2140,7 +2141,7 @@ msgstr "音階で2度上"
 #: js/basicblocks.js:488
 #.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
-msgstr "音階の移調"
+msgstr "音階内の移調"
 
 #: js/basicblocks.js:537
 #: js/basicblocks.js:4219
@@ -2332,7 +2333,7 @@ msgstr "複製ファクター"
 #: js/basicblocks.js:1087
 #.TRANS: oscillator time (in milliseconds)
 msgid "milliseconds"
-msgstr ""
+msgstr "ミリ秒"
 
 #: js/basicblocks.js:1100
 #: js/basicblocks.js:1111
@@ -2433,11 +2434,11 @@ msgstr "クロックなし"
 
 #: js/basicblocks.js:1404
 msgid "on weak beat do"
-msgstr ""
+msgstr "弱拍に～する"
 
 #: js/basicblocks.js:1417
 msgid "on strong beat"
-msgstr ""
+msgstr "強拍に"
 
 #: js/basicblocks.js:1417
 ## http://musical-grammar.com/time004.html
@@ -2454,7 +2455,7 @@ msgstr "拍子"
 #.TRANS: take (do) some action
 ## アクションis action and する is "to do"; taking liberties based on context
 msgid "do"
-msgstr "する"
+msgstr "～する"
 
 #: js/basicblocks.js:1432
 msgid "on every beat do"
@@ -2554,14 +2555,16 @@ msgstr "隣接音"
 #: js/basicblocks.js:1636
 #: js/basicblocks.js:2285
 #.TRANS: calculate a relative step between notes based on semi-tones
+## https://ja.wikibooks.org/wiki/%E9%9F%B3%E7%A8%8B#%E5%8D%8A%E9%9F%B3%E9%9A%8E%E7%9A%84%E9%9F%B3%E7%A8%8B
 msgid "semi-tone interval"
-msgstr "半音間隔"
+msgstr "半音階的音程"
 
 #: js/basicblocks.js:1654
 #: js/basicblocks.js:2442
 #.TRANS: calculate a relative step between notes based on the current musical scale
+## https://ja.wikibooks.org/wiki/%E9%9F%B3%E7%A8%8B#%E5%85%A8%E9%9F%B3%E9%9A%8E%E7%9A%84%E9%9F%B3%E7%A8%8B
 msgid "scalar interval"
-msgstr "音階：音間の間隔"
+msgstr "音階的音程"
 
 #: js/basicblocks.js:1670
 #: js/timbre.js:1586
@@ -2679,13 +2682,12 @@ msgstr "重"
 #: js/basicblocks.js:1920
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr "半音で数える"
+msgstr "半音階的音程で計る"
 
 #: js/basicblocks.js:1931
 #.TRANS: measure the distance between two pitches in steps of musical scale
-## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
-msgstr "音階同志の音の間隔"
+msgstr "全音階的音程で計る"
 
 #: js/basicblocks.js:1942
 #: js/basicblocks.js:1953
@@ -2740,17 +2742,17 @@ msgstr "長３度下"
 #: js/basicblocks.js:2298
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'V"
-msgstr ""
+msgstr "和音' + ' ' + 'V"
 
 #: js/basicblocks.js:2310
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'IV"
-msgstr ""
+msgstr "和音' + ' ' + 'IV"
 
 #: js/basicblocks.js:2322
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'I"
-msgstr ""
+msgstr "和音' + ' ' + 'I"
 
 #: js/basicblocks.js:2455
 #.TRANS: define a custom mode
@@ -2760,7 +2762,7 @@ msgstr "モードを定義する"
 
 #: js/basicblocks.js:2468
 msgid "moveable Do"
-msgstr ""
+msgstr "移動ド"
 
 #: js/basicblocks.js:2479
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -2972,7 +2974,7 @@ msgstr "x座標"
 #: js/basicblocks.js:2854
 #.TRANS: scroll canvas image by x, y position
 msgid "scroll xy"
-msgstr ""
+msgstr "xyスクロール"
 
 #: js/basicblocks.js:2869
 #: js/pitchdrummatrix.js:138
@@ -3261,19 +3263,19 @@ msgstr "～へ"
 
 #: js/basicblocks.js:3637
 msgid "box 2"
-msgstr ""
+msgstr "ボックス２"
 
 #: js/basicblocks.js:3650
 msgid "store in box 2"
-msgstr ""
+msgstr "ボックス２に保存"
 
 #: js/basicblocks.js:3663
 msgid "box 1"
-msgstr ""
+msgstr "ボックス１に保存"
 
 #: js/basicblocks.js:3676
 msgid "store in box 1"
-msgstr ""
+msgstr "ボックス１に保存"
 
 #: js/basicblocks.js:3710
 #.TRANS: return value from a function
@@ -3803,7 +3805,7 @@ msgstr "相対音量を設定"
 #: js/basicblocks.js:5289
 #.TRANS: a gradual increase in loudness
 msgid "decrescendo"
-msgstr ""
+msgstr "デクレシェンド"
 
 #: js/basicblocks.js:5302
 #.TRANS: a gradual increase in loudness
@@ -3935,7 +3937,7 @@ msgstr "ブロックのアートを保存"
 #: js/savebox.js:159
 #.TRANS: block artwork is a file name we use to save the program blocks as they appear on the screen.
 msgid "block artwork"
-msgstr ""
+msgstr "ブロックのアート"
 
 #: js/lilypond.js:18
 msgid "brown rat"
@@ -4024,11 +4026,11 @@ msgstr "言語を変更するにはブラウザを再起動する必要があり
 
 #: js/help.js:53
 msgid "previous page"
-msgstr ""
+msgstr "前のページ"
 
 #: js/help.js:72
 msgid "next page"
-msgstr ""
+msgstr "次のページ"
 
 #: js/pitchdrummatrix.js:132
 #: js/pitchtimematrix.js:187
@@ -4046,7 +4048,7 @@ msgstr "休符"
 
 #: js/pitchdrummatrix.js:313
 msgid "Click in the grid to map notes to drums."
-msgstr ""
+msgstr "グラフにクリックして音符をどちらのドラムに変えるか決めることができます。"
 
 #: js/pitchslider.js:388
 msgid "move up"
@@ -4058,7 +4060,7 @@ msgstr "下に動く"
 
 #: js/pitchslider.js:417
 msgid "Use the slider to change the pitch."
-msgstr ""
+msgstr "スライダーでピッチを変えます。"
 
 #: js/pitchtimematrix.js:197
 msgid "export"
@@ -4070,7 +4072,7 @@ msgstr "整理"
 
 #: js/pitchtimematrix.js:448
 msgid "Click on the table to add notes."
-msgstr ""
+msgstr "行列にクリックすると音符やメロディが作れます"
 
 #: js/pitchtimematrix.js:707
 #: js/pitchtimematrix.js:839
@@ -4102,7 +4104,7 @@ msgstr "元にもどす"
 
 #: js/timbre.js:820
 msgid "Click on buttons to open the timbre design tools."
-msgstr ""
+msgstr "ボタンをクリックするとカスタム音色ツールが開きます。"
 
 #: js/timbre.js:1018
 ## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
@@ -4144,7 +4146,7 @@ msgstr "スローダウン"
 
 #: js/tempo.js:431
 msgid "Adjust the tempo with the buttons."
-msgstr ""
+msgstr "ボタンでテンポが設定できます。"
 
 #: js/rhythmruler.js:133
 #: js/rhythmruler.js:133
@@ -4174,7 +4176,7 @@ msgstr "ドラムマシーンを保存"
 
 #: js/rhythmruler.js:1758
 msgid "Click on the ruler to divide it."
-msgstr ""
+msgstr "ルーラーをクリックすると割ることができます。"
 
 #: js/modewidget.js:77
 msgid "rotate counter clockwise"
@@ -4187,7 +4189,7 @@ msgstr "時計回り"
 #: js/modewidget.js:200
 #.TRANS: A circle of notes represents the musical mode.
 msgid "Click in the circle to select notes for the mode."
-msgstr ""
+msgstr "円のなかでクリックして音階のピッチが選ばれます。"
 
 #: js/pitchstaircase.js:475
 msgid "play chord"
@@ -4199,13 +4201,13 @@ msgstr "音階を再生する"
 
 #: js/pitchstaircase.js:639
 msgid "Click on a note to create a new step."
-msgstr ""
+msgstr "ピッチをクリックすると新しい段が作れますよ。"
 
 #: js/synthutils.js:16
 #: js/musicutils.js:241
 #.TRANS: musical instrument
 msgid "piano"
-msgstr ""
+msgstr "ピアノ"
 
 #: js/synthutils.js:18
 #: js/musicutils.js:242
