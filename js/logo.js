@@ -4172,7 +4172,28 @@ function Logo () {
                     that.synthVolume[turtle][drumname] = [DEFAULTVOLUME];
                     that.crescendoInitialVolume[turtle][drumname] = [DEFAULTVOLUME];
                 }
-            } else {
+            } else if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
+                // Play a stand-alone drum block as a quarter note.
+                that.clearNoteParams(turtle, blk, []);
+                that.inNoteBlock[turtle].push(blk);
+                that.noteDrums[turtle][last(that.inNoteBlock[turtle])].push(drumname);
+
+                if (that.bpm[turtle].length > 0) {
+                    var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                } else {
+                    var bpmFactor = TONEBPM / that._masterBPM;
+                }
+
+                var noteBeatValue = 4;
+                var beatValue = bpmFactor / noteBeatValue;
+
+                __callback = function () {
+                    var j = that.inNoteBlock[turtle].indexOf(blk);
+                    that.inNoteBlock[turtle].splice(j, 1);
+                };
+
+                that._processNote(noteBeatValue, blk, turtle, __callback);
+	    } else {
                 that.errorMsg(_('Drum Block: Did you mean to use a Note block?'), blk);
                 break;
             }
