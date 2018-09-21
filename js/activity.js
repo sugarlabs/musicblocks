@@ -2338,8 +2338,8 @@ define(MYDEFINES, function (compatibility) {
                 searchWidget.value = null;
                 docById('searchResults').style.visibility = 'visible';
                 searchWidget.style.visibility = 'visible';
-                searchWidget.style.left = (palettes.getSearchPos()[0] + 10) * turtleBlocksScale + 'px';
-                searchWidget.style.top = (palettes.getSearchPos()[1] + 10) * turtleBlocksScale + 'px';
+                searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale + 'px';
+                searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale + 'px';
 
                 searchBlockPosition = [100, 100];
 

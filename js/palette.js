@@ -238,7 +238,8 @@ function Palettes () {
     }
 
     this.getSearchPos = function () {
-        return [50 * PALETTE_SCALE_FACTOR, 55];
+        return [this.cellSize, 55]
+        // return [50 * PALETTE_SCALE_FACTOR, 55];
     };
 
     this.getPluginMacroExpansion = function (blkname, x, y) {
@@ -285,7 +286,7 @@ function Palettes () {
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            shape.graphics.f('#a2c5d8').r(0, 55, 3 * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
+            shape.graphics.f('#a2c5d8').r(0, 55, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
             shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
@@ -311,7 +312,7 @@ function Palettes () {
             that.buttons[name].visible = false;
 
             that.dict[name].makeMenu(true);
-            that.dict[name]._moveMenu(3 * STANDARDBLOCKHEIGHT, 55);
+            that.dict[name]._moveMenu(Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 55);
             that.dict[name]._updateMenu(false);
 
             // Add tooltip for palette buttons
