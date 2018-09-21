@@ -100,7 +100,7 @@ const MENUWIDTH = 200;
 
 const PALETTEFILLER = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="filler_height">' + '<rect width="200" height="filler_height" x="0" y="0" style="fill:#b3b3b3;fill-opacity:1;stroke:none" />' + '</svg>';
 
-const PALETTEHEADER = '<svg xmlns="http://www.w3.org/2000/svg" width="header_width" height="30">' + '<rect width="header_width" height="30" x="0" y="0" style="fill:fill_color;fill-opacity:1;stroke:none" />' + '<text style="font-size:16px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill-opacity:1;stroke:none;font-family:Sans">' + '<tspan  x="40" y="22" style="font-size:16px;text-align:start;text-anchor:start;fill:#ffffff">palette_label</tspan>' + '</text>' + '</svg>';
+const PALETTEHEADER = '<svg xmlns="http://www.w3.org/2000/svg" width="header_width" height="35">' + '<rect width="header_width" height="35" x="0" y="0" style="fill:fill_color;fill-opacity:1;stroke:none" />' + '<text style="font-size:16px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill-opacity:1;stroke:none;font-family:Sans">' + '<tspan  x="40" y="22" style="font-size:16px;text-align:start;text-anchor:start;fill:#ffffff">palette_label</tspan>' + '</text>' + '</svg>';
 
 const PALETTEBUTTON = '<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55">' + '<circle cx="27.5" cy="27.5" r="27.5" x="0" y="0" style="fill:fill_color;fill-opacity:1;stroke:none" />' + '</svg>';
 
