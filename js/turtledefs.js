@@ -18,10 +18,17 @@ const TITLESTRING = _('Music Blocks is a collection of tools for exploring music
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-BUILTINPALETTES = ['search', 'rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
+const BUILTINPALETTES = ['search', 'rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
 
 const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('mice'), _('extras')];
 
+// We put the palette buttons into groups.
+const MULTIPALETTES = [['rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'widgets'], ['flow', 'action', 'boxes', 'number', 'boolean', 'heap', 'extras'], ['mouse', 'pen', 'media', 'sensors', 'mice']];
+
+// Icons used to select between multipalettes.
+const MULTIPALETTEICONSOFF = ['musicoff', 'logicoff', 'graphicsoff'];
+const MULTIPALETTEICONSON = ['musicon', 'logicon', 'graphicson'];
+const MULTIPALETTENAMES = [_('music'), _('logic'), _('graphics')];
 
 function getMainToolbarButtonNames(name) {
     return (['popdown-palette', 'run', 'step', 'step-music', 'stop-turtle', 'hard-stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help', 'sugarizer-stop', 'beginner', 'advanced'].indexOf(name) > -1);
