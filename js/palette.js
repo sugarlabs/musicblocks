@@ -134,7 +134,6 @@ function Palettes () {
             // FIXME: rescale needs to reset all of this.
             that.stage.addChild(bitmap);
             that.selectorButtonsOn.push(bitmap);
-            that.bitmap.visible = false;
         };
 
         makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONSOFF[i]], MULTIPALETTENAMES[i], __processSelectButtonOff, i);
@@ -286,7 +285,6 @@ function Palettes () {
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            // shape.graphics.f('#a2c5d8').r(0, 0, this.paletteWidth, windowHeight()).ef();
             shape.graphics.f('#a2c5d8').r(0, 55, 3 * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
             shape.width = this.paletteWidth;
             shape.height = windowHeight();
@@ -313,15 +311,15 @@ function Palettes () {
             that.buttons[name].visible = false;
 
             that.dict[name].makeMenu(true);
-            that.dict[name]._moveMenu(that.cellSize, that.cellSize);
+            that.dict[name]._moveMenu(3 * STANDARDBLOCKHEIGHT, 55);
             that.dict[name]._updateMenu(false);
 
             // Add tooltip for palette buttons
             if (localStorage.kanaPreference === 'kana') {
-		that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Arial', '#808080');
-	    } else {
-		that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Arial', '#808080');
-	    }
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Arial', '#808080');
+            } else {
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Arial', '#808080');
+            }
             var r = that.cellSize / 2;
             that.labels[name].x = that.buttons[name].x + 2.2 * r;
             that.labels[name].y = that.buttons[name].y + r / 2;
@@ -349,6 +347,13 @@ function Palettes () {
                             this.y[i] += this.cellSize;
                             break;
                         }
+                    }
+
+                    if (i === MULTIPALETTES.length) {
+                        // We didn't find a match...
+                        this.buttons[name].x = this.x[1];
+                        this.buttons[name].y = this.y[1] + this.scrollDiff;
+                        this.y[1] += this.cellSize;
                     }
                 }
 
@@ -596,8 +601,6 @@ function Palettes () {
                 locked = false;
             }, 500);
 
-            that.dict[name]._moveMenu(that.initial_x, that.initial_y);
-            
             if (!that.dict[name].visible) {
                 that.showPalette(name);
             } else {
@@ -1444,7 +1447,6 @@ function Palette(palettes, name) {
         }
 
         this.palettes.pluginsDeleteStatus = false;
-        this._moveMenu(this.palettes.cellSize, this.palettes.cellSize);
     };
 
     this.showMenu = function () {
@@ -1757,31 +1759,6 @@ function Palette(palettes, name) {
 
         this.menuContainer.on('mouseout', function(event) {
             document.body.style.cursor = 'default';
-        });
-
-        this.menuContainer.on('mousedown', function (event) {
-            // Move them all?
-            var offset = {
-                x: that.menuContainer.x - Math.round(event.stageX / that.palettes.scale),
-                y: that.menuContainer.y - Math.round(event.stageY / that.palettes.scale)
-            };
-
-            that.menuContainer.removeAllEventListeners('pressmove');
-            that.menuContainer.on('pressmove', function (event) {
-                var oldX = that.menuContainer.x;
-                var oldY = that.menuContainer.y;
-                that.menuContainer.x = Math.round(event.stageX / that.palettes.scale) + offset.x;
-                that.menuContainer.y = Math.round(event.stageY / that.palettes.scale) + offset.y;
-                that.palettes.refreshCanvas();
-                var dx = that.menuContainer.x - oldX;
-                var dy = that.menuContainer.y - oldY;
-                that.palettes.initial_x = that.menuContainer.x;
-                that.palettes.initial_y = that.menuContainer.y;
-
-                // Hide the menu items while drag.
-                that._hideMenuItems();
-                that._moveMenuItemsRelative(dx, dy);
-            });
         });
     };
 
