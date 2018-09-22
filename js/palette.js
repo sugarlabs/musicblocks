@@ -11,8 +11,8 @@
 
 // All things related to palettes
 
-const PROTOBLOCKSCALE = 1.0;
-const PALETTELEFTMARGIN = 10;
+const PROTOBLOCKSCALE = 0.75;
+const PALETTELEFTMARGIN = Math.floor(10 * PROTOBLOCKSCALE);
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
@@ -545,7 +545,7 @@ function Palettes () {
             var py = this.dict[name].menuContainer.y;
             var height = Math.min(maxPaletteHeight(this.cellSize, this.scale), this.dict[name].y);
             if (this.dict[name].menuContainer.visible && px < x &&
-                x < px + MENUWIDTH && py < y && y < py + height) {
+                x < px + MENUWIDTH * PROTOBLOCKSCALE && py < y && y < py + height) {
                 return this.dict[name];
             }
         }
@@ -747,7 +747,7 @@ function PaletteModel(palette, palettes, name) {
             }
 
             var protoBlock = this.palettes.blocks.protoBlockDict[blkname];
-            if (protoBlock == null) {
+            if (protoBlock === null) {
                 console.log('Could not find block ' + blkname);
                 continue;
             }
@@ -1147,7 +1147,7 @@ function Palette(palettes, name) {
             makePaletteBitmap(palette, PALETTEICONS[name], name, __processButtonIcon, null);
         };
 
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             this.menuContainer = new createjs.Container();
             this.menuContainer.snapToPixelEnabled = true;
         }
@@ -1156,7 +1156,7 @@ function Palette(palettes, name) {
             return;
         }
 
-        var paletteWidth = MENUWIDTH + this._getOverflowWidth();
+        var paletteWidth = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
@@ -1181,7 +1181,7 @@ function Palette(palettes, name) {
 
     this._updateBlockMasks = function () {
         var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
-        var w = MENUWIDTH + this._getOverflowWidth();
+        var w = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         for (var i in this.protoContainers) {
             var s = new createjs.Shape();
             s.graphics.r(0, 0, w, h);
@@ -1194,13 +1194,18 @@ function Palette(palettes, name) {
     this._getOverflowWidth = function() {
         var maxWidth = 0;
         for(var i in this.protoList) {
+	    if (this.protoList[i].hidden) {
+		continue;
+	    }
+
             maxWidth = Math.max(maxWidth, this.protoList[i].textWidth);
         }
-        return (maxWidth  > 100 ? maxWidth - 30 : 0);
+
+        return (maxWidth  > 100 ? (maxWidth - 30) * PROTOBLOCKSCALE : 0);
     }
 
     this._updateBackground = function () {
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             return;
         }
 
@@ -1222,8 +1227,8 @@ function Palette(palettes, name) {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
-        shape.graphics.f('#949494').r(0, 0, MENUWIDTH + this._getOverflowWidth(), h).ef();
-        shape.width = MENUWIDTH + this._getOverflowWidth();
+        shape.graphics.f('#949494').r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef();
+        shape.width = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         shape.height = h;
         this.background.addChild(shape);
 
@@ -1233,7 +1238,7 @@ function Palette(palettes, name) {
 
     this._resetLayout = function () {
         // Account for menu toolbar
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             console.log('menuContainer is null');
             return;
         }
@@ -1256,12 +1261,14 @@ function Palette(palettes, name) {
             var i = items.pop();
             var h = heights.pop();
             i.x = this.menuContainer.x;
-            if (h == undefined) {
-                h = STANDARDBLOCKHEIGHT;
-            }
+            if (h === undefined) {
+                h = STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE;
+            } else {
+		h = h * PROTOBLOCKSCALE;
+	    }
 
             i.y = this.y;
-            this.y += h + (STANDARDBLOCKHEIGHT * 0.1);
+            this.y += h + (STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1);
         }
 
         for (var i in this.protoContainers) {
@@ -1286,7 +1293,7 @@ function Palette(palettes, name) {
 
             for (var b in that.model.blocks) {
                 if (that.model.blocks[b].modname === modname) {
-                    if (that.protoHeights[modname] == undefined) {
+                    if (that.protoHeights[modname] === undefined) {
                         // console.log('assigning height to ' + modname);
                         that.protoHeights[modname] = that.model.blocks[b].actualHeight;
                     }
@@ -1299,7 +1306,7 @@ function Palette(palettes, name) {
             var blk = args[1];
             var protoListBlk = args[2];
 
-            if (that.protoContainers[modname] == undefined) {
+            if (that.protoContainers[modname] === undefined) {
                 console.log('no protoContainer for ' + modname);
                 return;
             }
@@ -1338,7 +1345,7 @@ function Palette(palettes, name) {
             makePaletteBitmap(palette, b.artwork, b.modname, __processBitmap, args);
         };
 
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             this.makeMenu(true);
         } else {
             // Hide the menu while we update.
@@ -1353,7 +1360,7 @@ function Palette(palettes, name) {
         this.model.update();
 
         var blocks = this.model.blocks;
-        if (BUILTINPALETTES.indexOf(name) == -1)
+        if (BUILTINPALETTES.indexOf(name) === -1)
             blocks.reverse();
 
         for (var blk in blocks) {
@@ -1369,7 +1376,7 @@ function Palette(palettes, name) {
                 this.protoContainers[b.modname].snapToPixelEnabled = true;
 
                 this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
-                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT + 0.5);
+                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE + 0.5);
                 this.palettes.stage.addChild(this.protoContainers[b.modname]);
                 this.protoContainers[b.modname].visible = false;
 
@@ -1384,7 +1391,7 @@ function Palette(palettes, name) {
                 makePaletteBitmap(this, PALETTEFILLER.replace(/filler_height/g, b.height.toString()), b.modname, __processFiller, [b, blk, this.protoList[blk]]);
             } else {
                 this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
-                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT + 0.5);
+                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE + 0.5);
                 this.protoHeights[b.modname] = b.actualHeight;
                 this.y += Math.ceil(b.actualHeight * PROTOBLOCKSCALE);
             }
@@ -1721,7 +1728,7 @@ function Palette(palettes, name) {
         var that = this;
         var locked = false;
         var trashcan = this.palettes.trashcan;
-        var paletteWidth = MENUWIDTH + this._getOverflowWidth();
+        var paletteWidth = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
 
         this.menuContainer.on('click', function (event) {
             if (Math.round(event.stageX / that.palettes.scale) > that.menuContainer.x + paletteWidth - STANDARDBLOCKHEIGHT) {
@@ -1952,7 +1959,7 @@ function Palette(palettes, name) {
     };
 
     this._makeBlockFromPalette = function (protoblk, blkname, callback) {
-        if (protoblk == null) {
+        if (protoblk === null) {
             console.log('null protoblk?');
             return;
         }
