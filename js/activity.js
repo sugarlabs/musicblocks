@@ -4334,6 +4334,7 @@ handleComplete);
                 }
 
 		palettes.deltaY(dy);
+		turtles.deltaY(dy);
             } else {
                 headerContainer.y -= dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
@@ -4345,6 +4346,7 @@ handleComplete);
                 }
 
 		palettes.deltaY(-dy);
+		turtles.deltaY(-dy);
             }
 
             refreshCanvas();
