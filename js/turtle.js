@@ -79,14 +79,14 @@ function Turtle (name, turtles, drum) {
     console.log(ctx.canvas.width + ' x ' + ctx.canvas.height);
 
     this.doScrollXY = function(dx, dy) {
-	// FIXME: how big?
-	var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
-	ctx.putImageData(imgData, dx, dy);
+        // FIXME: how big?
+        var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
+        ctx.putImageData(imgData, dx, dy);
     };
 
     this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
-	// Simulate an arc with line segments since Tinkercad cannot
-	// import SVG arcs reliably.
+        // Simulate an arc with line segments since Tinkercad cannot
+        // import SVG arcs reliably.
         var a = sa;
         if (ea == null) {
             var da = Math.PI / nsteps;
@@ -1144,9 +1144,19 @@ function Turtles () {
     this.stage = null;
     this.refreshCanvas = null;
     this.scale = 1.0;
+    this.w = 1200;
+    this.h = 900;
+    this.backgroundColor = platformColor.background; // '#acd0e4';
     this._canvas = null;
     this._rotating = false;
     this._drum = false;
+
+    console.log('CREATING BORDER CONTAINER');
+    this._borderContainer = new createjs.Container();
+    this._expandedBoundary = null;
+    this._expandButton = null;
+    this._collapsedBoundary = null;
+    this._collapseButton = null;
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
@@ -1158,7 +1168,14 @@ function Turtles () {
 
     this.setStage = function (stage) {
         this.stage = stage;
+        this.stage.addChild(this._borderContainer);
         return this;
+    };
+
+    this.scaleStage = function (scale) {
+        this.stage.scaleX = scale;
+        this.stage.scaleY = scale;
+        this.refreshCanvas();
     };
 
     this.setRefreshCanvas = function (refreshCanvas) {
@@ -1166,8 +1183,134 @@ function Turtles () {
         return this;
     };
 
-    this.setScale = function (scale) {
+    this.setScale = function (w, h, scale) {
         this.scale = scale;
+        console.log(w + ' ' + h + ' ' + scale);
+
+        this.w = w / scale;
+        this.h = h / scale;
+
+        this.makeBackground();
+    };
+
+    this.makeBackground = function () {
+        // Remove any old background containers.
+        for (var i = 0; i < this._borderContainer.children.length; i++) {
+            this._borderContainer.children[i].visible = false;
+            this._borderContainer.removeChild(this._borderContainer.children[i]);
+        }
+
+        var that = this;
+
+        function __makeBoundary() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._expandedBoundary !== null) {
+                    that._expandedBoundary.visible = false;
+                }
+
+                that._expandedBoundary = new createjs.Bitmap(img);
+                that._expandedBoundary.x = 0;
+                that._expandedBoundary.y = 55;
+                that._borderContainer.addChild(that._expandedBoundary);
+                __makeBoundary2();
+            };
+
+            var dx = that.w - 5;
+            var dy = that.h - 60;
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 2.5).replace('X', 2.5).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 5))));
+        };
+
+        function __makeBoundary2() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._collapsedBoundary !== null) {
+                    that._collapsedBoundary.visible = false;
+                }
+
+                that._collapsedBoundary = new createjs.Bitmap(img);
+                that._collapsedBoundary.x = 0;
+                that._collapsedBoundary.y = 55;
+                that._borderContainer.addChild(that._collapsedBoundary);
+                that._collapsedBoundary.visible = false;
+
+                __makeExpandButton();
+            };
+
+            var dx = that.w - 20;
+            var dy = that.h - 65;
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
+        };
+
+        function __makeExpandButton() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._expandButton !== null) {
+                    that._expandButton.visible = false;
+                }
+
+                that._expandButton = new createjs.Bitmap(img);
+                that._expandButton.x = that.w - 10 - 4 * 55;
+                that._expandButton.y = 65;
+                that._expandButton.scaleX = 4;
+                that._expandButton.scaleY = 4;
+                that._expandButton.visible = false;
+                that._borderContainer.addChild(that._expandButton);
+
+                that._expandButton.on('pressmove', function (event) {
+                    var w = (that.w - 10 - 4 * 55) / 4;
+                    that.stage.x = event.stageX / that.scale - w;
+                    that.stage.y = event.stageY / that.scale - 16;
+                    that.refreshCanvas();
+                });
+
+                that._expandButton.on('click', function (event) {
+                    that.scaleStage(1.0);
+                    that._expandedBoundary.visible = true;
+                    that._collapseButton.visible = true;
+                    that._collapsedBoundary.visible = false;
+                    that._expandButton.visible = false;
+                    that.stage.x = 0;
+                    that.stage.y = 0;
+                });
+
+                __makeCollapseButton();
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(EXPANDBUTTON)));
+        };
+
+        function __makeCollapseButton() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._collapseButton !== null) {
+                    that._collapseButton.visible = false;
+                }
+
+                that._collapseButton = new createjs.Bitmap(img);
+                that._borderContainer.addChild(that._collapseButton);
+                that._collapseButton.x = that.w - 65;
+                that._collapseButton.y = 65;
+
+                that._collapseButton.on('click', function (event) {
+                    that.scaleStage(0.25);
+                    that._collapsedBoundary.visible = true;
+                    that._expandButton.visible = true;
+                    that._expandedBoundary.visible = false;
+                    that._collapseButton.visible = false;
+                    that.stage.x = (that.w * 3 / 4) - 10;
+                    that.stage.y = 50;
+                });
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(COLLAPSEBUTTON)))
+        };
+
+        __makeBoundary();
         return this;
     };
 

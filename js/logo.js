@@ -11219,7 +11219,10 @@ function Logo () {
         } else {
             var c = this.turtles.turtleList[turtle].canvasColor;
         }
-        docById('myCanvas').style.background = c;
+
+        // docById('myCanvas').style.background = c;
+	this.turtles.backgroundColor = c;
+	this.turtles.makeBackground();
         this.svgOutput = '';
     };
 
