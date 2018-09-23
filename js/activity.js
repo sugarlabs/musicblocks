@@ -52,25 +52,25 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     try {
-	// console.log(localStorage.beginnerMode);
+        // console.log(localStorage.beginnerMode);
 
-	if (localStorage.beginnerMode !== null) {
+        if (localStorage.beginnerMode !== null) {
             // console.log('setting mode from local storage');
-	    // console.log(localStorage.beginnerMode);
+            // console.log(localStorage.beginnerMode);
             beginnerMode = localStorage.beginnerMode;
-	    if (typeof(beginnerMode) === 'string') {
-		if (beginnerMode === 'false') {
-		    beginnerMode = false;
-		} else {
-		    beginnerMode = truee;
-		}
-	    }
-	} else {
+            if (typeof(beginnerMode) === 'string') {
+                if (beginnerMode === 'false') {
+                    beginnerMode = false;
+                } else {
+                    beginnerMode = truee;
+                }
+            }
+        } else {
             beginnerMode = true;
-	}
+        }
     } catch (e) {
-	console.log(e);
-	beginnerMode = true;
+        console.log(e);
+        beginnerMode = true;
     }
 } else {
     beginnerMode = false;
@@ -236,7 +236,7 @@ define(MYDEFINES, function (compatibility) {
         var storage;
         var buttonsVisible = true;
         var headerContainer = null;
-        var menuButtonsVisible = true;
+        var menuButtonsVisible = false;
         var menuContainer = null;
         var scrollBlockContainer = false;
         var currentKeyCode = 0;
@@ -362,8 +362,6 @@ define(MYDEFINES, function (compatibility) {
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
-            palettes.initial_x = 55;
-            palettes.initial_y = 55;
             palettes.updatePalettes();
             var x = Math.floor(155 * turtleBlocksScale);
             var y = Math.floor(55 * turtleBlocksScale);
@@ -1243,7 +1241,7 @@ define(MYDEFINES, function (compatibility) {
                 .setStats(doAnalytics)
                 .setScroller(toggleScroller)
                 .setLanguage(doLanguageBox, languageBox)
-	        .setSwitchMode(doSwitchMode)
+                .setSwitchMode(doSwitchMode)
                 .setOptimize(doOptimize);
 
             playbackBox = new PlaybackBox();
@@ -2967,7 +2965,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doUtilityBox() {
-	    console.log('PRESS');
+            console.log('PRESS');
             _hideBoxes();
             utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
         };
@@ -3727,7 +3725,7 @@ handleComplete);
             }
 
             headerContainer = new createjs.Shape();
-            headerContainer.graphics.f(platformColor.header).r(0, 0, screen.width / turtleBlocksScale, cellSize);
+            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 1.5, screen.width / turtleBlocksScale, 3 * cellSize);
 
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
@@ -3740,30 +3738,30 @@ handleComplete);
             // on-long-press function, on-extra-long-press function,
             // on-long-press icon, on-extra-long-press icon
             if (_THIS_IS_MUSIC_BLOCKS_) {
-		if (beginnerMode) {
+                if (beginnerMode) {
                     var buttonNames = [
-			['run', _doFastButton, _('Play'), null, null, null, null],
-			['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
-			['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-			['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
-			['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-			['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-			['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-			// ['beginner', doSwitchMode, _('Switch to advanced mode'), null, null, null, null],
+                        ['run', _doFastButton, _('Play'), null, null, null, null],
+                        ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
+                        ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
+                        ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
+                        ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+                        ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+                        ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
+                        // ['beginner', doSwitchMode, _('Switch to advanced mode'), null, null, null, null],
                     ];
-		} else {
-		    var buttonNames = [
-			['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly') + ' [ENTER]', _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
-			['step', _doStepButton, _('Run step by step'), null, null, null, null],
-			['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
-			['hard-stop-turtle', doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
-			['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-			['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
-			['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-			['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-			['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-			// ['advanced', doSwitchMode, _('Switch to beginner mode'), null, null, null, null],
-		    ];
+                } else {
+                    var buttonNames = [
+                        ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly') + ' [ENTER]', _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+                        ['step', _doStepButton, _('Run step by step'), null, null, null, null],
+                        ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
+                        ['hard-stop-turtle', doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
+                        ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
+                        ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
+                        ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+                        ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+                        ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
+                        // ['advanced', doSwitchMode, _('Switch to beginner mode'), null, null, null, null],
+                    ];
                 }
 
                 buttonNames.push(['help', _showHelp, _('Help'), null, null, null, null]);
@@ -3864,30 +3862,30 @@ handleComplete);
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-		if (beginnerMode) {
+                if (beginnerMode) {
                     var menuNames = [
-			planetMenuItem,
-			['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-			['save', doSave, _('Save project'), null, null, null, null],
-			['paste-disabled', pasteStack, _('Right-click to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
-			['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-			['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-			['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-			['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
+                        planetMenuItem,
+                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                        ['save', doSave, _('Save project'), null, null, null, null],
+                        ['paste-disabled', pasteStack, _('Right-click to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
+                        ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+                        ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
+                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
+                        ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
                     ];
-		} else {
+                } else {
                     var menuNames = [
-			planetMenuItem,
-			['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-			['save', doSave, _('Save project'), null, null, null, null],
-			['paste-disabled', pasteStack, _('Right-click to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
-			['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-			['compile', _doPlaybackBox, _('playback'), null, null, null, null],
-			['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-			['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-			['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
+                        planetMenuItem,
+                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                        ['save', doSave, _('Save project'), null, null, null, null],
+                        ['paste-disabled', pasteStack, _('Right-click to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
+                        ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+                        ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
+                        ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
+                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
+                        ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
                     ];
-		}
+                }
             } else {
                 var menuNames = [
                     planetMenuItem,
@@ -3909,14 +3907,22 @@ handleComplete);
             }
 
             var btnSize = cellSize;
+	    /*
+            var dx = 0;
+            var dy = btnSize;
+            */
+
             var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
-            var dx = 0;
-            var dy = btnSize;
-
             menuContainer = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
+
+            var x = Math.floor(-btnSize / 2);
+            var y = Math.floor(btnSize / 2);
+
+            var dx = btnSize;
+            var dy = 0;
 
             for (var i = 0; i < menuNames.length; i++) {
                 if (!getAuxToolbarButtonNames(menuNames[i][0])) {
@@ -4025,13 +4031,15 @@ handleComplete);
                 if (menuButtonsVisible) {
                     menuButtonsVisible = false;
                     for (var button in onscreenMenu) {
-                        onscreenMenu[button].visible = false;
+                        // onscreenMenu[button].visible = false;
                     }
+		    _piemenuStageContext();
                 } else {
                     menuButtonsVisible = true;
                     for (var button in onscreenMenu) {
                         onscreenMenu[button].visible = true;
                     }
+		    _piemenuStageContext();
                 }
                 update = true;
             }, 500);
@@ -4065,7 +4073,7 @@ handleComplete);
             container.y = y;
 
             var text = new createjs.Text(label, '14px Sans', '#282828');
-            if (container.y < 55) {
+            // if (container.y < 55) {
                 if (container.x < 55) {
                     text.textAlign = 'left';
                     text.x = -14;
@@ -4074,11 +4082,11 @@ handleComplete);
                     text.x = 0;
                 }
                 text.y = 30;
-            } else {
-                text.textAlign = 'right';
-                text.x = -28;
-                text.y = 0;
-            }
+            // } else {
+            //     text.textAlign = 'right';
+            //    text.x = -28;
+            //    text.y = 0;
+            // }
 
             text.visible = false;
 
@@ -4292,101 +4300,77 @@ handleComplete);
         };
 
         function _piemenuStageContext () {
-            // A context menu to replace the top and right toolbars
-            var x = stageX - 180;
-            var y = stageY - 180;
+	    var cellsize = 55;
+	    var dy = 1.5 * cellsize;
+            if (headerContainer.y === 0) {
+                headerContainer.y += dy;
+                for (var i = 0; i < onscreenButtons.length; i++) {
+                    onscreenButtons[i].y += dy;
+                }
 
-            docById('contextWheelDiv').style.left = x + 'px';
-            docById('contextWheelDiv').style.top = y + 'px';
-            docById('contextWheelDiv').style.position = 'absolute';
-            docById('contextWheelDiv').style.display = '';
+                for (var i = 0; i < onscreenMenu.length; i++) {
+                    onscreenMenu[i].y = cellsize / 2;
+                }
+
+		palettes.deltaY(dy);
+            } else {
+                headerContainer.y -= dy;
+                for (var i = 0; i < onscreenButtons.length; i++) {
+                    onscreenButtons[i].y -= dy;
+                }
+
+                for (var i = 0; i < onscreenMenu.length; i++) {
+                    onscreenMenu[i].y -= dy;
+                }
+
+		palettes.deltaY(-dy);
+            }
+
+            refreshCanvas();
+        };
+
+        function _piemenuStageContext_x () {
+            // A submenu menu to replace the top and right toolbars
+            docById('submenuWheelDiv').style.width = '900px';
+            docById('submenuWheelDiv').style.height = '900px';
+            docById('submenuWheelDiv').style.left = '192px';
+            docById('submenuWheelDiv').style.top = '-375px';
+            docById('submenuWheelDiv').style.position = 'absolute';
+            docById('submenuWheelDiv').style.display = '';
 
             // Main menu items, [submenu index], function
             var wheelValues = [
-                ['imgsrc:header-icons/cancel-button.svg', null, null],
-                ['imgsrc:header-icons/run-button.svg', [0, 4], null],
-                ['imgsrc:header-icons/stop-turtle-button.svg', null, doHardStopButton],
-                ['imgsrc:header-icons/clear-button.svg', null, _allClear],
-                ['imgsrc:header-icons/hide-blocks-button.svg', null, _changeBlockVisibility],
-                ['imgsrc:header-icons/collapse-blocks-button.svg', null, _toggleCollapsibleStacks],
-                ['imgsrc:header-icons/go-home-button.svg', null, _findBlocks],
-                ['imgsrc:header-icons/menu-button.svg', [5, 15], null],
-                ['imgsrc:header-icons/help-button.svg', null, _showHelp]
+                ['imgsrc:header-icons/hide-blocks-button.svg', _doOpenSamples],
+                ['imgsrc:header-icons/collapse-blocks-button.svg', doLoad],
+                ['imgsrc:header-icons/go-home-button.svg', doSave],
+                ['imgsrc:header-icons/help-button.svg', pasteStack],
+                [null], [null], [null], [null],
             ];
 
-            // Sub-menu items, function
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                var submenuWheelValues = [
-                    // play button submenu
-                    ['imgsrc:header-icons/step-button.svg', _doStepButton],
-                    ['imgsrc:header-icons/slow-button.svg', _doSlowButton],
-                    ['imgsrc:header-icons/run-button.svg', _doFastButton],
-                    ['imgsrc:header-icons/slow-music-button.svg', _doSlowMusicButton],
-                    ['imgsrc:header-icons/step-music-button.svg', _doStepMusicButton],
-
-                    // submenu button submenu
-                    ['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
-                    ['imgsrc:header-icons/open-button.svg', doLoad],
-                    ['imgsrc:header-icons/open-merge-button.svg', _doMergeLoad],
-                    ['imgsrc:header-icons/save-button.svg', doSave],
-                    ['imgsrc:header-icons/paste-button.svg', pasteStack],
-                    ['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
-                    ['imgsrc:header-icons/compile-button.svg', _doPlaybackBox],
-                    ['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
-                    ['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
-                    ['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
-                    ['imgsrc:header-icons/beginner-button.svg', doSwitchMode],
-                    [null, null],
-                    [null, null],
-                ];
-
-                var planetIdx = 5;
-            } else {
-                var submenuWheelValues = [
-                    // play button submenu
-                    ['imgsrc:header-icons/step-button.svg', _doStepButton],
-                    ['imgsrc:header-icons/slow-button.svg', _doSlowButton],
-                    ['imgsrc:header-icons/run-button.svg', _doFastButton],
-
-                    // submenu button submenu
-                    ['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
-                    ['imgsrc:header-icons/open-button.svg', doLoad],
-                    ['imgsrc:header-icons/open-merge-button.svg', _doMergeLoad],
-                    ['imgsrc:header-icons/save-button.svg', doSave],
-                    ['imgsrc:header-icons/paste-button.svg', pasteStack],
-                    ['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
-                    ['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
-                    ['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
-                    ['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
-                    [null, null],
-                    [null, null],
-                    [null, null],
-                    [null, null],
-                    [null, null],
-                    [null, null],
-                ];
-
-                wheelValues[1][1] = [0, 2];
-                wheelValues[7][1] = [3, 11];
-                var planetIdx = 3;
-            }
-
-            // Check to ensure index is correct.
-            if (!planet) {
-                submenuWheelValues[planetIdx] = ['imgsrc:header-icons/planet-disabled-button.svg', null];
-            }
-
-            if (_THIS_IS_MUSIC_BLOCKS_ && !beginnerMode) {
-                submenuWheelValues[15] = ['imgsrc:header-icons/advanced-button.svg', doSwitchMode];
-            }
+            var subwheelValues = [
+                ['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
+                ['imgsrc:header-icons/open-button.svg', doLoad],
+                ['imgsrc:header-icons/save-button.svg', doSave],
+                ['imgsrc:header-icons/paste-button.svg', pasteStack],
+                ['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
+                ['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
+                ['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
+                ['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
+                [null], [null], [null], [null],
+                [null], [null], [null], [null],
+            ];
 
             var wheelLabels = [];
             for (var i = 0; i < wheelValues.length; i++) {
                 wheelLabels.push(wheelValues[i][0]);
             }
 
-            var wheel = new wheelnav('contextWheelDiv', null, 300, 300);
-            // submenu wheel
+            var subwheelLabels = [];
+            for (var i = 0; i < subwheelValues.length; i++) {
+                subwheelLabels.push(subwheelValues[i][0]);
+            }
+
+            var wheel = new wheelnav('submenuWheelDiv', null, 450, 450);
             var submenuWheel = new wheelnav('_submenuWheel', wheel.raphael);
 
             wheelnav.cssMode = true;
@@ -4396,14 +4380,16 @@ handleComplete);
             wheel.colors = ['#2584af'];
             wheel.slicePathFunction = slicePath().DonutSlice;
             wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            wheel.slicePathCustom.minRadiusPercent = 0.2;
-            wheel.slicePathCustom.maxRadiusPercent = 0.6;
+            wheel.slicePathCustom.minRadiusPercent = 0.1;
+            wheel.slicePathCustom.maxRadiusPercent = 0.4;
             wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
             wheel.sliceInitPathCustom = wheel.slicePathCustom;
             wheel.animatetime = 300;
+            wheel.navAngle = 360 / (2 * wheelLabels.length);
             wheel.clickModeRotate = false;
             wheel.createWheel(wheelLabels);
 
+            /*
             wheel.navItems[0].setTooltip(_('Close'));
             wheel.navItems[1].setTooltip(_('Run'));
             wheel.navItems[2].setTooltip(_('Stop'));
@@ -4413,23 +4399,21 @@ handleComplete);
             wheel.navItems[6].setTooltip(_('Home'));
             wheel.navItems[7].setTooltip(_('More'));
             wheel.navItems[8].setTooltip(_('Help'));
-
-            var tabsLabels = [];
-            for (var i = 0; i < submenuWheelValues.length; i++) {
-                tabsLabels.push(submenuWheelValues[i][0]);
-            }
+            */
 
             submenuWheel.colors = ['#489eca'];
             submenuWheel.slicePathFunction = slicePath().DonutSlice;
             submenuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            submenuWheel.slicePathCustom.minRadiusPercent = 0.6;
-            submenuWheel.slicePathCustom.maxRadiusPercent = 1.0;
+            submenuWheel.slicePathCustom.minRadiusPercent = 0.4;
+            submenuWheel.slicePathCustom.maxRadiusPercent = 0.7;
             submenuWheel.sliceSelectedPathCustom = submenuWheel.slicePathCustom;
             submenuWheel.sliceInitPathCustom = submenuWheel.slicePathCustom;
             submenuWheel.clickModeRotate = false;
-            submenuWheel.navAngle = -180 / wheelValues.length + 180 / (wheelValues.length * submenuWheelValues[0].length);
-            submenuWheel.createWheel(tabsLabels);
-        
+            // submenuWheel.navAngle = -180 / wheelValues.length + 180 / (wheelValues.length * submenuWheelValues[0].length);
+            submenuWheel.navAngle = 360 / (2 * subwheelLabels.length);
+            submenuWheel.createWheel(subwheelLabels);
+
+            /*
             submenuWheel.navItems[0].setTooltip(_('Run step by step'));
             submenuWheel.navItems[1].setTooltip(_('Run slowly'));
             submenuWheel.navItems[2].setTooltip(_('Run fast'));
@@ -4509,16 +4493,17 @@ handleComplete);
                     submenuWheelValues[i][1]();
                 }
             };
-
+            */
             var __exitMenu = function () {
                 var d = new Date();
                 piemenuExitTime = d.getTime();
-                docById('contextWheelDiv').style.display = 'none';
+                docById('submenuWheelDiv').style.display = 'none';
                 wheel.removeWheel();
             };
 
             var __showHide = function () {
                 var i = wheel.selectedNavItemIndex;
+                /*
                 var subitems = wheelValues[i][1];
                 if (subitems === null) {
                     for (var j = 0; j < submenuWheelValues.length; j++) {
@@ -4533,10 +4518,11 @@ handleComplete);
                         }
                     }
                 }
+                */
             };
 
             wheel.navItems[0].navigateFunction = function () {
-                __exitMenu();
+                // __exitMenu();
             };
 
             var __action = function () {
@@ -4545,7 +4531,7 @@ handleComplete);
                 __showHide();
 
                 if (wheelValues[i][2] !== null) {
-                    __exitMenu();
+                   // __exitMenu();
                     wheelValues[i][2]();
                 }
             };
@@ -4554,6 +4540,7 @@ handleComplete);
                 wheel.navItems[i].navigateFunction = __action;
             }
 
+            /*
             // Hide the widget when the selection is made.
             for (var i = 0; i < tabsLabels.length; i++) {
                 submenuWheel.navItems[i].navigateFunction = function () {
@@ -4561,8 +4548,9 @@ handleComplete);
                     __exitMenu();
                 };
             }
+            */
 
-            wheel.navigateWheel(1);
+            // wheel.navigateWheel(1);
 
             setTimeout(function () {
                 blocks.stageClick = false;
