@@ -62,8 +62,6 @@ function Palettes () {
     this.scrollDiff = 0;
     this.originalSize = 55;  // this is the original svg size
     this.trashcan = null;
-    this.initial_x = 55 * PALETTE_WIDTH_FACTOR;
-    this.initial_y = 55;
     this.firstTime = true;
     this.background = null;
     this.circles = {};
@@ -77,6 +75,7 @@ function Palettes () {
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
+    this.top = Math.floor(55 * 1.5);
     this.current = DEFAULTPALETTE;
     this.x = [];  // We track x and y for each of the multipalettes
     this.y = [];
@@ -103,8 +102,34 @@ function Palettes () {
         for (var i = 0; i < MULTIPALETTES.length; i++) {
             this._makeSelectorButton(i);
             this.x.push(0);
-            this.y.push(2.5 * this.cellSize / PALETTE_SCALE_FACTOR);
+            this.y.push(3 * this.cellSize / PALETTE_SCALE_FACTOR);
         }
+    };
+
+    this.deltaY = function (dy) {
+	for (var i = 0; i < this.selectorButtonsOff.length; i++) {
+	    this.selectorButtonsOff[i].y += dy;
+	    this.selectorButtonsOn[i].y += dy;
+	}
+
+	for (var b in this.buttons) {
+	    this.buttons[b].y += dy;
+	}
+
+	for (var l in this.labels) {
+	    this.labels[l].y += dy;
+	}
+
+	for (var m in this.dict) {
+            this.dict[m]._moveMenuRelative(0, dy);
+            if (dy < 0 && this.dict[m].visible) {
+                this.dict[m]._resetLayout();
+                this.dict[m].showMenu();
+                this.dict[m]._showMenuItems();
+            }
+	}
+
+	this.background.y += dy;
     };
 
     this._makeSelectorButton = function (i) {
@@ -113,7 +138,7 @@ function Palettes () {
         __processSelectButtonOff = function (that, name, bitmap, arg) {
             var scale = 1.5 * that.cellSize / that.originalSize;
             bitmap.x = arg * scale * 55;
-            bitmap.y = 55 + that.cellSize * 1.25;
+            bitmap.y = that.top + that.cellSize * 1.25;
             bitmap.scaleX = scale;
             bitmap.scaleY = scale;
             // FIXME: rescale needs to reset all of this.
@@ -128,7 +153,7 @@ function Palettes () {
         __processSelectButtonOn = function (that, name, bitmap, arg) {
             var scale = 1.5 * that.cellSize / that.originalSize;
             bitmap.x = arg * scale * 55;
-            bitmap.y = 55 + that.cellSize * 1.25;
+            bitmap.y = that.top + that.cellSize * 1.25;
             bitmap.scaleX = scale;
             bitmap.scaleY = scale;
             // FIXME: rescale needs to reset all of this.
@@ -238,7 +263,7 @@ function Palettes () {
     }
 
     this.getSearchPos = function () {
-        return [this.cellSize, 55]
+        return [this.cellSize, that.top]
         // return [50 * PALETTE_SCALE_FACTOR, 55];
     };
 
@@ -286,7 +311,8 @@ function Palettes () {
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            shape.graphics.f('#a2c5d8').r(0, 55, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
+	    // a2c5d8
+            shape.graphics.f('#f0f0f0').r(0, this.top, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
             shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
@@ -312,7 +338,7 @@ function Palettes () {
             that.buttons[name].visible = false;
 
             that.dict[name].makeMenu(true);
-            that.dict[name]._moveMenu(Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 55);
+            that.dict[name]._moveMenu(Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, that.top);
             that.dict[name]._updateMenu(false);
 
             // Add tooltip for palette buttons
@@ -339,7 +365,7 @@ function Palettes () {
                 // Which multipalette are we in?
                 if (name === 'search') {
                     this.buttons[name].x = 0;
-                    this.buttons[name].y = 55;
+                    this.buttons[name].y = this.top;
                 } else {
                     for (var i = 0; i < MULTIPALETTES.length; i++) {
                         if (MULTIPALETTES[i].indexOf(name) !== -1) {
@@ -1227,7 +1253,8 @@ function Palette(palettes, name) {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
-        shape.graphics.f('#949494').r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef();
+	// 949494
+        shape.graphics.f('#f0f0f0').r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef();
         shape.width = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         shape.height = h;
         this.background.addChild(shape);
