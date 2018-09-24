@@ -144,7 +144,7 @@ function Palettes () {
             // FIXME: rescale needs to reset all of this.
             that.stage.addChild(bitmap);
             that.selectorButtonsOff.push(bitmap);
-            that.selectorButtonsOff[i].on('click', function (event) {
+            that.selectorButtonsOff[i].on('mouseover', function (event) {
                 console.log('SHOWING ' + i);
                 that.showSelection(i);
             });
