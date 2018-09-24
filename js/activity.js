@@ -221,7 +221,7 @@ define(MYDEFINES, function (compatibility) {
         // Are we running off of a server?
         var server = true;
         var turtleBlocksScale = 1;
-	var mousestage;
+        var mousestage;
         var stage;
         var turtles;
         var palettes;
@@ -1138,11 +1138,11 @@ define(MYDEFINES, function (compatibility) {
             trashContainer = new createjs.Container();
             turtleContainer = new createjs.Container();
             /*
-	    console.log(turtleContainer);
-	    turtleContainer.scaleX = 0.5;
-	    turtleContainer.scaleY = 0.5;
-	    turtleContainer.x = 100;
-	    turtleContainer.y = 100;
+            console.log(turtleContainer);
+            turtleContainer.scaleX = 0.5;
+            turtleContainer.scaleY = 0.5;
+            turtleContainer.x = 100;
+            turtleContainer.y = 100;
             */
             stage.addChild(turtleContainer);
             stage.addChild(trashContainer, blocksContainer, palettesContainer);
@@ -2685,10 +2685,10 @@ define(MYDEFINES, function (compatibility) {
                         break;
                     case SPACE:
                         if (turtleContainer.scaleX == 1) {
-			    turtles.scaleStage(0.5);
-			} else {
-			    turtles.scaleStage(1);
-			}
+                            turtles.scaleStage(0.5);
+                        } else {
+                            turtles.scaleStage(1);
+                        }
                         break;
                     case ESC:
                         if (searchWidget.style.visibility === 'visible') {
@@ -2974,10 +2974,34 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _deleteBlocksBox() {
-            _hideBoxes();
-            clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
-            clearBox.show();
+            // _hideBoxes();
+            // clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
+	    if (!confirmContainer.visible) {
+		confirmContainer.visible = true;
+                if (beginnerMode) {
+		    confirmContainer.x = 55 * 6 + 27.5;
+		} else {
+		    confirmContainer.x = 55 * 7 + 27.5;
+		}
+
+		confirmContainer.y = 27.5;
+		deltaY(85);
+	    } else {
+		confirmContainer.visible = false;
+		deltaY(-85);
+	    }
         };
+
+        function _afterDelete() {
+            sendAllToTrash(true, false);
+            if (planet !== undefined) {
+                planet.initialiseNewProject.bind(planet);
+            }
+
+	    confirmContainer.visible = false;
+	    deltaY(-85);
+	    _showHideAuxMenu();
+	};
 
         function doLanguageBox() {
             _hideBoxes();
@@ -3361,6 +3385,7 @@ define(MYDEFINES, function (compatibility) {
                 // The container may not be ready yet, so do nothing.
                 return;
             }
+
             var msgContainer = msgText.parent;
             msgContainer.visible = true;
             msgText.text = msg;
@@ -3432,6 +3457,7 @@ define(MYDEFINES, function (compatibility) {
                 if (text == null) {
                     text = 'foo';
                 }
+
                 errorArtwork['nostack'].children[1].text = text;
                 errorArtwork['nostack'].visible = true;
                 errorArtwork['nostack'].updateCache();
@@ -3441,6 +3467,7 @@ define(MYDEFINES, function (compatibility) {
                 if (text == null) {
                     text = 'foo';
                 }
+
                 errorArtwork['emptybox'].children[1].text = text;
                 errorArtwork['emptybox'].visible = true;
                 errorArtwork['emptybox'].updateCache();
@@ -3857,15 +3884,42 @@ handleComplete);
                 //y += dy;
             }
 
-            _setupRightMenu(turtleBlocksScale);
+            _setupAuxMenu(turtleBlocksScale);
+            _setupBoxMenus(turtleBlocksScale);
         };
 
         function _doMergeLoad() {
             console.log('merge load');
             doLoad(true);
-        }
+        };
 
-        function _setupRightMenu(turtleBlocksScale) {
+        function _setupBoxMenus(turtleBlocksScale) {
+	    // Each box menu is positioned above the Aux menus
+	    var cellsize = 55;
+            var y = Math.floor(-3 * cellsize / 2);
+	    var x = 200;
+            confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
+	    confirmContainer.visible = false;
+
+	    confirmContainer.on('click', function (event) {
+		_afterDelete();
+	    });
+
+            confirmContainer.on('mouseover', function (event) {
+                if (!loading) {
+                    document.body.style.cursor = 'pointer';
+                }
+            });
+
+            confirmContainer.on('mouseout', function (event) {
+                if (!loading) {
+                    document.body.style.cursor = 'default';
+                }
+            });
+
+	};
+
+        function _setupAuxMenu(turtleBlocksScale) {
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
                 for (var i in onscreenMenu) {
@@ -3928,7 +3982,7 @@ handleComplete);
             }
 
             var btnSize = cellSize;
-	    /*
+            /*
             var dx = 0;
             var dy = btnSize;
             */
@@ -4051,16 +4105,14 @@ handleComplete);
             setTimeout(function () {
                 if (menuButtonsVisible) {
                     menuButtonsVisible = false;
-                    for (var button in onscreenMenu) {
-                        // onscreenMenu[button].visible = false;
-                    }
-		    _piemenuStageContext();
+                    _showHideAuxMenu();
                 } else {
                     menuButtonsVisible = true;
                     for (var button in onscreenMenu) {
                         onscreenMenu[button].visible = true;
                     }
-		    _piemenuStageContext();
+
+                    _showHideAuxMenu();
                 }
                 update = true;
             }, 500);
@@ -4320,11 +4372,27 @@ handleComplete);
             pasteBox.hide();
         };
 
-        function _piemenuStageContext () {
-	    var cellsize = 55;
-	    var dy = 1.5 * cellsize;
+        function deltaY (dy) {
+            headerContainer.y += dy;
+            for (var i = 0; i < onscreenButtons.length; i++) {
+                onscreenButtons[i].y += dy;
+            }
+
+            for (var i = 0; i < onscreenMenu.length; i++) {
+                onscreenMenu[i].y += dy;
+            }
+
+            palettes.deltaY(dy);
+            turtles.deltaY(dy);
+
+            refreshCanvas();
+	};
+
+        function _showHideAuxMenu () {
+            var cellsize = 55;
             if (headerContainer.y === 0) {
-                headerContainer.y += dy;
+		dy = cellsize * 1.5;
+                headerContainer.y = dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y += dy;
                 }
@@ -4333,20 +4401,21 @@ handleComplete);
                     onscreenMenu[i].y = cellsize / 2;
                 }
 
-		palettes.deltaY(dy);
-		turtles.deltaY(dy);
+                palettes.deltaY(dy);
+                turtles.deltaY(dy);
             } else {
-                headerContainer.y -= dy;
+		var dy = headerContainer.y;
+                headerContainer.y = 0;
                 for (var i = 0; i < onscreenButtons.length; i++) {
-                    onscreenButtons[i].y -= dy;
+                    onscreenButtons[i].y = cellsize / 2;
                 }
 
                 for (var i = 0; i < onscreenMenu.length; i++) {
-                    onscreenMenu[i].y -= dy;
+                    onscreenMenu[i].y = -cellsize;
                 }
 
-		palettes.deltaY(-dy);
-		turtles.deltaY(-dy);
+                palettes.deltaY(-dy);
+                turtles.deltaY(-dy);
             }
 
             refreshCanvas();
