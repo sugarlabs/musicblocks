@@ -170,6 +170,16 @@ function Block(protoblock, blocks, overrideName) {
             return;
         }
 
+        if (!this.container.visible) {
+	    // block is hidden, so do nothing.
+	    return;
+	}
+
+	if (!this.bitmap.visible) {
+	    // block is hidden, so do nothing.
+	    return;
+	}
+
         // Always hide the non-highlighted artwork.
         this.container.visible = true;
         this.bitmap.visible = false;
