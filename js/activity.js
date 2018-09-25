@@ -253,7 +253,8 @@ define(MYDEFINES, function (compatibility) {
         var loading = false;
         // For auxillary menus
 	var utilityContainer = null;
-	var modeContainer = null;
+	var beginnerModeContainer = null;
+	var advancedModeContainer = null;
 	var languageContainer = null;
 	var smallerContainer = null;
 	var largerContainer = null;
@@ -845,10 +846,16 @@ define(MYDEFINES, function (compatibility) {
             if (beginnerMode) {
                 textMsg(_('Refresh your browser to change to advanced mode.'));
                 localStorage.setItem('beginnerMode', false);
+		beginnerModeContainer.visible = false;
+		advancedModeContainer.visible = true;
             } else {
                 textMsg(_('Refresh your browser to change to beginner mode.'));
                 localStorage.setItem('beginnerMode', true);
+		beginnerModeContainer.visible = true;
+		advancedModeContainer.visible = false;
             }
+
+	    refreshCanvas();
         };
 
         function doStopButton() {
@@ -3027,28 +3034,36 @@ define(MYDEFINES, function (compatibility) {
             // _hideBoxes();
             languageBox.createBox(turtleBlocksScale, 55 * 7, 150); // saveButton.x - 27, saveButton.y - 55);
             languageBox.show();
-	    modeContainer.visible = false;
+	    beginnerModeContainer.visible = false;
+	    advancedModeContainer.visible = false;
 	    languageContainer.visible = false;
+	    smallerContainer.visible = false;
+	    largerContainer.visible = false;
+	    smallerOffContainer.visible = false;
+	    largerOffContainer.visible = false;
 	    deltaY(-85);
         };
 
         function _doUtilityBox() {
             // _hideBoxes();
             // utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
-	    if (!modeContainer.visible) {	
-		modeContainer.visible = true;
+	    if (!languageContainer.visible) {	
 		languageContainer.visible = true;
 		smallerContainer.visible = true;
 		largerContainer.visible = true;
                 if (beginnerMode) {
-		    modeContainer.x = 55 * 4;
+		    beginnerModeContainer.visible = true;
+		    beginnerModeContainer.x = 55 * 4;
+		    advancedModeContainer.x = 55 * 4;
 		    languageContainer.x = 55 * 5;
 		    smallerContainer.x = 55 * 6;
 		    largerContainer.x = 55 * 7;
 		    smallerOffContainer.x = 55 * 6;
 		    largerOffContainer.x = 55 * 7;
 		} else {
-		    modeContainer.x = 55 * 6 + 27.5;
+		    advancedModeContainer.visible = true;
+		    beginnerModeContainer.x = 55 * 6 + 27.5;
+		    advancedModeContainer.x = 55 * 6 + 27.5;
 		    languageContainer.x = 55 * 7 + 27.5;
 		    smallerContainer.x = 55 * 8 + 27.5;
 		    largerContainer.x = 55 * 9 + 27.5;
@@ -3058,7 +3073,8 @@ define(MYDEFINES, function (compatibility) {
 
 		setSmallerLargerStatus();
 
-		modeContainer.y = 27.5;
+		beginnerModeContainer.y = 27.5;
+		advancedModeContainer.y = 27.5;
 		languageContainer.y = 27.5;
 		smallerContainer.y = 27.5;
 		largerContainer.y = 27.5;
@@ -3067,7 +3083,8 @@ define(MYDEFINES, function (compatibility) {
 		deltaY(85);
 	    } else {
 		// Hide everything
-		modeContainer.visible = false;
+		beginnerModeContainer.visible = false;
+		advancedModeContainer.visible = false;
 		languageContainer.visible = false;
 		smallerContainer.visible = false;
 		largerContainer.visible = false;
@@ -3985,122 +4002,139 @@ handleComplete);
 
 	    // Settings Box Buttons: Mode, Language, Smaller, Larger
 	    // FIXME: Add advanced mode buttons
-	    if (beginnerMode) {
-		modeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
-		modeContainer.visible = false;
+	    beginnerModeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
+	    beginnerModeContainer.visible = false;
 
-		modeContainer.on('click', function (event) {
-		    _doSwitchMode();
-		});
+	    beginnerModeContainer.on('click', function (event) {
+		doSwitchMode();
+	    });
 
-		modeContainer.on('mouseover', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'pointer';
-                    }
-		});
+	    beginnerModeContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
 
-		modeContainer.on('mouseout', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'default';
-                    }
-		});
+	    beginnerModeContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
 
-		languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
-		languageContainer.visible = false;
+	    advancedModeContainer = _makeButton('advanced-button', _('Switch to beginner mode'), x, y, cellsize, 0);
+	    
+	    advancedModeContainer.visible = false;
 
-		languageContainer.on('click', function (event) {
-		    doLanguageBox();
-		});
+	    advancedModeContainer.on('click', function (event) {
+		doSwitchMode();
+	    });
 
-		languageContainer.on('mouseover', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'pointer';
-                    }
-		});
+	    advancedModeContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
 
-		languageContainer.on('mouseout', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'default';
-                    }
-		});
+	    advancedModeContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
 
-		smallerContainer = _makeButton('smaller-button', _('Decrease block size'), x, y, cellsize, 0);
-		smallerContainer.visible = false;
+	    languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
+	    languageContainer.visible = false;
 
-		smallerContainer.on('click', function (event) {
-		    doSmallerBlocks();
-		});
+	    languageContainer.on('click', function (event) {
+		doLanguageBox();
+	    });
 
-		smallerContainer.on('mouseover', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'pointer';
-                    }
-		});
+	    languageContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
 
-		smallerContainer.on('mouseout', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'default';
-                    }
-		});
+	    languageContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
 
-		largerContainer = _makeButton('bigger-button', _('Increase block size'), x, y, cellsize, 0);
-		largerContainer.visible = false;
+	    smallerContainer = _makeButton('smaller-button', _('Decrease block size'), x, y, cellsize, 0);
+	    smallerContainer.visible = false;
 
-		largerContainer.on('click', function (event) {
-		    doLargerBlocks();
-		});
+	    smallerContainer.on('click', function (event) {
+		doSmallerBlocks();
+	    });
 
-		largerContainer.on('mouseover', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'pointer';
-                    }
-		});
+	    smallerContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
 
-		largerContainer.on('mouseout', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'default';
-                    }
-		});
+	    smallerContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
 
-		smallerOffContainer = _makeButton('smaller-disable-button', _('Cannot be further decreased'), x, y, cellsize, 0);
-		smallerOffContainer.visible = false;
+	    largerContainer = _makeButton('bigger-button', _('Increase block size'), x, y, cellsize, 0);
+	    largerContainer.visible = false;
 
-		smallerOffContainer.on('click', function (event) {
-		    doSmallerBlocks();
-		});
+	    largerContainer.on('click', function (event) {
+		doLargerBlocks();
+	    });
 
-		smallerOffContainer.on('mouseover', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'pointer';
-                    }
-		});
+	    largerContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
 
-		smallerOffContainer.on('mouseout', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'default';
-                    }
-		});
+	    largerContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
 
-		largerOffContainer = _makeButton('bigger-disable-button', _('Cannot be further increased'), x, y, cellsize, 0);
-		largerOffContainer.visible = false;
+	    smallerOffContainer = _makeButton('smaller-disable-button', _('Cannot be further decreased'), x, y, cellsize, 0);
+	    smallerOffContainer.visible = false;
 
-		largerOffContainer.on('click', function (event) {
-		    doLargerBlocks();
-		});
+	    smallerOffContainer.on('click', function (event) {
+		doSmallerBlocks();
+	    });
 
-		largerOffContainer.on('mouseover', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'pointer';
-                    }
-		});
+	    smallerOffContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
 
-		largerOffContainer.on('mouseout', function (event) {
-                    if (!loading) {
-			document.body.style.cursor = 'default';
-                    }
-		});
-	    } else {
-	    }
+	    smallerOffContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
+
+	    largerOffContainer = _makeButton('bigger-disable-button', _('Cannot be further increased'), x, y, cellsize, 0);
+	    largerOffContainer.visible = false;
+
+	    largerOffContainer.on('click', function (event) {
+		doLargerBlocks();
+	    });
+
+	    largerOffContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
+
+	    largerOffContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
 	};
 
         function _setupAuxMenu(turtleBlocksScale) {
@@ -4605,7 +4639,8 @@ handleComplete);
             }
 
 	    confirmContainer.visible = false;
-	    modeContainer.visible = false;
+	    beginnerModeContainer.visible = false;
+	    advancedModeContainer.visible = false;
 	    languageContainer.visible = false;
 	    smallerContainer.visible = false;
 	    largerContainer.visible = false;
