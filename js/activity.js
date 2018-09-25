@@ -990,7 +990,7 @@ define(MYDEFINES, function (compatibility) {
             scrollOnContainer.visible = false;
             scrollOffContainer.visible = false;
             deltaY(-85);
-            _showHideAuxMenu();
+            _showHideAuxMenu(false);
 
             blocks.activeBlock = null;
             var myChart = docById('myChart');
@@ -2856,6 +2856,13 @@ define(MYDEFINES, function (compatibility) {
                 return;
             }
 
+	    // If any menus were open, close them.
+	    if (confirmContainer !== null && newContainer.visible) {
+		if (headerContainer.y > 0) {
+		    _showHideAuxMenu(true);
+		}
+	    }
+
             if (!platform.androidWebkit) {
                 var w = window.innerWidth;
                 var h = window.innerHeight;
@@ -3134,7 +3141,7 @@ define(MYDEFINES, function (compatibility) {
                 if (beginnerMode) {
                     confirmContainer.x = 55 * 6 + 27.5;
                 } else {
-                    confirmContainer.x = 55 * 7 + 27.5;
+                    confirmContainer.x = 55 * 6 + 27.5;
                 }
 
                 confirmContainer.y = 27.5;
@@ -3153,7 +3160,7 @@ define(MYDEFINES, function (compatibility) {
 
             confirmContainer.visible = false;
             deltaY(-85);
-            _showHideAuxMenu();
+            _showHideAuxMenu(false);
         };
 
         function doLanguageBox() {
@@ -4363,6 +4370,8 @@ handleComplete);
                 }
             }
 
+	    onscreenMenu = [];
+
             // NOTE: see getAuxToolbarButtonNames in turtledefs.js
             // Misc. other buttons
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
@@ -4469,27 +4478,11 @@ handleComplete);
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
                 onscreenMenu.push(container);
-
-                // Don't think we need these any more...
-                /*
-                if (menuNames[i][0] === 'utility') {
-                    utilityButton = container;
-                } else if (menuNames[i][0] === 'save') {
-                    saveButton = container;
-                } else if (menuNames[i][0] === 'compile') {
-                    playbackButton = container;
-                } else if (menuNames[i][0] === 'new') {
-                    deleteAllButton = container;
-                }
-                */
                 container.visible = false;
             }
 
-            if (menuButtonsVisible) {
-                for (var button in onscreenMenu) {
-                    onscreenMenu[button].visible = true;
-                }
-            }
+	    // Always start with menuButton off.
+	    menuButtonsVisible = false;
         };
 
         function _makeExtraGridButtons(name, delay) {
@@ -4573,14 +4566,14 @@ handleComplete);
             setTimeout(function () {
                 if (menuButtonsVisible) {
                     menuButtonsVisible = false;
-                    _showHideAuxMenu();
+                    _showHideAuxMenu(false);
                 } else {
                     menuButtonsVisible = true;
                     for (var button in onscreenMenu) {
                         onscreenMenu[button].visible = true;
                     }
 
-                    _showHideAuxMenu();
+                    _showHideAuxMenu(false);
                 }
                 update = true;
             }, timeout);
@@ -4858,9 +4851,10 @@ handleComplete);
             refreshCanvas();
         };
 
-        function _showHideAuxMenu () {
+        function _showHideAuxMenu (resize) {
             var cellsize = 55;
-            if (headerContainer.y === 0) {
+            if (!resize && headerContainer.y === 0) {
+		console.log('FOO');
                 dy = cellsize * 1.5;
                 headerContainer.y = dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
@@ -4869,12 +4863,15 @@ handleComplete);
 
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = cellsize / 2;
+		    onscreenMenu[i].visible = true;
+		    console.log('setting ' + i + ' to visible');
                 }
 
                 palettes.deltaY(dy);
                 turtles.deltaY(dy);
                 blocksContainer.y += dy;
             } else {
+		console.log('BAR');
                 var dy = headerContainer.y;
                 headerContainer.y = 0;
                 for (var i = 0; i < onscreenButtons.length; i++) {
@@ -4883,6 +4880,8 @@ handleComplete);
 
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = -cellsize;
+		    console.log('setting ' + i + ' to invisible');
+		    onscreenMenu[i].visible = false;
                 }
 
                 palettes.deltaY(-dy);
