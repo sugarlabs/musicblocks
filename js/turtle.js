@@ -1194,7 +1194,6 @@ function Turtles () {
     };
 
     this.deltaY = function (dy) {
-	this._borderContainer.y += dy;
 	this.stage.y += dy;
     };
 
