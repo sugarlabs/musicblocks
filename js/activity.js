@@ -61,7 +61,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
                 } else {
-                    beginnerMode = truee;
+                    beginnerMode = true;
                 }
             }
         } else {
