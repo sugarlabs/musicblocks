@@ -33,7 +33,6 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
         };
     };
 
-
     try {
         (function (d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];
@@ -130,7 +129,7 @@ var MYDEFINES = [
     'activity/block',
     'activity/turtledefs',
     'activity/logo',
-    'activity/clearbox',
+    // 'activity/clearbox',
     'activity/savebox',
     'activity/languagebox',
     'activity/utilitybox',
@@ -227,7 +226,7 @@ define(MYDEFINES, function (compatibility) {
         var palettes;
         var blocks;
         var logo;
-        var clearBox;
+        // var clearBox;
         var pasteBox;
         var utilityBox;
         var languageBox = null;
@@ -857,7 +856,7 @@ define(MYDEFINES, function (compatibility) {
             hideDOMLabel();
 
             pasteBox.hide();
-            clearBox.hide();
+            // clearBox.hide();
             saveBox.hide();
             languageBox.hide();
             utilityBox.hide();
@@ -1685,12 +1684,14 @@ define(MYDEFINES, function (compatibility) {
                 }
             };
 
+	    /*
             clearBox = new ClearBox();
             clearBox
                 .setCanvas(canvas)
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
                 .setClear(__clearFunction);
+            */
 
             // FIXME: Third arg indicates beginner mode
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -3004,15 +3005,36 @@ define(MYDEFINES, function (compatibility) {
 	};
 
         function doLanguageBox() {
-            _hideBoxes();
-            languageBox.createBox(turtleBlocksScale, saveButton.x - 27, saveButton.y - 55);
+            // _hideBoxes();
+            languageBox.createBox(turtleBlocksScale, 55 * 7, 150); // saveButton.x - 27, saveButton.y - 55);
             languageBox.show();
+	    modeContainer.visible = false;
+	    languageContainer.visible = false;
+	    deltaY(-85);
         };
 
         function _doUtilityBox() {
-            console.log('PRESS');
-            _hideBoxes();
-            utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
+            // _hideBoxes();
+            // utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
+	    if (!modeContainer.visible) {	
+		modeContainer.visible = true;
+		languageContainer.visible = true;
+                if (beginnerMode) {
+		    modeContainer.x = 55 * 5 + 27.5;
+		    languageContainer.x = 55 * 6 + 27.5;
+		} else {
+		    modeContainer.x = 55 * 6 + 27.5;
+		    languageContainer.x = 55 * 7 + 27.5;
+		}
+
+		modeContainer.y = 27.5;
+		languageContainer.y = 27.5;
+		deltaY(85);
+	    } else {
+		modeContainer.visible = false;
+		languageContainer.visible = false;
+		deltaY(-85);
+	    }
         };
 
         function _doPlaybackBox() {
@@ -3773,7 +3795,7 @@ handleComplete);
             }
 
             headerContainer = new createjs.Shape();
-            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 1.5, screen.width / turtleBlocksScale, 3 * cellSize);
+            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 3, screen.width / turtleBlocksScale, 4.5 * cellSize);
 
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
@@ -3897,7 +3919,9 @@ handleComplete);
 	    // Each box menu is positioned above the Aux menus
 	    var cellsize = 55;
             var y = Math.floor(-3 * cellsize / 2);
-	    var x = 200;
+	    var x = 27.5;
+
+	    // Clear Box Confirm Button
             confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
 	    confirmContainer.visible = false;
 
@@ -3917,6 +3941,48 @@ handleComplete);
                 }
             });
 
+	    // Settings Box Buttons: Mode, Language, Smaller, Larger
+	    // FIXME: Add advanced mode buttons
+	    if (beginnerMode) {
+		modeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
+		modeContainer.visible = false;
+
+		modeContainer.on('click', function (event) {
+		    _doSwitchMode();
+		});
+
+		modeContainer.on('mouseover', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'pointer';
+                    }
+		});
+
+		modeContainer.on('mouseout', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'default';
+                    }
+		});
+
+		languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
+		languageContainer.visible = false;
+
+		languageContainer.on('click', function (event) {
+		    doLanguageBox();
+		});
+
+		languageContainer.on('mouseover', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'pointer';
+                    }
+		});
+
+		languageContainer.on('mouseout', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'default';
+                    }
+		});
+	    } else {
+	    }
 	};
 
         function _setupAuxMenu(turtleBlocksScale) {
@@ -4417,6 +4483,10 @@ handleComplete);
                 palettes.deltaY(-dy);
                 turtles.deltaY(-dy);
             }
+
+	    confirmContainer.visible = false;
+	    modeContainer.visible = false;
+	    languageContainer.visible = false;
 
             refreshCanvas();
         };
