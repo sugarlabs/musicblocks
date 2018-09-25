@@ -4720,6 +4720,7 @@ handleComplete);
 
             palettes.deltaY(dy);
             turtles.deltaY(dy);
+	    blocksContainer.y += dy;
 
             refreshCanvas();
 	};
@@ -4739,6 +4740,7 @@ handleComplete);
 
                 palettes.deltaY(dy);
                 turtles.deltaY(dy);
+		blocksContainer.y += dy;
             } else {
 		var dy = headerContainer.y;
                 headerContainer.y = 0;
@@ -4752,6 +4754,7 @@ handleComplete);
 
                 palettes.deltaY(-dy);
                 turtles.deltaY(-dy);
+		blocksContainer.y -= dy;
             }
 
 	    confirmContainer.visible = false;
