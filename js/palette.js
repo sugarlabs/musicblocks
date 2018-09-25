@@ -138,7 +138,7 @@ function Palettes () {
         __processSelectButtonOff = function (that, name, bitmap, arg) {
             var scale = 1.5 * that.cellSize / that.originalSize;
             bitmap.x = arg * scale * 55;
-            bitmap.y = that.top + that.cellSize * 1.25;
+            bitmap.y = that.top; // that.top + that.cellSize * 1.25;
             bitmap.scaleX = scale;
             bitmap.scaleY = scale;
             // FIXME: rescale needs to reset all of this.
@@ -153,7 +153,7 @@ function Palettes () {
         __processSelectButtonOn = function (that, name, bitmap, arg) {
             var scale = 1.5 * that.cellSize / that.originalSize;
             bitmap.x = arg * scale * 55;
-            bitmap.y = that.top + that.cellSize * 1.25;
+            bitmap.y = that.top; // that.top + that.cellSize * 1.25;
             bitmap.scaleX = scale;
             bitmap.scaleY = scale;
             // FIXME: rescale needs to reset all of this.
@@ -263,7 +263,7 @@ function Palettes () {
     }
 
     this.getSearchPos = function () {
-        return [this.cellSize, that.top]
+        return [this.cellSize, this.top + this.cellSize * 1.75]
         // return [50 * PALETTE_SCALE_FACTOR, 55];
     };
 
@@ -365,7 +365,7 @@ function Palettes () {
                 // Which multipalette are we in?
                 if (name === 'search') {
                     this.buttons[name].x = 0;
-                    this.buttons[name].y = this.top;
+                    this.buttons[name].y = this.top + this.cellSize * 1.75;
                 } else {
                     for (var i = 0; i < MULTIPALETTES.length; i++) {
                         if (MULTIPALETTES[i].indexOf(name) !== -1) {
