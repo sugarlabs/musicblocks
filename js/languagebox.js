@@ -56,8 +56,8 @@ function LanguageBox () {
         const MSG = {
 	    'default': _('Refresh your browser to change your language preference.'),
             'en': 'Refresh your browser to change your language preference.',
-	    'ja': '言語設定についた変化（日本語）をするため、ブラウザをリフレッシュしてください。',
-            'kana': '"げんごをへんこうするにはブラウザをさいきどうするひつようがあります。',
+	    'ja': '言語を変更するにはブラウザを再起動する必要があります。',
+            'kana': 'げんごをへんこうするにはブラウザをさいきどうするひつようがあります。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
             'zh-CN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
@@ -72,7 +72,7 @@ function LanguageBox () {
         var language = localStorage.languagePreference;
         if (language == undefined || language === '' || language === 'en-US'  || language === 'en-US') {
             language = 'en';
-        }
+        } 
 
         if (this._container != null) {
             this._container.visible = false;
@@ -137,7 +137,7 @@ function LanguageBox () {
         console.log(localStorage.kanaPreference);
         if (selected == undefined || selected === '' || selected === 'en') {
             selected = 'en-US';
-        } else if (selected === 'ja' && localStorage.kanaPreference === 'kana') {
+        } else if (selected === 'kana' && localStorage.kanaPreference === 'ja') {
 	    console.log('kana');
             selected = 'kana';
 	}
