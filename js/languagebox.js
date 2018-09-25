@@ -137,7 +137,7 @@ function LanguageBox () {
         console.log(localStorage.kanaPreference);
         if (selected == undefined || selected === '' || selected === 'en') {
             selected = 'en-US';
-        } else if (selected === 'kana' && localStorage.kanaPreference === 'ja') {
+        } else if (selected === 'ja' && localStorage.kanaPreference === 'kana') {
 	    console.log('kana');
             selected = 'kana';
 	}
