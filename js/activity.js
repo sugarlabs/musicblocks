@@ -266,6 +266,15 @@ define(MYDEFINES, function (compatibility) {
 	var scrollOnContainer = null;
 	var scrollOffContainer = null;
 	var confirmOntainer = null;	
+        var saveHTMLContainer = null;
+        var saveSVGContainer = null;
+	var savePNGContainer = null;
+        var saveWAVContainer = null;
+        var uploadOnContainer = null;
+	var uploadOffContainer = null;
+	var saveLilypondContainer = null;
+	var saveABCContainer = null;
+	var saveArtworkContainer = null;
 
         var searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
@@ -4044,259 +4053,87 @@ handleComplete);
 	    // Each box menu is positioned above the Aux menus
 	    var cellsize = 55;
             var y = Math.floor(-3 * cellsize / 2);
-	    var x = 27.5;
+	    var x = 110;
+
+	    var __addEventHandlers = function(container, action, arg) {
+
+		if (arg !== undefined) {
+		    container.on('click', function (event) {
+			action(arg);
+		    });
+		} else {
+		    container.on('click', function (event) {
+			action();
+		    });
+		}
+
+		container.on('mouseover', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'pointer';
+                    }
+		});
+
+		container.on('mouseout', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'default';
+                    }
+		});
+	    };
 
 	    // Clear Box Confirm Button
             confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
 	    confirmContainer.visible = false;
-
-	    confirmContainer.on('click', function (event) {
-		_afterDelete();
-	    });
-
-            confirmContainer.on('mouseover', function (event) {
-                if (!loading) {
-                    document.body.style.cursor = 'pointer';
-                }
-            });
-
-            confirmContainer.on('mouseout', function (event) {
-                if (!loading) {
-                    document.body.style.cursor = 'default';
-                }
-            });
+	    __addEventHandlers(confirmContainer, _afterDelete);
 
 	    // Settings Box Buttons: Mode, Language, Smaller, Larger
 	    // FIXME: Add advanced mode buttons
 	    beginnerModeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
 	    beginnerModeContainer.visible = false;
-
-	    beginnerModeContainer.on('click', function (event) {
-		doSwitchMode();
-	    });
-
-	    beginnerModeContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    beginnerModeContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(beginnerModeContainer, doSwitchMode);
 
 	    advancedModeContainer = _makeButton('advanced-button', _('Switch to beginner mode'), x, y, cellsize, 0);
 	    
 	    advancedModeContainer.visible = false;
-
-	    advancedModeContainer.on('click', function (event) {
-		doSwitchMode();
-	    });
-
-	    advancedModeContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    advancedModeContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(advancedModeContainer, doSwitchMode);
 
 	    languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
 	    languageContainer.visible = false;
-
-	    languageContainer.on('click', function (event) {
-		doLanguageBox();
-	    });
-
-	    languageContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    languageContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(languageContainer, doLanguageBox);
 
 	    smallerContainer = _makeButton('smaller-button', _('Decrease block size'), x, y, cellsize, 0);
 	    smallerContainer.visible = false;
-
-	    smallerContainer.on('click', function (event) {
-		doSmallerBlocks();
-	    });
-
-	    smallerContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    smallerContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(smallerContainer, doSmallerBlocks);
 
 	    largerContainer = _makeButton('bigger-button', _('Increase block size'), x, y, cellsize, 0);
 	    largerContainer.visible = false;
-
-	    largerContainer.on('click', function (event) {
-		doLargerBlocks();
-	    });
-
-	    largerContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    largerContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(largerContainer, doLargerBlocks);
 
 	    smallerOffContainer = _makeButton('smaller-disable-button', _('Cannot be further decreased'), x, y, cellsize, 0);
 	    smallerOffContainer.visible = false;
 
-	    smallerOffContainer.on('click', function (event) {
-		doSmallerBlocks();
-	    });
-
-	    smallerOffContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    smallerOffContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
-
 	    largerOffContainer = _makeButton('bigger-disable-button', _('Cannot be further increased'), x, y, cellsize, 0);
 	    largerOffContainer.visible = false;
-
-	    largerOffContainer.on('click', function (event) {
-		doLargerBlocks();
-	    });
-
-	    largerOffContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    largerOffContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
 
 	    // ALways create these buttons (but not use them in beginner mode)
 	    statsContainer = _makeButton('stats-button', _('Display statistics'), x, y, cellsize, 0);
 	    statsContainer.visible = false;
-
-	    statsContainer.on('click', function (event) {
-		doAnalytics();
-	    });
-
-	    statsContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    statsContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(statsContainer, doAnalytics);
 
 	    pluginsContainer = _makeButton('plugins-button', _('Load plugin from file'), x, y, cellsize, 0);
 	    pluginsContainer.visible = false;
-
-	    pluginsContainer.on('click', function (event) {
-		doOpenPlugin();
-	    });
-
-	    pluginsContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    pluginsContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(pluginsContainer, doOpenPlugin);
 
 	    deletePluginContainer = _makeButton('plugins-delete-button', _('Delete plugin'), x, y, cellsize, 0);
 	    deletePluginContainer.visible = false;
-
-	    deletePluginContainer.on('click', function (event) {
-		deletePlugin();
-	    });
-
-	    deletePluginContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    deletePluginContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(deletePluginContainer, deletePlugin);
 
 	    scrollOnContainer = _makeButton('scroll-unlock-button', _('Enable horizontal scrolling'), x, y, cellsize, 0);
 	    scrollOnContainer.visible = false;
-
-	    scrollOnContainer.on('click', function (event) {
-		setScroller(true);
-	    });
-
-	    scrollOnContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    scrollOnContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(scrollOnContainer, setScroller, true);
 
 	    scrollOffContainer = _makeButton('scroll-lock-button', _('Disable horizontal scrolling'), x, y, cellsize, 0);
 	    scrollOffContainer.visible = false;
-
-	    scrollOffContainer.on('click', function (event) {
-		setScroller(false);
-	    });
-
-	    scrollOffContainer.on('mouseover', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'pointer';
-                }
-	    });
-
-	    scrollOffContainer.on('mouseout', function (event) {
-                if (!loading) {
-		    document.body.style.cursor = 'default';
-                }
-	    });
+	    __addEventHandlers(scrollOffContainer, setScroller, false);
 
         };
 
@@ -4537,6 +4374,7 @@ handleComplete);
                     text.textAlign = 'center';
                     text.x = 0;
                 }
+
                 text.y = 30;
             // } else {
             //     text.textAlign = 'right';
