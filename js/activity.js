@@ -382,14 +382,16 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _findBlocks() {
+	    var leftpos = Math.floor(canvas.width / 4);
+	    var toppos = 90;
             blocks.activeBlock = null;
             hideDOMLabel();
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
             palettes.updatePalettes();
-            var x = Math.floor(155 * turtleBlocksScale);
-            var y = Math.floor(55 * turtleBlocksScale);
+            var x = Math.floor(leftpos * turtleBlocksScale);
+            var y = Math.floor(toppos * turtleBlocksScale);
             var even = true;
 
             // First start blocks
@@ -415,15 +417,15 @@ define(MYDEFINES, function (compatibility) {
                         }
 
                         x += Math.floor(150 * turtleBlocksScale);
-                        if (x > (canvas.width - 200) / (turtleBlocksScale)) {
+                        if (x > (canvas.width * 7 / 8) / (turtleBlocksScale)) {
                             even = !even;
                             if (even) {
-                                x = Math.floor(155 * turtleBlocksScale);
+                                x = Math.floor(leftpos);
                             } else {
-                                x = Math.floor(182 * turtleBlocksScale);
+                                x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
                             }
 
-                            y += Math.floor(42 * turtleBlocksScale);
+                            y += STANDARDBLOCKHEIGHT;
                         }
                     }
                 }
@@ -451,15 +453,15 @@ define(MYDEFINES, function (compatibility) {
                             }
                         }
                         x += 150 * turtleBlocksScale;
-                        if (x > (canvas.width - 200) / (turtleBlocksScale)) {
+                        if (x > (canvas.width * 7 / 8) / (turtleBlocksScale)) {
                             even = !even;
                             if (even) {
-                                x = 100 * turtleBlocksScale;
+                                x = Math.floor(leftpos);
                             } else {
-                                x = 150 * turtleBlocksScale;
+                                x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
                             }
 
-                            y += 50 * turtleBlocksScale;
+                            y += STANDARDBLOCKHEIGHT;
                         }
                     }
                 }
