@@ -4772,8 +4772,8 @@ handleComplete);
                     clearTimeout(lockTimer);
 
                     hideButtonHighlight(circles, stage);
-                    container.x = ox;
-                    container.y = oy;
+                    // container.x = ox;
+                    // container.y = oy;
 
                     if (longImg !== null || extraLongImg !== null) {
                         container.visible = false;
@@ -4854,7 +4854,6 @@ handleComplete);
         function _showHideAuxMenu (resize) {
             var cellsize = 55;
             if (!resize && headerContainer.y === 0) {
-		console.log('FOO');
                 dy = cellsize * 1.5;
                 headerContainer.y = dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
@@ -4864,14 +4863,12 @@ handleComplete);
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = cellsize / 2;
 		    onscreenMenu[i].visible = true;
-		    console.log('setting ' + i + ' to visible');
                 }
 
                 palettes.deltaY(dy);
                 turtles.deltaY(dy);
                 blocksContainer.y += dy;
             } else {
-		console.log('BAR');
                 var dy = headerContainer.y;
                 headerContainer.y = 0;
                 for (var i = 0; i < onscreenButtons.length; i++) {
@@ -4880,7 +4877,6 @@ handleComplete);
 
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = -cellsize;
-		    console.log('setting ' + i + ' to invisible');
 		    onscreenMenu[i].visible = false;
                 }
 
