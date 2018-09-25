@@ -260,6 +260,11 @@ define(MYDEFINES, function (compatibility) {
 	var largerContainer = null;
 	var smallerOffContainer = null;
 	var largerOffContainer = null;
+	var pluginsContainer = null;
+	var deletePluginContainer = null;
+	var statusContainer = null;
+	var scrollOnContainer = null;
+	var scrollOffContainer = null;
 	var confirmOntainer = null;	
 
         var searchWidget = docById('search');
@@ -913,10 +918,23 @@ define(MYDEFINES, function (compatibility) {
             update = true;
         };
 
-        function toggleScroller() {
+        function setScroller(state) {
             blocks.activeBlock = null;
-            scrollBlockContainer = !scrollBlockContainer;
+            scrollBlockContainer = state;
+	    setScrollerButton();
         };
+
+        function setScrollerButton() {
+	    if (scrollBlockContainer) {
+		scrollOffContainer.visible = true;
+		scrollOnContainer.visible = false;
+	    } else {
+		scrollOffContainer.visible = false;
+		scrollOnContainer.visible = true;
+	    }
+
+	    refreshCanvas();
+	};
 
         function closeAnalytics(chartBitmap, ctx) {
             blocks.activeBlock = null;
@@ -942,6 +960,21 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doAnalytics() {
+	    beginnerModeContainer.visible = false;
+	    advancedModeContainer.visible = false;
+	    languageContainer.visible = false;
+	    smallerContainer.visible = false;
+	    largerContainer.visible = false;
+	    smallerOffContainer.visible = false;
+	    largerOffContainer.visible = false;
+	    pluginsContainer.visible = false;
+	    deletePluginContainer.visible = false;
+	    statsContainer.visible = false;
+	    scrollOnContainer.visible = false;
+	    scrollOffContainer.visible = false;
+	    deltaY(-85);
+	    _showHideAuxMenu();
+
             blocks.activeBlock = null;
             var myChart = docById('myChart');
 
@@ -1036,7 +1069,9 @@ define(MYDEFINES, function (compatibility) {
 
         function deletePlugin() {
             blocks.activeBlock = null;
-            palettes.paletteObject._promptPaletteDelete();
+	    if (palettes.paletteObject !== null) {
+		palettes.paletteObject._promptPaletteDelete();
+	    }
         };
 
         function getPlaybackQueueStatus () {
@@ -1271,10 +1306,10 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 // .setLarger(doLargerFont)
                 // .setSmaller(doSmallerFont)
-                .setPlugins(doOpenPlugin)
-                .deletePlugins(deletePlugin)
-                .setStats(doAnalytics)
-                .setScroller(toggleScroller)
+                // .setPlugins(doOpenPlugin)
+                // .deletePlugins(deletePlugin)
+                // .setStats(doAnalytics)
+                // .setScroller(setScroller)
                 // .setLanguage(doLanguageBox, languageBox)
                 // .setSwitchMode(doSwitchMode)
                 .setOptimize(doOptimize);
@@ -3041,6 +3076,11 @@ define(MYDEFINES, function (compatibility) {
 	    largerContainer.visible = false;
 	    smallerOffContainer.visible = false;
 	    largerOffContainer.visible = false;
+	    pluginsContainer.visible = false;
+	    deletePluginContainer.visible = false;
+	    statsContainer.visible = false;
+	    scrollOnContainer.visible = false;
+	    scrollOffContainer.visible = false;
 	    deltaY(-85);
         };
 
@@ -3053,6 +3093,12 @@ define(MYDEFINES, function (compatibility) {
 		largerContainer.visible = true;
                 if (beginnerMode) {
 		    beginnerModeContainer.visible = true;
+		    pluginsContainer.visible = false;
+		    deletePluginContainer.visible = false;
+		    statsContainer.visible = false;
+		    scrollOnContainer.visible = false;
+		    scrollOffContainer.visible = false;
+
 		    beginnerModeContainer.x = 55 * 4;
 		    advancedModeContainer.x = 55 * 4;
 		    languageContainer.x = 55 * 5;
@@ -3062,13 +3108,23 @@ define(MYDEFINES, function (compatibility) {
 		    largerOffContainer.x = 55 * 7;
 		} else {
 		    advancedModeContainer.visible = true;
-		    beginnerModeContainer.x = 55 * 6 + 27.5;
-		    advancedModeContainer.x = 55 * 6 + 27.5;
-		    languageContainer.x = 55 * 7 + 27.5;
-		    smallerContainer.x = 55 * 8 + 27.5;
-		    largerContainer.x = 55 * 9 + 27.5;
-		    smallerOffContainer.x = 55 * 8 + 27.5;
-		    largerOffContainer.x = 55 * 9 + 27.5;
+		    pluginsContainer.visible = true;
+		    deletePluginContainer.visible = true;
+		    statsContainer.visible = true;
+		    setScrollerButton();
+
+		    beginnerModeContainer.x = 55 * 1 + 27.5;
+		    advancedModeContainer.x = 55 * 1 + 27.5;
+		    languageContainer.x = 55 * 2 + 27.5;
+		    smallerContainer.x = 55 * 3 + 27.5;
+		    largerContainer.x = 55 * 4 + 27.5;
+		    smallerOffContainer.x = 55 * 3 + 27.5;
+		    largerOffContainer.x = 55 * 4 + 27.5;
+		    pluginsContainer.x = 55 * 5 + 27.5;
+		    deletePluginContainer.x = 55 * 6 + 27.5;
+		    statsContainer.x = 55 * 7 + 27.5;
+		    scrollOnContainer.x = 55 * 8 + 27.5;
+		    scrollOffContainer.x = 55 * 8 + 27.5;
 		}
 
 		setSmallerLargerStatus();
@@ -3080,6 +3136,11 @@ define(MYDEFINES, function (compatibility) {
 		largerContainer.y = 27.5;
 		smallerOffContainer.y = 27.5;
 		largerOffContainer.y = 27.5;
+		pluginsContainer.y = 27.5;
+		deletePluginContainer.y = 27.5;
+		statsContainer.y = 27.5;
+		scrollOnContainer.y = 27.5;
+		scrollOffContainer.y = 27.5;
 		deltaY(85);
 	    } else {
 		// Hide everything
@@ -3090,6 +3151,11 @@ define(MYDEFINES, function (compatibility) {
 		largerContainer.visible = false;
 		smallerOffContainer.visible = false;
 		largerOffContainer.visible = false;
+		pluginsContainer.visible = false;
+		deletePluginContainer.visible = false;
+		statsContainer.visible = false;
+		scrollOnContainer.visible = false;
+		scrollOffContainer.visible = false;
 		// Move it down since we are about to move it up.
 		utilityContainer.y = 110;
 		deltaY(-85);
@@ -4135,7 +4201,104 @@ handleComplete);
 		    document.body.style.cursor = 'default';
                 }
 	    });
-	};
+
+	    // ALways create these buttons (but not use them in beginner mode)
+	    statsContainer = _makeButton('stats-button', _('Display statistics'), x, y, cellsize, 0);
+	    statsContainer.visible = false;
+
+	    statsContainer.on('click', function (event) {
+		doAnalytics();
+	    });
+
+	    statsContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
+
+	    statsContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
+
+	    pluginsContainer = _makeButton('plugins-button', _('Load plugin from file'), x, y, cellsize, 0);
+	    pluginsContainer.visible = false;
+
+	    pluginsContainer.on('click', function (event) {
+		doOpenPlugin();
+	    });
+
+	    pluginsContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
+
+	    pluginsContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
+
+	    deletePluginContainer = _makeButton('plugins-delete-button', _('Delete plugin'), x, y, cellsize, 0);
+	    deletePluginContainer.visible = false;
+
+	    deletePluginContainer.on('click', function (event) {
+		deletePlugin();
+	    });
+
+	    deletePluginContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
+
+	    deletePluginContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
+
+	    scrollOnContainer = _makeButton('scroll-unlock-button', _('Enable horizontal scrolling'), x, y, cellsize, 0);
+	    scrollOnContainer.visible = false;
+
+	    scrollOnContainer.on('click', function (event) {
+		setScroller(true);
+	    });
+
+	    scrollOnContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
+
+	    scrollOnContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
+
+	    scrollOffContainer = _makeButton('scroll-lock-button', _('Disable horizontal scrolling'), x, y, cellsize, 0);
+	    scrollOffContainer.visible = false;
+
+	    scrollOffContainer.on('click', function (event) {
+		setScroller(false);
+	    });
+
+	    scrollOffContainer.on('mouseover', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'pointer';
+                }
+	    });
+
+	    scrollOffContainer.on('mouseout', function (event) {
+                if (!loading) {
+		    document.body.style.cursor = 'default';
+                }
+	    });
+
+        };
 
         function _setupAuxMenu(turtleBlocksScale) {
             if (menuContainer !== undefined) {
@@ -4646,7 +4809,11 @@ handleComplete);
 	    largerContainer.visible = false;
 	    smallerOffContainer.visible = false;
 	    largerOffContainer.visible = false;
-
+	    statsContainer.visible = false;
+	    pluginsContainer.visible = false;
+	    deletePluginContainer.visible = false;
+	    scrollOnContainer.visible = false;
+	    scrollOffContainer.visible = false;
             refreshCanvas();
         };
 
