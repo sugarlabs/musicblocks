@@ -1094,7 +1094,7 @@ function Palette(palettes, name) {
             // close button.
             var hitArea = new createjs.Shape();
             hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth * 1 / 4, STANDARDBLOCKHEIGHT);
-            hitArea.x = paletteWidth - STANDARDBLOCKHEIGHT; // * 2 / 3;
+            hitArea.x = paletteWidth - STANDARDBLOCKHEIGHT;
             hitArea.y = 0;
             that.menuContainer.hitArea = hitArea;
             that.menuContainer.visible = false;
@@ -1118,7 +1118,6 @@ function Palette(palettes, name) {
             that.upButton.on('click', function (event) {
                 that.scrollEvent(STANDARDBLOCKHEIGHT, 10);
             });
-
         };
 
         function __processDownIcon(palette, name, bitmap, args) {
