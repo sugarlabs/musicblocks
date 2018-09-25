@@ -317,6 +317,7 @@ function Logo () {
 
     // Things we tweak to optimize performance
     this.blinkState = !this.optimize;
+    this.blinkState = true;
     if (this.optimize) {
 	createjs.Ticker.framerate = 10;
     } else {
@@ -371,6 +372,7 @@ function Logo () {
         }
 
         this.blinkState = !state;
+        this.blinkState = true;
     };
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {

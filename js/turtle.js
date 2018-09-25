@@ -1079,7 +1079,12 @@ function Turtle (name, turtles, drum) {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
-
+            //
+            this.container.visible = true;
+            this.turtles.refreshCanvas();
+            this.blinkFinished = true;
+            return;
+            //
             this.bitmap.alpha = 1.0;
             this.bitmap.scaleX = this._sizeInUse;
             this.bitmap.scaleY = this.bitmap.scaleX;
@@ -1098,6 +1103,23 @@ function Turtle (name, turtles, drum) {
         var that = this;
         this._sizeInUse = that.bitmap.scaleX;
         this._blinkTimeout = null;
+
+        //
+	if (duration > 16) {
+	    return;
+	}
+
+	this.stopBlink();
+
+        this.container.visible = false;
+	this._blinkTimeout = setTimeout(function () {
+            that.container.visible = true;
+            that.turtles.refreshCanvas();
+	}, 100);
+        this.turtles.refreshCanvas();
+
+	return;
+        //
 
         if (this.beforeBlinkSize == null) {
             this.beforeBlinkSize = that.bitmap.scaleX;
