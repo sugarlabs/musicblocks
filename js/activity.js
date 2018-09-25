@@ -4053,7 +4053,6 @@ handleComplete);
 	    // Each box menu is positioned above the Aux menus
 	    var cellsize = 55;
             var y = Math.floor(-3 * cellsize / 2);
-	    var x = 110;
 
 	    var __addEventHandlers = function(container, action, arg) {
 
@@ -4080,13 +4079,9 @@ handleComplete);
 		});
 	    };
 
-	    // Clear Box Confirm Button
-            confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
-	    confirmContainer.visible = false;
-	    __addEventHandlers(confirmContainer, _afterDelete);
-
 	    // Settings Box Buttons: Mode, Language, Smaller, Larger
-	    // FIXME: Add advanced mode buttons
+	    // Force left-aligned labels
+	    var x = 27.5;
 	    beginnerModeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
 	    beginnerModeContainer.visible = false;
 	    __addEventHandlers(beginnerModeContainer, doSwitchMode);
@@ -4096,6 +4091,8 @@ handleComplete);
 	    advancedModeContainer.visible = false;
 	    __addEventHandlers(advancedModeContainer, doSwitchMode);
 
+	    // Force center-aligned labels
+	    var x = 110;
 	    languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
 	    languageContainer.visible = false;
 	    __addEventHandlers(languageContainer, doLanguageBox);
@@ -4134,6 +4131,11 @@ handleComplete);
 	    scrollOffContainer = _makeButton('scroll-lock-button', _('Disable horizontal scrolling'), x, y, cellsize, 0);
 	    scrollOffContainer.visible = false;
 	    __addEventHandlers(scrollOffContainer, setScroller, false);
+
+	    // Clear Box Confirm Button
+            confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
+	    confirmContainer.visible = false;
+	    __addEventHandlers(confirmContainer, _afterDelete);
 
         };
 
