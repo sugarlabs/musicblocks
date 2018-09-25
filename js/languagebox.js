@@ -80,7 +80,11 @@ function LanguageBox () {
             myDiv.style.display = 'none';
             myDiv.style.visibility = 'hidden';
 	    if (language in MSG) {
-		this._message(MSG[language]);
+		if (language === 'ja' && localStorage.kanaPreference === 'kana') {
+		    this._message(MSG['kana']);
+		} else {
+		    this._message(MSG[language]);
+		}
 	    } else {
 		this._message('default');
 	    }
