@@ -62,7 +62,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
                 } else {
-                    beginnerMode = truee;
+                    beginnerMode = true;
                 }
             }
         } else {
@@ -3898,7 +3898,7 @@ handleComplete);
 	    var cellsize = 55;
             var y = Math.floor(-3 * cellsize / 2);
 	    var x = 200;
-            confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
+            confirmContainer = _makeButton('empty-trash-button', _('confirm'), x, y, cellsize, 0);
 	    confirmContainer.visible = false;
 
 	    confirmContainer.on('click', function (event) {
