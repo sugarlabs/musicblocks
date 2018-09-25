@@ -140,7 +140,7 @@ var MYDEFINES = [
     'activity/SaveInterface',
     'utils/musicutils',
     'utils/synthutils',
-    'activity/playbackbox',
+    // 'activity/playbackbox',
     'activity/pastebox',
     'prefixfree.min'
 ];
@@ -230,7 +230,7 @@ define(MYDEFINES, function (compatibility) {
         var pasteBox;
         var utilityBox;
         var languageBox = null;
-        var playbackBox = null;
+        // var playbackBox = null;
         var planet;
         window.converter;
         var storage;
@@ -248,7 +248,7 @@ define(MYDEFINES, function (compatibility) {
         var gridButtonLabel = null;
         var gridImages = [];
         var chartBitmap = null;
-        var saveBox;
+        // var saveBox;
         var merging = false;
         var loading = false;
         // For auxillary menus
@@ -266,12 +266,12 @@ define(MYDEFINES, function (compatibility) {
 	var scrollOnContainer = null;
 	var scrollOffContainer = null;
 	var confirmOntainer = null;	
+        var saveContainer = null;
         var saveHTMLContainer = null;
         var saveSVGContainer = null;
 	var savePNGContainer = null;
         var saveWAVContainer = null;
-        var uploadOnContainer = null;
-	var uploadOffContainer = null;
+        var uploadContainer = null;
 	var saveLilypondContainer = null;
 	var saveABCContainer = null;
 	var saveArtworkContainer = null;
@@ -367,10 +367,10 @@ define(MYDEFINES, function (compatibility) {
 
         var onscreenButtons = [];
         var onscreenMenu = [];
-        var utilityButton = null;
-        var playbackButton = null;
-        var saveButton = null;
-        var deleteAllButton = null;
+        // var utilityButton = null;
+        // var playbackButton = null;
+        // var saveButton = null;
+        // var deleteAllButton = null;
 
         var firstRun = true;
 
@@ -887,10 +887,10 @@ define(MYDEFINES, function (compatibility) {
 
             pasteBox.hide();
             // clearBox.hide();
-            saveBox.hide();
+            // saveBox.hide();
             languageBox.hide();
-            utilityBox.hide();
-            playbackBox.hide();
+            // utilityBox.hide();
+            // playbackBox.hide();
         };
 
         function _doCartesianPolar() {
@@ -1088,17 +1088,17 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function setPlaybackStatus () {
-            if (playbackBox != null) {
-                playbackBox.setPlaybackStatus();
-            }
+            // if (playbackBox != null) {
+            //     playbackBox.setPlaybackStatus();
+            // }
         };
 
         function doPausePlayback () {
             blocks.activeBlock = null;
             logo.restartPlayback = false;
             logo.playback(-1);
-            playbackBox.playButton.visible = true;
-            playbackBox.pauseButton.visible = false;
+            // playbackBox.playButton.visible = true;
+            // playbackBox.pauseButton.visible = false;
         };
 
         function doPlayback() {
@@ -1107,10 +1107,10 @@ define(MYDEFINES, function (compatibility) {
             progressBar.style.left = (playbackBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
             progressBar.style.top = (playbackBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
             logo.playback(-1);
-            playbackBox.playButton.visible = false;
-            playbackBox.pauseButton.visible = true;
-            playbackBox.norewindButton.visible = false;
-            playbackBox.rewindButton.visible = true;
+            // playbackBox.playButton.visible = false;
+            // playbackBox.pauseButton.visible = true;
+            // playbackBox.norewindButton.visible = false;
+            // playbackBox.rewindButton.visible = true;
         };
 
         function doRestartPlayback() {
@@ -1118,6 +1118,7 @@ define(MYDEFINES, function (compatibility) {
             logo.doStopTurtle();
             logo.restartPlayback = true;
             
+            /*
             setTimeout(function () {
                 // logo.playback(-1);
                 playbackBox.playButton.visible = true;
@@ -1125,6 +1126,7 @@ define(MYDEFINES, function (compatibility) {
                 playbackBox.norewindButton.visible = true;
                 playbackBox.rewindButton.visible = false;
             }, 500);
+            */
         };
 
         function doCompile() {
@@ -1308,6 +1310,7 @@ define(MYDEFINES, function (compatibility) {
                 .setMessage(errorMsg)
                 .setRefreshCanvas(refreshCanvas);
 
+            /*
             utilityBox = new UtilityBox();
             console.log(utilityBox);
             utilityBox
@@ -1322,7 +1325,8 @@ define(MYDEFINES, function (compatibility) {
                 // .setLanguage(doLanguageBox, languageBox)
                 // .setSwitchMode(doSwitchMode)
                 .setOptimize(doOptimize);
-
+            */
+            /*
             playbackBox = new PlaybackBox();
             playbackBox
                 .setStage(stage)
@@ -1332,8 +1336,10 @@ define(MYDEFINES, function (compatibility) {
                 .setCompile(doCompile)
                 .setPause(doPausePlayback)
                 .setRewind(doRestartPlayback);
+            */
 
             playbackOnLoad = function() {
+		/*
                 if (_THIS_IS_TURTLE_BLOCKS_) {
                     // Play playback queue if there is one.
                     for (turtle in logo.playbackQueue) {
@@ -1345,6 +1351,7 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }
                 }
+		*/
             };
 
             function PlanetInterface(storage) {
@@ -1523,7 +1530,7 @@ define(MYDEFINES, function (compatibility) {
                     }
 
                     var __afterLoad = function () {
-                        playbackOnLoad();
+                        // playbackOnLoad();
                         document.removeEventListener('finishedLoading', __afterLoad);
                     };
 
@@ -1717,6 +1724,7 @@ define(MYDEFINES, function (compatibility) {
             window.saveLocally = saveLocally;
             logo.setSaveLocally(saveLocally);
 
+	    /*
             saveBox = new SaveBox();
             if (planet) {
                 var planetItem = ['_doSavePlanet', doUploadToPlanet];
@@ -1746,6 +1754,7 @@ define(MYDEFINES, function (compatibility) {
                     ['_doShareOnFacebook', doShareOnFacebook]
                 ]);
             }
+            */
 
             var __clearFunction = function () {
                 sendAllToTrash(true, false);
@@ -1895,7 +1904,7 @@ define(MYDEFINES, function (compatibility) {
                                 stage.removeAllEventListeners('trashsignal');
 
                                 var __afterLoad = function () {
-                                    playbackOnLoad();
+                                    // playbackOnLoad();
                                     document.removeEventListener('finishedLoading', __afterLoad);
                                 };
 
@@ -2603,7 +2612,7 @@ define(MYDEFINES, function (compatibility) {
                     _allClear();
                     break;
                 case 80: // 'P'
-                    logo.playback(-1);
+                    // logo.playback(-1);
                     break;
                 case 82: // 'R'
                     _doFastButton();
@@ -2871,7 +2880,7 @@ define(MYDEFINES, function (compatibility) {
               turtleBlocksScale = 0.5;
            } else if (turtleBlocksScale < 1) {
               turtleBlocksScale = 1;
-           } else if (turtleBlocksScale < 1,5) {
+           } else if (turtleBlocksScale < 1.5) {
               turtleBlocksScale = 1.5;
            } else {
               turtleBlocksScale = 2;
@@ -3172,8 +3181,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doPlaybackBox() {
-            _hideBoxes();
-            playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
+            // _hideBoxes();
+            // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
         };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
@@ -3309,8 +3318,63 @@ define(MYDEFINES, function (compatibility) {
             if (beginnerMode) {
                 save.saveHTML(_('My Project'));
             } else {
-                _hideBoxes();
-                saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+                // _hideBoxes();
+                // saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+		if (!saveHTMLContainer.visible) {
+		    saveHTMLContainer.visible = true;
+		    uploadContainer.visible = true;
+		    saveSVGContainer.visible = true;
+		    savePNGContainer.visible = true;
+		    saveArtworkContainer.visible = true;
+		    if (_THIS_IS_MUSIC_BLOCKS_) {
+			saveWAVContainer.visible = true;
+			saveLilypondContainer.visible = true;
+			saveABCContainer.visible = true;
+
+			saveHTMLContainer.x = 55 * 0 + 27.5;
+			uploadContainer.x = 55 * 1 + 27.5;
+			saveSVGContainer.x = 55 * 2 + 27.5;
+			savePNGContainer.x = 55 * 3 + 27.5;
+			saveWAVContainer.x = 55 * 4 + 27.5;
+			saveLilypondContainer.x = 55 * 5 + 27.5;
+			saveABCContainer.x = 55 * 6 + 27.5;
+			saveArtworkContainer.x = 55 * 7 + 27.5;
+		    } else {
+			saveHTMLContainer.x = 55 * 2 + 27.5;
+			uploadContainer.x = 55 * 3 + 27.5;
+			saveSVGContainer.x = 55 * 4 + 27.5;
+			savePNGContainer.x = 55 * 5 + 27.5;
+			saveArtworkContainer.x = 55 * 6 + 27.5;
+		    }
+
+		    saveHTMLContainer.y = 27.5;
+		    uploadContainer.y = 27.5;
+		    saveSVGContainer.y = 27.5;
+		    savePNGContainer.y = 27.5;
+		    saveArtworkContainer.y = 27.5;
+		    if (_THIS_IS_MUSIC_BLOCKS_) {
+			saveWAVContainer.y = 27.5;
+			saveLilypondContainer.y = 27.5;
+			saveABCContainer.y = 27.5;
+		    }
+
+		    deltaY(85);
+		} else {
+		    saveHTMLContainer.visible = false;
+		    uploadContainer.visible = false;
+		    saveSVGContainer.visible = false;
+		    savePNGContainer.visible = false;
+		    saveArtworkContainer.visible = false;
+		    if (_THIS_IS_MUSIC_BLOCKS_) {
+			saveWAVContainer.visible = false;
+			saveLilypondContainer.visible = false;
+			saveABCContainer.visible = false;
+		    }
+
+		    // Move it down since we are about to move it up.
+		    saveContainer.y = 110;
+		    deltaY(-85);
+		}
             }
         };
 
@@ -3479,7 +3543,7 @@ define(MYDEFINES, function (compatibility) {
                             turtles.turtleList[turtle].doClear(true, true, false);
                         }
 
-                        playbackOnLoad();
+                        // playbackOnLoad();
                     }, 1000);
                 }
 
@@ -4079,6 +4143,50 @@ handleComplete);
 		});
 	    };
 
+	    // Advanced Save Box Buttons: HTML, SVG, etc.
+	    // Force left-aligned labels
+	    var x = 27.5;
+	    saveHTMLContainer = _makeButton('save-button-dark', _('Save project'), x, y, cellsize, 0);
+	    saveHTMLContainer.visible = false;
+	    __addEventHandlers(saveHTMLContainer, save.saveHTML.bind(save));
+
+            if (planet) {
+		uploadContainer = _makeButton('upload-planet', _('Share project'), x, y, cellsize, 0);
+		uploadContainer.visible = false;
+		__addEventHandlers(uploadContainer, doUploadToPlanet);
+	    } else {
+		uploadContainer = _makeButton('planet-disabled-button', _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
+		uploadContainer.visible = false;
+	    }
+
+	    // Force center-aligned labels
+	    var x = 110;
+	    saveSVGContainer = _makeButton('save-svg', _('Save as .svg'), x, y, cellsize, 0);
+	    saveSVGContainer.visible = false;
+	    __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
+
+	    savePNGContainer = _makeButton('save-png', _('Save as .png'), x, y, cellsize, 0);
+	    savePNGContainer.visible = false;
+	    __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
+
+	    if (_THIS_IS_MUSIC_BLOCKS_) {
+		saveWAVContainer = _makeButton('save-wav', _('Save as .wav'), x, y, cellsize, 0);
+		saveWAVContainer.visible = false;
+		__addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
+
+		saveLilypondContainer = _makeButton('save-lilypond', _('Save sheet music'), x, y, cellsize, 0);
+		saveLilypondContainer.visible = false;
+		__addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
+
+		saveABCContainer = _makeButton('save-abc', _('Save as .abc'), x, y, cellsize, 0);
+		saveABCContainer.visible = false;
+		__addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
+	    }
+
+	    saveArtworkContainer = _makeButton('save-block-artwork', _('Save block artwork'), x, y, cellsize, 0);
+	    saveArtworkContainer.visible = false;
+	    __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
+
 	    // Settings Box Buttons: Mode, Language, Smaller, Larger
 	    // Force left-aligned labels
 	    var x = 27.5;
@@ -4238,10 +4346,15 @@ handleComplete);
                     }
                 } else if (menuNames[i][0] === 'utility') {
 		    utilityContainer = container;
+                } else if (menuNames[i][0] === 'save' && !beginnerMode) {
+		    saveContainer = container;
 		}
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
                 onscreenMenu.push(container);
+
+		// Don't think we need these any more...
+                /*
                 if (menuNames[i][0] === 'utility') {
                     utilityButton = container;
                 } else if (menuNames[i][0] === 'save') {
@@ -4251,7 +4364,7 @@ handleComplete);
                 } else if (menuNames[i][0] === 'new') {
                     deleteAllButton = container;
                 }
-
+                */
                 container.visible = false;
             }
 
@@ -4654,6 +4767,17 @@ handleComplete);
 	    deletePluginContainer.visible = false;
 	    scrollOnContainer.visible = false;
 	    scrollOffContainer.visible = false;
+	    saveHTMLContainer.visible = false;
+	    uploadContainer.visible = false;
+	    saveSVGContainer.visible = false;
+	    savePNGContainer.visible = false;
+	    saveArtworkContainer.visible = false;
+	    if (_THIS_IS_MUSIC_BLOCKS_) {
+		saveWAVContainer.visible = false;
+		saveLilypondContainer.visible = false;
+		saveABCContainer.visible = false;
+	    }
+
             refreshCanvas();
         };
 
