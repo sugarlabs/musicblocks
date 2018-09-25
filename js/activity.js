@@ -236,6 +236,7 @@ define(MYDEFINES, function (compatibility) {
         var storage;
         var buttonsVisible = true;
         var headerContainer = null;
+        var swiping = false;
         var menuButtonsVisible = false;
         var menuContainer = null;
         var scrollBlockContainer = false;
@@ -252,29 +253,29 @@ define(MYDEFINES, function (compatibility) {
         var merging = false;
         var loading = false;
         // For auxillary menus
-	var utilityContainer = null;
-	var beginnerModeContainer = null;
-	var advancedModeContainer = null;
-	var languageContainer = null;
-	var smallerContainer = null;
-	var largerContainer = null;
-	var smallerOffContainer = null;
-	var largerOffContainer = null;
-	var pluginsContainer = null;
-	var deletePluginContainer = null;
-	var statusContainer = null;
-	var scrollOnContainer = null;
-	var scrollOffContainer = null;
-	var confirmOntainer = null;	
+        var utilityContainer = null;
+        var beginnerModeContainer = null;
+        var advancedModeContainer = null;
+        var languageContainer = null;
+        var smallerContainer = null;
+        var largerContainer = null;
+        var smallerOffContainer = null;
+        var largerOffContainer = null;
+        var pluginsContainer = null;
+        var deletePluginContainer = null;
+        var statusContainer = null;
+        var scrollOnContainer = null;
+        var scrollOffContainer = null;
+        var confirmOntainer = null;        
         var saveContainer = null;
         var saveHTMLContainer = null;
         var saveSVGContainer = null;
-	var savePNGContainer = null;
+        var savePNGContainer = null;
         var saveWAVContainer = null;
         var uploadContainer = null;
-	var saveLilypondContainer = null;
-	var saveABCContainer = null;
-	var saveArtworkContainer = null;
+        var saveLilypondContainer = null;
+        var saveABCContainer = null;
+        var saveArtworkContainer = null;
 
         var searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
@@ -860,16 +861,16 @@ define(MYDEFINES, function (compatibility) {
             if (beginnerMode) {
                 textMsg(_('Refresh your browser to change to advanced mode.'));
                 localStorage.setItem('beginnerMode', false);
-		beginnerModeContainer.visible = false;
-		advancedModeContainer.visible = true;
+                beginnerModeContainer.visible = false;
+                advancedModeContainer.visible = true;
             } else {
                 textMsg(_('Refresh your browser to change to beginner mode.'));
                 localStorage.setItem('beginnerMode', true);
-		beginnerModeContainer.visible = true;
-		advancedModeContainer.visible = false;
+                beginnerModeContainer.visible = true;
+                advancedModeContainer.visible = false;
             }
 
-	    refreshCanvas();
+            refreshCanvas();
         };
 
         function doStopButton() {
@@ -930,20 +931,20 @@ define(MYDEFINES, function (compatibility) {
         function setScroller(state) {
             blocks.activeBlock = null;
             scrollBlockContainer = state;
-	    setScrollerButton();
+            setScrollerButton();
         };
 
         function setScrollerButton() {
-	    if (scrollBlockContainer) {
-		scrollOffContainer.visible = true;
-		scrollOnContainer.visible = false;
-	    } else {
-		scrollOffContainer.visible = false;
-		scrollOnContainer.visible = true;
-	    }
+            if (scrollBlockContainer) {
+                scrollOffContainer.visible = true;
+                scrollOnContainer.visible = false;
+            } else {
+                scrollOffContainer.visible = false;
+                scrollOnContainer.visible = true;
+            }
 
-	    refreshCanvas();
-	};
+            refreshCanvas();
+        };
 
         function closeAnalytics(chartBitmap, ctx) {
             blocks.activeBlock = null;
@@ -969,20 +970,20 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doAnalytics() {
-	    beginnerModeContainer.visible = false;
-	    advancedModeContainer.visible = false;
-	    languageContainer.visible = false;
-	    smallerContainer.visible = false;
-	    largerContainer.visible = false;
-	    smallerOffContainer.visible = false;
-	    largerOffContainer.visible = false;
-	    pluginsContainer.visible = false;
-	    deletePluginContainer.visible = false;
-	    statsContainer.visible = false;
-	    scrollOnContainer.visible = false;
-	    scrollOffContainer.visible = false;
-	    deltaY(-85);
-	    _showHideAuxMenu();
+            beginnerModeContainer.visible = false;
+            advancedModeContainer.visible = false;
+            languageContainer.visible = false;
+            smallerContainer.visible = false;
+            largerContainer.visible = false;
+            smallerOffContainer.visible = false;
+            largerOffContainer.visible = false;
+            pluginsContainer.visible = false;
+            deletePluginContainer.visible = false;
+            statsContainer.visible = false;
+            scrollOnContainer.visible = false;
+            scrollOffContainer.visible = false;
+            deltaY(-85);
+            _showHideAuxMenu();
 
             blocks.activeBlock = null;
             var myChart = docById('myChart');
@@ -1039,7 +1040,7 @@ define(MYDEFINES, function (compatibility) {
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
 
-	    setSmallerLargerStatus();
+            setSmallerLargerStatus();
         };
 
         function doSmallerBlocks() {
@@ -1051,36 +1052,36 @@ define(MYDEFINES, function (compatibility) {
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
 
-	    setSmallerLargerStatus();
+            setSmallerLargerStatus();
         };
 
         function setSmallerLargerStatus() {
             if (BLOCKSCALES[blockscale] > 1) {
                 // utilityBox._decreaseStatus = true;
-		smallerContainer.visible = true;
-		smallerOffContainer.visible = false;
+                smallerContainer.visible = true;
+                smallerOffContainer.visible = false;
             } else {
-		smallerOffContainer.visible = true;
-		smallerContainer.visible = false;
+                smallerOffContainer.visible = true;
+                smallerContainer.visible = false;
                 // utilityBox._decreaseStatus = false;
-	    }
+            }
 
             if (BLOCKSCALES[blockscale] == 4) {
                 // utilityBox._increaseStatus = false;
-		largerOffContainer.visible = true;
-		largerContainer.visible = false;
+                largerOffContainer.visible = true;
+                largerContainer.visible = false;
             } else {
                 // utilityBox._increaseStatus = true;
-		largerContainer.visible = true;
-		largerOffContainer.visible = false;
-	    }
-	};
+                largerContainer.visible = true;
+                largerOffContainer.visible = false;
+            }
+        };
 
         function deletePlugin() {
             blocks.activeBlock = null;
-	    if (palettes.paletteObject !== null) {
-		palettes.paletteObject._promptPaletteDelete();
-	    }
+            if (palettes.paletteObject !== null) {
+                palettes.paletteObject._promptPaletteDelete();
+            }
         };
 
         function getPlaybackQueueStatus () {
@@ -1339,7 +1340,7 @@ define(MYDEFINES, function (compatibility) {
             */
 
             playbackOnLoad = function() {
-		/*
+                /*
                 if (_THIS_IS_TURTLE_BLOCKS_) {
                     // Play playback queue if there is one.
                     for (turtle in logo.playbackQueue) {
@@ -1351,7 +1352,7 @@ define(MYDEFINES, function (compatibility) {
                         }
                     }
                 }
-		*/
+                */
             };
 
             function PlanetInterface(storage) {
@@ -1724,7 +1725,7 @@ define(MYDEFINES, function (compatibility) {
             window.saveLocally = saveLocally;
             logo.setSaveLocally(saveLocally);
 
-	    /*
+            /*
             saveBox = new SaveBox();
             if (planet) {
                 var planetItem = ['_doSavePlanet', doUploadToPlanet];
@@ -1763,7 +1764,7 @@ define(MYDEFINES, function (compatibility) {
                 }
             };
 
-	    /*
+            /*
             clearBox = new ClearBox();
             clearBox
                 .setCanvas(canvas)
@@ -2874,22 +2875,25 @@ define(MYDEFINES, function (compatibility) {
                 }
             }
 
+            turtleBlocksScale = 1.0;
+            /*
             console.log('=====================');
             console.log(turtleBlocksScale);
             if (turtleBlocksScale < 0.5) {
-              turtleBlocksScale = 0.5;
-           } else if (turtleBlocksScale < 1) {
-              turtleBlocksScale = 1;
-           } else if (turtleBlocksScale < 1.5) {
-              turtleBlocksScale = 1.5;
-           } else {
-              turtleBlocksScale = 2;
-           }
+                turtleBlocksScale = 0.5;
+            } else if (turtleBlocksScale < 1) {
+                turtleBlocksScale = 1;
+            } else if (turtleBlocksScale < 1.5) {
+                turtleBlocksScale = 1.5;
+            } else {
+                turtleBlocksScale = 2;
+            }
+            console.log(turtleBlocksScale);
+            console.log('=====================')
+            */
 
             stage.scaleX = turtleBlocksScale;
             stage.scaleY = turtleBlocksScale;
-            console.log(turtleBlocksScale);
-            console.log('=====================')
 
             stage.canvas.width = w;
             stage.canvas.height = h;
@@ -3056,20 +3060,20 @@ define(MYDEFINES, function (compatibility) {
         function _deleteBlocksBox() {
             // _hideBoxes();
             // clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
-	    if (!confirmContainer.visible) {
-		confirmContainer.visible = true;
+            if (!confirmContainer.visible) {
+                confirmContainer.visible = true;
                 if (beginnerMode) {
-		    confirmContainer.x = 55 * 6 + 27.5;
-		} else {
-		    confirmContainer.x = 55 * 7 + 27.5;
-		}
+                    confirmContainer.x = 55 * 6 + 27.5;
+                } else {
+                    confirmContainer.x = 55 * 7 + 27.5;
+                }
 
-		confirmContainer.y = 27.5;
-		deltaY(85);
-	    } else {
-		confirmContainer.visible = false;
-		deltaY(-85);
-	    }
+                confirmContainer.y = 27.5;
+                deltaY(85);
+            } else {
+                confirmContainer.visible = false;
+                deltaY(-85);
+            }
         };
 
         function _afterDelete() {
@@ -3078,106 +3082,106 @@ define(MYDEFINES, function (compatibility) {
                 planet.initialiseNewProject.bind(planet);
             }
 
-	    confirmContainer.visible = false;
-	    deltaY(-85);
-	    _showHideAuxMenu();
-	};
+            confirmContainer.visible = false;
+            deltaY(-85);
+            _showHideAuxMenu();
+        };
 
         function doLanguageBox() {
             // _hideBoxes();
             languageBox.createBox(turtleBlocksScale, 55 * 7, 150); // saveButton.x - 27, saveButton.y - 55);
             languageBox.show();
-	    beginnerModeContainer.visible = false;
-	    advancedModeContainer.visible = false;
-	    languageContainer.visible = false;
-	    smallerContainer.visible = false;
-	    largerContainer.visible = false;
-	    smallerOffContainer.visible = false;
-	    largerOffContainer.visible = false;
-	    pluginsContainer.visible = false;
-	    deletePluginContainer.visible = false;
-	    statsContainer.visible = false;
-	    scrollOnContainer.visible = false;
-	    scrollOffContainer.visible = false;
-	    deltaY(-85);
+            beginnerModeContainer.visible = false;
+            advancedModeContainer.visible = false;
+            languageContainer.visible = false;
+            smallerContainer.visible = false;
+            largerContainer.visible = false;
+            smallerOffContainer.visible = false;
+            largerOffContainer.visible = false;
+            pluginsContainer.visible = false;
+            deletePluginContainer.visible = false;
+            statsContainer.visible = false;
+            scrollOnContainer.visible = false;
+            scrollOffContainer.visible = false;
+            deltaY(-85);
         };
 
         function _doUtilityBox() {
             // _hideBoxes();
             // utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
-	    if (!languageContainer.visible) {	
-		languageContainer.visible = true;
-		smallerContainer.visible = true;
-		largerContainer.visible = true;
+            if (!languageContainer.visible) {        
+                languageContainer.visible = true;
+                smallerContainer.visible = true;
+                largerContainer.visible = true;
                 if (beginnerMode) {
-		    beginnerModeContainer.visible = true;
-		    pluginsContainer.visible = false;
-		    deletePluginContainer.visible = false;
-		    statsContainer.visible = false;
-		    scrollOnContainer.visible = false;
-		    scrollOffContainer.visible = false;
+                    beginnerModeContainer.visible = true;
+                    pluginsContainer.visible = false;
+                    deletePluginContainer.visible = false;
+                    statsContainer.visible = false;
+                    scrollOnContainer.visible = false;
+                    scrollOffContainer.visible = false;
 
-		    beginnerModeContainer.x = 55 * 4;
-		    advancedModeContainer.x = 55 * 4;
-		    languageContainer.x = 55 * 5;
-		    smallerContainer.x = 55 * 6;
-		    largerContainer.x = 55 * 7;
-		    smallerOffContainer.x = 55 * 6;
-		    largerOffContainer.x = 55 * 7;
-		} else {
-		    advancedModeContainer.visible = true;
-		    pluginsContainer.visible = true;
-		    deletePluginContainer.visible = true;
-		    statsContainer.visible = true;
-		    setScrollerButton();
+                    beginnerModeContainer.x = 55 * 4;
+                    advancedModeContainer.x = 55 * 4;
+                    languageContainer.x = 55 * 5;
+                    smallerContainer.x = 55 * 6;
+                    largerContainer.x = 55 * 7;
+                    smallerOffContainer.x = 55 * 6;
+                    largerOffContainer.x = 55 * 7;
+                } else {
+                    advancedModeContainer.visible = true;
+                    pluginsContainer.visible = true;
+                    deletePluginContainer.visible = true;
+                    statsContainer.visible = true;
+                    setScrollerButton();
 
-		    beginnerModeContainer.x = 55 * 1 + 27.5;
-		    advancedModeContainer.x = 55 * 1 + 27.5;
-		    languageContainer.x = 55 * 2 + 27.5;
-		    smallerContainer.x = 55 * 3 + 27.5;
-		    largerContainer.x = 55 * 4 + 27.5;
-		    smallerOffContainer.x = 55 * 3 + 27.5;
-		    largerOffContainer.x = 55 * 4 + 27.5;
-		    pluginsContainer.x = 55 * 5 + 27.5;
-		    deletePluginContainer.x = 55 * 6 + 27.5;
-		    statsContainer.x = 55 * 7 + 27.5;
-		    scrollOnContainer.x = 55 * 8 + 27.5;
-		    scrollOffContainer.x = 55 * 8 + 27.5;
-		}
+                    beginnerModeContainer.x = 55 * 1 + 27.5;
+                    advancedModeContainer.x = 55 * 1 + 27.5;
+                    languageContainer.x = 55 * 2 + 27.5;
+                    smallerContainer.x = 55 * 3 + 27.5;
+                    largerContainer.x = 55 * 4 + 27.5;
+                    smallerOffContainer.x = 55 * 3 + 27.5;
+                    largerOffContainer.x = 55 * 4 + 27.5;
+                    pluginsContainer.x = 55 * 5 + 27.5;
+                    deletePluginContainer.x = 55 * 6 + 27.5;
+                    statsContainer.x = 55 * 7 + 27.5;
+                    scrollOnContainer.x = 55 * 8 + 27.5;
+                    scrollOffContainer.x = 55 * 8 + 27.5;
+                }
 
-		setSmallerLargerStatus();
+                setSmallerLargerStatus();
 
-		beginnerModeContainer.y = 27.5;
-		advancedModeContainer.y = 27.5;
-		languageContainer.y = 27.5;
-		smallerContainer.y = 27.5;
-		largerContainer.y = 27.5;
-		smallerOffContainer.y = 27.5;
-		largerOffContainer.y = 27.5;
-		pluginsContainer.y = 27.5;
-		deletePluginContainer.y = 27.5;
-		statsContainer.y = 27.5;
-		scrollOnContainer.y = 27.5;
-		scrollOffContainer.y = 27.5;
-		deltaY(85);
-	    } else {
-		// Hide everything
-		beginnerModeContainer.visible = false;
-		advancedModeContainer.visible = false;
-		languageContainer.visible = false;
-		smallerContainer.visible = false;
-		largerContainer.visible = false;
-		smallerOffContainer.visible = false;
-		largerOffContainer.visible = false;
-		pluginsContainer.visible = false;
-		deletePluginContainer.visible = false;
-		statsContainer.visible = false;
-		scrollOnContainer.visible = false;
-		scrollOffContainer.visible = false;
-		// Move it down since we are about to move it up.
-		utilityContainer.y = 110;
-		deltaY(-85);
-	    }
+                beginnerModeContainer.y = 27.5;
+                advancedModeContainer.y = 27.5;
+                languageContainer.y = 27.5;
+                smallerContainer.y = 27.5;
+                largerContainer.y = 27.5;
+                smallerOffContainer.y = 27.5;
+                largerOffContainer.y = 27.5;
+                pluginsContainer.y = 27.5;
+                deletePluginContainer.y = 27.5;
+                statsContainer.y = 27.5;
+                scrollOnContainer.y = 27.5;
+                scrollOffContainer.y = 27.5;
+                deltaY(85);
+            } else {
+                // Hide everything
+                beginnerModeContainer.visible = false;
+                advancedModeContainer.visible = false;
+                languageContainer.visible = false;
+                smallerContainer.visible = false;
+                largerContainer.visible = false;
+                smallerOffContainer.visible = false;
+                largerOffContainer.visible = false;
+                pluginsContainer.visible = false;
+                deletePluginContainer.visible = false;
+                statsContainer.visible = false;
+                scrollOnContainer.visible = false;
+                scrollOffContainer.visible = false;
+                // Move it down since we are about to move it up.
+                utilityContainer.y = 110;
+                deltaY(-85);
+            }
         };
 
         function _doPlaybackBox() {
@@ -3320,61 +3324,61 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 // _hideBoxes();
                 // saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
-		if (!saveHTMLContainer.visible) {
-		    saveHTMLContainer.visible = true;
-		    uploadContainer.visible = true;
-		    saveSVGContainer.visible = true;
-		    savePNGContainer.visible = true;
-		    saveArtworkContainer.visible = true;
-		    if (_THIS_IS_MUSIC_BLOCKS_) {
-			saveWAVContainer.visible = true;
-			saveLilypondContainer.visible = true;
-			saveABCContainer.visible = true;
+                if (!saveHTMLContainer.visible) {
+                    saveHTMLContainer.visible = true;
+                    uploadContainer.visible = true;
+                    saveSVGContainer.visible = true;
+                    savePNGContainer.visible = true;
+                    saveArtworkContainer.visible = true;
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        saveWAVContainer.visible = true;
+                        saveLilypondContainer.visible = true;
+                        saveABCContainer.visible = true;
 
-			saveHTMLContainer.x = 55 * 0 + 27.5;
-			uploadContainer.x = 55 * 1 + 27.5;
-			saveSVGContainer.x = 55 * 2 + 27.5;
-			savePNGContainer.x = 55 * 3 + 27.5;
-			saveWAVContainer.x = 55 * 4 + 27.5;
-			saveLilypondContainer.x = 55 * 5 + 27.5;
-			saveABCContainer.x = 55 * 6 + 27.5;
-			saveArtworkContainer.x = 55 * 7 + 27.5;
-		    } else {
-			saveHTMLContainer.x = 55 * 2 + 27.5;
-			uploadContainer.x = 55 * 3 + 27.5;
-			saveSVGContainer.x = 55 * 4 + 27.5;
-			savePNGContainer.x = 55 * 5 + 27.5;
-			saveArtworkContainer.x = 55 * 6 + 27.5;
-		    }
+                        saveHTMLContainer.x = 55 * 0 + 27.5;
+                        uploadContainer.x = 55 * 1 + 27.5;
+                        saveSVGContainer.x = 55 * 2 + 27.5;
+                        savePNGContainer.x = 55 * 3 + 27.5;
+                        saveWAVContainer.x = 55 * 4 + 27.5;
+                        saveLilypondContainer.x = 55 * 5 + 27.5;
+                        saveABCContainer.x = 55 * 6 + 27.5;
+                        saveArtworkContainer.x = 55 * 7 + 27.5;
+                    } else {
+                        saveHTMLContainer.x = 55 * 2 + 27.5;
+                        uploadContainer.x = 55 * 3 + 27.5;
+                        saveSVGContainer.x = 55 * 4 + 27.5;
+                        savePNGContainer.x = 55 * 5 + 27.5;
+                        saveArtworkContainer.x = 55 * 6 + 27.5;
+                    }
 
-		    saveHTMLContainer.y = 27.5;
-		    uploadContainer.y = 27.5;
-		    saveSVGContainer.y = 27.5;
-		    savePNGContainer.y = 27.5;
-		    saveArtworkContainer.y = 27.5;
-		    if (_THIS_IS_MUSIC_BLOCKS_) {
-			saveWAVContainer.y = 27.5;
-			saveLilypondContainer.y = 27.5;
-			saveABCContainer.y = 27.5;
-		    }
+                    saveHTMLContainer.y = 27.5;
+                    uploadContainer.y = 27.5;
+                    saveSVGContainer.y = 27.5;
+                    savePNGContainer.y = 27.5;
+                    saveArtworkContainer.y = 27.5;
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        saveWAVContainer.y = 27.5;
+                        saveLilypondContainer.y = 27.5;
+                        saveABCContainer.y = 27.5;
+                    }
 
-		    deltaY(85);
-		} else {
-		    saveHTMLContainer.visible = false;
-		    uploadContainer.visible = false;
-		    saveSVGContainer.visible = false;
-		    savePNGContainer.visible = false;
-		    saveArtworkContainer.visible = false;
-		    if (_THIS_IS_MUSIC_BLOCKS_) {
-			saveWAVContainer.visible = false;
-			saveLilypondContainer.visible = false;
-			saveABCContainer.visible = false;
-		    }
+                    deltaY(85);
+                } else {
+                    saveHTMLContainer.visible = false;
+                    uploadContainer.visible = false;
+                    saveSVGContainer.visible = false;
+                    savePNGContainer.visible = false;
+                    saveArtworkContainer.visible = false;
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        saveWAVContainer.visible = false;
+                        saveLilypondContainer.visible = false;
+                        saveABCContainer.visible = false;
+                    }
 
-		    // Move it down since we are about to move it up.
-		    saveContainer.y = 110;
-		    deltaY(-85);
-		}
+                    // Move it down since we are about to move it up.
+                    saveContainer.y = 110;
+                    deltaY(-85);
+                }
             }
         };
 
@@ -3999,6 +4003,35 @@ handleComplete);
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
             }
 
+            headerContainer.removeAllEventListeners('mousedown');
+            swiping = false;
+            headerContainer.on('mousedown', function (event) {
+                scrolling = true;
+                var firstY = event.stageY;
+
+                headerContainer.removeAllEventListeners('pressup');
+                headerContainer.on('pressup', function (event) {
+                    scrolling = false;
+                    var diff = event.stageY - firstY;
+                    if (diff > 55 && !menuButtonsVisible) {
+                        _doMenuAnimation(false);
+                    } else if (diff < -55 && menuButtonsVisible) {
+                        _doMenuAnimation(false);
+                    }
+                }, null, true);
+
+                headerContainer.removeAllEventListeners('mouseup');
+                headerContainer.on('mouseup', function (event) {
+                    scrolling = false;
+                    var diff = event.stageY - firstY;
+                    if (diff > 55 && !menuButtonsVisible) {
+                        _doMenuAnimation(false);
+                    } else if (diff < -55 && menuButtonsVisible) {
+                        _doMenuAnimation(false);
+                    }
+                }, null, true);
+            });
+
             stage.addChild(headerContainer);
 
             // Buttons used when running turtle programs:
@@ -4114,136 +4147,136 @@ handleComplete);
         };
 
         function _setupBoxMenus(turtleBlocksScale) {
-	    // Each box menu is positioned above the Aux menus
-	    var cellsize = 55;
+            // Each box menu is positioned above the Aux menus
+            var cellsize = 55;
             var y = Math.floor(-3 * cellsize / 2);
 
-	    var __addEventHandlers = function(container, action, arg) {
+            var __addEventHandlers = function(container, action, arg) {
 
-		if (arg !== undefined) {
-		    container.on('click', function (event) {
-			action(arg);
-		    });
-		} else {
-		    container.on('click', function (event) {
-			action();
-		    });
-		}
+                if (arg !== undefined) {
+                    container.on('click', function (event) {
+                        action(arg);
+                    });
+                } else {
+                    container.on('click', function (event) {
+                        action();
+                    });
+                }
 
-		container.on('mouseover', function (event) {
+                container.on('mouseover', function (event) {
                     if (!loading) {
-			document.body.style.cursor = 'pointer';
+                        document.body.style.cursor = 'pointer';
                     }
-		});
+                });
 
-		container.on('mouseout', function (event) {
+                container.on('mouseout', function (event) {
                     if (!loading) {
-			document.body.style.cursor = 'default';
+                        document.body.style.cursor = 'default';
                     }
-		});
-	    };
+                });
+            };
 
-	    // Advanced Save Box Buttons: HTML, SVG, etc.
-	    // Force left-aligned labels
-	    var x = 27.5;
-	    saveHTMLContainer = _makeButton('save-button-dark', _('Save project'), x, y, cellsize, 0);
-	    saveHTMLContainer.visible = false;
-	    __addEventHandlers(saveHTMLContainer, save.saveHTML.bind(save));
+            // Advanced Save Box Buttons: HTML, SVG, etc.
+            // Force left-aligned labels
+            var x = 27.5;
+            saveHTMLContainer = _makeButton('save-button-dark', _('Save project'), x, y, cellsize, 0);
+            saveHTMLContainer.visible = false;
+            __addEventHandlers(saveHTMLContainer, save.saveHTML.bind(save));
 
             if (planet) {
-		uploadContainer = _makeButton('upload-planet', _('Share project'), x, y, cellsize, 0);
-		uploadContainer.visible = false;
-		__addEventHandlers(uploadContainer, doUploadToPlanet);
-	    } else {
-		uploadContainer = _makeButton('planet-disabled-button', _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
-		uploadContainer.visible = false;
-	    }
+                uploadContainer = _makeButton('upload-planet', _('Share project'), x, y, cellsize, 0);
+                uploadContainer.visible = false;
+                __addEventHandlers(uploadContainer, doUploadToPlanet);
+            } else {
+                uploadContainer = _makeButton('planet-disabled-button', _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
+                uploadContainer.visible = false;
+            }
 
-	    // Force center-aligned labels
-	    var x = 110;
-	    saveSVGContainer = _makeButton('save-svg', _('Save as .svg'), x, y, cellsize, 0);
-	    saveSVGContainer.visible = false;
-	    __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
+            // Force center-aligned labels
+            var x = 110;
+            saveSVGContainer = _makeButton('save-svg', _('Save as .svg'), x, y, cellsize, 0);
+            saveSVGContainer.visible = false;
+            __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
 
-	    savePNGContainer = _makeButton('save-png', _('Save as .png'), x, y, cellsize, 0);
-	    savePNGContainer.visible = false;
-	    __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
+            savePNGContainer = _makeButton('save-png', _('Save as .png'), x, y, cellsize, 0);
+            savePNGContainer.visible = false;
+            __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
 
-	    if (_THIS_IS_MUSIC_BLOCKS_) {
-		saveWAVContainer = _makeButton('save-wav', _('Save as .wav'), x, y, cellsize, 0);
-		saveWAVContainer.visible = false;
-		__addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveWAVContainer = _makeButton('save-wav', _('Save as .wav'), x, y, cellsize, 0);
+                saveWAVContainer.visible = false;
+                __addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
 
-		saveLilypondContainer = _makeButton('save-lilypond', _('Save sheet music'), x, y, cellsize, 0);
-		saveLilypondContainer.visible = false;
-		__addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
+                saveLilypondContainer = _makeButton('save-lilypond', _('Save sheet music'), x, y, cellsize, 0);
+                saveLilypondContainer.visible = false;
+                __addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
 
-		saveABCContainer = _makeButton('save-abc', _('Save as .abc'), x, y, cellsize, 0);
-		saveABCContainer.visible = false;
-		__addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
-	    }
+                saveABCContainer = _makeButton('save-abc', _('Save as .abc'), x, y, cellsize, 0);
+                saveABCContainer.visible = false;
+                __addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
+            }
 
-	    saveArtworkContainer = _makeButton('save-block-artwork', _('Save block artwork'), x, y, cellsize, 0);
-	    saveArtworkContainer.visible = false;
-	    __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
+            saveArtworkContainer = _makeButton('save-block-artwork', _('Save block artwork'), x, y, cellsize, 0);
+            saveArtworkContainer.visible = false;
+            __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
 
-	    // Settings Box Buttons: Mode, Language, Smaller, Larger
-	    // Force left-aligned labels
-	    var x = 27.5;
-	    beginnerModeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
-	    beginnerModeContainer.visible = false;
-	    __addEventHandlers(beginnerModeContainer, doSwitchMode);
+            // Settings Box Buttons: Mode, Language, Smaller, Larger
+            // Force left-aligned labels
+            var x = 27.5;
+            beginnerModeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
+            beginnerModeContainer.visible = false;
+            __addEventHandlers(beginnerModeContainer, doSwitchMode);
 
-	    advancedModeContainer = _makeButton('advanced-button', _('Switch to beginner mode'), x, y, cellsize, 0);
-	    
-	    advancedModeContainer.visible = false;
-	    __addEventHandlers(advancedModeContainer, doSwitchMode);
+            advancedModeContainer = _makeButton('advanced-button', _('Switch to beginner mode'), x, y, cellsize, 0);
+            
+            advancedModeContainer.visible = false;
+            __addEventHandlers(advancedModeContainer, doSwitchMode);
 
-	    // Force center-aligned labels
-	    var x = 110;
-	    languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
-	    languageContainer.visible = false;
-	    __addEventHandlers(languageContainer, doLanguageBox);
+            // Force center-aligned labels
+            var x = 110;
+            languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
+            languageContainer.visible = false;
+            __addEventHandlers(languageContainer, doLanguageBox);
 
-	    smallerContainer = _makeButton('smaller-button', _('Decrease block size'), x, y, cellsize, 0);
-	    smallerContainer.visible = false;
-	    __addEventHandlers(smallerContainer, doSmallerBlocks);
+            smallerContainer = _makeButton('smaller-button', _('Decrease block size'), x, y, cellsize, 0);
+            smallerContainer.visible = false;
+            __addEventHandlers(smallerContainer, doSmallerBlocks);
 
-	    largerContainer = _makeButton('bigger-button', _('Increase block size'), x, y, cellsize, 0);
-	    largerContainer.visible = false;
-	    __addEventHandlers(largerContainer, doLargerBlocks);
+            largerContainer = _makeButton('bigger-button', _('Increase block size'), x, y, cellsize, 0);
+            largerContainer.visible = false;
+            __addEventHandlers(largerContainer, doLargerBlocks);
 
-	    smallerOffContainer = _makeButton('smaller-disable-button', _('Cannot be further decreased'), x, y, cellsize, 0);
-	    smallerOffContainer.visible = false;
+            smallerOffContainer = _makeButton('smaller-disable-button', _('Cannot be further decreased'), x, y, cellsize, 0);
+            smallerOffContainer.visible = false;
 
-	    largerOffContainer = _makeButton('bigger-disable-button', _('Cannot be further increased'), x, y, cellsize, 0);
-	    largerOffContainer.visible = false;
+            largerOffContainer = _makeButton('bigger-disable-button', _('Cannot be further increased'), x, y, cellsize, 0);
+            largerOffContainer.visible = false;
 
-	    // ALways create these buttons (but not use them in beginner mode)
-	    statsContainer = _makeButton('stats-button', _('Display statistics'), x, y, cellsize, 0);
-	    statsContainer.visible = false;
-	    __addEventHandlers(statsContainer, doAnalytics);
+            // ALways create these buttons (but not use them in beginner mode)
+            statsContainer = _makeButton('stats-button', _('Display statistics'), x, y, cellsize, 0);
+            statsContainer.visible = false;
+            __addEventHandlers(statsContainer, doAnalytics);
 
-	    pluginsContainer = _makeButton('plugins-button', _('Load plugin from file'), x, y, cellsize, 0);
-	    pluginsContainer.visible = false;
-	    __addEventHandlers(pluginsContainer, doOpenPlugin);
+            pluginsContainer = _makeButton('plugins-button', _('Load plugin from file'), x, y, cellsize, 0);
+            pluginsContainer.visible = false;
+            __addEventHandlers(pluginsContainer, doOpenPlugin);
 
-	    deletePluginContainer = _makeButton('plugins-delete-button', _('Delete plugin'), x, y, cellsize, 0);
-	    deletePluginContainer.visible = false;
-	    __addEventHandlers(deletePluginContainer, deletePlugin);
+            deletePluginContainer = _makeButton('plugins-delete-button', _('Delete plugin'), x, y, cellsize, 0);
+            deletePluginContainer.visible = false;
+            __addEventHandlers(deletePluginContainer, deletePlugin);
 
-	    scrollOnContainer = _makeButton('scroll-unlock-button', _('Enable horizontal scrolling'), x, y, cellsize, 0);
-	    scrollOnContainer.visible = false;
-	    __addEventHandlers(scrollOnContainer, setScroller, true);
+            scrollOnContainer = _makeButton('scroll-unlock-button', _('Enable horizontal scrolling'), x, y, cellsize, 0);
+            scrollOnContainer.visible = false;
+            __addEventHandlers(scrollOnContainer, setScroller, true);
 
-	    scrollOffContainer = _makeButton('scroll-lock-button', _('Disable horizontal scrolling'), x, y, cellsize, 0);
-	    scrollOffContainer.visible = false;
-	    __addEventHandlers(scrollOffContainer, setScroller, false);
+            scrollOffContainer = _makeButton('scroll-lock-button', _('Disable horizontal scrolling'), x, y, cellsize, 0);
+            scrollOffContainer.visible = false;
+            __addEventHandlers(scrollOffContainer, setScroller, false);
 
-	    // Clear Box Confirm Button
+            // Clear Box Confirm Button
             confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
-	    confirmContainer.visible = false;
-	    __addEventHandlers(confirmContainer, _afterDelete);
+            confirmContainer.visible = false;
+            __addEventHandlers(confirmContainer, _afterDelete);
 
         };
 
@@ -4283,7 +4316,7 @@ handleComplete);
                         ['save', doSave, _('Save project'), null, null, null, null],
                         ['paste-disabled', pasteStack, _('Right-click to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
                         ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                        ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
+                        // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                         ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
                         ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
                         ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
@@ -4296,7 +4329,7 @@ handleComplete);
                     ['save', doSave, _('Save project'), null, null, null, null],
                     ['paste-disabled', pasteStack, _('Paste'), null, null, null, null],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                    ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
+                    // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
                     ['new', _deleteBlocksBox, _('Delete all'), null, null, null, null],
                     ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
@@ -4345,15 +4378,15 @@ handleComplete);
                         _makeExtraGridButtons(gridButtons[j], 250 + j * 250);
                     }
                 } else if (menuNames[i][0] === 'utility') {
-		    utilityContainer = container;
+                    utilityContainer = container;
                 } else if (menuNames[i][0] === 'save' && !beginnerMode) {
-		    saveContainer = container;
-		}
+                    saveContainer = container;
+                }
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
                 onscreenMenu.push(container);
 
-		// Don't think we need these any more...
+                // Don't think we need these any more...
                 /*
                 if (menuNames[i][0] === 'utility') {
                     utilityButton = container;
@@ -4414,24 +4447,40 @@ handleComplete);
         };
 
         function _doMenuButton() {
-            _doMenuAnimation(1);
+            _doMenuAnimation(true);
         };
 
-        function _doMenuAnimation() {
+        function _doMenuAnimation(arg) {
+            if (arg === undefined) {
+                var animate = true;
+            } else {
+                var animate = arg;
+            }
+
+            if (animate) {
+                var timeout = 500;
+            } else {
+                var timeout = 50;
+            }
+
             var bitmap = last(menuContainer.children);
             if (bitmap != null) {
-                var r = bitmap.rotation;
-                if (r % 90 !== 0) {
-                    return;
-                }
+                if (animate) {
+                    var r = bitmap.rotation;
+                    if (r % 90 !== 0) {
+                        return;
+                    }
 
-                createjs.Tween.get(bitmap)
-                    .to({
-                        rotation: r
-                    })
-                    .to({
-                        rotation: r + 90
-                    }, 500);
+                    createjs.Tween.get(bitmap)
+                        .to({
+                            rotation: r
+                        })
+                        .to({
+                            rotation: r + 90
+                        }, 500);
+                } else {
+                    bitmap.rotation += 90;
+                }
             } else {
                 // Race conditions during load
                 setTimeout(_doMenuAnimation, 50);
@@ -4450,7 +4499,7 @@ handleComplete);
                     _showHideAuxMenu();
                 }
                 update = true;
-            }, 500);
+            }, timeout);
         };
 
         function _toggleToolbar() {
@@ -4720,15 +4769,15 @@ handleComplete);
 
             palettes.deltaY(dy);
             turtles.deltaY(dy);
-	    blocksContainer.y += dy;
+            blocksContainer.y += dy;
 
             refreshCanvas();
-	};
+        };
 
         function _showHideAuxMenu () {
             var cellsize = 55;
             if (headerContainer.y === 0) {
-		dy = cellsize * 1.5;
+                dy = cellsize * 1.5;
                 headerContainer.y = dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y += dy;
@@ -4740,9 +4789,9 @@ handleComplete);
 
                 palettes.deltaY(dy);
                 turtles.deltaY(dy);
-		blocksContainer.y += dy;
+                blocksContainer.y += dy;
             } else {
-		var dy = headerContainer.y;
+                var dy = headerContainer.y;
                 headerContainer.y = 0;
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y = cellsize / 2;
@@ -4754,32 +4803,32 @@ handleComplete);
 
                 palettes.deltaY(-dy);
                 turtles.deltaY(-dy);
-		blocksContainer.y -= dy;
+                blocksContainer.y -= dy;
             }
 
-	    confirmContainer.visible = false;
-	    beginnerModeContainer.visible = false;
-	    advancedModeContainer.visible = false;
-	    languageContainer.visible = false;
-	    smallerContainer.visible = false;
-	    largerContainer.visible = false;
-	    smallerOffContainer.visible = false;
-	    largerOffContainer.visible = false;
-	    statsContainer.visible = false;
-	    pluginsContainer.visible = false;
-	    deletePluginContainer.visible = false;
-	    scrollOnContainer.visible = false;
-	    scrollOffContainer.visible = false;
-	    saveHTMLContainer.visible = false;
-	    uploadContainer.visible = false;
-	    saveSVGContainer.visible = false;
-	    savePNGContainer.visible = false;
-	    saveArtworkContainer.visible = false;
-	    if (_THIS_IS_MUSIC_BLOCKS_) {
-		saveWAVContainer.visible = false;
-		saveLilypondContainer.visible = false;
-		saveABCContainer.visible = false;
-	    }
+            confirmContainer.visible = false;
+            beginnerModeContainer.visible = false;
+            advancedModeContainer.visible = false;
+            languageContainer.visible = false;
+            smallerContainer.visible = false;
+            largerContainer.visible = false;
+            smallerOffContainer.visible = false;
+            largerOffContainer.visible = false;
+            statsContainer.visible = false;
+            pluginsContainer.visible = false;
+            deletePluginContainer.visible = false;
+            scrollOnContainer.visible = false;
+            scrollOffContainer.visible = false;
+            saveHTMLContainer.visible = false;
+            uploadContainer.visible = false;
+            saveSVGContainer.visible = false;
+            savePNGContainer.visible = false;
+            saveArtworkContainer.visible = false;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveWAVContainer.visible = false;
+                saveLilypondContainer.visible = false;
+                saveABCContainer.visible = false;
+            }
 
             refreshCanvas();
         };
