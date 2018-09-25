@@ -1093,8 +1093,8 @@ function Palette(palettes, name) {
             // left half is for draggging, the right half is for the
             // close button.
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth, STANDARDBLOCKHEIGHT / 2);
-            hitArea.x = paletteWidth - STANDARDBLOCKHEIGHT * 2 / 3;
+            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth * 1 / 4, STANDARDBLOCKHEIGHT);
+            hitArea.x = paletteWidth - STANDARDBLOCKHEIGHT; // * 2 / 3;
             hitArea.y = 0;
             that.menuContainer.hitArea = hitArea;
             that.menuContainer.visible = false;
@@ -1279,7 +1279,8 @@ function Palette(palettes, name) {
             this.protoContainers[i].y -= this.scrollDiff;
         }
 
-        this.y = this.menuContainer.y + 50; // a bit more than the header height
+        // a bit more than the header height
+        this.y = this.menuContainer.y + 50;
         var items = [];
         var heights = [];
         // Reverse order
