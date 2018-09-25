@@ -161,7 +161,7 @@ function Palettes () {
             that.selectorButtonsOn.push(bitmap);
         };
 
-        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONSOFF[i]], MULTIPALETTENAMES[i], __processSelectButtonOff, i);
+        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONSOFF[i]].replace('fill_color', platformColor.selectorBackground), MULTIPALETTENAMES[i], __processSelectButtonOff, i);
 
         makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONSON[i]], MULTIPALETTENAMES[i], __processSelectButtonOn, i);
     };
@@ -1074,6 +1074,7 @@ function Palette(palettes, name) {
 
         function __processButtonIcon(palette, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.6;
+	    bitmap.y = 6;
             that.menuContainer.addChild(bitmap);
             // that.palettes.container.addChild(that.menuContainer);
         };
@@ -1082,7 +1083,7 @@ function Palette(palettes, name) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.5;
             that.menuContainer.addChild(bitmap);
             bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT * 2 / 3;
-            bitmap.y = 0;
+            bitmap.y = 8;
 
             // Define the hit area for the entire header area; the
             // left half is for draggging, the right half is for the
@@ -1169,7 +1170,7 @@ function Palette(palettes, name) {
             makePaletteBitmap(palette, FADEDDOWNICON, name, __makeFadedDownIcon, null);
             makePaletteBitmap(palette, FADEDUPICON, name, __makeFadedUpIcon, null);
             makePaletteBitmap(palette, UPICON, name, __processUpIcon, null);
-            makePaletteBitmap(palette, CLOSEICON, name, __processCloseIcon, null);
+            makePaletteBitmap(palette, CLOSEICON.replace('fill_color', platformColor.selectorBackground), name, __processCloseIcon, null);
             makePaletteBitmap(palette, PALETTEICONS[name], name, __processButtonIcon, null);
         };
 
@@ -1186,7 +1187,7 @@ function Palette(palettes, name) {
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
-        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', '#282828').replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
+        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', platformColor.selectorBackground).replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
     };
 
     this._getDownButtonY = function () {
@@ -1274,7 +1275,7 @@ function Palette(palettes, name) {
             this.protoContainers[i].y -= this.scrollDiff;
         }
 
-        this.y = this.menuContainer.y + 40;  // STANDARDBLOCKHEIGHT / 2;
+        this.y = this.menuContainer.y + 50; // a bit more than the header height
         var items = [];
         var heights = [];
         // Reverse order
