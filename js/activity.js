@@ -132,7 +132,7 @@ var MYDEFINES = [
     // 'activity/clearbox',
     'activity/savebox',
     'activity/languagebox',
-    'activity/utilitybox',
+    // 'activity/utilitybox',
     'activity/basicblocks',
     'activity/blockfactory',
     'activity/rubrics',
@@ -266,7 +266,8 @@ define(MYDEFINES, function (compatibility) {
         var statusContainer = null;
         var scrollOnContainer = null;
         var scrollOffContainer = null;
-        var confirmOntainer = null;        
+        var newContainer = null;
+        var confirmContainer = null;        
         var saveContainer = null;
         var saveHTMLContainer = null;
         var saveSVGContainer = null;
@@ -276,6 +277,9 @@ define(MYDEFINES, function (compatibility) {
         var saveLilypondContainer = null;
         var saveABCContainer = null;
         var saveArtworkContainer = null;
+        var planetContainer = null;
+        var restoreContainer = null;
+        var openContainer = null;
 
         var searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
@@ -382,8 +386,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _findBlocks() {
-	    var leftpos = Math.floor(canvas.width / 4);
-	    var toppos = 90;
+            var leftpos = Math.floor(canvas.width / 4);
+            var toppos = 90;
             blocks.activeBlock = null;
             hideDOMLabel();
             logo.showBlocks();
@@ -898,6 +902,7 @@ define(MYDEFINES, function (compatibility) {
 
         function _doCartesianPolar() {
             blocks.activeBlock = null;
+            closeSubMenus();
             if (cartesianBitmap.visible && polarBitmap.visible) {
                 _hideCartesian();
                 //.TRANS: hide Polar coordinate overlay grid
@@ -2968,6 +2973,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             blocks.activeBlock = null;
+            closeSubMenus();
             refreshCanvas();
 
             var dx = 0;
@@ -3059,10 +3065,71 @@ define(MYDEFINES, function (compatibility) {
             blocks.refreshCanvas();
         };
 
+        function closeSubMenus() {
+            if (confirmContainer.visible) {
+                confirmContainer.visible = false;
+                saveContainer.y = 110;
+                gridContainer.y = 110;
+                newContainer.y = 110;
+                planetContainer.y = 110;
+                restoreContainer.y = 110;
+                openContainer.y = 110;
+                pasteContainer.y = 110;
+                utilityContainer.y = 110;
+                deltaY(-85);
+            } else if (uploadContainer.visible) {
+                saveHTMLContainer.visible = false;
+                uploadContainer.visible = false;
+                saveSVGContainer.visible = false;
+                savePNGContainer.visible = false;
+                saveArtworkContainer.visible = false;
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    saveWAVContainer.visible = false;
+                    saveLilypondContainer.visible = false;
+                    saveABCContainer.visible = false;
+                }
+
+                saveContainer.y = 110;
+                gridContainer.y = 110;
+                newContainer.y = 110;
+                utilityContainer.y = 110;
+                planetContainer.y = 110;
+                restoreContainer.y = 110;
+                openContainer.y = 110;
+                pasteContainer.y = 110;
+                deltaY(-85);
+            } else if (languageContainer.visible) {
+                beginnerModeContainer.visible = false;
+                advancedModeContainer.visible = false;
+                languageContainer.visible = false;
+                smallerContainer.visible = false;
+                largerContainer.visible = false;
+                smallerOffContainer.visible = false;
+                largerOffContainer.visible = false;
+                pluginsContainer.visible = false;
+                deletePluginContainer.visible = false;
+                statsContainer.visible = false;
+                scrollOnContainer.visible = false;
+                scrollOffContainer.visible = false;
+
+                saveContainer.y = 110;
+                gridContainer.y = 110;
+                newContainer.y = 110;
+                planetContainer.y = 110;
+                restoreContainer.y = 110;
+                openContainer.y = 110;
+                pasteContainer.y = 110;
+                utilityContainer.y = 110;
+                deltaY(-85);
+            }
+        };
+
         function _deleteBlocksBox() {
             // _hideBoxes();
             // clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
+            // if save or settings is open, close them.
             if (!confirmContainer.visible) {
+                closeSubMenus();
                 confirmContainer.visible = true;
                 if (beginnerMode) {
                     confirmContainer.x = 55 * 6 + 27.5;
@@ -3112,6 +3179,7 @@ define(MYDEFINES, function (compatibility) {
             // _hideBoxes();
             // utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
             if (!languageContainer.visible) {        
+                closeSubMenus();
                 languageContainer.visible = true;
                 smallerContainer.visible = true;
                 largerContainer.visible = true;
@@ -3317,16 +3385,19 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doOpenSamples() {
+            closeSubMenus();
             planet.openPlanet();
         };
 
         function doSave() {
             if (beginnerMode) {
+                closeSubMenus();
                 save.saveHTML(_('My Project'));
             } else {
                 // _hideBoxes();
                 // saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
                 if (!saveHTMLContainer.visible) {
+                    closeSubMenus();
                     saveHTMLContainer.visible = true;
                     uploadContainer.visible = true;
                     saveSVGContainer.visible = true;
@@ -3394,6 +3465,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doLoad(merge) {
+            closeSubMenus();
             if (merge === undefined) {
                 merge = false;
             }
@@ -3760,6 +3832,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function pasteStack() {
+            closeSubMenus();
             blocks.pasteStack();
         };
 
@@ -4370,6 +4443,7 @@ handleComplete);
                 x += dx;
                 y += dy;
                 var container = _makeButton(menuNames[i][0] + '-button', menuNames[i][2], x, y, btnSize, 0);
+                // Save a reference to the containers as we have to move them around.
                 if (menuNames[i][0] === 'paste-disabled') {
                     pasteContainer = container;
                 } else if (menuNames[i][0] === 'Cartesian') {
@@ -4381,8 +4455,16 @@ handleComplete);
                     }
                 } else if (menuNames[i][0] === 'utility') {
                     utilityContainer = container;
-                } else if (menuNames[i][0] === 'save' && !beginnerMode) {
+                } else if (menuNames[i][0] === 'save') {
                     saveContainer = container;
+                } else if (menuNames[i][0] === 'new') {
+                    newContainer = container;
+                } else if (menuNames[i][0] === 'open') {
+                    openContainer = container;
+                } else if (menuNames[i][0] === 'restore-trash') {
+                    restoreContainer = container;
+                } else if (menuNames[i][0] === 'planet' || menuNames[i][0] === 'planet-disabled') {
+                    planetContainer = container;
                 }
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
