@@ -15,6 +15,8 @@ const DEFAULTVALUE = 50;
 const DEFAULTCHROMA = 100;
 const DEFAULTSTROKE = 5;
 const DEFAULTFONT = 'sans-serif';
+// What is the scale factor when stage is shrunk?
+const SCALEFACTOR = 4
 
 // Turtle sprite
 const TURTLEBASEPATH = 'images/';
@@ -1105,20 +1107,20 @@ function Turtle (name, turtles, drum) {
         this._blinkTimeout = null;
 
         //
-	if (duration > 16) {
-	    return;
-	}
+        if (duration > 16) {
+            return;
+        }
 
-	this.stopBlink();
+        this.stopBlink();
 
         this.container.visible = false;
-	this._blinkTimeout = setTimeout(function () {
+        this._blinkTimeout = setTimeout(function () {
             that.container.visible = true;
             that.turtles.refreshCanvas();
-	}, 100);
+        }, 100);
         this.turtles.refreshCanvas();
 
-	return;
+        return;
         //
 
         if (this.beforeBlinkSize == null) {
@@ -1216,7 +1218,7 @@ function Turtles () {
     };
 
     this.deltaY = function (dy) {
-	this.stage.y += dy;
+        this.stage.y += dy;
     };
 
     this.makeBackground = function () {
@@ -1245,7 +1247,7 @@ function Turtles () {
             var dx = that.w - 5;
             var dy = that.h - 60;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 2.5).replace('X', 2.5).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 5))));
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10 / SCALEFACTOR).replace('X', 10 / SCALEFACTOR).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20 / SCALEFACTOR))));
         };
 
         function __makeBoundary2() {
@@ -1280,13 +1282,14 @@ function Turtles () {
                 that._expandButton = new createjs.Bitmap(img);
                 that._expandButton.x = that.w - 10 - 4 * 55;
                 that._expandButton.y = 83;
-                that._expandButton.scaleX = 4;
-                that._expandButton.scaleY = 4;
+                that._expandButton.scaleX = SCALEFACTOR;
+                that._expandButton.scaleY = SCALEFACTOR;
+                that._expandButton.scale = SCALEFACTOR;
                 that._expandButton.visible = false;
                 that._borderContainer.addChild(that._expandButton);
 
                 that._expandButton.on('pressmove', function (event) {
-                    var w = (that.w - 10 - 4 * 55) / 4;
+                    var w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
                     that.stage.x = event.stageX / that.scale - w;
                     that.stage.y = event.stageY / that.scale - 16;
                     that.refreshCanvas();
@@ -1300,6 +1303,11 @@ function Turtles () {
                     that._expandButton.visible = false;
                     that.stage.x = 0;
                     that.stage.y = 0;
+                    for (var i = 0; i < that.turtleList.length; i++) {
+                        that.turtleList[i].container.scaleX = 1;
+                        that.turtleList[i].container.scaleY = 1;
+                        that.turtleList[i].container.scale = 1;
+                    }
                 });
 
                 __makeCollapseButton();
@@ -1329,6 +1337,11 @@ function Turtles () {
                     that._collapseButton.visible = false;
                     that.stage.x = (that.w * 3 / 4) - 10;
                     that.stage.y = 65;
+                    for (var i = 0; i < that.turtleList.length; i++) {
+                        that.turtleList[i].container.scaleX = SCALEFACTOR;
+                        that.turtleList[i].container.scaleY = SCALEFACTOR;
+                        that.turtleList[i].container.scale = SCALEFACTOR;
+                    }
                 });
             };
 
