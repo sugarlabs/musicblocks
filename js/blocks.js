@@ -598,8 +598,8 @@ function Blocks () {
                 var lastDock = last(thisBlock.docks);
                 var dx = lastDock[0] - vspaceBlock.docks[0][0];
                 var dy = lastDock[1] - vspaceBlock.docks[0][1];
-                vspaceBlock.container.x = Math.floor(thisBlock.container.x + dx + 0.5);
-                vspaceBlock.container.y = Math.floor(thisBlock.container.y + dy + 0.5);
+                vspaceBlock.container.x = thisBlock.container.x + dx; // Math.floor(thisBlock.container.x + dx + 0.5);
+                vspaceBlock.container.y = thisBlock.container.y + dy; // Math.floor(thisBlock.container.y + dy + 0.5);
                 vspaceBlock.connections[0] = that.blockList.indexOf(thisBlock);
                 vspaceBlock.connections[1] = nextBlock;
                 thisBlock.connections[thisBlock.connections.length - 1] = vspace;
@@ -812,8 +812,8 @@ function Blocks () {
                 if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
                 } else {
-                    var nx = Math.floor(myBlock.container.x + dx + 0.5);
-                    var ny = Math.floor(myBlock.container.y + dy + 0.5);
+                    var nx = myBlock.container.x + dx; // Math.floor(myBlock.container.x + dx + 0.5);
+                    var ny = myBlock.container.y + dy; // Math.floor(myBlock.container.y + dy + 0.5);
                 }
 
                 this._moveBlock(cblk, nx, ny);
@@ -828,8 +828,8 @@ function Blocks () {
                 console.log('dy ' + dy);
                 */
 
-                var nx = Math.floor(this.blockList[cblk].container.x + dx + 0.5);
-                var ny = Math.floor(this.blockList[cblk].container.y + dy + 0.5);
+                var nx = this.blockList[cblk].container.x; // Math.floor(this.blockList[cblk].container.x + dx + 0.5);
+                var ny = this.blockList[cblk].container.y; // Math.floor(this.blockList[cblk].container.y + dy + 0.5);
 
                 this._moveBlock(blk, nx, ny);
             }
@@ -1690,8 +1690,8 @@ function Blocks () {
         // Move a block (and its label) to x, y.
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
-            myBlock.container.x = Math.floor(x + 0.5);
-            myBlock.container.y = Math.floor(y + 0.5);
+            myBlock.container.x = x; // Math.floor(x + 0.5);
+            myBlock.container.y = y; // Math.floor(y + 0.5);
 
             this.checkBounds();
         } else {
@@ -1707,8 +1707,8 @@ function Blocks () {
 
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
-            myBlock.container.x += Math.floor(dx + 0.5);
-            myBlock.container.y += Math.floor(dy + 0.5);
+            myBlock.container.x += dx; // Math.floor(dx + 0.5);
+            myBlock.container.y += dy; // Math.floor(dy + 0.5);
 
             this.checkBounds();
         } else {
@@ -4589,8 +4589,8 @@ function Blocks () {
 
             if (thisBlock === this.blockList.length - 1) {
                 if (this.blockList[thisBlock].connections[0] == null) {
-                    this.blockList[thisBlock].container.x = Math.floor(blkData[2] + 0.5);
-                    this.blockList[thisBlock].container.y = Math.floor(blkData[3] + 0.5);
+                    this.blockList[thisBlock].container.x = blkData[2]; // Math.floor(blkData[2] + 0.5);
+                    this.blockList[thisBlock].container.y = blkData[3]; // Math.floor(blkData[3] + 0.5);
                     this._adjustTheseDocks.push(thisBlock);
                     if (blkData[4][0] == null) {
                         this._adjustTheseStacks.push(thisBlock);
