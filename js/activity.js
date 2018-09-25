@@ -251,6 +251,15 @@ define(MYDEFINES, function (compatibility) {
         var saveBox;
         var merging = false;
         var loading = false;
+        // For auxillary menus
+	var utilityContainer = null;
+	var modeContainer = null;
+	var languageContainer = null;
+	var smallerContainer = null;
+	var largerContainer = null;
+	var smallerOffContainer = null;
+	var largerOffContainer = null;
+	var confirmOntainer = null;	
 
         var searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
@@ -972,41 +981,51 @@ define(MYDEFINES, function (compatibility) {
             logo.setOptimize(state);
         };
 
-        function doBiggerFont() {
+        function doLargerBlocks() {
             blocks.activeBlock = null;
-            hideDOMLabel();
+            // hideDOMLabel();
 
             if (blockscale < BLOCKSCALES.length - 1) {
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
 
-            if (BLOCKSCALES[blockscale] > 1) {
-                utilityBox._decreaseStatus = true;
-            }
-
-            if (BLOCKSCALES[blockscale] == 4) {
-                utilityBox._increaseStatus = false;
-            }
+	    setSmallerLargerStatus();
         };
 
-        function doSmallerFont() {
+        function doSmallerBlocks() {
             blocks.activeBlock = null;
-            hideDOMLabel();
+            // hideDOMLabel();
 
             if (blockscale > 0) {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
 
-            if (BLOCKSCALES[blockscale] == 1) {
-                utilityBox._decreaseStatus = false;
-            }
-
-            if (BLOCKSCALES[blockscale] < 4) {
-                utilityBox._increaseStatus = true;
-            } 
+	    setSmallerLargerStatus();
         };
+
+        function setSmallerLargerStatus() {
+            if (BLOCKSCALES[blockscale] > 1) {
+                // utilityBox._decreaseStatus = true;
+		smallerContainer.visible = true;
+		smallerOffContainer.visible = false;
+            } else {
+		smallerOffContainer.visible = true;
+		smallerContainer.visible = false;
+                // utilityBox._decreaseStatus = false;
+	    }
+
+            if (BLOCKSCALES[blockscale] == 4) {
+                // utilityBox._increaseStatus = false;
+		largerOffContainer.visible = true;
+		largerContainer.visible = false;
+            } else {
+                // utilityBox._increaseStatus = true;
+		largerContainer.visible = true;
+		largerOffContainer.visible = false;
+	    }
+	};
 
         function deletePlugin() {
             blocks.activeBlock = null;
@@ -1243,14 +1262,14 @@ define(MYDEFINES, function (compatibility) {
             utilityBox
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
-                .setBigger(doBiggerFont)
-                .setSmaller(doSmallerFont)
+                // .setLarger(doLargerFont)
+                // .setSmaller(doSmallerFont)
                 .setPlugins(doOpenPlugin)
                 .deletePlugins(deletePlugin)
                 .setStats(doAnalytics)
                 .setScroller(toggleScroller)
-                .setLanguage(doLanguageBox, languageBox)
-                .setSwitchMode(doSwitchMode)
+                // .setLanguage(doLanguageBox, languageBox)
+                // .setSwitchMode(doSwitchMode)
                 .setOptimize(doOptimize);
 
             playbackBox = new PlaybackBox();
@@ -3019,20 +3038,43 @@ define(MYDEFINES, function (compatibility) {
 	    if (!modeContainer.visible) {	
 		modeContainer.visible = true;
 		languageContainer.visible = true;
+		smallerContainer.visible = true;
+		largerContainer.visible = true;
                 if (beginnerMode) {
-		    modeContainer.x = 55 * 5 + 27.5;
-		    languageContainer.x = 55 * 6 + 27.5;
+		    modeContainer.x = 55 * 4;
+		    languageContainer.x = 55 * 5;
+		    smallerContainer.x = 55 * 6;
+		    largerContainer.x = 55 * 7;
+		    smallerOffContainer.x = 55 * 6;
+		    largerOffContainer.x = 55 * 7;
 		} else {
 		    modeContainer.x = 55 * 6 + 27.5;
 		    languageContainer.x = 55 * 7 + 27.5;
+		    smallerContainer.x = 55 * 8 + 27.5;
+		    largerContainer.x = 55 * 9 + 27.5;
+		    smallerOffContainer.x = 55 * 8 + 27.5;
+		    largerOffContainer.x = 55 * 9 + 27.5;
 		}
+
+		setSmallerLargerStatus();
 
 		modeContainer.y = 27.5;
 		languageContainer.y = 27.5;
+		smallerContainer.y = 27.5;
+		largerContainer.y = 27.5;
+		smallerOffContainer.y = 27.5;
+		largerOffContainer.y = 27.5;
 		deltaY(85);
 	    } else {
+		// Hide everything
 		modeContainer.visible = false;
 		languageContainer.visible = false;
+		smallerContainer.visible = false;
+		largerContainer.visible = false;
+		smallerOffContainer.visible = false;
+		largerOffContainer.visible = false;
+		// Move it down since we are about to move it up.
+		utilityContainer.y = 110;
 		deltaY(-85);
 	    }
         };
@@ -3981,6 +4023,82 @@ handleComplete);
 			document.body.style.cursor = 'default';
                     }
 		});
+
+		smallerContainer = _makeButton('smaller-button', _('Decrease block size'), x, y, cellsize, 0);
+		smallerContainer.visible = false;
+
+		smallerContainer.on('click', function (event) {
+		    doSmallerBlocks();
+		});
+
+		smallerContainer.on('mouseover', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'pointer';
+                    }
+		});
+
+		smallerContainer.on('mouseout', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'default';
+                    }
+		});
+
+		largerContainer = _makeButton('bigger-button', _('Increase block size'), x, y, cellsize, 0);
+		largerContainer.visible = false;
+
+		largerContainer.on('click', function (event) {
+		    doLargerBlocks();
+		});
+
+		largerContainer.on('mouseover', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'pointer';
+                    }
+		});
+
+		largerContainer.on('mouseout', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'default';
+                    }
+		});
+
+		smallerOffContainer = _makeButton('smaller-disable-button', _('Cannot be further decreased'), x, y, cellsize, 0);
+		smallerOffContainer.visible = false;
+
+		smallerOffContainer.on('click', function (event) {
+		    doSmallerBlocks();
+		});
+
+		smallerOffContainer.on('mouseover', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'pointer';
+                    }
+		});
+
+		smallerOffContainer.on('mouseout', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'default';
+                    }
+		});
+
+		largerOffContainer = _makeButton('bigger-disable-button', _('Cannot be further increased'), x, y, cellsize, 0);
+		largerOffContainer.visible = false;
+
+		largerOffContainer.on('click', function (event) {
+		    doLargerBlocks();
+		});
+
+		largerOffContainer.on('mouseover', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'pointer';
+                    }
+		});
+
+		largerOffContainer.on('mouseout', function (event) {
+                    if (!loading) {
+			document.body.style.cursor = 'default';
+                    }
+		});
 	    } else {
 	    }
 	};
@@ -4082,7 +4200,9 @@ handleComplete);
                     for (var j = 0; j < gridButtons.length; j++) {
                         _makeExtraGridButtons(gridButtons[j], 250 + j * 250);
                     }
-                }
+                } else if (menuNames[i][0] === 'utility') {
+		    utilityContainer = container;
+		}
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
                 onscreenMenu.push(container);
@@ -4487,6 +4607,10 @@ handleComplete);
 	    confirmContainer.visible = false;
 	    modeContainer.visible = false;
 	    languageContainer.visible = false;
+	    smallerContainer.visible = false;
+	    largerContainer.visible = false;
+	    smallerOffContainer.visible = false;
+	    largerOffContainer.visible = false;
 
             refreshCanvas();
         };
