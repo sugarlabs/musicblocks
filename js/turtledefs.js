@@ -26,8 +26,7 @@ const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch')
 const MULTIPALETTES = [['rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'widgets'], ['flow', 'action', 'boxes', 'number', 'boolean', 'heap', 'extras'], ['mouse', 'pen', 'media', 'sensors', 'mice']];
 
 // Icons used to select between multipalettes.
-const MULTIPALETTEICONSOFF = ['musicoff', 'logicoff', 'graphicsoff'];
-const MULTIPALETTEICONSON = ['musicon', 'logicon', 'graphicson'];
+const MULTIPALETTEICONS = ['music', 'logic', 'graphics'];
 const MULTIPALETTENAMES = [_('music'), _('logic'), _('graphics')];
 
 function getMainToolbarButtonNames(name) {

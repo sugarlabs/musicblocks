@@ -165,9 +165,9 @@ function Palettes () {
             that.selectorButtonsOn.push(bitmap);
         };
 
-        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONSOFF[i]].replace('fill_color', platformColor.selectorBackground), MULTIPALETTENAMES[i], __processSelectButtonOff, i);
+        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('fill_color', platformColor.selectorBackground), MULTIPALETTENAMES[i], __processSelectButtonOff, i);
 
-        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONSON[i]], MULTIPALETTENAMES[i], __processSelectButtonOn, i);
+        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('fill_color', '#ffffff'), MULTIPALETTENAMES[i], __processSelectButtonOn, i);
     };
 
     this.showSelection = function (i) {
