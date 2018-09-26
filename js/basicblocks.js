@@ -3712,12 +3712,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('return');
-    if (beginnerMode && !beginnerBlock('return')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['return'] = newblock;
     //.TRANS: return value from a function
     newblock.staticLabels.push(_('return'));
@@ -3731,12 +3726,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('returnToUrl');
-    if (beginnerMode && !beginnerBlock('returnToURL')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['returnToUrl'] = newblock;
     //.TRANS: return value from a function to a URL
     newblock.staticLabels.push(_('return to URL'));
@@ -3750,12 +3740,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('calc');
-    if (beginnerMode && !beginnerBlock('calc')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['calc'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3768,12 +3753,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedcalc');
-    if (beginnerMode && !beginnerBlock('namedcalc')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedcalc'] = newblock;
     newblock.staticLabels.push(_('action'));
     newblock.extraWidth = 10;
@@ -3784,12 +3764,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('nameddoArg');
-    if (beginnerMode && !beginnerBlock('nameddoArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['nameddoArg'] = newblock;
     //.TRANS: take (do) some action
     newblock.staticLabels.push(_('do'));
@@ -3801,12 +3776,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedcalcArg');
-    if (beginnerMode && !beginnerBlock('namedcalcArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedcalcArg'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3818,12 +3788,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('doArg');
-    if (beginnerMode && !beginnerBlock('doArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['doArg'] = newblock;
     newblock.staticLabels.push(_('do'));
     newblock.adjustWidthToLabel();
@@ -3836,12 +3801,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('calcArg');
-    if (beginnerMode && !beginnerBlock('calcArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['calcArg'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3855,12 +3815,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('arg');
-    if (beginnerMode && !beginnerBlock('arg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['arg'] = newblock;
     newblock.staticLabels.push('arg');
     newblock.adjustWidthToLabel();
@@ -3873,12 +3828,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedarg');
-    if (beginnerMode && !beginnerBlock('namedarg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedarg'] = newblock;
     newblock.staticLabels.push('arg ' + 1);
     newblock.adjustWidthToLabel();
@@ -3888,12 +3838,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('listen');
-    if (beginnerMode && !beginnerBlock('box')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['listen'] = newblock;
     //.TRANS: an event, such as user actions (mouse clicks, key presses)
     newblock.staticLabels.push(_('on'));
@@ -3910,12 +3855,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('dispatch');
-    if (beginnerMode && !beginnerBlock('box')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['dispatch'] = newblock;
     //.TRANS: dispatch an event to trigger a listener
     newblock.staticLabels.push(_('broadcast'));
