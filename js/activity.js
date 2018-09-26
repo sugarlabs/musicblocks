@@ -1242,6 +1242,7 @@ define(MYDEFINES, function (compatibility) {
             turtles = new Turtles();
             turtles
                 .setCanvas(canvas)
+	        .setClear(_allClear)
                 .setHideMenu(hideAuxMenu)
                 .setMasterStage(stage)
                 .setStage(turtleContainer)
@@ -4140,7 +4141,7 @@ handleComplete);
                         ['run', _doFastButton, _('Play'), null, null, null, null],
                         ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
+                        // ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
                         ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                         ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
                         ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
@@ -4153,7 +4154,7 @@ handleComplete);
                         ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
                         ['hard-stop-turtle', doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
+                        // ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
                         ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                         ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
                         ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
@@ -4168,7 +4169,7 @@ handleComplete);
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
-                    ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
+                    // ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
                     ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                     ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
                     ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
