@@ -1182,13 +1182,14 @@ function Turtles () {
     this._expandButton = null;
     this._collapsedBoundary = null;
     this._collapseButton = null;
+    this._isShrunk = false;
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
 
     this.setMasterStage = function (stage) {
-	this.masterStage = stage;
-	return this;
+        this.masterStage = stage;
+        return this;
     };
 
     this.setCanvas = function (canvas) {
@@ -1309,15 +1310,16 @@ function Turtles () {
                     that._expandButton.visible = false;
                     that.stage.x = 0;
                     that.stage.y = 0;
+                    that._isShrunk = false;
                     for (var i = 0; i < that.turtleList.length; i++) {
                         that.turtleList[i].container.scaleX = 1;
                         that.turtleList[i].container.scaleY = 1;
                         that.turtleList[i].container.scale = 1;
                     }
 
-		    // remove the stage and add it back in position 0
-		    that.masterStage.removeChild(that.stage);
-		    that.masterStage.addChildAt(that.stage, 0);
+                    // remove the stage and add it back in position 0
+                    that.masterStage.removeChild(that.stage);
+                    that.masterStage.addChildAt(that.stage, 0);
                 });
 
                 __makeCollapseButton();
@@ -1347,15 +1349,16 @@ function Turtles () {
                     that._collapseButton.visible = false;
                     that.stage.x = (that.w * 3 / 4) - 10;
                     that.stage.y = 65;
+                    that._isShrunk = true;
                     for (var i = 0; i < that.turtleList.length; i++) {
                         that.turtleList[i].container.scaleX = SCALEFACTOR;
                         that.turtleList[i].container.scaleY = SCALEFACTOR;
                         that.turtleList[i].container.scale = SCALEFACTOR;
                     }
 
-		    // remove the stage and add it back at the top
-		    that.masterStage.removeChild(that.stage);
-		    that.masterStage.addChild(that.stage);
+                    // remove the stage and add it back at the top
+                    that.masterStage.removeChild(that.stage);
+                    that.masterStage.addChild(that.stage);
                 });
             };
 
@@ -1380,6 +1383,12 @@ function Turtles () {
     this.addTurtle = function (startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
+        if (this._isShrunk) {
+            var t = last(this.turtleList);
+            t.container.scaleX = SCALEFACTOR;
+            t.container.scaleY = SCALEFACTOR;
+            t.container.scale = SCALEFACTOR;
+        }
     };
 
     this.add = function (startBlock, infoDict) {
