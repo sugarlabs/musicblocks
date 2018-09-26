@@ -1338,7 +1338,7 @@ function Turtles () {
 
                 that._collapseButton = new createjs.Bitmap(img);
                 that._borderContainer.addChild(that._collapseButton);
-                that._collapseButton.x = that.w - 55 - 10;
+                that._collapseButton.x = that.w - 55;
                 that._collapseButton.y = 55 + LEADING;
 
                 that._collapseButton.on('click', function (event) {
