@@ -102,7 +102,8 @@ function Palettes () {
         for (var i = 0; i < MULTIPALETTES.length; i++) {
             this._makeSelectorButton(i);
             this.x.push(0);
-            this.y.push(3 * this.cellSize / PALETTE_SCALE_FACTOR);
+	    // This is the top of the palette buttons stack
+            this.y.push((2.5 * this.cellSize + 2 * LEADING) / PALETTE_SCALE_FACTOR);
         }
     };
 
@@ -138,7 +139,7 @@ function Palettes () {
         __processSelectButtonOff = function (that, name, bitmap, arg) {
             var scale = 1.5 * that.cellSize / that.originalSize;
             bitmap.x = arg * scale * 55;
-            bitmap.y = that.top; // that.top + that.cellSize * 1.25;
+            bitmap.y = that.top;
             bitmap.scaleX = scale;
             bitmap.scaleY = scale;
             // FIXME: rescale needs to reset all of this.
@@ -157,7 +158,7 @@ function Palettes () {
         __processSelectButtonOn = function (that, name, bitmap, arg) {
             var scale = 1.5 * that.cellSize / that.originalSize;
             bitmap.x = arg * scale * 55;
-            bitmap.y = that.top; // that.top + that.cellSize * 1.25;
+            bitmap.y = that.top;
             bitmap.scaleX = scale;
             bitmap.scaleY = scale;
             // FIXME: rescale needs to reset all of this.
