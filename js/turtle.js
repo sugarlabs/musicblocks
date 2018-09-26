@@ -1222,8 +1222,6 @@ function Turtles () {
 
     this.setScale = function (w, h, scale) {
         this.scale = scale;
-        console.log(w + ' ' + h + ' ' + scale);
-
         this.w = w / scale;
         this.h = h / scale;
 
@@ -1301,13 +1299,17 @@ function Turtles () {
                 that._expandButton.visible = false;
                 that._borderContainer.addChild(that._expandButton);
 
+		that._expandButton.removeAllEventListeners('pressmove');
                 that._expandButton.on('pressmove', function (event) {
                     var w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
-                    that.stage.x = event.stageX / that.scale - w;
-                    that.stage.y = event.stageY / that.scale - 16;
+		    var x = event.stageX / that.scale - w;
+		    var y = event.stageY / that.scale - 16;
+                    that.stage.x = Math.max(0, Math.min(that.w * 3 / 4, x));
+                    that.stage.y = Math.max(55, Math.min(that.h * 3 / 4, y));
                     that.refreshCanvas();
                 });
 
+		that._expandButton.removeAllEventListeners('click');
                 that._expandButton.on('click', function (event) {
                     that.hideMenu();
                     that.scaleStage(1.0);
@@ -1348,6 +1350,7 @@ function Turtles () {
                 that._collapseButton.x = that.w - 55;
                 that._collapseButton.y = 55 + LEADING;
 
+		that._collapseButton.removeAllEventListeners('click');
                 that._collapseButton.on('click', function (event) {
                     that.hideMenu();
                     that.scaleStage(0.25);
