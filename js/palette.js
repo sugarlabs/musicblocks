@@ -1356,14 +1356,14 @@ function Palette(palettes, name) {
                 image.onload = function () {
                     var bitmap = new createjs.Bitmap(image);
                     if (image.width > image.height) {
-                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / image.width * (b.scale / 2);
+                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / image.width * (b.scale / 2) * PROTOBLOCKSCALE;
                     } else {
-                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / image.height * (b.scale / 2);
+                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / image.height * (b.scale / 2) * PROTOBLOCKSCALE;
                     }
                     that.protoContainers[modname].addChild(bitmap);
-                    bitmap.x = Math.floor((MEDIASAFEAREA[0] * (b.scale / 2)) + 0.5);
+                    bitmap.x = Math.floor((MEDIASAFEAREA[0] * (b.scale / 2)) + 0.5) * PROTOBLOCKSCALE;
                     
-                    bitmap.y = Math.floor((MEDIASAFEAREA[1] * (b.scale / 2)) + 0.5);
+                    bitmap.y = Math.floor((MEDIASAFEAREA[1] * (b.scale / 2)) + 0.5) * PROTOBLOCKSCALE;
                     __calculateBounds(palette, blk, modname, protoListBlk);
                 };
 
