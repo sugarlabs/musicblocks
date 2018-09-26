@@ -1319,7 +1319,7 @@ define(MYDEFINES, function (compatibility) {
             languageBox
                 .setCanvas(canvas)
                 .setStage(stage)
-                .setMessage(errorMsg)
+                .setMessage(textMsg)
                 .setRefreshCanvas(refreshCanvas);
 
             /*
@@ -3408,7 +3408,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSave() {
-            if (beginnerMode) {
+            if (false) { // (beginnerMode) {
                 closeSubMenus();
                 save.saveHTML(_('My Project'));
             } else {
@@ -3704,16 +3704,19 @@ define(MYDEFINES, function (compatibility) {
 
             var msgContainer = msgText.parent;
             msgContainer.visible = true;
+            console.log(msgContainer.x + ' ' + msgContainer.y);
             msgText.text = msg;
             msgContainer.updateCache();
             stage.setChildIndex(msgContainer, stage.children.length - 1);
+	    refreshCanvas();
         };
 
         function errorMsg(msg, blk, text, timeout) {
+	    /*
             if (logo.optimize) {
                 return;
             }
-
+            */
             if (errorMsgTimeoutID != null) {
                 clearTimeout(errorMsgTimeoutID);
             }
@@ -3822,7 +3825,7 @@ define(MYDEFINES, function (compatibility) {
                 }, myTimeout);
             }
 
-            update = true;
+	    refreshCanvas();
         };
 
         function _hideCartesian() {

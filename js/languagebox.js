@@ -81,12 +81,15 @@ function LanguageBox () {
             myDiv.style.visibility = 'hidden';
 	    if (language in MSG) {
 		if (language === 'ja' && localStorage.kanaPreference === 'kana') {
+                    console.log(MSG['kana']);
 		    this._message(MSG['kana']);
 		} else {
+                    console.log(MSG[language]);
 		    this._message(MSG[language]);
 		}
 	    } else {
-		this._message('default');
+                console.log('default');
+		this._message(MSG['default']);
 	    }
 
             this._refreshCanvas();
@@ -96,8 +99,6 @@ function LanguageBox () {
     this.createBox = function (scale, x, y) {
         if (this._container == null) {
             this._scale = scale;
-
-            console.log(scale);
 
             this._container = new createjs.Container();
             this._stage.addChild(this._container);
