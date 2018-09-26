@@ -75,7 +75,7 @@ function Palettes () {
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
-    this.top = Math.floor(55 * 1.5);
+    this.top = 55 + LEADING;
     this.current = DEFAULTPALETTE;
     this.x = [];  // We track x and y for each of the multipalettes
     this.y = [];

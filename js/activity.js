@@ -20,6 +20,8 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 
+const LEADING = 0;
+
 if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
@@ -989,7 +991,7 @@ define(MYDEFINES, function (compatibility) {
             statsContainer.visible = false;
             scrollOnContainer.visible = false;
             scrollOffContainer.visible = false;
-            deltaY(-85);
+            deltaY(-55 - LEADING);
             _showHideAuxMenu(false);
 
             blocks.activeBlock = null;
@@ -3076,15 +3078,15 @@ define(MYDEFINES, function (compatibility) {
         function closeSubMenus() {
             if (confirmContainer.visible) {
                 confirmContainer.visible = false;
-                saveContainer.y = 110;
-                gridContainer.y = 110;
-                newContainer.y = 110;
-                planetContainer.y = 110;
-                restoreContainer.y = 110;
-                openContainer.y = 110;
-                pasteContainer.y = 110;
-                utilityContainer.y = 110;
-                deltaY(-85);
+                saveContainer.y = 82.5 + LEADING;
+                gridContainer.y = 82.5 + LEADING;
+                newContainer.y = 82.5 + LEADING;
+                planetContainer.y = 82.5 + LEADING;
+                restoreContainer.y = 82.5 + LEADING;
+                openContainer.y = 82.5 + LEADING;
+                pasteContainer.y = 82.5 + LEADING;
+                utilityContainer.y = 82.5 + LEADING;
+                deltaY(-55 - LEADING);
             } else if (uploadContainer.visible) {
                 saveHTMLContainer.visible = false;
                 uploadContainer.visible = false;
@@ -3097,15 +3099,15 @@ define(MYDEFINES, function (compatibility) {
                     saveABCContainer.visible = false;
                 }
 
-                saveContainer.y = 110;
-                gridContainer.y = 110;
-                newContainer.y = 110;
-                utilityContainer.y = 110;
-                planetContainer.y = 110;
-                restoreContainer.y = 110;
-                openContainer.y = 110;
-                pasteContainer.y = 110;
-                deltaY(-85);
+                saveContainer.y = 82.5 + LEADING;
+                gridContainer.y = 82.5 + LEADING;
+                newContainer.y = 82.5 + LEADING;
+                utilityContainer.y = 82.5 + LEADING;
+                planetContainer.y = 82.5 + LEADING;
+                restoreContainer.y = 82.5 + LEADING;
+                openContainer.y = 82.5 + LEADING;
+                pasteContainer.y = 82.5 + LEADING;
+                deltaY(-55 - LEADING);
             } else if (languageContainer.visible) {
                 beginnerModeContainer.visible = false;
                 advancedModeContainer.visible = false;
@@ -3120,15 +3122,15 @@ define(MYDEFINES, function (compatibility) {
                 scrollOnContainer.visible = false;
                 scrollOffContainer.visible = false;
 
-                saveContainer.y = 110;
-                gridContainer.y = 110;
-                newContainer.y = 110;
-                planetContainer.y = 110;
-                restoreContainer.y = 110;
-                openContainer.y = 110;
-                pasteContainer.y = 110;
-                utilityContainer.y = 110;
-                deltaY(-85);
+                saveContainer.y = 82.5 + LEADING;
+                gridContainer.y = 82.5 + LEADING;
+                newContainer.y = 82.5 + LEADING;
+                planetContainer.y = 82.5 + LEADING;
+                restoreContainer.y = 82.5 + LEADING;
+                openContainer.y = 82.5 + LEADING;
+                pasteContainer.y = 82.5 + LEADING;
+                utilityContainer.y = 82.5 + LEADING;
+                deltaY(-55 - LEADING);
             }
         };
 
@@ -3146,10 +3148,10 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 confirmContainer.y = 27.5;
-                deltaY(85);
+                deltaY(55 + LEADING);
             } else {
                 confirmContainer.visible = false;
-                deltaY(-85);
+                deltaY(-55 - LEADING);
             }
         };
 
@@ -3160,7 +3162,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             confirmContainer.visible = false;
-            deltaY(-85);
+            deltaY(-55 - LEADING);
             _showHideAuxMenu(false);
         };
 
@@ -3180,7 +3182,7 @@ define(MYDEFINES, function (compatibility) {
             statsContainer.visible = false;
             scrollOnContainer.visible = false;
             scrollOffContainer.visible = false;
-            deltaY(-85);
+            deltaY(-55 - LEADING);
         };
 
         function _doUtilityBox() {
@@ -3241,7 +3243,7 @@ define(MYDEFINES, function (compatibility) {
                 statsContainer.y = 27.5;
                 scrollOnContainer.y = 27.5;
                 scrollOffContainer.y = 27.5;
-                deltaY(85);
+                deltaY(55 + LEADING);
             } else {
                 // Hide everything
                 beginnerModeContainer.visible = false;
@@ -3257,8 +3259,8 @@ define(MYDEFINES, function (compatibility) {
                 scrollOnContainer.visible = false;
                 scrollOffContainer.visible = false;
                 // Move it down since we are about to move it up.
-                utilityContainer.y = 110;
-                deltaY(-85);
+                utilityContainer.y = 82.5 + LEADING;
+                deltaY(-55 - LEADING);
             }
         };
 
@@ -3443,7 +3445,7 @@ define(MYDEFINES, function (compatibility) {
                         saveABCContainer.y = 27.5;
                     }
 
-                    deltaY(85);
+                    deltaY(55 + LEADING);
                 } else {
                     saveHTMLContainer.visible = false;
                     uploadContainer.visible = false;
@@ -3457,8 +3459,8 @@ define(MYDEFINES, function (compatibility) {
                     }
 
                     // Move it down since we are about to move it up.
-                    saveContainer.y = 110;
-                    deltaY(-85);
+                    saveContainer.y = 82.5 + LEADING;
+                    deltaY(-55 - LEADING);
                 }
             }
         };
@@ -4080,7 +4082,7 @@ handleComplete);
             }
 
             headerContainer = new createjs.Shape();
-            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 3, screen.width / turtleBlocksScale, 4.5 * cellSize);
+            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 2 + 2 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING);
 
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
@@ -4276,7 +4278,7 @@ handleComplete);
             }
 
             // Force center-aligned labels
-            var x = 110;
+            var x = 82.5 + LEADING;
             saveSVGContainer = _makeButton('save-svg', _('Save as .svg'), x, y, cellsize, 0);
             saveSVGContainer.visible = false;
             __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
@@ -4316,7 +4318,7 @@ handleComplete);
             __addEventHandlers(advancedModeContainer, doSwitchMode);
 
             // Force center-aligned labels
-            var x = 110;
+            var x = 82.5 + LEADING;
             languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
             languageContainer.visible = false;
             __addEventHandlers(languageContainer, doLanguageBox);
@@ -4863,7 +4865,7 @@ handleComplete);
         function _showHideAuxMenu (resize) {
             var cellsize = 55;
             if (!resize && headerContainer.y === 0) {
-                dy = cellsize * 1.5;
+                dy = cellsize + LEADING;
                 headerContainer.y = dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y += dy;

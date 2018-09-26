@@ -1246,13 +1246,13 @@ function Turtles () {
 
                 that._expandedBoundary = new createjs.Bitmap(img);
                 that._expandedBoundary.x = 0;
-                that._expandedBoundary.y = 83;
+                that._expandedBoundary.y = 55 + LEADING;
                 that._borderContainer.addChild(that._expandedBoundary);
                 __makeBoundary2();
             };
 
             var dx = that.w - 5;
-            var dy = that.h - 60;
+            var dy = that.h - 55 - LEADING;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10 / SCALEFACTOR).replace('X', 10 / SCALEFACTOR).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20 / SCALEFACTOR))));
         };
@@ -1266,7 +1266,7 @@ function Turtles () {
 
                 that._collapsedBoundary = new createjs.Bitmap(img);
                 that._collapsedBoundary.x = 0;
-                that._collapsedBoundary.y = 83;
+                that._collapsedBoundary.y = 55 + LEADING;
                 that._borderContainer.addChild(that._collapsedBoundary);
                 that._collapsedBoundary.visible = false;
 
@@ -1274,7 +1274,7 @@ function Turtles () {
             };
 
             var dx = that.w - 20;
-            var dy = that.h - 60;
+            var dy = that.h - 55 - LEADING;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
         };
@@ -1288,7 +1288,7 @@ function Turtles () {
 
                 that._expandButton = new createjs.Bitmap(img);
                 that._expandButton.x = that.w - 10 - 4 * 55;
-                that._expandButton.y = 83;
+                that._expandButton.y = 55 + LEADING;
                 that._expandButton.scaleX = SCALEFACTOR;
                 that._expandButton.scaleY = SCALEFACTOR;
                 that._expandButton.scale = SCALEFACTOR;
@@ -1338,8 +1338,8 @@ function Turtles () {
 
                 that._collapseButton = new createjs.Bitmap(img);
                 that._borderContainer.addChild(that._collapseButton);
-                that._collapseButton.x = that.w - 65;
-                that._collapseButton.y = 83;
+                that._collapseButton.x = that.w - 55 - 10;
+                that._collapseButton.y = 55 + LEADING;
 
                 that._collapseButton.on('click', function (event) {
                     that.scaleStage(0.25);
@@ -1348,7 +1348,7 @@ function Turtles () {
                     that._expandedBoundary.visible = false;
                     that._collapseButton.visible = false;
                     that.stage.x = (that.w * 3 / 4) - 10;
-                    that.stage.y = 65;
+                    that.stage.y = 55 + LEADING;
                     that._isShrunk = true;
                     for (var i = 0; i < that.turtleList.length; i++) {
                         that.turtleList[i].container.scaleX = SCALEFACTOR;
