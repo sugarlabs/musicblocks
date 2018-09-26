@@ -1165,6 +1165,7 @@ function Turtle (name, turtles, drum) {
 
 
 function Turtles () {
+    this.masterStage = null;
     this.stage = null;
     this.refreshCanvas = null;
     this.scale = 1.0;
@@ -1184,6 +1185,11 @@ function Turtles () {
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
+
+    this.setMasterStage = function (stage) {
+	this.masterStage = stage;
+	return this;
+    };
 
     this.setCanvas = function (canvas) {
         this._canvas = canvas;
@@ -1308,6 +1314,10 @@ function Turtles () {
                         that.turtleList[i].container.scaleY = 1;
                         that.turtleList[i].container.scale = 1;
                     }
+
+		    // remove the stage and add it back in position 0
+		    that.masterStage.removeChild(that.stage);
+		    that.masterStage.addChildAt(that.stage, 0);
                 });
 
                 __makeCollapseButton();
@@ -1342,6 +1352,10 @@ function Turtles () {
                         that.turtleList[i].container.scaleY = SCALEFACTOR;
                         that.turtleList[i].container.scale = SCALEFACTOR;
                     }
+
+		    // remove the stage and add it back at the top
+		    that.masterStage.removeChild(that.stage);
+		    that.masterStage.addChild(that.stage);
                 });
             };
 
