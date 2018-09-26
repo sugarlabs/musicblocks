@@ -1673,7 +1673,8 @@ define(MYDEFINES, function (compatibility) {
                 ['logo', logo],
                 ['turtles', turtles],
                 ['storage', storage],
-                ['printBlockSVG', _printBlockSVG]
+                ['printBlockSVG', _printBlockSVG],
+                ['planet', planet]
             ]);
             save.init();
 

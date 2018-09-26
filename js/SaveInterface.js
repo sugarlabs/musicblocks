@@ -14,6 +14,7 @@ function SaveInterface(PlanetInterface) {
     this.logo = null;
     this.turtles = null;
     this.storage = null;
+    this.planet = null;
     this.printBlockSVG = null;
 
     this.filename = null;
@@ -218,7 +219,7 @@ function SaveInterface(PlanetInterface) {
         }
 
         docById('submitLilypond').onclick = function(){this.saveLYFile(false);}.bind(this);
-        if (window.Converter.isConnected()){
+        if (this.planet){
             docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
             docById('submitPDF').disabled = false;
         } else {
