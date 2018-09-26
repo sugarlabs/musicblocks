@@ -1166,6 +1166,7 @@ function Turtle (name, turtles, drum) {
 
 function Turtles () {
     this.masterStage = null;
+    this.hideMenu = null;
     this.stage = null;
     this.refreshCanvas = null;
     this.scale = 1.0;
@@ -1189,6 +1190,11 @@ function Turtles () {
 
     this.setMasterStage = function (stage) {
         this.masterStage = stage;
+        return this;
+    };
+
+    this.setHideMenu = function (hideMenu) {
+        this.hideMenu = hideMenu;
         return this;
     };
 
@@ -1303,6 +1309,7 @@ function Turtles () {
                 });
 
                 that._expandButton.on('click', function (event) {
+                    that.hideMenu();
                     that.scaleStage(1.0);
                     that._expandedBoundary.visible = true;
                     that._collapseButton.visible = true;
@@ -1342,6 +1349,7 @@ function Turtles () {
                 that._collapseButton.y = 55 + LEADING;
 
                 that._collapseButton.on('click', function (event) {
+                    that.hideMenu();
                     that.scaleStage(0.25);
                     that._collapsedBoundary.visible = true;
                     that._expandButton.visible = true;

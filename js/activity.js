@@ -1242,7 +1242,8 @@ define(MYDEFINES, function (compatibility) {
             turtles = new Turtles();
             turtles
                 .setCanvas(canvas)
-	        .setMasterStage(stage)
+                .setHideMenu(hideAuxMenu)
+                .setMasterStage(stage)
                 .setStage(turtleContainer)
                 .setRefreshCanvas(refreshCanvas);
 
@@ -2859,12 +2860,12 @@ define(MYDEFINES, function (compatibility) {
                 return;
             }
 
-	    // If any menus were open, close them.
-	    if (confirmContainer !== null && newContainer.visible) {
-		if (headerContainer.y > 0) {
-		    _showHideAuxMenu(true);
-		}
-	    }
+            // If any menus were open, close them.
+            if (confirmContainer !== null && newContainer.visible) {
+                if (headerContainer.y > 0) {
+                    _showHideAuxMenu(true);
+                }
+            }
 
             if (!platform.androidWebkit) {
                 var w = window.innerWidth;
@@ -3152,6 +3153,13 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 confirmContainer.visible = false;
                 deltaY(-55 - LEADING);
+            }
+        };
+
+        function hideAuxMenu() {
+            if (headerContainer.y > 0) {
+                _showHideAuxMenu(false);
+                menuButtonsVisible = false;
             }
         };
 
@@ -4373,7 +4381,7 @@ handleComplete);
                 }
             }
 
-	    onscreenMenu = [];
+            onscreenMenu = [];
 
             // NOTE: see getAuxToolbarButtonNames in turtledefs.js
             // Misc. other buttons
@@ -4484,8 +4492,8 @@ handleComplete);
                 container.visible = false;
             }
 
-	    // Always start with menuButton off.
-	    menuButtonsVisible = false;
+            // Always start with menuButton off.
+            menuButtonsVisible = false;
         };
 
         function _makeExtraGridButtons(name, delay) {
@@ -4626,19 +4634,19 @@ handleComplete);
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = true;
-			// Do we need to add a background?
-			// Should be image and text, hence === 2
-			// The exception is the Cartesian grid
-			if ([2, 5, 8].indexOf(container.children.length) !== -1) {
-			    var b = container.children[c].getBounds();
+                        // Do we need to add a background?
+                        // Should be image and text, hence === 2
+                        // The exception is the Cartesian grid
+                        if ([2, 5, 8].indexOf(container.children.length) !== -1) {
+                            var b = container.children[c].getBounds();
                             var bg = new createjs.Shape();
-			    if (container.children[c].textAlign === 'center') {
-				bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
-			    } else {
-				bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
-			    }
+                            if (container.children[c].textAlign === 'center') {
+                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
+                            } else {
+                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
+                            }
                             container.addChildAt(bg, 0);
-			}
+                        }
 
                         container.children[0].visible = true;
                         stage.update();
@@ -4873,7 +4881,7 @@ handleComplete);
 
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = cellsize / 2;
-		    onscreenMenu[i].visible = true;
+                    onscreenMenu[i].visible = true;
                 }
 
                 palettes.deltaY(dy);
@@ -4888,7 +4896,7 @@ handleComplete);
 
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = -cellsize;
-		    onscreenMenu[i].visible = false;
+                    onscreenMenu[i].visible = false;
                 }
 
                 palettes.deltaY(-dy);
