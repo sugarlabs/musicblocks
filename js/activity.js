@@ -1240,6 +1240,7 @@ define(MYDEFINES, function (compatibility) {
             turtles = new Turtles();
             turtles
                 .setCanvas(canvas)
+	        .setMasterStage(stage)
                 .setStage(turtleContainer)
                 .setRefreshCanvas(refreshCanvas);
 
@@ -4607,22 +4608,15 @@ handleComplete);
             container.y = y;
 
             var text = new createjs.Text(label, '14px Sans', '#282828');
-            // if (container.y < 55) {
-                if (container.x < 55) {
-                    text.textAlign = 'left';
-                    text.x = -14;
-                } else {
-                    text.textAlign = 'center';
-                    text.x = 0;
-                }
+            if (container.x < 55) {
+                text.textAlign = 'left';
+                text.x = -14;
+            } else {
+                text.textAlign = 'center';
+                text.x = 0;
+            }
 
-                text.y = 30;
-            // } else {
-            //     text.textAlign = 'right';
-            //    text.x = -28;
-            //    text.y = 0;
-            // }
-
+            text.y = 30;
             text.visible = false;
 
             var circles;
@@ -4630,6 +4624,21 @@ handleComplete);
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = true;
+			// Do we need to add a background?
+			// Should be image and text, hence === 2
+			// The exception is the Cartesian grid
+			if ([2, 5, 8].indexOf(container.children.length) !== -1) {
+			    var b = container.children[c].getBounds();
+                            var bg = new createjs.Shape();
+			    if (container.children[c].textAlign === 'center') {
+				bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
+			    } else {
+				bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
+			    }
+                            container.addChildAt(bg, 0);
+			}
+
+                        container.children[0].visible = true;
                         stage.update();
                         break;
                     }
@@ -4644,6 +4653,7 @@ handleComplete);
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = false;
+                        container.children[0].visible = false;
                         stage.update();
                         break;
                     }
@@ -4687,7 +4697,6 @@ handleComplete);
 
             img.src = 'header-icons/' + name + '.svg';
             container.addChild(text);
-
             return container;
         };
 
