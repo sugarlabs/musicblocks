@@ -2115,12 +2115,12 @@ define(MYDEFINES, function (compatibility) {
                 setTimeout(function () {
                     console.log('loading ' + projectID);
                     loadStartWrapper(loadProject, projectID, flags, env);
-                }, 2000);
+                }, 200); // 2000
             } else {
                 setTimeout(function () {
                     console.log('load new Start block');
                     loadStartWrapper(_loadStart);
-                }, 2000);
+                }, 200); // 2000
             }
 
             document.addEventListener('mousewheel', scrollEvent, false);
@@ -3321,7 +3321,7 @@ define(MYDEFINES, function (compatibility) {
             // We really need to signal when each palette item is deleted
             setTimeout(function() {
                 stage.dispatchEvent('trashsignal');
-           }, 1000 * actionBlockCounter);
+           }, 100 * actionBlockCounter); // 1000
 
             update = true;
         };

@@ -881,7 +881,7 @@ function Blocks () {
                                     that.palettes.hide();
                                     that.palettes.updatePalettes('action');
                                     that.palettes.show();
-                                }, 500);
+                                }, 50); // 500
 
                                 break;
                             }
@@ -1414,7 +1414,7 @@ function Blocks () {
                                             that.palettes.hide();
                                             that.palettes.updatePalettes('action');
                                             that.palettes.show();
-                                        }, 500);
+                                        }, 50); // 500
 
                                         break;
                                     }
@@ -1422,7 +1422,7 @@ function Blocks () {
 
                                 that.renameNameddos(that.blockList[connection].value, myBlock.value);
                                 that.renameDos(that.blockList[connection].value, myBlock.value);
-                            }, 750);
+                            }, 75); // 750
                         }
                     } else if (this.blockList[newBlock].name === 'storein') {
                         // We may need to add new storein and namedo
@@ -1436,7 +1436,7 @@ function Blocks () {
                                 that.palettes.hide();
                                 that.palettes.updatePalettes('boxes');
                                 that.palettes.show();
-                            }, 500);
+                            }, 50); // 500
                          }
                     }
                 } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
@@ -2998,7 +2998,7 @@ function Blocks () {
             that.palettes.hide();
             that.palettes.updatePalettes('action');
             that.palettes.show();
-        }, 500);
+        }, 100); // 500
     };
 
     this._removeNamedoEntries = function (name) {
@@ -4710,7 +4710,7 @@ function Blocks () {
                 that.palettes.updatePalettes('boxes');
                 // that.palettes.dict['boxes'].hide();
                 that.palettes.show();
-            }, 1500);
+            }, 150); // 1500
         }
 
         console.log("Finished block loading");
@@ -4864,11 +4864,11 @@ function Blocks () {
 
             // Delete action blocks from action palette.
             // Use a timeout to avoid palette refresh race condition.
-            this.deleteActionTimeout += 500;
+            this.deleteActionTimeout += 50; // 500
             var timeout = this.deleteActionTimeout;
             var that = this;
             setTimeout(function () {
-                that.deleteActionTimeout -= 500;
+                that.deleteActionTimeout -= 50; // 500
                 that.palettes.removeActionPrototype(actionName);
             }, timeout);
         }

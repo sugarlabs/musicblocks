@@ -2240,7 +2240,7 @@ function initPalettes (palettes) {
         palettes.show();
         palettes.bringToTop();
         palettes.showSelection(0);
-    }, 6000);
+    }, 1000); // 6000
 };
 
 
