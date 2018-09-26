@@ -43,7 +43,7 @@ function beginnerBlock(name) {
     // Only these blocks appear on the palette in beginner mode.
     return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
             'meter', 'setmasterbpm2', 'everybeatdo', 'beatvalue',  // meter palette
-            'pitch', 'pitch2', 'pitchnumber', 'hertz', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
+            'pitch', 'pitch2', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
             'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', // interval palette
             'settimbre', 'newstaccato', 'newslur', 'vibrato', 'neighbor2', 'chorus', 'dis', 'phaser', 'tremelo', // tone palette
             'crescendo', 'decrescendo', 'setsynthvolume',  // volume palette
