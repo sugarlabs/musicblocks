@@ -4586,9 +4586,9 @@ handleComplete);
                             var b = container.children[c].getBounds();
                             var bg = new createjs.Shape();
                             if (container.children[c].textAlign === 'center') {
-                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2, b.width + 16, b.height + 8, 5, 5, 5, 5);
+                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
                             } else {
-                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2, b.width + 16, b.height + 8, 5, 5, 5, 5);
+                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
                             }
                             container.addChildAt(bg, 0);
                         }
