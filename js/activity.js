@@ -1229,7 +1229,7 @@ define(MYDEFINES, function (compatibility) {
             turtles = new Turtles();
             turtles
                 .setCanvas(canvas)
-	        .setClear(_allClear)
+                .setClear(_allClear)
                 .setHideMenu(hideAuxMenu)
                 .setMasterStage(stage)
                 .setStage(turtleContainer)
@@ -3056,8 +3056,8 @@ define(MYDEFINES, function (compatibility) {
                 utilityContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
                 collapseBlocksContainer.y = 82.5 + LEADING;
-		homeButtonContainers[0].y = 82.5 + LEADING;
-		homeButtonContainers[1].y = 82.5 + LEADING;
+                homeButtonContainers[0].y = 82.5 + LEADING;
+                homeButtonContainers[1].y = 82.5 + LEADING;
                 deltaY(-55 - LEADING);
             } else if (uploadContainer.visible) {
                 saveHTMLContainer.visible = false;
@@ -3076,8 +3076,8 @@ define(MYDEFINES, function (compatibility) {
                 restoreContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
                 collapseBlocksContainer.y = 82.5 + LEADING;
-		homeButtonContainers[0].y = 82.5 + LEADING;
-		homeButtonContainers[1].y = 82.5 + LEADING;
+                homeButtonContainers[0].y = 82.5 + LEADING;
+                homeButtonContainers[1].y = 82.5 + LEADING;
                 deltaY(-55 - LEADING);
             } else if (languageContainer.visible) {
                 beginnerModeContainer.visible = false;
@@ -3093,29 +3093,29 @@ define(MYDEFINES, function (compatibility) {
                 scrollOnContainer.visible = false;
                 scrollOffContainer.visible = false;
                 hideBlocksContainer.visible = false;
-		collapseBlocksContainer.visible = false;
-		homeButtonContainers[0].visible = false;
-		homeButtonContainers[1].visible = false;
+                collapseBlocksContainer.visible = false;
+                homeButtonContainers[0].visible = false;
+                homeButtonContainers[1].visible = false;
 
                 gridContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
                 collapseBlocksContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
-		homeButtonContainers[0].y = 82.5 + LEADING;
-		homeButtonContainers[1].y = 82.5 + LEADING;
+                homeButtonContainers[0].y = 82.5 + LEADING;
+                homeButtonContainers[1].y = 82.5 + LEADING;
                 deltaY(-55 - LEADING);
             }
         };
 
         function _deleteBlocksBox() {
             // if save or settings is open, close them.
-	    homeButtonContainers[0].visible = false;
-	    homeButtonContainers[1].visible = false;
+            homeButtonContainers[0].visible = false;
+            homeButtonContainers[1].visible = false;
             if (!confirmContainer.visible) {
                 closeSubMenus();
                 confirmContainer.visible = true;
-		confirmContainer.x = newContainer.x;
+                confirmContainer.x = newContainer.x;
                 confirmContainer.y = 27.5;
                 deltaY(55 + LEADING);
             } else {
@@ -3174,15 +3174,15 @@ define(MYDEFINES, function (compatibility) {
                     scrollOnContainer.visible = false;
                     scrollOffContainer.visible = false;
 
-		    var x = Math.floor(canvas.width / turtleBlocksScale) - 11 * 55 / 2;
+                    var x = Math.floor(canvas.width / turtleBlocksScale) - 11 * 55 / 2;
                     beginnerModeContainer.x = x;
                     advancedModeContainer.x = x;
-		    x += 55;
+                    x += 55;
                     languageContainer.x = x;
-		    x += 55;
+                    x += 55;
                     smallerContainer.x = x;
                     smallerOffContainer.x = x;
-		    x += 55;
+                    x += 55;
                     largerContainer.x = x;
                     largerOffContainer.x = x;
                 } else {
@@ -3192,18 +3192,26 @@ define(MYDEFINES, function (compatibility) {
                     statsContainer.visible = true;
                     setScrollerButton();
 
-                    beginnerModeContainer.x = 55 * 1 + 27.5;
-                    advancedModeContainer.x = 55 * 1 + 27.5;
-                    languageContainer.x = 55 * 2 + 27.5;
-                    smallerContainer.x = 55 * 3 + 27.5;
-                    largerContainer.x = 55 * 4 + 27.5;
-                    smallerOffContainer.x = 55 * 3 + 27.5;
-                    largerOffContainer.x = 55 * 4 + 27.5;
-                    pluginsContainer.x = 55 * 5 + 27.5;
-                    deletePluginContainer.x = 55 * 6 + 27.5;
-                    statsContainer.x = 55 * 7 + 27.5;
-                    scrollOnContainer.x = 55 * 8 + 27.5;
-                    scrollOffContainer.x = 55 * 8 + 27.5;
+                    var x = Math.floor(canvas.width / turtleBlocksScale) - 19 * 55 / 2;
+                    beginnerModeContainer.x = x;
+                    advancedModeContainer.x = x;
+                    x += 55;
+                    languageContainer.x = x;
+                    x += 55;
+                    smallerContainer.x = x;
+                    smallerOffContainer.x = x;
+                    x += 55;
+                    largerContainer.x = x;
+                    largerOffContainer.x = x; 
+                    x += 55;
+                    pluginsContainer.x = x;
+                    x += 55;
+                    deletePluginContainer.x = x;
+                    x += 55;
+                    statsContainer.x = x;
+                    x += 55;
+                    scrollOnContainer.x = x;
+                    scrollOffContainer.x = x;
                 }
 
                 setSmallerLargerStatus();
@@ -3375,12 +3383,15 @@ define(MYDEFINES, function (compatibility) {
             closeSubMenus();
             planet.openPlanet();
         };
-
+ 
         function doSave() {
             if (beginnerMode) {
                 closeSubMenus();
                 save.saveHTML(_('My Project'));
             } else {
+                homeButtonContainers[0].visible = false;
+                homeButtonContainers[1].visible = false;
+
                 if (!saveHTMLContainer.visible) {
                     closeSubMenus();
                     saveHTMLContainer.visible = true;
@@ -3393,20 +3404,33 @@ define(MYDEFINES, function (compatibility) {
                         saveLilypondContainer.visible = true;
                         saveABCContainer.visible = true;
 
-                        saveHTMLContainer.x = 55 * 0 + 27.5;
-                        uploadContainer.x = 55 * 1 + 27.5;
-                        saveSVGContainer.x = 55 * 2 + 27.5;
-                        savePNGContainer.x = 55 * 3 + 27.5;
-                        saveWAVContainer.x = 55 * 4 + 27.5;
-                        saveLilypondContainer.x = 55 * 5 + 27.5;
-                        saveABCContainer.x = 55 * 6 + 27.5;
-                        saveArtworkContainer.x = 55 * 7 + 27.5;
+                        var x = Math.floor(canvas.width / turtleBlocksScale) - 19 * 55 / 2;
+                        saveHTMLContainer.x = x;
+                        x += 55;
+                        uploadContainer.x = x;
+                        x += 55;
+                        saveSVGContainer.x = x;
+                        x += 55;
+                        savePNGContainer.x = x;
+                        x += 55;
+                        saveWAVContainer.x = x;
+                        x += 55;
+                        saveLilypondContainer.x = x;
+                        x += 55;
+                        saveABCContainer.x = x;
+                        x += 55;
+                        saveArtworkContainer.x = x;
                     } else {
-                        saveHTMLContainer.x = 55 * 2 + 27.5;
-                        uploadContainer.x = 55 * 3 + 27.5;
-                        saveSVGContainer.x = 55 * 4 + 27.5;
-                        savePNGContainer.x = 55 * 5 + 27.5;
-                        saveArtworkContainer.x = 55 * 6 + 27.5;
+                        var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * 55 / 2;
+                        saveHTMLContainer.x = x;
+                        x += 55;
+                        uploadContainer.x = x;
+                        x += 55;
+                        saveSVGContainer.x = x;
+                        x += 55;
+                        savePNGContainer.x = x;
+                        x += 55;
+                        saveArtworkContainer.x = x;
                     }
 
                     saveHTMLContainer.y = 27.5;
@@ -3434,8 +3458,8 @@ define(MYDEFINES, function (compatibility) {
                     }
 
                     // Move it down since we are about to move it up.
-                    saveContainer.y = 82.5 + LEADING;
                     deltaY(-55 - LEADING);
+                    _showHideAuxMenu(true);
                 }
             }
         };
@@ -3675,11 +3699,11 @@ define(MYDEFINES, function (compatibility) {
             msgText.text = msg;
             msgContainer.updateCache();
             stage.setChildIndex(msgContainer, stage.children.length - 1);
-	    refreshCanvas();
+            refreshCanvas();
         };
 
         function errorMsg(msg, blk, text, timeout) {
-	    /*
+            /*
             if (logo.optimize) {
                 return;
             }
@@ -3792,7 +3816,7 @@ define(MYDEFINES, function (compatibility) {
                 }, myTimeout);
             }
 
-	    refreshCanvas();
+            refreshCanvas();
         };
 
         function _hideCartesian() {
@@ -4122,9 +4146,9 @@ handleComplete);
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
                         ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                         ['save', doSave, _('Save project'), null, null, null, null],
-			planetMenuItem,
+                        planetMenuItem,
                         ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-			['help', _showHelp, _('Help'), null, null, null, null]
+                        ['help', _showHelp, _('Help'), null, null, null, null]
                     ];
                 } else {
                     var buttonNames = [
@@ -4135,9 +4159,9 @@ handleComplete);
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
                         ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                         ['save', doSave, _('Save project'), null, null, null, null],
-			planetMenuItem,
+                        planetMenuItem,
                         ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-			['help', _showHelp, _('Help'), null, null, null, null]
+                        ['help', _showHelp, _('Help'), null, null, null, null]
                     ];
                 }
 
@@ -4150,7 +4174,7 @@ handleComplete);
                     ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
                     ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
-		    planetMenuItem,
+                    planetMenuItem,
                     ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
                     ['help', _showHelp, _('Help'), null, null, null, null]
                 ];
@@ -4181,11 +4205,11 @@ handleComplete);
                     continue;
                 }
 
-		if (buttonNames[i][0] === 'open') {
-		    var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
-		} else if (buttonNames[i][0] === 'help') {
-		    var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
-		}
+                if (buttonNames[i][0] === 'open') {
+                    var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
+                } else if (buttonNames[i][0] === 'help') {
+                    var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
+                }
 
                 var container = _makeButton(buttonNames[i][0] + '-button', buttonNames[i][2], x, y, btnSize, 0);
                 _loadButtonDragHandler(container, x, y, buttonNames[i][1], buttonNames[i][3], buttonNames[i][4], buttonNames[i][5], buttonNames[i][6]);
@@ -4196,8 +4220,8 @@ handleComplete);
                 } else if (buttonNames[i][0] === 'hard-stop-turtle') {
                     console.log('hard stop turtle');
                     hardStopTurtleContainer = container;
-		} else if (buttonNames[i][0] === 'new') {
-		    newContainer = container;
+                } else if (buttonNames[i][0] === 'new') {
+                    newContainer = container;
                 }
 
                 // Ensure that stop-turtle button is placed on top of
@@ -4386,7 +4410,7 @@ handleComplete);
             menuContainer = _makeButton('menu-button', _('Auxillary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
-	    var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
+            var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
             // var x = Math.floor(-btnSize / 2);
             var y = Math.floor(btnSize / 2);
 
@@ -4430,7 +4454,7 @@ handleComplete);
                     homeButtonContainers[1].visible = false;
                     boundary.hide();
                     blocks.setHomeContainers(homeButtonContainers, boundary);
-		}
+                }
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
                 onscreenMenu.push(container);
@@ -4810,6 +4834,8 @@ handleComplete);
 
             palettes.deltaY(dy);
             turtles.deltaY(dy);
+
+            menuContainer.y += dy;
             blocksContainer.y += dy;
 
             refreshCanvas();
@@ -4831,7 +4857,10 @@ handleComplete);
 
                 palettes.deltaY(dy);
                 turtles.deltaY(dy);
+
                 blocksContainer.y += dy;
+                menuContainer.y += dy;
+
             } else {
                 var dy = headerContainer.y;
                 headerContainer.y = 0;
@@ -4846,6 +4875,8 @@ handleComplete);
 
                 palettes.deltaY(-dy);
                 turtles.deltaY(-dy);
+
+                menuContainer.y = cellsize / 2;
                 blocksContainer.y -= dy;
             }
 
@@ -4874,234 +4905,6 @@ handleComplete);
             }
 
             refreshCanvas();
-        };
-
-        function _piemenuStageContext_x () {
-            // A submenu menu to replace the top and right toolbars
-            docById('submenuWheelDiv').style.width = '900px';
-            docById('submenuWheelDiv').style.height = '900px';
-            docById('submenuWheelDiv').style.left = '192px';
-            docById('submenuWheelDiv').style.top = '-375px';
-            docById('submenuWheelDiv').style.position = 'absolute';
-            docById('submenuWheelDiv').style.display = '';
-
-            // Main menu items, [submenu index], function
-            var wheelValues = [
-                ['imgsrc:header-icons/hide-blocks-button.svg', _doOpenSamples],
-                ['imgsrc:header-icons/collapse-blocks-button.svg', doLoad],
-                ['imgsrc:header-icons/go-home-button.svg', doSave],
-                ['imgsrc:header-icons/help-button.svg', pasteStack],
-                [null], [null], [null], [null],
-            ];
-
-            var subwheelValues = [
-                ['imgsrc:header-icons/planet-button.svg', _doOpenSamples],
-                ['imgsrc:header-icons/open-button.svg', doLoad],
-                ['imgsrc:header-icons/save-button.svg', doSave],
-                ['imgsrc:header-icons/paste-button.svg', pasteStack],
-                ['imgsrc:header-icons/Cartesian-button.svg', _doCartesianPolar],
-                ['imgsrc:header-icons/utility-button.svg', _doUtilityBox],
-                ['imgsrc:header-icons/new-button.svg', _deleteBlocksBox],
-                ['imgsrc:header-icons/restore-trash-button.svg', _restoreTrash],
-                [null], [null], [null], [null],
-                [null], [null], [null], [null],
-            ];
-
-            var wheelLabels = [];
-            for (var i = 0; i < wheelValues.length; i++) {
-                wheelLabels.push(wheelValues[i][0]);
-            }
-
-            var subwheelLabels = [];
-            for (var i = 0; i < subwheelValues.length; i++) {
-                subwheelLabels.push(subwheelValues[i][0]);
-            }
-
-            var wheel = new wheelnav('submenuWheelDiv', null, 450, 450);
-            var submenuWheel = new wheelnav('_submenuWheel', wheel.raphael);
-
-            wheelnav.cssMode = true;
-
-            wheel.keynavigateEnabled = true;
-
-            wheel.colors = ['#2584af'];
-            wheel.slicePathFunction = slicePath().DonutSlice;
-            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            wheel.slicePathCustom.minRadiusPercent = 0.1;
-            wheel.slicePathCustom.maxRadiusPercent = 0.4;
-            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-            wheel.sliceInitPathCustom = wheel.slicePathCustom;
-            wheel.animatetime = 300;
-            wheel.navAngle = 360 / (2 * wheelLabels.length);
-            wheel.clickModeRotate = false;
-            wheel.createWheel(wheelLabels);
-
-            /*
-            wheel.navItems[0].setTooltip(_('Close'));
-            wheel.navItems[1].setTooltip(_('Run'));
-            wheel.navItems[2].setTooltip(_('Stop'));
-            wheel.navItems[3].setTooltip(_('Clean'));
-            wheel.navItems[4].setTooltip(_('Show/hide blocks'));
-            wheel.navItems[5].setTooltip(_('Expand/collapse collapsible blocks'));
-            wheel.navItems[6].setTooltip(_('Home'));
-            wheel.navItems[7].setTooltip(_('More'));
-            wheel.navItems[8].setTooltip(_('Help'));
-            */
-
-            submenuWheel.colors = ['#489eca'];
-            submenuWheel.slicePathFunction = slicePath().DonutSlice;
-            submenuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            submenuWheel.slicePathCustom.minRadiusPercent = 0.4;
-            submenuWheel.slicePathCustom.maxRadiusPercent = 0.7;
-            submenuWheel.sliceSelectedPathCustom = submenuWheel.slicePathCustom;
-            submenuWheel.sliceInitPathCustom = submenuWheel.slicePathCustom;
-            submenuWheel.clickModeRotate = false;
-            // submenuWheel.navAngle = -180 / wheelValues.length + 180 / (wheelValues.length * submenuWheelValues[0].length);
-            submenuWheel.navAngle = 360 / (2 * subwheelLabels.length);
-            submenuWheel.createWheel(subwheelLabels);
-
-            /*
-            submenuWheel.navItems[0].setTooltip(_('Run step by step'));
-            submenuWheel.navItems[1].setTooltip(_('Run slowly'));
-            submenuWheel.navItems[2].setTooltip(_('Run fast'));
-
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                submenuWheel.navItems[3].setTooltip(_('Run music slowly'));
-                submenuWheel.navItems[4].setTooltip(_('Run music step by step'));
-
-                if (planet) {
-                    submenuWheel.navItems[5].setTooltip(_('Load samples from server'));
-                } else {
-                    submenuWheel.navItems[5].setTooltip(_('The Planet is unavailable.'));
-                }
-
-                submenuWheel.navItems[6].setTooltip(_('Load project from file'));
-                submenuWheel.navItems[7].setTooltip(_('Merge project from file'));
-                submenuWheel.navItems[8].setTooltip(_('Save project'));
-                submenuWheel.navItems[9].setTooltip(_('Click here to paste'));
-
-                if (cartesianBitmap.visible && polarBitmap.visible) {
-                    //.TRANS: show Polar coordinate overlay grid
-                    submenuWheel.navItems[10].setTooltip(_('Polar'));
-                } else if (!cartesianBitmap.visible && polarBitmap.visible) {
-                    //.TRANS: hide Polar coordinate overlay grid
-                    submenuWheel.navItems[10].setTooltip(_('hide grid'));
-                } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
-                    submenuWheel.navItems[10].setTooltip(_('Cartesian'));
-                } else if (cartesianBitmap.visible && !polarBitmap.visible) {
-                    //.TRANS: show Cartesian coordinate overlay grid
-                    submenuWheel.navItems[10].setTooltip(_('Cartesian') + ' + ' + _('Polar'));
-                }
-
-                submenuWheel.navItems[11].setTooltip(_('playback'));
-                submenuWheel.navItems[12].setTooltip(_('Settings'));
-                submenuWheel.navItems[13].setTooltip(_('New Project'));
-                submenuWheel.navItems[14].setTooltip(_('Restore'));
-
-                if (beginnerMode) {
-                    submenuWheel.navItems[15].setTooltip(_('Switch to advanced mode'));
-                } else {
-                    submenuWheel.navItems[15].setTooltip(_('Switch to beginner mode'));
-                }
-            } else {
-                if (planet) {
-                    submenuWheel.navItems[3].setTooltip(_('Load samples from server'));
-                } else {
-                    submenuWheel.navItems[3].setTooltip(_('The Planet is unavailable.'));
-                }
-
-                submenuWheel.navItems[4].setTooltip(_('Load project from file'));
-                submenuWheel.navItems[5].setTooltip(_('Merge project from file'));
-                submenuWheel.navItems[6].setTooltip(_('Save project'));
-                submenuWheel.navItems[7].setTooltip(_('Click here to paste'));
-
-                if (cartesianBitmap.visible && polarBitmap.visible) {
-                    //.TRANS: show Polar coordinate overlay grid
-                    submenuWheel.navItems[8].setTooltip(_('Polar'));
-                } else if (!cartesianBitmap.visible && polarBitmap.visible) {
-                    //.TRANS: hide Polar coordinate overlay grid
-                    submenuWheel.navItems[8].setTooltip(_('hide grid'));
-                } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
-                    submenuWheel.navItems[8].setTooltip(_('Cartesian'));
-                } else if (cartesianBitmap.visible && !polarBitmap.visible) {
-                    //.TRANS: show Cartesian coordinate overlay grid
-                    submenuWheel.navItems[8].setTooltip(_('Cartesian') + ' + ' + _('Polar'));
-                }
-
-                submenuWheel.navItems[9].setTooltip(_('Settings'));
-                submenuWheel.navItems[10].setTooltip(_('New Project'));
-                submenuWheel.navItems[11].setTooltip(_('Restore'));
-            }
-
-            var __selectionChanged = function () {
-                var i = submenuWheel.selectedNavItemIndex;
-                if (submenuWheelValues[i][1] !== null) {
-                    __exitMenu();
-                    submenuWheelValues[i][1]();
-                }
-            };
-            */
-            var __exitMenu = function () {
-                var d = new Date();
-                piemenuExitTime = d.getTime();
-                docById('submenuWheelDiv').style.display = 'none';
-                wheel.removeWheel();
-            };
-
-            var __showHide = function () {
-                var i = wheel.selectedNavItemIndex;
-                /*
-                var subitems = wheelValues[i][1];
-                if (subitems === null) {
-                    for (var j = 0; j < submenuWheelValues.length; j++) {
-                        submenuWheel.navItems[j].navItem.hide();
-                    }
-                } else {
-                    for (var j = 0; j < submenuWheelValues.length; j++) {
-                        if (j < subitems[0] || j > subitems[1]) {
-                            submenuWheel.navItems[j].navItem.hide();
-                        } else {
-                            submenuWheel.navItems[j].navItem.show();
-                        }
-                    }
-                }
-                */
-            };
-
-            wheel.navItems[0].navigateFunction = function () {
-                // __exitMenu();
-            };
-
-            var __action = function () {
-                var i = wheel.selectedNavItemIndex;
-                console.log('action: ' + i);
-                __showHide();
-
-                if (wheelValues[i][2] !== null) {
-                   // __exitMenu();
-                    wheelValues[i][2]();
-                }
-            };
-
-            for (var i = 1; i < wheelValues.length; i++) {
-                wheel.navItems[i].navigateFunction = __action;
-            }
-
-            /*
-            // Hide the widget when the selection is made.
-            for (var i = 0; i < tabsLabels.length; i++) {
-                submenuWheel.navItems[i].navigateFunction = function () {
-                    __selectionChanged();
-                    __exitMenu();
-                };
-            }
-            */
-
-            // wheel.navigateWheel(1);
-
-            setTimeout(function () {
-                blocks.stageClick = false;
-            }, 500);
         };
 
         function piemenuBlockContext (activeBlock) {
