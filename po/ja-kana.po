@@ -965,20 +965,20 @@ msgstr "サステイン あたいには 0 いじょう 100いかの すうじを
 
 #: js/logo.js:3716
 msgid "Release value should be from 0-100."
-msgstr "リリース あたいには 0 いじょう100いかのすうじをいれてください。"
+msgstr "リリース あたいには 0 いじょう100いかの すうじを いれて ください。"
 
 #: js/logo.js:3732
 msgid "You are adding multiple envelope blocks."
-msgstr "「エンベロープ」ブロックをふくすうついかしています。"
+msgstr "「エンベロープ」ブロックを ふくすう ついか しています。"
 
 #: js/logo.js:3761
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
-msgstr "ロールオフあたいは -12, -24, -48, -98 デシベル / オクターヴであるひつようがあります。"
+msgstr "ロールオフ あたいは -12, -24, -48, -98 デシベル / オクターヴ である ひつようが あります。"
 
 #: js/logo.js:3799
 msgid "You are adding multiple oscillator blocks."
-msgstr "ふくすうのオシレーターブロックをついかしています。"
+msgstr "ふくすうの オシレーター ブロックを ついか しています。"
 
 #: js/logo.js:3845
 #: js/basicblocks.js:292
@@ -1010,19 +1010,19 @@ msgstr "おんかいてき"
 
 #: js/logo.js:3916
 msgid "The Case Block must be used inside of a Switch Block."
-msgstr "ケースブロックはスイッチブロックのなかにあるひつようがあります。"
+msgstr "ケースブロックは スイッチ ブロックの なかに ある ひつようが あります。"
 
 #: js/logo.js:3986
 msgid "The Scalar Step Block must be used inside of a Note Block."
-msgstr "おんかいステップブロックはおんぷブロックのなかにあるひつようがあります。"
+msgstr "おんかい ステップ ブロックは おんぷ ブロックの なかに ある ひつようが あります。"
 
 #: js/logo.js:4134
 msgid "Drum Block: Did you mean to use a Note block?"
-msgstr "ドラムブロック：おんぷブロックといっしょにつかいますか？"
+msgstr "ドラム ブロック：おんぷ ブロックと いっしょに つかいますか？"
 
 #: js/logo.js:4547
 msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr "ピッチブロック：おんぷブロックといっしょにつかいますか?"
+msgstr "ピッチ ブロック：おんぷ ブロックと いっしょに つかいますか?"
 
 #: js/logo.js:4587
 msgid "polyphonic rhythm"
@@ -1031,23 +1031,23 @@ msgstr "ポリリズム"
 #: js/logo.js:4917
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
-msgstr "おんかのすうちは０よりおおきいひつようがあります"
+msgstr "おんかの すうちは ０より おおきい ひつようが あります"
 
 #: js/logo.js:4993
 msgid "An argument of -1 results in a note value of 0."
-msgstr "ー１は０のおんかにします"
+msgstr "ー１は ０の おんかに します"
 
 #: js/logo.js:5234
 msgid "Vibrato intensity must be between 1 and 100."
-msgstr "ビブラートの「きょうど」は０と100のあいだであるひつようがあります。"
+msgstr "ビブラートの「きょうど」は ０と 100の あいだ である ひつようが あります。"
 
 #: js/logo.js:5239
 msgid "Vibrato rate must be greater than 0."
-msgstr "ビブラートの「レート」すうじは０よりおおきいひつようがあります。"
+msgstr "ビブラートの 「レート」 すうじは ０より おおきい ひつようが あります。"
 
 #: js/logo.js:5271
 msgid "Distortion must be from 0 to 100."
-msgstr "ディストーションのすうじは０と100のあいだであるひつようがあります。"
+msgstr "ディストーションの すうじは ０と 100の あいだ である ひつようが あります。"
 
 #: js/logo.js:5301
 #: js/logo.js:5369
@@ -1055,22 +1055,22 @@ msgstr "ディストーションのすうじは０と100のあいだであるひ
 #.TRANS: Depth is the intesity of the chorus effect.
 ## http://jisho.org/word/%E5%A4%89%E5%9F%9F ; 変域＝へんいき
 msgid "Depth is out of range."
-msgstr "（エフェクタの）ふかさのすうじがへんいきがいです。"
+msgstr "（エフェクタの）ふかさの すうじが へんいきがい です。"
 
 #: js/logo.js:5405
 #.TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
-msgstr "ばいおんが０いじょうであるひつようがあります。"
+msgstr "ばいおんが ０いじょう である ひつようが あります。"
 
 #: js/logo.js:5455
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
-msgstr "ばいおんのウェートは０と１のあいだであるひつようがあります。"
+msgstr "ばいおんの ウェートは ０と １の あいだ である ひつようが あります。"
 
 #: js/logo.js:5465
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partials block."
-msgstr "ばいおんブロックが「ばいおんウェートブロック」のなかにあるひつようがあります。"
+msgstr "ばいおん ブロック が「ばいおん ウェート ブロック」の なかに ある ひつようが あります。"
 
 #: js/logo.js:6293
 #: js/logo.js:6338
@@ -1109,28 +1109,28 @@ msgstr "オリジナル"
 
 #: js/logo.js:6676
 msgid "Hertz Block: Did you mean to use a Note block?"
-msgstr "ヘルツ・ブロック：おんぷブロックをつかいますか？"
+msgstr "ヘルツ・ブロック：おんぷ ブロックを つかいますか？"
 
 #: js/logo.js:7265
 msgid "Playback is ready."
-msgstr "コンパイルかんりょう"
+msgstr "コンパイル かんりょう"
 
 #: js/logo.js:7519
 #.TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
-msgstr "「ばいおんウェート」ブロックのなかにひとついじょうのばいおんブロックがはいっているひつようがあります。"
+msgstr "「ばいおん ウェート」ブロックの なかに ひとつ いじょうの ばいおん ブロックが はいっている ひつようが あります。"
 
 #: js/logo.js:7650
 msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-msgstr "おなじたかさのおとだけタイでつなげることがかのうです。"
+msgstr "おなじ たかさの おと だけ タイで つなげる ことが かのう です。スラー ブロックを つかう つもり ですか？"
 
 #: js/logo.js:8088
 msgid "synth cannot play chords."
-msgstr "このシンセではわおんができません"
+msgstr "この シンセでは わおんが できません。"
 
 #: js/logo.js:10512
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
-msgstr "おんめいはA, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭のなかからひつようがあります。"
+msgstr "おんめいは 「A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯, A♭」のなか から えらぶ ひつようが あります。"
 
 #: js/logo.js:10544
 #: js/basicblocks.js:3984
@@ -1138,12 +1138,12 @@ msgstr "おんめいはA, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F�
 #: plugins/heap.rtp:142
 #.TRANS: empty the heap
 msgid "empty heap"
-msgstr "からのヒープ"
+msgstr "からの ヒープ"
 
 #: js/logo.js:10653
 #: js/logo.js:10728
 msgid "You must use two pitch blocks when measuring an interval."
-msgstr "インターバルをはかるさいは、２つのおんぷをつかうひつようがあります。"
+msgstr "インターバルを はかる さいは、２つの おんぷを つかう ひつようが あります。"
 
 #: js/logo.js:10867
 #: js/basicblocks.js:313
@@ -1158,24 +1158,24 @@ msgstr "おんぷ"
 
 #: js/logo.js:10907
 msgid "Cannot find block"
-msgstr "ブロックがみつかりません"
+msgstr "ブロックが みつかりません"
 
 #: js/logo.js:10915
 #: js/logo.js:10920
 msgid "Warning: block argument type mismatch"
-msgstr "ちゅうい：ブロックとタイプが合っていません。"
+msgstr "ちゅうい：ブロックと タイプが あっていません。"
 
 #: js/logo.js:11504
 msgid "Lilypond cannot process tempo of "
-msgstr "Lilypondではこのテンポをたいおうできません："
+msgstr "Lilypondでは この テンポを たいおう できません："
 
 #: js/logo.js:11525
 msgid "Lilypond cannot process pickup of "
-msgstr "Lilypondではこのピックアップをたいおうできません："
+msgstr "Lilypondでは この ピックアップを たいおう できません："
 
 #: js/clearbox.js:70
 msgid "confirm"
-msgstr "かくにんする"
+msgstr "かくにん する"
 
 #: js/palette.js:715
 #: js/palette.js:833
@@ -1205,11 +1205,11 @@ msgstr "テキスト"
 #: js/palette.js:793
 ## To be checked
 msgid "mode name"
-msgstr "モードのなまえ"
+msgstr "モードの なまえ"
 
 #: js/palette.js:796
 msgid "invert mode"
-msgstr "モードをはんてんさせる"
+msgstr "モードを はんてん させる"
 
 #: js/palette.js:799
 msgid "voice name"
@@ -1245,16 +1245,16 @@ msgstr "ほぞん"
 #: js/basicblocks.js:3610
 #: js/blocks.js:2431
 msgid "store in box"
-msgstr "ボックスにほぞん"
+msgstr "ボックスに ほぞん"
 
 #: js/palette.js:848
 #: js/blocks.js:1742
 msgid "open file"
-msgstr "ファイルをひらく"
+msgstr "ファイルを ひらく"
 
 #: js/palette.js:953
 msgid "Click to select a block."
-msgstr "クリックしてブロックをえらんでください"
+msgstr "クリックして ブロックを えらんで ください"
 
 #: js/palette.js:953
 #: js/basicblocks.js:2994
@@ -1262,7 +1262,7 @@ msgstr "クリックしてブロックをえらんでください"
 #: plugins/rodi.rtp:391
 #.TRANS: move backward (in the opposite direction of the current heading)
 msgid "back"
-msgstr "うしろへすすむ"
+msgstr "うしろへ すすむ"
 
 #: js/palette.js:961
 #: js/palette.js:962
@@ -1297,11 +1297,11 @@ msgstr "ドラム・スタート"
 
 #: js/turtledefs.js:17
 msgid "Music Blocks is a collection of tools for exploring musical concepts."
-msgstr "ミュージック・ブロックス：おんがくとさんすうとコーディングのかんけいを発見するツール"
+msgstr "ミュージック・ブロックス：おんがくと さんすうと コーディングの かんけいを たのしく たんきゅうする ための ツールです。"
 
 #: js/turtledefs.js:23
 msgid "search"
-msgstr ""
+msgstr "けんさく"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:865
@@ -1420,7 +1420,7 @@ msgstr "ミュージック・ブロックスへ　ようこそ"
 #: js/turtledefs.js:136
 ## Need to refine this
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr "ミュージック・ブロックスは おんがくと すうがくと プログラミングの かんけいを たのしく たんきゅうするための ツールです。"
+msgstr "ミュージック・ブロックスは おんがくと すうがくと プログラミングの かんけいを たのしく たんきゅうする ための ツールです。"
 
 #: js/turtledefs.js:107
 #: js/turtledefs.js:137
