@@ -878,9 +878,9 @@ function Blocks () {
                                 setTimeout(function () {
                                     blockPalette.remove(protoblock, that.blockList[oldBlock].value);
                                     delete that.protoBlockDict['myDo_' + that.blockList[oldBlock].value];
-                                    that.palettes.hide();
+                                    // that.palettes.hide();
                                     that.palettes.updatePalettes('action');
-                                    that.palettes.show();
+                                    // that.palettes.show();
                                 }, 50); // 500
 
                                 break;
@@ -1413,7 +1413,7 @@ function Blocks () {
                                             delete that.protoBlockDict['myDo_' + that.blockList[connection].value];
                                             that.palettes.hide();
                                             that.palettes.updatePalettes('action');
-                                            that.palettes.show();
+                                            // that.palettes.show();
                                         }, 50); // 500
 
                                         break;
@@ -1433,9 +1433,9 @@ function Blocks () {
                             this.newNamedboxBlock(myBlock.value);
                             var that = this;
                             setTimeout(function () {
-                                that.palettes.hide();
+                                // that.palettes.hide();
                                 that.palettes.updatePalettes('boxes');
-                                that.palettes.show();
+                                // that.palettes.show();
                             }, 50); // 500
                          }
                     }
@@ -2476,9 +2476,9 @@ function Blocks () {
                 if (value !== _('action')) {
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
-                    this.palettes.hide();
+                    // this.palettes.hide();
                     this.palettes.updatePalettes('action');
-                    this.palettes.show();
+                    // this.palettes.show();
                 }
             }
 
@@ -2657,9 +2657,9 @@ function Blocks () {
 
         // Force an update if the name has changed.
         if (stateChanged) {
-            this.palettes.hide();
+            // this.palettes.hide();
             this.palettes.updatePalettes('action');
-            this.palettes.show();
+            // this.palettes.show();
         }
     };
 
@@ -2880,9 +2880,9 @@ function Blocks () {
 
         // Force an update if the name has changed.
         if (nameChanged) {
-            this.palettes.hide();
+            // this.palettes.hide();
             this.palettes.updatePalettes('action');
-            this.palettes.show();
+            // this.palettes.show();
         }
     };
 
@@ -2995,9 +2995,9 @@ function Blocks () {
         // Add delay to avoid race condition.
         var that = this;
         setTimeout(function () {
-            that.palettes.hide();
+            // that.palettes.hide();
             that.palettes.updatePalettes('action');
-            that.palettes.show();
+            // that.palettes.show();
         }, 100); // 500
     };
 
@@ -3563,7 +3563,7 @@ function Blocks () {
             return;
         }
 
-        this.palettes.hide();
+        // this.palettes.hide();
 
         var blockObjs = this._copyBlocksToObj();
         // The first block is an action block. Its first connection is
@@ -3899,9 +3899,9 @@ function Blocks () {
         }
 
         if (updatePalettes) {
-            this.palettes.hide();
+            // this.palettes.hide();
             this.palettes.updatePalettes('action');
-            this.palettes.show();
+            // this.palettes.show();
         }
 
 
@@ -4673,10 +4673,10 @@ function Blocks () {
             }
         }
         if (updatePalettes) {
-            this.palettes.hide();
+            // this.palettes.hide();
             this.palettes.updatePalettes('action');
             // this.palettes.dict['action'].hide();
-            this.palettes.show();
+            // this.palettes.show();
         }
 
         var updatePalettes = false;
@@ -4706,10 +4706,10 @@ function Blocks () {
             // the actions update.
             var that = this;
             setTimeout(function () {
-                that.palettes.hide();
+                // that.palettes.hide();
                 that.palettes.updatePalettes('boxes');
                 // that.palettes.dict['boxes'].hide();
-                that.palettes.show();
+                // that.palettes.show();
             }, 150); // 1500
         }
 
@@ -4853,7 +4853,7 @@ function Blocks () {
                 }
 
                 if (blockValue === actionName) {
-                    thisBlock.hide();
+                    // thisBlock.hide();
                     thisBlock.trash = true;
                     if (argBlock !== null) {
                         argBlock.hide();

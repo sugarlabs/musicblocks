@@ -75,7 +75,7 @@ function Palettes () {
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
-    this.top = 55 + LEADING;
+    this.top = 55 + 5 + LEADING;
     this.current = DEFAULTPALETTE;
     this.x = [];  // We track x and y for each of the multipalettes
     this.y = [];
@@ -672,13 +672,13 @@ function Palettes () {
 
         // Force an update if a block was removed.
         if (blockRemoved) {
-            this.hide();
+            // this.hide();
             this.updatePalettes('action');
-            if (this.mobile) {
-                this.hide();
-            } else {
-                this.show();
-            }
+            // if (this.mobile) {
+            //     this.hide();
+            // } else {
+            //     this.show();
+            // }
         }
     };
 
