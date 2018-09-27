@@ -2833,7 +2833,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // If any menus were open, close them.
-            if (confirmContainer !== null && utilitiesContainer.visible) {
+            if (confirmContainer !== null && utilityContainer.visible) {
                 if (headerContainer.y > 0) {
                     _showHideAuxMenu(true);
                 }
@@ -4424,8 +4424,6 @@ handleComplete);
                     homeButtonContainers.push(container);
                     var container2 = _makeButton('go-home-faded-button', _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0);
                     _loadButtonDragHandler(container2, x, y, menuNames[i][1], null, null, null, null);
-		    console.log('Y === ' + container.y);
-		    console.log('Y === ' + container2.y);
                     homeButtonContainers.push(container2);
                     onscreenMenu.push(container2);
                     homeButtonContainers[0].visible = false;
@@ -4588,9 +4586,9 @@ handleComplete);
                             var b = container.children[c].getBounds();
                             var bg = new createjs.Shape();
                             if (container.children[c].textAlign === 'center') {
-                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
+                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2, b.width + 16, b.height + 8, 5, 5, 5, 5);
                             } else {
-                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2 , b.width + 16, b.height + 4, 5, 5, 5, 5);
+                                bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2, b.width + 16, b.height + 8, 5, 5, 5, 5);
                             }
                             container.addChildAt(bg, 0);
                         }
