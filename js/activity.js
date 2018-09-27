@@ -2016,7 +2016,8 @@ define(MYDEFINES, function (compatibility) {
                             if (palettes.visible) {
                                 palettes.hide();
                             }
-                            palettes.show();
+
+                            // palettes.show();
                             palettes.bringToTop();
                         }, 1000);
 
@@ -2614,7 +2615,7 @@ define(MYDEFINES, function (compatibility) {
             if (event.keyCode === RETURN && docById('search').value.length > 0) {
                 doSearch();
                 palettes.hide();
-                palettes.show();
+                // palettes.show();
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -2966,7 +2967,7 @@ define(MYDEFINES, function (compatibility) {
                 palettes.hide();
             } else {
                 palettes.setMobile(false);
-                palettes.show();
+                // palettes.show();
                 palettes.bringToTop();
             }
 
@@ -3421,7 +3422,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSave() {
-            if (false) { // (beginnerMode) {
+            if (beginnerMode) {
                 closeSubMenus();
                 save.saveHTML(_('My Project'));
             } else {
