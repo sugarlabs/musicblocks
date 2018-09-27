@@ -894,6 +894,7 @@ function RhythmRuler () {
             this._elapsedTimes[this._rulerSelected] = 0;
             this._offsets[this._rulerSelected] = 0;
         }
+        console.log("this._rulerSelected " +this._rulerSelected);
 
         this.__loop(0, this._rulerSelected, 0);
     };

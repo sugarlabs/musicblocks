@@ -15,7 +15,7 @@ const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote'];
-const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote'];
+const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
@@ -904,6 +904,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'pitchslider':
                     that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'musickeyboard':
+                    that.collapseText = new createjs.Text(_('mKeyboard'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'drum':
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');

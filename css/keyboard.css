@@ -1,0 +1,56 @@
+#keyboard {
+    height: 135px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    border: 1px solid black;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+}
+table {
+    table-layout:fixed;
+}
+table.white {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 120px;
+    border-spacing: 0px 0px;
+}
+table.black {
+    position: absolute;
+    border-collapse: separate;
+    border-spacing: 20px 0px;
+    height: 60px;
+    top: 0px;
+    left: 30px;
+}
+table.white > tbody > tr {
+    position: relative;
+}
+table.white > tbody > tr > td {
+    min-width: 80px;
+    width: 80px;
+    max-width: 80px;
+    height: 100%;
+    vertical-align: bottom;
+    border: 1px solid black;
+}
+table.black > tbody > tr > td {
+    min-width: 60px;
+    width: 60px;
+    max-width: 60px;
+    height: 100%;
+    vertical-align: bottom;
+    border: 1px solid white;
+    background-color: black;
+    color: white;
+    z-index: 100;
+}
+select.keySelect {
+    background-color: white;
+    display: inline-block;
+    width: 50px;
+    border: 1px solid black !important;
+}
