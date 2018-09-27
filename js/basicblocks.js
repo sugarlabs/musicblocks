@@ -966,6 +966,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: widget to generate pitches using a slider
     newblock.staticLabels.push(_('music keyboard'));
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('musickeyboard')) {
         newblock.hidden = true;
