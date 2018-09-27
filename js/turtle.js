@@ -1166,6 +1166,7 @@ function Turtle (name, turtles, drum) {
 
 function Turtles () {
     this.masterStage = null;
+    this.doClear = null;
     this.hideMenu = null;
     this.stage = null;
     this.refreshCanvas = null;
@@ -1183,7 +1184,8 @@ function Turtles () {
     this._expandButton = null;
     this._collapsedBoundary = null;
     this._collapseButton = null;
-    this._isShrunk = false;
+    this.isShrunk = false;
+    this._clearButton = null;
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
@@ -1191,6 +1193,11 @@ function Turtles () {
     this.setMasterStage = function (stage) {
         this.masterStage = stage;
         return this;
+    };
+
+    this.setClear = function (doClear) {
+	this.doClear = doClear;
+	return this;
     };
 
     this.setHideMenu = function (hideMenu) {
@@ -1232,7 +1239,13 @@ function Turtles () {
         this.stage.y += dy;
     };
 
-    this.makeBackground = function () {
+    this.makeBackground = function (setCollapsed) {
+        if (setCollapsed === undefined) {
+	    var doCollapse = false;
+	} else {
+	    var doCollapse = setCollapsed;
+	}
+
         // Remove any old background containers.
         for (var i = 0; i < this._borderContainer.children.length; i++) {
             this._borderContainer.children[i].visible = false;
@@ -1319,12 +1332,17 @@ function Turtles () {
                     that._expandButton.visible = false;
                     that.stage.x = 0;
                     that.stage.y = 0;
-                    that._isShrunk = false;
+                    that.isShrunk = false;
                     for (var i = 0; i < that.turtleList.length; i++) {
                         that.turtleList[i].container.scaleX = 1;
                         that.turtleList[i].container.scaleY = 1;
                         that.turtleList[i].container.scale = 1;
                     }
+
+                    that._clearButton.scaleX = 1;
+                    that._clearButton.scaleY = 1;
+                    that._clearButton.scale = 1;
+                    that._clearButton.x = that.w - 10 - 2 * 55;
 
                     // remove the stage and add it back in position 0
                     that.masterStage.removeChild(that.stage);
@@ -1352,33 +1370,73 @@ function Turtles () {
 
 		that._collapseButton.removeAllEventListeners('click');
                 that._collapseButton.on('click', function (event) {
-                    that.hideMenu();
-                    that.scaleStage(0.25);
-                    that._collapsedBoundary.visible = true;
-                    that._expandButton.visible = true;
-                    that._expandedBoundary.visible = false;
-                    that._collapseButton.visible = false;
-                    that.stage.x = (that.w * 3 / 4) - 10;
-                    that.stage.y = 55 + LEADING;
-                    that._isShrunk = true;
-                    for (var i = 0; i < that.turtleList.length; i++) {
-                        that.turtleList[i].container.scaleX = SCALEFACTOR;
-                        that.turtleList[i].container.scaleY = SCALEFACTOR;
-                        that.turtleList[i].container.scale = SCALEFACTOR;
-                    }
-
-                    // remove the stage and add it back at the top
-                    that.masterStage.removeChild(that.stage);
-                    that.masterStage.addChild(that.stage);
+		    that.collapse();
                 });
+
+                __makeClearButton();
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(COLLAPSEBUTTON)))
         };
 
+        function __makeClearButton() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._clearButton !== null) {
+                    that._clearButton.visible = false;
+                }
+
+                that._clearButton = new createjs.Bitmap(img);
+                that._clearButton.x = that.w - 10 - 2 * 55;
+                that._clearButton.y = 55 + LEADING;
+                that._clearButton.visible = true;
+                that._borderContainer.addChild(that._clearButton);
+
+		that._clearButton.removeAllEventListeners('click');
+                that._clearButton.on('click', function (event) {
+		    that.doClear();
+                });
+
+                if (doCollapse) {
+		    that.collapse();
+		}
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(CLEARBUTTON)));
+        };
+
         __makeBoundary();
         return this;
+    };
+
+    this.collapse = function () {
+        this.hideMenu();
+        this.scaleStage(0.25);
+        this._collapsedBoundary.visible = true;
+        this._expandButton.visible = true;
+        this._expandedBoundary.visible = false;
+        this._collapseButton.visible = false;
+        this.stage.x = (this.w * 3 / 4) - 10;
+        this.stage.y = 55 + LEADING;
+        this.isShrunk = true;
+        for (var i = 0; i < this.turtleList.length; i++) {
+            this.turtleList[i].container.scaleX = SCALEFACTOR;
+            this.turtleList[i].container.scaleY = SCALEFACTOR;
+            this.turtleList[i].container.scale = SCALEFACTOR;
+        }
+
+        this._clearButton.scaleX = SCALEFACTOR;
+        this._clearButton.scaleY = SCALEFACTOR;
+        this._clearButton.scale = SCALEFACTOR;
+        this._clearButton.x = this.w - 10 - 8 * 55;
+
+        // remove the stage and add it back at the top
+        this.masterStage.removeChild(this.stage);
+        this.masterStage.addChild(this.stage);
+
+	this.refreshCanvas();
     };
 
     this.setBlocks = function (blocks) {
@@ -1394,7 +1452,7 @@ function Turtles () {
     this.addTurtle = function (startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
-        if (this._isShrunk) {
+        if (this.isShrunk) {
             var t = last(this.turtleList);
             t.container.scaleX = SCALEFACTOR;
             t.container.scaleY = SCALEFACTOR;
