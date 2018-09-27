@@ -131,10 +131,8 @@ var MYDEFINES = [
     'activity/block',
     'activity/turtledefs',
     'activity/logo',
-    // 'activity/clearbox',
     'activity/savebox',
     'activity/languagebox',
-    // 'activity/utilitybox',
     'activity/basicblocks',
     'activity/blockfactory',
     'activity/rubrics',
@@ -231,9 +229,7 @@ define(MYDEFINES, function (compatibility) {
         var logo;
         // var clearBox;
         var pasteBox;
-        var utilityBox;
         var languageBox = null;
-        // var playbackBox = null;
         var planet;
         window.converter;
         var storage;
@@ -271,7 +267,7 @@ define(MYDEFINES, function (compatibility) {
         var scrollOffContainer = null;
         var newContainer = null;
         var confirmContainer = null;        
-        var saveContainer = null;
+        // var saveContainer = null;
         var saveHTMLContainer = null;
         var saveSVGContainer = null;
         var savePNGContainer = null;
@@ -282,7 +278,12 @@ define(MYDEFINES, function (compatibility) {
         var saveArtworkContainer = null;
         var planetContainer = null;
         var restoreContainer = null;
-        var openContainer = null;
+        // var openContainer = null;
+        var hideBlocksContainer = null;
+        var collapseBlocksContainer = null;
+        var stopTurtleContainer = null;
+        var hardStopTurtleContainer = null;
+        var homeButtonContainers = [];
 
         var searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
@@ -345,10 +346,6 @@ define(MYDEFINES, function (compatibility) {
         // Stacks of blocks saved in local storage
         var macroDict = {};
 
-        var stopTurtleContainer = null;
-        var hardStopTurtleContainer = null;
-        var homeButtonContainers = [];
-
         var cameraID = null;
 
         // default values
@@ -375,10 +372,6 @@ define(MYDEFINES, function (compatibility) {
 
         var onscreenButtons = [];
         var onscreenMenu = [];
-        // var utilityButton = null;
-        // var playbackButton = null;
-        // var saveButton = null;
-        // var deleteAllButton = null;
 
         var firstRun = true;
 
@@ -389,6 +382,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _findBlocks() {
+            _showHideAuxMenu(false);
             var leftpos = Math.floor(canvas.width / 4);
             var toppos = 90;
             blocks.activeBlock = null;
@@ -896,11 +890,7 @@ define(MYDEFINES, function (compatibility) {
             hideDOMLabel();
 
             pasteBox.hide();
-            // clearBox.hide();
-            // saveBox.hide();
             languageBox.hide();
-            // utilityBox.hide();
-            // playbackBox.hide();
         };
 
         function _doCartesianPolar() {
@@ -1067,21 +1057,17 @@ define(MYDEFINES, function (compatibility) {
 
         function setSmallerLargerStatus() {
             if (BLOCKSCALES[blockscale] > 1) {
-                // utilityBox._decreaseStatus = true;
                 smallerContainer.visible = true;
                 smallerOffContainer.visible = false;
             } else {
                 smallerOffContainer.visible = true;
                 smallerContainer.visible = false;
-                // utilityBox._decreaseStatus = false;
             }
 
             if (BLOCKSCALES[blockscale] == 4) {
-                // utilityBox._increaseStatus = false;
                 largerOffContainer.visible = true;
                 largerContainer.visible = false;
             } else {
-                // utilityBox._increaseStatus = true;
                 largerContainer.visible = true;
                 largerOffContainer.visible = false;
             }
@@ -1323,34 +1309,6 @@ define(MYDEFINES, function (compatibility) {
                 .setStage(stage)
                 .setMessage(textMsg)
                 .setRefreshCanvas(refreshCanvas);
-
-            /*
-            utilityBox = new UtilityBox();
-            console.log(utilityBox);
-            utilityBox
-                .setStage(stage)
-                .setRefreshCanvas(refreshCanvas)
-                // .setLarger(doLargerFont)
-                // .setSmaller(doSmallerFont)
-                // .setPlugins(doOpenPlugin)
-                // .deletePlugins(deletePlugin)
-                // .setStats(doAnalytics)
-                // .setScroller(setScroller)
-                // .setLanguage(doLanguageBox, languageBox)
-                // .setSwitchMode(doSwitchMode)
-                .setOptimize(doOptimize);
-            */
-            /*
-            playbackBox = new PlaybackBox();
-            playbackBox
-                .setStage(stage)
-                .setRefreshCanvas(refreshCanvas)
-                .setQueueStatus(getPlaybackQueueStatus)
-                .setPlay(doPlayback)
-                .setCompile(doCompile)
-                .setPause(doPausePlayback)
-                .setRewind(doRestartPlayback);
-            */
 
             playbackOnLoad = function() {
                 /*
@@ -2875,7 +2833,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // If any menus were open, close them.
-            if (confirmContainer !== null && newContainer.visible) {
+            if (confirmContainer !== null && utilitiesContainer.visible) {
                 if (headerContainer.y > 0) {
                     _showHideAuxMenu(true);
                 }
@@ -3093,14 +3051,13 @@ define(MYDEFINES, function (compatibility) {
         function closeSubMenus() {
             if (confirmContainer.visible) {
                 confirmContainer.visible = false;
-                saveContainer.y = 82.5 + LEADING;
                 gridContainer.y = 82.5 + LEADING;
-                newContainer.y = 82.5 + LEADING;
-                planetContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
-                openContainer.y = 82.5 + LEADING;
-                pasteContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
+                hideBlocksContainer.y = 82.5 + LEADING;
+                collapseBlocksContainer.y = 82.5 + LEADING;
+		homeButtonContainers[0].y = 82.5 + LEADING;
+		homeButtonContainers[1].y = 82.5 + LEADING;
                 deltaY(-55 - LEADING);
             } else if (uploadContainer.visible) {
                 saveHTMLContainer.visible = false;
@@ -3114,14 +3071,13 @@ define(MYDEFINES, function (compatibility) {
                     saveABCContainer.visible = false;
                 }
 
-                saveContainer.y = 82.5 + LEADING;
                 gridContainer.y = 82.5 + LEADING;
-                newContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
-                planetContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
-                openContainer.y = 82.5 + LEADING;
-                pasteContainer.y = 82.5 + LEADING;
+                hideBlocksContainer.y = 82.5 + LEADING;
+                collapseBlocksContainer.y = 82.5 + LEADING;
+		homeButtonContainers[0].y = 82.5 + LEADING;
+		homeButtonContainers[1].y = 82.5 + LEADING;
                 deltaY(-55 - LEADING);
             } else if (languageContainer.visible) {
                 beginnerModeContainer.visible = false;
@@ -3136,32 +3092,30 @@ define(MYDEFINES, function (compatibility) {
                 statsContainer.visible = false;
                 scrollOnContainer.visible = false;
                 scrollOffContainer.visible = false;
+                hideBlocksContainer.visible = false;
+		collapseBlocksContainer.visible = false;
+		homeButtonContainers[0].visible = false;
+		homeButtonContainers[1].visible = false;
 
-                saveContainer.y = 82.5 + LEADING;
                 gridContainer.y = 82.5 + LEADING;
-                newContainer.y = 82.5 + LEADING;
-                planetContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
-                openContainer.y = 82.5 + LEADING;
-                pasteContainer.y = 82.5 + LEADING;
+                hideBlocksContainer.y = 82.5 + LEADING;
+                collapseBlocksContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
+		homeButtonContainers[0].y = 82.5 + LEADING;
+		homeButtonContainers[1].y = 82.5 + LEADING;
                 deltaY(-55 - LEADING);
             }
         };
 
         function _deleteBlocksBox() {
-            // _hideBoxes();
-            // clearBox.createBox(turtleBlocksScale, deleteAllButton.x - 27, deleteAllButton.y - 55);
             // if save or settings is open, close them.
+	    homeButtonContainers[0].visible = false;
+	    homeButtonContainers[1].visible = false;
             if (!confirmContainer.visible) {
                 closeSubMenus();
                 confirmContainer.visible = true;
-                if (beginnerMode) {
-                    confirmContainer.x = 55 * 6 + 27.5;
-                } else {
-                    confirmContainer.x = 55 * 6 + 27.5;
-                }
-
+		confirmContainer.x = newContainer.x;
                 confirmContainer.y = 27.5;
                 deltaY(55 + LEADING);
             } else {
@@ -3185,12 +3139,11 @@ define(MYDEFINES, function (compatibility) {
 
             confirmContainer.visible = false;
             deltaY(-55 - LEADING);
-            _showHideAuxMenu(false);
+            _showHideAuxMenu(true);
         };
 
         function doLanguageBox() {
-            // _hideBoxes();
-            languageBox.createBox(turtleBlocksScale, 55 * 7, 150); // saveButton.x - 27, saveButton.y - 55);
+            languageBox.createBox(turtleBlocksScale, 55 * 7, 150);
             languageBox.show();
             beginnerModeContainer.visible = false;
             advancedModeContainer.visible = false;
@@ -3208,8 +3161,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doUtilityBox() {
-            // _hideBoxes();
-            // utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton, palettes.pluginsDeleteStatus);
             if (!languageContainer.visible) {        
                 closeSubMenus();
                 languageContainer.visible = true;
@@ -3223,13 +3174,17 @@ define(MYDEFINES, function (compatibility) {
                     scrollOnContainer.visible = false;
                     scrollOffContainer.visible = false;
 
-                    beginnerModeContainer.x = 55 * 4;
-                    advancedModeContainer.x = 55 * 4;
-                    languageContainer.x = 55 * 5;
-                    smallerContainer.x = 55 * 6;
-                    largerContainer.x = 55 * 7;
-                    smallerOffContainer.x = 55 * 6;
-                    largerOffContainer.x = 55 * 7;
+		    var x = Math.floor(canvas.width / turtleBlocksScale) - 11 * 55 / 2;
+                    beginnerModeContainer.x = x;
+                    advancedModeContainer.x = x;
+		    x += 55;
+                    languageContainer.x = x;
+		    x += 55;
+                    smallerContainer.x = x;
+                    smallerOffContainer.x = x;
+		    x += 55;
+                    largerContainer.x = x;
+                    largerOffContainer.x = x;
                 } else {
                     advancedModeContainer.visible = true;
                     pluginsContainer.visible = true;
@@ -3426,8 +3381,6 @@ define(MYDEFINES, function (compatibility) {
                 closeSubMenus();
                 save.saveHTML(_('My Project'));
             } else {
-                // _hideBoxes();
-                // saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
                 if (!saveHTMLContainer.visible) {
                     closeSubMenus();
                     saveHTMLContainer.visible = true;
@@ -4149,17 +4102,23 @@ handleComplete);
             // button name, on-press function, hover label,
             // on-long-press function, on-extra-long-press function,
             // on-long-press icon, on-extra-long-press icon
+            if (planet) {
+                var planetMenuItem = ['planet', _doOpenSamples, _('Find and share projects'), null, null, null, null];
+            } else {
+                var planetMenuItem = ['planet-disabled', null, _('Offline. Sharing is unavailable.'), null, null, null, null];
+            }
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 if (beginnerMode) {
                     var buttonNames = [
                         ['run', _doFastButton, _('Play'), null, null, null, null],
                         ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        // ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
-                        ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-                        ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                        ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-                        // ['beginner', doSwitchMode, _('Switch to advanced mode'), null, null, null, null],
+                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                        ['save', doSave, _('Save project'), null, null, null, null],
+			planetMenuItem,
+                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
+			['help', _showHelp, _('Help'), null, null, null, null]
                     ];
                 } else {
                     var buttonNames = [
@@ -4168,11 +4127,11 @@ handleComplete);
                         ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
                         ['hard-stop-turtle', doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        // ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
-                        ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-                        ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                        ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-                        // ['advanced', doSwitchMode, _('Switch to beginner mode'), null, null, null, null],
+                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                        ['save', doSave, _('Save project'), null, null, null, null],
+			planetMenuItem,
+                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
+			['help', _showHelp, _('Help'), null, null, null, null]
                     ];
                 }
 
@@ -4183,10 +4142,10 @@ handleComplete);
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
-                    // ['clear', _allClear, _('Clean') + ' [Alt-E]', null, null, null, null],
-                    ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-                    ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                    ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
+                    ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                    ['save', doSave, _('Save project'), null, null, null, null],
+		    planetMenuItem,
+                    ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
                     ['help', _showHelp, _('Help'), null, null, null, null]
                 ];
             }
@@ -4216,6 +4175,12 @@ handleComplete);
                     continue;
                 }
 
+		if (buttonNames[i][0] === 'open') {
+		    var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
+		} else if (buttonNames[i][0] === 'help') {
+		    var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
+		}
+
                 var container = _makeButton(buttonNames[i][0] + '-button', buttonNames[i][2], x, y, btnSize, 0);
                 _loadButtonDragHandler(container, x, y, buttonNames[i][1], buttonNames[i][3], buttonNames[i][4], buttonNames[i][5], buttonNames[i][6]);
                 onscreenButtons.push(container);
@@ -4225,17 +4190,8 @@ handleComplete);
                 } else if (buttonNames[i][0] === 'hard-stop-turtle') {
                     console.log('hard stop turtle');
                     hardStopTurtleContainer = container;
-                } else if (buttonNames[i][0] === 'go-home') {
-                    homeButtonContainers = [];
-                    homeButtonContainers.push(container);
-                    var container2 = _makeButton('go-home-faded-button', _('Home') + ' [HOME]', x, y, btnSize, 0);
-                    _loadButtonDragHandler(container2, x, y, buttonNames[i][1], null, null, null, null);
-                    homeButtonContainers.push(container2);
-                    onscreenButtons.push(container2);
-                    homeButtonContainers[0].visible = false;
-                    homeButtonContainers[1].visible = true;
-                    boundary.hide();
-                    blocks.setHomeContainers(homeButtonContainers, boundary);
+		} else if (buttonNames[i][0] === 'new') {
+		    newContainer = container;
                 }
 
                 // Ensure that stop-turtle button is placed on top of
@@ -4249,7 +4205,7 @@ handleComplete);
             }
 
             _setupAuxMenu(turtleBlocksScale);
-            _setupBoxMenus(turtleBlocksScale);
+            _setupSubMenus(turtleBlocksScale);
         };
 
         function _doMergeLoad() {
@@ -4257,8 +4213,8 @@ handleComplete);
             doLoad(true);
         };
 
-        function _setupBoxMenus(turtleBlocksScale) {
-            // Each box menu is positioned above the Aux menus
+        function _setupSubMenus(turtleBlocksScale) {
+            // Each sub menu is positioned above the aux menus
             var cellsize = 55;
             var y = Math.floor(-3 * cellsize / 2);
 
@@ -4411,41 +4367,14 @@ handleComplete);
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                if (beginnerMode) {
-                    var menuNames = [
-                        planetMenuItem,
-                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                        ['save', doSave, _('Save project'), null, null, null, null],
-                        ['paste-disabled', pasteStack, _('Right-click to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
-                        ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                        ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                        ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
-                    ];
-                } else {
-                    var menuNames = [
-                        planetMenuItem,
-                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                        ['save', doSave, _('Save project'), null, null, null, null],
-                        ['paste-disabled', pasteStack, _('Right-click to copy.') + ' [Alt-C] ' + _('Click here to paste.') + ' [Alt-V]', null, null, null, null],
-                        ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                        // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
-                        ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                        ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
-                    ];
-                }
-            } else {
                 var menuNames = [
-                    planetMenuItem,
-                    ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                    ['save', doSave, _('Save project'), null, null, null, null],
-                    ['paste-disabled', pasteStack, _('Paste'), null, null, null, null],
+                    ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+                    ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+                    ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                    // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                     ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['new', _deleteBlocksBox, _('Delete all'), null, null, null, null],
-                    ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null]
+                    ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null],
+                    // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                 ];
             }
 
@@ -4456,18 +4385,14 @@ handleComplete);
             }
 
             var btnSize = cellSize;
-            /*
-            var dx = 0;
-            var dy = btnSize;
-            */
-
-            var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
+            var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
             menuContainer = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
-            var x = Math.floor(-btnSize / 2);
+	    var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
+            // var x = Math.floor(-btnSize / 2);
             var y = Math.floor(btnSize / 2);
 
             var dx = btnSize;
@@ -4493,17 +4418,26 @@ handleComplete);
                     }
                 } else if (menuNames[i][0] === 'utility') {
                     utilityContainer = container;
-                } else if (menuNames[i][0] === 'save') {
-                    saveContainer = container;
-                } else if (menuNames[i][0] === 'new') {
-                    newContainer = container;
-                } else if (menuNames[i][0] === 'open') {
-                    openContainer = container;
+                } else if (menuNames[i][0] === 'hide-blocks') {
+                    hideBlocksContainer = container;
+                } else if (menuNames[i][0] === 'collapse-blocks') {
+                    collapseBlocksContainer = container;
                 } else if (menuNames[i][0] === 'restore-trash') {
                     restoreContainer = container;
-                } else if (menuNames[i][0] === 'planet' || menuNames[i][0] === 'planet-disabled') {
-                    planetContainer = container;
-                }
+                } else if (menuNames[i][0] === 'go-home') {
+                    homeButtonContainers = [];
+                    homeButtonContainers.push(container);
+                    var container2 = _makeButton('go-home-faded-button', _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0);
+                    _loadButtonDragHandler(container2, x, y, menuNames[i][1], null, null, null, null);
+		    console.log('Y === ' + container.y);
+		    console.log('Y === ' + container2.y);
+                    homeButtonContainers.push(container2);
+                    onscreenMenu.push(container2);
+                    homeButtonContainers[0].visible = false;
+                    homeButtonContainers[1].visible = false;
+                    boundary.hide();
+                    blocks.setHomeContainers(homeButtonContainers, boundary);
+		}
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
                 onscreenMenu.push(container);
