@@ -1,7 +1,7 @@
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
-"PO-Revision-Date: 2011-08-26 07:25+0200\n"
+"PO-Revision-Date: 2018-09-27 07:25+0200\n"
 "Last-Translator: Devin Ulibarri <devin@devinulibarri.com>\n"
 "Contributing-Editor: Sachiko Nakajima <zadigouniverse@yahoo.co.jp>\n"
 "Language-Team: LANGUAGE <walter@sugarlabs.org>\n"
@@ -457,11 +457,11 @@ msgstr "エオリアン音階"
 
 #: js/activity.js:826
 msgid "Refresh your browser to change to advanced mode."
-msgstr "高度モードを設定するため、ブラウザーをリフレッシュして下さい。"
+msgstr "高度モードを設定するため、ブラウザを再起動して下さい。"
 
 #: js/activity.js:829
 msgid "Refresh your browser to change to beginner mode."
-msgstr "簡単モードを設定するため、ブラウザーをリフレッシュして下さい。"
+msgstr "簡単モードを設定するため、ブラウザを再起動して下さい。"
 
 #: js/activity.js:860
 #: js/activity.js:4444
@@ -752,7 +752,7 @@ msgstr "再生"
 
 #: js/activity.js:4399
 msgid "Expand/collapse collapsible blocks"
-msgstr "チャンクの最小化"
+msgstr "チャンクを ひょうじ/ひひょうじ"
 
 #: js/activity.js:4401
 msgid "More"
@@ -760,11 +760,11 @@ msgstr "その他"
 
 #: js/activity.js:4421
 msgid "Run slowly"
-msgstr "ゆっくり再生する"
+msgstr "スロー再生する"
 
 #: js/activity.js:4425
 msgid "Run music slowly"
-msgstr "音楽をゆっくり演奏する"
+msgstr "音楽をゆっくりに演奏する"
 
 #: js/activity.js:4426
 msgid "Run music step by step"
@@ -1750,7 +1750,7 @@ msgstr "<em>休符</em>ブロックは音価ブロックの中に入れるとそ
 
 #: js/turtledefs.js:184
 msgid "The <em>Note value</em> block is the value of the duration of the note currently being played."
-msgstr "<em>音価</em>"ブロックは音符の長さの値です。
+msgstr "<em>音価</em>"ブロックは音符の長さの値です。"
 
 #: js/turtledefs.js:185
 msgid "The beat of the music is determined by the <em>Meter</em> block (by default, 4 1/4 notes per measure)."
@@ -1790,7 +1790,7 @@ msgstr "ピッチ・アルファベットの名前が<em>「C D E F G A B」</em
 
 #: js/turtledefs.js:195
 msgid "The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>."
-msgstr "<em>ステップ<ピッチ</em>ブロックはメロディーの音符を音階的に上/下に動かすことができます。(例えば、もし<em>ステップピッチ</em>の前のブロックは<em>ソル</em>だったら<em>ステップピッチ＝１</em>は<em>ラ</em>を鳴らします。"
+msgstr "<em>ステップピッチ</em>ブロックはメロディーの音符を音階的に上/下に動かすことができます。(例えば、もし<em>ステップピッチ</em>の前のブロックは<em>ソル</em>だったら<em>ステップピッチ＝１</em>は<em>ラ</em>を鳴らします。"
 
 #: js/turtledefs.js:196
 msgid "The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency."
@@ -1806,11 +1806,11 @@ msgstr "<em>変化記号セレクター</em>ブロックはダブルシャープ
 
 #: js/turtledefs.js:199
 msgid "The <em>Scalar transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) the scale. In the example shown above, <em>sol</em> is shifted up to <em>la</em>."
-msgstr "<em>音階内の移調</em>ブロックは<em>音符</em>の中に入っている音高を上（また下）に、特定されている<em>数字</em>の値によって、音階の音高で移動します。例の画像に<em>ソル</em>が<em>ラ</em>に上に移動されています。"
+msgstr "<em>音階内の移調</em>ブロックは<em>音符</em>の中に入っている音高を上（または下）に、特定されている<em>数字</em>の値によって、音階の音高で移動します。例の画像に<em>ソル</em>が<em>ラ</em>に上に移動されています。"
 
 #: js/turtledefs.js:200
 msgid "The <em>Semi-tone transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) by half steps. In the example shown above, <em>sol</em> is shifted up to <em>sol#</em>."
-msgstr "<em>半音で移調</em>ブロックは<em>音符</em>の中に入っている音高を上（また下）に、特定されている<em>数字</em>の値によって、半音ずつ移動します。例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
+msgstr "<em>半音で移調</em>ブロックは<em>音符</em>の中に入っている音高を上（または下）に、特定されている<em>数字</em>の値によって、半音ずつ移動します。例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
 
 #: js/turtledefs.js:201
 msgid "The <em>Pitch number</em> block is the value of the pitch of the note currently being played."
@@ -1822,7 +1822,7 @@ msgstr "<em>音程の違い</em>ブロックは現在に鳴らされている音
 
 #: js/turtledefs.js:203
 msgid "The <em>Set key</em> block is used to set the key and mode, e.g., <em>C Major</em>"
-msgstr "<em>音階の設定</em>ブロックは音階（キー、またモード）を設定するためです（例えば<em>「ド」　メージャー</em>）"
+msgstr "<em>音階の設定</em>ブロックは音階（キー、またモード）を設定するためです（例えば<em>「ド」メージャー</em>）"
 
 #: js/turtledefs.js:204
 msgid "The <em>Mode length</em> block is the number of notes in the current scale. Most <em>Western</em> scales have 7 notes."
@@ -1838,7 +1838,7 @@ msgstr "<em>音階的音程</em>ブロックは音階にない音高を無視、
 
 #: js/turtledefs.js:207
 msgid "The <em>Semi-tone interval</em> block calculates a relative interval based on half steps. In the figure, we add <em>sol#</em> to <em>sol</em>."
-msgstr "<em>半音階的音程</em>ブロックは音階を無視、半音で新しい音高を計算して鳴らします。例の画像には<em>ソル</em>が<em>ソル#</em>に鳴ります。"
+msgstr "<em>半音階的音程</em>ブロックは音階を無視、半音で新しい音高を計算して鳴らします。例の画像には<em>ソル</em>が<em>ソル#</em>になります。"
 
 #: js/turtledefs.js:208
 #: js/turtledefs.js:209
@@ -4072,7 +4072,7 @@ msgstr "整理"
 
 #: js/pitchtimematrix.js:448
 msgid "Click on the table to add notes."
-msgstr "行列にクリックすると音符やメロディが作れます"
+msgstr "行列にクリックすると音符やメロディが作ることができます。"
 
 #: js/pitchtimematrix.js:707
 #: js/pitchtimematrix.js:839
