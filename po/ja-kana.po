@@ -211,7 +211,7 @@ msgstr "スタート"
 
 #: js/block.js:869
 msgid "matrix"
-msgstr "ピッチ・じきぎょうれつ"
+msgstr "ピッチ・じき ぎょうれつ"
 
 #: js/block.js:872
 #: js/basicblocks.js:1041
@@ -274,7 +274,7 @@ msgstr "スライダー"
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm ruler"
-msgstr "リズムルーラー"
+msgstr "リズム ルーラー"
 
 #: js/block.js:902
 #: js/basicblocks.js:779
@@ -307,7 +307,7 @@ msgstr "おんか"
 #: js/basicblocks.js:562
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
-msgstr "おんかいのおんど"
+msgstr "おんかいの おんど"
 
 #: js/block.js:1274
 #: js/basicblocks.js:578
@@ -321,7 +321,7 @@ msgstr "おんかいないのうごき"
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr "ピッチすうち"
+msgstr "ピッチ すうち"
 
 #: js/block.js:1287
 #: js/block.js:1295
@@ -366,7 +366,7 @@ msgstr "オフ"
 #.TRANS: double sharp is a music term related to pitch
 ## https://dictionary.goo.ne.jp/jn/103241/meaning/m0u/
 msgid "double sharp"
-msgstr "ダブルシャープ"
+msgstr "ダブル シャープ"
 
 #: js/block.js:2350
 #: js/logo.js:6181
@@ -404,7 +404,7 @@ msgstr "フラット"
 #: js/musicutils.js:304
 #.TRANS: double flat is a music term related to pitch
 msgid "double flat"
-msgstr "ダブルフラット"
+msgstr "ダブル フラット"
 
 #: js/block.js:3547
 #: js/basicblocks.js:476
@@ -446,14 +446,14 @@ msgstr "アイオニアン"
 #.TRANS: minor is a music term related to intervals and mode
 ## 短=たん；http://jisho.org/word/%E7%9F%AD 
 msgid "minor"
-msgstr "マイナーおんかい"
+msgstr "マイナー おんかい"
 
 #: js/block.js:3675
 #: js/block.js:3751
 #: js/musicutils.js:172
 #.TRANS: modal scale for music
 msgid "aeolian"
-msgstr "エオリアンおんかい"
+msgstr "エオリアン おんかい"
 
 #: js/activity.js:826
 msgid "Refresh your browser to change to advanced mode."
@@ -471,7 +471,7 @@ msgstr ""
 #.TRANS: hide Polar coordinate overlay grid
 ## need to verify
 msgid "hide grid"
-msgstr "ざひょうをひひょうじ"
+msgstr "ざひょうを ひひょうじ"
 
 #: js/activity.js:867
 #: js/activity.js:873
@@ -488,7 +488,7 @@ msgstr "ざひょうをひひょうじ"
 #.TRANS: show Cartesian coordinate overlay grid
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
-msgstr "カーテシアンをひょうじ"
+msgstr "カーテシアンを ひょうじ"
 
 #: js/activity.js:873
 #: js/activity.js:880
@@ -521,15 +521,15 @@ msgstr "とじる"
 #: js/activity.js:1788
 #: js/activity.js:1834
 msgid "Cannot load project from the file. Please check the file type."
-msgstr "ファイルからプロジェクトをロードすることができません。ファイルのしゅるいをもういちどかくにんしてください。"
+msgstr "ファイルから プロジェクトを ロードする ことが できません。ファイルの しゅるいを もういちど かくにん して ください。"
 
 #: js/activity.js:2369
 msgid "This block is deprecated."
-msgstr "このブロックはもうありません。"
+msgstr "このブロックは もう ありません。"
 
 #: js/activity.js:2371
 msgid "Block cannot be found."
-msgstr "ブロックがみつかりません。"
+msgstr "ブロックが みつかりません。"
 
 #: js/activity.js:3098
 #: js/SaveInterface.js:29
@@ -540,17 +540,17 @@ msgstr "ブロックがみつかりません。"
 #: js/ProjectStorage.js:13
 #: js/GlobalPlanet.js:370
 msgid "My Project"
-msgstr "わたしのプロジェクト"
+msgstr "わたしの プロジェクト"
 
 #: js/activity.js:3232
 ## check verb
 msgid "Please set browser zoom level to 100%"
-msgstr "ブラウザひょうじを100%にせっていしてください。"
+msgstr "ブラウザ ひょうじを 100%に せってい して ください。"
 
 #: js/activity.js:3732
 #: js/turtledefs.js:109
 msgid "Play"
-msgstr ""
+msgstr "さいせい"
 
 #: js/activity.js:3733
 #: js/activity.js:3761
@@ -583,7 +583,7 @@ msgstr "しょうきょ"
 #: js/turtledefs.js:112
 #: js/turtledefs.js:150
 msgid "Show/hide blocks"
-msgstr "ブロックのひょうじ/ひひょうじ"
+msgstr "ブロックの ひょうじ/ひひょうじ"
 
 #: js/activity.js:3737
 #: js/activity.js:3750
@@ -591,7 +591,7 @@ msgstr "ブロックのひょうじ/ひひょうじ"
 #: js/turtledefs.js:113
 #: js/turtledefs.js:151
 msgid "Expand/collapse collapsable blocks"
-msgstr "かたまりをひらく/とじる"
+msgstr "かたまりを ひらく/とじる"
 
 #: js/activity.js:3738
 #: js/activity.js:3751
@@ -614,28 +614,28 @@ msgstr ""
 #: js/activity.js:4422
 #: js/turtledefs.js:143
 msgid "Run fast"
-msgstr "はやくさいせい"
+msgstr "はやく さいせい"
 
 #: js/activity.js:3743
 #: js/activity.js:3759
 msgid "long press to run slowly"
-msgstr "ながおしでゆっくりさいせい"
+msgstr "ながおしで ゆっくり さいせい"
 
 #: js/activity.js:3743
 msgid "extra-long press to run music slowly"
-msgstr "もっとながおしでおんがくをゆっくりさいせい"
+msgstr "もっと ながおしで おんがくを ゆっくり さいせい"
 
 #: js/activity.js:3744
 #: js/activity.js:3760
 #: js/activity.js:4420
 #: js/turtledefs.js:146
 msgid "Run step by step"
-msgstr "ブロックをひとつずつさいせい"
+msgstr "ブロックを ひとつずつ さいせい"
 
 #: js/activity.js:3745
 #: js/turtledefs.js:147
 msgid "Run note by note"
-msgstr "おんぷをひとつずつさいせい"
+msgstr "おんぷを ひとつずつ さいせい"
 
 #: js/activity.js:3752
 #: js/activity.js:4460
@@ -658,14 +658,14 @@ msgstr "ヘルプ"
 #: js/turtledefs.js:117
 #: js/turtledefs.js:155
 msgid "Load samples from server"
-msgstr "「プラネット」サーバからサンプルをダウンロードする"
+msgstr "「プラネット」サーバから サンプルを ダウンロード する"
 
 #: js/activity.js:3850
 #: js/activity.js:4431
 #: js/activity.js:4466
 #: js/savebox.js:113
 msgid "The Planet is unavailable."
-msgstr "「プラネット」サーバはいまつかえません"
+msgstr "「プラネット」サーバは いま つかえません"
 
 #: js/activity.js:3857
 #: js/activity.js:3868
@@ -673,7 +673,7 @@ msgstr "「プラネット」サーバはいまつかえません"
 #: js/turtledefs.js:118
 #: js/turtledefs.js:156
 msgid "Load project from files"
-msgstr "ファイルをロードする"
+msgstr "ファイルを ロード する"
 
 #: js/activity.js:3858
 #: js/activity.js:3869
@@ -684,17 +684,17 @@ msgstr "ファイルをロードする"
 #: js/turtledefs.js:157
 #: js/savebox.js:62
 msgid "Save project"
-msgstr "プロジェクトをほぞんする"
+msgstr "プロジェクトを ほぞん する"
 
 #: js/activity.js:3859
 #: js/activity.js:3870
 msgid "Long press on blocks to copy."
-msgstr "ブロックながおしでコピー"
+msgstr "ブロック ながおしで コピー"
 
 #: js/activity.js:3859
 #: js/activity.js:3870
 msgid "Click here to paste."
-msgstr "はりつけるにはここをクリック"
+msgstr "はりつけるには ここを クリック"
 
 #: js/activity.js:3861
 #: js/activity.js:3873
@@ -713,7 +713,7 @@ msgstr "せってい"
 #: js/turtledefs.js:128
 #: js/turtledefs.js:172
 msgid "New Project"
-msgstr "しんきさくせい"
+msgstr "しんき さくせい"
 
 #: js/activity.js:3863
 #: js/activity.js:3875
@@ -723,13 +723,13 @@ msgstr "しんきさくせい"
 #: js/turtledefs.js:129
 #: js/turtledefs.js:173
 msgid "Restore"
-msgstr "ブロックをリストア"
+msgstr "ブロックを リストア"
 
 #: js/activity.js:3872
 #: js/activity.js:3885
 #: js/activity.js:4452
 msgid "playback"
-msgstr "コンパイルされたおんがくをさいせい"
+msgstr "コンパイル された おんがくを さいせい"
 
 #: js/activity.js:3883
 #: js/activity.js:4610
@@ -740,11 +740,11 @@ msgstr "はりつけ"
 
 #: js/activity.js:3887
 msgid "Delete all"
-msgstr "ブロックをぜんぶけす"
+msgstr "ブロックを ぜんぶ けす"
 
 #: js/activity.js:4267
 msgid "Could not parse JSON input."
-msgstr "JSONきにゅうのパースができません。"
+msgstr "JSONきにゅうの パースが できません。"
 
 #: js/activity.js:4395
 msgid "Run"
@@ -773,7 +773,7 @@ msgstr ""
 #: js/activity.js:4434
 #: js/activity.js:4469
 msgid "Load project from file"
-msgstr "ファイルからプロジェクトをロードする"
+msgstr "ファイルから プロジェクトを ロード する"
 
 #: js/activity.js:4435
 #: js/activity.js:4470
@@ -803,24 +803,24 @@ msgstr ""
 #: js/activity.js:4615
 #: js/blocks.js:363
 msgid "Save stack"
-msgstr "スタックをほぞん"
+msgstr "スタックを ほぞん"
 
 #: js/logo.js:31
 ## http://jisho.org/word/%E5%A6%A5%E5%BD%93 ; 妥当=だとう; maybe just ヴァリッド(http://jisho.org/word/%E3%83%B4%E3%82%A1%E3%83%AA%E3%83%83%E3%83%89 )
 msgid "Not a valid pitch name"
-msgstr "えらばれたおんめいがてきせつではありません。"
+msgstr "えらばれた おんめいが てきせつでは ありません。"
 
 #: js/logo.js:358
 msgid "Turning off mouse blink; setting FPS to 10."
-msgstr "ネズミのてんめつをオフにされ、FPSを１０にされている"
+msgstr "ネズミの てんめつを オフに され、FPSを １０に されている"
 
 #: js/logo.js:363
 msgid "Turning on mouse blink; setting FPS to 30."
-msgstr "ネズミのてんめつをオンにされ、FPSを３０にされている；"
+msgstr "ネズミの てんめつを オンに され、FPSを ３０に されている；"
 
 #: js/logo.js:1514
 msgid "Block does not support incrementing."
-msgstr "このブロックは、ぞうしょくのサポートがありません"
+msgstr "このブロックは、ぞうしょくの サポートが ありません"
 
 #: js/logo.js:1906
 #: js/logo.js:2491
@@ -834,7 +834,7 @@ msgstr "このブロックは、ぞうしょくのサポートがありません
 #: js/logo.js:10304
 #: js/logo.js:10332
 msgid "Cannot find mouse"
-msgstr "ネズミがみつかりません。"
+msgstr "ネズミが みつかりません。"
 
 #: js/logo.js:1908
 #: js/logo.js:2493
@@ -848,73 +848,73 @@ msgstr "ネズミがみつかりません。"
 #: js/logo.js:10306
 #: js/logo.js:10334
 msgid "Cannot find turtle"
-msgstr "タートルがみつかりません。"
+msgstr "タートルが みつかりません。"
 
 #: js/logo.js:2523
 msgid "Mouse is already running."
-msgstr "ネズミはすでにうごいています。"
+msgstr "ネズミは すでに うごいています。"
 
 #: js/logo.js:2525
 msgid "Turtle is already running."
-msgstr "タートルはすでにうごいています。"
+msgstr "タートルは すでに うごいています。"
 
 #: js/logo.js:2545
 msgid "Cannot find start block"
-msgstr "「スタート」ブロックがみつかりません。"
+msgstr "「スタート」ブロックが みつかりません。"
 
 #: js/logo.js:2907
 msgid "Please enter a valid URL."
-msgstr "ただしい URL （リンク）をいれてください。"
+msgstr "ただしい URL （リンク）をいれて ください。"
 
 #: js/logo.js:3012
 #: js/logo.js:9182
 msgid "You must select a file."
-msgstr "ファイルをえらぶひつようがあります。"
+msgstr "ファイルを えらぶ ひつようが あります。"
 
 #: js/logo.js:3021
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
-msgstr "えらんだファイルには、ただしいヒープがふくまれません。"
+msgstr "えらんだ ファイルには、ただしい ヒープが ふくまれません。"
 
 #: js/logo.js:3025
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
-msgstr "ロードヒープのブロックには、ロードファイルブロックがひつようです。"
+msgstr "「ロードヒープ」の ブロックには、「ロードファイル」 ブロックが ひつよう です。"
 
 #: js/logo.js:3046
 msgid "Error parsing JSON data:"
-msgstr "JSON データのこうぶんエラーです。"
+msgstr "JSON データの こうぶん エラー です。"
 
 #: js/logo.js:3051
 msgid "404: Page not found"
-msgstr "404: このページがみつかりません"
+msgstr "404: このページが みつかりません"
 
 #: js/logo.js:3080
 ## To be verified
 msgid "Cannot find a valid heap for"
-msgstr "ただしいヒープがみつかりません。"
+msgstr "ただしい ヒープが みつかりません。"
 
 #: js/logo.js:3100
 #: js/logo.js:10563
 msgid "Index must be > 0."
-msgstr "インデクスばんごうは 0 よりおおきいひつようがあります。"
+msgstr "インデクス ばんごうは 0 より おおきい ひつようが あります。"
 
 #: js/logo.js:3105
 #: js/logo.js:10568
 msgid "Maximum heap size is 1000."
-msgstr "ヒープのさいだいちは1000です。"
+msgstr "ヒープの さいだいちは 1000です。"
 
 #: js/logo.js:3128
 #: js/logo.js:3159
 #: js/logo.js:3190
 #: js/timbre.js:607
 msgid "Unable to use synth due to existing oscillator"
-msgstr "オシレーターがあるため、シンセがつかえません。"
+msgstr "オシレーターが あるため、シンセが つかえません。"
 
 #: js/logo.js:3140
 #: js/logo.js:3171
 msgid "The input cannot be negative."
-msgstr "マイナスのすうちをいれることはできません。"
+msgstr "マイナスの すうちを いれることは できません。"
 
 #: js/logo.js:3283
 msgid "Adding missing pitch number 0."
@@ -922,50 +922,50 @@ msgstr "ピッチすうち「0」をくわえる"
 
 #: js/logo.js:3293
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
-msgstr "ピッチすうちのうち、0よりちいさい、11よりおおきいかずはむしします。"
+msgstr "ピッチすうち のうち、0より ちいさい、11より おおきい かずは むし します。"
 
 #: js/logo.js:3298
 ## check verb
 msgid "Ignoring duplicate pitch numbers."
-msgstr "ちょうふくしているピッチすうちはむしします"
+msgstr "ちょうふく している ピッチすうちは むし します"
 
 #: js/logo.js:3431
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "「ピッチ・じこくぎょうれつ」には、ひとついじょうのピッチブロックとひとついじょうのドラムブロックがひつようです。"
+msgstr "「ピッチ・じこく ぎょうれつ」には、ひとつ いじょうの ピッチ ブロックと ひとつ いじょうの ドラム ブロックが ひつようです。"
 
 #: js/logo.js:3524
 #: js/logo.js:3546
 #: js/logo.js:3574
 #: js/logo.js:3597
 msgid "Beats per minute must be > 30."
-msgstr "BPM(いっぷんあたりのはくすう)は30よりおおきいひつようがあります。a"
+msgstr "BPM(いっぷん あたりの はく すう)は 30より おおきい ひつようが あります。"
 
 #: js/logo.js:3527
 #: js/logo.js:3549
 #: js/logo.js:3577
 #: js/logo.js:3600
 msgid "Maximum beats per minute is 1000."
-msgstr "BPM(いっぷんあたりのはくすう)はさいだい1000とします。"
+msgstr "BPM(いっぷん あたりの はく すう)は さいだい 1000と します。"
 
 #: js/logo.js:3670
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "「ピッチ・じこくぎょうれつ」には、ひとついじょうのピッチブロックとひとついじょうのドラムブロックがひつようです。"
+msgstr "「ピッチ・じこく ぎょうれつ」には、ひとつ いじょうの ピッチ ブロックと ひとつ いじょうの ドラム ブロックが ひつよう です。"
 
 #: js/logo.js:3707
 msgid "Attack value should be from 0 to 100."
-msgstr "アタックあたいには 0 いじょう100いかのすうじをいれてください。"
+msgstr "アタック あたいには 0 いじょう 100いかの すうじを いれて ください。"
 
 #: js/logo.js:3710
 msgid "Decay value should be from 0 to 100."
-msgstr "げんすいあたいには 0 いじょう100いかのすうじをいれてください。"
+msgstr "げんすい あたいには 0 いじょう 100いかの すうじを いれて ください。"
 
 #: js/logo.js:3713
 msgid "Sustain value should be from 0 to 100."
-msgstr "サステインあたいには 0 いじょう100いかのすうじをいれてください。"
+msgstr "サステイン あたいには 0 いじょう 100いかの すうじを いれて ください。"
 
 #: js/logo.js:3716
 msgid "Release value should be from 0-100."
-msgstr "リリースあたいには 0 いじょう100いかのすうじをいれてください。"
+msgstr "リリース あたいには 0 いじょう100いかのすうじをいれてください。"
 
 #: js/logo.js:3732
 msgid "You are adding multiple envelope blocks."
@@ -1414,36 +1414,36 @@ msgstr "そのた"
 #: js/turtledefs.js:136
 ## Maybe just have "Music Blocks" in roman. Otherwise, ミュージック・ブロックス
 msgid "Welcome to Music Blocks"
-msgstr "ミュージック・ブロックスへようこそ"
+msgstr "ミュージック・ブロックスへ　ようこそ"
 
 #: js/turtledefs.js:106
 #: js/turtledefs.js:136
 ## Need to refine this
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr "ミュージック・ブロックスはおんがくとすうがくとプログラミングのかんけいをたのしくたんきゅうするためのツールです。"
+msgstr "ミュージック・ブロックスは おんがくと すうがくと プログラミングの かんけいを たのしく たんきゅうするための ツールです。"
 
 #: js/turtledefs.js:107
 #: js/turtledefs.js:137
 ## Literally ネズミさんにあいます but I think that context suggests "introduction"
 msgid "Meet Mr. Mouse!"
-msgstr "ミスター・マウスにあいましょう！"
+msgstr "ミスター・マウスに あいましょう！"
 
 #: js/turtledefs.js:107
 #: js/turtledefs.js:137
 ## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "ミスター・マウスはわたしたちのミュージック・ブロックスしきしゃです。"
+msgstr "ミスター・マウスは わたしたちの ミュージック・ブロックス しきしゃ です。"
 
 #: js/turtledefs.js:107
 #: js/turtledefs.js:137
 ## I took some artistic liberty: Says "together with Mouse-san, discover music/math/coding
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr "ミスター・マウスといっしょにミュージック・ブロックスのせかいをたんきゅうしましょう。"
+msgstr "ミスター・マウスと　いっしょに　ミュージック・ブロックスの　せかいを　たんきゅう　しましょう。"
 
 #: js/turtledefs.js:107
 #: js/turtledefs.js:137
 msgid "Let us start our tour!"
-msgstr "では、ツアーをはじめましょう。"
+msgstr "では、ツアーを はじめましょう。"
 
 #: js/turtledefs.js:108
 #: js/turtledefs.js:139
@@ -1455,113 +1455,113 @@ msgstr "パレット・ボタン"
 #: js/turtledefs.js:141
 #.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
-msgstr "このツールバーにはリズム、ピッチ、ねいろ、アクションなどをふくむパレットボタンがあります。"
+msgstr "このツールバーには リズム、ピッチ、ねいろ、アクションなどを ふくむ パレットボタンが あります。"
 
 #: js/turtledefs.js:108
 #: js/turtledefs.js:141
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "ここをクリックすると、ブロックスのパレットがひょうじされますので、ブロックスをキャンバスうえにドラッグできます。"
+msgstr "ここを クリックすると、ブロックスの パレットが ひょうじされますので、ブロックスを キャンバスうえに ドラッグできます。"
 
 #: js/turtledefs.js:109
 #: js/turtledefs.js:143
 msgid "Click the run button to run the project in fast mode."
-msgstr "はやいモードでプロジェクトをさいせいするにはここをクリック。"
+msgstr "はやいモードで プロジェクトを さいせいするには ここをクリック。"
 
 #: js/turtledefs.js:110
 #: js/turtledefs.js:148
 msgid "Stop the music (and the turtles)."
-msgstr "おんがくとネズミのうごきをとめます。"
+msgstr "おんがくと ネズミの うごきを とめます。"
 
 #: js/turtledefs.js:110
 #: js/turtledefs.js:148
 msgid "You can also type Alt-S to stop."
-msgstr "Alt+Sでとめることもできます"
+msgstr "Alt+Sでとめる ことも できます"
 
 #: js/turtledefs.js:111
 #: js/turtledefs.js:149
 msgid "Clear the screen and return the turtles to their initial positions."
-msgstr "がめんにあるものをぜんぶけして、しょきじょうたいにもどします。"
+msgstr "がめんに あるものを ぜんぶけして、しょき じょうたいに もどします。"
 
 #: js/turtledefs.js:112
 #: js/turtledefs.js:150
 msgid "Hide or show the blocks and the palettes."
-msgstr "ブロックとパレットをひょうじする / ひひょうじ アイコンです。"
+msgstr "ブロックと パレットを ひょうじする / ひひょうじ アイコンです。"
 
 #: js/turtledefs.js:113
 #: js/turtledefs.js:151
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートとアクションのスタックをふやす / つぶす アイコンです。"
+msgstr "スタートと アクションの スタックを ふやす / つぶす アイコンです。"
 
 #: js/turtledefs.js:114
 #: js/turtledefs.js:152
 ## 整理＝せいり; literally "organize"
 msgid "Return all blocks to the center of the screen."
-msgstr "ぜんぶのブロックをスクリーンのセンター(まんなか)にもどします。"
+msgstr "ぜんぶの ブロックを スクリーンの センター(まんなか)に もどします。"
 
 #: js/turtledefs.js:115
 #: js/turtledefs.js:153
 msgid "Show these messages."
-msgstr "これらのメッセージをひょうじします。"
+msgstr "これらの メッセージを ひょうじ します。"
 
 #: js/turtledefs.js:116
 #: js/turtledefs.js:154
 msgid "Expand/collapse option toolbar"
-msgstr "オプションツールバーをひょうじ"
+msgstr "オプション ツールバー をひょうじ"
 
 #: js/turtledefs.js:116
 #: js/turtledefs.js:154
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "ここをクリックして、オプションツールバーをひょうじ"
+msgstr "ここを クリックして、オプション ツールバー をひょうじ"
 
 #: js/turtledefs.js:117
 #: js/turtledefs.js:155
 msgid "This button opens a viewer for loading example projects."
-msgstr "このボタンをクリックすると、プロジェクトれつをダウンロードするためのがめんをひらきます。"
+msgstr "このボタンを クリックすると、プロジェクトれつを ダウンロードする ための がめんを ひらきます。"
 
 #: js/turtledefs.js:118
 #: js/turtledefs.js:156
 msgid "You can also load projects from the file system."
-msgstr "ファイルシステムからプロジェクトをロードできますよ。"
+msgstr "ファイルシステムから プロジェクトを ロードできますよ。"
 
 #: js/turtledefs.js:119
 #: js/turtledefs.js:157
 msgid "Save your project to a file."
-msgstr "このプロジェクトをファイルにほぞんするアイコンです。"
+msgstr "このプロジェクトを ファイルに ほぞんする アイコンです。"
 
 #: js/turtledefs.js:120
 #: js/turtledefs.js:159
 msgid "To copy a stack to the clipboard, do a long press on the stack."
-msgstr "スタックうえでながおしすると、スタックをクリップボードにコピーできます。"
+msgstr "スタックうえで ながおしすると、スタックを クリップボードに コピー できます。"
 
 #: js/turtledefs.js:120
 #: js/turtledefs.js:159
 msgid "You can also use Alt+C to copy a stack of blocks."
-msgstr "Alt+Cでブロックスをコピーすることもできます。"
+msgstr "Alt+Cでブロックスを コピーすることも できます。"
 
 #: js/turtledefs.js:120
 #: js/turtledefs.js:159
 msgid "The Paste Button will highlight."
-msgstr "ペーストボタンがひかります。"
+msgstr "ペーストボタンが ひかります。"
 
 #: js/turtledefs.js:121
 #: js/turtledefs.js:160
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr "ブロックスがクリップボードにコピーされると、ペーストボタンがつかえるようになります。"
+msgstr "ブロックスが クリップボードに コピーされると、ペーストボタンが つかえるように なります。"
 
 #: js/turtledefs.js:121
 #: js/turtledefs.js:160
 msgid "You can also use Alt+V to paste a stack of blocks. "
-msgstr "Alt+Vでブロックスをはりつけることもできます。"
+msgstr "Alt+Vでブロックスを はりつけることも できます。"
 
 #: js/turtledefs.js:122
 #: js/turtledefs.js:161
 msgid "Show or hide a coordinate grid."
-msgstr "グリッドをひょうじ/ひひょうじする"
+msgstr "グリッドを ひょうじ/ひひょうじ する"
 
 #: js/turtledefs.js:123
 #: js/turtledefs.js:163
 msgid "Open a panel for configuring Music Blocks."
-msgstr "ミュージック・ブロックスをせっていするためのパネルをひらきます。"
+msgstr "ミュージック・ブロックスを せっていするための パネルを ひらきます。"
 
 #: js/turtledefs.js:124
 #: js/turtledefs.js:164
@@ -1577,44 +1577,44 @@ msgstr ""
 #: js/turtledefs.js:166
 #: js/utilitybox.js:190
 msgid "Decrease block size"
-msgstr "ブロックをちいさくする"
+msgstr "ブロックを ちいさくする"
 
 #: js/turtledefs.js:125
 #: js/turtledefs.js:166
 msgid "Decrease the size of the blocks."
-msgstr "ブロックのおおきさをちいさくする"
+msgstr "ブロックの おおきさを ちいさくする"
 
 #: js/turtledefs.js:126
 #: js/turtledefs.js:167
 #: js/utilitybox.js:210
 msgid "Increase block size"
-msgstr "ブロックをおおきくする"
+msgstr "ブロックを おおきくする"
 
 #: js/turtledefs.js:126
 #: js/turtledefs.js:167
 msgid "Increase the size of the blocks."
-msgstr "ブロックのおおきさをおおきくする"
+msgstr "ブロックの おおきさを おおきくする"
 
 #: js/turtledefs.js:127
 #: js/turtledefs.js:171
 #: js/utilitybox.js:179
 msgid "Select language"
-msgstr "げんごをえらぶ"
+msgstr "げんごを えらぶ"
 
 #: js/turtledefs.js:127
 #: js/turtledefs.js:171
 msgid "Select your language preference."
-msgstr "げんごをえらんでください"
+msgstr "げんごを えらんで ください"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:172
 msgid "Initialise a new project."
-msgstr "しんプロジェクトをしょきかします"
+msgstr "しんプロジェクトを しょきか します"
 
 #: js/turtledefs.js:129
 #: js/turtledefs.js:173
 msgid "Restore blocks from the trash."
-msgstr "ブロックをゴミばこからとりもどします。"
+msgstr "ブロックを ゴミばこから とりもどします。"
 
 #: js/turtledefs.js:130
 #: js/turtledefs.js:174
@@ -1624,7 +1624,7 @@ msgstr "ショートカット・キー"
 #: js/turtledefs.js:130
 #: js/turtledefs.js:174
 msgid "You can type \"d\" to create a \"do\" block, \"r\" to create a \"re\" block, etc."
-msgstr "「d」をうつと「ド」のブロックがつくられ、「r」をうつと「レ」のブロックがつくられます"
+msgstr "「d」を うつと「ド」の ブロックが つくられ、「r」を うつと「レ」の ブロックが つくられます"
 
 #: js/turtledefs.js:131
 #: js/turtledefs.js:175
@@ -1635,12 +1635,12 @@ msgstr "ガイド"
 #: js/turtledefs.js:175
 ## しょうさい＝詳細
 msgid "A detailed guide to Music Blocks is available."
-msgstr "ミュージック・ブロックスのしょうさいガイドがあります。"
+msgstr "ミュージック・ブロックスの しょうさい ガイドが あります。"
 
 #: js/turtledefs.js:131
 #: js/turtledefs.js:175
 msgid "Music Blocks Guide"
-msgstr "ミュージック・ブロックスガイド"
+msgstr "ミュージック・ブロックス ガイド"
 
 #: js/turtledefs.js:132
 #: js/turtledefs.js:176
@@ -1650,91 +1650,91 @@ msgstr "おめでとうございます！"
 #: js/turtledefs.js:132
 #: js/turtledefs.js:176
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr "ツアーがおわりました。ミュージック・ブロックスをどうぞ、これからもたのしんでください。"
+msgstr "ツアーが おわりました。ミュージック・ブロックスを どうぞ、これからも たのしんで ください。"
 
 #: js/turtledefs.js:142
 msgid "Play music"
-msgstr "おんがくをさいせい"
+msgstr "おんがくを さいせい"
 
 #: js/turtledefs.js:142
 #: js/turtledefs.js:147
 msgid "Click to run the music note by note."
-msgstr "おんぷをひとつずつさいせいするにはここをクリック。"
+msgstr "おんぷを ひとつずつ さいせいするには ここを クリック。"
 
 #: js/turtledefs.js:142
 msgid "Alternatively, you can hit the ENTER or RETURN key."
-msgstr "もしくは、エンターキー、リターンキーのどちらかをおしてください。"
+msgstr "もしくは、エンターキー、リターンキーの どちらかを おしてください。"
 
 #: js/turtledefs.js:144
 msgid "Run slow"
-msgstr "スローささいせい"
+msgstr "スロー さいせい"
 
 #: js/turtledefs.js:144
 msgid "Long press the run button to run the project in slow mode."
-msgstr "ながおしでスローさいせいになります。"
+msgstr "ながおしで スローさいせい になります。"
 
 #: js/turtledefs.js:145
 msgid "Run music slow"
-msgstr "おんがくをスローさいせい"
+msgstr "おんがくを スロー さいせい"
 
 #: js/turtledefs.js:145
 msgid "Extra-long press the run button to run the music in slow mode."
-msgstr "よりながおしすると、よりスローさいせいとなります。"
+msgstr "より ながおしすると、より スローさいせいと なります。"
 
 #: js/turtledefs.js:146
 msgid "Click to run the project step by step."
-msgstr "プロジェクトをひとつずつさいせいするにはここをクリック。"
+msgstr "プロジェクトを ひとつずつ さいせいするには ここを クリック。"
 
 #: js/turtledefs.js:158
 #: js/savebox.js:121
 msgid "Save sheet music"
-msgstr "がくふ(Lilypondのフォーマット)でほぞん"
+msgstr "がくふ (Lilypondの フォーマット)で ほぞん"
 
 #: js/turtledefs.js:158
 msgid "Save your project to as a Lilypond file."
-msgstr "Lilypondファイルとしてほぞんします。"
+msgstr "Lilypondファイルとして ほぞん します。"
 
 #: js/turtledefs.js:162
 ## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "きょくざひょうをひょうじ/ひひょうじする"
+msgstr "きょくざひょうを ひょうじ/ひひょうじ する"
 
 #: js/turtledefs.js:165
 #: js/utilitybox.js:268
 msgid "Enable scrolling"
-msgstr "スクロールをONに"
+msgstr "スクロールを ONに"
 
 #: js/turtledefs.js:165
 msgid "You can scroll the blocks on the canvas."
-msgstr "キャンバスうえのブロックスをスクロールできます。"
+msgstr "キャンバスうえの ブロックスを スクロール できます。"
 
 #: js/turtledefs.js:168
 #: js/utilitybox.js:231
 ## ひらがな＝とうけいじょうほう|Display is literal, but maybe not best word choice
 msgid "Display statistics"
-msgstr "とうけいをひょうじする"
+msgstr "とうけいを ひょうじ する"
 
 #: js/turtledefs.js:168
 msgid "Display statistics about your Music project."
-msgstr "いままでのさくひんのとうけいをひょうじする"
+msgstr "いままでの さくひんの とうけいを ひょうじ する"
 
 #: js/turtledefs.js:169
 #: js/utilitybox.js:242
 msgid "Load plugin from file"
-msgstr "ファイルからプラグインをロードする"
+msgstr "ファイルから プラグインを ロード する"
 
 #: js/turtledefs.js:169
 msgid "You can load new blocks from the file system."
-msgstr "あたらしいブロックをファイルシステムからロードできます。"
+msgstr "あたらしいブロックを ファイルシステムから ロードできます。"
 
 #: js/turtledefs.js:170
 #: js/utilitybox.js:257
 msgid "Delete plugin"
-msgstr "プラグインをけす"
+msgstr "プラグインを けす"
 
 #: js/turtledefs.js:170
 msgid "Delete a selected plugin."
-msgstr "えらばれているプラグインをけす"
+msgstr "えらばれているプラグインを けす"
 
 #: js/turtledefs.js:181
 msgid "At the heart of Music Blocks is the <em>Note</em> block. The <em>Note</em> block is a container for a <em>Pitch</em> block that specifies the duration (note value) of the pitch."
@@ -1882,7 +1882,7 @@ msgstr ""
 #: js/SaveInterface.js:78
 #: js/SaveInterface.js:27
 msgid "No description provided"
-msgstr "きにゅうがありません"
+msgstr "きにゅうが ありません"
 
 #: js/SaveInterface.js:188
 #.TRANS: File name prompt for save as Lilypond
@@ -1903,22 +1903,22 @@ msgstr "さっきょくか"
 #: js/SaveInterface.js:194
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr "MIDIのアウトプットがくふにもまとめましょうか？"
+msgstr "MIDIのアウトプット がくふにも まとめましょうか？"
 
 #: js/SaveInterface.js:196
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr "ギターのTABもがくふにまとめましょうか？"
+msgstr "ギターの TABも がくふに まとめましょうか？"
 
 #: js/SaveInterface.js:198
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr "Lilypondがくふのフォーマットでほぞん"
+msgstr "Lilypondがくふの フォーマットで ほぞん"
 
 #: js/SaveInterface.js:200
 #.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
 msgid "Save as PDF"
-msgstr "PDFでほぞんする"
+msgstr "PDFで ほぞんする"
 
 #: js/SaveInterface.js:217
 #: js/basicblocks.js:4898
@@ -1944,7 +1944,7 @@ msgstr "ミスター・マウス"
 
 #: js/SaveInterface.js:337
 msgid "Do you want to save your project?"
-msgstr "プロジェクトをほぞんしますか"
+msgstr "プロジェクトを ほぞん しますか"
 
 #: js/basicblocks.js:75
 #: js/synthutils.js:54
@@ -1999,28 +1999,28 @@ msgstr "いちょう"
 #: js/basicblocks.js:143
 #.TRANS: step down one note in current musical scale
 msgid "scalar step down"
-msgstr "おんかいないで～どさがる:"
+msgstr "おんかいないで～ど さがる:"
 
 #: js/basicblocks.js:154
 #.TRANS: step up one note in current musical scale
 msgid "scalar step up"
-msgstr "おんかいないで～どあがる:"
+msgstr "おんかいないで～ど あがる:"
 
 #: js/basicblocks.js:165
 #.TRANS: the change meaused in half-steps between the current pitch and the previous pitch
 msgid "change in pitch"
-msgstr "おんていのちがい"
+msgstr "おんていの ちがい"
 
 #: js/basicblocks.js:187
 #.TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
-msgstr "ピッチをヘルツにする"
+msgstr "ピッチを ヘルツに する"
 
 #: js/basicblocks.js:209
 #.TRANS: MIDI is a technical standard for electronic music
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
-msgstr "ピッチすうちをしょきか"
+msgstr "ピッチ すうちを しょきか"
 
 #: js/basicblocks.js:210
 #: js/basicblocks.js:290
@@ -2047,12 +2047,12 @@ msgstr "オクターヴ"
 #: js/basicblocks.js:225
 #.TRANS: convert piano key number (1-88) to pitch
 msgid "number to pitch"
-msgstr "すうじをおんめいへ"
+msgstr "すうじを おんめいへ"
 
 #: js/basicblocks.js:237
 #.TRANS: convert piano key number (1-88) to octave
 msgid "number to octave"
-msgstr "すうじをオクターヴひょうきへ"
+msgstr "すうじを オクターヴ ひょうきへ"
 
 #: js/basicblocks.js:289
 #: js/modewidget.js:89
@@ -2079,68 +2079,68 @@ msgstr "オクターヴのたかさ"
 #: js/basicblocks.js:356
 #.TRANS: adjust the amount of shift (up or down) of a pitch
 msgid "semi-tone transpose"
-msgstr "はんおんでいちょう"
+msgstr "はんおんで いちょう"
 
 #: js/basicblocks.js:380
 #: js/basicblocks.js:2334
 #.TRANS: down sixth means the note is five scale degrees below current note
 #.TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
-msgstr "おんかいで6どした"
+msgstr "おんかいで6ど した"
 
 #: js/basicblocks.js:392
 #: js/basicblocks.js:2346
 #.TRANS: down third means the note is two scale degrees below current note
 #.TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
-msgstr "おんかいで3どした"
+msgstr "おんかいで3ど した"
 
 #: js/basicblocks.js:404
 #: js/basicblocks.js:2358
 #.TRANS: seventh means the note is the six scale degrees above current note
 #.TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
-msgstr "おんかいで7どうえ"
+msgstr "おんかいで7ど うえ"
 
 #: js/basicblocks.js:416
 #: js/basicblocks.js:2370
 #.TRANS: sixth means the note is the five scale degrees above current note
 #.TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
-msgstr "おんかいで6どうえ"
+msgstr "おんかいで6ど うえ"
 
 #: js/basicblocks.js:428
 #: js/basicblocks.js:2382
 #.TRANS: fifth means the note is the four scale degrees above current note
 #.TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
-msgstr "おんかいで5どうえ"
+msgstr "おんかいで5ど うえ"
 
 #: js/basicblocks.js:440
 #: js/basicblocks.js:2394
 #.TRANS: fourth means the note is three scale degrees above current note
 #.TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
-msgstr "おんかいで4どうえ"
+msgstr "おんかいで4ど うえ"
 
 #: js/basicblocks.js:452
 #: js/basicblocks.js:2406
 #.TRANS: third means the note is two scale degrees above current note
 #.TRANS: third means the note is two scale degrees above current note
 msgid "third"
-msgstr "おんかいで3どうえ"
+msgstr "おんかいで3ど うえ"
 
 #: js/basicblocks.js:464
 #: js/basicblocks.js:2418
 #.TRANS: second means the note is one scale degree above current note
 #.TRANS: second means the note is one scale degree above current note
 msgid "second"
-msgstr "おんかいで2どうえ"
+msgstr "おんかいで2ど うえ"
 
 #: js/basicblocks.js:488
 #.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
-msgstr "おんかいのいちょう"
+msgstr "おんかいの いちょう"
 
 #: js/basicblocks.js:537
 #: js/basicblocks.js:4219
@@ -2227,29 +2227,29 @@ msgstr "ハイパス・フィルター"
 
 #: js/basicblocks.js:700
 msgid "1/64 note"
-msgstr "６４ぶんおんぷ"
+msgstr "６４ぶん おんぷ"
 
 #: js/basicblocks.js:711
 msgid "1/32 note"
-msgstr "３２ぶんおんぷ"
+msgstr "３２ぶん おんぷ"
 
 #: js/basicblocks.js:722
 msgid "1/16 note"
-msgstr "１６ぶんおんぷ"
+msgstr "１６ぶん おんぷ"
 
 #: js/basicblocks.js:733
 msgid "eighth note"
-msgstr "８ぶんおんぷ"
+msgstr "８ぶん おんぷ"
 
 #: js/basicblocks.js:744
 ## 四分＝しぶ
 msgid "quarter note"
-msgstr "４ぶおんぷ"
+msgstr "４ぶ おんぷ"
 
 #: js/basicblocks.js:755
 ## 二分＝にぶ
 msgid "half note"
-msgstr "２ぶおんぷ"
+msgstr "２ぶ おんぷ"
 
 #: js/basicblocks.js:766
 msgid "whole note"
@@ -2268,7 +2268,7 @@ msgstr "～れんぷ（タプル）"
 #: js/basicblocks.js:866
 #: js/basicblocks.js:881
 msgid "number of notes"
-msgstr "おんぷのかず"
+msgstr "おんぷの かず"
 
 #: js/basicblocks.js:818
 #.TRANS: A tuplet divided into 7 time values.
@@ -2302,12 +2302,12 @@ msgstr "ピッチ-ドラム・マッパー"
 #: js/basicblocks.js:953
 #.TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
-msgstr "ピッチをスライダーでつくる"
+msgstr "ピッチを スライダーで つくる"
 
 #: js/basicblocks.js:967
 #.TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
-msgstr "ピッチのすうれつをつくる"
+msgstr "ピッチの すうれつを つくる"
 
 #: js/basicblocks.js:1006
 msgid "G major scale"
@@ -2321,13 +2321,13 @@ msgstr "C メジャーおんかい（ハちょうちょう）"
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 ## ピッチと時刻のグラフ is about equally as good
 msgid "pitch-time matrix"
-msgstr "ピッチ・じこくぎょうれつ"
+msgstr "ピッチ・じこく ぎょうれつ"
 
 #: js/basicblocks.js:1067
 #.TRANS: factor used in determining how many duplications to make
 ## Probably incorrect/misleading. PLEASE CHECK!
 msgid "duplicate factor"
-msgstr "ふくせいファクター"
+msgstr "ふくせい ファクター"
 
 #: js/basicblocks.js:1087
 #.TRANS: oscillator time (in milliseconds)
@@ -2345,18 +2345,18 @@ msgstr "スイング"
 #: js/basicblocks.js:1123
 #.TRANS: the amount to shift to the offbeat note
 msgid "swing value"
-msgstr "スイングすうち"
+msgstr "スイング すうち"
 
 #: js/basicblocks.js:1139
 #.TRANS: substitute rests on notes being skipped
 ## 省略＝しょうりゃく
 msgid "skip notes"
-msgstr "おんぷのしょうりゃく"
+msgstr "おんぷの しょうりゃく"
 
 #: js/basicblocks.js:1151
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 msgid "multiply note value"
-msgstr "おんかを～ばいにするファクター"
+msgstr "おんかを ～ばいにする ファクター"
 
 #: js/basicblocks.js:1164
 #.TRANS: tie notes together into one longer note
@@ -2390,42 +2390,42 @@ msgstr "あたい"
 #.TRANS: number of beats per minute
 ## probably a little wrong. This is just multiply, I think...
 msgid "beat factor"
-msgstr "はくを～ばいにするファクター"
+msgstr "はくを ～ばいにする ファクター"
 
 #: js/basicblocks.js:1327
 #: js/basicblocks.js:1473
 #: js/basicblocks.js:1488
 #.TRANS: number of beats played per minute
 msgid "beats per minute"
-msgstr "BPM(いっぷんあたりのはくすう)"
+msgstr "BPM(いっぷんあたりの はくすう)"
 
 #: js/basicblocks.js:1338
 #.TRANS: count of current measure in meter
 ## https://ja.wikipedia.org/wiki/%E5%B0%8F%E7%AF%80
 msgid "measure count"
-msgstr "しょうせつのかず"
+msgstr "しょうせつの かず"
 
 #: js/basicblocks.js:1349
 #.TRANS: count of current beat in meter
 ## trying "what beat"
 msgid "beat count"
-msgstr "はくのかず"
+msgstr "はくの かず"
 
 #: js/basicblocks.js:1360
 #.TRANS: count the number of notes
 ## ^^Should say "calculate the total note value";http://jisho.org/word/%E5%85%A8%E9%A1%8D ;全額＝ぜんがく
 msgid "note counter"
-msgstr "おんぷのごうけいすう"
+msgstr "おんぷの ごうけい すう"
 
 #: js/basicblocks.js:1371
 #.TRANS: number of whole notes that have been played
 msgid "whole notes played"
-msgstr "さいせいされたぜんおんぷのかず"
+msgstr "さいせい された ぜんおんぷの かず"
 
 #: js/basicblocks.js:1382
 #.TRANS: number of notes that have been played
 msgid "notes played"
-msgstr "さいせいされたおんぷのかず"
+msgstr "さいせい された おんぷの かず"
 
 #: js/basicblocks.js:1393
 #.TRANS: don't lock notes to master clock
@@ -2459,14 +2459,14 @@ msgstr "する"
 
 #: js/basicblocks.js:1432
 msgid "on every beat do"
-msgstr "ぜんぶのはくに～する"
+msgstr "ぜんぶの はくに ～する"
 
 #: js/basicblocks.js:1446
 #: js/basicblocks.js:1462
 #.TRANS: sets tempo by defniing a beat and beats per minute
 #.TRANS: old block to set master tempo which doesn't set value of beat
 msgid "master beats per minute"
-msgstr "マスターBPM(いっぷんあたりのはくすう)"
+msgstr "マスターBPM(いっぷんあたりの はく すう)"
 
 #: js/basicblocks.js:1447
 #: js/basicblocks.js:1474
@@ -2476,7 +2476,7 @@ msgstr "BPM"
 #: js/basicblocks.js:1447
 #: js/basicblocks.js:1474
 msgid "beat value"
-msgstr "びょうしのあたい"
+msgstr "びょうしの あたい"
 
 #: js/basicblocks.js:1499
 #.TRANS: anacrusis
@@ -2487,35 +2487,35 @@ msgstr "ピックアップ"
 #: js/basicblocks.js:1513
 ## https://ja.wikipedia.org/wiki/%E6%8B%8D%E5%AD%90
 msgid "number of beats"
-msgstr "はくのかず"
+msgstr "はくの かず"
 
 #: js/basicblocks.js:1529
 #.TRANS: the duration of a note played as staccato
 ## ジーニアス英和辞典
 msgid "staccato factor"
-msgstr "スタッカートのながさファクター"
+msgstr "スタッカートの ながさ ファクター"
 
 #: js/basicblocks.js:1540
 #.TRANS: the degree of overlap of notes played as legato
 msgid "slur factor"
-msgstr "スラーのながさファクター"
+msgstr "スラーの ながさ ファクター"
 
 #: js/basicblocks.js:1551
 #: js/timbre.js:971
 #.TRANS: a duo synthesizer combines a synth with a sequencer
 ## ジーニアス英和辞典
 msgid "duo synth"
-msgstr "シーケンサー込みシンセ"
+msgstr "シーケンサーこみ シンセ"
 
 #: js/basicblocks.js:1552
 #: js/timbre.js:1192
 msgid "vibrato rate"
-msgstr "ビブラートエフェクタのレート"
+msgstr "ビブラート エフェクタの レート"
 
 #: js/basicblocks.js:1552
 ## 強度=きょうど；http://jisho.org/word/%E5%BC%B7%E5%BA%A6 
 msgid "vibrato intensity"
-msgstr "ビブラートエフェクタのきょうど"
+msgstr "ビブラート エフェクタの きょうど"
 
 #: js/basicblocks.js:1568
 #: js/timbre.js:971
@@ -2550,19 +2550,19 @@ msgstr "ハーモニックス"
 #.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
 ## This seems to have a lot of great stuff: https://ja.wikipedia.org/wiki/%E9%9D%9E%E5%92%8C%E5%A3%B0%E9%9F%B3#%E5%88%BA%E7%B9%8D%E9%9F%B3
 msgid "neighbor"
-msgstr "となりのおと"
+msgstr "となりの おと"
 
 #: js/basicblocks.js:1636
 #: js/basicblocks.js:2285
 #.TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
-msgstr "はんおんかんかく"
+msgstr "はんおん かんかく"
 
 #: js/basicblocks.js:1654
 #: js/basicblocks.js:2442
 #.TRANS: calculate a relative step between notes based on the current musical scale
 msgid "scalar interval"
-msgstr "おんかい：おとまのかんかく"
+msgstr "おんかい：おとまの かんかく"
 
 #: js/basicblocks.js:1670
 #: js/timbre.js:1586
@@ -2595,7 +2595,7 @@ msgstr "レート"
 #: js/timbre.js:1755
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
-msgstr "トレモロ・エフェクタのおおきさ"
+msgstr "トレモロ・エフェクタの おおきさ"
 
 #: js/basicblocks.js:1702
 #: js/timbre.js:1586
@@ -2612,17 +2612,17 @@ msgstr "オクターヴ"
 #: js/timbre.js:1829
 ## guessing...
 msgid "base frequency"
-msgstr "きほんしゅうはすう"
+msgstr "きほん しゅうはすう"
 
 #: js/basicblocks.js:1721
 #: js/timbre.js:1586
 #.TRANS: musical effect to simulate a choral sound
 msgid "chorus"
-msgstr "コーラスエフェクタ"
+msgstr "コーラス エフェクタ"
 
 #: js/basicblocks.js:1722
 msgid "delay"
-msgstr "ディレイエフェクタ"
+msgstr "ディレイ エフェクタ"
 
 #: js/basicblocks.js:1740
 #: js/timbre.js:1586
@@ -2639,7 +2639,7 @@ msgstr "おおきさ"
 #: js/basicblocks.js:1756
 #.TRANS: select synthesizer
 msgid "set synth"
-msgstr "シンセをせってい"
+msgstr "シンセを せってい"
 
 #: js/basicblocks.js:1771
 #.TRANS: glide (glissando) is a blended overlap successive notes
@@ -2662,16 +2662,16 @@ msgstr "スタッカート"
 
 #: js/basicblocks.js:1829
 msgid "synth name"
-msgstr "シンセのなまえ"
+msgstr "シンセの なまえ"
 
 #: js/basicblocks.js:1850
 #.TRANS: set the characteristics of a custom instrument
 msgid "set timbre"
-msgstr "ねいろのせってい"
+msgstr "ねいろの せってい"
 
 #: js/basicblocks.js:1863
 msgid "set temperament"
-msgstr "おんりつをせってい"
+msgstr "おんりつを せってい"
 
 #: js/basicblocks.js:1897
 msgid "doubly"
@@ -2680,13 +2680,13 @@ msgstr "じゅう"
 #: js/basicblocks.js:1920
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr "はんおんでかぞえる"
+msgstr "はんおんで かぞえる"
 
 #: js/basicblocks.js:1931
 #.TRANS: measure the distance between two pitches in steps of musical scale
 ## 音程＝おんてい；https://ja.wikipedia.org/wiki/%E9%9F%B3%E7%A8%8B
 msgid "scalar interval measure"
-msgstr "おんかいどうしのおとのかんかく"
+msgstr "おんかい どうしの おとの かんかく"
 
 #: js/basicblocks.js:1942
 #: js/basicblocks.js:1953
@@ -2731,12 +2731,12 @@ msgstr "パーフェクト（かんぜん）"
 #: js/basicblocks.js:2152
 #: js/basicblocks.js:2163
 msgid "down minor"
-msgstr "短３どした"
+msgstr "たん３ど した"
 
 #: js/basicblocks.js:2218
 #: js/basicblocks.js:2229
 msgid "down major"
-msgstr "ちょう３どした"
+msgstr "ちょう３ど した"
 
 #: js/basicblocks.js:2298
 #.TRANS: a chord is a group fo three or more notes.
@@ -2757,7 +2757,7 @@ msgstr ""
 #.TRANS: define a custom mode
 ## http://jisho.org/word/%E5%AE%9A%E7%BE%A9 
 msgid "define mode"
-msgstr "モードをていぎする"
+msgstr "モードを ていぎ する"
 
 #: js/basicblocks.js:2468
 msgid "moveable Do"
@@ -2766,7 +2766,7 @@ msgstr ""
 #: js/basicblocks.js:2479
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
-msgstr "おんかいのおんすう"
+msgstr "おんかいの おんすう"
 
 #: js/basicblocks.js:2490
 #: js/basicblocks.js:2515
@@ -2781,7 +2781,7 @@ msgstr "ちょう"
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: set the key and mode, e.g. C Major
 msgid "set key"
-msgstr "ちょうのせってい"
+msgstr "ちょうの せってい"
 
 #: js/basicblocks.js:2541
 #: js/synthutils.js:112
@@ -2817,7 +2817,7 @@ msgstr "いぬ"
 #: js/musicutils.js:274
 #.TRANS: sound effect
 msgid "bottle"
-msgstr "あきびんのおと"
+msgstr "あきびんの おと"
 
 #: js/basicblocks.js:2596
 #: js/synthutils.js:104
@@ -2825,7 +2825,7 @@ msgstr "あきびんのおと"
 #.TRANS: sound effect
 ## http://jisho.org/word/%E3%81%97%E3%82%85%E3%82%8F%E3%81%97%E3%82%85%E3%82%8F 
 msgid "bubbles"
-msgstr "あわのおと"
+msgstr "あわの おと"
 
 #: js/basicblocks.js:2607
 #: js/synthutils.js:90
@@ -2841,14 +2841,14 @@ msgstr "チャイム"
 #.TRANS: sound effect
 ## http://jisho.org/word/%E3%81%8B%E3%81%A1%E3%82%83%E3%81%8B%E3%81%A1%E3%82%83 
 msgid "clang"
-msgstr "カチャカチャのおと"
+msgstr "カチャカチャの おと"
 
 #: js/basicblocks.js:2629
 #: js/synthutils.js:98
 #: js/musicutils.js:275
 #.TRANS: sound effect
 msgid "clap"
-msgstr "てをたたくおと"
+msgstr "てを たたく おと"
 
 #: js/basicblocks.js:2640
 #: js/synthutils.js:100
@@ -2856,21 +2856,21 @@ msgstr "てをたたくおと"
 #.TRANS: sound effect
 ## http://jisho.org/word/%E5%B9%B3%E6%89%8B%E6%89%93%E3%81%A1 
 msgid "slap"
-msgstr "てをスラップするおと"
+msgstr "てを スラップする おと"
 
 #: js/basicblocks.js:2651
 #: js/synthutils.js:94
 #: js/musicutils.js:273
 #.TRANS: sound effect
 msgid "crash"
-msgstr "こわれるおと（クラッシュ）"
+msgstr "こわれる おと（クラッシュ）"
 
 #: js/basicblocks.js:2662
 #: js/synthutils.js:102
 #: js/musicutils.js:277
 #.TRANS: sound effect
 msgid "splash"
-msgstr "しぶきのおと（スプラッシュ）"
+msgstr "しぶきの おと（スプラッシュ）"
 
 #: js/basicblocks.js:2673
 #: js/musicutils.js:268
@@ -2880,13 +2880,13 @@ msgstr "カウベル"
 #: js/basicblocks.js:2684
 #: js/musicutils.js:267
 msgid "ride bell"
-msgstr "ライドシンバル"
+msgstr "ライド シンバル"
 
 #: js/basicblocks.js:2695
 #: js/musicutils.js:270
 ## https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%B3%E3%82%AC%E3%83%BC%E3%82%B7%E3%83%B3%E3%83%90%E3%83%AB
 msgid "finger cymbals"
-msgstr "フィンガーシンバル"
+msgstr "フィンガー シンバル"
 
 #: js/basicblocks.js:2706
 #: js/musicutils.js:269
@@ -2902,18 +2902,18 @@ msgstr "ハイハット"
 #: js/musicutils.js:265
 ## https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%A9%E3%83%96%E3%83%83%E3%82%AB
 msgid "darbuka drum"
-msgstr "ダブカドラム"
+msgstr "ダブカ ドラム"
 
 #: js/basicblocks.js:2739
 #: js/musicutils.js:264
 ## Guessing
 msgid "cup drum"
-msgstr "カップドラム"
+msgstr "カップ ドラム"
 
 #: js/basicblocks.js:2750
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "floor tom tom"
-msgstr "フロアタム"
+msgstr "フロア タム"
 
 #: js/basicblocks.js:2761
 #: js/musicutils.js:262
@@ -2925,7 +2925,7 @@ msgstr "タムタム"
 #: js/musicutils.js:261
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "kick drum"
-msgstr "キックドラム"
+msgstr "キック ドラム"
 
 #: js/basicblocks.js:2783
 #: js/rhythmruler.js:989
@@ -2934,12 +2934,12 @@ msgstr "キックドラム"
 #: js/musicutils.js:260
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "snare drum"
-msgstr "スネアドラム"
+msgstr "スネア ドラム"
 
 #: js/basicblocks.js:2795
 #.TRANS: set the current drum sound for playback
 msgid "set drum"
-msgstr "ドラムをせってい"
+msgstr "ドラムを せってい"
 
 #: js/basicblocks.js:2821
 #.TRANS: orientation or compass direction
@@ -3000,7 +3000,7 @@ msgstr "コントロールてん１"
 #.TRANS: Bézier curves employ at least three points to define a curve
 ## https://ja.wikipedia.org/wiki/%E3%83%99%E3%82%B8%E3%82%A7%E6%9B%B2%E7%B7%9A
 msgid "bezier"
-msgstr "ベジェきょくせん"
+msgstr "ベジェ きょくせん"
 
 #: js/basicblocks.js:2928
 #.TRANS: draws a part of the circumference of a circle
@@ -3021,12 +3021,12 @@ msgstr "はんけい"
 #: js/basicblocks.js:2943
 #.TRANS: set compass heading
 msgid "set heading"
-msgstr "むきをせってい"
+msgstr "むきを せってい"
 
 #: js/basicblocks.js:2955
 #.TRANS: set xy position
 msgid "set xy"
-msgstr "「xy」ざひょうのせってい"
+msgstr "「xy」ざひょうの せってい"
 
 #: js/basicblocks.js:2970
 #: js/basicblocks.js:4085
@@ -3035,7 +3035,7 @@ msgstr "「xy」ざひょうのせってい"
 #: plugins/rodi.rtp:379
 #.TRANS: turn right (clockwise)
 msgid "right"
-msgstr "みぎにまがる"
+msgstr "みぎに まがる"
 
 #: js/basicblocks.js:2982
 #: js/basicblocks.js:4095
@@ -3044,14 +3044,14 @@ msgstr "みぎにまがる"
 #: plugins/rodi.rtp:366
 #.TRANS: turn left (counter-clockwise)
 msgid "left"
-msgstr "ひだりにまがる"
+msgstr "ひだりに まがる"
 
 #: js/basicblocks.js:3006
 #: plugins/rodi.rtp:73
 #: plugins/rodi.rtp:404
 #.TRANS: move forward (in the same direction of the current heading)
 msgid "forward"
-msgstr "まえへすすむ"
+msgstr "まえへ すすむ"
 
 #: js/basicblocks.js:3020
 msgid "purple"
@@ -3094,11 +3094,11 @@ msgstr "くろ"
 
 #: js/basicblocks.js:3099
 msgid "begin fill"
-msgstr "きにゅうをはじめる"
+msgstr "きにゅうを はじめる"
 
 #: js/basicblocks.js:3110
 msgid "end fill"
-msgstr "きにゅうをおわらせる"
+msgstr "きにゅうを おわらせる"
 
 #: js/basicblocks.js:3119
 #: js/basicblocks.js:3179
@@ -3122,11 +3122,11 @@ msgstr "いろ"
 
 #: js/basicblocks.js:3157
 msgid "pen size"
-msgstr "ペンのおおきさ"
+msgstr "ペンの おおきさ"
 
 #: js/basicblocks.js:3167
 msgid "set font"
-msgstr "フォントのせってい"
+msgstr "フォントの せってい"
 
 #: js/basicblocks.js:3191
 #.TRANS: draw a line that has a hollow space down its center
@@ -3141,7 +3141,7 @@ msgstr "きにゅうする"
 #: js/basicblocks.js:3214
 #.TRANS: riase up the pen so that it does not draw when it is moved
 msgid "pen up"
-msgstr "ペンをあげる"
+msgstr "ペンを あげる"
 
 #: js/basicblocks.js:3225
 #.TRANS: put down the pen so that it draws when it is moved
@@ -3151,33 +3151,33 @@ msgstr "ペンおろす"
 #: js/basicblocks.js:3236
 #.TRANS: set the width of the line drawn by the pen
 msgid "set pen size"
-msgstr "ペンのおおきさのせってい"
+msgstr "ペンの おおきさの せってい"
 
 #: js/basicblocks.js:3248
 #.TRANS: set degree of translucence of the pen color
 ## 透明=とうめい　https://ja.wikipedia.org/wiki/%E9%80%8F%E6%98%8E
 msgid "set translucency"
-msgstr "とうめいどをせってい"
+msgstr "とうめいどを せってい"
 
 #: js/basicblocks.js:3259
 ## 色相=しきそうhttps://ja.wikipedia.org/wiki/%E8%89%B2%E7%9B%B8
 msgid "set hue"
-msgstr "しきそうをせってい"
+msgstr "しきそうを せってい"
 
 #: js/basicblocks.js:3270
 ## ひらがな＝のうたん
 msgid "set shade"
-msgstr "のうたんをせってい"
+msgstr "のうたんを せってい"
 
 #: js/basicblocks.js:3282
 #.TRANS: set the level of vividness of the pen color
 msgid "set grey"
-msgstr "はいいろをせってい"
+msgstr "はいいろを せってい"
 
 #: js/basicblocks.js:3293
 ## 色のせってい
 msgid "set color"
-msgstr "いろをせってい"
+msgstr "いろを せってい"
 
 #: js/basicblocks.js:3307
 #.TRANS: convert a real number to an integer
@@ -3222,7 +3222,7 @@ msgstr "ぜったいち"
 #: js/basicblocks.js:3518
 ## Literally "this or that"
 msgid "one of"
-msgstr "どちらかをえらぶ"
+msgstr "どちらかを えらぶ"
 
 #: js/basicblocks.js:3518
 ## need context
@@ -3249,7 +3249,7 @@ msgstr "さいだいち"
 #: js/basicblocks.js:3553
 ## check this
 msgid "add 1 to"
-msgstr "～に１をたす"
+msgstr "～に１を たす"
 
 #: js/basicblocks.js:3563
 msgid "add"
@@ -3285,7 +3285,7 @@ msgstr "リターン"
 #: js/basicblocks.js:3724
 #.TRANS: return value from a function to a URL
 msgid "return to URL"
-msgstr "URLにもどります"
+msgstr "URLに もどります"
 
 #: js/basicblocks.js:3728
 msgid "100"
@@ -3296,7 +3296,7 @@ msgstr "ひゃく"
 #: js/basicblocks.js:3798
 ## 計算＝けいさん; p69 Collins Shubun
 msgid "calculate"
-msgstr "けいさんする"
+msgstr "けいさん する"
 
 #: js/basicblocks.js:3846
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
@@ -3319,24 +3319,24 @@ msgstr "おくる"
 #: js/basicblocks.js:3920
 #.TRANS: load the heap contents from a URL
 msgid "load heap from App"
-msgstr "アプリからヒープをロード"
+msgstr "アプリから ヒープを ロード"
 
 #: js/basicblocks.js:3935
 #.TRANS: save the heap contents to a URL
 msgid "save heap to App"
-msgstr "アプリにヒープをほぞん"
+msgstr "アプリに ヒープを ほぞん"
 
 #: js/basicblocks.js:3950
 #: plugins/heap.rtp:126
 #.TRANS: Display the heap contents
 ## https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%BC%E3%83%97
 msgid "show heap"
-msgstr "ヒープをひょうじする"
+msgstr "ヒープを ひょうじ する"
 
 #: js/basicblocks.js:3961
 #.TRANS: How many entries are in the heap?
 msgid "heap length"
-msgstr "ヒープのながさ"
+msgstr "ヒープの ながさ"
 
 #: js/basicblocks.js:3973
 #: plugins/heap.rtp:134
@@ -3344,36 +3344,36 @@ msgstr "ヒープのながさ"
 ## Literally means "throw away the heap"
 ## I am guessing
 msgid "heap empty?"
-msgstr "ヒープはからですか？"
+msgstr "ヒープは から ですか？"
 
 #: js/basicblocks.js:3995
 #: plugins/heap.rtp:150
 #.TRANS: save the heap to a file
 msgid "save heap"
-msgstr "ヒープをほぞんする"
+msgstr "ヒープを ほぞん する"
 
 #: js/basicblocks.js:4008
 #: plugins/heap.rtp:160
 #.TRANS: load the heap from a file
 msgid "load heap"
-msgstr "ヒープをロードする"
+msgstr "ヒープを ロード する"
 
 #: js/basicblocks.js:4021
 #.TRANS: reverse the order of the heap
 msgid "reverse heap"
-msgstr "ヒープをぎゃくにする"
+msgstr "ヒープを ぎゃくに する"
 
 #: js/basicblocks.js:4032
 #.TRANS: retrieve a value from the heap at index position in the heap
 ## ひらがな＝さいば
 msgid "index heap"
-msgstr "ヒープにばんごうをふる"
+msgstr "ヒープに ばんごうを ふる"
 
 #: js/basicblocks.js:4045
 #.TRANS: set a value in the heap
 ## 数値＝すうち；unsure if this is just a number value http://jisho.org/word/%E6%95%B0%E5%80%A4 
 msgid "set heap"
-msgstr "ヒープをせっていする"
+msgstr "ヒープを せってい する"
 
 #: js/basicblocks.js:4045
 ## Double-check. Not sure. May be too literal.
@@ -3417,7 +3417,7 @@ msgstr "たかさ(たて)"
 #: js/basicblocks.js:4146
 #.TRANS: stops playback of an audio recording
 msgid "stop play"
-msgstr "さいせいをていし"
+msgstr "さいせいを ていし"
 
 #: js/basicblocks.js:4158
 #.TRANS: play an audio recording
@@ -3427,22 +3427,22 @@ msgstr "プレーバック"
 #: js/basicblocks.js:4169
 ## Maybe 話す
 msgid "speak"
-msgstr "こえをだす"
+msgstr "こえを だす"
 
 #: js/basicblocks.js:4209
 ## A/Vを停止
 msgid "stop media"
-msgstr "メデイアをていし"
+msgstr "メデイアを ていし"
 
 #: js/basicblocks.js:4219
 msgid "duration (ms)"
-msgstr "ながさ（1秒間の1000ぶんの1）"
+msgstr "ながさ（ミリびょう）"
 
 #: js/basicblocks.js:4233
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 ## 周波数=しゅうはすう　https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
 msgid "note to frequency"
-msgstr "おんぷのたかさをしゅうはすうひょうじへ"
+msgstr "おんぷの たかさを しゅうはすう ひょうじへ"
 
 #: js/basicblocks.js:4248
 #.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
@@ -3465,13 +3465,13 @@ msgstr "オブジェクト"
 #: js/basicblocks.js:4314
 #.TRANS: play music backward
 msgid "backward"
-msgstr "ぎゃくさいせい"
+msgstr "ぎゃく さいせい"
 
 #: js/basicblocks.js:4326
 #.TRANS: play each note more than once
 ## 複製
 msgid "duplicate"
-msgstr "ふくせいする"
+msgstr "ふくせい する"
 
 #: js/basicblocks.js:4349
 #.TRANS: the case statement used in a switch statement in programming
@@ -3530,7 +3530,7 @@ msgstr "ずっと"
 #: js/basicblocks.js:4455
 ## Scrath po (L268)
 msgid "repeat"
-msgstr "～かいくりかえす"
+msgstr "～かい くりかえす"
 
 #: js/basicblocks.js:4469
 #: js/basicblocks.js:4479
@@ -3546,7 +3546,7 @@ msgstr "ふめい"
 #: js/basicblocks.js:4536
 #.TRANS: Open a palette of blocks.
 msgid "open palette"
-msgstr "パレットをひらきます"
+msgstr "パレットを ひらきます"
 
 #: js/basicblocks.js:4540
 msgid "Rhythm"
@@ -3555,48 +3555,48 @@ msgstr "リズム"
 #: js/basicblocks.js:4549
 #.TRANS: Move this block to the trash.
 msgid "delete block"
-msgstr "ブロックをけす"
+msgstr "ブロックを けす"
 
 #: js/basicblocks.js:4561
 #.TRANS: Move the position of a block on the screen.
 msgid "move block"
-msgstr "ブロックをうごかす"
+msgstr "ブロックを うごかす"
 
 #: js/basicblocks.js:4561
 #: js/basicblocks.js:4587
 ## I need some context
 msgid "block number"
-msgstr "ブロックのばんごう"
+msgstr "ブロックの ばんごう"
 
 #: js/basicblocks.js:4575
 #.TRANS: Run program beginning at this block.
 msgid "run block"
-msgstr "ブロックをさいせい"
+msgstr "ブロックを さいせい"
 
 #: js/basicblocks.js:4587
 #.TRANS: We can connect a block to another block.
 ## Check
 msgid "connect blocks"
-msgstr "ブロックをつなぐ"
+msgstr "ブロックを つなぐ"
 
 #: js/basicblocks.js:4587
 ## check
 msgid "target block"
-msgstr "もくひょうのブロック"
+msgstr "もくひょうの ブロック"
 
 #: js/basicblocks.js:4587
 ## check; http://jisho.org/word/%E6%8E%A5%E7%B6%9A 
 msgid "connection number"
-msgstr "せつぞくのばんごう"
+msgstr "せつぞくの ばんごう"
 
 #: js/basicblocks.js:4601
 #.TRANS: Create a new block programmatically.
 msgid "make block"
-msgstr "ブロックをつくる"
+msgstr "ブロックを つくる"
 
 #: js/basicblocks.js:4616
 msgid "save as ABC"
-msgstr "「ABC」でほぞん"
+msgstr "「ABC」で ほぞん"
 
 #: js/basicblocks.js:4619
 #: js/basicblocks.js:4633
@@ -3606,11 +3606,11 @@ msgstr "めい"
 
 #: js/basicblocks.js:4630
 msgid "save as lilypond"
-msgstr "Lilypondのファイルフォーマットでほぞん"
+msgstr "Lilypondの ファイルフォーマットで ほぞん"
 
 #: js/basicblocks.js:4644
 msgid "save svg"
-msgstr "svgでほぞん"
+msgstr "svgで ほぞん"
 
 #: js/basicblocks.js:4657
 msgid "no background"
@@ -3618,15 +3618,15 @@ msgstr "バックグラウンドなし"
 
 #: js/basicblocks.js:4667
 msgid "show blocks"
-msgstr "ブロックをひょうじ"
+msgstr "ブロックを ひょうじ"
 
 #: js/basicblocks.js:4677
 msgid "hide blocks"
-msgstr "ブロックをひひょうじ"
+msgstr "ブロックを ひひょうじ"
 
 #: js/basicblocks.js:4687
 msgid "open project"
-msgstr "プロジェクトをひらく"
+msgstr "プロジェクトを ひらく"
 
 #: js/basicblocks.js:4720
 msgid "wait"
@@ -3658,7 +3658,7 @@ msgstr "クリック"
 #: js/basicblocks.js:4820
 #: plugins/rodi.rtp:220
 msgid "pixel color"
-msgstr "ピクセルのいろ"
+msgstr "ピクセルの いろ"
 
 #: js/basicblocks.js:4830
 msgid "time"
@@ -3666,11 +3666,11 @@ msgstr "じかん"
 
 #: js/basicblocks.js:4840
 msgid "cursor y"
-msgstr "yざひょうカーソル"
+msgstr "yざひょう カーソル"
 
 #: js/basicblocks.js:4851
 msgid "cursor x"
-msgstr "xざひょうカーソル"
+msgstr "xざひょう カーソル"
 
 #: js/basicblocks.js:4862
 msgid "mouse button"
@@ -3686,78 +3686,78 @@ msgstr "キーボード"
 
 #: js/basicblocks.js:4894
 msgid "stop mouse"
-msgstr "ネズミをとめる"
+msgstr "ネズミを とめる"
 
 #: js/basicblocks.js:4906
 msgid "start mouse"
-msgstr "ネズミをスタート"
+msgstr "ネズミを スタート"
 
 #: js/basicblocks.js:4919
 #.TRANS: pen color for this mouse
 msgid "mouse color"
-msgstr "ネズミのいろ"
+msgstr "ネズミの いろ"
 
 #: js/basicblocks.js:4932
 #.TRANS: heading (compass direction) for this mouse
 ## http://jisho.org/word/%E6%96%B9%E4%BD%8D ; 方位＝ほうい
 msgid "mouse heading"
-msgstr "ネズミのすすむかくど"
+msgstr "ネズミの すすむ かくど"
 
 #: js/basicblocks.js:4945
 #: js/basicblocks.js:4960
 #.TRANS: set xy position for this mouse
 msgid "set mouse"
-msgstr "ネズミをせってい"
+msgstr "ネズミを せってい"
 
 #: js/basicblocks.js:4973
 #.TRANS: y position for this mouse
 ## check for consistency against cursor x/y
 msgid "mouse y"
-msgstr "ネズミのyざひょう"
+msgstr "ネズミの yざひょう"
 
 #: js/basicblocks.js:4986
 #.TRANS: x position for this mouse
 msgid "mouse x"
-msgstr "ネズミのxざひょう"
+msgstr "ネズミの xざひょう"
 
 #: js/basicblocks.js:4999
 #.TRANS: notes played by this mouse
 ## To be verified
 msgid "mouse notes played"
-msgstr "ネズミのえんそうしたおんぷのかず"
+msgstr "ネズミの えんそうした おんぷの かず"
 
 #: js/basicblocks.js:5012
 #.TRANS: convert current note for this turtle to piano key (1-88)
 ## Is there a Japanese technical word for "pitch number"; below is literal
 msgid "mouse pitch number"
-msgstr "ネズミのピッチすうち"
+msgstr "ネズミの ピッチ すうち"
 
 #: js/basicblocks.js:5024
 #: js/basicblocks.js:5037
 msgid "mouse note value"
-msgstr "ネズミのおんか"
+msgstr "ネズミの おんか"
 
 #: js/basicblocks.js:5049
 ## http://jisho.org/word/%E5%90%8C%E6%9C%9F 
 msgid "mouse sync"
-msgstr "ネズミをどうきさせる"
+msgstr "ネズミを どうき させる"
 
 #: js/basicblocks.js:5061
 msgid "found mouse"
-msgstr "ネズミをみつけた"
+msgstr "ネズミを みつけた"
 
 #: js/basicblocks.js:5074
 msgid "new mouse"
-msgstr "あたらしいネズミ"
+msgstr "あたらしい ネズミ"
 
 #: js/basicblocks.js:5086
 msgid "mouse name"
-msgstr "ネズミのなまえ"
+msgstr "ネズミの なまえ"
 
 #: js/basicblocks.js:5097
 #: js/basicblocks.js:5114
 msgid "set name"
-msgstr "なまえをつける"
+msgstr "なまえを つける"
 
 #: js/basicblocks.js:5098
 #: plugins/translate.rtp:95
@@ -3775,14 +3775,14 @@ msgstr "ターゲット"
 #: js/basicblocks.js:5128
 #.TRANS: the volume at which notes are played
 msgid "master volume"
-msgstr "マスターおんりょう"
+msgstr "マスター おんりょう"
 
 #: js/basicblocks.js:5227
 #: js/basicblocks.js:5239
 #.TRANS: a rapid, slight variation in pitch
 #.TRANS: set the loudness level
 msgid "set synth volume"
-msgstr "シンセのおんりょうをせってい"
+msgstr "シンセの おんりょうを せってい"
 
 #: js/basicblocks.js:5227
 #: js/basicblocks.js:5239
@@ -3794,12 +3794,12 @@ msgstr "シンセサイザー"
 #.TRANS: set the loudness level
 #.TRANS: set the loudness level
 msgid "set master volume"
-msgstr "マスターおんりょうをせってい"
+msgstr "マスター おんりょうを せってい"
 
 #: js/basicblocks.js:5276
 #.TRANS: set an articulation (change in volume)
 msgid "set relative volume"
-msgstr "あいたいおんりょうをせってい"
+msgstr "あいたい おんりょうを せってい"
 
 #: js/basicblocks.js:5289
 #.TRANS: a gradual increase in loudness
@@ -3813,23 +3813,23 @@ msgstr "クレッシェンド"
 
 #: js/utilitybox.js:153
 msgid "Optimize performance"
-msgstr "パーフォマンスをさいだいげんにする"
+msgstr "パーフォマンスを さいだいげんに する"
 
 #: js/utilitybox.js:154
 msgid "Optimize feedback"
-msgstr "フィードバックをさいだいげんにする"
+msgstr "フィードバックを さいだいげんに する"
 
 #: js/utilitybox.js:199
 msgid "Cannot be further decreased"
-msgstr "これよりへらすことはできません"
+msgstr "これより へらす ことは できません"
 
 #: js/utilitybox.js:219
 msgid "Cannot be further increased"
-msgstr "これよりふやすことはできません"
+msgstr "これより ふやす ことは できません"
 
 #: js/utilitybox.js:281
 msgid "Disable scrolling"
-msgstr "スクロールをむこうにする"
+msgstr "スクロールを むこうに する"
 
 #: js/playback.js:28
 #: js/playback.js:28
@@ -3841,7 +3841,7 @@ msgstr "スクロールをむこうにする"
 #: js/rhythmruler.js:1642
 #: js/rhythmruler.js:1642
 msgid "pause"
-msgstr "いちじていし"
+msgstr "いちじ ていし"
 
 #: js/playback.js:31
 #: js/playback.js:31
@@ -3851,7 +3851,7 @@ msgstr "いちじていし"
 #: js/rhythmruler.js:1392
 #: js/modewidget.js:59
 msgid "play all"
-msgstr "すべてさいせいする"
+msgstr "すべて さいせい する"
 
 #: js/playback.js:77
 #: js/help.js:92
@@ -3907,31 +3907,31 @@ msgstr "さいせい"
 
 #: js/savebox.js:72
 msgid "Save as .svg"
-msgstr ".svgでほぞん"
+msgstr ".svgで ほぞん"
 
 #: js/savebox.js:82
 msgid "Save as .png"
-msgstr ".pngでほぞん"
+msgstr ".pngで ほぞん"
 
 #: js/savebox.js:93
 msgid "Save as .wav"
-msgstr ".wavでほぞん"
+msgstr ".wavで ほぞん"
 
 #: js/savebox.js:105
 msgid "Upload to Planet"
-msgstr "プラネットにアップロード"
+msgstr "プラネットに アップロード"
 
 #: js/savebox.js:129
 msgid "Share on Facebook"
-msgstr "フェースブックでシェア"
+msgstr "フェースブックで シェア"
 
 #: js/savebox.js:142
 msgid "Save as .abc"
-msgstr ".abcのフォーマットでほぞん"
+msgstr ".abcの フォーマットで ほぞん"
 
 #: js/savebox.js:153
 msgid "Save block artwork"
-msgstr "ブロックのアートをほぞん"
+msgstr "ブロックの アートを ほぞん"
 
 #: js/savebox.js:159
 #.TRANS: block artwork is a file name we use to save the program blocks as they appear on the screen.
@@ -3940,7 +3940,7 @@ msgstr ""
 
 #: js/lilypond.js:18
 msgid "brown rat"
-msgstr "ちゃいろのドブネズミ"
+msgstr "ちゃいろの ドブネズミ"
 
 #: js/lilypond.js:18
 msgid "mole"
@@ -3972,7 +3972,7 @@ msgstr "くろいねずみ"
 
 #: js/lilypond.js:18
 msgid "grey squirrel"
-msgstr "はいいろのリス"
+msgstr "はいいろの リス"
 
 #: js/lilypond.js:18
 msgid "flying squirrel"
@@ -3984,44 +3984,44 @@ msgstr "こうもり"
 
 #: js/lilypond.js:177
 msgid "Lilypond ignoring mode"
-msgstr "Lilypondはこのモードをむしします"
+msgstr "Lilypondは このモードを むし します"
 
 #: js/blocks.js:1247
 msgid "Consider breaking this stack into parts."
-msgstr "このながいスタックをべつべつのスタックにしたほうがいい"
+msgstr "この ながい スタックを べつべつの スタックに したほうが わかりやすくて、さいせいが　はやい です。"
 
 #: js/blocks.js:3287
 #: js/blocks.js:3313
 msgid "There is no block selected."
-msgstr "ブロックがえらばれていません"
+msgstr "ブロックが えらばれて いません。"
 
 #: js/playbackbox.js:83
 #: js/playbackbox.js:91
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "playback music"
-msgstr "コンパイルされたおんがく"
+msgstr "コンパイル された おんがく"
 
 #: js/playbackbox.js:96
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "pause playback"
-msgstr "コンパイルされたおんがくをていし"
+msgstr "コンパイル された おんがくを ていし"
 
 #: js/playbackbox.js:107
 #: js/playbackbox.js:116
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "restart playback"
-msgstr "コンパイルされたおんがくをさいせい"
+msgstr "コンパイル された おんがくを さいせい"
 
 #: js/playbackbox.js:123
 #.TRANS: playback in the case refers to playing back music that has been preprocessed.
 msgid "prepare music for playback"
-msgstr "プレイバックようのおんがくをじゅんび（コンパイル）します"
+msgstr "プレイバックようの おんがくを じゅんび（コンパイル）します"
 
 #: js/languagebox.js:57
 ## Check
 msgid "Refresh your browser to change your language preference."
-msgstr "げんごをへんこうするにはブラウザをさいきどうするひつようがあります。"
+msgstr "げんごを へんこうするには ブラウザを さいきどう する ひつようが あります。"
 
 #: js/help.js:53
 msgid "previous page"
@@ -4037,7 +4037,7 @@ msgstr ""
 #: js/modewidget.js:65
 #: js/pitchstaircase.js:501
 msgid "save"
-msgstr "ほぞんする"
+msgstr "ほぞん する"
 
 #: js/pitchdrummatrix.js:236
 #: js/musicutils.js:48
@@ -4051,11 +4051,11 @@ msgstr ""
 
 #: js/pitchslider.js:388
 msgid "move up"
-msgstr "うえにうごく"
+msgstr "うえに うごく"
 
 #: js/pitchslider.js:402
 msgid "move down"
-msgstr "したにうごく"
+msgstr "したに うごく"
 
 #: js/pitchslider.js:417
 msgid "Use the slider to change the pitch."
@@ -4067,7 +4067,7 @@ msgstr "エクスポート"
 
 #: js/pitchtimematrix.js:202
 msgid "sort"
-msgstr "せいり"
+msgstr "せいり する"
 
 #: js/pitchtimematrix.js:448
 msgid "Click on the table to add notes."
@@ -4076,7 +4076,7 @@ msgstr ""
 #: js/pitchtimematrix.js:707
 #: js/pitchtimematrix.js:839
 msgid "tuplet value"
-msgstr "なんれんぷか"
+msgstr "れんぷ の あたい"
 
 #: js/timbre.js:591
 ## http://jisho.org/word/%E3%82%B7%E3%83%B3%E3%82%BB%E3%82%B5%E3%82%A4%E3%82%B6%E3%83%BC 
@@ -4092,7 +4092,7 @@ msgstr "こうかおん"
 #: js/timbre.js:727
 ## http://jisho.org/word/%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC ; 加える＝くわえるhttp://jisho.org/word/%E5%8A%A0%E3%81%88%E3%82%8B 
 msgid "add filter"
-msgstr "フィルターをくわえる"
+msgstr "フィルターを くわえる"
 
 #: js/timbre.js:743
 #: js/rhythmruler.js:1448
@@ -4100,7 +4100,7 @@ msgstr "フィルターをくわえる"
 #: js/pitchstaircase.js:534
 ## Uses the Katakana version for computer terminology according to http://jisho.org/word/%E3%82%A2%E3%83%B3%E3%83%89%E3%82%A5 
 msgid "undo"
-msgstr "もとにもどす"
+msgstr "もとに もどす"
 
 #: js/timbre.js:820
 msgid "Click on buttons to open the timbre design tools."
@@ -4109,13 +4109,13 @@ msgstr ""
 #: js/timbre.js:1018
 ## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
 msgid "harmonicity"
-msgstr "ばいおんのねいろ"
+msgstr "ばいおんの ねいろ"
 
 #: js/timbre.js:1075
 #: js/timbre.js:1135
 ## Musical modulation? http://jisho.org/word/%E8%BB%A2%E8%AA%BF 転調＝てんちょう; http://jisho.org/word/%E6%8C%87%E6%A8%99 目録＝もくろく
 msgid "modulation index"
-msgstr "モジュレーションインデックス"
+msgstr "モジュレーション インデックス"
 
 #: js/timbre.js:1193
 ## http://jisho.org/word/%E3%83%93%E3%83%96%E3%83%A9%E3%83%BC%E3%83%88 
@@ -4134,15 +4134,15 @@ msgstr "ディストーションの量"
 #: js/tempo.js:75
 #: js/tempo.js:78
 msgid "The beats per minute must be between 30 and 1000."
-msgstr "BPM(いっぷんあたりのはくすう)は30から1000であるひつようがあります"
+msgstr "BPM(いっぷん あたりの はく すう)は 30から 1000である ひつようが あります"
 
 #: js/tempo.js:339
 msgid "speed up"
-msgstr "スピードアップ"
+msgstr "スピード アップ"
 
 #: js/tempo.js:355
 msgid "slow down"
-msgstr "スローダウン"
+msgstr "スロー ダウン"
 
 #: js/tempo.js:431
 msgid "Adjust the tempo with the buttons."
@@ -4157,7 +4157,7 @@ msgstr ""
 #: js/rhythmruler.js:1454
 #.TRANS: user can tap out a rhythm by clicking on a ruler.
 msgid "tap a rhythm"
-msgstr "リズムをタップする"
+msgstr "リズムを タップ する"
 
 #: js/rhythmruler.js:1240
 #: js/synthutils.js:24
@@ -4168,11 +4168,11 @@ msgstr "ギター"
 
 #: js/rhythmruler.js:1403
 msgid "save rhythms"
-msgstr "リズムをほぞん"
+msgstr "リズムを ほぞん"
 
 #: js/rhythmruler.js:1409
 msgid "save drum machine"
-msgstr "ドラムマシーンをほぞん"
+msgstr "ドラム マシーンを ほぞん"
 
 #: js/rhythmruler.js:1758
 msgid "Click on the ruler to divide it."
@@ -4180,11 +4180,11 @@ msgstr ""
 
 #: js/modewidget.js:77
 msgid "rotate counter clockwise"
-msgstr "はんとけいまわり"
+msgstr "はんとけい まわり"
 
 #: js/modewidget.js:83
 msgid "rotate clockwise"
-msgstr "とけいまわり"
+msgstr "とけい まわり"
 
 #: js/modewidget.js:200
 #.TRANS: A circle of notes represents the musical mode.
@@ -4193,11 +4193,11 @@ msgstr ""
 
 #: js/pitchstaircase.js:475
 msgid "play chord"
-msgstr "わおんをさいせいする"
+msgstr "わおんを さいせい する"
 
 #: js/pitchstaircase.js:480
 msgid "play scale"
-msgstr "おんかいをさいせいする"
+msgstr "おんかいを さいせい する"
 
 #: js/pitchstaircase.js:639
 msgid "Click on a note to create a new step."
@@ -4284,30 +4284,30 @@ msgstr "シンプル・シンセ４"
 #.TRANS: white noise synthesizer
 ## guessing -- to be verified
 msgid "white noise"
-msgstr "ホワイトノイズ"
+msgstr "ホワイト ノイズ"
 
 #: js/synthutils.js:48
 #: js/musicutils.js:257
 #.TRANS: brown noise synthesizer
 ## https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%A9%E3%82%A6%E3%83%8B%E3%82%A2%E3%83%B3%E3%83%8E%E3%82%A4%E3%82%BA
 msgid "brown noise"
-msgstr "ブラウンノイズ"
+msgstr "ブラウン ノイズ"
 
 #: js/synthutils.js:50
 #: js/musicutils.js:258
 #.TRANS: pink noise synthesizer
 msgid "pink noise"
-msgstr "ピンクノイズ"
+msgstr "ピンク ノイズ"
 
 #: js/synthutils.js:68
 #.TRANS: musical instrument
 msgid "snare-drum"
-msgstr "スネアドラム"
+msgstr "スネア ドラム"
 
 #: js/synthutils.js:70
 #.TRANS: musical instrument
 msgid "kick-drum"
-msgstr "キックドラム"
+msgstr "キック ドラム"
 
 #: js/synthutils.js:72
 #.TRANS: musical instrument
@@ -4317,12 +4317,12 @@ msgstr "タムタム"
 #: js/synthutils.js:74
 #.TRANS: musical instrument
 msgid "floor-tom-tom"
-msgstr "フロアタムタム"
+msgstr "フロア タム"
 
 #: js/synthutils.js:76
 #.TRANS: a drum made from an inverted cup
 msgid "cup-drum"
-msgstr "カップドラム"
+msgstr "カップ ドラム"
 
 #: js/synthutils.js:78
 #.TRANS: musical instrument
@@ -4352,20 +4352,20 @@ msgstr "トライアングル"
 #: js/synthutils.js:88
 #.TRANS: musical instrument
 msgid "finger-cymbals"
-msgstr "ゆびのシンバル"
+msgstr "ゆびの シンバル"
 
 #: js/musicutils.js:148
 #.TRANS: twelve semi-tone scale for music
 msgid "chromatic"
-msgstr "クロマティックおんかい"
+msgstr "クロマティック おんかい"
 
 #: js/musicutils.js:149
 msgid "algerian"
-msgstr "アルジェリアおんかい"
+msgstr "アルジェリア おんかい"
 
 #: js/musicutils.js:150
 msgid "spanish"
-msgstr "スペインおんかい"
+msgstr "スペイン おんかい"
 
 #: js/musicutils.js:152
 #.TRANS: modal scale in music
@@ -4383,58 +4383,58 @@ msgstr "ハーモニック・メジャー（わせいちょうおんかい）"
 #.TRANS: natural minor scales in music
 ## https://cyta.jp/composition/c/entry/6542
 msgid "natural minor"
-msgstr "しぜんたんおんかい"
+msgstr "しぜんたん おんかい"
 
 #: js/musicutils.js:158
 #.TRANS: harmonic minor scale in music
 ## 和声短おんかい=わせいたんおんかい； https://ja.wikipedia.org/wiki/%E9%9F%B3%E9%9A%8E
 msgid "harmonic minor"
-msgstr "わせいたんおんかい"
+msgstr "わせいたん おんかい"
 
 #: js/musicutils.js:160
 #.TRANS: melodic minor scale in music
 ## 旋律短音階=せんりつたんおんかい；http://jisho.org/word/%E6%97%8B%E5%BE%8B%E7%9A%84%E7%9F%AD%E9%9F%B3%E9%9A%8E 
 msgid "melodic minor"
-msgstr "せんりつたんおんかい"
+msgstr "せんりつたん おんかい"
 
 #: js/musicutils.js:164
 #.TRANS: modal scale for music
 msgid "dorian"
-msgstr "ドリアンおんかい"
+msgstr "ドリアン おんかい"
 
 #: js/musicutils.js:166
 #.TRANS: modal scale for music
 msgid "phrygian"
-msgstr "フリジアンおんかい"
+msgstr "フリジアン おんかい"
 
 #: js/musicutils.js:168
 #.TRANS: modal scale for music
 msgid "lydian"
-msgstr "リディアンおんかい"
+msgstr "リディアン おんかい"
 
 #: js/musicutils.js:170
 #.TRANS: modal scale for music
 msgid "mixolydian"
-msgstr "ミクソリディアンおんかい"
+msgstr "ミクソリディアン おんかい"
 
 #: js/musicutils.js:174
 #.TRANS: modal scale for music
 msgid "locrian"
-msgstr "ロクリアンおんかい"
+msgstr "ロクリアン おんかい"
 
 #: js/musicutils.js:176
 #.TRANS: minor jazz scale for music
 msgid "jazz minor"
-msgstr "オルタードおんかい"
+msgstr "オルタード おんかい"
 
 #: js/musicutils.js:178
 #.TRANS: bebop scale for music
 msgid "bebop"
-msgstr "ビバップおんかい"
+msgstr "ビバップ おんかい"
 
 #: js/musicutils.js:179
 msgid "arabic"
-msgstr "アラビアおんかい"
+msgstr "アラビア おんかい"
 
 #: js/musicutils.js:180
 msgid "byzantine"
@@ -4443,68 +4443,68 @@ msgstr "ビザンティン"
 #: js/musicutils.js:182
 #.TRANS: musical scale for music by Verdi
 msgid "enigmatic"
-msgstr "ヴェルディおんかい"
+msgstr "ヴェルディ おんかい"
 
 #: js/musicutils.js:183
 msgid "ethiopian"
-msgstr "エチオピアおんかい"
+msgstr "エチオピア おんかい"
 
 #: js/musicutils.js:185
 #.TRANS: Ethiopic scale for music
 ## https://en.wikipedia.org/wiki/Ge%27ez_language ; I only see ge'ez as a language on wikipedia...
 msgid "geez"
-msgstr "ゲエズおんかい"
+msgstr "ゲエズ おんかい"
 
 #: js/musicutils.js:186
 ## http://jisho.org/word/%E3%83%92%E3%83%B3%E3%82%BA%E3%83%BC 
 msgid "hindu"
-msgstr "ヒンドゥーおんかい"
+msgstr "ヒンドゥー おんかい"
 
 #: js/musicutils.js:187
 msgid "hungarian"
-msgstr "ハンガリーおんかい"
+msgstr "ハンガリー おんかい"
 
 #: js/musicutils.js:189
 #.TRANS: minor Romanian scale for music
 msgid "romanian minor"
-msgstr "ルーマニア・マイナーおんかい"
+msgstr "ルーマニア・マイナー おんかい"
 
 #: js/musicutils.js:190
 msgid "spanish gypsy"
-msgstr "スパニッシュ・ジプシーおんかい"
+msgstr "スパニッシュ・ジプシー おんかい"
 
 #: js/musicutils.js:192
 #.TRANS: musical scale for Mid-Eastern music
 ## https://en.wikipedia.org/wiki/Arabic_maqam;looks like there are many... oh well, we need to split them up, I guess...
 msgid "maqam"
-msgstr "マカームおんかい"
+msgstr "マカーム おんかい"
 
 #: js/musicutils.js:194
 #.TRANS: minor blues scale for music
 msgid "minor blues"
-msgstr "マイナー・ブルースおんかい"
+msgstr "マイナー・ブルース おんかい"
 
 #: js/musicutils.js:196
 #.TRANS: major blues scale for music
 msgid "major blues"
-msgstr "メジャー・ブルースおんかい"
+msgstr "メジャー・ブルース おんかい"
 
 #: js/musicutils.js:197
 msgid "whole tone"
-msgstr "ホールトーンおんかい"
+msgstr "ホールトーン おんかい"
 
 #: js/musicutils.js:199
 #.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
 msgid "minor pentatonic"
-msgstr "マイナー・ペンタトニックおんかい"
+msgstr "マイナー・ペンタトニック おんかい"
 
 #: js/musicutils.js:200
 msgid "chinese"
-msgstr "ちゅうごくおんかい"
+msgstr "ちゅうごく おんかい"
 
 #: js/musicutils.js:201
 msgid "egyptian"
-msgstr "エジプトおんかい"
+msgstr "エジプト おんかい"
 
 #: js/musicutils.js:203
 #.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
@@ -4525,12 +4525,12 @@ msgstr "いんおんかい"
 #.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
 ## I cannot find the Japanese translation on Wikipedia and therefore cannot guess the Kanji
 msgid "minyo"
-msgstr "みんよおんかい"
+msgstr "みんよ おんかい"
 
 #: js/musicutils.js:210
 #.TRANS: Italian mathematician
 msgid "fibonacci"
-msgstr "フィボナッチおんかい"
+msgstr "フィボナッチ おんかい"
 
 #: js/musicutils.js:215
 #: js/musicutils.js:437
@@ -4598,26 +4598,26 @@ msgstr "フロアタム"
 #: js/musicutils.js:454
 #.TRANS: musical temperament
 msgid "equal"
-msgstr "へいきんりつ"
+msgstr "へいきん おんりつ"
 
 #: js/musicutils.js:286
 #: js/musicutils.js:456
 #.TRANS: musical temperament
 msgid "Pythagorean"
-msgstr "ピタゴラスおんりつ "
+msgstr "ピタゴラス おんりつ "
 
 #: js/musicutils.js:288
 #: js/musicutils.js:455
 #.TRANS: musical temperament
 msgid "just intonation"
-msgstr "じゅんせいりつ"
+msgstr "じゅんせい おんりつ"
 
 #: js/musicutils.js:290
 #: js/musicutils.js:457
 #: js/musicutils.js:458
 #.TRANS: musical temperament
 msgid "meantone"
-msgstr "ちゅうぜんおんりつ"
+msgstr "ちゅうぜん おんりつ"
 
 #: js/musicutils.js:1710
 #: js/musicutils.js:1744
@@ -4640,15 +4640,15 @@ msgstr "プラネット"
 
 #: js/StringHelper.js:17
 msgid "Close Planet"
-msgstr "プラネットをとじる"
+msgstr "プラネットを とじる"
 
 #: js/StringHelper.js:18
 msgid "Open project from file"
-msgstr "ファイルからプロジェクトをひらく"
+msgstr "ファイルから プロジェクトを ひらく"
 
 #: js/StringHelper.js:19
 msgid "New project"
-msgstr "あたらしいプロジェクト"
+msgstr "あたらしい プロジェクト"
 
 #: js/StringHelper.js:20
 msgid "Local"
@@ -4660,16 +4660,16 @@ msgstr "グローバル"
 
 #: js/StringHelper.js:22
 msgid "Search for a project"
-msgstr "プロジェクトけんさく"
+msgstr "プロジェクト けんさく"
 
 #: js/StringHelper.js:23
 msgid "My Projects"
-msgstr "わたしのプロジェクト"
+msgstr "わたしの プロジェクト"
 
 #: js/StringHelper.js:24
 #: js/Publisher.js:125
 msgid "Publish Project"
-msgstr "プロジェクトをこうかいする"
+msgstr "プロジェクトを こうかい する"
 
 #: js/StringHelper.js:26
 msgid "Tags (max 5)"
@@ -4692,11 +4692,11 @@ msgstr "キャンセル"
 
 #: js/StringHelper.js:30
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr "\\"<span id=\\"deleter-title\\"></span>\\"をけしますか？"
+msgstr "\\"<span id=\\"deleter-title\\"></span>\\"を けしますか？"
 
 #: js/StringHelper.js:31
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr "\\"<span id=\\"deleter-name\\"></span>\\"をかんぜんけしますか？"
+msgstr "\\"<span id=\\"deleter-name\\"></span>\\"を かんぜん けしますか？"
 
 #: js/StringHelper.js:32
 msgid "Delete"
@@ -4704,39 +4704,39 @@ msgstr "けす"
 
 #: js/StringHelper.js:34
 msgid "Explore Projects"
-msgstr "プロジェクトをさがす"
+msgstr "プロジェクトを さがす"
 
 #: js/StringHelper.js:35
 msgid "View More"
-msgstr "もっとみる"
+msgstr "もっと みる"
 
 #: js/StringHelper.js:36
 msgid "Most recent"
-msgstr "いちばんさいきん"
+msgstr "いちばん さいきん"
 
 #: js/StringHelper.js:37
 msgid "Most liked"
-msgstr "「いいね」のいちばんある"
+msgstr "「いいね」の いちばん ある"
 
 #: js/StringHelper.js:38
 msgid "Most downloaded"
-msgstr "ダウンロードのいちばんある"
+msgstr "ダウンロードの いちばん ある"
 
 #: js/StringHelper.js:39
 msgid "A-Z"
-msgstr "「A-Z」のじゅんばん"
+msgstr "「A-Z」の じゅんばん"
 
 #: js/StringHelper.js:40
 msgid "Sort by"
-msgstr "～でせいりする"
+msgstr "～で せいり する"
 
 #: js/StringHelper.js:41
 msgid "Load More Projects"
-msgstr "プロジェクトをもっとロードする"
+msgstr "プロジェクトを もっと ロードする"
 
 #: js/StringHelper.js:42
 msgid "Last Updated"
-msgstr "さいごのこうしん"
+msgstr "さいごの こうしん"
 
 #: js/StringHelper.js:43
 msgid "Creation Date"
@@ -4744,11 +4744,11 @@ msgstr "さくせいび"
 
 #: js/StringHelper.js:44
 msgid "Number of Downloads:"
-msgstr "ダウンロードすう"
+msgstr "ダウンロードの かず"
 
 #: js/StringHelper.js:45
 msgid "Number of Likes:"
-msgstr "「いいね」のかず"
+msgstr "「いいね」の かず"
 
 #: js/StringHelper.js:46
 msgid "Tags:"
@@ -4759,7 +4759,7 @@ msgstr "タッグ"
 #: js/StringHelper.js:53
 #: js/ProjectViewer.js:18
 msgid "Report Project"
-msgstr "プロジェクトをつうほうする"
+msgstr "プロジェクトを つうほう する"
 
 #: js/StringHelper.js:50
 msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
@@ -4767,15 +4767,15 @@ msgstr "<a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_C
 
 #: js/StringHelper.js:51
 msgid "Reason for reporting project"
-msgstr "プロジェクトをつうほうするりゆう"
+msgstr "プロジェクトを つうほうする りゆう"
 
 #: js/StringHelper.js:55
 msgid "Download as File"
-msgstr "ファイルでダウンロードする"
+msgstr "ファイルで ダウンロード する"
 
 #: js/StringHelper.js:56
 msgid "Open in Music Blocks"
-msgstr "ミュージック・ブロックスでひらく"
+msgstr "ミュージック・ブロックスで ひらく"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
@@ -4783,12 +4783,12 @@ msgstr "しょうさい"
 
 #: js/GlobalCard.js:32
 msgid "Like project"
-msgstr "プロジェクトに「いいね」をする"
+msgstr "プロジェクトに 「いいね」を する"
 
 #: js/GlobalCard.js:34
 #: js/LocalCard.js:34
 msgid "Share project"
-msgstr "プロジェクトをシェアする"
+msgstr "プロジェクトを シェア する"
 
 #: js/GlobalCard.js:37
 #: js/LocalCard.js:37
@@ -4803,22 +4803,22 @@ msgstr "はた"
 #: js/GlobalCard.js:41
 #: js/LocalCard.js:41
 msgid "Run project on startup."
-msgstr "スタートしたらプロジェクトをさいせいする"
+msgstr "スタートしたら プロジェクトを さいせい する"
 
 #: js/GlobalCard.js:42
 #: js/LocalCard.js:42
 msgid "Show code blocks on startup."
-msgstr "スタートしたら、コードブロックをひょうじする"
+msgstr "スタート したら、コード ブロックを ひょうじ する"
 
 #: js/GlobalCard.js:43
 #: js/LocalCard.js:43
 msgid "Collapse code blocks on startup."
-msgstr "スタートしたら、コードブロックをけす"
+msgstr "スタート したら、コード ブロックを ひひょうじ　する"
 
 #: js/GlobalCard.js:47
 #: js/LocalCard.js:47
 msgid "Advanced Options"
-msgstr "じょうきゅうオプション"
+msgstr "じょうきゅう オプション"
 
 #: js/ProjectStorage.js:221
 msgid "anonymous"
@@ -4826,93 +4826,93 @@ msgstr "とくめい"
 
 #: js/ProjectViewer.js:16
 msgid "Error: Report could not be submitted. Try again later."
-msgstr "エラー：つうほうができませんでした。あとでさいどためしてください。"
+msgstr "エラー：つうほうが できませんでした。あとで さいど ためして ください。"
 
 #: js/ProjectViewer.js:17
 msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
-msgstr "このプロジェクトをつうほうしてくださってありがとうございます。モデレータがまもなく、プロジェクトをみます。"
+msgstr "このプロジェクトを つうほうして くださって ありがとう ございます。モデレータが まもなく、プロジェクトを みます。"
 
 #: js/ProjectViewer.js:19
 msgid "Project Reported"
-msgstr "プロジェクトはつうほうされました"
+msgstr "プロジェクトは つうほう されました"
 
 #: js/ProjectViewer.js:20
 msgid "Report description required"
-msgstr "レポートひょうきがひつようです"
+msgstr "レポート ひょうきが ひつよう です"
 
 #: js/ProjectViewer.js:21
 msgid "Report description too long"
-msgstr "レポートひょうきがながすぎます"
+msgstr "レポート ひょうきが ながすぎます"
 
 #: js/Publisher.js:16
 #: js/GlobalPlanet.js:14
 msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
-msgstr "エラー：サーバにせつぞくできません。ミュージック・ブロックスをリロードし、さいどためしてください。"
+msgstr "エラー：サーバに せつぞく できません。ブラウザを さいきどう して、さいど ためしてください。"
 
 #: js/Publisher.js:121
 msgid "Republish Project"
-msgstr "プロジェクトをさいどこうかいする"
+msgstr "プロジェクトを さいど こうかい する"
 
 #: js/Publisher.js:163
 #: js/Publisher.js:179
 msgid "This field is required"
-msgstr "このこうもくはひっすこうもくです"
+msgstr "この こうもくは ひっすこうもく です"
 
 #: js/Publisher.js:170
 msgid "Title too long"
-msgstr "タイトルがながすぎます"
+msgstr "タイトルが ながすぎます"
 
 #: js/Publisher.js:186
 msgid "Description too long"
-msgstr "ひょうきがながすぎます"
+msgstr "ひょうきが ながすぎます"
 
 #: js/Publisher.js:263
 msgid "Server Error"
-msgstr "サーバーエラー"
+msgstr "サーバー エラー"
 
 #: js/Publisher.js:263
 msgid "Try Again"
-msgstr "もういちどつかいなおしてください。"
+msgstr "もういちど つかいなおして ください。"
 
 #: js/LocalCard.js:21
 msgid "View published project"
-msgstr "こうかいされたプロジェクトをみる"
+msgstr "こうかい された プロジェクトを みる"
 
 #: js/LocalCard.js:24
 msgid "Publish project"
-msgstr "プロジェクトをこうかいする"
+msgstr "プロジェクトを こうかい する"
 
 #: js/LocalCard.js:31
 msgid "Edit project"
-msgstr "プロジェクトをへんしゅうする"
+msgstr "プロジェクトを へんしゅう する"
 
 #: js/LocalCard.js:32
 msgid "Delete project"
-msgstr "プロジェクトをけす"
+msgstr "プロジェクトを けす"
 
 #: js/LocalCard.js:51
 msgid "Download project"
-msgstr "プロジェクトをダウンロードする"
+msgstr "プロジェクトを ダウンロード する"
 
 #: js/LocalCard.js:52
 msgid "Merge with current project"
-msgstr "げんざいのプロジェクトにくみあわせます。"
+msgstr "げんざいの プロジェクトに くみあわせます。"
 
 #: js/LocalCard.js:53
 msgid "Duplicate project"
-msgstr "プロジェクトをコピーする"
+msgstr "プロジェクトを コピー する"
 
 #: js/GlobalPlanet.js:15
 msgid "No results found."
-msgstr "けんさくのけっかになにもはありません"
+msgstr "けんさくの けっかには なにも ありません"
 
 #: js/GlobalPlanet.js:31
 msgid "Remix of"
-msgstr "～プロジェクトのリミックス"
+msgstr "～プロジェクトの リミックス"
 
 #: js/GlobalPlanet.js:380
 msgid "Cannot connect to server"
-msgstr "サーバにせつぞくできません"
+msgstr "サーバに せつぞく できません"
 
 #: plugins/finance.rtp:28
 ## http://jisho.org/word/%E9%80%9A%E8%B2%A8 通貨＝つうか
@@ -4943,20 +4943,20 @@ msgstr "こんにちは"
 #: plugins/translate.rtp:84
 ## 検出=けんしゅつ http://jisho.org/word/%E3%82%AD%E3%83%A3%E3%83%AA%E3%82%A2%E6%A4%9C%E5%87%BA 
 msgid "detect lang"
-msgstr "げんごをけんしゅつ"
+msgstr "げんごを けんしゅつ"
 
 #: plugins/translate.rtp:95
 msgid "set lang"
-msgstr "げんごをせってい"
+msgstr "げんごを せってい"
 
 #: plugins/gmap.rtp:30
 msgid "city latitude"
-msgstr "しのいど"
+msgstr "しの いど"
 
 #: plugins/gmap.rtp:40
 ## http://jisho.org/word/%E7%B5%8C%E5%BA%A6 軽度＝けいど
 msgid "city longitude"
-msgstr "しのけいど"
+msgstr "しの けいど"
 
 #: plugins/gmap.rtp:71
 #: plugins/gmap.rtp:74
@@ -4964,12 +4964,12 @@ msgstr "しのけいど"
 #: plugins/gmap.rtp:107
 ## 座標＝ざひょうhttp://jisho.org/word/%E5%BA%A7%E6%A8%99 ; I literately wrote "Cannot find coordinate data"
 msgid "Coordinate data not available."
-msgstr "ざひょうデータがみつかりません"
+msgstr "ざひょう データが みつかりません"
 
 #: plugins/gmap.rtp:116
 ## To verify
 msgid "Google map"
-msgstr "グーグルマップ"
+msgstr "グーグル マップ"
 
 #: plugins/gmap.rtp:116
 #: plugins/gmap.rtp:160
@@ -4980,7 +4980,7 @@ msgstr "ざひょう"
 #: plugins/gmap.rtp:116
 ## 因子＝いんし http://jisho.org/word/%E5%9B%A0%E5%AD%90 
 msgid "zoom factor"
-msgstr "ズームファクター"
+msgstr "ズーム ファクター"
 
 #: plugins/gmap.rtp:144
 msgid "zoom"
@@ -5027,7 +5027,7 @@ msgstr "おんど"
 #: plugins/maths.rtp:74
 ## I don't really understand context. This says "what degree". Maybe just leave second character, which means "degree".
 msgid "to degrees"
-msgstr "どすうほうへへんかん"
+msgstr "どすうほうへ へんかん"
 
 #: plugins/maths.rtp:76
 ## also ラディアン
@@ -5036,19 +5036,19 @@ msgstr "ラジアン"
 
 #: plugins/maths.rtp:76
 msgid "to radians"
-msgstr "ラジアンへへんかん"
+msgstr "ラジアンへ へんかん"
 
 #: plugins/accelerometer.rtp:48
 msgid "motion x"
-msgstr "「x」ざひょうのうごき"
+msgstr "「x」ざひょうの うごき"
 
 #: plugins/accelerometer.rtp:56
 msgid "motion y"
-msgstr "「y」ざひょうのうごき"
+msgstr "「y」ざひょうの うごき"
 
 #: plugins/accelerometer.rtp:64
 msgid "motion z"
-msgstr "「z」ざひょうのうごき"
+msgstr "「z」ざひょうの うごき"
 
 #: plugins/dictionary.rtp:25
 ## 定義＝ていぎ；http://jisho.org/word/%E6%9C%80%E9%AB%98%E9%99%90%E5%BA%A6 
@@ -5057,21 +5057,21 @@ msgstr "ていぎ"
 
 #: plugins/nutrition.rtp:104
 msgid "get calories"
-msgstr "カロリーをとる"
+msgstr "カロリーを とる"
 
 #: plugins/nutrition.rtp:107
 msgid "get protein"
-msgstr "たんぱくしつをとる"
+msgstr "たんぱくしつを とる"
 
 #: plugins/nutrition.rtp:110
 ## たんすいかぶつ"
 msgid "get carbs"
-msgstr "たんすいかぶつ"
+msgstr "たんす いかぶつ"
 
 #: plugins/nutrition.rtp:113
 ##　Get is ambiguous English word. Translates to "Take Dietary Fiber"
 msgid "get fiber"
-msgstr "せんいしつをとる"
+msgstr "せんいしつを とる"
 
 #: plugins/nutrition.rtp:116
 msgid "get fat"
@@ -5079,7 +5079,7 @@ msgstr "ふとる"
 
 #: plugins/nutrition.rtp:119
 msgid "get name"
-msgstr "なまえをかくとくする"
+msgstr "なまえを かくとく する"
 
 #: plugins/nutrition.rtp:122
 msgid "calories"
@@ -5092,7 +5092,7 @@ msgstr "たんぱく"
 #: plugins/nutrition.rtp:134
 ## 炭水化物=たんすいかぶつ
 msgid "carbs"
-msgstr "たんすいかぶつ"
+msgstr "たんす いかぶつ"
 
 #: plugins/nutrition.rtp:140
 msgid "fiber"
@@ -5110,7 +5110,7 @@ msgstr "たべる"
 #: plugins/nutrition.rtp:155
 ## ひらがな＝こな\E3\81"
 msgid "digest meal"
-msgstr "しょくじをじゅくす"
+msgstr "しょくじを じゅくす"
 
 #: plugins/nutrition.rtp:158
 msgid "apple"
@@ -5147,7 +5147,7 @@ msgstr "ブロッコリー"
 
 #: plugins/nutrition.rtp:185
 msgid "rice and beans"
-msgstr "ごはんとまめ"
+msgstr "ごはんと まめ"
 
 #: plugins/nutrition.rtp:188
 msgid "tamale"
@@ -5183,43 +5183,43 @@ msgstr "みず"
 
 #: plugins/bitcoin.rtp:27
 msgid "bitcoin"
-msgstr "ビットコイン"　#Maybe no need, but this did seem to come up in dictionary"
+msgstr "ビットコイン"
 
 #: plugins/facebook.rtp:27
 ## I was just thinking it maybe should be 現在のプロジェクト
 msgid "publish"
-msgstr "プロジェクトをフェースブックにアップロードする"
+msgstr "プロジェクトを フェースブックに アップロード する"
 
 #: plugins/turtle.rtp:42
 msgid "turtle x"
-msgstr "ネズミのxざひょう"
+msgstr "ネズミの xざひょう"
 
 #: plugins/turtle.rtp:52
 msgid "turtle y"
-msgstr "ネズミののyざひょう"
+msgstr "ネズミの yざひょう"
 
 #: plugins/turtle.rtp:62
 msgid "start turtle"
-msgstr "ネズミをスタートする"
+msgstr "ネズミを スタート する"
 
 #: plugins/turtle.rtp:72
 msgid "stop turtle"
-msgstr "ネズミをとめる"
+msgstr "ネズミを とめる"
 
 #: plugins/turtle.rtp:82
 ## check this
 msgid "turtle name"
-msgstr "ネズミのなまえ"
+msgstr "ネズミの なまえ"
 
 #: plugins/weather.rtp:62
 #: plugins/weather.rtp:86
 ## This needs to be corrected
 msgid "Days ahead must be in the range of -1 to 5."
-msgstr "ひにちは -１から５までのかずでなくてはなりません"
+msgstr "ひにちは -１から ５までの かず でなくては なりません"
 
 #: plugins/weather.rtp:107
 msgid "forecast"
-msgstr "てんきよほう"
+msgstr "てんき よほう"
 
 #: plugins/weather.rtp:108
 #: plugins/weather.rtp:122
@@ -5245,20 +5245,20 @@ msgstr "ていきあつ"
 #: plugins/rodi.rtp:176
 ## Blinking light is てんめつする
 msgid "blink"
-msgstr "てんめつする"
+msgstr "てんめつ する"
 
 #: plugins/rodi.rtp:197
 msgid "duration"
-msgstr "きかんのせってい"
+msgstr "きかんの せってい"
 
 #: plugins/rodi.rtp:250
 ## 発光＝はっこう　Pretty sure most people would understand "LED" as well http://jisho.org/word/%EF%BC%AC%EF%BC%A5%EF%BC%A4 
 msgid "led"
-msgstr "はっこうダイオード"
+msgstr "はっこう ダイオード"
 
 #: plugins/rodi.rtp:269
 msgid "light intensity"
-msgstr "ひかりのつよさ"
+msgstr "ひかりの つよさ"
 
 #: plugins/rodi.rtp:286
 ## http://jisho.org/word/%E8%B5%A4%E5%A4%96　赤外＝せきがい 
@@ -5280,7 +5280,7 @@ msgstr "うごきだし"
 #: plugins/heap.rtp:81
 #: plugins/heap.rtp:85
 msgid "You need to select a file."
-msgstr "ファイルをえらぶひつようがあります"
+msgstr "ファイルを えらぶ ひつようが あります"
 
 #~msgid "gp"
 #~msgstr "ギニ…"
@@ -5289,10 +5289,10 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "はい…"
 
 #~msgid "Stop the current project."
-#~msgstr "プロジェクトをとめます"
+#~msgstr "プロジェクトを とめます"
 
 #~msgid "Click to run the project in slow mode."
-#~msgstr "プロジェクトをスローさいせいするには、ここをクリック。"
+#~msgstr "プロジェクトを スローさいせい するには、ここを クリック。"
 
 #~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
 #~msgstr "このツールバーには、リズム、ピッチ、ねいろ、タートル、そのたのパレットボタンがあります。"
