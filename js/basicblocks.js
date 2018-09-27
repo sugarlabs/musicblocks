@@ -960,6 +960,17 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
+    var newblock = new ProtoBlock('musickeyboard');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['musickeyboard'] = newblock;
+    //.TRANS: widget to generate pitches using a slider
+    newblock.staticLabels.push(_('music keyboard'));
+    newblock.adjustWidthToLabel();
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('musickeyboard')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('pitchstaircase');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['pitchstaircase'] = newblock;

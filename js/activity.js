@@ -157,6 +157,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         'widgets/pitchstaircase',
         'widgets/tempo',
         'widgets/pitchslider',
+        'widgets/musickeyboard',
         'widgets/timbre',
         'activity/lilypond',
         'activity/abc'
@@ -1379,6 +1380,7 @@ define(MYDEFINES, function (compatibility) {
                         storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
                         storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
                         storage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
+                        storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
                         storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                         storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
                         storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
@@ -1394,6 +1396,12 @@ define(MYDEFINES, function (compatibility) {
                             docById('pdmDiv').style.visibility = 'hidden';
                             docById('pdmButtonsDiv').style.visibility = 'hidden';
                             docById('pdmTableDiv').style.visibility = 'hidden';
+                        }
+
+                        if (docById('mkbDiv').style.visibility !== 'hidden') {
+                            docById('mkbDiv').style.visibility = 'hidden';
+                            docById('mkbButtonsDiv').style.visibility = 'hidden';
+                            docById('mkbTableDiv').style.visibility = 'hidden';
                         }
 
                         if (docById('rulerDiv').style.visibility !== 'hidden') {
@@ -1473,6 +1481,9 @@ define(MYDEFINES, function (compatibility) {
                         docById('pdmDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                         docById('pdmButtonsDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                         docById('pdmTableDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
+                        docById('mkbDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
+                        docById('mkbButtonsDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
+                        docById('mkbTableDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                         docById('rulerDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                         docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                         docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
@@ -3926,6 +3937,7 @@ define(MYDEFINES, function (compatibility) {
                     case 'pitchstaircase':
                     case 'tempo':
                     case 'pitchslider':
+                    case 'musickeyboard':
                     case 'modewidget':
                     case 'status':
                         var args = {
