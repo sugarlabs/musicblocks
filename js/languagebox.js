@@ -57,7 +57,7 @@ function LanguageBox () {
 	    'default': _('Refresh your browser to change your language preference.'),
             'en': 'Refresh your browser to change your language preference.',
 	    'ja': '言語を変更するにはブラウザを再起動する必要があります。',
-            'kana': 'げんごを へんこうするには ブラウザを さいきどうする ひつようがあります。',
+            'kana': 'げんごを へんこうするには ブラウザを さいきどうする ひつようが あります。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
             'zh-CN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
