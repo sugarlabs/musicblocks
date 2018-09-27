@@ -66,7 +66,7 @@ function Palettes () {
     this.background = null;
     this.circles = {};
     // paletteText is used for the highlighted tooltip
-    this.paletteText = new createjs.Text('', '20px Arial', '#ff7700');
+    this.paletteText = new createjs.Text('', '20px Sans', '#ff7700');
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
@@ -75,7 +75,7 @@ function Palettes () {
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
-    this.top = 55 + 5 + LEADING;
+    this.top = 55 + 10 + LEADING;
     this.current = DEFAULTPALETTE;
     this.x = [];  // We track x and y for each of the multipalettes
     this.y = [];
@@ -343,14 +343,14 @@ function Palettes () {
             that.buttons[name].visible = false;
 
             that.dict[name].makeMenu(true);
-            that.dict[name]._moveMenu(Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, that.top);
+            that.dict[name]._moveMenu( Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, that.top);
             that.dict[name]._updateMenu(false);
 
             // Add tooltip for palette buttons
             if (localStorage.kanaPreference === 'kana') {
-                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Arial', '#808080');
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Sans', '#808080');
             } else {
-                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Arial', '#808080');
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Sans', '#808080');
             }
             var r = that.cellSize / 2;
             that.labels[name].x = that.buttons[name].x + 2.2 * r;
@@ -597,7 +597,12 @@ function Palettes () {
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
             // Add tooltip for palette buttons
-            that.paletteText = new createjs.Text(toTitleCase(_(name)), '16px Arial', 'black');
+            if (localStorage.kanaPreference === 'kana') {
+		that.paletteText = new createjs.Text(toTitleCase(_(name)), '12px Sans', 'black');
+	    } else {
+		that.paletteText = new createjs.Text(toTitleCase(_(name)), '16px Sans', 'black');
+	    }
+
             that.paletteText.x = that.buttons[name].x + 2.2 * r;
             that.paletteText.y = that.buttons[name].y + r / 2;
             that.stage.addChild(that.paletteText);
