@@ -4108,13 +4108,19 @@ handleComplete);
                 var planetMenuItem = ['planet-disabled', null, _('Offline. Sharing is unavailable.'), null, null, null, null];
             }
 
+            if (planet) {
+                document.querySelector('#myOpenFile').addEventListener('change', function (event) {
+                    planet.closePlanet();
+                });
+            }
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 if (beginnerMode) {
                     var buttonNames = [
                         ['run', _doFastButton, _('Play'), null, null, null, null],
                         ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                        ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                         ['save', doSave, _('Save project'), null, null, null, null],
 			planetMenuItem,
                         ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
@@ -4127,7 +4133,7 @@ handleComplete);
                         ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
                         ['hard-stop-turtle', doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
                         ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                        ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                         ['save', doSave, _('Save project'), null, null, null, null],
 			planetMenuItem,
                         ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
@@ -4142,7 +4148,7 @@ handleComplete);
                     ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                     ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
                     ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
-                    ['open', doLoad, _('Load project from files'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                    ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
                     ['save', doSave, _('Save project'), null, null, null, null],
 		    planetMenuItem,
                     ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
@@ -4360,11 +4366,6 @@ handleComplete);
             // NOTE: see getAuxToolbarButtonNames in turtledefs.js
             // Misc. other buttons
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
-            if (planet) {
-                var planetMenuItem = ['planet', _doOpenSamples, _('Find and share projects'), null, null, null, null];
-            } else {
-                var planetMenuItem = ['planet-disabled', null, _('Offline. Sharing is unavailable.'), null, null, null, null];
-            }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var menuNames = [
@@ -4378,17 +4379,11 @@ handleComplete);
                 ];
             }
 
-            if (planet) {
-                document.querySelector('#myOpenFile').addEventListener('change', function (event) {
-                    planet.closePlanet();
-                });
-            }
-
             var btnSize = cellSize;
             var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
-            menuContainer = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
+            menuContainer = _makeButton('menu-button', _('Auxillary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
 	    var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
