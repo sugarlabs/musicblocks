@@ -4969,6 +4969,7 @@ handleComplete);
             wheel.navItems[2].navigateFunction = function () {
                 blocks.activeBlock = activeBlock;
                 blocks.extract();
+                docById('contextWheelDiv').style.display = 'none';
             };
 
             wheel.navItems[3].navigateFunction = function () {
@@ -4994,6 +4995,7 @@ handleComplete);
                     blocks.activeBlock = activeBlock;
                     var helpWidget = new HelpWidget();
                     helpWidget.init(blocks);
+                    docById('contextWheelDiv').style.display = 'none';
                 };
             }
 
