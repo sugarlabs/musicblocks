@@ -247,6 +247,9 @@ function Blocks () {
         var blkObj = this.blockList[blk];
 
         if (SPECIALINPUTS.indexOf(blkObj.name) === -1) {
+            var clampList = [];
+            this.findNestedClampBlocks(blk, clampList);
+
             var firstConnection = blkObj.connections[0];
             var lastConnection = last(blkObj.connections);
 
@@ -273,9 +276,7 @@ function Blocks () {
             if (adjustDock && firstConnection != null) {
                 this.blockMoved(firstConnection);
                 this.adjustDocks(firstConnection, true);
-                if (connectionIdx !== this.blockList[firstConnection].connections.length - 1) {
-                    clampList = [];
-                    this.findNestedClampBlocks(firstConnection, clampList);
+                if (clampList.length > 0) {
                     this.clampBlocksToCheck = clampList;
                     this.adjustExpandableClampBlock();
                 }
@@ -285,12 +286,12 @@ function Blocks () {
             if (firstConnection != null) {
                 var connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
                 this.blockList[firstConnection].connections[connectionIdx] = null;
-		blkObj.connections[0] = null;
+                blkObj.connections[0] = null;
             }
 
             this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
             this.blockMoved(blk);
-	}
+        }
     };
 
     this.bottomMostBlock = function () {
@@ -2237,12 +2238,12 @@ function Blocks () {
             case 'oscillatortype':
             case 'invertmode':
             case 'filtertype':
-		console.log(value + ' ' + _(value));
+                console.log(value + ' ' + _(value));
                 that.blockList[thisBlock].text.text = _(value);
                 break;
-	    case 'noisename':
-		var label = getNoiseName(value);
-		break;
+            case 'noisename':
+                var label = getNoiseName(value);
+                break;
             case 'temperamentname':
                 that.blockList[thisBlock].text.text = _(TEMPERAMENTS[0][1]);
                 for (var i = 0; i < TEMPERAMENTS.length; i++) {
@@ -3140,7 +3141,9 @@ function Blocks () {
         } else {
             // If we find a clamp block, add it to the list.
             var cblk = this.blockList[blk].connections[0];
+            console.log(this.blockList[cblk].name);
             if (this.blockList[cblk].isClampBlock()) {
+                console.log('is a clamp block');
                 if (this.blockList[cblk].isDoubleClampBlock()) {
                     // Just check them both.
                     clampList.push([cblk, 0]);
@@ -4383,7 +4386,7 @@ function Blocks () {
                 }
                 break;
 
-	    case 'noisename':
+            case 'noisename':
                 var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
