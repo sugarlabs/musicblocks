@@ -246,7 +246,7 @@ function Blocks () {
         // Remove a single block from within a stack.
         var blkObj = this.blockList[blk];
 
-        if (blkObj.name !== 'number' && blkObj.name !== 'text') {
+        if (SPECIALINPUTS.indexOf(blkObj.name) === -1) {
             var firstConnection = blkObj.connections[0];
             var lastConnection = last(blkObj.connections);
 
@@ -280,7 +280,17 @@ function Blocks () {
                     this.adjustExpandableClampBlock();
                 }
             }
-        }
+        } else {
+            var firstConnection = blkObj.connections[0];
+            if (firstConnection != null) {
+                var connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
+                this.blockList[firstConnection].connections[connectionIdx] = null;
+		blkObj.connections[0] = null;
+            }
+
+            this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
+            this.blockMoved(blk);
+	}
     };
 
     this.bottomMostBlock = function () {

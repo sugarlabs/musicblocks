@@ -4018,6 +4018,8 @@ handleComplete);
         };
 
         function updatePasteButton() {
+	    return;
+	    // deprecated
             if (blocks.selectedBlocksObj == null) {
                 pasteContainer.removeAllChildren();
                 var img = new Image();
