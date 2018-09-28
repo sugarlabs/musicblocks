@@ -4691,6 +4691,7 @@ handleComplete);
                 }
             });
 
+            container.removeAllEventListeners('mousedown');
             container.on('mousedown', function (event) {
                 if (locked) {
                     return;
@@ -4758,10 +4759,9 @@ handleComplete);
                     mousedown = false;
                 };
 
-                // Remove the previous listener, if any, so we don't
-                // get multiple listeners added to the event.
                 container.removeAllEventListeners('pressup');
                 var closure = container.on('pressup', __pressupFunction);
+		// Do we need this?
                 // container.removeAllEventListeners('mouseup');
                 // var closure = container.on('mouseup', __pressupFunction);
 
