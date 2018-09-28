@@ -257,7 +257,6 @@ function Palettes () {
     // We need access to the macro dictionary because we load them.
     this.setMacroDictionary = function (obj) {
         this.macroDict = obj;
-
         return this;
     };
 
@@ -269,7 +268,6 @@ function Palettes () {
 
     this.getSearchPos = function () {
         return [this.cellSize, this.top + this.cellSize * 1.75]
-        // return [50 * PALETTE_SCALE_FACTOR, 55];
     };
 
     this.getPluginMacroExpansion = function (blkname, x, y) {
@@ -351,6 +349,7 @@ function Palettes () {
             } else {
                 that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Sans', platformColor.paletteText);
             }
+
             var r = that.cellSize / 2;
             that.labels[name].x = that.buttons[name].x + 2.2 * r;
             that.labels[name].y = that.buttons[name].y + r / 2;
@@ -592,39 +591,26 @@ function Palettes () {
         this.buttons[name].on('mouseover', function (event) {
             document.body.style.cursor = 'pointer';
             that.mouseOver = true;
-            var r = that.cellSize / 2;
+            var r = 1;
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
-            // Add tooltip for palette buttons
-            if (localStorage.kanaPreference === 'kana') {
-		that.paletteText = new createjs.Text(toTitleCase(_(name)), '12px Sans', 'black');
-	    } else {
-		that.paletteText = new createjs.Text(toTitleCase(_(name)), '16px Sans', 'black');
-	    }
-
-            that.paletteText.x = that.buttons[name].x + 2.2 * r;
-            that.paletteText.y = that.buttons[name].y + r / 2;
-            that.stage.addChild(that.paletteText);
+	    // Add a background
+	    that.paletteHighlight = new createjs.Shape();
+	    that.paletteHighlight.graphics.f(platformColor.paletteSelected).r(that.buttons[name].x + 2, that.buttons[name].y + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, that.cellSize).ef();
+	    that.stage.addChildAt(that.paletteHighlight, 2);
         });
 
         this.buttons[name].on('pressup', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
-            if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.paletteText, that.stage);
-            }
-
             hideButtonHighlight(that.circles, that.stage);
         });
 
         this.buttons[name].on('mouseout', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
-            if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.paletteText, that.stage);
-            }
-
             hideButtonHighlight(that.circles, that.stage);
+	    that.stage.removeChild(that.paletteHighlight);
         });
 
         this.buttons[name].on('click', function (event) {
