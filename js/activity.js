@@ -4084,11 +4084,13 @@ handleComplete);
             }
 
             headerContainer = new createjs.Shape();
-            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 2 + 2 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING);
+            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 2 + 2 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING).f(platformColor.aux).r(0, -cellSize * 3 + 3 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING).f(platformColor.sub).r(0, -cellSize * 4 + 4 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING);
 
+            /*
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
             }
+            */
 
             headerContainer.removeAllEventListeners('mousedown');
             swiping = false;

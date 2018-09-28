@@ -1173,12 +1173,11 @@ function Turtles () {
     this.scale = 1.0;
     this.w = 1200;
     this.h = 900;
-    this.backgroundColor = platformColor.background; // '#acd0e4';
+    this.backgroundColor = platformColor.background;
     this._canvas = null;
     this._rotating = false;
     this._drum = false;
 
-    console.log('CREATING BORDER CONTAINER');
     this._borderContainer = new createjs.Container();
     this._expandedBoundary = null;
     this._expandButton = null;
@@ -1381,22 +1380,65 @@ function Turtles () {
         };
 
         function __makeClearButton() {
+	    that._clearButton = new createjs.Container();
+
+            /*
+	    that._clearButton.removeAllEventListeners('mouseover');
+	    that._clearButton.on('mouseover', function (event) {
+                for (var c = 0; c < that._clearButton.children.length; c++) {
+		    if (that._clearButton.children[c].text != undefined) {
+                        that._clearButton.children[c].visible = true;
+			if (that._clearButton.children.length === 2) {
+			    var b = that._clearButton.children[c].getBounds();
+			    var bg = new createjs.Shape();
+                            bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+			    that._clearButton.addChildAt(bg, 0);
+			    that._clearButton.children[0].visible = true;
+			    that.refreshCanvas();
+			}
+		    }
+		}
+	    });
+
+	    that._clearButton.removeAllEventListeners('mouseout');
+	    that._clearButton.on('mouseout', function (event) {
+                for (var c = 0; c < that._clearButton.children.length; c++) {
+		    if (that._clearButton.children[c].text != undefined) {
+                        that._clearButton.children[c].visible = false;
+                        that._clearButton.children[0].visible = false;
+                        that.refreshCanvas();
+                        break;
+		    }
+                }
+	    });
+            */
+
+	    that._clearButton.removeAllEventListeners('click');
+            that._clearButton.on('click', function (event) {
+		that.doClear();
+            });
+
+            /*
+	    var text = new createjs.Text(_('Clean'), '14px Sans', '#282828');
+            text.textAlign = 'center';
+            text.x = 0;
+	    text.y = 30;
+	    text.visible = false;
+            */
+
             var img = new Image();
             img.onload = function () {
-                if (that._clearButton !== null) {
-                    that._clearButton.visible = false;
-                }
+                var bitmap = new createjs.Bitmap(img);
+                that._clearButton.addChild(bitmap);
+		// that._clearButton.addChild(text);
 
-                that._clearButton = new createjs.Bitmap(img);
+		bitmap.visible = true;
                 that._clearButton.x = that.w - 10 - 2 * 55;
                 that._clearButton.y = 55 + LEADING;
                 that._clearButton.visible = true;
-                that._borderContainer.addChild(that._clearButton);
 
-		that._clearButton.removeAllEventListeners('click');
-                that._clearButton.on('click', function (event) {
-		    that.doClear();
-                });
+                that._borderContainer.addChild(that._clearButton);
+                that.refreshCanvas();
 
                 if (doCollapse) {
 		    that.collapse();
