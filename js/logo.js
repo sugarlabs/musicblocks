@@ -965,7 +965,9 @@ function Logo () {
                 this.blocks.blockList[blk].text.text = value;
             } else if (name === 'divide') {
                 this.blocks.blockList[blk].text.text = mixedNumber(value);
-            }
+            } else {
+                this.blocks.blockList[blk].text.text = value.toString();
+	    }
 
             this.blocks.blockList[blk].container.updateCache();
             this.refreshCanvas();
