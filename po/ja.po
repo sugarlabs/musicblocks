@@ -89,10 +89,6 @@ msgstr "モード（音階）"
 msgid "slider"
 msgstr "スライダー"
 
-#: js/block.js:909
-msgid "mKeyboard"
-msgstr ""
-
 #: js/block.js:915
 #: js/basicblocks.js:993
 #: js/basicblocks.js:1005
@@ -895,7 +891,7 @@ msgid "custom"
 msgstr "オリジナル"
 
 #: js/logo.js:6824
-msgid "Hertz Block: Did you mean to use a Note block3?"
+msgid "Hertz Block: Did you mean to use a Note block?"
 msgstr ""
 
 #: js/logo.js:7417

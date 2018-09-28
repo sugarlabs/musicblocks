@@ -9,229 +9,6 @@
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
-#: js/activity.js:472
-#: js/activity.js:472
-#: js/activity.js:475
-#: js/block.js:632
-#: js/pitchdrummatrix.js:178
-#: js/musicutils.js:37
-#: js/block.js:531
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/musicutils.js:45
-#: js/block.js:536
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:45
-#: js/block.js:551
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:46
-#: js/block.js:551
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:46
-#: js/block.js:565
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:565
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:565
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:567
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:720
-#: js/block.js:3892
-#: js/block.js:3901
-#: js/block.js:3912
-#: js/activity.js:2732
-#: js/analytics.js:475
-#: js/palette.js:676
-#: js/palette.js:685
-#: js/palette.js:694
-#: js/palette.js:703
-#: js/palette.js:1978
-#: js/palette.js:1989
-#: js/palette.js:2000
-#: js/palette.js:2011
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1148
-#: js/basicblocks.js:1159
-#: js/basicblocks.js:2806
-#: js/basicblocks.js:2837
-#: js/basicblocks.js:2844
-#: js/basicblocks.js:2873
-#: js/basicblocks.js:2883
-#: js/basicblocks.js:2915
-#: js/basicblocks.js:2960
-#: js/basicblocks.js:2964
-#: js/basicblocks.js:2970
-#: js/macros.js:44
-#: js/blocks.js:784
-#: js/blocks.js:2385
-#: js/blocks.js:2386
-#: js/blocks.js:2578
-#: js/blocks.js:2784
-#: js/blocks.js:2940
-#: js/blocks.js:3503
-#: js/blocks.js:4308
-#: js/block.js:720
-#: js/block.js:3892
-#: js/block.js:3901
-#: js/block.js:3912
-#: js/activity.js:2732
-#: js/analytics.js:475
-#: js/palette.js:681
-#: js/palette.js:690
-#: js/palette.js:699
-#: js/palette.js:708
-#: js/palette.js:1983
-#: js/palette.js:1994
-#: js/palette.js:2005
-#: js/palette.js:2016
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1148
-#: js/basicblocks.js:1159
-#: js/basicblocks.js:1170
-#: js/basicblocks.js:2817
-#: js/basicblocks.js:2848
-#: js/basicblocks.js:2855
-#: js/basicblocks.js:2884
-#: js/basicblocks.js:2894
-#: js/basicblocks.js:2926
-#: js/basicblocks.js:2971
-#: js/basicblocks.js:2975
-#: js/basicblocks.js:2981
-#: js/macros.js:44
-#: js/blocks.js:784
-#: js/blocks.js:2385
-#: js/blocks.js:2386
-#: js/blocks.js:2578
-#: js/blocks.js:2784
-#: js/blocks.js:2940
-#: js/blocks.js:3514
-#: js/blocks.js:4319
-#: js/block.js:720
-#: js/block.js:3892
-#: js/block.js:3901
-#: js/block.js:3912
-#: js/activity.js:2732
-#: js/analytics.js:475
-#: js/palette.js:681
-#: js/palette.js:690
-#: js/palette.js:699
-#: js/palette.js:708
-#: js/palette.js:1983
-#: js/palette.js:1994
-#: js/palette.js:2005
-#: js/palette.js:2016
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1148
-#: js/basicblocks.js:1159
-#: js/basicblocks.js:1170
-#: js/basicblocks.js:2817
-#: js/basicblocks.js:2848
-#: js/basicblocks.js:2855
-#: js/basicblocks.js:2884
-#: js/basicblocks.js:2894
-#: js/basicblocks.js:2926
-#: js/basicblocks.js:2971
-#: js/basicblocks.js:2975
-#: js/basicblocks.js:2981
-#: js/macros.js:44
-#: js/blocks.js:784
-#: js/blocks.js:2385
-#: js/blocks.js:2386
-#: js/blocks.js:2578
-#: js/blocks.js:2784
-#: js/blocks.js:2940
-#: js/blocks.js:3514
-#: js/blocks.js:4319
-#: js/block.js:863
-#: js/block.js:4105
-#: js/block.js:4114
-#: js/block.js:4125
-#: js/activity.js:2934
-#: js/palette.js:734
-#: js/palette.js:745
-#: js/palette.js:754
-#: js/palette.js:763
-#: js/palette.js:2076
-#: js/palette.js:2088
-#: js/palette.js:2099
-#: js/palette.js:2110
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1406
-#: js/basicblocks.js:1420
-#: js/basicblocks.js:1434
-#: js/basicblocks.js:3700
-#: js/basicblocks.js:3740
-#: js/basicblocks.js:3750
-#: js/basicblocks.js:3788
-#: js/basicblocks.js:3801
-#: js/basicblocks.js:3852
-#: js/basicblocks.js:3897
-#: js/basicblocks.js:3902
-#: js/basicblocks.js:3907
-#: js/rubrics.js:475
-#: js/macros.js:44
-#: js/blocks.js:863
-#: js/blocks.js:2466
-#: js/blocks.js:2467
-#: js/blocks.js:2659
-#: js/blocks.js:2865
-#: js/blocks.js:3021
-#: js/blocks.js:3661
-#: js/blocks.js:4458
-#: js/rhythmruler.js:1138
-#: js/rhythmruler.js:1140
-#: js/rhythmruler.js:1240
-#: js/rhythmruler.js:1242
-#: js/block.js:876
-#: js/block.js:4289
-#: js/block.js:4298
-#: js/block.js:4309
-#: js/activity.js:3042
-#: js/palette.js:750
-#: js/palette.js:759
-#: js/palette.js:768
-#: js/palette.js:777
-#: js/palette.js:2057
-#: js/palette.js:2068
-#: js/palette.js:2079
-#: js/palette.js:2090
-#: js/palette.js:2100
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1407
-#: js/basicblocks.js:1421
-#: js/basicblocks.js:1435
-#: js/basicblocks.js:3720
-#: js/basicblocks.js:3760
-#: js/basicblocks.js:3770
-#: js/basicblocks.js:3808
-#: js/basicblocks.js:3821
-#: js/basicblocks.js:3862
-#: js/basicblocks.js:3917
-#: js/basicblocks.js:3922
-#: js/basicblocks.js:3927
-#: js/rubrics.js:476
-#: js/macros.js:44
-#: js/blocks.js:863
-#: js/blocks.js:2475
-#: js/blocks.js:2476
-#: js/blocks.js:2668
-#: js/blocks.js:2874
-#: js/blocks.js:3030
-#: js/blocks.js:3851
-#: js/blocks.js:4668
-#: js/rhythmruler.js:1149
-#: js/rhythmruler.js:1151
-#: js/rhythmruler.js:1251
-#: js/rhythmruler.js:1253
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "acción"
@@ -301,10 +78,6 @@ msgstr "modo"
 #: js/block.js:906
 msgid "slider"
 msgstr "deslizador"
-
-#: js/block.js:909
-msgid "mKeyboard"
-msgstr ""
 
 #: js/block.js:915
 #: js/basicblocks.js:993
@@ -488,11 +261,11 @@ msgstr ""
 
 #: js/activity.js:866
 msgid "Refresh your browser to change to advanced mode."
-msgstr ""
+msgstr "Actualice su navegador para cambiar al modo avanzado."
 
 #: js/activity.js:871
 msgid "Refresh your browser to change to beginner mode."
-msgstr ""
+msgstr "Actualice su navegador para cambiar al modo principiante."
 
 #: js/activity.js:903
 #.TRANS: hide Polar coordinate overlay grid
@@ -557,17 +330,17 @@ msgstr "Por favor, configure el nivel de zoom del navegador al 100%"
 #: js/activity.js:4129
 #: js/turtledefs.js:120
 msgid "Find and share projects"
-msgstr ""
+msgstr "Encuentra y comparte proyectos"
 
 #: js/activity.js:4131
 #: js/activity.js:4263
 msgid "Offline. Sharing is unavailable."
-msgstr ""
+msgstr "Desconectado. Compartir no está disponible."
 
 #: js/activity.js:4141
 #: js/turtledefs.js:115
 msgid "Play"
-msgstr ""
+msgstr "Tocar"
 
 #: js/activity.js:4142
 msgid "Hard stop"
@@ -608,7 +381,7 @@ msgstr "Ayuda"
 
 #: js/activity.js:4207
 msgid "Run slowly"
-msgstr ""
+msgstr "Tocar lentamente"
 
 #: js/activity.js:4209
 #: js/turtledefs.js:124
@@ -656,12 +429,12 @@ msgstr "Guardar bloque svg"
 #: js/activity.js:4298
 #: js/utilitybox.js:126
 msgid "Switch to advanced mode"
-msgstr ""
+msgstr "Cambiar a modo avanzado"
 
 #: js/activity.js:4302
 #: js/utilitybox.js:127
 msgid "Switch to beginner mode"
-msgstr ""
+msgstr "Cambiar al modo principiante"
 
 #: js/activity.js:4309
 #: js/turtledefs.js:132
@@ -713,11 +486,11 @@ msgstr "Eliminar plugin"
 
 #: js/activity.js:4340
 msgid "Enable horizontal scrolling"
-msgstr ""
+msgstr "Habilitar desplazamiento horizontal"
 
 #: js/activity.js:4344
 msgid "Disable horizontal scrolling"
-msgstr ""
+msgstr "Deshabilitar desplazamiento horizontal"
 
 #: js/activity.js:4349
 #: js/clearbox.js:70
@@ -734,7 +507,7 @@ msgstr "Mostrar u ocultar los bloques."
 #: js/turtledefs.js:126
 #: js/turtledefs.js:161
 msgid "Expand/collapse collapsable blocks"
-msgstr ""
+msgstr "Expandir / Contraer bloque colapsable"
 
 #: js/activity.js:4373
 #: js/activity.js:4424
@@ -761,7 +534,7 @@ msgstr "reproducir"
 
 #: js/activity.js:4385
 msgid "Auxillary menu"
-msgstr ""
+msgstr "Menú auxiliar"
 
 #: js/activity.js:4780
 msgid "Could not parse JSON input."
@@ -780,11 +553,11 @@ msgstr "Pegar"
 
 #: js/activity.js:4942
 msgid "Extract"
-msgstr ""
+msgstr "Extraer"
 
 #: js/activity.js:4943
 msgid "Move to trash"
-msgstr ""
+msgstr "Mover para recargar"
 
 #: js/activity.js:4946
 #: js/blocks.js:363
@@ -998,7 +771,7 @@ msgstr "El bloque de paso escalar debe utilizarse dentro de un bloque de nota."
 
 #: js/logo.js:4150
 msgid "Noise Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "Bloque de ruido: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/logo.js:4230
 msgid "Drum Block: Did you mean to use a Note block?"
@@ -1006,7 +779,7 @@ msgstr "Bloque de tambor: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/logo.js:4691
 msgid "Pitch Block: Did you mean to use a Note block2?"
-msgstr ""
+msgstr "Bloque de tone: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/logo.js:4731
 msgid "polyphonic rhythm"
@@ -1060,7 +833,7 @@ msgstr "El bloque parcial debe usarse dentro de un bloque de parciales ponderado
 #: js/logo.js:6532
 #: js/logo.js:6619
 msgid "Setting volume to 0."
-msgstr ""
+msgstr "Ajuste el volumen a 0"
 
 #: js/logo.js:6538
 #: js/logo.js:6625
@@ -1090,8 +863,8 @@ msgid "custom"
 msgstr "personalizado"
 
 #: js/logo.js:6824
-msgid "Hertz Block: Did you mean to use a Note block3?"
-msgstr ""
+msgid "Hertz Block: Did you mean to use a Note block?"
+msgstr "Bloque de Hertz: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/logo.js:7417
 msgid "Playback is ready."
@@ -1280,7 +1053,7 @@ msgstr "Bloques de Música es una colección de herramientas para explorar conce
 
 #: js/turtledefs.js:23
 msgid "search"
-msgstr ""
+msgstr "buscar"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:865
@@ -1387,7 +1160,7 @@ msgstr "extras"
 
 #: js/turtledefs.js:30
 msgid "music"
-msgstr ""
+msgstr "música"
 
 #: js/turtledefs.js:30
 msgid "logic"
@@ -1395,7 +1168,7 @@ msgstr "lógica"
 
 #: js/turtledefs.js:30
 msgid "graphics"
-msgstr ""
+msgstr "gráficos"
 
 #: js/turtledefs.js:112
 #: js/turtledefs.js:143
@@ -1452,7 +1225,7 @@ msgstr "Haga clic para ejecutar el proyecto en modo rápido."
 #: js/turtledefs.js:116
 #: js/turtledefs.js:155
 msgid "Stop the music (and the mice)."
-msgstr ""
+msgstr "Detener la música (y los ratones)"
 
 #: js/turtledefs.js:116
 #: js/turtledefs.js:155
@@ -1476,7 +1249,7 @@ msgstr "Guarde proyecto en archivo"
 
 #: js/turtledefs.js:120
 msgid "This button opens a viewer for sharing projects and for finding example projects."
-msgstr ""
+msgstr "Este botón abre un visor para compartir proyectos y encontrar proyectos de ejemplo."
 
 #: js/turtledefs.js:121
 #: js/turtledefs.js:156
@@ -1543,12 +1316,12 @@ msgstr "Restaurar bloques de la papelera."
 #: js/turtledefs.js:131
 #: js/turtledefs.js:174
 msgid "Switch mode"
-msgstr ""
+msgstr "Cambiar el modo"
 
 #: js/turtledefs.js:131
 #: js/turtledefs.js:174
 msgid "Switch between beginner and advance modes."
-msgstr ""
+msgstr "Cambia entre los modos principiante y avanzado."
 
 #: js/turtledefs.js:132
 #: js/turtledefs.js:180
@@ -1568,17 +1341,17 @@ msgstr "Incrementa el tamaño de los bloques."
 #: js/turtledefs.js:135
 #: js/turtledefs.js:158
 msgid "Clear the screen and return the mice to their initial positions."
-msgstr ""
+msgstr "Borre la pantalla y devuelva los ratones a sus posiciones iniciales."
 
 #: js/turtledefs.js:136
 #: js/turtledefs.js:159
 msgid "Collapse"
-msgstr ""
+msgstr "Contraer"
 
 #: js/turtledefs.js:136
 #: js/turtledefs.js:159
 msgid "Collapse the graphics window."
-msgstr ""
+msgstr "Contraer la ventana de gráficos."
 
 #: js/turtledefs.js:137
 #: js/turtledefs.js:182
