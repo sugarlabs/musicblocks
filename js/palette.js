@@ -316,8 +316,7 @@ function Palettes () {
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            // a2c5d8
-            shape.graphics.f(platformColor.paletteBackground).r(0, this.top, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
+            shape.graphics.f(platformColor.ruleColor).r(0, this.top, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef().f(platformColor.paletteBackground).r(2, this.top + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, 8 * STANDARDBLOCKHEIGHT - 4).ef();
             shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
@@ -1263,8 +1262,7 @@ function Palette(palettes, name) {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
-        // 949494
-        shape.graphics.f(platformColor.paletteBackground).r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef();
+        shape.graphics.f(platformColor.ruleColor).r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef().f(platformColor.paletteBackground).r(2, 2, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth() - 4, h - 4).ef();
         shape.width = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         shape.height = h;
         this.background.addChild(shape);
