@@ -25,6 +25,9 @@ const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch')
 // We put the palette buttons into groups.
 const MULTIPALETTES = [['rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'widgets'], ['flow', 'action', 'boxes', 'number', 'boolean', 'heap', 'extras'], ['mouse', 'pen', 'media', 'sensors', 'mice']];
 
+// Skip these palettes in beginner mode.
+const SKIPPALETTES = ['heap'];
+
 // Icons used to select between multipalettes.
 const MULTIPALETTEICONS = ['music', 'logic', 'graphics'];
 const MULTIPALETTENAMES = [_('music'), _('logic'), _('graphics')];

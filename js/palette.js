@@ -102,7 +102,7 @@ function Palettes () {
         for (var i = 0; i < MULTIPALETTES.length; i++) {
             this._makeSelectorButton(i);
             this.x.push(0);
-	    // This is the top of the palette buttons stack
+            // This is the top of the palette buttons stack
             this.y.push((2.5 * this.cellSize + 2 * LEADING) / PALETTE_SCALE_FACTOR);
         }
     };
@@ -369,7 +369,7 @@ function Palettes () {
                 if (name === 'search') {
                     this.buttons[name].x = 0;
                     this.buttons[name].y = this.top + this.cellSize * 1.75;
-                } else {
+                } else if (!beginnerMode || SKIPPALETTES.indexOf(name) === -1) {
                     for (var i = 0; i < MULTIPALETTES.length; i++) {
                         if (MULTIPALETTES[i].indexOf(name) !== -1) {
                             this.buttons[name].x = this.x[i];
@@ -594,10 +594,10 @@ function Palettes () {
             var r = 1;
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
-	    // Add a background
-	    that.paletteHighlight = new createjs.Shape();
-	    that.paletteHighlight.graphics.f(platformColor.paletteSelected).r(that.buttons[name].x + 2, that.buttons[name].y + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, that.cellSize).ef();
-	    that.stage.addChildAt(that.paletteHighlight, 2);
+            // Add a background
+            that.paletteHighlight = new createjs.Shape();
+            that.paletteHighlight.graphics.f(platformColor.paletteSelected).r(that.buttons[name].x + 2, that.buttons[name].y + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, that.cellSize).ef();
+            that.stage.addChildAt(that.paletteHighlight, 2);
         });
 
         this.buttons[name].on('pressup', function (event) {
@@ -610,7 +610,7 @@ function Palettes () {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
             hideButtonHighlight(that.circles, that.stage);
-	    that.stage.removeChild(that.paletteHighlight);
+            that.stage.removeChild(that.paletteHighlight);
         });
 
         this.buttons[name].on('click', function (event) {
