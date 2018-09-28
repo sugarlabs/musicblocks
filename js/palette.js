@@ -66,7 +66,7 @@ function Palettes () {
     this.background = null;
     this.circles = {};
     // paletteText is used for the highlighted tooltip
-    this.paletteText = new createjs.Text('', '20px Sans', '#ff7700');
+    this.paletteText = new createjs.Text('', '20px Sans', platformColor.paletteText);
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
@@ -166,9 +166,9 @@ function Palettes () {
             that.selectorButtonsOn.push(bitmap);
         };
 
-        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('fill_color', platformColor.selectorBackground), MULTIPALETTENAMES[i], __processSelectButtonOff, i);
+        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('background_fill_color', platformColor.selectorBackground).replace(/stroke_color/g, platformColor.ruleColor).replace(/fill_color/g, platformColor.background), MULTIPALETTENAMES[i], __processSelectButtonOff, i);
 
-        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('fill_color', '#ffffff'), MULTIPALETTENAMES[i], __processSelectButtonOn, i);
+        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('background_fill_color', platformColor.selectorSelected).replace(/stroke_color/g, platformColor.ruleColor).replace(/fill_color/g, platformColor.background), MULTIPALETTENAMES[i], __processSelectButtonOn, i);
     };
 
     this.showSelection = function (i) {
@@ -317,7 +317,7 @@ function Palettes () {
         if (this.firstTime) {
             var shape = new createjs.Shape();
             // a2c5d8
-            shape.graphics.f('#f0f0f0').r(0, this.top, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
+            shape.graphics.f(platformColor.paletteBackground).r(0, this.top, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef();
             shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
@@ -348,9 +348,9 @@ function Palettes () {
 
             // Add tooltip for palette buttons
             if (localStorage.kanaPreference === 'kana') {
-                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Sans', '#808080');
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Sans', platformColor.paletteText);
             } else {
-                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Sans', '#808080');
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Sans', platformColor.paletteText);
             }
             var r = that.cellSize / 2;
             that.labels[name].x = that.buttons[name].x + 2.2 * r;
@@ -1179,7 +1179,7 @@ function Palette(palettes, name) {
             makePaletteBitmap(palette, FADEDDOWNICON, name, __makeFadedDownIcon, null);
             makePaletteBitmap(palette, FADEDUPICON, name, __makeFadedUpIcon, null);
             makePaletteBitmap(palette, UPICON, name, __processUpIcon, null);
-            makePaletteBitmap(palette, CLOSEICON.replace('fill_color', platformColor.selectorBackground), name, __processCloseIcon, null);
+            makePaletteBitmap(palette, CLOSEICON.replace('fill_color', platformColor.selectorSelected), name, __processCloseIcon, null);
             makePaletteBitmap(palette, PALETTEICONS[name], name, __processButtonIcon, null);
         };
 
@@ -1196,7 +1196,7 @@ function Palette(palettes, name) {
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
-        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', platformColor.selectorBackground).replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
+        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', platformColor.selectorSelected).replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
     };
 
     this._getDownButtonY = function () {
@@ -1264,7 +1264,7 @@ function Palette(palettes, name) {
 
         var shape = new createjs.Shape();
         // 949494
-        shape.graphics.f('#f0f0f0').r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef();
+        shape.graphics.f(platformColor.paletteBackground).r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef();
         shape.width = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         shape.height = h;
         this.background.addChild(shape);
