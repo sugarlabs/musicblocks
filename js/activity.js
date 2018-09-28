@@ -131,7 +131,6 @@ var MYDEFINES = [
     'activity/block',
     'activity/turtledefs',
     'activity/logo',
-    'activity/savebox',
     'activity/languagebox',
     'activity/basicblocks',
     'activity/blockfactory',
@@ -227,7 +226,6 @@ define(MYDEFINES, function (compatibility) {
         var palettes;
         var blocks;
         var logo;
-        // var clearBox;
         var pasteBox;
         var languageBox = null;
         var planet;
@@ -248,7 +246,6 @@ define(MYDEFINES, function (compatibility) {
         var gridButtonLabel = null;
         var gridImages = [];
         var chartBitmap = null;
-        // var saveBox;
         var merging = false;
         var loading = false;
         // For auxillary menus
