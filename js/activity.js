@@ -266,8 +266,10 @@ define(MYDEFINES, function (compatibility) {
         var scrollOnContainer = null;
         var scrollOffContainer = null;
         var newContainer = null;
+        var runContainer = null;
+        var slowContainer = null;
+        var stepContainer = null;
         var confirmContainer = null;        
-        // var saveContainer = null;
         var saveHTMLContainer = null;
         var saveSVGContainer = null;
         var savePNGContainer = null;
@@ -278,7 +280,6 @@ define(MYDEFINES, function (compatibility) {
         var saveArtworkContainer = null;
         var planetContainer = null;
         var restoreContainer = null;
-        // var openContainer = null;
         var hideBlocksContainer = null;
         var collapseBlocksContainer = null;
         var stopTurtleContainer = null;
@@ -4003,8 +4004,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _showStopButton() {
-            // stopTurtleContainer.x = onscreenButtons[0].x;
-            // stopTurtleContainer.y = onscreenButtons[0].y;
             stopTurtleContainer.visible = true;
             hardStopTurtleContainer.visible = false;
         };
@@ -4138,47 +4137,16 @@ handleComplete);
                 });
             }
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                if (beginnerMode) {
-                    var buttonNames = [
-                        ['run', _doFastButton, _('Play'), null, null, null, null],
-                        ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
-                        ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                        ['save', doSave, _('Save project'), null, null, null, null],
-                        planetMenuItem,
-                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                        ['help', _showHelp, _('Help'), null, null, null, null]
-                    ];
-                } else {
-                    var buttonNames = [
-                        ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' / ' + _('extra-long press to run music slowly') + ' [ENTER]', _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
-                        ['step', _doStepButton, _('Run step by step'), null, null, null, null],
-                        ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
-                        ['hard-stop-turtle', doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
-                        ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                        ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                        ['save', doSave, _('Save project'), null, null, null, null],
-                        planetMenuItem,
-                        ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                        ['help', _showHelp, _('Help'), null, null, null, null]
-                    ];
-                }
-
-                buttonNames.push(['help', _showHelp, _('Help'), null, null, null, null]);
-            } else {
-                var buttonNames = [
-                    ['run', _doFastButton, _('Run fast') + ' / ' + _('long press to run slowly') + ' [ENTER]', _doSlowButton, null, 'slow-button', null],
-                    ['step', _doStepButton, _('Run step by step'), null, null, null, null],
-                    ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
-                    ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
-                    ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                    ['save', doSave, _('Save project'), null, null, null, null],
-                    planetMenuItem,
-                    ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                    ['help', _showHelp, _('Help'), null, null, null, null]
-                ];
-            }
+            var buttonNames = [
+                ['run', _doFastButton, _('Play'), null, null, null, null],
+                ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
+                ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
+                ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
+                ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                ['save', doSave, _('Save project'), null, null, null, null],
+                planetMenuItem,
+                ['help', _showHelp, _('Help'), null, null, null, null]
+            ];
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 buttonNames.push(['sugarizer-stop', function () {
@@ -4201,11 +4169,10 @@ handleComplete);
 
             for (var i = 0; i < buttonNames.length; i++) {
                 if (!getMainToolbarButtonNames(buttonNames[i][0])) {
-                    console.log('continue');
                     continue;
                 }
 
-                if (buttonNames[i][0] === 'open') {
+                if (buttonNames[i][0] === 'new') {
                     var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
                 } else if (buttonNames[i][0] === 'help') {
                     var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
@@ -4218,21 +4185,29 @@ handleComplete);
                 if (buttonNames[i][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
                 } else if (buttonNames[i][0] === 'hard-stop-turtle') {
-                    console.log('hard stop turtle');
                     hardStopTurtleContainer = container;
                 } else if (buttonNames[i][0] === 'new') {
                     newContainer = container;
+                } else if (buttonNames[i][0] === 'run') {
+                    runContainer = container;
                 }
+
+                _loadButtonDragHandler(container, x, y, buttonNames[i][1], buttonNames[i][3], buttonNames[i][4], buttonNames[i][5], buttonNames[i][6]);
 
                 // Ensure that stop-turtle button is placed on top of
                 // hard-stop-turtle button.
-                if (!(buttonNames[i][0] === 'hard-stop-turtle' && buttonNames[i + 1][0] === 'stop-turtle')) {
+                if (buttonNames[i][0] !== 'hard-stop-turtle') { // && buttonNames[i + 1][0] === 'stop-turtle')) {
                     x += dx;
                     y += dy;
                 }
-                //x += dx;
-                //y += dy;
             }
+
+            var x = runContainer.x;
+            var y = runContainer.y;
+            slowContainer = _makeButton('slow-button', _('Run slowly'), x, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(slowContainer, x, y, _doSlowButton, null, null, null, null);
+            stepContainer = _makeButton('step-button', _('Run step by step'), x + btnSize, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(stepContainer, x, y, _doStepButton, null, null, null, null);
 
             _setupAuxMenu(turtleBlocksScale);
             _setupSubMenus(turtleBlocksScale);
@@ -4733,11 +4708,6 @@ handleComplete);
 
                 var mousedown = true;
 
-                var offset = {
-                    x: container.x - Math.round(event.stageX / turtleBlocksScale),
-                    y: container.y - Math.round(event.stageY / turtleBlocksScale)
-                };
-
                 pressTimer = setTimeout(function () {
                     isLong = true;
                     if (longImg !== null) {
@@ -4760,9 +4730,6 @@ handleComplete);
                     clearTimeout(lockTimer);
 
                     hideButtonHighlight(circles, stage);
-                    // container.x = ox;
-                    // container.y = oy;
-
                     if (longImg !== null || extraLongImg !== null) {
                         container.visible = false;
                         container = formerContainer;
@@ -4791,6 +4758,8 @@ handleComplete);
                 // get multiple listeners added to the event.
                 container.removeAllEventListeners('pressup');
                 var closure = container.on('pressup', __pressupFunction);
+                // container.removeAllEventListeners('mouseup');
+                // var closure = container.on('mouseup', __pressupFunction);
 
                 isLong = false;
                 isExtraLong = false;
@@ -4837,6 +4806,8 @@ handleComplete);
 
             menuContainer.y += dy;
             blocksContainer.y += dy;
+            slowContainer.y += dy;
+            stepContainer.y += dy;
 
             refreshCanvas();
         };
@@ -4861,6 +4832,10 @@ handleComplete);
                 blocksContainer.y += dy;
                 menuContainer.y += dy;
 
+                slowContainer.y = 27.5;
+                slowContainer.visible = true;
+                stepContainer.y = 27.5;
+                stepContainer.visible = true;
             } else {
                 var dy = headerContainer.y;
                 headerContainer.y = 0;
@@ -4878,6 +4853,11 @@ handleComplete);
 
                 menuContainer.y = cellsize / 2;
                 blocksContainer.y -= dy;
+
+                slowContainer.y = -27.5;
+                slowContainer.visible = false;
+                stepContainer.y = -27.5;
+                stepContainer.visible = false;
             }
 
             confirmContainer.visible = false;
