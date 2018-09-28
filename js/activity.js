@@ -308,14 +308,24 @@ define(MYDEFINES, function (compatibility) {
             blocks.stageClick = true;
 
             if (blocks.activeBlock === null) {
-                // Stage context menu
-                // _piemenuStageContext();
+		// Is there a block we can make active?
+                for (var i = 0; i < blocks.blockList.length; i++) {
+		    if (blocks.blockList[i].ignore()) {
+			continue;
+                    }
+
+		    var myBlock = blocks.blockList[i];
+		    if (stageX > myBlock.container.x && stageX < myBlock.container.x + myBlock.width && stageY > myBlock.container.y && stageY < myBlock.container.y + myBlock.hitHeight) {
+			console.log(blocks.name);
+			blocks.activeBlock = i;
+			piemenuBlockContext(i);
+			break;
+		    }
+		}
             } else {
                 // Block context menu
-                // Would be better to trigger this from the block
-                // container, but it doesn't seem to work from there.
-                var activeBlock = blocks.activeBlock;
-                piemenuBlockContext(activeBlock);
+                // var activeBlock = blocks.activeBlock;
+                piemenuBlockContext(blocks.activeBlock);
             }
         }, false);
 
@@ -479,19 +489,7 @@ define(MYDEFINES, function (compatibility) {
             var xMax = 0;
             var yMax = 0;
             for (var i = 0; i < blocks.blockList.length; i++) {
-                if (blocks.blockList[i].name === 'hidden') {
-                    continue;
-                }
-
-                if (blocks.blockList[i].name === 'hiddennoflow') {
-                    continue;
-                }
-
-                if (blocks.blockList[i].trash) {
-                    continue;
-                }
-
-                if (blocks.blockList[i].inCollapsed) {
+		if (blocks.blockList[i].ignore()) {
                     continue;
                 }
 
@@ -4929,12 +4927,12 @@ handleComplete);
                 var helpButton = null;
             }
 
-            var wheel = new wheelnav('contextWheelDiv', null, 150, 150);
+            var wheel = new wheelnav('contextWheelDiv', null, 250, 250);
             wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
             wheel.slicePathFunction = slicePath().DonutSlice;
             wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            wheel.slicePathCustom.minRadiusPercent = 0.4;
-            wheel.slicePathCustom.maxRadiusPercent = 1.0;
+            wheel.slicePathCustom.minRadiusPercent = 0.2;
+            wheel.slicePathCustom.maxRadiusPercent = 0.6;
             wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
             wheel.sliceInitPathCustom = wheel.slicePathCustom;
             wheel.clickModeRotate = false;
