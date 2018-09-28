@@ -6823,7 +6823,7 @@ function Logo () {
             //     that.musicKeyboard.Sliders.push([args[0], 0, 0]);
             // }
              else {
-                that.errorMsg(_('Hertz Block: Did you mean to use a Note block3?'), blk);
+                that.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
             }
             break;
             // deprecated
