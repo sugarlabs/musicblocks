@@ -4854,8 +4854,6 @@ handleComplete);
                 return;
             }
 
-            // piemenu version of ruler
-
             // Position the widget centered over the note block.
             var x = blocks.blockList[activeBlock].container.x;
             var y = blocks.blockList[activeBlock].container.y;
@@ -4864,8 +4862,10 @@ handleComplete);
             var canvasTop = blocks.canvas.offsetTop + 6 * blocks.getStageScale();
 
             docById('contextWheelDiv').style.position = 'absolute';
-            docById('contextWheelDiv').style.left = Math.min(blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150)) + 'px';
-            docById('contextWheelDiv').style.top = Math.min(blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150)) + 'px';
+            // docById('contextWheelDiv').style.left = Math.min(blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150)) + 'px';
+            docById('contextWheelDiv').style.left = Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150 + 'px';
+            // docById('contextWheelDiv').style.top = Math.min(blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150)) + 'px';
+	    docById('contextWheelDiv').style.top = Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150 + 'px';
             docById('contextWheelDiv').style.display = '';
 
             labels = ['imgsrc:header-icons/copy-button.svg',
