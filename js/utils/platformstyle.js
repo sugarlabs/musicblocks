@@ -39,9 +39,11 @@ window.platformColor = {
     // background: platform.FF? '#00CAF2' : '#96D3F3'
     // background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
     // ruleColor: '#e3e3e3', // 2.5B 9/0
+    rule: '#e2e2e2',
     ruleColor: '#e2e2e2',
     // background: '#e8e8e8', // '#acd0e4'  // 2.5B 8/4
     background: '#f9f9f9', // '#acd0e4'  // 2.5B 8/4
+    paletteSelected: '#f3f3f3',
     paletteBackground: '#ffffff',
     paletteText: '#666666',
     // selectorBackground: '#2584af',
