@@ -729,12 +729,12 @@ function Blocks () {
             // Find the connecting block.
             var cblk = myBlock.connections[c];
             // Nothing connected here so continue to the next connection.
-            if (cblk == null) {
+            if (cblk === null) {
                 continue;
             }
 
             // Another database integrety check.
-            if (this.blockList[cblk] == null) {
+            if (this.blockList[cblk] === null) {
                 console.log('This is not good: we encountered a null block: ' + cblk);
                 continue;
             }
@@ -757,18 +757,7 @@ function Blocks () {
             }
 
             var cdock = this.blockList[cblk].docks[b];
-
-            /*
-            if (this.blockList[blk].name === 'newnote' || this.blockList[cblk].name === 'newnote') {
-                console.log(this.blockList[blk].name);
-                console.log(bdock);
-                console.log(this.blockList[cblk].name);
-                console.log(cdock);
-            }
-            */
-
             if (c > 0) {
-                // Move the connected block...
                 var dx = bdock[0] - cdock[0];
 
                 if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
@@ -777,39 +766,24 @@ function Blocks () {
                     var n = myBlock.docks.length;
                     var dd = myBlock.docks[n - 1][1] - myBlock.docks[n - 2][1];
                     var dy = bdock[1] - dd - cdock[1];
-                    // console.log('adjust inline connection: ' + n + ' ' + dd + ' ' + dy);
                 } else {
                     var dy = bdock[1] - cdock[1];
                 }
 
-                /*
-                console.log('child');
-                console.log('dx ' + dx);
-                console.log('dy ' + dy);
-                */
-
                 if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
                 } else {
-                    var nx = myBlock.container.x + dx; // Math.floor(myBlock.container.x + dx + 0.5);
-                    var ny = myBlock.container.y + dy; // Math.floor(myBlock.container.y + dy + 0.5);
+                    var nx = myBlock.container.x + dx;
+                    var ny = myBlock.container.y + dy;
                 }
 
                 this._moveBlock(cblk, nx, ny);
             } else {
-                // or it's parent.
+                console.log('Move the parent block');
                 var dx = cdock[0] - bdock[0];
                 var dy = cdock[1] - bdock[1];
-
-                /*
-                console.log('parent');
-                console.log('dx ' + dx);
-                console.log('dy ' + dy);
-                */
-
-                var nx = this.blockList[cblk].container.x; // Math.floor(this.blockList[cblk].container.x + dx + 0.5);
-                var ny = this.blockList[cblk].container.y; // Math.floor(this.blockList[cblk].container.y + dy + 0.5);
-
+                var nx = this.blockList[cblk].container.x + dx;
+                var ny = this.blockList[cblk].container.y + dy;
                 this._moveBlock(blk, nx, ny);
             }
 
