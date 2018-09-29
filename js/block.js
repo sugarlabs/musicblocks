@@ -1815,14 +1815,6 @@ function Block(protoblock, blocks, overrideName) {
 
                 this.blocks.unhighlight(null);
                 this.blocks.refreshCanvas();
-            } else if (this.blocks.activeBlock !== thisBlock) {
-                // Are we in a different block altogether?
-                hideDOMLabel();
-                this.blocks.unhighlight(null);
-                this.blocks.refreshCanvas();
-            } else {
-                // this.blocks.unhighlight(null);
-                // this.blocks.refreshCanvas();
             }
 
             this.blocks.activeBlock = null;
