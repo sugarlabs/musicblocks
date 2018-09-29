@@ -15,12 +15,12 @@ const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote'];
-const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard'];
+const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament1'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
 const EXTRAWIDENAMES = [];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -702,6 +702,10 @@ function Block(protoblock, blocks, overrideName) {
                 case 'eastindiansolfege':
                     this.value = 'sol';
                     break;
+                case 'customNote':
+                    var len = this.blocks.logo.synth.startingPitch.length;
+                    this.value = this.blocks.logo.synth.startingPitch.substring(0, len - 1) + '(+0)';
+                    break;
                 case 'notename':
                     this.value = 'G';
                     break;
@@ -950,6 +954,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'newnote':
                     that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'temperament1':
+                    that.collapseText = new createjs.Text(_('temperament'), fontSize + 'px Sans', '#000000');
                     break;
                 default:
                     that.collapseText = new createjs.Text('foobar', fontSize + 'px Sans', '#000000');
@@ -2001,6 +2008,33 @@ function Block(protoblock, blocks, overrideName) {
             if (this.piemenuOKtoLaunch()) {
                 this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
+        } else if (this.name === 'customNote') {
+            if (!this.blocks.logo.customTemperamentDefined) {
+                // If custom temperament is not defined by user, 
+                // then custom temperament is supposed to be equal temperament.
+                var obj = splitSolfege(this.value);
+                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+
+                if (this.piemenuOKtoLaunch()) {
+                    this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+                }
+            } else {
+                if (this.value != null) {
+                    var selectedNote = this.value;
+                } else {
+                    var selectedNote = TEMPERAMENT['custom']['0'][1];
+                }
+
+                var noteLabels = [];
+                var noteValues = [];
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        noteLabels.push(TEMPERAMENT['custom'][pitchNumber][1]);
+                        noteValues.push(TEMPERAMENT['custom'][pitchNumber][1]);
+                    }   
+                }
+                this._piemenuPitches(noteLabels, noteValues, '', selectednote, '', true);
+            }
         } else if (this.name === 'eastindiansolfege') {
             var obj = splitSolfege(this.value);
             var selectednote = obj[0];
@@ -2338,7 +2372,24 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
                     break;
                 case 'pitchnumber':
-                    this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    for (var i = 0; i < this.blocks.blockList.length; i++) {
+                        if (this.blocks.blockList[i].name == 'settemperament' && this.blocks.blockList[i].connections[0] !== null) {
+                            var index = this.blocks.blockList[i].connections[1];
+                            var temperament = this.blocks.blockList[index].value;
+                        }
+                    }
+                    if (temperament === undefined) {
+                        temperament = 'equal';
+                    }
+                    if (temperament === 'equal') {
+                        this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    } else {
+                        var pitchNumbers = [];
+                        for (var i = 0; i < TEMPERAMENT[temperament]['pitchNumber']; i++) {
+                            pitchNumbers.push(i);
+                        }
+                        this._piemenuNumber(pitchNumbers, this.value);
+                    }
                     break;
                 case 'neighbor':
                 case 'neighbor2':
@@ -2391,7 +2442,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                that._labelChanged(true);
+                that._labelChanged(true, true);
 
                 event.preventDefault();
 
@@ -2425,7 +2476,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label.addEventListener('keypress', __keypress);
 
             this.label.addEventListener('change', function () {
-                that._labelChanged(true);
+                that._labelChanged(true, true);
             });
 
             this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
@@ -2462,12 +2513,123 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental) {
+    this._noteValueNumber = function (c) {
+        // Is this a number block being used as a note value
+        // denominator argument?
+        var dblk = this.connections[0];
+        // Are we connected to a divide block?
+        if (this.name === 'number' && dblk !== null && this.blocks.blockList[dblk].name === 'divide') {
+            // Are we the denominator (c == 2) or numerator (c == 1)?
+            if (this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)) {
+                // Is the divide block connected to a note value block?
+                cblk = this.blocks.blockList[dblk].connections[0];
+                if (cblk !== null) {
+                    // Is it the first or second arg?
+                    switch (this.blocks.blockList[cblk].name) {
+                    case 'newnote':
+                    case 'pickup':
+                    case 'tuplet4':
+                    case 'newstaccato':
+                    case 'newslur':
+                    case 'elapsednotes2':
+                        if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case 'meter':
+                    case 'setbpm2':
+                    case 'setmasterbpm2':
+                    case 'stuplet':
+                    case 'rhythm2':
+                    case 'newswing2':
+                    case 'vibrato':
+                    case 'neighbor':
+                    case 'neighbor2':
+                        if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return false;
+    };
+
+    this._noteValueValue = function () {
+        // Return the number block value being used as a note value
+        // denominator argument.
+        var dblk = this.connections[0];
+        // We are connected to a divide block.
+        // Is the divide block connected to a note value block?
+        cblk = this.blocks.blockList[dblk].connections[0];
+        if (cblk !== null) {
+            // Is it the first or second arg?
+            switch (this.blocks.blockList[cblk].name) {
+            case 'newnote':
+            case 'pickup':
+            case 'tuplet4':
+            case 'newstaccato':
+            case 'newslur':
+            case 'elapsednotes2':
+                if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                    cblk = this.blocks.blockList[dblk].connections[2];
+                    return this.blocks.blockList[cblk].value;
+                } else {
+                    return 1;
+                }
+                break;
+            case 'meter':
+            case 'setbpm2':
+            case 'setmasterbpm2':
+            case 'stuplet':
+            case 'rhythm2':
+            case 'newswing2':
+            case 'vibrato':
+            case 'neighbor':
+            case 'neighbor2':
+                if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                    if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                        cblk = this.blocks.blockList[dblk].connections[2];
+                        return this.blocks.blockList[cblk].value;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+                break;
+            }
+        }
+
+        return 1;
+    };
+
+    this._octaveNumber = function () {
+        // Is this a number block being used as an octave argument?
+        return (this.name === 'number' && this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
+    };
+
+    this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental, custom) {
         // wheelNav pie menu for pitch selection
         if (this.blocks.stageClick) {
             return;
         }
 
+        if (custom === undefined) {
+            custom = false;
+        }
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
         var hasOctaveWheel = (this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1);
@@ -2484,8 +2646,10 @@ function Block(protoblock, blocks, overrideName) {
         // the pitch selector
         this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
 
-        // the accidental selector
-        this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
+        if (!custom) {
+            // the accidental selector
+            this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
+        }
         // the octave selector
         if (hasOctaveWheel) {
             this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
@@ -2502,7 +2666,12 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        if (!custom) {
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        } else {
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.75;
+        }
+        
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
@@ -2519,28 +2688,29 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
 
-        this._accidentalsWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428'];
-        this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
-        this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.50;
-        this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
-        this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
-        this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
+        if (!custom) {
+            this._accidentalsWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428'];
+            this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
+            this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.50;
+            this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
+            this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
+            this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
 
-        var accidentalLabels = [];
-        for (var i = 0; i < accidentals.length; i++) {
-            accidentalLabels.push(accidentals[i]);
+            var accidentalLabels = [];
+            for (var i = 0; i < accidentals.length; i++) {
+                accidentalLabels.push(accidentals[i]);
+            }
+
+            for (var i = 0; i < 9; i++) {
+                accidentalLabels.push(null);
+                this._accidentalsWheel.colors.push('#c0c0c0');
+            }
+
+            this._accidentalsWheel.animatetime = 300;
+            this._accidentalsWheel.createWheel(accidentalLabels);
+            this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
         }
-
-        for (var i = 0; i < 9; i++) {
-            accidentalLabels.push(null);
-            this._accidentalsWheel.colors.push('#c0c0c0');
-        }
-
-        this._accidentalsWheel.animatetime = 300;
-        this._accidentalsWheel.createWheel(accidentalLabels);
-        this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
-
         if (hasOctaveWheel) {
             this._octavesWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
             this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2574,30 +2744,31 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._pitchWheel.navigateWheel(i);
-
-        // Navigate to a the current accidental value.
-        if (accidental === '') {
-            this._accidentalsWheel.navigateWheel(2);
-        } else {
-            switch(accidental) {
-            case DOUBLEFLAT:
-                this._accidentalsWheel.navigateWheel(4);
-                break;
-            case FLAT:
-                this._accidentalsWheel.navigateWheel(3);
-                break;
-            case NATURAL:
+        if (!custom) {
+            // Navigate to a the current accidental value.
+            if (accidental === '') {
                 this._accidentalsWheel.navigateWheel(2);
-                break;
-            case SHARP:
-                this._accidentalsWheel.navigateWheel(1);
-                break;
-            case DOUBLESHARP:
-                this._accidentalsWheel.navigateWheel(0);
-                break;
-            default:
-                this._accidentalsWheel.navigateWheel(2);
-                break;
+            } else {
+                switch(accidental) {
+                case DOUBLEFLAT:
+                    this._accidentalsWheel.navigateWheel(4);
+                    break;
+                case FLAT:
+                    this._accidentalsWheel.navigateWheel(3);
+                    break;
+                case NATURAL:
+                    this._accidentalsWheel.navigateWheel(2);
+                    break;
+                case SHARP:
+                    this._accidentalsWheel.navigateWheel(1);
+                    break;
+                case DOUBLESHARP:
+                    this._accidentalsWheel.navigateWheel(0);
+                    break;
+                default:
+                    this._accidentalsWheel.navigateWheel(2);
+                    break;
+                }
             }
         }
 
@@ -2616,10 +2787,12 @@ function Block(protoblock, blocks, overrideName) {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
             that.value = noteValues[i];
-            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
-            if (attr !== '♮') {
-                label += attr;
-                that.value += attr;
+            if (!custom) {
+                var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+                if (attr !== '♮') {
+                    label += attr;
+                    that.value += attr;
+                }
             }
 
             that.text.text = label;
@@ -2640,12 +2813,14 @@ function Block(protoblock, blocks, overrideName) {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
             var note = noteValues[i];
-            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+            if (!custom) {
+                var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
 
-            if (label === ' ') {
-                return;
-            } else if (attr !== '♮') {
-                note += attr;
+                if (label === ' ') {
+                    return;
+                } else if (attr !== '♮') {
+                    note += attr;
+                }
             }
 
             if (hasOctaveWheel) {
@@ -2656,9 +2831,10 @@ function Block(protoblock, blocks, overrideName) {
 
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
-            var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg);
-            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
-
+            var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
+            if (!custom) {
+                obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+            }
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -2680,11 +2856,11 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < noteValues.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
         }
-
-        for (var i = 0; i < accidentals.length; i++) {
-            this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+        if (!custom) {
+            for (var i = 0; i < accidentals.length; i++) {
+                this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
         }
-
         if (hasOctaveWheel) {
             for (var i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
@@ -2697,7 +2873,9 @@ function Block(protoblock, blocks, overrideName) {
             that._piemenuExitTime = d.getTime();
             docById('wheelDiv').style.display = 'none';
             that._pitchWheel.removeWheel();
-            that._accidentalsWheel.removeWheel();
+            if (!custom) {
+                that._accidentalsWheel.removeWheel();
+            }
             that._exitWheel.removeWheel();
             if (hasOctaveWheel) {
                 that._octavesWheel.removeWheel();
@@ -2813,6 +2991,7 @@ function Block(protoblock, blocks, overrideName) {
 
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
+
             var obj = getNote('C', octave, note, 'C major', false, null, that.blocks.errorMsg);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
 
@@ -4175,7 +4354,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.navItems[1].navigateFunction = __prepScale;
     };
 
-    this._labelChanged = function (closeInput) {
+    this._labelChanged = function (closeInput, change) {
         // Update the block values as they change in the DOM label.
         if (this === null || this.label === null) {
             this._labelLock = false;
@@ -4243,6 +4422,26 @@ function Block(protoblock, blocks, overrideName) {
                     this.label.value = newValue;
                     this.updateCache();
                 }
+                break;
+            case 'pitch':
+                // In case of custom temperament
+                var uniqueValue = this.blocks.findUniqueCustomName(newValue);
+                newValue = uniqueValue;
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        if (oldValue == TEMPERAMENT['custom'][pitchNumber][1]) {
+                         TEMPERAMENT['custom'][pitchNumber][1] = newValue;   
+                        }
+                    }   
+                }
+                this.value = newValue;
+                var label = this.value.toString();
+                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {  
+                    label = label.substr(0, STRINGLEN) + '...';
+                }
+                this.text.text = label;
+                this.label.value = newValue;
+                this.updateCache();
                 break;
             default:
                 break;

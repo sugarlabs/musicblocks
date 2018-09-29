@@ -89,6 +89,7 @@ const TACAT = {
     'timbre': 'ignore',
     'modewidget': 'ignore',
     'tempo': 'ignore',
+    'temperament': 'ignore',
     'pitchdrummatrix': 'ignore',
     'pitchslider': 'ignore',
     'musickeyboard': 'ignore',
@@ -155,7 +156,7 @@ const TACAT = {
     'synthname': 'tone',
     'voicename': 'tone',
     'settimbre': 'tone',
-
+    'settemperament': 'tone',
     // interval palette
 
     'modename': 'ignore',
