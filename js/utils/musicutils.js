@@ -317,7 +317,7 @@ const INTERVALS = [
     [_('major'), 'major', [2, 3, 6, 7]],
 ];
 
-// [semi-tones, direction -1 == down; 0 == neutral; 1 == up]
+// [semi-tones, direction -1 === down; 0 === neutral; 1 === up]
 const INTERVALVALUES = {
     'perfect 1': [0, 0],
     'augmented 1': [1, 1],
@@ -684,7 +684,7 @@ function getDrumName(name) {
     if (name === '') {
         console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) == 'http') {
+    } else if (name.slice(0, 4) === 'http') {
         return null;
     }
 
@@ -761,7 +761,7 @@ function getDrumIcon(name) {
     if (name === '') {
         console.log('getDrumIcon passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) == 'http') {
+    } else if (name.slice(0, 4) === 'http') {
         return 'images/drum.svg';
     }
 
@@ -777,13 +777,13 @@ function getDrumIcon(name) {
 
 
 function getDrumSynthName(name) {
-    if (name == null || name == undefined) {
+    if (name === null || name === undefined) {
         console.log('getDrumSynthName passed null name. Returning null');
         return null;
     } else if (name === '') {
         console.log('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) == 'http') {
+    } else if (name.slice(0, 4) === 'http') {
         return name;
     }
 
@@ -823,7 +823,7 @@ function getNoiseIcon(name) {
     if (name === '') {
         console.log('getNoiseIcon passed blank name. Returning ' + DEFAULTNOISE);
         name = DEFAULTNOISE;
-    } else if (name.slice(0, 4) == 'http') {
+    } else if (name.slice(0, 4) === 'http') {
         return 'images/noises.svg';
     }
 
@@ -839,7 +839,7 @@ function getNoiseIcon(name) {
 
 
 function getNoiseSynthName(name) {
-    if (name == null || name == undefined) {
+    if (name === null || name === undefined) {
         console.log('getNoiseSynthName passed null name. Returning null');
         return null;
     } else if (name === '') {
@@ -862,7 +862,7 @@ function getVoiceName(name) {
     if (name === '') {
         console.log('getVoiceName passed blank name. Returning ' + DEFAULTVOICE);
         name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) == 'http') {
+    } else if (name.slice(0, 4) === 'http') {
         return null;
     }
 
@@ -885,7 +885,7 @@ function getVoiceIcon(name) {
     if (name === '') {
         console.log('getVoiceIcon passed blank name. Returning ' + DEFAULTVOICE);
         name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) == 'http') {
+    } else if (name.slice(0, 4) === 'http') {
         return 'images/voices.svg';
     }
 
@@ -901,13 +901,13 @@ function getVoiceIcon(name) {
 
 
 function getVoiceSynthName(name) {
-    if (name == null || name == undefined) {
+    if (name === null || name === undefined) {
         console.log('getVoiceSynthName passed null name. Returning null');
         return null;
     } else if (name === '') {
         console.log('getVoiceSynthName passed blank name. Returning ' + DEFAULTVOICE);
         name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) == 'http') {
+    } else if (name.slice(0, 4) === 'http') {
         return name;
     }
 
@@ -1029,7 +1029,7 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
     if (temperament === undefined) {
         temperament = 'equal';
     }
-    if (temperament == 'custom') {
+    if (temperament === 'custom') {
         //Scalar = Semitone for custom Temperament.
         return transposition;
     }
@@ -1187,7 +1187,7 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     var obj = _buildScale(keySignature);
     var scale = obj[0];
 
-    // Scale degree is specified as do == 1, re == 2, etc., so we need
+    // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
     scaleDegree -= 1;
 
@@ -1396,45 +1396,45 @@ function getNoteFromInterval (pitch, interval) {
     function findOtherIntervals(interval) {
         var num = interval.split(' ');
 
-        if (interval == 'minor 2' || interval == 'minor 3' || interval == 'minor 6' || interval == 'minor 7') {
+        if (interval === 'minor 2' || interval === 'minor 3' || interval === 'minor 6' || interval === 'minor 7') {
             //Major intervals lowered by a half step become minor.
             var majorNote = findMajorInterval('major ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
-            if (index1 == 0) {
+            if (index1 === 0) {
                 accidental = priorAttrs[index1] + FLAT;
             } else {
                 accidental = priorAttrs[index1 - 1];   
             }    
         }
-        if (interval == 'diminished 4' || interval == 'diminished 5' || interval == 'diminished 8') {
+        if (interval === 'diminished 4' || interval === 'diminished 5' || interval === 'diminished 8') {
             //Perfect intervals lowered by a half step are called diminished.
             var majorNote = findMajorInterval('perfect ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
-            if (index1 == 0) {
+            if (index1 === 0) {
                 accidental = priorAttrs[index1] + FLAT;
             } else {
                 accidental = priorAttrs[index1 - 1];   
             }
         }
-        if (interval == 'augmented 2' || interval == 'augmented 3' || interval == 'augmented 6' || interval == 'augmented 7') {
+        if (interval === 'augmented 2' || interval === 'augmented 3' || interval === 'augmented 6' || interval === 'augmented 7') {
             //Major intervals raised by a half step are called augmented.
             var majorNote = findMajorInterval('major ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
-            if (index1 == 4) {
+            if (index1 === 4) {
                 accidental = priorAttrs[index1] + SHARP;
             } else {
                 accidental = priorAttrs[index1 + 1];   
             }
         }
-        if (interval == 'augmented 1' || interval == 'augmented 4' || interval == 'augmented 5' || interval == 'augmented 8') {
+        if (interval === 'augmented 1' || interval === 'augmented 4' || interval === 'augmented 5' || interval === 'augmented 8') {
             //Perfect intervals raised by a half step are called augmented.
             var majorNote = findMajorInterval('perfect ' + num[1]);
             var accidental = majorNote[0].substring(1, majorNote[0].length);
             var index1 = priorAttrs.indexOf(accidental);
-            if (index1 == 4) {
+            if (index1 === 4) {
                 accidental = priorAttrs[index1] + SHARP;
             } else {
                 accidental = priorAttrs[index1 + 1];   
@@ -1445,7 +1445,7 @@ function getNoteFromInterval (pitch, interval) {
         var octave = majorNote[1];
         return [Note, octave];  
     }
-    if (interval == 'major 2' || interval == 'major 3' || interval == 'major 6' || interval == 'major 7'|| interval == 'perfect 4'|| interval == 'perfect 5' || interval == 'perfect 8' || interval == 'perfect 1') {
+    if (interval === 'major 2' || interval === 'major 3' || interval === 'major 6' || interval === 'major 7'|| interval === 'perfect 4'|| interval === 'perfect 5' || interval === 'perfect 8' || interval === 'perfect 1') {
         return findMajorInterval(interval);
     } else {
         return findOtherIntervals(interval);
@@ -1455,7 +1455,7 @@ function getNoteFromInterval (pitch, interval) {
 function calcNoteValueToDisplay(a, b, scale) {
     var noteValue = a / b;
     var noteValueToDisplay = null;
-    if (scale == undefined) {
+    if (scale === undefined) {
         var cellScale = 1.0;
     } else {
         var cellScale = scale;
@@ -1600,20 +1600,20 @@ function numberToPitch(i, temperament, startPitch, offset) {
             i += 12;
             n += 1;  // Count octave bump ups.
         }
-        if (temperament == 'equal') {
+        if (temperament === 'equal') {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
         } else {
             var pitchNumber = Math.floor(i - offset);
         }
         
     } else {
-        if (temperament == 'equal') {
+        if (temperament === 'equal') {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
         } else {
             var pitchNumber = Math.floor(i - offset);
         }
     }
-    if (temperament == 'custom') {
+    if (temperament === 'custom') {
         pitchNumber = pitchNumber + '';
         if (TEMPERAMENT['custom'][pitchNumber][1] === undefined) {
             //If custom temperament is not defined, then it will store equal temperament notes.
@@ -1735,7 +1735,7 @@ function pitchToNumber(pitch, octave, keySignature) {
 
 
 function noteIsSolfege(note) {
-    if (SOLFEGECONVERSIONTABLE[note] == undefined) {
+    if (SOLFEGECONVERSIONTABLE[note] === undefined) {
         return true;
     } else {
         return false;
@@ -1968,7 +1968,7 @@ calcOctaveInterval = function (arg) {
 
 
 function isInt(value) {
-    return !isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10));
+    return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
 };
 
 
@@ -2029,6 +2029,14 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
     if (temperament === undefined) {
         temperament = 'equal';
     }
+
+    // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
+    if (noteArg.substr(-1) === '>') {
+        // Read octave and solfege from HTML
+        octave = parseInt(noteArg.slice(noteArg.indexOf('>') + 1, noteArg.indexOf('/') - 1));
+        noteArg = noteArg.substr(0, noteArg.indexOf('<'));
+    }
+
     var sharpFlat = false;
     var rememberFlat = false;
     var rememberSharp = false;    
@@ -2040,7 +2048,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
 
     octave = Math.round(octave);
 
-    if (transposition == undefined) {
+    if (transposition === undefined) {
         transposition = 0;
     }
 
@@ -2049,7 +2057,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
         noteArg = noteArg.toString();
     }
 
-    if (temperament == 'equal') {
+    if (temperament === 'equal') {
         // Check for double flat or double sharp. Since 𝄫 and 𝄪 behave
         // funny with string operations, we jump through some hoops.
         var articulation = noteArg.replace('do', '').replace('re', '').replace('mi', '').replace('fa', '').replace('sol', '').replace('la', '').replace('ti', '').replace('A', '').replace('B', '').replace('C', '').replace('D', '').replace('E', '').replace('F', '').replace('G', '');
@@ -2110,14 +2118,6 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
             // Convert to uppercase, e.g., d♭ -> D♭.
             var note = NOTESFLAT[notesFlat2.indexOf(noteArg)];
         } else {
-            // Not a letter note, so convert from Solfege.
-            // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
-            if (noteArg.substr(-1) === '>') {
-                // Read octave and solfege from HTML
-                octave = parseInt(noteArg.slice(noteArg.indexOf('>') + 1, noteArg.indexOf('/') - 1));
-                noteArg = noteArg.substr(0, noteArg.indexOf('<'));
-            }
-
             if (['#', SHARP, FLAT, 'b'].indexOf(noteArg.substr(-1)) !== -1) {
                 sharpFlat = true;
             }
@@ -2339,11 +2339,11 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                 note = EQUIVALENTFLATS[note];
             }
         }
-    } else if (temperament == 'custom') {
+    } else if (temperament === 'custom') {
         var note = getCustomNote(noteArg);
         for (var number in TEMPERAMENT['custom']) {
             if (number !== 'pitchNumber') {
-                if (note == TEMPERAMENT['custom'][number][1]) {
+                if (note === TEMPERAMENT['custom'][number][1]) {
                     var pitchNumber = Number(number);
                     break;
                 }
@@ -2440,7 +2440,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                         break;
                     }
                 }
-            } else if (deltaNote == 0) {
+            } else if (deltaNote === 0) {
                 var pitch = note + '' + octave;
                 var note1 = getNoteFromInterval(pitch, 'perfect 1');
             }
