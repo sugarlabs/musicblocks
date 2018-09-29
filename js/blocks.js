@@ -118,15 +118,8 @@ function Blocks () {
         return this.inLongPress;
     };
 
-    this.clearLongPressButtons = function () {
-        // this.saveStackButton.visible = false;
-        // this.dismissButton.visible = false;
+    this.clearLongPress = function () {
         this.inLongPress = false;
-    };
-
-    this.setContextMenu = function (contextMenu) {
-        this.contextMenu = contextMenu;
-        return this;
     };
 
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
@@ -224,6 +217,12 @@ function Blocks () {
     // on blocks.
     this.setLogo = function (logo) {
         this.logo = logo;
+        return this;
+    };
+
+    // We need to access the right-click (and long press) context menu.
+    this.setContextMenu = function (contextMenu) {
+        this.contextMenu = contextMenu;
         return this;
     };
 
@@ -360,38 +359,6 @@ function Blocks () {
         this._homeButtonContainers = containers;
         this.boundary = boundary;
         return this;
-    };
-
-    // set up copy/paste, dismiss, and copy-stack buttons
-    this.makeCopyPasteButtons = function (makeButton, updatePasteButton) {
-        var that = this;
-        this.updatePasteButton = updatePasteButton;
-
-        /*
-        this.dismissButton = makeButton('cancel-button', '', 0, 0, 55, 0, this.stage);
-        this.dismissButton.visible = false;
-
-        this.saveStackButton = makeButton('save-blocks-button', _('Save stack'), 0, 0, 55, 0, this.stage);
-        this.saveStackButton.visible = false;
-
-        this.dismissButton.on('click', function (event) {
-            that.saveStackButton.visible = false;
-            that.dismissButton.visible = false;
-            that.inLongPress = false;
-            that.refreshCanvas();
-        });
-
-        this.saveStackButton.on('click', function (event) {
-            // Only invoked from action blocks.
-            var topBlock = that.findTopBlock(that.activeBlock);
-            that.inLongPress = false;
-            that.selectedStack = topBlock;
-            that.saveStackButton.visible = false;
-            that.dismissButton.visible = false;
-            that.saveStack();
-            that.refreshCanvas();
-        });
-        */
     };
 
     this._actionBlock = function (name) {
@@ -1712,9 +1679,7 @@ function Blocks () {
 
     this.moveBlockRelative = function (blk, dx, dy) {
         // Move a block (and its label) by dx, dy.
-        if (this.inLongPress) {
-            this.clearLongPressButtons();
-        }
+        this.inLongPress = false;
 
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
@@ -3499,9 +3464,7 @@ function Blocks () {
         this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj()));
         console.log(this.selectedBlocksObj);
 
-        // Update the paste button to indicate a block is selected.
-        this.updatePasteButton();
-        // ...and reset paste offset.
+        // Reset paste offset.
         this._pasteDX = 0;
         this._pasteDY = 0;
     };
@@ -3512,36 +3475,8 @@ function Blocks () {
             this.longPressTimeout = null;
         }
 
-        if (this.activeBlock === null) {
-            this.errorMsg(_('There is no block selected.'));
-            console.log('No block associated with long press.');
-            return;
-        }
-
-        this.prepareStackForCopy();
-
-        // We need to set a flag to ensure:
-        // (1) we don't trigger a click and
-        // (2) we later remove the additional buttons for the action stack.
         this.inLongPress = true;
         this.contextMenu(this.activeBlock);
-
-        /*
-        // We display some extra buttons when we long-press an action block.
-        var myBlock = this.blockList[this.activeBlock];
-        if (myBlock.name === 'action') {
-            var z = this.stage.children.length - 1;
-            this.dismissButton.visible = true;
-            this.dismissButton.x = myBlock.container.x - 27;
-            this.dismissButton.y = myBlock.container.y - 27;
-            this.stage.setChildIndex(this.dismissButton, z - 1);
-            this.saveStackButton.visible = true;
-            this.saveStackButton.x = myBlock.container.x + 27;
-            this.saveStackButton.y = myBlock.container.y - 27;
-            this.stage.setChildIndex(this.saveStackButton, z - 2);
-        }
-        */
-        this.refreshCanvas();
     };
 
     this.pasteStack = function () {
@@ -3564,8 +3499,6 @@ function Blocks () {
             this._pasteDX += 21;
             this._pasteDY += 21;
             this.loadNewBlocks(this.selectedBlocksObj);
-            this.updatePasteButton();
-
         }
     };
 

@@ -240,8 +240,6 @@ define(MYDEFINES, function (compatibility) {
         var currentKeyCode = 0;
         var pasteContainer = null;
         var pasteImage = null;
-        // For updatePasteButton function
-        var bitmapActivePaste, bitmapDisablePaste;
         var gridContainer = null;
         var gridButtonLabel = null;
         var gridImages = [];
@@ -308,23 +306,23 @@ define(MYDEFINES, function (compatibility) {
             blocks.stageClick = true;
 
             if (blocks.activeBlock === null) {
-		// Is there a block we can make active?
+                // Is there a block we can make active?
                 for (var i = 0; i < blocks.blockList.length; i++) {
-		    if (blocks.blockList[i].ignore()) {
-			continue;
+                    if (blocks.blockList[i].ignore()) {
+                        continue;
                     }
 
-		    var myBlock = blocks.blockList[i];
-		    if (stageX > myBlock.container.x && stageX < myBlock.container.x + myBlock.width && stageY > myBlock.container.y && stageY < myBlock.container.y + myBlock.hitHeight) {
-			console.log(blocks.name);
-			blocks.activeBlock = i;
-			piemenuBlockContext(i);
-			break;
-		    }
-		}
+                    var myBlock = blocks.blockList[i];
+                    if (stageX > myBlock.container.x && stageX < myBlock.container.x + myBlock.width && stageY > myBlock.container.y && stageY < myBlock.container.y + myBlock.hitHeight) {
+                        // FIXME: check Z-order in case there are
+                        // overlapping blocks.
+                        blocks.activeBlock = i;
+                        piemenuBlockContext(i);
+                        break;
+                    }
+                }
             } else {
                 // Block context menu
-                // var activeBlock = blocks.activeBlock;
                 piemenuBlockContext(blocks.activeBlock);
             }
         }, false);
@@ -489,7 +487,7 @@ define(MYDEFINES, function (compatibility) {
             var xMax = 0;
             var yMax = 0;
             for (var i = 0; i < blocks.blockList.length; i++) {
-		if (blocks.blockList[i].ignore()) {
+                if (blocks.blockList[i].ignore()) {
                     continue;
                 }
 
@@ -704,9 +702,9 @@ define(MYDEFINES, function (compatibility) {
 
             if (!turtles.running()) {
                 console.log('running');
-		if (!turtles.isShrunk) {
+                if (!turtles.isShrunk) {
                     logo.hideBlocks(true);
-		}
+                }
 
                 logo.runLogoCommands(null, env);
             } else {
@@ -1253,7 +1251,6 @@ define(MYDEFINES, function (compatibility) {
                 .setSetPlaybackStatus(setPlaybackStatus)
                 .setErrorMsg(errorMsg)
                 .setContextMenu(piemenuBlockContext);
-            blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             turtles.setBlocks(blocks);
 
@@ -4015,64 +4012,6 @@ define(MYDEFINES, function (compatibility) {
 handleComplete);
         };
 
-        function updatePasteButton() {
-	    return;
-	    // deprecated
-            if (blocks.selectedBlocksObj == null) {
-                pasteContainer.removeAllChildren();
-                var img = new Image();
-
-                img.onload = function () {
-                    var originalSize = 55; // this is the original svg size
-                    var halfSize = Math.floor(cellSize / 2);
-
-                    bitmapDisablePaste = new createjs.Bitmap(img);
-                    if (cellSize !== originalSize) {
-                        bitmapDisablePaste.scaleX = cellSize / originalSize;
-                        bitmapDisablePaste.scaleY = cellSize / originalSize;
-                    }
-
-                    bitmapDisablePaste.regX = halfSize / bitmapDisablePaste.scaleX;
-                    bitmapDisablePaste.regY = halfSize / bitmapDisablePaste.scaleY;
-                    pasteContainer.addChild(bitmapDisablePaste);
-
-                    update = true;
-                };
-
-                img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PASTEDISABLEDBUTTON)))
-                return;
-            }
-
-            if (pasteImage === null) {
-                console.log('Updating paste button');
-                var img = new Image();
-
-                img.onload = function () {
-                    var originalSize = 55; // this is the original svg size
-                    var halfSize = Math.floor(cellSize / 2);
-
-                    bitmapActivePaste = new createjs.Bitmap(img);
-                    if (cellSize !== originalSize) {
-                        bitmapActivePaste.scaleX = cellSize / originalSize;
-                        bitmapActivePaste.scaleY = cellSize / originalSize;
-                    }
-
-                    bitmapActivePaste.regX = halfSize / bitmapActivePaste.scaleX;
-                    bitmapActivePaste.regY = halfSize / bitmapActivePaste.scaleY;
-                    pasteContainer.addChild(bitmapActivePaste);
-                    pasteImage = bitmapActivePaste;
-
-                    update = true;
-                };
-
-                img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PASTEBUTTON)))
-            } else {
-                pasteContainer.addChild(bitmapActivePaste);
-                console.log('Blinking paste button');
-                blinkPasteButton(pasteImage);
-            }
-        };
-
         function _setupAndroidToolbar(showPalettesPopover) {
             // NOTE: see getMainToolbarButtonNames in turtledefs.js
 
@@ -4759,7 +4698,7 @@ handleComplete);
 
                 container.removeAllEventListeners('pressup');
                 var closure = container.on('pressup', __pressupFunction);
-		// Do we need this?
+                // Do we need this?
                 // container.removeAllEventListeners('mouseup');
                 // var closure = container.on('mouseup', __pressupFunction);
 
