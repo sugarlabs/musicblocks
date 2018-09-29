@@ -109,6 +109,7 @@ function Blocks () {
 
     // We need to know if we are processing a copy or save stack command.
     this.inLongPress = false;
+    this.customTemperamentDefined = false;
 
     // We stage deletion of prototype action blocks on the palette so
     // as to avoid palette refresh race conditions.
@@ -1728,6 +1729,9 @@ function Blocks () {
                 label += attr;
             }
             break;
+        case 'customNote':
+            var label = _(myBlock.value);
+            break;
         case 'eastindiansolfege':
             var obj = splitSolfege(myBlock.value);
             var label = WESTERN2EISOLFEGENAMES[obj[0]];
@@ -2258,6 +2262,9 @@ function Blocks () {
             postProcessArg = [thisBlock, true];
         } else if (name === 'solfege') {
             postProcessArg = [thisBlock, 'sol'];
+        } else if (name === 'customNote') {
+            var len = this.logo.synth.startingPitch.length;
+            postProcessArg = [thisBlock, this.logo.synth.startingPitch.substring(0, len - 1) + '(+0)'];
         } else if (name === 'notename') {
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
@@ -2664,6 +2671,44 @@ function Blocks () {
         }
         return value;
     };
+
+    this.findUniqueCustomName = function (name) {
+        var noteNames = [];
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'text' && !this.blockList[blk].trash) {
+                var c = this.blockList[blk].connections[0];
+                if (c != null && this.blockList[c].name === 'pitch' && !this.blockList[c].trash) {
+                    noteNames.push(this.blockList[blk].value);
+                }
+            }
+        }
+        var i = 1;
+        var value = name;
+        while (noteNames.indexOf(value) !== -1) {
+            value = name + i.toString();
+            i += 1;
+        }
+        return value;
+    }
+
+    this.findUniqueTemperamentName = function (name) {
+        var temperamentNames = [];
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'text' && !this.blockList[blk].trash) {
+                var c = this.blockList[blk].connections[0];
+                if (c != null && this.blockList[c].name === 'temperament1' && !this.blockList[c].trash) {
+                    temperamentNames.push(this.blockList[blk].value);
+                }
+            }
+        }
+        var i = 1;
+        var value = name;
+        while (temperamentNames.indexOf(value) !== -1) {
+            value = name + i.toString();
+            i += 1;
+        }
+        return value;
+    }
 
     this._findDrumURLs = function () {
         // Make sure we initialize any drum with a URL name.
@@ -3603,6 +3648,16 @@ function Blocks () {
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
     };
 
+    this.findBlockInstance = function (blkName) {
+        // Returns true if block of name blkName is loaded.
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     this.loadNewBlocks = function (blockObjs) {
         var playbackQueueStartsHere = null;
 
@@ -4054,6 +4109,10 @@ function Blocks () {
 
             var that = this;
 
+            if (this.findBlockInstance('temperament1')) {
+                this.customTemperamentDefined = true;
+            }
+
             // A few special cases.
             switch (name) {
             case 'start':
@@ -4090,6 +4149,23 @@ function Blocks () {
                 blkData[4][0] = null;
                 blkData[4][3] = null;
                 this._makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null);
+                break;
+
+             case 'temperament1':
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    if (value.customTemperamentNotes !== undefined) {
+                        TEMPERAMENT['custom'] = value.customTemperamentNotes;
+                        TEMPERAMENT['custom']['pitchNumber'] = value.customTemperamentNotes.length;
+                        that.logo.synth.startingPitch = value.startingPitch;
+                        OCTAVERATIO = value.octaveSpace;
+                        console.log(TEMPERAMENT['custom']);
+                        that.logo.customTemperamentDefined = true;     //This is for custom pitch pie menu
+                    }
+                   
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
                 break;
 
                 // Named boxes and dos need private data.
@@ -4265,6 +4341,7 @@ function Blocks () {
                 break;
             case 'text':
             case 'solfege':
+            case 'customNote':
             case 'eastindiansolfege':
             case 'notename':
             case 'modename':
