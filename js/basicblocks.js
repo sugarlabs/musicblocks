@@ -904,13 +904,17 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var temperamentBlock = new ProtoBlock('temperament');
-    temperamentBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['temperament'] = temperamentBlock;
-    temperamentBlock.staticLabels.push(_('temperament'));
-    temperamentBlock.extraWidth = 20;
-    temperamentBlock.adjustWidthToLabel();
-    temperamentBlock.stackClampOneArgBlock();
+    var newblock = new ProtoBlock('temperament');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['temperament'] = newblock;
+    newblock.staticLabels.push(_('temperament'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampOneArgBlock();
+    if (beginnerMode && !beginnerBlock('temperament')) {
+        newblock.hidden = true;
+    }
 
     // macro
     var newblock = new ProtoBlock('timbre');
@@ -1889,39 +1893,48 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var setTemperamentBlock = new ProtoBlock('settemperament');
-    setTemperamentBlock.palette = palettes.dict['intervals'];
-    blocks.protoBlockDict['settemperament'] = setTemperamentBlock;
-    setTemperamentBlock.staticLabels.push(_('set temperament'));
-    setTemperamentBlock.staticLabels.push(_('temperament'));
-    setTemperamentBlock.staticLabels.push(_('reference pitch'), _('octave'));
-    setTemperamentBlock.adjustWidthToLabel();
-    setTemperamentBlock.threeArgBlock();
+    var newblock = new ProtoBlock('settemperament');
+    newblock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['settemperament'] = newblock;
+    newblock.staticLabels.push(_('set temperament'));
+    newblock.staticLabels.push(_('temperament'));
+    newblock.staticLabels.push(_('reference pitch'), _('octave'));
+    newblock.adjustWidthToLabel();
+    newblock.threeArgBlock();
+    if (beginnerMode && !beginnerBlock('settemperament')) {
+        newblock.hidden = true;
+    }
 
-    var octaveSpaceBlock = new ProtoBlock('octavespace');
-    octaveSpaceBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['octavespace'] = octaveSpaceBlock;
-    octaveSpaceBlock.staticLabels.push(_('octave space'));
-    octaveSpaceBlock.adjustWidthToLabel();
-    octaveSpaceBlock.oneArgBlock();
-    octaveSpaceBlock.hidden = true; 
+    var newblock = new ProtoBlock('octavespace');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['octavespace'] = newblock;
+    newblock.staticLabels.push(_('octave space'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.hidden = true; 
 
-    var temperamentNameBlock = new ProtoBlock('temperamentname');
-    temperamentNameBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['temperamentname'] = temperamentNameBlock;
-    temperamentNameBlock.valueBlock();
-    temperamentNameBlock.hidden = true; 
-    temperamentNameBlock.extraWidth = 50;
-    temperamentNameBlock.dockTypes[0] = 'anyout';
+    var newblock = new ProtoBlock('temperamentname');
+    newblock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['temperamentname'] = newblock;
+    newblock.valueBlock();
+    newblock.hidden = true; 
+    newblock.extraWidth = 50;
+    newblock.dockTypes[0] = 'anyout';
+    if (beginnerMode && !beginnerBlock('temperamentname')) {
+        newblock.hidden = true;
+    }
 
-    var temperament1Block = new ProtoBlock('temperament1');
-    temperament1Block.palette = palettes.dict['action'];
-    blocks.protoBlockDict['temperament1'] = temperament1Block;
-    temperament1Block.staticLabels.push(_('define temperament'));
-    temperament1Block.hidden = true; 
-    temperament1Block.extraWidth = 20;
-    temperament1Block.adjustWidthToLabel();
-    temperament1Block.stackClampOneArgBlock();   
+    var newblock = new ProtoBlock('temperament1');
+    newblock.palette = palettes.dict['action'];
+    blocks.protoBlockDict['temperament1'] = newblock;
+    newblock.staticLabels.push(_('define temperamentX'));
+    newblock.hidden = true; 
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.stackClampOneArgBlock();   
+    if (beginnerMode && !beginnerBlock('temperament1')) {
+        newblock.hidden = true;
+    }
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 

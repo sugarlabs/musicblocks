@@ -15,7 +15,7 @@ const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote'];
-const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament1'];
+const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
@@ -955,7 +955,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'newnote':
                     that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', '#000000');
                     break;
-                case 'temperament1':
+                case 'temperament':
                     that.collapseText = new createjs.Text(_('temperament'), fontSize + 'px Sans', '#000000');
                     break;
                 default:
