@@ -161,7 +161,7 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        if (!this.bitmap.visiblee && !this.highlightBitmap.visible) {
+        if (!this.bitmap.visible && !this.highlightBitmap.visible) {
             if (this.collapseBlockBitmap === null) {
                 return true;
             } else {
