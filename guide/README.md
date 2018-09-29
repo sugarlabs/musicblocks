@@ -58,6 +58,7 @@ also available.
     7. [Generating Arbitrary Pitches](#slider)
     8. [Changing Tempo](#tempo)
     9. [Custom Timbres](#timbre)
+    10. [Music Keyboard](#keyboard)
  5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
@@ -1398,6 +1399,24 @@ custom timbre.
 As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
+
+### <a name="keyboard"></a>4.10 Music Keyboard
+
+It is used to generate pitches by pressing keys of the keyboard. When there is no pitch block inside 
+the widget clamp, keyboard with all keys between C4 and G5 is shown. 
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard1.png "keyboard without clamp")
+
+When there are pitch blocks inside the widget clamp, only those pitches are shown as keys in the keyboard. 
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard2.png "keyboard with pitch block in clamp")
+
+Click on the keys to hear the sound. Clicking on play button plays all the the notes. To get the output
+as pitch blocks click on save button. Clear is pressed to delete all keys pressed till now and start afresh. 
+
+
+
+
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
 
