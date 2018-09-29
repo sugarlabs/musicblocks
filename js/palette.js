@@ -485,8 +485,10 @@ function Palettes () {
                 myPalettes.dict[showPalette]._resetLayout();
                 // Show the action palette after adding/deleting new
                 // nameddo blocks.
-                myPalettes.dict[showPalette].showMenu();
-                myPalettes.dict[showPalette]._showMenuItems();
+                // myPalettes.dict[showPalette].showMenu();
+                // myPalettes.dict[showPalette]._showMenuItems();
+                myPalettes.dict[showPalette].hideMenu();
+                myPalettes.dict[showPalette]._hideMenuItems();
                 myPalettes.refreshCanvas();
             }, 100);
         } else {
