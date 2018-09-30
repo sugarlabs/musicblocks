@@ -18,7 +18,7 @@
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
 function RhythmRuler () {
-    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
+    const BUTTONDIVWIDTH = 535;  // 9 buttons 535 = (55 + 4) * 9
     const OUTERWINDOWWIDTH = 675;
     const INNERWINDOWWIDTH = 600;
     const RULERHEIGHT = 70;
@@ -1356,6 +1356,7 @@ function RhythmRuler () {
         this._playingAll = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
+        this._expanded = false;
 
         // If there are no drums, add one.
         if (this.Drums.length === 0) {
@@ -1590,6 +1591,22 @@ function RhythmRuler () {
             }
         };
 
+        var expandCell = this._addButton(row, 'collapse-blocks-button.svg', iconSize, _('expand/collapse'), '');
+        
+        expandCell.onclick = function () {
+            var rulerDiv = docById('rulerDiv');
+
+            if (that._expanded) {
+                rulerDiv.style.width = OUTERWINDOWWIDTH + 'px';
+                rulerDiv.style.height = 100 + 85 * that.Rulers.length + 'px';
+                that._expanded = false;
+            } else {
+                rulerDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
+                rulerDiv.style.height = Math.max(100 + 85 * that.Rulers.length, Math.min(900, window.innerHeight)) + 'px';
+                that._expanded = true;
+            }
+        };
+
         // The ruler table
         var rulerTableDiv = docById('rulerTableDiv');
         rulerTableDiv.style.display = 'inline';
@@ -1793,7 +1810,7 @@ function RhythmRuler () {
     };
 
     this._piemenuRuler = function (selectedRuler) {
-	return;  // In progress
+        return;  // In progress
         // piemenu version of ruler
         docById('wheelDiv2').style.display = '';
         docById('wheelDiv2').style.position = 'absolute';
@@ -1801,42 +1818,42 @@ function RhythmRuler () {
         docById('wheelDiv2').style.top = '300px';
 
         if (selectedRuler === undefined) {
-	    selectedRuler = 0;
-	}
+            selectedRuler = 0;
+        }
 
         if (this._wheel !== null) {
             this._wheel.removeWheel();
-	}
+        }
 
         console.log(this.Rulers[selectedRuler]);
         this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
-	this._wheel.wheelRadius = 200;
-	this._wheel.maxPercent = 1.6;
+        this._wheel.wheelRadius = 200;
+        this._wheel.maxPercent = 1.6;
         this._wheel.colors = [MATRIXNOTECELLCOLOR, MATRIXNOTECELLCOLORHOVER];
-	this._wheel.navItemsContinuous = true;
-	this._wheel.markerPathFunction = markerPath().PieLineMarker;
-	this._wheel.clickModeRotate = false;
-	this._wheel.markerEnable = true;
-	this._wheel.slicePathFunction = slicePath().DonutSlice;
-	this._wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._wheel.navItemsContinuous = true;
+        this._wheel.markerPathFunction = markerPath().PieLineMarker;
+        this._wheel.clickModeRotate = false;
+        this._wheel.markerEnable = true;
+        this._wheel.slicePathFunction = slicePath().DonutSlice;
+        this._wheel.slicePathCustom = slicePath().DonutSliceCustomization();
 
         var labels = [];
         for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
             if (this.Rulers[selectedRuler][0][i] < 17 && this.Rulers[selectedRuler][0][i] > 0) {
-		labels.push('1/' + this.Rulers[selectedRuler][0][i]);
-	    } else {
-		labels.push(' ');
-	    }
-	}
+                labels.push('1/' + this.Rulers[selectedRuler][0][i]);
+            } else {
+                labels.push(' ');
+            }
+        }
 
         console.log(labels);
-	this._wheel.initWheel(labels);
+        this._wheel.initWheel(labels);
 
         for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
-	    this._wheel.navItems[i].sliceAngle = 360 / Math.abs(this.Rulers[selectedRuler][0][i]);
-	}
+            this._wheel.navItems[i].sliceAngle = 360 / Math.abs(this.Rulers[selectedRuler][0][i]);
+        }
 
-	this._wheel.createWheel();
+        this._wheel.createWheel();
     };
 
     this._piemenuNumber = function (wheelValues, selectedValue) {
