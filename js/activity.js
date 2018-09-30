@@ -4390,6 +4390,8 @@ handleComplete);
                     onscreenMenu.push(container2);
                     homeButtonContainers[0].visible = false;
                     homeButtonContainers[1].visible = false;
+                    homeButtonContainers[0].y = -3 * btnSize / 2;
+                    homeButtonContainers[1].y = -3 * btnSize / 2;
                     boundary.hide();
                     blocks.setHomeContainers(homeButtonContainers, boundary);
                 }
