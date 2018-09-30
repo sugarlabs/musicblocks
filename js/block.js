@@ -14,8 +14,8 @@
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ['newnote'];
-const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament'];
+const INLINECOLLAPSIBLES = ['newnote', 'interval'];
+const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
@@ -955,6 +955,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'newnote':
                     that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', '#000000');
                     break;
+                case 'interval':
+                    that.collapseText = new createjs.Text(_('scalar interval'), fontSize + 'px Sans', '#000000');
+                    break;
                 case 'temperament':
                     that.collapseText = new createjs.Text(_('temperament'), fontSize + 'px Sans', '#000000');
                     break;
@@ -1231,7 +1234,17 @@ function Block(protoblock, blocks, overrideName) {
         this.collapseText.visible = !isCollapsed;
 
         if (this.isInlineCollapsible() && this.collapseText.visible) {
-            this._newNoteLabel();
+	    switch(this.name) {
+	    case 'newnote':
+		this._newNoteLabel();
+		break;
+	    case 'interval':
+		this._intervalLabel();
+		break;
+	    default:
+		console.log('What do we do with a collapsed ' + this.name + ' block?');
+		break;
+	    }
         }
 
         this.bitmap.visible = this.collapsed;
@@ -1256,7 +1269,7 @@ function Block(protoblock, blocks, overrideName) {
         var z = this.container.children.length - 1;
         this.container.setChildIndex(this.collapseText, z);
 
-        if (this.name == 'newnote') {
+        if (this.name === 'newnote' || this.name === 'interval') {
             // Only collapse the contents of the note block.
             this._toggle_inline(thisBlock, isCollapsed);
         } else {
@@ -1278,80 +1291,81 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     };
 
+    this._intervalLabel = function () {
+        // Find pitch and value to display on the collapsed interval
+        // block.
+	var intervals = [];
+	var i = 0;
+
+	var c = this.blocks.blockList.indexOf(this);
+	while (c !== null) {
+	    var lastIntervalBlock = c;
+	    var n = this.blocks.blockList[c].connections[1];
+            var cblock = this.blocks.blockList[n];
+	    if (cblock.name === 'number') {
+		intervals.push('+' + cblock.value);
+	    } else {
+		intervals.push('');
+	    }
+
+	    i += 1;
+	    if (i > 5) {
+		console.log('loop?');
+		break;
+	    }
+
+	    c = this.blocks.findNestedIntervalBlock(this.blocks.blockList[c].connections[2]);
+	}
+
+	var itext = '';
+	for (var i = intervals.length; i > 0; i--) {
+	    itext += ' ' + intervals[i - 1];
+	}
+
+	var nblk = this.blocks.findNoteBlock(lastIntervalBlock);
+	if (nblk === null) {
+	    this.collapseText.text = _('scalar interval') + itext;
+	} else {
+            c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
+            var p = this._getPitch(c);
+            if (c === null || p === '') {
+		this.collapseText.text = _('scalar interval') + itext;
+            } else {
+		// Are there more pitch blocks in this note?
+		c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
+		// Update the collapsed-block label.
+		if (c === null) {
+                    this.collapseText.text = p + itext;
+		} else {
+                    this.collapseText.text = p + '...' + itext;
+		}
+            }
+	}
+    };
+
     this._newNoteLabel = function () {
         // Find pitch and value to display on the collapsed note value
         // block.
-        v = '';
-        c = this.connections[1];
+        var v = '';
+        var c = this.connections[1];
         if (c !== null) {
             // Only look for standard form: / 1 4
             if (this.blocks.blockList[c].name === 'divide') { 
-                c1 = this.blocks.blockList[c].connections[1];
-                c2 = this.blocks.blockList[c].connections[2];
+                var c1 = this.blocks.blockList[c].connections[1];
+                var c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                     v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
                 }
             }
         }
 
-        p = '';
-        c = this.connections[2];
+	c = this.connections[2];
         c = this.blocks.findFirstPitchBlock(c);
-        if (c !== null) {
-            switch(this.blocks.blockList[c].name) {
-            case 'pitch':
-                c1 = this.blocks.blockList[c].connections[1];
-                c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c2].name === 'number') {
-                    if (this.blocks.blockList[c1].name === 'solfege') {
-                        p = _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
-                    } else if (this.blocks.blockList[c1].name === 'notename') {
-                        p = this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
-                    }
-                }
-                break;
-            case 'scaledegree':
-                c1 = this.blocks.blockList[c].connections[1];
-                c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c2].name === 'number') {
-                    if (this.blocks.blockList[c1].name === 'number') {
-                        p = _('scale degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
-                    }
-                }
-                break;
-            case 'hertz':
-                c1 = this.blocks.blockList[c].connections[1];
-                if (this.blocks.blockList[c1].name === 'number') {
-                    p = this.blocks.blockList[c2].value + 'HZ';
-                }
-                break;
-            case 'steppitch':
-                c1 = this.blocks.blockList[c].connections[1];
-                if (this.blocks.blockList[c1].name === 'number') {
-                    p = _('scalar step') + ' ' + this.blocks.blockList[c2].value;
-                }
-                break;
-            case 'pitchnumber':
-                c1 = this.blocks.blockList[c].connections[1];
-                if (this.blocks.blockList[c1].name === 'number') {
-                    p = _('pitch number') + ' ' + this.blocks.blockList[c2].value;
-                }
-                break;
-            case 'playdrum':
-                p = _('drum');
-                break;
-            case 'rest2':
-                p = _('silence');
-                break;
-            default:
-                p = '';
-            }
-        }
-
+        var p = this._getPitch(c);
         if (c === null) {
             this.collapseText.text = _('silence') + ' | ' + v;
         } else if (p === '' && v === '') {
-            this.collapseText.text = 'note value';
+            this.collapseText.text = _('note value');
         } else {
             // Are there more pitch blocks in this note?
             c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
@@ -1361,6 +1375,61 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 this.collapseText.text = p + '... | ' + v;
             }
+        }
+    };
+
+    this._getPitch = function (c) {
+        if (c === null) {
+	    return '';
+	}
+
+        switch(this.blocks.blockList[c].name) {
+        case 'pitch':
+            var c1 = this.blocks.blockList[c].connections[1];
+            var c2 = this.blocks.blockList[c].connections[2];
+            if (this.blocks.blockList[c2].name === 'number') {
+                if (this.blocks.blockList[c1].name === 'solfege') {
+                    return _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
+                } else if (this.blocks.blockList[c1].name === 'notename') {
+                    return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
+                }
+            }
+            break;
+        case 'scaledegree':
+            var c1 = this.blocks.blockList[c].connections[1];
+            var c2 = this.blocks.blockList[c].connections[2];
+            if (this.blocks.blockList[c2].name === 'number') {
+                if (this.blocks.blockList[c1].name === 'number') {
+                    return _('scale degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
+                }
+            }
+            break;
+        case 'hertz':
+            var c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === 'number') {
+                return this.blocks.blockList[c2].value + 'HZ';
+            }
+            break;
+        case 'steppitch':
+            var c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === 'number') {
+                return _('scalar step') + ' ' + this.blocks.blockList[c2].value;
+            }
+            break;
+        case 'pitchnumber':
+            var c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === 'number') {
+                return _('pitch number') + ' ' + this.blocks.blockList[c2].value;
+            }
+            break;
+        case 'playdrum':
+            return _('drum');
+            break;
+        case 'rest2':
+            return _('silence');
+            break;
+        default:
+            return '';
         }
     };
 

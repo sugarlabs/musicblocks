@@ -3923,6 +3923,7 @@ define(MYDEFINES, function (compatibility) {
                             };
                         }
                         break;
+		    case 'interval':
                     case 'newnote':
                     case 'action':
                     case 'matrix':

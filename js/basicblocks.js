@@ -2498,6 +2498,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['interval'] = newblock;
     //.TRANS: calculate a relative step between notes based on the current musical scale
     newblock.staticLabels.push(_('scalar interval') + ' (+/–)');
+    newblock.labelOffset = 15;
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);

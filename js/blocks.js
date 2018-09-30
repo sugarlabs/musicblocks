@@ -312,7 +312,7 @@ function Blocks () {
         var someCollapsed = false;
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (myBlock.name === 'newnote') {
+            if (myBlock.name === 'newnote' || myBlock.name === 'interval') {
                 continue;
             }
 
@@ -330,7 +330,7 @@ function Blocks () {
             // If any blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-                if (myBlock.name === 'newnote') {
+                if (myBlock.name === 'newnote' || myBlock.name === 'interval') {
                     continue;
                 }
 
@@ -342,7 +342,7 @@ function Blocks () {
             // If no blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-                if (myBlock.name === 'newnote') {
+                if (myBlock.name === 'newnote' || myBlock.name === 'interval') {
                     continue;
                 }
 
@@ -446,7 +446,7 @@ function Blocks () {
     // Returns the block size.
     this._getBlockSize = function (blk) {
         var myBlock = this.blockList[blk];
-        if (myBlock.name === 'newnote' && myBlock.collapsed) {
+        if ((myBlock.name === 'newnote' || myBlock.name === 'interval') && myBlock.collapsed) {
             return 1;
         }
 
@@ -656,7 +656,7 @@ function Blocks () {
         }
 
         // If the note value block is collapsed, spoof size.
-        if (myBlock.name === 'newnote' && myBlock.collapsed) {
+        if ((myBlock.name === 'newnote' || myBlock.name === 'interval') && myBlock.collapsed) {
             size = 1
         }
 
@@ -3226,6 +3226,46 @@ function Blocks () {
         }
 
         return this.insideNoteBlock(c0);
+    };
+
+    this.findNoteBlock = function (blk) {
+        // Returns first note block found.
+        if (blk === null) {
+            return null;
+        }
+
+        if (this.blockList[blk].name === 'newnote') {
+            return blk;
+        }
+
+	if (this.blockList[blk].isClampBlock()) {
+	    var n = this.blockList[blk].connections.length - 2;
+            var c = this.blockList[blk].connections[n];
+	} else {
+            var c = last(this.blockList[blk].connections);
+	}
+
+        return this.findNoteBlock(c);
+    };
+
+    this.findNestedIntervalBlock = function (blk) {
+        // Returns first interval block found.
+        if (blk === null) {
+            return null;
+        }
+
+        if (this.blockList[blk].name === 'interval') {
+            return blk;
+        }
+
+	if (this.blockList[blk].isClampBlock()) {
+	    var n = this.blockList[blk].connections.length - 2;
+            var c = this.blockList[blk].connections[n];
+	} else {
+            var c = last(this.blockList[blk].connections);
+	}
+
+        return this.findNestedIntervalBlock(c);
     };
 
     this.findFirstPitchBlock = function (blk) {
