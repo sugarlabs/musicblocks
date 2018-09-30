@@ -16,9 +16,9 @@ const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
 
 function PitchTimeMatrix () {
-    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    const OUTERWINDOWWIDTH = 728;  // 675;
-    const INNERWINDOWWIDTH = 600;
+    const BUTTONDIVWIDTH = 535;  // 8 buttons 535 = (55 + 4) * 9
+    const OUTERWINDOWWIDTH = 758; // 728;
+    const INNERWINDOWWIDTH = 630; // 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
@@ -140,6 +140,7 @@ function PitchTimeMatrix () {
         this._logo = logo;
 
         this.playingNow = false;
+        this._expanded = false;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -286,6 +287,26 @@ function PitchTimeMatrix () {
             }
         };
 
+        var expandCell = this._addButton(row, 'expand-button.svg', iconSize, _('expand'), '');
+        
+        expandCell.onclick = function () {
+            var ptmDiv = docById('ptmDiv');
+
+            if (that._expanded) {
+                ptmDiv.style.width = that._initial_w;
+                ptmDiv.style.height = that._initial_h;
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+
+                that._expanded = false;
+            } else {
+                ptmDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
+                ptmDiv.style.height = Math.max(400, Math.min(900, window.innerHeight)) + 'px';
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                that._expanded = true;
+            }
+        };
+
         // The ptm table
         var ptmTableDiv = docById('ptmTableDiv');
         ptmTableDiv.style.display = 'inline';
@@ -393,9 +414,9 @@ function PitchTimeMatrix () {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 this._noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
-                if (noteIsSolfege(this.rowLabels[i])) {
+                if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                    var noteObj = getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false, null, this._logo.errorMsg);
+                    var noteObj = getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false, null, this._logo.errorMsg, this._logo.synth.inTemperament);
                 } else {
                     cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
@@ -446,6 +467,9 @@ function PitchTimeMatrix () {
         }
 
         this._logo.textMsg(_('Click on the table to add notes.'));
+
+        this._initial_w = ptmDiv.style.width;
+        this._initial_h = ptmDiv.style.height;
     };
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -1223,6 +1247,7 @@ function PitchTimeMatrix () {
 
             // We have an array of pitches and note values.
             var note = this._notesToPlay[this._notesCounter][0];
+            console.log(this._noteStored);
             var pitchNotes = [];
             var synthNotes = [];
             var drumNotes = [];
@@ -1752,35 +1777,54 @@ function PitchTimeMatrix () {
                         }
 
                         if (note[0][j][1] === '♯') {
-                            newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
-                            newStack.push([thisBlock + 1, ['accidentalname', {value: _('sharp') + ' ♯'}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
-                            newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
-                            newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
-                            if (lastConnection != null) {
-                                lastConnection += 3;
+                            if (this._logo.synth.inTemperament == 'custom') {
+                                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                                newStack.push([thisBlock + 1, ['customNote', {'value': note[0][j].substring(0, note[0][j].length - 1)}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock]]);
+                                previousBlock = thisBlock;
+                                thisBlock += 3;
+                            } else {
+                                newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
+                                newStack.push([thisBlock + 1, ['accidentalname', {value: _('sharp') + ' ♯'}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
+                                newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
+                                newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
+                                if (lastConnection != null) {
+                                    lastConnection += 3;
+                                }
+                                newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                                previousBlock = thisBlock + 5;
+                                thisBlock += 6;
                             }
-
-                            newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
-                            previousBlock = thisBlock + 5;
-                            thisBlock += 6;
                         } else if (note[0][j][1] === '♭') {
-                            newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
-                            newStack.push([thisBlock + 1, ['accidentalname', {value: _('flat') + ' ♭'}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);
-                            newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
-                            newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
-                            if (lastConnection != null) {
-                                lastConnection += 3;
-                            }
-
-                            newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
-                            previousBlock = thisBlock + 5;
-                            thisBlock += 6;
+                            if (this._logo.synth.inTemperament == 'custom') {
+                                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                                newStack.push([thisBlock + 1, ['customNote', {'value': note[0][j].substring(0, note[0][j].length - 1)}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock]]);
+                                previousBlock = thisBlock;
+                                thisBlock += 3;
+                            } else {
+                                newStack.push([thisBlock, 'accidental', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, thisBlock + 5]]);
+                                newStack.push([thisBlock + 1, ['accidentalname', {value: _('flat') + ' ♭'}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, 'pitch', 0, 0, [thisBlock, thisBlock + 3, thisBlock + 4, null]]);    
+                                newStack.push([thisBlock + 3, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock + 2]]);
+                                newStack.push([thisBlock + 4, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock + 2]]);
+                                if (lastConnection != null) {
+                                    lastConnection += 3;
+                                }
+                                newStack.push([thisBlock + 5, 'hidden', 0, 0, [thisBlock, lastConnection]]);
+                                previousBlock = thisBlock + 5;
+                                thisBlock += 6;
+                            }    
                         } else {
                             newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
+                            if (this._logo.synth.inTemperament == 'custom') {
+                                newStack.push([thisBlock + 1, ['customNote', {'value': note[0][j].substring(0, note[0][j].length - 1)}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j].slice(-1)}], 0, 0, [thisBlock]]);
+                            } else {
+                                newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                                newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
+                            }
                             previousBlock = thisBlock;
                             thisBlock += 3;
                         }

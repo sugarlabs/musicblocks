@@ -31,10 +31,24 @@ console.log('On platform: ', platform);
 
 window.platformColor = {
     // header: platform.FF? '#00539F' : '#2196F3',
-    header: platform.FF? '#2584af' : '#2584af',  // 10B 5/8
+    // header: platform.FF? '#2584af' : '#2584af',  // 10B 5/8
+    header: platform.FF? '#4da6ff' : '#4da6ff',
+    aux: '#1a8cff',
+    sub: '#8cc6ff',
     doHeaderShadow: !platform.FF,
     // background: platform.FF? '#00CAF2' : '#96D3F3'
-    background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
+    // background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
+    // ruleColor: '#e3e3e3', // 2.5B 9/0
+    rule: '#e2e2e2',
+    ruleColor: '#e2e2e2',
+    // background: '#e8e8e8', // '#acd0e4'  // 2.5B 8/4
+    background: '#f9f9f9', // '#acd0e4'  // 2.5B 8/4
+    paletteSelected: '#f3f3f3',
+    paletteBackground: '#ffffff',
+    paletteText: '#666666',
+    // selectorBackground: '#2584af',
+    selectorBackground: '#8cc6ff',
+    selectorSelected: '#1a8cff',
 };
 
 document.querySelector('meta[name=theme-color]')

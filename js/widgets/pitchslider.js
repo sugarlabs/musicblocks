@@ -49,12 +49,8 @@ function PitchSlider() {
     this._play = function (cell) {
         var cellIndex = cell.cellIndex;
         var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
-        var obj = frequencyToPitch(frequency);
-        var pitchnotes = [];
-        var note = obj[0] + obj[1];
-        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
-        var slider = docById('slider');
-        this._logo.synth.trigger(0, pitchnotes, 1, 'default', null, null);
+        this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
+        return;
     };
 
     this._moveSlider = function (cell, upDown) {
@@ -80,13 +76,12 @@ function PitchSlider() {
         var top = Number(cellDiv.style.top.replace('px', ''));
         cellDiv.style.top = (top - (upDown * SLIDERHEIGHT / 12)) + 'px';
 
-        frequencyDiv.innerHTML = frequency.toFixed(2);
+        frequencyDiv.innerHTML = frequency.toFixed(this.places);
         this._logo.synth.stop();
         this._play(sliderrow.cells[cellIndex]);
     };
 
     this._save = function (cell) {
-        console.log(cell);
         var that = this;
         var cellIndex = cell.cellIndex;
         var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
@@ -107,7 +102,7 @@ function PitchSlider() {
         var frequencyIdx = hertzIdx + 1;
         var hiddenIdx = hertzIdx + 2;
         newStack.push([hertzIdx, 'hertz', 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
-        newStack.push([frequencyIdx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [hertzIdx]]);
+        newStack.push([frequencyIdx, ['number', {'value': frequency.toFixed(this.places)}], 0, 0, [hertzIdx]]);
         newStack.push([hiddenIdx, 'hidden', 0, 0, [hertzIdx, null]]);
 
         that._logo.blocks.loadNewBlocks(newStack);
@@ -153,7 +148,6 @@ function PitchSlider() {
                 }
 
                 if (event.keyCode === RETURN) {
-                    console.log('RETURN');
                     that._save(cell);
                 }
             }
@@ -181,6 +175,12 @@ function PitchSlider() {
 
     this.init = function (logo) {
         this._logo = logo;
+
+        if (beginnerMode) {
+            this.places = 0;
+        } else {
+            this.places = 2;
+        }
 
         var w = window.innerWidth;
         this._cellScale = 1.0;
@@ -342,7 +342,7 @@ function PitchSlider() {
 
             // Add a paragraph element for the slider value.
             var slider = document.createElement('P');
-            slider.innerHTML = this.Sliders[i][0].toFixed(2);
+            slider.innerHTML = this.Sliders[i][0].toFixed(this.places);
             cellDiv.appendChild(slider);
 
             sliderCell.onmouseover = function(event) {
@@ -372,12 +372,12 @@ function PitchSlider() {
                 var distanceFromBottom = Math.max(SLIDERHEIGHT - offset, 0);
                 var frequencyOffset = parseFloat(that.Sliders[cellIndex][0]) / SLIDERHEIGHT * distanceFromBottom;
 
-                that.Sliders[cellIndex][1] = parseInt(Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffset) / that.Sliders[cellIndex][0]) * 12);
+                that.Sliders[cellIndex][1] = Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffset) / that.Sliders[cellIndex][0]) * 12;
                 that.Sliders[cellIndex][2] = frequencyOffset - that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
 
                 var frequencyDiv = cellDiv.childNodes[0];
                 var frequency = that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
-                frequencyDiv.innerHTML = frequency.toFixed(2);
+                frequencyDiv.innerHTML = frequency.toFixed(that.places);
                 that._play(this);
             };
 
@@ -391,26 +391,10 @@ function PitchSlider() {
                 that._moveSlider(this, 1);
             };
 
-            upCell.onmouseover = function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-            };
-
-            upCell.onmouseout = function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
-            };
-
             var downCell = this._addButton(downRow, 'down.svg', iconSize, _('move down'));
 
             downCell.onclick = function() {
                 that._moveSlider(this, -1);
-            };
-
-            downCell.onmouseover = function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-            };
-
-            downCell.onmouseout = function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
             };
         }
 

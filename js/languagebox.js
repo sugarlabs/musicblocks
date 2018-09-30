@@ -56,8 +56,8 @@ function LanguageBox () {
         const MSG = {
 	    'default': _('Refresh your browser to change your language preference.'),
             'en': 'Refresh your browser to change your language preference.',
-	    'ja': '言語設定についた変化（日本語）をするため、ブラウザをリフレッシュしてください。',
-            'kana': '"げんごをへんこうするにはブラウザをさいきどうするひつようがあります。',
+	    'ja': '言語を変更するにはブラウザを再起動する必要があります。',
+            'kana': 'げんごを へんこうするには ブラウザを さいきどうする ひつようが あります。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
             'zh-CN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
@@ -80,9 +80,16 @@ function LanguageBox () {
             myDiv.style.display = 'none';
             myDiv.style.visibility = 'hidden';
 	    if (language in MSG) {
-		this._message(MSG[language]);
+		if (language === 'ja' && localStorage.kanaPreference === 'kana') {
+                    console.log(MSG['kana']);
+		    this._message(MSG['kana']);
+		} else {
+                    console.log(MSG[language]);
+		    this._message(MSG[language]);
+		}
 	    } else {
-		this._message('default');
+                console.log('default');
+		this._message(MSG['default']);
 	    }
 
             this._refreshCanvas();
@@ -92,8 +99,6 @@ function LanguageBox () {
     this.createBox = function (scale, x, y) {
         if (this._container == null) {
             this._scale = scale;
-
-            console.log(scale);
 
             this._container = new createjs.Container();
             this._stage.addChild(this._container);

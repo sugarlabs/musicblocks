@@ -15,6 +15,8 @@ const DEFAULTVALUE = 50;
 const DEFAULTCHROMA = 100;
 const DEFAULTSTROKE = 5;
 const DEFAULTFONT = 'sans-serif';
+// What is the scale factor when stage is shrunk?
+const SCALEFACTOR = 4
 
 // Turtle sprite
 const TURTLEBASEPATH = 'images/';
@@ -79,14 +81,14 @@ function Turtle (name, turtles, drum) {
     console.log(ctx.canvas.width + ' x ' + ctx.canvas.height);
 
     this.doScrollXY = function(dx, dy) {
-	// FIXME: how big?
-	var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
-	ctx.putImageData(imgData, dx, dy);
+        // FIXME: how big?
+        var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
+        ctx.putImageData(imgData, dx, dy);
     };
 
     this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
-	// Simulate an arc with line segments since Tinkercad cannot
-	// import SVG arcs reliably.
+        // Simulate an arc with line segments since Tinkercad cannot
+        // import SVG arcs reliably.
         var a = sa;
         if (ea == null) {
             var da = Math.PI / nsteps;
@@ -1079,7 +1081,12 @@ function Turtle (name, turtles, drum) {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
-
+            //
+            this.container.visible = true;
+            this.turtles.refreshCanvas();
+            this.blinkFinished = true;
+            return;
+            //
             this.bitmap.alpha = 1.0;
             this.bitmap.scaleX = this._sizeInUse;
             this.bitmap.scaleY = this.bitmap.scaleX;
@@ -1098,6 +1105,23 @@ function Turtle (name, turtles, drum) {
         var that = this;
         this._sizeInUse = that.bitmap.scaleX;
         this._blinkTimeout = null;
+
+        //
+        if (duration > 16) {
+            return;
+        }
+
+        this.stopBlink();
+
+        this.container.visible = false;
+        this._blinkTimeout = setTimeout(function () {
+            that.container.visible = true;
+            that.turtles.refreshCanvas();
+        }, 100);
+        this.turtles.refreshCanvas();
+
+        return;
+        //
 
         if (this.beforeBlinkSize == null) {
             this.beforeBlinkSize = that.bitmap.scaleX;
@@ -1141,15 +1165,44 @@ function Turtle (name, turtles, drum) {
 
 
 function Turtles () {
+    this.masterStage = null;
+    this.doClear = null;
+    this.hideMenu = null;
     this.stage = null;
     this.refreshCanvas = null;
     this.scale = 1.0;
+    this.w = 1200;
+    this.h = 900;
+    this.backgroundColor = platformColor.background;
     this._canvas = null;
     this._rotating = false;
     this._drum = false;
 
+    this._borderContainer = new createjs.Container();
+    this._expandedBoundary = null;
+    this._expandButton = null;
+    this._collapsedBoundary = null;
+    this._collapseButton = null;
+    this.isShrunk = false;
+    this._clearButton = null;
+
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
+
+    this.setMasterStage = function (stage) {
+        this.masterStage = stage;
+        return this;
+    };
+
+    this.setClear = function (doClear) {
+	this.doClear = doClear;
+	return this;
+    };
+
+    this.setHideMenu = function (hideMenu) {
+        this.hideMenu = hideMenu;
+        return this;
+    };
 
     this.setCanvas = function (canvas) {
         this._canvas = canvas;
@@ -1158,7 +1211,14 @@ function Turtles () {
 
     this.setStage = function (stage) {
         this.stage = stage;
+        this.stage.addChild(this._borderContainer);
         return this;
+    };
+
+    this.scaleStage = function (scale) {
+        this.stage.scaleX = scale;
+        this.stage.scaleY = scale;
+        this.refreshCanvas();
     };
 
     this.setRefreshCanvas = function (refreshCanvas) {
@@ -1166,9 +1226,259 @@ function Turtles () {
         return this;
     };
 
-    this.setScale = function (scale) {
+    this.setScale = function (w, h, scale) {
         this.scale = scale;
+        this.w = w / scale;
+        this.h = h / scale;
+
+        this.makeBackground();
+    };
+
+    this.deltaY = function (dy) {
+        this.stage.y += dy;
+    };
+
+    this.makeBackground = function (setCollapsed) {
+        if (setCollapsed === undefined) {
+	    var doCollapse = false;
+	} else {
+	    var doCollapse = setCollapsed;
+	}
+
+        // Remove any old background containers.
+        for (var i = 0; i < this._borderContainer.children.length; i++) {
+            this._borderContainer.children[i].visible = false;
+            this._borderContainer.removeChild(this._borderContainer.children[i]);
+        }
+
+        var that = this;
+
+        function __makeBoundary() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._expandedBoundary !== null) {
+                    that._expandedBoundary.visible = false;
+                }
+
+                that._expandedBoundary = new createjs.Bitmap(img);
+                that._expandedBoundary.x = 0;
+                that._expandedBoundary.y = 55 + LEADING;
+                that._borderContainer.addChild(that._expandedBoundary);
+                __makeBoundary2();
+            };
+
+            var dx = that.w - 5;
+            var dy = that.h - 55 - LEADING;
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10 / SCALEFACTOR).replace('X', 10 / SCALEFACTOR).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20 / SCALEFACTOR))));
+        };
+
+        function __makeBoundary2() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._collapsedBoundary !== null) {
+                    that._collapsedBoundary.visible = false;
+                }
+
+                that._collapsedBoundary = new createjs.Bitmap(img);
+                that._collapsedBoundary.x = 0;
+                that._collapsedBoundary.y = 55 + LEADING;
+                that._borderContainer.addChild(that._collapsedBoundary);
+                that._collapsedBoundary.visible = false;
+
+                __makeExpandButton();
+            };
+
+            var dx = that.w - 20;
+            var dy = that.h - 55 - LEADING;
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
+        };
+
+        function __makeExpandButton() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._expandButton !== null) {
+                    that._expandButton.visible = false;
+                }
+
+                that._expandButton = new createjs.Bitmap(img);
+                that._expandButton.x = that.w - 10 - 4 * 55;
+                that._expandButton.y = 55 + LEADING;
+                that._expandButton.scaleX = SCALEFACTOR;
+                that._expandButton.scaleY = SCALEFACTOR;
+                that._expandButton.scale = SCALEFACTOR;
+                that._expandButton.visible = false;
+                that._borderContainer.addChild(that._expandButton);
+
+		that._expandButton.removeAllEventListeners('pressmove');
+                that._expandButton.on('pressmove', function (event) {
+                    var w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
+		    var x = event.stageX / that.scale - w;
+		    var y = event.stageY / that.scale - 16;
+                    that.stage.x = Math.max(0, Math.min(that.w * 3 / 4, x));
+                    that.stage.y = Math.max(55, Math.min(that.h * 3 / 4, y));
+                    that.refreshCanvas();
+                });
+
+		that._expandButton.removeAllEventListeners('click');
+                that._expandButton.on('click', function (event) {
+                    that.hideMenu();
+                    that.scaleStage(1.0);
+                    that._expandedBoundary.visible = true;
+                    that._collapseButton.visible = true;
+                    that._collapsedBoundary.visible = false;
+                    that._expandButton.visible = false;
+                    that.stage.x = 0;
+                    that.stage.y = 0;
+                    that.isShrunk = false;
+                    for (var i = 0; i < that.turtleList.length; i++) {
+                        that.turtleList[i].container.scaleX = 1;
+                        that.turtleList[i].container.scaleY = 1;
+                        that.turtleList[i].container.scale = 1;
+                    }
+
+                    that._clearButton.scaleX = 1;
+                    that._clearButton.scaleY = 1;
+                    that._clearButton.scale = 1;
+                    that._clearButton.x = that.w - 10 - 2 * 55;
+
+                    // remove the stage and add it back in position 0
+                    that.masterStage.removeChild(that.stage);
+                    that.masterStage.addChildAt(that.stage, 0);
+                });
+
+                __makeCollapseButton();
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(EXPANDBUTTON)));
+        };
+
+        function __makeCollapseButton() {
+            var img = new Image();
+            img.onload = function () {
+                if (that._collapseButton !== null) {
+                    that._collapseButton.visible = false;
+                }
+
+                that._collapseButton = new createjs.Bitmap(img);
+                that._borderContainer.addChild(that._collapseButton);
+                that._collapseButton.x = that.w - 55;
+                that._collapseButton.y = 55 + LEADING;
+
+		that._collapseButton.removeAllEventListeners('click');
+                that._collapseButton.on('click', function (event) {
+		    that.collapse();
+                });
+
+                __makeClearButton();
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(COLLAPSEBUTTON)))
+        };
+
+        function __makeClearButton() {
+	    that._clearButton = new createjs.Container();
+
+            /*
+	    that._clearButton.removeAllEventListeners('mouseover');
+	    that._clearButton.on('mouseover', function (event) {
+                for (var c = 0; c < that._clearButton.children.length; c++) {
+		    if (that._clearButton.children[c].text != undefined) {
+                        that._clearButton.children[c].visible = true;
+			if (that._clearButton.children.length === 2) {
+			    var b = that._clearButton.children[c].getBounds();
+			    var bg = new createjs.Shape();
+                            bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+			    that._clearButton.addChildAt(bg, 0);
+			    that._clearButton.children[0].visible = true;
+			    that.refreshCanvas();
+			}
+		    }
+		}
+	    });
+
+	    that._clearButton.removeAllEventListeners('mouseout');
+	    that._clearButton.on('mouseout', function (event) {
+                for (var c = 0; c < that._clearButton.children.length; c++) {
+		    if (that._clearButton.children[c].text != undefined) {
+                        that._clearButton.children[c].visible = false;
+                        that._clearButton.children[0].visible = false;
+                        that.refreshCanvas();
+                        break;
+		    }
+                }
+	    });
+            */
+
+	    that._clearButton.removeAllEventListeners('click');
+            that._clearButton.on('click', function (event) {
+		that.doClear();
+            });
+
+            /*
+	    var text = new createjs.Text(_('Clean'), '14px Sans', '#282828');
+            text.textAlign = 'center';
+            text.x = 0;
+	    text.y = 30;
+	    text.visible = false;
+            */
+
+            var img = new Image();
+            img.onload = function () {
+                var bitmap = new createjs.Bitmap(img);
+                that._clearButton.addChild(bitmap);
+		// that._clearButton.addChild(text);
+
+		bitmap.visible = true;
+                that._clearButton.x = that.w - 10 - 2 * 55;
+                that._clearButton.y = 55 + LEADING;
+                that._clearButton.visible = true;
+
+                that._borderContainer.addChild(that._clearButton);
+                that.refreshCanvas();
+
+                if (doCollapse) {
+		    that.collapse();
+		}
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(CLEARBUTTON)));
+        };
+
+        __makeBoundary();
         return this;
+    };
+
+    this.collapse = function () {
+        this.hideMenu();
+        this.scaleStage(0.25);
+        this._collapsedBoundary.visible = true;
+        this._expandButton.visible = true;
+        this._expandedBoundary.visible = false;
+        this._collapseButton.visible = false;
+        this.stage.x = (this.w * 3 / 4) - 10;
+        this.stage.y = 55 + LEADING;
+        this.isShrunk = true;
+        for (var i = 0; i < this.turtleList.length; i++) {
+            this.turtleList[i].container.scaleX = SCALEFACTOR;
+            this.turtleList[i].container.scaleY = SCALEFACTOR;
+            this.turtleList[i].container.scale = SCALEFACTOR;
+        }
+
+        this._clearButton.scaleX = SCALEFACTOR;
+        this._clearButton.scaleY = SCALEFACTOR;
+        this._clearButton.scale = SCALEFACTOR;
+        this._clearButton.x = this.w - 10 - 8 * 55;
+
+        // remove the stage and add it back at the top
+        this.masterStage.removeChild(this.stage);
+        this.masterStage.addChild(this.stage);
+
+	this.refreshCanvas();
     };
 
     this.setBlocks = function (blocks) {
@@ -1184,6 +1494,12 @@ function Turtles () {
     this.addTurtle = function (startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
+        if (this.isShrunk) {
+            var t = last(this.turtleList);
+            t.container.scaleX = SCALEFACTOR;
+            t.container.scaleY = SCALEFACTOR;
+            t.container.scale = SCALEFACTOR;
+        }
     };
 
     this.add = function (startBlock, infoDict) {

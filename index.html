@@ -7,6 +7,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
     <link rel="stylesheet" href="css/activity.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/keyboard.css">
 
     <noscript>
     Javascript is required to view this page.
@@ -70,22 +71,22 @@
     <script src="lib/tweenjs.min.js">
     </script>
 
+    <script src="js/widgets/musickeyboard.js">
+    </script>
+
     <!--
     <script src="lib/movieclip-0.7.1.min.js">
     </script>
     -->
 
     <script>
-      var canvas, stage, exportRoot;
+      var canvas, stage;
       function init() {
         canvas = document.getElementById("canvas");
-        // exportRoot = new lib.SugarAnimation();
         stage = new createjs.Stage(canvas);
-        // stage.addChild(exportRoot);
         stage.update();
-        // createjs.Ticker.setFPS(lib.properties.fps);
         createjs.Ticker.addEventListener("tick", stage);
-      }
+      };
     </script>
 
     <script>
@@ -104,7 +105,8 @@
 
   </head>
 
-  <body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
+  <!-- #96D3F3-->
+  <body onload="init();" data-title="index" id="body" style="background: #f9f9f9;">
     <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
       <img src='loading-animation.gif' style="max-width:90%; width: 1024px; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"/>
     </div>
@@ -157,7 +159,8 @@
       var isDragging = false;
     </script>
 
-    <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
+  <!-- #92B5C8  width = 3790 height = 1743-->
+    <canvas id="canvas" width="100%" height="100%" style="background-color:#FFFFFF; width:100%">
     </canvas>
 
     <!--hidden at the beginning whilst everything loads-->
@@ -254,6 +257,115 @@
         </div>
       </div>
 
+      <div id="mkbDiv" draggable="false">
+        <div id="mkbButtonsDiv">
+        </div>
+
+        <div id="mkbTableDiv">
+
+          <div id="keyboardHolder" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:155px; width: 100%; background-color: white;">
+              <!--style="display: none;   is used if we do not want show that element -->
+              <select id="firstNote" class="keySelect" style="display: none; onchange="changeKeys()">
+                  <option value="C" selected>C</option>      
+                  <!--selectors were defined in previous code as options for drop down. We are not using dropdown to select starting key. If we remove selectors, then we have to make drastic changes in JS code. So I have not removed selectors. Since we want keyboard to start from C4 hence C is selected. -->
+                  <option value="D">D</option>               
+                  <option value="E">E</option>
+                  <option value="F">F</option>
+                  <option value="G">G</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+              </select>
+              <input type="number" style="display: none; min="0" max="7" step="1" id="firstOctave" onchange="changeKeys()" value="4"/>  <!--C4 -->
+              <select id="secondNote" class="keySelect" style="display: none; onchange="changeKeys()">
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="E">E</option>
+                  <option value="F">F</option>
+                  <option value="G" selected>G</option>          <!--because last key is G5 -->
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+              </select>
+              <input type="number" style="display: none; min="2" max="8" step="1" id="secondOctave" onchange="changeKeys()" value="5"/>   <!--G5 -->
+              <input type="button" style="display: none; value="Deselect all notes" onclick="deselect();" />
+              <input type="button" style="display: none; value="Generate Pitch Blocks!" onclick="handleKeyboardPitches(selected); deselect();" /><br>
+              <!--Actual Keyboard-->
+              <div id="keyboard">
+                  
+                  <table class="white">
+                      <tr id="white">
+                           
+                      </tr>
+                  </table>
+                  <table class="black">
+                      <tr id="black">
+                              
+                      </tr>
+                  </table>
+              </div>
+          </div>
+
+
+          <div id="keyboardHolder2" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:145px; width: 74%; background-color: white;">
+
+
+            <!-- <table>
+              <tr id="myrow">
+                <td id="1">Hello</td>
+              </tr>
+                <tr>
+                <td id="1">Hello</td>
+              </tr>
+                <tr>
+                <td id="1">Hello</td>
+              </tr>
+            </table> -->
+
+
+              <table class="white">
+                  <tbody>
+                    <tr id="myrow">
+                 <!--     <td id="C4">C4</td>
+                      <td id="D4">D4</td>
+                      <td id="E4">E4</td>
+                      <td id="F4">F4</td>
+                      <td id="G4">G4</td> 
+                      <td id="A4">A4</td>
+                      <td id="B4">B4</td>
+                      <td id="C5">C5</td>
+                      <td id="D5">D5</td> -->
+                    </tr>
+                  </tbody>
+                </table>
+
+
+                <table class="black">
+                  <tbody>
+                    <tr id="myrow2">
+                    </tr>
+                  </tbody>
+                </table>
+                    
+              <div id="keyboard2">
+                  <table class="white">
+                      <tbody><tr id="white">
+                           
+                          </tr>
+                      </tbody>
+                  </table>
+                  <table class="black">
+                      <tbody><tr id="black">
+                              
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+
+
+        </div>
+      </div>
+
+
       <div id="pscDiv" draggable="false">
         <div id="pscButtonsDiv">
         </div>
@@ -279,6 +391,14 @@
         <div id="helpButtonsDiv">
         </div>
         <div id="helpBodyDiv">
+	</div>
+      </div>
+
+      <div id="temperamentDiv" draggable="false">
+        <div id="temperamentButtonsDiv">
+        </div>
+
+        <div id="temperamentTableDiv">
         </div>
       </div>
 
@@ -322,10 +442,13 @@
       <div id="wheelDiv" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)">
       </div>
 
-      <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)">
+      <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden">
       </div>
 
       <div id="contextWheelDiv" class="wheelNav">
+      </div>
+
+      <div id="submenuWheelDiv" class="wheelNav">
       </div>
 
       <div id="searchBar">
@@ -334,7 +457,7 @@
       </div>
 
       <div id="pastecode">
-	<input type="text" name="paste" id="paste" class="ui-autocomplete" placeholder="Paste Music Blocks code here">
+	<input type="text" name="paste" id="paste" class="ui-autocomplete" placeholder="Paste Music Blocks code here" style="visibility: false">
 	<ul class="matches"></ul>
 	<input onkeypress="doPaste()" type="submit" value="">
       </div>

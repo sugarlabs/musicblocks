@@ -280,6 +280,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var customNoteBlock = new ProtoBlock('customNote');
+    customNoteBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['customNote'] = customNoteBlock;
+    customNoteBlock.valueBlock();
+
     // Transposition blocks
     // macro
     var newblock = new ProtoBlock('invert1');
@@ -371,6 +376,15 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     if (beginnerMode && !beginnerBlock('octave')) {
         newblock.hidden = true;
     }
+
+    var customPitchBlock = new ProtoBlock('custompitch');
+    customPitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['custompitch'] = customPitchBlock;
+    //.TRANS: unison means the note is the same as the current note
+    customPitchBlock.staticLabels.push(_('custom pitch'));
+    customPitchBlock.adjustWidthToLabel();
+    customPitchBlock.zeroArgBlock();
+    customPitchBlock.hidden = true;
 
     // macro
     var newblock = new ProtoBlock('downsixth');
@@ -890,6 +904,18 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('temperament');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['temperament'] = newblock;
+    newblock.staticLabels.push(_('temperament'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampOneArgBlock();
+    if (beginnerMode && !beginnerBlock('temperament')) {
+        newblock.hidden = true;
+    }
+
     // macro
     var newblock = new ProtoBlock('timbre');
     newblock.palette = palettes.dict['widgets'];
@@ -960,6 +986,18 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
+    var newblock = new ProtoBlock('musickeyboard');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['musickeyboard'] = newblock;
+    //.TRANS: widget to generate pitches using a slider
+    newblock.staticLabels.push(_('music keyboard'));
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('musickeyboard')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('pitchstaircase');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['pitchstaircase'] = newblock;
@@ -1057,17 +1095,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('mynotevalue')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('duplicatefactor');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['duplicatefactor'] = newblock;
-    //.TRANS: factor used in determining how many duplications to make
-    newblock.staticLabels.push(_('duplicate factor'));
-    newblock.adjustWidthToLabel();
-    newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('duplicatefactor')) {
         newblock.hidden = true;
     }
 
@@ -1306,6 +1333,15 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     if (beginnerMode && !beginnerBlock('newnote')) {
         newblock.hidden = true;
     }
+
+    // macro
+    var defineFrequencyBlock = new ProtoBlock('definefrequency');
+    defineFrequencyBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['definefrequency'] = defineFrequencyBlock;
+    defineFrequencyBlock.staticLabels.push(_('define frequency'));
+    defineFrequencyBlock.adjustWidthToLabel();
+    defineFrequencyBlock.flowClampOneArgBlock();
+    defineFrequencyBlock.hidden = true;
 
     // METER PALETTE
 
@@ -1858,14 +1894,24 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('settemperament');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['settemperament'] = newblock;
     newblock.staticLabels.push(_('set temperament'));
+    newblock.staticLabels.push(_('temperament'));
+    newblock.staticLabels.push(_('reference pitch'), _('octave'));
     newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
+    newblock.threeArgBlock();
     if (beginnerMode && !beginnerBlock('settemperament')) {
         newblock.hidden = true;
     }
+
+    var newblock = new ProtoBlock('octavespace');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['octavespace'] = newblock;
+    newblock.staticLabels.push(_('octave space'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.hidden = true; 
 
     var newblock = new ProtoBlock('temperamentname');
     newblock.palette = palettes.dict['tone'];
@@ -1873,8 +1919,20 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.hidden = true; 
     newblock.extraWidth = 50;
-    newblock.dockTypes[0] = 'anyout';   
+    newblock.dockTypes[0] = 'anyout';
     if (beginnerMode && !beginnerBlock('temperamentname')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('temperament1');
+    newblock.palette = palettes.dict['action'];
+    blocks.protoBlockDict['temperament1'] = newblock;
+    newblock.staticLabels.push(_('define temperamentX'));
+    newblock.hidden = true; 
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.stackClampOneArgBlock();   
+    if (beginnerMode && !beginnerBlock('temperament1')) {
         newblock.hidden = true;
     }
 
@@ -2440,6 +2498,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['interval'] = newblock;
     //.TRANS: calculate a relative step between notes based on the current musical scale
     newblock.staticLabels.push(_('scalar interval') + ' (+/–)');
+    newblock.labelOffset = 15;
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(5);
@@ -3593,11 +3653,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('box');
-    if (beginnerMode && !beginnerBlock('box')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['boxes'];
-    }
+    newblock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['box'] = newblock;
     //.TRANS: a container into which to put something
     newblock.staticLabels.push(_('box'));
@@ -3609,41 +3665,36 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // Show the value in the box as if it were a parameter.
     newblock.parameter = true;
     newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('box')) {
+        newblock.hidden = true;
+    }
 
     var newblock = new ProtoBlock('namedbox');
-    if (beginnerMode && !beginnerBlock('namedbox')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['boxes'];
-    }
+    newblock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['namedbox'] = newblock;
     newblock.staticLabels.push(_('box'));
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     newblock.dockTypes[0] = 'anyout';
-
-    var newblock = new ProtoBlock('storein2');
-    if (beginnerMode && !beginnerBlock('storein2')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['boxes'];
+    if (beginnerMode && !beginnerBlock('namedbox')) {
+        newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('storein2');
+    newblock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['storein2'] = newblock;
     newblock.staticLabels.push(_('store in box'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(4);
     newblock.dockTypes[1] = 'anyin';
-
-    var newblock = new ProtoBlock('storein');
-    if (beginnerMode && !beginnerBlock('storein')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['boxes'];
+    if (beginnerMode && !beginnerBlock('storein2')) {
+        newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('storein');
+    newblock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['storein'] = newblock;
     //.TRANS: put something into a container for later reference
     newblock.staticLabels.push(_('store in'));
@@ -3654,6 +3705,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(4);
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
+    if (beginnerMode && !beginnerBlock('storein')) {
+        newblock.hidden = true;
+    }
 
     // macro
     var newblock = new ProtoBlock('box2');
@@ -3710,12 +3764,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // ACTIONS PALETTE
 
     var newblock = new ProtoBlock('do');
-    if (beginnerMode && !beginnerBlock('do')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['do'] = newblock;
     newblock.staticLabels.push(_('do'));
     newblock.adjustWidthToLabel();
@@ -3728,12 +3777,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('return');
-    if (beginnerMode && !beginnerBlock('return')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['return'] = newblock;
     //.TRANS: return value from a function
     newblock.staticLabels.push(_('return'));
@@ -3747,12 +3791,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('returnToUrl');
-    if (beginnerMode && !beginnerBlock('returnToURL')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['returnToUrl'] = newblock;
     //.TRANS: return value from a function to a URL
     newblock.staticLabels.push(_('return to URL'));
@@ -3766,12 +3805,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('calc');
-    if (beginnerMode && !beginnerBlock('calc')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['calc'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3784,12 +3818,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedcalc');
-    if (beginnerMode && !beginnerBlock('namedcalc')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedcalc'] = newblock;
     newblock.staticLabels.push(_('action'));
     newblock.extraWidth = 10;
@@ -3800,12 +3829,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('nameddoArg');
-    if (beginnerMode && !beginnerBlock('nameddoArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['nameddoArg'] = newblock;
     //.TRANS: take (do) some action
     newblock.staticLabels.push(_('do'));
@@ -3817,12 +3841,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedcalcArg');
-    if (beginnerMode && !beginnerBlock('namedcalcArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedcalcArg'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3834,12 +3853,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('doArg');
-    if (beginnerMode && !beginnerBlock('doArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['doArg'] = newblock;
     newblock.staticLabels.push(_('do'));
     newblock.adjustWidthToLabel();
@@ -3852,12 +3866,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('calcArg');
-    if (beginnerMode && !beginnerBlock('calcArg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['calcArg'] = newblock;
     newblock.staticLabels.push(_('calculate'));
     newblock.adjustWidthToLabel();
@@ -3871,12 +3880,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('arg');
-    if (beginnerMode && !beginnerBlock('arg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['arg'] = newblock;
     newblock.staticLabels.push('arg');
     newblock.adjustWidthToLabel();
@@ -3889,12 +3893,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('namedarg');
-    if (beginnerMode && !beginnerBlock('namedarg')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedarg'] = newblock;
     newblock.staticLabels.push('arg ' + 1);
     newblock.adjustWidthToLabel();
@@ -3904,12 +3903,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('listen');
-    if (beginnerMode && !beginnerBlock('box')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['listen'] = newblock;
     //.TRANS: an event, such as user actions (mouse clicks, key presses)
     newblock.staticLabels.push(_('on'));
@@ -3926,12 +3920,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('dispatch');
-    if (beginnerMode && !beginnerBlock('box')) {
-        newblock.palette = palettes.dict['extras'];
-    } else {
-        newblock.palette = palettes.dict['action'];
-    }
-
+    newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['dispatch'] = newblock;
     //.TRANS: dispatch an event to trigger a listener
     newblock.staticLabels.push(_('broadcast'));
@@ -4376,6 +4365,15 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // FLOW PALETTE
+
+    var newblock = new ProtoBlock('duplicatefactor');
+    newblock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['duplicatefactor'] = newblock;
+    //.TRANS: factor used in determining how many duplications to make
+    newblock.staticLabels.push(_('duplicate factor'));
+    newblock.adjustWidthToLabel();
+    newblock.parameterBlock();
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('hiddennoflow');
     newblock.palette = palettes.dict['flow'];
@@ -4822,7 +4820,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('print');
-    newblock.palette = palettes.dict['extras'];
+    if (beginnerMode) {
+        newblock.palette = palettes.dict['media'];
+    } else {
+        newblock.palette = palettes.dict['extras'];
+    }
     blocks.protoBlockDict['print'] = newblock;
     newblock.staticLabels.push(_('print'));
     newblock.adjustWidthToLabel();

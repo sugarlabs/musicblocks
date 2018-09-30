@@ -89,8 +89,10 @@ const TACAT = {
     'timbre': 'ignore',
     'modewidget': 'ignore',
     'tempo': 'ignore',
+    'temperament': 'ignore',
     'pitchdrummatrix': 'ignore',
     'pitchslider': 'ignore',
+    'musickeyboard': 'ignore',
     'pitchstaircase': 'ignore',
     'rhythmruler2': 'ignore',
     'matrix': 'ignore',
@@ -154,7 +156,7 @@ const TACAT = {
     'synthname': 'tone',
     'voicename': 'tone',
     'settimbre': 'tone',
-
+    'settemperament': 'tone',
     // interval palette
 
     'modename': 'ignore',
@@ -494,10 +496,10 @@ function analyzeProject(blocks) {
         case 'flat':
         case 'fill':
         case 'hollowline':
-	case 'start':
+    case 'start':
             if (blocks.blockList[blk].connections[1] == null) {
-		continue;
-	    }
+        continue;
+        }
             break;
         case 'note':
         case 'multiplybeatfactor':
@@ -517,25 +519,25 @@ function analyzeProject(blocks) {
         case 'phaser':
         case 'action':
             if (blocks.blockList[blk].connections[2] == null) {
-		continue;
-	    }
-	    break;
+        continue;
+        }
+        break;
         case 'tuplet2':
             if (blocks.blockList[blk].connections[3] == null) {
-		continue;
-	    }
-	    break;
+        continue;
+        }
+        break;
          case 'invert':
             if (blocks.blockList[blk].connections[4] == null) {
         continue;
         }
         break;
-	default:
+    default:
             if (blocks.blockList[blk].connections[0] == null && last(blocks.blockList[blk].connections) == null) {
-		continue;
-	    }
-	    break;
-	}
+        continue;
+        }
+        break;
+    }
         blockList.push(blocks.blockList[blk].name);
     }
 
