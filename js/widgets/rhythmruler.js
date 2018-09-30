@@ -174,7 +174,7 @@ function RhythmRuler () {
             this.__dissectByNumber(cell, inputNum, true);
         }
 
-        this._piemenuRuler(this._rulerSelected);
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__startTapping = function (noteValues, interval) {
@@ -460,7 +460,7 @@ function RhythmRuler () {
             divisionHistory.push(cell.cellIndex);
         }
 
-        this._piemenuRuler(this._rulerSelected);
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__divideFromList = function (cell, newNoteValues, addToUndoList) {
@@ -510,7 +510,7 @@ function RhythmRuler () {
             this._calculateZebraStripes(this._rulerSelected);
         }
 
-        this._piemenuRuler(this._rulerSelected);
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__dissectByNumber = function (cell, inputNum, addToUndoList) {
@@ -572,7 +572,7 @@ function RhythmRuler () {
             this._calculateZebraStripes(this._rulerSelected);
         }
 
-        this._piemenuRuler(this._rulerSelected);
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this._tieRuler = function (event) {
@@ -592,7 +592,7 @@ function RhythmRuler () {
             this.__tie(true);
         }
 
-        this._piemenuRuler(this._rulerSelected);
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__tie = function (addToUndoList) {
@@ -801,7 +801,7 @@ function RhythmRuler () {
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
 
-        this._piemenuRuler(this._rulerSelected);
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this._tap = function () {
@@ -818,7 +818,7 @@ function RhythmRuler () {
             }
         }
 
-        this._piemenuRuler(this._rulerSelected);
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__pause = function () {
@@ -1435,7 +1435,7 @@ function RhythmRuler () {
         var numberInput = docById('dissectNumber');
 
         numberInput.onfocus = function (event) {
-            that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
+            // that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
         };
 
         numberInput.onkeydown = function (event) {
@@ -1478,8 +1478,8 @@ function RhythmRuler () {
 
         cell.onclick = function () {
             // If the piemenu was open, close it.
-            docById('wheelDiv').style.display = 'none';
-            docById('contextWheelDiv').style.display = 'none';
+            // docById('wheelDiv').style.display = 'none';
+            // docById('contextWheelDiv').style.display = 'none';
 
             // Save the new dissect history.
             var dissectHistory = [];
@@ -1557,7 +1557,7 @@ function RhythmRuler () {
                 rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
 
-                that._positionWheel();
+                // that._positionWheel();
             }
         };
 
@@ -1574,7 +1574,7 @@ function RhythmRuler () {
                 rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
 
-                that._positionWheel();
+                // that._positionWheel();
             }
         };
 
@@ -1591,18 +1591,22 @@ function RhythmRuler () {
             }
         };
 
-        var expandCell = this._addButton(row, 'collapse-blocks-button.svg', iconSize, _('expand/collapse'), '');
+        var expandCell = this._addButton(row, 'expand-button.svg', iconSize, _('expand'), '');
         
         expandCell.onclick = function () {
             var rulerDiv = docById('rulerDiv');
 
             if (that._expanded) {
-                rulerDiv.style.width = OUTERWINDOWWIDTH + 'px';
-                rulerDiv.style.height = 100 + 85 * that.Rulers.length + 'px';
+                rulerDiv.style.width = that._initial_w;
+                rulerDiv.style.height = that._initial_h;
+		this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+
                 that._expanded = false;
             } else {
                 rulerDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
                 rulerDiv.style.height = Math.max(100 + 85 * that.Rulers.length, Math.min(900, window.innerHeight)) + 'px';
+
+		this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that._expanded = true;
             }
         };
@@ -1784,7 +1788,10 @@ function RhythmRuler () {
         }
 
         this._logo.textMsg(_('Click on the ruler to divide it.'));
-        this._piemenuRuler(this._rulerSelected);
+
+	this._initial_w = rulerDiv.style.width;
+	this._initial_h = rulerDiv.style.height;
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this._addButton = function(row, icon, iconSize, label, extras) {
