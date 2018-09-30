@@ -16,9 +16,9 @@ const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
 
 function PitchTimeMatrix () {
-    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    const OUTERWINDOWWIDTH = 728;  // 675;
-    const INNERWINDOWWIDTH = 600;
+    const BUTTONDIVWIDTH = 535;  // 8 buttons 535 = (55 + 4) * 9
+    const OUTERWINDOWWIDTH = 758; // 728;
+    const INNERWINDOWWIDTH = 630; // 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
@@ -140,6 +140,7 @@ function PitchTimeMatrix () {
         this._logo = logo;
 
         this.playingNow = false;
+        this._expanded = false;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -283,6 +284,26 @@ function PitchTimeMatrix () {
                 e.dataTransfer.setData('text/plain', '');
             } else {
                 e.preventDefault();
+            }
+        };
+
+        var expandCell = this._addButton(row, 'expand-button.svg', iconSize, _('expand'), '');
+        
+        expandCell.onclick = function () {
+            var ptmDiv = docById('ptmDiv');
+
+            if (that._expanded) {
+                ptmDiv.style.width = that._initial_w;
+                ptmDiv.style.height = that._initial_h;
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+
+                that._expanded = false;
+            } else {
+                ptmDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
+                ptmDiv.style.height = Math.max(400, Math.min(900, window.innerHeight)) + 'px';
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                that._expanded = true;
             }
         };
 
@@ -446,6 +467,9 @@ function PitchTimeMatrix () {
         }
 
         this._logo.textMsg(_('Click on the table to add notes.'));
+
+        this._initial_w = ptmDiv.style.width;
+        this._initial_h = ptmDiv.style.height;
     };
 
     this._addButton = function(row, icon, iconSize, label) {

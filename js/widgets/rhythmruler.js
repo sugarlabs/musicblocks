@@ -1599,14 +1599,14 @@ function RhythmRuler () {
             if (that._expanded) {
                 rulerDiv.style.width = that._initial_w;
                 rulerDiv.style.height = that._initial_h;
-		this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
 
                 that._expanded = false;
             } else {
                 rulerDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
                 rulerDiv.style.height = Math.max(100 + 85 * that.Rulers.length, Math.min(900, window.innerHeight)) + 'px';
 
-		this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that._expanded = true;
             }
         };
@@ -1789,8 +1789,8 @@ function RhythmRuler () {
 
         this._logo.textMsg(_('Click on the ruler to divide it.'));
 
-	this._initial_w = rulerDiv.style.width;
-	this._initial_h = rulerDiv.style.height;
+        this._initial_w = rulerDiv.style.width;
+        this._initial_h = rulerDiv.style.height;
         // this._piemenuRuler(this._rulerSelected);
     };
 
