@@ -40,24 +40,10 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     try {
         // console.log(localStorage.beginnerMode);
 
-<<<<<<< HEAD
-	if (localStorageShim.beginnerMode !== null) {
-            // console.log('setting mode from local storage');
-	    // console.log(localStorage.beginnerMode);
-            beginnerMode = localStorageShim.beginnerMode;
-	    if (typeof(beginnerMode) === 'string') {
-		if (beginnerMode === 'false') {
-		    beginnerMode = false;
-		} else {
-		    beginnerMode = truee;
-		}
-	    }
-	} else {
-=======
-        if (localStorage.beginnerMode !== null) {
+        if (localStorageShim.beginnerMode !== null) {
             // console.log('setting mode from local storage');
             // console.log(localStorage.beginnerMode);
-            beginnerMode = localStorage.beginnerMode;
+            beginnerMode = localStorageShim.beginnerMode;
             if (typeof(beginnerMode) === 'string') {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
@@ -66,7 +52,6 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
                 }
             }
         } else {
->>>>>>> master
             beginnerMode = true;
         }
     } catch (e) {

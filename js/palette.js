@@ -344,7 +344,7 @@ function Palettes () {
             that.dict[name]._updateMenu(false);
 
             // Add tooltip for palette buttons
-            if (localStorage.kanaPreference === 'kana') {
+            if (localStorageShim.kanaPreference === 'kana') {
                 that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Sans', platformColor.paletteText);
             } else {
                 that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Sans', platformColor.paletteText);
