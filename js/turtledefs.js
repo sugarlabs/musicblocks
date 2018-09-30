@@ -48,11 +48,11 @@ function beginnerBlock(name) {
             'meter', 'setmasterbpm2', 'everybeatdo', 'beatvalue',  // meter palette
             'pitch', 'pitch2', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
             'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', // interval palette
-            'settimbre', 'newstaccato', 'newslur', 'vibrato', 'neighbor2', 'chorus', 'dis', 'phaser', 'tremelo', // tone palette
+            'settimbre', 'newstaccato', 'newslur', 'vibrato', 'neighbor2', 'chorus', 'dis', 'phaser', 'tremolo', // tone palette
             'crescendo', 'decrescendo', 'setsynthvolume',  // volume palette
             'playdrum', 'setdrum', // drum palette
             'if', 'ifthenelse', 'repeat', 'forever', 'backward', 'duplicatenotes',  // flow palette
-            'action', 'start',  // action palette
+            'action', 'start', 'do', 'dispatch', 'listen',  // action palette
             'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne',  // boxes palette
             'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet',  // widgets palette
             'forward', 'back', 'left', 'right', 'setxy', 'arc', 'x', 'y', 'heading', 'scrollxy',  // mouse palette
@@ -63,7 +63,7 @@ function beginnerBlock(name) {
             'mousebutton', 'mousex', 'mousey', 'time', 'myclick', // sensor palette
             'push', 'pop', 'setHeapEntry', 'indexHeap', 'reverseHeap', 'emptyHeap', 'heapEmpty', 'heapLength', 'showHeap',  // heap palette
             'setturtlename2', 'turtlename', 'turtlesync',  // mice palette
-            'print', 'hspace', 'vspace', 'do', 'dispatch', 'listen',  // extras palette
+            'print', 'hspace', 'vspace',  // extras palette
            ].indexOf(name) !== -1
 };
 
@@ -189,43 +189,135 @@ function createHelpContent() {
     }
 
     BLOCKHELP = {
+	// Rhythm palette
 	'newnote': [_('The <em>Note</em> block is a container for one or more <em>Pitch</em> blocks. The <em>Note</em> block specifies the duration (note value) of its contents.'), 'documentation', 'notevalue.svg'],
 	'playdrum': [_('You can use multiple <em>Drum</em> blocks within a <em>Note</em> block.'), 'documentation', 'playdrum.svg'],
 	'rest2': [_('A rest of the specified note value duration can be constructed using a <em>Silence</em> block.'), 'documentation', 'silence.svg'],
 	'mynotevalue': [_('The <em>Note value</em> block is the value of the duration of the note currently being played.'), 'documentation', 'mynotevalue.svg'],
+	// Meter palette
 	'meter': [_('The beat of the music is determined by the <em>Meter</em> block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter.svg'],
 	'setmasterbpm2': [_('The <em>Beats per minute</em> block sets the number of 1/4 notes per minute.'), 'documentation', 'setmasterbpm.svg'],
 	'everybeatdo': [_('The <em>On-every-beat</em> block let you specify actions to take on every beat.'), 'documentation', 'beatcount.svg'],
+	'beatvalue': [_('The <em>Beat count</em> block is the number of the current beat, e.g., 1, 2, 3, or 4.\n In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'beatcount.svg'],
+	// Pitch palette
+        'pitch': [_('The <em>Pitch</em> block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', 'pitch.svg'],
+	'solfege': [_('Pitch can be specified in terms of <em>do re mi fa sol la ti<em>.'), 'documentation', 'pitch.svg'],
+	'notename': [_('Pitch can be specified in terms of <em>C D E F G A B</em>.'), 'documentation', 'notename.svg'],
+	'steppitch': [_('The <em>Scaler Step</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Scalar Step 1</em> will play <em>la</em>.'), 'documentation', 'scalarstep.svg'],
+	'hertz': [_('The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency.'), 'documentation', 'hertz.svg'],
+	'setscalartransposition': [_('The <em>Scalar transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) the scale. In the example shown above, <em>sol</em> is shifted up to <em>la</em>.'), 'documentation', 'setscalartransposition.svg'],
+	'pitchinhertz': [_('The <em>Pitch in Hertz</em> block is the value in Hertz of the pitch of the note currently being played.'), 'documentation', ''],
+	'mypitch': [_('The <em>Pitch number</em> block is the value of the pitch of the note currently being played.'), 'documentation', 'mypitch.svg'],
+        // Intervals palette
+        'setkey2': [_('The <em>Set key</em> block is used to set the key and mode, e.g., <em>C Major</em>'), 'documentation', 'setkey2.svg'],
+	'modelength': [_('The <em>Mode length</em> block is the number of notes in the current scale. Most <em>Western</em> scales have 7 notes.'), 'documentation', 'modelength.svg'],
+	'interval': [_('The <em>Scalar interval</em> block calculates a relative interval based on the current mode, skipping all notes outside of the mode. In the figure, we add <em>la</em> to <em>sol</em>.'), 'documentation', 'interval.svg'],
+	// Tone palette
+        'settimbre': [_('The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello.'), 'documentation', 'settimbre.svg'],
+	'newstaccato': [_('The <em>Staccato</em> block shortens the length of the actual note—making them tighter bursts—while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato.svg'],
+	'newslur': [_('The <em>Slur</em> block lengthens the sustain of notes—running longer than the noted duration and blending it into the next note—while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur.svg'],
+	'vibrato': [_('The <em>Vibrato</em> block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato.svg'],
+	'chorus': [_('The <em>Chorus</em> block adds a chorus effect.'), 'documentation', 'chorus.svg'],
+	'phaser': [_('The <em>Phaser</em> block adds a sweeping sound.'), 'documentation', 'phaser.svg'],
+	'dis': [_('The <em>Distortion</em> block adds distortion to the pitch.'), 'documentation', 'distortion.svg'],
+	'neighbor2': [_('The <em>Neighbor</em> block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor.svg'],
+	'tremolo': [_('The <em>Tremolo</em> block adds a wavering effect.'), 'documentation', 'tremolo.svg'],
+	// Volume palette
+        'crescendo': [_('The <em>Crescendo</em> block will increase the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo.svg'],
+        'decrescendo': [_('The <em>Decrescendo</em> block will decrease the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Decrescendo</em> block with a value of 5, the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo.svg'],
+	'setsynthvolume': [_('The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume).'), 'documentation', 'setsynthvolume.svg'],
+	// Drum palette
+	// 'playdrum' is described on the Rhythm palette.
+	'setdrum': [_('The <em>Set drum</em> block will select a drum sound to replace the pitch of any contained notes. In the example above, a <em>kick drum</em> sound will be played instead of <em>sol</em>.'), 'documentation', 'setdrum.svg'],
+	// Widgets palette
+	'status': [_('The <em>Status</em> block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', 'status.svg'],
+	'matrix': [_('The <em>Pitch-time Matrix</em> block opens a tool to create musical phrases.'), 'documentation', 'status.svg'],
+	'rhythmruler2': [_('The <em>Rhythm Ruler</em> block opens a tool to create drum machines.'), 'documentation', 'status.svg'],
+	'pitchslider': [_('The <em>Pitch-slider<em> block opens a tool to generate arbitray pitches.'), 'documentation', 'status.svg'],
+	'rhythm2': [_('The <em>Rhythm</em> block is used to generate rhythm patterns.'), 'documentation', 'status.svg'],
+	'stuplet': [_('<em>Tuplets</em> are a collection of notes that get scaled to a specific duration. Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', 'status.svg'],
+	// Flow palette
+	'repeat': [_('The <em>Repeat</em> block will repeat the contained blocks. In this example, the note will be played 4 times.'), 'documentation', 'repeat.svg'],
+	'forever': [_('The <em>Forever</em> block will repeat the contained blocks forever. In this example, a simple drum machine, a kick drum will play 1/4 notes forever.'), 'documentation', 'forever.svg'],
+        'if':  [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional.svg'],
+	'ifthenelse': [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional.svg'],
+	'duplicatenotes': [_('The <em>Duplicate</em> block will run each block multiple times. The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.'), 'documentation', 'status.svg'],
+	'backward': [_('The <em>Backward</em> block runs code in reverse order (Musical retrograde).'), 'documentation', 'status.svg'],
+	// Action palette
+	'action': [_('The <em>Action</em> block is used to group together blocks so that they can be used more than once. It is often used for storing a phrase of music that is repeated.'), 'documentation', 'status.svg'],
+	'start': [_('Each <em>Start</em> block is a separate voice. All of the <em>Start</em> blocks run at the same time when the <em>Play</em> button is pressed.'), 'documentation', 'status.svg'],
+	'listen': [_('The <em>Listen</em> block is used to listen for an event such as a mouse click. When the event happens, an <em>action</em> is taken.'), 'documentation', 'status.svg'],
+	'dispatch': [_('The <em>Dispatch</em> block is used to trigger an event.'), 'documentation', 'status.svg'],
+	'do': [_('The <em>Do</em> block is used to initiate an action. In the example, it is used with the <em>One of</em> block to choose a random phase.'), 'documentation', 'status.svg'],
+	// Boxes palette
+        'storebox1': [_('The <em>Store in Box 1</em> block is used to store a value in <em>Box 1</em>.'), 'documentation', 'status.svg'],
+	'box1': [_('The <em>Box 1</em> returns the value stored on <em>Box 1</em>.'), 'documentation', 'status.svg'],
+        'storebox2': [_('The <em>Store in Box 2</em> block is used to store a value in <em>Box 2</em>.'), 'documentation', 'status.svg'],
+	'box2': [_('The <em>Box 2</em> returns the value stored on <em>Box 2</em>.'), 'documentation', 'status.svg'],
+	'increment': [_('The <em>Add-to</em> block is used to add to the value stored in a box. It can also be used with other blocks, such as <em>Color</em>, <em>Pen-size</em>. etc.'), 'documentation', 'status.svg'],
+	'incrementOne': [_('The <em>Add-1-to<em> block adds one to the value stored in a box.'), 'documentation', 'status.svg'],
+	// Number palette
+        'number': [_('The <em>Number</em> block holds a number.'), 'documentation', 'status.svg'],
+	'random': [_('The <em>Random</em> block returns a random number.'), 'documentation', 'status.svg'],
+	'oneof': [_('The <em>One-of</em> block returns one of two choices.'), 'documentation', 'status.svg'],
+	'plus': [_('The <em>Plus</em> block is used to add.'), 'documentation', 'status.svg'],
+	'minus': [_('The <em>Minus</em> block is used to subtract.'), 'documentation', 'status.svg'],
+	'multiply': [_('The <em>Multiply</em> block is used to multiply.'), 'documentation', 'status.svg'],
+	'divide': [_('The <em>Divide</em> block is used to divide.'), 'documentation', 'status.svg'],
+	// Boolean palette
+	'greater': [_(''), 'documentation', 'status.svg'],
+	'less': [_(''), 'documentation', 'status.svg'],
+	'equal': [_(''), 'documentation', 'status.svg'],
+	// Mouse palette
+	'forward': [_(''), 'documentation', 'status.svg'],
+	'back': [_(''), 'documentation', 'status.svg'],
+	'left': [_(''), 'documentation', 'status.svg'],
+	'right': [_(''), 'documentation', 'status.svg'],
+	'arc': [_(''), 'documentation', 'status.svg'],
+	'setxy': [_(''), 'documentation', 'status.svg'],
+	'scrollxy': [_(''), 'documentation', 'status.svg'],
+	'x': [_(''), 'documentation', 'status.svg'],
+	'y': [_(''), 'documentation', 'status.svg'],
+	'heading': [_(''), 'documentation', 'status.svg'],
+	// Pen palette
+	'setpensize': [_(''), 'documentation', 'status.svg'],
+	'penup': [_(''), 'documentation', 'status.svg'],
+	'pendown': [_(''), 'documentation', 'status.svg'],
+	'color': [_(''), 'documentation', 'status.svg'],
+	'setcolor': [_(''), 'documentation', 'status.svg'],
+	// Media palette
+	'print': [_(''), 'documentation', 'status.svg'],
+	'text': [_(''), 'documentation', 'status.svg'],
+	'media': [_(''), 'documentation', 'status.svg'],
+	'show': [_(''), 'documentation', 'status.svg'],
+	'turtleshell': [_(''), 'documentation', 'status.svg'],
+	'speak': [_(''), 'documentation', 'status.svg'],
+	'height': [_(''), 'documentation', 'status.svg'],
+	'width': [_(''), 'documentation', 'status.svg'],
+	'toppos': [_(''), 'documentation', 'status.svg'],
+	'bottompos': [_(''), 'documentation', 'status.svg'],
+	'leftpos': [_(''), 'documentation', 'status.svg'],
+	'rightpos': [_(''), 'documentation', 'status.svg'],
+	// Sensors palette
+	'mousebutton': [_(''), 'documentation', 'status.svg'],
+	'mousex': [_(''), 'documentation', 'status.svg'],
+	'mousey': [_(''), 'documentation', 'status.svg'],
+	'time': [_(''), 'documentation', 'status.svg'],
+	'click': [_(''), 'documentation', 'status.svg'],
+	// Mice palette
+	'setturtlename2': [_(''), 'documentation', 'status.svg'],
+	'turtlename': [_(''), 'documentation', 'status.svg'],
+	'turtlesync': [_(''), 'documentation', 'status.svg'],
+	// Advanced blocks
 	'onbeatdo': [_('The <em>On-strong-beat</em> block let you specify actions to take on specified beats.'), 'documentation', 'onstrongbeatdo.svg'],
 	'offbeatdo': [_('The <em>On-weak-beat</em> block let you specify actions to take on weak (off) beats.'), 'documentation', 'onweakbeatdo.svg'],
 	'no-clock': [_('The <em>No clock</em> block decouples the notes from the master clock.'), 'documentation', 'no-clock.svg'],
-	'beatvalue': [_('The <em>Beat count</em> block is the number of the current beat, e.g., 1, 2, 3, or 4.\n In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'beatcount.svg'],
-        'pitch': [_('The <em>Pitch</em> block specifies the pitch name and pitch octave of a note that determine the frequency of the note.'), 'documentation', 'pitch.svg'],
-	'solfege': [_('Pitch can be specified in terms of <em>do re mi fa sol la ti<em>.'), 'documentation', 'pitch.svg'],
-	'notename': [_('Pitch can be specified in terms of <em>C D E F G A B</em>.'), 'documentation', 'notename.svg'],
-	'steppitch': [_('The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>.'), 'documentation', 'scalarstep.svg'],
-	'hertz': [_('The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency.'), 'documentation', 'hertz.svg'],
 	'accidental': [_('The <em>Accidental</em> block is used to create <em>sharps</em> and <em>flats</em>'), 'documentation', 'accidental.svg'],
 	'accidentalname': [_('The <em>Accidental selector</em> block is used to choose between double-sharp, sharp, natural, flat, and double-flat.'), 'documentation', 'accidental.svg'],
-	'setscalartransposition': [_('The <em>Scalar transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) the scale. In the example shown above, <em>sol</em> is shifted up to <em>la</em>.'), 'documentation', 'setscalartransposition.svg'],
 	'settransposition': [_('The <em>Semi-tone transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) by half steps. In the example shown above, <em>sol</em> is shifted up to <em>sol#</em>.'), 'documentation', 'settransposition.svg'],
-	'mypitch': [_('The <em>Pitch number</em> block is the value of the pitch of the note currently being played.'), 'documentation', 'mypitch.svg'],
 	'deltapitch': [_('The <em>Change in pitch</em> block is the difference (in half steps) between the current pitch being played and the previous pitch played.'), 'documentation', 'deltapitch.svg'],
-        'setkey2': [_('The <em>Set key</em> block is used to set the key and mode, e.g., <em>C Major</em>'), 'documentation', 'setkey2.svg'],
-	'modelength': [_('The <em>Mode length</em> block is the number of notes in the current scale. Most <em>Western</em> scales have 7 notes.'), 'documentation', 'modelength.svg'],
-	'movable': [_('???'), 'documentation', 'movable.svg'],
-	'interval': [_('The <em>Scalar interval</em> block calculates a relative interval based on the current mode, skipping all notes outside of the mode. In the figure, we add <em>la</em> to <em>sol</em>.'), 'documentation', 'interval.svg'],
+	'movable': ['???', 'documentation', 'movable.svg'],
 	'semitoneinterval': [_('The <em>Semi-tone interval</em> block calculates a relative interval based on half steps. In the figure, we add <em>sol#</em> to <em>sol</em>.'), 'documentation', 'semitoneinterval.svg'],
-        'settimbre': [_('The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello.'), 'documentation', 'settimbre.svg'],
         'voicename': [_('The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello.'), 'documentation', 'settimbre.svg'],
-	'newstaccato': [_('The <em>Staccato</em> block shortens the length of the actual note—making them tighter bursts—while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato.svg'],
-	'newslur': [_('The <em>Slur</em> block lengthens the sustain of notes—running longer than the noted duration and blending it into the next note—while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur.svg'],
-        'crescendo': [_('The Crescendo block will increase (or decrease) the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo.svg'],
-	'setsynthvolume': [_('The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume).'), 'documentation', 'setsynthvolume.svg'],
-	'setdrum': [_('The <em>Set drum</em> block will select a drum sound to replace the pitch of any contained notes. In the example above, a <em>kick drum</em> sound will be played instead of <em>sol</em>.'), 'documentation', 'setdrum.svg'],
-        'if':  [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional.svg'],
-	'ifthenelse': [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional.svg'],
-	'repeat': [_('The <em>Repeat</em> block will repeat the contained blocks. In this example, the note will be played 4 times.'), 'documentation', 'repeat.svg'],
-	'forever': [_('The <em>Forever</em> block will repeat the contained blocks forever. In this example, a simple drum machine, a kick drum will play 1/4 notes forever.'), 'documentation', 'forever.svg'],
     }
 };
