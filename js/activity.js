@@ -247,7 +247,7 @@ define(MYDEFINES, function (compatibility) {
         var chartBitmap = null;
         var merging = false;
         var loading = false;
-        // For auxillary menus
+        // For auxilary menus
         var utilityContainer = null;
         var beginnerModeContainer = null;
         var advancedModeContainer = null;
@@ -4345,7 +4345,7 @@ handleComplete);
             var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
-            menuContainer = _makeButton('menu-button', _('Auxillary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
+            menuContainer = _makeButton('menu-button', _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
             var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
