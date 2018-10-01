@@ -83,7 +83,7 @@ function Trashcan () {
         var highlightString = 'rgb(' + this._highlightPower + ',' + this._highlightPower + ',' + this._highlightPower + ')';
         if (isActive) {
             // When trash is activated, warn the user with red highlight.
-            highlightString = 'rgb(255, 0, 0)';
+            highlightString = platformColor.trashActive;
         }
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', highlightString))));
@@ -101,7 +101,7 @@ function Trashcan () {
             that._makeBorderHighlight(false);
         };
 
-        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', '#e0e0e0'))));
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', platformColor.trashBorder))));
     };
 
     this._makeTrash = function () {
@@ -119,7 +119,7 @@ function Trashcan () {
             that._makeBorder();
         };
 
-        img.src = 'images/trash.svg';
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(TRASHICON.replace(/fill_color/g, platformColor.trashBorder))));
     };
 
     this.resizeEvent = function (scale) {

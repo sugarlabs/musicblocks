@@ -41,6 +41,9 @@ window.platformColor = {
     // ruleColor: '#e3e3e3', // 2.5B 9/0
     rule: '#e2e2e2',
     ruleColor: '#e2e2e2',
+    trashColor: '#c0c0c0',
+    trashBorder: '#808080',
+    trashActive: '#ff0000',
     // background: '#e8e8e8', // '#acd0e4'  // 2.5B 8/4
     background: '#f9f9f9', // '#acd0e4'  // 2.5B 8/4
     paletteSelected: '#f3f3f3',
