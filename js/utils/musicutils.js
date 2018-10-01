@@ -34,6 +34,13 @@ const NATURAL = '♮';
 const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
 
+const NSYMBOLS = {1: '𝅝',
+		  2: '𝅗𝅥',
+		  4: '♩',
+		  8: '♪',
+		  16: '𝅘𝅥𝅯'
+		 };
+
 const BTOFLAT = {'Eb': 'E' + FLAT, 'Gb': 'G' + FLAT, 'Ab': 'A' + FLAT, 'Bb': 'B' + FLAT, 'Db': 'D' + FLAT, 'Cb': 'C' + FLAT, 'Fb': 'F' + FLAT, 'eb': 'E' + FLAT, 'gb': 'G' + FLAT, 'ab': 'A' + FLAT, 'bb': 'B' + FLAT, 'db': 'D' + FLAT, 'cb': 'C' + FLAT, 'fb': 'F' + FLAT};
 const STOSHARP = {'E#': 'E' + SHARP, 'G#': 'G' + SHARP, 'A#': 'A' + SHARP, 'B#': 'B' + SHARP, 'D#': 'D' + SHARP, 'C#': 'C' + SHARP, 'F#': 'F' + SHARP, 'e#': 'E' + SHARP, 'g#': 'G' + SHARP, 'a#': 'A' + SHARP, 'b#': 'B' + SHARP, 'd#': 'D' + SHARP, 'c#': 'C' + SHARP, 'f#': 'F' + SHARP};
 const NOTESSHARP = ['C', 'C' + SHARP, 'D', 'D' + SHARP, 'E', 'F', 'F' + SHARP, 'G', 'G' + SHARP, 'A', 'A' + SHARP, 'B'];

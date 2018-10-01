@@ -1365,6 +1365,9 @@ function Block(protoblock, blocks, overrideName) {
                     var c2 = this.blocks.blockList[c].connections[2];
                     if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                         v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+			if (this.blocks.blockList[c2].value in NSYMBOLS) {
+			    v += NSYMBOLS[this.blocks.blockList[c2].value];
+			}
                     }
                 }
             }
@@ -1398,6 +1401,9 @@ function Block(protoblock, blocks, overrideName) {
                 var c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                     v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+		    if (this.blocks.blockList[c2].value in NSYMBOLS) {
+			v += NSYMBOLS[this.blocks.blockList[c2].value];
+		    }
                 }
             }
         }
