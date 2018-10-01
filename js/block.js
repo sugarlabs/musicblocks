@@ -406,7 +406,12 @@ function Block(protoblock, blocks, overrideName) {
         if (this.isCollapsible()) {
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
-            proto.extraWidth = 40;
+            if (this.name === 'interval') {
+                proto.extraWidth = 60;
+            } else {
+                proto.extraWidth = 40;
+            }
+
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
@@ -810,7 +815,11 @@ function Block(protoblock, blocks, overrideName) {
             if (this.isInlineCollapsible()) {
                 var proto = new ProtoBlock('collapse-note');
                 proto.scale = this.protoblock.scale;
-                proto.extraWidth = 40;
+                if (this.name === 'interval') {
+                    proto.extraWidth = 60;
+                } else {
+                    proto.extraWidth = 40;
+                }
                 proto.zeroArgBlock();
             } else {
                 var proto = new ProtoBlock('collapse');
@@ -1234,17 +1243,17 @@ function Block(protoblock, blocks, overrideName) {
         this.collapseText.visible = !isCollapsed;
 
         if (this.isInlineCollapsible() && this.collapseText.visible) {
-	    switch(this.name) {
-	    case 'newnote':
-		this._newNoteLabel();
-		break;
-	    case 'interval':
-		this._intervalLabel();
-		break;
-	    default:
-		console.log('What do we do with a collapsed ' + this.name + ' block?');
-		break;
-	    }
+            switch(this.name) {
+            case 'newnote':
+                this._newNoteLabel();
+                break;
+            case 'interval':
+                this._intervalLabel();
+                break;
+            default:
+                console.log('What do we do with a collapsed ' + this.name + ' block?');
+                break;
+            }
         }
 
         this.bitmap.visible = this.collapsed;
@@ -1294,53 +1303,66 @@ function Block(protoblock, blocks, overrideName) {
     this._intervalLabel = function () {
         // Find pitch and value to display on the collapsed interval
         // block.
-	var intervals = [];
-	var i = 0;
+        const INTERVALLABELS = {0: _('1st'),
+                                1: _('2nd'),
+                                2: _('3rd'),
+                                3: _('4th'),
+                                4: _('5th'),
+                                5: _('6th'),
+                                6: _('7th')
+                               };
 
-	var c = this.blocks.blockList.indexOf(this);
-	while (c !== null) {
-	    var lastIntervalBlock = c;
-	    var n = this.blocks.blockList[c].connections[1];
+        var intervals = [];
+        var i = 0;
+
+        var c = this.blocks.blockList.indexOf(this);
+        while (c !== null) {
+            var lastIntervalBlock = c;
+            var n = this.blocks.blockList[c].connections[1];
             var cblock = this.blocks.blockList[n];
-	    if (cblock.name === 'number') {
-		intervals.push('+' + cblock.value);
-	    } else {
-		intervals.push('');
-	    }
+            if (cblock.name === 'number') {
+                if (cblock.value in INTERVALLABELS) {
+                    intervals.push('+' + INTERVALLABELS[cblock.value]);
+                } else {
+                    intervals.push('+' + cblock.value);
+                }
+            } else {
+                intervals.push('');
+            }
 
-	    i += 1;
-	    if (i > 5) {
-		console.log('loop?');
-		break;
-	    }
+            i += 1;
+            if (i > 5) {
+                console.log('loop?');
+                break;
+            }
 
-	    c = this.blocks.findNestedIntervalBlock(this.blocks.blockList[c].connections[2]);
-	}
+            c = this.blocks.findNestedIntervalBlock(this.blocks.blockList[c].connections[2]);
+        }
 
-	var itext = '';
-	for (var i = intervals.length; i > 0; i--) {
-	    itext += ' ' + intervals[i - 1];
-	}
+        var itext = '';
+        for (var i = intervals.length; i > 0; i--) {
+            itext += ' ' + intervals[i - 1];
+        }
 
-	var nblk = this.blocks.findNoteBlock(lastIntervalBlock);
-	if (nblk === null) {
-	    this.collapseText.text = _('scalar interval') + itext;
-	} else {
+        var nblk = this.blocks.findNoteBlock(lastIntervalBlock);
+        if (nblk === null) {
+            this.collapseText.text = _('scalar interval') + itext;
+        } else {
             c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
             var p = this._getPitch(c);
             if (c === null || p === '') {
-		this.collapseText.text = _('scalar interval') + itext;
+                this.collapseText.text = _('scalar interval') + itext;
             } else {
-		// Are there more pitch blocks in this note?
-		c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
-		// Update the collapsed-block label.
-		if (c === null) {
+                // Are there more pitch blocks in this note?
+                c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
+                // Update the collapsed-block label.
+                if (c === null) {
                     this.collapseText.text = p + itext;
-		} else {
+                } else {
                     this.collapseText.text = p + '...' + itext;
-		}
+                }
             }
-	}
+        }
     };
 
     this._newNoteLabel = function () {
@@ -1359,7 +1381,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-	c = this.connections[2];
+        c = this.connections[2];
         c = this.blocks.findFirstPitchBlock(c);
         var p = this._getPitch(c);
         if (c === null) {
@@ -1380,8 +1402,8 @@ function Block(protoblock, blocks, overrideName) {
 
     this._getPitch = function (c) {
         if (c === null) {
-	    return '';
-	}
+            return '';
+        }
 
         switch(this.blocks.blockList[c].name) {
         case 'pitch':
