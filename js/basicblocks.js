@@ -929,7 +929,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
     newblock.stackClampOneArgBlock();
-    newblock.defaults.push(_('custom'));
+    /*newblock.defaults.push(_('custom'));*/ // <--removing this seems to fix what timbre looks like when collapsed. Any reason for it?
     if (beginnerMode && !beginnerBlock('timbre')) {
         newblock.hidden = true;
     }
