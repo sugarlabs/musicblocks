@@ -280,10 +280,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var customNoteBlock = new ProtoBlock('customNote');
-    customNoteBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['customNote'] = customNoteBlock;
-    customNoteBlock.valueBlock();
+    var newblock = new ProtoBlock('customNote');
+    newblock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['customNote'] = newblock;
+    newblock.valueBlock();
+    if (beginnerMode && !beginnerBlock('customNote')) {
+        newblock.hidden = true;
+    }
 
     // Transposition blocks
     // macro

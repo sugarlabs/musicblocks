@@ -533,7 +533,7 @@ msgid "playback"
 msgstr "reproducir"
 
 #: js/activity.js:4385
-msgid "Auxillary menu"
+msgid "Auxilary menu"
 msgstr "Menú auxiliar"
 
 #: js/activity.js:4780
@@ -1260,7 +1260,7 @@ msgstr "Expandir/colapsar la barra de opciones."
 #: js/turtledefs.js:121
 #: js/turtledefs.js:156
 #: js/turtledefs.js:163
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxilary toolbar."
 msgstr "Haz click en este botón para expandir o colapsar la barra de herramientas auxiliar."
 
 #: js/turtledefs.js:122

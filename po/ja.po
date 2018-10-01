@@ -553,7 +553,7 @@ msgid "playback"
 msgstr "コンパイルされた音楽を再生"
 
 #: js/activity.js:4385
-msgid "Auxillary menu"
+msgid "Auxilary menu"
 msgstr ""
 
 #: js/activity.js:4780
@@ -1302,7 +1302,7 @@ msgstr "オプションツールバーを表示"
 #: js/turtledefs.js:121
 #: js/turtledefs.js:156
 #: js/turtledefs.js:163
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxilary toolbar."
 msgstr "ここをクリックして、オプションツールバーを表示"
 
 #: js/turtledefs.js:122
