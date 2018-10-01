@@ -1309,7 +1309,7 @@ function Block(protoblock, blocks, overrideName) {
                                 3: _('4th'),
                                 4: _('5th'),
                                 5: _('6th'),
-                                6: _('7th')
+                                6: _('7th'),
                                };
 
         var intervals = [];
@@ -1321,10 +1321,18 @@ function Block(protoblock, blocks, overrideName) {
             var n = this.blocks.blockList[c].connections[1];
             var cblock = this.blocks.blockList[n];
             if (cblock.name === 'number') {
-                if (cblock.value in INTERVALLABELS) {
-                    intervals.push('+' + INTERVALLABELS[cblock.value]);
+                if (Math.abs(cblock.value) in INTERVALLABELS) {
+                    if (cblock.value < 0) {
+                        intervals.push('-' + INTERVALLABELS[-cblock.value]);
+                    } else {
+                        intervals.push('+' + INTERVALLABELS[cblock.value]);
+                    }
                 } else {
-                    intervals.push('+' + cblock.value);
+                    if (cblock.value < 0) {
+                        intervals.push('-' + cblock.value);
+                    } else {
+                        intervals.push('+' + cblock.value);
+                    }
                 }
             } else {
                 intervals.push('');
