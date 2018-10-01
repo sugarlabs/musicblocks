@@ -407,7 +407,7 @@ function Block(protoblock, blocks, overrideName) {
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             if (this.name === 'interval') {
-                proto.extraWidth = 60;
+                proto.extraWidth = 80;
             } else {
                 proto.extraWidth = 40;
             }
@@ -816,7 +816,7 @@ function Block(protoblock, blocks, overrideName) {
                 var proto = new ProtoBlock('collapse-note');
                 proto.scale = this.protoblock.scale;
                 if (this.name === 'interval') {
-                    proto.extraWidth = 60;
+                    proto.extraWidth = 80;
                 } else {
                     proto.extraWidth = 40;
                 }
@@ -1344,10 +1344,23 @@ function Block(protoblock, blocks, overrideName) {
             itext += ' ' + intervals[i - 1];
         }
 
+        var v = '';
         var nblk = this.blocks.findNoteBlock(lastIntervalBlock);
         if (nblk === null) {
             this.collapseText.text = _('scalar interval') + itext;
         } else {
+            var c = this.blocks.blockList[nblk].connections[1];
+            if (c !== null) {
+                // Only look for standard form: / 1 4
+                if (this.blocks.blockList[c].name === 'divide') { 
+                    var c1 = this.blocks.blockList[c].connections[1];
+                    var c2 = this.blocks.blockList[c].connections[2];
+                    if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
+                        v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+                    }
+                }
+            }
+
             c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
             var p = this._getPitch(c);
             if (c === null || p === '') {
@@ -1357,9 +1370,9 @@ function Block(protoblock, blocks, overrideName) {
                 c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
                 // Update the collapsed-block label.
                 if (c === null) {
-                    this.collapseText.text = p + itext;
+                    this.collapseText.text = p  + ' | ' + v + itext;
                 } else {
-                    this.collapseText.text = p + '...' + itext;
+                    this.collapseText.text = p + '...' + ' | ' + v + itext;
                 }
             }
         }
