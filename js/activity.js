@@ -322,6 +322,10 @@ define(MYDEFINES, function (compatibility) {
                         break;
                     }
                 }
+
+                if (i === blocks.blockList.length) {
+                    docById('contextWheelDiv').style.display = 'none';
+                }
             } else {
                 // Block context menu
                 piemenuBlockContext(blocks.activeBlock);
@@ -3923,7 +3927,7 @@ define(MYDEFINES, function (compatibility) {
                             };
                         }
                         break;
-		    case 'interval':
+                    case 'interval':
                     case 'newnote':
                     case 'action':
                     case 'matrix':
@@ -4868,7 +4872,7 @@ handleComplete);
             // docById('contextWheelDiv').style.left = Math.min(blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150)) + 'px';
             docById('contextWheelDiv').style.left = Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150 + 'px';
             // docById('contextWheelDiv').style.top = Math.min(blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150)) + 'px';
-	    docById('contextWheelDiv').style.top = Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150 + 'px';
+            docById('contextWheelDiv').style.top = Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150 + 'px';
             docById('contextWheelDiv').style.display = '';
 
             labels = ['imgsrc:header-icons/copy-button.svg',
