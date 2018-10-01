@@ -1542,11 +1542,13 @@ function PitchTimeMatrix () {
             if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
                 var graphicsBlock = true;
             }
+
             var obj = note.split(':');
         }
 
         var row = docById('ptm' + j);
         var cell = row.cells[colIndex];
+
         // Using the alt attribute to store the note value
         var noteValue = cell.getAttribute('alt');
 
@@ -1557,11 +1559,14 @@ function PitchTimeMatrix () {
                 if (drumName != null) {
 
                     this._logo.synth.trigger(0, 'C2', noteValue, drumName, null, null);
-                } else if (this.rowLabels[j - 1] === 'hertz') {
+                } else if (this.rowLabels[j] === 'hertz') {
                     this._logo.synth.trigger(0, Number(note), noteValue, 'default', null, null);
                 } else if (graphicsBlock !== true) {
-                    this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
-
+		    if (typeof(note) === 'string') {
+			this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
+		    } else {
+			this._logo.synth.trigger(0, note, noteValue, 'default', null, null);
+		    }
                 } else {
                     console.log('Cannot parse note object: ' + obj);
                 }
