@@ -119,6 +119,27 @@ function searchColors(r, g, b) {
             nearestColor = i;
         }
     }
+
+    return nearestColor;
+}
+
+
+function searchAllColors(r, g, b) {
+    console.log(r + ' ' + g + ' ' + b);
+    var nearestColor = -1;
+    var distance = 10000000;
+    for (var i = 0; i < MUNSELL.length; i++) {
+        var color = MUNSELL[i];
+        var r1 = parseInt(color.substr(1, 2), 16);
+        var g1 = parseInt(color.substr(3, 2), 16);
+        var b1 = parseInt(color.substr(5, 2), 16);
+        var distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
+        if (distSquared < distance) {
+            distance = distSquared;
+            nearestColor = i;
+        }
+    }
+
     return nearestColor;
 }
 
@@ -166,7 +187,6 @@ COLORS40 = [
     [6, 26, "#ff00b2"],
     [6, 24, "#ff0098"]
 ];
-
 
 // 10RP 2.5R 5R 7.5R 10R ... 7.5RP -> V0 - V10 -> C0 - C28 (by 2)
 MUNSELL = [
