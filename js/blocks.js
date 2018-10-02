@@ -3207,7 +3207,7 @@ function Blocks () {
         return false;
     };
 
-    this.insideNoteBlock = function (blk) {
+    this.insideInlineCollapsibleBlock = function (blk) {
         // Return the first containing note block, if any.
         if (blk === null) {
             return null;
@@ -3221,11 +3221,11 @@ function Blocks () {
         // If we are connected to a note block arg or child flow,
         // return the note block. If we are connected to the flow, we
         // are not inside, so keep looking.
-        if (this.blockList[c0].name === 'newnote' && blk !== last(this.blockList[c0].connections)) {
+        if (this.blockList[c0].isInlineCollapsible() && blk !== last(this.blockList[c0].connections)) {
             return c0;
         }
 
-        return this.insideNoteBlock(c0);
+        return this.insideInlineCollapsibleBlock(c0);
     };
 
     this.findNoteBlock = function (blk) {
@@ -3238,12 +3238,12 @@ function Blocks () {
             return blk;
         }
 
-	if (this.blockList[blk].isClampBlock()) {
-	    var n = this.blockList[blk].connections.length - 2;
+        if (this.blockList[blk].isClampBlock()) {
+            var n = this.blockList[blk].connections.length - 2;
             var c = this.blockList[blk].connections[n];
-	} else {
+        } else {
             var c = last(this.blockList[blk].connections);
-	}
+        }
 
         return this.findNoteBlock(c);
     };
@@ -3258,12 +3258,12 @@ function Blocks () {
             return blk;
         }
 
-	if (this.blockList[blk].isClampBlock()) {
-	    var n = this.blockList[blk].connections.length - 2;
+        if (this.blockList[blk].isClampBlock()) {
+            var n = this.blockList[blk].connections.length - 2;
             var c = this.blockList[blk].connections[n];
-	} else {
+        } else {
             var c = last(this.blockList[blk].connections);
-	}
+        }
 
         return this.findNestedIntervalBlock(c);
     };

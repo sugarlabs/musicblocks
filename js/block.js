@@ -1278,7 +1278,7 @@ function Block(protoblock, blocks, overrideName) {
         var z = this.container.children.length - 1;
         this.container.setChildIndex(this.collapseText, z);
 
-        if (this.name === 'newnote' || this.name === 'interval') {
+        if (this.isInlineCollapsible()) {
             // Only collapse the contents of the note block.
             this._toggle_inline(thisBlock, isCollapsed);
         } else {
@@ -1289,7 +1289,7 @@ function Block(protoblock, blocks, overrideName) {
                     if (this.collapsed) { // if (this.blocks.blockList[blk].inCollapsed) {
                         this.blocks.blockList[blk].setCollapsedState();
                     } else {
-                        this.blocks.blockList[blk].setUncollapsedState(this.blocks.insideNoteBlock(blk));
+                        this.blocks.blockList[blk].setUncollapsedState(this.blocks.insideInlineCollapsibleBlock(blk));
                     }
                 }
             }
@@ -1365,9 +1365,9 @@ function Block(protoblock, blocks, overrideName) {
                     var c2 = this.blocks.blockList[c].connections[2];
                     if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                         v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
-			if (this.blocks.blockList[c2].value in NSYMBOLS) {
-			    v += NSYMBOLS[this.blocks.blockList[c2].value];
-			}
+                        if (this.blocks.blockList[c2].value in NSYMBOLS) {
+                            v += NSYMBOLS[this.blocks.blockList[c2].value];
+                        }
                     }
                 }
             }
@@ -1401,9 +1401,9 @@ function Block(protoblock, blocks, overrideName) {
                 var c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                     v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
-		    if (this.blocks.blockList[c2].value in NSYMBOLS) {
-			v += NSYMBOLS[this.blocks.blockList[c2].value];
-		    }
+                    if (this.blocks.blockList[c2].value in NSYMBOLS) {
+                        v += NSYMBOLS[this.blocks.blockList[c2].value];
+                    }
                 }
             }
         }
@@ -1483,9 +1483,9 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._toggle_inline = function (thisBlock, collapse) {
-        // Toggle the collapsed state of blocks inside of a note block
-        // and reposition any blocks below it. Finally, resize any
-        // surrounding clamps.
+        // Toggle the collapsed state of blocks inside of a note (or
+        // interval) block and reposition any blocks below
+        // it. Finally, resize any surrounding clamps.
 
         // Set collapsed state of note value arg blocks...
         if (this.connections[1] !== null) {
@@ -1494,9 +1494,9 @@ function Block(protoblock, blocks, overrideName) {
                 var blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].container.visible = collapse;
                 if (collapse) {
-                    this,blocks.blockList[blk].inCollapsed = false;
+                    this.blocks.blockList[blk].inCollapsed = false;
                 } else {
-                    this,blocks.blockList[blk].inCollapsed = true;
+                    this.blocks.blockList[blk].inCollapsed = true;
                 }
             }
         }
@@ -1506,11 +1506,19 @@ function Block(protoblock, blocks, overrideName) {
             this.blocks.findDragGroup(this.connections[2]);
             for (var b = 0; b < this.blocks.dragGroup.length; b++) {
                 var blk = this.blocks.dragGroup[b];
-                this.blocks.blockList[blk].container.visible = collapse;
-                if (collapse) {
-                    this,blocks.blockList[blk].inCollapsed = false;
+                // Look to see if the local parent block is collapsed.
+                var parent = this.blocks.insideInlineCollapsibleBlock(blk);
+                if (parent === null || !this.blocks.blockList[parent].collapsed) {
+                    this.blocks.blockList[blk].container.visible = collapse;
+                    if (collapse) {
+                        this.blocks.blockList[blk].inCollapsed = false;
+                    } else {
+                        this.blocks.blockList[blk].inCollapsed = true;
+                    }
                 } else {
-                    this,blocks.blockList[blk].inCollapsed = true;
+                    // Parent is collapsed, so keep hidden.
+                    this.blocks.blockList[blk].container.visible = false;
+                    this.blocks.blockList[blk].inCollapsed = true;
                 }
             }
         }
