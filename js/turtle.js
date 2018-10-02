@@ -1302,13 +1302,27 @@ function Turtles () {
         };
 
         function __makeExpandButton() {
+            that._expandButton = new createjs.Container();
+            that._expandLabel = null;
+            that._expandLabelBG = null;
+
+            that._expandLabel = new createjs.Text(_('Expand'), '14px Sans', '#282828');
+            that._expandLabel.textAlign = 'center';
+            that._expandLabel.x = 11.5;
+            that._expandLabel.y = 55;
+            that._expandLabel.visible = false;
+
             var img = new Image();
             img.onload = function () {
                 if (that._expandButton !== null) {
                     that._expandButton.visible = false;
                 }
 
-                that._expandButton = new createjs.Bitmap(img);
+                var bitmap = new createjs.Bitmap(img);
+                that._expandButton.addChild(bitmap);
+                bitmap.visible = true;
+                that._expandButton.addChild(that._expandLabel);
+
                 that._expandButton.x = that.w - 10 - 4 * 55;
                 that._expandButton.y = 55 + LEADING;
                 that._expandButton.scaleX = SCALEFACTOR;
@@ -1316,6 +1330,29 @@ function Turtles () {
                 that._expandButton.scale = SCALEFACTOR;
                 that._expandButton.visible = false;
                 that._borderContainer.addChild(that._expandButton);
+
+                that._expandButton.removeAllEventListeners('mouseover');
+                that._expandButton.on('mouseover', function (event) {
+                    that._expandLabel.visible = true;
+
+                    if (that._expandLabelBG === null) {
+                        var b = that._expandLabel.getBounds();
+                        that._expandLabelBG = new createjs.Shape();
+                        that._expandLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._expandLabel.x + b.x - 8, that._expandLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                        that._expandButton.addChildAt(that._expandLabelBG, 0);
+                    } else {
+                        that._expandLabelBG.visible = true;
+                    }
+
+                    that.refreshCanvas();
+                });
+
+                that._expandButton.removeAllEventListeners('mouseout');
+                that._expandButton.on('mouseout', function (event) {
+                    that._expandLabel.visible = false;
+                    that._expandLabelBG.visible = false;
+                    that.refreshCanvas();
+                });
 
                 that._expandButton.removeAllEventListeners('pressmove');
                 that._expandButton.on('pressmove', function (event) {
@@ -1362,20 +1399,59 @@ function Turtles () {
         };
 
         function __makeCollapseButton() {
+            that._collapseButton = new createjs.Container();
+            that._collapseLabel = null;
+            that._collapseLabelBG = null;
+
+            that._collapseLabel = new createjs.Text(_('Collapse'), '14px Sans', '#282828');
+            that._collapseLabel.textAlign = 'center';
+            that._collapseLabel.x = 11.5;
+            that._collapseLabel.y = 55;
+            that._collapseLabel.visible = false;
+
             var img = new Image();
             img.onload = function () {
                 if (that._collapseButton !== null) {
                     that._collapseButton.visible = false;
                 }
 
-                that._collapseButton = new createjs.Bitmap(img);
+                var bitmap = new createjs.Bitmap(img);
+                that._collapseButton.addChild(bitmap);
+                bitmap.visible = true;
+                that._collapseButton.addChild(that._collapseLabel);
+
                 that._borderContainer.addChild(that._collapseButton);
+                that._collapseButton.visible = true;
                 that._collapseButton.x = that.w - 55;
                 that._collapseButton.y = 55 + LEADING;
+                that.refreshCanvas();
 
                 that._collapseButton.removeAllEventListeners('click');
                 that._collapseButton.on('click', function (event) {
                     that.collapse();
+                });
+
+                that._collapseButton.removeAllEventListeners('mouseover');
+                that._collapseButton.on('mouseover', function (event) {
+                    that._collapseLabel.visible = true;
+
+                    if (that._collapseLabelBG === null) {
+                        var b = that._collapseLabel.getBounds();
+                        that._collapseLabelBG = new createjs.Shape();
+                        that._collapseLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._collapseLabel.x + b.x - 8, that._collapseLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                        that._collapseButton.addChildAt(that._collapseLabelBG, 0);
+                    } else {
+                        that._collapseLabelBG.visible = true;
+                    }
+
+                    that.refreshCanvas();
+                });
+
+                that._collapseButton.removeAllEventListeners('mouseout');
+                that._collapseButton.on('mouseout', function (event) {
+                    that._collapseLabel.visible = false;
+                    that._collapseLabelBG.visible = false;
+                    that.refreshCanvas();
                 });
 
                 __makeClearButton();
@@ -1387,56 +1463,25 @@ function Turtles () {
 
         function __makeClearButton() {
             that._clearButton = new createjs.Container();
-
-            /*
-            that._clearButton.removeAllEventListeners('mouseover');
-            that._clearButton.on('mouseover', function (event) {
-                for (var c = 0; c < that._clearButton.children.length; c++) {
-                    if (that._clearButton.children[c].text != undefined) {
-                        that._clearButton.children[c].visible = true;
-                        if (that._clearButton.children.length === 2) {
-                            var b = that._clearButton.children[c].getBounds();
-                            var bg = new createjs.Shape();
-                            bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-                            that._clearButton.addChildAt(bg, 0);
-                            that._clearButton.children[0].visible = true;
-                            that.refreshCanvas();
-                        }
-                    }
-                }
-            });
-
-            that._clearButton.removeAllEventListeners('mouseout');
-            that._clearButton.on('mouseout', function (event) {
-                for (var c = 0; c < that._clearButton.children.length; c++) {
-                    if (that._clearButton.children[c].text != undefined) {
-                        that._clearButton.children[c].visible = false;
-                        that._clearButton.children[0].visible = false;
-                        that.refreshCanvas();
-                        break;
-                    }
-                }
-            });
-            */
+            that._clearLabel = null;
+            that._clearLabelBG = null;
 
             that._clearButton.removeAllEventListeners('click');
             that._clearButton.on('click', function (event) {
                 that.doClear();
             });
 
-            /*
-            var text = new createjs.Text(_('Clean'), '14px Sans', '#282828');
-            text.textAlign = 'center';
-            text.x = 0;
-            text.y = 30;
-            text.visible = false;
-            */
+            that._clearLabel = new createjs.Text(_('Clean'), '14px Sans', '#282828');
+            that._clearLabel.textAlign = 'center';
+            that._clearLabel.x = 27.5;
+            that._clearLabel.y = 55;
+            that._clearLabel.visible = false;
 
             var img = new Image();
             img.onload = function () {
                 var bitmap = new createjs.Bitmap(img);
                 that._clearButton.addChild(bitmap);
-                // that._clearButton.addChild(text);
+                that._clearButton.addChild(that._clearLabel);
 
                 bitmap.visible = true;
                 that._clearButton.x = that.w - 10 - 2 * 55;
@@ -1445,6 +1490,29 @@ function Turtles () {
 
                 that._borderContainer.addChild(that._clearButton);
                 that.refreshCanvas();
+
+                that._clearButton.removeAllEventListeners('mouseover');
+                that._clearButton.on('mouseover', function (event) {
+                    that._clearLabel.visible = true;
+
+                    if (that._clearLabelBG === null) {
+                        var b = that._clearLabel.getBounds();
+                        that._clearLabelBG = new createjs.Shape();
+                        that._clearLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._clearLabel.x + b.x - 8, that._clearLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                        that._clearButton.addChildAt(that._clearLabelBG, 0);
+                    } else {
+                        that._clearLabelBG.visible = true;
+                    }
+
+                    that.refreshCanvas();
+                });
+
+                that._clearButton.removeAllEventListeners('mouseout');
+                that._clearButton.on('mouseout', function (event) {
+                    that._clearLabel.visible = false;
+                    that._clearLabelBG.visible = false;
+                    that.refreshCanvas();
+                });
 
                 if (doCollapse) {
                     that.collapse();
