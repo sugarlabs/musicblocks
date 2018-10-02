@@ -347,15 +347,15 @@ define(MYDEFINES, function (compatibility) {
 	    var h = Math.floor(i / (15 * 11));
 	    var v = Math.floor((i - h * (15 * 11)) / 15);
 	    var c = i - (h * 11 + v) * 15;
-	    console.log(p + ': ' + platformColor.paletteColors[p][0] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
+	    // console.log(p + ': ' + platformColor.paletteColors[p][0] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
             var i = searchAllColors(hexToRGB(platformColor.paletteColors[p][1]).r, hexToRGB(platformColor.paletteColors[p][1]).g, hexToRGB(platformColor.paletteColors[p][1]).b);
 	    var h = Math.floor(i / (15 * 11));
 	    var v = Math.floor((i - h * (15 * 11)) / 15);
 	    var c = i - (h * 11 + v) * 15;
-	    console.log(p + ': ' + platformColor.paletteColors[p][1] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
+	    // console.log(p + ': ' + platformColor.paletteColors[p][1] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
 	    PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
 	    PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
-	    PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(h * 2.5, v * 10 + 10, c * 100 / 14);
+	    PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(h * 2.5, v * 10 + 20, c * 100 / 14);
 	    HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
 	};
 

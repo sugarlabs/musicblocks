@@ -30,7 +30,7 @@ console.log('On platform: ', platform);
 
 
 window.platformColor = {
-    blockText: '#000000',
+    blockText: '#282828',
     paletteColors: {
 	'widgets': ['#7CD622', '#57AD02'],
 	'pitch': ['#7CD622', '#57AD02'],
