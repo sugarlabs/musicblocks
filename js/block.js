@@ -508,7 +508,7 @@ function Block(protoblock, blocks, overrideName) {
         // text blocks, this is the primary label; for parameter
         // blocks, this is used to display the current block value.
         var fontSize = 10 * this.protoblock.scale;
-        this.text = new createjs.Text('', fontSize + 'px Sans', '#000000');
+        this.text = new createjs.Text('', fontSize + 'px Sans', platformColor.blockText);
 
         this.generateArtwork(true, []);
     };
@@ -920,58 +920,58 @@ function Block(protoblock, blocks, overrideName) {
                 var fontSize = 10 * that.protoblock.scale;
                 switch (that.name) {
                 case 'action':
-                    that.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'start':
-                    that.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'matrix':
-                    that.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'status':
-                    that.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'pitchdrummatrix':
-                    that.collapseText = new createjs.Text(_('drum mapper'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('drum mapper'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'rhythmruler':
-                    that.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'timbre':
-                    that.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'pitchstaircase':
-                    that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'tempo':
-                    that.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'modewidget':
-                    that.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'pitchslider':
-                    that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'musickeyboard':
-                    that.collapseText = new createjs.Text(_('keyboard'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('keyboard'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'drum':
-                    that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'rhythmruler2':
-                    that.collapseText = new createjs.Text(_('rhythm ruler'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('rhythm ruler'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'newnote':
-                    that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'interval':
-                    that.collapseText = new createjs.Text(_('scalar interval'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('scalar interval'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'temperament':
-                    that.collapseText = new createjs.Text(_('temperament'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('temperament'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 default:
-                    that.collapseText = new createjs.Text('foobar', fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text('foobar', fontSize + 'px Sans', platformColor.blockText);
                 }
 
                 that.collapseText.textAlign = 'left';

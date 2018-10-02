@@ -125,6 +125,8 @@ const MBOUNDARY = '<svg xmlns="http://www.w3.org/2000/svg" height="HEIGHT" width
 const BORDER = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">' + '<rect width="115" height="115" x="2.5" y="2.5" style="fill:none;stroke:stroke_color;stroke-width:5.0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:15, 15;stroke-dashoffset:0" />' + '</svg>';
 
 // palette artwork
+
+// deprecated: see platformstyle.js
 // Palettes have different colored blocks
 // hue, value, chroma
 const PALETTECOLORS0 = {

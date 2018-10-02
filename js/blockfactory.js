@@ -317,7 +317,7 @@ function SVG() {
 
         var yy = y;
         var tspans = string.split('\n');
-        var text = '<text style="font-size:' + fontSize + 'px;fill:#000000;font-family:sans-serif;text-anchor:' + align + '">';
+        var text = '<text style="font-size:' + fontSize + 'px;fill:' + platformColor.blockText + ';font-family:sans-serif;text-anchor:' + align + '">';
         for (var i = 0; i < tspans.length; i++) {
             text += '<tspan x="' + Math.floor(x + 0.5) + '" y="' + Math.floor(yy +0.5) + '">' + tspans[i] + '</tspan>';
             yy += fontSize;

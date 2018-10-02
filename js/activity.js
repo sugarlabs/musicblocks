@@ -333,12 +333,31 @@ define(MYDEFINES, function (compatibility) {
         }, false);
 
         // Calculate the palette colors.
+        /*
         for (var p in PALETTECOLORS) {
             PALETTEFILLCOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1], PALETTECOLORS[p][2]);
             PALETTESTROKECOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] - 30, PALETTECOLORS[p][2]);
             PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] + 10, PALETTECOLORS[p][2]);
             HIGHLIGHTSTROKECOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] - 50, PALETTECOLORS[p][2]);
         }
+        */
+
+        for (var p in platformColor.paletteColors) {
+            var i = searchAllColors(hexToRGB(platformColor.paletteColors[p][0]).r, hexToRGB(platformColor.paletteColors[p][0]).g, hexToRGB(platformColor.paletteColors[p][0]).b);
+	    var h = Math.floor(i / (15 * 11));
+	    var v = Math.floor((i - h * (15 * 11)) / 15);
+	    var c = i - (h * 11 + v) * 15;
+	    console.log(p + ': ' + platformColor.paletteColors[p][0] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
+            var i = searchAllColors(hexToRGB(platformColor.paletteColors[p][1]).r, hexToRGB(platformColor.paletteColors[p][1]).g, hexToRGB(platformColor.paletteColors[p][1]).b);
+	    var h = Math.floor(i / (15 * 11));
+	    var v = Math.floor((i - h * (15 * 11)) / 15);
+	    var c = i - (h * 11 + v) * 15;
+	    console.log(p + ': ' + platformColor.paletteColors[p][1] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
+	    PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
+	    PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
+	    PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(h * 2.5, v * 10 + 10, c * 100 / 14);
+	    HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
+	};
 
         pluginObjs = {
             'PALETTEPLUGINS': {},
