@@ -1168,6 +1168,7 @@ function Turtles () {
     this.masterStage = null;
     this.doClear = null;
     this.hideMenu = null;
+    this.hideGrids = null;
     this.stage = null;
     this.refreshCanvas = null;
     this.scale = 1.0;
@@ -1195,8 +1196,13 @@ function Turtles () {
     };
 
     this.setClear = function (doClear) {
-	this.doClear = doClear;
-	return this;
+        this.doClear = doClear;
+        return this;
+    };
+
+    this.setHideGrids = function (hideGrids) {
+        this.hideGrids = hideGrids;
+        return this;
     };
 
     this.setHideMenu = function (hideMenu) {
@@ -1240,10 +1246,10 @@ function Turtles () {
 
     this.makeBackground = function (setCollapsed) {
         if (setCollapsed === undefined) {
-	    var doCollapse = false;
-	} else {
-	    var doCollapse = setCollapsed;
-	}
+            var doCollapse = false;
+        } else {
+            var doCollapse = setCollapsed;
+        }
 
         // Remove any old background containers.
         for (var i = 0; i < this._borderContainer.children.length; i++) {
@@ -1311,17 +1317,17 @@ function Turtles () {
                 that._expandButton.visible = false;
                 that._borderContainer.addChild(that._expandButton);
 
-		that._expandButton.removeAllEventListeners('pressmove');
+                that._expandButton.removeAllEventListeners('pressmove');
                 that._expandButton.on('pressmove', function (event) {
                     var w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
-		    var x = event.stageX / that.scale - w;
-		    var y = event.stageY / that.scale - 16;
+                    var x = event.stageX / that.scale - w;
+                    var y = event.stageY / that.scale - 16;
                     that.stage.x = Math.max(0, Math.min(that.w * 3 / 4, x));
                     that.stage.y = Math.max(55, Math.min(that.h * 3 / 4, y));
                     that.refreshCanvas();
                 });
 
-		that._expandButton.removeAllEventListeners('click');
+                that._expandButton.removeAllEventListeners('click');
                 that._expandButton.on('click', function (event) {
                     that.hideMenu();
                     that.scaleStage(1.0);
@@ -1367,9 +1373,9 @@ function Turtles () {
                 that._collapseButton.x = that.w - 55;
                 that._collapseButton.y = 55 + LEADING;
 
-		that._collapseButton.removeAllEventListeners('click');
+                that._collapseButton.removeAllEventListeners('click');
                 that._collapseButton.on('click', function (event) {
-		    that.collapse();
+                    that.collapse();
                 });
 
                 __makeClearButton();
@@ -1380,59 +1386,59 @@ function Turtles () {
         };
 
         function __makeClearButton() {
-	    that._clearButton = new createjs.Container();
+            that._clearButton = new createjs.Container();
 
             /*
-	    that._clearButton.removeAllEventListeners('mouseover');
-	    that._clearButton.on('mouseover', function (event) {
+            that._clearButton.removeAllEventListeners('mouseover');
+            that._clearButton.on('mouseover', function (event) {
                 for (var c = 0; c < that._clearButton.children.length; c++) {
-		    if (that._clearButton.children[c].text != undefined) {
+                    if (that._clearButton.children[c].text != undefined) {
                         that._clearButton.children[c].visible = true;
-			if (that._clearButton.children.length === 2) {
-			    var b = that._clearButton.children[c].getBounds();
-			    var bg = new createjs.Shape();
+                        if (that._clearButton.children.length === 2) {
+                            var b = that._clearButton.children[c].getBounds();
+                            var bg = new createjs.Shape();
                             bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-			    that._clearButton.addChildAt(bg, 0);
-			    that._clearButton.children[0].visible = true;
-			    that.refreshCanvas();
-			}
-		    }
-		}
-	    });
+                            that._clearButton.addChildAt(bg, 0);
+                            that._clearButton.children[0].visible = true;
+                            that.refreshCanvas();
+                        }
+                    }
+                }
+            });
 
-	    that._clearButton.removeAllEventListeners('mouseout');
-	    that._clearButton.on('mouseout', function (event) {
+            that._clearButton.removeAllEventListeners('mouseout');
+            that._clearButton.on('mouseout', function (event) {
                 for (var c = 0; c < that._clearButton.children.length; c++) {
-		    if (that._clearButton.children[c].text != undefined) {
+                    if (that._clearButton.children[c].text != undefined) {
                         that._clearButton.children[c].visible = false;
                         that._clearButton.children[0].visible = false;
                         that.refreshCanvas();
                         break;
-		    }
+                    }
                 }
-	    });
+            });
             */
 
-	    that._clearButton.removeAllEventListeners('click');
+            that._clearButton.removeAllEventListeners('click');
             that._clearButton.on('click', function (event) {
-		that.doClear();
+                that.doClear();
             });
 
             /*
-	    var text = new createjs.Text(_('Clean'), '14px Sans', '#282828');
+            var text = new createjs.Text(_('Clean'), '14px Sans', '#282828');
             text.textAlign = 'center';
             text.x = 0;
-	    text.y = 30;
-	    text.visible = false;
+            text.y = 30;
+            text.visible = false;
             */
 
             var img = new Image();
             img.onload = function () {
                 var bitmap = new createjs.Bitmap(img);
                 that._clearButton.addChild(bitmap);
-		// that._clearButton.addChild(text);
+                // that._clearButton.addChild(text);
 
-		bitmap.visible = true;
+                bitmap.visible = true;
                 that._clearButton.x = that.w - 10 - 2 * 55;
                 that._clearButton.y = 55 + LEADING;
                 that._clearButton.visible = true;
@@ -1441,8 +1447,8 @@ function Turtles () {
                 that.refreshCanvas();
 
                 if (doCollapse) {
-		    that.collapse();
-		}
+                    that.collapse();
+                }
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
@@ -1455,6 +1461,7 @@ function Turtles () {
 
     this.collapse = function () {
         this.hideMenu();
+        this.hideGrids();
         this.scaleStage(0.25);
         this._collapsedBoundary.visible = true;
         this._expandButton.visible = true;
@@ -1478,7 +1485,7 @@ function Turtles () {
         this.masterStage.removeChild(this.stage);
         this.masterStage.addChild(this.stage);
 
-	this.refreshCanvas();
+        this.refreshCanvas();
     };
 
     this.setBlocks = function (blocks) {

@@ -344,20 +344,20 @@ define(MYDEFINES, function (compatibility) {
 
         for (var p in platformColor.paletteColors) {
             var i = searchAllColors(hexToRGB(platformColor.paletteColors[p][0]).r, hexToRGB(platformColor.paletteColors[p][0]).g, hexToRGB(platformColor.paletteColors[p][0]).b);
-	    var h = Math.floor(i / (15 * 11));
-	    var v = Math.floor((i - h * (15 * 11)) / 15);
-	    var c = i - (h * 11 + v) * 15;
-	    // console.log(p + ': ' + platformColor.paletteColors[p][0] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
+            var h = Math.floor(i / (15 * 11));
+            var v = Math.floor((i - h * (15 * 11)) / 15);
+            var c = i - (h * 11 + v) * 15;
+            // console.log(p + ': ' + platformColor.paletteColors[p][0] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
             var i = searchAllColors(hexToRGB(platformColor.paletteColors[p][1]).r, hexToRGB(platformColor.paletteColors[p][1]).g, hexToRGB(platformColor.paletteColors[p][1]).b);
-	    var h = Math.floor(i / (15 * 11));
-	    var v = Math.floor((i - h * (15 * 11)) / 15);
-	    var c = i - (h * 11 + v) * 15;
-	    // console.log(p + ': ' + platformColor.paletteColors[p][1] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
-	    PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
-	    PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
-	    PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(h * 2.5, v * 10 + 20, c * 100 / 14);
-	    HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
-	};
+            var h = Math.floor(i / (15 * 11));
+            var v = Math.floor((i - h * (15 * 11)) / 15);
+            var c = i - (h * 11 + v) * 15;
+            // console.log(p + ': ' + platformColor.paletteColors[p][1] + ' = ' + h * 2.5 + ' ' + v * 10 + ' ' + c * 100 / 14);
+            PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
+            PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
+            PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(h * 2.5, v * 10 + 10, c * 100 / 14);
+            HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
+        };
 
         pluginObjs = {
             'PALETTEPLUGINS': {},
@@ -914,6 +914,15 @@ define(MYDEFINES, function (compatibility) {
             languageBox.hide();
         };
 
+        function hideGrids() {
+            gridButtonLabel.text = _('Cartesian');
+            gridImages[1].visible = false;
+            gridImages[2].visible = false;
+            gridImages[3].visible = false;
+            _hideCartesian();
+            _hidePolar();
+        };
+
         function _doCartesianPolar() {
             blocks.activeBlock = null;
             closeSubMenus();
@@ -1254,6 +1263,7 @@ define(MYDEFINES, function (compatibility) {
                 .setHideMenu(hideAuxMenu)
                 .setMasterStage(stage)
                 .setStage(turtleContainer)
+                .setHideGrids(hideGrids)
                 .setRefreshCanvas(refreshCanvas);
 
             // Put the boundary in the blocks container so it scrolls
