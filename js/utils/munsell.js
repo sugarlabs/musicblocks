@@ -125,7 +125,6 @@ function searchColors(r, g, b) {
 
 
 function searchAllColors(r, g, b) {
-    console.log(r + ' ' + g + ' ' + b);
     var nearestColor = -1;
     var distance = 10000000;
     for (var i = 0; i < MUNSELL.length; i++) {
