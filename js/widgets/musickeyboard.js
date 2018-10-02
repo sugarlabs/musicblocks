@@ -26,7 +26,7 @@ function MusicKeyboard() {
     this.octaves = [];
 
     var keyboard = document.getElementById('keyboard');
-    var keyboardHolder = document.getElementById('keyboardHolder');
+    var keyboardHolder = document.getElementById('keyboardHolder2');
     var firstOctave = document.getElementById('firstOctave');
     var firstNote = document.getElementById('firstNote');
     var secondOctave = document.getElementById('secondOctave');
@@ -39,8 +39,6 @@ function MusicKeyboard() {
 
     var selected = [];
     var selected1 = [];
-    var customKeyboard = 0;
-    var standardKeyboard = 0;
 
     this.processClick = function(i) {
         var temp1 = this.noteNames[i];
@@ -93,15 +91,11 @@ function MusicKeyboard() {
 
         // For the button callbacks
         var that = this;
-        if (this.noteNames.length == 0) {
+        if (this.noteNames.length === 0) {
             document.getElementById('keyboardHolder').style.display = 'block';
-            standardKeyboard = 1;
         } else {
             document.getElementById('keyboardHolder2').style.display = 'block';
-            customKeyboard = 1;
-
             var idContainer = [];
-            var idContainer2 = [];
 
             for (var p = 0; p < this.noteNames.length; p++){
                 if (this.noteNames[p][2] === SHARP || this.noteNames[p][3] === SHARP) {
@@ -134,9 +128,6 @@ function MusicKeyboard() {
                 }
             }
 
-            console.log('idContainer ' + idContainer);
-            console.log('idContainer2 ' + idContainer2);
-
             for (var i = 0; i < idContainer.length; i++) {
                 this.loadHandler(document.getElementById(idContainer[i]), i);
             }
@@ -151,7 +142,6 @@ function MusicKeyboard() {
                     var zx = selected[q];
                     var res = zx.replace(SHARP, '#').replace(FLAT, 'b');
 
-                    console.log('res ' + res);
                     synth.triggerAttackRelease(res, '8n');
                     sleep(500);
                 }
@@ -160,7 +150,6 @@ function MusicKeyboard() {
                     var zx = selected1[q];
                     var res = zx.replace(SHARP, '#').replace(FLAT, 'b');
 
-                    console.log('res ' + res);
                     synth.triggerAttackRelease(res, '8n');
                     sleep(500);
                 }
@@ -274,32 +263,31 @@ function MusicKeyboard() {
         var note2 = secondNote.value;
         var oct1 = firstOctave.value;
         var oct2 = secondOctave.value;
-        //sanity checks
-        //missing values
+
         if (note1 === '' || note2 === '' || oct1 === '' || oct2 === '') {
             return;
         }
 
-        //2nd octave < 1st octave
+        // 2nd octave < 1st octave
         if (oct2 < oct1) {
             var tmp = oct1;
             oct1 = oct2;
             oct2 = tmp;
         }
-        //2nd key comes before 1st key on same octave
+
+        // 2nd key comes before 1st key on same octave
         if (oct1 === oct2 && whiteNoteEnums.indexOf(note1) > whiteNoteEnums.indexOf(note2)) {
             var tmp = note1;
             note1 = note2;
             note2 = tmp;
         }
 
-        //reflect sanity changes
         firstNote.value = note1;
         secondNote.value = note2;
         firstOctave.value = oct1;
         secondOctave.value = oct2;
         
-        //first key -> end of first octave
+        // 1st key -> end of first octave
         for (var j = whiteNoteEnums.indexOf(note1); j < whiteNoteEnums.length; j++) {
             whiteKeys.innerHTML += '<td>' + whiteNoteEnums[j] + oct1 + '</td>';
         }
@@ -312,7 +300,7 @@ function MusicKeyboard() {
             }
         }
 
-        //2nd octave -> second to last octave
+        // 2nd octave -> second to last octave
         for (var i = parseInt(oct1) + 1; i <= oct2-1; i++) {
             for (var j = 0; j < whiteNoteEnums.length; j++) {
                 whiteKeys.innerHTML += '<td>' + whiteNoteEnums[j] + i + '</td>';
@@ -327,7 +315,7 @@ function MusicKeyboard() {
             }
         }
 
-        //last octave -> last key
+        // last octave -> last key
         for (var j = 0; j < whiteNoteEnums.indexOf(note2) + 1; j++) {
             whiteKeys.innerHTML += '<td>' + whiteNoteEnums[j] + oct2 + '</td>';
         }
@@ -340,7 +328,8 @@ function MusicKeyboard() {
                 blackKeys.innerHTML += "<td style='visibility: hidden'></td>";
             }
         }
-        //assign the IDs (for clearing)
+
+        // Assign the IDs (for clearing)
         for (var i = 0; i < whiteKeys.children.length; i++) {
             whiteKeys.children[i].id = whiteKeys.children[i].textContent;
         }
@@ -403,13 +392,12 @@ function MusicKeyboard() {
     };
 
     function handleKeyboard (key) {
-        //Tone can't do special sharps, need # isntead of ♯
-        var noSharp = key;
-        if (key[1] === '♯') {
-            noSharp = key[0] + '#' + key[2];
-        }
-
-        synth.triggerAttackRelease(noSharp, '8n');
+	keys = key.split('/');
+        if (keys.length === 1) {
+            synth.triggerAttackRelease(keys[0].replace(SHARP, '#').replace(FLAT, 'b'), '8n');
+	} else {
+            synth.triggerAttackRelease(keys[1].replace(SHARP, '#').replace(FLAT, 'b'), '8n');
+	}
     };  
 
     this._save = function(pitches) {
