@@ -4170,9 +4170,54 @@ handleComplete);
                 buttonNames.unshift(['popdown-palette', doPopdownPalette]);
             }
 
+            // Load the logo
+            var logoContainer = new createjs.Container();
+            var logoText = new createjs.Text(_('Music Blocks'), '14px Sans', '#282828');
+            logoText.textAlign = 'center';
+            logoText.visible = false;
+            var img = new Image();
+            img.onload = function () {
+                var bitmap = new createjs.Bitmap(img);
+                logoContainer.addChild(bitmap);
+                stage.addChild(logoContainer);
+                bitmap.x = 0;
+                bitmap.y = 0;
+                bitmap.visible = true;
+                logoContainer.x = 0;
+                logoContainer.y = 0;
+                logoContainer.visible = true;
+                refreshCanvas();
+
+                var bg = null;
+                logoContainer.on('mouseover', function (event) {
+                    if (bg === null) {
+                        logoText.x = 65;
+                        logoText.y = 55;
+                        var b = logoText.getBounds();
+                        bg = new createjs.Shape();
+                        bg.graphics.beginFill('#FFF').drawRoundRect(logoText.x - b.width / 2 - 8, logoText.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                        logoContainer.addChild(logoText);
+                        logoContainer.addChildAt(bg, 0);
+                    }
+
+                    logoText.visible = true;
+                    bg.visible = true;
+                    refreshCanvas();
+                });
+
+                logoContainer.on('mouseout', function (event) {
+                    logoText.visible = false;
+                    bg.visible = false;
+                    refreshCanvas();
+                });
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
+
             var btnSize = cellSize;
-            var x = Math.floor(btnSize / 2);
-            var y = x;
+            // The magic number comes from the paletteWidth (See palettes.js)
+            var x = 7 / 3 * STANDARDBLOCKHEIGHT + Math.floor(btnSize);
+            var y = Math.floor(btnSize / 2);
             var dx = btnSize;
             var dy = 0;
 
