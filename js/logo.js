@@ -3433,7 +3433,6 @@ function Logo () {
             that.inMusicKeyboard = true;
             that.musicKeyboard.noteNames = [];
             that.musicKeyboard.octaves = [];
-            that.musicKeyboard.clearBlocks();
 
             var listenerName = '_musickeyboard_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
@@ -4655,13 +4654,6 @@ function Logo () {
 
                 that.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (that.inMusicKeyboard) {
-            	if (note.toLowerCase() !== 'rest') {
-                    that.musicKeyboard.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                }
-
                 if (!(that.invertList[turtle].length === 0)) {
                     delta += that._calculateInvert(turtle, note, octave);
                 }
