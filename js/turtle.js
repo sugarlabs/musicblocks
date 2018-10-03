@@ -1186,6 +1186,12 @@ function Turtles () {
     this._collapseButton = null;
     this.isShrunk = false;
     this._clearButton = null;
+    this._expandLabel = null;
+    this._expandLabelBG = null;
+    this._collapseLabel = null;
+    this._collapseLabelBG = null;
+    this._clearLabel = null;
+    this._clearLabelBG = null;
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
@@ -1333,15 +1339,17 @@ function Turtles () {
 
                 that._expandButton.removeAllEventListeners('mouseover');
                 that._expandButton.on('mouseover', function (event) {
-                    that._expandLabel.visible = true;
+                    if (that._expandLabel !== null) {
+                        that._expandLabel.visible = true;
 
-                    if (that._expandLabelBG === null) {
-                        var b = that._expandLabel.getBounds();
-                        that._expandLabelBG = new createjs.Shape();
-                        that._expandLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._expandLabel.x + b.x - 8, that._expandLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-                        that._expandButton.addChildAt(that._expandLabelBG, 0);
-                    } else {
-                        that._expandLabelBG.visible = true;
+                        if (that._expandLabelBG === null) {
+                            var b = that._expandLabel.getBounds();
+                            that._expandLabelBG = new createjs.Shape();
+                            that._expandLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._expandLabel.x + b.x - 8, that._expandLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                            that._expandButton.addChildAt(that._expandLabelBG, 0);
+                        } else {
+                            that._expandLabelBG.visible = true;
+                        }
                     }
 
                     that.refreshCanvas();
@@ -1349,9 +1357,11 @@ function Turtles () {
 
                 that._expandButton.removeAllEventListeners('mouseout');
                 that._expandButton.on('mouseout', function (event) {
-                    that._expandLabel.visible = false;
-                    that._expandLabelBG.visible = false;
-                    that.refreshCanvas();
+                    if (that._expandLabel !== null) {
+                        that._expandLabel.visible = false;
+                        that._expandLabelBG.visible = false;
+                        that.refreshCanvas();
+                    }
                 });
 
                 that._expandButton.removeAllEventListeners('pressmove');
@@ -1433,15 +1443,17 @@ function Turtles () {
 
                 that._collapseButton.removeAllEventListeners('mouseover');
                 that._collapseButton.on('mouseover', function (event) {
-                    that._collapseLabel.visible = true;
+                    if (that._collapseLabel !== null) {
+                        that._collapseLabel.visible = true;
 
-                    if (that._collapseLabelBG === null) {
-                        var b = that._collapseLabel.getBounds();
-                        that._collapseLabelBG = new createjs.Shape();
-                        that._collapseLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._collapseLabel.x + b.x - 8, that._collapseLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-                        that._collapseButton.addChildAt(that._collapseLabelBG, 0);
-                    } else {
-                        that._collapseLabelBG.visible = true;
+                        if (that._collapseLabelBG === null) {
+                            var b = that._collapseLabel.getBounds();
+                            that._collapseLabelBG = new createjs.Shape();
+                            that._collapseLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._collapseLabel.x + b.x - 8, that._collapseLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                            that._collapseButton.addChildAt(that._collapseLabelBG, 0);
+                        } else {
+                            that._collapseLabelBG.visible = true;
+                        }
                     }
 
                     that.refreshCanvas();
@@ -1449,9 +1461,11 @@ function Turtles () {
 
                 that._collapseButton.removeAllEventListeners('mouseout');
                 that._collapseButton.on('mouseout', function (event) {
-                    that._collapseLabel.visible = false;
-                    that._collapseLabelBG.visible = false;
-                    that.refreshCanvas();
+                  if (that._collapseLabel !== null) {
+                     that._collapseLabel.visible = false;
+                     that._collapseLabelBG.visible = false;
+                     that.refreshCanvas();
+                  }
                 });
 
                 __makeClearButton();
@@ -1493,15 +1507,17 @@ function Turtles () {
 
                 that._clearButton.removeAllEventListeners('mouseover');
                 that._clearButton.on('mouseover', function (event) {
-                    that._clearLabel.visible = true;
+                    if (that._clearLabel !== null) {
+                        that._clearLabel.visible = true;
 
-                    if (that._clearLabelBG === null) {
-                        var b = that._clearLabel.getBounds();
-                        that._clearLabelBG = new createjs.Shape();
-                        that._clearLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._clearLabel.x + b.x - 8, that._clearLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-                        that._clearButton.addChildAt(that._clearLabelBG, 0);
-                    } else {
-                        that._clearLabelBG.visible = true;
+                        if (that._clearLabelBG === null) {
+                            var b = that._clearLabel.getBounds();
+                            that._clearLabelBG = new createjs.Shape();
+                            that._clearLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._clearLabel.x + b.x - 8, that._clearLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                            that._clearButton.addChildAt(that._clearLabelBG, 0);
+                        } else {
+                            that._clearLabelBG.visible = true;
+                        }
                     }
 
                     that.refreshCanvas();
@@ -1509,9 +1525,11 @@ function Turtles () {
 
                 that._clearButton.removeAllEventListeners('mouseout');
                 that._clearButton.on('mouseout', function (event) {
-                    that._clearLabel.visible = false;
-                    that._clearLabelBG.visible = false;
-                    that.refreshCanvas();
+                    if (that._clearLabel !== null) {
+                        that._clearLabel.visible = false;
+                        that._clearLabelBG.visible = false;
+                        that.refreshCanvas();
+                    }
                 });
 
                 if (doCollapse) {
