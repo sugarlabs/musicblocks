@@ -875,7 +875,8 @@ define(MYDEFINES, function (compatibility) {
 
         function doSwitchMode() {
             blocks.activeBlock = null;
-            if (beginnerMode) {
+            var mode = localStorage.beginnerMode;
+            if (mode === null || mode === 'true') {
                 textMsg(_('Refresh your browser to change to advanced mode.'));
                 localStorage.setItem('beginnerMode', false);
                 beginnerModeContainer.visible = false;
