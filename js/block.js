@@ -873,11 +873,11 @@ function Block(protoblock, blocks, overrideName) {
 
                 that.container.addChild(that.collapseButtonBitmap);
 
-                that.collapseButtonBitmap.x = 0;
+                that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
-                    that.collapseButtonBitmap.y = 2 * that.protoblock.scale;
+                    that.collapseButtonBitmap.y = 4 * that.protoblock.scale;
                 } else {
-                    that.collapseButtonBitmap.y = 2 * that.protoblock.scale; // 8 * that.protoblock.scale;
+                    that.collapseButtonBitmap.y = 4 * that.protoblock.scale; // 8 * that.protoblock.scale;
                 }
 
                 that.collapseButtonBitmap.visible = !that.collapsed;
@@ -897,11 +897,11 @@ function Block(protoblock, blocks, overrideName) {
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
 
-                that.expandButtonBitmap.x = 0;
+                that.expandButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
-                    that.expandButtonBitmap.y = 2 * that.protoblock.scale;
+                    that.expandButtonBitmap.y = 4 * that.protoblock.scale;
                 } else {
-                    that.expandButtonBitmap.y = 2 * that.protoblock.scale; // 8 * that.protoblock.scale;
+                    that.expandButtonBitmap.y = 4 * that.protoblock.scale; // 8 * that.protoblock.scale;
                 }
 
                 __processCollapseButton(that);
