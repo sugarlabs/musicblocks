@@ -489,7 +489,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // Blocks are all home, so reset go-home-button.
-	    setHomeContainers(false, true);
+            setHomeContainers(false, true);
             boundary.hide();
         };
 
@@ -1192,6 +1192,11 @@ define(MYDEFINES, function (compatibility) {
         init();
 
         function init() {
+            this.innerWidth = window.innerWidth;
+            this.innerHeight = window.innerHeight;
+            this.outerWidth = window.outerWidth;
+            this.outerHeight = window.outerHeight;
+
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 //sugarizerCompatibility.data.blocks = prepareExport();
                 storage = sugarizerCompatibility.data;
@@ -2043,7 +2048,7 @@ define(MYDEFINES, function (compatibility) {
             var flags = {run: false, show: false, collapse: false};
 
             // Scale the canvas relative to the screen size.
-            _onResize();
+            _onResize(true);
 
             var urlParts;
             var env = [];
@@ -2863,7 +2868,27 @@ define(MYDEFINES, function (compatibility) {
             currentKeyCode = 0;
         };
 
-        function _onResize() {
+        function _onResize(force) {
+            if (!platform.androidWebkit) {
+                var w = window.innerWidth;
+                // Don't trigger resize if browser header or footer
+                // added/removed.
+                if (!force && w === this.innerWidth) {
+                    return;
+                }
+
+                var h = window.innerHeight;
+            } else {
+                var w = window.outerWidth;
+                // Don't trigger resize if browser header or footer
+                // added/removed.
+                if (!force && w === this.outerWidth) {
+                    return;
+                }
+
+                var h = window.outerHeight;
+            }
+
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
                 return;
             }
@@ -2871,16 +2896,9 @@ define(MYDEFINES, function (compatibility) {
             // If any menus were open, close them.
             if (confirmContainer !== null && utilityContainer.visible) {
                 if (headerContainer.y > 0) {
+                    console.log('CLOSING MENUS BEFORE RESIZE');
                     _showHideAuxMenu(true);
                 }
-            }
-
-            if (!platform.androidWebkit) {
-                var w = window.innerWidth;
-                var h = window.innerHeight;
-            } else {
-                var w = window.outerWidth;
-                var h = window.outerHeight;
             }
 
             var smallSide = Math.min(w, h);
@@ -2981,7 +2999,8 @@ define(MYDEFINES, function (compatibility) {
         };
 
         window.onresize = function () {
-            _onResize();
+            console.log('RESIZE EVENT');
+            _onResize(false);
         };
 
         function _restoreTrash() {
