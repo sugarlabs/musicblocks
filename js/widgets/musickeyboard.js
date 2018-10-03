@@ -21,7 +21,6 @@ function MusicKeyboard() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
-    this._blocks = [];
     this.noteNames = [];
     this.octaves = [];
 
@@ -42,9 +41,14 @@ function MusicKeyboard() {
 
     this.processClick = function(i) {
         var temp1 = this.noteNames[i];
-        var temp2 = FIXEDSOLFEGE1[temp1] + this.octaves[i];
-        selected1.push(temp2);
+        if (temp1 in FIXEDSOLFEGE1) {
+            var temp2 = FIXEDSOLFEGE1[temp1] + this.octaves[i];
+        } else {
+            var temp2 = temp1 + this.octaves[i];
+        }
 
+        selected1.push(temp2);
+        console.log(temp2);
         synth.triggerAttackRelease(temp2.replace(SHARP, '#').replace(FLAT, 'b'), '8n');
     };
 
@@ -92,13 +96,34 @@ function MusicKeyboard() {
         // For the button callbacks
         var that = this;
         if (this.noteNames.length === 0) {
-            document.getElementById('keyboardHolder').style.display = 'block';
-        } else {
+            // document.getElementById('keyboardHolder').style.display = 'block';
+            for (var i = 0; i < PITCHES3.length; i++) {
+                this.noteNames.push(PITCHES3[i]);
+                this.octaves.push(4);
+                if (i === 4) {
+                    this.noteNames.push(null); // missing black key
+                    this.octaves.push(4);
+                }
+            }
+
+            this.noteNames.push(PITCHES3[0]);
+            this.octaves.push(5);
+        } // else {
             document.getElementById('keyboardHolder2').style.display = 'block';
             var idContainer = [];
 
             for (var p = 0; p < this.noteNames.length; p++){
-                if (this.noteNames[p][2] === SHARP || this.noteNames[p][3] === SHARP) {
+                if (this.noteNames[p] === null) {
+                    var parenttbl2 = document.getElementById('myrow2');
+                    var newel2 = document.createElement('td');
+                    var elementid2 = document.getElementsByTagName('td').length
+                    
+                    newel2.setAttribute('id',elementid2);
+                    idContainer.push(elementid2);
+                    newel2.innerHTML = '';
+                    newel2.style.visibility = 'hidden';
+                    parenttbl2.appendChild(newel2);
+                } else if (this.noteNames[p].indexOf(SHARP) !== -1 || this.noteNames[p].indexOf('#') !== -1) {
                     var parenttbl2 = document.getElementById('myrow2');
                     var newel2 = document.createElement('td');
                     var elementid2 = document.getElementsByTagName('td').length
@@ -107,7 +132,7 @@ function MusicKeyboard() {
                     idContainer.push(elementid2);
                     newel2.innerHTML = this.noteNames[p] + this.octaves[p];
                     parenttbl2.appendChild(newel2);
-                } else if (this.noteNames[p][2] === FLAT || this.noteNames[p][3] === FLAT) {
+                } else if (this.noteNames[p].indexOf(FLAT) !== -1 || this.noteNames[p].indexOf('b') !== -1) {
                     var parenttbl2 = document.getElementById('myrow2');
                     var newel2 = document.createElement('td');
                     var elementid2 = document.getElementsByTagName('td').length
@@ -131,7 +156,7 @@ function MusicKeyboard() {
             for (var i = 0; i < idContainer.length; i++) {
                 this.loadHandler(document.getElementById(idContainer[i]), i);
             }
-        }
+        // }
 
         var cell = this._addButton(row1, 'play-button.svg', ICONSIZE, _('play'));
 
@@ -252,91 +277,6 @@ function MusicKeyboard() {
                 e.preventDefault();
             }
         };
-
-        changeKeys();
-    };
-
-    function changeKeys() {
-        whiteKeys.innerHTML = '';
-        blackKeys.innerHTML = '';
-        var note1 = firstNote.value;
-        var note2 = secondNote.value;
-        var oct1 = firstOctave.value;
-        var oct2 = secondOctave.value;
-
-        if (note1 === '' || note2 === '' || oct1 === '' || oct2 === '') {
-            return;
-        }
-
-        // 2nd octave < 1st octave
-        if (oct2 < oct1) {
-            var tmp = oct1;
-            oct1 = oct2;
-            oct2 = tmp;
-        }
-
-        // 2nd key comes before 1st key on same octave
-        if (oct1 === oct2 && whiteNoteEnums.indexOf(note1) > whiteNoteEnums.indexOf(note2)) {
-            var tmp = note1;
-            note1 = note2;
-            note2 = tmp;
-        }
-
-        firstNote.value = note1;
-        secondNote.value = note2;
-        firstOctave.value = oct1;
-        secondOctave.value = oct2;
-        
-        // 1st key -> end of first octave
-        for (var j = whiteNoteEnums.indexOf(note1); j < whiteNoteEnums.length; j++) {
-            whiteKeys.innerHTML += '<td>' + whiteNoteEnums[j] + oct1 + '</td>';
-        }
-
-        for (var j = whiteNoteEnums.indexOf(note1); j < blackNoteEnums.length; j++) {
-            if (blackNoteEnums[j] !== null) {
-                blackKeys.innerHTML += '<td>' + blackNoteEnums[j] + oct1 + '</td>';
-            } else {
-                blackKeys.innerHTML += "<td style='visibility: hidden'></td>";
-            }
-        }
-
-        // 2nd octave -> second to last octave
-        for (var i = parseInt(oct1) + 1; i <= oct2-1; i++) {
-            for (var j = 0; j < whiteNoteEnums.length; j++) {
-                whiteKeys.innerHTML += '<td>' + whiteNoteEnums[j] + i + '</td>';
-            }
-
-            for (var j = 0; j < blackNoteEnums.length; j++) {
-                if (blackNoteEnums[j] !== null) {
-                    blackKeys.innerHTML += '<td>' + blackNoteEnums[j] + i + '</td>';
-                } else {
-                    blackKeys.innerHTML += "<td style='visibility: hidden'></td>";
-                }
-            }
-        }
-
-        // last octave -> last key
-        for (var j = 0; j < whiteNoteEnums.indexOf(note2) + 1; j++) {
-            whiteKeys.innerHTML += '<td>' + whiteNoteEnums[j] + oct2 + '</td>';
-        }
-
-        for (var j = 0; j < whiteNoteEnums.indexOf(note2); j++) {
-            if (blackNoteEnums[j] !== null) {
-                blackKeys.innerHTML += '<td>' + blackNoteEnums[j] + oct2 + '</td>';
-            }
-            else {
-                blackKeys.innerHTML += "<td style='visibility: hidden'></td>";
-            }
-        }
-
-        // Assign the IDs (for clearing)
-        for (var i = 0; i < whiteKeys.children.length; i++) {
-            whiteKeys.children[i].id = whiteKeys.children[i].textContent;
-        }
-
-        for (var i = 0; i < blackKeys.children.length; i++) {
-            blackKeys.children[i].id = blackKeys.children[i].textContent;
-        }
     };
 
     keyboard.addEventListener('mousedown', function (e) {
@@ -392,12 +332,12 @@ function MusicKeyboard() {
     };
 
     function handleKeyboard (key) {
-	keys = key.split('/');
+        keys = key.split('/');
         if (keys.length === 1) {
             synth.triggerAttackRelease(keys[0].replace(SHARP, '#').replace(FLAT, 'b'), '8n');
-	} else {
+        } else {
             synth.triggerAttackRelease(keys[1].replace(SHARP, '#').replace(FLAT, 'b'), '8n');
-	}
+        }
     };  
 
     this._save = function(pitches) {
@@ -430,7 +370,7 @@ function MusicKeyboard() {
             var lastConnection = null;
 
             newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-            if (['♯', '♭'].indexOf(notePitch[1]) !== -1) {
+            if (['#', 'b', '♯', '♭'].indexOf(notePitch[1]) !== -1) {
                 newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0]] + note[1]}], 0, 0, [thisBlock]]);
                 newStack.push([thisBlock + 2, ['number', {'value': note[note.length-1]}], 0, 0, [thisBlock]]);
             } 
@@ -444,13 +384,8 @@ function MusicKeyboard() {
     }
 
     this.clearBlocks = function() {
-        this._blocks = [];
         this.noteNames = [];
         this.octaves = [];
-    };
-
-    this.addRowBlock = function(pitchBlock) {
-        this._blocks.push(pitchBlock);
     };
 
     function sleep(milliseconds) {
