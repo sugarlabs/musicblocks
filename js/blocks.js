@@ -356,8 +356,8 @@ function Blocks () {
     };
 
     // We need access to the go-home buttons and boundary.
-    this.setHomeContainers = function (containers, boundary) {
-        this._homeButtonContainers = containers;
+    this.setHomeContainers = function (setContainers, boundary) {
+        this._setHomeButtonContainers = setContainers;
         this.boundary = boundary;
         return this;
     };
@@ -1619,8 +1619,7 @@ function Blocks () {
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].connections[0] == null) {
                 if (this.blockList[blk].offScreen(this.boundary)) {
-                    this._homeButtonContainers[0].visible = true;
-                    this._homeButtonContainers[1].visible = false;
+                    this._setHomeButtonContainers(true, false);
                     this.boundary.show();
                     onScreen = false;
                     break;
@@ -1628,8 +1627,7 @@ function Blocks () {
             }
         }
         if (onScreen) {
-            this._homeButtonContainers[0].visible = false;
-            this._homeButtonContainers[1].visible = true;
+            this._setHomeButtonContainers(false, true);
             this.boundary.hide();
         }
     };
@@ -4633,8 +4631,7 @@ function Blocks () {
                         this._adjustTheseStacks.push(thisBlock);
                     }
                     if (blkData[2] < 0 || blkData[3] < 0 || blkData[2] > canvas.width || blkData[3] > canvas.height) {
-                        this._homeButtonContainers[0].visible = true;
-                        this._homeButtonContainers[1].visible = false;
+                        this._setHomeButtonContainers(true, false);
                     }
                 }
             }

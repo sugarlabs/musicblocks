@@ -489,9 +489,15 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // Blocks are all home, so reset go-home-button.
-            homeButtonContainers[0].visible = false;
-            homeButtonContainers[1].visible = true;
+	    setHomeContainers(false, true);
             boundary.hide();
+        };
+
+        function setHomeContainers(zero, one) {
+            if (!saveHTMLContainer.visible) {
+                homeButtonContainers[0].visible = zero;
+                homeButtonContainers[1].visible = one;
+            }
         };
 
         function _printBlockSVG() {
@@ -4416,7 +4422,7 @@ handleComplete);
                     homeButtonContainers[0].y = -3 * btnSize / 2;
                     homeButtonContainers[1].y = -3 * btnSize / 2;
                     boundary.hide();
-                    blocks.setHomeContainers(homeButtonContainers, boundary);
+                    blocks.setHomeContainers(setHomeContainers, boundary);
                 }
 
                 _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
