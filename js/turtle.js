@@ -871,7 +871,7 @@ function Turtle (name, turtles, drum) {
 
     this.resizeDecoration = function(scale, width) {
         this.decorationBitmap.x = width - 30 * scale / 2;
-        this.decorationBitmap.y = 35 * scale / 2;
+        this.decorationBitmap.y = 20 * scale / 2;
         this.decorationBitmap.scaleX = this.decorationBitmap.scaleY = this.decorationBitmap.scale = 0.5 * scale / 2
     };
 
@@ -1670,7 +1670,7 @@ function Turtles () {
 
                 newTurtle.decorationBitmap.x = width - offset * startBlock.protoblock.scale / 2;
 
-                newTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
+                newTurtle.decorationBitmap.y = 20 * startBlock.protoblock.scale / 2;
                 newTurtle.decorationBitmap.scaleX = newTurtle.decorationBitmap.scaleY = newTurtle.decorationBitmap.scale = 0.5 * startBlock.protoblock.scale / 2
                 startBlock.updateCache();
             }

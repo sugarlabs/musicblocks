@@ -877,7 +877,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (that.isInlineCollapsible()) {
                     that.collapseButtonBitmap.y = 2 * that.protoblock.scale;
                 } else {
-                    that.collapseButtonBitmap.y = 8 * that.protoblock.scale;
+                    that.collapseButtonBitmap.y = 2 * that.protoblock.scale; // 8 * that.protoblock.scale;
                 }
 
                 that.collapseButtonBitmap.visible = !that.collapsed;
@@ -901,7 +901,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (that.isInlineCollapsible()) {
                     that.expandButtonBitmap.y = 2 * that.protoblock.scale;
                 } else {
-                    that.expandButtonBitmap.y = 8 * that.protoblock.scale;
+                    that.expandButtonBitmap.y = 2 * that.protoblock.scale; // 8 * that.protoblock.scale;
                 }
 
                 __processCollapseButton(that);
@@ -1611,7 +1611,7 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseText.y = Math.floor(((COLLAPSETEXTY - 8) * blockScale / 2) + 0.5);
         } else {
             this.collapseText.x = Math.floor(((COLLAPSETEXTX + 30) * blockScale / 2) + 0.5);
-            this.collapseText.y = Math.floor((COLLAPSETEXTY * blockScale / 2) + 0.5);
+            this.collapseText.y = Math.floor(((COLLAPSETEXTY - 8) * blockScale / 2) + 0.5);
         }
 
         // Ensure text is on top.
