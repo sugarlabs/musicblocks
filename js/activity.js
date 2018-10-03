@@ -52,6 +52,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 }
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
+    beginnerMode = true;
+
     try {
         // console.log(localStorage.beginnerMode);
 
@@ -62,16 +64,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
             if (typeof(beginnerMode) === 'string') {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
-                } else {
-                    beginnerMode = true;
                 }
             }
-        } else {
-            beginnerMode = true;
         }
     } catch (e) {
         console.log(e);
-        beginnerMode = true;
     }
 } else {
     beginnerMode = false;
