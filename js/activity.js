@@ -234,6 +234,7 @@ define(MYDEFINES, function (compatibility) {
         var swiping = false;
         var menuButtonsVisible = false;
         var menuContainer = null;
+        var logoContainer = null;
         var scrollBlockContainer = false;
         var currentKeyCode = 0;
         var pasteContainer = null;
@@ -923,7 +924,7 @@ define(MYDEFINES, function (compatibility) {
             if (cartesianBitmap.visible && polarBitmap.visible) {
                 _hideCartesian();
                 //.TRANS: hide Polar coordinate overlay grid
-                gridButtonLabel.text = _('hide grid');
+                gridButtonLabel.text = _('Hide grid');
                 gridImages[1].visible = false;
                 gridImages[2].visible = false;
                 gridImages[3].visible = true;
@@ -975,7 +976,7 @@ define(MYDEFINES, function (compatibility) {
             var button = this;
             button.x = (canvas.width / (2 * turtleBlocksScale))  + (300 / Math.sqrt(2));
             button.y = 300.00 - (300.00 / Math.sqrt(2));
-            this.closeButton = _makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
+            this.closeButton = _makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
             this.closeButton.on('click', function (event) {
                 console.log('Deleting Chart');
                 button.closeButton.visible = false;
@@ -4135,9 +4136,9 @@ handleComplete);
             // on-long-press function, on-extra-long-press function,
             // on-long-press icon, on-extra-long-press icon
             if (planet) {
-                var planetMenuItem = ['planet', _doOpenSamples, _('Find and share projects'), null, null, null, null];
+                var planetMenuItem = [PLANETBUTTON, _doOpenSamples, _('Find and share projects'), null, null, null, null];
             } else {
-                var planetMenuItem = ['planet-disabled', null, _('Offline. Sharing is unavailable.'), null, null, null, null];
+                var planetMenuItem = [PLANETDISABLEDBUTTON, null, _('Offline. Sharing is unavailable.'), null, null, null, null];
             }
 
             if (planet) {
@@ -4147,18 +4148,18 @@ handleComplete);
             }
 
             var buttonNames = [
-                ['run', _doFastButton, _('Play'), null, null, null, null],
-                ['hard-stop-turtle', doHardStopButton, _('Hard stop') + ' [Alt-S]', null, null, null, null],
-                ['stop-turtle', doStopButton, _('Stop') + ' [Alt-S]', doHardStopButton, null, 'stop-turtle-button', null],
-                ['new', _deleteBlocksBox, _('New Project'), null, null, null, null],
-                ['open', doLoad, _('Load project from file'), _doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                ['save', doSave, _('Save project'), null, null, null, null],
+                [PLAYBUTTON, _doFastButton, _('Play'), null, null, null, null],
+                [STOPBUTTON, doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
+                [STOPTURTLEBUTTON, doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null], // doHardStopButton, null, 'stop-turtle-button', null],
+                [NEWBUTTON, _deleteBlocksBox, _('New Project'), null, null, null, null],
+                [OPENBUTTON, doLoad, _('Load project from file'), null, null, null, null], //_doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
+                [SAVEBUTTON, doSave, _('Save project'), null, null, null, null],
                 planetMenuItem,
-                ['help', _showHelp, _('Help'), null, null, null, null]
+                [HELPBUTTON, _showHelp, _('Help'), null, null, null, null]
             ];
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
-                buttonNames.push(['sugarizer-stop', function () {
+                buttonNames.push([STOPBUTTON, function () {
                     sugarizerCompatibility.data.blocks = prepareExport();
                     sugarizerCompatibility.saveLocally(function () {
                         sugarizerCompatibility.sugarizerStop();
@@ -4171,7 +4172,7 @@ handleComplete);
             }
 
             // Load the logo
-            var logoContainer = new createjs.Container();
+            logoContainer = new createjs.Container();
             var logoText = new createjs.Text(_('Music Blocks'), '14px Sans', '#282828');
             logoText.textAlign = 'center';
             logoText.visible = false;
@@ -4222,27 +4223,27 @@ handleComplete);
             var dy = 0;
 
             for (var i = 0; i < buttonNames.length; i++) {
-                if (!getMainToolbarButtonNames(buttonNames[i][0])) {
-                    continue;
-                }
+                // if (!getMainToolbarButtonNames(buttonNames[i][0])) {
+                //     continue;
+                // }
 
-                if (buttonNames[i][0] === 'new') {
+                if (i === 3) { // (buttonNames[i][0] === 'new') {
                     var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
-                } else if (buttonNames[i][0] === 'help') {
+                } else if (i === 7) { // (buttonNames[i][0] === 'help') {
                     var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
                 }
 
-                var container = _makeButton(buttonNames[i][0] + '-button', buttonNames[i][2], x, y, btnSize, 0);
+                var container = _makeButton(buttonNames[i][0], buttonNames[i][2], x, y, btnSize, 0);
                 _loadButtonDragHandler(container, x, y, buttonNames[i][1], buttonNames[i][3], buttonNames[i][4], buttonNames[i][5], buttonNames[i][6]);
                 onscreenButtons.push(container);
 
-                if (buttonNames[i][0] === 'stop-turtle') {
+                if (i === 2) { // buttonNames[i][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
-                } else if (buttonNames[i][0] === 'hard-stop-turtle') {
+                } else if (i === 1) { // buttonNames[i][0] === 'hard-stop-turtle') {
                     hardStopTurtleContainer = container;
-                } else if (buttonNames[i][0] === 'new') {
+                } else if (i === 3) { // buttonNames[i][0] === 'new') {
                     newContainer = container;
-                } else if (buttonNames[i][0] === 'run') {
+                } else if (i === 0) { // buttonNames[i][0] === 'run') {
                     runContainer = container;
                 }
 
@@ -4250,7 +4251,7 @@ handleComplete);
 
                 // Ensure that stop-turtle button is placed on top of
                 // hard-stop-turtle button.
-                if (buttonNames[i][0] !== 'hard-stop-turtle') { // && buttonNames[i + 1][0] === 'stop-turtle')) {
+                if (i !== 1) { // buttonNames[i][0] !== 'hard-stop-turtle') { // && buttonNames[i + 1][0] === 'stop-turtle')) {
                     x += dx;
                     y += dy;
                 }
@@ -4258,9 +4259,9 @@ handleComplete);
 
             var x = runContainer.x;
             var y = runContainer.y;
-            slowContainer = _makeButton('slow-button', _('Run slowly'), x, y - btnSize, btnSize, 0);
+            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x, y - btnSize, btnSize, 0);
             _loadButtonDragHandler(slowContainer, x, y, _doSlowButton, null, null, null, null);
-            stepContainer = _makeButton('step-button', _('Run step by step'), x + btnSize, y - btnSize, btnSize, 0);
+            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x + btnSize, y - btnSize, btnSize, 0);
             _loadButtonDragHandler(stepContainer, x, y, _doStepButton, null, null, null, null);
 
             _setupAuxMenu(turtleBlocksScale);
@@ -4305,102 +4306,102 @@ handleComplete);
             // Advanced Save Box Buttons: HTML, SVG, etc.
             // Force left-aligned labels
             var x = 27.5;
-            saveHTMLContainer = _makeButton('save-button-dark', _('Save project'), x, y, cellsize, 0);
+            saveHTMLContainer = _makeButton(SAVEDARKBUTTON, _('Save project'), x, y, cellsize, 0);
             saveHTMLContainer.visible = false;
             __addEventHandlers(saveHTMLContainer, save.saveHTML.bind(save));
 
             if (planet) {
-                uploadContainer = _makeButton('upload-planet', _('Share project'), x, y, cellsize, 0);
+                uploadContainer = _makeButton(UPLOADPLANETBUTTON, _('Share project'), x, y, cellsize, 0);
                 uploadContainer.visible = false;
                 __addEventHandlers(uploadContainer, doUploadToPlanet);
             } else {
-                uploadContainer = _makeButton('planet-disabled-button', _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
+                uploadContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
                 uploadContainer.visible = false;
             }
 
             // Force center-aligned labels
             var x = 82.5 + LEADING;
-            saveSVGContainer = _makeButton('save-svg', _('Save as .svg'), x, y, cellsize, 0);
+            saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
             saveSVGContainer.visible = false;
             __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
 
-            savePNGContainer = _makeButton('save-png', _('Save as .png'), x, y, cellsize, 0);
+            savePNGContainer = _makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
             savePNGContainer.visible = false;
             __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                saveWAVContainer = _makeButton('save-wav', _('Save as .wav'), x, y, cellsize, 0);
+                saveWAVContainer = _makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
                 saveWAVContainer.visible = false;
                 __addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
 
-                saveLilypondContainer = _makeButton('save-lilypond', _('Save sheet music'), x, y, cellsize, 0);
+                saveLilypondContainer = _makeButton(SAVELILYPONDBUTTON, _('Save sheet music'), x, y, cellsize, 0);
                 saveLilypondContainer.visible = false;
                 __addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
 
-                saveABCContainer = _makeButton('save-abc', _('Save as .abc'), x, y, cellsize, 0);
+                saveABCContainer = _makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
                 saveABCContainer.visible = false;
                 __addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
             }
 
-            saveArtworkContainer = _makeButton('save-block-artwork', _('Save block artwork'), x, y, cellsize, 0);
+            saveArtworkContainer = _makeButton(SAVEBLOCKARTWORKBUTTON, _('Save block artwork'), x, y, cellsize, 0);
             saveArtworkContainer.visible = false;
             __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
 
             // Settings Box Buttons: Mode, Language, Smaller, Larger
             // Force left-aligned labels
             var x = 27.5;
-            beginnerModeContainer = _makeButton('beginner-button', _('Switch to advanced mode'), x, y, cellsize, 0);
+            beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, cellsize, 0);
             beginnerModeContainer.visible = false;
             __addEventHandlers(beginnerModeContainer, doSwitchMode);
 
-            advancedModeContainer = _makeButton('advanced-button', _('Switch to beginner mode'), x, y, cellsize, 0);
+            advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, cellsize, 0);
             
             advancedModeContainer.visible = false;
             __addEventHandlers(advancedModeContainer, doSwitchMode);
 
             // Force center-aligned labels
             var x = 82.5 + LEADING;
-            languageContainer = _makeButton('language-button', _('Select language'), x, y, cellsize, 0);
+            languageContainer = _makeButton(LANGUAGEBUTTON, _('Select language'), x, y, cellsize, 0);
             languageContainer.visible = false;
             __addEventHandlers(languageContainer, doLanguageBox);
 
-            smallerContainer = _makeButton('smaller-button', _('Decrease block size'), x, y, cellsize, 0);
+            smallerContainer = _makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, cellsize, 0);
             smallerContainer.visible = false;
             __addEventHandlers(smallerContainer, doSmallerBlocks);
 
-            largerContainer = _makeButton('bigger-button', _('Increase block size'), x, y, cellsize, 0);
+            largerContainer = _makeButton(BIGGERBUTTON, _('Increase block size'), x, y, cellsize, 0);
             largerContainer.visible = false;
             __addEventHandlers(largerContainer, doLargerBlocks);
 
-            smallerOffContainer = _makeButton('smaller-disable-button', _('Cannot be further decreased'), x, y, cellsize, 0);
+            smallerOffContainer = _makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, cellsize, 0);
             smallerOffContainer.visible = false;
 
-            largerOffContainer = _makeButton('bigger-disable-button', _('Cannot be further increased'), x, y, cellsize, 0);
+            largerOffContainer = _makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, cellsize, 0);
             largerOffContainer.visible = false;
 
             // ALways create these buttons (but not use them in beginner mode)
-            statsContainer = _makeButton('stats-button', _('Display statistics'), x, y, cellsize, 0);
+            statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, cellsize, 0);
             statsContainer.visible = false;
             __addEventHandlers(statsContainer, doAnalytics);
 
-            pluginsContainer = _makeButton('plugins-button', _('Load plugin from file'), x, y, cellsize, 0);
+            pluginsContainer = _makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, cellsize, 0);
             pluginsContainer.visible = false;
             __addEventHandlers(pluginsContainer, doOpenPlugin);
 
-            deletePluginContainer = _makeButton('plugins-delete-button', _('Delete plugin'), x, y, cellsize, 0);
+            deletePluginContainer = _makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, cellsize, 0);
             deletePluginContainer.visible = false;
             __addEventHandlers(deletePluginContainer, deletePlugin);
 
-            scrollOnContainer = _makeButton('scroll-unlock-button', _('Enable horizontal scrolling'), x, y, cellsize, 0);
+            scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('enable horizontal scrolling'), x, y, cellsize, 0);
             scrollOnContainer.visible = false;
             __addEventHandlers(scrollOnContainer, setScroller, true);
 
-            scrollOffContainer = _makeButton('scroll-lock-button', _('Disable horizontal scrolling'), x, y, cellsize, 0);
+            scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, cellsize, 0);
             scrollOffContainer.visible = false;
             __addEventHandlers(scrollOffContainer, setScroller, false);
 
             // Clear Box Confirm Button
-            confirmContainer = _makeButton('empty-trash-confirm-button', _('confirm'), x, y, cellsize, 0);
+            confirmContainer = _makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
             confirmContainer.visible = false;
             __addEventHandlers(confirmContainer, _afterDelete);
 
@@ -4422,12 +4423,12 @@ handleComplete);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var menuNames = [
-                    ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-                    ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                    ['go-home', _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                    ['utility', _doUtilityBox, _('Settings'), null, null, null, null],
-                    ['restore-trash', _restoreTrash, _('Restore'), null, null, null, null],
+                    [HIDEBLOCKSBUTTON, _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+                    [COLLAPSEBLOCKSBUTTON, _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+                    [GOHOMEBUTTON, _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
+                    [CARTESIANBUTTON, _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+                    [UTILITYBUTTON, _doUtilityBox, _('Settings'), null, null, null, null],
+                    [RESTORETRASHBUTTON, _restoreTrash, _('Restore'), null, null, null, null],
                     // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
                 ];
             }
@@ -4436,7 +4437,7 @@ handleComplete);
             var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
-            menuContainer = _makeButton('menu-button', _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
+            menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
             var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
@@ -4447,35 +4448,36 @@ handleComplete);
             var dy = 0;
 
             for (var i = 0; i < menuNames.length; i++) {
-                if (!getAuxToolbarButtonNames(menuNames[i][0])) {
-                    continue;
-                }
+                // if (!getAuxToolbarButtonNames(menuNames[i][0])) {
+                //    continue;
+                // }
 
                 x += dx;
                 y += dy;
-                var container = _makeButton(menuNames[i][0] + '-button', menuNames[i][2], x, y, btnSize, 0);
+                var container = _makeButton(menuNames[i][0], menuNames[i][2], x, y, btnSize, 0);
                 // Save a reference to the containers as we have to move them around.
-                if (menuNames[i][0] === 'paste-disabled') {
-                    pasteContainer = container;
-                } else if (menuNames[i][0] === 'Cartesian') {
+                // if (menuNames[i][0] === 'paste-disabled') {
+                //     pasteContainer = container;
+                // } else
+                if (i === 3) { // menuNames[i][0] === 'Cartesian') {
                     gridContainer = container;
 
-                    var gridButtons = ['header-icons/Cartesian-polar-button.svg', 'header-icons/polar-button.svg', 'header-icons/no-grid-button.svg'];
+                    var gridButtons = [CARTESIANPOLARBUTTON, POLARBUTTON, NOGRIDBUTTON];
                     for (var j = 0; j < gridButtons.length; j++) {
                         _makeExtraGridButtons(gridButtons[j], 250 + j * 250);
                     }
-                } else if (menuNames[i][0] === 'utility') {
+                } else if (i === 4) { // menuNames[i][0] === 'utility') {
                     utilityContainer = container;
-                } else if (menuNames[i][0] === 'hide-blocks') {
+                } else if (i === 0) { // menuNames[i][0] === 'hide-blocks') {
                     hideBlocksContainer = container;
-                } else if (menuNames[i][0] === 'collapse-blocks') {
+                } else if (i === 1) { // menuNames[i][0] === 'collapse-blocks') {
                     collapseBlocksContainer = container;
-                } else if (menuNames[i][0] === 'restore-trash') {
+                } else if (i === 5) { // menuNames[i][0] === 'restore-trash') {
                     restoreContainer = container;
-                } else if (menuNames[i][0] === 'go-home') {
+                } else if (i === 2) { // menuNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
                     homeButtonContainers.push(container);
-                    var container2 = _makeButton('go-home-faded-button', _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0);
+                    var container2 = _makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0);
                     _loadButtonDragHandler(container2, x, y, menuNames[i][1], null, null, null, null);
                     homeButtonContainers.push(container2);
                     onscreenMenu.push(container2);
@@ -4519,7 +4521,7 @@ handleComplete);
                     update = true;
                 };
 
-                img.src = name;
+                img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(name)));
             }, delay);
         };
 
@@ -4698,14 +4700,15 @@ handleComplete);
                 bitmap.updateCache();
                 update = true;
 
-                if (name === 'Cartesian-button') {
+                if (name === CARTESIANBUTTON) {
                     gridButtonLabel = text;
                     gridImages = [bitmap];
                 }
 
             };
 
-            img.src = 'header-icons/' + name + '.svg';
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(name)));
+            // img.src = 'header-icons/' + name + '.svg';
             container.addChild(text);
             return container;
         };
@@ -4853,6 +4856,8 @@ handleComplete);
                 onscreenButtons[i].y += dy;
             }
 
+            logoContainer.y += dy;
+
             for (var i = 0; i < onscreenMenu.length; i++) {
                 onscreenMenu[i].y += dy;
             }
@@ -4877,6 +4882,8 @@ handleComplete);
                     onscreenButtons[i].y += dy;
                 }
 
+                logoContainer.y += dy;
+
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = cellsize / 2;
                     onscreenMenu[i].visible = true;
@@ -4898,6 +4905,8 @@ handleComplete);
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y = cellsize / 2;
                 }
+
+                logoContainer.y = 0;
 
                 for (var i = 0; i < onscreenMenu.length; i++) {
                     onscreenMenu[i].y = -cellsize;
