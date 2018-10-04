@@ -1168,6 +1168,7 @@ function Turtles () {
     this.masterStage = null;
     this.doClear = null;
     this.hideMenu = null;
+    this.doGrid = null;
     this.hideGrids = null;
     this.stage = null;
     this.refreshCanvas = null;
@@ -1181,20 +1182,27 @@ function Turtles () {
 
     this._borderContainer = new createjs.Container();
     this._expandedBoundary = null;
-    this._expandButton = null;
     this._collapsedBoundary = null;
-    this._collapseButton = null;
     this.isShrunk = false;
-    this._clearButton = null;
+    this._expandButton = null;
     this._expandLabel = null;
     this._expandLabelBG = null;
+    this._collapseButton = null;
     this._collapseLabel = null;
     this._collapseLabelBG = null;
+    this._clearButton = null;
     this._clearLabel = null;
     this._clearLabelBG = null;
+    this._gridLabel = null;
+    this._gridLabelBG = null;
+
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
+
+    this.setGridLabel = function (text) {
+        this._gridLabel.text = text;
+    };
 
     this.setMasterStage = function (stage) {
         this.masterStage = stage;
@@ -1203,6 +1211,11 @@ function Turtles () {
 
     this.setClear = function (doClear) {
         this.doClear = doClear;
+        return this;
+    };
+
+    this.setDoGrid = function (doGrid) {
+        this.doGrid = doGrid;
         return this;
     };
 
@@ -1394,7 +1407,13 @@ function Turtles () {
                     that._clearButton.scaleX = 1;
                     that._clearButton.scaleY = 1;
                     that._clearButton.scale = 1;
-                    that._clearButton.x = that.w - 10 - 2 * 55;
+                    that._clearButton.x = that.w - 5 - 2 * 55;
+
+                    that._gridButton.scaleX = 1;
+                    that._gridButton.scaleY = 1;
+                    that._gridButton.scale = 1;
+                    that._gridButton.x = that.w - 10 - 3 * 55;
+                    that._gridButton.visible = true;
 
                     // remove the stage and add it back in position 0
                     that.masterStage.removeChild(that.stage);
@@ -1498,7 +1517,7 @@ function Turtles () {
                 that._clearButton.addChild(that._clearLabel);
 
                 bitmap.visible = true;
-                that._clearButton.x = that.w - 10 - 2 * 55;
+                that._clearButton.x = that.w - 5 - 2 * 55;
                 that._clearButton.y = 55 + LEADING;
                 that._clearButton.visible = true;
 
@@ -1535,10 +1554,78 @@ function Turtles () {
                 if (doCollapse) {
                     that.collapse();
                 }
+
+                __makeGridButton();
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(CLEARBUTTON)));
+        };
+
+        function __makeGridButton() {
+            that._gridButton = new createjs.Container();
+            that._gridLabel = null;
+            that._gridLabelBG = null;
+
+            that._gridButton.removeAllEventListeners('click');
+            that._gridButton.on('click', function (event) {
+                that.doGrid();
+            });
+
+            that._gridLabel = new createjs.Text(_('Cartesian'), '14px Sans', '#282828');
+            that._gridLabel.textAlign = 'center';
+            that._gridLabel.x = 27.5;
+            that._gridLabel.y = 55;
+            that._gridLabel.visible = false;
+
+            var img = new Image();
+            img.onload = function () {
+                var bitmap = new createjs.Bitmap(img);
+                that._gridButton.addChild(bitmap);
+                that._gridButton.addChild(that._gridLabel);
+
+                bitmap.visible = true;
+                that._gridButton.x = that.w - 10 - 3 * 55;
+                that._gridButton.y = 55 + LEADING;
+                that._gridButton.visible = true;
+
+                that._borderContainer.addChild(that._gridButton);
+                that.refreshCanvas();
+
+                that._gridButton.removeAllEventListeners('mouseover');
+                that._gridButton.on('mouseover', function (event) {
+                    if (that._gridLabel !== null) {
+                        that._gridLabel.visible = true;
+
+                        if (that._gridLabelBG === null) {
+                            var b = that._gridLabel.getBounds();
+                            that._gridLabelBG = new createjs.Shape();
+                            that._gridLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._gridLabel.x + b.x - 8, that._gridLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                            that._gridButton.addChildAt(that._gridLabelBG, 0);
+                        } else {
+                            that._gridLabelBG.visible = true;
+                        }
+                    }
+
+                    that.refreshCanvas();
+                });
+
+                that._gridButton.removeAllEventListeners('mouseout');
+                that._gridButton.on('mouseout', function (event) {
+                    if (that._gridLabel !== null) {
+                        that._gridLabel.visible = false;
+                        that._gridLabelBG.visible = false;
+                        that.refreshCanvas();
+                    }
+                });
+
+                if (doCollapse) {
+                    that.collapse();
+                }
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + window.btoa(
+                unescape(encodeURIComponent(CARTESIANBUTTON)));
         };
 
         __makeBoundary();
@@ -1565,7 +1652,13 @@ function Turtles () {
         this._clearButton.scaleX = SCALEFACTOR;
         this._clearButton.scaleY = SCALEFACTOR;
         this._clearButton.scale = SCALEFACTOR;
-        this._clearButton.x = this.w - 10 - 8 * 55;
+        this._clearButton.x = this.w - 5 - 8 * 55;
+
+        this._gridButton.scaleX = SCALEFACTOR;
+        this._gridButton.scaleY = SCALEFACTOR;
+        this._gridButton.scale = SCALEFACTOR;
+        this._gridButton.x = this.w - 10 - 12 * 55;
+        this._gridButton.visible = false;
 
         // remove the stage and add it back at the top
         this.masterStage.removeChild(this.stage);

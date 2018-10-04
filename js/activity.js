@@ -239,9 +239,6 @@ define(MYDEFINES, function (compatibility) {
         var currentKeyCode = 0;
         var pasteContainer = null;
         var pasteImage = null;
-        var gridContainer = null;
-        var gridButtonLabel = null;
-        var gridImages = [];
         var chartBitmap = null;
         var merging = false;
         var loading = false;
@@ -909,50 +906,6 @@ define(MYDEFINES, function (compatibility) {
             languageBox.hide();
         };
 
-        function hideGrids() {
-            gridButtonLabel.text = _('Cartesian');
-            gridImages[1].visible = false;
-            gridImages[2].visible = false;
-            gridImages[3].visible = false;
-            _hideCartesian();
-            _hidePolar();
-        };
-
-        function _doCartesianPolar() {
-            blocks.activeBlock = null;
-            closeSubMenus();
-            if (cartesianBitmap.visible && polarBitmap.visible) {
-                _hideCartesian();
-                //.TRANS: hide Polar coordinate overlay grid
-                gridButtonLabel.text = _('Hide grid');
-                gridImages[1].visible = false;
-                gridImages[2].visible = false;
-                gridImages[3].visible = true;
-            } else if (!cartesianBitmap.visible && polarBitmap.visible) {
-                _hidePolar();
-                //.TRANS: show Cartesian coordinate overlay grid
-                gridButtonLabel.text = _('Cartesian');
-                gridImages[1].visible = false;
-                gridImages[2].visible = false;
-                gridImages[3].visible = false;
-            } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
-                _showCartesian();
-                gridButtonLabel.text = _('Cartesian') + ' + ' + _('Polar');
-                gridImages[1].visible = true;
-                gridImages[2].visible = false;
-                gridImages[3].visible = false;
-            } else if (cartesianBitmap.visible && !polarBitmap.visible) {
-                _showPolar();
-                //.TRANS: show Polar coordinate overlay grid
-                gridButtonLabel.text = _('Polar');
-                gridImages[1].visible = false;
-                gridImages[2].visible = true;
-                gridImages[3].visible = false;
-            }
-
-            update = true;
-        };
-
         function setScroller(state) {
             blocks.activeBlock = null;
             scrollBlockContainer = state;
@@ -1264,6 +1217,7 @@ define(MYDEFINES, function (compatibility) {
                 .setMasterStage(stage)
                 .setStage(turtleContainer)
                 .setHideGrids(hideGrids)
+                .setDoGrid(_doCartesianPolar)
                 .setRefreshCanvas(refreshCanvas);
 
             // Put the boundary in the blocks container so it scrolls
@@ -2141,6 +2095,33 @@ define(MYDEFINES, function (compatibility) {
 
             this.document.onkeydown = __keyPressed;
             _hideStopButton();
+        };
+
+        function hideGrids() {
+            turtles.setGridLabel(_('Cartesian'));
+            _hideCartesian();
+            _hidePolar();
+        };
+
+        function _doCartesianPolar() {
+            if (cartesianBitmap.visible && polarBitmap.visible) {
+                _hideCartesian();
+                //.TRANS: hide Polar coordinate overlay grid
+                turtles.setGridLabel(_('Hide grid'));
+            } else if (!cartesianBitmap.visible && polarBitmap.visible) {
+                _hidePolar();
+                //.TRANS: show Cartesian coordinate overlay grid
+                turtles.setGridLabel(_('Cartesian'));
+            } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
+                _showCartesian();
+                turtles.setGridLabel(_('Cartesian') + ' + ' + _('Polar'));
+            } else if (cartesianBitmap.visible && !polarBitmap.visible) {
+                _showPolar();
+                //.TRANS: show Polar coordinate overlay grid
+                turtles.setGridLabel(_('Polar'));
+            }
+
+            update = true;
         };
 
         function _setupBlocksContainerEvents() {
@@ -3105,7 +3086,6 @@ define(MYDEFINES, function (compatibility) {
         function closeSubMenus() {
             if (confirmContainer.visible) {
                 confirmContainer.visible = false;
-                gridContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
@@ -3125,7 +3105,6 @@ define(MYDEFINES, function (compatibility) {
                     saveABCContainer.visible = false;
                 }
 
-                gridContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
@@ -3151,7 +3130,6 @@ define(MYDEFINES, function (compatibility) {
                 homeButtonContainers[0].visible = false;
                 homeButtonContainers[1].visible = false;
 
-                gridContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
                 collapseBlocksContainer.y = 82.5 + LEADING;
@@ -4426,7 +4404,7 @@ handleComplete);
                     [HIDEBLOCKSBUTTON, _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                     [COLLAPSEBLOCKSBUTTON, _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
                     [GOHOMEBUTTON, _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-                    [CARTESIANBUTTON, _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
+                    // [CARTESIANBUTTON, _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
                     [UTILITYBUTTON, _doUtilityBox, _('Settings'), null, null, null, null],
                     [RESTORETRASHBUTTON, _restoreTrash, _('Restore'), null, null, null, null],
                     // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
@@ -4456,23 +4434,13 @@ handleComplete);
                 y += dy;
                 var container = _makeButton(menuNames[i][0], menuNames[i][2], x, y, btnSize, 0);
                 // Save a reference to the containers as we have to move them around.
-                // if (menuNames[i][0] === 'paste-disabled') {
-                //     pasteContainer = container;
-                // } else
-                if (i === 3) { // menuNames[i][0] === 'Cartesian') {
-                    gridContainer = container;
-
-                    var gridButtons = [CARTESIANPOLARBUTTON, POLARBUTTON, NOGRIDBUTTON];
-                    for (var j = 0; j < gridButtons.length; j++) {
-                        _makeExtraGridButtons(gridButtons[j], 250 + j * 250);
-                    }
-                } else if (i === 4) { // menuNames[i][0] === 'utility') {
+                if (i === 3) { // menuNames[i][0] === 'utility') {
                     utilityContainer = container;
                 } else if (i === 0) { // menuNames[i][0] === 'hide-blocks') {
                     hideBlocksContainer = container;
                 } else if (i === 1) { // menuNames[i][0] === 'collapse-blocks') {
                     collapseBlocksContainer = container;
-                } else if (i === 5) { // menuNames[i][0] === 'restore-trash') {
+                } else if (i === 4) { // menuNames[i][0] === 'restore-trash') {
                     restoreContainer = container;
                 } else if (i === 2) { // menuNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
@@ -4496,33 +4464,6 @@ handleComplete);
 
             // Always start with menuButton off.
             menuButtonsVisible = false;
-        };
-
-        function _makeExtraGridButtons(name, delay) {
-            setTimeout(function () {
-                var img = new Image();
-
-                img.onload = function () {
-                    var originalSize = 55;
-                    var halfSize = Math.floor(cellSize / 2);
-
-                    var bitmap = new createjs.Bitmap(img);
-                    if (cellSize !== originalSize) {
-                        bitmap.scaleX = cellSize / originalSize;
-                        bitmap.scaleY = cellSize / originalSize;
-                    }
-
-                    bitmap.regX = halfSize / bitmap.scaleX;
-                    bitmap.regY = halfSize / bitmap.scaleY;
-                    gridContainer.addChild(bitmap);
-                    bitmap.visible = false;
-                    gridImages.push(bitmap);
-
-                    update = true;
-                };
-
-                img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(name)));
-            }, delay);
         };
 
         function doPopdownPalette() {
@@ -4638,7 +4579,6 @@ handleComplete);
                         container.children[c].visible = true;
                         // Do we need to add a background?
                         // Should be image and text, hence === 2
-                        // The exception is the Cartesian grid
                         if ([2, 5, 8].indexOf(container.children.length) !== -1) {
                             var b = container.children[c].getBounds();
                             var bg = new createjs.Shape();
@@ -4699,16 +4639,9 @@ handleComplete);
                 bitmap.cache(0, 0, size, size);
                 bitmap.updateCache();
                 update = true;
-
-                if (name === CARTESIANBUTTON) {
-                    gridButtonLabel = text;
-                    gridImages = [bitmap];
-                }
-
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(name)));
-            // img.src = 'header-icons/' + name + '.svg';
             container.addChild(text);
             return container;
         };
