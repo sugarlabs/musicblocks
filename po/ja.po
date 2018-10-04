@@ -382,7 +382,7 @@ msgstr "簡単モードを設定するため、ブラウザを再起動して下
 #: js/activity.js:913
 #.TRANS: hide Polar coordinate overlay grid
 ## need to verify
-msgid "hide grid"
+msgid "Hide grid"
 msgstr "グリッド（座標）を非表示"
 
 #: js/activity.js:920

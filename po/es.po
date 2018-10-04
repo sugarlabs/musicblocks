@@ -364,7 +364,7 @@ msgstr "Actualice su navegador para cambiar al modo principiante."
 
 #: js/activity.js:913
 #.TRANS: hide Polar coordinate overlay grid
-msgid "hide grid"
+msgid "Hide grid"
 msgstr "ocultar las rejillas de coordenadas"
 
 #: js/activity.js:920

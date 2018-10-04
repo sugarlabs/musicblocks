@@ -381,7 +381,7 @@ msgstr "かんたん モードを せってい するため、ブラウザを �
 #: js/activity.js:913
 #.TRANS: hide Polar coordinate overlay grid
 ## need to verify
-msgid "hide grid"
+msgid "Hide grid"
 msgstr "ざひょうを ひひょうじ"
 
 #: js/activity.js:920

@@ -372,7 +372,7 @@ msgstr ""
 
 #: js/activity.js:913
 #.TRANS: hide Polar coordinate overlay grid
-msgid "hide grid"
+msgid "Hide grid"
 msgstr ""
 
 #: js/activity.js:920
