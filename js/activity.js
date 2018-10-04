@@ -4409,10 +4409,10 @@ handleComplete);
 
             x += dx;
 
-            utilityContainer = _makeButton(UTILITYBUTTON, _('Settings'), x, y, btnSize, 0);
-            _loadButtonDragHandler(utilityContainer, x, y, _doUtilityBox, null, null, null, null);
-            onscreenMenu.push(utilityContainer);
-            utilityContainer.visible = false;
+            restoreContainer = _makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
+            _loadButtonDragHandler(restoreContainer, x, y, _restoreTrash, null, null, null, null);
+            onscreenMenu.push(restoreContainer);
+            restoreContainer.visible = false;
 
             x += dx;
 
@@ -4454,10 +4454,10 @@ handleComplete);
 
             x += dx;
 
-            restoreContainer = _makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
-            _loadButtonDragHandler(restoreContainer, x, y, _restoreTrash, null, null, null, null);
-            onscreenMenu.push(restoreContainer);
-            restoreContainer.visible = false;
+            utilityContainer = _makeButton(UTILITYBUTTON, _('Settings'), x, y, btnSize, 0);
+            _loadButtonDragHandler(utilityContainer, x, y, _doUtilityBox, null, null, null, null);
+            onscreenMenu.push(utilityContainer);
+            utilityContainer.visible = false;
 
             // Always start with menuButton off.
             menuButtonsVisible = false;
