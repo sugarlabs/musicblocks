@@ -492,7 +492,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function setHomeContainers(zero, one) {
-            if (!saveHTMLContainer.visible) {
+            if (utilityContainer.visible || !saveHTMLContainer.visible) {
                 homeButtonContainers[0].visible = zero;
                 homeButtonContainers[1].visible = one;
             }
