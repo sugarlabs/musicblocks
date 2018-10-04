@@ -351,8 +351,8 @@ function Palettes () {
             }
 
             var r = that.cellSize / 2;
-            that.labels[name].x = that.buttons[name].x + 2.2 * r;
-            that.labels[name].y = that.buttons[name].y + r / 2;
+            that.labels[name].x = Math.floor(that.buttons[name].x + 2.2 * r);
+            that.labels[name].y = Math.floor(that.buttons[name].y + r / 2);
             that.stage.addChild(that.labels[name]);
 
             that._loadPaletteButtonHandler(name);
@@ -1022,7 +1022,7 @@ function PopdownPalette(palettes) {
                 // console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = palette._makeBlockFromPalette(palette.protoList[e.dataset.blk], e.dataset.modname, function (newBlock) {
                     // Move the block and the drag group.
-                    that.palettes.blocks._moveBlock(newBlock, 75 - that.palettes.blocks.stage.x, 75 - that.palettes.blocks.stage.y);
+                    that.palettes.blocks._moveBlock(newBlock, Math.floor(75 - that.palettes.blocks.stage.x), Math.floor(75 - that.palettes.blocks.stage.y));
                     that.palettes.blocks.findDragGroup(newBlock);
                     for (var i in that.palettes.blocks.dragGroup) {
                         that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], 0, 0);
@@ -1292,7 +1292,7 @@ function Palette(palettes, name) {
             }
 
             i.y = this.y;
-            this.y += h + (STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1);
+            this.y += Math.floor(h + (STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1));
         }
 
         for (var i in this.protoContainers) {
