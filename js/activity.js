@@ -1238,6 +1238,7 @@ define(MYDEFINES, function (compatibility) {
                 .setTurtles(turtles)
                 .setSetPlaybackStatus(setPlaybackStatus)
                 .setErrorMsg(errorMsg)
+		.setHomeContainers(setHomeContainers, boundary)
                 .setContextMenu(piemenuBlockContext);
 
             turtles.setBlocks(blocks);
