@@ -959,7 +959,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'rhythmruler2':
-                    that.collapseText = new createjs.Text(_('rhythm ruler'), fontSize + 'px Sans', platformColor.blockText);
+                    that.collapseText = new createjs.Text(_('rhythm maker'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'newnote':
                     that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', platformColor.blockText);

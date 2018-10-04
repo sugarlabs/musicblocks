@@ -141,7 +141,7 @@ msgstr ""
 #: js/basicblocks.js:1034
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
-msgid "rhythm ruler"
+msgid "rhythm maker"
 msgstr ""
 
 #: js/block.js:965
@@ -1696,7 +1696,7 @@ msgid "The <em>Pitch-time Matrix</em> block opens a tool to create musical phras
 msgstr ""
 
 #: js/turtledefs.js:235
-msgid "The <em>Rhythm Ruler</em> block opens a tool to create drum machines."
+msgid "The <em>Rhythm Maker</em> block opens a tool to create drum machines."
 msgstr ""
 
 #: js/turtledefs.js:236

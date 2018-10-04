@@ -232,7 +232,7 @@ function createHelpContent() {
 	// Widgets palette
 	'status': [_('The <em>Status</em> block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', 'status.svg'],
 	'matrix': [_('The <em>Pitch-time Matrix</em> block opens a tool to create musical phrases.'), 'documentation', 'status.svg'],
-	'rhythmruler2': [_('The <em>Rhythm Ruler</em> block opens a tool to create drum machines.'), 'documentation', 'status.svg'],
+	'rhythmruler2': [_('The <em>Rhythm Maker</em> block opens a tool to create drum machines.'), 'documentation', 'status.svg'],
 	'pitchslider': [_('The <em>Pitch-slider<em> block opens a tool to generate arbitray pitches.'), 'documentation', 'status.svg'],
 	'rhythm2': [_('The <em>Rhythm</em> block is used to generate rhythm patterns.'), 'documentation', 'status.svg'],
 	'stuplet': [_('<em>Tuplets</em> are a collection of notes that get scaled to a specific duration. Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', 'status.svg'],

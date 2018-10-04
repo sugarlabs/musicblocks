@@ -1019,7 +1019,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.palette = palettes.dict['widgets'];
         blocks.protoBlockDict['rhythmruler3'] = newblock;
         //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-        newblock.staticLabels.push(_('rhythm ruler'));
+        newblock.staticLabels.push(_('rhythm maker'));
         newblock.extraWidth = 20;
         newblock.adjustWidthToLabel();
         newblock.labelOffset = 15;
@@ -1031,7 +1031,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['rhythmruler2'] = newblock;
     //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-    newblock.staticLabels.push(_('rhythm ruler'));
+    newblock.staticLabels.push(_('rhythm maker'));
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
