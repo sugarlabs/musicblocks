@@ -2884,7 +2884,9 @@ define(MYDEFINES, function (compatibility) {
             var smallSide = Math.min(w, h);
 
             if (smallSide < cellSize * 9) {
-                var mobileSize = true;
+                // var mobileSize = true;
+		// FIXME
+		var mobileSize = false;
                 if (w < cellSize * 10) {
                     turtleBlocksScale = smallSide / (cellSize * 11);
                 } else {
@@ -4109,33 +4111,6 @@ handleComplete);
 
             stage.addChild(headerContainer);
 
-            // Buttons used when running turtle programs:
-            // button name, on-press function, hover label,
-            // on-long-press function, on-extra-long-press function,
-            // on-long-press icon, on-extra-long-press icon
-            if (planet) {
-                var planetMenuItem = [PLANETBUTTON, _doOpenSamples, _('Find and share projects'), null, null, null, null];
-            } else {
-                var planetMenuItem = [PLANETDISABLEDBUTTON, null, _('Offline. Sharing is unavailable.'), null, null, null, null];
-            }
-
-            if (planet) {
-                document.querySelector('#myOpenFile').addEventListener('change', function (event) {
-                    planet.closePlanet();
-                });
-            }
-
-            var buttonNames = [
-                [PLAYBUTTON, _doFastButton, _('Play'), null, null, null, null],
-                [STOPBUTTON, doHardStopButton, _('Stop') + ' [Alt-S]', null, null, null, null],
-                [STOPTURTLEBUTTON, doStopButton, _('Stop') + ' [Alt-S]', null, null, null, null], // doHardStopButton, null, 'stop-turtle-button', null],
-                [NEWBUTTON, _deleteBlocksBox, _('New Project'), null, null, null, null],
-                [OPENBUTTON, doLoad, _('Load project from file'), null, null, null, null], //_doMergeLoad, _doMergeLoad, 'open-merge-button', 'open-merge-button'],
-                [SAVEBUTTON, doSave, _('Save project'), null, null, null, null],
-                planetMenuItem,
-                [HELPBUTTON, _showHelp, _('Help'), null, null, null, null]
-            ];
-
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 buttonNames.push([STOPBUTTON, function () {
                     sugarizerCompatibility.data.blocks = prepareExport();
@@ -4146,7 +4121,8 @@ handleComplete);
             }
 
             if (showPalettesPopover) {
-                buttonNames.unshift(['popdown-palette', doPopdownPalette]);
+		// FIXME
+                // buttonNames.unshift(['popdown-palette', doPopdownPalette]);
             }
 
             // Load the logo
@@ -4198,49 +4174,69 @@ handleComplete);
             var x = 7 / 3 * STANDARDBLOCKHEIGHT + Math.floor(btnSize);
             var y = Math.floor(btnSize / 2);
             var dx = btnSize;
-            var dy = 0;
 
-            for (var i = 0; i < buttonNames.length; i++) {
-                // if (!getMainToolbarButtonNames(buttonNames[i][0])) {
-                //     continue;
-                // }
+            runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
+            _loadButtonDragHandler(runContainer, x, y, _doFastButton, null, null, null, null);
+            onscreenButtons.push(runContainer);
 
-                if (i === 3) { // (buttonNames[i][0] === 'new') {
-                    var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
-                } else if (i === 7) { // (buttonNames[i][0] === 'help') {
-                    var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
-                }
-
-                var container = _makeButton(buttonNames[i][0], buttonNames[i][2], x, y, btnSize, 0);
-                _loadButtonDragHandler(container, x, y, buttonNames[i][1], buttonNames[i][3], buttonNames[i][4], buttonNames[i][5], buttonNames[i][6]);
-                onscreenButtons.push(container);
-
-                if (i === 2) { // buttonNames[i][0] === 'stop-turtle') {
-                    stopTurtleContainer = container;
-                } else if (i === 1) { // buttonNames[i][0] === 'hard-stop-turtle') {
-                    hardStopTurtleContainer = container;
-                } else if (i === 3) { // buttonNames[i][0] === 'new') {
-                    newContainer = container;
-                } else if (i === 0) { // buttonNames[i][0] === 'run') {
-                    runContainer = container;
-                }
-
-                _loadButtonDragHandler(container, x, y, buttonNames[i][1], buttonNames[i][3], buttonNames[i][4], buttonNames[i][5], buttonNames[i][6]);
-
-                // Ensure that stop-turtle button is placed on top of
-                // hard-stop-turtle button.
-                if (i !== 1) { // buttonNames[i][0] !== 'hard-stop-turtle') { // && buttonNames[i + 1][0] === 'stop-turtle')) {
-                    x += dx;
-                    y += dy;
-                }
-            }
-
-            var x = runContainer.x;
-            var y = runContainer.y;
             slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x, y - btnSize, btnSize, 0);
             _loadButtonDragHandler(slowContainer, x, y, _doSlowButton, null, null, null, null);
+
             stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x + btnSize, y - btnSize, btnSize, 0);
             _loadButtonDragHandler(stepContainer, x, y, _doStepButton, null, null, null, null);
+
+            x += dx;
+
+            hardStopTurtleContainer = _makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+            _loadButtonDragHandler(hardStopTurtleContainer, x, y, doHardStopButton, null, null, null, null);
+            onscreenButtons.push(hardStopTurtleContainer);
+
+            stopTurtleContainer = _makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+            _loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
+            onscreenButtons.push(stopTurtleContainer);
+
+            x += dx;
+
+	    // Move to the right
+            var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
+
+            newContainer = _makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
+            _loadButtonDragHandler(newContainer, x, y, _deleteBlocksBox, null, null, null, null);
+            onscreenButtons.push(newContainer);
+
+            x += dx;
+
+            openContainer = _makeButton(OPENBUTTON, _('Load project from file'), x, y, btnSize, 0);
+            _loadButtonDragHandler(openContainer, x, y, doLoad, null, null, null, null);
+            onscreenButtons.push(openContainer);
+
+            x += dx;
+
+            saveContainer = _makeButton(SAVEBUTTON, _('Save Project'), x, y, btnSize, 0);
+            _loadButtonDragHandler(saveContainer, x, y, doSave, null, null, null, null);
+            onscreenButtons.push(saveContainer);
+
+            x += dx;
+
+            if (planet) {
+		planetContainer = _makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
+		_loadButtonDragHandler(planetContainer, x, y, _doOpenSamples, null, null, null, null);
+
+                document.querySelector('#myOpenFile').addEventListener('change', function (event) {
+                    planet.closePlanet();
+                });
+            } else {
+		planetContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
+            }
+
+	    onscreenButtons.push(planetContainer);
+
+	    // Move to the far right
+            x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
+
+            helpContainer = _makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
+            _loadButtonDragHandler(helpContainer, x, y, _showHelp, null, null, null, null);
+            onscreenButtons.push(helpContainer);
 
             _setupAuxMenu(turtleBlocksScale);
             _setupSubMenus(turtleBlocksScale);
@@ -4395,22 +4391,6 @@ handleComplete);
 
             onscreenMenu = [];
 
-            // NOTE: see getAuxToolbarButtonNames in turtledefs.js
-            // Misc. other buttons
-            // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
-
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                var menuNames = [
-                    [HIDEBLOCKSBUTTON, _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-                    [COLLAPSEBLOCKSBUTTON, _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                    [GOHOMEBUTTON, _findBlocks, _('Home') + ' [HOME]', null, null, null, null],
-                    // [CARTESIANBUTTON, _doCartesianPolar, _('Cartesian') + '/' + _('Polar'), null, null, null, null],
-                    [UTILITYBUTTON, _doUtilityBox, _('Settings'), null, null, null, null],
-                    [RESTORETRASHBUTTON, _restoreTrash, _('Restore'), null, null, null, null],
-                    // ['compile', _doPlaybackBox, _('playback'), null, null, null, null],
-                ];
-            }
-
             var btnSize = cellSize;
             var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
             var y = Math.floor(btnSize / 2);
@@ -4421,46 +4401,52 @@ handleComplete);
             var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
             // var x = Math.floor(-btnSize / 2);
             var y = Math.floor(btnSize / 2);
-
             var dx = btnSize;
-            var dy = 0;
 
-            for (var i = 0; i < menuNames.length; i++) {
-                // if (!getAuxToolbarButtonNames(menuNames[i][0])) {
-                //    continue;
-                // }
+            x += dx;
 
-                x += dx;
-                y += dy;
-                var container = _makeButton(menuNames[i][0], menuNames[i][2], x, y, btnSize, 0);
-                // Save a reference to the containers as we have to move them around.
-                if (i === 3) { // menuNames[i][0] === 'utility') {
-                    utilityContainer = container;
-                } else if (i === 0) { // menuNames[i][0] === 'hide-blocks') {
-                    hideBlocksContainer = container;
-                } else if (i === 1) { // menuNames[i][0] === 'collapse-blocks') {
-                    collapseBlocksContainer = container;
-                } else if (i === 4) { // menuNames[i][0] === 'restore-trash') {
-                    restoreContainer = container;
-                } else if (i === 2) { // menuNames[i][0] === 'go-home') {
-                    homeButtonContainers = [];
-                    homeButtonContainers.push(container);
-                    var container2 = _makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0);
-                    _loadButtonDragHandler(container2, x, y, menuNames[i][1], null, null, null, null);
-                    homeButtonContainers.push(container2);
-                    onscreenMenu.push(container2);
-                    homeButtonContainers[0].visible = false;
-                    homeButtonContainers[1].visible = false;
-                    homeButtonContainers[0].y = -3 * btnSize / 2;
-                    homeButtonContainers[1].y = -3 * btnSize / 2;
-                    boundary.hide();
-                    blocks.setHomeContainers(setHomeContainers, boundary);
-                }
+            hideBlockContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
+            _loadButtonDragHandler(hideBlockContainer, x, y, _changeBlockVisibility, null, null, null, null);
+            onscreenMenu.push(hideBlockContainer);
+            hideBlockContainer.visible = false;
 
-                _loadButtonDragHandler(container, x, y, menuNames[i][1],menuNames[i][3],menuNames[i][4],menuNames[i][5],menuNames[i][6]);
-                onscreenMenu.push(container);
-                container.visible = false;
-            }
+            x += dx;
+
+            collapseBlockContainer = _makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
+            _loadButtonDragHandler(collapseBlockContainer, x, y, _toggleCollapsibleStacks, null, null, null, null);
+            onscreenMenu.push(collapseBlockContainer);
+            collapseBlockContainer.visible = false;
+
+            x += dx;
+
+            homeButtonContainers = [];
+            homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
+            _loadButtonDragHandler(homeButtonContainers[0], x, y, _findBlocks, null, null, null, null);
+            onscreenMenu.push(homeButtonContainers[0]);
+            homeButtonContainers[0].visible = false;
+            homeButtonContainers[0].y = -3 * btnSize / 2;
+
+            homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
+            _loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
+            onscreenMenu.push(homeButtonContainers[1]);
+            homeButtonContainers[1].visible = false;
+            homeButtonContainers[1].y = -3 * btnSize / 2;
+
+            boundary.hide();
+
+            x += dx;
+
+            utilityContainer = _makeButton(UTILITYBUTTON, _('Settings'), x, y, btnSize, 0);
+            _loadButtonDragHandler(utilityContainer, x, y, _doUtilityBox, null, null, null, null);
+            onscreenMenu.push(utilityContainer);
+            utilityContainer.visible = false;
+
+            x += dx;
+
+            restoreContainer = _makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
+            _loadButtonDragHandler(restoreContainer, x, y, _restoreTrash, null, null, null, null);
+            onscreenMenu.push(restoreContainer);
+            restoreContainer.visible = false;
 
             // Always start with menuButton off.
             menuButtonsVisible = false;
