@@ -602,7 +602,7 @@ msgstr "ブロックの ひょうじ/ひひょうじ"
 
 #: js/activity.js:4348
 #: js/turtledefs.js:129
-msgid "Expand/collapse collapsable blocks"
+msgid "Expand/collapse blocks"
 msgstr "かたまりを ひらく/とじる"
 
 #: js/activity.js:4349

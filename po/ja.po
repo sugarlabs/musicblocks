@@ -603,7 +603,7 @@ msgstr "ブロックの表示"
 
 #: js/activity.js:4348
 #: js/turtledefs.js:129
-msgid "Expand/collapse collapsable blocks"
+msgid "Expand/collapse blocks"
 msgstr "潰せるブロックを表示/隠す"
 
 #: js/activity.js:4349

@@ -582,8 +582,8 @@ msgstr "Mostrar u ocultar los bloques."
 
 #: js/activity.js:4348
 #: js/turtledefs.js:129
-msgid "Expand/collapse collapsable blocks"
-msgstr "Expandir / Contraer bloque colapsable"
+msgid "Expand/collapse blocks"
+msgstr "Expandir / Contraer bloques"
 
 #: js/activity.js:4349
 #: js/activity.js:4400

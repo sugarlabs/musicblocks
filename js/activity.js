@@ -3091,6 +3091,7 @@ define(MYDEFINES, function (compatibility) {
                 confirmContainer.visible = false;
                 restoreContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
+                openMergeContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
                 collapseBlocksContainer.y = 82.5 + LEADING;
                 homeButtonContainers[0].y = 82.5 + LEADING;
@@ -3109,6 +3110,7 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 utilityContainer.y = 82.5 + LEADING;
+                openMergeContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
                 hideBlocksContainer.y = 82.5 + LEADING;
                 collapseBlocksContainer.y = 82.5 + LEADING;
@@ -3137,6 +3139,7 @@ define(MYDEFINES, function (compatibility) {
                 hideBlocksContainer.y = 82.5 + LEADING;
                 collapseBlocksContainer.y = 82.5 + LEADING;
                 utilityContainer.y = 82.5 + LEADING;
+                openMergeContainer.y = 82.5 + LEADING;
                 homeButtonContainers[0].y = 82.5 + LEADING;
                 homeButtonContainers[1].y = 82.5 + LEADING;
                 deltaY(-55 - LEADING);
@@ -4399,10 +4402,24 @@ handleComplete);
             menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
-            var x = Math.floor(canvas.width / turtleBlocksScale) - 17 * btnSize / 2;
+            var x = Math.floor(canvas.width / turtleBlocksScale) - 15 * btnSize / 2;
             // var x = Math.floor(-btnSize / 2);
             var y = Math.floor(btnSize / 2);
             var dx = btnSize;
+
+            x += dx;
+
+            utilityContainer = _makeButton(UTILITYBUTTON, _('Settings'), x, y, btnSize, 0);
+            _loadButtonDragHandler(utilityContainer, x, y, _doUtilityBox, null, null, null, null);
+            onscreenMenu.push(utilityContainer);
+            utilityContainer.visible = false;
+
+            x += dx;
+
+            openMergeContainer = _makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
+            _loadButtonDragHandler(openMergeContainer, x, y, doMergeLoad, null, null, null, null);
+            onscreenMenu.push(openMergeContainer);
+            openMergeContainer.visible = false;
 
             x += dx;
 
@@ -4434,13 +4451,6 @@ handleComplete);
             homeButtonContainers[1].y = -3 * btnSize / 2;
 
             boundary.hide();
-
-            x += dx;
-
-            utilityContainer = _makeButton(UTILITYBUTTON, _('Settings'), x, y, btnSize, 0);
-            _loadButtonDragHandler(utilityContainer, x, y, _doUtilityBox, null, null, null, null);
-            onscreenMenu.push(utilityContainer);
-            utilityContainer.visible = false;
 
             x += dx;
 
