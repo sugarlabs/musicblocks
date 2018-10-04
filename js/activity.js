@@ -3212,7 +3212,7 @@ define(MYDEFINES, function (compatibility) {
                     scrollOnContainer.visible = false;
                     scrollOffContainer.visible = false;
 
-                    var x = Math.floor(canvas.width / turtleBlocksScale) - 11 * 55 / 2;
+                    var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * 55 / 2;
                     beginnerModeContainer.x = x;
                     advancedModeContainer.x = x;
                     x += 55;
@@ -4417,7 +4417,7 @@ handleComplete);
             x += dx;
 
             openMergeContainer = _makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
-            _loadButtonDragHandler(openMergeContainer, x, y, doMergeLoad, null, null, null, null);
+            _loadButtonDragHandler(openMergeContainer, x, y, _doMergeLoad, null, null, null, null);
             onscreenMenu.push(openMergeContainer);
             openMergeContainer.visible = false;
 
