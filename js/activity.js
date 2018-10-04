@@ -1238,7 +1238,7 @@ define(MYDEFINES, function (compatibility) {
                 .setTurtles(turtles)
                 .setSetPlaybackStatus(setPlaybackStatus)
                 .setErrorMsg(errorMsg)
-		.setHomeContainers(setHomeContainers, boundary)
+                .setHomeContainers(setHomeContainers, boundary)
                 .setContextMenu(piemenuBlockContext);
 
             turtles.setBlocks(blocks);
@@ -2886,8 +2886,8 @@ define(MYDEFINES, function (compatibility) {
 
             if (smallSide < cellSize * 9) {
                 // var mobileSize = true;
-		// FIXME
-		var mobileSize = false;
+                // FIXME
+                var mobileSize = false;
                 if (w < cellSize * 10) {
                     turtleBlocksScale = smallSide / (cellSize * 11);
                 } else {
@@ -4125,7 +4125,7 @@ handleComplete);
             }
 
             if (showPalettesPopover) {
-		// FIXME
+                // FIXME
                 // buttonNames.unshift(['popdown-palette', doPopdownPalette]);
             }
 
@@ -4201,7 +4201,7 @@ handleComplete);
 
             x += dx;
 
-	    // Move to the right
+            // Move to the right
             var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
 
             newContainer = _makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
@@ -4223,19 +4223,19 @@ handleComplete);
             x += dx;
 
             if (planet) {
-		planetContainer = _makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
-		_loadButtonDragHandler(planetContainer, x, y, _doOpenSamples, null, null, null, null);
+                planetContainer = _makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
+                _loadButtonDragHandler(planetContainer, x, y, _doOpenSamples, null, null, null, null);
 
                 document.querySelector('#myOpenFile').addEventListener('change', function (event) {
                     planet.closePlanet();
                 });
             } else {
-		planetContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
+                planetContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
             }
 
-	    onscreenButtons.push(planetContainer);
+            onscreenButtons.push(planetContainer);
 
-	    // Move to the far right
+            // Move to the far right
             x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
 
             helpContainer = _makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
@@ -4829,6 +4829,7 @@ handleComplete);
                 slowContainer.visible = true;
                 stepContainer.y = 27.5;
                 stepContainer.visible = true;
+                blocks.checkBounds();
             } else {
                 var dy = headerContainer.y;
                 headerContainer.y = 0;
