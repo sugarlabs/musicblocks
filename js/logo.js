@@ -320,7 +320,7 @@ function Logo () {
     this._savePenState = {};
 
     // Things we tweak to optimize performance
-    this.blinkState = !this.optimize;
+    // this.blinkState = !this.optimize;
     this.blinkState = true;
     if (this.optimize) {
 	createjs.Ticker.framerate = 10;
@@ -365,17 +365,17 @@ function Logo () {
 
     this.setOptimize = function (state) {
         if (state) {
-            this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
+            // this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
             createjs.Ticker.framerate = 10;
             this.optimize = true;
 
         } else {
-            this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
-            createjs.Ticker.framerate = 30;
+            // this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
+            createjs.Ticker.framerate = 10; // 30;
             this.optimize = false;
         }
 
-        this.blinkState = !state;
+        // this.blinkState = !state;
         this.blinkState = true;
     };
 
@@ -8504,6 +8504,7 @@ function Logo () {
     };
 
     this._playbackPush = function (turtle, obj) {
+	return;  // Not using this at the moment.
         // Don't record in optimize mode or Turtle Blocks.
         if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
             this.playbackQueue[turtle].push(obj);
