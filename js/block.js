@@ -1456,19 +1456,19 @@ function Block(protoblock, blocks, overrideName) {
         case 'hertz':
             var c1 = this.blocks.blockList[c].connections[1];
             if (this.blocks.blockList[c1].name === 'number') {
-                return this.blocks.blockList[c2].value + 'HZ';
+                return this.blocks.blockList[c1].value + 'HZ';
             }
             break;
         case 'steppitch':
             var c1 = this.blocks.blockList[c].connections[1];
             if (this.blocks.blockList[c1].name === 'number') {
-                return _('scalar step') + ' ' + this.blocks.blockList[c2].value;
+                return _('scalar step') + ' ' + this.blocks.blockList[c1].value;
             }
             break;
         case 'pitchnumber':
             var c1 = this.blocks.blockList[c].connections[1];
             if (this.blocks.blockList[c1].name === 'number') {
-                return _('pitch number') + ' ' + this.blocks.blockList[c2].value;
+                return _('pitch number') + ' ' + this.blocks.blockList[c1].value;
             }
             break;
         case 'playdrum':
