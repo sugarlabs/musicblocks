@@ -2000,7 +2000,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2456,7 +2456,10 @@ function Block(protoblock, blocks, overrideName) {
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
                 case 'setcolor':
-                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value);
+                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, 'setcolor');
+                    break;
+                case 'setshade':
+                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, 'setshade');
                     break;
                 case 'duplicatenotes':
                     this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
@@ -3605,7 +3608,7 @@ function Block(protoblock, blocks, overrideName) {
         };
     };
 
-    this._piemenuColor = function (wheelValues, selectedValue) {
+    this._piemenuColor = function (wheelValues, selectedValue, mode) {
         // input form and  wheelNav pie menu for setcolor selection
 
         if (this.blocks.stageClick) {
@@ -3629,22 +3632,24 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.keynavigateEnabled = true;
 
         this._numberWheel.colors = [];
-        for (var i = 0; i < wheelValues.length; i++) {
-            this._numberWheel.colors.push(COLORS40[Math.floor(wheelValues[i] / 2.5)][2]);
+        if (mode === 'setcolor') {
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.colors.push(COLORS40[Math.floor(wheelValues[i] / 2.5)][2]);
+            }
+        } else {
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.colors.push(getMunsellColor(0, wheelValues[i], 0));
+            }
+
+            for (var i = 0; i < wheelValues.length; i++) {
+                wheelLabels.push(null);
+            }
         }
 
         this._numberWheel.slicePathFunction = slicePath().DonutSlice;
         this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        if (wheelValues.length > 16) {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
-        } else if (wheelValues.length > 10) {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.4;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.8;
-        } else {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        }
+        this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
+        this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
 
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
