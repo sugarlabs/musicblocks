@@ -1229,7 +1229,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['rest2'] = newblock;
     newblock.staticLabels.push(_('silence'));
     newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
+    newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('rest2')) {
         newblock.hidden = true;
     }
