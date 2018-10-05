@@ -40,16 +40,17 @@ function MusicKeyboard() {
     var selected1 = [];
 
     this.processClick = function(i) {
-        var temp1 = this.noteNames[i];
-        if (temp1 in FIXEDSOLFEGE1) {
+        var temp1 = this.noteNames[i].replace(SHARP, '#').replace(FLAT, 'b');
+        if (temp1 === 'hertz') {
+            var temp2 = this.octaves[i];
+        } else if (temp1 in FIXEDSOLFEGE1) {
             var temp2 = FIXEDSOLFEGE1[temp1] + this.octaves[i];
         } else {
             var temp2 = temp1 + this.octaves[i];
         }
 
         selected1.push(temp2);
-        console.log(temp2);
-        synth.triggerAttackRelease(temp2.replace(SHARP, '#').replace(FLAT, 'b'), '8n');
+        synth.triggerAttackRelease(temp2, '8n');
     };
 
     this.loadHandler = function(element, i) {
@@ -123,11 +124,20 @@ function MusicKeyboard() {
                     newel2.innerHTML = '';
                     newel2.style.visibility = 'hidden';
                     parenttbl2.appendChild(newel2);
+                } else if (this.noteNames[p] === 'hertz') {
+                    var parenttbl = document.getElementById('myrow');
+                    var newel = document.createElement('td');
+                    var elementid = document.getElementsByTagName('td').length
+
+                    newel.setAttribute('id',elementid);
+                    idContainer.push(elementid);
+                    newel.innerHTML = this.octaves[p];
+                    parenttbl.appendChild(newel);
                 } else if (this.noteNames[p].indexOf(SHARP) !== -1 || this.noteNames[p].indexOf('#') !== -1) {
                     var parenttbl2 = document.getElementById('myrow2');
                     var newel2 = document.createElement('td');
                     var elementid2 = document.getElementsByTagName('td').length
-                    
+
                     newel2.setAttribute('id',elementid2);
                     idContainer.push(elementid2);
                     newel2.innerHTML = this.noteNames[p] + this.octaves[p];
@@ -136,7 +146,7 @@ function MusicKeyboard() {
                     var parenttbl2 = document.getElementById('myrow2');
                     var newel2 = document.createElement('td');
                     var elementid2 = document.getElementsByTagName('td').length
-                    
+
                     newel2.setAttribute('id',elementid2);
                     idContainer.push(elementid2);
                     newel2.innerHTML = this.noteNames[p] + this.octaves[p];
@@ -145,7 +155,7 @@ function MusicKeyboard() {
                     var parenttbl = document.getElementById('myrow');
                     var newel = document.createElement('td');
                     var elementid = document.getElementsByTagName('td').length
-                
+
                     newel.setAttribute('id',elementid);
                     idContainer.push(elementid);
                     newel.innerHTML = this.noteNames[p] + this.octaves[p];
@@ -345,7 +355,13 @@ function MusicKeyboard() {
         var newStack = [[0, ['action', {'collapsed':false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value':'chunk'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         for (var i = 0; i < pitches.length; i++) {
-            var note = pitches[i].slice(0);
+            // Could be a note or a frequency.
+            if (typeof(pitches[i]) === 'string') {
+                var note = pitches[i].slice(0);
+                var notePitch = note.substring(0, note.length - 1);  // e.g., D or D# not D#1
+            } else {
+                var note = pitches[i];  // e.g., 392
+            }
 
             // Add the Note block and its value
             var idx = newStack.length;
@@ -360,7 +376,6 @@ function MusicKeyboard() {
             var endOfStackIdx = idx;
             newStack.push([idx + 1, ['number', {'value': '4'}], 0, 0, [idx]]);
             // Add the pitch blocks to the Note block
-            var  notePitch = note.substring(0,note.length-1);  //i.e. D or D# not D#1
             var thisBlock = idx + 2;
      
             // We need to point to the previous note or pitch block.
@@ -369,16 +384,22 @@ function MusicKeyboard() {
             // The last connection in last pitch block is null.
             var lastConnection = null;
 
-            newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-            if (['#', 'b', '♯', '♭'].indexOf(notePitch[1]) !== -1) {
-                newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0]] + note[1]}], 0, 0, [thisBlock]]);
-                newStack.push([thisBlock + 2, ['number', {'value': note[note.length-1]}], 0, 0, [thisBlock]]);
-            } 
-            else {
-                newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[notePitch[0]]}], 0, 0, [thisBlock]]);
-                newStack.push([thisBlock + 2, ['number', {'value': note[note.length-1]}], 0, 0, [thisBlock]]);
+            if (typeof(pitches[i]) === 'string') {
+                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                if (['#', 'b', '♯', '♭'].indexOf(notePitch[1]) !== -1) {
+                    newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0]] + note[1]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 2, ['number', {'value': note[note.length - 1]}], 0, 0, [thisBlock]]);
+                } else {
+                    newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[notePitch[0]]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 2, ['number', {'value': note[note.length-1]}], 0, 0, [thisBlock]]);
+                }
+            } else {
+                newStack.push([thisBlock, 'hertz', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                newStack.push([thisBlock + 1, ['number', {'value': note}], 0, 0, [thisBlock]]);
+
             }
         }
+
         console.log(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
     }

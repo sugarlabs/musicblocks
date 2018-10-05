@@ -135,9 +135,9 @@ function Logo () {
 
     // Optimize for runtime speed
     if (beginnerMode) {
-	this.optimize = true;
+        this.optimize = true;
     } else {
-	this.optimize = false;
+        this.optimize = false;
     }
 
     // Widget-related attributes
@@ -323,9 +323,9 @@ function Logo () {
     // this.blinkState = !this.optimize;
     this.blinkState = true;
     if (this.optimize) {
-	createjs.Ticker.framerate = 10;
+        createjs.Ticker.framerate = 10;
     } else {
-	createjs.Ticker.framerate = 30;
+        createjs.Ticker.framerate = 30;
     }
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -969,7 +969,7 @@ function Logo () {
                 this.blocks.blockList[blk].text.text = mixedNumber(value);
             } else {
                 this.blocks.blockList[blk].text.text = value.toString();
-	    }
+            }
 
             this.blocks.blockList[blk].container.updateCache();
             this.refreshCanvas();
@@ -1199,6 +1199,7 @@ function Logo () {
 
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
+        this.inMusicKeyboard = false;
         this.inTimbre = false;
         this.inRhythmRuler = false;
         this.rhythmRulerMeasure = null;
@@ -4169,7 +4170,7 @@ function Logo () {
             }
 
             if (that.inNoteBlock[turtle].length > 0) {
-		// Add the noise sound as if it were a drum
+                // Add the noise sound as if it were a drum
                 that.noteDrums[turtle][last(that.inNoteBlock[turtle])].push(noisename);
                 if (that.synthVolume[turtle][noisename] == undefined) {
                     that.synthVolume[turtle][noisename] = [DEFAULTVOLUME];
@@ -4255,7 +4256,7 @@ function Logo () {
                 };
 
                 that._processNote(noteBeatValue, blk, turtle, __callback);
-	    } else {
+            } else {
                 that.errorMsg(_('Drum Block: Did you mean to use a Note block?'), blk);
                 break;
             }
@@ -4681,11 +4682,11 @@ function Logo () {
                         that.currentCalculatedOctave[turtle] = 4;
                     }
 
-		    if (that.blocks.blockList[blk].name == 'scaledegree') {
-			var noteObj = getNote(that.currentNote, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], that.currentNote), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
-		    } else {
-			var noteObj = getNote(arg0, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], arg0), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
-		    }
+                    if (that.blocks.blockList[blk].name == 'scaledegree') {
+                        var noteObj = getNote(that.currentNote, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], that.currentNote), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    } else {
+                        var noteObj = getNote(arg0, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], arg0), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    }
 
                     if (!that.validNote) {
                         that.errorMsg(INVALIDPITCH, blk);
@@ -5254,9 +5255,9 @@ function Logo () {
             if (args.length > 1 && args[0] !== 0) {
                 if (that.blocks.blockList[blk].name === 'crescendo') {
                     that.crescendoDelta[turtle].push(args[0]);
-		} else {
+                } else {
                     that.crescendoDelta[turtle].push(-args[0]);
-		}
+                }
 
                 for (var synth in that.synthVolume[turtle]) {
                     var vol = last(that.synthVolume[turtle][synth]);
@@ -6783,6 +6784,9 @@ function Logo () {
 
                 that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
                 that.pitchTimeMatrix.rowArgs.push(arg);
+            } else if (that.inMusicKeyboard) {
+                that.musicKeyboard.noteNames.push('hertz');
+                that.musicKeyboard.octaves.push(arg);
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, frequency, direction) {
@@ -6869,8 +6873,6 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inPitchSlider) {
                     that.pitchSlider.Sliders.push([args[0], 0, 0]);
-                } else if (that.inMusicKeyboard) {
-                    that.musicKeyboard.Sliders.push([args[0], 0, 0]);
                 } else {
                     that.oscList[turtle][last(that.inNoteBlock[turtle])].push(that.blocks.blockList[blk].name);
 
@@ -8504,7 +8506,7 @@ function Logo () {
     };
 
     this._playbackPush = function (turtle, obj) {
-	return;  // Not using this at the moment.
+        return;  // Not using this at the moment.
         // Don't record in optimize mode or Turtle Blocks.
         if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
             this.playbackQueue[turtle].push(obj);
@@ -11365,8 +11367,8 @@ function Logo () {
         }
 
         // docById('myCanvas').style.background = c;
-	this.turtles.backgroundColor = c;
-	this.turtles.makeBackground(this.turtles.isShrunk);
+        this.turtles.backgroundColor = c;
+        this.turtles.makeBackground(this.turtles.isShrunk);
 
         this.svgOutput = '';
     };
@@ -11634,8 +11636,8 @@ function Logo () {
         if (drum.length === 0) {
             this.notationDrumStaging[turtle].push([['R'], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
         } else if (['noise1', 'noise2', 'noise3'].indexOf(drum[0]) === -1) {
-		var drumSymbol = getDrumSymbol(drum[0]);
-		this.notationDrumStaging[turtle].push([[drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
+            var drumSymbol = getDrumSymbol(drum[0]);
+            this.notationDrumStaging[turtle].push([[drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false]);
         }
 
         this.pickupPoint[turtle] = null;
