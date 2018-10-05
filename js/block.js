@@ -2363,6 +2363,11 @@ function Block(protoblock, blocks, overrideName) {
             var temperamentLabels = [];
             var temperamentValues = [];
             for (var i = 0; i < TEMPERAMENTS.length; i++) {
+                // Skip custom temperament in Beginner Mode.
+                if (beginnerMode && TEMPERAMENTS[i][1] === 'custom') {
+                    continue;
+                }
+
                 temperamentLabels.push(TEMPERAMENTS[i][0]);
                 temperamentValues.push(TEMPERAMENTS[i][1]);
             }
