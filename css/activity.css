@@ -367,7 +367,7 @@ select {
 }
 
 input.text {
-    background-color: #76dbd7 !important; /* 7.5BG 8/6 */
+    background-color: #FF5942 !important;
     text-align: center;
     font-weight: bold !important;
     resize: none !important;
@@ -377,7 +377,7 @@ input.text {
 }
 
 input.boolean {
-    background-color: #f2ec4d !important; /* */
+    background-color: #C96DF3 !important; /* */
     text-align: center;
     font-weight: bold !important;
     resize: none !important;
@@ -387,7 +387,7 @@ input.boolean {
 }
 
 input.number {
-    background-color: #ffb2bc !important; /* 0RP 8/10 */
+    background-color: #FF5293 !important; /* 0RP 8/10 */
     text-align: center;
     font-weight: bold !important;
     resize: none !important;
