@@ -2781,7 +2781,7 @@ define(MYDEFINES, function (compatibility) {
                             searchWidget.style.visibility = 'hidden';
                         } else {
                             // toggle full screen
-                            _toggleToolbar();
+                            // _toggleToolbar();
                         }
                         break;
                     case RETURN:
