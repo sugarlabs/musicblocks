@@ -1893,7 +1893,7 @@ msgid "The <em>Show</em> block is used to display text or images on the canvas."
 msgstr ""
 
 #: js/turtledefs.js:293
-msgid "The <em>Shell</em> block is used to change the appearance of the mouse."
+msgid "The <em>Avatar</em> block is used to change the appearance of the mouse."
 msgstr ""
 
 #: js/turtledefs.js:294
@@ -3495,8 +3495,8 @@ msgid "note to frequency"
 msgstr ""
 
 #: js/basicblocks.js:4324
-#.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
-msgid "shell"
+#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
 msgstr ""
 
 #: js/basicblocks.js:4324

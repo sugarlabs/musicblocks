@@ -4320,8 +4320,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('turtleshell');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['turtleshell'] = newblock;
-    //.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
-    newblock.staticLabels.push(_('shell'), _('size'), _('image'));
+    //.TRANS: Avatar is the image used to determine the appearance of the mouse.
+    newblock.staticLabels.push(_('avatar'), _('size'), _('image'));
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(55);
