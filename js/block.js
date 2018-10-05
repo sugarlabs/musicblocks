@@ -1449,7 +1449,8 @@ function Block(protoblock, blocks, overrideName) {
             var c2 = this.blocks.blockList[c].connections[2];
             if (this.blocks.blockList[c2].name === 'number') {
                 if (this.blocks.blockList[c1].name === 'number') {
-                    return _('scale degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
+		    //.TRANS: scale degree
+                    return _('degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
                 }
             }
             break;
@@ -1462,13 +1463,15 @@ function Block(protoblock, blocks, overrideName) {
         case 'steppitch':
             var c1 = this.blocks.blockList[c].connections[1];
             if (this.blocks.blockList[c1].name === 'number') {
-                return _('scalar step') + ' ' + this.blocks.blockList[c1].value;
+		//.TRANS: scalar step
+                return _('step') + ' ' + this.blocks.blockList[c1].value;
             }
             break;
         case 'pitchnumber':
             var c1 = this.blocks.blockList[c].connections[1];
             if (this.blocks.blockList[c1].name === 'number') {
-                return _('pitch number') + ' ' + this.blocks.blockList[c1].value;
+		//.TRANS: pitch number
+                return _('pitch') + ' ' + this.blocks.blockList[c1].value;
             }
             break;
         case 'playdrum':
