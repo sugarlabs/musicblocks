@@ -2459,7 +2459,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, 'setcolor');
                     break;
                 case 'setshade':
-                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, 'setshade');
+                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value, 'setshade');
                     break;
                 case 'duplicatenotes':
                     this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
