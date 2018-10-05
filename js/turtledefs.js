@@ -18,19 +18,19 @@ const TITLESTRING = _('Music Blocks is a collection of tools for exploring music
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-const BUILTINPALETTES = ['search', 'rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'mouse', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'mice', 'extras'];
+const BUILTINPALETTES = ['search', 'rhythm',  'meter', 'pitch', 'intervals', 'tone', 'ornament', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'graphics', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'ensemble', 'extras'];
 
-const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('mice'), _('extras')];
+const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('ornament'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('graphics'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('ensemble'), _('extras')];
 
 // We put the palette buttons into groups.
-const MULTIPALETTES = [['rhythm',  'meter', 'pitch', 'intervals', 'tone', 'volume', 'drum', 'widgets'], ['flow', 'action', 'boxes', 'number', 'boolean', 'heap', 'extras'], ['mouse', 'pen', 'media', 'sensors', 'mice']];
+const MULTIPALETTES = [['rhythm',  'meter', 'pitch', 'intervals', 'tone', 'ornament', 'volume', 'drum', 'widgets'], ['flow', 'action', 'boxes', 'number', 'boolean', 'heap', 'extras'], ['graphics', 'pen', 'media', 'sensors', 'ensemble']];
 
 // Skip these palettes in beginner mode.
 const SKIPPALETTES = ['heap', 'extras'];
 
 // Icons used to select between multipalettes.
-const MULTIPALETTEICONS = ['music', 'logic', 'graphics'];
-const MULTIPALETTENAMES = [_('music'), _('logic'), _('graphics')];
+const MULTIPALETTEICONS = ['music', 'logic', 'artwork'];
+const MULTIPALETTENAMES = [_('music'), _('logic'), _('artwork')];
 
 function getMainToolbarButtonNames(name) {
    return (['popdown-palette', 'run', 'step', 'step-music', 'stop-turtle', 'hard-stop-turtle', 'palette', 'help', 'sugarizer-stop', 'beginner', 'advanced', 'planet', 'planet-disabled', 'open', 'save', 'new'].indexOf(name) > -1);
@@ -45,22 +45,22 @@ function getAuxToolbarButtonNames(name) {
 function beginnerBlock(name) {
    // Only these blocks appear on the palette in beginner mode.
    return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
-           'meter', 'setmasterbpm2', 'everybeatdo', 'beatvalue',  // meter palette
+           'meter', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
            'pitch', 'pitch2', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
-           'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', // interval palette
-           'settimbre', 'newstaccato', 'newslur', 'vibrato', 'neighbor2', 'chorus', 'dis', 'phaser', 'tremolo', // tone palette
+           'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
+           'settimbre', 'newstaccato', 'newslur', 'vibrato', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setsynthvolume',  // volume palette
            'playdrum', 'setdrum', // drum palette
-           'if', 'ifthenelse', 'repeat', 'forever', 'backward', 'duplicatenotes',  // flow palette
+           'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
            'action', 'start', 'do', 'dispatch', 'listen',  // action palette
            'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne',  // boxes palette
-           'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet',  // widgets palette
+           'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet', 'musickeyboard', 'tempo', 'modewidget', 'matrixcmajor', 'matrixgmajor', // widgets palette
            'forward', 'back', 'left', 'right', 'setxy', 'arc', 'x', 'y', 'heading', 'scrollxy',  // mouse palette
-           'setpensize', 'penup', 'pendown', 'color', 'red', 'green', 'blue', 'yellow', 'purple', 'orange', 'black', 'white',  // pen palette
+           'setpensize', 'penup', 'pendown', 'color', 'setcolor', 'setshade',  // pen palette
            'number', 'random', 'oneOf', 'plus', 'minus', 'multiply', 'divide',  // number palette
            'equal', 'less', 'greater',  // boolean palette
            'text', 'media', 'show', 'turtleshell', 'speak', 'height', 'width', 'bottompos', 'toppos', 'leftpos', 'rightpos',  // media palette
-           'mousebutton', 'mousex', 'mousey', 'time', 'myclick', // sensor palette
+           'mousebutton', 'mousex', 'mousey', 'myclick', // sensor palette
            'push', 'pop', 'setHeapEntry', 'indexHeap', 'reverseHeap', 'emptyHeap', 'heapEmpty', 'heapLength', 'showHeap',  // heap palette
            'setturtlename2', 'turtlename', // mice palette
            'print',  // extras palette

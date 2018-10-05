@@ -37,10 +37,11 @@ window.platformColor = {
 	'rhythm': ['#FE994F', '#E86B0E', '#FF8B2D'],
 	'meter': ['#FE994F', '#E86B0E', '#FF8B2D'],
 	'tone': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#47E0DB'],
+	'ornament': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#47E0DB'],
 	'intervals': ['#7CD622', '#57AD02', '#77C428'],
 	'volume': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#47E0DB'],
 	'drum': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#47E0DB'],
-	'mouse': ['#92A9FF', '#5370DC', '#728FF9'],
+	'graphics': ['#92A9FF', '#5370DC', '#728FF9'],
 	'pen': ['#92A9FF', '#5370DC', '#728FF9'],
 	'boxes': ['#FFBF00', '#DAAF30', '#DAA926', '#F6C444'],
 	'action': ['#FFBF00', '#DAAF30', '#DAA926', '#F6C444'],
@@ -52,7 +53,7 @@ window.platformColor = {
 	'extras': ['#C4C4C4', '#A0A0A0', '#B0B0B0'],
 	'myblocks': ['#C4C4C4', '#A0A0A0', '#B0B0B0'],
 	'heap': ['#D98A43', '#B7651A', '#D68136'],
-	'mice': ['#92A9FF', '#5370DC', '#728FF9']
+	'ensemble': ['#92A9FF', '#5370DC', '#728FF9']
     },
     // header: platform.FF? '#00539F' : '#2196F3',
     // header: platform.FF? '#2584af' : '#2584af',  // 10B 5/8

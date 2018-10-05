@@ -268,6 +268,8 @@ const STOPBUTTON = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg 
 
 const TONEPALETTEICON = '<svg width="55" height="55" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><title>アセット 6</title><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="56" height="56" style="fill:#dfdfdf;opacity:0"/><path d="M36.08,45.48a7.08,7.08,0,1,1,0-14.15,6.91,6.91,0,0,1,3.13.75V26.36H22.74v12a7.09,7.09,0,1,1-7.09-7.08,6.91,6.91,0,0,1,3.13.75V14.76H43.17V38.41A7.09,7.09,0,0,1,36.08,45.48Z" style="fill:#3edcdd"/><path d="M42.47,15.46V38.41A6.39,6.39,0,1,1,36.08,32a6.31,6.31,0,0,1,3.83,1.31V25.66H22V38.41A6.39,6.39,0,1,1,15.65,32a6.31,6.31,0,0,1,3.83,1.31V15.46h23m1.4-1.4H18.08V31a7.64,7.64,0,0,0-2.43-.4,7.78,7.78,0,1,0,7.79,7.78V27.06H38.51v4a7.64,7.64,0,0,0-2.43-.4,7.78,7.78,0,1,0,7.79,7.78V14.06Z" style="fill:#1dbcbd"/></g></g></svg>';
 
+const ORNAMENTPALETTEICON = TONEPALETTEICON;
+
 const VOLUMEPALETTEICON = '<svg width="55" height="55" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><title>アセット 7</title><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="56" height="56" style="fill:#dfdfdf;opacity:0"/><path d="M27,40.15a2.15,2.15,0,0,1-1.13-.32l-9.3-5.54H10.86a2.13,2.13,0,0,1-2.16-2.1V23.81a2.13,2.13,0,0,1,2.16-2.09h5.66l9.3-5.55A2.17,2.17,0,0,1,29.11,18v20.1a2.06,2.06,0,0,1-.67,1.52,2.23,2.23,0,0,1-1.49.58Z" style="fill:#3edcdd"/><path d="M27,16.55A1.43,1.43,0,0,1,28.41,18v20.1A1.43,1.43,0,0,1,27,39.45a1.51,1.51,0,0,1-.78-.22l-9.46-5.65H10.86A1.42,1.42,0,0,1,9.4,32.19V23.81a1.42,1.42,0,0,1,1.46-1.39h5.85l9.46-5.65a1.51,1.51,0,0,1,.78-.22m0-1.4a2.89,2.89,0,0,0-1.49.42L16.33,21H10.86A2.83,2.83,0,0,0,8,23.81v8.38A2.83,2.83,0,0,0,10.86,35h5.47l9.13,5.45a2.89,2.89,0,0,0,1.49.42,2.83,2.83,0,0,0,2.86-2.8V18A2.83,2.83,0,0,0,27,15.15Z" style="fill:#1dbcbd"/><path d="M34.79,35.29a1.67,1.67,0,0,1-1.26-.52,2.47,2.47,0,0,1-.05-3.08,7.06,7.06,0,0,0,0-7.92,2.5,2.5,0,0,1,.05-3.1,1.71,1.71,0,0,1,1.26-.52A2.79,2.79,0,0,1,37,21.45,11.21,11.21,0,0,1,37,34a2.78,2.78,0,0,1-2.23,1.29Z" style="fill:#3edcdd"/><path d="M34.79,20.86a2.1,2.1,0,0,1,1.65,1,10.56,10.56,0,0,1,0,11.77,2.1,2.1,0,0,1-1.65,1A1,1,0,0,1,34,34.3a1.84,1.84,0,0,1,0-2.23,7.77,7.77,0,0,0,0-8.69,1.84,1.84,0,0,1,0-2.23,1,1,0,0,1,.75-.29m-.75.29h0m.75-1.7A2.41,2.41,0,0,0,33,20.2a3.2,3.2,0,0,0-.12,3.95,6.35,6.35,0,0,1,0,7.14,3.2,3.2,0,0,0,.12,4,2.39,2.39,0,0,0,1.77.73,3.49,3.49,0,0,0,2.81-1.6,11.91,11.91,0,0,0,0-13.33,3.5,3.5,0,0,0-2.81-1.61Z" style="fill:#1dbcbd"/><path d="M41.43,39.51A1.79,1.79,0,0,1,40.11,39a2.36,2.36,0,0,1,0-3.11,12.86,12.86,0,0,0,0-16.26,2.37,2.37,0,0,1,0-3.12,1.79,1.79,0,0,1,1.32-.54,2.68,2.68,0,0,1,2,1,17,17,0,0,1,0,21.47,2.68,2.68,0,0,1-2,1Z" style="fill:#3edcdd"/><path d="M41.43,16.64a2,2,0,0,1,1.5.79,16.39,16.39,0,0,1,0,20.59,2,2,0,0,1-1.5.79,1.14,1.14,0,0,1-.82-.32h0a1.69,1.69,0,0,1,.09-2.2,13.62,13.62,0,0,0,0-17.13,1.69,1.69,0,0,1-.09-2.2,1.14,1.14,0,0,1,.82-.32m-.82.32h0m.82-1.72a2.5,2.5,0,0,0-1.82.75,3,3,0,0,0,0,4,12.17,12.17,0,0,1,0,15.38,3.07,3.07,0,0,0,0,4.05,2.5,2.5,0,0,0,1.82.75A3.38,3.38,0,0,0,44,38.9a17.67,17.67,0,0,0,0-22.35,3.38,3.38,0,0,0-2.59-1.31Z" style="fill:#1dbcbd"/></g></g></svg>';
 
 const WIDGETSPALETTEICON = '<svg width="55" height="55" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><title>アセット 5</title><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="56" height="56" style="fill:#dfdfdf;opacity:0"/><rect x="9.4" y="9.45" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="18.7" y="9.45" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="28" y="9.45" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="37.3" y="9.45" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="9.4" y="18.72" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="18.7" y="18.72" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="28" y="18.72" width="9.3" height="9.28" style="fill:#57ad02;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="37.3" y="18.72" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="9.4" y="28" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="18.7" y="28" width="9.3" height="9.28" style="fill:#57ad02;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="28" y="28" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="37.3" y="28" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="9.4" y="37.28" width="9.3" height="9.28" style="fill:#57ad02;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="18.7" y="37.28" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="28" y="37.28" width="9.3" height="9.28" style="fill:#7cd622;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/><rect x="37.3" y="37.28" width="9.3" height="9.28" style="fill:#57ad02;stroke:#57ad02;stroke-miterlimit:10;stroke-width:1.399999976158142px"/></g></g></svg>';
@@ -303,10 +305,11 @@ const PALETTEICONS = {
     'meter': METERPALETTEICON,
     'pitch': PITCHPALETTEICON,
     'tone': TONEPALETTEICON,
+    'ornament': ORNAMENTPALETTEICON,
     'intervals': INTERVALSPALETTEICON,
     'volume': VOLUMEPALETTEICON,
     'drum': DRUMPALETTEICON,
-    'mouse': TURTLEPALETTEICON,
+    'graphics': TURTLEPALETTEICON,
     'pen': PENPALETTEICON,
     'number': NUMBERPALETTEICON,
     'boolean': BOOLEANPALETTEICON,
@@ -318,9 +321,9 @@ const PALETTEICONS = {
     'extras': EXTRASPALETTEICON,
     'myblocks': MYBLOCKSPALETTEICON,
     'heap': HEAPPALETTEICON,
-    'mice': TURTLESPALETTEICON,
+    'ensemble': TURTLESPALETTEICON,
     'music': MUSICICON,
-    'graphics': GRAPHICSICON,
+    'artwork': GRAPHICSICON,
     'logic': LOGICICON,
 }
 

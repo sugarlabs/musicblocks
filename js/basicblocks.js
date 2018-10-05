@@ -1229,7 +1229,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['rest2'] = newblock;
     newblock.staticLabels.push(_('silence'));
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('rest2')) {
         newblock.hidden = true;
     }
@@ -1240,7 +1240,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note4'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + _('drum'));
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note4')) {
         newblock.hidden = true;
     }
@@ -1251,7 +1251,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note3'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note3')) {
         newblock.hidden = true;
     }
@@ -1262,7 +1262,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note5'] = newblock;
     newblock.staticLabels.push(_('note value') + ' 7');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note5')) {
         newblock.hidden = true;
     }
@@ -1273,7 +1273,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note7'] = newblock;
     newblock.staticLabels.push(_('note value') + ' 5 4');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note7')) {
         newblock.hidden = true;
     }
@@ -1284,7 +1284,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note6'] = newblock;
     newblock.staticLabels.push(_('note value') + ' +1');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note6')) {
         newblock.hidden = true;
     }
@@ -1295,7 +1295,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note2'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + 'G4');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+        newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note2')) {
         newblock.hidden = true;
     }
@@ -1306,7 +1306,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note1'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + i18nSolfege('sol') + '4');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note1')) {
         newblock.hidden = true;
     }
@@ -1562,7 +1562,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // TONE (ARTICULATION) PALETTE
 
     var newblock = new ProtoBlock('staccatofactor');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['staccatofactor'] = newblock;
     //.TRANS: the duration of a note played as staccato
     newblock.staticLabels.push(_('staccato factor'));
@@ -1573,7 +1573,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('slurfactor');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['slurfactor'] = newblock;
     //.TRANS: the degree of overlap of notes played as legato
     newblock.staticLabels.push(_('slur factor'));
@@ -1668,7 +1668,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('neighbor');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['neighbor'] = newblock;
     //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
     newblock.staticLabels.push(_('neighbor') + ' (+/–)');
@@ -1686,7 +1686,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('neighbor2');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['neighbor2'] = newblock;
     //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
     newblock.staticLabels.push(_('neighbor') + ' (+/–)');
@@ -1804,7 +1804,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('glide');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['glide'] = newblock;
    //.TRANS: glide (glissando) is a blended overlap successive notes
     newblock.staticLabels.push(_('glide'));
@@ -1815,7 +1815,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('slur');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['slur'] = newblock;
     //.TRANS: slur or legato is an overlap successive notes
     newblock.staticLabels.push(_('slur'));
@@ -1826,7 +1826,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('staccato');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['staccato'] = newblock;
     //.TRANS: play each note sharply detached from the others
     newblock.staticLabels.push(_('staccato'));
@@ -1837,7 +1837,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('newslur');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['newslur'] = newblock;
     //.TRANS: legato: overlap successive notes
     newblock.staticLabels.push(_('slur'));
@@ -1850,7 +1850,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('newstaccato');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['newstaccato'] = newblock;
     //.TRANS: play each note sharply detached from the others
     newblock.staticLabels.push(_('staccato'));
@@ -2901,7 +2901,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // TURTLE PALETTE
 
     var newblock = new ProtoBlock('heading');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['heading'] = newblock;
     //.TRANS: orientation or compass direction
     newblock.staticLabels.push(_('heading'));
@@ -2912,7 +2912,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('y');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['y'] = newblock;
     //.TRANS: y coordinate
     newblock.staticLabels.push(_('y'));
@@ -2923,7 +2923,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('x');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['x'] = newblock;
     //.TRANS: x coordinate
     newblock.staticLabels.push(_('x'));
@@ -2934,7 +2934,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('scrollxy');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['scrollxy'] = newblock;
     //.TRANS: scroll canvas image by x, y position
     newblock.staticLabels.push(_('scroll xy'));
@@ -2949,7 +2949,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('clear');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['clear'] = newblock;
     //.TRANS: erase the screen and return the mice to the center position
     newblock.staticLabels.push(_('clear'));
@@ -2960,7 +2960,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('controlpoint2');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['controlpoint2'] = newblock;
     //.TRANS: control point in a bezier curve
     newblock.staticLabels.push(_('control point 2'))
@@ -2976,7 +2976,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('controlpoint1');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['controlpoint1'] = newblock;
     //.TRANS: control point in a Bezier curve
     newblock.staticLabels.push(_('control point 1'));
@@ -2992,7 +2992,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('bezier');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['bezier'] = newblock;
     //.TRANS: Bézier curves employ at least three points to define a curve
     newblock.staticLabels.push(_('bezier'));
@@ -3008,7 +3008,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('arc');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['arc'] = newblock;
     //.TRANS: draws a part of the circumference of a circle
     newblock.staticLabels.push(_('arc'));
@@ -3023,7 +3023,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setheading');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['setheading'] = newblock;
     //.TRANS: set compass heading
     newblock.staticLabels.push(_('set heading'));
@@ -3035,7 +3035,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setxy');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['setxy'] = newblock;
     //.TRANS: set xy position
     newblock.staticLabels.push(_('set xy'));
@@ -3050,7 +3050,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('right');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['right'] = newblock;
     //.TRANS: turn right (clockwise)
     newblock.staticLabels.push(_('right'));
@@ -3062,7 +3062,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('left');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['left'] = newblock;
     //.TRANS: turn left (counter-clockwise)
     newblock.staticLabels.push(_('left'));
@@ -3074,7 +3074,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('back');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['back'] = newblock;
     //.TRANS: move backward (in the opposite direction of the current heading)
     newblock.staticLabels.push(_('back'));
@@ -3086,7 +3086,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('forward');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['forward'] = newblock;
     //.TRANS: move forward (in the same direction of the current heading)
     newblock.staticLabels.push(_('forward'));
@@ -4975,10 +4975,10 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // Mice palette (blocks for interacting between mice)
+    // Mice palette (blocks for interacting between ensemble)
 
     var newblock = new ProtoBlock('stopTurtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['stopTurtle'] = newblock;
     newblock.staticLabels.push(_('stop mouse'));
     newblock.adjustWidthToLabel();
@@ -4990,7 +4990,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('startTurtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['startTurtle'] = newblock;
     newblock.staticLabels.push(_('start mouse'));
     newblock.adjustWidthToLabel();
@@ -5002,7 +5002,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlecolor');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlecolor'] = newblock;
     //.TRANS: pen color for this mouse
     newblock.staticLabels.push(_('mouse color'));
@@ -5015,7 +5015,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtleheading');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtleheading'] = newblock;
     //.TRANS: heading (compass direction) for this mouse
     newblock.staticLabels.push(_('mouse heading'));
@@ -5028,7 +5028,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setxyturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setxyturtle'] = newblock;
     //.TRANS: set xy position for this mouse
     newblock.staticLabels.push(_('set mouse'), _('name'), _('x'), _('y'));
@@ -5044,7 +5044,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setturtle'] = newblock;
     newblock.staticLabels.push(_('set mouse'));
     newblock.adjustWidthToLabel();
@@ -5056,7 +5056,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('yturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['yturtle'] = newblock;
     //.TRANS: y position for this mouse
     newblock.staticLabels.push(_('mouse y'));
@@ -5069,7 +5069,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('xturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['xturtle'] = newblock;
     //.TRANS: x position for this mouse
     newblock.staticLabels.push(_('mouse x'));
@@ -5082,7 +5082,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtleelapsednotes');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtleelapsednotes'] = newblock;
     //.TRANS: notes played by this mouse
     newblock.staticLabels.push(_('mouse notes played'));
@@ -5095,7 +5095,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlepitch');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlepitch'] = newblock;
     //.TRANS: convert current note for this turtle to piano key (1-88)
     newblock.staticLabels.push(_('mouse pitch number'));
@@ -5108,7 +5108,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlenote');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlenote'] = newblock;
     newblock.staticLabels.push(_('mouse note value'));
     newblock.oneArgMathBlock();
@@ -5121,7 +5121,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlenote2');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlenote2'] = newblock;
     newblock.staticLabels.push(_('mouse note value'));
     newblock.oneArgMathBlock();
@@ -5133,7 +5133,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlesync');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlesync'] = newblock;
     newblock.staticLabels.push(_('mouse sync'));
     newblock.oneArgBlock();
@@ -5145,7 +5145,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('foundturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['foundturtle'] = newblock;
     newblock.staticLabels.push(_('found mouse'));
     newblock.adjustWidthToLabel();
@@ -5158,7 +5158,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('newturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['newturtle'] = newblock;
     newblock.staticLabels.push(_('new mouse'));
     newblock.adjustWidthToLabel();
@@ -5170,7 +5170,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlename');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlename'] = newblock;
     newblock.staticLabels.push(_('mouse name'));
     newblock.adjustWidthToLabel();
@@ -5181,7 +5181,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setturtlename');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setturtlename'] = newblock;
     newblock.staticLabels.push(_('set name'));
     newblock.staticLabels.push(_('source'));
@@ -5198,7 +5198,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setturtlename2');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setturtlename2'] = newblock;
     newblock.staticLabels.push(_('set name'));
     newblock.adjustWidthToLabel();
