@@ -2003,7 +2003,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2468,9 +2468,10 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'setcolor':
                 case 'sethue':
-                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, 'setcolor');
+                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, this.blocks.blockList[this.connections[0]].name);
                     break;
                 case 'setshade':
+                case 'settranslucency':
                 case 'setgrey':
                     this._piemenuColor([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0], this.value, this.blocks.blockList[this.connections[0]].name);
                     break;
@@ -3657,6 +3658,10 @@ function Block(protoblock, blocks, overrideName) {
             if (mode === 'setshade') {
                 for (var i = 0; i < wheelValues.length; i++) {
                     this._numberWheel.colors.push(getMunsellColor(0, wheelValues[i], 0));
+                }
+            } else if (mode === 'settranslucency') {
+                for (var i = 0; i < wheelValues.length; i++) {
+                    this._numberWheel.colors.push(getMunsellColor(35, 70, 100 - wheelValues[i]));
                 }
             } else {
                 for (var i = 0; i < wheelValues.length; i++) {
