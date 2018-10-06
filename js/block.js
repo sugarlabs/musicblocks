@@ -1462,10 +1462,11 @@ function Block(protoblock, blocks, overrideName) {
             break;
         case 'steppitch':
             var c1 = this.blocks.blockList[c].connections[1];
-            if (this.blocks.blockList[c1].name === 'number') {
+            if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c1].value < 0) {
                 //.TRANS: scalar step
-                return _('step') + ' ' + this.blocks.blockList[c1].value;
-            }
+                return _('down') + ' ' + Math.abs(this.blocks.blockList[c1].value);
+	    } else
+                return _('up') + ' ' + this.blocks.blockList[c1].value;
             break;
         case 'pitchnumber':
             var c1 = this.blocks.blockList[c].connections[1];
