@@ -1449,7 +1449,7 @@ function Block(protoblock, blocks, overrideName) {
             var c2 = this.blocks.blockList[c].connections[2];
             if (this.blocks.blockList[c2].name === 'number') {
                 if (this.blocks.blockList[c1].name === 'number') {
-		    //.TRANS: scale degree
+                    //.TRANS: scale degree
                     return _('degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
                 }
             }
@@ -1463,14 +1463,14 @@ function Block(protoblock, blocks, overrideName) {
         case 'steppitch':
             var c1 = this.blocks.blockList[c].connections[1];
             if (this.blocks.blockList[c1].name === 'number') {
-		//.TRANS: scalar step
+                //.TRANS: scalar step
                 return _('step') + ' ' + this.blocks.blockList[c1].value;
             }
             break;
         case 'pitchnumber':
             var c1 = this.blocks.blockList[c].connections[1];
             if (this.blocks.blockList[c1].name === 'number') {
-		//.TRANS: pitch number
+                //.TRANS: pitch number
                 return _('pitch') + ' ' + this.blocks.blockList[c1].value;
             }
             break;
@@ -2003,7 +2003,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2464,10 +2464,12 @@ function Block(protoblock, blocks, overrideName) {
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
                 case 'setcolor':
+                case 'sethue':
                     this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, 'setcolor');
                     break;
                 case 'setshade':
-                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value, 'setshade');
+                case 'setgrey':
+                    this._piemenuColor([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0], this.value, this.blocks.blockList[this.connections[0]].name);
                     break;
                 case 'duplicatenotes':
                     this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
@@ -3644,9 +3646,19 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < wheelValues.length; i++) {
                 this._numberWheel.colors.push(COLORS40[Math.floor(wheelValues[i] / 2.5)][2]);
             }
-        } else {
+        } else if (mode === 'sethue') {
             for (var i = 0; i < wheelValues.length; i++) {
-                this._numberWheel.colors.push(getMunsellColor(0, wheelValues[i], 0));
+                this._numberWheel.colors.push(getMunsellColor(wheelValues[i], 50, 50));
+            }
+        } else {
+            if (mode === 'setshade') {
+                for (var i = 0; i < wheelValues.length; i++) {
+                    this._numberWheel.colors.push(getMunsellColor(0, wheelValues[i], 0));
+                }
+            } else {
+                for (var i = 0; i < wheelValues.length; i++) {
+                    this._numberWheel.colors.push(getMunsellColor(60, 60, wheelValues[i]));
+                }
             }
 
             for (var i = 0; i < wheelValues.length; i++) {
