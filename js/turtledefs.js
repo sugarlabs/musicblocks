@@ -437,10 +437,10 @@ function createHelpContent() {
         'deleteblokc': [_('The <em>Delete block</em> block will remove a block.'), 'documentation', 'status.svg'],
         'openpalette': [_('The <em>Open palette</em> block will open a palette.'), 'documentation', 'status.svg'],
         // Graphics palette
-        'setheading': [_('The <em>Setheading</em> block'), 'documentation', 'status.svg'],
-        'bezier': [_('The <em>Bezier</em> block'), 'documentation', 'status.svg'],
-        'controlpoint1': [_('The <em>Controlpoint1</em> block'), 'documentation', 'status.svg'],
-        'controlpoint2': [_('The <em>Controlpoint2</em> block'), 'documentation', 'status.svg'],
+        'setheading': [_('The <em>Set heading</em> block sets the heading of the mouse.'), 'documentation', 'status.svg'],
+        'bezier': [_('The <em>Bezier</em> block draws a Bezier curve.'), 'documentation', 'status.svg'],
+        'controlpoint1': [_('The <em>Control-point 1</em> block sets the first control point for the Bezier curve.'), 'documentation', 'status.svg'],
+        'controlpoint1': [_('The <em>Control-point 2</em> block sets the second control point for the Bezier curve.'), 'documentation', 'status.svg'],
         // Pen palette
         'sethue': [_('The <em>Sethue</em> block'), 'documentation', 'status.svg'],
         'setgrey': [_('The <em>Setgrey</em> block'), 'documentation', 'status.svg'],
