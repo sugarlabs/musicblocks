@@ -121,9 +121,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.dockTypes[0] = 'textout';
     newblock.extraWidth = 50;
-    if (beginnerMode && !beginnerBlock('invertmode')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('transpositionfactor');
     newblock.palette = palettes.dict['pitch'];
@@ -132,9 +130,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('transposition'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('transpositionfactor')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('consonantstepsizedown');
     newblock.palette = palettes.dict['pitch'];
@@ -1568,9 +1564,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('staccato factor'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('staccatofactor')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('slurfactor');
     newblock.palette = palettes.dict['ornament'];
@@ -1579,9 +1573,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('slur factor'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('slurfactor')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('duosynth');
     newblock.palette = palettes.dict['tone'];
@@ -1930,14 +1922,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('temperament1');
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['temperament1'] = newblock;
-    newblock.staticLabels.push(_('define temperamentX'));
+    newblock.staticLabels.push(_('define temperament'));
     newblock.hidden = true; 
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
     newblock.stackClampOneArgBlock();   
-    if (beginnerMode && !beginnerBlock('temperament1')) {
-        newblock.hidden = true;
-    }
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
@@ -3186,9 +3175,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('beginfill')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('endfill');
     newblock.palette = palettes.dict['pen'];
@@ -4704,9 +4690,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.abc');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('saveabc')) {
-        newblock.hidden = true;
-    }
 
     // deprecated in favor of save button
     var newblock = new ProtoBlock('savelilypond');
@@ -4718,9 +4701,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.ly');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('savelilypond')) {
-        newblock.hidden = true;
-    }
 
     // deprecated in favor of save button
     var newblock = new ProtoBlock('savesvg');
@@ -4732,9 +4712,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.svg');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('savesvg')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('nobackground');
     newblock.palette = palettes.dict['extras'];
@@ -5039,9 +5016,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[3] = 'numberin';
     newblock.defaults.push(_('Mr. Mouse'), 0, 0);
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('setxyturtle')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('setturtle');
     newblock.palette = palettes.dict['ensemble'];
@@ -5116,9 +5090,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.hidden = true;
     newblock.defaults.push(_('Mr. Mouse'));
-    if (beginnerMode && !beginnerBlock('turtlenote')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('turtlenote2');
     newblock.palette = palettes.dict['ensemble'];
