@@ -1450,7 +1450,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.blocks.blockList[c2].name === 'number') {
                 if (this.blocks.blockList[c1].name === 'number') {
                     //.TRANS: scale degree
-                    return this.blocks.blockList[c1].value + 'th,' + ' ' + this.blocks.blockList[c2].value;
+                    return this.blocks.blockList[c1].value + '°,' + ' ' + this.blocks.blockList[c2].value;
                 }
             }
             break;
