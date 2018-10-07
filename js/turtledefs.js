@@ -248,7 +248,7 @@ function createHelpContent() {
         'start': [_('Each <em>Start</em> block is a separate voice. All of the <em>Start</em> blocks run at the same time when the <em>Play</em> button is pressed.'), 'documentation', 'status.svg'],
         'listen': [_('The <em>Listen</em> block is used to listen for an event such as a mouse click. When the event happens, an <em>action</em> is taken.'), 'documentation', 'status.svg'],
         'dispatch': [_('The <em>Dispatch</em> block is used to trigger an event.'), 'documentation', 'status.svg'],
-        'do': [_('The <em>Do</em> block is used to initiate an action.') + ' ' _('In the example, it is used with the <em>One of</em> block to choose a random phase.'), 'documentation', 'status.svg'],
+        'do': [_('The <em>Do</em> block is used to initiate an action.') + ' ' + _('In the example, it is used with the <em>One of</em> block to choose a random phase.'), 'documentation', 'status.svg'],
         // Boxes palette
         'storebox1': [_('The <em>Store in Box 1</em> block is used to store a value in <em>Box 1</em>.'), 'documentation', 'status.svg'],
         'box1': [_('The <em>Box 1</em> block returns the value stored in <em>Box 1</em>.'), 'documentation', 'status.svg'],
@@ -301,7 +301,7 @@ function createHelpContent() {
         // Sensors palette
         'mousebutton': [_('The <em>Mouse-button</em> block returns <em>True</em> if the mouse button is pressed.'), 'documentation', 'status.svg'],
         'mousex': [_('The <em>Cursor X</em> block returns the horizontal position of the mouse.'), 'documentation', 'status.svg'],
-        'mousey': [_('The <em>Cursor Y</em> block returns the veritcal position of the mouse.'), 'documentation', 'status.svg'],
+        'mousey': [_('The <em>Cursor Y</em> block returns the vertical position of the mouse.'), 'documentation', 'status.svg'],
         'click': [_('The <em>Click</em> block returns <em>True</em> if a mouse has been clicked.'), 'documentation', 'status.svg'],
         // Mice palette
         'setturtlename2': [_('The <em>Set-name</em> block is used to name a mouse.'), 'documentation', 'status.svg'],
@@ -415,7 +415,7 @@ function createHelpContent() {
         'reverseHeap': [_('The <em>Reverseheap</em> block reverses the order of the heap.'), 'documentation', 'status.svg'],
         'loadHeap': [_('The <em>Loadheap</em> block loads the heap from a file.'), 'documentation', 'status.svg'],
         'saveHeap': [_('The <em>Saveheap</em> block saves the heap to a file.'), 'documentation', 'status.svg'],
-        'emptyHeap': [_('The <em>Emptyheap</em> block emptys the heap.'), 'documentation', 'status.svg'],
+        'emptyHeap': [_('The <em>Emptyheap</em> block empties the heap.'), 'documentation', 'status.svg'],
         'heapEmpty': [_('The <em>Heap empty?</em> block returns true if the heap is emptry.'), 'documentation', 'status.svg'],
         'heapLength': [_('The <em>Heap length</em> block returns the length of the heap.'), 'documentation', 'status.svg'],
         'showHeap': [_('The <em>Show heap</em> block displays the contents of the heap at the top of the screen.'), 'documentation', 'status.svg'],
