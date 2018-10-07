@@ -597,7 +597,7 @@ msgid "Delete plugin"
 msgstr "プラグインを消す"
 
 #: js/activity.js:4373
-msgid "enable horizontal scrolling"
+msgid "Enable horizontal scrolling"
 msgstr ""
 
 #: js/activity.js:4377
@@ -6174,9 +6174,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #: js/activity.js:4316
 
-#~msgid "Enable horizontal scrolling"
-#~msgstr ""
-
 #~msgid "pentatonic"
 #~msgstr "五音音階（ペンタトニック）"
 
@@ -6619,4 +6616,3 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "play backward"
 #~msgstr "逆に再生"
-

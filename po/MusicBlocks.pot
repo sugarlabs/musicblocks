@@ -585,7 +585,7 @@ msgid "Delete plugin"
 msgstr ""
 
 #: js/activity.js:4373
-msgid "enable horizontal scrolling"
+msgid "Enable horizontal scrolling"
 msgstr ""
 
 #: js/activity.js:4377

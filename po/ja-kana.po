@@ -6174,9 +6174,6 @@ msgstr "ファイルを えらぶ ひつようが あります"
 
 #: js/activity.js:4316
 
-#~msgid "Enable horizontal scrolling"
-#~msgstr ""
-
 #~msgid "pentatonic"
 #~msgstr "五音おんかい（ペンタトニック）"
 

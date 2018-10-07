@@ -618,8 +618,8 @@ msgid "Delete plugin"
 msgstr "Eliminar plugin"
 
 #: js/activity.js:4373
-msgid "enable horizontal scrolling"
-msgstr ""
+msgid "Enable horizontal scrolling"
+msgstr "Habilitar desplazamiento horizontal"
 
 #: js/activity.js:4377
 msgid "Disable horizontal scrolling"
@@ -6080,9 +6080,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgstr "Guarde proyecto en el servidor."
 
 #: js/activity.js:4316
-
-#~msgid "Enable horizontal scrolling"
-#~msgstr "Habilitar desplazamiento horizontal"
 
 #: js/musicutils.js:291
 

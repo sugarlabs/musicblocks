@@ -4370,7 +4370,7 @@ handleComplete);
             deletePluginContainer.visible = false;
             __addEventHandlers(deletePluginContainer, deletePlugin);
 
-            scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('enable horizontal scrolling'), x, y, cellsize, 0);
+            scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, cellsize, 0);
             scrollOnContainer.visible = false;
             __addEventHandlers(scrollOnContainer, setScroller, true);
 
