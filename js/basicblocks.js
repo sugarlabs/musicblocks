@@ -4208,9 +4208,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('stop play'));
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stopplayback')) {
+    // if (beginnerMode && !beginnerBlock('stopplayback')) {
         newblock.hidden = true;
-    }
+    // }
 
     var newblock = new ProtoBlock('playback');
     newblock.palette = palettes.dict['media'];
@@ -4221,9 +4221,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'mediain';
-    if (beginnerMode && !beginnerBlock('playback')) {
+    // if (beginnerMode && !beginnerBlock('playback')) {
         newblock.hidden = true;
-    }
+    // }
 
     var newblock = new ProtoBlock('speak');
     newblock.palette = palettes.dict['media'];
