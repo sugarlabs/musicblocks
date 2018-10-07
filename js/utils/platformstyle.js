@@ -55,26 +55,20 @@ window.platformColor = {
 	'heap': ['#D98A43', '#B7651A', '#D68136'],
 	'ensemble': ['#92A9FF', '#5370DC', '#728FF9']
     },
-    // header: platform.FF? '#00539F' : '#2196F3',
-    // header: platform.FF? '#2584af' : '#2584af',  // 10B 5/8
+
     header: platform.FF? '#4DA6FF' : '#4DA6FF',
     aux: '#1A8CFF',
     sub: '#8CC6FF',
     doHeaderShadow: !platform.FF,
-    // background: platform.FF? '#00CAF2' : '#96D3F3'
-    // background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
-    // ruleColor: '#e3e3e3', // 2.5B 9/0
     rule: '#E2E2E2',
     ruleColor: '#E2E2E2',
     trashColor: '#C0C0C0',
     trashBorder: '#808080',
     trashActive: '#FF0000',
-    // background: '#E8E8E8', // '#ACD0E4'  // 2.5B 8/4
-    background: '#F9F9F9', // '#ACD0E4'  // 2.5B 8/4
+    background: '#F9F9F9',
     paletteSelected: '#F3F3F3',
     paletteBackground: '#FFFFFF',
     paletteText: '#666666',
-    // selectorBackground: '#2584AF',
     selectorBackground: '#8CC6FF',
     selectorSelected: '#1A8CFF',
 };
