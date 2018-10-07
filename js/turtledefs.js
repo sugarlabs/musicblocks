@@ -251,9 +251,9 @@ function createHelpContent() {
         'do': [_('The <em>Do</em> block is used to initiate an action.') + ' ' _('In the example, it is used with the <em>One of</em> block to choose a random phase.'), 'documentation', 'status.svg'],
         // Boxes palette
         'storebox1': [_('The <em>Store in Box 1</em> block is used to store a value in <em>Box 1</em>.'), 'documentation', 'status.svg'],
-        'box1': [_('The <em>Box 1</em> returns the value stored on <em>Box 1</em>.'), 'documentation', 'status.svg'],
+        'box1': [_('The <em>Box 1</em> block returns the value stored in <em>Box 1</em>.'), 'documentation', 'status.svg'],
         'storebox2': [_('The <em>Store in Box 2</em> block is used to store a value in <em>Box 2</em>.'), 'documentation', 'status.svg'],
-        'box2': [_('The <em>Box 2</em> returns the value stored on <em>Box 2</em>.'), 'documentation', 'status.svg'],
+        'box2': [_('The <em>Box 2</em> block returns the value stored in <em>Box 2</em>.'), 'documentation', 'status.svg'],
         'increment': [_('The <em>Add-to</em> block is used to add to the value stored in a box. It can also be used with other blocks, such as <em>Color</em>, <em>Pen-size</em>. etc.'), 'documentation', 'status.svg'],
         'incrementOne': [_('The <em>Add-1-to<em> block adds one to the value stored in a box.'), 'documentation', 'status.svg'],
         // Number palette
@@ -393,9 +393,9 @@ function createHelpContent() {
         'returnToUrl': [_('The <em>Return to URL</em> block will return a value to a webpage.'), 'documentation', 'status.svg'],
         'return': [_('The <em>Return</em> block will return a value from an action.'), 'documentation', 'status.svg'],
         // Boxes palette
-        'storein': [_('The <em>Storein</em> block'), 'documentation', 'status.svg'],
-        'storein2': ['Store in box', 'documentation', 'status.svg'],
-        'namedbox': [_('The <em>Namedbox</em> block'), 'documentation', 'status.svg'],
+        'storein': [_('The <em>Store in</em> block will store a value in a box.'), 'documentation', 'status.svg'],
+        'storein2': [_('The <em>Store in</em> block will store a value in a box.'), 'documentation', 'status.svg'],
+        'namedbox': [_('The <em>Box</em> block returns the value stored in a box.'), 'documentation', 'status.svg'],
         // Number palette
         'abs': [_('The <em>Abs</em> block'), 'documentation', 'status.svg'],
         'sqrt': [_('The <em>Sqrt</em> block'), 'documentation', 'status.svg'],
