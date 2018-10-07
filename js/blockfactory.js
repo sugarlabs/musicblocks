@@ -243,8 +243,8 @@ function SVG() {
             this.margins[0] += this._innieX1 + this._innieX2;
         }
         if (this._cap) {
-            y += 0; // this._slotY * 3.0;
-            this.margins[1] += 0; // this._slotY * 3.0;
+            y += this._slotY * 3.0;
+            this.margins[1] += this._slotY * 3.0;
         } else if (this._slot) {
             this.margins[1] += this._slotY;
         }
@@ -445,8 +445,7 @@ function SVG() {
         } else if (this._cap) {
             var x = this._x + this._slotX / 2.0;
             this.docks.push([(x * this._scale), (this._y * this._scale)]);
-            // return this._rLineTo(this._slotX / 2.0, -this._slotY * 3.0) + this._rLineTo(this._slotX / 2.0, this._slotY * 3.0);
-	    return this._rLineTo(this._slotX / 2.0, 0) + this._rLineTo(this._slotX / 2.0, 0);
+            return this._rLineTo(this._slotX / 2.0, -this._slotY * 3.0) + this._rLineTo(this._slotX / 2.0, this._slotY * 3.0);
         } else {
             return this._rLineTo(this._slotX, 0);
         }
@@ -900,7 +899,7 @@ function SVG() {
             var x = this._strokeWidth / 2.0;
         }
         if (this._cap) {
-            var y = this._strokeWidth / 2.0 + this._radius; //  + this._slotY * 3.0;
+            var y = this._strokeWidth / 2.0 + this._radius  + this._slotY * 3.0;
         } else {
             var y = this._strokeWidth / 2.0 + this._radius;
         }
@@ -1015,7 +1014,7 @@ function SVG() {
         }
 
         if (this._cap) {
-            var ty = (this._strokeWidth / 2.0 + this._radius) * this._scale / 2;; // (this._strokeWidth / 2.0 + this._radius + this._slotY) * this._scale;
+            var ty = (this._strokeWidth / 2.0 + this._radius + this._slotY) * this._scale;
         } else if (this._innies.length > 1) {
             var ty = (this._strokeWidth / 2.0 + this._radius) * this._scale / 2;
             ty += this._fontSize;
