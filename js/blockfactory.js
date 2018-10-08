@@ -528,9 +528,9 @@ function SVG() {
     };
 
     this._header = function (center) {
-    // FIXME: Why are our calculations off by 2 x strokeWidth?
-    var width = this._width + 2 * this._strokeWidth;
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width * 1.1 + '" height="' + this._height * 1.3 + '">' + this._transform(center) + '<filter id="dropshadow" height="130%"> \
+	// FIXME: Why are our calculations off by 2 x strokeWidth?
+	var width = this._width + 2 * this._strokeWidth;
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="' + Math.floor(width + 0.5) + '" height="' + Math.floor(this._height + 0.5) + '">' + this._transform(center) + '<filter id="dropshadow" height="130%"> \
   <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> \
   <feOffset dx="2" dy="2" result="offsetblur"/> \
   <feComponentTransfer xmlns="http://www.w3.org/2000/svg"> \
