@@ -40,13 +40,13 @@ function MusicKeyboard() {
     var selected1 = [];
 
     this.processClick = function(i) {
-        var temp1 = this.noteNames[i].replace(SHARP, '#').replace(FLAT, 'b');
+        var temp1 = this.noteNames[i];
         if (temp1 === 'hertz') {
             var temp2 = this.octaves[i];
         } else if (temp1 in FIXEDSOLFEGE1) {
-            var temp2 = FIXEDSOLFEGE1[temp1] + this.octaves[i];
+            var temp2 = FIXEDSOLFEGE1[temp1].replace(SHARP, '#').replace(FLAT, 'b') + this.octaves[i];
         } else {
-            var temp2 = temp1 + this.octaves[i];
+            var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.octaves[i];
         }
 
         selected1.push(temp2);
