@@ -1604,7 +1604,7 @@ function RhythmRuler () {
                 var outerDiv = docById('rulerOuterDiv');
                 outerDiv.style.height = 85 * n + 'px';
 
-                that.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
 
                 that._expanded = false;
             } else {
@@ -1614,7 +1614,7 @@ function RhythmRuler () {
                 var outerDiv = docById('rulerOuterDiv');
                 outerDiv.style.height = Math.max(100 + 85 * that.Rulers.length, Math.min(900 - 20, window.innerHeight - 20)) + 'px';
 
-                that.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that._expanded = true;
             }
         };
