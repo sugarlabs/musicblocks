@@ -3133,9 +3133,7 @@ function Block(protoblock, blocks, overrideName) {
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
 
-            var obj = getNote('C', octave, note, 'C major', false, null, that.blocks.errorMsg);
-            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
-
+            var noteName = scaleDegreeToPitch('C major', note);
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -3148,7 +3146,7 @@ function Block(protoblock, blocks, overrideName) {
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
             that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+	    that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, 'default', null, null);
 
             __selectionChanged();
         };
