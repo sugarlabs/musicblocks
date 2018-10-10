@@ -1449,8 +1449,14 @@ function Block(protoblock, blocks, overrideName) {
             var c2 = this.blocks.blockList[c].connections[2];
             if (this.blocks.blockList[c2].name === 'number') {
                 if (this.blocks.blockList[c1].name === 'number') {
-                    //.TRANS: scale degree
-                    return _('degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
+                    //.TRANS: ordinal number. Please keep exactly one space between each number.
+		    degrees = _('1st 2nd 3rd 4th 5th 6th 7th 8th 9th').split(' ');
+		    var i = this.blocks.blockList[c1].value - 1;
+		    if (i > 0 && i < degrees.length) {
+			return degrees[i] + ' ' + this.blocks.blockList[c2].value;
+		    } else {
+			return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
+		    }
                 }
             }
             break;
