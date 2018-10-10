@@ -1448,10 +1448,19 @@ function Block(protoblock, blocks, overrideName) {
             var c1 = this.blocks.blockList[c].connections[1];
             var c2 = this.blocks.blockList[c].connections[2];
             if (this.blocks.blockList[c2].name === 'number') {
-                if (this.blocks.blockList[c1].name === 'number') {
-                    //.TRANS: scale degree
-                    return _('degree') + ' ' + _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
-                }
+                if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c1].value === 1 ) {
+                    //.TRANS: scale degree = 1st
+                    return this.blocks.blockList[c1].value + _('st, ') + this.blocks.blockList[c2].value;
+		} else if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c1].value === 2 ) {
+                    //.TRANS: scale degree = 2nd
+                    return this.blocks.blockList[c1].value + _('nd, ') + this.blocks.blockList[c2].value;
+		} else if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c1].value === 3 ) {
+		    //.TRANS: scale degree = 3rd
+		    return this.blocks.blockList[c1].value + _('rd, ') + this.blocks.blockList[c2].value;
+		} else if (this.blocks.blockList[c1].name === 'number') {
+		    //.TRANS: scale degree = 4th and above
+                    return this.blocks.blockList[c1].value + _('th, ') + this.blocks.blockList[c2].value;
+		}
             }
             break;
         case 'hertz':
