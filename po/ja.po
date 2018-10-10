@@ -83,7 +83,7 @@ msgstr "ステータス"
 
 #: js/block.js:935
 msgid "drum mapper"
-msgstr ""
+msgstr "ドラム・ピッチ行列"
 
 #: js/block.js:938
 ## ひらがな＝じょうぎ
@@ -192,31 +192,31 @@ msgstr "音律"
 
 #: js/block.js:1306
 msgid "1st"
-msgstr ""
+msgstr "１度"
 
 #: js/block.js:1307
 msgid "2nd"
-msgstr ""
+msgstr "２度"
 
 #: js/block.js:1308
 msgid "3rd"
-msgstr ""
+msgstr "３度"
 
 #: js/block.js:1309
 msgid "4th"
-msgstr ""
+msgstr "４度"
 
 #: js/block.js:1310
 msgid "5th"
-msgstr ""
+msgstr "５度"
 
 #: js/block.js:1311
 msgid "6th"
-msgstr ""
+msgstr "６度"
 
 #: js/block.js:1312
 msgid "7th"
-msgstr ""
+msgstr "７度"
 
 #: js/block.js:1415
 #: js/block.js:1482
@@ -230,16 +230,16 @@ msgstr "休符"
 #: js/block.js:1453
 #.TRANS: scale degree
 msgid "degree"
-msgstr ""
+msgstr "温度記号"
 
 #: js/block.js:1467
 #.TRANS: scalar step
 msgid "down"
-msgstr ""
+msgstr "下"
 
 #: js/block.js:1469
 msgid "up"
-msgstr ""
+msgstr "上"
 
 #: js/block.js:1475
 #: js/turtledefs.js:23
@@ -488,16 +488,16 @@ msgstr "ファイルからプロジェクトをロードする"
 
 #: js/activity.js:4219
 msgid "Save Project"
-msgstr ""
+msgstr "プロジェクトを保存"
 
 #: js/activity.js:4226
 #: js/turtledefs.js:123
 msgid "Find and share projects"
-msgstr ""
+msgstr "プロジェクトを見つけたりシェアしたり"
 
 #: js/activity.js:4233
 msgid "Offline. Sharing is unavailable"
-msgstr ""
+msgstr "オフライン。シェア機能が使えません"
 
 #: js/activity.js:4241
 #: js/activity.js:4946
@@ -520,7 +520,7 @@ msgstr "プロジェクトをシェアする"
 
 #: js/activity.js:4296
 msgid "Offline. Sharing is unavailable."
-msgstr ""
+msgstr "オフライン。シェア機能が使えません"
 
 #: js/activity.js:4302
 msgid "Save as .svg"
@@ -598,11 +598,11 @@ msgstr "プラグインを消す"
 
 #: js/activity.js:4373
 msgid "Enable horizontal scrolling"
-msgstr ""
+msgstr "水平スクロールをON"
 
 #: js/activity.js:4377
 msgid "Disable horizontal scrolling"
-msgstr ""
+msgstr "水平スクロールをOFF"
 
 #: js/activity.js:4382
 msgid "confirm"
@@ -610,7 +610,7 @@ msgstr "確認する"
 
 #: js/activity.js:4402
 msgid "Auxilary menu"
-msgstr ""
+msgstr "他メニュー"
 
 #: js/activity.js:4412
 #: js/turtledefs.js:133
@@ -625,7 +625,7 @@ msgstr "現在のプロジェクトに組み合わせます。"
 
 #: js/activity.js:4426
 msgid "Show/hide block"
-msgstr ""
+msgstr "ブロックを表示/非表示"
 
 #: js/activity.js:4433
 msgid "Expand/collapse blocks"
@@ -884,7 +884,7 @@ msgstr "音階ステップブロックは音符ブロックの中にある必要
 
 #: js/logo.js:4180
 msgid "Noise Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "ノイズ・ブロック：音符ブロックと一緒に使いますか？"
 
 #: js/logo.js:4260
 msgid "Drum Block: Did you mean to use a Note block?"
@@ -892,7 +892,7 @@ msgstr "ドラムブロック：音符ブロックと一緒に使いますか？
 
 #: js/logo.js:4722
 msgid "Pitch Block: Did you mean to use a Note block2?"
-msgstr ""
+msgstr "ピッチ・ブロック：音符ブロックと一緒に使いますか？"
 
 #: js/logo.js:4762
 msgid "polyphonic rhythm"
@@ -1159,13 +1159,13 @@ msgstr "ドラム・スタート"
 
 #: js/turtle.js:1328
 msgid "Expand"
-msgstr ""
+msgstr "膨らむ"
 
 #: js/turtle.js:1435
 #: js/turtledefs.js:139
 #: js/turtledefs.js:162
 msgid "Collapse"
-msgstr ""
+msgstr "縮む"
 
 #: js/turtle.js:1507
 #: js/turtledefs.js:138
@@ -1210,8 +1210,9 @@ msgid "tone"
 msgstr "音色"
 
 #: js/turtledefs.js:23
+## 装飾音=そうしょくおん
 msgid "ornament"
-msgstr ""
+msgstr "装飾音"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:5288
@@ -1235,7 +1236,7 @@ msgstr "ウィジェット"
 
 #: js/turtledefs.js:23
 msgid "graphics"
-msgstr ""
+msgstr "グラフィックス"
 
 #: js/turtledefs.js:23
 #: js/rubrics.js:477
@@ -1267,8 +1268,9 @@ msgid "heap"
 msgstr "ヒープ"
 
 #: js/turtledefs.js:23
+## 合奏=がっそう
 msgid "ensemble"
-msgstr ""
+msgstr "合奏"
 
 #: js/turtledefs.js:23
 ## May be いろいろ
@@ -1277,7 +1279,7 @@ msgstr "その他"
 
 #: js/turtledefs.js:33
 msgid "music"
-msgstr ""
+msgstr "音楽"
 
 #: js/turtledefs.js:33
 msgid "logic"
@@ -1285,7 +1287,7 @@ msgstr "論理"
 
 #: js/turtledefs.js:33
 msgid "artwork"
-msgstr ""
+msgstr "アート"
 
 #: js/turtledefs.js:115
 #: js/turtledefs.js:146
@@ -1347,7 +1349,7 @@ msgstr "速いモードでプロジェクトを再生するにはここをクリ
 #: js/turtledefs.js:119
 #: js/turtledefs.js:158
 msgid "Stop the music (and the mice)."
-msgstr ""
+msgstr "音楽（とグラフィックス）を停止"
 
 #: js/turtledefs.js:119
 #: js/turtledefs.js:158
@@ -1370,7 +1372,7 @@ msgstr "このプロジェクトをファイルに保存するアイコンです
 
 #: js/turtledefs.js:123
 msgid "This button opens a viewer for sharing projects and for finding example projects."
-msgstr ""
+msgstr "このボタンをクリックするとプロジェクトを見つけたりシェアしたりウィンドーが開きます。"
 
 #: js/turtledefs.js:124
 #: js/turtledefs.js:159
@@ -1380,7 +1382,7 @@ msgstr "オプションツールバーを表示"
 
 #: js/turtledefs.js:124
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr ""
+msgstr "このボタンをクリックするとオプションツールバーが表示/非表示します。"
 
 #: js/turtledefs.js:125
 #: js/turtledefs.js:160
@@ -1414,12 +1416,12 @@ msgstr "ブロックとパレットを表示する / 隠す アイコンです�
 
 #: js/turtledefs.js:129
 msgid "Expand/collapse collapsable blocks"
-msgstr ""
+msgstr "膨らむブロックを膨らむ/萎む"
 
 #: js/turtledefs.js:129
 #: js/turtledefs.js:164
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートとアクションのスタックを増やす / つぶす アイコンです。"
+msgstr "スタートとアクションのスタックを膨らむ/縮むアイコンです。"
 
 #: js/turtledefs.js:130
 #: js/turtledefs.js:165
@@ -1470,12 +1472,12 @@ msgstr "ブロックの大きを大きくします。"
 #: js/turtledefs.js:138
 #: js/turtledefs.js:161
 msgid "Clear the screen and return the mice to their initial positions."
-msgstr ""
+msgstr "画面をクリアしてネズミをみんな元に戻す"
 
 #: js/turtledefs.js:139
 #: js/turtledefs.js:162
 msgid "Collapse the graphics window."
-msgstr ""
+msgstr "グラフィックスウィンドーを非表示"
 
 #: js/turtledefs.js:140
 #: js/turtledefs.js:185
@@ -1545,15 +1547,15 @@ msgstr "音符を一つずつ再生"
 #: js/turtledefs.js:159
 #: js/turtledefs.js:166
 msgid "Click this button to expand or collapse the auxiliary toolbar."
-msgstr ""
+msgstr "このボタンをクリックするとオプションツールバーを表示/非表示"
 
 #: js/turtledefs.js:164
 msgid "Expand/collapse collapsible blocks"
-msgstr "チャンクを ひょうじ/ひひょうじ"
+msgstr "膨らむブロックを 表示/非表示"
 
 #: js/turtledefs.js:167
 msgid "Initialize a new project."
-msgstr ""
+msgstr "新プロジェクトを初期化する"
 
 #: js/turtledefs.js:170
 msgid "Load samples from server"
@@ -1569,7 +1571,7 @@ msgstr "Lilypondファイルとして保存します。"
 
 #: js/turtledefs.js:172
 msgid "To copy a stack to the clipboard, right-click on the stack."
-msgstr ""
+msgstr "コードスタックをコピーするため、右クリック"
 
 #: js/turtledefs.js:172
 msgid "You can also use Alt+C to copy a stack of blocks."
@@ -2803,7 +2805,7 @@ msgstr "半音で移調"
 #: js/basicblocks.js:383
 #.TRANS: unison means the note is the same as the current note
 msgid "custom pitch"
-msgstr ""
+msgstr "カスタムピッチ"
 
 #: js/basicblocks.js:393
 #: js/basicblocks.js:2384
@@ -3041,7 +3043,7 @@ msgstr "音高をスライダーで作る"
 #: js/basicblocks.js:992
 #.TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
-msgstr ""
+msgstr "ピアノ・キーボード"
 
 #: js/basicblocks.js:1004
 #.TRANS: generate a progressive sequence of pitches
@@ -3121,7 +3123,7 @@ msgstr "値"
 
 #: js/basicblocks.js:1340
 msgid "define frequency"
-msgstr ""
+msgstr "周波数を明確にする"
 
 #: js/basicblocks.js:1351
 #.TRANS: number of beats per minute
@@ -3406,15 +3408,15 @@ msgstr "音律を設定"
 
 #: js/basicblocks.js:1896
 msgid "reference pitch"
-msgstr ""
+msgstr "参考音高"
 
 #: js/basicblocks.js:1906
 msgid "octave space"
-msgstr ""
+msgstr "オクターヴ・スペース"
 
 #: js/basicblocks.js:1925
 msgid "define temperament"
-msgstr ""
+msgstr "音律を明確にする"
 
 #: js/basicblocks.js:1947
 msgid "doubly"
@@ -3527,7 +3529,7 @@ msgstr "調の設定"
 
 #: js/basicblocks.js:2603
 msgid "noise"
-msgstr ""
+msgstr "ノイズ"
 
 #: js/basicblocks.js:2607
 #: js/synthutils.js:16
@@ -4802,17 +4804,17 @@ msgstr "整理"
 #: js/rhythmruler.js:1602
 #: js/rhythmruler.js:1602
 msgid "expand"
-msgstr ""
+msgstr "膨らむ"
 
 #: js/pitchtimematrix.js:305
 #: js/rhythmruler.js:1609
 msgid "collapse"
-msgstr ""
+msgstr "縮む"
 
 #: js/pitchtimematrix.js:305
 #: js/rhythmruler.js:1609
 msgid "collpase"
-msgstr ""
+msgstr "縮む"
 
 #: js/pitchtimematrix.js:469
 msgid "Click on the table to add notes."
@@ -4924,11 +4926,11 @@ msgstr "ルーラーをクリックすると割ることができます。"
 
 #: js/temperament.js:1621
 msgid "table"
-msgstr ""
+msgstr "グラフ"
 
 #: js/temperament.js:1700
 msgid "add pitches"
-msgstr ""
+msgstr "音高を足す"
 
 #: js/modewidget.js:77
 msgid "rotate counter clockwise"
