@@ -1303,14 +1303,11 @@ function Block(protoblock, blocks, overrideName) {
     this._intervalLabel = function () {
         // Find pitch and value to display on the collapsed interval
         // block.
-        const INTERVALLABELS = {0: _('1st'),
-                                1: _('2nd'),
-                                2: _('3rd'),
-                                3: _('4th'),
-                                4: _('5th'),
-                                5: _('6th'),
-                                6: _('7th'),
-                               };
+	var degrees = DEGREES.split(' ');
+	var intervalLabels = {};
+	for (var i = 0; i < degrees.length; i++) {
+	    intervalLabels[i] = degrees[i];
+	}
 
         var intervals = [];
         var i = 0;
@@ -1321,11 +1318,11 @@ function Block(protoblock, blocks, overrideName) {
             var n = this.blocks.blockList[c].connections[1];
             var cblock = this.blocks.blockList[n];
             if (cblock.name === 'number') {
-                if (Math.abs(cblock.value) in INTERVALLABELS) {
+                if (Math.abs(cblock.value) in intervalLabels) {
                     if (cblock.value < 0) {
-                        intervals.push('-' + INTERVALLABELS[-cblock.value]);
+                        intervals.push('-' + intervalLabels[-cblock.value]);
                     } else {
-                        intervals.push('+' + INTERVALLABELS[cblock.value]);
+                        intervals.push('+' + intervalLabels[cblock.value]);
                     }
                 } else {
                     if (cblock.value < 0) {
@@ -1449,8 +1446,7 @@ function Block(protoblock, blocks, overrideName) {
             var c2 = this.blocks.blockList[c].connections[2];
             if (this.blocks.blockList[c2].name === 'number') {
                 if (this.blocks.blockList[c1].name === 'number') {
-                    //.TRANS: ordinal number. Please keep exactly one space between each number.
-		    degrees = _('1st 2nd 3rd 4th 5th 6th 7th 8th 9th').split(' ');
+		    var degrees = DEGREES.split(' ');
 		    var i = this.blocks.blockList[c1].value - 1;
 		    if (i > 0 && i < degrees.length) {
 			return degrees[i] + ' ' + this.blocks.blockList[c2].value;

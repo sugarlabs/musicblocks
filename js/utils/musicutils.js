@@ -76,6 +76,8 @@ const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
 const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 
+//.TRANS: ordinal number. Please keep exactly one space between each number.
+const DEGREES = _('1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th');
 
 function getSharpFlatPreference (keySignature) {
     var obj = keySignatureToMode(keySignature);
