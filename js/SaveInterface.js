@@ -36,7 +36,11 @@ function SaveInterface(PlanetInterface) {
                 defaultfilename += '.' + extension;
             }
 
-            filename = prompt('Filename:', defaultfilename);
+            if (window.isElectron == true) {
+                filename = defaultfilename;
+            } else {
+                filename = prompt('Filename:', defaultfilename);
+            }
         } else {
             if (fileExt(defaultfilename) != extension) {
                 defaultfilename += '.' + extension;
