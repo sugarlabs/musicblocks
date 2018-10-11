@@ -2181,10 +2181,10 @@ function Logo () {
                     if (that.suppressOutput[turtle]) {
                         var savedPenState = that.turtles.turtleList[turtle].penState;
                         that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doScrollxy(args[0], args[1]);
+                        that.turtles.turtleList[turtle].doScrollXY(args[0], args[1]);
                         that.turtles.turtleList[turtle].penState = savedPenState;
                     } else {
-                        that.turtles.turtleList[turtle].doScrollxy(args[0], args[1]);
+                        that.turtles.turtleList[turtle].doScrollXY(args[0], args[1]);
                     }
 
                     if (that.justCounting[turtle].length === 0) {
@@ -4412,6 +4412,7 @@ function Logo () {
                         if (scaleDegree > 1) {
                             scaleDegree = modeLength - scaleDegree + 2;
                         }
+
                         note = scaleDegreeToPitch(that.keySignature[turtle], scaleDegree);
                         that.currentNote = note;
                         var deltaOctave = Math.floor((arg0 + modeLength - 2) / modeLength);
@@ -4423,6 +4424,7 @@ function Logo () {
                         var octave = Math.floor(calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], that.currentNote)) + deltaOctave;
                     }
 
+		    console.log('that.currentNote = ' + that.currentNote);
                     var cents = 0;
                 } else {
                     var cents = 0;
