@@ -482,17 +482,17 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function setHomeContainers(zero, one) {
-	    if (utilityContainer === null) {
-		return;
-	    }
+            if (utilityContainer === null) {
+                return;
+            }
 
-	    if (saveHTMLContainer === null) {
-		return;
-	    }
+            if (saveHTMLContainer === null) {
+                return;
+            }
 
-	    if (homeButtonContainers[0] === null) {
-		return;
-	    }
+            if (homeButtonContainers[0] === null) {
+                return;
+            }
 
             if (utilityContainer.visible || !saveHTMLContainer.visible) {
                 homeButtonContainers[0].visible = zero;
@@ -1005,7 +1005,7 @@ define(MYDEFINES, function (compatibility) {
             myRadarChart = new Chart(ctx).Radar(data, options);
         };
 
-	// Deprecated
+        // Deprecated
         function doOptimize (state) {
             blocks.activeBlock = null;
             console.log('Setting optimize to ' + state);
@@ -1107,7 +1107,7 @@ define(MYDEFINES, function (compatibility) {
             */
         };
 
-	// Deprecated
+        // Deprecated
         function doCompile() {
             blocks.activeBlock = null;
             logo.restartPlayback = true;
@@ -1148,16 +1148,16 @@ define(MYDEFINES, function (compatibility) {
         init();
 
         function init() {
-	    console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
-	    this._clientWidth = document.body.clientWidth;
-	    this._clientHeight = document.body.clientHeight;
+            console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
+            this._clientWidth = document.body.clientWidth;
+            this._clientHeight = document.body.clientHeight;
 
             this._innerWidth = window.innerWidth;
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
 
-	    console.log('window inner/outer width/height: ' + this.innerWidth + ', ' + this.innerHeight + ' ' + this.outerWidth + ', ' + this.outerHeight);
+            console.log('window inner/outer width/height: ' + this.innerWidth + ', ' + this.innerHeight + ' ' + this.outerWidth + ', ' + this.outerHeight);
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 //sugarizerCompatibility.data.blocks = prepareExport();
@@ -2859,10 +2859,10 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _onResize(force) {
-	    console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
-	    console.log('stored values: ' + this._clientWidth + ' ' + this._clientHeight);
+            console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
+            console.log('stored values: ' + this._clientWidth + ' ' + this._clientHeight);
 
-	    console.log('window inner/outer width/height: ' + window.innerWidth + ', ' + window.innerHeight + ' ' + window.outerWidth + ', ' + window.outerHeight);
+            console.log('window inner/outer width/height: ' + window.innerWidth + ', ' + window.innerHeight + ' ' + window.outerWidth + ', ' + window.outerHeight);
 
 
             if (!platform.androidWebkit) {
@@ -2873,12 +2873,12 @@ define(MYDEFINES, function (compatibility) {
                 var h = window.outerHeight;
             }
 
-	    // If the clientWidth hasn't changed, don't resize (except
-	    // on init).
+            // If the clientWidth hasn't changed, don't resize (except
+            // on init).
             if (!force && this._clientWidth === document.body.clientWidth) {
-		console.log('NO WIDTH CHANGE');
-		return;
-	    }
+                console.log('NO WIDTH CHANGE');
+                return;
+            }
 
 
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
@@ -3399,9 +3399,9 @@ define(MYDEFINES, function (compatibility) {
 
         function onStopTurtle() {
             // TODO: plugin support
-	    if (stopTurtleContainer === null) {
-		return;
-	    }
+            if (stopTurtleContainer === null) {
+                return;
+            }
 
             if (stopTurtleContainer.visible) {
                 _hideStopButton();
@@ -3412,9 +3412,9 @@ define(MYDEFINES, function (compatibility) {
         function onRunTurtle() {
             // TODO: plugin support
             // If the stop button is hidden, show it.
-	    if (stopTurtleContainer === null) {
-		return;
-	    }
+            if (stopTurtleContainer === null) {
+                return;
+            }
 
             if (!stopTurtleContainer.visible) {
                 _showStopButton();
@@ -4062,18 +4062,18 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _hideStopButton() {
-	    if (stopTurtleContainer === null) {
-		return;
-	    }
+            if (stopTurtleContainer === null) {
+                return;
+            }
 
             stopTurtleContainer.visible = false;
             hardStopTurtleContainer.visible = true;
         };
 
         function _showStopButton() {
-	    if (stopTurtleContainer === null) {
-		return;
-	    }
+            if (stopTurtleContainer === null) {
+                return;
+            }
 
             stopTurtleContainer.visible = true;
             hardStopTurtleContainer.visible = false;
@@ -4445,17 +4445,17 @@ handleComplete);
 
             x += dx;
 
-            hideBlockContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
-            _loadButtonDragHandler(hideBlockContainer, x, y, _changeBlockVisibility, null, null, null, null);
-            onscreenMenu.push(hideBlockContainer);
-            hideBlockContainer.visible = false;
+            hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
+            _loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility, null, null, null, null);
+            onscreenMenu.push(hideBlocksContainer);
+            hideBlocksContainer.visible = false;
 
             x += dx;
 
-            collapseBlockContainer = _makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
-            _loadButtonDragHandler(collapseBlockContainer, x, y, _toggleCollapsibleStacks, null, null, null, null);
-            onscreenMenu.push(collapseBlockContainer);
-            collapseBlockContainer.visible = false;
+            collapseBlocksContainer = _makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
+            _loadButtonDragHandler(collapseBlocksContainer, x, y, _toggleCollapsibleStacks, null, null, null, null);
+            onscreenMenu.push(collapseBlocksContainer);
+            collapseBlocksContainer.visible = false;
 
             x += dx;
 
