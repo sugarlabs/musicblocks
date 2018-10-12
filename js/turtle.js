@@ -92,7 +92,7 @@ function Turtle (name, turtles, drum) {
             }
 
             if (this.turtles.turtleList[t].penState) {
-		this.turtles.turtleList[t].processColor();
+                this.turtles.turtleList[t].processColor();
                 ctx.lineWidth = this.turtles.turtleList[t].stroke;
                 ctx.lineCap = 'round';
                 ctx.beginPath();
@@ -1564,9 +1564,13 @@ function Turtles () {
                 that._clearButton.on('mouseout', function (event) {
                     if (that._clearLabel !== null) {
                         that._clearLabel.visible = false;
-                        that._clearLabelBG.visible = false;
-                        that.refreshCanvas();
                     }
+
+                    if (that._clearLabelBG !== null) {
+                        that._clearLabelBG.visible = false;
+                    }
+
+                    that.refreshCanvas();
                 });
 
                 if (doCollapse) {
