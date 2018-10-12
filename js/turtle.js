@@ -84,6 +84,24 @@ function Turtle (name, turtles, drum) {
         // FIXME: how big?
         var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
         ctx.putImageData(imgData, dx, dy);
+
+        // Draw under the turtle as the canvas moves.
+        for (var t = 0; t < this.turtles.turtleList.length; t++) {
+            if (this.turtles.turtleList[t].trash) {
+                continue;
+            }
+
+            if (this.turtles.turtleList[t].penState) {
+		this.turtles.turtleList[t].processColor();
+                ctx.lineWidth = this.turtles.turtleList[t].stroke;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(this.turtles.turtleList[t].container.x + dx, this.turtles.turtleList[t].container.y + dy);
+                ctx.lineTo(this.turtles.turtleList[t].container.x, this.turtles.turtleList[t].container.y);
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
     };
 
     this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
