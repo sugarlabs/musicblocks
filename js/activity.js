@@ -55,11 +55,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     beginnerMode = true;
 
     try {
-        // console.log(localStorage.beginnerMode);
-
         if (localStorage.beginnerMode !== null) {
-            // console.log('setting mode from local storage');
-            // console.log(localStorage.beginnerMode);
             beginnerMode = localStorage.beginnerMode;
             if (typeof(beginnerMode) === 'string') {
                 if (beginnerMode === 'false') {
@@ -84,7 +80,6 @@ try {
     console.log(localStorage.languagePreference);
 
     if (localStorage.languagePreference) {
-        console.log('setting language from local storage');
         try {
             lang = localStorage.languagePreference;
             document.webL10n.setLanguage(lang);
@@ -169,7 +164,6 @@ define(MYDEFINES, function (compatibility) {
                 sugarizerCompatibility.loadData(function () {
                     var planet=document.getElementById('planet-iframe');
                     planet.onload = function() {
-                        console.log('load');
                         domReady(doc);
                     };
                 });
@@ -177,7 +171,6 @@ define(MYDEFINES, function (compatibility) {
 
             document.webL10n.setLanguage(sugarizerCompatibility.getLanguage());
         } else {
-            console.log('loaded');
             domReady(doc);
         }
     });
@@ -489,6 +482,18 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function setHomeContainers(zero, one) {
+	    if (utilityContainer === null) {
+		return;
+	    }
+
+	    if (saveHTMLContainer === null) {
+		return;
+	    }
+
+	    if (homeButtonContainers[0] === null) {
+		return;
+	    }
+
             if (utilityContainer.visible || !saveHTMLContainer.visible) {
                 homeButtonContainers[0].visible = zero;
                 homeButtonContainers[1].visible = one;
@@ -716,7 +721,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (!turtles.running()) {
-                console.log('running');
+                console.log('RUNNING');
                 if (!turtles.isShrunk) {
                     logo.hideBlocks(true);
                 }
@@ -725,15 +730,15 @@ define(MYDEFINES, function (compatibility) {
             } else {
                 if (currentDelay !== 0) {
                     // keep playing at full speed
-                    console.log('running from step');
+                    console.log('RUNNING FROM STEP');
                     logo.step();
                 } else {
                     // stop and restart
-                    console.log('stopping...');
+                    console.log('STOPPING...');
                     logo.doStopTurtle();
 
                     setTimeout(function () {
-                        console.log('and running');
+                        console.log('AND RUNNING');
                         logo.runLogoCommands(null, env);
                     }, 500);
                 }
@@ -854,7 +859,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (onblur && _THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
-                console.log('ignoring hard stop due to blur');
+                console.log('Ignoring hard stop due to blur');
                 return;
             }
 
@@ -931,7 +936,6 @@ define(MYDEFINES, function (compatibility) {
             button.y = 300.00 - (300.00 / Math.sqrt(2));
             this.closeButton = _makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
             this.closeButton.on('click', function (event) {
-                console.log('Deleting Chart');
                 button.closeButton.visible = false;
                 stage.removeChild(chartBitmap);
                 logo.showBlocks();
@@ -975,7 +979,6 @@ define(MYDEFINES, function (compatibility) {
             document.body.style.cursor = 'wait';
             var myRadarChart = null;
             var scores = analyzeProject(blocks);
-            console.log(scores);
             var data = scoreToChartData(scores);
             var Analytics = this;
             Analytics.close = closeAnalytics;
@@ -999,10 +1002,10 @@ define(MYDEFINES, function (compatibility) {
             };
 
             var options = getChartOptions(__callback);
-            console.log('creating new chart');
             myRadarChart = new Chart(ctx).Radar(data, options);
         };
 
+	// Deprecated
         function doOptimize (state) {
             blocks.activeBlock = null;
             console.log('Setting optimize to ' + state);
@@ -1104,6 +1107,7 @@ define(MYDEFINES, function (compatibility) {
             */
         };
 
+	// Deprecated
         function doCompile() {
             blocks.activeBlock = null;
             logo.restartPlayback = true;
@@ -1144,10 +1148,16 @@ define(MYDEFINES, function (compatibility) {
         init();
 
         function init() {
-            this.innerWidth = window.innerWidth;
-            this.innerHeight = window.innerHeight;
-            this.outerWidth = window.outerWidth;
-            this.outerHeight = window.outerHeight;
+	    console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
+	    this._clientWidth = document.body.clientWidth;
+	    this._clientHeight = document.body.clientHeight;
+
+            this._innerWidth = window.innerWidth;
+            this._innerHeight = window.innerHeight;
+            this._outerWidth = window.outerWidth;
+            this._outerHeight = window.outerHeight;
+
+	    console.log('window inner/outer width/height: ' + this.innerWidth + ', ' + this.innerHeight + ' ' + this.outerWidth + ', ' + this.outerHeight);
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 //sugarizerCompatibility.data.blocks = prepareExport();
@@ -1469,7 +1479,7 @@ define(MYDEFINES, function (compatibility) {
                 };
 
                 this.openPlanet = function() {
-                    console.log('save locally');
+                    console.log('SAVE LOCALLY');
                     this.saveLocally();
                     this.hideMusicBlocks();
                     this.showPlanet();
@@ -2355,7 +2365,6 @@ define(MYDEFINES, function (compatibility) {
 
             var img = new Image();
             img.onload = function () {
-                // console.log('creating error message artwork for ' + img.src);
                 var artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
                 var text = new createjs.Text('', '20px Sans', '#000000');
@@ -2850,25 +2859,27 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _onResize(force) {
+	    console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
+	    console.log('stored values: ' + this._clientWidth + ' ' + this._clientHeight);
+
+	    console.log('window inner/outer width/height: ' + window.innerWidth + ', ' + window.innerHeight + ' ' + window.outerWidth + ', ' + window.outerHeight);
+
+
             if (!platform.androidWebkit) {
                 var w = window.innerWidth;
-                // Don't trigger resize if browser header or footer
-                // added/removed.
-                if (!force && w === this.innerWidth) {
-                    return;
-                }
-
                 var h = window.innerHeight;
             } else {
                 var w = window.outerWidth;
-                // Don't trigger resize if browser header or footer
-                // added/removed.
-                if (!force && w === this.outerWidth) {
-                    return;
-                }
-
                 var h = window.outerHeight;
             }
+
+	    // If the clientWidth hasn't changed, don't resize (except
+	    // on init).
+            if (!force && this._clientWidth === document.body.clientWidth) {
+		console.log('NO WIDTH CHANGE');
+		return;
+	    }
+
 
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
                 return;
@@ -2877,7 +2888,7 @@ define(MYDEFINES, function (compatibility) {
             // If any menus were open, close them.
             if (confirmContainer !== null && utilityContainer.visible) {
                 if (headerContainer.y > 0) {
-                    console.log('CLOSING MENUS BEFORE RESIZE');
+                    console.log('Closing menus before resize.');
                     _showHideAuxMenu(true);
                 }
             }
@@ -2982,7 +2993,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         window.onresize = function () {
-            console.log('RESIZE EVENT');
             _onResize(false);
         };
 
@@ -3383,13 +3393,16 @@ define(MYDEFINES, function (compatibility) {
             hideDOMLabel();
 
             if (blocks.visible) {
-                console.log('calling toggleCollapsibles');
                 blocks.toggleCollapsibles();
             }
         };
 
         function onStopTurtle() {
             // TODO: plugin support
+	    if (stopTurtleContainer === null) {
+		return;
+	    }
+
             if (stopTurtleContainer.visible) {
                 _hideStopButton();
                 setPlaybackStatus();
@@ -3399,6 +3412,10 @@ define(MYDEFINES, function (compatibility) {
         function onRunTurtle() {
             // TODO: plugin support
             // If the stop button is hidden, show it.
+	    if (stopTurtleContainer === null) {
+		return;
+	    }
+
             if (!stopTurtleContainer.visible) {
                 _showStopButton();
             }
@@ -3518,7 +3535,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (merge) {
-                console.log('merge load');
+                console.log('MERGE LOAD');
                 merging = true;
             } else {
                 merging = false;
@@ -3640,7 +3657,7 @@ define(MYDEFINES, function (compatibility) {
             // where to put this?
             // palettes.updatePalettes();
             justLoadStart = function () {
-                console.log('loading start and a matrix');
+                console.log('Loading start and a matrix');
                 logo.playbackQueue = {};
                 blocks.loadNewBlocks(DATAOBJS);
                 setPlaybackStatus();
@@ -3710,7 +3727,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function hideMsgs() {
-            console.log('hiding messages');
             errorMsgText.parent.visible = false;
             if (errorMsgArrow != null) {
                 errorMsgArrow.removeAllChildren();
@@ -3733,7 +3749,6 @@ define(MYDEFINES, function (compatibility) {
 
             var msgContainer = msgText.parent;
             msgContainer.visible = true;
-            console.log(msgContainer.x + ' ' + msgContainer.y);
             msgText.text = msg;
             msgContainer.updateCache();
             stage.setChildIndex(msgContainer, stage.children.length - 1);
@@ -4047,11 +4062,19 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _hideStopButton() {
+	    if (stopTurtleContainer === null) {
+		return;
+	    }
+
             stopTurtleContainer.visible = false;
             hardStopTurtleContainer.visible = true;
         };
 
         function _showStopButton() {
+	    if (stopTurtleContainer === null) {
+		return;
+	    }
+
             stopTurtleContainer.visible = true;
             hardStopTurtleContainer.visible = false;
         };
@@ -4247,7 +4270,6 @@ handleComplete);
         };
 
         function _doMergeLoad() {
-            console.log('merge load');
             doLoad(true);
         };
 
@@ -4464,7 +4486,6 @@ handleComplete);
         };
 
         function doPopdownPalette() {
-            console.log('doPopdownPalette');
             var p = new PopdownPalette(palettes);
             p.popdown();
         };
