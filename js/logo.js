@@ -6345,7 +6345,7 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0] !== 'string')) {
+            if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg = 'sharp';
             } else {
@@ -8181,7 +8181,9 @@ function Logo () {
                                 var d = that.tieCarryOver[turtle];
                             }
 
-                            that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
+			    if (that.runningLilypond) {
+				that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
+			    }
                         }
                     }
                     if (that.synth.inTemperament === 'custom') {
