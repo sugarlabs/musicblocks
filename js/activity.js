@@ -4203,7 +4203,7 @@ handleComplete);
             var dx = btnSize;
 
             runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
-            _loadButtonDragHandler(runContainer, x, y, _doFastButton, null, null, null, null);
+            _loadButtonDragHandler(runContainer, x, y, _doFastButton, _openAuxMenu, null, null, null);
             onscreenButtons.push(runContainer);
 
             slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x, y - btnSize, btnSize, 0);
@@ -4664,11 +4664,12 @@ handleComplete);
             return container;
         };
 
-        function _loadButtonDragHandler(container, ox, oy, action, longAction, extraLongAction, longImg, extraLongImg) {
+        function _loadButtonDragHandler(container, ox, oy, action, hoverAction) { // longAction, extraLongAction, longImg, extraLongImg) {
             // Prevent multiple button presses (i.e., debounce).
             var lockTimer = null;
             var locked = false;
 
+            /*
             if (longAction === null) {
                 longAction = action;
             }
@@ -4684,21 +4685,52 @@ handleComplete);
             var isExtraLong = false;
 
             var formerContainer = container;
+            */
+
+            // Long hover variables
+            var hoverTimer = null;
+            var isLongHover = false;
 
             container.on('mouseover', function (event) {
                 if (!loading) {
                     document.body.style.cursor = 'pointer';
                 }
+
+                if (hoverAction === null) {
+                    return;
+                }
+
+                if (locked) {
+                    return;
+                } else {
+                    locked = true;
+                    lockTimer = setTimeout(function () {
+                        locked = false;
+
+                        clearTimeout(hoverTimer);
+                    }, 2000);
+                }
+
+                hoverTimer = setTimeout(function () {
+                    isLongHover = true;
+                    console.log('HOVER ACTION');
+                    hoverAction(false);
+                }, 1500);
             });
 
             container.on('mouseout', function (event) {
                 if (!loading) {
                     document.body.style.cursor = 'default';
                 }
+
+                if (hoverTimer !== null) {
+                    clearTimeout(hoverTimer);
+                }
             });
 
             container.removeAllEventListeners('mousedown');
             container.on('mousedown', function (event) {
+                /*
                 if (locked) {
                     return;
                 } else {
@@ -4734,13 +4766,15 @@ handleComplete);
                         container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
                     }
                 }, 1000);
-
+                */
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
                 function __pressupFunction (event) {
+                    hideButtonHighlight(circles, stage);
+
+                    /*
                     clearTimeout(lockTimer);
 
-                    hideButtonHighlight(circles, stage);
                     if (longImg !== null || extraLongImg !== null) {
                         container.visible = false;
                         container = formerContainer;
@@ -4761,18 +4795,18 @@ handleComplete);
                             extraLongAction();
                         }
                     }
+                    */
 
+                    action();
                     mousedown = false;
                 };
 
                 container.removeAllEventListeners('pressup');
                 var closure = container.on('pressup', __pressupFunction);
-                // Do we need this?
-                // container.removeAllEventListeners('mouseup');
-                // var closure = container.on('mouseup', __pressupFunction);
 
-                isLong = false;
-                isExtraLong = false;
+                isLongHover = false;
+                // isLong = false;
+                // isExtraLong = false;
             });
         };
 
@@ -4822,6 +4856,12 @@ handleComplete);
             stepContainer.y += dy;
 
             refreshCanvas();
+        };
+
+        function _openAuxMenu () {
+            if (headerContainer.y === 0) {
+                _showHideAuxMenu(false);
+            }
         };
 
         function _showHideAuxMenu (resize) {
