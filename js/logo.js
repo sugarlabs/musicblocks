@@ -7463,11 +7463,14 @@ function Logo () {
                     }
 
                     // Give the last note time to play.
+		    console.log('SETTING LAST NOTE TIMEOUT: ' + that.recording + ' ' + that.suppressOutput[turtle]);
                     setTimeout(function () {
+			console.log('LAST NOTE PLAYED');
                         if (that.suppressOutput[turtle] && that.recording) {
                             that.suppressOutput[turtle] = false;
                             that.checkingCompletionState = false;
                             that.saveLocally();
+			    console.log('PLAYBACK FOR RECORD');
                             that.playback(-1, true);
                             // that.recording = false;
                         } else {
@@ -8508,7 +8511,11 @@ function Logo () {
     };
 
     this._playbackPush = function (turtle, obj) {
-        return;  // Not using this at the moment.
+	// We only push for saveWAV, etc.
+	if (!this.recordingStatus()) {
+            return;
+	}
+
         // Don't record in optimize mode or Turtle Blocks.
         if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
             this.playbackQueue[turtle].push(obj);
@@ -8533,6 +8540,7 @@ function Logo () {
         }
 
         if (this.turtles.running()) {
+	    console.log(this.turtles.running() + ' PUNTING');
             if (this.playbackTime === 0) {
                 return;
             } else {
@@ -8571,6 +8579,8 @@ function Logo () {
                 }
             }
         }
+
+	console.log(playbackList.length);
 
         var d = new Date();
         this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
@@ -8757,7 +8767,7 @@ function Logo () {
                             }
 
                             setTimeout(function(){
-                                console.log('finishing recording');
+                                console.log('FINISHING RECORDING');
                                 that.synth.recorder.stop();
                                 that.synth.recorder.exportWAV(save.afterSaveWAV.bind(save));
                                 that.recording = false;
@@ -8805,9 +8815,12 @@ function Logo () {
         this.stopTurtle = false;
 
         if (recording) {
+	    console.log('RECORDING');
             this.synth.recorder.clear();
             this.synth.recorder.record();
         }
+
+	console.log(this.playbackQueue);
 
         if (whichMouse < 0) {
             for (var turtle in this.playbackQueue) {
