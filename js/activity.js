@@ -4859,7 +4859,7 @@ handleComplete);
         };
 
         function _openAuxMenu () {
-            if (headerContainer.y === 0) {
+            if (!turtles.running() && headerContainer.y === 0) {
                 _showHideAuxMenu(false);
             }
         };
