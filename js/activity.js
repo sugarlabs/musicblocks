@@ -3191,7 +3191,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doLanguageBox() {
-            languageBox.createBox(turtleBlocksScale, 55 * 7, 150);
+            languageBox.createBox(turtleBlocksScale, languageContainer.x, 150);
             languageBox.show();
             beginnerModeContainer.visible = false;
             advancedModeContainer.visible = false;
