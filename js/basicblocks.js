@@ -1893,7 +1893,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['settemperament'] = newblock;
     newblock.staticLabels.push(_('set temperament'));
     newblock.staticLabels.push(_('temperament'));
-    newblock.staticLabels.push(_('reference pitch'), _('octave'));
+    newblock.staticLabels.push(_('pitch'), _('octave'));
     newblock.adjustWidthToLabel();
     newblock.threeArgBlock();
     if (beginnerMode && !beginnerBlock('settemperament')) {
