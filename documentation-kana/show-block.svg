@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg1870"
-   version="1.1"
-   viewBox="0 0 58.737495 17.4625"
+   width="64.381935mm"
    height="17.4625mm"
-   width="58.737495mm">
+   viewBox="0 0 64.381935 17.4625"
+   version="1.1"
+   id="svg1870">
   <defs
      id="defs1864" />
   <metadata
@@ -25,103 +25,103 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(-117.32577,-169.32723)"
-     id="layer1">
+     id="layer1"
+     transform="translate(-111.68133,-169.32723)">
     <text
-       y="192.21368"
-       x="142.19659"
-       id="text572"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan570"
-         y="196.9762"
-         x="160.45285" />
-    </text>
-    <text
-       y="192.21368"
-       x="142.19659"
        style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
-       id="text3783">
+       id="text572"
+       x="142.19659"
+       y="192.21368">
       <tspan
-         style="stroke-width:0.39687499"
          x="160.45285"
          y="196.9762"
-         id="tspan3781" />
+         id="tspan570"
+         style="stroke-width:0.39687499" />
+    </text>
+    <text
+       id="text3783"
+       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+       x="142.19659"
+       y="192.21368">
+      <tspan
+         id="tspan3781"
+         y="196.9762"
+         x="160.45285"
+         style="stroke-width:0.39687499" />
     </text>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,117.32577,169.32723)"
-       id="g604">
+       id="g604"
+       transform="matrix(0.26458333,0,0,0.26458333,117.32577,169.32723)">
       <g
-         id="g602"
-         transform="scale(1.5)">
+         transform="scale(1.5,1.5)"
+         id="g602">
         <path
-           id="path588"
+           d="m -13.722222,8.5 0,-4 c 0,-2.209139 1.790861,-4 3.9999995,-4 l 4,0 0,2 10,0 0,-2 44.2222225,0 4,0 c 2.209139,0 4,1.790861 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -44.2222225,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.2091385,0 -3.9999995,-1.790861 -3.9999995,-4 l 0,-4 0,-21 z"
            style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
+           id="path588" />
         <text
-           id="text592"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text592">
           <tspan
-             id="tspan590"
+             x="46"
              y="24"
-             x="46">ひょうじする</tspan>
+             id="tspan590">ひょうじする</tspan>
         </text>
         <text
-           id="text596"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text596">
           <tspan
-             id="tspan594"
+             x="46"
              y="12"
-             x="46">おおきさ</tspan>
+             id="tspan594">おおきさ</tspan>
         </text>
         <text
-           id="text600"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text600">
           <tspan
-             id="tspan598"
+             x="46"
              y="33"
-             x="46">オブジェクト</tspan>
+             id="tspan598">オブジェクト</tspan>
         </text>
       </g>
     </g>
     <g
-       id="g614"
-       transform="matrix(0.26458333,0,0,0.26458333,136.77264,169.32723)">
+       transform="matrix(0.26458333,0,0,0.26458333,136.77264,169.32723)"
+       id="g614">
       <g
-         id="g612"
-         transform="scale(1.5)">
+         transform="scale(1.5,1.5)"
+         id="g612">
         <path
-           id="path606"
+           d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="path606" />
         <text
-           id="text610"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text610">
           <tspan
-             id="tspan608"
+             x="13"
              y="14"
-             x="13">24</tspan>
+             id="tspan608">24</tspan>
         </text>
       </g>
     </g>
     <g
-       id="g624"
-       transform="matrix(0.26458333,0,0,0.26458333,136.77264,177.6616)">
+       transform="matrix(0.26458333,0,0,0.26458333,136.77264,177.6616)"
+       id="g624">
       <g
-         id="g622"
-         transform="scale(1.5)">
+         transform="scale(1.5,1.5)"
+         id="g622">
         <path
-           id="path616"
+           d="m 8.5,0.5 90,0 0,20 -90,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
            style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="path616" />
         <text
-           id="text620"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text620">
           <tspan
-             id="tspan618"
+             x="13"
              y="14"
-             x="13">テキスト</tspan>
+             id="tspan618">テキスト</tspan>
         </text>
       </g>
     </g>
