@@ -302,10 +302,10 @@ function createHelpContent() {
         'mousebutton': [_('The <em>Mouse-button</em> block returns <em>True</em> if the mouse button is pressed.'), 'documentation', 'mouse-button-block.svg'],
         'mousex': [_('The <em>Cursor X</em> block returns the horizontal position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
         'mousey': [_('The <em>Cursor Y</em> block returns the vertical position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
-        'click': [_('The <em>Click</em> block returns <em>True</em> if a mouse has been clicked.'), 'documentation', 'broadcast-block.svg'],
+        'click': [_('The <em>Click</em> block returns <em>True</em> if a mouse has been clicked.'), 'documentation', 'click-block.svg'],
         // Mice palette
-        'setturtlename2': [_('The <em>Set-name</em> block is used to name a mouse.'), 'documentation', 'status.svg'],
-        'turtlename': [_('The <em>Mouse-name</em> block returns the name of a mouse.'), 'documentation', 'status.svg'],
+        'setturtlename2': [_('The <em>Set-name</em> block is used to name a mouse.'), 'documentation', 'click-block.svg'],
+        'turtlename': [_('The <em>Mouse-name</em> block returns the name of a mouse.'), 'documentation', 'click-block.svg'],
         // Advanced blocks
         // Rhythm palette
         'rhythmic2dot': [_('The <em>Dot</em> block extends the duration of a note by 50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'status.svg'],
