@@ -15,6 +15,7 @@ Safari        | Supported
 Firefox       | Supported
 Opera         | Supported
 IE            | Not Supported
+Edge	      | Coming soon
 
 You can run it from
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
