@@ -835,7 +835,7 @@
          id="g550-8">
         <path
            d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-           style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            id="path544-9" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
