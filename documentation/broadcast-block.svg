@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg2831"
-   version="1.1"
-   viewBox="0 0 64.061976 48.520837"
+   width="64.061974mm"
    height="48.520836mm"
-   width="64.061974mm">
+   viewBox="0 0 64.061976 48.520837"
+   version="1.1"
+   id="svg2831">
   <defs
      id="defs2825" />
   <metadata
@@ -25,218 +25,214 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(84.741874,-109.39791)"
-     id="layer1">
+     transform="translate(77.581576,-0.98752502)"
+     id="g6310">
     <g
-       id="g2348"
-       transform="matrix(0.26458333,0,0,0.26458333,-358.05645,25.260408)">
+       transform="matrix(0.26458334,0,0,0.26458334,-77.581576,20.933362)"
+       id="g794-4">
       <g
-         transform="translate(1106.5,318)"
-         id="g1020">
-        <g
-           transform="scale(1.5)"
-           id="g1018">
-          <path
-             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path1012" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text1016">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan1014">クリック</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1033,318)"
-         id="g1038">
-        <g
-           transform="scale(1.5)"
-           id="g1036">
-          <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
-             style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path1022" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text1026">
-            <tspan
-               x="46"
-               y="24"
-               id="tspan1024">の時に</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text1030">
-            <tspan
-               x="46"
-               y="12"
-               id="tspan1028">イベント</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text1034">
-            <tspan
-               x="46"
-               y="33"
-               id="tspan1032">～する</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1106.5,349.5)"
-         id="g1058">
-        <g
-           transform="scale(1.5)"
-           id="g1056">
-          <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path1050" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text1054">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan1052">アクション</tspan>
-          </text>
-        </g>
+         transform="scale(1.5)"
+         id="g792-1">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path778-8" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text782-5">
+          <tspan
+             x="46"
+             y="24"
+             id="tspan780-9">on</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text786-7">
+          <tspan
+             x="46"
+             y="12"
+             id="tspan784-5">event</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text790-3">
+          <tspan
+             x="46"
+             y="33"
+             id="tspan788-8">do</tspan>
+        </text>
       </g>
     </g>
     <g
-       id="g2369"
-       transform="matrix(0.26458333,0,0,0.26458333,-362.28978,12.187495)">
+       transform="matrix(0.26458334,0,0,0.26458334,-58.1347,20.933362)"
+       id="g804-8">
       <g
-         transform="translate(1049,443)"
-         id="g794">
-        <g
-           transform="scale(1.5)"
-           id="g792">
-          <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
-             style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path778" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text782">
-            <tspan
-               x="46"
-               y="24"
-               id="tspan780">の時に</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text786">
-            <tspan
-               x="46"
-               y="12"
-               id="tspan784">イベント</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text790">
-            <tspan
-               x="46"
-               y="33"
-               id="tspan788">～する</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1122.5,443)"
-         id="g804">
-        <g
-           transform="scale(1.5)"
-           id="g802">
-          <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path796" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text800">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan798">イベント</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1122.5,474.5)"
-         id="g814">
-        <g
-           transform="scale(1.5)"
-           id="g812">
-          <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path806" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text810">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan808">アクション</tspan>
-          </text>
-        </g>
+         transform="scale(1.5)"
+         id="g802-3">
+        <path
+           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path796-1" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text800-8">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan798-9">event</tspan>
+        </text>
       </g>
     </g>
     <g
-       id="g2383"
-       transform="matrix(0.26458333,0,0,0.26458333,-362.55437,5.9156199)">
+       transform="matrix(0.26458334,0,0,0.26458334,-58.1347,29.267737)"
+       id="g814-6">
       <g
-         transform="translate(1050,540)"
-         id="g828">
-        <g
-           transform="scale(1.5)"
-           id="g826">
-          <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 43.916016 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-             style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path816" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text820">
-            <tspan
-               x="60"
-               y="14"
-               id="tspan818">送る</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text824">
-            <tspan
-               x="60"
-               y="12"
-               id="tspan822" />
-          </text>
-        </g>
+         transform="scale(1.5)"
+         id="g812-4">
+        <path
+           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path806-3" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text810-3">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan808-3">action</tspan>
+        </text>
       </g>
+    </g>
+  </g>
+  <g
+     transform="translate(77.316992,-7.2052334)"
+     id="g6324">
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-77.316992,46.597946)"
+       id="g828-8">
       <g
-         transform="translate(1144.374,540)"
-         id="g838">
-        <g
-           transform="scale(1.5)"
-           id="g836">
-          <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path830" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text834">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan832">イベント</tspan>
-          </text>
-        </g>
+         transform="scale(1.5)"
+         id="g826-6">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 43.916016 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path816-0" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text820-4">
+          <tspan
+             x="60"
+             y="14"
+             id="tspan818-8">broadcast</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text824-8">
+          <tspan
+             x="60"
+             y="12"
+             id="tspan822-8" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-52.347204,46.597946)"
+       id="g838-9">
+      <g
+         transform="scale(1.5)"
+         id="g836-7">
+        <path
+           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path830-7" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text834-6">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan832-4">event</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+  <g
+     transform="translate(81.814909,12.139556)"
+     id="g6289">
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-62.368033,-12.139556)"
+       id="g1020-3">
+      <g
+         transform="scale(1.5)"
+         id="g1018-0">
+        <path
+           d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1012-3" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1016-0">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan1014-9">click</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1038-2"
+       transform="matrix(0.26458334,0,0,0.26458334,-81.814909,-12.139556)">
+      <g
+         transform="scale(1.5)"
+         id="g1036-5">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1022-4" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1026-0">
+          <tspan
+             x="46"
+             y="24"
+             id="tspan1024-5">on</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1030-9">
+          <tspan
+             x="46"
+             y="12"
+             id="tspan1028-4">event</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1034-6">
+          <tspan
+             x="46"
+             y="33"
+             id="tspan1032-9">do</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-62.368033,-3.8051806)"
+       id="g1058-2">
+      <g
+         transform="scale(1.5)"
+         id="g1056-2">
+        <path
+           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1050-4" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1054-7">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan1052-7">action</tspan>
+        </text>
       </g>
     </g>
   </g>

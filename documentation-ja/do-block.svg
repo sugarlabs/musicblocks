@@ -43,7 +43,7 @@
           <tspan
              id="tspan842"
              y="14"
-             x="46">do</tspan>
+             x="46">～する</tspan>
         </text>
         <text
            id="text848"
@@ -111,7 +111,7 @@
           <tspan
              id="tspan1062"
              y="23"
-             x="54">one of</tspan>
+             x="54">どちらかを選ぶ</tspan>
         </text>
         <text
            id="text1068"
@@ -119,7 +119,7 @@
           <tspan
              id="tspan1066"
              y="12"
-             x="54">this</tspan>
+             x="54">これか</tspan>
         </text>
         <text
            id="text1072"
@@ -127,7 +127,7 @@
           <tspan
              id="tspan1070"
              y="33"
-             x="54">that</tspan>
+             x="54">それか</tspan>
         </text>
       </g>
     </g>
