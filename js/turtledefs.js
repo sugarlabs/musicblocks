@@ -259,7 +259,7 @@ function createHelpContent() {
         // Number palette
         'number': [_('The <em>Number</em> block holds a number.'), 'documentation', 'repeat-block.svg'],
         'random': [_('The <em>Random</em> block returns a random number.'), 'documentation', 'random-block.svg'],
-        'oneof': [_('The <em>One-of</em> block returns one of two choices.'), 'documentation', 'one-of-block.svg'],
+        'oneOf': [_('The <em>One-of</em> block returns one of two choices.'), 'documentation', 'one-of-block.svg'],
         'plus': [_('The <em>Plus</em> block is used to add.'), 'documentation', 'scalar-transpose-block.svg'],
         'minus': [_('The <em>Minus</em> block is used to subtract.'), 'documentation', ''],
         'multiply': [_('The <em>Multiply</em> block is used to multiply.'), 'documentation', 'scalar-transpose-block.svg'],
