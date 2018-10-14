@@ -240,8 +240,8 @@ function createHelpContent() {
         // Flow palette
         'repeat': [_('The <em>Repeat</em> block will repeat the contained blocks. In this example, the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
         'forever': [_('The <em>Forever</em> block will repeat the contained blocks forever. In this example, a simple drum machine, a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
-        'if':  [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional.svg'],
-        'ifthenelse': [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional.svg'],
+        'if':  [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional-block.svg'],
+        'ifthenelse': [_('Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play.'), 'documentation', 'conditional-block.svg'],
         'backward': [_('The <em>Backward</em> block runs code in reverse order (Musical retrograde).'), 'documentation', 'box-1-block.svg'],
         // Action palette
         'action': [_('The <em>Action</em> block is used to group together blocks so that they can be used more than once. It is often used for storing a phrase of music that is repeated.'), 'documentation', 'action-block.svg'],
