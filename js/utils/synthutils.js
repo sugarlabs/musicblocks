@@ -296,15 +296,19 @@ function Synth() {
                 var note = notes.substring(0, len - 1);
                 var octave = Number(notes.slice(-1));
                 return pitchToFrequency(note, octave, 0, null);
-	    } else if (typeof(notes) === 'number') {
-		return notes;
+            } else if (typeof(notes) === 'number') {
+                return notes;
             } else {
                 var results = [];
                 for (i = 0; i < notes.length; i++) {
-                    var len = notes[i].length;
-                    var note = notes[i].substring(0, len - 1);
-                    var octave = Number(notes[i].slice(-1));
-                    results.push(pitchToFrequency(note, octave, 0, null));
+                    if (typeof(notes[i]) === 'string') {
+                        var len = notes[i].length;
+                        var note = notes[i].substring(0, len - 1);
+                        var octave = Number(notes[i].slice(-1));
+                        results.push(pitchToFrequency(note, octave, 0, null));
+                    } else {
+                        results.push(notes[i]);
+                    }
                 }
                 return results;
             }
@@ -998,7 +1002,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-	console.log(instrumentName);
+        console.log(instrumentName);
         console.log(notes);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
