@@ -276,8 +276,8 @@ function createHelpContent() {
         'arc': [_('The <em>Arc</em> block moves the mouse in a arc.'), 'documentation', 'arc-block.svg'],
         'setxy': [_('The <em>Set XY</em> block moves the mouse to a specific position on the screen.'), 'documentation', 'mouse-button-block.svg'],
         'scrollxy': [_('The <em>Scroll XY</em> block moves the canvas.'), 'documentation', 'on-every-beat-do-block.svg'],
-        'x': [_('The <em>X</em> block returns the horizontal position of the mouse.'), 'documentation', 'status.svg'],
-        'y': [_('The <em>Y</em> block returns the vertical position of the mouse.'), 'documentation', 'status.svg'],
+        'x': [_('The <em>X</em> block returns the horizontal position of the mouse.'), 'documentation', 'x-block.svg'],
+        'y': [_('The <em>Y</em> block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg'],
         'heading': [_('The <em>Heading</em> block returns the orientation of the mouse.'), 'documentation', 'status.svg'],
         // Pen palette
         'setpensize': [_('The <em>Set-pen-size</em> block changes the size of the pen.'), 'documentation', 'set_color-block.svg'],
@@ -295,8 +295,8 @@ function createHelpContent() {
         'height': [_('The <em>Height</em> block returns the height of the canvas.'), 'documentation', 'width-block.svg'],
         'width': [_('The <em>Width</em> block returns the width of the canvas.'), 'documentation', 'width-block.svg'],
         'toppos': [_('The <em>Top</em> block returns the position of the top of the canvas.'), 'documentation', 'width-block.svg'],
-        'bottompos': [_('The <em>Bottom</em> block returns the position of the bottom of the canvas.'), 'documentation', 'width-block.svg'],
-        'leftpos': [_('The <em>Left</em> block returns the position of the left of the canvas.'), 'documentation', 'width-block.svg'],
+        'bottompos': [_('The <em>Bottom</em> block returns the position of the bottom of the canvas.'), 'documentation', 'x-block.svg'],
+        'leftpos': [_('The <em>Left</em> block returns the position of the left of the canvas.'), 'documentation', 'x-block.svg'],
         'rightpos': [_('The <em>Right</em> block returns the position of the right of the canvas.'), 'documentation', 'width-block.svg'],
         // Sensors palette
         'mousebutton': [_('The <em>Mouse-button</em> block returns <em>True</em> if the mouse button is pressed.'), 'documentation', 'mouse-button-block.svg'],
