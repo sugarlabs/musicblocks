@@ -14,7 +14,7 @@
    viewBox="0 0 67.336457 17.4625"
    version="1.1"
    id="svg1430"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="setkey2.svg">
   <defs
      id="defs1424" />
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="552.48856"
-     inkscape:cy="267.10652"
+     inkscape:zoom="4.8199085"
+     inkscape:cx="68.880976"
+     inkscape:cy="30.937499"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -35,10 +35,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:window-width="1278"
+     inkscape:window-height="773"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="1"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata1427">
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -74,7 +74,7 @@
           <tspan
              x="48"
              y="24"
-             id="tspan3491">set key</tspan>
+             id="tspan3491">調の設定</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -82,7 +82,7 @@
           <tspan
              x="48"
              y="12"
-             id="tspan3495">key</tspan>
+             id="tspan3495">調</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -90,7 +90,7 @@
           <tspan
              x="48"
              y="33"
-             id="tspan3499">mode</tspan>
+             id="tspan3499">モード（音階)</tspan>
         </text>
       </g>
     </g>
@@ -132,7 +132,7 @@
           <tspan
              x="13"
              y="14"
-             id="tspan3519">major</tspan>
+             id="tspan3519">メジャー</tspan>
         </text>
       </g>
     </g>

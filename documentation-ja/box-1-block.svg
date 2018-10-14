@@ -5,11 +5,35 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg2831"
    version="1.1"
    viewBox="0 0 73.421877 89.128129"
    height="89.128128mm"
-   width="73.421875mm">
+   width="73.421875mm"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="box-1-block.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1278"
+     inkscape:window-height="773"
+     id="namedview72"
+     showgrid="false"
+     inkscape:zoom="0.74728872"
+     inkscape:cx="130.07813"
+     inkscape:cy="157.90416"
+     inkscape:window-x="0"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2831" />
   <defs
      id="defs2825" />
   <metadata
@@ -20,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -166,7 +190,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan618">box1</tspan>
+               id="tspan618">ボックス1</tspan>
           </text>
         </g>
       </g>
@@ -234,7 +258,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan662">box1</tspan>
+               id="tspan662">ボックス1</tspan>
           </text>
         </g>
       </g>
@@ -258,7 +282,7 @@
             <tspan
                x="68"
                y="14"
-               id="tspan732">box1</tspan>
+               id="tspan732">ボックス1</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"

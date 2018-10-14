@@ -14,7 +14,7 @@
    viewBox="0 0 92.471877 109.27292"
    version="1.1"
    id="svg1368"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="crescendo.svg">
   <defs
      id="defs1362" />
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2"
-     inkscape:cx="-108.98598"
-     inkscape:cy="38.133325"
+     inkscape:cx="109.51402"
+     inkscape:cy="217.13333"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -35,10 +35,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:window-width="1278"
+     inkscape:window-height="773"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="1"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata1365">
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -240,7 +240,7 @@
           <tspan
              x="13"
              y="14"
-             id="tspan3057">する</tspan>
+             id="tspan3057">ド</tspan>
         </text>
       </g>
     </g>
@@ -411,7 +411,7 @@
           <tspan
              x="5"
              y="15"
-             id="tspan3177">crescendo (+/–)</tspan>
+             id="tspan3177">クレシェンド (+/–)</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -452,9 +452,10 @@
          id="g3209">
         <path
            inkscape:connector-curvature="0"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 20 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 63 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           d="m 0.5,8.5 0,-4 c 0,-2.209139 1.790861,-4 4,-4 l 4,0 0,2 10,0 0,-2 9,0 34.222222,0 4,0 c 2.209139,0 4,1.790861 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -34.222222,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.761424,0 -5,2.238576 -5,5 l 0,4 0,4 0,63 0,4 c 0,2.76142 2.238576,5 5,5 l 4,0 0,2 10,0 0,-2 8,0 0,6 0,6 0,4 c 0,2.20914 -1.790861,4 -4,4 l -4,0 -9,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.209139,0 -4,-1.79086 -4,-4 l 0,-4 z"
            style="fill:#e9a066;fill-opacity:1;stroke:#3f0a00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path3199" />
+           id="path3199"
+           sodipodi:nodetypes="cssccccccssccccccccsscccccccsscccsscccccccsscccccccsscc" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
            id="text3203">
@@ -490,7 +491,7 @@
           <tspan
              x="88"
              y="14"
-             id="tspan3215">scalar step (+/–)</tspan>
+             id="tspan3215">音階内 (+/–)</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -524,14 +525,14 @@
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,-143.92389,-21.785119)"
+       transform="matrix(0.26458333,0,0,0.26458333,-138.27945,-21.785119)"
        id="g3245">
       <g
-         transform="scale(1.5)"
+         transform="scale(1.5,1.5)"
          id="g3243">
         <path
            inkscape:connector-curvature="0"
-           d="m 8.5,0.5 h 95.03906 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           d="m 8.5,0.5 95.03906,0 0,20 -95.03906,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            id="path3237" />
         <text
