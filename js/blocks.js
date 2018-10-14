@@ -1641,8 +1641,9 @@ function Blocks () {
         // Move a block (and its label) to x, y.
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
-            myBlock.container.x = x; // Math.floor(x + 0.5);
-            myBlock.container.y = y; // Math.floor(y + 0.5);
+            // Round position so font renders clearly.
+            myBlock.container.x = Math.floor(x + 0.5);
+            myBlock.container.y = Math.floor(y + 0.5);
 
             this.checkBounds();
         } else {
@@ -1656,6 +1657,7 @@ function Blocks () {
 
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
+            // Seems we don't need to round again here.
             myBlock.container.x += dx; // Math.floor(dx + 0.5);
             myBlock.container.y += dy; // Math.floor(dy + 0.5);
 
