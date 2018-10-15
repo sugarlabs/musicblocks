@@ -1435,7 +1435,20 @@ function Block(protoblock, blocks, overrideName) {
             var c2 = this.blocks.blockList[c].connections[2];
             if (this.blocks.blockList[c2].name === 'number') {
                 if (this.blocks.blockList[c1].name === 'solfege') {
-                    return _(this.blocks.blockList[c1].value) + ' ' + this.blocks.blockList[c2].value;
+                    var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+                    var stripped = this.blocks.blockList[c1].value.replace(SHARP, '').replace(FLAT, '').replace(DOUBLESHARP, '').replace(DOUBLEFLAT, '');
+                    var i = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'].indexOf(stripped);
+                    if (this.blocks.blockList[c1].value.indexOf(SHARP) !== -1) {
+                        return solfnotes_[i] + SHARP + ' ' + this.blocks.blockList[c2].value;
+                    } else if (this.blocks.blockList[c1].value.indexOf(FLAT) !== -1) {
+                        return solfnotes_[i] + FLAT + ' ' + this.blocks.blockList[c2].value;
+                    } else if (this.blocks.blockList[c1].value.indexOf(DOUBLESHARP) !== -1) {
+                        return solfnotes_[i] + DOUBLESHARP + ' ' + this.blocks.blockList[c2].value;
+                    } else if (this.blocks.blockList[c1].value.indexOf(DOUBLEFLAT) !== -1) {
+                        return solfnotes_[i] + DOUBLEFLAT + ' ' + this.blocks.blockList[c2].value;
+                    } else {
+                        return solfnotes_[i] + ' ' + this.blocks.blockList[c2].value;
+                    }
                 } else if (this.blocks.blockList[c1].name === 'notename') {
                     return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
                 }
@@ -1446,13 +1459,13 @@ function Block(protoblock, blocks, overrideName) {
             var c2 = this.blocks.blockList[c].connections[2];
             if (this.blocks.blockList[c2].name === 'number') {
                 if (this.blocks.blockList[c1].name === 'number') {
-		    var degrees = DEGREES.split(' ');
-		    var i = this.blocks.blockList[c1].value - 1;
-		    if (i > 0 && i < degrees.length) {
-			return degrees[i] + ' ' + this.blocks.blockList[c2].value;
-		    } else {
-			return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
-		    }
+                    var degrees = DEGREES.split(' ');
+                    var i = this.blocks.blockList[c1].value - 1;
+                    if (i > 0 && i < degrees.length) {
+                        return degrees[i] + ' ' + this.blocks.blockList[c2].value;
+                    } else {
+                        return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
+                    }
                 }
             }
             break;
@@ -1467,7 +1480,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c1].value < 0) {
                 //.TRANS: scalar step
                 return _('down') + ' ' + Math.abs(this.blocks.blockList[c1].value);
-	    } else
+            } else
                 return _('up') + ' ' + this.blocks.blockList[c1].value;
             break;
         case 'pitchnumber':
@@ -3146,7 +3159,7 @@ function Block(protoblock, blocks, overrideName) {
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
             that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-	    that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, 'default', null, null);
+            that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, 'default', null, null);
 
             __selectionChanged();
         };
