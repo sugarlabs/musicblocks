@@ -54,8 +54,8 @@ function getMacroExpansion (blkname, x, y) {
     const AUGMENTED8OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'augmented 8'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const BACKWARDOBJ = [[0, 'backward', x, y, [null, 1, null]], [1, 'hidden', 0, 0, [0, null]]];
     const BOTTLEOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': 'bottle'}], 0, 0, [0]]];
-    const BOX1 = [[0, ['namedbox', {'value': 'box1'}], x, y, [null]]];
-    const BOX2 = [[0, ['namedbox', {'value': 'box2'}], x, y, [null]]];
+    const BOX1 = [[0, ['namedbox', {'value': _('box1')}], x, y, [null]]];
+    const BOX2 = [[0, ['namedbox', {'value': _('box2')}], x, y, [null]]];
     const BPMOBJ = [[0, 'setbpm', x, y, [null, 1, null, 2]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const BPMOBJ2 = [[0, 'setbpm2', x, y, [null, 1, 3, 2, 6]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, 'vspace', 0, 0, [0, null]], [3, 'divide', 0, 0, [0, 4, 5]], [4, ['number', {'value': 1}], 0, 0, [3]], [5, ['number', {'value': 4}], 0, 0, [3]], [6, 'hidden', 0, 0, [0, null]]];
     const BUBBLESOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': 'bubbles'}], 0, 0, [0]]];
@@ -196,8 +196,8 @@ function getMacroExpansion (blkname, x, y) {
     const STACCATOOBJ = [[0, 'staccato', x, y, [null, 1, null, 2]], [1, ['number', {'value': 32}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const STARTDRUMOBJ = [[0, 'start', x, y, [null, 1, null]], [1, 'setdrum', 0, 0,[0, 2, null, 3]], [2, ['drumname', {'value': 'kick drum'}], 0, 0, [1]], [3, 'hidden', 0, 0, [1, null]]];
     const STATUSOBJ = [[0, 'status', x, y, [null, 1, 12]], [1, 'hidden', 0, 0, [0,10]], [2, 'print', 0, 0, [10,3,4]], [3, 'beatvalue', 0, 0, [2]], [4, 'print', 0, 0, [2,5,6]], [5, 'measurevalue', 0, 0, [4]], [6, 'print', 0, 0, [4,7,8]], [7, 'elapsednotes', 0, 0, [6]], [8, 'print', 0, 0, [6,9,null]], [9, 'bpmfactor', 0, 0, [8]], [10, 'print', 0, 0, [1,11,2]], [11, 'pitchinhertz', 0, 0, [10]], [12, 'hiddennoflow', 0, 0, [0,null]]];
-    const STOREIN1 = [[0, ['storein2', {'value': 'box1'}], x, y, [null, 1, null]], [1, ['number', {'value': 4}], x, y, [0]]];
-    const STOREIN2 = [[0, ['storein2', {'value': 'box2'}], x, y, [null, 1, null]], [1, ['number', {'value': 4}], x, y, [0]]];
+    const STOREIN1 = [[0, ['storein2', {'value': _('box1')}], x, y, [null, 1, null]], [1, ['number', {'value': 4}], x, y, [0]]];
+    const STOREIN2 = [[0, ['storein2', {'value': _('box2')}], x, y, [null, 1, null]], [1, ['number', {'value': 4}], x, y, [0]]];
     const STUPLETOBJ = [[0, 'stuplet', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 3}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 2}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const STUPLET3OBJ = [[0, 'stuplet', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 3}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 2}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const STUPLET5OBJ = [[0, 'stuplet', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 2}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
