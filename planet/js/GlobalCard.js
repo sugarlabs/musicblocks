@@ -180,7 +180,7 @@ function share(id) {
         navigator.clipboard.writeText(toCopy);     
         alert("Copied!");
         console.log('MB url copied');
-      } catch (err) {
+      } catch (err) { 
         console.error('Failed to copy: ', err); 
       }
 }
