@@ -57,16 +57,22 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     try {
         if (localStorage.beginnerMode !== null) {
             beginnerMode = localStorage.beginnerMode;
+	    console.log('READING BEGINNERMODE FROM LOCAL STORAGE: ' + beginnerMode + ' ' + typeof(beginnerMode)); 
             if (typeof(beginnerMode) === 'string') {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
                 }
             }
         }
+
+	console.log('BEGINNERMODE is ' + beginnerMode);
     } catch (e) {
         console.log(e);
+	console.log('ERROR READING BEGINNER MODE');
+	console.log('BEGINNERMODE is ' + beginnerMode);
     }
 } else {
+    // Turtle Blocks
     beginnerMode = false;
 }
 
