@@ -35,7 +35,8 @@ function GlobalCard(Planet) {
                                         <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> \
                                                 <div class="card-content shareurltext"> \
                                                         <div class="shareurltitle">'+_('Share')+'</div> \
-                                                        <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
+                                                        <input id="shareurlselect" type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
+                                                        <a onclick="share(\'{ID}\');"><span id="copiedtoclipboard">Copy URL to clipboard</span></a>\
                                                         <div class="shareurl-advanced" id="global-advanced-{ID}"> \
                                                                 <div class="shareurltitle">'+_('Flags')+'</div> \
                                                                 <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">'+_('Run project on startup.')+'</label></div> \
@@ -171,3 +172,15 @@ function GlobalCard(Planet) {
         this.ProjectData = Planet.GlobalPlanet.cache[id];
     };
 };
+
+function share(id) {   
+    this.id = id;
+    try {
+        const toCopy = "https://musicblocks.sugarlabs.org/index.html?id="+id+"&run=True";
+        navigator.clipboard.writeText(toCopy);     
+        alert("Copied!");
+        console.log('MB url copied');
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+}
