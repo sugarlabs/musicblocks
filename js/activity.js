@@ -57,7 +57,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     try {
 	if (localStorage.beginnerMode === undefined) {
 	    console.log('FIRST TIME USER');
-        } elif (localStorage.beginnerMode !== null) {
+        } else if (localStorage.beginnerMode !== null) {
             beginnerMode = localStorage.beginnerMode;
 	    console.log('READING BEGINNERMODE FROM LOCAL STORAGE: ' + beginnerMode + ' ' + typeof(beginnerMode)); 
             if (typeof(beginnerMode) === 'string') {
