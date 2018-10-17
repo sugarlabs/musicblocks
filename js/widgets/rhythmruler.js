@@ -21,6 +21,7 @@ function RhythmRuler () {
     const BUTTONDIVWIDTH = 535;  // 9 buttons 535 = (55 + 4) * 9
     const OUTERWINDOWWIDTH = 675;
     const INNERWINDOWWIDTH = 600;
+    const ROWHEIGHT = 110;
     const RULERHEIGHT = 70;
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
@@ -1602,17 +1603,17 @@ function RhythmRuler () {
 
                 var n = Math.min(Math.floor((window.innerHeight * 0.5) / 100), 2);
                 var outerDiv = docById('rulerOuterDiv');
-                outerDiv.style.height = 100 * n + 'px';
+                outerDiv.style.height = ROWHEIGHT * n + 'px';
 
                 this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
 
                 that._expanded = false;
             } else {
                 rulerDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
-                rulerDiv.style.height = Math.max(100 + 100 * that.Rulers.length, Math.min(900, window.innerHeight)) + 'px';
+                rulerDiv.style.height = Math.max(100 + ROWHEIGHT * that.Rulers.length, Math.min(900, window.innerHeight)) + 'px';
 
                 var outerDiv = docById('rulerOuterDiv');
-                outerDiv.style.height = Math.max(100 + 100 * that.Rulers.length, Math.min(900 - 20, window.innerHeight - 20)) + 'px';
+                outerDiv.style.height = Math.max(100 + ROWHEIGHT * that.Rulers.length, Math.min(900 - 20, window.innerHeight - 20)) + 'px';
 
                 this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that._expanded = true;
@@ -1633,11 +1634,11 @@ function RhythmRuler () {
         var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 2);
         var outerDiv = docById('rulerOuterDiv');
         if (this.Rulers.length > n) {
-            outerDiv.style.height = 100 * n + 'px';
+            outerDiv.style.height = ROWHEIGHT * n + 'px';
             var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 25 + 'px';  // Add a bit of extra space for the horizontal slider.
         } else {
-            outerDiv.style.height = 100 * this.Rulers.length + 'px';
+            outerDiv.style.height = ROWHEIGHT * this.Rulers.length + 'px';
             var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 25 + 'px';  // Add a bit of extra space for the horizontal slider.
         }
