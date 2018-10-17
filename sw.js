@@ -7,10 +7,10 @@ var urlsToCache = [
 
     'header-icons/a-button.svg',
     'header-icons/add.svg',
-    'header-icons/advanced.svg',
+    'header-icons/advanced-button.svg',
     'header-icons/apply.svg',
     'header-icons/b-button.svg',
-    'header-icons/beginner.svg',
+    'header-icons/beginner-button.svg',
     'header-icons/bigger-button.svg',
     'header-icons/bigger-disable-button.svg',
     'header-icons/cancel-button.svg',
