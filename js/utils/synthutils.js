@@ -1002,8 +1002,6 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-        console.log(instrumentName);
-        console.log(notes);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
