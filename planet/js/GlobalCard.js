@@ -181,6 +181,6 @@ function share(id) {
         alert("Copied!");
         console.log('MB url copied');
       } catch (err) {
-        console.error('Failed to copy: ', err);
+        console.error('Failed to copy: ', err); 
       }
 }
