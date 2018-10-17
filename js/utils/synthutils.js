@@ -28,7 +28,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    // [_('bass'), 'basse', 'images/voices.svg', 'string'],
+    [_('bass'), 'basse', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
