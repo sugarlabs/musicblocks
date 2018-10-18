@@ -92,7 +92,7 @@ function createDefaultStack() {
         [16, ['number', {'value': 4}], 0, 0, [14]],
         [17, 'vspace', 0, 0, [13, 18]],
         [18, 'pitch', 0, 0, [17, 19, 20, null]],
-        [19, ['solfege', {'value': 're'}], 0, 0, [18]],
+        [19, ['solfege', {'value': 'mi'}], 0, 0, [18]],
         [20, ['number', {'value': 4}], 0, 0, [18]],
         [21, 'hidden', 0, 0, [13, 22]],
 
@@ -102,7 +102,7 @@ function createDefaultStack() {
         [25, ['number', {'value': 4}], 0, 0, [23]],
         [26, 'vspace', 0, 0, [22, 27]],
         [27, 'pitch', 0, 0, [26, 28, 29, null]],
-        [28, ['solfege', {'value': 'mi'}], 0, 0, [27]],
+        [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
         [29, ['number', {'value': 4}], 0, 0, [27]],
         [30, 'hidden', 0, 0, [22, 31]],
 
