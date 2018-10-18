@@ -272,6 +272,7 @@ define(MYDEFINES, function (compatibility) {
         var saveArtworkContainer = null;
         var planetContainer = null;
         var restoreContainer = null;
+        var openMergeContainer = null;
         var hideBlocksContainer = null;
         var collapseBlocksContainer = null;
         var stopTurtleContainer = null;
