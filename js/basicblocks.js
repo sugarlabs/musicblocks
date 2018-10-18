@@ -1501,6 +1501,21 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.hidden = true;
 
     // macro
+    var newblock = new ProtoBlock('setbpm3');
+    newblock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['setbpm3'] = newblock;
+    //.TRANS: sets tempo by defniing a beat and beats per minute
+    newblock.staticLabels.push(_('beats per minute'));
+    newblock.staticLabels.push(_('bpm'), _('beat value'));
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(90);
+    newblock.defaults.push(1 / 4);
+    newblock.twoArgBlock();
+    if (beginnerMode && !beginnerBlock('setbpm3')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('setbpm2');
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['setbpm2'] = newblock;
@@ -1511,9 +1526,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampTwoArgBlock();
     newblock.defaults.push(90);
     newblock.defaults.push(1 / 4);
-    if (beginnerMode && !beginnerBlock('setbpm2')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     // macro
     var newblock = new ProtoBlock('setbpm');

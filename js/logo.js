@@ -3701,6 +3701,29 @@ function Logo () {
                 that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
             }
             break;
+        case 'setbpm3':
+            if (args.length === 2 && typeof(args[0]) === 'number' && typeof(args[1]) === 'number') {
+                var bpm  = args[0] * args[1] / 0.25
+                if (bpm < 30) {
+                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    bpm = 30;
+                } else if (bpm > 1000) {
+                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    bpm = 1000;
+                } else {
+                    bpm = bpm;
+                }
+
+                that.notationTempo(turtle, args[0], args[1]);
+                that.bpm[turtle].push(bpm);
+            }
+
+            if (that.inTempo) {
+                that.tempo.BPMBlocks.push(blk);
+                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
+            }
+            break;
         case 'setbpm2':
             if (args.length === 3 && typeof(args[0]) === 'number' && typeof(args[1]) == 'number') {
                 var bpm  = args[0] * args[1] / 0.25

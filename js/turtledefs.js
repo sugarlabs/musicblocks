@@ -45,10 +45,10 @@ function getAuxToolbarButtonNames(name) {
 function beginnerBlock(name) {
    // Only these blocks appear on the palette in beginner mode.
    return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
-           'meter', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
+           'meter', 'setbpm3', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
            'pitch', 'pitch2', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
-           'settimbre', 'newstaccato', 'newslur', 'vibrato', 'neighbor2', // tone palette
+           'settimbre', 'newstaccato', 'newslur', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setsynthvolume',  // volume palette
            'playdrum', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
@@ -206,7 +206,8 @@ function createHelpContent() {
         'mynotevalue': [_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg'],
         // Meter palette
         'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg'],
-        'setmasterbpm2': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'master-beats-per-minute-block.svg'],
+        'setmasterbpm2': [_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', 'master-beats-per-minute-block.svg'],
+        'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'beats-per-minute-block.svg'],
         'everybeatdo': [_('The On-every-beat block let you specify actions to take on every beat.'), 'documentation', 'on-every-beat-do-block.svg'],
         'beatvalue': [_('The Beat count block is the number of the current beat,') + ' ' + _('e.g., 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'],
         'elapsednotes2': [_('The Notes played block is the number of notes that have been played.') + ' ' + _('(By default, it counts quarter notes.)'), 'documentation', 'on-every-beat-do.svg'],
