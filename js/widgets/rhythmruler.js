@@ -935,7 +935,10 @@ function RhythmRuler () {
                 drum = DRUMNAMES[d][1];
                 foundDrum = true;
                 break;
-            }
+            } else if (DRUMNAMES[d][1] === drum) {
+                foundDrum = true;
+                break;
+	    }
         }
 
         var foundVoice = false;
@@ -945,7 +948,10 @@ function RhythmRuler () {
                     drum = VOICENAMES[d][1];
                     foundVoice = true;
                     break;
-                }
+		} else if (VOICENAMES[d][1] === drum) {
+                    foundVoice = true;
+                    break;
+		}
             }
         }
 
@@ -954,11 +960,12 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-                if (foundDrum) {
-                    that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
-                } else if (foundVoice) {
+		// console.log(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
+                if (foundVoice) {
                     that._logo.synth.trigger(0, 'C4', that._logo.defaultBPMFactor / noteValue, drum, null, null, false);
-                }                
+                } else if (foundDrum) {
+                    that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
+		}
             }
 
             // And highlight its cell.
