@@ -16,6 +16,8 @@ const DEFAULTPALETTE = 'rhythm';
 
 const TITLESTRING = _('Music Blocks is a collection of tools for exploring musical concepts.');
 
+const VERSION = 3.0;
+
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
 const BUILTINPALETTES = ['search', 'rhythm',  'meter', 'pitch', 'intervals', 'tone', 'ornament', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'graphics', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'ensemble', 'extras'];
@@ -149,6 +151,7 @@ function createHelpContent() {
             [_('Collapse'), _('Collapse the graphics window.'), 'header-icons/collapse-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
+            [_('About'), _('An about page for Music Blocks that details the licensing and acknowledgements due.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/about', _('About Music Blocks')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
         ];
     } else {
@@ -194,6 +197,7 @@ function createHelpContent() {
             [_('Restore'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
+            [_('About'), _('An about page for Music Blocks that details the AGPL licenses and acknowledgements due.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/about', _('About Music Blocks')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
         ];
     }
