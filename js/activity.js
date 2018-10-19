@@ -4332,6 +4332,19 @@ handleComplete);
         };
 
         function _setupPaletteMenu(turtleBlocksScale) {
+	    // Clean up if we've been here before.
+
+            if (homeButtonContainers.length !== 0) {
+                stage.removeChild(homeButtonContainers[0]);
+                stage.removeChild(homeButtonContainers[1]);
+                stage.removeChild(hideBlocksContainer);
+                stage.removeChild(collapseBlocksContainer);
+                stage.removeChild(smallerContainer);
+                stage.removeChild(smallerOffContainer);
+                stage.removeChild(largerContainer);
+                stage.removeChild(largerOffContainer);
+            }
+
             var btnSize = cellSize;
             var x = 27.5 + 6;
             var y = headerContainer.y + 82.5 + 6;
