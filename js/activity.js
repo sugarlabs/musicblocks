@@ -4334,8 +4334,7 @@ handleComplete);
         };
 
         function _setupPaletteMenu(turtleBlocksScale) {
-	    // Clean up if we've been here before.
-
+            // Clean up if we've been here before.
             if (homeButtonContainers.length !== 0) {
                 stage.removeChild(homeButtonContainers[0]);
                 stage.removeChild(homeButtonContainers[1]);
