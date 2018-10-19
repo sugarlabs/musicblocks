@@ -1388,7 +1388,7 @@ function Logo () {
                         that.unhighlightQueue[turtle] = [];
                         that.parameterQueue[turtle] = [];
                         if (!that.turtles.turtleList[turtle].trash) {
-                            if (this.turtles.turtleList[turtle].running) {
+                            if (that.turtles.turtleList[turtle].running) {
                                 console.log('already running...');
                             }
 
