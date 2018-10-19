@@ -2981,6 +2981,8 @@ define(MYDEFINES, function (compatibility) {
                 artcanvas.width = w;
                 artcanvas.height = h;
             }
+
+            blocks.checkBounds();
         };
 
         window.onresize = function () {
