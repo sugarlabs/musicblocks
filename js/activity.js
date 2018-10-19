@@ -55,11 +55,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     beginnerMode = true;
 
     try {
-	if (localStorage.beginnerMode === undefined) {
-	    console.log('FIRST TIME USER');
+        if (localStorage.beginnerMode === undefined) {
+            console.log('FIRST TIME USER');
         } else if (localStorage.beginnerMode !== null) {
             beginnerMode = localStorage.beginnerMode;
-	    console.log('READING BEGINNERMODE FROM LOCAL STORAGE: ' + beginnerMode + ' ' + typeof(beginnerMode)); 
+            console.log('READING BEGINNERMODE FROM LOCAL STORAGE: ' + beginnerMode + ' ' + typeof(beginnerMode)); 
             if (typeof(beginnerMode) === 'string') {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
@@ -67,11 +67,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
             }
         }
 
-	console.log('BEGINNERMODE is ' + beginnerMode);
+        console.log('BEGINNERMODE is ' + beginnerMode);
     } catch (e) {
         console.log(e);
-	console.log('ERROR READING BEGINNER MODE');
-	console.log('BEGINNERMODE is ' + beginnerMode);
+        console.log('ERROR READING BEGINNER MODE');
+        console.log('BEGINNERMODE is ' + beginnerMode);
     }
 } else {
     // Turtle Blocks
@@ -244,7 +244,6 @@ define(MYDEFINES, function (compatibility) {
         var merging = false;
         var loading = false;
         // For auxilary menus
-        var utilityContainer = null;
         var beginnerModeContainer = null;
         var advancedModeContainer = null;
         var languageContainer = null;
@@ -254,7 +253,7 @@ define(MYDEFINES, function (compatibility) {
         var largerOffContainer = null;
         var pluginsContainer = null;
         var deletePluginContainer = null;
-        var statusContainer = null;
+        var statsContainer = null;
         var scrollOnContainer = null;
         var scrollOffContainer = null;
         var newContainer = null;
@@ -399,7 +398,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _findBlocks() {
-            _showHideAuxMenu(false);
+            // _showHideAuxMenu(false);
             var leftpos = Math.floor(canvas.width / 4);
             var toppos = 90;
             blocks.activeBlock = null;
@@ -491,22 +490,12 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function setHomeContainers(zero, one) {
-            if (utilityContainer === null) {
-                return;
-            }
-
-            if (saveHTMLContainer === null) {
-                return;
-            }
-
             if (homeButtonContainers[0] === null) {
                 return;
             }
 
-            if (utilityContainer.visible || !saveHTMLContainer.visible) {
-                homeButtonContainers[0].visible = zero;
-                homeButtonContainers[1].visible = one;
-            }
+            homeButtonContainers[0].visible = zero;
+            homeButtonContainers[1].visible = one;
         };
 
         function _printBlockSVG() {
@@ -920,9 +909,9 @@ define(MYDEFINES, function (compatibility) {
             languageBox.hide();
         };
 
-        function setScroller(state) {
+        function setScroller() {
             blocks.activeBlock = null;
-            scrollBlockContainer = state;
+            scrollBlockContainer = !scrollBlockContainer;
             setScrollerButton();
         };
 
@@ -961,18 +950,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doAnalytics() {
-            beginnerModeContainer.visible = false;
-            advancedModeContainer.visible = false;
-            languageContainer.visible = false;
-            smallerContainer.visible = false;
-            largerContainer.visible = false;
-            smallerOffContainer.visible = false;
-            largerOffContainer.visible = false;
-            pluginsContainer.visible = false;
-            deletePluginContainer.visible = false;
-            statsContainer.visible = false;
-            scrollOnContainer.visible = false;
-            scrollOffContainer.visible = false;
+            // pluginsContainer.visible = false;
+            // deletePluginContainer.visible = false;
+            // statsContainer.visible = false;
+            // scrollOnContainer.visible = false;
+            // scrollOffContainer.visible = false;
             deltaY(-55 - LEADING);
             _showHideAuxMenu(false);
 
@@ -2895,7 +2877,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // If any menus were open, close them.
-            if (confirmContainer !== null && utilityContainer.visible) {
+            if (confirmContainer !== null && languageContainer.visible) {
                 if (headerContainer.y > 0) {
                     console.log('Closing menus before resize.');
                     _showHideAuxMenu(true);
@@ -3109,12 +3091,19 @@ define(MYDEFINES, function (compatibility) {
             if (confirmContainer.visible) {
                 confirmContainer.visible = false;
                 restoreContainer.y = 82.5 + LEADING;
-                utilityContainer.y = 82.5 + LEADING;
+
                 openMergeContainer.y = 82.5 + LEADING;
-                hideBlocksContainer.y = 82.5 + LEADING;
-                collapseBlocksContainer.y = 82.5 + LEADING;
-                homeButtonContainers[0].y = 82.5 + LEADING;
-                homeButtonContainers[1].y = 82.5 + LEADING;
+                beginnerModeContainer.y = 82.5 + LEADING;
+                advancedModeContainer.y = 82.5 + LEADING;
+                languageContainer.y = 82.5 + LEADING;
+                if (!beginnerMode) {
+                    pluginsContainer = 82.5 + LEADING;
+                    deletePluginContainer = 82.5 + LEADING;
+                    statsContainer = 82.5 + LEADING;
+                    scrollOnContainer = 82.5 + LEADING;
+                    scrollOffContainer = 82.5 + LEADING;
+                }
+
                 deltaY(-55 - LEADING);
             } else if (uploadContainer.visible) {
                 saveHTMLContainer.visible = false;
@@ -3128,47 +3117,24 @@ define(MYDEFINES, function (compatibility) {
                     saveABCContainer.visible = false;
                 }
 
-                utilityContainer.y = 82.5 + LEADING;
                 openMergeContainer.y = 82.5 + LEADING;
+                beginnerModeContainer.y = 82.5 + LEADING;
+                advancedModeContainer.y = 82.5 + LEADING;
+                languageContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
-                hideBlocksContainer.y = 82.5 + LEADING;
-                collapseBlocksContainer.y = 82.5 + LEADING;
-                homeButtonContainers[0].y = 82.5 + LEADING;
-                homeButtonContainers[1].y = 82.5 + LEADING;
-                deltaY(-55 - LEADING);
-            } else if (languageContainer.visible) {
-                beginnerModeContainer.visible = false;
-                advancedModeContainer.visible = false;
-                languageContainer.visible = false;
-                smallerContainer.visible = false;
-                largerContainer.visible = false;
-                smallerOffContainer.visible = false;
-                largerOffContainer.visible = false;
-                pluginsContainer.visible = false;
-                deletePluginContainer.visible = false;
-                statsContainer.visible = false;
-                scrollOnContainer.visible = false;
-                scrollOffContainer.visible = false;
-                hideBlocksContainer.visible = false;
-                collapseBlocksContainer.visible = false;
-                homeButtonContainers[0].visible = false;
-                homeButtonContainers[1].visible = false;
-
-                restoreContainer.y = 82.5 + LEADING;
-                hideBlocksContainer.y = 82.5 + LEADING;
-                collapseBlocksContainer.y = 82.5 + LEADING;
-                utilityContainer.y = 82.5 + LEADING;
-                openMergeContainer.y = 82.5 + LEADING;
-                homeButtonContainers[0].y = 82.5 + LEADING;
-                homeButtonContainers[1].y = 82.5 + LEADING;
+                if (!beginnerMode) {
+                    pluginsContainer = 82.5 + LEADING;
+                    deletePluginContainer = 82.5 + LEADING;
+                    statsContainer = 82.5 + LEADING;
+                    scrollOnContainer = 82.5 + LEADING;
+                    scrollOffContainer = 82.5 + LEADING;
+                }
                 deltaY(-55 - LEADING);
             }
         };
 
         function _deleteBlocksBox() {
             // if save or settings is open, close them.
-            homeButtonContainers[0].visible = false;
-            homeButtonContainers[1].visible = false;
             if (!confirmContainer.visible) {
                 closeSubMenus();
                 confirmContainer.visible = true;
@@ -3204,106 +3170,7 @@ define(MYDEFINES, function (compatibility) {
             languageBox.show();
             beginnerModeContainer.visible = false;
             advancedModeContainer.visible = false;
-            languageContainer.visible = false;
-            smallerContainer.visible = false;
-            largerContainer.visible = false;
-            smallerOffContainer.visible = false;
-            largerOffContainer.visible = false;
-            pluginsContainer.visible = false;
-            deletePluginContainer.visible = false;
-            statsContainer.visible = false;
-            scrollOnContainer.visible = false;
-            scrollOffContainer.visible = false;
             deltaY(-55 - LEADING);
-        };
-
-        function _doUtilityBox() {
-            if (!languageContainer.visible) {        
-                closeSubMenus();
-                languageContainer.visible = true;
-                smallerContainer.visible = true;
-                largerContainer.visible = true;
-                if (beginnerMode) {
-                    beginnerModeContainer.visible = true;
-                    pluginsContainer.visible = false;
-                    deletePluginContainer.visible = false;
-                    statsContainer.visible = false;
-                    scrollOnContainer.visible = false;
-                    scrollOffContainer.visible = false;
-
-                    var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * 55 / 2;
-                    beginnerModeContainer.x = x;
-                    advancedModeContainer.x = x;
-                    x += 55;
-                    languageContainer.x = x;
-                    x += 55;
-                    smallerContainer.x = x;
-                    smallerOffContainer.x = x;
-                    x += 55;
-                    largerContainer.x = x;
-                    largerOffContainer.x = x;
-                } else {
-                    advancedModeContainer.visible = true;
-                    pluginsContainer.visible = true;
-                    deletePluginContainer.visible = true;
-                    statsContainer.visible = true;
-                    setScrollerButton();
-
-                    var x = Math.floor(canvas.width / turtleBlocksScale) - 19 * 55 / 2;
-                    beginnerModeContainer.x = x;
-                    advancedModeContainer.x = x;
-                    x += 55;
-                    languageContainer.x = x;
-                    x += 55;
-                    smallerContainer.x = x;
-                    smallerOffContainer.x = x;
-                    x += 55;
-                    largerContainer.x = x;
-                    largerOffContainer.x = x; 
-                    x += 55;
-                    pluginsContainer.x = x;
-                    x += 55;
-                    deletePluginContainer.x = x;
-                    x += 55;
-                    statsContainer.x = x;
-                    x += 55;
-                    scrollOnContainer.x = x;
-                    scrollOffContainer.x = x;
-                }
-
-                setSmallerLargerStatus();
-
-                beginnerModeContainer.y = 27.5;
-                advancedModeContainer.y = 27.5;
-                languageContainer.y = 27.5;
-                smallerContainer.y = 27.5;
-                largerContainer.y = 27.5;
-                smallerOffContainer.y = 27.5;
-                largerOffContainer.y = 27.5;
-                pluginsContainer.y = 27.5;
-                deletePluginContainer.y = 27.5;
-                statsContainer.y = 27.5;
-                scrollOnContainer.y = 27.5;
-                scrollOffContainer.y = 27.5;
-                deltaY(55 + LEADING);
-            } else {
-                // Hide everything
-                beginnerModeContainer.visible = false;
-                advancedModeContainer.visible = false;
-                languageContainer.visible = false;
-                smallerContainer.visible = false;
-                largerContainer.visible = false;
-                smallerOffContainer.visible = false;
-                largerOffContainer.visible = false;
-                pluginsContainer.visible = false;
-                deletePluginContainer.visible = false;
-                statsContainer.visible = false;
-                scrollOnContainer.visible = false;
-                scrollOffContainer.visible = false;
-                // Move it down since we are about to move it up.
-                utilityContainer.y = 82.5 + LEADING;
-                deltaY(-55 - LEADING);
-            }
         };
 
         function _doPlaybackBox() {
@@ -3453,9 +3320,6 @@ define(MYDEFINES, function (compatibility) {
                 closeSubMenus();
                 save.saveHTML(_('My Project'));
             } else {
-                homeButtonContainers[0].visible = false;
-                homeButtonContainers[1].visible = false;
-
                 if (!saveHTMLContainer.visible) {
                     closeSubMenus();
                     saveHTMLContainer.visible = true;
@@ -4275,6 +4139,7 @@ handleComplete);
             onscreenButtons.push(helpContainer);
 
             _setupAuxMenu(turtleBlocksScale);
+            _setupPaletteMenu(turtleBlocksScale);
             _setupSubMenus(turtleBlocksScale);
         };
 
@@ -4356,59 +4221,11 @@ handleComplete);
             saveArtworkContainer.visible = false;
             __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
 
-            // Settings Box Buttons: Mode, Language, Smaller, Larger
+            // Settings Box Buttons: Mode, Language
             // Force left-aligned labels
             var x = 27.5;
-            beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, cellsize, 0);
-            beginnerModeContainer.visible = false;
-            __addEventHandlers(beginnerModeContainer, doSwitchMode);
-
-            advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, cellsize, 0);
-            
-            advancedModeContainer.visible = false;
-            __addEventHandlers(advancedModeContainer, doSwitchMode);
-
-            // Force center-aligned labels
-            var x = 82.5 + LEADING;
-            languageContainer = _makeButton(LANGUAGEBUTTON, _('Select language'), x, y, cellsize, 0);
-            languageContainer.visible = false;
-            __addEventHandlers(languageContainer, doLanguageBox);
-
-            smallerContainer = _makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, cellsize, 0);
-            smallerContainer.visible = false;
-            __addEventHandlers(smallerContainer, doSmallerBlocks);
-
-            largerContainer = _makeButton(BIGGERBUTTON, _('Increase block size'), x, y, cellsize, 0);
-            largerContainer.visible = false;
-            __addEventHandlers(largerContainer, doLargerBlocks);
-
-            smallerOffContainer = _makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, cellsize, 0);
-            smallerOffContainer.visible = false;
-
-            largerOffContainer = _makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, cellsize, 0);
-            largerOffContainer.visible = false;
 
             // ALways create these buttons (but not use them in beginner mode)
-            statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, cellsize, 0);
-            statsContainer.visible = false;
-            __addEventHandlers(statsContainer, doAnalytics);
-
-            pluginsContainer = _makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, cellsize, 0);
-            pluginsContainer.visible = false;
-            __addEventHandlers(pluginsContainer, doOpenPlugin);
-
-            deletePluginContainer = _makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, cellsize, 0);
-            deletePluginContainer.visible = false;
-            __addEventHandlers(deletePluginContainer, deletePlugin);
-
-            scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, cellsize, 0);
-            scrollOnContainer.visible = false;
-            __addEventHandlers(scrollOnContainer, setScroller, true);
-
-            scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, cellsize, 0);
-            scrollOffContainer.visible = false;
-            __addEventHandlers(scrollOffContainer, setScroller, false);
-
             // Clear Box Confirm Button
             confirmContainer = _makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
             confirmContainer.visible = false;
@@ -4426,17 +4243,56 @@ handleComplete);
 
             onscreenMenu = [];
 
+
             var btnSize = cellSize;
-            var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
+            var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
             menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
-            var x = Math.floor(canvas.width / turtleBlocksScale) - 15 * btnSize / 2;
+            var dx = btnSize;
+
+            if (beginnerMode) {
+                var x = Math.floor(canvas.width / turtleBlocksScale) - 15 * btnSize / 2;
+
+            } else {
+                var x = Math.floor(canvas.width / turtleBlocksScale) - 21 * btnSize / 2;
+
+                statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
+                _loadButtonDragHandler(statsContainer, x, y, doAnalytics, null, null, null, null);
+                onscreenMenu.push(statsContainer);
+                statsContainer.visible = false;
+
+                x += dx;
+
+                pluginsContainer = _makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, btnSize, 0);
+                _loadButtonDragHandler(pluginsContainer, x, y, doOpenPlugin, null, null, null, null);
+                onscreenMenu.push(pluginsContainer);
+                pluginsContainer.visible = false;
+
+                x += dx;
+
+                deletePluginContainer = _makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, btnSize, 0);
+                _loadButtonDragHandler(deletePluginContainer, x, y, deletePlugin, null, null, null, null);
+                onscreenMenu.push(deletePluginContainer);
+                deletePluginContainer.visible = false;
+
+                x += dx;
+
+                scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
+                _loadButtonDragHandler(scrollOnContainer, x, y, setScroller, null, null, null, null);
+                onscreenMenu.push(scrollOnContainer);
+                scrollOnContainer.visible = false;
+
+                scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
+                _loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
+                onscreenMenu.push(scrollOffContainer);
+                scrollOffContainer.visible = false;
+            }
+
             // var x = Math.floor(-btnSize / 2);
             var y = Math.floor(btnSize / 2);
-            var dx = btnSize;
 
             x += dx;
 
@@ -4454,44 +4310,70 @@ handleComplete);
 
             x += dx;
 
+            beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
+            _loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
+            beginnerModeContainer.visible = false;
+            onscreenMenu.push(beginnerModeContainer);
+
+            advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
+            _loadButtonDragHandler(advancedModeContainer, x, y, doSwitchMode, null, null, null, null);            
+            onscreenMenu.push(advancedModeContainer);
+            advancedModeContainer.visible = false;
+
+            // Force center-aligned labels
+            x += dx;
+            languageContainer = _makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
+            _loadButtonDragHandler(languageContainer, x, y, doLanguageBox, null, null, null, null);
+            languageContainer.visible = false;
+            onscreenMenu.push(languageContainer);
+
+            // Always start with menuButton off.
+            menuButtonsVisible = false;
+        };
+
+        function _setupPaletteMenu(turtleBlocksScale) {
+            var btnSize = cellSize;
+            var x = 27.5 + 6;
+            var y = headerContainer.y + 82.5 + 6;
+            var dx = btnSize;
+
+            homeButtonContainers = [];
+            homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
+            _loadButtonDragHandler(homeButtonContainers[0], x, y, _findBlocks, null, null, null, null);
+
+            homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
+            _loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
+            homeButtonContainers[1].visible = false;
+
+            homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
+            homeButtonContainers[1].y = headerContainer.y + 82.5 + 6;
+            boundary.hide();
+
+            x += dx;
+
             hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
             _loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility, null, null, null, null);
-            onscreenMenu.push(hideBlocksContainer);
-            hideBlocksContainer.visible = false;
 
             x += dx;
 
             collapseBlocksContainer = _makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
             _loadButtonDragHandler(collapseBlocksContainer, x, y, _toggleCollapsibleStacks, null, null, null, null);
-            onscreenMenu.push(collapseBlocksContainer);
-            collapseBlocksContainer.visible = false;
 
             x += dx;
 
-            homeButtonContainers = [];
-            homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
-            _loadButtonDragHandler(homeButtonContainers[0], x, y, _findBlocks, null, null, null, null);
-            onscreenMenu.push(homeButtonContainers[0]);
-            homeButtonContainers[0].visible = false;
-            homeButtonContainers[0].y = -3 * btnSize / 2;
+            smallerContainer = _makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, btnSize, 0);
+            _loadButtonDragHandler(smallerContainer, x, y, doSmallerBlocks, null, null, null, null);
 
-            homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
-            _loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
-            onscreenMenu.push(homeButtonContainers[1]);
-            homeButtonContainers[1].visible = false;
-            homeButtonContainers[1].y = -3 * btnSize / 2;
-
-            boundary.hide();
+            smallerOffContainer = _makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, btnSize, 0);
+            smallerOffContainer.visible = false;
 
             x += dx;
 
-            utilityContainer = _makeButton(UTILITYBUTTON, _('Settings'), x, y, btnSize, 0);
-            _loadButtonDragHandler(utilityContainer, x, y, _doUtilityBox, null, null, null, null);
-            onscreenMenu.push(utilityContainer);
-            utilityContainer.visible = false;
+            largerContainer = _makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
+            _loadButtonDragHandler(largerContainer, x, y, doLargerBlocks, null, null, null, null);
 
-            // Always start with menuButton off.
-            menuButtonsVisible = false;
+            largerOffContainer = _makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, btnSize, 0);
+            largerOffContainer.visible = false;
         };
 
         function doPopdownPalette() {
@@ -4554,6 +4436,13 @@ handleComplete);
                         onscreenMenu[button].visible = true;
                     }
 
+                    if (beginnerMode) {
+                        advancedModeContainer.visible = false;
+                    } else {
+                        beginnerModeContainer.visible = true;
+                        setScrollerButton()
+                    }
+
                     _showHideAuxMenu(false);
                 }
                 update = true;
@@ -4570,6 +4459,15 @@ handleComplete);
 
             for (var button in onscreenMenu) {
                 onscreenMenu[button].visible = buttonsVisible;
+            }
+
+            if (buttonsVisible) {
+                if (beginnerMode) {
+                    advancedModeContainer.visible = false;
+                } else {
+                    beginnerModeContainer.visible = true;
+                    setScrollerButton()
+                }
             }
 
             update = true;
@@ -4851,6 +4749,12 @@ handleComplete);
             }
 
             logoContainer.y += dy;
+            homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
+            homeButtonContainers[1].y = homeButtonContainers[0].y;
+            hideBlocksContainer.y = homeButtonContainers[0].y;
+            collapseBlocksContainer.y = homeButtonContainers[0].y;
+            smallerContainer.y = homeButtonContainers[0].y;
+            largerContainer.y = homeButtonContainers[0].y;
 
             for (var i = 0; i < onscreenMenu.length; i++) {
                 onscreenMenu[i].y += dy;
@@ -4889,6 +4793,21 @@ handleComplete);
                     onscreenMenu[i].visible = true;
                 }
 
+                if (beginnerMode) {
+                    advancedModeContainer.visible = false;
+                } else {
+                    beginnerModeContainer.visible = true;
+                    setScrollerButton()
+                }
+
+                // These buttons are smaller, hence + 6
+                homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
+                homeButtonContainers[1].y = homeButtonContainers[0].y;
+                hideBlocksContainer.y = homeButtonContainers[0].y;
+                collapseBlocksContainer.y = homeButtonContainers[0].y;
+                smallerContainer.y = homeButtonContainers[0].y;
+                largerContainer.y = homeButtonContainers[0].y;
+
                 palettes.deltaY(dy);
                 turtles.deltaY(dy);
 
@@ -4914,6 +4833,13 @@ handleComplete);
                     onscreenMenu[i].visible = false;
                 }
 
+                homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
+                homeButtonContainers[1].y = homeButtonContainers[0].y;
+                hideBlocksContainer.y = homeButtonContainers[0].y;
+                collapseBlocksContainer.y = homeButtonContainers[0].y;
+                smallerContainer.y = homeButtonContainers[0].y;
+                largerContainer.y = homeButtonContainers[0].y;
+
                 palettes.deltaY(-dy);
                 turtles.deltaY(-dy);
 
@@ -4927,18 +4853,6 @@ handleComplete);
             }
 
             confirmContainer.visible = false;
-            beginnerModeContainer.visible = false;
-            advancedModeContainer.visible = false;
-            languageContainer.visible = false;
-            smallerContainer.visible = false;
-            largerContainer.visible = false;
-            smallerOffContainer.visible = false;
-            largerOffContainer.visible = false;
-            statsContainer.visible = false;
-            pluginsContainer.visible = false;
-            deletePluginContainer.visible = false;
-            scrollOnContainer.visible = false;
-            scrollOffContainer.visible = false;
             saveHTMLContainer.visible = false;
             uploadContainer.visible = false;
             saveSVGContainer.visible = false;

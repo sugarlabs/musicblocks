@@ -1620,7 +1620,8 @@ function Blocks () {
             if (this.blockList[blk].connections[0] == null) {
                 if (this.blockList[blk].offScreen(this.boundary)) {
                     this._setHomeButtonContainers(true, false);
-                    this.boundary.show();
+		    // Just highlight the button.
+                    // this.boundary.show();
                     onScreen = false;
                     break;
                 }
