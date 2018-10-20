@@ -1279,9 +1279,6 @@ define(MYDEFINES, function (compatibility) {
 
             blocks.setLogo(logo);
 
-            // Set the default background color...
-            logo.setBackgroundColor(-1);
-
             pasteBox = new PasteBox();
             pasteBox
                 .setCanvas(canvas)
