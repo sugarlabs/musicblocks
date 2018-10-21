@@ -1099,12 +1099,12 @@ function Turtle (name, turtles, drum) {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
-            //
+
             this.container.visible = true;
             this.turtles.refreshCanvas();
             this.blinkFinished = true;
-            return;
-            //
+
+            /*
             this.bitmap.alpha = 1.0;
             this.bitmap.scaleX = this._sizeInUse;
             this.bitmap.scaleY = this.bitmap.scaleX;
@@ -1116,6 +1116,7 @@ function Turtle (name, turtles, drum) {
             this.container.visible = true;
             this.turtles.refreshCanvas();
             this.blinkFinished = true;
+            */
         }
     };
 
@@ -1138,8 +1139,7 @@ function Turtle (name, turtles, drum) {
         }, 100);
         this.turtles.refreshCanvas();
 
-        return;
-        //
+        /*
 
         if (this.beforeBlinkSize == null) {
             this.beforeBlinkSize = that.bitmap.scaleX;
@@ -1177,7 +1177,7 @@ function Turtle (name, turtles, drum) {
             that.blinkFinished = true;
             that.turtles.refreshCanvas();
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
-
+        */
     };
 };
 
