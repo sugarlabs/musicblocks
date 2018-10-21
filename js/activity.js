@@ -4074,6 +4074,10 @@ handleComplete);
             var y = Math.floor(btnSize / 2);
             var dx = btnSize;
 
+	    // Add the palette buttons here so that the hover tooltips
+	    // for the other buttons do not get occluded.
+            _setupPaletteMenu(turtleBlocksScale);
+
             runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
             _loadButtonDragHandler(runContainer, x, y, _doFastButton, _openAuxMenu, null, null, null);
             onscreenButtons.push(runContainer);
@@ -4138,7 +4142,6 @@ handleComplete);
             onscreenButtons.push(helpContainer);
 
             _setupAuxMenu(turtleBlocksScale);
-            _setupPaletteMenu(turtleBlocksScale);
             _setupSubMenus(turtleBlocksScale);
         };
 
