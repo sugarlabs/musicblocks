@@ -162,7 +162,7 @@ msgstr "estatus"
 
 #: js/block.js:935
 msgid "drum mapper"
-msgstr ""
+msgstr "mapa del tambor"
 
 #: js/block.js:938
 msgid "ruler"
@@ -289,11 +289,11 @@ msgstr "si la sol fa mi re do"
 #: js/block.js:1482
 #.TRANS: scalar step
 msgid "down"
-msgstr ""
+msgstr "abajo"
 
 #: js/block.js:1484
 msgid "up"
-msgstr ""
+msgstr "arriba"
 
 #: js/block.js:1490
 #: js/turtledefs.js:23
@@ -525,7 +525,7 @@ msgstr "Cargar proyecto de archivo"
 
 #: js/activity.js:4118
 msgid "Save Project"
-msgstr ""
+msgstr "Guardar proyecto"
 
 #: js/activity.js:4125
 #: js/turtledefs.js:133
@@ -534,7 +534,7 @@ msgstr "Encuentra y comparte proyectos"
 
 #: js/activity.js:4132
 msgid "Offline. Sharing is unavailable"
-msgstr ""
+msgstr "Desconectado. Compartir no está disponible."
 
 #: js/activity.js:4140
 #: js/activity.js:4944
@@ -648,7 +648,7 @@ msgstr "Casa"
 
 #: js/activity.js:4368
 msgid "Show/hide block"
-msgstr ""
+msgstr "Mostrar/ocultar bloques"
 
 #: js/activity.js:4373
 msgid "Expand/collapse blocks"
@@ -1182,7 +1182,7 @@ msgstr "iniciar tambor"
 #: js/turtle.js:1363
 #: js/turtle.foo.js:1359
 msgid "Expand"
-msgstr ""
+msgstr "Expandir"
 
 #: js/turtle.js:1471
 #: js/turtledefs.js:149
@@ -1236,7 +1236,7 @@ msgstr "tono"
 
 #: js/turtledefs.js:23
 msgid "ornament"
-msgstr ""
+msgstr "ornamento"
 
 #: js/turtledefs.js:23
 #: js/basicblocks.js:5334
@@ -1293,7 +1293,7 @@ msgstr "pila"
 
 #: js/turtledefs.js:23
 msgid "ensemble"
-msgstr ""
+msgstr "conjunto"
 
 #: js/turtledefs.js:23
 msgid "extras"
@@ -1309,7 +1309,7 @@ msgstr "lógica"
 
 #: js/turtledefs.js:33
 msgid "artwork"
-msgstr ""
+msgstr "arte"
 
 #: js/turtledefs.js:125
 #: js/turtledefs.js:156
@@ -1399,7 +1399,7 @@ msgstr "Expandir/colapsar la barra de opciones."
 
 #: js/turtledefs.js:134
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr ""
+msgstr "Haga clic en este botón para expandir o contraer la barra de herramientas auxiliar."
 
 #: js/turtledefs.js:135
 #: js/turtledefs.js:170
@@ -1433,7 +1433,7 @@ msgstr "Ocultar o mostrar los bloques y las paletas."
 
 #: js/turtledefs.js:139
 msgid "Expand/collapse collapsable blocks"
-msgstr ""
+msgstr "Expandir/contraer los bloques"
 
 #: js/turtledefs.js:139
 #: js/turtledefs.js:174
@@ -1567,7 +1567,7 @@ msgstr "Ejecutar nota a nota"
 #: js/turtledefs.js:169
 #: js/turtledefs.js:176
 msgid "Click this button to expand or collapse the auxiliary toolbar."
-msgstr ""
+msgstr "Haga clic en este botón para expandir o contraer la barra de herramientas auxiliar."
 
 #: js/turtledefs.js:174
 msgid "Expand/collapse collapsible blocks"
@@ -1591,7 +1591,7 @@ msgstr "Guarde el proyecto como un archivo de LilyPond."
 
 #: js/turtledefs.js:182
 msgid "To copy a stack to the clipboard, right-click on the stack."
-msgstr ""
+msgstr "Para copiar una pila en el portapapeles, haga clic derecho en la pila."
 
 #: js/turtledefs.js:182
 msgid "You can also use Alt+C to copy a stack of blocks."
@@ -5428,15 +5428,15 @@ msgstr "Planeta"
 
 #: js/StringHelper.js:17
 msgid "Close Planet"
-msgstr ""
+msgstr "Cerrar Planeta"
 
 #: js/StringHelper.js:18
 msgid "Open project from file"
-msgstr ""
+msgstr "Abrir proyecto desde archivo"
 
 #: js/StringHelper.js:19
 msgid "New project"
-msgstr ""
+msgstr "Nuevo proyecto"
 
 #: js/StringHelper.js:20
 msgid "Local"
@@ -5448,11 +5448,11 @@ msgstr ""
 
 #: js/StringHelper.js:22
 msgid "Search for a project"
-msgstr ""
+msgstr "Buscar un proyecto"
 
 #: js/StringHelper.js:23
 msgid "My Projects"
-msgstr ""
+msgstr "Mis proyectos"
 
 #: js/StringHelper.js:24
 #: js/Publisher.js:125
@@ -5466,25 +5466,25 @@ msgstr ""
 #: js/StringHelper.js:27
 #: js/StringHelper.js:47
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: js/StringHelper.js:28
 #: js/StringHelper.js:52
 msgid "Submit"
-msgstr ""
+msgstr "Presentar"
 
 #: js/StringHelper.js:29
 #: js/StringHelper.js:33
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: js/StringHelper.js:30
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr ""
+msgstr "Borrar \\"<span id=\\"deleter-title\\"></span>\\"?"
 
 #: js/StringHelper.js:31
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr ""
+msgstr "Eliminar permanentemente el proyecto \\"<span id=\\"deleter-name\\"></span>\\"?"
 
 #: js/StringHelper.js:32
 msgid "Delete"
@@ -5492,23 +5492,23 @@ msgstr "Borrar"
 
 #: js/StringHelper.js:34
 msgid "Explore Projects"
-msgstr ""
+msgstr "Explorar proyectos"
 
 #: js/StringHelper.js:35
 msgid "View More"
-msgstr ""
+msgstr "Ver más"
 
 #: js/StringHelper.js:36
 msgid "Most recent"
-msgstr ""
+msgstr "Más reciente"
 
 #: js/StringHelper.js:37
 msgid "Most liked"
-msgstr ""
+msgstr "Más gustado"
 
 #: js/StringHelper.js:38
 msgid "Most downloaded"
-msgstr ""
+msgstr "Más descargados"
 
 #: js/StringHelper.js:39
 msgid "A-Z"
@@ -5516,27 +5516,27 @@ msgstr ""
 
 #: js/StringHelper.js:40
 msgid "Sort by"
-msgstr ""
+msgstr "Ordenar por"
 
 #: js/StringHelper.js:41
 msgid "Load More Projects"
-msgstr ""
+msgstr "Cargar más proyectos"
 
 #: js/StringHelper.js:42
 msgid "Last Updated"
-msgstr ""
+msgstr "Última actualización"
 
 #: js/StringHelper.js:43
 msgid "Creation Date"
-msgstr ""
+msgstr "Fecha de creación"
 
 #: js/StringHelper.js:44
 msgid "Number of Downloads:"
-msgstr ""
+msgstr "Numero de descargas:"
 
 #: js/StringHelper.js:45
 msgid "Number of Likes:"
-msgstr ""
+msgstr "Número de me gusta:"
 
 #: js/StringHelper.js:46
 msgid "Tags:"
@@ -5547,23 +5547,23 @@ msgstr ""
 #: js/StringHelper.js:53
 #: js/ProjectViewer.js:18
 msgid "Report Project"
-msgstr ""
+msgstr "Informe de proyecto"
 
 #: js/StringHelper.js:50
 msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr ""
+msgstr "Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">el código de conducta de Sugar Labs</a>."
 
 #: js/StringHelper.js:51
 msgid "Reason for reporting project"
-msgstr ""
+msgstr "Razón para informar el proyecto"
 
 #: js/StringHelper.js:55
 msgid "Download as File"
-msgstr ""
+msgstr "Descargar como archivo"
 
 #: js/StringHelper.js:56
 msgid "Open in Music Blocks"
-msgstr ""
+msgstr "Abrir en bloques de música"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
