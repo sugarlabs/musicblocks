@@ -2324,6 +2324,11 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < VOICENAMES.length; i++) {
+                // Skip custom voice in Beginner Mode.
+                if (beginnerMode && VOICENAMES[i][1] === 'custom') {
+                    continue;
+                }
+
                 var label = _(VOICENAMES[i][1]);
                 if (getTextWidth(label, 'bold 48pt Sans') > 400) {
                     voiceLabels.push(label.substr(0, 8) + '...');

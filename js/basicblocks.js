@@ -550,7 +550,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('hertz'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
-    newblock.defaults.push(392);
+    var language = localStorage.languagePreference;
+    if (language === 'ja') {
+        newblock.defaults.push(440);
+    } else {
+        newblock.defaults.push(392);
+    }
+
     if (beginnerMode && !beginnerBlock('hertz')) {
         newblock.hidden = true;
     }
@@ -706,203 +712,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[3] = 'numberin';
     newblock.hidden = true;
 
-    // macro
-    var newblock = new ProtoBlock('sixtyfourthNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['sixtyfourthNote'] = newblock;
-    newblock.staticLabels.push(_('1/64 note') + ' 𝅘𝅥𝅱');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('sixtyfourthNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('thirtysecondNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['thirtysecondNote'] = newblock;
-    newblock.staticLabels.push(_('1/32 note') + ' 𝅘𝅥𝅰');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('thirtysecondNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('sixteenthNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['sixteenthNote'] = newblock;
-    newblock.staticLabels.push(_('1/16 note') + ' 𝅘𝅥𝅯');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('sixteenthNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('eighthNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['eighthNote'] = newblock;
-    newblock.staticLabels.push(_('eighth note') + ' ♪');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('eighthNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('quarterNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['quarterNote'] = newblock;
-    newblock.staticLabels.push(_('quarter note') + ' ♩');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('quarterNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('halfNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['halfNote'] = newblock;
-    newblock.staticLabels.push(_('half note') + ' 𝅗𝅥');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('halfNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('wholeNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['wholeNote'] = newblock;
-    newblock.staticLabels.push(_('whole note') + ' 𝅝');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('wholeNote')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('tuplet2');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['tuplet2'] = newblock;
-    //.TRANS: A tuplet is a note value divided into irregular time values.
-    newblock.staticLabels.push(_('tuplet'));
-    newblock.staticLabels.push(_('number of notes'));
-    newblock.staticLabels.push(_('note value'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.defaults.push(1);
-    newblock.defaults.push(4);
-    newblock.hidden = true;
-
-    // macro
-    var tuplet3Block = new ProtoBlock('tuplet3');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['tuplet3'] = tuplet3Block;
-    newblock.staticLabels.push(_('tuplet'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.defaults.push(1);
-    newblock.defaults.push(4);
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('tuplet4');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['tuplet4'] = newblock;
-    newblock.staticLabels.push(_('tuplet'));
-    newblock.staticLabels.push(_('note value'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1 / 4);
-    if (beginnerMode && !beginnerBlock('tuplet4')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet7');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet7'] = newblock;
-    //.TRANS: A tuplet divided into 7 time values.
-    newblock.staticLabels.push(_('septuplet'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stuplet7')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet5');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet5'] = newblock;
-    //.TRANS: A tuplet divided into 5 time values.
-    newblock.staticLabels.push(_('quintuplet'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stuplet5')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet3');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet3'] = newblock;
-    //.TRANS: A tuplet divided into 3 time values.
-    newblock.staticLabels.push(_('triplet'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stuplet3')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet'] = newblock;
-    newblock.staticLabels.push(_('simple tuplet'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.adjustWidthToLabel();
-    newblock.twoArgBlock();
-    newblock.defaults.push(3);
-    newblock.defaults.push(1 / 2);
-    if (beginnerMode && !beginnerBlock('stuplet')) {
-        newblock.hidden = true;
-    }
-
-    // deprecated
-    var newblock = new ProtoBlock('rhythm');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['rhythm'] = newblock;
-    //.TRANS: an arrangement of notes based on duration
-    newblock.staticLabels.push(_('rhythm'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(3);
-    newblock.defaults.push(4);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'anyin';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('rhythm2');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['rhythm2'] = newblock;
-    //.TRANS: an arrangement of notes based on duration
-    newblock.staticLabels.push(_('rhythm'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(3);
-    newblock.defaults.push(4);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'anyin';
-    if (beginnerMode && !beginnerBlock('rhythm2')) {
-        newblock.hidden = true;
-    }
-
     var newblock = new ProtoBlock('temperament');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['temperament'] = newblock;
@@ -984,7 +793,36 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // macro
+
+    var language = localStorage.languagePreference;
+    if (language === 'ja') {
+        // macro
+        var newblock = new ProtoBlock('musickeyboardja');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['musickeyboardja'] = newblock;
+        //.TRANS: widget to generate pitches using a slider
+        newblock.staticLabels.push(_('music keyboard'));
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+        if (beginnerMode && !beginnerBlock('musickeyboard')) {
+            newblock.hidden = true;
+        }
+    } else {
+        // macro
+        var newblock = new ProtoBlock('musickeyboard2');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['musickeyboard2'] = newblock;
+        //.TRANS: widget to generate pitches using a slider
+        newblock.staticLabels.push(_('music keyboard'));
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+        if (beginnerMode && !beginnerBlock('musickeyboard')) {
+            newblock.hidden = true;
+        }
+    }
+
     var newblock = new ProtoBlock('musickeyboard');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['musickeyboard'] = newblock;
@@ -993,9 +831,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('musickeyboard')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('pitchstaircase');
     newblock.palette = palettes.dict['widgets'];
@@ -1085,6 +921,203 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // RHYTHM PALETTE
+
+    // macro
+    var newblock = new ProtoBlock('sixtyfourthNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['sixtyfourthNote'] = newblock;
+    newblock.staticLabels.push(_('1/64 note') + ' 𝅘𝅥𝅱');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('sixtyfourthNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('thirtysecondNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['thirtysecondNote'] = newblock;
+    newblock.staticLabels.push(_('1/32 note') + ' 𝅘𝅥𝅰');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('thirtysecondNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('sixteenthNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['sixteenthNote'] = newblock;
+    newblock.staticLabels.push(_('1/16 note') + ' 𝅘𝅥𝅯');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('sixteenthNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('eighthNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['eighthNote'] = newblock;
+    newblock.staticLabels.push(_('eighth note') + ' ♪');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('eighthNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('quarterNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['quarterNote'] = newblock;
+    newblock.staticLabels.push(_('quarter note') + ' ♩');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('quarterNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('halfNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['halfNote'] = newblock;
+    newblock.staticLabels.push(_('half note') + ' 𝅗𝅥');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('halfNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('wholeNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['wholeNote'] = newblock;
+    newblock.staticLabels.push(_('whole note') + ' 𝅝');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('wholeNote')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('tuplet2');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['tuplet2'] = newblock;
+    //.TRANS: A tuplet is a note value divided into irregular time values.
+    newblock.staticLabels.push(_('tuplet'));
+    newblock.staticLabels.push(_('number of notes'));
+    newblock.staticLabels.push(_('note value'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.flowClampTwoArgBlock();
+    newblock.defaults.push(1);
+    newblock.defaults.push(4);
+    newblock.hidden = true;
+
+    // macro
+    var tuplet3Block = new ProtoBlock('tuplet3');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['tuplet3'] = tuplet3Block;
+    newblock.staticLabels.push(_('tuplet'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.flowClampTwoArgBlock();
+    newblock.defaults.push(1);
+    newblock.defaults.push(4);
+    newblock.hidden = true;
+
+    // macro
+    var newblock = new ProtoBlock('tuplet4');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['tuplet4'] = newblock;
+    newblock.staticLabels.push(_('tuplet'));
+    newblock.staticLabels.push(_('note value'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.flowClampOneArgBlock();
+    newblock.defaults.push(1 / 4);
+    if (beginnerMode && !beginnerBlock('tuplet4')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet7');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet7'] = newblock;
+    //.TRANS: A tuplet divided into 7 time values.
+    newblock.staticLabels.push(_('septuplet'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('stuplet7')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet5');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet5'] = newblock;
+    //.TRANS: A tuplet divided into 5 time values.
+    newblock.staticLabels.push(_('quintuplet'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('stuplet5')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet3');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet3'] = newblock;
+    //.TRANS: A tuplet divided into 3 time values.
+    newblock.staticLabels.push(_('triplet'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('stuplet3')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet'] = newblock;
+    newblock.staticLabels.push(_('simple tuplet'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.adjustWidthToLabel();
+    newblock.twoArgBlock();
+    newblock.defaults.push(3);
+    newblock.defaults.push(1 / 2);
+    if (beginnerMode && !beginnerBlock('stuplet')) {
+        newblock.hidden = true;
+    }
+
+    // deprecated
+    var newblock = new ProtoBlock('rhythm');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['rhythm'] = newblock;
+    //.TRANS: an arrangement of notes based on duration
+    newblock.staticLabels.push(_('rhythm'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(3);
+    newblock.defaults.push(4);
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('rhythm2');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['rhythm2'] = newblock;
+    //.TRANS: an arrangement of notes based on duration
+    newblock.staticLabels.push(_('rhythm'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(3);
+    newblock.defaults.push(4);
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
+    if (beginnerMode && !beginnerBlock('rhythm2')) {
+        newblock.hidden = true;
+    }
 
     var newblock = new ProtoBlock('mynotevalue');
     newblock.palette = palettes.dict['rhythm'];
@@ -5306,6 +5339,22 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(50);
     newblock.hidden = true;
 
+    // macro
+    var newblock = new ProtoBlock('setdrumvolume');
+    newblock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['setdrumvolume'] = newblock;
+    //.TRANS: set the loudness level
+    newblock.staticLabels.push(_('set drum volume'), _('drum'), _('volume'));
+    newblock.adjustWidthToLabel();
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'textin';
+    newblock.defaults.push('default');
+    newblock.defaults.push(50);
+    if (beginnerMode && !beginnerBlock('setdrumvolume')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('setsynthvolume');
     newblock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['setsynthvolume'] = newblock;
