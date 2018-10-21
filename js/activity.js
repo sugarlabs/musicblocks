@@ -2464,6 +2464,10 @@ define(MYDEFINES, function (compatibility) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
                         blocks.moveBlock(newBlock, 100 + searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
+			// Race condition with palette hide.
+			setTimeout(function() {
+			    palettes.show();
+			}, 200);
                     });
 
                     // Move the position of the next newly created block.
