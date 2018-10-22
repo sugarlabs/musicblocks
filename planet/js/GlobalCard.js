@@ -36,7 +36,7 @@ function GlobalCard(Planet) {
                                                 <div class="card-content shareurltext"> \
                                                         <div class="shareurltitle">'+_('Share')+'</div> \
                                                         <input id="shareurlselect" type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
-                                                        <a onclick="share(\'{ID}\');"><span id="copiedtoclipboard">Copy URL to clipboard</span></a>\
+                                                        <a class="copyclipboardimg"onclick="share(\'{ID}\');"><img src="images/copytoclipboard.svg"alt="Copy!"></a>\
                                                         <div class="shareurl-advanced" id="global-advanced-{ID}"> \
                                                                 <div class="shareurltitle">'+_('Flags')+'</div> \
                                                                 <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">'+_('Run project on startup.')+'</label></div> \
@@ -178,9 +178,9 @@ function share(id) {
     try {
         const toCopy = "https://musicblocks.sugarlabs.org/index.html?id="+id+"&run=True";
         navigator.clipboard.writeText(toCopy);     
-        alert("Copied!");
         console.log('MB url copied');
       } catch (err) { 
-        console.error('Failed to copy: ', err); 
+        alert("Failed to copy.");
+        console.error('Failed to copy. Error: ', err); 
       }
 }
