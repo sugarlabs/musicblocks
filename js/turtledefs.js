@@ -49,11 +49,11 @@ function beginnerBlock(name) {
            'pitch', 'pitch2', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
            'settimbre', 'newstaccato', 'newslur', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
-           'crescendo', 'decrescendo', 'setsynthvolume',  // volume palette
+           'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
            'playdrum', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
            'action', 'start', 'do', 'dispatch', 'listen',  // action palette
-           'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne',  // boxes palette
+           'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne', 'storein', 'namedbox',  // boxes palette
            'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet', 'musickeyboard', 'tempo', 'modewidget', 'matrixcmajor', 'matrixgmajor', // widgets palette
            'forward', 'back', 'left', 'right', 'setxy', 'arc', 'x', 'y', 'heading', 'scrollxy',  // mouse palette
            'setpensize', 'penup', 'pendown', 'color', 'setcolor', 'setshade',  // pen palette
@@ -235,6 +235,7 @@ function createHelpContent() {
         'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example, if you have 7 notes in sequence contained in a Crescendo block with a value of 5, the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg'],
         'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example, if you have 7 notes in sequence contained in a Decrescendo block with a value of 5, the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg'],
         'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('e.g., guitar, violin, snare drum, etc.') + ' ' + _('The default volume is 50; the range is 0 (silence) to 100 (full volume).'), 'documentation', 'start-block.svg'],
+        'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'status.svg'],
         // Drum palette
         // 'playdrum' is described on the Rhythm palette.
         'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'rhythm-ruler-block.svg'],
@@ -371,7 +372,6 @@ function createHelpContent() {
         'duosynth': [_('The Duo synth block is a duo-frequency modulator used to define a timbre.'), 'documentation', 'status.svg'],
         // Volume palette
         'articulation': [_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', 'status.svg'],
-        'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'status.svg'],
         'notevolumefactor': [_('The Note volume block returns the current volume of the current synthesizer.'), 'documentation', 'status.svg'],
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],

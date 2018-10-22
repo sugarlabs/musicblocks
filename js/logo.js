@@ -1267,10 +1267,7 @@ function Logo () {
             if (['start', 'drum', 'status'].indexOf(this.blocks.blockList[this.blocks.stackList[blk]].name) !== -1) {
                 // Don't start on a start block in the trash.
                 if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
-                    // Don't start on a start block with no connections.
-                    if (this.blocks.blockList[this.blocks.stackList[blk]].connections[1] != null) {
-                        startBlocks.push(this.blocks.stackList[blk]);
-                    }
+                    startBlocks.push(this.blocks.stackList[blk]);
                 }
             } else if (this.blocks.blockList[this.blocks.stackList[blk]].name === 'action') {
                 // Does the action stack have a name?

@@ -1099,12 +1099,12 @@ function Turtle (name, turtles, drum) {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
-            //
+
             this.container.visible = true;
             this.turtles.refreshCanvas();
             this.blinkFinished = true;
-            return;
-            //
+
+            /*
             this.bitmap.alpha = 1.0;
             this.bitmap.scaleX = this._sizeInUse;
             this.bitmap.scaleY = this.bitmap.scaleX;
@@ -1116,6 +1116,7 @@ function Turtle (name, turtles, drum) {
             this.container.visible = true;
             this.turtles.refreshCanvas();
             this.blinkFinished = true;
+            */
         }
     };
 
@@ -1138,8 +1139,7 @@ function Turtle (name, turtles, drum) {
         }, 100);
         this.turtles.refreshCanvas();
 
-        return;
-        //
+        /*
 
         if (this.beforeBlinkSize == null) {
             this.beforeBlinkSize = that.bitmap.scaleX;
@@ -1177,7 +1177,7 @@ function Turtle (name, turtles, drum) {
             that.blinkFinished = true;
             that.turtles.refreshCanvas();
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
-
+        */
     };
 };
 
@@ -1294,6 +1294,23 @@ function Turtles () {
             this._borderContainer.removeChild(this._borderContainer.children[i]);
         }
 
+        // We put the buttons on the stage so they will be on top.
+        if (this._expandButton !== null) {
+            this.stage.removeChild(this._expandButton);
+        }
+
+        if (this._collapseButton !== null) {
+            this.stage.removeChild(this._collapseButton);
+        }
+
+        if (this._clearButton !== null) {
+            this.stage.removeChild(this._clearButton);
+        }
+
+        if (this._gridButton !== null) {
+            this.stage.removeChild(this._gridButton);
+        }
+
         var that = this;
 
         function __makeBoundary() {
@@ -1366,7 +1383,8 @@ function Turtles () {
                 that._expandButton.scaleY = SCALEFACTOR;
                 that._expandButton.scale = SCALEFACTOR;
                 that._expandButton.visible = false;
-                that._borderContainer.addChild(that._expandButton);
+                // that._borderContainer.addChild(that._expandButton);
+                that.stage.addChild(that._expandButton);
 
                 that._expandButton.removeAllEventListeners('mouseover');
                 that._expandButton.on('mouseover', function (event) {
@@ -1467,7 +1485,9 @@ function Turtles () {
                 bitmap.visible = true;
                 that._collapseButton.addChild(that._collapseLabel);
 
-                that._borderContainer.addChild(that._collapseButton);
+                // that._borderContainer.addChild(that._collapseButton);
+                that.stage.addChild(that._collapseButton);
+
                 that._collapseButton.visible = true;
                 that._collapseButton.x = that.w - 55;
                 that._collapseButton.y = 55 + LEADING + 6;
@@ -1539,7 +1559,8 @@ function Turtles () {
                 that._clearButton.y = 55 + LEADING + 6;
                 that._clearButton.visible = true;
 
-                that._borderContainer.addChild(that._clearButton);
+                // that._borderContainer.addChild(that._clearButton);
+                that.stage.addChild(that._clearButton);
                 that.refreshCanvas();
 
                 that._clearButton.removeAllEventListeners('mouseover');
@@ -1611,7 +1632,8 @@ function Turtles () {
                 that._gridButton.y = 55 + LEADING + 6;
                 that._gridButton.visible = true;
 
-                that._borderContainer.addChild(that._gridButton);
+                // that._borderContainer.addChild(that._gridButton);
+                that.stage.addChild(that._gridButton);
                 that.refreshCanvas();
 
                 that._gridButton.removeAllEventListeners('mouseover');
@@ -1753,6 +1775,16 @@ function Turtles () {
         this.stage.addChild(newTurtle.container);
         newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
         newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
+
+        // Ensure that the buttons are on top.
+        this.stage.removeChild(this._expandButton);
+        this.stage.addChild(this._expandButton);
+        this.stage.removeChild(this._collapseButton);
+        this.stage.addChild(this._collapseButton);
+        this.stage.removeChild(this._clearButton);
+        this.stage.addChild(this._clearButton);
+        this.stage.removeChild(this._gridButton);
+        this.stage.addChild(this._gridButton);
 
         var hitArea = new createjs.Shape();
         hitArea.graphics.beginFill('#FFF').drawEllipse(-27, -27, 55, 55);

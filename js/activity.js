@@ -1279,9 +1279,6 @@ define(MYDEFINES, function (compatibility) {
 
             blocks.setLogo(logo);
 
-            // Set the default background color...
-            logo.setBackgroundColor(-1);
-
             pasteBox = new PasteBox();
             pasteBox
                 .setCanvas(canvas)
@@ -2467,6 +2464,10 @@ define(MYDEFINES, function (compatibility) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
                         blocks.moveBlock(newBlock, 100 + searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
+			// Race condition with palette hide.
+			setTimeout(function() {
+			    palettes.show();
+			}, 200);
                     });
 
                     // Move the position of the next newly created block.
@@ -2981,6 +2982,8 @@ define(MYDEFINES, function (compatibility) {
                 artcanvas.width = w;
                 artcanvas.height = h;
             }
+
+            blocks.checkBounds();
         };
 
         window.onresize = function () {
@@ -4075,6 +4078,10 @@ handleComplete);
             var y = Math.floor(btnSize / 2);
             var dx = btnSize;
 
+	    // Add the palette buttons here so that the hover tooltips
+	    // for the other buttons do not get occluded.
+            _setupPaletteMenu(turtleBlocksScale);
+
             runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
             _loadButtonDragHandler(runContainer, x, y, _doFastButton, _openAuxMenu, null, null, null);
             onscreenButtons.push(runContainer);
@@ -4139,7 +4146,6 @@ handleComplete);
             onscreenButtons.push(helpContainer);
 
             _setupAuxMenu(turtleBlocksScale);
-            _setupPaletteMenu(turtleBlocksScale);
             _setupSubMenus(turtleBlocksScale);
         };
 
@@ -4332,6 +4338,18 @@ handleComplete);
         };
 
         function _setupPaletteMenu(turtleBlocksScale) {
+            // Clean up if we've been here before.
+            if (homeButtonContainers.length !== 0) {
+                stage.removeChild(homeButtonContainers[0]);
+                stage.removeChild(homeButtonContainers[1]);
+                stage.removeChild(hideBlocksContainer);
+                stage.removeChild(collapseBlocksContainer);
+                stage.removeChild(smallerContainer);
+                stage.removeChild(smallerOffContainer);
+                stage.removeChild(largerContainer);
+                stage.removeChild(largerOffContainer);
+            }
+
             var btnSize = cellSize;
             var x = 27.5 + 6;
             var y = headerContainer.y + 82.5 + 6;
