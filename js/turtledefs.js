@@ -151,7 +151,7 @@ function createHelpContent() {
             [_('Collapse'), _('Collapse the graphics window.'), 'header-icons/collapse-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('An about page for Music Blocks that details the licensing and acknowledgements due.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/about', _('About Music Blocks')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found at the GitHub repo. It is currently in version 3.0 and is licensed under AGPL.'), 'activity/activity-icon-mouse-color.svg','https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repo')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
         ];
     } else {
@@ -197,7 +197,7 @@ function createHelpContent() {
             [_('Restore'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('An about page for Music Blocks that details the AGPL licenses and acknowledgements due.'), 'activity/activity-icon-mouse-color.svg', 'https://sugarlabs.github.io/musicblocks/about', _('About Music Blocks')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts founded by Walter Bender. It is licensed under the AGPL license. Many students have contributed to Music Blocks through Google Summer of Code and Google Code-In. It is currently in version 3.0.'), 'activity/activity-icon-mouse-color.svg','https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repo') ],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
         ];
     }
