@@ -4027,7 +4027,7 @@ handleComplete);
 
             // Load the logo
             logoContainer = new createjs.Container();
-            var logoText = new createjs.Text(_('Music Blocks'), '14px Sans', '#282828');
+            var logoText = new createjs.Text(_('About Music Blocks'), '14px Sans', '#282828');
             logoText.textAlign = 'center';
             logoText.visible = false;
             var img = new Image();
@@ -4045,6 +4045,7 @@ handleComplete);
 
                 var bg = null;
                 logoContainer.on('mouseover', function (event) {
+                    document.body.style.cursor = "pointer";
                     if (bg === null) {
                         logoText.x = 65;
                         logoText.y = 55;
@@ -4061,11 +4062,15 @@ handleComplete);
                 });
 
                 logoContainer.on('mouseout', function (event) {
+                    document.body.style.cursor = "default";
                     logoText.visible = false;
                     bg.visible = false;
                     refreshCanvas();
                 });
             };
+            logoContainer.on('click', function (event) {
+                _showHelpPage(27) // show about page
+            });
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
 
@@ -4384,6 +4389,12 @@ handleComplete);
         function _showHelp() {
             var helpWidget = new HelpWidget();
             helpWidget.init(null);
+        };
+
+        function _showHelpPage(page) {
+            var helpWidget = new HelpWidget();
+            helpWidget.init(null);
+            helpWidget._showPage(page);           
         };
 
         function _doMenuButton() {
