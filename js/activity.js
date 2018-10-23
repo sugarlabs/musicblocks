@@ -2464,10 +2464,10 @@ define(MYDEFINES, function (compatibility) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
                         blocks.moveBlock(newBlock, 100 + searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
-			// Race condition with palette hide.
-			setTimeout(function() {
-			    palettes.show();
-			}, 200);
+                        // Race condition with palette hide.
+                        setTimeout(function() {
+                            palettes.show();
+                        }, 200);
                     });
 
                     // Move the position of the next newly created block.
@@ -3096,8 +3096,11 @@ define(MYDEFINES, function (compatibility) {
                 restoreContainer.y = 82.5 + LEADING;
 
                 openMergeContainer.y = 82.5 + LEADING;
-                beginnerModeContainer.y = 82.5 + LEADING;
-                advancedModeContainer.y = 82.5 + LEADING;
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    beginnerModeContainer.y = 82.5 + LEADING;
+                    advancedModeContainer.y = 82.5 + LEADING;
+                }
+
                 languageContainer.y = 82.5 + LEADING;
                 if (!beginnerMode) {
                     pluginsContainer = 82.5 + LEADING;
@@ -3121,8 +3124,11 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 openMergeContainer.y = 82.5 + LEADING;
-                beginnerModeContainer.y = 82.5 + LEADING;
-                advancedModeContainer.y = 82.5 + LEADING;
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    beginnerModeContainer.y = 82.5 + LEADING;
+                    advancedModeContainer.y = 82.5 + LEADING;
+                }
+
                 languageContainer.y = 82.5 + LEADING;
                 restoreContainer.y = 82.5 + LEADING;
                 if (!beginnerMode) {
@@ -3171,8 +3177,11 @@ define(MYDEFINES, function (compatibility) {
         function doLanguageBox() {
             languageBox.createBox(turtleBlocksScale, languageContainer.x, 150);
             languageBox.show();
-            beginnerModeContainer.visible = false;
-            advancedModeContainer.visible = false;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                beginnerModeContainer.visible = false;
+                advancedModeContainer.visible = false;
+            }
+
             deltaY(-55 - LEADING);
         };
 
@@ -4030,7 +4039,12 @@ handleComplete);
 
             // Load the logo
             logoContainer = new createjs.Container();
-            var logoText = new createjs.Text(_('Music Blocks'), '14px Sans', '#282828');
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var logoText = new createjs.Text(_('Music Blocks'), '14px Sans', '#282828');
+            } else {
+                var logoText = new createjs.Text(_('Turtle Blocks'), '14px Sans', '#282828');
+            }
+
             logoText.textAlign = 'center';
             logoText.visible = false;
             var img = new Image();
@@ -4038,7 +4052,12 @@ handleComplete);
                 var bitmap = new createjs.Bitmap(img);
                 logoContainer.addChild(bitmap);
                 stage.addChild(logoContainer);
-                bitmap.x = 0;
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    bitmap.x = 0;
+                } else {
+                    bitmap.x = 37.5;
+                }
+
                 bitmap.y = 0;
                 bitmap.visible = true;
                 logoContainer.x = 0;
@@ -4078,8 +4097,8 @@ handleComplete);
             var y = Math.floor(btnSize / 2);
             var dx = btnSize;
 
-	    // Add the palette buttons here so that the hover tooltips
-	    // for the other buttons do not get occluded.
+            // Add the palette buttons here so that the hover tooltips
+            // for the other buttons do not get occluded.
             _setupPaletteMenu(turtleBlocksScale);
 
             runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
@@ -4314,17 +4333,18 @@ handleComplete);
             onscreenMenu.push(openMergeContainer);
             openMergeContainer.visible = false;
 
-            x += dx;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                x += dx;
+                beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
+                _loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
+                beginnerModeContainer.visible = false;
+                onscreenMenu.push(beginnerModeContainer);
 
-            beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
-            _loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
-            beginnerModeContainer.visible = false;
-            onscreenMenu.push(beginnerModeContainer);
-
-            advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
-            _loadButtonDragHandler(advancedModeContainer, x, y, doSwitchMode, null, null, null, null);            
-            onscreenMenu.push(advancedModeContainer);
-            advancedModeContainer.visible = false;
+                advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
+                _loadButtonDragHandler(advancedModeContainer, x, y, doSwitchMode, null, null, null, null);            
+                onscreenMenu.push(advancedModeContainer);
+                advancedModeContainer.visible = false;
+            }
 
             // Force center-aligned labels
             x += dx;
@@ -4454,10 +4474,14 @@ handleComplete);
                         onscreenMenu[button].visible = true;
                     }
 
-                    if (beginnerMode) {
-                        advancedModeContainer.visible = false;
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (beginnerMode) {
+                            advancedModeContainer.visible = false;
+                        } else {
+                            beginnerModeContainer.visible = true;
+                            setScrollerButton()
+                        }
                     } else {
-                        beginnerModeContainer.visible = true;
                         setScrollerButton()
                     }
 
@@ -4480,10 +4504,14 @@ handleComplete);
             }
 
             if (buttonsVisible) {
-                if (beginnerMode) {
-                    advancedModeContainer.visible = false;
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (beginnerMode) {
+                        advancedModeContainer.visible = false;
+                    } else {
+                        beginnerModeContainer.visible = true;
+                        setScrollerButton()
+                    }
                 } else {
-                    beginnerModeContainer.visible = true;
                     setScrollerButton()
                 }
             }
@@ -4811,10 +4839,14 @@ handleComplete);
                     onscreenMenu[i].visible = true;
                 }
 
-                if (beginnerMode) {
-                    advancedModeContainer.visible = false;
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (beginnerMode) {
+                        advancedModeContainer.visible = false;
+                    } else {
+                        beginnerModeContainer.visible = true;
+                        setScrollerButton()
+                    }
                 } else {
-                    beginnerModeContainer.visible = true;
                     setScrollerButton()
                 }
 
