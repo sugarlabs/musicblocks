@@ -24,28 +24,14 @@ NOTE: The instructions for encoding and utilizing a .mp3 sound are exactly the s
    ```
 (Replace `BASE64ENCODEDSAMPLEDATA` with the data from your exported *.b64encoded file. If using an mp3 file, replace `wav` with `mp3`.)
 
-NOTE: You must replace all line breaks. One way to do this on emacs is:
-
-    ```
-    Select region
-　　
-    shift-alt-%
-　　
-    ctrl-Q ctrl-J
-　　
-    return
-　　
-    return
-　　
-    !
-    ```
+NOTE: You must replace all line breaks. As a "regular expression" a line break is `\n`. You can do a find and replace for these characters within a text editor to replace all line breaks.
 
 * Include a comment in the code (e.g. piano.js) regarding the sample source and license.
   // Piano sample from
   // https://github.com/sugarlabs/tamtam/blob/master/common/Resources/Sounds/piano
   // License: GPL-v2
 
-* Add you new sample to `js/utils/synthutils.js`
+* Add your new sample to `js/utils/synthutils.js`
 
    ```
    var VOICENAMES = [
@@ -64,7 +50,7 @@ NOTE: You must replace all line breaks. One way to do this on emacs is:
                {'name': 'piano', 'data': PIANO_SAMPLE},
    ```
 
-* Add you new sample name to the list of string that need translation
+* Add your new sample name to the list of string that need translation
 in `js/utils/musicutils.js`
 
    ```
