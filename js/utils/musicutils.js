@@ -145,6 +145,7 @@ const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eigh
 const SELECTORSTRINGS = [
     //.TRANS: unison is a music term related to intervals
     _('unison'),
+    _('battle'),	
     //.TRANS: augmented is a music term related to intervals
     _('augmented'),
     //.TRANS: diminished is a music term related to intervals and mode
