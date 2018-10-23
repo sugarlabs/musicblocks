@@ -3,6 +3,10 @@ How to add a new sample sound
 
 * Find a sample under a free/libre open-source (FOSS) license.
 
+Let's say you are adding a new piano sound from a .wav (or .mp3) file.
+
+NOTE: The instructions for encoding and utilizing a .mp3 sound are exactly the same, just replace every instance of .wav with .mp3
+
 * `base64` encode the sample data
 
   ```
@@ -18,8 +22,25 @@ How to add a new sample sound
     return "data:audio/wav;base64,BASE64ENCODEDSAMPLEDATA";
    };
    ```
+(Replace `BASE64ENCODEDSAMPLEDATA` with the data from your exported *.b64encoded file. If using an mp3 file, replace `wav` with `mp3`.)
 
-* Include a comment in the code regarding the sample source and license.
+NOTE: You must replace all line breaks. One way to do this on emacs is:
+
+    ```
+    Select region
+　　
+    shift-alt-%
+　　
+    ctrl-Q ctrl-J
+　　
+    return
+　　
+    return
+　　
+    !
+    ```
+
+* Include a comment in the code (e.g. piano.js) regarding the sample source and license.
   // Piano sample from
   // https://github.com/sugarlabs/tamtam/blob/master/common/Resources/Sounds/piano
   // License: GPL-v2
@@ -51,3 +72,7 @@ in `js/utils/musicutils.js`
    const SELECTORSTRINGS = [
        _('piano'),
    ```
+
+* Other notes:
+
+Sometimes a sample is not perfectly pitched (ie tuned to A440). In this case, you should use a sound editor to modify the pitch of the sample. Audacity has a tool called "change pitch" that can help with this.
