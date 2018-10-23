@@ -151,7 +151,7 @@ function createHelpContent() {
             [_('Collapse'), _('Collapse the graphics window.'), 'header-icons/collapse-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'images/logo.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the GitHub repo. Music Blocks is licensed under the AGPL. The current version is:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repo')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'images/logo.svg']
         ];
     } else {
@@ -197,7 +197,7 @@ function createHelpContent() {
             [_('Restore'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'images/logo.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the GitHub repo. Music Blocks is licensed under the AGPL. The current version is:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repo')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'images/logo.svg']
         ];
     }
