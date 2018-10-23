@@ -2418,30 +2418,39 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function showSearchWidget() {
-            if (searchWidget.style.visibility === 'visible') {
-                hideSearchWidget();
-            } else {
-                var obj = docByClass('ui-menu');
-                if (obj.length > 0) {
-                    obj[0].style.visibility = 'visible';
+            const outsideClickListener = event => {
+                if (searchWidget.style.visibility === 'visible' && !searchWidget.contains(event.target)) { // or use: event.target.closest(selector) === null
+                    hideSearchWidget();
+                    removeClickListener()
+                } else {
+                    var obj = docByClass('ui-menu');
+                    if (obj.length > 0) {
+                        obj[0].style.visibility = 'visible';
+                    }
+    
+                    searchWidget.value = null;
+                    docById('searchResults').style.visibility = 'visible';
+                    searchWidget.style.visibility = 'visible';
+                    searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale + 'px';
+                    searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale + 'px';
+    
+                    searchBlockPosition = [100, 100];
+    
+                    // Give the browser time to update before selecting
+                    // focus.
+                    setTimeout(function () {
+                        searchWidget.focus();
+                        doSearch();
+                    }, 00);
                 }
-
-                searchWidget.value = null;
-                docById('searchResults').style.visibility = 'visible';
-                searchWidget.style.visibility = 'visible';
-                searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale + 'px';
-                searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale + 'px';
-
-                searchBlockPosition = [100, 100];
-
-                // Give the browser time to update before selecting
-                // focus.
-                setTimeout(function () {
-                    searchWidget.focus();
-                    doSearch();
-                }, 500);
             }
-        };
+        
+            const removeClickListener = () => {
+                document.removeEventListener('click', outsideClickListener)
+            }
+        
+            document.addEventListener('click', outsideClickListener)
+        }
 
         function doSearch() {
             var $j = jQuery.noConflict();
