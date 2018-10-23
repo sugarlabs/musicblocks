@@ -36,7 +36,7 @@ function GlobalCard(Planet) {
                                                 <div class="card-content shareurltext"> \
                                                         <div class="shareurltitle">'+_('Share')+'</div> \
                                                         <input id="shareurlselect" type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
-                                                        <a class="copyclipboardimg"onclick="share(\'{ID}\');"><img src="images/copytoclipboard.svg"alt="Copy!"></a>\
+                                                        <a class="copyclipboardimg tooltipped" onclick="share(\'{ID}\');" data-delay="50" data-tooltip="'+_('Copy link to clipboard')+'"><i class="material-icons"alt="Copy!">file_copy</i></a>\
                                                         <div class="shareurl-advanced" id="global-advanced-{ID}"> \
                                                                 <div class="shareurltitle">'+_('Flags')+'</div> \
                                                                 <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">'+_('Run project on startup.')+'</label></div> \
