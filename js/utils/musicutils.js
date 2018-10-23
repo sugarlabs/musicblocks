@@ -254,6 +254,14 @@ const SELECTORSTRINGS = [
     _('cello'),
     _('bass'),
     _('guitar'),
+    _('electroorgan'),
+    _('electrosaw'),
+    _('frenchhorn'),
+    _('gong'),
+    _('lightgrid'),
+    _('orientalflute'),
+    _('shamisen'),
+    _('tamboura'),
     _('acoustic guitar'),
     _('flute'),
     _('clarinet'),
@@ -1742,7 +1750,6 @@ function pitchToNumber(pitch, octave, keySignature) {
     // We start at A0.
     return octave * 12 + pitchNumber - PITCHES.indexOf('A') + transposition;
 };
-
 
 function noteIsSolfege(note) {
     if (SOLFEGECONVERSIONTABLE[note] === undefined) {

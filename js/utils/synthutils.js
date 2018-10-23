@@ -34,6 +34,10 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('acoustic guitar'), 'acousticguitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
+    [_('tamboura'), 'tamboura', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('shamisen'), 'shamisen', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
     [_('clarinet'), 'clarinet', 'images/voices.svg', 'wind'],
@@ -43,10 +47,14 @@ var VOICENAMES = [
     [_('tuba'), 'tuba', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
     [_('trumpet'), 'trumpet', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('frenchhorn'), 'frenchhorn', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('orientalflute'), 'orientalflute', 'images/voices.svg', 'wind'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple 1'), 'mono1', 'images/synth.svg', 'electronic'],
+    //[_('simple 1'), 'mono1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
     // [_('simple-2'), 'mono2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -61,6 +69,12 @@ var VOICENAMES = [
     [_('sawtooth'), 'sawtooth', 'images/synth.svg', 'electronic'],
     //.TRANS: triangle wave
     [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
+    //.TRANS: musical instrument
+    [_('electroorgan'), 'electroorgan', 'images/voices.svg', 'electronic'],
+    //.TRANS: musical instrument
+    [_('electrosaw'), 'electrosaw', 'images/voices.svg', 'electronic'],
+    //.TRANS: musical instrument
+    [_('lightgrid'), 'lightgrid', 'images/voices.svg', 'electronic'],
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
 ];
@@ -86,6 +100,8 @@ var DRUMNAMES = [
     [_('ride-bell'), 'ride bell', 'images/ridebell.svg', 'rb', 'bell'],
     //.TRANS: musical instrument
     [_('cow-bell'), 'cow bell', 'images/cowbell.svg', 'cb', 'bell'],
+    //.TRANS: musical instrument
+    [_('gong'), 'gong', 'images/cowbell.svg', 'cymca', 'bell'],
     //.TRANS: musical instrument
     [_('triangle-bell'), 'triangle bell', 'images/trianglebell.svg', 'tri', 'bell'],
     //.TRANS: musical instrument
@@ -125,7 +141,9 @@ var SOUNDSAMPLESDEFINES = [
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare", "samples/piano", "samples/acguit"
+    "samples/snare", "samples/piano", "samples/acguit", "samples/tamboura", 
+    "samples/electroorgan", "samples/electrosaw", "samples/frenchhorn", "samples/gong",
+    "samples/lightgrid", "samples/orientalflute", "samples/shamisen"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -137,6 +155,14 @@ const SAMPLECENTERNO = {
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'tamboura': ['E4', 43], // pitchToNumber('E', 4, 'C Major')],
+    'electroorgan': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],
+    'electrosaw': ['D4', 41], // pitchToNumber('C', 4, 'C Major')],
+    'frenchhorn': ['D4', 41], // pitchToNumber('C', 4, 'C Major')],
+    'gong': ['E3', 31], // pitchToNumber('C', 4, 'C Major')],
+    'lightgrid': ['C#3', 28], // pitchToNumber('C', 4, 'C Major')],
+    'orientalflute': ['C6', 63], // pitchToNumber('C', 4, 'C Major')],
+    'shamisen': ['D4', 41], // pitchToNumber('C', 4, 'C Major')],
     'flute': ['F5', 57], // pitchToNumber('F', 5, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -415,6 +441,14 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
+                {'name': 'electroorgan', 'data': ELECTROORGAN_SAMPLE},
+                {'name': 'electrosaw', 'data': ELECTROSAW_SAMPLE},
+                {'name': 'frenchhorn', 'data': FRENCHHORN_SAMPLE},
+                {'name': 'gong', 'data': GONG_SAMPLE},
+                {'name': 'lightgrid', 'data': LIGHTGRID_SAMPLE},
+                {'name': 'orientalflute', 'data': ORIENTALFLUTE_SAMPLE},
+                {'name': 'shamisen', 'data': SHAMISEN_SAMPLE},
+                {'name': 'tamboura', 'data': TAMBOURA_SAMPLE},
 		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE}
             ],
