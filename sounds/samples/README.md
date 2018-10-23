@@ -19,6 +19,11 @@ How to add a new sample sound
    };
    ```
 
+* Include a comment in the code regarding the sample source and license.
+  // Piano sample from
+  // https://github.com/sugarlabs/tamtam/blob/master/common/Resources/Sounds/piano
+  // License: GPL-v2
+
 * Add you new sample to `js/utils/synthutils.js`
 
    ```
