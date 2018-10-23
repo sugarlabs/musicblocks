@@ -32,6 +32,8 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
+    [_('acoustic guitar'), 'acousticguitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
     [_('clarinet'), 'clarinet', 'images/voices.svg', 'wind'],
@@ -123,7 +125,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare", "samples/piano"
+    "samples/snare", "samples/piano", "samples/acguit"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -134,6 +136,7 @@ const SAMPLECENTERNO = {
     'cello': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'flute': ['F5', 57], // pitchToNumber('F', 5, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -412,6 +415,7 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
+		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE}
             ],
             'drum': [

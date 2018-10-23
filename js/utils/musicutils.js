@@ -254,6 +254,7 @@ const SELECTORSTRINGS = [
     _('cello'),
     _('bass'),
     _('guitar'),
+    _('acoustic guitar'),
     _('flute'),
     _('clarinet'),
     _('saxophone'),
