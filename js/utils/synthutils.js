@@ -63,6 +63,8 @@ var VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
+    //.TRANS: musical instrument
+    [_('battle'), 'battle', 'images/voices.svg', 'string'],
 ];
 
 // drum symbols are from
@@ -125,7 +127,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare", "samples/piano", "samples/acguit"
+    "samples/snare", "samples/piano", "samples/acguit","samples/battle",
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -142,6 +144,7 @@ const SAMPLECENTERNO = {
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'tuba': ['A#4', 49], // pitchToNumber('A#', 4, 'C Major')],
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
+    'battle': ['C5', 50], // pitchToNumber('C', 5, 'C Major')],
 };
 
 
@@ -416,6 +419,7 @@ function Synth() {
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
 		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+		{'name': 'battle', 'data': BATTLE_SOUND},
                 {'name': 'bass', 'data': BASS_SAMPLE}
             ],
             'drum': [
