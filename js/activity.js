@@ -4110,12 +4110,6 @@ handleComplete);
             _loadButtonDragHandler(runContainer, x, y, _doFastButton, _openAuxMenu, null, null, null);
             onscreenButtons.push(runContainer);
 
-            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(slowContainer, x, y, _doSlowButton, null, null, null, null);
-
-            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x + btnSize, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(stepContainer, x, y, _doStepButton, null, null, null, null);
-
             x += dx;
 
             hardStopTurtleContainer = _makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
@@ -4125,6 +4119,12 @@ handleComplete);
             stopTurtleContainer = _makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
             _loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
             onscreenButtons.push(stopTurtleContainer);
+
+            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - dx, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(slowContainer, x - dx, y - btnSize, _doSlowButton, null, null, null, null);
+
+            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(stepContainer, x, y - btnSize, _doStepButton, null, null, null, null);
 
             x += dx;
 
