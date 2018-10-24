@@ -634,6 +634,7 @@ const DEFAULTINTERVAL = 'perfect' + ' 5';
 const DEFAULTVOICE = 'default';
 const DEFAULTNOISE = 'noise1';
 const DEFAULTDRUM = 'kick drum';
+const DEFAULTEFFECT = 'dog';
 const DEFAULTMODE = 'major';
 const DEFAULTTEMPERAMENT = 'equal';
 const DEFAULTFILTERTYPE = 'highpass';
@@ -718,6 +719,25 @@ function getDrumName(name) {
     return null;
 };
 
+function getEffectName(name) {
+    if (name === '') {
+        console.log('getEffectName passed blank name. Returning ' + DEFAULTEFFECT);
+        name = DEFAULTEFFECT;
+    } else if (name.slice(0, 4) === 'http') {
+        return null;
+    }
+
+    for (var effect = 0; effect < DEFAULTEFFECTS.length; effect++) {
+        if (DEFAULTEFFECTS[effect][0].toLowerCase() === name.toLowerCase()) {
+            return DEFAULTEFFECTS[effect][0];
+        } else if (DEFAULTEFFECTS[effect][1].toLowerCase() === name.toLowerCase()) {
+            return DEFAULTEFFECTS[effect][1];
+        }
+    }
+
+    // console.log(name + ' not found in DRUMNAMES');
+    return null;
+};
 
 function getDrumSymbol(name) {
     if (name === '') {
@@ -729,6 +749,24 @@ function getDrumSymbol(name) {
         if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[drum][3];
         } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            return 'hh';
+        }
+    }
+
+    console.log(name + ' not found in DRUMNAMES');
+    return 'hh';
+};
+
+function getEffectSymbol(name) {
+    if (name === '') {
+        console.log('getEffectName passed blank name. Returning ' + 'hh');
+        return 'hh';
+    }
+
+    for (var effect = 0; effect < EFFECTNAMES.length; effect++) {
+        if (EFFECTNAMES[effect][0].toLowerCase() === name.toLowerCase()) {
+            return EFFECTNAMES[effect][3];
+        } else if (EFFECTNAMES[effect][1].toLowerCase() === name.toLowerCase()) {
             return 'hh';
         }
     }
@@ -813,6 +851,46 @@ function getDrumSynthName(name) {
 
     console.log(name + ' not found in DRUMNAMES');
     return DEFAULTDRUM;
+};
+
+function getEffectIcon(name) {
+    if (name === '') {
+        console.log('getEffectIcon passed blank name. Returning ' + DEFAULTEFFECT);
+        name = DEFAULTEFFECT;
+    } else if (name.slice(0, 4) === 'http') {
+        return 'images/drum.svg';
+    }
+
+    for (var i = 0; i < EFFECTNAMES.length; i++) {
+        if (EFFECTNAMES[i][0] === name || EFFECTNAMES[i][1].toLowerCase() === name.toLowerCase()) {
+            return EFFECTNAMES[i][2];
+        }
+    }
+
+    console.log(name + ' not found in EFFECTNAMES');
+    return 'images/drum.svg';
+};
+
+
+function getEffectSynthName(name) {
+    if (name === null || name === undefined) {
+        console.log('getEffectSynthName passed null name. Returning null');
+        return null;
+    } else if (name === '') {
+        console.log('getEffectSynthName passed blank name. Returning ' + DEFAULTEFFECT);
+        name = DEFAULTEFFECT;
+    } else if (name.slice(0, 4) === 'http') {
+        return name;
+    }
+
+    for (var i = 0; i < EFFECTNAMES.length; i++) {
+        if (EFFECTNAMES[i][0] === name || EFFECTNAMES[i][1].toLowerCase() === name.toLowerCase()) {
+            return EFFECTNAMES[i][1];
+        }
+    }
+
+    console.log(name + ' not found in DEFAULTEFFECTS');
+    return DEFAULTEFFECT;
 };
 
 

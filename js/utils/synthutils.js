@@ -108,6 +108,17 @@ var DRUMNAMES = [
     [_('finger-cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
+];
+
+var EFFECTNAMES = [
+    //.TRANS: animal sound effect
+    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
+    //.TRANS: animal sound effect
+    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
+    //.TRANS: animal sound effect
+    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
+    //.TRANS: animal sound effect
+    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
     //.TRANS: sound effect
     [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
@@ -122,14 +133,6 @@ var DRUMNAMES = [
     [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
     //.TRANS: sound effect
     [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
-    //.TRANS: animal sound effect
-    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
-    //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
-    //.TRANS: animal sound effect
-    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
-    //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
 ];
 
 var SOUNDSAMPLESDEFINES = [
@@ -453,29 +456,31 @@ function Synth() {
                 {'name': 'bass', 'data': BASS_SAMPLE}
             ],
             'drum': [
-                {'name': 'bottle', 'data': BOTTLE_SAMPLE},
-                {'name': 'clap', 'data': CLAP_SAMPLE},
                 {'name': 'darbuka drum', 'data': DARBUKA_SAMPLE},
                 {'name': 'hi hat', 'data': HIHAT_SAMPLE},
                 {'name': 'splash', 'data': SPLASH_SAMPLE},
                 {'name': 'bubbles', 'data': BUBBLES_SAMPLE},
                 {'name': 'cow bell', 'data': COWBELL_SAMPLE},
-                {'name': 'dog', 'data': DOG_SAMPLE},
                 {'name': 'kick drum', 'data': KICK_SAMPLE},
                 {'name': 'tom tom', 'data': TOM_SAMPLE},
-                {'name': 'cat', 'data': CAT_SAMPLE},
                 {'name': 'crash', 'data': CRASH_SAMPLE},
-                {'name': 'duck', 'data': DUCK_SAMPLE},
                 {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
                 {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
                 {'name': 'chime', 'data': CHIME_SAMPLE},
-                {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
-                {'name': 'slap', 'data': SLAP_SAMPLE},
-                {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
                 {'name': 'snare drum', 'data': SNARE_SAMPLE}
+            ],
+            'effect' : [
+                {'name': 'cat', 'data': CAT_SAMPLE},
+                {'name': 'bottle', 'data': BOTTLE_SAMPLE},
+                {'name': 'clap', 'data': CLAP_SAMPLE},
+                {'name': 'dog', 'data': DOG_SAMPLE},
+                {'name': 'duck', 'data': DUCK_SAMPLE},
+                {'name': 'cricket', 'data': CRICKET_SAMPLE},
+                {'name': 'slap', 'data': SLAP_SAMPLE},
+                {'name': 'clang', 'data': CLANG_SAMPLE}
             ]
         }
 
@@ -725,6 +730,10 @@ function Synth() {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
             var tempSynth = new Tone.Player(this.samples.drum[sourceName]);
+        } else if (sourceName in this.samples.effect) {
+            instrumentsSource[instrumentName] = [1, sourceName];
+            console.log(sourceName);
+            var tempSynth = new Tone.Player(this.samples.effect[sourceName]);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, 'drum'];
@@ -809,7 +818,7 @@ function Synth() {
 
     this.__createSynth = function (turtle, instrumentName, sourceName, params) {
         this._loadSample(sourceName);
-        if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum)) {
+        if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum) || (sourceName in this.samples.effect)) {
             instruments[turtle][instrumentName] = this._createSampleSynth(turtle, instrumentName, sourceName, null).toMaster();
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(turtle, instrumentName, sourceName, params).toMaster();
