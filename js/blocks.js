@@ -21,7 +21,7 @@ const CAMERAVALUE = '##__CAMERA__##';
 const VIDEOVALUE = '##__VIDEO__##';
 
 const NOTEBLOCKS = ['newnote', 'osctime'];
-const PITCHBLOCKS = ['pitch', 'steppitch', 'hertz', 'pitchnumber', 'scaledegree', 'playdrum'];
+const PITCHBLOCKS = ['pitch', 'steppitch', 'hertz', 'pitchnumber', 'scaledegree', 'playdrum', 'playeffect'];
 
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
@@ -1726,6 +1726,7 @@ function Blocks () {
             break;
         case 'filtertype':
         case 'drumname':
+        case 'effectsname':
         case 'voicename':
         case 'oscillatortype':
         case 'invertmode':
@@ -2178,6 +2179,7 @@ function Blocks () {
             that.blockList[thisBlock].value = value;
             switch (that.blockList[thisBlock].name) {
             case 'drumname':
+            case 'effectsname':
             case 'voicename':
             case 'oscillatortype':
             case 'invertmode':
@@ -2244,7 +2246,9 @@ function Blocks () {
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
             postProcessArg = [thisBlock, DEFAULTDRUM];
-         } else if (name === 'filtertype') {
+        } else if (name === 'effectsname') {
+            postProcessArg = [thisBlock, DEFAULTEFFECT];
+        } else if (name === 'filtertype') {
             postProcessArg = [thisBlock, DEFAULTFILTER];
         } else if (name === 'oscillatortype') {
             postProcessArg = [thisBlock, DEFAULTOSCILLATORTYPE];
@@ -4159,6 +4163,23 @@ function Blocks () {
                     this.logo.synth.loadSynth(0, 'kick');
                 }
                 break;
+            case 'effect':
+                blkData[4][0] = null;
+                blkData[4][2] = null;
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var blkInfo = args[1];
+                    that.blockList[thisBlock].value = that.turtles.turtleList.length;
+                    that.turtles.addEffect(that.blockList[thisBlock], blkInfo);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
+
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    // Load the synth for this drum
+                    this.logo.synth.loadSynth(0, 'dog');
+                }
+                break;    
             case 'action':
             case 'hat':
                 blkData[4][0] = null;
@@ -4389,6 +4410,22 @@ function Blocks () {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
+                    this.logo.synth.loadSynth(0, getEffectSynthName(value));
+                }
+                break;
+            case 'effectname':
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    // Load the synth for this drum
+                    this.logo.synth.loadSynth(0, getEffectSynthName(value));
                 }
                 break;
             case 'voicename':

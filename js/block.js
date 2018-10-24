@@ -17,10 +17,10 @@ const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote', 'interval'];
 const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
-const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', "effectsname", 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'effectsname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
 const EXTRAWIDENAMES = [];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'effectsname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -743,6 +743,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'drumname':
                     this.value = DEFAULTDRUM;
+                    break;
+                case 'effectsname':
+                    this.value = DEFAULTEFFECT;
                     break;
                 case 'filtertype':
                     this.value = DEFAULTFILTERTYPE;
@@ -2284,6 +2287,36 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
+
+        } else if (this.name === 'effectsname') {
+            if (this.value != null) {
+                var selectedeffect = this.value;
+            } else {
+                var selectedeffect = DEFAULTEFFECT;
+            }
+
+            var effectLabels = [];
+            var effectValues = [];            
+            var categories = [];
+            var categoriesList = [];
+            for (var i = 0; i < EFFECTNAMES.length; i++) {
+                var label = _(EFFECTNAMES[i][1]);
+                if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                    effectLabels.push(label.substr(0, 8) + '...');
+                } else {
+                    effectLabels.push(label);
+                }
+
+                effectLabels.push(EFFECTNAMES[i][1]);
+
+                if (categoriesList.indexOf(EFFECTNAMES[i][4]) === -1) {
+                    categoriesList.push(EFFECTNAMES[i][4]);
+                }
+
+                categories.push(categoriesList.indexOf(EFFECTNAMES[i][4]));
+            }
+
+            this._piemenuVoices(effectLabels, effectValues, categories, selectedeffect);
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
                 var selectedtype = this.value;
@@ -4045,6 +4078,12 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
             }
 
+            if (getEffectName(that.value) === null) {
+                that.blocks.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
+            } else {
+                that.blocks.logo.synth.loadSynth(0, getEffectSynthName(that.value));
+            }
+
             // Make sure text is on top.
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
@@ -4916,6 +4955,8 @@ function Block(protoblock, blocks, overrideName) {
             // Load the synth for the selected drum.
             if (this.name === 'drumname') {
                 this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+            } else if (this.name === 'effectsname') {
+                this.blocks.logo.synth.loadSynth(0, getEffectSynthName(this.value));
             } else if (this.name === 'voicename') {
                 this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
             } else if (this.name === 'noisename') {
