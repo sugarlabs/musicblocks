@@ -586,6 +586,7 @@ function Palettes () {
     // Palette Button event handlers
     this._loadPaletteButtonHandler = function (name) {
         var locked = false;
+        var searchlocked = false;
         var scrolling = false;
         var that = this;
 
@@ -615,22 +616,49 @@ function Palettes () {
             that.stage.removeChild(that.paletteHighlight);
         });
 
+
         this.buttons[name].on('click', function (event) {
-            if (locked) {
-                return;
-            }
-            locked = true;
+            var clickOutside = function(event) {                
+                setTimeout(function () {
+                    searchlocked = false;
+                }, 500);
 
-            setTimeout(function () {
-                locked = false;
-            }, 500);
+                if (!that.dict['search'].visible && searchlocked) {
+                    that.showPalette('search');
+                } else { 
+                    document.removeEventListener('click', clickOutside);
+                    that.dict['search'].hide();
+                }
 
-            if (!that.dict[name].visible) {
-                that.showPalette(name);
+                that.refreshCanvas();
+            };
+
+            if (name === "search") {
+                searchlocked = true;
+                document.addEventListener("click", clickOutside);
             } else {
-                that.dict[name].hide();
+                if (locked) {
+                    return;
+                }
+
+                locked = true;
+                searchlocked = false;
+
+                setTimeout(function () {
+                    locked = false;
+                }, 500);
+
+                if (!that.dict[name].visible && name !== 'search') {
+                    that.dict['search'].hide();                        
+                    if (!searchlocked) {
+                        that.showPalette(name);
+                    }
+                } else { 
+                    that.dict[name].hide();
+                }
+
+                that.refreshCanvas();
             }
-            that.refreshCanvas();
         });
     };
 
@@ -1764,6 +1792,7 @@ function Palette(palettes, name) {
             if (locked) {
                 return;
             }
+            
             locked = true;
             setTimeout(function () {
                 locked = false;
