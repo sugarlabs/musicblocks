@@ -622,22 +622,25 @@ function Palettes () {
                 setTimeout(function () {
                     searchlocked = false;
                 }, 500);
-                if (!that.dict['search'].visible && searchlocked) {                   
+
+                if (!that.dict['search'].visible && searchlocked) {
                     that.showPalette('search');
                 } else { 
                     document.removeEventListener('click', clickOutside);
                     that.dict['search'].hide();
                 }
+
                 that.refreshCanvas();
             };
 
-            if(name === "search"){
+            if (name === "search") {
                 searchlocked = true;
                 document.addEventListener("click", clickOutside);
             } else {
                 if (locked) {
                     return;
                 }
+
                 locked = true;
                 searchlocked = false;
 
@@ -645,13 +648,15 @@ function Palettes () {
                     locked = false;
                 }, 500);
 
-                if (!that.dict[name].visible && name !== 'search')  {                    
-                        console.log(name);
-                        that.dict['search'].hide();                        
-                        if(!searchlocked) that.showPalette(name);
+                if (!that.dict[name].visible && name !== 'search') {
+                    that.dict['search'].hide();                        
+                    if (!searchlocked) {
+                        that.showPalette(name);
+                    }
                 } else { 
                     that.dict[name].hide();
                 }
+
                 that.refreshCanvas();
             }
         });
