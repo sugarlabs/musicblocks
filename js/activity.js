@@ -2418,39 +2418,30 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function showSearchWidget() {
-            const outsideClickListener = event => {
-                if (searchWidget.style.visibility === 'visible' && !searchWidget.contains(event.target)) { // or use: event.target.closest(selector) === null
-                    hideSearchWidget();
-                    removeClickListener()
-                } else {
-                    var obj = docByClass('ui-menu');
-                    if (obj.length > 0) {
-                        obj[0].style.visibility = 'visible';
-                    }
-    
-                    searchWidget.value = null;
-                    docById('searchResults').style.visibility = 'visible';
-                    searchWidget.style.visibility = 'visible';
-                    searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale + 'px';
-                    searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale + 'px';
-    
-                    searchBlockPosition = [100, 100];
-    
-                    // Give the browser time to update before selecting
-                    // focus.
-                    setTimeout(function () {
-                        searchWidget.focus();
-                        doSearch();
-                    }, 00);
+            if (searchWidget.style.visibility === 'visible') {
+                hideSearchWidget();
+            } else {
+                var obj = docByClass('ui-menu');
+                if (obj.length > 0) {
+                    obj[0].style.visibility = 'visible';
                 }
+
+                searchWidget.value = null;
+                docById('searchResults').style.visibility = 'visible';
+                searchWidget.style.visibility = 'visible';
+                searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale + 'px';
+                searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale + 'px';
+
+                searchBlockPosition = [100, 100];
+
+                // Give the browser time to update before selecting
+                // focus.
+                setTimeout(function () {
+                    searchWidget.focus();
+                    doSearch();
+                }, 500);
             }
-        
-            const removeClickListener = () => {
-                document.removeEventListener('click', outsideClickListener)
-            }
-        
-            document.addEventListener('click', outsideClickListener)
-        }
+        };
 
         function doSearch() {
             var $j = jQuery.noConflict();
@@ -4049,7 +4040,7 @@ handleComplete);
             // Load the logo
             logoContainer = new createjs.Container();
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var logoText = new createjs.Text(_('Music Blocks'), '14px Sans', '#282828');
+                var logoText = new createjs.Text(_('About Music Blocks'), '14px Sans', '#282828');
             } else {
                 var logoText = new createjs.Text(_('Turtle Blocks'), '14px Sans', '#282828');
             }
@@ -4076,6 +4067,7 @@ handleComplete);
 
                 var bg = null;
                 logoContainer.on('mouseover', function (event) {
+                    document.body.style.cursor = "pointer";
                     if (bg === null) {
                         logoText.x = 65;
                         logoText.y = 55;
@@ -4092,11 +4084,15 @@ handleComplete);
                 });
 
                 logoContainer.on('mouseout', function (event) {
+                    document.body.style.cursor = "default";
                     logoText.visible = false;
                     bg.visible = false;
                     refreshCanvas();
                 });
             };
+            logoContainer.on('click', function (event) {
+                _showHelpPage(27) // show about page
+            });
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
 
@@ -4431,6 +4427,12 @@ handleComplete);
         function _showHelp() {
             var helpWidget = new HelpWidget();
             helpWidget.init(null);
+        };
+
+        function _showHelpPage(page) {
+            var helpWidget = new HelpWidget();
+            helpWidget.init(null);
+            helpWidget._showPage(page);           
         };
 
         function _doMenuButton() {
