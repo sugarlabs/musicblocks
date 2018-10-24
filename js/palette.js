@@ -616,21 +616,46 @@ function Palettes () {
         });
 
         this.buttons[name].on('click', function (event) {
-            if (locked) {
+            var clickOutside = function(event) {
+                if (locked) {
+                    return;
+                }
+                locked = true;
+    
+                setTimeout(function () {
+                    locked = false;
+                }, 500);
+    
+                if (!that.dict[name].visible) {
+                    that.showPalette(name);
+                } else { 
+                    document.removeEventListener('click', clickOutside);
+                    that.dict[name].hide();
+                }
+                that.refreshCanvas();
+            };
+
+            if(name === "search"){
+                document.addEventListener("click", clickOutside)
                 return;
-            }
-            locked = true;
-
-            setTimeout(function () {
-                locked = false;
-            }, 500);
-
-            if (!that.dict[name].visible) {
-                that.showPalette(name);
             } else {
-                that.dict[name].hide();
+
+                if (locked) {
+                    return;
+                }
+                locked = true;
+
+                setTimeout(function () {
+                    locked = false;
+                }, 500);
+
+                if (!that.dict[name].visible) {
+                    that.showPalette(name);
+                } else { 
+                    that.dict[name].hide();
+                }
+                that.refreshCanvas();
             }
-            that.refreshCanvas();
         });
     };
 
