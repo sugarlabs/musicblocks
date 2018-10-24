@@ -586,6 +586,7 @@ function Palettes () {
     // Palette Button event handlers
     this._loadPaletteButtonHandler = function (name) {
         var locked = false;
+        var searchlocked = false;
         var scrolling = false;
         var that = this;
 
@@ -615,42 +616,39 @@ function Palettes () {
             that.stage.removeChild(that.paletteHighlight);
         });
 
+
         this.buttons[name].on('click', function (event) {
-            var clickOutside = function(event) {
-                if (locked) {
-                    return;
-                }
-                locked = true;
-    
+            var clickOutside = function(event) {                
                 setTimeout(function () {
-                    locked = false;
+                    searchlocked = false;
                 }, 500);
-    
-                if (!that.dict[name].visible) {
-                    that.showPalette(name);
+                if (!that.dict['search'].visible && searchlocked) {                   
+                    that.showPalette('search');
                 } else { 
                     document.removeEventListener('click', clickOutside);
-                    that.dict[name].hide();
+                    that.dict['search'].hide();
                 }
                 that.refreshCanvas();
             };
 
             if(name === "search"){
-                document.addEventListener("click", clickOutside)
-                return;
+                searchlocked = true;
+                document.addEventListener("click", clickOutside);
             } else {
-
                 if (locked) {
                     return;
                 }
                 locked = true;
+                searchlocked = false;
 
                 setTimeout(function () {
                     locked = false;
                 }, 500);
 
-                if (!that.dict[name].visible) {
-                    that.showPalette(name);
+                if (!that.dict[name].visible && name !== 'search')  {                    
+                        console.log(name);
+                        that.dict['search'].hide();                        
+                        if(!searchlocked) that.showPalette(name);
                 } else { 
                     that.dict[name].hide();
                 }
@@ -1789,6 +1787,7 @@ function Palette(palettes, name) {
             if (locked) {
                 return;
             }
+            
             locked = true;
             setTimeout(function () {
                 locked = false;
