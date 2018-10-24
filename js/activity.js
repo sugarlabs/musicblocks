@@ -3146,6 +3146,7 @@ define(MYDEFINES, function (compatibility) {
             // if save or settings is open, close them.
             if (!confirmContainer.visible) {
                 closeSubMenus();
+                hideAuxMenu();
                 confirmContainer.visible = true;
                 confirmContainer.x = newContainer.x;
                 confirmContainer.y = 27.5;
