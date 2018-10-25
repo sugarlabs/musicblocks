@@ -4395,7 +4395,7 @@ function Blocks () {
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
                 break;
-            case 'effectname':
+            case 'effectsname':
                 var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
