@@ -36,7 +36,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('tamboura'), 'tamboura', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('shamisen'), 'shamisen', 'images/voices.svg', 'string'],
+    [_('funky shamisen'), 'funky shamisen', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
@@ -48,9 +48,9 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('trumpet'), 'trumpet', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
-    [_('frenchhorn'), 'frenchhorn', 'images/voices.svg', 'wind'],
+    [_('french horn'), 'french horn', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
-    [_('orientalflute'), 'orientalflute', 'images/voices.svg', 'wind'],
+    [_('oriental flute'), 'oriental flute', 'images/voices.svg', 'wind'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -155,14 +155,14 @@ const SAMPLECENTERNO = {
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
-    'tamboura': ['E4', 43], // pitchToNumber('E', 4, 'C Major')],
-    'electroorgan': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],
-    'electrosaw': ['D4', 41], // pitchToNumber('C', 4, 'C Major')],
-    'frenchhorn': ['D4', 41], // pitchToNumber('C', 4, 'C Major')],
-    'gong': ['E3', 31], // pitchToNumber('C', 4, 'C Major')],
-    'lightgrid': ['C#3', 28], // pitchToNumber('C', 4, 'C Major')],
-    'orientalflute': ['C6', 63], // pitchToNumber('C', 4, 'C Major')],
-    'shamisen': ['D4', 41], // pitchToNumber('C', 4, 'C Major')],
+    'tamboura': ['A4', 48], // pitchToNumber('E', 4, 'C Major')],                                                                                            
+    'electroorgan': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],                                                                                        
+    'electrosaw': ['D#4', 52], // pitchToNumber('C', 4, 'C Major')],                                                                                         
+    'french horn': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],                                                                                          
+    'gong': ['E3', 31], // pitchToNumber('C', 4, 'C Major')],                                                                                                
+    'lightgrid': ['A2', 24], // pitchToNumber('C', 4, 'C Major')],                                                                                           
+    'oriental flute': ['C6', 63], // pitchToNumber('C', 4, 'C Major')],                                                                                       
+    'funky shamisen': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],
     'flute': ['F5', 57], // pitchToNumber('F', 5, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -443,11 +443,11 @@ function Synth() {
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
                 {'name': 'electroorgan', 'data': ELECTROORGAN_SAMPLE},
                 {'name': 'electrosaw', 'data': ELECTROSAW_SAMPLE},
-                {'name': 'frenchhorn', 'data': FRENCHHORN_SAMPLE},
+                {'name': 'french horn', 'data': FRENCHHORN_SAMPLE},
                 {'name': 'gong', 'data': GONG_SAMPLE},
                 {'name': 'lightgrid', 'data': LIGHTGRID_SAMPLE},
-                {'name': 'orientalflute', 'data': ORIENTALFLUTE_SAMPLE},
-                {'name': 'shamisen', 'data': SHAMISEN_SAMPLE},
+                {'name': 'oriental flute', 'data': ORIENTALFLUTE_SAMPLE},
+                {'name': 'funky shamisen', 'data': SHAMISEN_SAMPLE},
                 {'name': 'tamboura', 'data': TAMBOURA_SAMPLE},
 		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE}
