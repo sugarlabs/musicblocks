@@ -260,7 +260,7 @@ const SELECTORSTRINGS = [
     _('gong'),
     _('light grid'),
     _('oriental flute'),
-    _('funky shamisen'),
+    _('shamisen funky'),
     _('tamboura'),
     _('acoustic guitar'),
     _('flute'),

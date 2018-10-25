@@ -36,7 +36,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('tamboura'), 'tamboura', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('funky shamisen'), 'funky shamisen', 'images/voices.svg', 'string'],
+    [_('shamisen funky'), 'shamisenfunky', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
@@ -162,7 +162,7 @@ const SAMPLECENTERNO = {
     'gong': ['E3', 31], // pitchToNumber('C', 4, 'C Major')],                                                                                                
     'lightgrid': ['A2', 24], // pitchToNumber('C', 4, 'C Major')],                                                                                           
     'oriental flute': ['C6', 63], // pitchToNumber('C', 4, 'C Major')],                                                                                       
-    'funky shamisen': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],
+    'shamisen funky': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],
     'flute': ['F5', 57], // pitchToNumber('F', 5, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -447,7 +447,7 @@ function Synth() {
                 {'name': 'gong', 'data': GONG_SAMPLE},
                 {'name': 'lightgrid', 'data': LIGHTGRID_SAMPLE},
                 {'name': 'oriental flute', 'data': ORIENTALFLUTE_SAMPLE},
-                {'name': 'funky shamisen', 'data': SHAMISEN_SAMPLE},
+                {'name': 'shamisen funky', 'data': SHAMISEN_SAMPLE},
                 {'name': 'tamboura', 'data': TAMBOURA_SAMPLE},
 		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE}
