@@ -4083,7 +4083,6 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
             }
 
-
             // Make sure text is on top.
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
