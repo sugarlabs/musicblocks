@@ -711,26 +711,6 @@ function getDrumName(name) {
     return null;
 };
 
-function getEffectName(name) {
-    if (name === '') {
-        console.log('getEffectName passed blank name. Returning ' + EFFECTNAMES);
-        name = DEFAULTEFFECT;
-    } else if (name.slice(0, 4) === 'http') {
-        return null;
-    }
-
-    for (var effect = 0; effect < EFFECTNAMES.length; effect++) {
-        if (EFFECTNAMES[effect][0].toLowerCase() === name.toLowerCase()) {
-            return EFFECTNAMES[effect][0];
-        } else if (EFFECTNAMES[effect][1].toLowerCase() === name.toLowerCase()) {
-            return EFFECTNAMES[effect][1];
-        }
-    }
-
-    // console.log(name + ' not found in DRUMNAMES');
-    return null;
-};
-
 function getDrumSymbol(name) {
     if (name === '') {
         console.log('getDrumName passed blank name. Returning ' + 'hh');
@@ -748,25 +728,6 @@ function getDrumSymbol(name) {
     console.log(name + ' not found in DRUMNAMES');
     return 'hh';
 };
-
-function getEffectSymbol(name) {
-    if (name === '') {
-        console.log('getEffectName passed blank name. Returning ' + 'hh');
-        return 'hh';
-    }
-
-    for (var effect = 0; effect < EFFECTNAMES.length; effect++) {
-        if (EFFECTNAMES[effect][0].toLowerCase() === name.toLowerCase()) {
-            return EFFECTNAMES[effect][3];
-        } else if (EFFECTNAMES[effect][1].toLowerCase() === name.toLowerCase()) {
-            return 'hh';
-        }
-    }
-
-    console.log(name + ' not found in DRUMNAMES');
-    return 'hh';
-};
-
 
 function getFilterTypes(name) {
     if (name === '') {
@@ -843,46 +804,6 @@ function getDrumSynthName(name) {
 
     console.log(name + ' not found in DRUMNAMES');
     return DEFAULTDRUM;
-};
-
-function getEffectIcon(name) {
-    if (name === '') {
-        console.log('getEffectIcon passed blank name. Returning ' + DEFAULTEFFECT);
-        name = DEFAULTEFFECT;
-    } else if (name.slice(0, 4) === 'http') {
-        return 'images/drum.svg';
-    }
-
-    for (var i = 0; i < EFFECTNAMES.length; i++) {
-        if (EFFECTNAMES[i][0] === name || EFFECTNAMES[i][1].toLowerCase() === name.toLowerCase()) {
-            return EFFECTNAMES[i][2];
-        }
-    }
-
-    console.log(name + ' not found in EFFECTNAMES');
-    return 'images/drum.svg';
-};
-
-
-function getEffectSynthName(name) {
-    if (name === null || name === undefined) {
-        console.log('getEffectSynthName passed null name. Returning null');
-        return null;
-    } else if (name === '') {
-        console.log('getEffectSynthName passed blank name. Returning ' + DEFAULTEFFECT);
-        name = DEFAULTEFFECT;
-    } else if (name.slice(0, 4) === 'http') {
-        return name;
-    }
-
-    for (var i = 0; i < EFFECTNAMES.length; i++) {
-        if (EFFECTNAMES[i][0] === name || EFFECTNAMES[i][1].toLowerCase() === name.toLowerCase()) {
-            return EFFECTNAMES[i][1];
-        }
-    }
-
-    console.log(name + ' not found in DEFAULTEFFECTS');
-    return DEFAULTEFFECT;
 };
 
 

@@ -4393,7 +4393,6 @@ function Blocks () {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
-                    this.logo.synth.loadSynth(0, getEffectSynthName(value));
                 }
                 break;
             case 'effectname':
@@ -4408,7 +4407,7 @@ function Blocks () {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
-                    this.logo.synth.loadSynth(0, getEffectSynthName(value));
+                    this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
                 break;
             case 'voicename':

@@ -2270,6 +2270,7 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
+                 if(i in EFFECTNAMES == false) {
                 var label = _(DRUMNAMES[i][1]);
                 if (getTextWidth(label, 'bold 48pt Sans') > 400) {
                     drumLabels.push(label.substr(0, 8) + '...');
@@ -2285,38 +2286,42 @@ function Block(protoblock, blocks, overrideName) {
 
                 categories.push(categoriesList.indexOf(DRUMNAMES[i][4]));
             }
+            }
 
             this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
 
         } else if (this.name === 'effectsname') {
             if (this.value != null) {
-                var selectedeffect = this.value;
+                var selecteddrum = this.value;
             } else {
                 var selectedeffect = DEFAULTEFFECT;
             }
 
             var effectLabels = [];
             var effectValues = [];            
-            var effectCategories = [];
-            var effectCategoriesList = [];
-            for (var i = 0; i < EFFECTNAMES.length; i++) {
-                var label = _(EFFECTNAMES[i][1]);
-                if (getTextWidth(label, 'bold 48pt Sans') > 400) {
-                    effectLabels.push(label.substr(0, 8) + '...');
-                } else {
-                    effectLabels.push(label);
+            var effectcategories = [];
+            var effectcategoriesList = [];
+            for (var i = 0; i < DRUMNAMES.length; i++) {
+               if(i in EFFECTNAMES) {
+                   console.log("found");
+                    var label = _(DRUMNAMES[i][1]);
+                    if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                        effectLabels.push(label.substr(0, 8) + '...');
+                    } else {
+                        effectLabels.push(label);
+                    }
+
+                    effectValues.push(DRUMNAMES[i][1]);
+
+                    if (effectcategoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                        effectcategoriesList.push(DRUMNAMES[i][4]);
+                    }
+
+                    effectcategories.push(effectcategoriesList.indexOf(DRUMNAMES[i][4]));
                 }
-
-                effectLabels.push(EFFECTNAMES[i][1]);
-
-                if (effectCategoriesList.indexOf(EFFECTNAMES[i][4]) === -1) {
-                    effectCategories.push(EFFECTNAMES[i][4]);
-                }
-
-                effectCategories.push(effectCategoriesList.indexOf(EFFECTNAMES[i][4]));
             }
 
-            this._piemenuVoices(effectLabels, effectValues, effectCategories, selectedeffect);
+            this._piemenuVoices(effectLabels, effectValues, effectcategories, selectedeffect);
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
                 var selectedtype = this.value;
@@ -4078,11 +4083,6 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
             }
 
-            if (getEffectName(that.value) === null) {
-                that.blocks.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
-            } else {
-                that.blocks.logo.synth.loadSynth(0, getEffectSynthName(that.value));
-            }
 
             // Make sure text is on top.
             var z = that.container.children.length - 1;
@@ -4943,13 +4943,6 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
                 break;
-            case 'playeffect':
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    if (newValue.slice(0, 4) === 'http') {
-                        this.blocks.logo.synth.loadSynth(0, newValue);
-                    }
-                }
-                break;    
             default:
                 break;
             }
@@ -4963,7 +4956,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.name === 'drumname') {
                 this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === 'effectsname') {
-                this.blocks.logo.synth.loadSynth(0, getEffectSynthName(this.value));
+                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === 'voicename') {
                 this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
             } else if (this.name === 'noisename') {

@@ -68,6 +68,28 @@ var VOICENAMES = [
 // drum symbols are from
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
 var DRUMNAMES = [
+     //.TRANS: animal sound effect
+     [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
+     //.TRANS: animal sound effect
+     [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
+     //.TRANS: animal sound effect
+     [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
+     //.TRANS: animal sound effect
+     [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
+     //.TRANS: sound effect
+     [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
+     //.TRANS: sound effect
+     [_('crash'), 'crash', 'images/crash.svg', 'cymca', 'effect'],
+     //.TRANS: sound effect
+     [_('bottle'), 'bottle', 'images/bottle.svg', 'hh', 'effect'],
+     //.TRANS: sound effect
+     [_('clap'), 'clap', 'images/clap.svg', 'hc', 'effect'],
+     //.TRANS: sound effect
+     [_('slap'), 'slap', 'images/slap.svg', 'vibs', 'effect'],
+     //.TRANS: sound effect
+     [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
+     //.TRANS: sound effect
+     [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
     //.TRANS: musical instrument
     [_('snare-drum'), 'snare drum', 'images/snaredrum.svg', 'sn', 'drum'],
     //.TRANS: musical instrument
@@ -92,6 +114,7 @@ var DRUMNAMES = [
     [_('finger-cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
+   
 ];
 
 var EFFECTNAMES = [
@@ -694,10 +717,6 @@ function Synth() {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
             var tempSynth = new Tone.Player(this.samples.drum[sourceName]);
-        } else if (sourceName in this.samples.effect) {
-            instrumentsSource[instrumentName] = [1, sourceName];
-            console.log(sourceName);
-            var tempSynth = new Tone.Player(this.samples.effect[sourceName]);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, 'drum'];
@@ -782,7 +801,7 @@ function Synth() {
 
     this.__createSynth = function (turtle, instrumentName, sourceName, params) {
         this._loadSample(sourceName);
-        if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum) || (sourceName in this.samples.effect)) {
+        if ((sourceName in this.samples.voice) || (sourceName in this.samples.drum)) {
             instruments[turtle][instrumentName] = this._createSampleSynth(turtle, instrumentName, sourceName, null).toMaster();
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(turtle, instrumentName, sourceName, params).toMaster();
