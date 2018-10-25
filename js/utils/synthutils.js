@@ -436,9 +436,7 @@ function Synth() {
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
-                {'name': 'snare drum', 'data': SNARE_SAMPLE}
-            ],
-            'effect' : [
+                {'name': 'snare drum', 'data': SNARE_SAMPLE},
                 {'name': 'cat', 'data': CAT_SAMPLE},
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
                 {'name': 'clap', 'data': CLAP_SAMPLE},

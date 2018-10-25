@@ -713,17 +713,17 @@ function getDrumName(name) {
 
 function getEffectName(name) {
     if (name === '') {
-        console.log('getEffectName passed blank name. Returning ' + DEFAULTEFFECT);
+        console.log('getEffectName passed blank name. Returning ' + EFFECTNAMES);
         name = DEFAULTEFFECT;
     } else if (name.slice(0, 4) === 'http') {
         return null;
     }
 
-    for (var effect = 0; effect < DEFAULTEFFECTS.length; effect++) {
-        if (DEFAULTEFFECTS[effect][0].toLowerCase() === name.toLowerCase()) {
-            return DEFAULTEFFECTS[effect][0];
-        } else if (DEFAULTEFFECTS[effect][1].toLowerCase() === name.toLowerCase()) {
-            return DEFAULTEFFECTS[effect][1];
+    for (var effect = 0; effect < EFFECTNAMES.length; effect++) {
+        if (EFFECTNAMES[effect][0].toLowerCase() === name.toLowerCase()) {
+            return EFFECTNAMES[effect][0];
+        } else if (EFFECTNAMES[effect][1].toLowerCase() === name.toLowerCase()) {
+            return EFFECTNAMES[effect][1];
         }
     }
 

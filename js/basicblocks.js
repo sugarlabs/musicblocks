@@ -2643,7 +2643,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('effectsname');
-    newblock.palette = palettes.dict['effects'];
+    newblock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['effectsname'] = newblock;
     newblock.valueBlock();
     newblock.extraWidth = 50;

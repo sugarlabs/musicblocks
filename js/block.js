@@ -960,7 +960,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'drum':
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', platformColor.blockText);
-                    break;
+                    break;    
                 case 'rhythmruler2':
                     that.collapseText = new createjs.Text(_('rhythm maker'), fontSize + 'px Sans', platformColor.blockText);
                     break;
@@ -2297,8 +2297,8 @@ function Block(protoblock, blocks, overrideName) {
 
             var effectLabels = [];
             var effectValues = [];            
-            var categories = [];
-            var categoriesList = [];
+            var effectCategories = [];
+            var effectCategoriesList = [];
             for (var i = 0; i < EFFECTNAMES.length; i++) {
                 var label = _(EFFECTNAMES[i][1]);
                 if (getTextWidth(label, 'bold 48pt Sans') > 400) {
@@ -2309,14 +2309,14 @@ function Block(protoblock, blocks, overrideName) {
 
                 effectLabels.push(EFFECTNAMES[i][1]);
 
-                if (categoriesList.indexOf(EFFECTNAMES[i][4]) === -1) {
-                    categoriesList.push(EFFECTNAMES[i][4]);
+                if (effectCategoriesList.indexOf(EFFECTNAMES[i][4]) === -1) {
+                    effectCategories.push(EFFECTNAMES[i][4]);
                 }
 
-                categories.push(categoriesList.indexOf(EFFECTNAMES[i][4]));
+                effectCategories.push(effectCategoriesList.indexOf(EFFECTNAMES[i][4]));
             }
 
-            this._piemenuVoices(effectLabels, effectValues, categories, selectedeffect);
+            this._piemenuVoices(effectLabels, effectValues, effectCategories, selectedeffect);
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
                 var selectedtype = this.value;
@@ -4943,6 +4943,13 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
                 break;
+            case 'playeffect':
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (newValue.slice(0, 4) === 'http') {
+                        this.blocks.logo.synth.loadSynth(0, newValue);
+                    }
+                }
+                break;    
             default:
                 break;
             }

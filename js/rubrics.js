@@ -175,6 +175,7 @@ const TACAT = {
     // drum palette
 
     'drumname': 'ignore',
+    'effectsname': 'ignore',
     'setdrum': 'tone',
     'playdrum': 'tone',
 

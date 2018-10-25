@@ -812,6 +812,9 @@ function PaletteModel(palette, palettes, name) {
             case 'drumname':
                 label = _('drum');
                 break;
+            case 'effectsname':
+                label = _('effect');
+                break;    
             case 'solfege':
                 label = i18nSolfege('sol');
                 break;
