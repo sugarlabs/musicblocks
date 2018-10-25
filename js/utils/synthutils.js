@@ -449,7 +449,7 @@ function Synth() {
                 {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'dog', 'data': DOG_SAMPLE},
                 {'name': 'duck', 'data': DUCK_SAMPLE},
-                {'name': 'clang', 'data': CLANG_SAMPLE}
+                {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'crash', 'data': CRASH_SAMPLE},
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
                 {'name': 'clap', 'data': CLAP_SAMPLE},
