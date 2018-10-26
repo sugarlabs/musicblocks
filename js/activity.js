@@ -4111,7 +4111,7 @@ handleComplete);
             _loadButtonDragHandler(runContainer, x, y, _doFastButton, _openAuxMenu, null, null, null);
             onscreenButtons.push(runContainer);
 
-            x += dx;
+            x += 1.5 * dx;
 
             hardStopTurtleContainer = _makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
             _loadButtonDragHandler(hardStopTurtleContainer, x, y, doHardStopButton, null, null, null, null);
@@ -4121,11 +4121,11 @@ handleComplete);
             _loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
             onscreenButtons.push(stopTurtleContainer);
 
-            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 1.5 * dx, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(slowContainer, x - 1.5 * dx, y - btnSize, _doSlowButton, null, null, null, null);
+            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, _doSlowButton, null, null, null, null);
 
-            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - 0.5 * dx, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(stepContainer, x - 0.5 * dx, y - btnSize, _doStepButton, null, null, null, null);
+            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(stepContainer, x - dx, y - btnSize, _doStepButton, null, null, null, null);
 
             x += dx;
 
@@ -4288,7 +4288,7 @@ handleComplete);
                 var x = Math.floor(canvas.width / turtleBlocksScale) - 15 * btnSize / 2;
 
             } else {
-                var x = Math.floor(canvas.width / turtleBlocksScale) - 23 * btnSize / 2;
+                var x = Math.floor(canvas.width / turtleBlocksScale) - 20.5 * btnSize / 2;
 
                 statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
                 _loadButtonDragHandler(statsContainer, x, y, doAnalytics, null, null, null, null);
@@ -4327,6 +4327,13 @@ handleComplete);
             // var x = Math.floor(-btnSize / 2);
             var y = Math.floor(btnSize / 2);
 
+            x += 2 * dx;
+
+            openMergeContainer = _makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
+            _loadButtonDragHandler(openMergeContainer, x, y, _doMergeLoad, null, null, null, null);
+            onscreenMenu.push(openMergeContainer);
+            openMergeContainer.visible = false;
+
             x += dx;
 
             restoreContainer = _makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
@@ -4334,15 +4341,9 @@ handleComplete);
             onscreenMenu.push(restoreContainer);
             restoreContainer.visible = false;
 
-            x += dx;
-
-            openMergeContainer = _makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
-            _loadButtonDragHandler(openMergeContainer, x, y, _doMergeLoad, null, null, null, null);
-            onscreenMenu.push(openMergeContainer);
-            openMergeContainer.visible = false;
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                x += 3.5 * dx;
+                x += 1.5 * dx;
                 beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
                 _loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
                 beginnerModeContainer.visible = false;
