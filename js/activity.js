@@ -4092,7 +4092,7 @@ handleComplete);
                 });
             };
             logoContainer.on('click', function (event) {
-                _showHelpPage(27) // show about page
+                _showHelpPage(31) // show about page
             });
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
