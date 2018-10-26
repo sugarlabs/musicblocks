@@ -4046,7 +4046,7 @@ handleComplete);
                 var logoText = new createjs.Text(_('Turtle Blocks'), '14px Sans', '#282828');
             }
 
-            logoText.textAlign = 'center';
+            logoText.textAlign = 'left';
             logoText.visible = false;
             var img = new Image();
             img.onload = function () {
@@ -4070,11 +4070,11 @@ handleComplete);
                 logoContainer.on('mouseover', function (event) {
                     document.body.style.cursor = "pointer";
                     if (bg === null) {
-                        logoText.x = 65;
+                        logoText.x = 10;
                         logoText.y = 55;
                         var b = logoText.getBounds();
                         bg = new createjs.Shape();
-                        bg.graphics.beginFill('#FFF').drawRoundRect(logoText.x - b.width / 2 - 8, logoText.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                        bg.graphics.beginFill('#FFF').drawRoundRect(logoText.x - 8, logoText.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
                         logoContainer.addChild(logoText);
                         logoContainer.addChildAt(bg, 0);
                     }
