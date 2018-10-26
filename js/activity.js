@@ -39,19 +39,12 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 if (_THIS_IS_MUSIC_BLOCKS_) {
     beginnerMode = true;
 
-<<<<<<< HEAD
-        if (localStorageShim.beginnerMode !== null) {
-            // console.log('setting mode from local storage');
-            // console.log(localStorage.beginnerMode);
-            beginnerMode = localStorageShim.beginnerMode;
-=======
     try {
-        if (localStorage.beginnerMode === undefined) {
+        if (localStorageShim.beginnerMode === undefined) {
             console.log('FIRST TIME USER');
-        } else if (localStorage.beginnerMode !== null) {
-            beginnerMode = localStorage.beginnerMode;
+        } else if (localStorageShim.beginnerMode !== null) {
+            beginnerMode = localStorageShim.beginnerMode;
             console.log('READING BEGINNERMODE FROM LOCAL STORAGE: ' + beginnerMode + ' ' + typeof(beginnerMode)); 
->>>>>>> origin/master
             if (typeof(beginnerMode) === 'string') {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
@@ -79,12 +72,7 @@ if (beginnerMode) {
 try {
     console.log(localStorageShim.languagePreference);
 
-<<<<<<< HEAD
     if (localStorageShim.languagePreference) {
-        console.log('setting language from local storage');
-=======
-    if (localStorage.languagePreference) {
->>>>>>> origin/master
         try {
             lang = localStorageShim.languagePreference;
             document.webL10n.setLanguage(lang);
