@@ -4121,11 +4121,11 @@ handleComplete);
             _loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
             onscreenButtons.push(stopTurtleContainer);
 
-            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - dx, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(slowContainer, x - dx, y - btnSize, _doSlowButton, null, null, null, null);
+            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 1.5 * dx, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(slowContainer, x - 1.5 * dx, y - btnSize, _doSlowButton, null, null, null, null);
 
-            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(stepContainer, x, y - btnSize, _doStepButton, null, null, null, null);
+            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - 0.5 * dx, y - btnSize, btnSize, 0);
+            _loadButtonDragHandler(stepContainer, x - 0.5 * dx, y - btnSize, _doStepButton, null, null, null, null);
 
             x += dx;
 
@@ -4340,7 +4340,7 @@ handleComplete);
             openMergeContainer.visible = false;
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                x += dx;
+                x += 4 * dx;
                 beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
                 _loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
                 beginnerModeContainer.visible = false;
