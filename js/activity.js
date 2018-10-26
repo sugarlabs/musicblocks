@@ -4092,7 +4092,7 @@ handleComplete);
                 });
             };
             logoContainer.on('click', function (event) {
-                _showHelpPage(27) // show about page
+                _showAboutPage(); // show about page
             });
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
@@ -4433,10 +4433,10 @@ handleComplete);
             helpWidget.init(null);
         };
 
-        function _showHelpPage(page) {
+        function _showAboutPage() {
             var helpWidget = new HelpWidget();
             helpWidget.init(null);
-            helpWidget._showPage(page);           
+            helpWidget._showPageByName("About");
         };
 
         function _doMenuButton() {
