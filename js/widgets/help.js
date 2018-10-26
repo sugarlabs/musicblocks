@@ -222,8 +222,16 @@ function HelpWidget () {
 	    body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
 	}
 
-	helpBody.innerHTML = body;
+    helpBody.innerHTML = body;
     };
+
+    this._showPageByName = function(pageName) {
+        for (let i = 0; i < HELPCONTENT.length; i++) {
+            if(HELPCONTENT[i].includes(pageName)) {
+                this._showPage(i);
+            }
+        }
+};
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
