@@ -4288,7 +4288,7 @@ handleComplete);
                 var x = Math.floor(canvas.width / turtleBlocksScale) - 15 * btnSize / 2;
 
             } else {
-                var x = Math.floor(canvas.width / turtleBlocksScale) - 21 * btnSize / 2;
+                var x = Math.floor(canvas.width / turtleBlocksScale) - 23 * btnSize / 2;
 
                 statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
                 _loadButtonDragHandler(statsContainer, x, y, doAnalytics, null, null, null, null);
@@ -4320,6 +4320,8 @@ handleComplete);
                 _loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
                 onscreenMenu.push(scrollOffContainer);
                 scrollOffContainer.visible = false;
+
+                x += dx;
             }
 
             // var x = Math.floor(-btnSize / 2);
@@ -4340,7 +4342,7 @@ handleComplete);
             openMergeContainer.visible = false;
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                x += 4 * dx;
+                x += 3.5 * dx;
                 beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
                 _loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
                 beginnerModeContainer.visible = false;
