@@ -14,7 +14,7 @@
    viewBox="0 0 88.767708 59.134374"
    version="1.1"
    id="svg1430"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="interval.svg">
   <defs
      id="defs1424" />
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="103.01787"
-     inkscape:cy="21.106551"
+     inkscape:cx="-62.98213"
+     inkscape:cy="17.106551"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -35,10 +35,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:window-width="1278"
+     inkscape:window-height="773"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="1"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata1427">
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -74,7 +74,7 @@
           <tspan
              x="5"
              y="15"
-             id="tspan3559">scalar interval (+/–)</tspan>
+             id="tspan3559">音階的音程　(+/–)</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -124,7 +124,7 @@
           <tspan
              x="20"
              y="15"
-             id="tspan3627">note</tspan>
+             id="tspan3627">音符</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -132,7 +132,7 @@
           <tspan
              x="85"
              y="12"
-             id="tspan3631">value</tspan>
+             id="tspan3631">値</tspan>
         </text>
       </g>
     </g>
@@ -253,7 +253,7 @@
           <tspan
              x="46"
              y="24"
-             id="tspan3689">pitch</tspan>
+             id="tspan3689">音高</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -261,7 +261,7 @@
           <tspan
              x="46"
              y="12"
-             id="tspan3693">name</tspan>
+             id="tspan3693">名前</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -269,7 +269,7 @@
           <tspan
              x="46"
              y="33"
-             id="tspan3697">octave</tspan>
+             id="tspan3697">オクターヴ</tspan>
         </text>
       </g>
     </g>
@@ -290,7 +290,7 @@
           <tspan
              x="13"
              y="14"
-             id="tspan3707">sol</tspan>
+             id="tspan3707">ソ</tspan>
         </text>
       </g>
     </g>

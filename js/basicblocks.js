@@ -121,9 +121,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.dockTypes[0] = 'textout';
     newblock.extraWidth = 50;
-    if (beginnerMode && !beginnerBlock('invertmode')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('transpositionfactor');
     newblock.palette = palettes.dict['pitch'];
@@ -132,9 +130,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('transposition'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('transpositionfactor')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('consonantstepsizedown');
     newblock.palette = palettes.dict['pitch'];
@@ -280,10 +276,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var customNoteBlock = new ProtoBlock('customNote');
-    customNoteBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['customNote'] = customNoteBlock;
-    customNoteBlock.valueBlock();
+    var newblock = new ProtoBlock('customNote');
+    newblock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['customNote'] = newblock;
+    newblock.valueBlock();
+    if (beginnerMode && !beginnerBlock('customNote')) {
+        newblock.hidden = true;
+    }
 
     // Transposition blocks
     // macro
@@ -551,7 +550,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('hertz'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
-    newblock.defaults.push(392);
+    var language = localStorage.languagePreference;
+    if (language === 'ja') {
+        newblock.defaults.push(440);
+    } else {
+        newblock.defaults.push(392);
+    }
+
     if (beginnerMode && !beginnerBlock('hertz')) {
         newblock.hidden = true;
     }
@@ -707,203 +712,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[3] = 'numberin';
     newblock.hidden = true;
 
-    // macro
-    var newblock = new ProtoBlock('sixtyfourthNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['sixtyfourthNote'] = newblock;
-    newblock.staticLabels.push(_('1/64 note') + ' 𝅘𝅥𝅱');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('sixtyfourthNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('thirtysecondNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['thirtysecondNote'] = newblock;
-    newblock.staticLabels.push(_('1/32 note') + ' 𝅘𝅥𝅰');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('thirtysecondNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('sixteenthNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['sixteenthNote'] = newblock;
-    newblock.staticLabels.push(_('1/16 note') + ' 𝅘𝅥𝅯');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('sixteenthNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('eighthNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['eighthNote'] = newblock;
-    newblock.staticLabels.push(_('eighth note') + ' ♪');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('eighthNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('quarterNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['quarterNote'] = newblock;
-    newblock.staticLabels.push(_('quarter note') + ' ♩');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('quarterNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('halfNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['halfNote'] = newblock;
-    newblock.staticLabels.push(_('half note') + ' 𝅗𝅥');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('halfNote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('wholeNote');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['wholeNote'] = newblock;
-    newblock.staticLabels.push(_('whole note') + ' 𝅝');
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('wholeNote')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('tuplet2');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['tuplet2'] = newblock;
-    //.TRANS: A tuplet is a note value divided into irregular time values.
-    newblock.staticLabels.push(_('tuplet'));
-    newblock.staticLabels.push(_('number of notes'));
-    newblock.staticLabels.push(_('note value'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.defaults.push(1);
-    newblock.defaults.push(4);
-    newblock.hidden = true;
-
-    // macro
-    var tuplet3Block = new ProtoBlock('tuplet3');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['tuplet3'] = tuplet3Block;
-    newblock.staticLabels.push(_('tuplet'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.defaults.push(1);
-    newblock.defaults.push(4);
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('tuplet4');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['tuplet4'] = newblock;
-    newblock.staticLabels.push(_('tuplet'));
-    newblock.staticLabels.push(_('note value'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1 / 4);
-    if (beginnerMode && !beginnerBlock('tuplet4')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet7');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet7'] = newblock;
-    //.TRANS: A tuplet divided into 7 time values.
-    newblock.staticLabels.push(_('septuplet'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stuplet7')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet5');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet5'] = newblock;
-    //.TRANS: A tuplet divided into 5 time values.
-    newblock.staticLabels.push(_('quintuplet'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stuplet5')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet3');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet3'] = newblock;
-    //.TRANS: A tuplet divided into 3 time values.
-    newblock.staticLabels.push(_('triplet'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stuplet3')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('stuplet');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['stuplet'] = newblock;
-    newblock.staticLabels.push(_('simple tuplet'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.adjustWidthToLabel();
-    newblock.twoArgBlock();
-    newblock.defaults.push(3);
-    newblock.defaults.push(1 / 2);
-    if (beginnerMode && !beginnerBlock('stuplet')) {
-        newblock.hidden = true;
-    }
-
-    // deprecated
-    var newblock = new ProtoBlock('rhythm');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['rhythm'] = newblock;
-    //.TRANS: an arrangement of notes based on duration
-    newblock.staticLabels.push(_('rhythm'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(3);
-    newblock.defaults.push(4);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'anyin';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('rhythm2');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['rhythm2'] = newblock;
-    //.TRANS: an arrangement of notes based on duration
-    newblock.staticLabels.push(_('rhythm'));
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(3);
-    newblock.defaults.push(4);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'anyin';
-    if (beginnerMode && !beginnerBlock('rhythm2')) {
-        newblock.hidden = true;
-    }
-
     var newblock = new ProtoBlock('temperament');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['temperament'] = newblock;
@@ -922,7 +730,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['timbre'] = newblock;
     //.TRANS: timbre is the character or quality of a musical sound
     newblock.staticLabels.push(_('timbre'));
-    newblock.extraWidth = 20;
+    newblock.extraWidth = 50;
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
     newblock.stackClampOneArgBlock();
@@ -985,7 +793,36 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // macro
+
+    var language = localStorage.languagePreference;
+    if (language === 'ja') {
+        // macro
+        var newblock = new ProtoBlock('musickeyboardja');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['musickeyboardja'] = newblock;
+        //.TRANS: widget to generate pitches using a slider
+        newblock.staticLabels.push(_('music keyboard'));
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+        if (beginnerMode && !beginnerBlock('musickeyboard')) {
+            newblock.hidden = true;
+        }
+    } else {
+        // macro
+        var newblock = new ProtoBlock('musickeyboard2');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['musickeyboard2'] = newblock;
+        //.TRANS: widget to generate pitches using a slider
+        newblock.staticLabels.push(_('music keyboard'));
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+        if (beginnerMode && !beginnerBlock('musickeyboard')) {
+            newblock.hidden = true;
+        }
+    }
+
     var newblock = new ProtoBlock('musickeyboard');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['musickeyboard'] = newblock;
@@ -994,9 +831,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('musickeyboard')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('pitchstaircase');
     newblock.palette = palettes.dict['widgets'];
@@ -1016,7 +851,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.palette = palettes.dict['widgets'];
         blocks.protoBlockDict['rhythmruler3'] = newblock;
         //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-        newblock.staticLabels.push(_('rhythm ruler'));
+        newblock.staticLabels.push(_('rhythm maker'));
         newblock.extraWidth = 20;
         newblock.adjustWidthToLabel();
         newblock.labelOffset = 15;
@@ -1028,7 +863,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['rhythmruler2'] = newblock;
     //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-    newblock.staticLabels.push(_('rhythm ruler'));
+    newblock.staticLabels.push(_('rhythm maker'));
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
@@ -1086,6 +921,203 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // RHYTHM PALETTE
+
+    // macro
+    var newblock = new ProtoBlock('sixtyfourthNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['sixtyfourthNote'] = newblock;
+    newblock.staticLabels.push(_('1/64 note') + ' 𝅘𝅥𝅱');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('sixtyfourthNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('thirtysecondNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['thirtysecondNote'] = newblock;
+    newblock.staticLabels.push(_('1/32 note') + ' 𝅘𝅥𝅰');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('thirtysecondNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('sixteenthNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['sixteenthNote'] = newblock;
+    newblock.staticLabels.push(_('1/16 note') + ' 𝅘𝅥𝅯');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('sixteenthNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('eighthNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['eighthNote'] = newblock;
+    newblock.staticLabels.push(_('eighth note') + ' ♪');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('eighthNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('quarterNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['quarterNote'] = newblock;
+    newblock.staticLabels.push(_('quarter note') + ' ♩');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('quarterNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('halfNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['halfNote'] = newblock;
+    newblock.staticLabels.push(_('half note') + ' 𝅗𝅥');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('halfNote')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('wholeNote');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['wholeNote'] = newblock;
+    newblock.staticLabels.push(_('whole note') + ' 𝅝');
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('wholeNote')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('tuplet2');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['tuplet2'] = newblock;
+    //.TRANS: A tuplet is a note value divided into irregular time values.
+    newblock.staticLabels.push(_('tuplet'));
+    newblock.staticLabels.push(_('number of notes'));
+    newblock.staticLabels.push(_('note value'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.flowClampTwoArgBlock();
+    newblock.defaults.push(1);
+    newblock.defaults.push(4);
+    newblock.hidden = true;
+
+    // macro
+    var tuplet3Block = new ProtoBlock('tuplet3');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['tuplet3'] = tuplet3Block;
+    newblock.staticLabels.push(_('tuplet'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.flowClampTwoArgBlock();
+    newblock.defaults.push(1);
+    newblock.defaults.push(4);
+    newblock.hidden = true;
+
+    // macro
+    var newblock = new ProtoBlock('tuplet4');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['tuplet4'] = newblock;
+    newblock.staticLabels.push(_('tuplet'));
+    newblock.staticLabels.push(_('note value'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.flowClampOneArgBlock();
+    newblock.defaults.push(1 / 4);
+    if (beginnerMode && !beginnerBlock('tuplet4')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet7');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet7'] = newblock;
+    //.TRANS: A tuplet divided into 7 time values.
+    newblock.staticLabels.push(_('septuplet'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('stuplet7')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet5');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet5'] = newblock;
+    //.TRANS: A tuplet divided into 5 time values.
+    newblock.staticLabels.push(_('quintuplet'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('stuplet5')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet3');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet3'] = newblock;
+    //.TRANS: A tuplet divided into 3 time values.
+    newblock.staticLabels.push(_('triplet'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('stuplet3')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('stuplet');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['stuplet'] = newblock;
+    newblock.staticLabels.push(_('simple tuplet'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.adjustWidthToLabel();
+    newblock.twoArgBlock();
+    newblock.defaults.push(3);
+    newblock.defaults.push(1 / 2);
+    if (beginnerMode && !beginnerBlock('stuplet')) {
+        newblock.hidden = true;
+    }
+
+    // deprecated
+    var newblock = new ProtoBlock('rhythm');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['rhythm'] = newblock;
+    //.TRANS: an arrangement of notes based on duration
+    newblock.staticLabels.push(_('rhythm'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(3);
+    newblock.defaults.push(4);
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('rhythm2');
+    newblock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['rhythm2'] = newblock;
+    //.TRANS: an arrangement of notes based on duration
+    newblock.staticLabels.push(_('rhythm'));
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(3);
+    newblock.defaults.push(4);
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
+    if (beginnerMode && !beginnerBlock('rhythm2')) {
+        newblock.hidden = true;
+    }
 
     var newblock = new ProtoBlock('mynotevalue');
     newblock.palette = palettes.dict['rhythm'];
@@ -1237,7 +1269,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note4'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + _('drum'));
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note4')) {
         newblock.hidden = true;
     }
@@ -1248,7 +1280,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note3'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note3')) {
         newblock.hidden = true;
     }
@@ -1259,7 +1291,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note5'] = newblock;
     newblock.staticLabels.push(_('note value') + ' 7');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note5')) {
         newblock.hidden = true;
     }
@@ -1270,7 +1302,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note7'] = newblock;
     newblock.staticLabels.push(_('note value') + ' 5 4');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note7')) {
         newblock.hidden = true;
     }
@@ -1281,7 +1313,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note6'] = newblock;
     newblock.staticLabels.push(_('note value') + ' +1');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note6')) {
         newblock.hidden = true;
     }
@@ -1292,7 +1324,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note2'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + 'G4');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+        newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note2')) {
         newblock.hidden = true;
     }
@@ -1303,7 +1335,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['note1'] = newblock;
     newblock.staticLabels.push(_('note value') + ' ' + i18nSolfege('sol') + '4');
     newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
+    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note1')) {
         newblock.hidden = true;
     }
@@ -1502,6 +1534,21 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.hidden = true;
 
     // macro
+    var newblock = new ProtoBlock('setbpm3');
+    newblock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['setbpm3'] = newblock;
+    //.TRANS: sets tempo by defniing a beat and beats per minute
+    newblock.staticLabels.push(_('beats per minute'));
+    newblock.staticLabels.push(_('bpm'), _('beat value'));
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(90);
+    newblock.defaults.push(1 / 4);
+    newblock.twoArgBlock();
+    if (beginnerMode && !beginnerBlock('setbpm3')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('setbpm2');
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['setbpm2'] = newblock;
@@ -1512,9 +1559,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampTwoArgBlock();
     newblock.defaults.push(90);
     newblock.defaults.push(1 / 4);
-    if (beginnerMode && !beginnerBlock('setbpm2')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     // macro
     var newblock = new ProtoBlock('setbpm');
@@ -1559,26 +1604,22 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // TONE (ARTICULATION) PALETTE
 
     var newblock = new ProtoBlock('staccatofactor');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['staccatofactor'] = newblock;
     //.TRANS: the duration of a note played as staccato
     newblock.staticLabels.push(_('staccato factor'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('staccatofactor')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('slurfactor');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['slurfactor'] = newblock;
     //.TRANS: the degree of overlap of notes played as legato
     newblock.staticLabels.push(_('slur factor'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('slurfactor')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('duosynth');
     newblock.palette = palettes.dict['tone'];
@@ -1665,7 +1706,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('neighbor');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['neighbor'] = newblock;
     //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
     newblock.staticLabels.push(_('neighbor') + ' (+/–)');
@@ -1683,7 +1724,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('neighbor2');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['neighbor2'] = newblock;
     //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
     newblock.staticLabels.push(_('neighbor') + ' (+/–)');
@@ -1801,7 +1842,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('glide');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['glide'] = newblock;
    //.TRANS: glide (glissando) is a blended overlap successive notes
     newblock.staticLabels.push(_('glide'));
@@ -1812,7 +1853,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('slur');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['slur'] = newblock;
     //.TRANS: slur or legato is an overlap successive notes
     newblock.staticLabels.push(_('slur'));
@@ -1823,7 +1864,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('staccato');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['staccato'] = newblock;
     //.TRANS: play each note sharply detached from the others
     newblock.staticLabels.push(_('staccato'));
@@ -1834,7 +1875,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('newslur');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['newslur'] = newblock;
     //.TRANS: legato: overlap successive notes
     newblock.staticLabels.push(_('slur'));
@@ -1847,7 +1888,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('newstaccato');
-    newblock.palette = palettes.dict['tone'];
+    newblock.palette = palettes.dict['ornament'];
     blocks.protoBlockDict['newstaccato'] = newblock;
     //.TRANS: play each note sharply detached from the others
     newblock.staticLabels.push(_('staccato'));
@@ -1898,7 +1939,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['settemperament'] = newblock;
     newblock.staticLabels.push(_('set temperament'));
     newblock.staticLabels.push(_('temperament'));
-    newblock.staticLabels.push(_('reference pitch'), _('octave'));
+    newblock.staticLabels.push(_('pitch'), _('octave'));
     newblock.adjustWidthToLabel();
     newblock.threeArgBlock();
     if (beginnerMode && !beginnerBlock('settemperament')) {
@@ -1927,14 +1968,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('temperament1');
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['temperament1'] = newblock;
-    newblock.staticLabels.push(_('define temperamentX'));
+    newblock.staticLabels.push(_('define temperament'));
     newblock.hidden = true; 
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
     newblock.stackClampOneArgBlock();   
-    if (beginnerMode && !beginnerBlock('temperament1')) {
-        newblock.hidden = true;
-    }
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
@@ -2898,7 +2936,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // TURTLE PALETTE
 
     var newblock = new ProtoBlock('heading');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['heading'] = newblock;
     //.TRANS: orientation or compass direction
     newblock.staticLabels.push(_('heading'));
@@ -2909,7 +2947,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('y');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['y'] = newblock;
     //.TRANS: y coordinate
     newblock.staticLabels.push(_('y'));
@@ -2920,7 +2958,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('x');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['x'] = newblock;
     //.TRANS: x coordinate
     newblock.staticLabels.push(_('x'));
@@ -2931,7 +2969,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('scrollxy');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['scrollxy'] = newblock;
     //.TRANS: scroll canvas image by x, y position
     newblock.staticLabels.push(_('scroll xy'));
@@ -2946,7 +2984,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('clear');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['clear'] = newblock;
     //.TRANS: erase the screen and return the mice to the center position
     newblock.staticLabels.push(_('clear'));
@@ -2957,7 +2995,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('controlpoint2');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['controlpoint2'] = newblock;
     //.TRANS: control point in a bezier curve
     newblock.staticLabels.push(_('control point 2'))
@@ -2973,7 +3011,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('controlpoint1');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['controlpoint1'] = newblock;
     //.TRANS: control point in a Bezier curve
     newblock.staticLabels.push(_('control point 1'));
@@ -2989,7 +3027,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('bezier');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['bezier'] = newblock;
     //.TRANS: Bézier curves employ at least three points to define a curve
     newblock.staticLabels.push(_('bezier'));
@@ -3005,7 +3043,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('arc');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['arc'] = newblock;
     //.TRANS: draws a part of the circumference of a circle
     newblock.staticLabels.push(_('arc'));
@@ -3020,7 +3058,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setheading');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['setheading'] = newblock;
     //.TRANS: set compass heading
     newblock.staticLabels.push(_('set heading'));
@@ -3032,7 +3070,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setxy');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['setxy'] = newblock;
     //.TRANS: set xy position
     newblock.staticLabels.push(_('set xy'));
@@ -3047,7 +3085,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('right');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['right'] = newblock;
     //.TRANS: turn right (clockwise)
     newblock.staticLabels.push(_('right'));
@@ -3059,7 +3097,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('left');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['left'] = newblock;
     //.TRANS: turn left (counter-clockwise)
     newblock.staticLabels.push(_('left'));
@@ -3071,7 +3109,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('back');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['back'] = newblock;
     //.TRANS: move backward (in the opposite direction of the current heading)
     newblock.staticLabels.push(_('back'));
@@ -3083,7 +3121,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('forward');
-    newblock.palette = palettes.dict['mouse'];
+    newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['forward'] = newblock;
     //.TRANS: move forward (in the same direction of the current heading)
     newblock.staticLabels.push(_('forward'));
@@ -3183,9 +3221,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('beginfill')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('endfill');
     newblock.palette = palettes.dict['pen'];
@@ -4219,9 +4254,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('stop play'));
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('stopplayback')) {
+    // if (beginnerMode && !beginnerBlock('stopplayback')) {
         newblock.hidden = true;
-    }
+    // }
 
     var newblock = new ProtoBlock('playback');
     newblock.palette = palettes.dict['media'];
@@ -4232,9 +4267,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'mediain';
-    if (beginnerMode && !beginnerBlock('playback')) {
+    // if (beginnerMode && !beginnerBlock('playback')) {
         newblock.hidden = true;
-    }
+    // }
 
     var newblock = new ProtoBlock('speak');
     newblock.palette = palettes.dict['media'];
@@ -4317,8 +4352,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('turtleshell');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['turtleshell'] = newblock;
-    //.TRANS: Shell is the shell of a turtle (used as a metaphor for changing the appearance of a sprite)
-    newblock.staticLabels.push(_('shell'), _('size'), _('image'));
+    //.TRANS: Avatar is the image used to determine the appearance of the mouse.
+    newblock.staticLabels.push(_('avatar'), _('size'), _('image'));
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(55);
@@ -4701,9 +4736,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.abc');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('saveabc')) {
-        newblock.hidden = true;
-    }
 
     // deprecated in favor of save button
     var newblock = new ProtoBlock('savelilypond');
@@ -4715,9 +4747,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.ly');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('savelilypond')) {
-        newblock.hidden = true;
-    }
 
     // deprecated in favor of save button
     var newblock = new ProtoBlock('savesvg');
@@ -4729,9 +4758,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.svg');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('savesvg')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('nobackground');
     newblock.palette = palettes.dict['extras'];
@@ -4972,10 +4998,10 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // Mice palette (blocks for interacting between mice)
+    // Mice palette (blocks for interacting between ensemble)
 
     var newblock = new ProtoBlock('stopTurtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['stopTurtle'] = newblock;
     newblock.staticLabels.push(_('stop mouse'));
     newblock.adjustWidthToLabel();
@@ -4987,7 +5013,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('startTurtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['startTurtle'] = newblock;
     newblock.staticLabels.push(_('start mouse'));
     newblock.adjustWidthToLabel();
@@ -4999,7 +5025,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlecolor');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlecolor'] = newblock;
     //.TRANS: pen color for this mouse
     newblock.staticLabels.push(_('mouse color'));
@@ -5012,7 +5038,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtleheading');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtleheading'] = newblock;
     //.TRANS: heading (compass direction) for this mouse
     newblock.staticLabels.push(_('mouse heading'));
@@ -5025,7 +5051,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setxyturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setxyturtle'] = newblock;
     //.TRANS: set xy position for this mouse
     newblock.staticLabels.push(_('set mouse'), _('name'), _('x'), _('y'));
@@ -5036,12 +5062,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[3] = 'numberin';
     newblock.defaults.push(_('Mr. Mouse'), 0, 0);
     newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('setxyturtle')) {
-        newblock.hidden = true;
-    }
 
     var newblock = new ProtoBlock('setturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setturtle'] = newblock;
     newblock.staticLabels.push(_('set mouse'));
     newblock.adjustWidthToLabel();
@@ -5053,7 +5076,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('yturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['yturtle'] = newblock;
     //.TRANS: y position for this mouse
     newblock.staticLabels.push(_('mouse y'));
@@ -5066,7 +5089,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('xturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['xturtle'] = newblock;
     //.TRANS: x position for this mouse
     newblock.staticLabels.push(_('mouse x'));
@@ -5079,7 +5102,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtleelapsednotes');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtleelapsednotes'] = newblock;
     //.TRANS: notes played by this mouse
     newblock.staticLabels.push(_('mouse notes played'));
@@ -5092,7 +5115,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlepitch');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlepitch'] = newblock;
     //.TRANS: convert current note for this turtle to piano key (1-88)
     newblock.staticLabels.push(_('mouse pitch number'));
@@ -5105,7 +5128,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlenote');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlenote'] = newblock;
     newblock.staticLabels.push(_('mouse note value'));
     newblock.oneArgMathBlock();
@@ -5113,12 +5136,10 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.hidden = true;
     newblock.defaults.push(_('Mr. Mouse'));
-    if (beginnerMode && !beginnerBlock('turtlenote')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('turtlenote2');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlenote2'] = newblock;
     newblock.staticLabels.push(_('mouse note value'));
     newblock.oneArgMathBlock();
@@ -5130,7 +5151,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlesync');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlesync'] = newblock;
     newblock.staticLabels.push(_('mouse sync'));
     newblock.oneArgBlock();
@@ -5142,7 +5163,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('foundturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['foundturtle'] = newblock;
     newblock.staticLabels.push(_('found mouse'));
     newblock.adjustWidthToLabel();
@@ -5155,7 +5176,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('newturtle');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['newturtle'] = newblock;
     newblock.staticLabels.push(_('new mouse'));
     newblock.adjustWidthToLabel();
@@ -5167,7 +5188,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('turtlename');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['turtlename'] = newblock;
     newblock.staticLabels.push(_('mouse name'));
     newblock.adjustWidthToLabel();
@@ -5178,7 +5199,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setturtlename');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setturtlename'] = newblock;
     newblock.staticLabels.push(_('set name'));
     newblock.staticLabels.push(_('source'));
@@ -5195,7 +5216,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('setturtlename2');
-    newblock.palette = palettes.dict['mice'];
+    newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setturtlename2'] = newblock;
     newblock.staticLabels.push(_('set name'));
     newblock.adjustWidthToLabel();
@@ -5318,6 +5339,22 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(50);
     newblock.hidden = true;
 
+    // macro
+    var newblock = new ProtoBlock('setdrumvolume');
+    newblock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['setdrumvolume'] = newblock;
+    //.TRANS: set the loudness level
+    newblock.staticLabels.push(_('set drum volume'), _('drum'), _('volume'));
+    newblock.adjustWidthToLabel();
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'textin';
+    newblock.defaults.push('default');
+    newblock.defaults.push(50);
+    if (beginnerMode && !beginnerBlock('setdrumvolume')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('setsynthvolume');
     newblock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['setsynthvolume'] = newblock;

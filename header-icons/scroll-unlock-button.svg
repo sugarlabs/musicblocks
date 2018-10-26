@@ -5,10 +5,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   height="55"
-   width="55"
+   id="svg2"
    version="1.1"
-   id="svg2">
+   width="55"
+   height="55">
   <metadata
      id="metadata27">
     <rdf:RDF>
@@ -24,55 +24,56 @@
   <defs
      id="defs25" />
   <g
-     style="fill:none;stroke:#000000;stroke-opacity:1"
+     transform="rotate(-90,42.18758,61.708515)"
      id="g113"
-     transform="rotate(-90,42.18758,61.708515)">
+     style="fill:none;stroke:#ffffff;stroke-opacity:1">
     <g
-       style="fill:none;stroke:#000000;stroke-opacity:1"
+       transform="translate(34.0803,-1006.42)"
        id="g115"
-       transform="translate(34.0803,-1006.42)">
+       style="fill:none;stroke:#ffffff;stroke-opacity:1">
       <polyline
-         id="polyline117"
+         points="51.562,15.306 41.17,16.188 42.053,5.794"
+         style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
          transform="matrix(-0.469241,0.469241,-0.469241,-0.469241,66.2906,1019.03)"
-         style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
-         points="51.562,15.306 41.17,16.188 42.053,5.794" />
+         id="polyline117" />
       <path
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 39.363241,1033.1291 -0.05636,9.4622"
          id="path119"
-         d="m 39.363241,1033.1291 -0.05636,9.4622" />
+         style="fill:none;stroke:#ffffff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
   <g
-     style="fill:none;stroke:#000000;stroke-opacity:1"
+     transform="matrix(0,-1,-1,0,74.52093,103.89609)"
      id="g121"
-     transform="matrix(0,-1,-1,0,74.52093,103.89609)">
+     style="fill:none;stroke:#ffffff;stroke-opacity:1">
     <g
-       style="fill:none;stroke:#000000;stroke-opacity:1"
+       transform="translate(34.0803,-1006.42)"
        id="g123"
-       transform="translate(34.0803,-1006.42)">
+       style="fill:none;stroke:#ffffff;stroke-opacity:1">
       <polyline
-         id="polyline125"
+         points="51.562,15.306 41.17,16.188 42.053,5.794"
+         style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
          transform="matrix(-0.469241,0.469241,-0.469241,-0.469241,66.2906,1019.03)"
-         style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
-         points="51.562,15.306 41.17,16.188 42.053,5.794" />
+         id="polyline125" />
       <path
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 39.363241,1033.1291 -0.05636,9.4115"
          id="path127"
-         d="m 39.363241,1033.1291 -0.05636,9.4115" />
+         style="fill:none;stroke:#ffffff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
   <path
-     id="path3160"
-     d="m 16.24999,34.41215 v -6.56249 q 0,-1.171875 0.82031,-1.992195 0.82031,-0.82031 1.99219,-0.82031 v -3.75 q 0,-3.51563 2.46094,-5.97656 2.46093,-2.46094 5.97656,-2.46094 3.51562,0 5.97656,2.46094 2.46094,2.46093 2.46094,5.97656 v 3.75 q 1.17187,0 1.99219,0.82031 0.82031,0.82032 0.82031,1.992195 v 6.56249 q 0,3.51562 -2.46094,5.97656 -2.46094,2.46094 -5.97656,2.46094 h -5.625 q -3.51563,0 -5.97656,-2.46094 -2.46094,-2.46094 -2.46094,-5.97656 z m 1.875,0 q 0,2.69531 1.93359,4.62891 1.9336,1.93359 4.62891,1.93359 h 5.625 q 2.69531,0 4.62891,-1.93359 1.93359,-1.9336 1.93359,-4.62891 v -6.56249 q 0,-0.410165 -0.26369,-0.673845 -0.26368,-0.26369 -0.67384,-0.26369 h -16.875 q -0.41016,0 -0.67384,0.26369 -0.26369,0.26368 -0.26369,0.673845 v 6.56249 z m 2.8125,-9.374995 h 1.875 v -3.75 q 0,-1.93359 1.37694,-3.31056 1.37694,-1.37697 3.31056,-1.37694 1.93362,3e-5 3.31056,1.37694 1.37694,1.37691 1.37694,3.31056 v 3.75 h 1.875 v -3.75 q 0,-2.69531 -1.93359,-4.62891 -1.9336,-1.93359 -4.62891,-1.93359 -2.69531,0 -4.62891,1.93359 -1.93359,1.9336 -1.93359,4.62891 z m 2.8125,0 h 7.5 v -3.75 q 0,-1.58203 -1.08397,-2.66603 -1.08397,-1.084 -2.66603,-1.08397 -1.58206,3e-5 -2.66603,1.08397 -1.08397,1.08394 -1.08397,2.66603 z m 1.875,7.499995 q 0,-0.76172 0.55663,-1.31836 0.55662,-0.55666 1.31837,-0.55663 0.76175,2e-5 1.31837,0.55663 0.55663,0.55658 0.55663,1.31836 0,0.82031 -0.64453,2.51953 -0.41016,1.23047 -1.23047,1.23047 -0.82031,0 -1.23047,-1.23047 -0.64453,-1.69922 -0.64453,-2.51953 z" />
+     style="stroke:#ffffff;stroke-opacity:1;fill:#ffffff;fill-opacity:1"
+     d="m 16.24999,34.41215 v -6.56249 q 0,-1.171875 0.82031,-1.992195 0.82031,-0.82031 1.99219,-0.82031 v -3.75 q 0,-3.51563 2.46094,-5.97656 2.46093,-2.46094 5.97656,-2.46094 3.51562,0 5.97656,2.46094 2.46094,2.46093 2.46094,5.97656 v 3.75 q 1.17187,0 1.99219,0.82031 0.82031,0.82032 0.82031,1.992195 v 6.56249 q 0,3.51562 -2.46094,5.97656 -2.46094,2.46094 -5.97656,2.46094 h -5.625 q -3.51563,0 -5.97656,-2.46094 -2.46094,-2.46094 -2.46094,-5.97656 z m 1.875,0 q 0,2.69531 1.93359,4.62891 1.9336,1.93359 4.62891,1.93359 h 5.625 q 2.69531,0 4.62891,-1.93359 1.93359,-1.9336 1.93359,-4.62891 v -6.56249 q 0,-0.410165 -0.26369,-0.673845 -0.26368,-0.26369 -0.67384,-0.26369 h -16.875 q -0.41016,0 -0.67384,0.26369 -0.26369,0.26368 -0.26369,0.673845 v 6.56249 z m 2.8125,-9.374995 h 1.875 v -3.75 q 0,-1.93359 1.37694,-3.31056 1.37694,-1.37697 3.31056,-1.37694 1.93362,3e-5 3.31056,1.37694 1.37694,1.37691 1.37694,3.31056 v 3.75 h 1.875 v -3.75 q 0,-2.69531 -1.93359,-4.62891 -1.9336,-1.93359 -4.62891,-1.93359 -2.69531,0 -4.62891,1.93359 -1.93359,1.9336 -1.93359,4.62891 z m 2.8125,0 h 7.5 v -3.75 q 0,-1.58203 -1.08397,-2.66603 -1.08397,-1.084 -2.66603,-1.08397 -1.58206,3e-5 -2.66603,1.08397 -1.08397,1.08394 -1.08397,2.66603 z m 1.875,7.499995 q 0,-0.76172 0.55663,-1.31836 0.55662,-0.55666 1.31837,-0.55663 0.76175,2e-5 1.31837,0.55663 0.55663,0.55658 0.55663,1.31836 0,0.82031 -0.64453,2.51953 -0.41016,1.23047 -1.23047,1.23047 -0.82031,0 -1.23047,-1.23047 -0.64453,-1.69922 -0.64453,-2.51953 z"
+     id="path3160" />
   <rect
-     style="fill:#92b5c8;fill-opacity:1;fill-rule:nonzero;stroke:none"
-     id="rect3954"
-     y="20.72156"
+     width="6.5671349"
+     height="3.7937014"
      x="30.255829"
-     height="4.3129773"
-     width="6.5671349" />
+     y="20.72156"
+     id="rect3954"
+     style="fill:#92b5c8;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.93787074" />
   <path
-     style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 31.309185,20.222992 4.11661,-0.0039"
      id="path3956"
-     d="m 31.30979,20.222994 3.81867,-0.0039" />
+     style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1.03763568px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
 </svg>

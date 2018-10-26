@@ -238,18 +238,24 @@ function SVG() {
         var y = this._strokeWidth / 2.0 + this._radius;
         this.margins[0] = x + this._strokeWidth + 0.5;
         this.margins[1] = this._strokeWidth + 0.5;
+
         if (this._outie) {
             x += this._innieX1 + this._innieX2;
             this.margins[0] += this._innieX1 + this._innieX2;
         }
+
         if (this._cap) {
             y += this._slotY * 3.0;
             this.margins[1] += this._slotY * 3.0;
         } else if (this._slot) {
             this.margins[1] += this._slotY;
         }
+
         this.margins[0] *= this._scale;
         this.margins[1] *= this._scale;
+
+	this.margins[0] = Math.floor(this.margins[0]);
+	this.margins[1] = Math.floor(this.margins[1]);
         return([x, y]);
     };
 
@@ -259,6 +265,7 @@ function SVG() {
         } else {
             this._width = (this._maxX - this._minX) * this._scale;
         }
+
         if (this.margins[2] === 0) {
             this.margins[2] = (this._strokeWidth + 0.5) * this._scale;
         } else {
@@ -270,6 +277,7 @@ function SVG() {
         } else {
             this._height = (this._maxY - this._minY) * this._scale;
         }
+
         if (this.margins[3] === 0) {
             if (this._tab) {
                 this.margins[3] = (this._slotY + this._strokeWidth + 0.5) * this._scale;
@@ -279,6 +287,9 @@ function SVG() {
         } else {
             this.margins[3] = this._height - this.margins[3];
         }
+
+	this.margins[2] = Math.floor(this.margins[2] + 0.5);
+	this.margins[3] = Math.floor(this.margins[3] + 0.5);
     };
 
     this._newPath = function (x, y) {
@@ -317,7 +328,7 @@ function SVG() {
 
         var yy = y;
         var tspans = string.split('\n');
-        var text = '<text style="font-size:' + fontSize + 'px;fill:#000000;font-family:sans-serif;text-anchor:' + align + '">';
+        var text = '<text style="font-size:' + fontSize + 'px;fill:' + platformColor.blockText + ';font-family:sans-serif;text-anchor:' + align + '">';
         for (var i = 0; i < tspans.length; i++) {
             text += '<tspan x="' + Math.floor(x + 0.5) + '" y="' + Math.floor(yy +0.5) + '">' + tspans[i] + '</tspan>';
             yy += fontSize;
@@ -517,9 +528,9 @@ function SVG() {
     };
 
     this._header = function (center) {
-    // FIXME: Why are our calculations off by 2 x strokeWidth?
-    var width = this._width + 2 * this._strokeWidth;
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width * 1.1 + '" height="' + this._height * 1.3 + '">' + this._transform(center) + '<filter id="dropshadow" height="130%"> \
+	// FIXME: Why are our calculations off by 2 x strokeWidth?
+	var width = this._width + 2 * this._strokeWidth;
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="' + Math.floor(width + 0.5) + '" height="' + Math.floor(this._height + 0.5) + '">' + this._transform(center) + '<filter id="dropshadow" height="130%"> \
   <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> \
   <feOffset dx="2" dy="2" result="offsetblur"/> \
   <feComponentTransfer xmlns="http://www.w3.org/2000/svg"> \
@@ -899,7 +910,7 @@ function SVG() {
             var x = this._strokeWidth / 2.0;
         }
         if (this._cap) {
-            var y = this._strokeWidth / 2.0 + this._radius + this._slotY * 3.0;
+            var y = this._strokeWidth / 2.0 + this._radius  + this._slotY * 3.0;
         } else {
             var y = this._strokeWidth / 2.0 + this._radius;
         }

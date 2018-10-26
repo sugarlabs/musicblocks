@@ -356,8 +356,8 @@ function Blocks () {
     };
 
     // We need access to the go-home buttons and boundary.
-    this.setHomeContainers = function (containers, boundary) {
-        this._homeButtonContainers = containers;
+    this.setHomeContainers = function (setContainers, boundary) {
+        this._setHomeButtonContainers = setContainers;
         this.boundary = boundary;
         return this;
     };
@@ -1619,17 +1619,16 @@ function Blocks () {
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].connections[0] == null) {
                 if (this.blockList[blk].offScreen(this.boundary)) {
-                    this._homeButtonContainers[0].visible = true;
-                    this._homeButtonContainers[1].visible = false;
-                    this.boundary.show();
+                    this._setHomeButtonContainers(true, false);
+		    // Just highlight the button.
+                    // this.boundary.show();
                     onScreen = false;
                     break;
                 }
             }
         }
         if (onScreen) {
-            this._homeButtonContainers[0].visible = false;
-            this._homeButtonContainers[1].visible = true;
+            this._setHomeButtonContainers(false, true);
             this.boundary.hide();
         }
     };
@@ -1643,8 +1642,9 @@ function Blocks () {
         // Move a block (and its label) to x, y.
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
-            myBlock.container.x = x; // Math.floor(x + 0.5);
-            myBlock.container.y = y; // Math.floor(y + 0.5);
+            // Round position so font renders clearly.
+            myBlock.container.x = Math.floor(x + 0.5);
+            myBlock.container.y = Math.floor(y + 0.5);
 
             this.checkBounds();
         } else {
@@ -1658,6 +1658,7 @@ function Blocks () {
 
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
+            // Seems we don't need to round again here.
             myBlock.container.x += dx; // Math.floor(dx + 0.5);
             myBlock.container.y += dy; // Math.floor(dy + 0.5);
 
@@ -3207,7 +3208,7 @@ function Blocks () {
         return false;
     };
 
-    this.insideNoteBlock = function (blk) {
+    this.insideInlineCollapsibleBlock = function (blk) {
         // Return the first containing note block, if any.
         if (blk === null) {
             return null;
@@ -3221,11 +3222,11 @@ function Blocks () {
         // If we are connected to a note block arg or child flow,
         // return the note block. If we are connected to the flow, we
         // are not inside, so keep looking.
-        if (this.blockList[c0].name === 'newnote' && blk !== last(this.blockList[c0].connections)) {
+        if (this.blockList[c0].isInlineCollapsible() && blk !== last(this.blockList[c0].connections)) {
             return c0;
         }
 
-        return this.insideNoteBlock(c0);
+        return this.insideInlineCollapsibleBlock(c0);
     };
 
     this.findNoteBlock = function (blk) {
@@ -3238,12 +3239,12 @@ function Blocks () {
             return blk;
         }
 
-	if (this.blockList[blk].isClampBlock()) {
-	    var n = this.blockList[blk].connections.length - 2;
+        if (this.blockList[blk].isClampBlock()) {
+            var n = this.blockList[blk].connections.length - 2;
             var c = this.blockList[blk].connections[n];
-	} else {
+        } else {
             var c = last(this.blockList[blk].connections);
-	}
+        }
 
         return this.findNoteBlock(c);
     };
@@ -3258,12 +3259,12 @@ function Blocks () {
             return blk;
         }
 
-	if (this.blockList[blk].isClampBlock()) {
-	    var n = this.blockList[blk].connections.length - 2;
+        if (this.blockList[blk].isClampBlock()) {
+            var n = this.blockList[blk].connections.length - 2;
             var c = this.blockList[blk].connections[n];
-	} else {
+        } else {
             var c = last(this.blockList[blk].connections);
-	}
+        }
 
         return this.findNestedIntervalBlock(c);
     };
@@ -4633,8 +4634,7 @@ function Blocks () {
                         this._adjustTheseStacks.push(thisBlock);
                     }
                     if (blkData[2] < 0 || blkData[3] < 0 || blkData[2] > canvas.width || blkData[3] > canvas.height) {
-                        this._homeButtonContainers[0].visible = true;
-                        this._homeButtonContainers[1].visible = false;
+                        this._setHomeButtonContainers(true, false);
                     }
                 }
             }

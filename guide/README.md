@@ -1036,30 +1036,30 @@ inside the *Repeat*, working our way down to `Sol` in `Octave
 
 ### <a name="rhythms"></a>4.3 Generating Rhythms
 
-The *Rhythm Ruler* block is used to launch a widget similar to the
+The *Rhythm Maker* block is used to launch a widget similar to the
 *Pitch-time Matrix* block. The widget can be used to generate rhythmic
 patterns.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm1.svg "generating rhythms")
 
-The argument to the *Rhythm Ruler* block specifies the duration that
+The argument to the *Rhythm Maker* block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
 / 1, e.g., a whole note.
 
-The *Set Drum* blocks contained in the clamp of the *Rhythm Ruler*
+The *Set Drum* blocks contained in the clamp of the *Rhythm Maker*
 block indicates the number of rhythms to be defined simultaneously. By
-default, two rhythms are defined. The embedded *Rhythm* blocks define
+default, two rhythm "rulers" are defined. The embedded *Rhythm* blocks define
 the initial subdivision of each rhythm ruler.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm2.svg "rhythm ruler")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm2.svg "rhythm maker")
 
-When the *Rhythm Ruler* block is clicked, the *Rhythm Ruler* widget is
+When the *Rhythm Maker* block is clicked, the *Rhythm Maker* widget is
 opened. It contains a row for each rhythm ruler. An input in the top
 row of the widget is used to specify how many subdivisions will be
 created within a cell when it is clicked. By default, 2 subdivisions
 are created.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm3.svg "usage of rhythm ruler")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm3.svg "usage of rhythm maker")
 
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
@@ -1068,13 +1068,13 @@ will playback the rhythm using a drum for each beat. The *Play-all*
 button on the upper-left of the widget will play back all rhythms
 simultaneously.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm4.svg "divide cells in rhythm ruler")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm4.svg "divide cells in rhythm maker")
 
 The rhythm can be further subdivided by clicking in individual
 cells. In the example above, two quarter-notes have been created by
 clicking on one of the half-notes.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm8.svg "tie cells in Rhythm Ruler")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm8.svg "tie cells in Rhythm Maker")
 
 By dragging across multiple cells, they become tied. In the example
 above, two third-notes have been tied into one two-thirds-note.
@@ -1093,7 +1093,7 @@ with the *Pitch-time Matrix* block.
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
 
-Another feature of the *Rhythm Ruler* wigdet is the ability to tap out
+Another feature of the *Rhythm Maker* wigdet is the ability to tap out
 a rhythm. By clicking on the *Tap* button and then clicking on a cell
 inside one of the rhythm rulers, you will be prompted (by four tones)
 to begin tapping the mouse button to divide the cell into

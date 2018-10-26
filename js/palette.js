@@ -75,7 +75,7 @@ function Palettes () {
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
-    this.top = 55 + 10 + LEADING;
+    this.top = 2 * 55 + 10 + LEADING;
     this.current = DEFAULTPALETTE;
     this.x = [];  // We track x and y for each of the multipalettes
     this.y = [];
@@ -103,7 +103,7 @@ function Palettes () {
             this._makeSelectorButton(i);
             this.x.push(0);
             // This is the top of the palette buttons stack
-            this.y.push((2.5 * this.cellSize + 2 * LEADING) / PALETTE_SCALE_FACTOR);
+            this.y.push((3.5 * this.cellSize + 2 * LEADING) / PALETTE_SCALE_FACTOR);
         }
     };
 
@@ -351,8 +351,8 @@ function Palettes () {
             }
 
             var r = that.cellSize / 2;
-            that.labels[name].x = that.buttons[name].x + 2.2 * r;
-            that.labels[name].y = that.buttons[name].y + r / 2;
+            that.labels[name].x = Math.floor(that.buttons[name].x + 2.2 * r);
+            that.labels[name].y = Math.floor(that.buttons[name].y + r / 2);
             that.stage.addChild(that.labels[name]);
 
             that._loadPaletteButtonHandler(name);
@@ -586,6 +586,7 @@ function Palettes () {
     // Palette Button event handlers
     this._loadPaletteButtonHandler = function (name) {
         var locked = false;
+        var searchlocked = false;
         var scrolling = false;
         var that = this;
 
@@ -615,22 +616,49 @@ function Palettes () {
             that.stage.removeChild(that.paletteHighlight);
         });
 
+
         this.buttons[name].on('click', function (event) {
-            if (locked) {
-                return;
-            }
-            locked = true;
+            var clickOutside = function(event) {                
+                setTimeout(function () {
+                    searchlocked = false;
+                }, 500);
 
-            setTimeout(function () {
-                locked = false;
-            }, 500);
+                if (!that.dict['search'].visible && searchlocked) {
+                    that.showPalette('search');
+                } else { 
+                    document.removeEventListener('click', clickOutside);
+                    that.dict['search'].hide();
+                }
 
-            if (!that.dict[name].visible) {
-                that.showPalette(name);
+                that.refreshCanvas();
+            };
+
+            if (name === "search") {
+                searchlocked = true;
+                document.addEventListener("click", clickOutside);
             } else {
-                that.dict[name].hide();
+                if (locked) {
+                    return;
+                }
+
+                locked = true;
+                searchlocked = false;
+
+                setTimeout(function () {
+                    locked = false;
+                }, 500);
+
+                if (!that.dict[name].visible && name !== 'search') {
+                    that.dict['search'].hide();                        
+                    if (!searchlocked) {
+                        that.showPalette(name);
+                    }
+                } else { 
+                    that.dict[name].hide();
+                }
+
+                that.refreshCanvas();
             }
-            that.refreshCanvas();
         });
     };
 
@@ -1022,7 +1050,7 @@ function PopdownPalette(palettes) {
                 // console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = palette._makeBlockFromPalette(palette.protoList[e.dataset.blk], e.dataset.modname, function (newBlock) {
                     // Move the block and the drag group.
-                    that.palettes.blocks._moveBlock(newBlock, 75 - that.palettes.blocks.stage.x, 75 - that.palettes.blocks.stage.y);
+                    that.palettes.blocks._moveBlock(newBlock, Math.floor(75 - that.palettes.blocks.stage.x), Math.floor(75 - that.palettes.blocks.stage.y));
                     that.palettes.blocks.findDragGroup(newBlock);
                     for (var i in that.palettes.blocks.dragGroup) {
                         that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], 0, 0);
@@ -1292,7 +1320,7 @@ function Palette(palettes, name) {
             }
 
             i.y = this.y;
-            this.y += h + (STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1);
+            this.y += Math.floor(h + (STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1));
         }
 
         for (var i in this.protoContainers) {
@@ -1764,6 +1792,7 @@ function Palette(palettes, name) {
             if (locked) {
                 return;
             }
+            
             locked = true;
             setTimeout(function () {
                 locked = false;

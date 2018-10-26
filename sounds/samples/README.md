@@ -19,6 +19,14 @@ How to add a new sample sound
    };
    ```
 
+Be sure to remove the newlines in your sample data: it should all be
+on one line.
+
+* Include a comment in the code regarding the sample source and license.
+  // Piano sample from
+  // https://github.com/sugarlabs/tamtam/blob/master/common/Resources/Sounds/piano
+  // License: GPL-v2
+
 * Add you new sample to `js/utils/synthutils.js`
 
    ```
@@ -37,6 +45,12 @@ How to add a new sample sound
            'voice': [
                {'name': 'piano', 'data': PIANO_SAMPLE},
    ```
+
+Note: To deterine the center pitch of your sample, you may find the
+"change pitch" feature of
+[Audacity](https://manual.audacityteam.org/man/change_pitch.html)
+useful.
+
 
 * Add you new sample name to the list of string that need translation
 in `js/utils/musicutils.js`

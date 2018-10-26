@@ -36,7 +36,11 @@ function SaveInterface(PlanetInterface) {
                 defaultfilename += '.' + extension;
             }
 
-            filename = prompt('Filename:', defaultfilename);
+            if (window.isElectron == true) {
+                filename = defaultfilename;
+            } else {
+                filename = prompt('Filename:', defaultfilename);
+            }
         } else {
             if (fileExt(defaultfilename) != extension) {
                 defaultfilename += '.' + extension;
@@ -138,10 +142,12 @@ function SaveInterface(PlanetInterface) {
         this.logo.playbackTime = 0;
         this.logo.compiling = true;
         this.logo.recording = true;
+	console.log('DURING SAVE WAV');
         this.logo.runLogoCommands();
     }
 
     this.afterSaveWAV = function(blob){
+	console.log('AFTER SAVE WAV');
         //don't reset cursor
         this.download('wav',URL.createObjectURL(blob));
     }

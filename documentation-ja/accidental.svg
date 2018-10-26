@@ -12,7 +12,7 @@
    version="1.1"
    id="svg584"
    sodipodi:docname="accidental.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="0.91 r13725">
   <metadata
      id="metadata590">
     <rdf:RDF>
@@ -21,7 +21,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -36,15 +36,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:window-width="1278"
+     inkscape:window-height="773"
      id="namedview586"
      showgrid="false"
      inkscape:zoom="1.618746"
-     inkscape:cx="414.04946"
-     inkscape:cy="166.75"
+     inkscape:cx="115.67034"
+     inkscape:cy="117.32903"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="1"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg584"
      fit-margin-top="0"
@@ -248,23 +248,23 @@
   <g
      transform="translate(102,96)"
      id="g238">
-    <g
-       transform="scale(1.5)"
-       id="g236">
-      <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path230"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text234">
-        <tspan
-           x="13"
-           y="14"
-           id="tspan232">sol</tspan>
-      </text>
-    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path230"
+       style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+       d="m 12.75,0.75 90,0 0,30 -90,0 0,-12 0,-1.5 -9,0 0,4.5 -3,0 0,-12 3,0 0,4.5 9,0 0,-1.5 z" />
+    <text
+       id="text234"
+       style="font-size:15px;line-height:125%;font-family:sans-serif;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000"
+       sodipodi:linespacing="125%"
+       x="18.532864"
+       y="21.621675">
+      <tspan
+         sodipodi:role="line"
+         id="tspan3397"
+         x="18.532864"
+         y="21.621675">ソ</tspan>
+    </text>
   </g>
   <g
      transform="translate(102,128)"
@@ -304,7 +304,7 @@
         <tspan
            x="13"
            y="14"
-           id="tspan252">flat ♭</tspan>
+           id="tspan252">フラット（変)♭</tspan>
       </text>
     </g>
   </g>

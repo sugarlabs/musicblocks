@@ -12,7 +12,7 @@
    version="1.1"
    id="svg336"
    sodipodi:docname="notevalue.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="0.91 r13725">
   <metadata
      id="metadata342">
     <rdf:RDF>
@@ -21,7 +21,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -36,8 +36,8 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:window-width="1278"
+     inkscape:window-height="773"
      id="namedview338"
      showgrid="false"
      fit-margin-top="0"
@@ -45,10 +45,10 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:zoom="1.3331323"
-     inkscape:cx="-125.25"
-     inkscape:cy="-74.75"
+     inkscape:cx="172.5449"
+     inkscape:cy="13.763346"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="1"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg336" />
   <g
@@ -233,7 +233,7 @@
         <tspan
            x="13"
            y="14"
-           id="tspan118">sol</tspan>
+           id="tspan118">ソ</tspan>
       </text>
     </g>
   </g>

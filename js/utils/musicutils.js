@@ -34,6 +34,13 @@ const NATURAL = '♮';
 const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
 
+const NSYMBOLS = {1: '𝅝',
+		  2: '𝅗𝅥',
+		  4: '♩',
+		  8: '♪',
+		  16: '𝅘𝅥𝅯'
+		 };
+
 const BTOFLAT = {'Eb': 'E' + FLAT, 'Gb': 'G' + FLAT, 'Ab': 'A' + FLAT, 'Bb': 'B' + FLAT, 'Db': 'D' + FLAT, 'Cb': 'C' + FLAT, 'Fb': 'F' + FLAT, 'eb': 'E' + FLAT, 'gb': 'G' + FLAT, 'ab': 'A' + FLAT, 'bb': 'B' + FLAT, 'db': 'D' + FLAT, 'cb': 'C' + FLAT, 'fb': 'F' + FLAT};
 const STOSHARP = {'E#': 'E' + SHARP, 'G#': 'G' + SHARP, 'A#': 'A' + SHARP, 'B#': 'B' + SHARP, 'D#': 'D' + SHARP, 'C#': 'C' + SHARP, 'F#': 'F' + SHARP, 'e#': 'E' + SHARP, 'g#': 'G' + SHARP, 'a#': 'A' + SHARP, 'b#': 'B' + SHARP, 'd#': 'D' + SHARP, 'c#': 'C' + SHARP, 'f#': 'F' + SHARP};
 const NOTESSHARP = ['C', 'C' + SHARP, 'D', 'D' + SHARP, 'E', 'F', 'F' + SHARP, 'G', 'G' + SHARP, 'A', 'A' + SHARP, 'B'];
@@ -69,6 +76,8 @@ const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
 const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 
+//.TRANS: ordinal number. Please keep exactly one space between each number.
+const DEGREES = _('1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th');
 
 function getSharpFlatPreference (keySignature) {
     var obj = keySignatureToMode(keySignature);
@@ -245,6 +254,7 @@ const SELECTORSTRINGS = [
     _('cello'),
     _('bass'),
     _('guitar'),
+    _('acoustic guitar'),
     _('flute'),
     _('clarinet'),
     _('saxophone'),

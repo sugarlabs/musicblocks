@@ -28,9 +28,11 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    // [_('bass'), 'basse', 'images/voices.svg', 'string'],
+    [_('bass'), 'bass', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('acoustic guitar'), 'acousticguitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
@@ -117,13 +119,13 @@ var DRUMNAMES = [
 var SOUNDSAMPLESDEFINES = [
     "samples/violin", "samples/cello", "samples/flute", "samples/guitar",
     "samples/clarinet", "samples/saxophone", "samples/tuba", "samples/trumpet",
-    "samples/basse", "samples/bottle", "samples/clap", "samples/darbuka",
+    "samples/bass", "samples/bottle", "samples/clap", "samples/darbuka",
     "samples/hihat", "samples/splash", "samples/bubbles", "samples/cowbell",
     "samples/dog", "samples/kick", "samples/tom", "samples/cat",
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare", "samples/piano"
+    "samples/snare", "samples/piano", "samples/acguit"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -132,8 +134,9 @@ const SAMPLECENTERNO = {
     'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'violin': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'cello': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
-    'basse': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
+    'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'flute': ['F5', 57], // pitchToNumber('F', 5, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -296,15 +299,19 @@ function Synth() {
                 var note = notes.substring(0, len - 1);
                 var octave = Number(notes.slice(-1));
                 return pitchToFrequency(note, octave, 0, null);
-	    } else if (typeof(notes) === 'number') {
-		return notes;
+            } else if (typeof(notes) === 'number') {
+                return notes;
             } else {
                 var results = [];
                 for (i = 0; i < notes.length; i++) {
-                    var len = notes[i].length;
-                    var note = notes[i].substring(0, len - 1);
-                    var octave = Number(notes[i].slice(-1));
-                    results.push(pitchToFrequency(note, octave, 0, null));
+                    if (typeof(notes[i]) === 'string') {
+                        var len = notes[i].length;
+                        var note = notes[i].substring(0, len - 1);
+                        var octave = Number(notes[i].slice(-1));
+                        results.push(pitchToFrequency(note, octave, 0, null));
+                    } else {
+                        results.push(notes[i]);
+                    }
                 }
                 return results;
             }
@@ -408,7 +415,8 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
-                {'name': 'basse', 'data': BASSE_SAMPLE}
+		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+                {'name': 'bass', 'data': BASS_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -998,8 +1006,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-	console.log(instrumentName);
-        console.log(notes);
+	// console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;

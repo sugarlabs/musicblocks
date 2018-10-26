@@ -59,10 +59,14 @@ Yash Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant
 Kasat contributed to additional widgets as part of GSoC
 2016. Additional contributions are being made by Tayba Wasim, Dinuka
 Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
-Patel as part of GSoC 2017.
+Patel as part of GSoC 2017. During GSoC 2018, Riya Lohia developed a
+Temperament Widget. Ritwik Abhishek added a keyboard widget and a
+pitch-tracking widget.
 
 Many students contributed to the project as part of Google Code-in
-(2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018).
+(2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018). Sam Parkinson
+built the Planet during GCI 2016&ndash;17. Euan Ong redesigned the
+Planet code as a series of GCI tasks in 2017&ndash;18.
 
 A full list of
 [contributors](https://github.com/sugarlabs/musicblocks/graphs/contributors)
