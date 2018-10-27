@@ -2270,22 +2270,22 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                 if(i in EFFECTNAMES == false) {
-                var label = _(DRUMNAMES[i][1]);
-                if (getTextWidth(label, 'bold 48pt Sans') > 400) {
-                    drumLabels.push(label.substr(0, 8) + '...');
-                } else {
-                    drumLabels.push(label);
+                if (i in EFFECTNAMES == false) {
+                    var label = _(DRUMNAMES[i][1]);
+                    if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                        drumLabels.push(label.substr(0, 8) + '...');
+                    } else {
+                        drumLabels.push(label);
+                    }
+
+                    drumValues.push(DRUMNAMES[i][1]);
+
+                    if (categoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                        categoriesList.push(DRUMNAMES[i][4]);
+                    }
+
+                    categories.push(categoriesList.indexOf(DRUMNAMES[i][4]));
                 }
-
-                drumValues.push(DRUMNAMES[i][1]);
-
-                if (categoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
-                    categoriesList.push(DRUMNAMES[i][4]);
-                }
-
-                categories.push(categoriesList.indexOf(DRUMNAMES[i][4]));
-            }
             }
 
             this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
@@ -2302,8 +2302,8 @@ function Block(protoblock, blocks, overrideName) {
             var effectcategories = [];
             var effectcategoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
-               if(i in EFFECTNAMES) {
-                   console.log("found");
+                if (i in EFFECTNAMES) {
+                    console.log("found");
                     var label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, 'bold 48pt Sans') > 400) {
                         effectLabels.push(label.substr(0, 8) + '...');
