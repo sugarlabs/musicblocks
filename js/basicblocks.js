@@ -2932,6 +2932,18 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
+    var newblock = new ProtoBlock('playeffect');
+    newblock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['playeffect'] = newblock;
+    newblock.staticLabels.push(_('sound effect'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('playeffect')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('playdrum');
     newblock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['playdrum'] = newblock;

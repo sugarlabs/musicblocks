@@ -52,7 +52,7 @@ function beginnerBlock(name) {
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
            'settimbre', 'newstaccato', 'newslur', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
-           'playdrum', 'setdrum', // drum palette
+           'playdrum', 'playeffect', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
            'action', 'start', 'do', 'dispatch', 'listen',  // action palette
            'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne', 'storein', 'namedbox',  // boxes palette
