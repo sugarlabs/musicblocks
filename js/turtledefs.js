@@ -380,6 +380,7 @@ function createHelpContent() {
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],
         'drumname': [_('The Drum name block is used to select a drum.'), 'documentation', 'status.svg'],
+        'effectsname': [_('The Effect name block is used to select an effect.'), 'documentation', 'status.svg'],
         'noisename': [_('The Noise name block is used to select a noise synthesizer.'), 'documentation', 'status.svg'],
         // Widgets palette
         'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'status.svg'],

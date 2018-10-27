@@ -4147,6 +4147,11 @@ function Logo () {
                     that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
                 }
 
+                if (that.effectStyle[turtle].length > 0) {
+                    var effectsname = last(that.effectStyle[turtle]);
+                    that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = effectsname;
+                }
+
                 if (!that.inMatrix) {
                     that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(noteObj[0]);
                     that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(noteObj[1]);

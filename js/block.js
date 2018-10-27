@@ -17,10 +17,10 @@ const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote', 'interval'];
 const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
-const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', "effectsname", 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'effectsname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
 const EXTRAWIDENAMES = [];
-const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'effectsname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -744,6 +744,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'drumname':
                     this.value = DEFAULTDRUM;
                     break;
+                case 'effectsname':
+                    this.value = DEFAULTEFFECT;
+                    break;
                 case 'filtertype':
                     this.value = DEFAULTFILTERTYPE;
                     break;
@@ -957,7 +960,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'drum':
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', platformColor.blockText);
-                    break;
+                    break;    
                 case 'rhythmruler2':
                     that.collapseText = new createjs.Text(_('rhythm maker'), fontSize + 'px Sans', platformColor.blockText);
                     break;
@@ -2267,6 +2270,7 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
+                 if(i in EFFECTNAMES == false) {
                 var label = _(DRUMNAMES[i][1]);
                 if (getTextWidth(label, 'bold 48pt Sans') > 400) {
                     drumLabels.push(label.substr(0, 8) + '...');
@@ -2282,8 +2286,42 @@ function Block(protoblock, blocks, overrideName) {
 
                 categories.push(categoriesList.indexOf(DRUMNAMES[i][4]));
             }
+            }
 
             this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
+
+        } else if (this.name === 'effectsname') {
+            if (this.value != null) {
+                var selecteddrum = this.value;
+            } else {
+                var selectedeffect = DEFAULTEFFECT;
+            }
+
+            var effectLabels = [];
+            var effectValues = [];            
+            var effectcategories = [];
+            var effectcategoriesList = [];
+            for (var i = 0; i < DRUMNAMES.length; i++) {
+               if(i in EFFECTNAMES) {
+                   console.log("found");
+                    var label = _(DRUMNAMES[i][1]);
+                    if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                        effectLabels.push(label.substr(0, 8) + '...');
+                    } else {
+                        effectLabels.push(label);
+                    }
+
+                    effectValues.push(DRUMNAMES[i][1]);
+
+                    if (effectcategoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                        effectcategoriesList.push(DRUMNAMES[i][4]);
+                    }
+
+                    effectcategories.push(effectcategoriesList.indexOf(DRUMNAMES[i][4]));
+                }
+            }
+
+            this._piemenuVoices(effectLabels, effectValues, effectcategories, selectedeffect);
         } else if (this.name === 'filtertype') {
             if (this.value != null) {
                 var selectedtype = this.value;
@@ -4915,6 +4953,8 @@ function Block(protoblock, blocks, overrideName) {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the synth for the selected drum.
             if (this.name === 'drumname') {
+                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+            } else if (this.name === 'effectsname') {
                 this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === 'voicename') {
                 this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
