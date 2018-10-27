@@ -938,7 +938,7 @@ function RhythmRuler () {
             } else if (DRUMNAMES[d][1] === drum) {
                 foundDrum = true;
                 break;
-	    }
+            }
         }
 
         var foundVoice = false;
@@ -948,10 +948,10 @@ function RhythmRuler () {
                     drum = VOICENAMES[d][1];
                     foundVoice = true;
                     break;
-		} else if (VOICENAMES[d][1] === drum) {
+                } else if (VOICENAMES[d][1] === drum) {
                     foundVoice = true;
                     break;
-		}
+                }
             }
         }
 
@@ -960,12 +960,12 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-		// console.log(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
+                // console.log(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
                 if (foundVoice) {
                     that._logo.synth.trigger(0, 'C4', that._logo.defaultBPMFactor / noteValue, drum, null, null, false);
                 } else if (foundDrum) {
                     that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
-		}
+                }
             }
 
             // And highlight its cell.
@@ -1122,9 +1122,16 @@ function RhythmRuler () {
             var drum = this._logo.blocks.blockList[drumBlockNo].value;
         }
 
+        for (var d = 0; d < EFFECTNAMES.length; d++) {
+            if (EFFECTNAMES[d][1] === drum) {
+                this._saveDrumMachine(selectedRuler, drum, true);
+                return;
+            }
+        }
+
         for (var d = 0; d < DRUMNAMES.length; d++) {
             if (DRUMNAMES[d][1] === drum) {
-                this._saveDrumMachine(selectedRuler, drum);
+                this._saveDrumMachine(selectedRuler, drum, false);
                 return;
             }
         }
@@ -1137,7 +1144,7 @@ function RhythmRuler () {
         }
     };
 
-    this._saveDrumMachine = function(selectedRuler, drum) {
+    this._saveDrumMachine = function(selectedRuler, drum, effect) {
         var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1186,7 +1193,11 @@ function RhythmRuler () {
                             newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
                             newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
                             newStack.push([idx + 5, 'playdrum', 0, 0, [idx + 4, idx + 6, null]]);
-                            newStack.push([idx + 6, ['drumname', {'value': drum}], 0, 0, [idx + 5]]);
+                            if (effect) {
+                                newStack.push([idx + 6, ['effectsname', {'value': drum}], 0, 0, [idx + 5]]);
+                            } else {
+                                newStack.push([idx + 6, ['drumname', {'value': drum}], 0, 0, [idx + 5]]);
+                            }
                         }
                         if (i == ruler.cells.length - 1) {
                             newStack.push([idx + 7, 'hidden', 0, 0, [idx, null]]);
@@ -1215,7 +1226,11 @@ function RhythmRuler () {
                             newStack.push([idx + 5, ['number', {'value': noteValue}], 0, 0, [idx + 3]]);
                             newStack.push([idx + 6, 'vspace', 0, 0, [idx + 2, idx + 7]]);
                             newStack.push([idx + 7, 'playdrum', 0, 0, [idx + 6, idx + 8, null]]);
-                            newStack.push([idx + 8, ['drumname', {'value': drum}], 0, 0, [idx + 7]]);
+                            if (effect) {
+                                newStack.push([idx + 8, ['effectsname', {'value': drum}], 0, 0, [idx + 7]]);
+                            } else {
+                                newStack.push([idx + 8, ['drumname', {'value': drum}], 0, 0, [idx + 7]]);
+                            }
                         }
                         newStack.push([idx + 9, 'hidden', 0, 0, [idx + 2, null]]);
                     }

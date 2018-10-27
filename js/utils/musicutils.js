@@ -626,6 +626,7 @@ const DEFAULTINTERVAL = 'perfect' + ' 5';
 const DEFAULTVOICE = 'default';
 const DEFAULTNOISE = 'noise1';
 const DEFAULTDRUM = 'kick drum';
+const DEFAULTEFFECT = 'crash';
 const DEFAULTMODE = 'major';
 const DEFAULTTEMPERAMENT = 'equal';
 const DEFAULTFILTERTYPE = 'highpass';
@@ -710,7 +711,6 @@ function getDrumName(name) {
     return null;
 };
 
-
 function getDrumSymbol(name) {
     if (name === '') {
         console.log('getDrumName passed blank name. Returning ' + 'hh');
@@ -728,7 +728,6 @@ function getDrumSymbol(name) {
     console.log(name + ' not found in DRUMNAMES');
     return 'hh';
 };
-
 
 function getFilterTypes(name) {
     if (name === '') {
@@ -818,7 +817,7 @@ function getNoiseName(name) {
         if (NOISENAMES[i][1] === name) {
             if (NOISENAMES[i][0] != '') {
                 return NOISENAMES[i][0];
-	    } else {
+        } else {
                 return NOISENAMES[i][1];
             }
         }

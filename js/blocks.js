@@ -1726,6 +1726,7 @@ function Blocks () {
             break;
         case 'filtertype':
         case 'drumname':
+        case 'effectsname':
         case 'voicename':
         case 'oscillatortype':
         case 'invertmode':
@@ -2178,6 +2179,7 @@ function Blocks () {
             that.blockList[thisBlock].value = value;
             switch (that.blockList[thisBlock].name) {
             case 'drumname':
+            case 'effectsname':
             case 'voicename':
             case 'oscillatortype':
             case 'invertmode':
@@ -2244,7 +2246,9 @@ function Blocks () {
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
             postProcessArg = [thisBlock, DEFAULTDRUM];
-         } else if (name === 'filtertype') {
+        } else if (name === 'effectsname') {
+            postProcessArg = [thisBlock, DEFAULTEFFECT];
+        } else if (name === 'filtertype') {
             postProcessArg = [thisBlock, DEFAULTFILTER];
         } else if (name === 'oscillatortype') {
             postProcessArg = [thisBlock, DEFAULTOSCILLATORTYPE];
@@ -4377,6 +4381,21 @@ function Blocks () {
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'drumname':
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    // Load the synth for this drum
+                    this.logo.synth.loadSynth(0, getDrumSynthName(value));
+                }
+                break;
+            case 'effectsname':
                 var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];

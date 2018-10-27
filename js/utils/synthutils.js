@@ -68,6 +68,28 @@ var VOICENAMES = [
 // drum symbols are from
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
 var DRUMNAMES = [
+     //.TRANS: animal sound effect
+     [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
+     //.TRANS: animal sound effect
+     [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
+     //.TRANS: animal sound effect
+     [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
+     //.TRANS: animal sound effect
+     [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
+     //.TRANS: sound effect
+     [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
+     //.TRANS: sound effect
+     [_('crash'), 'crash', 'images/crash.svg', 'cymca', 'effect'],
+     //.TRANS: sound effect
+     [_('bottle'), 'bottle', 'images/bottle.svg', 'hh', 'effect'],
+     //.TRANS: sound effect
+     [_('clap'), 'clap', 'images/clap.svg', 'hc', 'effect'],
+     //.TRANS: sound effect
+     [_('slap'), 'slap', 'images/slap.svg', 'vibs', 'effect'],
+     //.TRANS: sound effect
+     [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
+     //.TRANS: sound effect
+     [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
     //.TRANS: musical instrument
     [_('snare-drum'), 'snare drum', 'images/snaredrum.svg', 'sn', 'drum'],
     //.TRANS: musical instrument
@@ -92,6 +114,18 @@ var DRUMNAMES = [
     [_('finger-cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
+   
+];
+
+var EFFECTNAMES = [
+    //.TRANS: animal sound effect
+    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
+    //.TRANS: animal sound effect
+    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
+    //.TRANS: animal sound effect
+    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
+    //.TRANS: animal sound effect
+    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
     //.TRANS: sound effect
     [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
@@ -106,14 +140,6 @@ var DRUMNAMES = [
     [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
     //.TRANS: sound effect
     [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
-    //.TRANS: animal sound effect
-    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
-    //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
-    //.TRANS: animal sound effect
-    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
-    //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
 ];
 
 var SOUNDSAMPLESDEFINES = [
@@ -419,29 +445,29 @@ function Synth() {
                 {'name': 'bass', 'data': BASS_SAMPLE}
             ],
             'drum': [
+                {'name': 'cat', 'data': CAT_SAMPLE},
+                {'name': 'cricket', 'data': CRICKET_SAMPLE},
+                {'name': 'dog', 'data': DOG_SAMPLE},
+                {'name': 'duck', 'data': DUCK_SAMPLE},
+                {'name': 'clang', 'data': CLANG_SAMPLE},
+                {'name': 'crash', 'data': CRASH_SAMPLE},
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
                 {'name': 'clap', 'data': CLAP_SAMPLE},
-                {'name': 'darbuka drum', 'data': DARBUKA_SAMPLE},
-                {'name': 'hi hat', 'data': HIHAT_SAMPLE},
+                {'name': 'slap', 'data': SLAP_SAMPLE},
                 {'name': 'splash', 'data': SPLASH_SAMPLE},
                 {'name': 'bubbles', 'data': BUBBLES_SAMPLE},
-                {'name': 'cow bell', 'data': COWBELL_SAMPLE},
-                {'name': 'dog', 'data': DOG_SAMPLE},
+                {'name': 'snare drum', 'data': SNARE_SAMPLE},
                 {'name': 'kick drum', 'data': KICK_SAMPLE},
                 {'name': 'tom tom', 'data': TOM_SAMPLE},
-                {'name': 'cat', 'data': CAT_SAMPLE},
-                {'name': 'crash', 'data': CRASH_SAMPLE},
-                {'name': 'duck', 'data': DUCK_SAMPLE},
-                {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
-                {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
-                {'name': 'chime', 'data': CHIME_SAMPLE},
-                {'name': 'cricket', 'data': CRICKET_SAMPLE},
-                {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
-                {'name': 'slap', 'data': SLAP_SAMPLE},
-                {'name': 'clang', 'data': CLANG_SAMPLE},
-                {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
-                {'name': 'snare drum', 'data': SNARE_SAMPLE}
+                {'name': 'cup drum', 'data': CUP_SAMPLE},
+                {'name': 'darbuka drum', 'data': DARBUKA_SAMPLE},
+                {'name': 'hi hat', 'data': HIHAT_SAMPLE},
+                {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
+                {'name': 'cow bell', 'data': COWBELL_SAMPLE},
+                {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
+                {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
+                {'name': 'chime', 'data': CHIME_SAMPLE},
             ]
         }
 

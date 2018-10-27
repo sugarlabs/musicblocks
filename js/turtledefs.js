@@ -52,7 +52,7 @@ function beginnerBlock(name) {
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
            'settimbre', 'newstaccato', 'newslur', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
-           'playdrum', 'setdrum', // drum palette
+           'playdrum', 'playeffect', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
            'action', 'start', 'do', 'dispatch', 'listen',  // action palette
            'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne', 'storein', 'namedbox',  // boxes palette
@@ -380,6 +380,7 @@ function createHelpContent() {
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],
         'drumname': [_('The Drum name block is used to select a drum.'), 'documentation', 'status.svg'],
+        'effectsname': [_('The Sound effects block is used to select a sound effect.'), 'documentation', 'status.svg'],
         'noisename': [_('The Noise name block is used to select a noise synthesizer.'), 'documentation', 'status.svg'],
         // Widgets palette
         'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'status.svg'],
