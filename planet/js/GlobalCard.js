@@ -36,7 +36,7 @@ function GlobalCard(Planet) {
                                                 <div class="card-content shareurltext"> \
                                                         <div class="shareurltitle">'+_('Share')+'</div> \
                                                         <input id="shareurlselect" type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
-                                                        <a class="copyclipboardimg tooltipped" onclick="share(\'{ID}\');" data-delay="50" data-tooltip="'+_('Copy link to clipboard')+'"><i class="material-icons"alt="Copy!">file_copy</i></a>\
+                                                        <a class="copyshareurl tooltipped" onclick="copyURLToClipboard()" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="'+_('Copy link to clipboard')+'"><i class="material-icons"alt="Copy!">file_copy</i></a>\
                                                         <div class="shareurl-advanced" id="global-advanced-{ID}"> \
                                                                 <div class="shareurltitle">'+_('Flags')+'</div> \
                                                                 <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">'+_('Run project on startup.')+'</label></div> \
@@ -173,14 +173,15 @@ function GlobalCard(Planet) {
     };
 };
 
-function share(id) {   
-    this.id = id;
-    try {
-        const toCopy = "https://musicblocks.sugarlabs.org/index.html?id="+id+"&run=True";
-        navigator.clipboard.writeText(toCopy);     
-        console.log('MB url copied');
-      } catch (err) { 
-        alert("Failed to copy.");
-        console.error('Failed to copy. Error: ', err); 
-      }
+function copyURLToClipboard() {
+    var clipboard = new ClipboardJS('.copyshareurl');
+    clipboard.on('success', function (e) {
+        console.info('Copied:', e.text);
+        e.clearSelection();
+    });
+
+    clipboard.on('error', function (e) {
+        alert("Failed to copy!");
+        console.error('Failed to copy:', e.action);
+    });
 }
