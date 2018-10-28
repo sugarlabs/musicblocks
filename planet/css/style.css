@@ -90,7 +90,7 @@
 }
 .shareurlinput{
 	margin-top: 5px;
-	width: 350px;
+	width: 90% !important;
 	text-align: left;
 	visibility: visible;
 }
@@ -100,6 +100,11 @@
 }
 .shareurl-advanced.open {
 	display: block;
+}
+
+.copyshareurl {
+	position: absolute;
+	margin: 4.5% 0.05% 0 4.5% !important;
 }
 #morechips {
 	display: none;
