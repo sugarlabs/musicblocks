@@ -116,6 +116,11 @@ var DRUMNAMES = [
     [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
 ];
 
+// Some "drums" are sound effects.
+var EFFECTSNAMES = [
+    'duck', 'dog', 'cricket', 'cat', 'bubbles', 'splash', 'bottle',
+];
+
 var SOUNDSAMPLESDEFINES = [
     "samples/violin", "samples/cello", "samples/flute", "samples/guitar",
     "samples/clarinet", "samples/saxophone", "samples/tuba", "samples/trumpet",

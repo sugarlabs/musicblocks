@@ -2270,7 +2270,7 @@ function Block(protoblock, blocks, overrideName) {
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                if (i in EFFECTNAMES == false) {
+                if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) === -1) {
                     var label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, 'bold 48pt Sans') > 400) {
                         drumLabels.push(label.substr(0, 8) + '...');
@@ -2302,7 +2302,7 @@ function Block(protoblock, blocks, overrideName) {
             var effectcategories = [];
             var effectcategoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                if (i in EFFECTNAMES) {
+                if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) !== -1) {
                     console.log("found");
                     var label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, 'bold 48pt Sans') > 400) {
