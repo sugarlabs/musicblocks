@@ -1211,15 +1211,17 @@ function Turtles () {
     this._clearButton = null;
     this._clearLabel = null;
     this._clearLabelBG = null;
+    this._gridButton = null;
     this._gridLabel = null;
     this._gridLabelBG = null;
-
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
 
     this.setGridLabel = function (text) {
-        this._gridLabel.text = text;
+        if (this._gridLabel !== null) {
+            this._gridLabel.text = text;
+        }
     };
 
     this.setMasterStage = function (stage) {
@@ -1445,11 +1447,13 @@ function Turtles () {
                     that._clearButton.scale = 1;
                     that._clearButton.x = that.w - 5 - 2 * 55;
 
-                    that._gridButton.scaleX = 1;
-                    that._gridButton.scaleY = 1;
-                    that._gridButton.scale = 1;
-                    that._gridButton.x = that.w - 10 - 3 * 55;
-                    that._gridButton.visible = true;
+                    if (that._gridButton !== null) {
+                        that._gridButton.scaleX = 1;
+                        that._gridButton.scaleY = 1;
+                        that._gridButton.scale = 1;
+                        that._gridButton.x = that.w - 10 - 3 * 55;
+                        that._gridButton.visible = true;
+                    }
 
                     // remove the stage and add it back in position 0
                     that.masterStage.removeChild(that.stage);
@@ -1598,7 +1602,10 @@ function Turtles () {
                     that.collapse();
                 }
 
-                __makeGridButton();
+                var language = localStorage.languagePreference;
+                if (!beginnerMode || language !== 'ja') {
+                    __makeGridButton();
+                }
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
@@ -1698,11 +1705,13 @@ function Turtles () {
         this._clearButton.scale = SCALEFACTOR;
         this._clearButton.x = this.w - 5 - 8 * 55;
 
-        this._gridButton.scaleX = SCALEFACTOR;
-        this._gridButton.scaleY = SCALEFACTOR;
-        this._gridButton.scale = SCALEFACTOR;
-        this._gridButton.x = this.w - 10 - 12 * 55;
-        this._gridButton.visible = false;
+        if (this._gridButton !== null) {
+            this._gridButton.scaleX = SCALEFACTOR;
+            this._gridButton.scaleY = SCALEFACTOR;
+            this._gridButton.scale = SCALEFACTOR;
+            this._gridButton.x = this.w - 10 - 12 * 55;
+            this._gridButton.visible = false;
+        }
 
         // remove the stage and add it back at the top
         this.masterStage.removeChild(this.stage);
@@ -1783,8 +1792,10 @@ function Turtles () {
         this.stage.addChild(this._collapseButton);
         this.stage.removeChild(this._clearButton);
         this.stage.addChild(this._clearButton);
-        this.stage.removeChild(this._gridButton);
-        this.stage.addChild(this._gridButton);
+        if (this._gridButton !== null) {
+            this.stage.removeChild(this._gridButton);
+            this.stage.addChild(this._gridButton);
+        }
 
         var hitArea = new createjs.Shape();
         hitArea.graphics.beginFill('#FFF').drawEllipse(-27, -27, 55, 55);
