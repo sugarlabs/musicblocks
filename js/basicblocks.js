@@ -610,7 +610,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('pitch') + ' ' + 'G4');
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('pitch2')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('pitch2')) {
         newblock.hidden = true;
     }
 
