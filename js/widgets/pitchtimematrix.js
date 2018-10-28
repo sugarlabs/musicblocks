@@ -302,7 +302,7 @@ function PitchTimeMatrix () {
                 ptmDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
                 ptmDiv.style.height = Math.max(400, Math.min(900, window.innerHeight)) + 'px';
 
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collpase') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collapse') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that._expanded = true;
             }
         };

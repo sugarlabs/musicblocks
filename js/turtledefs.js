@@ -52,7 +52,7 @@ function beginnerBlock(name) {
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
            'settimbre', 'newstaccato', 'newslur', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
-           'playdrum', 'playeffect', 'setdrum', // drum palette
+           'playdrum', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
            'action', 'start', 'do', 'dispatch', 'listen',  // action palette
            'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne', 'storein', 'namedbox',  // boxes palette
@@ -151,7 +151,7 @@ function createHelpContent() {
             [_('Collapse'), _('Collapse the graphics window.'), 'header-icons/collapse-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'images/logo.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:') + ' ' + VERSION, 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'images/logo.svg']
         ];
     } else {
@@ -197,7 +197,7 @@ function createHelpContent() {
             [_('Restore'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Keyboard shortcuts'), _('You can type "d" to create a "do" block, "r" to create a "re" block, etc.'), 'header-icons/type-icon.svg'],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'images/logo.svg', 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:') + ' ' + VERSION, 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'images/logo.svg']
         ];
     }
@@ -380,7 +380,6 @@ function createHelpContent() {
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],
         'drumname': [_('The Drum name block is used to select a drum.'), 'documentation', 'status.svg'],
-        'effectsname': [_('The Sound effects block is used to select a sound effect.'), 'documentation', 'status.svg'],
         'noisename': [_('The Noise name block is used to select a noise synthesizer.'), 'documentation', 'status.svg'],
         // Widgets palette
         'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'status.svg'],
