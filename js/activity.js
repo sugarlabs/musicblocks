@@ -4107,8 +4107,16 @@ handleComplete);
             // for the other buttons do not get occluded.
             _setupPaletteMenu(turtleBlocksScale);
 
+            var language = localStorage.languagePreference;
+
             runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
-            _loadButtonDragHandler(runContainer, x, y, _doFastButton, _openAuxMenu, null, null, null);
+
+            if (beginnerMode && language === 'ja') {
+                _loadButtonDragHandler(runContainer, x, y, _doFastButton, null, null, null, null);
+            } else {
+                _loadButtonDragHandler(runContainer, x, y, _doFastButton, _openAuxMenu, null, null, null);
+            }
+
             onscreenButtons.push(runContainer);
 
             x += 1.5 * dx;
@@ -4121,13 +4129,13 @@ handleComplete);
             _loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
             onscreenButtons.push(stopTurtleContainer);
 
-            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, _doSlowButton, null, null, null, null);
+            if (!beginnerMode || language !== 'ja') {
+                slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
+                _loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, _doSlowButton, null, null, null, null);
 
-            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(stepContainer, x - dx, y - btnSize, _doStepButton, null, null, null, null);
-
-            x += dx;
+                stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
+                _loadButtonDragHandler(stepContainer, x - dx, y - btnSize, _doStepButton, null, null, null, null);
+            }
 
             // Move to the right
             var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
@@ -4826,8 +4834,11 @@ handleComplete);
 
             menuContainer.y += dy;
             blocksContainer.y += dy;
-            slowContainer.y += dy;
-            stepContainer.y += dy;
+            var language = localStorage.languagePreference;
+            if (!beginnerMode || language !== 'ja') {
+                slowContainer.y += dy;
+                stepContainer.y += dy;
+            }
 
             refreshCanvas();
         };
@@ -4879,10 +4890,14 @@ handleComplete);
                 blocksContainer.y += dy;
                 menuContainer.y += dy;
 
-                slowContainer.y = 27.5;
-                slowContainer.visible = true;
-                stepContainer.y = 27.5;
-                stepContainer.visible = true;
+                var language = localStorage.languagePreference;
+                if (!beginnerMode || language !== 'ja') {
+                    slowContainer.y = 27.5;
+                    slowContainer.visible = true;
+                    stepContainer.y = 27.5;
+                    stepContainer.visible = true;
+                }
+
                 blocks.checkBounds();
             } else {
                 var dy = headerContainer.y;
@@ -4911,10 +4926,13 @@ handleComplete);
                 menuContainer.y = cellsize / 2;
                 blocksContainer.y -= dy;
 
-                slowContainer.y = -27.5;
-                slowContainer.visible = false;
-                stepContainer.y = -27.5;
-                stepContainer.visible = false;
+                var language = localStorage.languagePreference;
+                if (!beginnerMode || language !== 'ja') {
+                    slowContainer.y = -27.5;
+                    slowContainer.visible = false;
+                    stepContainer.y = -27.5;
+                    stepContainer.visible = false;
+                }
             }
 
             confirmContainer.visible = false;
