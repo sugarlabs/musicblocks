@@ -50,7 +50,7 @@ function beginnerBlock(name) {
            'meter', 'setbpm3', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
            'pitch', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
-           'settimbre', 'newstaccato', 'newslur', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
+           'settimbre', 'newstaccato', 'newslur', 'tie', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
            'playdrum', 'playeffect', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
