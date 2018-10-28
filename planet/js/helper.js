@@ -87,9 +87,10 @@ function toggleExpandable(id, c) {
 function hideOnClickOutside(eles, other) {
     // if click not in id, hide
     const outsideClickListener = function(event) {
+        var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
         var ok = false;
         for (var i = 0; i < eles.length; i++){
-            if (event.path.indexOf(eles[i]) !== -1) {
+            if (path.indexOf(eles[i]) !== -1) {
                 ok = true;
             }
         }
