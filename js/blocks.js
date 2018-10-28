@@ -4897,8 +4897,10 @@ function Blocks () {
                 case 'calcArg':
                 case 'calc':
                 case 'do':
-                    var argBlock = this.blockList[thisBlock.connections[1]];
-                    var blockValue = argBlock.value;
+		    if (thisBlock.connections[1] !== null) {
+			var argBlock = this.blockList[thisBlock.connections[1]];
+			var blockValue = argBlock.value;
+		    }
                     break;
                 case 'nameddoArg':
                 case 'namedcalcArg':
