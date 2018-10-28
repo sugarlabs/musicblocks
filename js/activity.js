@@ -4436,7 +4436,7 @@ handleComplete);
         function _showAboutPage() {
             var helpWidget = new HelpWidget();
             helpWidget.init(null);
-            helpWidget._showPageByName("About");
+            helpWidget.showPageByName(_('About'));
         };
 
         function _doMenuButton() {

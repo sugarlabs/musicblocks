@@ -225,9 +225,9 @@ function HelpWidget () {
     helpBody.innerHTML = body;
     };
 
-    this._showPageByName = function(pageName) {
-        for (let i = 0; i < HELPCONTENT.length; i++) {
-            if(HELPCONTENT[i].includes(pageName)) {
+    this.showPageByName = function(pageName) {
+        for (var i = 0; i < HELPCONTENT.length; i++) {
+            if (HELPCONTENT[i].includes(pageName)) {
                 this._showPage(i);
             }
         }
