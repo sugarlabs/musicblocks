@@ -43,6 +43,10 @@ var VOICENAMES = [
     [_('tuba'), 'tuba', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
     [_('trumpet'), 'trumpet', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('banjo'), 'banjo', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('koto'), 'koto', 'images/voices.svg', 'string'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -130,7 +134,8 @@ var SOUNDSAMPLESDEFINES = [
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare", "samples/piano", "samples/acguit"
+    "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
+    "samples/koto"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -147,6 +152,8 @@ const SAMPLECENTERNO = {
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'tuba': ['A#3', 37], // pitchToNumber('A#', 3, 'C Major')],
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
+    'banjo': ['C5', 51],
+    'koto': ['C5', 51]
 };
 
 
@@ -421,7 +428,9 @@ function Synth() {
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
 		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
-                {'name': 'bass', 'data': BASS_SAMPLE}
+                {'name': 'bass', 'data': BASS_SAMPLE},
+		{'name': 'banjo', 'data': BANJO_SAMPLE},
+		{'name': 'koto', 'data': KOTO_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
