@@ -1603,9 +1603,9 @@ function Turtles () {
                 }
 
                 var language = localStorage.languagePreference;
-                if (!beginnerMode || language !== 'ja') {
+                // if (!beginnerMode || language !== 'ja') {
                     __makeGridButton();
-                }
+                // }
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
