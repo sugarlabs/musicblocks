@@ -152,7 +152,7 @@ const SAMPLECENTERNO = {
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'tuba': ['A#3', 37], // pitchToNumber('A#', 3, 'C Major')],
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
-    'banjo': ['C5', 51],
+    'banjo': ['C6', 63],
     'koto': ['C5', 51]
 };
 
