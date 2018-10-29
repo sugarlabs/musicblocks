@@ -147,13 +147,13 @@ const SAMPLECENTERNO = {
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
-    'flute': ['F#6', 69], // pitchToNumber('C', 6, 'C Major')],
+    'flute': ['F#5', 57], // pitchToNumber('F#', 5, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
-    'tuba': ['A#3', 37], // pitchToNumber('A#', 3, 'C Major')],
+    'tuba': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
-    'banjo': ['C6', 63],
-    'koto': ['C5', 51]
+    'banjo': ['C6', 63], // pitchToNumber('C', 6, 'C Major')],
+    'koto': ['C5', 51] // pitchToNumber('C', 5, 'C Major')],
 };
 
 
@@ -699,8 +699,10 @@ function Synth() {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
-            var n = SAMPLECENTERNO[sourceName][0];
-            var tempSynth = new Tone.Sampler({'C4': this.samples.voice[sourceName]});
+	    var noteDict = {};
+	    noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+	    var tempSynth = new Tone.Sampler(noteDict);
+            // var tempSynth = new Tone.Sampler({'C4': this.samples.voice[sourceName]});
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
