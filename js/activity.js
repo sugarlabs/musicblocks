@@ -1968,7 +1968,6 @@ define(MYDEFINES, function (compatibility) {
                                 palettes.hide();
                             }
 
-                            // palettes.show();
                             palettes.bringToTop();
                         }, 1000);
 
@@ -2464,10 +2463,7 @@ define(MYDEFINES, function (compatibility) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
                         blocks.moveBlock(newBlock, 100 + searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
-                        // Race condition with palette hide.
-                        setTimeout(function() {
-                            palettes.show();
-                        }, 200);
+                        
                     });
 
                     // Move the position of the next newly created block.
@@ -2595,8 +2591,6 @@ define(MYDEFINES, function (compatibility) {
             // Check for RETURN in search widget ahead of other events.
             if (event.keyCode === RETURN && docById('search').value.length > 0) {
                 doSearch();
-                palettes.hide();
-                // palettes.show();
             }
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -2965,7 +2959,6 @@ define(MYDEFINES, function (compatibility) {
                 palettes.hide();
             } else {
                 palettes.setMobile(false);
-                // palettes.show();
                 palettes.bringToTop();
             }
 
