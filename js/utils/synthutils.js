@@ -36,7 +36,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('tamboura'), 'tamboura', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('shamisen funky'), 'shamisenfunky', 'images/voices.svg', 'string'],
+    [_('shamisen'), 'shamisen funky', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
@@ -156,9 +156,9 @@ const SAMPLECENTERNO = {
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'tamboura': ['A4', 48], // pitchToNumber('E', 4, 'C Major')],                                                                                            
-    'electroorgan': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],                                                                                        
-    'electrosaw': ['D#4', 52], // pitchToNumber('C', 4, 'C Major')],                                                                                         
-    'french horn': ['E4', 43], // pitchToNumber('C', 4, 'C Major')],                                                                                          
+    'electroorgan': ['G#4', 47], // pitchToNumber('G#', 4, 'C Major')],                                                                                        
+    'electrosaw': ['D#5', 55], // pitchToNumber('D#', 4, 'C Major')],                                                                                         
+    'french horn': ['E4', 43], // pitchToNumber('E', 4, 'C Major')],                                                                                          
     'gong': ['E3', 31], // pitchToNumber('C', 4, 'C Major')],                                                                                                
     'lightgrid': ['A2', 24], // pitchToNumber('C', 4, 'C Major')],                                                                                           
     'oriental flute': ['C6', 63], // pitchToNumber('C', 4, 'C Major')],                                                                                       
