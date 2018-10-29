@@ -699,8 +699,9 @@ function Synth() {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
-            var n = SAMPLECENTERNO[sourceName][0];
-            var tempSynth = new Tone.Sampler({'C4': this.samples.voice[sourceName]});
+	    var noteDict = {};
+	    noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+	    var tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
@@ -1071,14 +1072,6 @@ function Synth() {
             }
             break;
         case 2:  // voice sample
-            // The new Sampler code does the recentering making this
-            // calculation redundant.
-
-            // var centerNo = SAMPLECENTERNO[sampleName][1];
-            // var obj = noteToPitchOctave(notes);
-            // var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
-            // tempNotes = noteNum - centerNo;
-            // this._performNotes(tempSynth.toMaster(), notes, beatValue, null, null, setNote);
             this._performNotes(tempSynth.toMaster(), notes, beatValue, paramsEffects, paramsFilters, setNote);
             break;
         case 3:  // builtin synth
