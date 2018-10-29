@@ -4144,12 +4144,11 @@ function Logo () {
 
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
-                    that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
-                }
-
-                if (that.effectStyle[turtle].length > 0) {
-                    var effectsname = last(that.effectStyle[turtle]);
-                    that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = effectsname;
+		    if (EFFECTSNAMES.indexOf(drumname) === -1) {
+			that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
+		    } else {
+			that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = effectsname;
+		    }
                 }
 
                 if (!that.inMatrix) {
