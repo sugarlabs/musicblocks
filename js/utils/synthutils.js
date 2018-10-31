@@ -67,6 +67,16 @@ var VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
+    //.TRANS: square wave
+     [_('vibraphone'), 'vibraphone', 'images/synth.svg', 'percussion'],
+    //.TRANS: square wave
+     [_('english_horn'), 'english_horn', 'images/voices.svg', 'wind'],
+    //.TRANS: square wave
+     [_('bassoon'), 'bassoon', 'images/voices.svg', 'wind'],
+    //.TRANS: square wave
+     [_('harp'), 'harp', 'images/voices.svg', 'string'],
+    //.TRANS: square wave
+     [_('xylophone'), 'xylophone', 'images/xylophone.svg', 'percussion'],
 ];
 
 // drum symbols are from
@@ -135,7 +145,8 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto"
+    "samples/koto", "samples/vibraphone", "samples/english_horn", "samples/bassoon",
+     "samples/harp", "samples/xylophone"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -154,6 +165,11 @@ const SAMPLECENTERNO = {
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
     'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
+    'vibraphone': ['C5', 51 ],// pitchToNumber('C', 5, 'C Major')],
+    'xylophone': ['C6' 63],// pitchToNumber('C', 6, 'C Major')],
+    'english_horn': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
+    'bassoon' : ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
+    'harp' : ['C2' 15],  // pitchToNumber('C', 2, 'C Major')],
 };
 
 
@@ -430,7 +446,13 @@ function Synth() {
 		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
-		{'name': 'koto', 'data': KOTO_SAMPLE}
+		{'name': 'koto', 'data': KOTO_SAMPLE},
+		{'name': 'koto', 'data': KOTO_SAMPLE},
+ 		{'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
+ 		{'name': 'english_horn', 'data': ENGLISH_HORN_SAMPLE},
+ 		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
+ 		{'name': 'harp', 'data': HARP_SAMPLE},
+ 		{'name': 'xylophone', 'data': XYLOPHONE_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
