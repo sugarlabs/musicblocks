@@ -35,10 +35,10 @@ const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
 
 const NSYMBOLS = {1: '𝅝',
-		  2: '𝅗𝅥',
+		  2: '𝅗𝅥',
 		  4: '♩',
 		  8: '♪',
-		  16: '𝅘𝅥𝅯'
+		  16: '𝅘𝅥𝅯'
 		 };
 
 const BTOFLAT = {'Eb': 'E' + FLAT, 'Gb': 'G' + FLAT, 'Ab': 'A' + FLAT, 'Bb': 'B' + FLAT, 'Db': 'D' + FLAT, 'Cb': 'C' + FLAT, 'Fb': 'F' + FLAT, 'eb': 'E' + FLAT, 'gb': 'G' + FLAT, 'ab': 'A' + FLAT, 'bb': 'B' + FLAT, 'db': 'D' + FLAT, 'cb': 'C' + FLAT, 'fb': 'F' + FLAT};
@@ -294,6 +294,11 @@ const SELECTORSTRINGS = [
     _('duck'),
     _('banjo'),
     _('koto'),
+    _('xylophone'),
+    _('harp'),
+    _('vibraphone'),
+    _('english_horn'),
+    _('bassoon'),
     //.TRANS: musical temperament
     _('equal'),
     //.TRANS: musical temperament
