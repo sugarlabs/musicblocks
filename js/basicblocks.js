@@ -3088,7 +3088,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(0);
-    if (beginnerMode && !beginnerBlock('setheading')) {
+    var language = localStorage.languagePreference;
+    if (language === 'ja' && beginnerMode && !beginnerBlock('setheading')) {
         newblock.hidden = true;
     }
 
