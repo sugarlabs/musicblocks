@@ -8286,15 +8286,16 @@ function Logo () {
                             denominator[k] = rationalToFraction(ratio[k])[1];
                         }
                     }
+
+                    var notesInfo = '';
+                    /*
                     if (that.synth.inTemperament === 'equal' || that.synth.inTemperament === '1/3 comma meantone') {
-                        var notesInfo = ' ( ' + startingPitch + '*' + OCTAVERATIO + ' ^ ' + '(' + number + ' / ' + pitchNumber + ')' + ' )'; 
-                    } else {
-                        if (numerator.length !== 0) {
-                            var notesInfo = ' ( ' + startingPitch + ' * ' + numerator + '/' + denominator + ' )'; 
-                        } else {
-                            var notesInfo = '';
-                        }   
+                        notesInfo = ' ( ' + startingPitch + '*' + OCTAVERATIO + ' ^ ' + '(' + number + ' / ' + pitchNumber + ')' + ' )'; 
+                    } else if (numerator.length !== 0) {
+                        notesInfo = ' ( ' + startingPitch + ' * ' + numerator + '/' + denominator + ' )'; 
                     }
+                    */
+
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
                         // console.log('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
