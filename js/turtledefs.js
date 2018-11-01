@@ -264,7 +264,8 @@ function createHelpContent() {
         'start': [_('Each Start block is a separate voice.') + ' ' + _('All of the Start blocks run at the same time when the Play button is pressed.'), 'documentation', 'repeat-block.svg'],
         'listen': [_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', 'broadcast-block.svg'],
         'dispatch': [_('The Dispatch block is used to trigger an event.'), 'documentation', 'broadcast.svg'],
-        'do': [_('The Do block is used to initiate an action.') + ' ' + _('In the example, it is used with the One of block to choose a random phase.'), 'documentation', 'do-block.svg'],
+        'on': [_('The On block allow you to make an action perfomed when An event is performed.'),'documentation','On.svg']
+	'do': [_('The Do block is used to initiate an action.') + ' ' + _('In the example, it is used with the One of block to choose a random phase.'), 'documentation', 'do-block.svg'],
         // Boxes palette
         'storebox1': [_('The Store in Box 1 block is used to store a value in Box 1.'), 'documentation', 'box-1-block.svg'],
         'box1': [_('The Box 1 block returns the value stored in Box 1.'), 'documentation', 'box-1-block.svg'],
@@ -272,6 +273,7 @@ function createHelpContent() {
         'box2': [_('The Box 2 block returns the value stored in Box 2.'), 'documentation', 'box-2-block.svg'],
         'increment': [_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks, such as Color, Pen-size.') + ' ' + _('etc.'), 'documentation', 'box-2-block.svg'],
         'incrementOne': [_('The Add-1-to block adds one to the value stored in a box.'), 'documentation', 'box-1-block.svg'],
+	'add': [_('The Add To Value block is used to add value to a perticular block'),'documentation','Add-to-value.svg'],
         // Number palette
         'number': [_('The Number block holds a number.'), 'documentation', 'repeat-block.svg'],
         'random': [_('The Random block returns a random number.'), 'documentation', 'random-block.svg'],
@@ -294,13 +296,14 @@ function createHelpContent() {
         'scrollxy': [_('The Scroll XY block moves the canvas.'), 'documentation', 'on-every-beat-do-block.svg'],
         'x': [_('The X block returns the horizontal position of the mouse.'), 'documentation', 'x-block.svg'],
         'y': [_('The Y block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg'],
-        'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'status.svg'],
+        'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'status.svg'],	    
         // Pen palette
         'setpensize': [_('The Set-pen-size block changes the size of the pen.'), 'documentation', 'set_color-block.svg'],
         'penup': [_('The Pen-up block raises the pen so that it does not draw.'), 'documentation', 'mouse-button-block.svg'],
         'pendown': [_('The Pen-down block lowers the pen so that it draws.'), 'documentation', 'mouse-button-block.svg'],
         'color': [_('The Color block returns the current pen color.'), 'documentation', 'set-color-block.svg'],
         'setcolor': [_('The Set-color block changes the pen color.'), 'documentation', 'set-color-block.svg'],
+	'setshade': [_('The Set-Shade block changes the shade of the pen color.'),'documentation','set-shade-block.svg']
         // Media palette
         'print': [_('The Print block displays text at the top of the screen.'), 'documentation', 'print-block.svg'],
         'text': [_('The Text block holds a text string.'), 'documentation', 'show-block.svg'],
