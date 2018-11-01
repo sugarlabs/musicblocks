@@ -1,4 +1,4 @@
-//source : https://freesound.org/people/arseniiv/sounds/238745/ and lliscence : Creative Commons 0 License
+//source : https://freesound.org/people/arseniiv/sounds/238745/ and lliscence :Creative Commons 0 License
 vibraphone.js
 
 VIBRAPHONE_SAMPLE = function () {
