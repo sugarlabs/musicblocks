@@ -1,3 +1,7 @@
+.materialize-iso, .material-icons .md-48 {
+  font-size: 48px;
+}
+
 input[type=range] {
   height: 4px;
   -webkit-appearance: none;

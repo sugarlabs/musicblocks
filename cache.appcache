@@ -11,6 +11,7 @@ js/samples.js
 js/artwork.js
 js/basicblocks.js
 js/activity.js
+js/toolbar.js
 js/palette.js
 js/savebox.js
 js/pluginsviewer.js

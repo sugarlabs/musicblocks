@@ -213,7 +213,7 @@ nav {
 }
 
 nav .nav-container {
-    padding: 0 12px;
+    padding: 0 0px;
 }
 
 nav .logo {
@@ -255,7 +255,7 @@ nav ul li {
 }
 
 .nav-spacer {
-    height: 48px;
+    height: 96px;
 }
 
 .content {

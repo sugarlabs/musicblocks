@@ -1388,7 +1388,7 @@ function Turtles () {
                 that._expandButton.addChild(that._expandLabel);
 
                 that._expandButton.x = that.w - 10 - 4 * 55;
-                that._expandButton.y = 55 + LEADING + 6;
+                that._expandButton.y = 70 + LEADING + 6;
                 that._expandButton.scaleX = SCALEFACTOR;
                 that._expandButton.scaleY = SCALEFACTOR;
                 that._expandButton.scale = SCALEFACTOR;
@@ -1502,7 +1502,7 @@ function Turtles () {
 
                 that._collapseButton.visible = true;
                 that._collapseButton.x = that.w - 55;
-                that._collapseButton.y = 55 + LEADING + 6;
+                that._collapseButton.y = 70 + LEADING + 6;
                 that.refreshCanvas();
 
                 that._collapseButton.removeAllEventListeners('click');
@@ -1568,7 +1568,7 @@ function Turtles () {
 
                 bitmap.visible = true;
                 that._clearButton.x = that.w - 5 - 2 * 55;
-                that._clearButton.y = 55 + LEADING + 6;
+                that._clearButton.y = 70 + LEADING + 6;
                 that._clearButton.visible = true;
 
                 // that._borderContainer.addChild(that._clearButton);
@@ -1644,7 +1644,7 @@ function Turtles () {
 
                 bitmap.visible = true;
                 that._gridButton.x = that.w - 10 - 3 * 55;
-                that._gridButton.y = 55 + LEADING + 6;
+                that._gridButton.y = 70 + LEADING + 6;
                 that._gridButton.visible = true;
 
                 // that._borderContainer.addChild(that._gridButton);
