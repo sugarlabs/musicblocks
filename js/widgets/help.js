@@ -25,11 +25,11 @@ function HelpWidget () {
         var canvas = docById('myCanvas');
 
         // help page
-	var page = 0;
+        var page = 0;
 
         // Position the widget and make it visible.
         var helpDiv = docById('helpDiv');
-	helpDiv.style.display = '';
+        helpDiv.style.display = '';
         helpDiv.style.visibility = 'visible';
         helpDiv.setAttribute('draggable', 'true');
         helpDiv.style.left = '200px';
@@ -49,45 +49,45 @@ function HelpWidget () {
         // For the button callbacks
         var that = this;
 
-	if (blocks === null) {
+        if (blocks === null) {
             var cell = this._addButton(row, 'up.svg', ICONSIZE, _('previous page'));
 
             cell.onclick=function() {
-		page = page - 1;
-		if (page < 0) {
-		    page = HELPCONTENT.length - 1;
-		}
+                page = page - 1;
+                if (page < 0) {
+                    page = HELPCONTENT.length - 1;
+                }
 
-		that._showPage(page);
+                that._showPage(page);
             };
 
             cell.onmouseover=function() {
-		this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
             };
 
             cell.onmouseout=function() {
-		this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = MATRIXBUTTONCOLOR;
             };
 
             var cell = this._addButton(row, 'down.svg', ICONSIZE, _('next page'));
 
             cell.onclick=function() {
-		page = page + 1;
-		if (page === HELPCONTENT.length) {
-		    page = 0;
-		}
+                page = page + 1;
+                if (page === HELPCONTENT.length) {
+                    page = 0;
+                }
 
-		that._showPage(page);
+                that._showPage(page);
             };
 
             cell.onmouseover=function() {
-		this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
             };
 
             cell.onmouseout=function() {
-		this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = MATRIXBUTTONCOLOR;
             };
-	}
+        }
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
 
@@ -170,57 +170,78 @@ function HelpWidget () {
         };
 
         if (blocks === null) {
-	    // display help menu
-	    this._showPage(0);
-	} else {
-	    // display help for this block
-	    if (blocks.activeBlock.name === null) {
-		helpDiv.style.display = 'none';
-	    } else {
-		var name = blocks.blockList[blocks.activeBlock].name;
+            // display help menu
+            this._showPage(0);
+        } else {
+            // display help for this block
+            if (blocks.activeBlock.name === null) {
+                helpDiv.style.display = 'none';
+            } else {
+                var name = blocks.blockList[blocks.activeBlock].name;
 
-		if (name in BLOCKHELP) {
-		    var helpBody = docById('helpBodyDiv');
+                if (name in BLOCKHELP) {
+                    var helpBody = docById('helpBodyDiv');
 
-		    body = '';
-		    if (BLOCKHELP[name].length > 1) {
-			var path = BLOCKHELP[name][1];
-			if (localStorage.languagePreference == 'ja') {
-			    if (localStorage.kanaPreference == 'kana') {
-				path = path + '-kana';
-			    } else {
-				path = path + '-ja';
-			    }
-			}
+                    body = '';
+                    if (BLOCKHELP[name].length > 1) {
+                        var path = BLOCKHELP[name][1];
+                        // We need to add a case here whenever we add
+                        // help artwor support for a new language.
+                        // e.g., documentation-es
+                        switch(localStorage.languagePreference) {
+                        case 'ja':
+                            if (localStorage.kanaPreference == 'kana') {
+                                path = path + '-kana';
+                            } else {
+                                path = path + '-ja';
+                            }
+                            break;
+                        case 'es':
+                            path = path + '-es';
+                            break;
+                        default:
+                            break;
+                        }
 
-			body = body + '<p><img src="' + path + '/' + BLOCKHELP[name][2] + '"></p>';
-		    }
+                        body = body + '<p><img src="' + path + '/' + BLOCKHELP[name][2] + '"></p>';
+                    }
 
-		    body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
-		    helpBody.innerHTML = body;
-		} else {
-		    helpDiv.style.display = 'none';
-		}
-	    }
-	}
+                    body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
+                    helpBody.innerHTML = body;
+                } else {
+                    helpDiv.style.display = 'none';
+                }
+            }
+        }
     };
 
     this._showPage = function(page) {
-	var helpBody = docById('helpBodyDiv');
-	var body = '';
-	body = body + '<p><img src="' + HELPCONTENT[page][2] + '"></p>';
-	body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
-	body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
+        var helpBody = docById('helpBodyDiv');
+        var body = '';
+        body = body + '<p><img src="' + HELPCONTENT[page][2] + '"></p>';
+        body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
+        body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
 
         if (HELPCONTENT[page].length > 3) {
-	    var link = HELPCONTENT[page][3];
-	    // FIXME
-	    if (localStorage.languagePreference == 'ja') {
-		link = link + '-ja';
-	    }
+            var link = HELPCONTENT[page][3];
+            // We need to add a case here whenever we add
+            // a guide a new language.
+            // e.g., guide-es
+            if (HELPCONTENT[page][0] !== _('About')) {
+                switch(localStorage.languagePreference) {
+                case 'ja':
+                    link = link + '-ja';
+                    break;
+                case 'es':
+                    link = link + '-es';
+                    break;
+                default:
+                    break;
+                }
+            }
 
-	    body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
-	}
+            body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
+        }
 
     helpBody.innerHTML = body;
     };
