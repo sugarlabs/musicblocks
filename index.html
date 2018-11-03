@@ -232,7 +232,7 @@
             <li><a id="stop" class="left tooltipped" data-position="bottom" data-delay="100" data-tooltip="Stop [Alt-S]"><i class="material-icons md-48">stop</i></a></li>
           </ul>
           <ul class="right">
-            <li><a class="tooltipped dropdown-trigger" data-position="bottom" data-delay="100" data-tooltip="New project" data-activates='newdropdown'><i class="material-icons md-48">note_add</i></a></li>
+            <li><a class="tooltipped dropdown-trigger" data-position="left" data-delay="100" data-tooltip="New project" data-activates='newdropdown'><i class="material-icons md-48">note_add</i></a></li>
             <li><a id="load" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Load project from file"><i class="material-icons md-48">folder</i></a></li>
             <li><a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom" data-delay="100" data-tooltip="Save project" data-activates='saveddropdown'><i id="save" class="material-icons md-48">save_alt</i></a></li>
             <li><a id="planetIcon" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Find and share projects"><i class="material-icons md-48">public</i></a></li>
@@ -276,6 +276,32 @@
         <li><a id="new-project" >Confirm</a></li>
       </ul>
       </div>
+
+      <script>
+        $(document).ready(function(){
+        var mode = localStorage.beginnerMode;
+
+        var modeIcon = document.getElementById('mode');
+        var modeText = document.getElementById('modeText');
+
+
+        if (mode === null || mode === 'true') {
+            modeIcon.innerHTML = 'star_border';
+            modeText.setAttribute('data-tooltip', 'Switch to advanced mode');
+        } else {
+            modeIcon.innerHTML = 'star';
+            modeText.setAttribute('data-tooltip', 'Switch to beginner mode');
+        }
+
+        $('.tooltipped').tooltip();
+
+        $('.materialize-iso, .dropdown-trigger').dropdown({
+            constrainWidth: false,
+            hover: false, // Activate on hover
+            belowOrigin: true, // Displays dropdown below the button
+        });
+      });
+      </script>
 
       <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
 
