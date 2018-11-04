@@ -3342,6 +3342,93 @@ i.left {
   .materialize-iso nav a.button-collapse {
     display: none;
   }
+  
+}
+
+@media only screen and (max-width: 860px) {
+
+  .materialize-iso nav i.material-icons {
+    font-size: 28px;  
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .materialize-iso .logo {
+    display: none;
+  }
+  .materialize-iso nav i.material-icons {
+    font-size: 26px;  
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .materialize-iso .logo {
+    display: none;
+  }
+  .materialize-iso nav i.material-icons {
+    font-size: 24px;  
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .materialize-iso .logo {
+    display: none;
+  }
+
+  .materialize-iso nav .main i.material-icons {
+    width: 20px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
+  .materialize-iso nav  .aux i.material-icons{
+    width: 10px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .materialize-iso .logo {
+    display: none;
+  }
+  .materialize-iso nav i.material-icons {
+    font-size: 24px;  
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .materialize-iso .logo {
+    display: none;
+  }
+
+  .materialize-iso nav .main i.material-icons {
+    width: 16px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
+  .materialize-iso nav  .aux i.material-icons{
+    width: 7px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
 }
 .materialize-iso nav .button-collapse {
   float: left;
@@ -3355,7 +3442,7 @@ i.left {
   line-height: 56px;
 }
 .materialize-iso nav .brand-logo {
-  position: absolute;
+  position: relative;
   color: #fff;
   display: inline-block;
   font-size: 2.1rem;
@@ -3495,8 +3582,8 @@ i.left {
   }
   .materialize-iso nav,
   .materialize-iso nav .nav-wrapper i,
-  .materialize-iso nav a.button-collapse,
-  .materialize-iso nav a.button-collapse i {
+   nav a.button-collapse,
+   nav a.button-collapse i {
     height: 64px;
     line-height: 64px;
   }
@@ -4680,26 +4767,26 @@ i.left {
   box-sizing: border-box;
   padding: 2rem;
 }
-.materialize-iso .side-nav .collapsible,
-.materialize-iso .side-nav.fixed .collapsible {
+.side-nav .collapsible,
+.side-nav.fixed .collapsible {
   border: none;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
-.materialize-iso .side-nav .collapsible li,
-.materialize-iso .side-nav.fixed .collapsible li {
+.side-nav .collapsible li,
+.side-nav.fixed .collapsible li {
   padding: 0;
 }
-.materialize-iso .side-nav .collapsible-header,
-.materialize-iso .side-nav.fixed .collapsible-header {
+.side-nav .collapsible-header,
+ .side-nav.fixed .collapsible-header {
   background-color: transparent;
   border: none;
   line-height: inherit;
   height: inherit;
   padding: 0 16px;
 }
-.materialize-iso .side-nav .collapsible-header:hover,
-.materialize-iso .side-nav.fixed .collapsible-header:hover {
+.side-nav .collapsible-header:hover,
+.side-nav.fixed .collapsible-header:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
 .materialize-iso .side-nav .collapsible-header i,
