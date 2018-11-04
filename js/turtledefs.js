@@ -211,7 +211,7 @@ function createHelpContent() {
         // Meter palette
         'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg'],
         'setmasterbpm2': [_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', 'master-beats-per-minute-block.svg'],
-        'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'beats-per-minute-block.svg'],
+        'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'bpm.svg'],
         'everybeatdo': [_('The On-every-beat block let you specify actions to take on every beat.'), 'documentation', 'on-every-beat-do-block.svg'],
         'beatvalue': [_('The Beat count block is the number of the current beat,') + ' ' + _('e.g., 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'],
         'elapsednotes2': [_('The Notes played block is the number of notes that have been played.') + ' ' + _('(By default, it counts quarter notes.)'), 'documentation', 'on-every-beat-do.svg'],
@@ -296,7 +296,7 @@ function createHelpContent() {
         'y': [_('The Y block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg'],
         'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'status.svg'],
         // Pen palette
-        'setpensize': [_('The Set-pen-size block changes the size of the pen.'), 'documentation', 'set_color-block.svg'],
+        'setpensize': [_('The Set-pen-size block changes the size of the pen.'), 'documentation', 'set-pen-size-block.svg'],
         'penup': [_('The Pen-up block raises the pen so that it does not draw.'), 'documentation', 'mouse-button-block.svg'],
         'pendown': [_('The Pen-down block lowers the pen so that it draws.'), 'documentation', 'mouse-button-block.svg'],
         'color': [_('The Color block returns the current pen color.'), 'documentation', 'set-color-block.svg'],
@@ -306,7 +306,7 @@ function createHelpContent() {
         'text': [_('The Text block holds a text string.'), 'documentation', 'show-block.svg'],
         'media': [_('The Media block is used to import an image.'), 'documentation', 'avatar-block.svg'],
         'show': [_('The Show block is used to display text or images on the canvas.'), 'documentation', 'show-block.svg'],
-        'turtleshell': [_('The Shell block is used to change the appearance of the mouse.'), 'documentation', 'avatar-block.svg'],
+        'turtleshell': [_('The Shell block is used to change the appearance of the mouse.'), 'documentation', 'turtleshell.svg'],
         'speak': [_('The Speak block outputs to the text-to-speech synthesizer'), 'documentation', 'speak-block.svg'],
         'height': [_('The Height block returns the height of the canvas.'), 'documentation', 'width-block.svg'],
         'width': [_('The Width block returns the width of the canvas.'), 'documentation', 'width-block.svg'],
@@ -327,7 +327,7 @@ function createHelpContent() {
         'rhythmic2dot': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'status.svg'],
         'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'status.svg'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'status.svg'],
-        'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'status.svg'],
+        'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes.svg'],
         'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'status.svg'],
         'osctime': [_('The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration.'), 'documentation', 'status.svg'],
         // Meter palette
@@ -368,7 +368,7 @@ function createHelpContent() {
         'phaser': [_('The Phaser block adds a sweeping sound.'), 'documentation', 'phaser.svg'],
         'dis': [_('The Distortion block adds distortion to the pitch.'), 'documentation', 'distortion.svg'],
         'tremolo': [_('The Tremolo block adds a wavering effect.'), 'documentation', 'tremolo.svg'],
-        'harmonic2': [_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', 'status.svg'],
+        'harmonic2': [_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', 'harmonic.svg'],
         'harmonic': [_('The Weighted partials block is used to specify the partials associated with a timbre.'), 'documentation', 'status.svg'],
         'partial': [_('The Partial block is used to specify a weight for a specific partical harmonic.'), 'documentation', 'status.svg'],
         'fmsynth': [_('The FM synth block is a frequency modulator used to define a timbre.'), 'documentation', 'status.svg'],
@@ -438,7 +438,7 @@ function createHelpContent() {
         'loadHeapFromApp': [_('The Load heap from app block loads the heap from a web page.'), 'documentation', 'status.svg'],
         // Extras palette
         'comment': [_('The Comment block prints a comment at the top of the screen when the program is running in slow mode.'), 'documentation', 'status.svg'],
-        'wait': [_('The Wait block pauses the program for a specified number of seconds.'), 'documentation', 'status.svg'],
+        'wait': [_('The Wait block pauses the program for a specified number of seconds.'), 'documentation', 'wait-block.svg'],
         'vspace': [_('The Space block is used to add space between blocks.'), 'documentation', 'status.svg'],
         'hspace': [_('The Space block is used to add space between blocks.'), 'documentation', 'status.svg'],
         'openproject': [_('The Open project block is used to open a project from a web page.'), 'documentation', 'status.svg'],
