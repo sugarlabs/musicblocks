@@ -1198,6 +1198,7 @@ function Turtles () {
     this._rotating = false;
     this._drum = false;
 
+    console.log('Creating border container');
     this._borderContainer = new createjs.Container();
     this._expandedBoundary = null;
     this._collapsedBoundary = null;
@@ -1214,6 +1215,8 @@ function Turtles () {
     this._gridButton = null;
     this._gridLabel = null;
     this._gridLabelBG = null;
+    this._locked = false;
+    this._queue = [];
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
@@ -1272,9 +1275,13 @@ function Turtles () {
     };
 
     this.setScale = function (w, h, scale) {
-        this.scale = scale;
-        this.w = w / scale;
-        this.h = h / scale;
+        if (this._locked) {
+	    this._queue = [w, h, scale];
+	} else {
+            this.scale = scale;
+            this.w = w / scale;
+            this.h = h / scale;
+	}
 
         this.makeBackground();
     };
@@ -1316,6 +1323,7 @@ function Turtles () {
         var that = this;
 
         function __makeBoundary() {
+	    that._locked = true;
             var img = new Image();
             img.onload = function () {
                 if (that._expandedBoundary !== null) {
@@ -1673,13 +1681,25 @@ function Turtles () {
                 if (doCollapse) {
                     that.collapse();
                 }
+
+		that._locked = false;
+		if (that._queue.length === 3) {
+		    that.scale = that._queue[2];
+		    that.w = that._queue[0] / that.scale;
+		    that.h = that._queue[1] / that.scale;
+		    that._queue = [];
+		    that.makeBackground();
+		}
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(CARTESIANBUTTON)));
         };
 
-        __makeBoundary();
+        if (!this._locked) {
+            __makeBoundary();
+	}
+
         return this;
     };
 
