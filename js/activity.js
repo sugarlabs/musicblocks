@@ -2866,6 +2866,8 @@ define(MYDEFINES, function (compatibility) {
                 return;
             }
 
+            this._clientWidth = document.body.clientWidth;
+            this._clientHeight = document.body.clientHeight;
 
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
                 return;
