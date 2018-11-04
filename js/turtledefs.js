@@ -296,7 +296,7 @@ function createHelpContent() {
         'y': [_('The Y block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg'],
         'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'status.svg'],
         // Pen palette
-        'setpensize': [_('The Set-pen-size block changes the size of the pen.'), 'documentation', 'set_color-block.svg'],
+        'setpensize': [_('The Set-pen-size block changes the size of the pen.'), 'documentation', 'set-pen-size-block.svg'],
         'penup': [_('The Pen-up block raises the pen so that it does not draw.'), 'documentation', 'mouse-button-block.svg'],
         'pendown': [_('The Pen-down block lowers the pen so that it draws.'), 'documentation', 'mouse-button-block.svg'],
         'color': [_('The Color block returns the current pen color.'), 'documentation', 'set-color-block.svg'],
