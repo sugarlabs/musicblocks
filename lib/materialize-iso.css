@@ -4416,6 +4416,7 @@ i.left {
   position: absolute;
   z-index: 999;
   will-change: width, height;
+  font-family: "Roboto", sans-serif;
 }
 .materialize-iso .dropdown-content li {
   clear: both;
