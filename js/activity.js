@@ -735,10 +735,13 @@ define(MYDEFINES, function (compatibility) {
                 } else {
                     // stop and restart
                     console.log('STOPPING...');
+                    document.getElementById('stop').style.color = 'white';
                     logo.doStopTurtle();
 
                     setTimeout(function () {
                         console.log('AND RUNNING');
+                        document.getElementById('stop').style.color = '#ea174c';
+
                         logo.runLogoCommands(null, env);
                     }, 500);
                 }
@@ -1657,7 +1660,7 @@ define(MYDEFINES, function (compatibility) {
             toolbar.renderStopIcon(doStopButton);
             toolbar.renderNewProjectIcon(_afterDelete);
             toolbar.renderLoadIcon(doLoad);
-            toolbar.renderSaveIcons(save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save));
+            toolbar.renderSaveIcons(save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save),  save.saveBlockArtwork.bind(save));
             toolbar.renderPlanetIcon(_doOpenSamples);
             toolbar.renderMenuIcon(_showHideAuxMenu);
             toolbar.renderHelpIcon(_showHelp);

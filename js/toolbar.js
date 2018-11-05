@@ -11,6 +11,8 @@
 
 function Toolbar() {
 
+    var stopIconColorWhenPlaying = '#ea174c';
+
     this.renderLogoIcon = function (onclick) {
         var logoIcon = document.getElementById('mb-logo');
         logoIcon.onmouseenter = function () {
@@ -26,14 +28,18 @@ function Toolbar() {
 
     this.renderPlayIcon = function (onclick) {
         var playIcon = document.getElementById('play');
+        var stopIcon = document.getElementById('stop');
         playIcon.onclick = function () {
             onclick();
+            stopIcon.style.color = stopIconColorWhenPlaying;
         };
+
     };
     this.renderStopIcon = function (onclick) {
         var stopIcon = document.getElementById('stop');
         stopIcon.onclick = function () {
             onclick();
+            stopIcon.style.color = 'white';
         };
     };
     this.renderNewProjectIcon = function (onclick) {
@@ -48,7 +54,7 @@ function Toolbar() {
             onclick();
         };
     };
-    this.renderSaveIcons = function (svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick) {
+    this.renderSaveIcons = function (svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
         var saveSVG = document.getElementById('save-svg');
         saveSVG.onclick = function () {
             svg_onclick();
@@ -72,6 +78,10 @@ function Toolbar() {
         var saveABC = document.getElementById('save-abc');
         saveABC.onclick = function () {
             abc_onclick();
+        };
+        var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
+        saveArtworkSVG.onclick = function () {
+            blockartworksvg_onclick();
         };
     };
     this.renderPlanetIcon = function (onclick) {
@@ -120,6 +130,8 @@ function Toolbar() {
         var runSlowlyIcon = document.getElementById('runSlowlyIcon');
         runSlowlyIcon.onclick = function () {
             onclick();
+            document.getElementById('stop').style.color = stopIconColorWhenPlaying;
+
         };
     };
     this.renderRunStepIcon = function (onclick) {
@@ -127,6 +139,7 @@ function Toolbar() {
         var runStepByStepIcon = document.getElementById('runStepByStepIcon');
         runStepByStepIcon.onclick = function () {
             onclick();
+            document.getElementById('stop').style.color = stopIconColorWhenPlaying;
         };
     };
     this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick, scroll_onclick) {

@@ -634,6 +634,7 @@ function Logo () {
         if (this.showBlocksAfterRun) {
             console.log('SHOW BLOCKS');
             this.showBlocks();
+            document.getElementById('stop').style.color = 'white';
         }
 
         this.showBlocksAfterRun = false;
@@ -7615,7 +7616,7 @@ function Logo () {
                         that.showBlocksAfterRun = false;
                     }
                 }
-
+                document.getElementById('stop').style.color = 'white';
                 console.log('fin');
             }
         }
