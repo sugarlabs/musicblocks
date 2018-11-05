@@ -20,7 +20,7 @@ Edge	        | Coming soon
 You can run it from
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
 
-![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/documentation/getting-started.svg "Music Blocks in a browser")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/documentation/getting-started.png "Music Blocks in a browser")
 
 Getting Started
 ---------------
@@ -329,7 +329,7 @@ Widget Palette
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
 
-![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/documentation/chords.svg "The Pitch-Time Matrix")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/documentation/chords.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
