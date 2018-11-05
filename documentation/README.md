@@ -33,7 +33,7 @@ first note is a `1/2` note; the second and third notes are `1/4` notes; the four
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
 
-Try clicking on the *Start* block or click on the *Play* button. You should hear the notes play in succession: `Sol` `Mi` `Sol`.
+Try clicking on the *Start* block or click on the *Play* button. You should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
 
 To write your own programs, drag blocks from their respective palettes
 on the left side of the screen. Use multiple blocks in stack(s) to
@@ -67,17 +67,23 @@ hidden at any time while running the program.
 Toolbars
 --------
 
-There are three toolbars:
+There are four toolbars:
 
-(1) the *Main* toolbar across the top of the screen. There you will
-find the *Run* button, the *Erase* button, and buttons to *Hide* and
-*Show* blocks.
+(1) The *Main* toolbar across the top of the screen. There you will 
+find the *Play* button, the *Stop* button, the *New Project* button, 
+buttons for loading and saving projects and the *Find and Share 
+projects* button.
 
-(2) the *Secondary* toolbar on the right side of the screen. There you
-will find buttons for loading and saving projects, the clipboard,
-etc. There is also a utility panel with additional controls.
+(2) The *Secondary* toolbar below the *main* toolbar. There you
+will find the *Home* button, the *Clean* button, buttons for 
+show/hide blocks, expand/collapse blocks and decrease/increase block size. 
 
-(3) the *Palette* toolbar on the left side of the screen. (An
+(3) The *Auxilary* toolbar above the *main* toolbar. It appears when 
+*auxilary menu* button is clicked. There you will find the buttons *Run 
+slowly*, *Run step by step*, *Display Statistics*, *beginner/advanced mode*, 
+etc. and also the button for selecting language.  
+
+(4) the *Palette* toolbar on the left side of the screen. (An
 additional menu appears when a "long press" is applied to a stack of
 blocks).
 
@@ -115,8 +121,8 @@ for general details on how to use the blocks.
 
 See the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
-for details specific to music: *Rhythm*, *Pitch*, *Meter*, *Tone*,
-*Intervals*, *Volume*, *Drum*, and *Widget*.
+for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*, 
+*Tone*, *Ornament*, *Volume*, *Drum*, and *Widget*.
 
 All of the other palettes are described in the 
 [Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
