@@ -1660,14 +1660,16 @@ define(MYDEFINES, function (compatibility) {
             toolbar.renderStopIcon(doStopButton);
             toolbar.renderNewProjectIcon(_afterDelete);
             toolbar.renderLoadIcon(doLoad);
-            toolbar.renderSaveIcons(save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save),  save.saveBlockArtwork.bind(save));
-            toolbar.renderPlanetIcon(_doOpenSamples);
+            toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save),  save.saveBlockArtwork.bind(save));
+            toolbar.renderPlanetIcon(planet, _doOpenSamples);
             toolbar.renderMenuIcon(_showHideAuxMenu);
             toolbar.renderHelpIcon(_showHelp);
             toolbar.renderModeSelectIcon(doSwitchMode);
             toolbar.renderRunSlowlyIcon(_doSlowButton);
             toolbar.renderRunStepIcon(_doStepButton);
-            toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller);
+            toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
+            // toolbar.renderEnableHorizScrollIcon(setScroller, _setupBlocksContainerEvents);  
+            //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
             toolbar.renderMergeIcon(doLoad);
             toolbar.renderRestoreIcon(_restoreTrash);
             toolbar.renderLanguageSelectIcon(doLanguageBox, _showHideAuxMenu);
@@ -4365,11 +4367,26 @@ define(MYDEFINES, function (compatibility) {
 
                 x += dx;
 
+                var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
+                var disableHorizScrollIcon = document.getElementById('disableHorizScrollIcon');
+                enableHorizScrollIcon.onclick = function () {
+                    setScroller();
+                    enableHorizScrollIcon.style.display = 'none';
+                    disableHorizScrollIcon.style.display = 'block';
+                    scrollOnContainer.visible = false;
+                }
+
+                disableHorizScrollIcon.onclick = function () {
+                    setScroller();
+                    disableHorizScrollIcon.style.display = 'none';
+                    enableHorizScrollIcon.style.display = 'block';
+                    scrollOffContainer.visible = false;
+                }
+
                 scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
                 _loadButtonDragHandler(scrollOnContainer, x, y, setScroller, null, null, null, null);
                 onscreenMenu.push(scrollOnContainer);
-                scrollOnContainer.visible = false;
-
+                
                 scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
                 _loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
                 onscreenMenu.push(scrollOffContainer);

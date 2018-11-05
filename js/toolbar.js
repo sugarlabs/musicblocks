@@ -12,6 +12,7 @@
 function Toolbar() {
 
     var stopIconColorWhenPlaying = '#ea174c';
+    var language = localStorage.languagePreference;
 
     this.renderLogoIcon = function (onclick) {
         var logoIcon = document.getElementById('mb-logo');
@@ -54,42 +55,58 @@ function Toolbar() {
             onclick();
         };
     };
-    this.renderSaveIcons = function (svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
-        var saveSVG = document.getElementById('save-svg');
-        saveSVG.onclick = function () {
-            svg_onclick();
-        };
+    this.renderSaveIcons = function (html_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
+        var saveButton = document.getElementById('saveButton');
+        if (beginnerMode) {
+            saveButton.onclick = function () {
+                html_onclick();
+            }
+        } else {
+            saveButton.onclick = function () {}
 
-        var savePNG = document.getElementById('save-png');
-        savePNG.onclick = function () {
-            png_onclick();
-        };
+            var saveSVG = document.getElementById('save-svg');
+            saveSVG.onclick = function () {
+                svg_onclick();
+            };
 
-        var saveWAV = document.getElementById('save-wav');
-        saveWAV.onclick = function () {
-            wave_onclick();
-        };
+            var savePNG = document.getElementById('save-png');
+            savePNG.onclick = function () {
+                png_onclick();
+            };
 
-        var saveLY = document.getElementById('save-ly');
-        saveLY.onclick = function () {
-            ly_onclick();
-        };
+            var saveWAV = document.getElementById('save-wav');
+            saveWAV.onclick = function () {
+                wave_onclick();
+            };
 
-        var saveABC = document.getElementById('save-abc');
-        saveABC.onclick = function () {
-            abc_onclick();
-        };
-        var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
-        saveArtworkSVG.onclick = function () {
-            blockartworksvg_onclick();
-        };
+            var saveLY = document.getElementById('save-ly');
+            saveLY.onclick = function () {
+                ly_onclick();
+            };
+
+            var saveABC = document.getElementById('save-abc');
+            saveABC.onclick = function () {
+                abc_onclick();
+            };
+            var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
+            saveArtworkSVG.onclick = function () {
+                blockartworksvg_onclick();
+            };
+        }
     };
-    this.renderPlanetIcon = function (onclick) {
+    this.renderPlanetIcon = function (planet, onclick) {
         var planetIcon = document.getElementById('planetIcon');
-        planetIcon.onclick = function () {
-            document.getElementById('toolbars').style.display = "none";
-            onclick();
-        };
+        var planetIconDisabled = document.getElementById('planetIconDisabled');
+
+        if (planet) {
+            planetIcon.onclick = function () {
+                document.getElementById('toolbars').style.display = "none";
+                onclick();
+            };
+        } else {
+            planetIcon.style.display = 'none';
+            planetIconDisabled.style.display = 'block';
+        }
     };
 
 
@@ -128,6 +145,10 @@ function Toolbar() {
 
     this.renderRunSlowlyIcon = function (onclick) {
         var runSlowlyIcon = document.getElementById('runSlowlyIcon');
+        if (beginnerMode && language === 'ja') {
+            runSlowlyIcon.style.display = 'none';
+
+        }
         runSlowlyIcon.onclick = function () {
             onclick();
             document.getElementById('stop').style.color = stopIconColorWhenPlaying;
@@ -135,18 +156,21 @@ function Toolbar() {
         };
     };
     this.renderRunStepIcon = function (onclick) {
-
         var runStepByStepIcon = document.getElementById('runStepByStepIcon');
+        if (beginnerMode && language === 'ja') {
+            runStepByStepIcon.style.display = 'none';
+        }
         runStepByStepIcon.onclick = function () {
             onclick();
             document.getElementById('stop').style.color = stopIconColorWhenPlaying;
         };
     };
-    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick, scroll_onclick) {
+    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick) {
         var displayStatsIcon = document.getElementById('displayStatsIcon');
         var loadPluginIcon = document.getElementById('loadPluginIcon');
         var delPluginIcon = document.getElementById('delPluginIcon');
         var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
+
 
         if (!beginnerMode) {
             displayStatsIcon.onclick = function () {
@@ -160,10 +184,6 @@ function Toolbar() {
             delPluginIcon.onclick = function () {
                 delPlugin_onclick();
             };
-
-            enableHorizScrollIcon.onclick = function () {
-                scroll_onclick();
-            };
         } else {
             displayStatsIcon.style.display = "none";
             loadPluginIcon.style.display = "none";
@@ -171,6 +191,15 @@ function Toolbar() {
             enableHorizScrollIcon.style.display = "none";
         }
     };
+    // var scrollEnabled = false;
+    // this.renderEnableHorizScrollIcon = function (setScroller, _setupBlocksContainerEvents) {
+    //     var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
+    //     enableHorizScrollIcon.onclick = function () {
+    //         setScroller();
+    //         _setupBlocksContainerEvents();
+    //     }
+
+    // }
 
     this.renderMergeIcon = function (onclick) {
         var mergeWithCurrentIcon = document.getElementById('mergeWithCurrentIcon');

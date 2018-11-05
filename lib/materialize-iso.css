@@ -3354,10 +3354,33 @@ i.left {
   
 }
 
-@media only screen and (max-width: 860px) {
+@media only screen and (max-width: 1004px) {
 
+  .materialize-iso .filler {
+    display: none;
+  }
+
+  .materialize-iso nav .aux i.material-icons {
+    font-size: 32px;  
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .materialize-iso .filler {
+    display: none;
+  }
   .materialize-iso nav i.material-icons {
     font-size: 28px;  
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
+  .materialize-iso nav .aux i.material-icons {
+    font-size: 23px;  
     position: relative;
     margin: 0;
     padding: 0;
@@ -3365,23 +3388,18 @@ i.left {
 }
 
 @media only screen and (max-width: 700px) {
-  .materialize-iso .logo {
+  .materialize-iso .filler, .materialize-iso .logo {
     display: none;
   }
-  .materialize-iso nav i.material-icons {
+  .materialize-iso nav .main i.material-icons {
     font-size: 26px;  
     position: relative;
     margin: 0;
     padding: 0;
   }
-}
 
-@media only screen and (max-width: 600px) {
-  .materialize-iso .logo {
-    display: none;
-  }
-  .materialize-iso nav i.material-icons {
-    font-size: 24px;  
+  .materialize-iso nav .aux i.material-icons {
+    font-size: 23px;  
     position: relative;
     margin: 0;
     padding: 0;
@@ -3389,7 +3407,7 @@ i.left {
 }
 
 @media only screen and (max-width: 500px) {
-  .materialize-iso .logo {
+   .materialize-iso .filler, .materialize-iso .logo {
     display: none;
   }
 
@@ -3409,11 +3427,11 @@ i.left {
 }
 
 @media only screen and (max-width: 600px) {
-  .materialize-iso .logo {
+  .materialize-iso .filler, .materialize-iso .logo {
     display: none;
   }
   .materialize-iso nav .main i.material-icons {
-    font-size: 24px;  
+    font-size: 22px;  
     position: relative;
     margin: 0;
     padding: 0;
@@ -3428,7 +3446,7 @@ i.left {
 }
 
 @media only screen and (max-width: 400px) {
-  .materialize-iso .logo {
+  .materialize-iso .filler, .materialize-iso .logo {
     display: none;
   }
 
@@ -4210,14 +4228,14 @@ i.left {
   font-size: 1rem;
   z-index: 2000;
   background-color: transparent;
-  border-radius: 2px;
+  border-radius: 23px;
   color: #fff;
   min-height: 20px;
   line-height: 120%;
   opacity: 0;
   position: absolute;
   text-align: center;
-  max-width: calc(100% - 4px);
+  max-width: calc(100% - 2px);
   overflow: hidden;
   left: 0;
   top: 0;
