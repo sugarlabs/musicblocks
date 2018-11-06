@@ -406,7 +406,7 @@ decreased over time, at each repetition.
 
 #### <a name="REPETITION"></a>3.2.6 Repeating Notes
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform6.svg "repeating notes")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/Repeating-Notes-block.svg "repeating notes")
 
 There are several ways to repeat notes. The *Repeat* block will play a
 sequence of notes multiple times; the *Duplicate* block will repeat each
@@ -418,7 +418,7 @@ Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 
 #### <a name="SWINGING"></a>3.2.7 Swinging Notes and Tied Notes
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform7.svg "swinging notes and tied notes")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/SwingingNotesAndTiedNotes-block.svg "swinging notes and tied notes")
 
 The *Swing* block works on pairs of notes (specified by note value),
 adding some duration (specified by swing value) to the first note and
@@ -433,11 +433,11 @@ unchanged.
 Tie also works on pairs of notes, combining them into one note. (The
 notes must be identical in pitch, but can vary in rhythm.)
 
-![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg "using notes with ties")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/UsingNotesWithTies-block.svg "using notes with ties")
 
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/SetSynthVolume-MasterVolume-RelativeVolume-Crescendo-block.svg "Set master volume, set synth volume, set relative volume, crescendo")
 
 The *Set master volume* block will change the master volume. The
 default is `50`; the range is `0` (silence) to `100` (full volume).
@@ -465,7 +465,7 @@ than the original value for volume.
 
 NOTE: The *Crescendo* block does not alter the volume of a note as it is being played. Music Blocks does not yet have this functionality.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform17.svg "Staccato, and Slur blocks")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/Staccato-Slur-block.svg "Staccato, and Slur blocks")
 
 The *Staccato* block shortens the length of the actual
 note&mdash;making them tighter bursts&mdash;while maintaining the
@@ -477,7 +477,7 @@ maintaining the specified rhythmic value of the notes.
 
 #### <a name="INTERVALS"></a>3.2.9 Intervals
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform9.svg "Scalar interval block")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/ScalarInterval-block.svg "Scalar interval block")
 
 The *Scalar interval* block calculates a relative interval based on
 the current mode, skipping all notes outside of the mode. For example,
@@ -491,11 +491,11 @@ on the *Intervals* palette: *Unison*, *Second*, *Third*, ...,
 The *Scalar interval measure* block can be used to measure the number
 of scalar steps between two pitched.
 
-#### <a name= "ABSOLUTE-INTERVALS"></a>Absolute Intervals
+#### <a name= "ABSOLUTE-INTERVALS"></a>3.2.10 Absolute Intervals
 
 Absolute (or semi-tone) intervals are based on half-steps.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform14.svg "Using absolute intervals")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/UsingAbsoluteIntervals-block.svg "Using absolute intervals")
 
 The *Augmented* block calculates an absolute interval (in half-steps),
 e.g., an augmented fifth, and adds the additional pitches to a
