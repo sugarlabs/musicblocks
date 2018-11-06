@@ -262,7 +262,8 @@ function Toolbar() {
         ["save-ly", _("Save sheet music"), 'innerHTML'],
         ["save-abc", _("Save as abc"), 'innerHTML'],
         ["save-blockartwork-svg", _("Save block artwork"), 'innerHTML'],
-        ["new-project", _("Confirm"), 'innerHTML']
+        ["new-project", _("Confirm"), 'innerHTML'],
+        ["languageSelectIcon", _("Select language")],
     ];
 
 
@@ -270,7 +271,7 @@ function Toolbar() {
         for (var i = 0; i < strings.length; i++) {
             var obj = strings[i];
             var elem = document.getElementById(obj[0]);
-            console.log(obj[0]);
+            console.log(obj[0] + " trans: " + obj[1]);
             if (strings[i].length == 3) {
                 document.getElementById(obj[0]).innerHTML = obj[1];
             } else {
