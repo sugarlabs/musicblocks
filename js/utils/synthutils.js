@@ -47,6 +47,8 @@ var VOICENAMES = [
     [_('banjo'), 'banjo', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('koto'), 'koto', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('sitar'), 'sitar', 'images/voices.svg', 'string'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -96,6 +98,8 @@ var DRUMNAMES = [
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
+    //.TRANS: musical instrument
+    [_('gong'), 'gong', 'images/voices.svg', 'bell'],
     //.TRANS: sound effect
     [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
@@ -135,7 +139,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto"
+    "samples/koto", "samples/sitar", "samples/gong" 
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -154,6 +158,7 @@ const SAMPLECENTERNO = {
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
     'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
+    'sitar': ['C7', 75],  // pitchToNumber('C', 7, 'C Major')],
 };
 
 
@@ -431,6 +436,7 @@ function Synth() {
                 {'name': 'bass', 'data': BASS_SAMPLE},
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
 		{'name': 'koto', 'data': KOTO_SAMPLE}
+		{'name': 'sitar', 'data': SITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -449,6 +455,7 @@ function Synth() {
                 {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
                 {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
                 {'name': 'chime', 'data': CHIME_SAMPLE},
+		{'name': 'gong', 'data': GONG_SAMPLE},
                 {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
