@@ -9,8 +9,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-function Toolbar() {
 
+function Toolbar() {
+    var $j = jQuery.noConflict();
     var stopIconColorWhenPlaying = '#ea174c';
     var language = localStorage.languagePreference;
 
@@ -57,41 +58,47 @@ function Toolbar() {
     };
     this.renderSaveIcons = function (html_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
         var saveButton = document.getElementById('saveButton');
+        var saveButtonAdvanced = document.getElementById('saveButtonAdvanced');
         if (beginnerMode) {
+            saveButtonAdvanced.style.display = 'block';
+            saveButtonAdvanced.style.display = 'none';
             saveButton.onclick = function () {
                 html_onclick();
             }
         } else {
-            saveButton.onclick = function () {}
+            saveButton.style.display = 'none';
+            saveButtonAdvanced.style.display = 'block';
+            saveButtonAdvanced.onclick = function () {
 
-            var saveSVG = document.getElementById('save-svg');
-            saveSVG.onclick = function () {
-                svg_onclick();
-            };
+                var saveSVG = document.getElementById('save-svg');
+                saveSVG.onclick = function () {
+                    svg_onclick();
+                };
 
-            var savePNG = document.getElementById('save-png');
-            savePNG.onclick = function () {
-                png_onclick();
-            };
+                var savePNG = document.getElementById('save-png');
+                savePNG.onclick = function () {
+                    png_onclick();
+                };
 
-            var saveWAV = document.getElementById('save-wav');
-            saveWAV.onclick = function () {
-                wave_onclick();
-            };
+                var saveWAV = document.getElementById('save-wav');
+                saveWAV.onclick = function () {
+                    wave_onclick();
+                };
 
-            var saveLY = document.getElementById('save-ly');
-            saveLY.onclick = function () {
-                ly_onclick();
-            };
+                var saveLY = document.getElementById('save-ly');
+                saveLY.onclick = function () {
+                    ly_onclick();
+                };
 
-            var saveABC = document.getElementById('save-abc');
-            saveABC.onclick = function () {
-                abc_onclick();
-            };
-            var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
-            saveArtworkSVG.onclick = function () {
-                blockartworksvg_onclick();
-            };
+                var saveABC = document.getElementById('save-abc');
+                saveABC.onclick = function () {
+                    abc_onclick();
+                };
+                var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
+                saveArtworkSVG.onclick = function () {
+                    blockartworksvg_onclick();
+                };
+            }
         }
     };
     this.renderPlanetIcon = function (planet, onclick) {
@@ -226,4 +233,51 @@ function Toolbar() {
         };
     };
 
+    var strings = [
+        ["mb-logo", _("About Music Blocks")],
+        ["play", _("Play")],
+        ["stop", _("Stop")],
+        ["newFile", _("New project")],
+        ["load", _("Load project from file")],
+        ["saveButton", _("Save project")],
+        ["saveButtonAdvanced", _("Save project")],
+        ["planetIcon", _("Find and share projects")],
+        ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+        ["toggleAuxBtn", _("Auxilary menu")],
+        ["helpIcon", _("Help")],
+        ["runSlowlyIcon", _("Run slowly")],
+        ["runStepByStepIcon", _("Run step by step")],
+        ["displayStatsIcon", _("Display statistics")],
+        ["loadPluginIcon", _("Load plugin")],
+        ["delPluginIcon", _("Delete plugin")],
+        ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
+        ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+        ["mergeWithCurrentIcon", _("Merge with current project")],
+        ["restoreIcon", _("Restore")],
+        ["modeText", _("Switch to beginner mode")],
+        ["languageSelectIcon", _("Select language")],
+        ["save-svg", _("Save as svg"), 'innerHTML'],
+        ["save-png", _("Save as png"), 'innerHTML'],
+        ["save-wav", _("Save as wav"), 'innerHTML'],
+        ["save-ly", _("Save sheet music"), 'innerHTML'],
+        ["save-abc", _("Save as abc"), 'innerHTML'],
+        ["save-blockartwork-svg", _("Save block artwork"), 'innerHTML'],
+        ["new-project", _("Confirm"), 'innerHTML']
+    ];
+
+
+    this.init = function () {
+        for (var i = 0; i < strings.length; i++) {
+            var obj = strings[i];
+            var elem = document.getElementById(obj[0]);
+            console.log(obj[0]);
+            if (strings[i].length == 3) {
+                document.getElementById(obj[0]).innerHTML = obj[1];
+            } else {
+                document.getElementById(obj[0]).setAttribute("data-tooltip", obj[1]);
+                
+            }
+        }
+
+    };
 }

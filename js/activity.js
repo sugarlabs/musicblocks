@@ -1655,6 +1655,8 @@ define(MYDEFINES, function (compatibility) {
             save.init();
 
             toolbar = new Toolbar();
+            toolbar.init();
+            
             toolbar.renderLogoIcon(_showAboutPage);
             toolbar.renderPlayIcon(_doFastButton);
             toolbar.renderStopIcon(doStopButton);

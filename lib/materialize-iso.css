@@ -18,6 +18,7 @@
  * Default mobile-first, responsive styling for pickadate.js
  * Demo: http://amsul.github.io/pickadate.js
  */
+ 
 
  -webkit-touch-callout: none; /* iOS Safari */
  -webkit-user-select: none; /* Safari */
@@ -4241,6 +4242,7 @@ i.left {
   top: 0;
   pointer-events: none;
   visibility: hidden;
+  font-family: "Roboto", sans-serif;
 }
 .backdrop {
   position: absolute;
