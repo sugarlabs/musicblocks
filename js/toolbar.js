@@ -266,17 +266,52 @@ function Toolbar() {
         ["languageSelectIcon", _("Select language")],
     ];
 
+    // Workaround for FF
+    var strings_ = [
+        _("About Music Blocks"),
+        _("Play"),
+        _("Stop"),
+        _("New project"),
+        _("Load project from file"),
+        _("Save project"),
+        _("Save project"),
+        _("Find and share projects"),
+        _("Offline. Sharing is unavailable"),
+        _("Auxilary menu"),
+        _("Help"),
+        _("Run slowly"),
+        _("Run step by step"),
+        _("Display statistics"),
+        _("Load plugin"),
+        _("Delete plugin"),
+        _("Enable horizontal scrolling"),
+        _("Disable horizontal scrolling"),
+        _("Merge with current project"),
+        _("Restore"),
+        _("Switch to beginner mode"),
+        _("Select language"),
+        _("Save as svg"),
+        _("Save as png"),
+        _("Save as wav"),
+        _("Save sheet music"),
+        _("Save as abc"),
+        _("Save block artwork"),
+        _("Confirm"),
+        _("Select language"),
+        ];
+
 
     this.init = function () {
         for (var i = 0; i < strings.length; i++) {
             var obj = strings[i];
+            var trans = strings_[i];
             var elem = document.getElementById(obj[0]);
-            console.log(obj[0] + " trans: " + obj[1]);
+            console.log(obj[0] + " trans: " + trans);
             if (strings[i].length == 3) {
-                document.getElementById(obj[0]).innerHTML = obj[1];
+                elem.innerHTML = obj[1];
             } else {
-                document.getElementById(obj[0]).setAttribute("data-tooltip", obj[1]);
-                
+                elem.setAttribute("data-tooltip", trans);
+               
             }
         }
 
