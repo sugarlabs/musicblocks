@@ -160,8 +160,8 @@ const SAMPLECENTERNO = {
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
     'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
-    'Dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
-    'Electricguitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
+    'electricguitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
 };
 
 
