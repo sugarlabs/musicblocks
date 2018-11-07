@@ -281,6 +281,7 @@ const SELECTORSTRINGS = [
     _('triangle bell'),
     _('finger cymbals'),
     _('chime'),
+    _('gong'),
     _('clang'),
     _('crash'),
     _('bottle'),

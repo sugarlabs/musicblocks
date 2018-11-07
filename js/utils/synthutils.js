@@ -96,6 +96,8 @@ var DRUMNAMES = [
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
+    //.TRANS: a musical instrument
+    [_('gong'), 'gong', 'images/gong.svg', 'cymca', 'bell'],
     //.TRANS: sound effect
     [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
@@ -135,7 +137,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto"
+    "samples/koto", "samples/gong"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -449,6 +451,7 @@ function Synth() {
                 {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
                 {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
                 {'name': 'chime', 'data': CHIME_SAMPLE},
+                {'name': 'gong', 'data': GONG_SAMPLE},
                 {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
