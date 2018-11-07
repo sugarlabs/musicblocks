@@ -292,7 +292,9 @@
             modeText.setAttribute('data-tooltip', _('Switch to beginner mode'));
           }
 
-          $('.tooltipped').tooltip();
+          $('.tooltipped').tooltip({
+            html: true
+          });
           $('.materialize-iso, .dropdown-trigger').dropdown({
             constrainWidth: false,
             hover: false, // Activate on hover

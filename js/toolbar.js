@@ -306,14 +306,17 @@ function Toolbar() {
             var obj = strings[i];
             var trans = strings_[i];
             var elem = document.getElementById(obj[0]);
-            console.log(obj[0] + " trans: " + trans);
+            // console.log(obj[0] + " trans: " + trans);
             if (strings[i].length == 3) {
                 elem.innerHTML = obj[1];
             } else {
-                elem.setAttribute("data-tooltip", trans);
-               
+                elem.setAttribute("data-tooltip", trans);  
             }
         }
+        $j('.tooltipped').tooltip({
+            html: true
+        });
+
 
     };
 }
