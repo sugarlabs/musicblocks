@@ -79,7 +79,13 @@ function Turtle (name, turtles, drum) {
     var canvas = document.getElementById('overlayCanvas');
     var ctx = canvas.getContext('2d');
     console.log(ctx.canvas.width + ' x ' + ctx.canvas.height);
-
+    
+    /**
+     *  As the canvas scrolls the turtle is drawn under
+     * 
+     * @param  dx - change in x coordinate 
+     * @param  dy - change in y coordinate 
+     */
     this.doScrollXY = function(dx, dy) {
         // FIXME: how big?
         var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
@@ -103,9 +109,19 @@ function Turtle (name, turtles, drum) {
             }
         }
     };
-
+    
+    /**
+     *  Simulate an arc with line segments since Tinkercad cannot
+     * 
+     * @param  nsteps - turtle's steps
+     * @param  cx - x coordinate of center
+     * @param  cy - y coordinate of center
+     * @param  radius - radius of arc
+     * @param  sa - start angle
+     * @param  ea - end angle
+     * 
+     */
     this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
-        // Simulate an arc with line segments since Tinkercad cannot
         // import SVG arcs reliably.
         var a = sa;
         if (ea == null) {
@@ -121,6 +137,17 @@ function Turtle (name, turtles, drum) {
         }
     };
 
+    /**
+     *  Draws a bezier curve
+     * 
+     * @param  cp1x - the x-coordinate of the first bezier control point
+     * @param  cp1y - the y-coordinate of the first bezier control point
+     * @param  cp2x - the x-coordinate of the second bezier control point
+     * @param  cp2y - the y-coordinate of the second bezier control point	
+     * @param  x2 - the x-coordinate of the ending point
+     * @param  y2 - the y-coordinate of the ending point
+     * 
+     */
     this.doBezier = function(cp1x, cp1y, cp2x, cp2y, x2, y2) {
         // FIXME: Add SVG output
         if (this.penState && this.hollowState) {
@@ -292,6 +319,16 @@ function Turtle (name, turtles, drum) {
         this.doSetHeading(degrees);
     };
 
+    /**
+     *  Moves turtle
+     * 
+     * @param  ox - the old x-coordinate of the turtle
+     * @param  oy - the old y-coordinate of the turtle
+     * @param  x - on screen x coordinate
+     * @param  y - on screen y coordinate
+     * @param  invert - boolean value regarding whether coordinates are inverted or not
+     * 
+     */
     this.move = function(ox, oy, x, y, invert) {
         if (invert) {
             ox = this.turtles.turtleX2screenX(ox);
@@ -422,11 +459,20 @@ function Turtle (name, turtles, drum) {
             this.y = this.turtles.screenY2turtleY(y);
         }
     };
-
+    
+    /**
+     * @return {Number} {the turtle's index in turtleList (the turtle's number)}
+     */
     this.getNumber = function () {
         return this.turtles.turtleList.indexOf(this);
     };
-
+    
+    /**
+     *  Renames start block
+     *
+     * @param name - name string which is assigned to startBlock
+     * 
+     */
     this.rename = function(name) {
         this.name = name;
 
@@ -442,7 +488,23 @@ function Turtle (name, turtles, drum) {
             this.startBlock.value = this.turtles.turtleList.indexOf(this);
         }
     };
-
+    
+    /**
+     * Draws an arc with turtle pen and moves turtle to the end of the arc
+     * 
+     * @param  cx - x-coordinate of circle center
+     * @param  cy - y-coordinate of circle center
+     * @param  ox - old x-coordinate of turtle
+     * @param  oy - old y coordinate of turtle
+     * @param  x - onscreen x coordinate of turtle
+     * @param  y - onscreen y coordinate of turtle
+     * @param  radius - radius of circle (for arc)
+     * @param  start - start angle
+     * @param  end - end angle
+     * @param  anticlockwise - boolean value regarding whether arc is cw or acw
+     * @param  invert - boolean value regarding whether coordinates are inverted or not
+     * 
+     */
     this.arc = function(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
         if (invert) {
             cx = this.turtles.turtleX2screenX(cx);
@@ -565,7 +627,14 @@ function Turtle (name, turtles, drum) {
         }
     };
 
-    // Turtle functions
+    /**
+     * Takes in turtle functions to reset the turtle position, pen, skin, media
+     * 
+     * @param  resetPen - boolean value regarding whether the pen's properties (color, value etc) should be reset
+     * @param  resetSkin - boolean value regarding whether the turtle's 'skin' (color, blockname etc) should be reset
+     * @param  resetPosition - boolean value regarding whether the turtle's position (orientation, x, y etc) should be reset
+     * 
+     */
     this.doClear = function(resetPen, resetSkin, resetPosition) {
         // Reset turtle.
         if (resetPosition) {
@@ -641,7 +710,10 @@ function Turtle (name, turtles, drum) {
         this.penstrokes.image = canvas;
         this.turtles.refreshCanvas();
     };
-
+    
+    /**
+     * Removes penstrokes and clears canvas
+     */
     this.clearPenStrokes = function() {
         this.penState = true;
         this.fillState = false;
@@ -664,6 +736,12 @@ function Turtle (name, turtles, drum) {
         this.turtles.refreshCanvas();
     };
 
+    /**
+     * Takes in turtle functions to reset the turtle position, pen, skin, media
+     * 
+     * @param  steps - the number of steps the turtle goes forward by
+     * 
+     */
     this.doForward = function(steps) {
 
         this.processColor();
@@ -687,6 +765,13 @@ function Turtle (name, turtles, drum) {
         this.turtles.refreshCanvas();
     };
 
+    /**
+     * Moves turtle to specific point (x, y)
+     * 
+     * @param  x - on-screen x coordinate of the point to where the turtle is moved
+     * @param  y - on-screen y coordinate of the point to where the turtle is moved
+     * 
+     */
     this.doSetXY = function(x, y) {
         this.processColor();
         if (!this.fillState) {
@@ -708,9 +793,16 @@ function Turtle (name, turtles, drum) {
         this.turtles.refreshCanvas();
     };
 
+    /**
+     * Draws arc with specified angle and radius by  
+     * breaking up arcs into chucks of 90 degrees or less 
+     * (in order to have exported SVG properly rendered).
+     * 
+     * @param  angle - angle of arc
+     * @param  radius - radius of arc
+     * 
+     */
     this.doArc = function(angle, radius) {
-        // Break up arcs into chucks of 90 degrees or less (in order
-        // to have exported SVG properly rendered).
         if (radius < 0) {
             radius = -radius;
         }
@@ -731,6 +823,13 @@ function Turtle (name, turtles, drum) {
         }
     };
 
+    /**
+     * Draws arc parts for eventual combination into one arc
+     * 
+     * @param  angle - angle of arc
+     * @param  radius - radius of arc
+     * 
+     */
     this._doArcPart = function(angle, radius) {
         this.processColor();
         if (!this.fillState) {
@@ -777,9 +876,15 @@ function Turtle (name, turtles, drum) {
         }
         this.turtles.refreshCanvas();
     };
-
+    
+    /**
+     * Adds an image object to the canvas (shows an image)
+     * 
+     * @param  size - size of image
+     * @param  myImage - image path
+     * 
+     */
     this.doShowImage = function(size, myImage) {
-        // Add an image object to the canvas
         // Is there a JS test for a valid image path?
         if (myImage === null) {
             return;
@@ -806,8 +911,14 @@ function Turtle (name, turtles, drum) {
         image.src = myImage;
     };
 
+    /**
+     * Adds an image object from a URL to the canvas (shows an image)
+     * 
+     * @param  size - size of image
+     * @param  myImage - URL of image (image address)
+     * 
+     */
     this.doShowURL = function(size, myURL) {
-        // Add an image object from a URL to the canvas
         if (myURL === null) {
             return;
         }
@@ -830,9 +941,15 @@ function Turtle (name, turtles, drum) {
             turtle.turtles.refreshCanvas();
         };
     };
-
+    
+    /**
+     * Adds an image object to the turtle
+     * 
+     * @param  size - size of image
+     * @param  myImage - path of image
+     * 
+     */
     this.doTurtleShell = function(size, myImage) {
-        // Add image to turtle
         if (myImage === null) {
             return;
         }
@@ -886,15 +1003,28 @@ function Turtle (name, turtles, drum) {
             that.turtles.refreshCanvas();
         };
     };
-
+    
+    /**
+     * Resizes decoration by width and scale
+     * 
+     * @param  scale - resize decoration by scale
+     * @param  width - resize decoration by width
+     * 
+     */
     this.resizeDecoration = function(scale, width) {
         this.decorationBitmap.x = width - 30 * scale / 2;
         this.decorationBitmap.y = 35 * scale / 2;
         this.decorationBitmap.scaleX = this.decorationBitmap.scaleY = this.decorationBitmap.scale = 0.5 * scale / 2
     };
-
+    
+    /**
+     * Adds a text object to the canvas
+     * 
+     * @param  size - specifies text size
+     * @param  myText - string of text to be displayed
+     * 
+     */
     this.doShowText = function(size, myText) {
-        // Add a text object to the canvas
         if (myText === null) {
             return;
         }
@@ -923,8 +1053,13 @@ function Turtle (name, turtles, drum) {
         }
     };
 
+     /**
+     * Turn right and display corresponding turtle graphic by rotating bitmap
+     * 
+     * @param  degrees - degrees for right turn
+     * 
+     */
     this.doRight = function(degrees) {
-        // Turn right and display corresponding turtle graphic.
         this.orientation += Number(degrees);
         while (this.orientation < 0) {
             this.orientation += 360;
@@ -937,7 +1072,13 @@ function Turtle (name, turtles, drum) {
             this.updateCache();
         }
     };
-
+    
+    /**
+     * Sets the direction of where the turtle is heading by rotating bitmap
+     * 
+     * @param  degrees -  degrees turned to set the 'heading' of turtle
+     * 
+     */
     this.doSetHeading = function(degrees) {
         this.orientation = Number(degrees);
         while (this.orientation < 0) {
@@ -951,14 +1092,26 @@ function Turtle (name, turtles, drum) {
             this.updateCache();
         }
     };
-
+    
+    /**
+     * Sets font
+     * 
+     * @param  font - font object
+     * 
+     */
     this.doSetFont = function(font) {
         this.font = font;
         this.updateCache();
     };
-
-    this.doSetColor = function(color) {
-        // Color sets hue but also selects maximum chroma.
+    
+    /**
+     * Sets color
+     * Color sets hue but also selects maximum chroma.
+     * 
+     * @param  color - hex code specifying color 
+     * 
+     */
+    this.doSetColor = function(color) {        
         this.closeSVG();
         this.color = Number(color);
         var results = getcolor(this.color);
@@ -967,11 +1120,21 @@ function Turtle (name, turtles, drum) {
         this.canvasColor = results[2];
         this.processColor();
     };
-
+    
+    /**
+     * Sets pen's alpha value (transparency)
+     * 
+     * @param  alpha - alpha value
+     * 
+     */
     this.doSetPenAlpha = function(alpha) {
         this.canvasAlpha = alpha;
     };
-
+    
+    /**
+     * Splits hex code for rgb number values.
+     * 
+     */
     this.processColor = function() {
         if (this.canvasColor[0] === '#') {
             this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
@@ -982,6 +1145,12 @@ function Turtle (name, turtles, drum) {
         ctx.fillStyle = subrgb + this.canvasAlpha + ')';
     };
 
+    /**
+     * Sets hue for canvas
+     * 
+     *  @param  hue - hue hex code
+     * 
+     */
     this.doSetHue = function(hue) {
         this.closeSVG();
         this.color = Number(hue);
@@ -989,6 +1158,12 @@ function Turtle (name, turtles, drum) {
         this.processColor();
     };
 
+    /**
+     * Sets shade for canvas
+     * 
+     *  @param  shade - shade hex code
+     * 
+     */
     this.doSetValue = function(shade) {
         this.closeSVG();
         this.value = Number(shade);
@@ -996,6 +1171,12 @@ function Turtle (name, turtles, drum) {
         this.processColor();
     };
 
+    /**
+     * Sets chroma for canvas
+     * 
+     *  @param  chroma - chroma hex code
+     * 
+     */
     this.doSetChroma = function(chroma) {
         this.closeSVG();
         this.chroma = Number(chroma);
@@ -1003,27 +1184,49 @@ function Turtle (name, turtles, drum) {
         this.processColor();
     };
 
+    /**
+     * Sets pen size/thickness
+     * 
+     *  @param  size - pen size which is assigned to pen stroke
+     * 
+     */
     this.doSetPensize = function(size) {
         this.closeSVG();
         this.stroke = size;
         ctx.lineWidth = this.stroke;
     };
 
+     /**
+     * Toggles penState - puts pen 'up'
+     * 
+     */
     this.doPenUp = function() {
         this.closeSVG();
         this.penState = false;
     };
-
+    
+    /**
+     * Toggles penState - puts pen 'down' 
+     * 
+     */
     this.doPenDown = function() {
         this.penState = true;
     };
 
+    /**
+     * Begins fill path 
+     * 
+     */
     this.doStartFill = function() {
         /// start tracking points here
         ctx.beginPath();
         this.fillState = true;
     };
 
+    /**
+     * Ends fill path 
+     * 
+     */
     this.doEndFill = function() {
         /// redraw the points with fill enabled
         ctx.fill();
@@ -1032,16 +1235,28 @@ function Turtle (name, turtles, drum) {
         this.fillState = false;
     };
 
+    /**
+     * Begins hollow line by toggling hollowState (to true)
+     * 
+     */
     this.doStartHollowLine = function() {
         /// start tracking points here
         this.hollowState = true;
     };
 
+    /**
+     * Ends hollow line by toggling hollowState (to false)
+     * 
+     */
     this.doEndHollowLine = function() {
         /// redraw the points with fill enabled
         this.hollowState = false;
     };
 
+    /**
+     * Function for closing SVG by changing SVG output to the canvas
+     * 
+     */
     this.closeSVG = function() {
         if (this.svgPath) {
             // For the SVG output, we need to replace rgba() with
@@ -1064,8 +1279,11 @@ function Turtle (name, turtles, drum) {
         }
     };
 
-    // Internal function for creating cache.
-    // Includes workaround for a race condition.
+    /**
+     * Internal function for creating cache.
+     * Includes workaround for a race condition.
+     * 
+     */
     this.createCache = function() {
         var that = this;
         that.bounds = that.container.getBounds();
@@ -1079,8 +1297,11 @@ function Turtle (name, turtles, drum) {
         }
     };
 
-    // Internal function for creating cache.
-    // Includes workaround for a race condition.
+    /** 
+    * Internal function for updating cache.
+    * Includes workaround for a race condition. 
+    * 
+    */
     this.updateCache = function() {
         var that = this;
 
@@ -1094,7 +1315,12 @@ function Turtle (name, turtles, drum) {
             that.turtles.refreshCanvas();
         }
     };
-
+    
+    /** 
+    * Stops blinking of turtle if not already finished.
+    * Sets timeout to null and blinkFinished boolean to true (if they have not been already changed)
+    * 
+    */
     this.stopBlink = function() {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
@@ -1120,6 +1346,9 @@ function Turtle (name, turtles, drum) {
         }
     };
 
+    /**
+     * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
+     */
     this.blink = function(duration, volume) {
         var that = this;
         this._sizeInUse = that.bitmap.scaleX;
@@ -1290,6 +1519,13 @@ function Turtles () {
         this.stage.y += dy;
     };
 
+    /**
+     * 
+     * Makes background for canvas - clears containers, renders buttons
+     * 
+     * @param  setCollapsed used to specified whether the background should be collapsed
+     * 
+     */
     this.makeBackground = function (setCollapsed) {
         if (setCollapsed === undefined) {
             var doCollapse = false;
@@ -1322,6 +1558,10 @@ function Turtles () {
 
         var that = this;
 
+        /**
+         * Makes boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG
+         * 
+         */
         function __makeBoundary() {
 	    that._locked = true;
             var img = new Image();
@@ -1343,6 +1583,10 @@ function Turtles () {
                 unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10 / SCALEFACTOR).replace('X', 10 / SCALEFACTOR).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20 / SCALEFACTOR))));
         };
 
+        /**
+         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG
+         * 
+         */
         function __makeBoundary2() {
             var img = new Image();
             img.onload = function () {
@@ -1365,6 +1609,11 @@ function Turtles () {
                 unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
         };
 
+         /**
+         * Makes expand button by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to remove stage and add it at posiion 0.
+         * 
+         */
         function __makeExpandButton() {
             that._expandButton = new createjs.Container();
             that._expandLabel = null;
@@ -1475,6 +1724,11 @@ function Turtles () {
                 unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 
+         /**
+         * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to call collapse() method
+         * 
+         */
         function __makeCollapseButton() {
             that._collapseButton = new createjs.Container();
             that._collapseLabel = null;
@@ -1544,6 +1798,11 @@ function Turtles () {
                 unescape(encodeURIComponent(COLLAPSEBUTTON)))
         };
 
+        /**
+         * Makes clear button by initailising 'CLEARBUTTON' SVG.
+         * Assigns click listener function to call doClear() method.
+         * 
+         */
         function __makeClearButton() {
             that._clearButton = new createjs.Container();
             that._clearLabel = null;
@@ -1619,7 +1878,12 @@ function Turtles () {
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(CLEARBUTTON)));
         };
-
+        
+        /**
+         * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
+         * Assigns click listener function to doGrid() method
+         * 
+         */
         function __makeGridButton() {
             that._gridButton = new createjs.Container();
             that._gridLabel = null;
@@ -1703,6 +1967,12 @@ function Turtles () {
         return this;
     };
 
+     /**
+     * Toggles visibility of menu and grids. 
+     * Scales down all 'turtles' in turtleList
+     * Removes the stage and adds it back at the top
+     * 
+     */
     this.collapse = function () {
         this.hideMenu();
         this.hideGrids();
@@ -1740,16 +2010,37 @@ function Turtles () {
         this.refreshCanvas();
     };
 
+    /**
+     * 
+     * Returns block object
+     * 
+     * @param  blocks 
+     * @return blocks object
+     */
     this.setBlocks = function (blocks) {
         this.blocks = blocks;
         return this;
     };
-
+    
+    /**
+     * Adds drum to start block
+     * 
+     * @param  startBlock name of startBlock
+     * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
+     * 
+     */
     this.addDrum = function (startBlock, infoDict) {
         this._drum = true;
         this.add(startBlock, infoDict);
     };
 
+    /**
+     * Adds turtle to start block
+     * 
+     * @param  startBlock name of startBlock
+     * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
+     * 
+     */
     this.addTurtle = function (startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
@@ -1761,8 +2052,14 @@ function Turtles () {
         }
     };
 
+    /**
+     * Add a new turtle for each start block. Creates container for each turtle.
+     * 
+     * @param  startBlock name of startBlock
+     * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
+     * 
+     */
     this.add = function (startBlock, infoDict) {
-        // Add a new turtle for each start block
         if (startBlock != null) {
             console.log('adding a new turtle ' + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
@@ -1933,8 +2230,17 @@ function Turtles () {
         this.refreshCanvas();
     };
 
+    /**
+     * Async creation of bitmap from SVG data
+     * 
+     * @param  data     SVG data
+     * @param  name     name of bitmap
+     * @param  callback function executed on load of bitmap
+     * @param  extras   
+     * 
+     */
     this._makeTurtleBitmap = function (data, name, callback, extras) {
-        // Async creation of bitmap from SVG data
+       
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
         var that = this;
@@ -1948,27 +2254,50 @@ function Turtles () {
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
     };
 
+    /**
+     * Convert on screen x coordinate to turtle x coordinate
+     * @param x x coordinate 
+     *
+     */
     this.screenX2turtleX = function (x) {
         return x - (this._canvas.width / (2.0 * this.scale));
     };
 
+    /**
+     * Convert on screen y coordinate to turtle y coordinate
+     * @param y y coordinate
+     */
     this.screenY2turtleY = function (y) {
         return this.invertY(y);
     };
 
+    /**
+     * Convert turtle x coordinate to on screen x coordinate
+     * @param x x coordinate
+     */
     this.turtleX2screenX = function (x) {
         return (this._canvas.width / (2.0 * this.scale)) + x;
     };
 
+    /**
+     * Convert turtle y coordinate to on screen y coordinate
+     * @param y y coordinate
+     */
     this.turtleY2screenY = function (y) {
         return this.invertY(y);
     };
 
+    /**
+     * Invert y coordinate
+     */
     this.invertY = function (y) {
         return this._canvas.height / (2.0 * this.scale) - y;
     };
 
-    this.markAsStopped = function () {
+    /**
+     * Toggles 'running' boolean value for all turtles 
+     */
+     this.markAsStopped = function () {
         for (var turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
             // Make sure the blink is really stopped.
@@ -1978,6 +2307,11 @@ function Turtles () {
         this.refreshCanvas();
     };
 
+    /**
+     * Returns boolean value depending on whether turtle is running
+     * 
+     * @return {boolean} running
+     */
     this.running = function () {
         for (var turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
@@ -1989,7 +2323,14 @@ function Turtles () {
 };
 
 
-// Queue entry for managing running blocks.
+/**
+ * Queue entry for managing running blocks.
+ * 
+ * @param  blk      block       
+ * @param  count    count 
+ * @param  parentBlk parent block
+ * @param  args      arguments
+ */
 function Queue (blk, count, parentBlk, args) {
     this.blk = blk;
     this.count = count;
@@ -1997,7 +2338,12 @@ function Queue (blk, count, parentBlk, args) {
     this.args = args
 };
 
-
+/**
+ * Converts hexcode to rgb 
+ * 
+ * @param  {Number} hex hexcode
+ * @return {String} rgb values of hexcode + alpha which is 1
+ */
 function hex2rgb (hex) {
     var bigint = parseInt(hex, 16);
     var r = (bigint >> 16) & 255;
