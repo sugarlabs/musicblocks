@@ -48,9 +48,9 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('koto'), 'koto', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('Dulcimer'), 'Dulcimer', 'images/voices.svg', 'string'],
+    [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('Electricguitar'), 'Electricguitar', 'images/voices.svg', 'string'],
+    [_('electric guitar'), 'electricguitar', 'images/voices.svg', 'string'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
