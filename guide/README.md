@@ -437,7 +437,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur
 
-![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/SetSynthVolume-MasterVolume-RelativeVolume-Crescendo-block.svg "Set master volume, set synth volume, set relative volume, crescendo")
+![alt tag](https://github.com/Ashnidh/musicblocks/blob/master/guide/SetSynthVolume-MasterVolume-RelativeVolume-Crescendo-block.svg.svg "Set master volume, set synth volume, set relative volume, crescendo")
 
 The *Set master volume* block will change the master volume. The
 default is `50`; the range is `0` (silence) to `100` (full volume).
