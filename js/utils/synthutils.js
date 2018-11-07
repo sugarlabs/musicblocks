@@ -435,7 +435,7 @@ function Synth() {
 		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
-		{'name': 'koto', 'data': KOTO_SAMPLE}
+		{'name': 'koto', 'data': KOTO_SAMPLE},
 		{'name': 'sitar', 'data': SITAR_SAMPLE}
             ],
             'drum': [
