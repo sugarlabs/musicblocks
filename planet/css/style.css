@@ -275,3 +275,8 @@ a {
 	width: calc(100% + 48px);
     left: -24px;
 }
+
+.material-tooltip {
+	border-radius:23px;
+	max-width: calc(100% - 2px);
+}
