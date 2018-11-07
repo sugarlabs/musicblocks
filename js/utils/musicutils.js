@@ -295,8 +295,8 @@ const SELECTORSTRINGS = [
     _('duck'),
     _('banjo'),
     _('koto'),
-    _('Dulcimer'),
-    _('Electricguitar'),
+    _('dulcimer'),
+    _('electricguitar'),
     //.TRANS: musical temperament
     _('equal'),
     //.TRANS: musical temperament
