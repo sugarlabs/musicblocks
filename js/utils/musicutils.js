@@ -281,6 +281,7 @@ const SELECTORSTRINGS = [
     _('triangle bell'),
     _('finger cymbals'),
     _('chime'),
+    _('gong'),
     _('clang'),
     _('crash'),
     _('bottle'),
@@ -294,8 +295,6 @@ const SELECTORSTRINGS = [
     _('duck'),
     _('banjo'),
     _('koto'),
-    _('sitar'),
-    _('gong'),
     //.TRANS: musical temperament
     _('equal'),
     //.TRANS: musical temperament
