@@ -1620,7 +1620,7 @@ define(MYDEFINES, function (compatibility) {
                 this.init = function () {
                     this.iframe = document.getElementById('planet-iframe');
                     try {
-                        this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage);
+                        this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage, window._);
                         this.planet = this.iframe.contentWindow.p;
                         this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
                         this.planet.setPlanetClose(this.closePlanet.bind(this));
