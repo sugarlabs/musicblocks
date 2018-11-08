@@ -2912,6 +2912,26 @@ define(MYDEFINES, function (compatibility) {
 
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
+            this._innerWidth = window.innerWidth;
+            this._innerHeight = window.innerHeight;
+            this._outerWidth = window.outerWidth;
+            this._outerHeight = window.outerHeight;
+
+            if (largerContainer !== null) {
+                homeButtonContainers[0].x = this._innerWidth - 4 * 55 - 27.5;
+                homeButtonContainers[1].x = homeButtonContainers[0].x;
+                hideBlocksContainer.x = homeButtonContainers[0].x;
+                collapseBlocksContainer.x = homeButtonContainers[0].x;
+                smallerContainer.x = homeButtonContainers[0].x;
+                largerContainer.x = homeButtonContainers[0].x;
+
+                homeButtonContainers[0].y = this._innerHeight - 27.5;
+                homeButtonContainers[1].y = homeButtonContainers[0].y;
+                hideBlocksContainer.y = homeButtonContainers[0].y;
+                collapseBlocksContainer.y = homeButtonContainers[0].y;
+                smallerContainer.y = homeButtonContainers[0].y;
+                largerContainer.y = homeButtonContainers[0].y;
+            }
 
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
                 return;
@@ -4453,8 +4473,12 @@ define(MYDEFINES, function (compatibility) {
             }
 
             var btnSize = cellSize;
-            var x = 27.5 + 6;
-            var y = toolbarHeight + 95.5 + 6;
+            // Upper left
+            // var x = 27.5 + 6;
+            // var y = toolbarHeight + 95.5 + 6;
+            // Lower right
+            var x = this._innerWidth - 4 * btnSize - 27.5;
+            var y = this._innerHeight - 27.5;
             var dx = btnSize;
 
             homeButtonContainers = [];
@@ -4465,8 +4489,8 @@ define(MYDEFINES, function (compatibility) {
             _loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
             homeButtonContainers[1].visible = false;
 
-            homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
-            homeButtonContainers[1].y = toolbarHeight + 95.5 + 6;
+            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
+            homeButtonContainers[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
             boundary.hide();
 
             x += dx;
@@ -4885,7 +4909,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             logoContainer.y += dy;
-            homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
+            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
             homeButtonContainers[1].y = homeButtonContainers[0].y;
             hideBlocksContainer.y = homeButtonContainers[0].y;
             collapseBlocksContainer.y = homeButtonContainers[0].y;
@@ -4945,7 +4969,7 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 // These buttons are smaller, hence + 6
-                homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
+                homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
                 homeButtonContainers[1].y = homeButtonContainers[0].y;
                 hideBlocksContainer.y = homeButtonContainers[0].y;
                 collapseBlocksContainer.y = homeButtonContainers[0].y;
@@ -4981,7 +5005,7 @@ define(MYDEFINES, function (compatibility) {
                     onscreenMenu[i].visible = false;
                 }
 
-                homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
+                homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
                 homeButtonContainers[1].y = homeButtonContainers[0].y;
                 hideBlocksContainer.y = homeButtonContainers[0].y;
                 collapseBlocksContainer.y = homeButtonContainers[0].y;
