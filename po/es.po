@@ -8084,8 +8084,8 @@ msgstr "Debe seleccionar un archivo."
 
 #: js/savebox.js:116
 
-#~msgid "Save as .tb"
-#~msgstr "Guardar como .tb"
+#~msgid "Save as HTML"
+#~msgstr "Guardar como HTML"
 
 #: js/lilypond.js:21
 

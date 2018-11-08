@@ -6764,8 +6764,8 @@ msgstr "ファイルを えらぶ ひつようが あります"
 #~msgid "Input to Minor Block must be 2, 3, 6, or 7"
 #~msgstr "「短（マイナー）」ブロックには 2, 3, 6, 7いずれかのかずをいれてください。"
 
-#~msgid "Save as .tb"
-#~msgstr ".tbをほぞん"
+#~msgid "Save as HTML"
+#~msgstr "HTMLをほぞん"
 
 #~msgid "note volume"
 #~msgstr "おんぷのおんりょう"

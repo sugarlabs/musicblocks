@@ -6805,8 +6805,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Input to Minor Block must be 2, 3, 6, or 7"
 #~msgstr "「短（マイナー）」ブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
 
-#~msgid "Save as .tb"
-#~msgstr ".tbを保存"
+#~msgid "Save as HTML"
+#~msgstr "HTMLを保存"
 
 #~msgid "note volume"
 #~msgstr "音符の音量"

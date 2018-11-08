@@ -70,6 +70,11 @@ function Toolbar() {
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = function () {
 
+                var saveHTML = document.getElementById('save-html');
+                saveHTML.onclick = function () {
+                    html_onclick();
+                };
+
                 var saveSVG = document.getElementById('save-svg');
                 saveSVG.onclick = function () {
                     svg_onclick();
@@ -94,6 +99,7 @@ function Toolbar() {
                 saveABC.onclick = function () {
                     abc_onclick();
                 };
+
                 var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
                 saveArtworkSVG.onclick = function () {
                     blockartworksvg_onclick();
@@ -256,6 +262,7 @@ function Toolbar() {
         ["restoreIcon", _("Restore")],
         ["modeText", _("Switch to beginner mode")],
         ["languageSelectIcon", _("Select language")],
+        ["save-html", _("Save as HTML"), 'innerHTML'],
         ["save-svg", _("Save as svg"), 'innerHTML'],
         ["save-png", _("Save as png"), 'innerHTML'],
         ["save-wav", _("Save as wav"), 'innerHTML'],
@@ -290,6 +297,7 @@ function Toolbar() {
         _("Restore"),
         _("Switch to beginner mode"),
         _("Select language"),
+        _("Save as HTML"),
         _("Save as svg"),
         _("Save as png"),
         _("Save as wav"),
