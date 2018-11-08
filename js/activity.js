@@ -47,8 +47,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
             js.src = 'https://connect.facebook.net/en_US/sdk.js';
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
-    } catch (e) {
-    };
+    } catch (e) {};
 }
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -59,8 +58,8 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
             console.log('FIRST TIME USER');
         } else if (localStorage.beginnerMode !== null) {
             beginnerMode = localStorage.beginnerMode;
-            console.log('READING BEGINNERMODE FROM LOCAL STORAGE: ' + beginnerMode + ' ' + typeof(beginnerMode)); 
-            if (typeof(beginnerMode) === 'string') {
+            console.log('READING BEGINNERMODE FROM LOCAL STORAGE: ' + beginnerMode + ' ' + typeof (beginnerMode));
+            if (typeof (beginnerMode) === 'string') {
                 if (beginnerMode === 'false') {
                     beginnerMode = false;
                 }
@@ -122,6 +121,7 @@ var MYDEFINES = [
     'widgets/status',
     'widgets/help',
     'utils/munsell',
+    'activity/toolbar',
     'activity/trash',
     'activity/boundary',
     'activity/turtle',
@@ -166,12 +166,12 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 define(MYDEFINES, function (compatibility) {
 
     // Manipulate the DOM only when it is ready.
-    require(['domReady!','activity/sugarizer-compatibility'], function (doc) {
+    require(['domReady!', 'activity/sugarizer-compatibility'], function (doc) {
         if (sugarizerCompatibility.isInsideSugarizer()) {
             window.addEventListener('localized', function () {
                 sugarizerCompatibility.loadData(function () {
-                    var planet=document.getElementById('planet-iframe');
-                    planet.onload = function() {
+                    var planet = document.getElementById('planet-iframe');
+                    planet.onload = function () {
                         domReady(doc);
                     };
                 });
@@ -260,7 +260,7 @@ define(MYDEFINES, function (compatibility) {
         var runContainer = null;
         var slowContainer = null;
         var stepContainer = null;
-        var confirmContainer = null;        
+        var confirmContainer = null;
         var saveHTMLContainer = null;
         var saveSVGContainer = null;
         var savePNGContainer = null;
@@ -292,8 +292,10 @@ define(MYDEFINES, function (compatibility) {
             // docById('contextWheelDiv').style.display = 'none';
         };
 
+        var toolbarHeight = document.getElementById('toolbars').offsetHeight;
+
         // Do something on right click
-        document.addEventListener("contextmenu", function(event) {
+        document.addEventListener("contextmenu", function (event) {
             stageX = event.x;
             stageY = event.y;
 
@@ -400,7 +402,7 @@ define(MYDEFINES, function (compatibility) {
         function _findBlocks() {
             // _showHideAuxMenu(false);
             var leftpos = Math.floor(canvas.width / 4);
-            var toppos = 90;
+            var toppos = 95.5;
             blocks.activeBlock = null;
             hideDOMLabel();
             logo.showBlocks();
@@ -528,11 +530,11 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
-                if (SPECIALINPUTS.indexOf(blocks.blockList[i].name) !== -1) { 
+                if (SPECIALINPUTS.indexOf(blocks.blockList[i].name) !== -1) {
                     for (var p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
-                            svg += '<' +  parts[p] + '><';
+                            svg += '<' + parts[p] + '><';
                         } else if (p === 2) {
                             // skip filter
                         } else if (p === 3) {
@@ -552,7 +554,7 @@ define(MYDEFINES, function (compatibility) {
                     for (var p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
-                            svg += '<' +  parts[p] + '><';
+                            svg += '<' + parts[p] + '><';
                         } else if (p === 2) {
                             // skip filter
                         } else if (p === 3) {
@@ -584,7 +586,7 @@ define(MYDEFINES, function (compatibility) {
                     }
 
                     for (var p = 2; p < parts.length - 1; p++) {
-                        svg += '<' +  parts[p] + '>';
+                        svg += '<' + parts[p] + '>';
                     }
 
                     svg += '</g>';
@@ -603,7 +605,7 @@ define(MYDEFINES, function (compatibility) {
                     }
 
                     for (var p = 2; p < parts.length - 1; p++) {
-                        svg += '<' +  parts[p] + '>';
+                        svg += '<' + parts[p] + '>';
                     }
 
                     svg += '</g>';
@@ -650,14 +652,14 @@ define(MYDEFINES, function (compatibility) {
 
             NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
                 for (var i = 0, len = this.length; i < len; i++) {
-                    if(this[i] && this[i].parentElement) {
+                    if (this[i] && this[i].parentElement) {
                         this[i].parentElement.removeChild(this[i]);
                     }
                 }
             };
 
             var table = docById('myTable');
-            if(table != null) {
+            if (table != null) {
                 table.remove();
             }
         };
@@ -733,10 +735,13 @@ define(MYDEFINES, function (compatibility) {
                 } else {
                     // stop and restart
                     console.log('STOPPING...');
+                    document.getElementById('stop').style.color = 'white';
                     logo.doStopTurtle();
 
                     setTimeout(function () {
                         console.log('AND RUNNING');
+                        document.getElementById('stop').style.color = '#ea174c';
+
                         logo.runLogoCommands(null, env);
                     }, 500);
                 }
@@ -874,9 +879,13 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
+
+       
+
         function doSwitchMode() {
             blocks.activeBlock = null;
             var mode = localStorage.beginnerMode;
+
             if (mode === null || mode === 'true') {
                 textMsg(_('Refresh your browser to change to advanced mode.'));
                 localStorage.setItem('beginnerMode', false);
@@ -930,8 +939,8 @@ define(MYDEFINES, function (compatibility) {
         function closeAnalytics(chartBitmap, ctx) {
             blocks.activeBlock = null;
             var button = this;
-            button.x = (canvas.width / (2 * turtleBlocksScale))  + (300 / Math.sqrt(2));
-            button.y = 300.00 - (300.00 / Math.sqrt(2));
+            button.x = (canvas.width / (2 * turtleBlocksScale)) + (300 / Math.sqrt(2));
+            button.y = 200.0;
             this.closeButton = _makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
             this.closeButton.on('click', function (event) {
                 button.closeButton.visible = false;
@@ -961,9 +970,9 @@ define(MYDEFINES, function (compatibility) {
             blocks.activeBlock = null;
             var myChart = docById('myChart');
 
-             if(_isCanvasBlank(myChart) == false) {
-                return ;
-             }
+            if (_isCanvasBlank(myChart) == false) {
+                return;
+            }
 
             var ctx = myChart.getContext('2d');
             loading = true;
@@ -981,7 +990,7 @@ define(MYDEFINES, function (compatibility) {
                     var chartBitmap = new createjs.Bitmap(img);
                     stage.addChild(chartBitmap);
                     chartBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (300);
-                    chartBitmap.y = 0;
+                    chartBitmap.y = 200;
                     chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale = 600 / chartBitmap.image.width;
                     logo.hideBlocks();
                     update = true;
@@ -997,7 +1006,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         // Deprecated
-        function doOptimize (state) {
+        function doOptimize(state) {
             blocks.activeBlock = null;
             console.log('Setting optimize to ' + state);
             logo.setOptimize(state);
@@ -1052,17 +1061,17 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function getPlaybackQueueStatus () {
+        function getPlaybackQueueStatus() {
             return Object.keys(logo.playbackQueue).length > 0;
         };
 
-        function setPlaybackStatus () {
+        function setPlaybackStatus() {
             // if (playbackBox != null) {
             //     playbackBox.setPlaybackStatus();
             // }
         };
 
-        function doPausePlayback () {
+        function doPausePlayback() {
             blocks.activeBlock = null;
             logo.restartPlayback = false;
             logo.playback(-1);
@@ -1086,7 +1095,7 @@ define(MYDEFINES, function (compatibility) {
             blocks.activeBlock = null;
             logo.doStopTurtle();
             logo.restartPlayback = true;
-            
+
             /*
             setTimeout(function () {
                 // logo.playback(-1);
@@ -1107,7 +1116,7 @@ define(MYDEFINES, function (compatibility) {
 
             // Suppress music and turtle output when generating
             // compiled output.
-            logo.setTurtleDelay(0);  // Compile at full speed.
+            logo.setTurtleDelay(0); // Compile at full speed.
             logo.playbackQueue = {};
             logo.playbackTime = 0;
             logo.compiling = true;
@@ -1169,7 +1178,7 @@ define(MYDEFINES, function (compatibility) {
 
             _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
                 msgText = text;
-            }, 55);
+            }, 120);
 
             _createMsgContainer('#ffcbc4', '#ff0031', function (text) {
                 errorMsgText = text;
@@ -1223,6 +1232,7 @@ define(MYDEFINES, function (compatibility) {
 
             // Put the boundary in the blocks container so it scrolls
             // with the blocks.
+
             boundary = new Boundary();
             boundary
                 .setStage(blocksContainer)
@@ -1293,7 +1303,9 @@ define(MYDEFINES, function (compatibility) {
                 .setMessage(textMsg)
                 .setRefreshCanvas(refreshCanvas);
 
-            playbackOnLoad = function() {
+
+
+            playbackOnLoad = function () {
                 /*
                 if (_THIS_IS_TURTLE_BLOCKS_) {
                     // Play playback queue if there is one.
@@ -1314,7 +1326,7 @@ define(MYDEFINES, function (compatibility) {
                 this.iframe = null;
                 this.mainCanvas = null;
 
-                this.hideMusicBlocks = function() {
+                this.hideMusicBlocks = function () {
                     hideSearchWidget();
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
@@ -1409,6 +1421,8 @@ define(MYDEFINES, function (compatibility) {
                 }
 
                 this.showMusicBlocks = function () {
+                    document.getElementById('toolbars').style.display = "block";
+
                     docById('statusDiv').style.visibility = storage.getItem('isStatusHidden');
                     docById('statusButtonsDiv').style.visibility = storage.getItem('isStatusHidden');
                     docById('statusTableDiv').style.visibility = storage.getItem('isStatusHidden');
@@ -1452,7 +1466,7 @@ define(MYDEFINES, function (compatibility) {
                     window.scroll(0, 0);
                 };
 
-                this.showPlanet = function() {
+                this.showPlanet = function () {
                     this.planet.open(this.mainCanvas.toDataURL('image/png'));
                     this.iframe.style.display = 'block';
                     try {
@@ -1462,25 +1476,25 @@ define(MYDEFINES, function (compatibility) {
                     }
                 };
 
-                this.hidePlanet = function() {
+                this.hidePlanet = function () {
                     this.iframe.style.display = 'none';
                 };
 
-                this.openPlanet = function() {
+                this.openPlanet = function () {
                     console.log('SAVE LOCALLY');
                     this.saveLocally();
                     this.hideMusicBlocks();
                     this.showPlanet();
                 };
 
-                this.closePlanet = function() {
+                this.closePlanet = function () {
                     this.hidePlanet();
                     this.showMusicBlocks();
                 };
 
-                this.loadProjectFromData = function(data, merge) {
-                    if (merge===undefined) {
-                        merge=false;
+                this.loadProjectFromData = function (data, merge) {
+                    if (merge === undefined) {
+                        merge = false;
                     }
 
                     this.closePlanet();
@@ -1531,25 +1545,25 @@ define(MYDEFINES, function (compatibility) {
                     document.body.style.cursor = 'default';
                 };
 
-                this.loadProjectFromFile = function() {
+                this.loadProjectFromFile = function () {
                     console.log('OPEN');
                     document.querySelector('#myOpenFile').focus();
                     document.querySelector('#myOpenFile').click();
                     window.scroll(0, 0);
                 };
 
-                this.newProject = function() {
+                this.newProject = function () {
                     this.closePlanet();
                     this.initialiseNewProject();
                 };
 
-                this.initialiseNewProject = function(name) {
+                this.initialiseNewProject = function (name) {
                     this.planet.ProjectStorage.initialiseNewProject(name);
                     blocks.trashStacks = [];
                     this.saveLocally();
                 };
 
-                this.saveLocally = function() {
+                this.saveLocally = function () {
                     console.log('overwriting session data');
                     var data = prepareExport();
                     var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
@@ -1575,35 +1589,35 @@ define(MYDEFINES, function (compatibility) {
                     //}
                 };
 
-                this.openCurrentProject = function() {
+                this.openCurrentProject = function () {
                     return this.planet.ProjectStorage.getCurrentProjectData();
                 };
 
-                this.openProjectFromPlanet = function(id,error) {
-                    this.planet.openProjectFromPlanet(id,error);
+                this.openProjectFromPlanet = function (id, error) {
+                    this.planet.openProjectFromPlanet(id, error);
                 };
 
-                this.onConverterLoad = function() {
+                this.onConverterLoad = function () {
                     window.Converter = this.planet.Converter;
                 };
 
-                this.getCurrentProjectName = function() {
+                this.getCurrentProjectName = function () {
                     return this.planet.ProjectStorage.getCurrentProjectName();
                 };
 
-                this.getCurrentProjectDescription = function() {
+                this.getCurrentProjectDescription = function () {
                     return this.planet.ProjectStorage.getCurrentProjectDescription();
                 };
 
-                this.getCurrentProjectImage = function() {
+                this.getCurrentProjectImage = function () {
                     return this.planet.ProjectStorage.getCurrentProjectImage();
                 };
 
-                this.getTimeLastSaved = function() {
+                this.getTimeLastSaved = function () {
                     return this.planet.ProjectStorage.TimeLastSaved;
                 };
 
-                this.init = function() {
+                this.init = function () {
                     this.iframe = document.getElementById('planet-iframe');
                     try {
                         this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage);
@@ -1640,11 +1654,34 @@ define(MYDEFINES, function (compatibility) {
             ]);
             save.init();
 
+            toolbar = new Toolbar();
+            toolbar.init();
+            
+            toolbar.renderLogoIcon(_showAboutPage);
+            toolbar.renderPlayIcon(_doFastButton);
+            toolbar.renderStopIcon(doStopButton);
+            toolbar.renderNewProjectIcon(_afterDelete);
+            toolbar.renderLoadIcon(doLoad);
+            toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save),  save.saveBlockArtwork.bind(save));
+            toolbar.renderPlanetIcon(planet, _doOpenSamples);
+            toolbar.renderMenuIcon(_showHideAuxMenu);
+            toolbar.renderHelpIcon(_showHelp);
+            toolbar.renderModeSelectIcon(doSwitchMode);
+            toolbar.renderRunSlowlyIcon(_doSlowButton);
+            toolbar.renderRunStepIcon(_doStepButton);
+            toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
+            // toolbar.renderEnableHorizScrollIcon(setScroller, _setupBlocksContainerEvents);  
+            //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
+            toolbar.renderMergeIcon(doLoad);
+            toolbar.renderRestoreIcon(_restoreTrash);
+            toolbar.renderLanguageSelectIcon(doLanguageBox, _showHideAuxMenu);
+
+
             if (planet != undefined) {
                 saveLocally = planet.saveLocally.bind(planet);
             } else {
 
-                __saveLocally = function() {
+                __saveLocally = function () {
                     console.log('overwriting session data (local)');
                     var data = prepareExport();
                     var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
@@ -1996,7 +2033,11 @@ define(MYDEFINES, function (compatibility) {
 
             var URL = window.location.href;
             var projectID = null;
-            var flags = {run: false, show: false, collapse: false};
+            var flags = {
+                run: false,
+                show: false,
+                collapse: false
+            };
 
             // Scale the canvas relative to the screen size.
             _onResize(true);
@@ -2012,55 +2053,55 @@ define(MYDEFINES, function (compatibility) {
                         if (newUrlParts[i].indexOf('=') > 0) {
                             var args = newUrlParts[i].split('=');
                             switch (args[0].toLowerCase()) {
-                            case 'file':
-                                console.log('Warning: old Music Blocks URLs will no longer work.');
-                                break;
-                            case 'id':
-                                projectID = args[1];
-                            case 'run':
-                                if (args[1].toLowerCase() === 'true')
-                                    flags.run = true;
-                                break;
-                            case 'show':
-                                if (args[1].toLowerCase() === 'true')
-                                    flags.show = true;
-                                break;
-                            case 'collapse':
-                                if (args[1].toLowerCase() === 'true')
-                                    flags.collapse = true;
-                                break;
-                            case 'inurl':
-                                var url = args[1];
-                                var getJSON = function (url) {
-                                    return new Promise(function (resolve, reject) {
-                                        var xhr = new XMLHttpRequest();
-                                        xhr.open('get', url, true);
-                                        xhr.responseType = 'json';
-                                        xhr.onload = function () {
-                                            var status = xhr.status;
-                                            if (status === 200) {
-                                                resolve(xhr.response);
-                                            } else {
-                                                reject(status);
-                                            }
-                                        };
-                                        xhr.send();
-                                    });
-                                };
+                                case 'file':
+                                    console.log('Warning: old Music Blocks URLs will no longer work.');
+                                    break;
+                                case 'id':
+                                    projectID = args[1];
+                                case 'run':
+                                    if (args[1].toLowerCase() === 'true')
+                                        flags.run = true;
+                                    break;
+                                case 'show':
+                                    if (args[1].toLowerCase() === 'true')
+                                        flags.show = true;
+                                    break;
+                                case 'collapse':
+                                    if (args[1].toLowerCase() === 'true')
+                                        flags.collapse = true;
+                                    break;
+                                case 'inurl':
+                                    var url = args[1];
+                                    var getJSON = function (url) {
+                                        return new Promise(function (resolve, reject) {
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open('get', url, true);
+                                            xhr.responseType = 'json';
+                                            xhr.onload = function () {
+                                                var status = xhr.status;
+                                                if (status === 200) {
+                                                    resolve(xhr.response);
+                                                } else {
+                                                    reject(status);
+                                                }
+                                            };
+                                            xhr.send();
+                                        });
+                                    };
 
-                                getJSON(url).then(function (data) {
-                                    // console.log('Your JSON result is:  ' + data.arg);
-                                    n = data.arg;
-                                    env.push(parseInt(n));
-                                }, function (status) {
-                                    alert('Something went wrong reading JSON-encoded project data.');
-                                });
-                                break;
-                            case 'outurl':
-                                var url = args[1];
-                                break;
-                            default:
-                                errorMsg('Invalid parameters');
+                                    getJSON(url).then(function (data) {
+                                        // console.log('Your JSON result is:  ' + data.arg);
+                                        n = data.arg;
+                                        env.push(parseInt(n));
+                                    }, function (status) {
+                                        alert('Something went wrong reading JSON-encoded project data.');
+                                    });
+                                    break;
+                                case 'outurl':
+                                    var url = args[1];
+                                    break;
+                                default:
+                                    errorMsg('Invalid parameters');
                             }
                         }
                     }
@@ -2132,30 +2173,30 @@ define(MYDEFINES, function (compatibility) {
 
             var __wheelHandler = function (event) {
                 // vertical scroll
-                if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) { 
+                if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
                     if (palettes.paletteVisible) {
                         if (event.clientX > cellSize + MENUWIDTH) {
                             blocksContainer.y -= event.deltaY;
-                        }    
+                        }
                     } else {
                         if (event.clientX > cellSize) {
                             blocksContainer.y -= event.deltaY;
                         }
-                    }   
+                    }
                 }
 
                 // horizontal scroll 
                 if (scrollBlockContainer) {
-                    if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) { 
+                    if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
                         if (palettes.paletteVisible) {
                             if (event.clientX > cellSize + MENUWIDTH) {
                                 blocksContainer.x -= event.deltaX;
-                            }    
+                            }
                         } else {
                             if (event.clientX > cellSize) {
                                 blocksContainer.x -= event.deltaX;
                             }
-                        }   
+                        }
                     }
                 } else {
                     event.preventDefault();
@@ -2402,7 +2443,7 @@ define(MYDEFINES, function (compatibility) {
 
         searchSuggestions = searchSuggestions.reverse();
 
-        searchWidget.onclick = function() {
+        searchWidget.onclick = function () {
             doSearch();
         };
 
@@ -2484,12 +2525,20 @@ define(MYDEFINES, function (compatibility) {
             var newNote = [
                 [0, 'newnote', 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
                 [1, 'divide', 0, 0, [0, 2, 3]],
-                [2, ['number', {'value': 1}], 0, 0, [1]],
-                [3, ['number', {'value': 4}], 0, 0, [1]],
+                [2, ['number', {
+                    'value': 1
+                }], 0, 0, [1]],
+                [3, ['number', {
+                    'value': 4
+                }], 0, 0, [1]],
                 [4, 'vspace', 0, 0, [0, 5]],
                 [5, 'pitch', 0, 0, [4, 6, 7, null]],
-                [6, ['solfege', {'value': solf}], 0, 0, [5]],
-                [7, ['number', {'value': octave}], 0, 0, [5]],
+                [6, ['solfege', {
+                    'value': solf
+                }], 0, 0, [5]],
+                [7, ['number', {
+                    'value': octave
+                }], 0, 0, [5]],
                 [8, 'hidden', 0, 0, [0, null]]
             ];
 
@@ -2603,77 +2652,77 @@ define(MYDEFINES, function (compatibility) {
 
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
-                case 66: // 'B'
-                    save.saveBlockArtwork();
-                    break;
-                case 67: // 'C'
-                    blocks.prepareStackForCopy();
-                    break;
-                case 69: // 'E'
-                    _allClear();
-                    break;
-                case 80: // 'P'
-                    // logo.playback(-1);
-                    break;
-                case 82: // 'R'
-                    _doFastButton();
-                    break;
-                case 83: // 'S'
-                    logo.doStopTurtle();
-                    break;
-                case 86: // 'V'
-                    blocks.pasteStack();
-                    break;
+                    case 66: // 'B'
+                        save.saveBlockArtwork();
+                        break;
+                    case 67: // 'C'
+                        blocks.prepareStackForCopy();
+                        break;
+                    case 69: // 'E'
+                        _allClear();
+                        break;
+                    case 80: // 'P'
+                        // logo.playback(-1);
+                        break;
+                    case 82: // 'R'
+                        _doFastButton();
+                        break;
+                    case 83: // 'S'
+                        logo.doStopTurtle();
+                        break;
+                    case 86: // 'V'
+                        blocks.pasteStack();
+                        break;
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
-                case V:
-                    pasteBox.createBox(turtleBlocksScale, 200, 200);
-                    pasteBox.show();
-                    docById('paste').style.left = (pasteBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
-                    docById('paste').style.top = (pasteBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
-                    docById('paste').focus();
-                    docById('paste').style.visibility = 'visible';
-                    update = true;
-                    break;
+                    case V:
+                        pasteBox.createBox(turtleBlocksScale, 200, 200);
+                        pasteBox.show();
+                        docById('paste').style.left = (pasteBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
+                        docById('paste').style.top = (pasteBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
+                        docById('paste').focus();
+                        docById('paste').style.visibility = 'visible';
+                        update = true;
+                        break;
                 }
             } else if (event.shiftKey && !disableKeys) {
                 switch (event.keyCode) {
-                case KEYCODE_D:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'do');
-                    }
-                    break;
-                case KEYCODE_R:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 're');
-                    }
-                    break;
-                case KEYCODE_M:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'mi');
-                    }
-                    break;
-                case KEYCODE_F:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'fa');
-                    }
-                    break;
-                case KEYCODE_S:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'sol');
-                    }
-                    break;
-                case KEYCODE_L:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'la');
-                    }
-                    break;
-                case KEYCODE_T:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'ti');
-                    }
-                    break;
+                    case KEYCODE_D:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(5, 'do');
+                        }
+                        break;
+                    case KEYCODE_R:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(5, 're');
+                        }
+                        break;
+                    case KEYCODE_M:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(5, 'mi');
+                        }
+                        break;
+                    case KEYCODE_F:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(5, 'fa');
+                        }
+                        break;
+                    case KEYCODE_S:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(5, 'sol');
+                        }
+                        break;
+                    case KEYCODE_L:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(5, 'la');
+                        }
+                        break;
+                    case KEYCODE_T:
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            __makeNewNote(5, 'ti');
+                        }
+                        break;
                 }
             } else {
                 if (docById('paste').style.visibility === 'visible' && event.keyCode === RETURN) {
@@ -2682,150 +2731,145 @@ define(MYDEFINES, function (compatibility) {
                     }
                 } else if (!disableKeys) {
                     switch (event.keyCode) {
-                    case END:
-                        blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
-                        break;
-                    case PAGE_UP:
-                        blocksContainer.y += logo.canvas.height / 2;
-                        stage.update();
-                        break;
-                    case PAGE_DOWN:
-                        blocksContainer.y -= logo.canvas.height / 2;
-                        stage.update();
-                        break;
-                    case DEL:
-                        blocks.extract();
-                        break;
-                    case KEYCODE_UP:
-                        if (disableArrowKeys) {
-                        } else if (blocks.activeBlock != null) {
-                            blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
-                            blocks.blockMoved(blocks.activeBlock);
-                            blocks.adjustDocks(blocks.activeBlock, true);
-                        } else if (palettes.mouseOver) {
-                            palettes.menuScrollEvent(1, 10);
-                            palettes.hidePaletteIconCircles();
-                        } else if (palettes.activePalette != null) {
-                            palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
-                        } else if (scrollBlockContainer) {
-                            blocksContainer.y -= 20;
-                        }
-                        stage.update();
-                        break;
-                    case KEYCODE_DOWN:
-                        if (disableArrowKeys) {
-                        } else if (blocks.activeBlock != null) {
-                            blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
-                            blocks.blockMoved(blocks.activeBlock);
-                            blocks.adjustDocks(blocks.activeBlock, true);
-                        } else if (palettes.mouseOver) {
-                            palettes.menuScrollEvent(-1, 10);
-                            palettes.hidePaletteIconCircles();
-                        } else if (palettes.activePalette != null) {
-                            palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
-                        } else if (scrollBlockContainer) {
-                            blocksContainer.y += 20;
-                        }
-                        stage.update();
-                        break;
-                    case KEYCODE_LEFT:
-                        if (disableArrowKeys) {
-                        } else if (blocks.activeBlock != null) {
-                            blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
-                            blocks.blockMoved(blocks.activeBlock);
-                            blocks.adjustDocks(blocks.activeBlock, true);
-                        } else if (scrollBlockContainer) {
-                            blocksContainer.x -= 20;
-                        }
-                        stage.update();
-                        break;
-                    case KEYCODE_RIGHT:
-                        if (disableArrowKeys) {
-                        } else if (blocks.activeBlock != null) {
-                            blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
-                            blocks.blockMoved(blocks.activeBlock);
-                            blocks.adjustDocks(blocks.activeBlock, true);
-                        } else if (scrollBlockContainer) {
-                            blocksContainer.x += 20;
-                        }
-                        stage.update();
-                        break;
-                    case HOME:
-                        if (palettes.mouseOver) {
-                            var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
-                            palettes.menuScrollEvent(1, dy);
-                            palettes.hidePaletteIconCircles();
-                        } else if (palettes.activePalette != null) {
-                            palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
-                        } else {
-                            _findBlocks();
-                        }
-                        stage.update();
-                        break;
-                    case TAB:
-                        break;
-                    case SPACE:
-                        if (turtleContainer.scaleX == 1) {
-                            turtles.scaleStage(0.5);
-                        } else {
-                            turtles.scaleStage(1);
-                        }
-                        break;
-                    case ESC:
-                        if (searchWidget.style.visibility === 'visible') {
-                            searchWidget.style.visibility = 'hidden';
-                        } else {
-                            // toggle full screen
-                            // _toggleToolbar();
-                        }
-                        break;
-                    case RETURN:
-                        if (disableArrowKeys) {
-                        } else if (docById('search').value.length > 0) {
-                            doSearch();
-                        } else {
-                            if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
-                                logo.runLogoCommands();
+                        case END:
+                            blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
+                            break;
+                        case PAGE_UP:
+                            blocksContainer.y += logo.canvas.height / 2;
+                            stage.update();
+                            break;
+                        case PAGE_DOWN:
+                            blocksContainer.y -= logo.canvas.height / 2;
+                            stage.update();
+                            break;
+                        case DEL:
+                            blocks.extract();
+                            break;
+                        case KEYCODE_UP:
+                            if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
+                                blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
+                                blocks.blockMoved(blocks.activeBlock);
+                                blocks.adjustDocks(blocks.activeBlock, true);
+                            } else if (palettes.mouseOver) {
+                                palettes.menuScrollEvent(1, 10);
+                                palettes.hidePaletteIconCircles();
+                            } else if (palettes.activePalette != null) {
+                                palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                            } else if (scrollBlockContainer) {
+                                blocksContainer.y -= 20;
                             }
-                        }
-                        break;
-                    case KEYCODE_D:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'do');
-                        }
-                        break;
-                    case KEYCODE_R:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 're');
-                        }
-                        break;
-                    case KEYCODE_M:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'mi');
-                        }
-                        break;
-                    case KEYCODE_F:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'fa');
-                        }
-                        break;
-                    case KEYCODE_S:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'sol');
-                        }
-                        break;
-                    case KEYCODE_L:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'la');
-                        }
-                        break;
-                    case KEYCODE_T:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'ti');
-                        }
-                        break;
-                    default:
-                        break;
+                            stage.update();
+                            break;
+                        case KEYCODE_DOWN:
+                            if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
+                                blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
+                                blocks.blockMoved(blocks.activeBlock);
+                                blocks.adjustDocks(blocks.activeBlock, true);
+                            } else if (palettes.mouseOver) {
+                                palettes.menuScrollEvent(-1, 10);
+                                palettes.hidePaletteIconCircles();
+                            } else if (palettes.activePalette != null) {
+                                palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
+                            } else if (scrollBlockContainer) {
+                                blocksContainer.y += 20;
+                            }
+                            stage.update();
+                            break;
+                        case KEYCODE_LEFT:
+                            if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
+                                blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
+                                blocks.blockMoved(blocks.activeBlock);
+                                blocks.adjustDocks(blocks.activeBlock, true);
+                            } else if (scrollBlockContainer) {
+                                blocksContainer.x -= 20;
+                            }
+                            stage.update();
+                            break;
+                        case KEYCODE_RIGHT:
+                            if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
+                                blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
+                                blocks.blockMoved(blocks.activeBlock);
+                                blocks.adjustDocks(blocks.activeBlock, true);
+                            } else if (scrollBlockContainer) {
+                                blocksContainer.x += 20;
+                            }
+                            stage.update();
+                            break;
+                        case HOME:
+                            if (palettes.mouseOver) {
+                                var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
+                                palettes.menuScrollEvent(1, dy);
+                                palettes.hidePaletteIconCircles();
+                            } else if (palettes.activePalette != null) {
+                                palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
+                            } else {
+                                _findBlocks();
+                            }
+                            stage.update();
+                            break;
+                        case TAB:
+                            break;
+                        case SPACE:
+                            if (turtleContainer.scaleX == 1) {
+                                turtles.scaleStage(0.5);
+                            } else {
+                                turtles.scaleStage(1);
+                            }
+                            break;
+                        case ESC:
+                            if (searchWidget.style.visibility === 'visible') {
+                                searchWidget.style.visibility = 'hidden';
+                            } else {
+                                // toggle full screen
+                                // _toggleToolbar();
+                            }
+                            break;
+                        case RETURN:
+                            if (disableArrowKeys) {} else if (docById('search').value.length > 0) {
+                                doSearch();
+                            } else {
+                                if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
+                                    logo.runLogoCommands();
+                                }
+                            }
+                            break;
+                        case KEYCODE_D:
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                __makeNewNote(4, 'do');
+                            }
+                            break;
+                        case KEYCODE_R:
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                __makeNewNote(4, 're');
+                            }
+                            break;
+                        case KEYCODE_M:
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                __makeNewNote(4, 'mi');
+                            }
+                            break;
+                        case KEYCODE_F:
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                __makeNewNote(4, 'fa');
+                            }
+                            break;
+                        case KEYCODE_S:
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                __makeNewNote(4, 'sol');
+                            }
+                            break;
+                        case KEYCODE_L:
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                __makeNewNote(4, 'la');
+                            }
+                            break;
+                        case KEYCODE_T:
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                __makeNewNote(4, 'ti');
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
 
@@ -2875,7 +2919,7 @@ define(MYDEFINES, function (compatibility) {
 
             // If any menus were open, close them.
             if (confirmContainer !== null && languageContainer.visible) {
-                if (headerContainer.y > 0) {
+                if (toolbarHeight > 0) {
                     console.log('Closing menus before resize.');
                     _showHideAuxMenu(true);
                 }
@@ -2950,8 +2994,7 @@ define(MYDEFINES, function (compatibility) {
             update = true;
 
             // Setup help now that we have calculated turtleBlocksScale.
-            if (storage.doneTour) {
-            } else {
+            if (storage.doneTour) {} else {
                 _showHelp();
             }
 
@@ -2969,7 +3012,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             var artcanvas = docById('overlayCanvas');
-            // Workaround for #795
+            // Workaround for #795.5
             if (mobileSize) {
                 artcanvas.width = w * 2;
                 artcanvas.height = h * 2;
@@ -3088,21 +3131,21 @@ define(MYDEFINES, function (compatibility) {
         function closeSubMenus() {
             if (confirmContainer.visible) {
                 confirmContainer.visible = false;
-                restoreContainer.y = 82.5 + LEADING;
+                restoreContainer.y = 95.5 + LEADING;
 
-                openMergeContainer.y = 82.5 + LEADING;
+                openMergeContainer.y = 95.5 + LEADING;
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    beginnerModeContainer.y = 82.5 + LEADING;
-                    advancedModeContainer.y = 82.5 + LEADING;
+                    beginnerModeContainer.y = 95.5 + LEADING;
+                    advancedModeContainer.y = 95.5 + LEADING;
                 }
 
-                languageContainer.y = 82.5 + LEADING;
+                languageContainer.y = 95.5 + LEADING;
                 if (!beginnerMode) {
-                    pluginsContainer = 82.5 + LEADING;
-                    deletePluginContainer = 82.5 + LEADING;
-                    statsContainer = 82.5 + LEADING;
-                    scrollOnContainer = 82.5 + LEADING;
-                    scrollOffContainer = 82.5 + LEADING;
+                    pluginsContainer = 95.5 + LEADING;
+                    deletePluginContainer = 95.5 + LEADING;
+                    statsContainer = 95.5 + LEADING;
+                    scrollOnContainer = 95.5 + LEADING;
+                    scrollOffContainer = 95.5 + LEADING;
                 }
 
                 deltaY(-55 - LEADING);
@@ -3118,20 +3161,20 @@ define(MYDEFINES, function (compatibility) {
                     saveABCContainer.visible = false;
                 }
 
-                openMergeContainer.y = 82.5 + LEADING;
+                openMergeContainer.y = 95.5 + LEADING;
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    beginnerModeContainer.y = 82.5 + LEADING;
-                    advancedModeContainer.y = 82.5 + LEADING;
+                    beginnerModeContainer.y = 95.5 + LEADING;
+                    advancedModeContainer.y = 95.5 + LEADING;
                 }
 
-                languageContainer.y = 82.5 + LEADING;
-                restoreContainer.y = 82.5 + LEADING;
+                languageContainer.y = 95.5 + LEADING;
+                restoreContainer.y = 95.5 + LEADING;
                 if (!beginnerMode) {
-                    pluginsContainer = 82.5 + LEADING;
-                    deletePluginContainer = 82.5 + LEADING;
-                    statsContainer = 82.5 + LEADING;
-                    scrollOnContainer = 82.5 + LEADING;
-                    scrollOffContainer = 82.5 + LEADING;
+                    pluginsContainer = 95.5 + LEADING;
+                    deletePluginContainer = 95.5 + LEADING;
+                    statsContainer = 95.5 + LEADING;
+                    scrollOnContainer = 95.5 + LEADING;
+                    scrollOffContainer = 95.5 + LEADING;
                 }
                 deltaY(-55 - LEADING);
             }
@@ -3153,7 +3196,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function hideAuxMenu() {
-            if (headerContainer.y > 0) {
+            if (toolbarHeight > 0) {
                 _showHideAuxMenu(false);
                 menuButtonsVisible = false;
             }
@@ -3236,9 +3279,9 @@ define(MYDEFINES, function (compatibility) {
 
             // Wait for palette to clear (#891)
             // We really need to signal when each palette item is deleted
-            setTimeout(function() {
+            setTimeout(function () {
                 stage.dispatchEvent('trashsignal');
-           }, 100 * actionBlockCounter); // 1000
+            }, 100 * actionBlockCounter); // 1000
 
             update = true;
         };
@@ -3322,7 +3365,7 @@ define(MYDEFINES, function (compatibility) {
             closeSubMenus();
             planet.openPlanet();
         };
- 
+
         function doSave() {
             if (beginnerMode) {
                 closeSubMenus();
@@ -3405,7 +3448,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doShareOnFacebook() {
-            alert('Facebook Sharing : disabled');    // remove when add fb share link
+            alert('Facebook Sharing : disabled'); // remove when add fb share link
             // add code for facebook share link
         };
 
@@ -3432,7 +3475,7 @@ define(MYDEFINES, function (compatibility) {
 
         window.prepareExport = prepareExport;
 
-        function runProject (env) {
+        function runProject(env) {
             console.log('Running Project from Event');
             document.removeEventListener('finishedLoading', runProject);
             setTimeout(function () {
@@ -3442,16 +3485,22 @@ define(MYDEFINES, function (compatibility) {
             }, 5000);
         }
 
-        function loadProject (projectID, flags, env) {
+        function loadProject(projectID, flags, env) {
             //set default value of run
-            flags = typeof flags !== 'undefined' ? flags : {run: false, show: false, collapse: false};
+            flags = typeof flags !== 'undefined' ? flags : {
+                run: false,
+                show: false,
+                collapse: false
+            };
             loading = true;
             document.body.style.cursor = 'wait';
 
             // palettes.updatePalettes();
             setTimeout(function () {
                 try {
-                    planet.openProjectFromPlanet(projectID, function() {loadStartWrapper(_loadStart);});
+                    planet.openProjectFromPlanet(projectID, function () {
+                        loadStartWrapper(_loadStart);
+                    });
                 } catch (e) {
                     console.log(e);
                     console.log('_loadStart on error');
@@ -3556,9 +3605,9 @@ define(MYDEFINES, function (compatibility) {
 
             var __afterLoad = function () {
                 if (!turtles.running()) {
-                    setTimeout(function() { 
+                    setTimeout(function () {
                         console.log('reset turtles ' + turtles.turtleList.length);
-                 
+
                         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                             logo.turtleHeaps[turtle] = [];
                             logo.notationStaging[turtle] = [];
@@ -3681,61 +3730,61 @@ define(MYDEFINES, function (compatibility) {
             }
 
             switch (msg) {
-            case NOMICERRORMSG:
-                errorArtwork['nomicrophone'].visible = true;
-                stage.setChildIndex(errorArtwork['nomicrophone'], stage.children.length - 1);
-                break;
-            case NOSTRINGERRORMSG:
-                errorArtwork['notastring'].visible = true;
-                stage.setChildIndex(errorArtwork['notastring'], stage.children.length - 1);
-                break;
-            case EMPTYHEAPERRORMSG:
-                errorArtwork['emptyheap'].visible = true;
-                stage.setChildIndex(errorArtwork['emptyheap'], stage.children.length - 1);
-                break;
-            case NOSQRTERRORMSG:
-                errorArtwork['negroot'].visible = true;
-                stage.setChildIndex(errorArtwork['negroot'], stage.children.length - 1);
-                break;
-            case NOACTIONERRORMSG:
-                if (text == null) {
-                    text = 'foo';
-                }
+                case NOMICERRORMSG:
+                    errorArtwork['nomicrophone'].visible = true;
+                    stage.setChildIndex(errorArtwork['nomicrophone'], stage.children.length - 1);
+                    break;
+                case NOSTRINGERRORMSG:
+                    errorArtwork['notastring'].visible = true;
+                    stage.setChildIndex(errorArtwork['notastring'], stage.children.length - 1);
+                    break;
+                case EMPTYHEAPERRORMSG:
+                    errorArtwork['emptyheap'].visible = true;
+                    stage.setChildIndex(errorArtwork['emptyheap'], stage.children.length - 1);
+                    break;
+                case NOSQRTERRORMSG:
+                    errorArtwork['negroot'].visible = true;
+                    stage.setChildIndex(errorArtwork['negroot'], stage.children.length - 1);
+                    break;
+                case NOACTIONERRORMSG:
+                    if (text == null) {
+                        text = 'foo';
+                    }
 
-                errorArtwork['nostack'].children[1].text = text;
-                errorArtwork['nostack'].visible = true;
-                errorArtwork['nostack'].updateCache();
-                stage.setChildIndex(errorArtwork['nostack'], stage.children.length - 1);
-                break;
-            case NOBOXERRORMSG:
-                if (text == null) {
-                    text = 'foo';
-                }
+                    errorArtwork['nostack'].children[1].text = text;
+                    errorArtwork['nostack'].visible = true;
+                    errorArtwork['nostack'].updateCache();
+                    stage.setChildIndex(errorArtwork['nostack'], stage.children.length - 1);
+                    break;
+                case NOBOXERRORMSG:
+                    if (text == null) {
+                        text = 'foo';
+                    }
 
-                errorArtwork['emptybox'].children[1].text = text;
-                errorArtwork['emptybox'].visible = true;
-                errorArtwork['emptybox'].updateCache();
-                stage.setChildIndex(errorArtwork['emptybox'], stage.children.length - 1);
-                break;
-            case ZERODIVIDEERRORMSG:
-                errorArtwork['zerodivide'].visible = true;
-                stage.setChildIndex(errorArtwork['zerodivide'], stage.children.length - 1);
-                break;
-              case NANERRORMSG:
-                errorArtwork['notanumber'].visible = true;
-                stage.setChildIndex(errorArtwork['notanumber'], stage.children.length - 1);
-                break;
-            case NOINPUTERRORMSG:
-                errorArtwork['noinput'].visible = true;
-                stage.setChildIndex(errorArtwork['noinput'], stage.children.length - 1);
-                break;
-            default:
-                var errorMsgContainer = errorMsgText.parent;
-                errorMsgContainer.visible = true;
-                errorMsgText.text = msg;
-                stage.setChildIndex(errorMsgContainer, stage.children.length - 1);
-                errorMsgContainer.updateCache();
-                break;
+                    errorArtwork['emptybox'].children[1].text = text;
+                    errorArtwork['emptybox'].visible = true;
+                    errorArtwork['emptybox'].updateCache();
+                    stage.setChildIndex(errorArtwork['emptybox'], stage.children.length - 1);
+                    break;
+                case ZERODIVIDEERRORMSG:
+                    errorArtwork['zerodivide'].visible = true;
+                    stage.setChildIndex(errorArtwork['zerodivide'], stage.children.length - 1);
+                    break;
+                case NANERRORMSG:
+                    errorArtwork['notanumber'].visible = true;
+                    stage.setChildIndex(errorArtwork['notanumber'], stage.children.length - 1);
+                    break;
+                case NOINPUTERRORMSG:
+                    errorArtwork['noinput'].visible = true;
+                    stage.setChildIndex(errorArtwork['noinput'], stage.children.length - 1);
+                    break;
+                default:
+                    var errorMsgContainer = errorMsgText.parent;
+                    errorMsgContainer.visible = true;
+                    errorMsgText.text = msg;
+                    stage.setChildIndex(errorMsgContainer, stage.children.length - 1);
+                    errorMsgContainer.updateCache();
+                    break;
             }
 
             if (timeout != undefined) {
@@ -3812,92 +3861,92 @@ define(MYDEFINES, function (compatibility) {
                     };
                 } else {
                     switch (myBlock.name) {
-                    case 'start':
-                    case 'drum':
-                        // Find the turtle associated with this block.
-                        var turtle = turtles.turtleList[myBlock.value];
-                        if (turtle == null) {
+                        case 'start':
+                        case 'drum':
+                            // Find the turtle associated with this block.
+                            var turtle = turtles.turtleList[myBlock.value];
+                            if (turtle == null) {
+                                var args = {
+                                    'collapsed': false,
+                                    'xcor': 0,
+                                    'ycor': 0,
+                                    'heading': 0,
+                                    'color': 0,
+                                    'shade': 50,
+                                    'pensize': 5,
+                                    'grey': 100
+                                };
+                            } else {
+                                var args = {
+                                    'collapsed': myBlock.collapsed,
+                                    'xcor': turtle.x,
+                                    'ycor': turtle.y,
+                                    'heading': turtle.orientation,
+                                    'color': turtle.color,
+                                    'shade': turtle.value,
+                                    'pensize': turtle.stroke,
+                                    'grey': turtle.chroma
+                                };
+                            }
+                            break;
+                        case 'temperament1':
+                            if (blocks.customTemperamentDefined) {
+                                // If temperament block is present
+                                var args = {
+                                    'customTemperamentNotes': TEMPERAMENT['custom'],
+                                    'startingPitch': logo.synth.startingPitch,
+                                    'octaveSpace': OCTAVERATIO
+                                };
+                            }
+                            break;
+                        case 'interval':
+                        case 'newnote':
+                        case 'action':
+                        case 'matrix':
+                        case 'pitchdrummatrix':
+                        case 'rhythmruler':
+                        case 'timbre':
+                        case 'pitchstaircase':
+                        case 'tempo':
+                        case 'pitchslider':
+                        case 'musickeyboard':
+                        case 'modewidget':
+                        case 'status':
                             var args = {
-                                'collapsed': false,
-                                'xcor': 0,
-                                'ycor': 0,
-                                'heading': 0,
-                                'color': 0,
-                                'shade': 50,
-                                'pensize': 5,
-                                'grey': 100
-                            };
-                        } else {
+                                'collapsed': myBlock.collapsed
+                            }
+                            break;
+                        case 'namedbox':
+                        case 'storein2':
+                        case 'nameddo':
+                        case 'nameddoArg':
+                        case 'namedcalc':
+                        case 'namedcalcArg':
+                        case 'namedarg':
                             var args = {
-                                'collapsed': myBlock.collapsed,
-                                'xcor': turtle.x,
-                                'ycor': turtle.y,
-                                'heading': turtle.orientation,
-                                'color': turtle.color,
-                                'shade': turtle.value,
-                                'pensize': turtle.stroke,
-                                'grey': turtle.chroma
-                            };
-                        }
-                        break;
-                    case 'temperament1':
-                        if (blocks.customTemperamentDefined) {
-                            // If temperament block is present
+                                'value': myBlock.privateData
+                            }
+                            break;
+                        case 'nopValueBlock':
+                        case 'nopZeroArgBlock':
+                        case 'nopOneArgBlock':
+                        case 'nopTwoArgBlock':
+                        case 'nopThreeArgBlock':
+                            // restore original block name
+                            myBlock.name = myBlock.privateData;
+                            var args = {}
+                            break;
+                        case 'matrixData':
+                            // deprecated
                             var args = {
-                                'customTemperamentNotes': TEMPERAMENT['custom'],
-                                'startingPitch': logo.synth.startingPitch,
-                                'octaveSpace': OCTAVERATIO
-                            };
-                        }
-                        break;
-                    case 'interval':
-                    case 'newnote':
-                    case 'action':
-                    case 'matrix':
-                    case 'pitchdrummatrix':
-                    case 'rhythmruler':
-                    case 'timbre':
-                    case 'pitchstaircase':
-                    case 'tempo':
-                    case 'pitchslider':
-                    case 'musickeyboard':
-                    case 'modewidget':
-                    case 'status':
-                        var args = {
-                            'collapsed': myBlock.collapsed
-                        }
-                        break;
-                    case 'namedbox':
-                    case 'storein2':
-                    case 'nameddo':
-                    case 'nameddoArg':
-                    case 'namedcalc':
-                    case 'namedcalcArg':
-                    case 'namedarg':
-                        var args = {
-                            'value': myBlock.privateData
-                        }
-                        break;
-                    case 'nopValueBlock':
-                    case 'nopZeroArgBlock':
-                    case 'nopOneArgBlock':
-                    case 'nopTwoArgBlock':
-                    case 'nopThreeArgBlock':
-                        // restore original block name
-                        myBlock.name = myBlock.privateData;
-                        var args = {}
-                        break;
-                    case 'matrixData':
-                        // deprecated
-                        var args = {
-                            'notes': window.savedMatricesNotes,
-                            'count': window.savedMatricesCount
-                        }
-                        hasMatrixDataBlock = true;
-                        break;
-                    default:
-                        var args = {}
-                        break;
+                                'notes': window.savedMatricesNotes,
+                                'count': window.savedMatricesCount
+                            }
+                            hasMatrixDataBlock = true;
+                            break;
+                        default:
+                            var args = {}
+                            break;
                     }
                 }
 
@@ -3962,11 +4011,17 @@ define(MYDEFINES, function (compatibility) {
 
         function blinkPasteButton(bitmap) {
             function handleComplete() {
-                createjs.Tween.get(bitmap).to({alpha:1, visible:true}, 500);
+                createjs.Tween.get(bitmap).to({
+                    alpha: 1,
+                    visible: true
+                }, 500);
             };
 
-            createjs.Tween.get(bitmap).to({alpha:0, visible:false}, 1000).call(
-handleComplete);
+            createjs.Tween.get(bitmap).to({
+                alpha: 0,
+                visible: false
+            }, 1000).call(
+                handleComplete);
         };
 
         function _setupAndroidToolbar(showPalettesPopover) {
@@ -4186,7 +4241,7 @@ handleComplete);
             var cellsize = 55;
             var y = Math.floor(-3 * cellsize / 2);
 
-            var __addEventHandlers = function(container, action, arg) {
+            var __addEventHandlers = function (container, action, arg) {
 
                 if (arg !== undefined) {
                     container.on('click', function (event) {
@@ -4228,7 +4283,7 @@ handleComplete);
             }
 
             // Force center-aligned labels
-            var x = 82.5 + LEADING;
+            var x = 95.5 + LEADING;
             saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
             saveSVGContainer.visible = false;
             __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
@@ -4282,7 +4337,7 @@ handleComplete);
             var y = Math.floor(btnSize / 2);
 
             var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
-            menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 90 : undefined);
+            menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 95.5 : undefined);
             _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
             var dx = btnSize;
@@ -4314,11 +4369,26 @@ handleComplete);
 
                 x += dx;
 
+                var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
+                var disableHorizScrollIcon = document.getElementById('disableHorizScrollIcon');
+                enableHorizScrollIcon.onclick = function () {
+                    setScroller();
+                    enableHorizScrollIcon.style.display = 'none';
+                    disableHorizScrollIcon.style.display = 'block';
+                    scrollOnContainer.visible = false;
+                }
+
+                disableHorizScrollIcon.onclick = function () {
+                    setScroller();
+                    disableHorizScrollIcon.style.display = 'none';
+                    enableHorizScrollIcon.style.display = 'block';
+                    scrollOffContainer.visible = false;
+                }
+
                 scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
                 _loadButtonDragHandler(scrollOnContainer, x, y, setScroller, null, null, null, null);
                 onscreenMenu.push(scrollOnContainer);
-                scrollOnContainer.visible = false;
-
+                
                 scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
                 _loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
                 onscreenMenu.push(scrollOffContainer);
@@ -4353,7 +4423,7 @@ handleComplete);
                 onscreenMenu.push(beginnerModeContainer);
 
                 advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
-                _loadButtonDragHandler(advancedModeContainer, x, y, doSwitchMode, null, null, null, null);            
+                _loadButtonDragHandler(advancedModeContainer, x, y, doSwitchMode, null, null, null, null);
                 onscreenMenu.push(advancedModeContainer);
                 advancedModeContainer.visible = false;
             }
@@ -4384,7 +4454,7 @@ handleComplete);
 
             var btnSize = cellSize;
             var x = 27.5 + 6;
-            var y = headerContainer.y + 82.5 + 6;
+            var y = toolbarHeight + 95.5 + 6;
             var dx = btnSize;
 
             homeButtonContainers = [];
@@ -4395,8 +4465,8 @@ handleComplete);
             _loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
             homeButtonContainers[1].visible = false;
 
-            homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
-            homeButtonContainers[1].y = headerContainer.y + 82.5 + 6;
+            homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
+            homeButtonContainers[1].y = toolbarHeight + 95.5 + 6;
             boundary.hide();
 
             x += dx;
@@ -4463,7 +4533,7 @@ handleComplete);
             if (bitmap != null) {
                 if (animate) {
                     var r = bitmap.rotation;
-                    if (r % 90 !== 0) {
+                    if (r % 95.5 !== 0) {
                         return;
                     }
 
@@ -4472,10 +4542,10 @@ handleComplete);
                             rotation: r
                         })
                         .to({
-                            rotation: r + 90
+                            rotation: r + 95.5
                         }, 500);
                 } else {
-                    bitmap.rotation += 90;
+                    bitmap.rotation += 95.5;
                 }
             } else {
                 // Race conditions during load
@@ -4635,6 +4705,8 @@ handleComplete);
             return container;
         };
 
+
+
         function _loadButtonDragHandler(container, ox, oy, action, hoverAction) { // longAction, extraLongAction, longImg, extraLongImg) {
             // Prevent multiple button presses (i.e., debounce).
             var lockTimer = null;
@@ -4740,7 +4812,7 @@ handleComplete);
                 */
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
-                function __pressupFunction (event) {
+                function __pressupFunction(event) {
                     hideButtonHighlight(circles, stage);
 
                     /*
@@ -4781,7 +4853,7 @@ handleComplete);
             });
         };
 
-        function pasted () {
+        function pasted() {
             var pasteinput = docById('paste').value;
             var rawData = pasteinput;
             if (rawData == null || rawData == '') {
@@ -4806,14 +4878,14 @@ handleComplete);
             pasteBox.hide();
         };
 
-        function deltaY (dy) {
-            headerContainer.y += dy;
+        function deltaY(dy) {
+            toolbarHeight += dy;
             for (var i = 0; i < onscreenButtons.length; i++) {
                 onscreenButtons[i].y += dy;
             }
 
             logoContainer.y += dy;
-            homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
+            homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
             homeButtonContainers[1].y = homeButtonContainers[0].y;
             hideBlocksContainer.y = homeButtonContainers[0].y;
             collapseBlocksContainer.y = homeButtonContainers[0].y;
@@ -4838,17 +4910,18 @@ handleComplete);
             refreshCanvas();
         };
 
-        function _openAuxMenu () {
-            if (!turtles.running() && headerContainer.y === 0) {
+
+        function _openAuxMenu() {
+            if (!turtles.running() && toolbarHeight === 0) {
                 _showHideAuxMenu(false);
             }
         };
 
-        function _showHideAuxMenu (resize) {
+        function _showHideAuxMenu(resize) {
             var cellsize = 55;
-            if (!resize && headerContainer.y === 0) {
-                dy = cellsize + LEADING;
-                headerContainer.y = dy;
+            if (!resize && toolbarHeight === 0) {
+                dy = cellsize + LEADING + 5;
+                toolbarHeight = dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y += dy;
                 }
@@ -4872,7 +4945,7 @@ handleComplete);
                 }
 
                 // These buttons are smaller, hence + 6
-                homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
+                homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
                 homeButtonContainers[1].y = homeButtonContainers[0].y;
                 hideBlocksContainer.y = homeButtonContainers[0].y;
                 collapseBlocksContainer.y = homeButtonContainers[0].y;
@@ -4895,8 +4968,8 @@ handleComplete);
 
                 blocks.checkBounds();
             } else {
-                var dy = headerContainer.y;
-                headerContainer.y = 0;
+                var dy = toolbarHeight;
+                toolbarHeight = 0;
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y = cellsize / 2;
                 }
@@ -4908,7 +4981,7 @@ handleComplete);
                     onscreenMenu[i].visible = false;
                 }
 
-                homeButtonContainers[0].y = headerContainer.y + 82.5 + 6;
+                homeButtonContainers[0].y = toolbarHeight + 95.5 + 6;
                 homeButtonContainers[1].y = homeButtonContainers[0].y;
                 hideBlocksContainer.y = homeButtonContainers[0].y;
                 collapseBlocksContainer.y = homeButtonContainers[0].y;
@@ -4945,7 +5018,7 @@ handleComplete);
             refreshCanvas();
         };
 
-        function piemenuBlockContext (activeBlock) {
+        function piemenuBlockContext(activeBlock) {
             if (activeBlock === null) {
                 return;
             }
@@ -4965,10 +5038,11 @@ handleComplete);
             docById('contextWheelDiv').style.display = '';
 
             labels = ['imgsrc:header-icons/copy-button.svg',
-                      'imgsrc:header-icons/paste-disabled-button.svg',
-                      'imgsrc:header-icons/extract-button.svg',
-                      'imgsrc:header-icons/empty-trash-button.svg',
-                      'imgsrc:header-icons/cancel-button.svg'];
+                'imgsrc:header-icons/paste-disabled-button.svg',
+                'imgsrc:header-icons/extract-button.svg',
+                'imgsrc:header-icons/empty-trash-button.svg',
+                'imgsrc:header-icons/cancel-button.svg'
+            ];
 
             var topBlock = blocks.findTopBlock(activeBlock);
             if (blocks.blockList[topBlock].name === 'action') {

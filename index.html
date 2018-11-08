@@ -25,11 +25,14 @@
     <script src="lib/reqwest.js">
     </script>
 
-    <script src="lib/jquery-2.1.4.js">
-    </script>
+    
+<script src="lib/jquery-2.1.4.js"></script>  
 
-    <script src="lib/jquery-ui.js">
-    </script>
+<script src="lib/jquery-ui.js"></script>
+
+<script src="lib/materialize.min.js">
+
+</script>
 
     <script src="lib/webL10n.js">
     </script>
@@ -71,7 +74,7 @@
     <script src="js/widgets/musickeyboard.js">
     </script>
 
-    <!--
+   <!--
     <script src="lib/movieclip-0.7.1.min.js">
     </script>
     -->
@@ -151,6 +154,7 @@
                 scrollTop: 0
             }, 2000);
         });
+
       });
 
       var isDragging = false;
@@ -162,6 +166,7 @@
 
     <!--hidden at the beginning whilst everything loads-->
     <div id="hideContents" style="display: none;">
+      
       <div class="canvasHolder" id="canvasHolder">
         <canvas id="myCanvas" width="1200" height="900">
         </canvas>
@@ -204,15 +209,104 @@
       <div id="popdown-palette">
       </div>
 
-      <div id="main-toolbar" class="toolbar">
-      </div>
-
+      <!-- <div id="main-toolbar" class="toolbar">
+      </div> -->  
       <div id="loader">
       </div>
 
-      <div id="header" class="EaselJS">
+      <!-- <div id="header" class="EaselJS">
+      </div> -->
+
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!-- <link rel="stylesheet" href="lib/materialize.min.css"> -->
+      <link rel="stylesheet" href="lib/materialize-iso.css">
+            
+      <div class="materialize-iso">
+      <nav id="toolbars" class="nav-wrapper" role="navigation">
+        <div class="blue nav-wrapper">
+          <a id="mb-logo" class="logo left tooltipped" data-position="bottom" data-delay="100"><img style="width: 100%;" src="images/logo.svg"></a>
+          <ul class="main left">           
+            <li><a id="play" class="left tooltipped"><i class="material-icons main">play_circle_filled</i></a></li>
+            <li><a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a></li>
+          </ul>
+          <ul class="main right">
+            <li><a id="newFile" class="tooltipped dropdown-trigger" data-position="left" data-delay="100" data-activates='newdropdown'><i class="material-icons md-48">note_add</i></a></li>
+            <li><a id="load" class="tooltipped" data-position="bottom" data-delay="100"><i class="material-icons md-48">folder</i></a></li>
+            <li><a id="saveButton" class="tooltipped" data-position="bottom" data-delay="100"><i id="save" class="material-icons md-48">save_alt</i></a></li>
+            <li><a style="display: none;" id="saveButtonAdvanced" class="tooltipped dropdown-trigger" data-position="bottom" data-delay="100" data-activates='saveddropdown'><i id="save" class="material-icons md-48">save_alt</i></a></li>
+            <li><a id="planetIcon" class="tooltipped" data-position="bottom" data-delay="100"><i class="material-icons md-48">public</i></a></li>
+            <li><a style="display: none;" id="planetIconDisabled" class="tooltipped" data-position="bottom" data-delay="100"><i style="color: #a5acba;" class="material-icons md-48">public</i></a></li>
+            <li><a id="toggleAuxBtn" class="tooltipped" data-position="bottom" data-delay="100"><i id="menu"class="animated-icon material-icons md-48 ">menu</i></a></li>
+            <li><a id="helpIcon" class="tooltipped" data-position="bottom" data-delay="100"><i class="material-icons md-48">help</i></a></li>
+          </ul>
+                    
+        </div>
+        <div class="nav-wrapper" id="aux-toolbar" style="display: none;">
+            <div class="blue darken-1 nav-wrapper">
+              <ul class="aux left">
+                <li><a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">play_circle_outline</i></a></li>
+                <li><a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">video_library</i></a></li>
+              </ul>
+              <ul class="aux right">
+                <li><a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">poll</i></a></li>
+                <li><a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">add_circle</i></a></li>
+                <li><a id="delPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">remove_circle</i></a></li>
+                <li><a id="enableHorizScrollIcon" class="tooltipped" data-position="bottom" data-delay="100"><i class="material-icons md-48">compare_arrows</i></a></li>
+                <li><a style="display: none;" id="disableHorizScrollIcon" class="tooltipped" data-position="bottom" data-delay="100"><i class="material-icons md-48">lock</i></a></li>
+                <li><a id="mergeWithCurrentIcon" class="tooltipped" data-position="bottom" data-delay="100"><i class="material-icons md-48">merge_type</i></a></li>
+                <li class="filler" id="aligns_merge_under_load"  style="user-select: none; visibility: hidden;"><a style="color: transparent;" >space</a></li>
+                <li><a id="restoreIcon" class="tooltipped" data-position="bottom" data-delay="100"><i class="material-icons md-48">restore_from_trash</i></a></li>
+                <li><a id="modeText" class="tooltipped" data-position="bottom" data-delay="100"><i id="mode" class="material-icons md-48" >star_border</i></a></li>
+                <li><a id="languageSelectIcon" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip=""><i class="material-icons md-48">translate</i></a></li>
+              </ul>
+            </div>
+        </div>
+      </nav>
+  
+      <ul id="saveddropdown" class="dropdown-content">
+        <li><a id="save-svg"></a></li>
+        <li><a id="save-png"></a></li>
+        <li><a id="save-wav"></a></li>
+        <li><a id="save-ly"></a></li>
+        <li><a id="save-abc"> </a></li>
+        <li><a id="save-blockartwork-svg"></a></li>
+      </ul>
+  
+      <ul id="newdropdown" class="dropdown-content">
+        <li><a id="new-project"></a></li>
+      </ul>
       </div>
+
+      <script>
+        $(document).ready(function () {
+          var mode = localStorage.beginnerMode;
+
+          var modeIcon = document.getElementById('mode');
+          var modeText = document.getElementById('modeText');
+
+          if (mode === null || mode === 'true') {
+            modeIcon.innerHTML = 'star_border';
+            modeText.setAttribute('data-tooltip', _('Switch to advanced mode'));
+          } else {
+            modeIcon.innerHTML = 'star';
+            modeText.setAttribute('data-tooltip', _('Switch to beginner mode'));
+          }
+
+          $('.tooltipped').tooltip({
+            html: true
+          });
+          $('.materialize-iso, .dropdown-trigger').dropdown({
+            constrainWidth: false,
+            hover: false, // Activate on hover
+            belowOrigin: true, // Displays dropdown below the button
+          });
+         
+
+        });
+      </script>
+
       <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
+
 
       <div id="modeDiv" draggable="false">
         <div id="modeButtonsDiv">
@@ -440,5 +534,6 @@
     </div> <!-- hideContents -->
 
   </body>
+
 
 </html>
