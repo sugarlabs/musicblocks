@@ -75,7 +75,8 @@ function Palettes () {
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
-    this.top = 2 * 55 + 10 + LEADING;
+    // Top of the palette
+    this.top = 55 + 20 + LEADING;
     this.current = DEFAULTPALETTE;
     this.x = [];  // We track x and y for each of the multipalettes
     this.y = [];
@@ -103,7 +104,7 @@ function Palettes () {
             this._makeSelectorButton(i);
             this.x.push(0);
             // This is the top of the palette buttons stack
-            this.y.push((3.5 * this.cellSize + 2 * LEADING) / PALETTE_SCALE_FACTOR);
+            this.y.push((this.top + LEADING) / PALETTE_SCALE_FACTOR);
         }
     };
 
