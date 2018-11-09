@@ -230,8 +230,8 @@ function createHelpContent() {
         'interval': [_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', 'scalar-interval-block.svg'],
         'settemperament': [_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', 'set-temperament-block.svg'],
         // Tone palette
-        'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('e.g., guitar, piano, violin, or cello.'), 'documentation', 'start-block.svg'],
-        'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato-block.svg'],
+        'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('e.g., guitar, piano, violin, or cello.'), 'documentation', 'settimbre.svg'],
+        'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato.svg'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur-block.svg'],
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg'],
         'neighbor2': [_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor-block.svg'],
@@ -239,7 +239,7 @@ function createHelpContent() {
         'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example, if you have 7 notes in sequence contained in a Crescendo block with a value of 5, the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg'],
         'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example, if you have 7 notes in sequence contained in a Decrescendo block with a value of 5, the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg'],
         'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('e.g., guitar, violin, snare drum, etc.') + ' ' + _('The default volume is 50; the range is 0 (silence) to 100 (full volume).'), 'documentation', 'start-block.svg'],
-        'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'status.svg'],
+        'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'setmastervolume.svg'],
         // Drum palette
         // 'playdrum' is described on the Rhythm palette.
         'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'rhythm-ruler-block.svg'],
