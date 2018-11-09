@@ -1,4 +1,4 @@
-# __How To Add BLocks__
+# __How To Add Blocks__
 
 This document describes for developers how to add new blocks in
 support of additional functionality by changes to the core code of
@@ -208,5 +208,26 @@ Valid blocks styles in turtleblocksjs:
 * `booleanTwoArgBlock`: E.g., greater, less, equal.
 * `parameterBlock`: E.g., color, shade, pensize
 
-Information about new block and protoblock types will be added soon.
+## Adding the Block to beginner/advanced mode
 
+You have to go to [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js) and under your variable with Block add this lines:
+
+```
+if (beginnerMode && !beginnerBlock('yourBlockName')) {
+        newblock.hidden = true;
+}
+```
+
+That's all if you want to add your Block to advanced mode.
+
+If you want to add your Block to beginner mode you have to go to [turtledefs.js](https://github.com/sugarlabs/musicblocks/blob/master/js/turtledefs.js#L47) and in `beginnerBlock` function add 'yourBlockName'.
+
+## Adding Help for your Block
+
+You have to go to [turtledefs.js](https://github.com/sugarlabs/musicblocks/blob/master/js/turtledefs.js#L205) and in 'BLOCKHELP' you have to add:
+
+`'yourBlockName': [_('Your help for this block'), 'documentation', 'your example of usage of this block.svg'],`
+
+Remember to add it under the right `palette`.
+
+You also need to add the `.svg` file (your example of usage of the Block) to the [musiclabs/documentation folder](https://github.com/sugarlabs/musicblocks/tree/master/documentation).
