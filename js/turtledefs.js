@@ -342,7 +342,7 @@ function createHelpContent() {
 	'bpmfactor': [_('The Beats per minute block returns the current beats per minute.'), 'documentation', 'status.svg'],
         // 'beatfactor': [_(''), 'documentation', 'status.svg'],
         // pitch palette
-        'accidental': [_('The Accidental block is used to create sharps and flats'), 'documentation', 'accidental.svg'],
+        'accidental': [_('The Accidental block is used to create sharps and flats.'), 'documentation', 'accidental.svg'],
         'settransposition': [_('The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.') + ' ' + _('In the example shown above, sol is shifted up to sol#.'), 'documentation', 'settransposition.svg'],
         'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'status.svg'],
         'invert1': [_('The Invert block rotates any contained notes around a target note.'), 'documentation', 'status.svg'],
