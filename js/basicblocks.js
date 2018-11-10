@@ -1497,8 +1497,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('everybeatdo');
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['everybeatdo'] = newblock;
-    // #TRANS: on every musical 'beat' do some action
-    newblock.staticLabels.push(_('on every beat do'));
+    // #TRANS: on every note played, do some action
+    newblock.staticLabels.push(_('on every note do'));
     newblock.oneArgBlock();
     newblock.defaults.push(_('action'));
     newblock.adjustWidthToLabel();

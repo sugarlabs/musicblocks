@@ -212,7 +212,7 @@ function createHelpContent() {
         'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg'],
         'setmasterbpm2': [_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', 'master-beats-per-minute-block.svg'],
         'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'bpm.svg'],
-        'everybeatdo': [_('The On-every-beat block let you specify actions to take on every beat.'), 'documentation', 'on-every-beat-do-block.svg'],
+        'everybeatdo': [_('The On-every-note block let you specify actions to take on every note.'), 'documentation', 'on-every-beat-do-block.svg'],
         'beatvalue': [_('The Beat count block is the number of the current beat,') + ' ' + _('e.g., 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'],
         'elapsednotes2': [_('The Notes played block is the number of notes that have been played.') + ' ' + _('(By default, it counts quarter notes.)'), 'documentation', 'on-every-beat-do.svg'],
         // Pitch palette

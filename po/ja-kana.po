@@ -1840,7 +1840,7 @@ msgid "The Beats per minute block sets the number of 1/4 notes per minute."
 msgstr "<em>BPM(いっぷん あたりの はくすう)</em>ブロックは きめられている おんか (たとえば1/4)で はくに します。"
 
 #: js/turtledefs.js:215
-msgid "The On-every-beat block let you specify actions to take on every beat."
+msgid "The On-every-note block let you specify actions to take on every note."
 msgstr "<em>ざんぶの はくに ～する</em> ブロックは ぜんぶの はくに とくてい されている アクションを します。"
 
 #: js/turtledefs.js:216
@@ -3530,7 +3530,7 @@ msgid "do"
 msgstr "する"
 
 #: js/basicblocks.js:1501
-msgid "on every beat do"
+msgid "on every note do"
 msgstr "ぜんぶの はくに ～する"
 
 #: js/basicblocks.js:1515
