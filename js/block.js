@@ -84,6 +84,10 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuExitTime = null;
     this._triggerLongPress = false;
 
+    // If we update the parameters of a meter block, we have extra
+    // actions to attend to.
+    this._check_meter_block = null;
+
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this._createCache = function (callback, args, counter) {
@@ -1975,6 +1979,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._usePiemenu = function () {
         // Check on all the special cases were we want to use a pie menu.
+        this._check_meter_block = null;
 
         // Special pie menus
         if (PIEMENUS.indexOf(this.name) !== -1) {
@@ -2012,7 +2017,11 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        return this._usePieNumberC1();
+        if (this._usePieNumberC1()) {
+            return true;
+        }
+
+        return false;
     };
 
     this._usePieNumberC1 = function () {
@@ -2741,6 +2750,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
                         break;
                     case 'meter':
+                        this._check_meter_block = cblk;
                     case 'setbpm2':
                     case 'setmasterbpm2':
                     case 'stuplet':
@@ -2790,6 +2800,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
                 break;
             case 'meter':
+                this._check_meter_block = cblk;
             case 'setbpm2':
             case 'setmasterbpm2':
             case 'stuplet':
@@ -3447,6 +3458,9 @@ function Block(protoblock, blocks, overrideName) {
             that._noteValueWheel.removeWheel();
             that._exitWheel.removeWheel();
             that.label.style.display = 'none';
+            if (that._check_meter_block !== null) {
+                that.blocks.meter_block_changed(that._check_meter_block);
+            }
         };
 
         var labelElem = docById('labelDiv');
@@ -3624,6 +3638,10 @@ function Block(protoblock, blocks, overrideName) {
             that._numberWheel.removeWheel();
             that._exitWheel.removeWheel();
             that.label.style.display = 'none';
+
+            if (that._check_meter_block !== null) {
+                that.blocks.meter_block_changed(that._check_meter_block);
+            }
         };
 
         var labelElem = docById('labelDiv');

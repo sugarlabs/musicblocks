@@ -1620,7 +1620,7 @@ function Blocks () {
             if (this.blockList[blk].connections[0] == null) {
                 if (this.blockList[blk].offScreen(this.boundary)) {
                     this._setHomeButtonContainers(true, false);
-		    // Just highlight the button.
+                    // Just highlight the button.
                     // this.boundary.show();
                     onScreen = false;
                     break;
@@ -3420,6 +3420,7 @@ function Blocks () {
                         }
                         break;
                     case 'meter':
+                        this.blockList[blk]._check_meter_block = cblk;
                     case 'setbpm2':
                     case 'setmasterbpm2':
                     case 'stuplet':
@@ -3474,6 +3475,7 @@ function Blocks () {
                 }
                 break;
             case 'meter':
+                this.blockList[blk]._check_meter_block = cblk;
             case 'setbpm2':
             case 'setmasterbpm2':
             case 'stuplet':
@@ -3510,6 +3512,73 @@ function Blocks () {
 
         var myBlock = this.blockList[blk];
         return (myBlock.name === 'number' && myBlock.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 && this.blockList[myBlock.connections[0]].connections[2] === blk);
+    };
+
+    this.meter_block_changed = function (blk) {
+        // If the meter block note value changed, update the BPM block.
+        if (blk === null || this.blockList[blk].name !== 'meter') {
+            return;
+        }
+
+        console.log('METER BLOCK CHANGED');
+
+        // Get the numerator and demoninator of the meter divide block
+        var dblk = this.blockList[blk].connections[2];
+        if (dblk === null || this.blockList[dblk].name !== 'divide') {
+            return;
+        }
+
+        var c1 = this.blockList[dblk].connections[1];
+        if (c1 === null || this.blockList[c1].name !== 'number') {
+            return;
+        }
+
+        var c1v = this.blockList[c1].value;
+
+        var c2 = this.blockList[dblk].connections[2];
+        if (c2 === null || this.blockList[c2].name !== 'number') {
+            return;
+        }
+
+        var c2v = this.blockList[c2].value;
+
+        for (var i = 0; i < this.blockList.length; i++) {
+            if (['setbpm3', 'setmasterbpm2'].indexOf(this.blockList[i].name) !== -1) {
+                var bn = this.blockList[i].connections[1];
+                if (bn === null || this.blockList[bn].name !== 'number') {
+                    continue;
+                }
+
+                var bnv = this.blockList[bn].value;
+
+                var dblk = this.blockList[i].connections[2];
+                if (dblk === null || this.blockList[dblk].name !== 'divide') {
+                    continue;
+                }
+
+                var b1 = this.blockList[dblk].connections[1];
+                if (b1 === null || this.blockList[b1].name !== 'number') {
+                    continue;
+                }
+
+                var b1v = this.blockList[b1].value;
+
+                var b2 = this.blockList[dblk].connections[2];
+                if (b2 === null || this.blockList[b2].name !== 'number') {
+                    continue;
+                }
+
+                var b2v = this.blockList[b2].value;
+                bnv *= (b1v * c2v / b2v * c1v);
+
+                this.blockList[bn].value = bnv;
+                this.updateBlockText(bn);
+                this.blockList[b1].value = c1v;
+                this.updateBlockText(b1);
+                this.blockList[b2].value = c2v;
+                this.updateBlockText(b2);
+            }
+        }
     };
 
     this.prepareStackForCopy = function () {
@@ -4897,10 +4966,10 @@ function Blocks () {
                 case 'calcArg':
                 case 'calc':
                 case 'do':
-		    if (thisBlock.connections[1] !== null) {
-			var argBlock = this.blockList[thisBlock.connections[1]];
-			var blockValue = argBlock.value;
-		    }
+                    if (thisBlock.connections[1] !== null) {
+                        var argBlock = this.blockList[thisBlock.connections[1]];
+                        var blockValue = argBlock.value;
+                    }
                     break;
                 case 'nameddoArg':
                 case 'namedcalcArg':
