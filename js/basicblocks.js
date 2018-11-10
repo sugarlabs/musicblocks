@@ -221,7 +221,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('number to pitch'));
     newblock.oneArgMathBlock();
     newblock.adjustWidthToLabel();
-    newblock.defaults.push(48);
+    newblock.defaults.push(55);
     if (beginnerMode && !beginnerBlock('number2pitch')) {
         newblock.hidden = true;
     }
@@ -233,7 +233,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('number to octave'));
     newblock.oneArgMathBlock();
     newblock.adjustWidthToLabel();
-    newblock.defaults.push(48);
+    newblock.defaults.push(55);
     if (beginnerMode && !beginnerBlock('number2octave')) {
         newblock.hidden = true;
     }
