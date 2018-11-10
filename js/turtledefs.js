@@ -239,7 +239,7 @@ function createHelpContent() {
         'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example, if you have 7 notes in sequence contained in a Crescendo block with a value of 5, the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg'],
         'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example, if you have 7 notes in sequence contained in a Decrescendo block with a value of 5, the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg'],
         'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('e.g., guitar, violin, snare drum, etc.') + ' ' + _('The default volume is 50; the range is 0 (silence) to 100 (full volume).'), 'documentation', 'start-block.svg'],
-        'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'status.svg'],
+        'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'setmastervolume.svg'],
         // Drum palette
         // 'playdrum' is described on the Rhythm palette.
         'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'rhythm-ruler-block.svg'],
@@ -345,7 +345,7 @@ function createHelpContent() {
         'accidental': [_('The Accidental block is used to create sharps and flats'), 'documentation', 'accidental.svg'],
         'settransposition': [_('The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.') + ' ' + _('In the example shown above, sol is shifted up to sol#.'), 'documentation', 'settransposition.svg'],
         'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'status.svg'],
-        'invert1': [_('The Invert block rotates any contained notes around a target note.'), 'documentation', 'status.svg'],
+        'invert1': [_('The Invert block rotates any contained notes around a target note.'), 'documentation', 'invert.svg'],
         'deltapitch': [_('The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played.'), 'documentation', 'deltapitch.svg'],
         '// customNote': ['', 'documentation', 'status.svg'],
 	//.TRANS: 'ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa' are East Indian note names.
@@ -357,7 +357,7 @@ function createHelpContent() {
         'consonantstepsizedown': [_('The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode.'), 'documentation', 'status.svg'],
         // Intervals palette
         'movable': [_('When Moveable do is false, the solfege note names are always tied to specific pitches,') + ' ' + _('e.g. "do" is always "C-natural"); when Moveable do is true, the solfege note names are assigned to scale degrees ("do" is always the first degree of the major scale).'), 'documentation', 'movable.svg'],
-        'definemode': [_('The Define mode block allows you define a custom mode by specifiying pitch numbers.'), 'documentation', 'status.svg'],
+        'definemode': [_('The Define mode block allows you define a custom mode by specifiying pitch numbers.'), 'documentation', 'definemode.svg'],
         'semitoneinterval': [_('The Semi-tone interval block calculates a relative interval based on half steps.') + ' ' + _('In the figure, we add sol# to sol.'), 'documentation', 'semitoneinterval.svg'],
         'measureintervalscalar': [_('The Scalar interval block measures the distance between two notes in the current key and mode.'), 'documentation', 'status.svg'],
         'measureintervalsemitones': [_('The Scalar interval block measures the distance between two notes in semi-tones.'), 'documentation', 'status.svg'],
