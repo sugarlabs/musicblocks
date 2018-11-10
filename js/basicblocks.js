@@ -4295,6 +4295,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     // }
 
+    // Eliminating until we find a better option.
     var newblock = new ProtoBlock('speak');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['speak'] = newblock;
@@ -4303,9 +4304,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push('hello');
     newblock.dockTypes[1] = 'textin';
-    if (beginnerMode && !beginnerBlock('speak')) {
+    // if (beginnerMode && !beginnerBlock('speak')) {
         newblock.hidden = true;
-    }
+    // }
 
     var newblock = new ProtoBlock('camera');
     newblock.palette = palettes.dict['media'];

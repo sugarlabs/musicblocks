@@ -114,7 +114,7 @@ var MYDEFINES = [
     'p5.min',
     'p5.sound.min',
     'p5.dom.min',
-    'mespeak',
+    // 'mespeak',
     'Chart',
     'utils/utils',
     'activity/artwork',
@@ -189,6 +189,7 @@ define(MYDEFINES, function (compatibility) {
         // facebookInit();
         window.scroll(0, 0);
 
+        /*
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
             var lang = document.webL10n.getLanguage();
@@ -204,6 +205,7 @@ define(MYDEFINES, function (compatibility) {
         } catch (e) {
             console.log(e);
         }
+        */
 
         document.title = TITLESTRING;
 
@@ -1287,7 +1289,7 @@ define(MYDEFINES, function (compatibility) {
                 .setGetStageMouseDown(getStageMouseDown)
                 .setGetCurrentKeyCode(getCurrentKeyCode)
                 .setClearCurrentKeyCode(clearCurrentKeyCode)
-                .setMeSpeak(meSpeak)
+                // .setMeSpeak(meSpeak)
                 .setSetPlaybackStatus(setPlaybackStatus);
 
             blocks.setLogo(logo);

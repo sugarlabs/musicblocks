@@ -1899,7 +1899,7 @@ function Logo () {
             break;
         case 'speak':
             if (args.length === 1) {
-                if (that.meSpeak) {
+                if (that.meSpeak !== null) {
                     if (that.inNoteBlock[turtle].length > 0) {
                         that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
                     } else {
@@ -9463,7 +9463,9 @@ function Logo () {
                 new_text += text[i];
         }
 
-        this.meSpeak.speak(new_text);
+        if (this.meSpeak !== null) {
+            this.meSpeak.speak(new_text);
+	}
     };
 
     this._processShow = function (turtle, blk, arg0, arg1) {
