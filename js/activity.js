@@ -296,8 +296,8 @@ define(MYDEFINES, function (compatibility) {
 
         // Do something on right click
         document.addEventListener("contextmenu", function (event) {
-            stageX = event.x;
-            stageY = event.y;
+            var stageX = event.x;
+            var stageY = event.y;
 
             event.preventDefault();
             event.stopPropagation();
@@ -305,6 +305,7 @@ define(MYDEFINES, function (compatibility) {
             blocks.stageClick = true;
 
             if (blocks.activeBlock === null) {
+                console.log('Right-click context menu: Active block is null: looking for a block under the click');
                 // Is there a block we can make active?
                 for (var i = 0; i < blocks.blockList.length; i++) {
                     if (blocks.blockList[i].ignore()) {
@@ -317,16 +318,18 @@ define(MYDEFINES, function (compatibility) {
                         // overlapping blocks.
                         blocks.activeBlock = i;
                         piemenuBlockContext(i);
+                        console.log('Found a hit.');
                         break;
                     }
                 }
 
                 if (i === blocks.blockList.length) {
+                    console.log('No block found.');
                     docById('contextWheelDiv').style.display = 'none';
                 }
             } else {
                 // Block context menu
-                piemenuBlockContext(blocks.activeBlock);
+                piemenuBlockContext(blocks.activeBlock, stageX, stageY);
             }
         }, false);
 
@@ -5042,23 +5045,32 @@ define(MYDEFINES, function (compatibility) {
             refreshCanvas();
         };
 
-        function piemenuBlockContext(activeBlock) {
+        function piemenuBlockContext(activeBlock, stageX, stageY) {
             if (activeBlock === null) {
+                console.log('piemenuBlockContext: no active block');
                 return;
             }
 
-            // Position the widget centered over the note block.
-            var x = blocks.blockList[activeBlock].container.x;
-            var y = blocks.blockList[activeBlock].container.y;
+            console.log('Showing context menu for ' +  blocks.blockList[activeBlock].name);
 
-            var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.getStageScale();
-            var canvasTop = blocks.canvas.offsetTop + 6 * blocks.getStageScale();
-
+            // Position the widget centered over the active block.
             docById('contextWheelDiv').style.position = 'absolute';
-            // docById('contextWheelDiv').style.left = Math.min(blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150)) + 'px';
-            docById('contextWheelDiv').style.left = Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150 + 'px';
-            // docById('contextWheelDiv').style.top = Math.min(blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150)) + 'px';
-            docById('contextWheelDiv').style.top = Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150 + 'px';
+
+            if (stageX === null || stageY === null) {
+                var x = blocks.blockList[activeBlock].container.x;
+                var y = blocks.blockList[activeBlock].container.y;
+
+                var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.getStageScale();
+                var canvasTop = blocks.canvas.offsetTop + 6 * blocks.getStageScale();
+
+                docById('contextWheelDiv').style.left = Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150 + 'px';
+                docById('contextWheelDiv').style.top = Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150 + 'px';
+
+            } else {
+                docById('contextWheelDiv').style.left = stageX - 175 + 'px';
+                docById('contextWheelDiv').style.top = stageY - 175 + 'px';
+            }
+
             docById('contextWheelDiv').style.display = '';
 
             labels = ['imgsrc:header-icons/copy-button.svg',
@@ -5154,6 +5166,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             setTimeout(function () {
+                console.log('Setting stage click to false.');
                 blocks.stageClick = false;
             }, 500);
         };

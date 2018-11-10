@@ -2709,9 +2709,10 @@ function Block(protoblock, blocks, overrideName) {
         var now = d.getTime();
         if (now - this._piemenuExitTime > 200) {
             return true;
-        } else {
-            return false;
         }
+
+        console.log('Pie Menu not OK to launch');
+        return false;
     };
 
     this._noteValueNumber = function (c) {
@@ -2825,6 +2826,7 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental, custom) {
         // wheelNav pie menu for pitch selection
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -2861,7 +2863,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._pitchWheel.keynavigateEnabled = true;
+        this._pitchWheel.keynavigateEnabled = false;
 
         this._pitchWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'];
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2876,7 +2878,7 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
-        this._pitchWheel.animatetime = 300;
+        this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(noteLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -2908,7 +2910,7 @@ function Block(protoblock, blocks, overrideName) {
                 this._accidentalsWheel.colors.push('#c0c0c0');
             }
 
-            this._accidentalsWheel.animatetime = 300;
+            this._accidentalsWheel.animatetime = 0; // 300;
             this._accidentalsWheel.createWheel(accidentalLabels);
             this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
         }
@@ -2921,7 +2923,7 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
             var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
-            this._octavesWheel.animatetime = 300;
+            this._octavesWheel.animatetime = 0; // 300;
             this._octavesWheel.createWheel(octaveLabels);
         }
 
@@ -3088,6 +3090,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for scale degree pitch selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3104,7 +3107,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._pitchWheel.keynavigateEnabled = true;
+        this._pitchWheel.keynavigateEnabled = false;
 
         this._pitchWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'];
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3114,7 +3117,7 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
-        this._pitchWheel.animatetime = 300;
+        this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(noteLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -3135,7 +3138,7 @@ function Block(protoblock, blocks, overrideName) {
         this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
         this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
         var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
-        this._octavesWheel.animatetime = 300;
+        this._octavesWheel.animatetime = 0; // 300;
         this._octavesWheel.createWheel(octaveLabels);
 
         // Position the widget over the note block.
@@ -3235,6 +3238,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for accidental selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3255,7 +3259,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._accidentalWheel.keynavigateEnabled = true;
+        this._accidentalWheel.keynavigateEnabled = false;
 
         this._accidentalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
         this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3265,7 +3269,7 @@ function Block(protoblock, blocks, overrideName) {
         this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
         this._accidentalWheel.titleRotateAngle = 0;
-        this._accidentalWheel.animatetime = 300;
+        this._accidentalWheel.animatetime = 0; // 300;
         this._accidentalWheel.createWheel(labels);
         this._accidentalWheel.setTooltips(accidentalLabels)
 
@@ -3340,6 +3344,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for note value selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3382,7 +3387,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._noteValueWheel.keynavigateEnabled = true;
+        this._noteValueWheel.keynavigateEnabled = false;
 
         this._noteValueWheel.colors = ['#ffb2bc', '#ffccd6'];
         this._noteValueWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3391,7 +3396,7 @@ function Block(protoblock, blocks, overrideName) {
         this._noteValueWheel.slicePathCustom.maxRadiusPercent = 0.6;
         this._noteValueWheel.sliceSelectedPathCustom = this._noteValueWheel.slicePathCustom;
         this._noteValueWheel.sliceInitPathCustom = this._noteValueWheel.slicePathCustom;
-        this._noteValueWheel.animatetime = 300;
+        this._noteValueWheel.animatetime = 0; // 300;
         this._noteValueWheel.clickModeRotate = false;
         this._noteValueWheel.createWheel(noteValueLabels);
 
@@ -3547,6 +3552,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for number selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3567,7 +3573,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._numberWheel.keynavigateEnabled = true;
+        this._numberWheel.keynavigateEnabled = false;
 
         this._numberWheel.colors = ['#ffb2bc', '#ffccd6'];
         this._numberWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3586,7 +3592,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
         // this._numberWheel.titleRotateAngle = 0;
-        this._numberWheel.animatetime = 300;
+        this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -3687,6 +3693,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for setcolor selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3704,7 +3711,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._numberWheel.keynavigateEnabled = true;
+        this._numberWheel.keynavigateEnabled = false;
 
         this._numberWheel.colors = [];
         if (mode === 'setcolor') {
@@ -3743,7 +3750,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
         // this._numberWheel.titleRotateAngle = 0;
-        this._numberWheel.animatetime = 300;
+        this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -3844,6 +3851,7 @@ function Block(protoblock, blocks, overrideName) {
         // basic wheelNav pie menu
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3863,7 +3871,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._basicWheel.keynavigateEnabled = true;
+        this._basicWheel.keynavigateEnabled = false;
 
         this._basicWheel.colors = colors;
         this._basicWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3873,7 +3881,7 @@ function Block(protoblock, blocks, overrideName) {
         this._basicWheel.sliceSelectedPathCustom = this._basicWheel.slicePathCustom;
         this._basicWheel.sliceInitPathCustom = this._basicWheel.slicePathCustom;
         this._basicWheel.titleRotateAngle = 0;
-        this._basicWheel.animatetime = 300;
+        this._basicWheel.animatetime = 0; // 300;
         this._basicWheel.createWheel(labels);
 
         var that = this;
@@ -3931,6 +3939,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for boolean selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3946,7 +3955,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._booleanWheel.keynavigateEnabled = true;
+        this._booleanWheel.keynavigateEnabled = false;
 
         this._booleanWheel.colors = ['#d3cf76', '#b8b45f'];
         this._booleanWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3956,7 +3965,7 @@ function Block(protoblock, blocks, overrideName) {
         this._booleanWheel.sliceSelectedPathCustom = this._booleanWheel.slicePathCustom;
         this._booleanWheel.sliceInitPathCustom = this._booleanWheel.slicePathCustom;
         // this._booleanWheel.titleRotateAngle = 0;
-        this._booleanWheel.animatetime = 300;
+        this._booleanWheel.animatetime = 0; // 300;
         this._booleanWheel.createWheel(labels);
 
         var that = this;
@@ -4017,6 +4026,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for voice selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4041,7 +4051,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._voiceWheel.keynavigateEnabled = true;
+        this._voiceWheel.keynavigateEnabled = false;
 
         this._voiceWheel.colors = colors;
         this._voiceWheel.slicePathFunction = slicePath().DonutSlice;
@@ -4056,7 +4066,7 @@ function Block(protoblock, blocks, overrideName) {
             this._voiceWheel.titleRotateAngle = rotate;
         }
 
-        this._voiceWheel.animatetime = 300;
+        this._voiceWheel.animatetime = 0; // 300;
         this._voiceWheel.createWheel(voiceLabels);
 
         this._exitWheel.colors = ['#808080', '#c0c0c0'];
@@ -4159,6 +4169,7 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for interval selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4178,7 +4189,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._intervalNameWheel.keynavigateEnabled = true;
+        this._intervalNameWheel.keynavigateEnabled = false;
 
         //Customize slicePaths for proper size
         this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
@@ -4196,7 +4207,7 @@ function Block(protoblock, blocks, overrideName) {
             labels.push(_(INTERVALS[i][1]));
         }
 
-        this._intervalNameWheel.animatetime = 300;
+        this._intervalNameWheel.animatetime = 0; // 300;
         this._intervalNameWheel.createWheel(labels);
 
         this._intervalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
@@ -4211,7 +4222,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalWheel.clickModeRotate = false;
         // Align each set of numbers with its corresponding interval
         this._intervalWheel.navAngle = -(180 / labels.length) + (180 / (8 * labels.length));
-        this._intervalWheel.animatetime = 300;
+        this._intervalWheel.animatetime = 0; // 300;
 
         var numbers = [];
         for (var i = 0; i < INTERVALS.length; i++) {
@@ -4344,6 +4355,7 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for mode selection
 
         if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4387,7 +4399,7 @@ function Block(protoblock, blocks, overrideName) {
         this._modeWheel.clickModeRotate = false;
         this._modeWheel.navAngle = -90;
         // this._modeWheel.selectedNavItemIndex = 2;
-        this._modeWheel.animatetime = 300;
+        this._modeWheel.animatetime = 0; // 300;
         this._modeWheel.createWheel(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
 
         this._modeGroupWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
@@ -4402,7 +4414,7 @@ function Block(protoblock, blocks, overrideName) {
         // this._modeGroupWheel.clickModeRotate = false;
         this._modeGroupWheel.navAngle = -90;
         // this._modeGroupWheel.selectedNavItemIndex = 2;
-        this._modeGroupWheel.animatetime = 300;
+        this._modeGroupWheel.animatetime = 0; // 300;
 
         var xlabels = [];
         for (modegroup in MODE_PIE_MENUS) {
@@ -4475,7 +4487,7 @@ function Block(protoblock, blocks, overrideName) {
                 newWheel = true;
             }
 
-            that._modeNameWheel.keynavigateEnabled = true;
+            that._modeNameWheel.keynavigateEnabled = false;
 
             // Customize slicePaths
             var colors = [];
@@ -4520,7 +4532,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            that._modeNameWheel.animatetime = 300;
+            that._modeNameWheel.animatetime = 0; // 300;
             if (newWheel) {
                 that._modeNameWheel.createWheel(labels);
             } else {
