@@ -141,7 +141,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto", "samples/gong", "samples/Dulcimer", "samples/Electricguitar"
+    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -439,8 +439,8 @@ function Synth() {
                 {'name': 'bass', 'data': BASS_SAMPLE},
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
 		{'name': 'koto', 'data': KOTO_SAMPLE},
-		{'name': 'Dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'Electricguitar', 'data': ELECTRICGUITAR_SAMPLE}
+		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+		{'name': 'electricguitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
