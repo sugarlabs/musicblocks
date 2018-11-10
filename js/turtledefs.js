@@ -50,7 +50,8 @@ function beginnerBlock(name) {
            'meter', 'setbpm3', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
            'pitch', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
-           'settimbre', 'newstaccato', 'newslur', 'tie', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
+           'settimbre', 'newstaccato', 'newslur', '
+	   ', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
            'playdrum', 'playeffect', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
@@ -294,7 +295,7 @@ function createHelpContent() {
         'scrollxy': [_('The Scroll XY block moves the canvas.'), 'documentation', 'on-every-beat-do-block.svg'],
         'x': [_('The X block returns the horizontal position of the mouse.'), 'documentation', 'x-block.svg'],
         'y': [_('The Y block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg'],
-        'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'status.svg'],
+        'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'heading-block.svg'],
         // Pen palette
         'setpensize': [_('The Set-pen-size block changes the size of the pen.'), 'documentation', 'set-pen-size-block.svg'],
         'penup': [_('The Pen-up block raises the pen so that it does not draw.'), 'documentation', 'mouse-button-block.svg'],
@@ -325,7 +326,7 @@ function createHelpContent() {
         // Advanced blocks
         // Rhythm palette
         'rhythmic2dot': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'status.svg'],
-        'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'status.svg'],
+        'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'status.svg'],
         'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes.svg'],
         'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'status.svg'],
@@ -388,7 +389,7 @@ function createHelpContent() {
         'temperamentname': [_('The Temperament name block is used to select a tuning method.'), 'documentation', 'status.svg'],
         'tuplet4': [_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', 'status.svg'],
         // Flow palette
-        'while': [_('The While block will repeat while the condition is true.'), 'documentation', 'status.svg'],
+        'while': [_('The While block will repeat while the condition is true.'), 'documentation', 'while-block.svg'],
         'until': [_('The Until block will repeat until the condition is true.'), 'documentation', 'status.svg'],
         'waitfor': [_('The Waitfor block will wait until the condition is true.'), 'documentation', 'status.svg'],
         'break': [_('The Stop block will stop a loop') + ': ' + _('Forever, Repeat, While, or Until.'), 'documentation', 'status.svg'],
@@ -452,7 +453,7 @@ function createHelpContent() {
         'deleteblock': [_('The Delete block block removes a block.'), 'documentation', 'status.svg'],
         'openpalette': [_('The Open palette block opens a palette.'), 'documentation', 'status.svg'],
         // Graphics palette
-        'setheading': [_('The Set heading block sets the heading of the mouse.'), 'documentation', 'status.svg'],
+        'setheading': [_('The Set heading block sets the heading of the mouse.'), 'documentation', 'heading-block.svg'],
         'bezier': [_('The Bezier block draws a Bezier curve.'), 'documentation', 'status.svg'],
         'controlpoint1': [_('The Control-point 1 block sets the first control point for the Bezier curve.'), 'documentation', 'status.svg'],
         'controlpoint1': [_('The Control-point 2 block sets the second control point for the Bezier curve.'), 'documentation', 'status.svg'],
