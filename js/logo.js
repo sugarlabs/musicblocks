@@ -4145,11 +4145,11 @@ function Logo () {
 
                 if (that.drumStyle[turtle].length > 0) {
                     var drumname = last(that.drumStyle[turtle]);
-		    if (EFFECTSNAMES.indexOf(drumname) === -1) {
-			that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
-		    } else {
-			that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = effectsname;
-		    }
+                    if (EFFECTSNAMES.indexOf(drumname) === -1) {
+                        that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
+                    } else {
+                        that.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = effectsname;
+                    }
                 }
 
                 if (!that.inMatrix) {
@@ -9465,7 +9465,7 @@ function Logo () {
 
         if (this.meSpeak !== null) {
             this.meSpeak.speak(new_text);
-	}
+        }
     };
 
     this._processShow = function (turtle, blk, arg0, arg1) {
@@ -10304,7 +10304,15 @@ function Logo () {
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'key']);
                 } else {
-                    that.blocks.blockList[blk].value = that.keySignature[turtle];
+                    that.blocks.blockList[blk].value = that.keySignature[turtle][0];
+                }
+                break;
+            case 'currentmode':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'currentmode']);
+                } else {
+                    var obj = that.keySignature[turtle].split(' ');
+                    that.blocks.blockList[blk].value = obj[1];
                 }
                 break;
             case 'modelength':

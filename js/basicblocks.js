@@ -1983,9 +1983,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.valueBlock();
     newblock.dockTypes[0] = 'textout';
     newblock.extraWidth = 50;  // 150;
-    if (beginnerMode && !beginnerBlock('modename')) {
+    // if (beginnerMode && !beginnerBlock('modename')) {
         newblock.hidden = true;
-    }
+    // }
 
     var newblock = new ProtoBlock('doubly');
     newblock.palette = palettes.dict['intervals'];
@@ -2582,11 +2582,22 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('currentmode');
+    newblock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['currentmode'] = newblock;
+    //.TRANS: the mode in music is 'major', 'minor', etc.
+    newblock.staticLabels.push(_('current mode'));
+    newblock.adjustWidthToLabel();
+    newblock.parameterBlock();
+    if (beginnerMode && !beginnerBlock('currentmode')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('key');
     newblock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['key'] = newblock;
     //.TRANS: the key is a group of pitches with which a music composition is created
-    newblock.staticLabels.push(_('key'));
+    newblock.staticLabels.push(_('current key'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('key')) {
