@@ -232,16 +232,10 @@ function Toolbar() {
             onclick();
         };
     };
-    this.renderLanguageSelectIcon = function (onclick, hideAux_onclick) {
-        var auxToolbar = document.getElementById('aux-toolbar');
-        var menuIcon = document.getElementById('menu');
+    this.renderLanguageSelectIcon = function (onclick) {
         var languageSelectIcon = document.getElementById('languageSelectIcon');
         languageSelectIcon.onclick = function () {
             onclick();
-            hideAux_onclick(true);
-            auxToolbar.style.display = 'none';
-            menuIcon.innerHTML = 'menu';
-            document.getElementById('toggleAuxBtn').className -= 'blue darken-1';
         };
     };
 

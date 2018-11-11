@@ -1189,11 +1189,11 @@ define(MYDEFINES, function (compatibility) {
 
             _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
                 msgText = text;
-            }, 120);
+            }, 130);
 
             _createMsgContainer('#ffcbc4', '#ff0031', function (text) {
                 errorMsgText = text;
-            }, 110);
+            }, 120);
 
             _createErrorContainers();
 
@@ -1685,7 +1685,7 @@ define(MYDEFINES, function (compatibility) {
             //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
             toolbar.renderMergeIcon(doLoad);
             toolbar.renderRestoreIcon(_restoreTrash);
-            toolbar.renderLanguageSelectIcon(doLanguageBox, _showHideAuxMenu);
+            toolbar.renderLanguageSelectIcon(doLanguageBox);
 
 
             if (planet != undefined) {
@@ -3245,14 +3245,14 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doLanguageBox() {
-            languageBox.createBox(turtleBlocksScale, languageContainer.x, 150);
+            languageBox.createBox(turtleBlocksScale, languageContainer.x, 150 + toolbarHeight);
             languageBox.show();
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 beginnerModeContainer.visible = false;
                 advancedModeContainer.visible = false;
             }
 
-            deltaY(-55 - LEADING);
+            // deltaY(-55 - LEADING);
         };
 
         function _doPlaybackBox() {
