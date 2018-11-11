@@ -1670,7 +1670,7 @@ msgid "Pitch can be specified in terms of C D E F G A B."
 msgstr ""
 
 #: js/turtledefs.js:222
-msgid "The Scaler Step block (in combination with a Number block) will play the next pitch in a scale,"
+msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
 msgstr ""
 
 #: js/turtledefs.js:222
@@ -7015,7 +7015,7 @@ msgstr "Debe seleccionar un archivo."
 
 #: js/turtledefs.js:207
 
-#~msgid "The <em>Scaler Step</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Scalar Step 1</em> will play <em>la</em>."
+#~msgid "The <em>Scalar Step</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Scalar Step 1</em> will play <em>la</em>."
 #~msgstr ""
 
 #: js/basicblocks.js:1933

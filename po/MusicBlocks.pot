@@ -1637,7 +1637,7 @@ msgid "Pitch can be specified in terms of C D E F G A B."
 msgstr ""
 
 #: js/turtledefs.js:222
-msgid "The Scaler Step block (in combination with a Number block) will play the next pitch in a scale,"
+msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
 msgstr ""
 
 #: js/turtledefs.js:222
