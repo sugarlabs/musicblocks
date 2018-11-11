@@ -37,6 +37,7 @@ function Toolbar() {
         };
 
     };
+
     this.renderStopIcon = function (onclick) {
         var stopIcon = document.getElementById('stop');
         stopIcon.onclick = function () {
@@ -44,18 +45,21 @@ function Toolbar() {
             stopIcon.style.color = 'white';
         };
     };
+
     this.renderNewProjectIcon = function (onclick) {
         var newProjectIcon = document.getElementById('new-project');
         newProjectIcon.onclick = function () {
             onclick();
         };
     };
+
     this.renderLoadIcon = function (onclick) {
         var loadIcon = document.getElementById('load');
         loadIcon.onclick = function () {
             onclick();
         };
     };
+
     this.renderSaveIcons = function (html_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
         var saveButton = document.getElementById('saveButton');
         var saveButtonAdvanced = document.getElementById('saveButtonAdvanced');
@@ -107,6 +111,7 @@ function Toolbar() {
             }
         }
     };
+
     this.renderPlanetIcon = function (planet, onclick) {
         var planetIcon = document.getElementById('planetIcon');
         var planetIconDisabled = document.getElementById('planetIconDisabled');
@@ -121,8 +126,6 @@ function Toolbar() {
             planetIconDisabled.style.display = 'block';
         }
     };
-
-
 
     this.renderMenuIcon = function (onclick) {
         var menuIcon = document.getElementById('menu');
@@ -149,6 +152,7 @@ function Toolbar() {
             onclick();
         };
     };
+
     this.renderModeSelectIcon = function (onclick) {
         var modeText = document.getElementById('modeText');
         modeText.onclick = function () {
@@ -168,6 +172,7 @@ function Toolbar() {
 
         };
     };
+
     this.renderRunStepIcon = function (onclick) {
         var runStepByStepIcon = document.getElementById('runStepByStepIcon');
         if (beginnerMode && language === 'ja') {
@@ -178,12 +183,12 @@ function Toolbar() {
             document.getElementById('stop').style.color = stopIconColorWhenPlaying;
         };
     };
+
     this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick) {
         var displayStatsIcon = document.getElementById('displayStatsIcon');
         var loadPluginIcon = document.getElementById('loadPluginIcon');
         var delPluginIcon = document.getElementById('delPluginIcon');
         var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
-
 
         if (!beginnerMode) {
             displayStatsIcon.onclick = function () {
@@ -204,6 +209,7 @@ function Toolbar() {
             enableHorizScrollIcon.style.display = "none";
         }
     };
+
     // var scrollEnabled = false;
     // this.renderEnableHorizScrollIcon = function (setScroller, _setupBlocksContainerEvents) {
     //     var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
@@ -220,12 +226,14 @@ function Toolbar() {
             onclick();
         };
     };
+
     this.renderRestoreIcon = function (onclick) {
         var restoreIcon = document.getElementById('restoreIcon');
         restoreIcon.onclick = function () {
             onclick();
         };
     };
+
     this.renderLanguageSelectIcon = function (languageBox) {
         var languageSelectIcon = document.getElementById('languageSelectIcon');
         languageSelectIcon.onclick=function(){
@@ -377,7 +385,6 @@ function Toolbar() {
         _("Select language"),
         ];
 
-
     this.init = function () {
         for (var i = 0; i < strings.length; i++) {
             var obj = strings[i];
@@ -390,10 +397,9 @@ function Toolbar() {
                 elem.setAttribute("data-tooltip", trans);  
             }
         }
+
         $j('.tooltipped').tooltip({
             html: true
         });
-
-
     };
-}
+};

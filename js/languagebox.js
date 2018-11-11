@@ -9,87 +9,82 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
-
 //A dropdown for selecting language
-function LanguageBox () {
+function LanguageBox() {
     var language = localStorage.languagePreference;
     this._message = null;
-    this._container = null;
-    var myDiv = docById('languageDiv');
-    this._scale = 1;
 
     this.setMessage = function (message) {
         this._message = message;
         return this;
     };
 
-    this.enUS_onclick=function(){
+    this.enUS_onclick = function() {
         language='enUS';
-        this.hide()
+        this.hide();
     };
 
-    this.enUK_onclick=function(){
+    this.enUK_onclick = function() {
         language='enUK';
-        this.hide()
+        this.hide();
     };
 
-    this.ja_onclick=function(){
+    this.ja_onclick = function() {
         language='ja';
-        this.hide()
+        this.hide();
     };
 
-    this.kana_onclick=function(){
+    this.kana_onclick = function() {
         language='kana';
-        this.hide()
+        this.hide();
     };
 
-    this.es_onclick=function(){
+    this.es_onclick = function() {
         language='es';
-        this.hide()
+        this.hide();
     };
 
-    this.zhCN_onclick=function(){
+    this.zhCN_onclick = function() {
         language='zhCN';
-        this.hide()
+        this.hide();
     };
 
-    this.th_onclick=function(){
+    this.th_onclick = function() {
         language='th';
-        this.hide()
+        this.hide();
     };
 
-    this.hi_onclick=function(){
+    this.hi_onclick = function() {
         language='hi';
-        this.hide()
+        this.hide();
     };
 
-    this.ibo_onclick=function(){
+    this.ibo_onclick = function() {
         language='ibo';
-        this.hide()
+        this.hide();
     };
 
-    this.ar_onclick=function(){
+    this.ar_onclick = function() {
         language='ar';
-        this.hide()
+        this.hide();
     };
 
-    this.he_onclick=function(){
+    this.he_onclick = function() {
         language='he';
-        this.hide()
+        this.hide();
     };
 
-    this.ayc_onclick=function(){
+    this.ayc_onclick = function() {
         language='ayc';
-        this.hide()
+        this.hide();
     };
 
-    this.gug_onclick=function(){
+    this.gug_onclick = function() {
         language='gug';
-        this.hide()
+        this.hide();
     };
 
-    this.hide=function(){
+    this.hide = function() {
 
         const MSG = {
             'default': _('Refresh your browser to change your language preference.'),
@@ -107,68 +102,10 @@ function LanguageBox () {
             'ayc': 'Actualice su navegador para cambiar su preferencia de idioma.',
             'gug': 'Actualice su navegador para cambiar su preferencia de idioma.',
         };
+
         localStorage.languagePreference=language;
         console.log(language);    
         console.log(MSG[language]);
         this._message(MSG[language]);
-    };
-
-    this.createdropdown=function(){
-
-        const LANGS = [
-            ['English (US)', 'enUS'],
-            ['English (UK)', 'enUK'],
-            ['español', 'es'],
-            ['日本語', 'ja'],
-            ['にほんご', 'kana'],
-            ['中文', 'zhCN'],
-            ['ภาษาไทย', 'th'],
-            ['aymara', 'ayc'],
-            ['guarani', 'gug'],
-            ['हिंदी', 'hi'],
-            ['igbo', 'ibo'],
-            ['عربى', 'ar'],
-            ['עִברִית', 'he'],
-        ];
-        
-        var myDiv = docById('languageDiv');
-        var selectOpt = '';
-
-        var selected = localStorage.languagePreference;
-
-        console.log(selected);
-        if (selected == undefined || selected === '' || selected === 'en') {
-            selected = 'enUS';
-        }
-
-        selectOpt += '<p>';
-        for (var i = 0; i < LANGS.length; i++) {
-            if (LANGS[i][1] === selected) {
-                console.log('found selected: ' + LANGS[i][1]);
-                selectOpt += '<p><input type="radio" id="lang' + i + '" name="languageName" checked="checked" value="' + LANGS[i][1] + '"/>' + LANGS[i][0] + '</br>'
-            } else {
-                selectOpt += '<p><input type="radio" id="lang' + i + '" name="languageName" value="' + LANGS[i][1] + '"/>' + LANGS[i][0] + '</br>'
-            }
-        }
-        selectOpt += '</p>';
-
-        myDiv.style.display = 'inline';
-        myDiv.style.position = 'absolute';
-        console.log(this._container.x + ' ' + this._container.y);
-        myDiv.style.top = this._scale * (this._container.y + 60) + 'px';
-        myDiv.style.left = this._scale * (this._container.x + 10) + 'px';
-        myDiv.style.visibility = 'visible';
-        myDiv.innerHTML = selectOpt;
-
-        for (var i = 0; i < LANGS.length; i++) {
-            var radioButton = docById('lang' + i);
-            radioButton.onclick = function (event) {
-                var elem = event.target;
-                var n = Number(elem.id.replace('lang', ''));
-                console.log('resetting language preference to ' + LANGS[n][1]);
-                localStorage.setItem('languagePreference', LANGS[n][1]);
-                localStorage.setItem('kanaPreference', null);
-            };
-        }
     };
 };

@@ -920,7 +920,6 @@ define(MYDEFINES, function (compatibility) {
             hideDOMLabel();
 
             pasteBox.hide();
-            languageBox.hide();
         };
 
         function setScroller() {
@@ -1304,8 +1303,6 @@ define(MYDEFINES, function (compatibility) {
             languageBox = new LanguageBox();
             languageBox.setMessage(textMsg);
 
-
-
             playbackOnLoad = function () {
                 /*
                 if (_THIS_IS_TURTLE_BLOCKS_) {
@@ -1675,8 +1672,7 @@ define(MYDEFINES, function (compatibility) {
             //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
             toolbar.renderMergeIcon(doLoad);
             toolbar.renderRestoreIcon(_restoreTrash);
-            toolbar.renderLanguageSelectIcon(languageBox, _showHideAuxMenu);
-
+            toolbar.renderLanguageSelectIcon(languageBox);
 
             if (planet != undefined) {
                 saveLocally = planet.saveLocally.bind(planet);
