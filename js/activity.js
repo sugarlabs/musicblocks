@@ -1670,7 +1670,7 @@ define(MYDEFINES, function (compatibility) {
             
             toolbar.renderLogoIcon(_showAboutPage);
             toolbar.renderPlayIcon(_doFastButton);
-            toolbar.renderStopIcon(doStopButton);
+            toolbar.renderStopIcon(doHardStopButton);
             toolbar.renderNewProjectIcon(_afterDelete);
             toolbar.renderLoadIcon(doLoad);
             toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save),  save.saveBlockArtwork.bind(save));
