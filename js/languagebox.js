@@ -25,70 +25,80 @@ function LanguageBox () {
     };
 
     this.enUS_onclick=function(){
-        language='en-US';
+        language='enUS';
+        this.hide()
     };
 
     this.enUK_onclick=function(){
-        language='en-UK';
+        language='enUK';
+        this.hide()
     };
 
     this.ja_onclick=function(){
         language='ja';
+        this.hide()
     };
 
     this.kana_onclick=function(){
         language='kana';
+        this.hide()
     };
 
     this.es_onclick=function(){
         language='es';
+        this.hide()
     };
 
     this.zhCN_onclick=function(){
-        language='zh-CN';
+        language='zhCN';
+        this.hide()
     };
 
     this.th_onclick=function(){
         language='th';
+        this.hide()
     };
 
     this.hi_onclick=function(){
         language='hi';
+        this.hide()
     };
 
     this.ibo_onclick=function(){
         language='ibo';
+        this.hide()
     };
 
     this.ar_onclick=function(){
         language='ar';
+        this.hide()
     };
 
     this.he_onclick=function(){
         language='he';
+        this.hide()
     };
 
     this.ayc_onclick=function(){
         language='ayc';
+        this.hide()
     };
 
     this.gug_onclick=function(){
         language='gug';
-    };
-
-    if (language == undefined || language === ''||language==='en-US'||language==='en-UK') {
-        language = 'en';
+        this.hide()
     };
 
     this.hide=function(){
 
         const MSG = {
             'default': _('Refresh your browser to change your language preference.'),
-            'en': 'Refresh your browser to change your language preference.',
+            'enUS': 'Refresh your browser to change your language preference.',
+            'enUK': 'Refresh your browser to change your language preference.',
             'ja': '言語を変更するにはブラウザを再起動する必要があります。',
             'kana': 'げんごを へんこうするには ブラウザを さいきどうする ひつようが あります。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
-            'zh-CN': '刷新浏览器以更改您的语言偏好',
+            'zhCN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
             'hi': 'अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें',
             'ibo': 'Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.',
@@ -97,7 +107,8 @@ function LanguageBox () {
             'ayc': 'Actualice su navegador para cambiar su preferencia de idioma.',
             'gug': 'Actualice su navegador para cambiar su preferencia de idioma.',
         };
-            
+        localStorage.languagePreference=language;
+        console.log(language);    
         console.log(MSG[language]);
         this._message(MSG[language]);
     };
@@ -105,12 +116,12 @@ function LanguageBox () {
     this.createdropdown=function(){
 
         const LANGS = [
-            ['English (US)', 'en-US'],
-            ['English (UK)', 'en-UK'],
+            ['English (US)', 'enUS'],
+            ['English (UK)', 'enUK'],
             ['español', 'es'],
             ['日本語', 'ja'],
             ['にほんご', 'kana'],
-            ['中文', 'zh-CN'],
+            ['中文', 'zhCN'],
             ['ภาษาไทย', 'th'],
             ['aymara', 'ayc'],
             ['guarani', 'gug'],
@@ -127,7 +138,7 @@ function LanguageBox () {
 
         console.log(selected);
         if (selected == undefined || selected === '' || selected === 'en') {
-            selected = 'en-US';
+            selected = 'enUS';
         }
 
         selectOpt += '<p>';
