@@ -1378,6 +1378,17 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // METER PALETTE
 
+    var newblock = new ProtoBlock('currentmeter');
+    newblock.palette = palettes.dict['meter'];
+    blocks.protoBlockDict['currentmeter'] = newblock;
+    //.TRANS: musical meter, e.g., 4:4
+    newblock.staticLabels.push(_('current meter'));
+    newblock.adjustWidthToLabel();
+    newblock.parameterBlock();
+    if (beginnerMode && !beginnerBlock('currentmeter')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('beatfactor');
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['beatfactor'] = newblock;

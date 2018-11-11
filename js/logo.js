@@ -10315,6 +10315,13 @@ function Logo () {
                     that.blocks.blockList[blk].value = obj[1];
                 }
                 break;
+            case 'currentmeter':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'currentmeter']);
+                } else {
+                    that.blocks.blockList[blk].value = that.beatsPerMeasure[turtle] + ':' + that.noteValuePerBeat[turtle];
+                }
+                break;
             case 'modelength':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'modelength']);
