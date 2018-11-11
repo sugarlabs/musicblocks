@@ -406,19 +406,13 @@ define(MYDEFINES, function (compatibility) {
 
         function _findBlocks() {
             // _showHideAuxMenu(false);
-            var auxToolbar = document.getElementById('aux-toolbar');
             var leftpos = Math.floor(canvas.width / 4);
-            var toppos;
+            var toppos = 95.5;
             blocks.activeBlock = null;
             hideDOMLabel();
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
-            if (auxToolbar.style.display === 'block') {
-                toppos = 90 + toolbarHeight;
-            } else {
-                toppos = 90;
-            }
             palettes.updatePalettes();
             var x = Math.floor(leftpos * turtleBlocksScale);
             var y = Math.floor(toppos * turtleBlocksScale);
@@ -1309,7 +1303,6 @@ define(MYDEFINES, function (compatibility) {
 
             languageBox = new LanguageBox();
             languageBox.setMessage(textMsg);
-                
 
 
 
@@ -1663,11 +1656,11 @@ define(MYDEFINES, function (compatibility) {
             save.init();
 
             toolbar = new Toolbar();
-            toolbar.init(beginnerMode);
+            toolbar.init();
             
             toolbar.renderLogoIcon(_showAboutPage);
             toolbar.renderPlayIcon(_doFastButton);
-            toolbar.renderStopIcon(doHardStopButton);
+            toolbar.renderStopIcon(doStopButton);
             toolbar.renderNewProjectIcon(_afterDelete);
             toolbar.renderLoadIcon(doLoad);
             toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save),  save.saveBlockArtwork.bind(save));
@@ -1682,7 +1675,7 @@ define(MYDEFINES, function (compatibility) {
             //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
             toolbar.renderMergeIcon(doLoad);
             toolbar.renderRestoreIcon(_restoreTrash);
-            toolbar.renderLanguageSelectIcon(doLanguageBox, _showHideAuxMenu);
+            toolbar.renderLanguageSelectIcon(languageBox, _showHideAuxMenu);
 
 
             if (planet != undefined) {
@@ -3241,16 +3234,6 @@ define(MYDEFINES, function (compatibility) {
             _showHideAuxMenu(true);
         };
 
-        function doLanguageBox() {
-            languageBox.createBox(turtleBlocksScale, languageContainer.x, 150);
-            languageBox.show();
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                beginnerModeContainer.visible = false;
-                advancedModeContainer.visible = false;
-            }
-
-            deltaY(-55 - LEADING);
-        };
 
         function _doPlaybackBox() {
             // _hideBoxes();
@@ -4459,7 +4442,6 @@ define(MYDEFINES, function (compatibility) {
             // Force center-aligned labels
             x += dx;
             languageContainer = _makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
-            _loadButtonDragHandler(languageContainer, x, y, doLanguageBox, null, null, null, null);
             languageContainer.visible = false;
             onscreenMenu.push(languageContainer);
 
