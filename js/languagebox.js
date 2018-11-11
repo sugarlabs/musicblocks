@@ -20,67 +20,69 @@ function LanguageBox() {
     };
 
     this.enUS_onclick = function() {
-        language='enUS';
+        language = 'enUS';
         this.hide();
     };
 
     this.enUK_onclick = function() {
-        language='enUK';
+        language = 'enUK';
         this.hide();
     };
 
     this.ja_onclick = function() {
-        language='ja';
+        language = 'ja';
+        localStorage.kanaPreference = 'kanji';
         this.hide();
     };
 
     this.kana_onclick = function() {
-        language='kana';
+        language = 'ja';
+        localStorage.kanaPreference = 'kana';
         this.hide();
     };
 
     this.es_onclick = function() {
-        language='es';
+        language = 'es';
         this.hide();
     };
 
     this.zhCN_onclick = function() {
-        language='zhCN';
+        language = 'zhCN';
         this.hide();
     };
 
     this.th_onclick = function() {
-        language='th';
+        language = 'th';
         this.hide();
     };
 
     this.hi_onclick = function() {
-        language='hi';
+        language = 'hi';
         this.hide();
     };
 
     this.ibo_onclick = function() {
-        language='ibo';
+        language = 'ibo';
         this.hide();
     };
 
     this.ar_onclick = function() {
-        language='ar';
+        language = 'ar';
         this.hide();
     };
 
     this.he_onclick = function() {
-        language='he';
+        language = 'he';
         this.hide();
     };
 
     this.ayc_onclick = function() {
-        language='ayc';
+        language = 'ayc';
         this.hide();
     };
 
     this.gug_onclick = function() {
-        language='gug';
+        language = 'gug';
         this.hide();
     };
 
@@ -103,9 +105,12 @@ function LanguageBox() {
             'gug': 'Actualice su navegador para cambiar su preferencia de idioma.',
         };
 
-        localStorage.languagePreference=language;
-        console.log(language);    
-        console.log(MSG[language]);
-        this._message(MSG[language]);
+        localStorage.languagePreference = language;
+        console.log(language);
+        if (language === 'ja' && localStorage.kanaPreference === 'kana') {
+            this._message(MSG['kana']);
+        } else {
+            this._message(MSG[language]);
+        }
     };
 };
