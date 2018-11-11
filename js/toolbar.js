@@ -133,6 +133,7 @@ function Toolbar() {
                 auxToolbar.style.display = 'block';
                 menuIcon.innerHTML = 'more_vert';
                 document.getElementById('toggleAuxBtn').className = 'blue darken-1';
+                // $('.tooltipped').tooltip();
             } else {
                 onclick(true);
                 auxToolbar.style.display = 'none';
@@ -149,17 +150,10 @@ function Toolbar() {
         };
     };
     this.renderModeSelectIcon = function (onclick) {
-        var begIcon = document.getElementById('beginnerMode');
-        var advIcon = document.getElementById('advancedMode');
-        if (begIcon.style.display === 'none') {
-            advIcon.onclick = function () {
-                onclick();
-            };
-        } else {
-            begIcon.onclick = function () {
-                onclick();
-            }
-        }
+        var modeText = document.getElementById('modeText');
+        modeText.onclick = function () {
+            onclick();
+        };
     };
 
     this.renderRunSlowlyIcon = function (onclick) {
@@ -232,72 +226,72 @@ function Toolbar() {
             onclick();
         };
     };
-    this.renderLanguageSelectIcon = function (enUS_onclick, enUK_onclick, es_onclick, ja_onclick, kana_onclick, zhCN_onclick, th_onclick, ayc_onclick, gug_onclick, hi_onclick, ibo_onclick, ar_onclick) {
+    this.renderLanguageSelectIcon = function (languageBox) {
         var languageSelectIcon = document.getElementById('languageSelectIcon');
         languageSelectIcon.onclick=function(){
-            var enUS=document.getElementById('en-US');
+            var enUS=document.getElementById('enUS');
             enUS.onclick=function(){
-                enUS_onclick();
+                languageBox.enUS_onclick();
             };
             
-            var enUK=document.getElementById('en-UK');
+            var enUK=document.getElementById('enUK');
             enUK.onclick=function(){
-                enUK_onclick();
+                languageBox.enUK_onclick();
             };
             
             var es=document.getElementById('es');
             es.onclick=function(){
-                es_onclick();
+                languageBox.es_onclick();
             };
             
             var ja=document.getElementById('ja');
             ja.onclick=function(){
-                ja_onclick();
+                languageBox.ja_onclick();
             };
             
             var kana=document.getElementById('kana');
             kana.onclick=function(){
-                kana_onclick();
+                languageBox.kana_onclick();
             };
             
             var zhCN=document.getElementById('zhCN');
-            chCN.onclick=function(){
-                zhCN_onclick();
+            zhCN.onclick=function(){
+                languageBox.zhCN_onclick();
             };
             
             var th=document.getElementById('th');
             th.onclick=function(){
-                th_onclick();
+                languageBox.th_onclick();
             };
             
             var ayc=document.getElementById('ayc');
             ayc.onclick=function(){
-                ayc_onclick();
+                languageBox.ayc_onclick();
             };
             
             var gug=document.getElementById('gug');
             gug.onclick=function(){
-                gug_onclick();
+                languageBox.gug_onclick();
             };
             
             var hi=document.getElementById('hi');
             hi.onclick=function(){
-                hi_onclick();
+                languageBox.hi_onclick();
             };
             
             var ibo=document.getElementById('ibo');
             ibo.onclick=function(){
-                ibo_onclick();
+                languageBox.ibo_onclick();
             };
             
             var ar=document.getElementById('ar');
             ar.onclick=function(){
-                ar_onclick();
+                languageBox.ar_onclick();
             };
             
             var he=document.getElementById('he');
             he.onclick=function(){
-                he_onclick();
+                languageBox.he_onclick();
             };
         }
     };
@@ -323,6 +317,7 @@ function Toolbar() {
         ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
         ["mergeWithCurrentIcon", _("Merge with current project")],
         ["restoreIcon", _("Restore")],
+        ["modeText", _("Switch to beginner mode")],
         ["languageSelectIcon", _("Select language")],
         ["save-html", _("Save as HTML"), 'innerHTML'],
         ["save-svg", _("Save as svg"), 'innerHTML'],
@@ -332,9 +327,19 @@ function Toolbar() {
         ["save-abc", _("Save as abc"), 'innerHTML'],
         ["save-blockartwork-svg", _("Save block artwork"), 'innerHTML'],
         ["new-project", _("Confirm"), 'innerHTML'],
-        ["beginnerMode", _("Switch to beginner mode")],
-        ["advancedMode", _("Switch to advanced mode")],
-
+        ["enUS", _("English (United States)"), 'innerHTML'],
+        ["enUK", _("English (United Kingdom)"), 'innerHTML'],
+        ["ja", _("日本語"), 'innerHTML'],
+        ["es", _("español"), 'innerHTML'],
+        ["kana", _("にほんご"), 'innerHTML'],
+        ["zhCN", _("中文"), 'innerHTML'],
+        ["th", _("ภาษาไทย"), 'innerHTML'],
+        ["ayc", _("aymara"), 'innerHTML'],
+        ["gug", _("guarani"), 'innerHTML'],
+        ["hi", _("हिंदी"), 'innerHTML'],
+        ["ibo", _("igbo"), 'innerHTML'],
+        ["ar", _("عربى"), 'innerHTML'],
+        ["he", _("עִברִית"), 'innerHTML'],
     ];
 
     // Workaround for FF
@@ -359,6 +364,7 @@ function Toolbar() {
         _("Disable horizontal scrolling"),
         _("Merge with current project"),
         _("Restore"),
+        _("Switch to beginner mode"),
         _("Select language"),
         _("Save as HTML"),
         _("Save as svg"),
@@ -368,43 +374,26 @@ function Toolbar() {
         _("Save as abc"),
         _("Save block artwork"),
         _("Confirm"),
-        _("Switch to beginner mode"),
-        _("Switch to advanced mode")
-    ];
+        _("Select language"),
+        ];
 
 
-    this.init = function (mode) {
-        var beginnerMode = document.getElementById('beginnerMode');
-        var advancedMode = document.getElementById('advancedMode');
-
-        if (mode || mode === 'null') {
-            advancedMode.style.display = "block";
-            beginnerMode.style.display = "none";
-        } else {
-            advancedMode.style.display = "none";
-            beginnerMode.style.display = "display";
-        }
-
+    this.init = function () {
         for (var i = 0; i < strings.length; i++) {
             var obj = strings[i];
             var trans = strings_[i];
             var elem = document.getElementById(obj[0]);
             // console.log(obj[0] + " trans: " + trans);
-            if (strings[i].length == 3) {
+            if (strings[i].length === 3) {
                 elem.innerHTML = obj[1];
             } else {
-                elem.setAttribute("data-tooltip", trans);
+                elem.setAttribute("data-tooltip", trans);  
             }
         }
         $j('.tooltipped').tooltip({
-            html: true,
-            delay: 100
+            html: true
         });
 
-        $j('.materialize-iso, .dropdown-trigger').dropdown({
-            constrainWidth: false,
-            hover: false, // Activate on hover
-            belowOrigin: true, // Displays dropdown below the button
-        });
+
     };
 }
