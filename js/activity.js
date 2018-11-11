@@ -1308,11 +1308,8 @@ define(MYDEFINES, function (compatibility) {
                 .setPaste(paste);
 
             languageBox = new LanguageBox();
-            languageBox
-                .setCanvas(canvas)
-                .setStage(stage)
-                .setMessage(textMsg)
-                .setRefreshCanvas(refreshCanvas);
+            languageBox.setMessage(textMsg);
+                
 
 
 
