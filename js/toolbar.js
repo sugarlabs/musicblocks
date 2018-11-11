@@ -133,7 +133,6 @@ function Toolbar() {
                 auxToolbar.style.display = 'block';
                 menuIcon.innerHTML = 'more_vert';
                 document.getElementById('toggleAuxBtn').className = 'blue darken-1';
-                // $('.tooltipped').tooltip();
             } else {
                 onclick(true);
                 auxToolbar.style.display = 'none';
@@ -150,10 +149,17 @@ function Toolbar() {
         };
     };
     this.renderModeSelectIcon = function (onclick) {
-        var modeText = document.getElementById('modeText');
-        modeText.onclick = function () {
-            onclick();
-        };
+        var begIcon = document.getElementById('beginnerMode');
+        var advIcon = document.getElementById('advancedMode');
+        if (begIcon.style.display === 'none') {
+            advIcon.onclick = function () {
+                onclick();
+            };
+        } else {
+            begIcon.onclick = function () {
+                onclick();
+            }
+        }
     };
 
     this.renderRunSlowlyIcon = function (onclick) {
@@ -260,7 +266,6 @@ function Toolbar() {
         ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
         ["mergeWithCurrentIcon", _("Merge with current project")],
         ["restoreIcon", _("Restore")],
-        ["modeText", _("Switch to beginner mode")],
         ["languageSelectIcon", _("Select language")],
         ["save-html", _("Save as HTML"), 'innerHTML'],
         ["save-svg", _("Save as svg"), 'innerHTML'],
@@ -270,7 +275,9 @@ function Toolbar() {
         ["save-abc", _("Save as abc"), 'innerHTML'],
         ["save-blockartwork-svg", _("Save block artwork"), 'innerHTML'],
         ["new-project", _("Confirm"), 'innerHTML'],
-        ["languageSelectIcon", _("Select language")],
+        ["beginnerMode", _("Switch to beginner mode")],
+        ["advancedMode", _("Switch to advanced mode")],
+
     ];
 
     // Workaround for FF
@@ -295,7 +302,6 @@ function Toolbar() {
         _("Disable horizontal scrolling"),
         _("Merge with current project"),
         _("Restore"),
-        _("Switch to beginner mode"),
         _("Select language"),
         _("Save as HTML"),
         _("Save as svg"),
@@ -305,11 +311,23 @@ function Toolbar() {
         _("Save as abc"),
         _("Save block artwork"),
         _("Confirm"),
-        _("Select language"),
-        ];
+        _("Switch to beginner mode"),
+        _("Switch to advanced mode")
+    ];
 
 
-    this.init = function () {
+    this.init = function (mode) {
+        var beginnerMode = document.getElementById('beginnerMode');
+        var advancedMode = document.getElementById('advancedMode');
+
+        if (mode || mode === 'null') {
+            advancedMode.style.display = "block";
+            beginnerMode.style.display = "none";
+        } else {
+            advancedMode.style.display = "none";
+            beginnerMode.style.display = "display";
+        }
+
         for (var i = 0; i < strings.length; i++) {
             var obj = strings[i];
             var trans = strings_[i];
@@ -318,13 +336,18 @@ function Toolbar() {
             if (strings[i].length == 3) {
                 elem.innerHTML = obj[1];
             } else {
-                elem.setAttribute("data-tooltip", trans);  
+                elem.setAttribute("data-tooltip", trans);
             }
         }
         $j('.tooltipped').tooltip({
-            html: true
+            html: true,
+            delay: 100
         });
 
-
+        $j('.materialize-iso, .dropdown-trigger').dropdown({
+            constrainWidth: false,
+            hover: false, // Activate on hover
+            belowOrigin: true, // Displays dropdown below the button
+        });
     };
 }
