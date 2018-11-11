@@ -232,17 +232,74 @@ function Toolbar() {
             onclick();
         };
     };
-    this.renderLanguageSelectIcon = function (onclick, hideAux_onclick) {
-        var auxToolbar = document.getElementById('aux-toolbar');
-        var menuIcon = document.getElementById('menu');
+    this.renderLanguageSelectIcon = function (enUS_onclick, enUK_onclick, es_onclick, ja_onclick, kana_onclick, zhCN_onclick, th_onclick, ayc_onclick, gug_onclick, hi_onclick, ibo_onclick, ar_onclick) {
         var languageSelectIcon = document.getElementById('languageSelectIcon');
-        languageSelectIcon.onclick = function () {
-            onclick();
-            hideAux_onclick(true);
-            auxToolbar.style.display = 'none';
-            menuIcon.innerHTML = 'menu';
-            document.getElementById('toggleAuxBtn').className -= 'blue darken-1';
-        };
+        languageSelectIcon.onclick=function(){
+            var enUS=document.getElementById('en-US');
+            enUS.onclick=function(){
+                enUS_onclick();
+            };
+            
+            var enUK=document.getElementById('en-UK');
+            enUK.onclick=function(){
+                enUK_onclick();
+            };
+            
+            var es=document.getElementById('es');
+            es.onclick=function(){
+                es_onclick();
+            };
+            
+            var ja=document.getElementById('ja');
+            ja.onclick=function(){
+                ja_onclick();
+            };
+            
+            var kana=document.getElementById('kana');
+            kana.onclick=function(){
+                kana_onclick();
+            };
+            
+            var zhCN=document.getElementById('zhCN');
+            chCN.onclick=function(){
+                zhCN_onclick();
+            };
+            
+            var th=document.getElementById('th');
+            th.onclick=function(){
+                th_onclick();
+            };
+            
+            var ayc=document.getElementById('ayc');
+            ayc.onclick=function(){
+                ayc_onclick();
+            };
+            
+            var gug=document.getElementById('gug');
+            gug.onclick=function(){
+                gug_onclick();
+            };
+            
+            var hi=document.getElementById('hi');
+            hi.onclick=function(){
+                hi_onclick();
+            };
+            
+            var ibo=document.getElementById('ibo');
+            ibo.onclick=function(){
+                ibo_onclick();
+            };
+            
+            var ar=document.getElementById('ar');
+            ar.onclick=function(){
+                ar_onclick();
+            };
+            
+            var he=document.getElementById('he');
+            he.onclick=function(){
+                he_onclick();
+            };
+        }
     };
 
     var strings = [
