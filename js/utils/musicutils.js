@@ -1785,7 +1785,7 @@ function i18nSolfege(note) {
 
 function splitSolfege(value) {
     // Separate the pitch from any attributes, e.g., # or b
-    if (value != null) {
+    if (value != null && typeof(value) === 'string') {
         if (SOLFNOTES.indexOf(value) !== -1) {
             var note = value;
             var attr = '';
