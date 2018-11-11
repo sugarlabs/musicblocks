@@ -127,9 +127,11 @@
                 };
 
                 function resizeFixed() {
+                  setTimeout(function () { 
                     $t_fixed.find("th").each(function(index) {
                         $(this).css("width", $this.find("th").eq(index).outerWidth() + "px");
                     });
+                  }, 100);
                 };
 
                 function scrollFixed() {
