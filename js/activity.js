@@ -1182,11 +1182,11 @@ define(MYDEFINES, function (compatibility) {
 
             _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
                 msgText = text;
-            }, 120);
+            }, 130);
 
             _createMsgContainer('#ffcbc4', '#ff0031', function (text) {
                 errorMsgText = text;
-            }, 110);
+            }, 130);
 
             _createErrorContainers();
 
