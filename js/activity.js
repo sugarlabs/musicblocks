@@ -407,12 +407,18 @@ define(MYDEFINES, function (compatibility) {
         function _findBlocks() {
             // _showHideAuxMenu(false);
             var leftpos = Math.floor(canvas.width / 4);
-            var toppos = 95.5;
+            var toppos;
             blocks.activeBlock = null;
             hideDOMLabel();
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
+            if (auxToolbar.style.display === 'block') {
+                toppos = 90 + toolbarHeight;
+            } else {
+                toppos = 90;
+            }
+
             palettes.updatePalettes();
             var x = Math.floor(leftpos * turtleBlocksScale);
             var y = Math.floor(toppos * turtleBlocksScale);
@@ -1653,7 +1659,7 @@ define(MYDEFINES, function (compatibility) {
             save.init();
 
             toolbar = new Toolbar();
-            toolbar.init();
+            toolbar.init(beginnerMode);
             
             toolbar.renderLogoIcon(_showAboutPage);
             toolbar.renderPlayIcon(_doFastButton);

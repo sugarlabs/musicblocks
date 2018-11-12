@@ -136,7 +136,6 @@ function Toolbar() {
                 auxToolbar.style.display = 'block';
                 menuIcon.innerHTML = 'more_vert';
                 document.getElementById('toggleAuxBtn').className = 'blue darken-1';
-                // $('.tooltipped').tooltip();
             } else {
                 onclick(true);
                 auxToolbar.style.display = 'none';
@@ -154,10 +153,17 @@ function Toolbar() {
     };
 
     this.renderModeSelectIcon = function (onclick) {
-        var modeText = document.getElementById('modeText');
-        modeText.onclick = function () {
-            onclick();
-        };
+        var begIcon = document.getElementById('beginnerMode');
+        var advIcon = document.getElementById('advancedMode');
+        if (begIcon.style.display === 'none') {
+            advIcon.onclick = function () {
+                onclick();
+            };
+        } else {
+            begIcon.onclick = function () {
+                onclick();
+            };
+        }
     };
 
     this.renderRunSlowlyIcon = function (onclick) {
@@ -236,69 +242,69 @@ function Toolbar() {
 
     this.renderLanguageSelectIcon = function (languageBox) {
         var languageSelectIcon = document.getElementById('languageSelectIcon');
-        languageSelectIcon.onclick=function(){
-            var enUS=document.getElementById('enUS');
-            enUS.onclick=function(){
+        languageSelectIcon.onclick=function() {
+            var enUS = document.getElementById('enUS');
+            enUS.onclick = function() {
                 languageBox.enUS_onclick();
             };
-            
-            var enUK=document.getElementById('enUK');
-            enUK.onclick=function(){
+
+            var enUK = document.getElementById('enUK');
+            enUK.onclick = function() {
                 languageBox.enUK_onclick();
             };
-            
-            var es=document.getElementById('es');
-            es.onclick=function(){
+
+            var es = document.getElementById('es');
+            es.onclick = function() {
                 languageBox.es_onclick();
             };
-            
-            var ja=document.getElementById('ja');
-            ja.onclick=function(){
+
+            var ja = document.getElementById('ja');
+            ja.onclick = function() {
                 languageBox.ja_onclick();
             };
-            
-            var kana=document.getElementById('kana');
-            kana.onclick=function(){
+
+            var kana = document.getElementById('kana');
+            kana.onclick = function() {
                 languageBox.kana_onclick();
             };
-            
-            var zhCN=document.getElementById('zhCN');
-            zhCN.onclick=function(){
+
+            var zhCN = document.getElementById('zhCN');
+            zhCN.onclick = function() {
                 languageBox.zhCN_onclick();
             };
-            
-            var th=document.getElementById('th');
-            th.onclick=function(){
+
+            var th = document.getElementById('th');
+            th.onclick = function() {
                 languageBox.th_onclick();
             };
-            
-            var ayc=document.getElementById('ayc');
-            ayc.onclick=function(){
+
+            var ayc = document.getElementById('ayc');
+            ayc.onclick = function() {
                 languageBox.ayc_onclick();
             };
-            
-            var gug=document.getElementById('gug');
-            gug.onclick=function(){
+
+            var gug = document.getElementById('gug');
+            gug.onclick = function() {
                 languageBox.gug_onclick();
             };
-            
-            var hi=document.getElementById('hi');
-            hi.onclick=function(){
+
+            var hi = document.getElementById('hi');
+            hi.onclick = function() {
                 languageBox.hi_onclick();
             };
-            
-            var ibo=document.getElementById('ibo');
-            ibo.onclick=function(){
+
+            var ibo = document.getElementById('ibo');
+            ibo.onclick = function() {
                 languageBox.ibo_onclick();
             };
-            
-            var ar=document.getElementById('ar');
-            ar.onclick=function(){
+
+            var ar = document.getElementById('ar');
+            ar.onclick = function() {
                 languageBox.ar_onclick();
             };
-            
-            var he=document.getElementById('he');
-            he.onclick=function(){
+
+            var he = document.getElementById('he');
+            he.onclick = function() {
                 languageBox.he_onclick();
             };
         }
@@ -325,7 +331,8 @@ function Toolbar() {
         ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
         ["mergeWithCurrentIcon", _("Merge with current project")],
         ["restoreIcon", _("Restore")],
-        ["modeText", _("Switch to beginner mode")],
+        ["beginnerMode", _("Switch to beginner mode")],
+        ["advancedMode", _("Switch to advanced mode")],
         ["languageSelectIcon", _("Select language")],
         ["save-html", _("Save as HTML"), 'innerHTML'],
         ["save-svg", _("Save as svg"), 'innerHTML'],
@@ -373,6 +380,7 @@ function Toolbar() {
         _("Merge with current project"),
         _("Restore"),
         _("Switch to beginner mode"),
+        _("Switch to advanced mode"),
         _("Select language"),
         _("Save as HTML"),
         _("Save as svg"),
@@ -385,21 +393,37 @@ function Toolbar() {
         _("Select language"),
         ];
 
-    this.init = function () {
+    this.init = function (mode) {
+        var beginnerMode = document.getElementById('beginnerMode');
+        var advancedMode = document.getElementById('advancedMode');
+         if (mode || mode === 'null') {
+            advancedMode.style.display = "block";
+            beginnerMode.style.display = "none";
+        } else {
+            advancedMode.style.display = "none";
+            beginnerMode.style.display = "display";
+        }
+
         for (var i = 0; i < strings.length; i++) {
             var obj = strings[i];
             var trans = strings_[i];
             var elem = document.getElementById(obj[0]);
-            // console.log(obj[0] + " trans: " + trans);
             if (strings[i].length === 3) {
                 elem.innerHTML = obj[1];
             } else {
-                elem.setAttribute("data-tooltip", trans);  
+                elem.setAttribute("data-tooltip", trans);
             }
         }
 
         $j('.tooltipped').tooltip({
-            html: true
+            html: true,
+            delay: 100
+        });
+
+        $j('.materialize-iso, .dropdown-trigger').dropdown({
+            constrainWidth: false,
+            hover: false, // Activate on hover
+            belowOrigin: true, // Displays dropdown below the button
         });
     };
 };
