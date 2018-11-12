@@ -231,9 +231,9 @@ get started.
 
 ### <a name="CHUNKS"></a>3.1 Chunks
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix4.svg "working of action stack")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-2.svg "working of action stack")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk1.svg "using chunk inside Start block")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-1.svg "using chunk inside Start block")
 
 Every time you create a new *Action* stack, Music Blocks creates a new
 block specific to, and linked with, that stack. (The new block is
@@ -265,23 +265,23 @@ inside the *Start* block (the *Chunk* block) will be executed. You can
 add more chunks after this one inside the *Start* block to execute
 them sequentially.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk2.svg "usage of multiple Chunk blocks")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-3.svg "usage of multiple Chunk blocks")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk3.svg "usage of Repeat block")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-4.svg "usage of Repeat block")
 
 You can [repeat](#REPETITION) chunks either by using multiple *Chunk* blocks or using a
 *Repeat* block.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk4.svg "multiple action stacks")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-6.svg "multiple action stacks")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk5.svg "mixing and matching chunks")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-5.svg "mixing and matching chunks")
 
 You can also mix and match chunks. Here we play the action block with
 name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk6.svg "creating a song using chunks")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-8.svg "creating a song using chunks")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk7.svg "usage of Repeat block in a song")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-7.svg "usage of Repeat block in a song")
 
 A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
