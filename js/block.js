@@ -55,6 +55,8 @@ function Block(protoblock, blocks, overrideName) {
     this.hitHeight = 0;
     this.bitmap = null;
     this.highlightBitmap = null;
+    this.disconnectedBitmap = null;
+    this.disconnectedHighlightBitmap = null;
 
     // The svg from which the bitmaps are generated
     this.artwork = null;
@@ -165,11 +167,19 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        if (!this.bitmap.visible && !this.highlightBitmap.visible) {
-            if (this.collapseBlockBitmap === null) {
-                return true;
-            } else {
-                if (!this.collapseBlockBitmap.visible && !this.highlightCollapseBlockBitmap.visible) {
+        if (this.disconnectedBitmap !== null && this.disconnectedHighlightBitmap !== null) {
+            if (!this.bitmap.visible && !this.highlightBitmap.visible && !this.disconnectedBitmap.visible && !this.disconnectedHighlightBitmap.visible) {
+                if (this.collapseBlockBitmap === null) {
+                    return true;
+                } else if (!this.collapseBlockBitmap.visible && !this.highlightCollapseBlockBitmap.visible) {
+                    return true;
+                }
+            }
+        } else {
+            if (!this.bitmap.visible && !this.highlightBitmap.visible) {
+                if (this.collapseBlockBitmap === null) {
+                    return true;
+                } else if (!this.collapseBlockBitmap.visible && !this.highlightCollapseBlockBitmap.visible) {
                     return true;
                 }
             }
@@ -213,14 +223,21 @@ function Block(protoblock, blocks, overrideName) {
             return;
         }
 
-        if (!this.bitmap.visible) {
-            // block is hidden, so do nothing.
+        if (this.disconnectedBitmap !== null) {
+            if (!this.bitmap.visible && !this.disconnectedBitmap.visible) {
+                // block is hidden, so do nothing.
+                return;
+            }
+        } else if (!this.bitmap.visible) {
             return;
         }
 
         // Always hide the non-highlighted artwork.
         this.container.visible = true;
         this.bitmap.visible = false;
+        if (this.disconnectedBitmap !== null) {
+            this.disconnectedBitmap.visible = false;
+        }
 
         // If it is a collapsed collapsable, hightlight the collapsed state.
         if (this.collapsed) {
@@ -240,9 +257,24 @@ function Block(protoblock, blocks, overrideName) {
 
             // but not the uncollapsed highlighted artwork.
             this.highlightBitmap.visible = false;
+            if (this.disconnectedHighlightBitmap !== null) {
+                this.disconnectedHighlightBitmap.visible = false; 
+            }
+
+            this.highlightBitmap.visible = false; 
         } else {
             // Show the highlighted artwork.
-            this.highlightBitmap.visible = true;
+            // If the block is disconnected, use the disconnected bitmap.
+            if (this.disconnectedHighlightBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+                this.disconnectedHighlightBitmap.visible = true;
+                this.highlightBitmap.visible = false;
+            } else {
+                if (this.disconnectedHighlightBitmap !== null) {
+                    this.disconnectedHighlightBitmap.visible = false;
+                }
+                
+                this.highlightBitmap.visible = true;
+            }
 
             // If it is an uncollapsed collapsable, make sure the
             // collapsed artwork is hidden.
@@ -283,6 +315,10 @@ function Block(protoblock, blocks, overrideName) {
 
         // Always hide the highlighted artwork.
         this.highlightBitmap.visible = false;
+        if (this.disconnectedHighlightBitmap !== null) {
+            this.disconnectedHighlightBitmap.visible = false; 
+        }
+
         this.container.visible = true;
 
         // If it is a collapsed collapsable, unhightlight the collapsed state.
@@ -304,9 +340,19 @@ function Block(protoblock, blocks, overrideName) {
 
             // and not the uncollapsed artwork.
             this.bitmap.visible = false;
-
         } else {
-            this.bitmap.visible = true;
+            // If the block is disconnected, use the disconnected bitmap.
+            if (this.disconnectedBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+                this.disconnectedBitmap.visible = true;
+                this.bitmap.visible = false;
+            } else {
+                if (this.disconnectedBitmap !== null) {
+                    this.disconnectedBitmap.visible = false;
+                }
+
+                this.bitmap.visible = true;
+            }
+
             this.container.visible = true;
 
             if (this.isCollapsible()) {
@@ -546,6 +592,14 @@ function Block(protoblock, blocks, overrideName) {
             this.container.removeChild(this.highlightBitmap);
         }
 
+        if (this.disconnectedBitmap != null) {
+            this.container.removeChild(this.disconnectedBitmap);
+        }
+
+        if (this.disconnectedHighlightBitmap != null) {
+            this.container.removeChild(this.disconnectedHighlightBitmap);
+        }
+
         if (collapse && this.collapseBlockBitmap !== null) {
             this.container.removeChild(this.collapseButtonBitmap);
             this.container.removeChild(this.expandButtonBitmap);
@@ -624,6 +678,66 @@ function Block(protoblock, blocks, overrideName) {
             that._createCache(__callback, firstTime);
         };
 
+        // Create the disconnect highlight bitmap for the block.
+        var __processDisconnectedHighlightBitmap = function (bitmap, that) {
+            if (that.disconnectedHighlightBitmap != null) {
+                that.container.removeChild(that.disconnectedHighlightBitmap);
+            }
+
+            that.disconnectedHighlightBitmap = bitmap;
+            that.container.addChild(that.disconnectedHighlightBitmap);
+            that.disconnectedHighlightBitmap.x = 0;
+            that.disconnectedHighlightBitmap.y = 0;
+            that.disconnectedHighlightBitmap.name = 'bmp_disconnect_hightlight_' + thisBlock;
+            if (!that.blocks.logo.runningLilypond) {
+                that.disconnectedHighlightBitmap.cursor = 'pointer';
+            }
+            // Hide disconnected bitmap to start.
+            that.disconnectedHighlightBitmap.visible = false;
+
+            if (that.protoblock.disabled) {
+                var artwork = that.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', safeSVG(block_label));
+            } else {
+                var artwork = that.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
+            }
+
+            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+            }
+
+            _blockMakeBitmap(artwork, __processHighlightBitmap, that);
+        };
+
+        // Create the disconnect bitmap for the block.
+        var __processDisconnectedBitmap = function (bitmap, that) {
+            if (that.disconnectedBitmap != null) {
+                that.container.removeChild(that.disconnectedBitmap);
+            }
+
+            that.disconnectedBitmap = bitmap;
+            that.container.addChild(that.disconnectedBitmap);
+            that.disconnectedBitmap.x = 0;
+            that.disconnectedBitmap.y = 0;
+            that.disconnectedBitmap.name = 'bmp_disconnect_' + thisBlock;
+            if (!that.blocks.logo.runningLilypond) {
+                that.disconnectedBitmap.cursor = 'pointer';
+            }
+            // Hide disconnected bitmap to start.
+            that.disconnectedBitmap.visible = false;
+
+            if (that.protoblock.disabled) {
+                var artwork = that.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', safeSVG(block_label));
+            } else {
+                var artwork = that.artwork.replace(/fill_color/g, platformColor.paletteColors[that.protoblock.palette.name][3]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
+            }
+
+            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+            }
+
+            _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
+        };
+
         // Create the bitmap for the block.
         var __processBitmap = function (bitmap, that) {
             if (that.bitmap != null) {
@@ -641,7 +755,7 @@ function Block(protoblock, blocks, overrideName) {
             if (that.protoblock.disabled) {
                 var artwork = that.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', safeSVG(block_label));
             } else {
-                var artwork = that.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
+                var artwork = that.artwork.replace(/fill_color/g, platformColor.disconnected).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
             }
 
             for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
@@ -649,7 +763,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
-            _blockMakeBitmap(artwork, __processHighlightBitmap, that);
+            _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
         if (this.overrideName) {
@@ -1037,9 +1151,31 @@ function Block(protoblock, blocks, overrideName) {
                     this.collapseText.visible = true;
                     this.expandButtonBitmap.visible = true;
                     this.collapseButtonBitmap.visible = false;
+                    if (this.disconnectedBitmap !== null) {
+                        this.disconnectedBitmap.visible = false;
+                    }
+
+                    if (this.disconnectedHighlightBitmap !== null) {
+                        this.disconnectedHighlightBitmap.visible = false;
+                    }
                 } else {
-                    this.bitmap.visible = true;
+                    // If the block is disconnected, use the disconnected bitmap.
+                    if (this.disconnectedBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+                        this.disconnectedBitmap.visible = true;
+                        this.bitmap.visible = false;
+                    } else {
+                        if (this.disconnectedBitmap !== null) {
+                            this.disconnectedBitmap.visible = false;
+                        }
+
+                        this.bitmap.visible = true;
+                    }
+
                     this.highlightBitmap.visible = false;
+                    if (this.disconnectedHighlightBitmap !== null) {
+                        this.disconnectedHighlightBitmap.visible = false;
+                    }
+
                     this.collapseBlockBitmap.visible = false;
                     this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseText.visible = false;
@@ -1047,8 +1183,22 @@ function Block(protoblock, blocks, overrideName) {
                     this.collapseButtonBitmap.visible = true;
                 }
             } else {
-                this.bitmap.visible = true;
+                // If the block is disconnected, use the disconnected bitmap.
+                if (this.disconnectedBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+                    this.disconnectedBitmap.visible = true;
+                    this.bitmap.visible = false;
+                } else {
+                    if (this.disconnectedBitmap !== null) {
+                        this.disconnectedBitmap.visible = false;
+                    }
+
+                    this.bitmap.visible = true;
+                }
+
                 this.highlightBitmap.visible = false;
+                if (this.disconnectedHighlightBitmap !== null) {
+                    this.disconnectedHighlightBitmap.visible = false;
+                }
             }
 
             this.updateCache();
@@ -1265,6 +1415,14 @@ function Block(protoblock, blocks, overrideName) {
 
         this.bitmap.visible = this.collapsed;
         this.highlightBitmap.visible = false;
+        if (this.disconnectedBitmap !== null) {
+            this.disconnectedBitmap.visible = false;
+        }
+
+        if (this.disconnectedHighlightBitmap !== null) {
+            this.disconnectedHighlightBitmap.visible = false;
+        }
+
         this.updateCache();
 
         if (this.name === 'action') {
@@ -2118,6 +2276,10 @@ function Block(protoblock, blocks, overrideName) {
 
         this.container.setChildIndex(this.bitmap, 0);
         this.container.setChildIndex(this.highlightBitmap, 0);
+        if (this.disconnectedBitmap !== null) {
+            this.container.setChildIndex(this.disconnectedBitmap, 0);
+        }
+
         this.updateCache();
     };
 
