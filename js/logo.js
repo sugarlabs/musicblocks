@@ -4258,12 +4258,12 @@ function Logo () {
         case 'playdrum':
             if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 'kick';
+                var arg = DEFAULTDRUM;
             } else {
                 var arg = args[0];
             }
 
-            var drumname = 'kick';
+            var drumname = DEFAULTDRUM;
             if (arg.slice(0, 4) === 'http') {
                 drumname = arg;
             } else {
@@ -4554,9 +4554,7 @@ function Logo () {
                 } else if (that.lastPitch[turtle].length < n) {
                     that.lastPitch[turtle].push(pitchNumber);
                 }
-            }
-           
-            else if (that.inPitchDrumMatrix) {
+            } else if (that.inPitchDrumMatrix) {
                 if (note.toLowerCase() !== 'rest') {
                     that.pitchDrumMatrix.addRowBlock(blk);
                     if (that.pitchBlocks.indexOf(blk) === -1) {
@@ -4745,7 +4743,7 @@ function Logo () {
                     that.musicKeyboard.octaves.push(nnote[1]);
                 }
             } else {
-                if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
+                if (true) { // that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
                     // Play a stand-alone pitch block as a quarter note.
                     that.clearNoteParams(turtle, blk, []);
                     if (that.currentCalculatedOctave[turtle] == undefined) {
@@ -4856,6 +4854,8 @@ function Logo () {
                 if (that.drumStyle[turtle].length > 0) {
                     that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
                 } else {
+                    // Load the synth for this drum
+                    that.synth.loadSynth(0, DEFAULTDRUM);
                     that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
                 }
 
@@ -5366,6 +5366,7 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
+            // Deprecated
         case 'darbuka':
         case 'clang':
         case 'bottle':
@@ -5405,7 +5406,7 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'setdrum':
-            var drumname = 'kick';
+            var drumname = DEFAULTDRUM;
             for (var drum in DRUMNAMES) {
                 if (DRUMNAMES[drum][0] === args[0]) {
                     drumname = DRUMNAMES[drum][1];
