@@ -325,7 +325,7 @@ function createHelpContent() {
         // Advanced blocks
         // Rhythm palette
         'rhythmic2dot': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'status.svg'],
-        'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'status.svg'],
+        'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'status.svg'],
         'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes.svg'],
         'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'status.svg'],
@@ -351,7 +351,7 @@ function createHelpContent() {
 	//.TRANS: 'ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa' are East Indian note names.
         'eastindiansolfege': [_('Pitch can be specified in terms of ni dha pa ma ga re sa.'), 'documentation', 'status.svg'],
         'accidentalname': [_('The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat.'), 'documentation', 'accidental.svg'],
-        'number2octave': [_('The Number to octave block will convert a pitch number to an octave.'), 'documentation', 'status.svg'],
+        'number2octave': [_('The Number to octave block will convert a pitch number to an octave.'), 'documentation', 'number2octave-block.svg'],
         'setpitchnumberoffset': [_('The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave.'), 'documentation', 'status.svg'],
         'consonantstepsizeup': [_('The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode.'), 'documentation', 'status.svg'],
         'consonantstepsizedown': [_('The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode.'), 'documentation', 'status.svg'],
@@ -361,7 +361,7 @@ function createHelpContent() {
         'semitoneinterval': [_('The Semi-tone interval block calculates a relative interval based on half steps.') + ' ' + _('In the figure, we add sol# to sol.'), 'documentation', 'semitoneinterval.svg'],
         'measureintervalscalar': [_('The Scalar interval block measures the distance between two notes in the current key and mode.'), 'documentation', 'status.svg'],
         'measureintervalsemitones': [_('The Scalar interval block measures the distance between two notes in semi-tones.'), 'documentation', 'status.svg'],
-        'doubly': [_('The Doubly block will double the size of an interval.'), 'documentation', 'status.svg'],
+        'doubly': [_('The Doubly block will double the size of an interval.'), 'documentation', 'doubly-block.svg'],
         // Tone palette
         'voicename': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('e.g., guitar, piano, violin, or cello.'), 'documentation', 'settimbre.svg'],
         'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', 'chorus.svg'],
