@@ -762,7 +762,6 @@ function Block(protoblock, blocks, overrideName) {
                 artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
-            that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
             _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
@@ -808,6 +807,9 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
+
+        that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
+
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
 
