@@ -4229,7 +4229,7 @@ function Blocks () {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
-                    this.logo.synth.loadSynth(0, 'kick');
+                    this.logo.synth.loadSynth(0, DEFAULTDRUM);
                 }
                 break;
             case 'action':
