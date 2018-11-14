@@ -1157,6 +1157,12 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
+        if (this.blocks.blockList[last(this.connections)].name === 'hidden') {
+            if (last(this.blocks.blockList[last(this.connections)].connections) === null) {
+                return true;
+            }
+        }
+
         return false;
     };
 
