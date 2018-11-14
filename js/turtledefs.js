@@ -219,6 +219,7 @@ function createHelpContent() {
         'pitch': [_('The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', 'note-value-block.svg'],
         'solfege': [_('Pitch can be specified in terms of do re mi fa sol la ti.'), 'documentation', 'note-value-block.svg'],
         'notename': [_('Pitch can be specified in terms of C D E F G A B.'), 'documentation', 'note-name-block.svg'],
+	'pitchnumber': [_('The Pitch Number block will play a pitch associated by its number, e.g, 1 for C, 7 for G'), 'documentation', 'pitch-number-block.svg'],
         'steppitch': [_('The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,') + ' ' + _('e.g., if the last note played was sol, Scalar Step 1 will play la.'), 'documentation', 'set-key-block.svg'],
         'hertz': [_('The Hertz block (in combination with a Number block) will play a sound at the specified frequency.'), 'documentation', 'hertz-block.svg'],
         'setscalartransposition': [_('The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.') + ' ' + _('In the example shown above, sol is shifted up to la.'), 'documentation', 'scalar-transpose-block.svg'],
@@ -256,8 +257,8 @@ function createHelpContent() {
         // Flow palette
         'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
         'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example, a simple drum machine, a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
-        'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example, if the mouse button is pressed, a snare drum will play.') + ' ' + _('Otherwise (else) a kick drum will play.'), 'documentation', 'conditional-block.svg'],
-        'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example, if the mouse button is pressed, a snare drum will play.') + ' ' + _('Otherwise (else) a kick drum will play.'), 'documentation', 'conditional-block.svg'],
+        'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example, if the mouse button is pressed, a snare drum will play.') + ' ' + _('Otherwise (else) a kick drum will play.'), 'documentation', 'if-conditional.svg'],
+        'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example, if the mouse button is pressed, a snare drum will play.') + ' ' + _('Otherwise (else) a kick drum will play.'), 'documentation', 'elif-conditional.svg'],
         'backward': [_('The Backward block runs code in reverse order (Musical retrograde).'), 'documentation', 'box-1-block.svg'],
         // Action palette
         'action': [_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', 'action-block.svg'],
@@ -301,6 +302,7 @@ function createHelpContent() {
         'pendown': [_('The Pen-down block lowers the pen so that it draws.'), 'documentation', 'mouse-button-block.svg'],
         'color': [_('The Color block returns the current pen color.'), 'documentation', 'set-color-block.svg'],
         'setcolor': [_('The Set-color block changes the pen color.'), 'documentation', 'set-color-block.svg'],
+        'setshade': [_('The Set-shade block changes the pen color from dark to light.'), 'documentation', 'set-shade-block.svg'],
         // Media palette
         'print': [_('The Print block displays text at the top of the screen.'), 'documentation', 'print-block.svg'],
         'text': [_('The Text block holds a text string.'), 'documentation', 'show-block.svg'],
@@ -318,7 +320,7 @@ function createHelpContent() {
         'mousebutton': [_('The Mouse-button block returns True if the mouse button is pressed.'), 'documentation', 'mouse-button-block.svg'],
         'mousex': [_('The Cursor X block returns the horizontal position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
         'mousey': [_('The Cursor Y block returns the vertical position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
-        'click': [_('The Click block returns True if a mouse has been clicked.'), 'documentation', 'click-block.svg'],
+        'myclick': [_('The Click block returns True if a mouse has been clicked.'), 'documentation', 'click-block.svg'],
         // Mice palette
         'setturtlename2': [_('The Set-name block is used to name a mouse.'), 'documentation', 'click-block.svg'],
         'turtlename': [_('The Mouse-name block returns the name of a mouse.'), 'documentation', 'click-block.svg'],
