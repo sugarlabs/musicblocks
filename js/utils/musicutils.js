@@ -208,6 +208,8 @@ const SELECTORSTRINGS = [
     _('whole tone'),
     //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
     _('minor pentatonic'),
+    //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
+    _('major pentatonic'),
     _('chinese'),
     _('egyptian'),
     //.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
@@ -367,7 +369,7 @@ const INTERVALVALUES = {
 // name block. The complete list of modes is available from the Mode
 // Widget.
 const MODE_PIE_MENUS = {
-    '5': ['minor pentatonic', ' ', 'chinese', ' ', 'egyptian', ' ', 'hirajoshi', 'in', 'minyo', ' ', 'fibonacci', ' '],
+    '5': ['minor pentatonic', 'major pentatonic', ' ', 'chinese', 'egyptian', ' ', 'hirajoshi', 'in', 'minyo', ' ', 'fibonacci', ' '],
     '6': ['minor blues', ' ', ' ', ' ', 'major blues', ' ', ' ', ' ', 'whole tone', ' ', ' ', ' '],
     '7': ['ionian', ' ', 'dorian', ' ', 'phrygian', 'lydian', ' ', 'mixolydian',  ' ', 'aeolian', ' ', 'locrian'],
     '7a': ['major', ' ', 'harmonic major', ' ', 'natural minor', ' ', 'harmonic minor', ' ', 'melodic minor', ' ', ' ', ' '],
@@ -425,6 +427,7 @@ const MUSICALMODES = {
     'whole tone': [2, 2, 2, 2, 2, 2],
 
      // 5 notes in an octave
+    'major pentatonic': [2, 2, 3, 2, 3],
     'minor pentatonic': [3, 2, 2, 3, 2],
     'chinese': [4, 2, 1, 4, 1],
     'egyptian': [2, 3, 2, 3, 2],

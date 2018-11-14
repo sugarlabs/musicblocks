@@ -5253,7 +5253,10 @@ msgstr ""
 #: js/musicutils.js:210
 #.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
 msgid "minor pentatonic"
-msgstr ""
+msgstr "pentatonic minor"
+
+msgid "major pentatonic"
+msgstr "pentatonic mayor"
 
 #: js/musicutils.js:211
 msgid "chinese"
