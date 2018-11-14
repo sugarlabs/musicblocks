@@ -1149,6 +1149,12 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
+        if (COLLAPSIBLES.indexOf(this.name) !== -1) {
+            if (INLINECOLLAPSIBLES.indexOf(this.name) === -1) {
+                return false;
+            }
+        }
+
         if (this.isArgBlock()) {
             return true;
         }
