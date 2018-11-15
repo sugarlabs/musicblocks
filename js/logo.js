@@ -4367,6 +4367,7 @@ function Logo () {
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
+            var useSolfegeName = false;
             if (that.blocks.blockList[blk].name === 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);
@@ -4497,6 +4498,10 @@ function Logo () {
                 } else {
                     var cents = 0;
                     var note = arg0;
+                    if (SOLFEGENAMES.indexOf(arg0) !== -1 || SOLFEGENAMES.indexOf(arg0) !== -1) {
+                        useSolfegeName = true;
+                    }
+
                     that.currentNote = note;
                     if (calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], that.currentNote) < 0) {
                         console.log('minimum allowable octave is 0');
@@ -4623,13 +4628,18 @@ function Logo () {
                         noteObj[0] = getSolfege(noteObj[0]);
                     }
 
-
                     // If we are in a setdrum clamp, override the pitch.
                     if (that.drumStyle[turtle].length > 0) {
                         that.pitchTimeMatrix.rowLabels.push(last(that.drumStyle[turtle]));
                         that.pitchTimeMatrix.rowArgs.push(-1);
                     } else {
-                        that.pitchTimeMatrix.rowLabels.push(noteObj[0]);
+                        // Was the pitch arg a note name or solfege name?
+                        if (useSolfegeName && noteObj[0] in SOLFEGECONVERSIONTABLE) {
+                            that.pitchTimeMatrix.rowLabels.push(SOLFEGECONVERSIONTABLE[noteObj[0]]);
+                        } else {
+                            that.pitchTimeMatrix.rowLabels.push(noteObj[0]);
+                        }
+
                         that.pitchTimeMatrix.rowArgs.push(noteObj[1]);
                     }
                 }
