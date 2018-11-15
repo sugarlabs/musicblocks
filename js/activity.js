@@ -1308,6 +1308,9 @@ define(MYDEFINES, function (compatibility) {
 
             languageBox = new LanguageBox();
             languageBox.setMessage(textMsg);
+            
+            // show help on startup
+            _showHelp();
 
             playbackOnLoad = function () {
                 /*
@@ -3016,10 +3019,7 @@ define(MYDEFINES, function (compatibility) {
             polarBitmap.y = (canvas.height / (2 * turtleBlocksScale)) - (450);
             update = true;
 
-            // Setup help now that we have calculated turtleBlocksScale.
-            if (storage.doneTour) {} else {
-                _showHelp();
-            }
+            
 
             // Hide palette icons on mobile
             if (mobileSize) {
