@@ -362,7 +362,7 @@ function PitchTimeMatrix () {
             var drumName = getDrumName(this.rowLabels[i]);
 
             if (drumName != null) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + _(drumName) + '" alt="' + _(drumName) + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
@@ -394,7 +394,7 @@ function PitchTimeMatrix () {
             cell.style.left = (BUTTONSIZE * this._cellScale) + 'px';
 
             if (drumName != null) {
-                cell.innerHTML = drumName;
+                cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
@@ -663,7 +663,7 @@ function PitchTimeMatrix () {
 
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                exportLabel.innerHTML = drumName;
+                exportLabel.innerHTML = _(drumName);
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 exportLabel.innerHTML = this.rowLabels[i];
@@ -1319,7 +1319,6 @@ function PitchTimeMatrix () {
 
             for (var i = 0; i < drumNotes.length; i++) {
                 this._logo.synth.trigger(0, 'C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i], null, null);
-
             }
 
             this.__playNote(0, 0, playButtonCell);
@@ -1557,7 +1556,6 @@ function PitchTimeMatrix () {
         if (obj.length === 1) {
             if (playNote) {
                 if (drumName != null) {
-
                     this._logo.synth.trigger(0, 'C2', noteValue, drumName, null, null);
                 } else if (this.rowLabels[j] === 'hertz') {
                     this._logo.synth.trigger(0, Number(note), noteValue, 'default', null, null);
