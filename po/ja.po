@@ -2606,11 +2606,11 @@ msgstr ""
 #: js/turtledefs.js:411
 #: js/turtledefs.js:412
 msgid "The Store in block will store a value in a box."
-msgstr ""
+msgstr "<h2>数の箱（値を入れる）</h2><br>指定した箱に、指定した数値を入れる。"
 
 #: js/turtledefs.js:413
 msgid "The Box block returns the value stored in a box."
-msgstr ""
+msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱の数値を使う。"
 
 #: js/turtledefs.js:415
 msgid "The Abs block returns the absolute value."
