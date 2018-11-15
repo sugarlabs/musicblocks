@@ -4370,12 +4370,12 @@ msgstr "～に１を足す"
 
 #: js/basicblocks.js:3705
 msgid "add"
-msgstr "加える"
+msgstr "足す"
 
 #: js/basicblocks.js:3705
 #: plugins/finance.rtp:28
 msgid "to"
-msgstr "～へ"
+msgstr "箱へ"
 
 #: js/basicblocks.js:3775
 msgid "box 2"
@@ -4654,7 +4654,7 @@ msgstr "ずっとくり返す"
 #: js/basicblocks.js:4596
 ## Scrath po (L268)
 msgid "repeat"
-msgstr "～回繰り返す"
+msgstr "～回くり返す"
 
 #: js/basicblocks.js:4610
 #: js/basicblocks.js:4620
