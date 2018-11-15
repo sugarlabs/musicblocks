@@ -1240,7 +1240,7 @@ msgstr "Lilypondではこのピックアップを対応できません："
 #.TRANS: a container into which to put something
 ## Maybe へんすう, which is "variable"
 msgid "box"
-msgstr "ボックス"
+msgstr "箱"
 
 #: js/palette.js:810
 #: js/basicblocks.js:4399
@@ -1284,14 +1284,14 @@ msgstr "音程名"
 #.TRANS: put something into a container for later reference
 ## ほうぞん means "to save"; put に before the word for "in"
 msgid "store in"
-msgstr "保存"
+msgstr "入れる"
 
 #: js/palette.js:868
 #: js/palette.js:869
 #: js/basicblocks.js:3746
 #: js/blocks.js:2402
 msgid "store in box"
-msgstr "ボックスに保存"
+msgstr "箱に入れる"
 
 #: js/palette.js:880
 #: js/blocks.js:1694
@@ -1409,11 +1409,11 @@ msgstr "音量"
 #: js/rubrics.js:478
 ## Could also be 流動 りゅうどう
 msgid "flow"
-msgstr "フロー"
+msgstr "実行手順"
 
 #: js/turtledefs.js:25
 msgid "boxes"
-msgstr "ボックス"
+msgstr "数の箱"
 
 #: js/turtledefs.js:25
 msgid "widgets"
@@ -1432,7 +1432,7 @@ msgstr "ペン"
 #: js/basicblocks.js:582
 #: js/rubrics.js:478
 msgid "number"
-msgstr "数字"
+msgstr "数値"
 
 #: js/turtledefs.js:25
 msgid "boolean"
@@ -2042,148 +2042,148 @@ msgstr ""
 
 #: js/turtledefs.js:257
 msgid "The Repeat block will repeat the contained blocks."
-msgstr "<em>～回繰り返す</em>ブロックで重なれているブロックを繰り返せます。"
+msgstr "<h2>実行ブロック（繰り返し）</h2><br>はさまれているブロックのプログラムを、入力した回数だけくり返す。"
 
 #: js/turtledefs.js:257
 msgid "In this example the note will be played 4 times."
-msgstr "例の画像で重なれている音符が４回鳴らします。"
+msgstr "<br><br>図の例では、「アクション」が４回実行される。"
 
 #: js/turtledefs.js:258
 msgid "The Forever block will repeat the contained blocks forever."
-msgstr "<em>ずっと</em>ブロックで重なれているブロックをずっと繰り返せます。"
+msgstr "<h2>実行ブロック（繰り返し）</h2><br>「ずっとくり返す」のブロックは、実行を停止しない限り、はさまれているブロックをくり返し実行する。"
 
 #: js/turtledefs.js:258
 msgid "In this example, a simple drum machine, a kick drum will play 1/4 notes forever."
-msgstr "例の画像に「ドラムループ」みたいにキックドラムが４分音符の音価でずっと鳴らします。"
+msgstr "<br><br>図の例は「アクション」の実行をくり返す。"
 
 #: js/turtledefs.js:259
 #: js/turtledefs.js:260
 msgid "Conditionals lets your program take different actions depending on the condition."
-msgstr "<em>条件式</em>のそれぞれのブロックで自分のプログラムをいろんな<em>条件式</em>によって再生するアクションが変わります。"
+msgstr "<h2>条件ブロック</h2><br>条件ブロックを使うと、条件によってちがうはたらきをするプログラムを作ることができる。"
 
 #: js/turtledefs.js:259
 #: js/turtledefs.js:260
 msgid "In this example, if the mouse button is pressed, a snare drum will play."
-msgstr "例の画像に<em>もし</em>ブロックでマウスクリックしたらスネアの音が鳴らします。"
+msgstr "<br><br>図の例では、もし、パソコンのマウスを長押ししていれば「スネアドラム」ブロックを演奏する。"
 
 #: js/turtledefs.js:259
 #: js/turtledefs.js:260
 msgid "Otherwise (else) a kick drum will play."
-msgstr ""
+msgstr "<br><br>図の例では、もし、パソコンのマウスを長押ししていれば「スネアドラム」ブロックを、長押ししていなければ（そうでなければ）キックドラム・ブロックを演奏する。"
 
 #: js/turtledefs.js:261
 msgid "The Backward block runs code in reverse order (Musical retrograde)."
-msgstr ""
+msgstr "<h2>実行ブロック（逆実行）</h2><br>はさまれているブロックを、通常とは逆の順序で、下から上に向かって実行する。"
 
 #: js/turtledefs.js:263
 msgid "The Action block is used to group together blocks so that they can be used more than once."
-msgstr ""
+msgstr "<h2>アクションブロック</h2><br>複数のブロックを１つのグループとしてまとめ、実行する。グループとなったプログラムは、１つの「アクション」として自由に名前をつけることができる。"
 
 #: js/turtledefs.js:263
 msgid "It is often used for storing a phrase of music that is repeated."
-msgstr ""
+msgstr "<br><br>何度も実行する音楽のフレーズなどにアクションを作っておくと便利。"
 
 #: js/turtledefs.js:264
 msgid "Each Start block is a separate voice."
-msgstr ""
+msgstr "<h2>スタートブロック</h2><br>実行ボタンが押されると、スタートブロックが実行される。プログラムには、少なくとも１つのスタートブロックが置かれていないと実行できない。"
 
 #: js/turtledefs.js:264
 msgid "All of the Start blocks run at the same time when the Play button is pressed."
-msgstr ""
+msgstr "<br><br>複数のスタートブロックがあるときは、実行ボタンが押されると、複数のスタートブロックが同時に実行される。<br><br>１つ１つのスタートブロックは別々の演奏者と考えることができる。"
 
 #: js/turtledefs.js:265
 msgid "The Listen block is used to listen for an event such as a mouse click."
-msgstr ""
+msgstr "<h2>イベントブロック（受け取り）</h2><br>特定のイベントに対して、その発生を受け取るたびに実行するアクションを１つ決めておくことができる。"
 
 #: js/turtledefs.js:265
 msgid "When the event happens, an action is taken."
-msgstr ""
+msgstr "<br><br>イベントの発生は、各スクリプトが【イベントのたびにアクション】で指定したアクションの引きがねとしてはたらく。"
 
 #: js/turtledefs.js:266
 msgid "The Dispatch block is used to trigger an event."
-msgstr ""
+msgstr "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのスクリプトに送る。"
 
 #: js/turtledefs.js:267
 #: js/turtledefs.js:403
 #: js/turtledefs.js:405
 msgid "The Do block is used to initiate an action."
-msgstr ""
+msgstr "<h2>アクションブロック（指定）</h2><br>指定したアクションブロックを実行する。"
 
 #: js/turtledefs.js:267
 msgid "In the example, it is used with the One of block to choose a random phase."
-msgstr ""
+msgstr "見本は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムに実行させる。"
 
 #: js/turtledefs.js:269
 msgid "The Store in Box 1 block is used to store a value in Box 1."
-msgstr ""
+msgstr "<h2>数の箱（値を入れる）</h2><br>箱１に指定した数値を入れる。"
 
 #: js/turtledefs.js:270
 msgid "The Box 1 block returns the value stored in Box 1."
-msgstr ""
+msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱１の数値を使う。"
 
 #: js/turtledefs.js:271
 msgid "The Store in Box 2 block is used to store a value in Box 2."
-msgstr ""
+msgstr "<h2>数の箱（値を入れる）</h2><br>箱２に指定した数値を入れる。"
 
 #: js/turtledefs.js:272
 msgid "The Box 2 block returns the value stored in Box 2."
-msgstr ""
+msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱２の数値を使う。"
 
 #: js/turtledefs.js:273
 msgid "The Add-to block is used to add to the value stored in a box."
-msgstr ""
+msgstr "<h2>数の箱（値を変える）</h2><br>指定した箱に、好きな数値を足す。"
 
 #: js/turtledefs.js:273
 msgid "It can also be used with other blocks, such as Color, Pen-size."
-msgstr ""
+msgstr "<br><br>マイナスの数値を使うと引き算になる。"
 
 #: js/turtledefs.js:273
 msgid "etc."
-msgstr ""
+msgstr "<br>"
 
 #: js/turtledefs.js:274
 msgid "The Add-1-to block adds one to the value stored in a box."
-msgstr ""
+msgstr "<h2>数の箱（値を変える）</h2><br>指定した箱に、１を足す。"
 
 #: js/turtledefs.js:276
 msgid "The Number block holds a number."
-msgstr ""
+msgstr "<h2>数値ブロック</h2><br>数値を表すブロック。"
 
 #: js/turtledefs.js:277
 msgid "The Random block returns a random number."
-msgstr ""
+msgstr "<h2>数値ブロック（ランダム）</h2><br>指定した最小値から最大値までの範囲で、ランダムな数値になる。<br><br>★ランダムとはサイコロの目のように、何が出るか分からない数値のこと。<br><br>ランダム（random）は日本語で「乱数」「でたらめな」という意味。ランダムを使うと、実行のたびに演奏順序が変わる曲などを作ることができる。"
 
 #: js/turtledefs.js:278
 msgid "The One-of block returns one of two choices."
-msgstr ""
+msgstr "<h2>特殊ブロック（ランダム）</h2><br>つないだ２つのブロックのうち、1つだけをランダムに選ぶ。「数値」「アクション名」など、さまざまなブロックをつなぐことができる。<br><br>★ランダムとはサイコロの目のように、何が出るか分からない数値のこと。<br><br>ランダム（random）は日本語で「乱数」「でたらめな」という意味。ランダムを使うと、実行のたびに演奏順序が変わる曲などを作ることができる。"
 
 #: js/turtledefs.js:279
 msgid "The Plus block is used to add."
-msgstr ""
+msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値を足し合わせた計算結果を表す数値ブロック。"
 
 #: js/turtledefs.js:280
 msgid "The Minus block is used to subtract."
-msgstr ""
+msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値の引き算した計算結果を表す数値ブロック。<br><br>上につないだ数値から、下につないだ数値を引く。"
 
 #: js/turtledefs.js:281
 msgid "The Multiply block is used to multiply."
-msgstr ""
+msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値を掛け合わせた計算結果を表す数値ブロック。"
 
 #: js/turtledefs.js:282
 msgid "The Divide block is used to divide."
-msgstr ""
+msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値の割り算した計算結果を表す数値ブロック。<br><br>上につないだ数値を、下につないだ数値で割る。"
 
 #: js/turtledefs.js:284
 msgid "The Greater-than block returns True if the top number is greater than the bottom number."
-msgstr ""
+msgstr "<h2>真偽ブロック（大なり）</h2><br>２つの数値をくらべて、数値の大小を判定する。「＞」は上の数値が下の数値よりも大きければ「真（しん）」、下の数値と同じか小さければ「偽（ぎ）」という結果になる。<br><br>★真偽（しんぎ）ブロックとは「もし～ならば」などの条件ブロックを動かすために必要なブロック。<br><br>「もし～ならば」は、正確に表現すると、「もし～という条件が正しいならば、次のブロックを実行する」という意味である。真偽ブロックは不等式などによる比較が「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
 #: js/turtledefs.js:285
 msgid "The Less-than block returns True if the top number is less than the bottom number."
-msgstr ""
+msgstr "<h2>真偽ブロック（小なり）</h2><br>２つの数値をくらべて、数値の大小を判定する。「＜」は上の数値が下の数値よりも小さければ「真（しん）」、下の数値と同じか大きければ「偽（ぎ）」という結果になる。</h2><br>★真偽（しんぎ）ブロックとは「もし～ならば」などの条件ブロックを動かすために必要なブロック。「もし～ならば」は、正確に表現すると、「もし～という条件が正しいならば、次のブロックを実行する」という意味である。真偽ブロックは不等式などによる比較が「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
 #: js/turtledefs.js:286
 msgid "The Equal block returns True if the two numbers are equal."
-msgstr ""
+msgstr "<h2>真偽ブロック（等しい）</h2><br>２つの数値をくらべて、同じ数値であるかどうか判定する。「＝」は、２つの数値が同じであれば「真（しん）」、同じでなければ「偽（ぎ）」という結果になる。<br><br>★真偽（しんぎ）ブロックとは「もし～ならば」などの条件ブロックを動かすために必要なブロック。<br><br>「もし～ならば」は、正確に表現すると、「もし～という条件が正しいならば、次のブロックを実行する」という意味である。真偽ブロックは不等式などによる比較が「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
 #: js/turtledefs.js:288
 msgid "The Forward block moves the mouse forward."
@@ -3080,7 +3080,7 @@ msgstr "音高の数字を初期化"
 #: js/basicblocks.js:5081
 #: js/blocks.js:2907
 msgid "name"
-msgstr "名前"
+msgstr "箱へ"
 
 #: js/basicblocks.js:206
 #: js/basicblocks.js:294
@@ -3453,7 +3453,7 @@ msgstr "３９２ヘルツ"
 #: plugins/bitcoin.rtp:27
 ## assuming "monetary value" ; many more values 価格、評価
 msgid "value"
-msgstr "値"
+msgstr "数値"
 
 #: js/basicblocks.js:1374
 msgid "define frequency"
@@ -3527,9 +3527,9 @@ msgstr "拍子"
 #: js/basicblocks.js:4542
 #: js/basicblocks.js:4553
 #.TRANS: take (do) some action
-## アクションis action and する is "to do"; taking liberties based on context
+## アクションis "action" and する is "to do"
 msgid "do"
-msgstr "～する"
+msgstr "アクション実行"
 
 #: js/basicblocks.js:1501
 msgid "on every note do"
@@ -4339,7 +4339,7 @@ msgstr "絶対値"
 #: js/basicblocks.js:3660
 ## Literally "this or that"
 msgid "one of"
-msgstr "どちらかを選ぶ"
+msgstr "どちらかランダム"
 
 #: js/basicblocks.js:3660
 ## need context
@@ -4353,7 +4353,7 @@ msgstr "それか"
 #: js/basicblocks.js:3674
 ## Scratch po (L247)
 msgid "random"
-msgstr "乱数"
+msgstr "ランダム"
 
 #: js/basicblocks.js:3674
 msgid "min"
@@ -4379,19 +4379,19 @@ msgstr "～へ"
 
 #: js/basicblocks.js:3775
 msgid "box 2"
-msgstr "ボックス２"
+msgstr "箱２の数値"
 
 #: js/basicblocks.js:3788
 msgid "store in box 2"
-msgstr "ボックス２に保存"
+msgstr "箱２に数値を入れる"
 
 #: js/basicblocks.js:3801
 msgid "box 1"
-msgstr "ボックス１に保存"
+msgstr "箱１の数値"
 
 #: js/basicblocks.js:3814
 msgid "store in box 1"
-msgstr "ボックス１に保存"
+msgstr "箱１に数値を入れる"
 
 #: js/basicblocks.js:3842
 #.TRANS: return value from a function
@@ -4417,9 +4417,8 @@ msgstr "計算する"
 
 #: js/basicblocks.js:3968
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
-## I need some context...
 msgid "on"
-msgstr "の時に"
+msgstr "のたびに"
 
 #: js/basicblocks.js:3969
 #: js/basicblocks.js:3973
@@ -4431,7 +4430,7 @@ msgstr "イベント"
 #: js/basicblocks.js:3985
 #.TRANS: dispatch an event to trigger a listener
 msgid "broadcast"
-msgstr "送る"
+msgstr "イベント発生"
 
 #: js/basicblocks.js:4052
 #.TRANS: load the heap contents from a URL
@@ -4588,7 +4587,7 @@ msgstr "複製ファクター"
 #: js/basicblocks.js:4455
 #.TRANS: play music backward
 msgid "backward"
-msgstr "逆再生"
+msgstr "逆向きに実行"
 
 #: js/basicblocks.js:4467
 #.TRANS: play each note more than once
@@ -4650,7 +4649,7 @@ msgstr "でなければ"
 
 #: js/basicblocks.js:4586
 msgid "forever"
-msgstr "ずっと"
+msgstr "ずっとくり返す"
 
 #: js/basicblocks.js:4596
 ## Scrath po (L268)
