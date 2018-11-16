@@ -3031,7 +3031,7 @@ msgstr "ピッチ すうちを しょきか"
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
-msgstr ""
+msgstr "なまえ"
 
 #: js/basicblocks.js:210
 #: js/basicblocks.js:212
@@ -3413,7 +3413,7 @@ msgstr "３９２ヘルツ"
 #: js/basicblocks.js:1375
 #.TRANS: value2 is note value of note (JAPANESE ONLY)
 msgid "value2"
-msgstr ""
+msgstr "ながさ"
 
 #: js/basicblocks.js:1377
 #: js/basicblocks.js:3755
@@ -3508,7 +3508,7 @@ msgstr "びょうし"
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 msgid "do1"
-msgstr ""
+msgstr "する"
 
 #: js/basicblocks.js:1520
 #: js/basicblocks.js:3889
@@ -4387,14 +4387,14 @@ msgstr "～へ"
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 msgid "value1"
-msgstr ""
+msgstr "すうち"
 
 #: js/basicblocks.js:3813
 #: js/basicblocks.js:5188
 #.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
 #.TRANS: name1 is name as in name of mouse (JAPANESE ONLY)
 msgid "name1"
-msgstr ""
+msgstr "はこへ"
 
 #: js/basicblocks.js:3831
 msgid "box 2"
@@ -4659,7 +4659,7 @@ msgstr "までに"
 #.TRANS: do2 is do something until some condition is met (JAPANESE ONLY)
 #.TRANS: do2 is do something while some condition is true (JAPANESE ONLY)
 msgid "do2"
-msgstr ""
+msgstr "する"
 
 #: js/basicblocks.js:4652
 #: js/basicblocks.js:4656
