@@ -891,9 +891,6 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-
-       
-
         function doSwitchMode() {
             blocks.activeBlock = null;
             var mode = localStorage.beginnerMode;
@@ -1309,9 +1306,9 @@ define(MYDEFINES, function (compatibility) {
 
             languageBox = new LanguageBox();
             languageBox.setMessage(textMsg);
-            
+
             // show help on startup if first time uer
-            if(firstTimeUser) {
+            if (firstTimeUser) {
                 _showHelp();
             }
 
@@ -1666,13 +1663,13 @@ define(MYDEFINES, function (compatibility) {
 
             toolbar = new Toolbar();
             toolbar.init(beginnerMode);
-            
+
             toolbar.renderLogoIcon(_showAboutPage);
             toolbar.renderPlayIcon(_doFastButton);
             toolbar.renderStopIcon(doStopButton);
             toolbar.renderNewProjectIcon(_afterDelete);
             toolbar.renderLoadIcon(doLoad);
-            toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save),  save.saveBlockArtwork.bind(save));
+            toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveBlockArtwork.bind(save));
             toolbar.renderPlanetIcon(planet, _doOpenSamples);
             toolbar.renderMenuIcon(_showHideAuxMenu);
             toolbar.renderHelpIcon(_showHelp);
@@ -2513,7 +2510,7 @@ define(MYDEFINES, function (compatibility) {
                 if (searchResult) {
                     palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
                         blocks.moveBlock(newBlock, 100 + searchBlockPosition[0] - blocksContainer.x, searchBlockPosition[1] - blocksContainer.y);
-                        
+
                     });
 
                     // Move the position of the next newly created block.
@@ -2898,6 +2895,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _onResize(force) {
+            var $j = jQuery.noConflict();
             console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
             console.log('stored values: ' + this._clientWidth + ' ' + this._clientHeight);
 
@@ -3022,12 +3020,13 @@ define(MYDEFINES, function (compatibility) {
             polarBitmap.y = (canvas.height / (2 * turtleBlocksScale)) - (450);
             update = true;
 
-            
 
-            // Hide palette icons on mobile
-            if (mobileSize) {
-                palettes.setMobile(true);
-                palettes.hide();
+
+            // Hide tooltips on mobile
+            if (platform.mobile) {
+                // palettes.setMobile(true);
+                // palettes.hide();
+                toolbar.disableTooltips($j);
             } else {
                 palettes.setMobile(false);
                 palettes.bringToTop();
@@ -4404,7 +4403,7 @@ define(MYDEFINES, function (compatibility) {
                 scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
                 _loadButtonDragHandler(scrollOnContainer, x, y, setScroller, null, null, null, null);
                 onscreenMenu.push(scrollOnContainer);
-                
+
                 scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
                 _loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
                 onscreenMenu.push(scrollOffContainer);
@@ -5043,7 +5042,7 @@ define(MYDEFINES, function (compatibility) {
                 return;
             }
 
-            console.log('Showing context menu for ' +  blocks.blockList[activeBlock].name);
+            console.log('Showing context menu for ' + blocks.blockList[activeBlock].name);
 
             // Position the widget centered over the active block.
             docById('contextWheelDiv').style.position = 'absolute';
