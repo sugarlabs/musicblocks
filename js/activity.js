@@ -52,9 +52,10 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     beginnerMode = true;
-
+    firstTimeUser = false;
     try {
         if (localStorage.beginnerMode === undefined) {
+            firstTimeUser = true;
             console.log('FIRST TIME USER');
         } else if (localStorage.beginnerMode !== null) {
             beginnerMode = localStorage.beginnerMode;
@@ -1308,6 +1309,11 @@ define(MYDEFINES, function (compatibility) {
 
             languageBox = new LanguageBox();
             languageBox.setMessage(textMsg);
+            
+            // show help on startup if first time uer
+            if(firstTimeUser) {
+                _showHelp();
+            }
 
             playbackOnLoad = function () {
                 /*
@@ -3016,10 +3022,7 @@ define(MYDEFINES, function (compatibility) {
             polarBitmap.y = (canvas.height / (2 * turtleBlocksScale)) - (450);
             update = true;
 
-            // Setup help now that we have calculated turtleBlocksScale.
-            if (storage.doneTour) {} else {
-                _showHelp();
-            }
+            
 
             // Hide palette icons on mobile
             if (mobileSize) {
