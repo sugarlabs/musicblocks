@@ -394,7 +394,7 @@ function Toolbar() {
         _("Select language"),
     ];
 
-    this.init = function (mode, mobile) {
+    this.init = function (mode) {
         var beginnerMode = document.getElementById('beginnerMode');
         var advancedMode = document.getElementById('advancedMode');
         if (mode || mode === 'null') {
