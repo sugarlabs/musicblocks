@@ -29,7 +29,7 @@
      id="layer1">
     <path
        id="path564"
-       style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
        d="m 142.39504,195.58713 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 11.90625 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.19063 h -1.5875 v 3.96875 h 1.5875 v -1.19062 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -11.90625 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.5875 z" />
     <text
        y="192.21368"
@@ -55,7 +55,7 @@
     </text>
     <path
        id="path578"
-       style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#ff6648;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
        d="m 165.01691,192.41213 h 35.71875 v 7.9375 h -35.71875 v -3.175 -0.39688 h -2.38125 v 1.19063 h -0.79375 v -3.175 h 0.79375 v 1.19062 h 2.38125 v -0.39687 z" />
     <text
        y="192.21368"
@@ -70,7 +70,7 @@
     </text>
     <path
        d="m 142.39504,195.58713 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 11.90625 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.19063 h -1.5875 v 3.96875 h 1.5875 v -1.19062 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -11.90625 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.5875 z"
-       style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#ff6648;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
        id="path3775" />
     <text
        y="192.21368"
@@ -96,7 +96,7 @@
     </text>
     <path
        d="m 165.01691,192.41213 h 35.71875 v 7.9375 h -35.71875 v -3.175 -0.39688 h -2.38125 v 1.19063 h -0.79375 v -3.175 h 0.79375 v 1.19062 h 2.38125 v -0.39687 z"
-       style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#ff6648;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
        id="path3789" />
     <text
        y="192.21368"
