@@ -416,7 +416,7 @@ function PitchTimeMatrix () {
             } else {
                 if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                    var noteObj = getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false, null, this._logo.errorMsg, this._logo.synth.inTemperament);
+                    var noteObj = getNote(this.rowLabels[i], this.rowArgs[i], 0, this._logo.keySignature[0], false, null, this._logo.errorMsg, this._logo.synth.inTemperament);
                 } else {
                     cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
@@ -1309,7 +1309,6 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-
                 this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, 'default', null, null);
             }
 
@@ -1560,11 +1559,11 @@ function PitchTimeMatrix () {
                 } else if (this.rowLabels[j] === 'hertz') {
                     this._logo.synth.trigger(0, Number(note), noteValue, 'default', null, null);
                 } else if (graphicsBlock !== true) {
-		    if (typeof(note) === 'string') {
-			this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
-		    } else {
-			this._logo.synth.trigger(0, note, noteValue, 'default', null, null);
-		    }
+                    if (typeof(note) === 'string') {
+                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
+                    } else {
+                        this._logo.synth.trigger(0, note, noteValue, 'default', null, null);
+                    }
                 } else {
                     console.log('Cannot parse note object: ' + obj);
                 }
