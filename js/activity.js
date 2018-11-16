@@ -52,9 +52,10 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     beginnerMode = true;
-
+    firstTimeUser = false;
     try {
         if (localStorage.beginnerMode === undefined) {
+            firstTimeUser = true;
             console.log('FIRST TIME USER');
         } else if (localStorage.beginnerMode !== null) {
             beginnerMode = localStorage.beginnerMode;
@@ -1309,8 +1310,10 @@ define(MYDEFINES, function (compatibility) {
             languageBox = new LanguageBox();
             languageBox.setMessage(textMsg);
             
-            // show help on startup
-            _showHelp();
+            // show help on startup if first time uer
+            if(firstTimeUser) {
+                _showHelp();
+            }
 
             playbackOnLoad = function () {
                 /*
