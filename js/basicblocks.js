@@ -55,6 +55,7 @@ var NAMEDICT = {
 
 function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.palettes = palettes;
+    var language = localStorage.languagePreference;
 
     // PITCH PALETTE
 
@@ -203,7 +204,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['setpitchnumberoffset'] = newblock;
     //.TRANS: set an offset associated with the numeric piano keyboard mapping
     newblock.staticLabels.push(_('set pitch number offset'));
-    newblock.staticLabels.push(_('name'), _('octave'));
+    if (language === 'ja') {
+	//.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
+	newblock.staticLabels.push(_('name2'));
+	newblock.staticLabels.push(_('octave'));
+    } else {
+	newblock.staticLabels.push(_('name'), _('octave'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push('C');
@@ -280,9 +287,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['customNote'] = newblock;
     newblock.valueBlock();
-    if (beginnerMode && !beginnerBlock('customNote')) {
-        newblock.hidden = true;
-    }
+    newblock.hidden = true;
 
     // Transposition blocks
     // macro
@@ -291,7 +296,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['invert1'] = newblock;
     //.TRANS: pitch inversion rotates a pitch around another pitch
     newblock.staticLabels.push(_('invert'));
-    newblock.staticLabels.push(_('name'), _('octave'));
+    if (language === 'ja') {
+	//.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
+	newblock.staticLabels.push(_('name2'));
+	newblock.staticLabels.push(_('octave'));
+    } else {
+	newblock.staticLabels.push(_('name'), _('octave'));
+    }
     //.TRANS: invert based on even or odd number or musical scale
     newblock.staticLabels.push(_('even') + '/' + _('odd') + '/' + _('scalar'));
     newblock.extraWidth = 10;
@@ -550,7 +561,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('hertz'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
-    var language = localStorage.languagePreference;
     if (language === 'ja') {
         newblock.defaults.push(440);
     } else {
@@ -610,7 +620,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('pitch') + ' ' + 'G4');
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
-    var language = localStorage.languagePreference;
     if (language === 'ja' && beginnerMode && !beginnerBlock('pitch2')) {
         newblock.hidden = true;
     }
@@ -620,7 +629,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['pitch'] = newblock;
     //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
     newblock.staticLabels.push(_('pitch'));
-    newblock.staticLabels.push(_('name'), _('octave'));
+    if (language === 'ja') {
+	//.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
+	newblock.staticLabels.push(_('name2'));
+	newblock.staticLabels.push(_('octave'));
+    } else {
+	newblock.staticLabels.push(_('name'), _('octave'));
+    }
     newblock.adjustWidthToLabel();
     newblock.defaults.push('sol');
     newblock.defaults.push(4);
@@ -794,8 +809,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-
-    var language = localStorage.languagePreference;
     if (language === 'ja') {
         // macro
         var newblock = new ProtoBlock('musickeyboardja');
@@ -1357,7 +1370,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newnote'] = newblock;
     newblock.staticLabels.push(_('note'));
-    newblock.staticLabels.push(_('value'));
+    if (language === 'ja') {
+	//.TRANS: value2 is note value of note (JAPANESE ONLY)
+	newblock.staticLabels.push(_('value2'));
+    } else {
+	newblock.staticLabels.push(_('value'));
+    }
     newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
@@ -1493,8 +1511,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('onbeatdo');
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['onbeatdo'] = newblock;
-    // #TRANS: 'on' musical 'beat' 'do' some action
-    newblock.staticLabels.push(_('on strong beat'), _('beat'), _('do'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('on strong beat'), _('beat'));
+	//.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+	newblock.staticLabels.push(_('do1'));
+    } else {
+	// #TRANS: 'on' musical 'beat' 'do' some action
+	newblock.staticLabels.push(_('on strong beat'), _('beat'), _('do'));
+    }
     newblock.twoArgBlock();
     newblock.defaults.push(1);
     newblock.defaults.push(_('action'));
@@ -3110,7 +3134,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(0);
-    var language = localStorage.languagePreference;
     if (language === 'ja' && beginnerMode && !beginnerBlock('setheading')) {
         newblock.hidden = true;
     }
@@ -3724,7 +3747,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('increment');
     newblock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['increment'] = newblock;
-    newblock.staticLabels.push(_('add'), _('to'), _('value'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('add'), _('to'));
+	//.TRANS: value1 is a numeric value (JAPANESE ONLY)
+	newblock.staticLabels.push(_('value1'));
+    } else {
+	newblock.staticLabels.push(_('add'), _('to'), _('value'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.dockTypes[1] = 'anyin';
@@ -3779,7 +3808,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['storein'] = newblock;
     //.TRANS: put something into a container for later reference
     newblock.staticLabels.push(_('store in'));
-    newblock.staticLabels.push(_('name'), _('value'));
+    if (language === 'ja') {
+	//.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
+	newblock.staticLabels.push(_('name1'), _('value1'));
+    } else {
+	newblock.staticLabels.push(_('name'), _('value'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(_('box'));
@@ -3847,7 +3881,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('do');
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['do'] = newblock;
-    newblock.staticLabels.push(_('do'));
+    if (language === 'ja') {
+	//.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+	newblock.staticLabels.push(_('do1'));
+    } else {
+	//.TRANS: do (take) an action
+	newblock.staticLabels.push(_('do'));
+    }
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     //.TRANS: a stack of blocks to run (an action to take)
@@ -3912,8 +3952,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('nameddoArg');
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['nameddoArg'] = newblock;
-    //.TRANS: take (do) some action
-    newblock.staticLabels.push(_('do'));
+    if (language === 'ja') {
+	//.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+	newblock.staticLabels.push(_('do1'));
+    } else {
+	//.TRANS: take (do) some action
+	newblock.staticLabels.push(_('do'));
+    }
     newblock.adjustWidthToLabel();
     newblock.argClampBlock();
     newblock.dockTypes[1] = 'anyin';
@@ -3936,7 +3981,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('doArg');
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['doArg'] = newblock;
-    newblock.staticLabels.push(_('do'));
+    if (language === 'ja') {
+	//.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+	newblock.staticLabels.push(_('do1'));
+    } else {
+	newblock.staticLabels.push(_('do'));
+    }
     newblock.adjustWidthToLabel();
     newblock.argClampOneArgBlock();
     newblock.defaults.push(_('action'));
@@ -3988,7 +4038,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['listen'] = newblock;
     //.TRANS: an event, such as user actions (mouse clicks, key presses)
     newblock.staticLabels.push(_('on'));
-    newblock.staticLabels.push(_('event'), _('do'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('event'));
+	//.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+	newblock.staticLabels.push(_('do1'));
+    } else {
+	newblock.staticLabels.push(_('event'), _('do'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     //.TRANS: a condition that is broadcast in order to trigger a listener to take an action
@@ -4196,7 +4252,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['heap'];
     blocks.protoBlockDict['setHeapEntry'] = newblock;
     //.TRANS: set a value in the heap
-    newblock.staticLabels.push(_('set heap'), _('index'), _('value'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('set heap'), _('index'))
+	//.TRANS: value1 is a numeric value (JAPANESE ONLY)
+	newblock.staticLabels.push(_('value1'));
+    } else {
+	newblock.staticLabels.push(_('set heap'), _('index'), _('value'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.dockTypes[1] = 'numberin';
@@ -4385,7 +4447,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tofrequency'] = newblock;
     //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
-    newblock.staticLabels.push(_('note to frequency'), _('name'), _('octave'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('note to frequency'));
+	//.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
+	newblock.staticLabels.push(_('name2'));
+	newblock.staticLabels.push(_('octave'));
+    } else {
+	newblock.staticLabels.push(_('note to frequency'), _('name'), _('octave'));
+    }
     newblock.adjustWidthToLabel();
     newblock.defaults.push('G');
     newblock.defaults.push(4);
@@ -4562,7 +4631,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('until');
     newblock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['until'] = newblock;
-    newblock.staticLabels.push(_('until'), _('do'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('until'));
+	//.TRANS: do2 is do something until some condition is met (JAPANESE ONLY)
+	newblock.staticLabels.push(_('do2'));
+    } else {
+        newblock.staticLabels.push(_('until'), _('do'));
+    }
     newblock.extraWidth = 15;
     newblock.adjustWidthToLabel();
     newblock.flowClampBooleanArgBlock();
@@ -4573,7 +4648,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('while');
     newblock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['while'] = newblock;
-    newblock.staticLabels.push(_('while'), _('do'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('while'));
+	//.TRANS: do2 is do something while some condition is true (JAPANESE ONLY)
+	newblock.staticLabels.push(_('do2'));
+    } else {
+	newblock.staticLabels.push(_('while'), _('do'));
+    }
     newblock.extraWidth = 15;
     newblock.adjustWidthToLabel();
     newblock.flowClampBooleanArgBlock();
@@ -5101,7 +5182,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['setxyturtle'] = newblock;
     //.TRANS: set xy position for this mouse
-    newblock.staticLabels.push(_('set mouse'), _('name'), _('x'), _('y'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('set mouse'))
+	//.TRANS: name1 is name as in name of mouse (JAPANESE ONLY)
+	newblock.staticLabels.push(_('name1'));
+	newblock.staticLabels.push(_('x'), _('y'));
+    } else {
+	newblock.staticLabels.push(_('set mouse'), _('name'), _('x'), _('y'));
+    }
     newblock.threeArgBlock();
     newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'anyin';
