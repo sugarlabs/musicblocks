@@ -14,6 +14,7 @@ function Toolbar() {
     var $j = jQuery.noConflict();
     var stopIconColorWhenPlaying = '#ea174c';
     var language = localStorage.languagePreference;
+    var tooltipsDisabled = false;
 
     this.renderLogoIcon = function (onclick) {
         var logoIcon = document.getElementById('mb-logo');
@@ -242,69 +243,69 @@ function Toolbar() {
 
     this.renderLanguageSelectIcon = function (languageBox) {
         var languageSelectIcon = document.getElementById('languageSelectIcon');
-        languageSelectIcon.onclick=function() {
+        languageSelectIcon.onclick = function () {
             var enUS = document.getElementById('enUS');
-            enUS.onclick = function() {
+            enUS.onclick = function () {
                 languageBox.enUS_onclick();
             };
 
             var enUK = document.getElementById('enUK');
-            enUK.onclick = function() {
+            enUK.onclick = function () {
                 languageBox.enUK_onclick();
             };
 
             var es = document.getElementById('es');
-            es.onclick = function() {
+            es.onclick = function () {
                 languageBox.es_onclick();
             };
 
             var ja = document.getElementById('ja');
-            ja.onclick = function() {
+            ja.onclick = function () {
                 languageBox.ja_onclick();
             };
 
             var kana = document.getElementById('kana');
-            kana.onclick = function() {
+            kana.onclick = function () {
                 languageBox.kana_onclick();
             };
 
             var zhCN = document.getElementById('zhCN');
-            zhCN.onclick = function() {
+            zhCN.onclick = function () {
                 languageBox.zhCN_onclick();
             };
 
             var th = document.getElementById('th');
-            th.onclick = function() {
+            th.onclick = function () {
                 languageBox.th_onclick();
             };
 
             var ayc = document.getElementById('ayc');
-            ayc.onclick = function() {
+            ayc.onclick = function () {
                 languageBox.ayc_onclick();
             };
 
             var gug = document.getElementById('gug');
-            gug.onclick = function() {
+            gug.onclick = function () {
                 languageBox.gug_onclick();
             };
 
             var hi = document.getElementById('hi');
-            hi.onclick = function() {
+            hi.onclick = function () {
                 languageBox.hi_onclick();
             };
 
             var ibo = document.getElementById('ibo');
-            ibo.onclick = function() {
+            ibo.onclick = function () {
                 languageBox.ibo_onclick();
             };
 
             var ar = document.getElementById('ar');
-            ar.onclick = function() {
+            ar.onclick = function () {
                 languageBox.ar_onclick();
             };
 
             var he = document.getElementById('he');
-            he.onclick = function() {
+            he.onclick = function () {
                 languageBox.he_onclick();
             };
         }
@@ -391,12 +392,12 @@ function Toolbar() {
         _("Save block artwork"),
         _("Confirm"),
         _("Select language"),
-        ];
+    ];
 
     this.init = function (mode) {
         var beginnerMode = document.getElementById('beginnerMode');
         var advancedMode = document.getElementById('advancedMode');
-         if (mode || mode === 'null') {
+        if (mode || mode === 'null') {
             advancedMode.style.display = "block";
             beginnerMode.style.display = "none";
         } else {
@@ -415,10 +416,12 @@ function Toolbar() {
             }
         }
 
-        $j('.tooltipped').tooltip({
-            html: true,
-            delay: 100
-        });
+        if (!tooltipsDisabled) {
+            $j('.tooltipped').tooltip({
+                html: true,
+                delay: 100
+            });
+        }
 
         $j('.materialize-iso, .dropdown-trigger').dropdown({
             constrainWidth: false,
@@ -426,4 +429,9 @@ function Toolbar() {
             belowOrigin: true, // Displays dropdown below the button
         });
     };
+
+    this.disableTooltips = function (jquery) {
+        jquery(".tooltipped").tooltip('remove');
+        tooltipsDisabled = true;
+    }
 };
