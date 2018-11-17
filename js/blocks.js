@@ -3130,9 +3130,7 @@ function Blocks () {
         } else {
             // If we find a clamp block, add it to the list.
             var cblk = this.blockList[blk].connections[0];
-            console.log(this.blockList[cblk].name);
             if (this.blockList[cblk].isClampBlock()) {
-                console.log('is a clamp block');
                 if (this.blockList[cblk].isDoubleClampBlock()) {
                     // Just check them both.
                     clampList.push([cblk, 0]);
