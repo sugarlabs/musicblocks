@@ -71,6 +71,21 @@ var VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
+	//.TRANS: square wave
+	[_('bagpipes'), 'bagpipes', 'images/synth.svg', 'string'],
+	//.TRANS: square wave
+	[_('beep'), 'beep', 'images/synth.svg', 'string'],
+	//.TRANS: square wave
+	[_('bird'), 'bird', 'images/synth.svg', 'string'],
+	//.TRANS: square wave
+	[_('broken_glass'), 'broken_glass', 'images/synth.svg', 'string'],
+	//.TRANS: square wave
+	[_('clock'), 'clock', 'images/synth.svg', 'string'],
+	//.TRANS: square wave
+	[_('police'), 'police', 'images/synth.svg', 'string'],
+	//.TRANS: square wave
+	[_('water_splash'), 'water_splash', 'images/synth.svg', 'string'],
+	
 ];
 
 // drum symbols are from
@@ -140,8 +155,10 @@ var SOUNDSAMPLESDEFINES = [
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
+	"samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
+    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar",
+	"samples/bagpipes", "samples/beep", "samples/bird", "samples/broken_glass",
+	"samples/clock", "samples/police", "samples/water_splash"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -162,6 +179,13 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electricguitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+	'bagpipes': ['A#2', 25], //pitchToNumber('A#',2,'C Major')],
+	'beep': ['F10', ], //pitchToNumber('F', 10, 'C Major')],
+	'bird': ['E7', 79], //pitchToNumber('E', 7, 'C Major')],
+	'broken_glass': ['D3', 29], //pitchToNumber('D', 3, 'C Major')],
+	'clock': ['B6', 74], //pitchToNumber('B', 6, 'C Major')],
+	'police': ['C5', 51], //pitchToNumber('C', 5, 'C Major')],
+	'water_splash': ['D5', 53], //pitchToNumber('D', 5, 'C Major')],
 };
 
 
@@ -435,12 +459,19 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
-		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+				{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
-		{'name': 'banjo', 'data': BANJO_SAMPLE},
-		{'name': 'koto', 'data': KOTO_SAMPLE},
-		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electricguitar', 'data': ELECTRICGUITAR_SAMPLE}
+				{'name': 'banjo', 'data': BANJO_SAMPLE},
+				{'name': 'koto', 'data': KOTO_SAMPLE},
+				{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+				{'name': 'electricguitar', 'data': ELECTRICGUITAR_SAMPLE},
+				{'name': 'bagpipes', 'data': BAGPIPES_SAMPLE},
+				{'name': 'beep', 'data': BEEP_SAMPLE},
+				{'name': 'bird', 'data': BIRD_SAMPLE},
+				{'name': 'broken_glass', 'data': BROKEN_GLASS_SAMPLE},
+				{'name': 'clock', 'data': CLOCK_SAMPLE},
+				{'name': 'police', 'data': POLCIE_SAMPLE},
+				{'name': 'water_splash', 'data': WATER_SPLASH_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
