@@ -127,17 +127,17 @@ var DRUMNAMES = [
     //.TRANS: animal sound effect
     [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
     //.TRANS: sound effect
-    [_('beep'), 'beep', 'images/beep.svg', 'string'],
+    [_('beep'), 'beep', 'images/beep.svg', 'hh', 'string'],
     //.TRANS: animal sound effect
-    [_('bird'), 'bird', 'images/bird.svg', 'string'],
+    [_('bird'), 'bird', 'images/bird.svg', 'hh', 'string'],
     //.TRANS: sound effect
-    [_('broken_glass'), 'broken_glass', 'images/broken_glass.svg', 'string'],
+    [_('broken_glass'), 'broken_glass', 'images/broken_glass.svg', 'hh', 'string'],
     //.TRANS: sound effect
-    [_('clock'), 'clock', 'images/clock.svg', 'string'],
+    [_('clock'), 'clock', 'images/clock.svg', 'hh', 'string'],
     //.TRANS: sound effect
-    [_('police'), 'police', 'images/police.svg', 'string'],
+    [_('police'), 'police', 'images/police.svg', 'hh', 'string'],
     //.TRANS: sound effect
-    [_('water_splash'), 'water_splash', 'images/water_splash.svg', 'string'],
+    [_('water_splash'), 'water_splash', 'images/water_splash.svg', 'hh', 'string'],
 ];
 
 // Some "drums" are sound effects.
