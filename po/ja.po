@@ -3424,9 +3424,8 @@ msgstr "長さ"
 #: js/basicblocks.js:4260
 #: js/blocks.js:2907
 #: plugins/bitcoin.rtp:27
-## assuming "monetary value" ; many more values 価格、評価
 msgid "value"
-msgstr "値"
+msgstr "長さ"
 
 #: js/basicblocks.js:1392
 msgid "define frequency"

@@ -414,11 +414,15 @@ define(MYDEFINES, function (compatibility) {
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
-            if (auxToolbar.style.display === 'block') {
+            /*
+	    if (auxToolbar.style.display === 'block') {
                 toppos = 90 + toolbarHeight;
             } else {
                 toppos = 90;
             }
+            */
+
+            toppos = 90;
 
             palettes.updatePalettes();
             var x = Math.floor(leftpos * turtleBlocksScale);
