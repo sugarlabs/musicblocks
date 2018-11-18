@@ -1225,7 +1225,7 @@ define(MYDEFINES, function (compatibility) {
 
             // Put the boundary in the turtles container so it scrolls
             // with the blocks.
-            turtles = new Turtles(this);
+            turtles = new Turtles();
             turtles
                 .setCanvas(canvas)
                 .setClear(_allClear)
