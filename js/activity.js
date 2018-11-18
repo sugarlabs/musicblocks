@@ -15,14 +15,13 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
-const _THIS_IS_MUSIC_BLOCKS_ = true;
-const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+function Activity() {
+this._THIS_IS_MUSIC_BLOCKS_ = true;
+this._THIS_IS_TURTLE_BLOCKS_ = !this._THIS_IS_MUSIC_BLOCKS_;
+this._ERRORMSGTIMEOUT_ = 15000;
+this.LEADING = 0;
 
-const _ERRORMSGTIMEOUT_ = 15000;
-
-const LEADING = 0;
-
-if (_THIS_IS_TURTLE_BLOCKS_) {
+if (this._THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
             FB.init({
@@ -50,7 +49,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     } catch (e) {};
 }
 
-if (_THIS_IS_MUSIC_BLOCKS_) {
+if (this._THIS_IS_MUSIC_BLOCKS_) {
     beginnerMode = true;
     firstTimeUser = false;
     try {
@@ -145,7 +144,7 @@ var MYDEFINES = [
     'prefixfree.min'
 ];
 
-if (_THIS_IS_MUSIC_BLOCKS_) {
+if (this._THIS_IS_MUSIC_BLOCKS_) {
     var MUSICBLOCKS_EXTRAS = [
         'Tone.min',
         'widgets/modewidget',
@@ -163,7 +162,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     ];
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
-
+this.run = function() {
 define(MYDEFINES, function (compatibility) {
 
     // Manipulate the DOM only when it is ready.
@@ -405,7 +404,7 @@ define(MYDEFINES, function (compatibility) {
             doHardStopButton(true);
         };
 
-        function _findBlocks() {
+        this._findBlocks = function () {
             // _showHideAuxMenu(false);
             var leftpos = Math.floor(canvas.width / 4);
             var toppos;
@@ -414,7 +413,7 @@ define(MYDEFINES, function (compatibility) {
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
-            if (auxToolbar.style.display === 'block') {
+            if (document.getElementById('aux-toolbar').style.display === 'block') {
                 toppos = 90 + toolbarHeight;
             } else {
                 toppos = 90;
@@ -503,7 +502,7 @@ define(MYDEFINES, function (compatibility) {
             boundary.hide();
         };
 
-        function setHomeContainers(zero, one) {
+        this.setHomeContainers = function(zero, one) {
             if (homeButtonContainers[0] === null) {
                 return;
             }
@@ -512,7 +511,7 @@ define(MYDEFINES, function (compatibility) {
             homeButtonContainers[1].visible = one;
         };
 
-        function _printBlockSVG() {
+        this._printBlockSVG = function() {
             blocks.activeBlock = null;
             var startCounter = 0;
             var svg = '';
@@ -633,7 +632,7 @@ define(MYDEFINES, function (compatibility) {
             return '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + encodeURIComponent(svg);
         };
 
-        function _allClear() {
+        this._allClear = function() {
             blocks.activeBlock = null;
             hideDOMLabel();
 
@@ -688,7 +687,7 @@ define(MYDEFINES, function (compatibility) {
             var currentDelay = logo.turtleDelay;
             var playingWidget = false;
             logo.setTurtleDelay(0);
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
 
                 if (docById('ptmDiv').style.visibility === 'visible') {
@@ -770,11 +769,11 @@ define(MYDEFINES, function (compatibility) {
             });
 
             logo.setTurtleDelay(DEFAULTDELAY);
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
             }
 
-            if (_THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
+            if (this._THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
                 logo.pitchTimeMatrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
@@ -793,7 +792,7 @@ define(MYDEFINES, function (compatibility) {
             });
 
             var turtleCount = Object.keys(logo.stepQueue).length;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
             }
 
@@ -822,7 +821,7 @@ define(MYDEFINES, function (compatibility) {
             });
 
             logo.setNoteDelay(DEFAULTDELAY);
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
             }
 
@@ -845,7 +844,7 @@ define(MYDEFINES, function (compatibility) {
             });
 
             var turtleCount = Object.keys(logo.stepQueue).length;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 logo.synth.resume();
             }
 
@@ -873,14 +872,14 @@ define(MYDEFINES, function (compatibility) {
                 onblur = false;
             }
 
-            if (onblur && _THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
+            if (onblur && this._THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
                 console.log('Ignoring hard stop due to blur');
                 return;
             }
 
             logo.doStopTurtle();
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 logo._setMasterVolume(0);
 
                 if (docById('tempoDiv') != null && docById('tempoDiv').style.visibility === 'visible') {
@@ -972,7 +971,7 @@ define(MYDEFINES, function (compatibility) {
             // statsContainer.visible = false;
             // scrollOnContainer.visible = false;
             // scrollOffContainer.visible = false;
-            deltaY(-55 - LEADING);
+            deltaY(-55 - this.LEADING);
             _showHideAuxMenu(false);
 
             blocks.activeBlock = null;
@@ -1069,9 +1068,9 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function getPlaybackQueueStatus() {
-            return Object.keys(logo.playbackQueue).length > 0;
-        };
+        // function getPlaybackQueueStatus() {
+        //     return Object.keys(logo.playbackQueue).length > 0;
+        // };
 
         function setPlaybackStatus() {
             // if (playbackBox != null) {
@@ -1079,57 +1078,57 @@ define(MYDEFINES, function (compatibility) {
             // }
         };
 
-        function doPausePlayback() {
-            blocks.activeBlock = null;
-            logo.restartPlayback = false;
-            logo.playback(-1);
-            // playbackBox.playButton.visible = true;
-            // playbackBox.pauseButton.visible = false;
-        };
+        // function doPausePlayback() {
+        //     blocks.activeBlock = null;
+        //     logo.restartPlayback = false;
+        //     logo.playback(-1);
+        //     // playbackBox.playButton.visible = true;
+        //     // playbackBox.pauseButton.visible = false;
+        // };
 
-        function doPlayback() {
-            blocks.activeBlock = null;
-            progressBar.style.visibility = 'visible';
-            progressBar.style.left = (playbackBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
-            progressBar.style.top = (playbackBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
-            logo.playback(-1);
-            // playbackBox.playButton.visible = false;
-            // playbackBox.pauseButton.visible = true;
-            // playbackBox.norewindButton.visible = false;
-            // playbackBox.rewindButton.visible = true;
-        };
+        // function doPlayback() {
+        //     blocks.activeBlock = null;
+        //     progressBar.style.visibility = 'visible';
+        //     progressBar.style.left = (playbackBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
+        //     progressBar.style.top = (playbackBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
+        //     logo.playback(-1);
+        //     // playbackBox.playButton.visible = false;
+        //     // playbackBox.pauseButton.visible = true;
+        //     // playbackBox.norewindButton.visible = false;
+        //     // playbackBox.rewindButton.visible = true;
+        // };
 
-        function doRestartPlayback() {
-            blocks.activeBlock = null;
-            logo.doStopTurtle();
-            logo.restartPlayback = true;
+        // function doRestartPlayback() {
+        //     blocks.activeBlock = null;
+        //     logo.doStopTurtle();
+        //     logo.restartPlayback = true;
 
-            /*
-            setTimeout(function () {
-                // logo.playback(-1);
-                playbackBox.playButton.visible = true;
-                playbackBox.pauseButton.visible = false;
-                playbackBox.norewindButton.visible = true;
-                playbackBox.rewindButton.visible = false;
-            }, 500);
-            */
-        };
+        //     /*
+        //     setTimeout(function () {
+        //         // logo.playback(-1);
+        //         playbackBox.playButton.visible = true;
+        //         playbackBox.pauseButton.visible = false;
+        //         playbackBox.norewindButton.visible = true;
+        //         playbackBox.rewindButton.visible = false;
+        //     }, 500);
+        //     */
+        // };
 
-        // Deprecated
-        function doCompile() {
-            blocks.activeBlock = null;
-            logo.restartPlayback = true;
-            document.body.style.cursor = 'wait';
-            console.log('Compiling music for playback');
+        // // Deprecated
+        // function doCompile() {
+        //     blocks.activeBlock = null;
+        //     logo.restartPlayback = true;
+        //     document.body.style.cursor = 'wait';
+        //     console.log('Compiling music for playback');
 
-            // Suppress music and turtle output when generating
-            // compiled output.
-            logo.setTurtleDelay(0); // Compile at full speed.
-            logo.playbackQueue = {};
-            logo.playbackTime = 0;
-            logo.compiling = true;
-            logo.runLogoCommands();
-        };
+        //     // Suppress music and turtle output when generating
+        //     // compiled output.
+        //     logo.setTurtleDelay(0); // Compile at full speed.
+        //     logo.playbackQueue = {};
+        //     logo.playbackTime = 0;
+        //     logo.compiling = true;
+        //     logo.runLogoCommands();
+        // };
 
         var saveLocally;
 
@@ -1152,10 +1151,9 @@ define(MYDEFINES, function (compatibility) {
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
-        // Get things started
-        init();
-
-        function init() {
+       
+        this.init = function() {
+            console.log("running");
             console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
@@ -1227,7 +1225,7 @@ define(MYDEFINES, function (compatibility) {
 
             // Put the boundary in the turtles container so it scrolls
             // with the blocks.
-            turtles = new Turtles();
+            turtles = new Turtles(this);
             turtles
                 .setCanvas(canvas)
                 .setClear(_allClear)
@@ -1246,7 +1244,7 @@ define(MYDEFINES, function (compatibility) {
                 .setStage(blocksContainer)
                 .init();
 
-            blocks = new Blocks();
+            blocks = new Blocks(this);
             blocks
                 .setCanvas(canvas)
                 .setStage(blocksContainer)
@@ -1262,7 +1260,7 @@ define(MYDEFINES, function (compatibility) {
 
             turtles.setBlocks(blocks);
 
-            palettes = new Palettes();
+            palettes = new Palettes(this);
             palettes
                 .setCanvas(canvas)
                 .setStage(palettesContainer)
@@ -1275,7 +1273,7 @@ define(MYDEFINES, function (compatibility) {
 
             initPalettes(palettes);
 
-            logo = new Logo();
+            logo = new Logo(this);
             logo
                 .setCanvas(canvas)
                 .setBlocks(blocks)
@@ -1314,7 +1312,7 @@ define(MYDEFINES, function (compatibility) {
 
             playbackOnLoad = function () {
                 /*
-                if (_THIS_IS_TURTLE_BLOCKS_) {
+                if (this._THIS_IS_TURTLE_BLOCKS_) {
                     // Play playback queue if there is one.
                     for (turtle in logo.playbackQueue) {
                         if (logo.playbackQueue[turtle].length > 0) {
@@ -1328,6 +1326,8 @@ define(MYDEFINES, function (compatibility) {
                 */
             };
 
+            prepSearchWidget(searchWidget, blocks, doSearch);
+
             function PlanetInterface(storage) {
                 this.planet = null;
                 this.iframe = null;
@@ -1335,7 +1335,7 @@ define(MYDEFINES, function (compatibility) {
 
                 this.hideMusicBlocks = function () {
                     hideSearchWidget();
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (this._THIS_IS_MUSIC_BLOCKS_) {
                         storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
                         storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
                         storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
@@ -1434,7 +1434,7 @@ define(MYDEFINES, function (compatibility) {
                     docById('statusButtonsDiv').style.visibility = storage.getItem('isStatusHidden');
                     docById('statusTableDiv').style.visibility = storage.getItem('isStatusHidden');
 
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (this._THIS_IS_MUSIC_BLOCKS_) {
                         docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
                         docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
                         docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
@@ -1518,7 +1518,7 @@ define(MYDEFINES, function (compatibility) {
                     console.log('loadRawProject ' + data);
                     loading = true;
                     document.body.style.cursor = 'wait';
-                    _allClear();
+                    this._allClear();
 
                     // First, hide the palettes as they will need updating.
                     for (var name in blocks.palettes.dict) {
@@ -1627,7 +1627,7 @@ define(MYDEFINES, function (compatibility) {
                 this.init = function () {
                     this.iframe = document.getElementById('planet-iframe');
                     try {
-                        this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage, window._);
+                        this.iframe.contentWindow.makePlanet(this._THIS_IS_MUSIC_BLOCKS_, storage, window._);
                         this.planet = this.iframe.contentWindow.p;
                         this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
                         this.planet.setPlanetClose(this.closePlanet.bind(this));
@@ -1656,7 +1656,7 @@ define(MYDEFINES, function (compatibility) {
                 ['logo', logo],
                 ['turtles', turtles],
                 ['storage', storage],
-                ['printBlockSVG', _printBlockSVG],
+                ['printBlockSVG', this._printBlockSVG],
                 ['planet', planet]
             ]);
             save.init();
@@ -1762,7 +1762,7 @@ define(MYDEFINES, function (compatibility) {
                 ['_doSaveBlockArtwork', save.saveBlockArtwork.bind(save)]
             ]);
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 saveBox.setVariables([
                     ['_doSaveWAV', save.saveWAV.bind(save)],
                     ['_doSaveAbc', save.saveAbc.bind(save)],
@@ -1792,7 +1792,7 @@ define(MYDEFINES, function (compatibility) {
             */
 
             // FIXME: Third arg indicates beginner mode
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 initBasicProtoBlocks(palettes, blocks, beginnerMode);
             } else {
                 initBasicProtoBlocks(palettes, blocks);
@@ -2141,7 +2141,10 @@ define(MYDEFINES, function (compatibility) {
             this.document.onkeydown = __keyPressed;
             _hideStopButton();
         };
-
+        
+        // Get things started
+        this.init();
+        
         function hideGrids() {
             turtles.setGridLabel(_('Cartesian'));
             _hideCartesian();
@@ -2430,6 +2433,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         // Prepare the search widget
+        function prepSearchWidget(searchWidget, blocks, searchSuggestions, doSearch) {
         searchWidget.style.visibility = 'hidden';
         var searchBlockPosition = [100, 100];
 
@@ -2452,6 +2456,7 @@ define(MYDEFINES, function (compatibility) {
         searchWidget.onclick = function () {
             doSearch();
         };
+    }
 
         function hideSearchWidget() {
             // Hide the jQuery search results widget
@@ -2583,7 +2588,7 @@ define(MYDEFINES, function (compatibility) {
                 return;
             }
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 if (docById('BPMInput').classList.contains('hasKeyboard')) {
                     return;
                 }
@@ -2648,13 +2653,13 @@ define(MYDEFINES, function (compatibility) {
                 doSearch();
             }
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 var disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planet-iframe').style.display === '' || docById('paste').style.visibility === 'visible' || docById('wheelDiv').style.display === '' || logo.turtles.running();
             } else {
                 var disableKeys = searchWidget.style.visibility === 'visible' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
             }
 
-            var disableArrowKeys = _THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible');
+            var disableArrowKeys = this._THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible');
 
             if (event.altKey && !disableKeys) {
                 switch (event.keyCode) {
@@ -2665,7 +2670,7 @@ define(MYDEFINES, function (compatibility) {
                         blocks.prepareStackForCopy();
                         break;
                     case 69: // 'E'
-                        _allClear();
+                        this.allClear;
                         break;
                     case 80: // 'P'
                         // logo.playback(-1);
@@ -2695,37 +2700,37 @@ define(MYDEFINES, function (compatibility) {
             } else if (event.shiftKey && !disableKeys) {
                 switch (event.keyCode) {
                     case KEYCODE_D:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             __makeNewNote(5, 'do');
                         }
                         break;
                     case KEYCODE_R:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             __makeNewNote(5, 're');
                         }
                         break;
                     case KEYCODE_M:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             __makeNewNote(5, 'mi');
                         }
                         break;
                     case KEYCODE_F:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             __makeNewNote(5, 'fa');
                         }
                         break;
                     case KEYCODE_S:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             __makeNewNote(5, 'sol');
                         }
                         break;
                     case KEYCODE_L:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             __makeNewNote(5, 'la');
                         }
                         break;
                     case KEYCODE_T:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             __makeNewNote(5, 'ti');
                         }
                         break;
@@ -2809,7 +2814,7 @@ define(MYDEFINES, function (compatibility) {
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
                             } else {
-                                _findBlocks();
+                                this._findBlocks;
                             }
                             stage.update();
                             break;
@@ -2840,37 +2845,37 @@ define(MYDEFINES, function (compatibility) {
                             }
                             break;
                         case KEYCODE_D:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this._THIS_IS_MUSIC_BLOCKS_) {
                                 __makeNewNote(4, 'do');
                             }
                             break;
                         case KEYCODE_R:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this._THIS_IS_MUSIC_BLOCKS_) {
                                 __makeNewNote(4, 're');
                             }
                             break;
                         case KEYCODE_M:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this._THIS_IS_MUSIC_BLOCKS_) {
                                 __makeNewNote(4, 'mi');
                             }
                             break;
                         case KEYCODE_F:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this._THIS_IS_MUSIC_BLOCKS_) {
                                 __makeNewNote(4, 'fa');
                             }
                             break;
                         case KEYCODE_S:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this._THIS_IS_MUSIC_BLOCKS_) {
                                 __makeNewNote(4, 'sol');
                             }
                             break;
                         case KEYCODE_L:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this._THIS_IS_MUSIC_BLOCKS_) {
                                 __makeNewNote(4, 'la');
                             }
                             break;
                         case KEYCODE_T:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this._THIS_IS_MUSIC_BLOCKS_) {
                                 __makeNewNote(4, 'ti');
                             }
                             break;
@@ -3156,52 +3161,52 @@ define(MYDEFINES, function (compatibility) {
         function closeSubMenus() {
             if (confirmContainer.visible) {
                 confirmContainer.visible = false;
-                restoreContainer.y = 95.5 + LEADING;
+                restoreContainer.y = 95.5 + this.LEADING;
 
-                openMergeContainer.y = 95.5 + LEADING;
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    beginnerModeContainer.y = 95.5 + LEADING;
-                    advancedModeContainer.y = 95.5 + LEADING;
+                openMergeContainer.y = 95.5 + this.LEADING;
+                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    beginnerModeContainer.y = 95.5 + this.LEADING;
+                    advancedModeContainer.y = 95.5 + this.LEADING;
                 }
 
-                languageContainer.y = 95.5 + LEADING;
+                languageContainer.y = 95.5 + this.LEADING;
                 if (!beginnerMode) {
-                    pluginsContainer = 95.5 + LEADING;
-                    deletePluginContainer = 95.5 + LEADING;
-                    statsContainer = 95.5 + LEADING;
-                    scrollOnContainer = 95.5 + LEADING;
-                    scrollOffContainer = 95.5 + LEADING;
+                    pluginsContainer = 95.5 + this.LEADING;
+                    deletePluginContainer = 95.5 + this.LEADING;
+                    statsContainer = 95.5 + this.LEADING;
+                    scrollOnContainer = 95.5 + this.LEADING;
+                    scrollOffContainer = 95.5 + this.LEADING;
                 }
 
-                deltaY(-55 - LEADING);
+                deltaY(-55 - this.LEADING);
             } else if (uploadContainer.visible) {
                 saveHTMLContainer.visible = false;
                 uploadContainer.visible = false;
                 saveSVGContainer.visible = false;
                 savePNGContainer.visible = false;
                 saveArtworkContainer.visible = false;
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (this._THIS_IS_MUSIC_BLOCKS_) {
                     saveWAVContainer.visible = false;
                     saveLilypondContainer.visible = false;
                     saveABCContainer.visible = false;
                 }
 
-                openMergeContainer.y = 95.5 + LEADING;
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    beginnerModeContainer.y = 95.5 + LEADING;
-                    advancedModeContainer.y = 95.5 + LEADING;
+                openMergeContainer.y = 95.5 + this.LEADING;
+                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    beginnerModeContainer.y = 95.5 + this.LEADING;
+                    advancedModeContainer.y = 95.5 + this.LEADING;
                 }
 
-                languageContainer.y = 95.5 + LEADING;
-                restoreContainer.y = 95.5 + LEADING;
+                languageContainer.y = 95.5 + this.LEADING;
+                restoreContainer.y = 95.5 + this.LEADING;
                 if (!beginnerMode) {
-                    pluginsContainer = 95.5 + LEADING;
-                    deletePluginContainer = 95.5 + LEADING;
-                    statsContainer = 95.5 + LEADING;
-                    scrollOnContainer = 95.5 + LEADING;
-                    scrollOffContainer = 95.5 + LEADING;
+                    pluginsContainer = 95.5 + this.LEADING;
+                    deletePluginContainer = 95.5 + this.LEADING;
+                    statsContainer = 95.5 + this.LEADING;
+                    scrollOnContainer = 95.5 + this.LEADING;
+                    scrollOffContainer = 95.5 + this.LEADING;
                 }
-                deltaY(-55 - LEADING);
+                deltaY(-55 - this.LEADING);
             }
         };
 
@@ -3213,10 +3218,10 @@ define(MYDEFINES, function (compatibility) {
                 confirmContainer.visible = true;
                 confirmContainer.x = newContainer.x;
                 confirmContainer.y = 27.5;
-                deltaY(55 + LEADING);
+                deltaY(55 + this.LEADING);
             } else {
                 confirmContainer.visible = false;
-                deltaY(-55 - LEADING);
+                deltaY(-55 - this.LEADING);
             }
         };
 
@@ -3234,7 +3239,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             confirmContainer.visible = false;
-            deltaY(-55 - LEADING);
+            deltaY(-55 - this.LEADING);
             _showHideAuxMenu(true);
         };
 
@@ -3393,7 +3398,7 @@ define(MYDEFINES, function (compatibility) {
                     saveSVGContainer.visible = true;
                     savePNGContainer.visible = true;
                     saveArtworkContainer.visible = true;
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (this._THIS_IS_MUSIC_BLOCKS_) {
                         saveWAVContainer.visible = true;
                         saveLilypondContainer.visible = true;
                         saveABCContainer.visible = true;
@@ -3432,27 +3437,27 @@ define(MYDEFINES, function (compatibility) {
                     saveSVGContainer.y = 27.5;
                     savePNGContainer.y = 27.5;
                     saveArtworkContainer.y = 27.5;
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (this._THIS_IS_MUSIC_BLOCKS_) {
                         saveWAVContainer.y = 27.5;
                         saveLilypondContainer.y = 27.5;
                         saveABCContainer.y = 27.5;
                     }
 
-                    deltaY(55 + LEADING);
+                    deltaY(55 + this.LEADING);
                 } else {
                     saveHTMLContainer.visible = false;
                     uploadContainer.visible = false;
                     saveSVGContainer.visible = false;
                     savePNGContainer.visible = false;
                     saveArtworkContainer.visible = false;
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (this._THIS_IS_MUSIC_BLOCKS_) {
                         saveWAVContainer.visible = false;
                         saveLilypondContainer.visible = false;
                         saveABCContainer.visible = false;
                     }
 
                     // Move it down since we are about to move it up.
-                    deltaY(-55 - LEADING);
+                    deltaY(-55 - this.LEADING);
                     _showHideAuxMenu(true);
                 }
             }
@@ -3485,7 +3490,7 @@ define(MYDEFINES, function (compatibility) {
             document.querySelector('#myOpenFile').click();
             window.scroll(0, 0);
             doStopButton();
-            _allClear();
+            this._allClear;
         };
 
         window.prepareExport = prepareExport;
@@ -3805,7 +3810,7 @@ define(MYDEFINES, function (compatibility) {
             if (timeout != undefined) {
                 var myTimeout = timeout;
             } else {
-                var myTimeout = _ERRORMSGTIMEOUT_;
+                var myTimeout = this._ERRORMSGTIMEOUT_;
             }
 
             if (myTimeout > 0) {
@@ -4050,7 +4055,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             headerContainer = new createjs.Shape();
-            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 2 + 2 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING).f(platformColor.aux).r(0, -cellSize * 3 + 3 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING).f(platformColor.sub).r(0, -cellSize * 4 + 4 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING);
+            headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 2 + 2 * this.LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * this.LEADING).f(platformColor.aux).r(0, -cellSize * 3 + 3 * this.LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * this.LEADING).f(platformColor.sub).r(0, -cellSize * 4 + 4 * this.LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * this.LEADING);
 
             /*
             if (platformColor.doHeaderShadow) {
@@ -4105,7 +4110,7 @@ define(MYDEFINES, function (compatibility) {
 
             // Load the logo
             logoContainer = new createjs.Container();
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 var logoText = new createjs.Text(_('About Music Blocks'), '14px Sans', '#282828');
             } else {
                 var logoText = new createjs.Text(_('Turtle Blocks'), '14px Sans', '#282828');
@@ -4118,7 +4123,7 @@ define(MYDEFINES, function (compatibility) {
                 var bitmap = new createjs.Bitmap(img);
                 logoContainer.addChild(bitmap);
                 stage.addChild(logoContainer);
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (this._THIS_IS_MUSIC_BLOCKS_) {
                     bitmap.x = 0;
                 } else {
                     bitmap.x = 37.5;
@@ -4298,7 +4303,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             // Force center-aligned labels
-            var x = 95.5 + LEADING;
+            var x = 95.5 + this.LEADING;
             saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
             saveSVGContainer.visible = false;
             __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
@@ -4307,7 +4312,7 @@ define(MYDEFINES, function (compatibility) {
             savePNGContainer.visible = false;
             __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 saveWAVContainer = _makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
                 saveWAVContainer.visible = false;
                 __addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
@@ -4430,7 +4435,7 @@ define(MYDEFINES, function (compatibility) {
             restoreContainer.visible = false;
 
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 x += 1.5 * dx;
                 beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
                 _loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
@@ -4477,10 +4482,10 @@ define(MYDEFINES, function (compatibility) {
 
             homeButtonContainers = [];
             homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
-            _loadButtonDragHandler(homeButtonContainers[0], x, y, _findBlocks, null, null, null, null);
+            _loadButtonDragHandler(homeButtonContainers[0], x, y, this._findBlocks, null, null, null, null);
 
             homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
-            _loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
+            _loadButtonDragHandler(homeButtonContainers[1], x, y, this._findBlocks, null, null, null, null);
             homeButtonContainers[1].visible = false;
 
             homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
@@ -4580,7 +4585,7 @@ define(MYDEFINES, function (compatibility) {
                         onscreenMenu[button].visible = true;
                     }
 
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (this._THIS_IS_MUSIC_BLOCKS_) {
                         if (beginnerMode) {
                             advancedModeContainer.visible = false;
                         } else {
@@ -4610,7 +4615,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (buttonsVisible) {
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (this._THIS_IS_MUSIC_BLOCKS_) {
                     if (beginnerMode) {
                         advancedModeContainer.visible = false;
                     } else {
@@ -4938,7 +4943,7 @@ define(MYDEFINES, function (compatibility) {
         function _showHideAuxMenu(resize) {
             var cellsize = 55;
             if (!resize && toolbarHeight === 0) {
-                dy = cellsize + LEADING + 5;
+                dy = cellsize + this.LEADING + 5;
                 toolbarHeight = dy;
                 for (var i = 0; i < onscreenButtons.length; i++) {
                     onscreenButtons[i].y += dy;
@@ -4951,7 +4956,7 @@ define(MYDEFINES, function (compatibility) {
                     onscreenMenu[i].visible = true;
                 }
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (this._THIS_IS_MUSIC_BLOCKS_) {
                     if (beginnerMode) {
                         advancedModeContainer.visible = false;
                     } else {
@@ -5027,7 +5032,7 @@ define(MYDEFINES, function (compatibility) {
             saveSVGContainer.visible = false;
             savePNGContainer.visible = false;
             saveArtworkContainer.visible = false;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (this._THIS_IS_MUSIC_BLOCKS_) {
                 saveWAVContainer.visible = false;
                 saveLilypondContainer.visible = false;
                 saveABCContainer.visible = false;
@@ -5164,3 +5169,9 @@ define(MYDEFINES, function (compatibility) {
 
     };
 });
+};
+};
+
+
+activity = new Activity();
+activity.run();

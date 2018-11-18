@@ -26,7 +26,7 @@ const PITCHBLOCKS = ['pitch', 'steppitch', 'hertz', 'pitchnumber', 'scaledegree'
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
-function Blocks () {
+function Blocks (activity) {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
@@ -2128,7 +2128,7 @@ function Blocks () {
         // Deprecated
         // If we drag in a synth block, we need to load the synth.
         if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(name) !== -1) {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (activity._THIS_IS_MUSIC_BLOCKS_) {
                 this.logo.synth.loadSynth(0, name);
             }
         }
@@ -2696,7 +2696,7 @@ function Blocks () {
                 var c = this.blockList[blk].connections[0];
                 if (c != null && ['playdrum', 'setdrum', 'playnoise', 'setvoice'].indexOf(this.blockList[c].name) !== -1) {
                     if (this.blockList[blk].value.slice(0, 4) === 'http') {
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (activity._THIS_IS_MUSIC_BLOCKS_) {
                             this.logo.synth.loadSynth(0, this.blockList[blk].value);
                         }
                     }
@@ -4225,7 +4225,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (activity._THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
                     this.logo.synth.loadSynth(0, DEFAULTDRUM);
                 }
@@ -4457,7 +4457,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (activity._THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
@@ -4472,7 +4472,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (activity._THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
@@ -4487,7 +4487,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (activity._THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this voice
                     try {
                         this.logo.synth.loadSynth(0, getVoiceSynthName(value));
@@ -4507,7 +4507,7 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (activity._THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this noise
                     try {
                         this.logo.synth.loadSynth(0, getNoiseSynthName(value));

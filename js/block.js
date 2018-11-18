@@ -1561,7 +1561,7 @@ function Block(protoblock, blocks, overrideName) {
                     var c2 = this.blocks.blockList[c].connections[2];
                     if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                         v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             if (this.blocks.blockList[c2].value in NSYMBOLS) {
                                 v += NSYMBOLS[this.blocks.blockList[c2].value];
                             }
@@ -1599,7 +1599,7 @@ function Block(protoblock, blocks, overrideName) {
                 var c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                     v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (this._THIS_IS_MUSIC_BLOCKS_) {
                         if (this.blocks.blockList[c2].value in NSYMBOLS) {
                             v += NSYMBOLS[this.blocks.blockList[c2].value];
                         }
@@ -1918,7 +1918,7 @@ function Block(protoblock, blocks, overrideName) {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this._THIS_IS_MUSIC_BLOCKS_) {
                             that.blocks.logo.synth.resume();
                         }
 
@@ -5162,7 +5162,7 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             case 'setdrum':
             case 'playdrum':
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (this._THIS_IS_MUSIC_BLOCKS_) {
                     if (newValue.slice(0, 4) === 'http') {
                         this.blocks.logo.synth.loadSynth(0, newValue);
                     }
@@ -5176,7 +5176,7 @@ function Block(protoblock, blocks, overrideName) {
         // We are done changing the label, so unlock.
         this._labelLock = false;
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
+        if (this._THIS_IS_MUSIC_BLOCKS_) {
             // Load the synth for the selected drum.
             if (this.name === 'drumname') {
                 this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));

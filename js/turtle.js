@@ -21,7 +21,7 @@ const SCALEFACTOR = 4
 // Turtle sprite
 const TURTLEBASEPATH = 'images/';
 
-function Turtle (name, turtles, drum) {
+function Turtle (activity,name, turtles, drum) {
     this.name = name;
     this.turtles = turtles;
     this.drum = drum;
@@ -1411,7 +1411,7 @@ function Turtle (name, turtles, drum) {
 };
 
 
-function Turtles () {
+function Turtles (activity) {
     this.masterStage = null;
     this.doClear = null;
     this.hideMenu = null;
@@ -1572,13 +1572,13 @@ function Turtles () {
 
                 that._expandedBoundary = new createjs.Bitmap(img);
                 that._expandedBoundary.x = 0;
-                that._expandedBoundary.y = 55 + LEADING;
+                that._expandedBoundary.y = 55 + activity.LEADING;
                 that._borderContainer.addChild(that._expandedBoundary);
                 __makeBoundary2();
             };
 
             var dx = that.w - 5;
-            var dy = that.h - 55 - LEADING;
+            var dy = that.h - 55 - activity.LEADING;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10 / SCALEFACTOR).replace('X', 10 / SCALEFACTOR).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20 / SCALEFACTOR))));
         };
@@ -1596,7 +1596,7 @@ function Turtles () {
 
                 that._collapsedBoundary = new createjs.Bitmap(img);
                 that._collapsedBoundary.x = 0;
-                that._collapsedBoundary.y = 55 + LEADING;
+                that._collapsedBoundary.y = 55 + activity.LEADING;
                 that._borderContainer.addChild(that._collapsedBoundary);
                 that._collapsedBoundary.visible = false;
 
@@ -1604,7 +1604,7 @@ function Turtles () {
             };
 
             var dx = that.w - 20;
-            var dy = that.h - 55 - LEADING;
+            var dy = that.h - 55 - activity.LEADING;
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
         };
@@ -1637,7 +1637,7 @@ function Turtles () {
                 that._expandButton.addChild(that._expandLabel);
 
                 that._expandButton.x = that.w - 10 - 4 * 55;
-                that._expandButton.y = 70 + LEADING + 6;
+                that._expandButton.y = 70 + activity.LEADING + 6;
                 that._expandButton.scaleX = SCALEFACTOR;
                 that._expandButton.scaleY = SCALEFACTOR;
                 that._expandButton.scale = SCALEFACTOR;
@@ -1756,7 +1756,7 @@ function Turtles () {
 
                 that._collapseButton.visible = true;
                 that._collapseButton.x = that.w - 55;
-                that._collapseButton.y = 70 + LEADING + 6;
+                that._collapseButton.y = 70 + activity.LEADING + 6;
                 that.refreshCanvas();
 
                 that._collapseButton.removeAllEventListeners('click');
@@ -1827,7 +1827,7 @@ function Turtles () {
 
                 bitmap.visible = true;
                 that._clearButton.x = that.w - 5 - 2 * 55;
-                that._clearButton.y = 70 + LEADING + 6;
+                that._clearButton.y = 70 + activity.LEADING + 6;
                 that._clearButton.visible = true;
 
                 // that._borderContainer.addChild(that._clearButton);
@@ -1908,7 +1908,7 @@ function Turtles () {
 
                 bitmap.visible = true;
                 that._gridButton.x = that.w - 10 - 3 * 55;
-                that._gridButton.y = 70 + LEADING + 6;
+                that._gridButton.y = 70 + activity.LEADING + 6;
                 that._gridButton.visible = true;
 
                 // that._borderContainer.addChild(that._gridButton);
@@ -1982,7 +1982,7 @@ function Turtles () {
         this._expandedBoundary.visible = false;
         this._collapseButton.visible = false;
         this.stage.x = (this.w * 3 / 4) - 10;
-        this.stage.y = 55 + LEADING + 6;
+        this.stage.y = 55 + activity.LEADING + 6;
         this.isShrunk = true;
         for (var i = 0; i < this.turtleList.length; i++) {
             this.turtleList[i].container.scaleX = SCALEFACTOR;
