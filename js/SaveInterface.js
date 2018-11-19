@@ -90,7 +90,7 @@ function SaveInterface(PlanetInterface) {
             var name = _('My Project');
         }
 
-        var data = prepareExport();
+        var data = this.prepareExport();
         if (this.PlanetInterface !== undefined) {
             var image = this.PlanetInterface.getCurrentProjectImage();
         } else {
