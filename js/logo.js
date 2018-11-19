@@ -39,7 +39,7 @@ const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
 
-function Logo (activity) {
+function Logo () {
 
     this.canvas = null;
     this.blocks = null;
