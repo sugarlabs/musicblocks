@@ -218,7 +218,7 @@ function HelpWidget () {
     this._showPage = function(page) {
         var helpBody = docById('helpBodyDiv');
         var body = '';
-        body = body + '<p><img src="' + HELPCONTENT[page][2] + '"></p>';
+        body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
         body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
         body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
 
