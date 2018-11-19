@@ -1,88 +1,91 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Music Blocks is a collection of tools for exploring musical concepts.</title>
 
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
-    <link rel="stylesheet" href="css/activity.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/keyboard.css">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Music Blocks is a collection of tools for exploring musical concepts.</title>
 
-    <noscript>
-    Javascript is required to view this page.
-    </noscript>
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
+  <link rel="stylesheet" href="css/activity.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/keyboard.css">
 
-    <script src="js/utils/detectIE.js">
-    </script>
+  <noscript>
+  JavaScript is required to view this page.
+  </noscript>
 
-    <script src="sounds/samples/manifest.js">
-    </script>
+  <script src="js/utils/detectIE.js">
+  </script>
 
-    <!--
-    <script src="lib/mespeak.js">
-    </script>
-    -->
+  <!--
+  <script src="sounds/samples/manifest.js">
+  </script>
+  -->
 
-    <script src="lib/reqwest.js">
-    </script>
+  <!--
+  <script src="lib/mespeak.js">
+  </script>
+  -->
 
-    
-<script src="lib/jquery-2.1.4.js"></script>  
+  <script src="lib/reqwest.js">
+  </script>
 
-<script src="lib/jquery-ui.js"></script>
 
-<script src="lib/materialize.min.js">
+  <script src="lib/jquery-2.1.4.js"></script>
 
-</script>
+  <script src="lib/jquery-ui.js"></script>
 
-    <script src="lib/webL10n.js">
-    </script>
+  <script src="lib/materialize.min.js">
 
-    <script src="lib/Tone.min.js">
-    </script>
+  </script>
 
-    <script src="lib/jquery.ruler.js">
-    </script>
+  <script src="lib/webL10n.js">
+  </script>
 
-    <script src="lib/modernizr-2.6.2.min.js">
-    </script>
+  <script src="lib/Tone.min.js">
+  </script>
 
-    <script src="lib/recorder.js">
-    </script>
+  <script src="lib/jquery.ruler.js">
+  </script>
 
-    <script src="lib/raphael.min.js">
-    </script>
+  <script src="lib/modernizr-2.6.2.min.js">
+  </script>
 
-    <script src="lib/wheelnav.js">
-    </script>
-    
-    <link rel="prefetch" type="application/l10n" href="./localization.ini">
+  <script src="lib/recorder.js">
+  </script>
 
-    <script data-main="js/loader" src="lib/require.js">
-    </script>
+  <script src="lib/raphael.min.js">
+  </script>
 
-    <link rel="manifest" href="android_chrome_manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="favicon.ico">
-    <meta id="theme-color" name="theme-color" content="#2196F3">
+  <script src="lib/wheelnav.js">
+  </script>
 
-    <script src="lib/easeljs.min.js">
-    </script>
+  <link rel="prefetch" type="application/l10n" href="./localization.ini">
 
-    <script src="lib/tweenjs.min.js">
-    </script>
+  <script data-main="js/loader" src="lib/require.js">
+  </script>
 
-    <script src="js/widgets/musickeyboard.js">
-    </script>
+  <link rel="manifest" href="android_chrome_manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="192x192" href="favicon.ico">
+  <meta id="theme-color" name="theme-color" content="#2196F3">
 
-   <!--
+  <script src="lib/easeljs.min.js">
+  </script>
+
+  <script src="lib/tweenjs.min.js">
+  </script>
+
+  <script src="js/widgets/musickeyboard.js">
+  </script>
+
+  <!--
     <script src="lib/movieclip-0.7.1.min.js">
     </script>
     -->
 
-    <script>
-      var canvas, stage;
+  <script>
+    var canvas, stage;
       function init() {
         canvas = document.getElementById("canvas");
         stage = new createjs.Stage(canvas);
@@ -91,8 +94,8 @@
       };
     </script>
 
-    <script>
-      if ('serviceWorker' in navigator) {
+  <script>
+    if ('serviceWorker' in navigator) {
           window.addEventListener('load', function() {
               navigator.serviceWorker.register('sw.js').then(function(registration) {
                   // Registration was successful
@@ -105,16 +108,17 @@
       }
     </script>
 
-  </head>
+</head>
 
-  <!-- #96D3F3-->
-  <body onload="init();" data-title="index" id="body" style="background: #f9f9f9;">
-    <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
-      <img src='loading-animation.gif' style="max-width:90%; width: 1024px; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"/>
-    </div>
+<!-- #96D3F3-->
 
-    <script>
-      (function($) {
+<body onload="init();" data-title="index" id="body" style="background: #f9f9f9;">
+  <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
+    <img src='loading-animation.gif' style="max-width:90%; width: 1024px; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />
+  </div>
+
+  <script>
+    (function($) {
         $.fn.fixMe = function() {
             return this.each(function() {
                 var $this = $(this), $t_fixed;
@@ -165,109 +169,355 @@
     </script>
 
   <!-- #92B5C8  width = 3790 height = 1743-->
-    <canvas id="canvas" width="100%" height="100%" style="background-color:#FFFFFF; width:100%">
-    </canvas>
+  <canvas id="canvas" width="100%" height="100%" style="background-color:#FFFFFF; width:100%">
+  </canvas>
 
-    <!--hidden at the beginning whilst everything loads-->
-    <div id="hideContents" style="display: none;">
-      
-      <div class="canvasHolder" id="canvasHolder">
-        <canvas id="myCanvas" width="1200" height="900">
-        </canvas>
+  <!--hidden at the beginning whilst everything loads-->
+  <div id="hideContents" style="display: none;">
 
-        <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute; pointer-events:none; left:0; top:0; z-index:-100; visibility:hidden;">
-        </canvas>
+    <div class="canvasHolder" id="canvasHolder">
+      <canvas id="myCanvas" width="1200" height="900">
+      </canvas>
 
-        <canvas id="myChart" width="600" height="600">
-        </canvas>
+      <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute; pointer-events:none; left:0; top:0; z-index:-100; visibility:hidden;">
+      </canvas>
 
-        <video id="camVideo" style="visibility:hidden;">
-        </video>
+      <canvas id="myChart" width="600" height="600">
+      </canvas>
 
-        <canvas id="camCanvas" style="visibility:hidden;">
-        </canvas>
+      <video id="camVideo" style="visibility:hidden;">
+      </video>
 
-        <div id="languageDiv">
-        </div>
+      <canvas id="camCanvas" style="visibility:hidden;">
+      </canvas>
 
-        <div id="labelDiv">
-        </div>
-
-        <div id="textLabel">
-        </div>
-
-        <div id="ioDiv" style="display:none">
-          <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*">
-          <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb, .html">
-          <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json">
-          <input tabindex="-1" class="file" type="file" id="myOpenAll">
-        </div>
-      </div> <!-- canvasHolder -->
-
-      <div id="audio">
+      <div id="languageDiv">
       </div>
 
-      <div id="tourData">
+      <div id="labelDiv">
       </div>
 
-      <div id="popdown-palette">
+      <div id="textLabel">
       </div>
 
-      <!-- <div id="main-toolbar" class="toolbar">
-      </div> -->  
-      <div id="loader">
+      <div id="ioDiv" style="display:none">
+        <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*">
+        <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb, .html">
+        <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json">
+        <input tabindex="-1" class="file" type="file" id="myOpenAll">
       </div>
+    </div> <!-- canvasHolder -->
 
-      <!-- <div id="header" class="EaselJS">
+    <div id="audio">
+    </div>
+
+    <div id="tourData">
+    </div>
+
+    <div id="popdown-palette">
+    </div>
+
+    <!-- <div id="main-toolbar" class="toolbar">
+      </div> -->
+    <div id="loader">
+    </div>
+
+    <!-- <div id="header" class="EaselJS">
       </div> -->
 
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <!-- <link rel="stylesheet" href="lib/materialize.min.css"> -->
-      <link rel="stylesheet" href="lib/materialize-iso.css">
-            
-      <div class="materialize-iso">
+    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="lib/materialize-iso.css">
+
+
+    <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
+
+
+    <div id="modeDiv" draggable="false">
+      <div id="modeButtonsDiv">
+      </div>
+
+      <div id="modeTableDiv">
+      </div>
+    </div>
+
+    <div id="statusDiv" draggable="false">
+      <div id="statusButtonsDiv">
+      </div>
+
+      <div id="statusTableDiv">
+      </div>
+    </div>
+
+    <div id="playbackDiv" draggable="false">
+      <div id="playbackButtonsDiv">
+      </div>
+
+      <div id="playbackTableDiv">
+      </div>
+    </div>
+
+    <div id="ptmDiv" draggable="false">
+      <div id="ptmButtonsDiv">
+      </div>
+
+      <div id="ptmTableDiv">
+      </div>
+    </div>
+
+    <div id="pdmDiv" draggable="false">
+      <div id="pdmButtonsDiv">
+      </div>
+
+      <div id="pdmTableDiv">
+      </div>
+    </div>
+
+    <div id="mkbDiv" draggable="false">
+      <div id="mkbButtonsDiv">
+      </div>
+
+      <div id="mkbTableDiv">
+        <div id="keyboardHolder" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:155px; width: 100%; background-color: white;">
+          <select id="firstNote" class="keySelect" style="display: none; onchange=" changeKeys()">
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+          </select>
+          <input type="number" style="display: none; min=" 0" max="7" step="1" id="firstOctave" onchange="changeKeys()"
+            value="4" />
+          <select id="secondNote" class="keySelect" style="display: none; onchange=" changeKeys()">
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G" selected>G</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+          </select>
+          <input type="number" style="display: none; min=" 2" max="8" step="1" id="secondOctave" onchange="changeKeys()"
+            value="5" />
+          <input type="button" style="display: none; value=" Deselect all notes" onclick="deselect();" />
+          <input type="button" style="display: none; value=" Generate Pitch Blocks!" onclick="handleKeyboardPitches(selected); deselect();" /><br>
+          <div id="keyboard">
+            <table class="white">
+              <tr id="white">
+              </tr>
+            </table>
+            <table class="black">
+              <tr id="black">
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div id="keyboardHolder2" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:145px; width: 74%; background-color: white;">
+          <table class="white">
+            <tbody>
+              <tr id="myrow">
+              </tr>
+            </tbody>
+          </table>
+          <table class="black">
+            <tbody>
+              <tr id="myrow2">
+              </tr>
+            </tbody>
+          </table>
+          <div id="keyboard2">
+            <table class="white">
+              <tbody>
+                <tr id="white">
+                </tr>
+              </tbody>
+            </table>
+            <table class="black">
+              <tbody>
+                <tr id="black">
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pscDiv" draggable="false">
+      <div id="pscButtonsDiv">
+      </div>
+
+      <div id="pscTableDiv">
+      </div>
+    </div>
+
+    <div id="timbreDiv" draggable="false">
+      <div id="timbreButtonsDiv">
+      </div>
+
+      <div id="timbreTableDiv">
+      </div>
+    </div>
+
+    <div id="tempoDiv" draggable="false">
+      <div id="tempoButtonsDiv">
+      </div>
+    </div>
+
+    <div id="helpDiv" draggable="false" style="visibility:hidden">
+      <div id="helpButtonsDiv">
+      </div>
+      <div id="helpBodyDiv">
+      </div>
+    </div>
+
+    <div id="temperamentDiv" draggable="false">
+      <div id="temperamentButtonsDiv">
+      </div>
+
+      <div id="temperamentTableDiv">
+      </div>
+    </div>
+
+    <div id="rulerDiv" draggable="false">
+      <div id="rulerButtonsDiv">
+      </div>
+
+      <div id="rulerTableDiv">
+      </div>
+    </div>
+
+    <div id="sliderDiv" draggable="false">
+      <div id="sliderButtonsDiv">
+      </div>
+
+      <div id="sliderTableDiv">
+      </div>
+    </div>
+
+    <div id="playPitch" style="visibility:hidden">
+    </div>
+
+    <div id="sliderInCell">
+    </div>
+
+    <div id="BPMInput">
+    </div>
+
+    <div id="musicratio1">
+    </div>
+
+    <div id="musicratio2">
+    </div>
+
+    <div id="dissectNumber">
+    </div>
+
+    <div id="helpElem">
+    </div>
+
+    <div id="wheelDiv" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)">
+    </div>
+
+    <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden">
+    </div>
+
+    <div id="contextWheelDiv" class="wheelNav">
+    </div>
+
+    <div id="submenuWheelDiv" class="wheelNav">
+    </div>
+
+    <div id="searchBar">
+      <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks">
+      <ul class="matches" id="searchResults"></ul>
+    </div>
+
+    <div id="pastecode">
+      <input type="text" name="paste" id="paste" class="ui-autocomplete" placeholder="Paste Music Blocks code here"
+        style="visibility: false">
+      <ul class="matches"></ul>
+      <input onkeypress="doPaste()" type="submit" value="">
+    </div>
+
+    <div id="myProgress">
+      <div id="myBar"></div>
+    </div>
+
+    <div id="lilypondModal" class="modal">
+
+      <!-- Modal content for Lilypond save dialog -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>
+          <div id="fileNameText"></div><input type="text" id="fileName"></input>
+        </p>
+        <p>
+          <div id="titleText"></div><input type="text" id="title"></input>
+        </p>
+        <p>
+          <div id="authorText"></div><input type="text" id="author"></input>
+        </p>
+        <p>
+          <div id="MIDIText"></div><input type="checkbox" id="MIDICheck"></input>
+        </p>
+        <p>
+          <div id="guitarText"></div><input type="checkbox" id="guitarCheck"></input>
+        </p>
+        <p><button id="submitLilypond"></button> <button id="submitPDF"></button></p>
+      </div>
+
+    </div>
+
+    <div class="materialize-iso">
       <nav id="toolbars" class="nav-wrapper" role="navigation">
         <div class="blue nav-wrapper">
           <a id="mb-logo" class="logo left tooltipped" data-position="bottom"><img style="width: 100%;" src="images/logo.svg"></a>
-          <ul class="main left">           
+          <ul class="main left">
             <li><a id="play" class="left tooltipped"><i class="material-icons main">play_circle_filled</i></a></li>
             <li><a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a></li>
           </ul>
           <ul class="main right">
-            <li><a id="newFile" class="tooltipped dropdown-trigger" data-position="left"  data-activates='newdropdown'><i class="material-icons md-48">note_add</i></a></li>
+            <li><a id="newFile" class="tooltipped dropdown-trigger" data-position="left" data-activates='newdropdown'><i
+                  class="material-icons md-48">note_add</i></a></li>
             <li><a id="load" class="tooltipped" data-position="bottom"><i class="material-icons md-48">folder</i></a></li>
             <li><a id="saveButton" class="tooltipped" data-position="bottom"><i id="save" class="material-icons md-48">save_alt</i></a></li>
-            <li><a style="display: none;" id="saveButtonAdvanced" class="tooltipped dropdown-trigger" data-position="bottom"  data-activates='saveddropdown'><i id="save" class="material-icons md-48">save_alt</i></a></li>
+            <li><a style="display: none;" id="saveButtonAdvanced" class="tooltipped dropdown-trigger" data-position="bottom"
+                data-activates='saveddropdown'><i id="save" class="material-icons md-48">save_alt</i></a></li>
             <li><a id="planetIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">public</i></a></li>
-            <li><a style="display: none;" id="planetIconDisabled" class="tooltipped" data-position="bottom"><i style="color: #a5acba;" class="material-icons md-48">public</i></a></li>
-            <li><a id="toggleAuxBtn" class="tooltipped" data-position="bottom"><i id="menu"class="animated-icon material-icons md-48 ">menu</i></a></li>
+            <li><a style="display: none;" id="planetIconDisabled" class="tooltipped" data-position="bottom"><i style="color: #a5acba;"
+                  class="material-icons md-48">public</i></a></li>
+            <li><a id="toggleAuxBtn" class="tooltipped" data-position="bottom"><i id="menu" class="animated-icon material-icons md-48 ">menu</i></a></li>
             <li><a id="helpIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">help</i></a></li>
           </ul>
-                    
+
         </div>
         <div class="nav-wrapper" id="aux-toolbar" style="display: none;">
-            <div class="blue darken-1 nav-wrapper">
-              <ul class="aux left">
-                <li><a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">play_circle_outline</i></a></li>
-                <li><a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">video_library</i></a></li>
-              </ul>
-              <ul class="aux right">
-                <li><a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">poll</i></a></li>
-                <li><a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">add_circle</i></a></li>
-                <li><a id="delPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">remove_circle</i></a></li>
-                <li><a id="enableHorizScrollIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">compare_arrows</i></a></li>
-                <li><a style="display: none;" id="disableHorizScrollIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">lock</i></a></li>
-                <li><a id="mergeWithCurrentIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">merge_type</i></a></li>
-                <li class="filler" id="aligns_merge_under_load"  style="user-select: none; visibility: hidden;"><a style="color: transparent;">space</a></li>
-                <li><a id="restoreIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">restore_from_trash</i></a></li>
-                <li><a id="beginnerMode" class="tooltipped" data-position="bottom"><i id="begIconText" class="material-icons md-48" >star</i></a></li>
-                <li><a id="advancedMode" class="tooltipped" data-position="bottom"><i id="advIconText" class="material-icons md-48" >star_border</i></a></li>
-                <li><a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="bottom" data-activates='languagedropdown'><i class="material-icons md-48">translate</i></a></li>
-              </ul>
-            </div>
+          <div class="blue darken-1 nav-wrapper">
+            <ul class="aux left">
+              <li><a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">play_circle_outline</i></a></li>
+              <li><a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">video_library</i></a></li>
+            </ul>
+            <ul class="aux right">
+              <li><a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">poll</i></a></li>
+              <li><a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">add_circle</i></a></li>
+              <li><a id="delPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">remove_circle</i></a></li>
+              <li><a id="enableHorizScrollIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">compare_arrows</i></a></li>
+              <li><a style="display: none;" id="disableHorizScrollIcon" class="tooltipped" data-position="bottom"><i
+                    class="material-icons md-48">lock</i></a></li>
+              <li><a id="mergeWithCurrentIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">merge_type</i></a></li>
+              <li class="filler" id="aligns_merge_under_load" style="user-select: none; visibility: hidden;"><a style="color: transparent;">space</a></li>
+              <li><a id="restoreIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">restore_from_trash</i></a></li>
+              <li><a id="beginnerMode" class="tooltipped" data-position="bottom"><i id="begIconText" class="material-icons md-48">star</i></a></li>
+              <li><a id="advancedMode" class="tooltipped" data-position="bottom"><i id="advIconText" class="material-icons md-48">star_border</i></a></li>
+              <li><a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="bottom" data-activates='languagedropdown'><i
+                    class="material-icons md-48">translate</i></a></li>
+            </ul>
+          </div>
         </div>
       </nav>
-  
+
       <ul id="saveddropdown" class="dropdown-content">
         <li><a id="save-html"></a></li>
         <li><a id="save-svg"></a></li>
@@ -277,7 +527,7 @@
         <li><a id="save-abc"> </a></li>
         <li><a id="save-blockartwork-svg"></a></li>
       </ul>
-  
+
       <ul id="languagedropdown" class="dropdown-content">
         <li><a id="enUS"></a></li>
         <li><a id="enUK"></a></li>
@@ -293,241 +543,15 @@
         <li><a id="ar"></a></li>
         <li><a id="he"></a></li>
       </ul>
-  
+
       <ul id="newdropdown" class="dropdown-content">
         <li><a id="new-project"></a></li>
       </ul>
-      </div>
-
-      <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
-
-
-      <div id="modeDiv" draggable="false">
-        <div id="modeButtonsDiv">
-        </div>
-
-        <div id="modeTableDiv">
-        </div>
-      </div>
-
-      <div id="statusDiv" draggable="false">
-        <div id="statusButtonsDiv">
-        </div>
-
-        <div id="statusTableDiv">
-        </div>
-      </div>
-
-      <div id="playbackDiv" draggable="false">
-        <div id="playbackButtonsDiv">
-        </div>
-
-        <div id="playbackTableDiv">
-        </div>
-      </div>
-
-      <div id="ptmDiv" draggable="false">
-        <div id="ptmButtonsDiv">
-        </div>
-
-        <div id="ptmTableDiv">
-        </div>
-      </div>
-
-      <div id="pdmDiv" draggable="false">
-        <div id="pdmButtonsDiv">
-        </div>
-
-        <div id="pdmTableDiv">
-        </div>
-      </div>
-
-      <div id="mkbDiv" draggable="false">
-        <div id="mkbButtonsDiv">
-        </div>
-
-        <div id="mkbTableDiv">
-          <div id="keyboardHolder" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:155px; width: 100%; background-color: white;">
-            <select id="firstNote" class="keySelect" style="display: none; onchange="changeKeys()">
-		<option value="D">D</option>               
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-	    </select>
-            <input type="number" style="display: none; min="0" max="7" step="1" id="firstOctave" onchange="changeKeys()" value="4"/>
-            <select id="secondNote" class="keySelect" style="display: none; onchange="changeKeys()">
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G" selected>G</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-           </select>
-           <input type="number" style="display: none; min="2" max="8" step="1" id="secondOctave" onchange="changeKeys()" value="5"/>
-           <input type="button" style="display: none; value="Deselect all notes" onclick="deselect();" />
-           <input type="button" style="display: none; value="Generate Pitch Blocks!" onclick="handleKeyboardPitches(selected); deselect();" /><br>
-              <div id="keyboard">
-                  <table class="white">
-                      <tr id="white">
-                      </tr>
-                  </table>
-                  <table class="black">
-                      <tr id="black">
-                      </tr>
-                  </table>
-              </div>
-          </div>
-
-          <div id="keyboardHolder2" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:145px; width: 74%; background-color: white;">
-              <table class="white">
-                  <tbody>
-                    <tr id="myrow">
-                    </tr>
-                  </tbody>
-                </table>
-                <table class="black">
-                  <tbody>
-                    <tr id="myrow2">
-                    </tr>
-                  </tbody>
-                </table>
-              <div id="keyboard2">
-                  <table class="white">
-                      <tbody><tr id="white">
-                          </tr>
-                      </tbody>
-                  </table>
-                  <table class="black">
-                      <tbody><tr id="black">
-                          </tr>
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="pscDiv" draggable="false">
-        <div id="pscButtonsDiv">
-        </div>
-
-        <div id="pscTableDiv">
-        </div>
-      </div>
-
-      <div id="timbreDiv" draggable="false">
-        <div id="timbreButtonsDiv">
-        </div>
-
-        <div id="timbreTableDiv">
-        </div>
-      </div>
-
-      <div id="tempoDiv" draggable="false">
-        <div id="tempoButtonsDiv">
-        </div>
-      </div>
-
-      <div id="helpDiv" draggable="false" style="visibility:hidden">
-        <div id="helpButtonsDiv">
-        </div>
-        <div id="helpBodyDiv">
-	</div>
-      </div>
-
-      <div id="temperamentDiv" draggable="false">
-        <div id="temperamentButtonsDiv">
-        </div>
-
-        <div id="temperamentTableDiv">
-        </div>
-      </div>
-
-      <div id="rulerDiv" draggable="false">
-        <div id="rulerButtonsDiv">
-        </div>
-
-        <div id="rulerTableDiv">
-        </div>
-      </div>
-
-      <div id="sliderDiv" draggable="false">
-        <div id="sliderButtonsDiv">
-        </div>
-
-        <div id="sliderTableDiv">
-        </div>
-      </div>
-
-      <div id="playPitch" style="visibility:hidden">
-      </div>
-
-      <div id="sliderInCell">
-      </div>
-
-      <div id="BPMInput">
-      </div>
-
-      <div id="musicratio1">
-      </div>
-
-      <div id="musicratio2">
-      </div>
-
-      <div id="dissectNumber">
-      </div>
-
-      <div id="helpElem">
-      </div>
-
-      <div id="wheelDiv" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)">
-      </div>
-
-      <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden">
-      </div>
-
-      <div id="contextWheelDiv" class="wheelNav">
-      </div>
-
-      <div id="submenuWheelDiv" class="wheelNav">
-      </div>
-
-      <div id="searchBar">
-         <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks">
-         <ul class="matches" id="searchResults"></ul>
-      </div>
-
-      <div id="pastecode">
-	<input type="text" name="paste" id="paste" class="ui-autocomplete" placeholder="Paste Music Blocks code here" style="visibility: false">
-	<ul class="matches"></ul>
-	<input onkeypress="doPaste()" type="submit" value="">
-      </div>
-      
-      <div id="myProgress">
-        <div id="myBar"></div>
-      </div>
-
-      <div id="lilypondModal" class="modal">
-
-      <!-- Modal content for Lilypond save dialog -->
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <p><div id="fileNameText"></div><input type="text" id="fileName"></input></p>
-        <p><div id="titleText"></div><input type="text" id="title"></input></p>
-        <p><div id="authorText"></div><input type="text" id="author"></input></p>
-        <p><div id="MIDIText"></div><input type="checkbox" id="MIDICheck"></input></p>
-        <p><div id="guitarText"></div><input type="checkbox" id="guitarCheck"></input></p>
-        <p><button id="submitLilypond"></button> <button id="submitPDF"></button></p>
-      </div>
-
     </div>
 
-    </div> <!-- hideContents -->
+  </div> <!-- hideContents -->
 
-  </body>
+</body>
 
 
 </html>

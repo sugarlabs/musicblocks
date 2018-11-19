@@ -46,7 +46,7 @@
             <tspan
                x="74"
                y="14"
-               id="tspan1184">ピッチ すうち</tspan>
+               id="tspan1184">pitch number</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -96,7 +96,7 @@
               <tspan
                  x="20"
                  y="15"
-                 id="tspan1478">おんぷ</tspan>
+                 id="tspan1478">note</tspan>
             </text>
             <text
                style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -104,7 +104,7 @@
               <tspan
                  x="85"
                  y="12"
-                 id="tspan1482">あたい</tspan>
+                 id="tspan1482">value</tspan>
             </text>
           </g>
         </g>

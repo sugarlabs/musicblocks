@@ -3130,9 +3130,7 @@ function Blocks () {
         } else {
             // If we find a clamp block, add it to the list.
             var cblk = this.blockList[blk].connections[0];
-            console.log(this.blockList[cblk].name);
             if (this.blockList[cblk].isClampBlock()) {
-                console.log('is a clamp block');
                 if (this.blockList[cblk].isDoubleClampBlock()) {
                     // Just check them both.
                     clampList.push([cblk, 0]);
@@ -4229,7 +4227,7 @@ function Blocks () {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
-                    this.logo.synth.loadSynth(0, 'kick');
+                    this.logo.synth.loadSynth(0, DEFAULTDRUM);
                 }
                 break;
             case 'action':

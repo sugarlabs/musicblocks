@@ -265,7 +265,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             // Show the highlighted artwork.
             // If the block is disconnected, use the disconnected bitmap.
-            if (this.disconnectedHighlightBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+            if (this.isDisconnected()) {
                 this.disconnectedHighlightBitmap.visible = true;
                 this.highlightBitmap.visible = false;
             } else {
@@ -342,7 +342,7 @@ function Block(protoblock, blocks, overrideName) {
             this.bitmap.visible = false;
         } else {
             // If the block is disconnected, use the disconnected bitmap.
-            if (this.disconnectedBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+            if (this.isDisconnected()) {
                 this.disconnectedBitmap.visible = true;
                 this.bitmap.visible = false;
             } else {
@@ -762,7 +762,6 @@ function Block(protoblock, blocks, overrideName) {
                 artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
-            that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
             _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
@@ -808,6 +807,9 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
+
+        that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
+
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
 
@@ -1138,6 +1140,38 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     };
 
+    this.isDisconnected = function () {
+        if (this.disconnectedBitmap === null) {
+            return false;
+        }
+
+        if (this.connections[0] !== null) {
+            return false;
+        }
+
+        if (COLLAPSIBLES.indexOf(this.name) !== -1) {
+            if (INLINECOLLAPSIBLES.indexOf(this.name) === -1) {
+                return false;
+            }
+        }
+
+        if (this.isArgBlock()) {
+            return true;
+        }
+
+        if (last(this.connections) === null) {
+            return true;
+        }
+
+        if (this.blocks.blockList[last(this.connections)].name === 'hidden') {
+            if (last(this.blocks.blockList[last(this.connections)].connections) === null) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
     this.show = function () {
         // If it is not in the trash and not in collapsed, then show it.
         if (!this.trash && !this.inCollapsed) {
@@ -1160,7 +1194,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 } else {
                     // If the block is disconnected, use the disconnected bitmap.
-                    if (this.disconnectedBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+                    if (this.isDisconnected()) {
                         this.disconnectedBitmap.visible = true;
                         this.bitmap.visible = false;
                     } else {
@@ -1184,7 +1218,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             } else {
                 // If the block is disconnected, use the disconnected bitmap.
-                if (this.disconnectedBitmap !== null && this.connections[0] === null && last(this.connections) === null) {
+                if (this.isDisconnected()) {
                     this.disconnectedBitmap.visible = true;
                     this.bitmap.visible = false;
                 } else {

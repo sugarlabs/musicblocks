@@ -362,7 +362,7 @@ function PitchTimeMatrix () {
             var drumName = getDrumName(this.rowLabels[i]);
 
             if (drumName != null) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + _(drumName) + '" alt="' + _(drumName) + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
@@ -372,7 +372,7 @@ function PitchTimeMatrix () {
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
-                const BELLSETIDX = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G': 5, 'A': 6, 'B': 7, 'do': 1, 're': 2, 'me': 3, 'fa': 4, 'sol': 5, 'la': 6, 'ti': 7};
+                const BELLSETIDX = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G': 5, 'A': 6, 'B': 7, 'do': 1, 're': 2, 'mi': 3, 'fa': 4, 'sol': 5, 'la': 6, 'ti': 7};
                 // Don't add bellset image with sharps and flats.
                 var noteName = this.rowLabels[i];
                 if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
@@ -394,7 +394,7 @@ function PitchTimeMatrix () {
             cell.style.left = (BUTTONSIZE * this._cellScale) + 'px';
 
             if (drumName != null) {
-                cell.innerHTML = drumName;
+                cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
@@ -416,7 +416,7 @@ function PitchTimeMatrix () {
             } else {
                 if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                    var noteObj = getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0], false, null, this._logo.errorMsg, this._logo.synth.inTemperament);
+                    var noteObj = getNote(this.rowLabels[i], this.rowArgs[i], 0, this._logo.keySignature[0], false, null, this._logo.errorMsg, this._logo.synth.inTemperament);
                 } else {
                     cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
@@ -663,7 +663,7 @@ function PitchTimeMatrix () {
 
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                exportLabel.innerHTML = drumName;
+                exportLabel.innerHTML = _(drumName);
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 exportLabel.innerHTML = this.rowLabels[i];
@@ -1309,7 +1309,6 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-
                 this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, 'default', null, null);
             }
 
@@ -1319,7 +1318,6 @@ function PitchTimeMatrix () {
 
             for (var i = 0; i < drumNotes.length; i++) {
                 this._logo.synth.trigger(0, 'C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i], null, null);
-
             }
 
             this.__playNote(0, 0, playButtonCell);
@@ -1557,16 +1555,15 @@ function PitchTimeMatrix () {
         if (obj.length === 1) {
             if (playNote) {
                 if (drumName != null) {
-
                     this._logo.synth.trigger(0, 'C2', noteValue, drumName, null, null);
                 } else if (this.rowLabels[j] === 'hertz') {
                     this._logo.synth.trigger(0, Number(note), noteValue, 'default', null, null);
                 } else if (graphicsBlock !== true) {
-		    if (typeof(note) === 'string') {
-			this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
-		    } else {
-			this._logo.synth.trigger(0, note, noteValue, 'default', null, null);
-		    }
+                    if (typeof(note) === 'string') {
+                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
+                    } else {
+                        this._logo.synth.trigger(0, note, noteValue, 'default', null, null);
+                    }
                 } else {
                     console.log('Cannot parse note object: ' + obj);
                 }

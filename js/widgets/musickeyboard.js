@@ -140,7 +140,12 @@ function MusicKeyboard() {
 
                     newel2.setAttribute('id',elementid2);
                     idContainer.push(elementid2);
-                    newel2.innerHTML = this.noteNames[p] + this.octaves[p];
+                    var nname = this.noteNames[p].replace(SHARP, '').replace('#', '');
+                    if (SOLFEGENAMES.indexOf(nname) !== -1) {
+                        newel2.innerHTML = i18nSolfege(nname) + SHARP + this.octaves[p];
+                    } else {
+                        newel2.innerHTML = this.noteNames[p] + this.octaves[p];
+                    }
                     parenttbl2.appendChild(newel2);
                 } else if (this.noteNames[p].indexOf(FLAT) !== -1 || this.noteNames[p].indexOf('b') !== -1) {
                     var parenttbl2 = document.getElementById('myrow2');
@@ -149,7 +154,12 @@ function MusicKeyboard() {
 
                     newel2.setAttribute('id',elementid2);
                     idContainer.push(elementid2);
-                    newel2.innerHTML = this.noteNames[p] + this.octaves[p];
+                    var nname = this.noteNames[p].replace(FLAT, '').replace('b', '');
+                    if (SOLFEGENAMES.indexOf(nname) !== -1) {
+                        newel2.innerHTML = i18nSolfege(nname) + FLAT + this.octaves[p];
+                    } else {
+                        newel2.innerHTML = this.noteNames[p] + this.octaves[p];
+                    }
                     parenttbl2.appendChild(newel2);
                 } else {
                     var parenttbl = document.getElementById('myrow');
@@ -158,7 +168,11 @@ function MusicKeyboard() {
 
                     newel.setAttribute('id',elementid);
                     idContainer.push(elementid);
-                    newel.innerHTML = this.noteNames[p] + this.octaves[p];
+                    if (SOLFEGENAMES.indexOf(this.noteNames[p]) !== -1) {
+                        newel.innerHTML = i18nSolfege(this.noteNames[p]) + this.octaves[p];
+                    } else {
+                        newel.innerHTML = this.noteNames[p] + this.octaves[p];
+                    }
                     parenttbl.appendChild(newel);
                 }
             }

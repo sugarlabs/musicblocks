@@ -3450,21 +3450,23 @@ i.left {
   .materialize-iso .filler, .materialize-iso .logo {
     display: none;
   }
-
   .materialize-iso nav .main i.material-icons {
-    width: 16px;
+    font-size: 20px;  
     position: relative;
-    margin: 0;
-    padding: 0;
+    margin-left: -5px;
+    margin-right: -5px;
+    padding: 0px;
   }
 
-  .materialize-iso nav  .aux i.material-icons{
-    width: 7px;
+  .materialize-iso nav .aux i.material-icons {
+    font-size: 17px;  
     position: relative;
-    margin: 0;
-    padding: 0;
+    margin-left: -7.5px;
+    margin-right: -7.5px;
+    padding: 0px;
   }
 }
+
 .materialize-iso nav .button-collapse {
   float: left;
   position: relative;
