@@ -3034,7 +3034,7 @@ msgstr "音高の数字を初期化"
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
-msgstr "箱へ"
+msgstr "名前"
 
 #: js/basicblocks.js:210
 #: js/basicblocks.js:212
