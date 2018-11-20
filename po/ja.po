@@ -76,10 +76,8 @@ msgstr "音高・時刻行列"
 #: js/block.js:1055
 #: js/basicblocks.js:928
 #: plugins/rodi.rtp:328
-## is this for "status widget"? Maybe ステータスモニター;
-## Also 現状 http://jisho.org/word/%E7%8F%BE%E7%8A%B6
 msgid "status"
-msgstr "ステータス"
+msgstr "実行じょうきょう"
 
 #: js/block.js:1058
 msgid "drum mapper"
@@ -106,7 +104,7 @@ msgstr "階段"
 #: js/basicblocks.js:776
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr "テンポ"
+msgstr "メトロノーム"
 
 #: js/block.js:1073
 #: js/basicblocks.js:2662
@@ -144,7 +142,7 @@ msgstr "ドラム"
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm maker"
-msgstr "リズムルーラー"
+msgstr "リズムメーカー"
 
 #: js/block.js:1088
 #: js/block.js:1617
@@ -172,7 +170,7 @@ msgstr "リズムルーラー"
 #: js/pitchtimematrix.js:854
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 msgid "note value"
-msgstr "音価"
+msgstr "音の長さ"
 
 #: js/block.js:1091
 #: js/block.js:1554
@@ -182,7 +180,7 @@ msgstr "音価"
 #.TRANS: calculate a relative step between notes based on the current musical scale
 ## https://ja.wikibooks.org/wiki/%E9%9F%B3%E7%A8%8B#%E5%85%A8%E9%9F%B3%E9%9A%8E%E7%9A%84%E9%9F%B3%E7%A8%8B
 msgid "scalar interval"
-msgstr "音階的音程"
+msgstr "音階の上下（+/-）"
 
 #: js/block.js:1094
 #: js/palette.js:836
@@ -231,7 +229,7 @@ msgstr "上"
 #.TRANS: pitch number
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
-msgstr "音高"
+msgstr "音の高さ"
 
 #: js/block.js:2654
 #: js/logo.js:740
@@ -364,7 +362,7 @@ msgstr "閉じる"
 #: js/activity.js:1911
 #: js/activity.js:1957
 msgid "Cannot load project from the file. Please check the file type."
-msgstr "ファイルからプロジェクトをロードすることができません。ファイルの種類をもう一度確認してください。"
+msgstr "プロジェクトを読みこめません。ファイルの種類をかくにんしてください。"
 
 #: js/activity.js:2149
 #: js/activity.js:2162
@@ -374,13 +372,13 @@ msgstr "ファイルからプロジェクトをロードすることができま
 #: js/turtledefs.js:187
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "Cartesian"
-msgstr "カーテシアン/極域を表示"
+msgstr "うがん（ざひょう）を表示"
 
 #: js/activity.js:2158
 #.TRANS: hide Polar coordinate overlay grid
 ## need to verify
 msgid "Hide grid"
-msgstr "グリッド（座標）を非表示"
+msgstr "中心の角度をかくす"
 
 #: js/activity.js:2165
 #: js/activity.js:2169
@@ -390,7 +388,7 @@ msgstr "グリッド（座標）を非表示"
 #.TRANS: show Polar coordinate overlay grid
 ## ひらがな＝きょくいき；http://jisho.org/word/%E6%A5%B5%E5%9F%9F；http://jisho.org/word/%E6%A5%B5%E7%B7%9A
 msgid "Polar"
-msgstr "極"
+msgstr "中心の角度を表示"
 
 #: js/activity.js:2523
 msgid "This block is deprecated."
@@ -420,7 +418,7 @@ msgstr "ブラウザ表示を100%に設定してください。"
 #: js/toolbar.js:314
 #: js/toolbar.js:362
 msgid "About Music Blocks"
-msgstr ""
+msgstr "ミュージック・ブロックスの説明"
 
 #: js/activity.js:4112
 msgid "Turtle Blocks"
@@ -440,13 +438,13 @@ msgstr "再生"
 #: js/toolbar.js:316
 #: js/toolbar.js:364
 msgid "Stop"
-msgstr "ストップ"
+msgstr "停止"
 
 #: js/activity.js:4199
 #: js/toolbar.js:325
 #: js/toolbar.js:373
 msgid "Run slowly"
-msgstr "スロー再生する"
+msgstr "ゆっくり実行する"
 
 #: js/activity.js:4202
 #: js/turtledefs.js:139
@@ -454,13 +452,13 @@ msgstr "スロー再生する"
 #: js/toolbar.js:326
 #: js/toolbar.js:374
 msgid "Run step by step"
-msgstr "ブロックを一つずつ再生"
+msgstr "ブロックを１つずつ実行する"
 
 #: js/activity.js:4209
 #: js/turtledefs.js:132
 #: js/turtledefs.js:180
 msgid "New Project"
-msgstr "新規作成"
+msgstr "新しいプロジェクト"
 
 #: js/activity.js:4215
 #: js/turtledefs.js:133
@@ -468,18 +466,18 @@ msgstr "新規作成"
 #: js/toolbar.js:318
 #: js/toolbar.js:366
 msgid "Load project from file"
-msgstr "ファイルからプロジェクトをロードする"
+msgstr "プロジェクトを読みこむ"
 
 #: js/activity.js:4221
 msgid "Save Project"
-msgstr "プロジェクトを保存"
+msgstr "プロジェクトをほぞん"
 
 #: js/activity.js:4228
 #: js/turtledefs.js:135
 #: js/toolbar.js:321
 #: js/toolbar.js:369
 msgid "Find and share projects"
-msgstr "プロジェクトを見つけたりシェアしたり"
+msgstr "みんなの作品"
 
 #: js/activity.js:4235
 #: js/toolbar.js:322
@@ -494,7 +492,7 @@ msgstr "オフライン。シェア機能が使えません"
 #: js/toolbar.js:324
 #: js/toolbar.js:372
 msgid "Help"
-msgstr "ヘルプ"
+msgstr "説明"
 
 #: js/activity.js:4288
 #: js/turtledefs.js:134
@@ -504,7 +502,7 @@ msgstr "ヘルプ"
 #: js/toolbar.js:367
 #: js/toolbar.js:368
 msgid "Save project"
-msgstr "プロジェクトを保存する"
+msgstr "プロジェクトをほぞんする"
 
 #: js/activity.js:4293
 #: js/GlobalCard.js:34
@@ -518,32 +516,32 @@ msgstr "オフライン。シェア機能が使えません"
 
 #: js/activity.js:4303
 msgid "Save as .svg"
-msgstr ".svgで保存"
+msgstr ".svgでほぞん"
 
 #: js/activity.js:4307
 msgid "Save as .png"
-msgstr ".pngで保存"
+msgstr ".pngでほぞん"
 
 #: js/activity.js:4312
 msgid "Save as .wav"
-msgstr ".wavで保存"
+msgstr ".wavでほぞん"
 
 #: js/activity.js:4316
 #: js/turtledefs.js:184
 #: js/toolbar.js:341
 #: js/toolbar.js:389
 msgid "Save sheet music"
-msgstr "楽譜(Lilypondのフォーマット)で保存"
+msgstr "がくふ(Lilypondのフォーマット)でほぞん"
 
 #: js/activity.js:4320
 msgid "Save as .abc"
-msgstr ".abcのフォーマットで保存"
+msgstr ".abcのフォーマットでほぞん"
 
 #: js/activity.js:4325
 #: js/toolbar.js:343
 #: js/toolbar.js:391
 msgid "Save block artwork"
-msgstr "ブロックのアートを保存"
+msgstr "ブロックのアートをほぞん"
 
 #: js/activity.js:4335
 msgid "confirm"
@@ -553,7 +551,7 @@ msgstr "確認する"
 #: js/toolbar.js:323
 #: js/toolbar.js:371
 msgid "Auxilary menu"
-msgstr "他メニュー"
+msgstr "サブメニュー"
 
 #: js/activity.js:4367
 #: js/turtledefs.js:194
@@ -561,11 +559,11 @@ msgstr "他メニュー"
 #: js/toolbar.js:375
 ## ひらがな＝とうけいじょうほう|Display is literal, but maybe not best word choice
 msgid "Display statistics"
-msgstr "統計を表示する"
+msgstr "とうけいを表示する"
 
 #: js/activity.js:4374
 msgid "Load plugin from file"
-msgstr "ファイルからプラグインをロードする"
+msgstr "プラグインを読みこむ"
 
 #: js/activity.js:4381
 #: js/turtledefs.js:195
@@ -578,20 +576,20 @@ msgstr "プラグインを消す"
 #: js/toolbar.js:330
 #: js/toolbar.js:378
 msgid "Enable horizontal scrolling"
-msgstr "水平スクロールをON"
+msgstr "自由な方向にスクロール"
 
 #: js/activity.js:4408
 #: js/toolbar.js:331
 #: js/toolbar.js:379
 msgid "Disable horizontal scrolling"
-msgstr "水平スクロールをOFF"
+msgstr "たて方向にスクロール"
 
 #: js/activity.js:4421
 #: js/toolbar.js:332
 #: js/toolbar.js:380
 #: js/LocalCard.js:52
 msgid "Merge with current project"
-msgstr "現在のプロジェクトに組み合わせます。"
+msgstr "プロジェクトを組みあわせる"
 
 #: js/activity.js:4428
 #: js/turtledefs.js:145
@@ -599,19 +597,19 @@ msgstr "現在のプロジェクトに組み合わせます。"
 #: js/toolbar.js:333
 #: js/toolbar.js:381
 msgid "Restore"
-msgstr "ブロックをリストア"
+msgstr "すてたブロックをもどす"
 
 #: js/activity.js:4436
 #: js/toolbar.js:335
 #: js/toolbar.js:383
 msgid "Switch to advanced mode"
-msgstr "高度モードに設定する"
+msgstr "はってんモードにする"
 
 #: js/activity.js:4441
 #: js/toolbar.js:334
 #: js/toolbar.js:382
 msgid "Switch to beginner mode"
-msgstr "簡単モードに設定"
+msgstr "かんたんモードにする"
 
 #: js/activity.js:4449
 #: js/turtledefs.js:147
@@ -631,31 +629,31 @@ msgstr "ホーム"
 
 #: js/activity.js:4493
 msgid "Show/hide block"
-msgstr "ブロックを表示/非表示"
+msgstr "ブロックを表示する/かくす"
 
 #: js/activity.js:4498
 msgid "Expand/collapse blocks"
-msgstr "潰せるブロックを表示/隠す"
+msgstr "ブロックを広げる/折りたたむ"
 
 #: js/activity.js:4503
 #: js/turtledefs.js:148
 #: js/turtledefs.js:192
 msgid "Decrease block size"
-msgstr "ブロックを小さくします。"
+msgstr "ブロックの表示を小さくする"
 
 #: js/activity.js:4506
 msgid "Cannot be further decreased"
-msgstr "これより減らすことはできません"
+msgstr "これより小さくできない"
 
 #: js/activity.js:4511
 #: js/turtledefs.js:149
 #: js/turtledefs.js:193
 msgid "Increase block size"
-msgstr "ブロックを大きくします。"
+msgstr "ブロックの表示を大きくする"
 
 #: js/activity.js:4514
 msgid "Cannot be further increased"
-msgstr "これより増やすことはできません"
+msgstr "これより大きくできない"
 
 #: js/activity.js:4531
 #: js/turtledefs.js:154
@@ -685,11 +683,11 @@ msgstr "取り出す"
 
 #: js/activity.js:5103
 msgid "Move to trash"
-msgstr "ゴミに捨てる"
+msgstr "すてる"
 
 #: js/activity.js:5106
 msgid "Save stack"
-msgstr "スタックを保存"
+msgstr "スタックをほぞん"
 
 #: js/logo.js:31
 ## http://jisho.org/word/%E5%A6%A5%E5%BD%93 ; 妥当=だとう; maybe just ヴァリッド(http://jisho.org/word/%E3%83%B4%E3%82%A1%E3%83%AA%E3%83%83%E3%83%89 )
@@ -817,7 +815,7 @@ msgstr "重複しているピッチ数値は無視します"
 
 #: js/logo.js:3509
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "「音高・時刻行列」には、一つ以上の音高ブロックと一つ以上のドラムブロックが必要です。"
+msgstr "フレーズメーカーには、音の高さブロックとドラムブロックを組み合わせてください。"
 
 #: js/logo.js:3633
 #: js/logo.js:3655
@@ -837,7 +835,7 @@ msgstr "BPM(一分あたりの拍数)は最大1000とします。"
 
 #: js/logo.js:3802
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "「音高・時刻行列」には、一つ以上の音高ブロックと一つ以上のドラムブロックが必要です。"
+msgstr "フレーズメーカーには、音の高さブロックとドラムブロックを組み合わせてください。"
 
 #: js/logo.js:3839
 msgid "Attack value should be from 0 to 100."
@@ -979,7 +977,7 @@ msgstr "音量を「0」に設定しています。"
 #.TRANS: the default case used in a switch statement in programming
 #.TRANS: polytone synthesizer
 msgid "default"
-msgstr "デフォルト"
+msgstr "ひょうじゅん"
 
 #: js/logo.js:6656
 #: js/logo.js:6743
@@ -1088,7 +1086,7 @@ msgstr "箱"
 #: js/basicblocks.js:4491
 #: js/blocks.js:2236
 msgid "text"
-msgstr "テキスト"
+msgstr "文字そざい"
 
 #: js/palette.js:817
 msgid "effect"
@@ -1126,14 +1124,14 @@ msgstr "音程名"
 #.TRANS: put something into a container for later reference
 ## ほうぞん means "to save"; put に before the word for "in"
 msgid "store in"
-msgstr "入れる"
+msgstr "ほぞん"
 
 #: js/palette.js:869
 #: js/palette.js:870
 #: js/basicblocks.js:3797
 #: js/blocks.js:2402
 msgid "store in box"
-msgstr "箱に入れる"
+msgstr "箱にほぞん"
 
 #: js/palette.js:881
 #: js/blocks.js:1694
@@ -1197,7 +1195,7 @@ msgstr "縮む"
 #: js/turtledefs.js:150
 #: js/turtledefs.js:174
 msgid "Clean"
-msgstr "消去"
+msgstr "ネズミとペンをもどす"
 
 #: js/turtledefs.js:17
 msgid "Music Blocks is a collection of tools for exploring musical concepts."
@@ -1218,13 +1216,13 @@ msgstr "検索"
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr "リズム"
+msgstr "連符（かけ算）"
 
 #: js/turtledefs.js:25
 #: js/basicblocks.js:1629
 #.TRANS: musical meter (time signature)
 msgid "meter"
-msgstr "拍子記号"
+msgstr "拍子"
 
 #: js/turtledefs.js:25
 msgid "intervals"
@@ -1238,7 +1236,7 @@ msgstr "音色"
 #: js/turtledefs.js:25
 ## 装飾音=そうしょくおん
 msgid "ornament"
-msgstr "装飾音"
+msgstr "そうしょく"
 
 #: js/turtledefs.js:25
 #: js/basicblocks.js:5469
@@ -1259,11 +1257,11 @@ msgstr "数の箱"
 
 #: js/turtledefs.js:25
 msgid "widgets"
-msgstr "ウィジェット"
+msgstr "ツール"
 
 #: js/turtledefs.js:25
 msgid "graphics"
-msgstr "グラフィックス"
+msgstr "ネズミの動き"
 
 #: js/turtledefs.js:25
 #: js/rubrics.js:478
@@ -1278,12 +1276,12 @@ msgstr "数値"
 
 #: js/turtledefs.js:25
 msgid "boolean"
-msgstr "ブーリアン"
+msgstr "くらべる"
 
 #: js/turtledefs.js:25
 #: js/rubrics.js:478
 msgid "media"
-msgstr "メディア"
+msgstr "他のメディア"
 
 #: js/turtledefs.js:25
 #: js/rubrics.js:478
@@ -1326,62 +1324,62 @@ msgstr "ミュージック・ブロックスへようこそ"
 #: js/turtledefs.js:159
 ## Need to refine this
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr "ミュージック・ブロックスは音楽と数学とコーディングの関係を楽しく探究するためのツールです。"
+msgstr "音楽と算数とプログラミングをむすびつけ、深く楽しむことができるツール。それが、ミュージック・ブロックスだ。"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:160
 ## Literally ネズミさんに会います but I think that context suggests "introduction"
 msgid "Meet Mr. Mouse!"
-msgstr "ミスター・マウスに会いましょう！"
+msgstr "ミスター・マウスに会おう！"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:160
 ## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "ミスター・マウスは私たちのミュージック・ブロックス指揮者です。"
+msgstr "ミスター・マウスは、ミュージック・ブロックスの指揮者。"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:160
 ## I took some artistic liberty: Says "together with Mouse-san, discover music/math/coding
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr "ミスター・マウスと一緒にミュージック・ブロックスの世界を探究しましょう。"
+msgstr "ミスター・マウスと一緒に、ミュージック・ブロックスの世界をたんきゅうしよう。"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:160
 msgid "Let us start our tour!"
-msgstr "では、ツアーを始めましょう。"
+msgstr "では、ツアーを始めよう。"
 
 #: js/turtledefs.js:129
 #: js/turtledefs.js:162
 #.TRANS: the buttons used to open various palettes of blocks
 msgid "Palette buttons"
-msgstr "パレット・ボタン"
+msgstr "パレットボタン"
 
 #: js/turtledefs.js:129
 #: js/turtledefs.js:164
 #.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
 msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
-msgstr "このツールバーにはリズム、ピッチ、音色、アクションなどを含むパレットボタンがあります。"
+msgstr "ミュージック・ブロックスの左側には、プログラミングに使うさまざまなブロックをグループ分けした「パレットボタン」がある。"
 
 #: js/turtledefs.js:129
 #: js/turtledefs.js:164
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "ここをクリックすると、ブロックスのパレットが表示されますので、ブロックスをキャンバス上にドラッグできます。"
+msgstr "それぞれのパレットボタンをクリックし、「音符（おんぷ）」「アクション」「ペン」などから好きなブロックを選んで、カンバス上にドラッグして置いてみよう。"
 
 #: js/turtledefs.js:130
 #: js/turtledefs.js:166
 msgid "Click the run button to run the project in fast mode."
-msgstr "速いモードでプロジェクトを再生するにはここをクリック。"
+msgstr "クリックをすると、ふつうのスピードでプログラムを実行することができる。"
 
 #: js/turtledefs.js:131
 #: js/turtledefs.js:171
 msgid "Stop the music (and the mice)."
-msgstr "音楽（とグラフィックス）を停止"
+msgstr "実行しているプログラムを止める。"
 
 #: js/turtledefs.js:131
 #: js/turtledefs.js:171
 msgid "You can also type Alt-S to stop."
-msgstr "Alt+Sで止めることもできます"
+msgstr "プログラムは、このボタンをおすかわりに、キーボードで「Altキーと Sキーの同時おし」でも止めることができる。"
 
 #: js/turtledefs.js:132
 msgid "Initialise a new project."
@@ -1390,12 +1388,12 @@ msgstr "新プロジェクトを初期化します"
 #: js/turtledefs.js:133
 #: js/turtledefs.js:181
 msgid "You can also load projects from the file system."
-msgstr "ファイルシステムからプロジェクトをロードできますよ。"
+msgstr "コンピューターに保存してあるファイルから、ミュージック・ブロックスのプロジェクトを読み込んで開く。"
 
 #: js/turtledefs.js:134
 #: js/turtledefs.js:182
 msgid "Save your project to a file."
-msgstr "このプロジェクトをファイルに保存するアイコンです。"
+msgstr "げんざい開いているプロジェクトをほぞんする。"
 
 #: js/turtledefs.js:135
 msgid "This button opens a viewer for sharing projects and for finding example projects."
@@ -1409,12 +1407,12 @@ msgstr "オプションツールバーを表示"
 
 #: js/turtledefs.js:136
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "このボタンをクリックするとオプションツールバーが表示/非表示します。"
+msgstr "このボタンをクリックすると「サブメニュー」を開いたり、折りたたんだりすることができる。"
 
 #: js/turtledefs.js:137
 #: js/turtledefs.js:173
 msgid "Show these messages."
-msgstr "これらのメッセージを表示します。"
+msgstr "ミスター・マウスによる、ミュージック・ブロックスの説明を表示する。"
 
 #: js/turtledefs.js:138
 #: js/turtledefs.js:167
@@ -1424,12 +1422,12 @@ msgstr "スローさ再生"
 #: js/turtledefs.js:138
 #: js/turtledefs.js:167
 msgid "Click to run the project in slow mode."
-msgstr "プロジェクトをスロー再生するには、ここをクリック。"
+msgstr "クリックをすると、ゆっくりとしたスピードでプログラムを実行することができる。"
 
 #: js/turtledefs.js:139
 #: js/turtledefs.js:169
 msgid "Click to run the project step by step."
-msgstr "プロジェクトを一つずつ再生するにはここをクリック。"
+msgstr "クリックをすると、とてもゆっくり、ブロックを１つずつ実行する。プログラムがうまくはたらかず、どのブロックが原因なのかを調べたいときなどに便利だ。"
 
 #: js/turtledefs.js:140
 #: js/turtledefs.js:176
@@ -1439,22 +1437,22 @@ msgstr "ブロックの表示"
 #: js/turtledefs.js:140
 #: js/turtledefs.js:176
 msgid "Hide or show the blocks and the palettes."
-msgstr "ブロックとパレットを表示する / 隠す アイコンです。"
+msgstr "クリックすると、パレットボタンとプログラムのブロックを画面上に表示させたり、かくしたりすることができる。"
 
 #: js/turtledefs.js:141
 msgid "Expand/collapse collapsable blocks"
-msgstr "膨らむブロックを膨らむ/萎む"
+msgstr "ブロックを広げる/折りたたむ"
 
 #: js/turtledefs.js:141
 #: js/turtledefs.js:177
 msgid "Expand or collapse start and action stacks."
-msgstr "スタートとアクションのスタックを膨らむ/縮むアイコンです。"
+msgstr "クリックすると、「スタート」と「アクション」に使われているブロックを、広げて表示したり、折りたたんでかくしたりすることができる。"
 
 #: js/turtledefs.js:142
 #: js/turtledefs.js:178
 ## 整理＝せいり; literally "organize"
 msgid "Return all blocks to the center of the screen."
-msgstr "全部のブロックをスクリーンのセンター(真ん中)に戻します。"
+msgstr "すべてのブロックを、カンバスのまんなかに配置する。"
 
 #: js/turtledefs.js:143
 #: js/turtledefs.js:187
@@ -1464,73 +1462,73 @@ msgstr "グリッドを表示する/隠す"
 #: js/turtledefs.js:144
 #: js/turtledefs.js:189
 msgid "Settings"
-msgstr "設定"
+msgstr "せってい"
 
 #: js/turtledefs.js:144
 #: js/turtledefs.js:189
 msgid "Open a panel for configuring Music Blocks."
-msgstr "ミュージック・ブロックスを設定するためのパネルを開きます。"
+msgstr "ミュージック・ブロックスの設定メニューを開く。"
 
 #: js/turtledefs.js:145
 #: js/turtledefs.js:197
 msgid "Restore blocks from the trash."
-msgstr "ブロックをゴミ箱から取り戻します。"
+msgstr "ゴミ箱にすててしまったブロックを取り出してもどす。ふくすうのブロックをすててあるときは新しい順に、ゴミ箱が空になるまでブロックを拾いもどすことができる。"
 
 #: js/turtledefs.js:146
 #: js/turtledefs.js:190
 msgid "Switch mode"
-msgstr "モードを設定"
+msgstr "はってんモード／かんたんモードにする"
 
 #: js/turtledefs.js:146
 #: js/turtledefs.js:190
 msgid "Switch between beginner and advance modes."
-msgstr "簡単/高度モードを設定"
+msgstr "ミュージック・ブロックスをかんたんモード／はってんモードに切りかえる。モードによって使えるきのうやブロックの種類が変わる。"
 
 #: js/turtledefs.js:147
 #: js/turtledefs.js:196
 msgid "Select your language preference."
-msgstr "言語を選んでください"
+msgstr "ブロックの名前などに表示される言語を選ぶ。"
 
 #: js/turtledefs.js:148
 #: js/turtledefs.js:192
 msgid "Decrease the size of the blocks."
-msgstr "ブロックの大きさを小さくします。"
+msgstr "画面に表示されるブロックのサイズを小さくする。"
 
 #: js/turtledefs.js:149
 #: js/turtledefs.js:193
 msgid "Increase the size of the blocks."
-msgstr "ブロックの大きを大きくします。"
+msgstr "画面に表示されるブロックのサイズを大きくする。"
 
 #: js/turtledefs.js:150
 #: js/turtledefs.js:174
 msgid "Clear the screen and return the mice to their initial positions."
-msgstr "画面をクリアしてネズミをみんな元に戻す"
+msgstr "ネズミを元の位置にもどし、ペンでえがいた線をすべて消す。"
 
 #: js/turtledefs.js:151
 #: js/turtledefs.js:175
 msgid "Collapse the graphics window."
-msgstr "グラフィックスウィンドーを非表示"
+msgstr "ネズミがいどうしたり、ペンで線をえがいたりできる「カンバス」の表示サイズを　しゅくしょう／かくだいする。<br>カンバスをしゅくしょうした場合は、プログラムをふつうのそくどで実行しても、ブロックがかくれない。ふつうの実行そくどでプログラムの動作かくにんをしたいときなどに便利だ。"
 
 #: js/turtledefs.js:152
 #: js/turtledefs.js:198
 msgid "Keyboard shortcuts"
-msgstr "ショートカット・キー"
+msgstr "キーボードのショートカット"
 
 #: js/turtledefs.js:152
 #: js/turtledefs.js:198
 msgid "You can type \"d\" to create a \"do\" block, \"r\" to create a \"re\" block, etc."
-msgstr "「d」を打つと「ド」のブロックが作られ、「r」を打つと「レ」のブロックが作られます"
+msgstr "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。<br><br>★ショートカットキー<br>d ……　「ド」（４分音符、４オクターヴ）<br>r ……　「レ」（４分音符、４オクターヴ）<br>m ……　「ミ」（４分音符、４オクターヴ）<br>f ……　「ファ」（４分音符、４オクターヴ）<br>s ……　「ソ」（４分音符、４オクターヴ）<br>l ……　「ラ」（４分音符、４オクターヴ）<br>t ……　「シ」（４分音符、４オクターヴ）<br>"
 
 #: js/turtledefs.js:153
 #: js/turtledefs.js:199
 msgid "Guide"
-msgstr "ガイド"
+msgstr "もっとくわしく知るには"
 
 #: js/turtledefs.js:153
 #: js/turtledefs.js:199
 ## しょうさい＝詳細
 msgid "A detailed guide to Music Blocks is available."
-msgstr "ミュージック・ブロックスの詳細ガイドがあります。"
+msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。<br><a href="https://github.com/sugarlabs/musicblocks/tree/master/guide-ja">https://github.com/sugarlabs/musicblocks/tree/master/guide-ja</a>"
 
 #: js/turtledefs.js:153
 #: js/turtledefs.js:199
@@ -1540,12 +1538,12 @@ msgstr "ミュージック・ブロックスガイド"
 #: js/turtledefs.js:154
 #: js/turtledefs.js:200
 msgid "Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:"
-msgstr ""
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。ミュージック・ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。ミュージック・ブロックスの最新バージョンは"
 
 #: js/turtledefs.js:154
 #: js/turtledefs.js:200
 msgid "Music Blocks GitHub repository"
-msgstr ""
+msgstr "ミュージック・ブロックスのリポジトリ"
 
 #: js/turtledefs.js:155
 #: js/turtledefs.js:201
@@ -1555,7 +1553,7 @@ msgstr "おめでとうございます！"
 #: js/turtledefs.js:155
 #: js/turtledefs.js:201
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr "ツアーが終わりました。ミュージック・ブロックスをどうぞ、これからも楽しんでください。"
+msgstr "ミスター・マウスのツアーはここで終わり。ミュージック・ブロックスを自由に楽しもう。"
 
 #: js/turtledefs.js:165
 msgid "Play music"
@@ -1597,11 +1595,11 @@ msgstr "膨らむブロックを 表示/非表示"
 
 #: js/turtledefs.js:180
 msgid "Initialize a new project."
-msgstr "新プロジェクトを初期化する"
+msgstr "新しいプロジェクトを作る。"
 
 #: js/turtledefs.js:183
 msgid "Load samples from server"
-msgstr "「プラネット」サーバからサンプルをダウンロードする"
+msgstr "インターネットの「プラネット（わくせい）」というページから、ほかの人が作ったプロジェクトを選んで、読みこむことができる。"
 
 #: js/turtledefs.js:183
 msgid "This button opens a viewer for loading example projects."
@@ -1609,7 +1607,7 @@ msgstr "このボタンをクリックすると、プロジェクト例をダウ
 
 #: js/turtledefs.js:184
 msgid "Save your project to as a Lilypond file."
-msgstr "Lilypondファイルとして保存します。"
+msgstr "作成した音楽を、コンピューター上でがくふをえがくファイル（Lilypondファイル）に変えてほぞんする。"
 
 #: js/turtledefs.js:185
 msgid "To copy a stack to the clipboard, right-click on the stack."
@@ -1632,33 +1630,32 @@ msgid "You can also use Alt+V to paste a stack of blocks. "
 msgstr "Alt+Vでブロックスを貼り付けることもできます。"
 
 #: js/turtledefs.js:188
-## 極座標系=きょくざひょうけい https://ja.wikipedia.org/wiki/%E6%A5%B5%E5%BA%A7%E6%A8%99%E7%B3%BB ; Is there a shorter way to say this?
 msgid "Show or hide a polar-coordinate grid."
-msgstr "極座標を表示する/隠す"
+msgstr "カンバス上にほうがん（ざひょう）や中心の角度を表示したり、かくしたりできる。"
 
 #: js/turtledefs.js:191
 msgid "Enable scrolling"
-msgstr "スクロールをONに"
+msgstr "自由な方向に／たて方向にスクロール"
 
 #: js/turtledefs.js:191
 msgid "You can scroll the blocks on the canvas."
-msgstr "キャンバス上のブロックスをスクロールできます。"
+msgstr "カンバス上をドラッグそうさしたときに、画面をスクロールさせることができる方向を上下だけと上下左右に変える。"
 
 #: js/turtledefs.js:194
 msgid "Display statistics about your Music project."
-msgstr "今までの作品の統計を表示する"
+msgstr "プロジェクトに含まれているブロックの種類、わりあいなど、とうけいてきなじょうほうを表示する。"
 
 #: js/turtledefs.js:195
 msgid "Delete a selected plugin."
-msgstr "選ばれているプラグインを消す"
+msgstr "せんたくしたプラグインを消す。"
 
 #: js/turtledefs.js:207
 msgid "The Note block is a container for one or more Pitch blocks."
-msgstr ""
+msgstr "<h2>音符（おんぷ）ブロック</h2><br>音の長さと高さをせっていする。長さを決め、「音の高さブロック」を入れて使う。"
 
 #: js/turtledefs.js:207
 msgid "The Note block specifies the duration (note value) of its contents."
-msgstr "ミュージック・ブロックスの一番基本なブロックは「音符」ブロックです。「音符」ブロックの中にピッチブロックが入られることができます。"
+msgstr "<br><br>「音の高さブロック」を２つ以上入れると、音を同時に出すことができる。"
 
 #: js/turtledefs.js:208
 msgid "You can use multiple Drum blocks within a Note block."
@@ -1666,15 +1663,15 @@ msgstr "「音符」ブロックはピッチの長さがどのぐらいか決め
 
 #: js/turtledefs.js:209
 msgid "A rest of the specified note value duration can be constructed using a Silence block."
-msgstr ""
+msgstr "<h2>休符（きゅうふ）ブロック</h2><br>音がない部分に使われる。<br><br>★休符（きゅうふ）とは<br>休みの長さ。"
 
 #: js/turtledefs.js:210
 msgid "The Note value block is the value of the duration of the note currently being played."
-msgstr "<em>音価</em>"ブロックは音符の長さの値です。"
+msgstr "<h2>音の長さブロック</h2><br>音の長さを表示する。<br>"
 
 #: js/turtledefs.js:212
 msgid "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
-msgstr "<em>拍子</em>ブロックで音楽のビートを決めます。拍子ブロックは拍子記号ブロックと一緒に使ってデフォルトが4/4です。"
+msgstr "<h2>拍子（ひょうし）ブロック</h2><br>拍子（ひょうし）をせっていする。ひょうじゅんは４分の４拍子（びょうし）。<br><br>★拍子（ひょうし）とは<br>拍がいくつかまとまったもの。<br>★４分の４拍子（びょうし）とは<br>４分音符（おんぷ）が４つでひとまとまりになった拍子（ひょうし）。<br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
 #: js/turtledefs.js:213
 msgid "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
@@ -1682,35 +1679,35 @@ msgstr ""
 
 #: js/turtledefs.js:214
 msgid "The Beats per minute block sets the number of 1/4 notes per minute."
-msgstr "<em>BPM(一分あたりの拍数)</em>ブロックは決められている音価(例えば1/4)で拍にします。"
+msgstr "<h2>スピードを決めるブロック</h2><br>１分あたりの拍（はく）の数をせっていすることで、曲のスピードを決める。ひょうじゅんは４分音符（おんぷ）９０こ。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
 #: js/turtledefs.js:215
 msgid "The On-every-note block let you specify actions to take on every note."
-msgstr "<em>全部の拍に～する</em>ブロックは全部の拍に特定されているアクションをします。"
+msgstr "<h2>全部の音符（おんぷ）に～するブロック</h2><br>すべての音符（おんぷ）にせっていするときに使う。<br><br>"
 
 #: js/turtledefs.js:216
 msgid "The Beat count block is the number of the current beat,"
-msgstr ""
+msgstr "<h2>拍（はく）の位置ブロック</h2><br>小節の中で何拍（はく）目かをあらわす数。たとえば、各小節の３拍（はく）めに何かアクション・イベントを起こしたいときなどに使う。"
 
 #: js/turtledefs.js:216
 msgid "e.g., 1, 2, 3, or 4."
-msgstr ""
+msgstr "<br>図の例では、それぞれの小節の１拍（ぱく）目に、特定のアクション・イベントを起こしている。"
 
 #: js/turtledefs.js:216
 msgid "In the figure, it is used to take an action on the first beat of each measure."
-msgstr ""
+msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。<br>★小節（しょうせつ）とは<br>楽譜（がくふ）の、たての線で区切られた部分。小節（しょうせつ）の中の拍（はく）は、拍子（ひょうし）と同じ数になる。"
 
 #: js/turtledefs.js:217
 msgid "The Notes played block is the number of notes that have been played."
-msgstr ""
+msgstr "<h2>全体の拍（はく）の数ブロック</h2><br>全体の拍（はく）の数を表示する。ひょうじゅんは拍（はく）は４分音符（おんぷ）を意味するため、げんそくは、曲全体の４分音符（おんぷ）の数を表す。"
 
 #: js/turtledefs.js:217
 msgid "(By default, it counts quarter notes.)"
-msgstr ""
+msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
 #: js/turtledefs.js:219
 msgid "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
-msgstr "<em>ピッチブ</em>ロックはピッチの名前とピッチのオクターヴを決めます。"
+msgstr "<h2>音の高さブロック</h2><br>音の高さをせっていする。名前とオクターヴの高さを決めて使う。音の周波数も同時に決まる。<br><br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。<br>★オクターヴの高さとは<br>同じ名前でも高さがちがう音を表すすうち。<br><br>"
 
 #: js/turtledefs.js:220
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
@@ -1722,68 +1719,68 @@ msgstr ""
 
 #: js/turtledefs.js:222
 msgid "The Pitch Number block will play a pitch associated by its number, e.g, 1 for C, 7 for G."
-msgstr ""
+msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを、数で表示する。たとえば、「ド」ならば１、「ソ」ならば７と表示される。"
 
 #: js/turtledefs.js:223
 msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
-msgstr ""
+msgstr "<h2>音階内を上る／下りるブロック</h2><br>音階内を順番に（ある一定のかんかくで）上りながら、または下りながら音をえんそうする。すうちをせっていすることで、次の音は前の音といくつちがうかが決まる。<br>たとえば、すうちを１にせっていした場合、ソの次にはラ（ソの１音上）、ファの次にはソ（ファの１音上）がえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。"
 
 #: js/turtledefs.js:223
 msgid "e.g., if the last note played was sol, Scalar Step 1 will play la."
-msgstr ""
+msgstr "<br><br>たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>"
 
 #: js/turtledefs.js:224
 msgid "The Hertz block (in combination with a Number block) will play a sound at the specified frequency."
-msgstr "<em>ヘルツ</em>ブロックは（<em>数字</em>ブロックと一緒）特定されている周波数でピッチを鳴らします。"
+msgstr "<h2>ヘルツブロック</h2><br>音の高さをヘルツ（周波数の単位）でせっていする。「すうちブロック」を組み合わせて使う。<br><br>★ヘルツとは<br>音の高さを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。<br><br>"
 
 #: js/turtledefs.js:225
 msgid "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale."
-msgstr "<em>音階内の移調</em>ブロックは<em>音符</em>の中に入っている音高を上（または下）に、特定されている<em>数字</em>の値によって、音階の音高で移動します。"
+msgstr "<h2>調を変えるブロック</h2><br>「音符ブロック」内の音の高さを、すべて（音階内で、せっていしたすうち分だけ）上げる、または下げる。"
 
 #: js/turtledefs.js:225
 msgid "In the example shown above, sol is shifted up to la."
-msgstr "例の画像に<em>ソル</em>が<em>ラ</em>に上に移動されています。"
+msgstr "<br><br>図の例では、ソがラに、ラがシに、シがドに…と置きかえられている。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。"
 
 #: js/turtledefs.js:226
 msgid "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
-msgstr ""
+msgstr "<h2>音の高さをヘルツで表示ブロック</h2><br>音の高さをヘルツで表示する。<br>たとえば、オクターヴが４のラの音は、４４０ヘルツというすうちで表すことができる。<br><br>★ヘルツとは<br>音の高さを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。<br><br>"
 
 #: js/turtledefs.js:227
 msgid "The Pitch number block is the value of the pitch of the note currently being played."
-msgstr "<em>ピッチ数値</em>ブロックは音高を数字として（半音ずつ）の値です。"
+msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数で表示する。<br>"
 
 #: js/turtledefs.js:229
 msgid "The Set key block is used to set the key and mode,"
-msgstr "<em>音階の設定</em>ブロックは音階（キー、またモード）を設定するためです"
+msgstr "<h2>調をせっていブロック</h2><br>調の部分に音の高さ、音階の部分に音階の種類を選び、調をせっていする。<br><br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。<br>★音階とは<br>順番に並んだ音のまとまり。"
 
 #: js/turtledefs.js:229
 msgid "e.g., C Major"
-msgstr "（例えば<em>「ド」メージャー</em>）"
+msgstr "たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/turtledefs.js:230
 msgid "The Mode length block is the number of notes in the current scale."
-msgstr "<em>音階の音数</em>ブロックは現在の音階の音高の数です。"
+msgstr "<h2>音階の音数ブロック</h2><br>えんそうされている音階の、音の数を表示する。"
 
 #: js/turtledefs.js:230
 msgid "Most Western scales have 7 notes."
-msgstr "例えば「メージャー」は七つの音高です。"
+msgstr "西洋のほとんどの音階は、7つの音をもつ。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/turtledefs.js:231
 msgid "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
-msgstr "<em>音階的音程</em>ブロックは音階にない音高を無視、特定されている値（音程）によって新しい音高を計算して鳴らします。"
+msgstr "<h2>音階の上下ブロック</h2><br>中に組み入れる「音符（おんぷ）ブロック」の音をきじゅんにして、別の音をつけ加える。"
 
 #: js/turtledefs.js:231
 msgid "In the figure, we add la to sol."
-msgstr "例の画像には<em>ソル</em>が<em>ラ</em>になります。"
+msgstr "<br><br>上の図では、ソの「音符（おんぷ）ブロック」をきじゅんにして、「音階の上下ブロック」のすうちを２にせっていしているので、ソと、ソから２音あがったシの音が同時にえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/turtledefs.js:232
 msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
-msgstr ""
+msgstr "<h2>音律（おんりつ）をせっていブロック</h2><br>ミュージック・ブロックスで用いる音階の調律（ちょうりつ）のしかたをせっていする。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調律（ちょうりつ）とは<br>楽器の音の高さを、音律（おんりつ）にしたがって整えること。<br>★音律（おんりつ）とは<br>音程（おんてい）（音どうしのへだたり）の決め方。同じ音階でも、音律（おんりつ）によって音の高さが変わる。<br>★オクターヴの高さとは<br>同じ名前でも高さがちがう音を表すすうち。<br>"
 
 #: js/turtledefs.js:234
 #: js/turtledefs.js:368
 msgid "The Set timbre block selects a voice for the synthesizer,"
-msgstr "<em>音色を設定</em>ブロックで声部のシンセを決めます"
+msgstr "<h2>音色のせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br>　"
 
 #: js/turtledefs.js:234
 #: js/turtledefs.js:368
@@ -1792,55 +1789,55 @@ msgstr "（例えば、ギター、ピアノ、バイオリン、チェロなど
 
 #: js/turtledefs.js:235
 msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
-msgstr "<em>スタッカート</em>ブロックは音符の鳴らす時刻を、特定されている値で、短くします。音符の音価は変わりません。"
+msgstr "<h2>スタッカートブロック</h2><br>音を短かく切る。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
 
 #: js/turtledefs.js:236
 msgid "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
-msgstr "<em>スラー</em>ブロックは音符の鳴らす時刻を、特定されている値で、長くします。音符の音価は変わりません。"
+msgstr "<h2>スラーブロック</h2><br>音と次の音をなめらかにつなげる。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
 
 #: js/turtledefs.js:237
 msgid "The Vibrato block adds a rapid, slight variation in pitch."
-msgstr ""
+msgstr "<h2>ビブラートブロック</h2><br>音の高さに小きざみな変化をつける。"
 
 #: js/turtledefs.js:238
 msgid "The Neighbor block rapidly switches between neighboring pitches."
-msgstr ""
+msgstr "<h2>音を加えるブロック</h2><br>２つの同じ高さの音のあいだに、音を１つ入れることができる。<br>図の例では、ソとソのあいだにラが入り、「ソラソ」とすばやくえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/turtledefs.js:240
 msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr "<em>クレシェンド</em>ブロックは重ねられている音符の音量を特定されている値で大きくしたり、小さくしたりします。"
+msgstr "<h2>クレシェンドブロック</h2><br>音量をだんだん大きくする。"
 
 #: js/turtledefs.js:240
 msgid "For example, if you have 7 notes in sequence contained in a Crescendo block with a value of 5, the final note will be at 35% more than the starting volume."
-msgstr "例えば、もし七つの音符が<em>クレシェンド</em>ブロックに重ねられていたら、最後の音符の音量が最初の音符より３５％で大きく鳴らします。"
+msgstr "<br>たとえば、７つの音に、すうちが５の「クレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がふえ、さいごの音はさいしょの音よりも３５パーセント音量が大きくなる。<br><br>　"
 
 #: js/turtledefs.js:241
 msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr ""
+msgstr "<h2>デクレシェンドブロック</h2><br>音量をだんだん小さくする。"
 
 #: js/turtledefs.js:241
 msgid "For example, if you have 7 notes in sequence contained in a Decrescendo block with a value of 5, the final note will be at 35% less than the starting volume."
-msgstr ""
+msgstr "<br>たとえば、７つの音にすうちが５の「デクレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がへり、さいごの音はさいしょの音よりも３５パーセント音量が小さくなる。"
 
 #: js/turtledefs.js:242
 msgid "The Set synth volume block will change the volume of a particular synth,"
-msgstr "<em>シンセの音量を設定</em>ブロックは特定されているシンセ（ギター、バイオリン、スネアドラムなど）の音量を変えます。"
+msgstr "<h2>楽器の音量をせっていブロック</h2><br>ギター、ヴァイオリン、スネアドラムなどの楽器の音量をせっていする。"
 
 #: js/turtledefs.js:242
 msgid "e.g., guitar, violin, snare drum, etc."
-msgstr "デフォルト音量が５０％です。"
+msgstr "<br><br>例えば、ギター、バイオリン、スネアドラムなど。"
 
 #: js/turtledefs.js:242
 msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
-msgstr "０から１００まで設定できます。"
+msgstr "デフォルトは音量５０。０から１００までのすうちをせっていできる。<br><br>　"
 
 #: js/turtledefs.js:243
 msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr ""
+msgstr "<h2>全体の音量をせっていブロック</h2><br>全体の音量をせっていする。"
 
 #: js/turtledefs.js:246
 msgid "The Set drum block will select a drum sound to replace the pitch of any contained notes."
-msgstr "<em>ドラムを設定</em>ブロックで重ねられている音符の音高をドラムの音に変えることができます。"
+msgstr "<h2>ドラムをせっていブロック</h2><br>「音符（おんぷ）ブロック」内の音を、ドラムの音に置きかえる。<br>図の例では、ソの音のかわりに、キックドラムの音がえんそうされる。"
 
 #: js/turtledefs.js:246
 msgid "In the example above, a kick drum sound will be played instead of sol."
@@ -1848,47 +1845,47 @@ msgstr "例の画像に<em>ソル</em>の代わりに<em>キックドラム</em>
 
 #: js/turtledefs.js:248
 msgid "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
-msgstr ""
+msgstr "<h2>実行じょうきょうブロック</h2><br>ブロックの実行じょうきょうをけんさくするテーブルを表示する。<br>"
 
 #: js/turtledefs.js:249
 msgid "The Pitch-time Matrix block opens a tool to create musical phrases."
-msgstr ""
+msgstr "<h2>フレーズメーカーブロック</h2><br>フレーズを作るためのテーブルを表示する。作ったフレーズをデータ化することができる。<br><br>★フレーズとは<br>ひとまとまりの音楽。<br><br>"
 
 #: js/turtledefs.js:250
 msgid "The Rhythm Maker block opens a tool to create drum machines."
-msgstr ""
+msgstr "<h2>リズムメーカーブロック</h2><br>音の長さでぶんかつしてリズムを作るテーブルを表示する。作ったリズムをデータ化することができる。<br><br>"
 
 #: js/turtledefs.js:251
 msgid "The Pitch-slider block opens a tool to generate arbitray pitches."
-msgstr ""
+msgstr "<h2>ヘルツスライダーブロック</h2><br>スライダーを上下にうごかすことで、違う周波数（ヘルツのすうち）の音を聞くことができる。作った音をデータ化することができる。ヘルツの初期せっていちは、自由に変えられる。<br><br>★ヘルツとは<br>音の高さを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。"
 
 #: js/turtledefs.js:252
 msgid "The Rhythm block is used to generate rhythm patterns."
-msgstr ""
+msgstr "<h2>連符（れんぷ）ブロック（かけ算）</h2><br>まとまったいくつかの音符（おんぷ）。一定の長さの音を３つや５つなどくり返して使う。３連符（れんぷ）や５連符（れんぷ）など、２の倍数ではない音符（おんぷ）の数でグループを作りやすくなる。"
 
 #: js/turtledefs.js:253
 msgid "Tuplets are a collection of notes that get scaled to a specific duration."
-msgstr ""
+msgstr "<h2>連符（れんぷ）ブロック（わり算）</h2><br>まとまったいくつかの音符（おんぷ）。一定の長さの音を３つや５つに等分して使う。"
 
 #: js/turtledefs.js:253
 msgid "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-msgstr ""
+msgstr "<br><br>３連符（れんぷ）や５連符（れんぷ）など、２の倍数ではない音符（おんぷ）の数でグループを作りやすくなる。"
 
 #: js/turtledefs.js:254
 msgid "The Music keyboard block opens a piano keyboard that can be used to create notes."
-msgstr ""
+msgstr "<h2>キーボードブロック</h2><br>ピアノのキーボードを表示する。作った音をデータ化することができる。<br><br>　"
 
 #: js/turtledefs.js:255
 msgid "The Tempo block opens a metronome to visualize the beat."
-msgstr ""
+msgstr "<h2>メトロノームブロック</h2><br>メトロノームを表示する。ボタンをおすと、メトロノームのはやさを変えられる。テーブル（表）には、１分あたりの拍（はく）の数が表示される。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
 #: js/turtledefs.js:256
 msgid "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
-msgstr ""
+msgstr "<h2>モード（音階）ブロック</h2><br>いろいろな音階をさがすツールを表示する。音階は、音と音のかんかくを決めながらさがすことができる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/turtledefs.js:258
 msgid "The Repeat block will repeat the contained blocks."
-msgstr "<h2>実行ブロック（繰り返し）</h2><br>はさまれているブロックのプログラムを、入力した回数だけくり返す。"
+msgstr "<h2>実行ブロック（くり返し）</h2><br>はさまれているブロックのプログラムを、入力した回数だけくり返す。"
 
 #: js/turtledefs.js:258
 msgid "In this example the note will be played 4 times."
@@ -1896,7 +1893,7 @@ msgstr "<br><br>図の例では、「アクション」が４回実行される�
 
 #: js/turtledefs.js:259
 msgid "The Forever block will repeat the contained blocks forever."
-msgstr "<h2>実行ブロック（繰り返し）</h2><br>「ずっとくり返す」のブロックは、実行を停止しない限り、はさまれているブロックをくり返し実行する。"
+msgstr "<h2>実行ブロック（くり返し）</h2><br>「ずっとくり返す」のブロックは、実行を停止しないかぎり、はさまれているブロックをくり返し実行する。"
 
 #: js/turtledefs.js:259
 msgid "In this example, a simple drum machine, a kick drum will play 1/4 notes forever."
@@ -1905,25 +1902,25 @@ msgstr "<br><br>図の例は「アクション」の実行をくり返す。"
 #: js/turtledefs.js:260
 #: js/turtledefs.js:261
 msgid "Conditionals lets your program take different actions depending on the condition."
-msgstr "<h2>条件ブロック</h2><br>条件ブロックを使うと、条件によってちがうはたらきをするプログラムを作ることができる。"
+msgstr "<h2>じょうけんブロック</h2><br>じょうけんブロックを使うと、じょうけんによってちがうはたらきをするプログラムを作ることができる。"
 
 #: js/turtledefs.js:260
 #: js/turtledefs.js:261
 msgid "In this example, if the mouse button is pressed, a snare drum will play."
-msgstr "<br><br>図の例では、もし、パソコンのマウスを長押ししていれば「スネアドラム」ブロックを演奏する。"
+msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「スネアドラム」ブロックを演奏する。"
 
 #: js/turtledefs.js:260
 #: js/turtledefs.js:261
 msgid "Otherwise (else) a kick drum will play."
-msgstr "<br><br>図の例では、もし、パソコンのマウスを長押ししていれば「スネアドラム」ブロックを、長押ししていなければ（そうでなければ）キックドラム・ブロックを演奏する。"
+msgstr "<br><br>そうでなければ「キックドラム」ブロックを演奏する。"
 
 #: js/turtledefs.js:262
 msgid "The Backward block runs code in reverse order (Musical retrograde)."
-msgstr "<h2>実行ブロック（逆実行）</h2><br>はさまれているブロックを、通常とは逆の順序で、下から上に向かって実行する。"
+msgstr "<h2>実行ブロック（ぎゃく実行）</h2><br>はさまれているブロックを、つうじょうとはぎゃくの順じょで、下から上に向かって実行する。"
 
 #: js/turtledefs.js:264
 msgid "The Action block is used to group together blocks so that they can be used more than once."
-msgstr "<h2>アクションブロック</h2><br>複数のブロックを１つのグループとしてまとめ、実行する。グループとなったプログラムは、１つの「アクション」として自由に名前をつけることができる。"
+msgstr "<h2>アクションブロック</h2><br>ふくすうのブロックを１つのグループとしてまとめ、実行する。グループとなったプログラムは、１つの「アクション」として自由に名前をつけることができる。"
 
 #: js/turtledefs.js:264
 msgid "It is often used for storing a phrase of music that is repeated."
@@ -1931,11 +1928,11 @@ msgstr "<br><br>何度も実行する音楽のフレーズなどにアクショ�
 
 #: js/turtledefs.js:265
 msgid "Each Start block is a separate voice."
-msgstr "<h2>スタートブロック</h2><br>実行ボタンが押されると、スタートブロックが実行される。プログラムには、少なくとも１つのスタートブロックが置かれていないと実行できない。"
+msgstr "<h2>スタートブロック</h2><br>実行ボタンがおされると、スタートブロックが実行される。"
 
 #: js/turtledefs.js:265
 msgid "All of the Start blocks run at the same time when the Play button is pressed."
-msgstr "<br><br>複数のスタートブロックがあるときは、実行ボタンが押されると、複数のスタートブロックが同時に実行される。<br><br>１つ１つのスタートブロックは別々の演奏者と考えることができる。"
+msgstr "<br><br>プログラムには、少なくとも１つのスタートブロックが置かれていないと実行できない。ふくすうのスタートブロックがあるときは、実行ボタンがおされると、ふくすうのスタートブロックが同時に実行される。１つ１つのスタートブロックは別々のえんそう者と考えることができる。"
 
 #: js/turtledefs.js:266
 msgid "The Listen block is used to listen for an event such as a mouse click."
@@ -1947,7 +1944,7 @@ msgstr "<br><br>イベントの発生は、各スクリプトが【イベント�
 
 #: js/turtledefs.js:267
 msgid "The Dispatch block is used to trigger an event."
-msgstr "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのスクリプトに送る。"
+msgstr "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのネズミに送る。<br>イベントの発生は、各スクリプトが【イベントの時にアクション】で指定したアクションの引きがねとしてはたらく。"
 
 #: js/turtledefs.js:268
 #: js/turtledefs.js:405
@@ -1957,11 +1954,11 @@ msgstr "<h2>アクションブロック（指定）</h2><br>指定したアク�
 
 #: js/turtledefs.js:268
 msgid "In the example, it is used with the One of block to choose a random phase."
-msgstr "見本は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムに実行させる。"
+msgstr "<br><br>図の例は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムに実行させる。"
 
 #: js/turtledefs.js:270
 msgid "The Store in Box 1 block is used to store a value in Box 1."
-msgstr "<h2>数の箱（値を入れる）</h2><br>箱１に指定した数値を入れる。"
+msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱１に指定したすうちを入れる。"
 
 #: js/turtledefs.js:271
 msgid "The Box 1 block returns the value stored in Box 1."
@@ -1969,7 +1966,7 @@ msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱１の�
 
 #: js/turtledefs.js:272
 msgid "The Store in Box 2 block is used to store a value in Box 2."
-msgstr "<h2>数の箱（値を入れる）</h2><br>箱２に指定した数値を入れる。"
+msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱２に指定したすうちを入れる。"
 
 #: js/turtledefs.js:273
 msgid "The Box 2 block returns the value stored in Box 2."
@@ -1977,7 +1974,7 @@ msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱２の�
 
 #: js/turtledefs.js:274
 msgid "The Add-to block is used to add to the value stored in a box."
-msgstr "<h2>数の箱（値を変える）</h2><br>指定した箱に、好きな数値を足す。"
+msgstr "<h2>数の箱（あたいを変える）</h2><br>指定した箱に、好きなすうちを足す。マイナスのすうちを使うと引き算になる。"
 
 #: js/turtledefs.js:274
 msgid "It can also be used with other blocks, such as Color, Pen-size."
@@ -1989,99 +1986,99 @@ msgstr "<br>"
 
 #: js/turtledefs.js:275
 msgid "The Add-1-to block adds one to the value stored in a box."
-msgstr "<h2>数の箱（値を変える）</h2><br>指定した箱に、１を足す。"
+msgstr "<h2>数の箱（あたいを変える）</h2><br>指定した箱に、１を足す。"
 
 #: js/turtledefs.js:277
 msgid "The Number block holds a number."
-msgstr "<h2>数値ブロック</h2><br>数値を表すブロック。"
+msgstr "<h2>すうちブロック</h2><br>すうちを指定するブロック。"
 
 #: js/turtledefs.js:278
 msgid "The Random block returns a random number."
-msgstr "<h2>数値ブロック（ランダム）</h2><br>指定した最小値から最大値までの範囲で、ランダムな数値になる。<br><br>★ランダムとはサイコロの目のように、何が出るか分からない数値のこと。<br><br>ランダム（random）は日本語で「乱数」「でたらめな」という意味。ランダムを使うと、実行のたびに演奏順序が変わる曲などを作ることができる。"
+msgstr "<h2>すうちブロック（ランダム）</h2><br>指定したさいしょうちからさいだいちまでのはんいで、ランダムなすうちになる。<br><br>★ランダムとは<br>サイコロの目のように、何が出るか分からないすうちのこと。ランダム（random）は日本語で「らんすう」「でたらめな」という意味。ランダムを使うと、実行のたびにえんそう順じょが変わる曲などを作ることができる。"
 
 #: js/turtledefs.js:279
 msgid "The One-of block returns one of two choices."
-msgstr "<h2>特殊ブロック（ランダム）</h2><br>つないだ２つのブロックのうち、1つだけをランダムに選ぶ。「数値」「アクション名」など、さまざまなブロックをつなぐことができる。<br><br>★ランダムとはサイコロの目のように、何が出るか分からない数値のこと。<br><br>ランダム（random）は日本語で「乱数」「でたらめな」という意味。ランダムを使うと、実行のたびに演奏順序が変わる曲などを作ることができる。"
+msgstr "<h2>特殊ブロック（ランダム）</h2><br>つないだ２つのブロックのうち、1つだけをランダムに選ぶ。「すうち」「アクション名」など、さまざまなブロックをつなぐことができる。<br><br>★ランダムとは<br>サイコロの目のように、何が出るか分からないすうちのこと。ランダム（random）は日本語で「らんすう」「でたらめな」という意味。ランダムを使うと、実行のたびにえんそう順じょが変わる曲などを作ることができる。"
 
 #: js/turtledefs.js:280
 msgid "The Plus block is used to add."
-msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値を足し合わせた計算結果を表す数値ブロック。"
+msgstr "<h2>すうちブロック（計算）</h2><br>２つのすうちを足し合わせた計算結果を表すすうちブロック。"
 
 #: js/turtledefs.js:281
 msgid "The Minus block is used to subtract."
-msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値の引き算した計算結果を表す数値ブロック。<br><br>上につないだ数値から、下につないだ数値を引く。"
+msgstr "<h2>すうちブロック（計算）</h2><br>２つのすうちの引き算した計算結果を表すすうちブロック。上につないだすうちから、下につないだすうちを引く。"
 
 #: js/turtledefs.js:282
 msgid "The Multiply block is used to multiply."
-msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値を掛け合わせた計算結果を表す数値ブロック。"
+msgstr "<h2>すうちブロック（計算）</h2><br>２つのすうちを掛け合わせた計算結果を表すすうちブロック。"
 
 #: js/turtledefs.js:283
 msgid "The Divide block is used to divide."
-msgstr "<h2>数値ブロック（計算）</h2><br>２つの数値の割り算した計算結果を表す数値ブロック。<br><br>上につないだ数値を、下につないだ数値で割る。"
+msgstr "<h2>すうちブロック（計算）</h2><br>２つのすうちの割り算した計算結果を表すすうちブロック。上につないだすうちを、下につないだすうちで割る。"
 
 #: js/turtledefs.js:285
 msgid "The Greater-than block returns True if the top number is greater than the bottom number."
-msgstr "<h2>真偽ブロック（大なり）</h2><br>２つの数値をくらべて、数値の大小を判定する。「＞」は上の数値が下の数値よりも大きければ「真（しん）」、下の数値と同じか小さければ「偽（ぎ）」という結果になる。<br><br>★真偽（しんぎ）ブロックとは「もし～ならば」などの条件ブロックを動かすために必要なブロック。<br><br>「もし～ならば」は、正確に表現すると、「もし～という条件が正しいならば、次のブロックを実行する」という意味である。真偽ブロックは不等式などによる比較が「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
+msgstr "<h2>しんぎブロック（大なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「</h2>」は上のすうちが下のすうちよりも大きければ「真（しん）」、下のすうちと同じか小さければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
 #: js/turtledefs.js:286
 msgid "The Less-than block returns True if the top number is less than the bottom number."
-msgstr "<h2>真偽ブロック（小なり）</h2><br>２つの数値をくらべて、数値の大小を判定する。「＜」は上の数値が下の数値よりも小さければ「真（しん）」、下の数値と同じか大きければ「偽（ぎ）」という結果になる。</h2><br>★真偽（しんぎ）ブロックとは「もし～ならば」などの条件ブロックを動かすために必要なブロック。「もし～ならば」は、正確に表現すると、「もし～という条件が正しいならば、次のブロックを実行する」という意味である。真偽ブロックは不等式などによる比較が「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
+msgstr "<h2>しんぎブロック（小なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「<h2>」は上のすうちが下のすうちよりも小さければ「真（しん）」、下のすうちと同じか大きければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
 #: js/turtledefs.js:287
 msgid "The Equal block returns True if the two numbers are equal."
-msgstr "<h2>真偽ブロック（等しい）</h2><br>２つの数値をくらべて、同じ数値であるかどうか判定する。「＝」は、２つの数値が同じであれば「真（しん）」、同じでなければ「偽（ぎ）」という結果になる。<br><br>★真偽（しんぎ）ブロックとは「もし～ならば」などの条件ブロックを動かすために必要なブロック。<br><br>「もし～ならば」は、正確に表現すると、「もし～という条件が正しいならば、次のブロックを実行する」という意味である。真偽ブロックは不等式などによる比較が「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
+msgstr "<h2>しんぎブロック（等しい）</h2><br>２つのすうちをくらべて、同じすうちであるかどうかはんていする。「＝」は、２つのすうちが同じであれば「真（しん）」、同じでなければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
 #: js/turtledefs.js:289
 msgid "The Forward block moves the mouse forward."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>指定したすうち分、ネズミを前に進める。"
 
 #: js/turtledefs.js:290
 msgid "The Back block moves the mouse backward."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>指定したすうち分、ネズミを後ろにもどす。体の向きは変えない。"
 
 #: js/turtledefs.js:291
 msgid "The Left block turns the mouse to the left."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度で左回りに回転させる。"
 
 #: js/turtledefs.js:292
 msgid "The Right block turns the mouse to the right."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度で右回りに回転させる。"
 
 #: js/turtledefs.js:293
 msgid "The Arc block moves the mouse in a arc."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
 
 #: js/turtledefs.js:294
 msgid "The Set XY block moves the mouse to a specific position on the screen."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定したざひょうにいどうさせる。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のネズミの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。"
 
 #: js/turtledefs.js:295
 msgid "The Scroll XY block moves the canvas."
-msgstr ""
+msgstr "<h2>いどうブロック（カンバス）</h2><br>カンバスを上下左右にいどうさせる。カンバスだけがいどうするので結果的に、画面上のすべてのネズミが同時にいどうするように見える。カンバスを右（プラス）にいどうするとネズミは左へ、左（マイナス）にいどうするとネズミは右に動いて見える。同じく、カンバスを上（プラス）にいどうするとネズミは下へ、下（マイナス）にいどうするとネズミは上に動いて見える。"
 
 #: js/turtledefs.js:296
 msgid "The X block returns the horizontal position of the mouse."
-msgstr ""
+msgstr "<h2>すうちブロック</h2><br>ネズミのｘざひょう（よこ方向の位置）を表すすうちブロック。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のネズミの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。"
 
 #: js/turtledefs.js:297
 msgid "The Y block returns the vertical position of the mouse."
-msgstr ""
+msgstr "<h2>すうちブロック</h2><br>ネズミのｙざひょう（たて方向の位置）を表すすうちブロック。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のネズミの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。"
 
 #: js/turtledefs.js:298
 msgid "The Heading block returns the orientation of the mouse."
-msgstr ""
+msgstr "<h2>すうちブロック</h2><br>ネズミの向いている角度を表すすうちブロック。向きの値は、０以上で、３６０より小さい値になり、プラスだと右回り、マイナスだと左回りに変化する。"
 
 #: js/turtledefs.js:300
 msgid "The Set-pen-size block changes the size of the pen."
-msgstr ""
+msgstr "<h2>ペンブロック</h2><br>ネズミがえがく線の太さをせっていする。太さには、0より大きいあたいを使う。"
 
 #: js/turtledefs.js:301
 msgid "The Pen-up block raises the pen so that it does not draw."
-msgstr ""
+msgstr "<h2>ペンブロック</h2><br>ネズミの動きに合わせて線をえがくことをやめる。"
 
 #: js/turtledefs.js:302
 msgid "The Pen-down block lowers the pen so that it draws."
-msgstr ""
+msgstr "<h2>ペンブロック</h2><br>ネズミの動きに合わせて線をえがく。"
 
 #: js/turtledefs.js:303
 msgid "The Color block returns the current pen color."
@@ -2089,7 +2086,7 @@ msgstr ""
 
 #: js/turtledefs.js:304
 msgid "The Set-color block changes the pen color."
-msgstr ""
+msgstr "<h2>ペンブロック</h2><br>ネズミがえがく線の色をせっていする。色は画面上で選ぶほか、それぞれすうちで決めることもできる。色は、0以上で、100より小さいあたいになる。"
 
 #: js/turtledefs.js:305
 msgid "The Set-shade block changes the pen color from dark to light."
@@ -2097,39 +2094,39 @@ msgstr ""
 
 #: js/turtledefs.js:307
 msgid "The Print block displays text at the top of the screen."
-msgstr ""
+msgstr "<h2>表示ブロック（結果）</h2><br>画面の上部に、指定した実行結果のすうちや文字を表示する。表示したテキストはクリックすると消すことができる。どこでプログラムがまちがっているかをかくにんする際（デバグ）などによく用いられる。"
 
 #: js/turtledefs.js:308
 msgid "The Text block holds a text string."
-msgstr ""
+msgstr "<h2>文字ブロック</h2><br>文字を指定するブロック。"
 
 #: js/turtledefs.js:309
 msgid "The Media block is used to import an image."
-msgstr ""
+msgstr "<h2>がぞうブロック</h2><br>がぞうのブロック。ブロックのマークをおすと、コンピューター上から画像ファイルを読み込むことができる。"
 
 #: js/turtledefs.js:310
 msgid "The Show block is used to display text or images on the canvas."
-msgstr ""
+msgstr "<h2>表示ブロック（スタンプ）</h2><br>スタンプは、実行するとネズミの位置に指定した文字またはがぞうを表示する。ネズミの体の下に表れるので、小さい文字やがぞうだとネズミが移動しないと見えない場合がある。"
 
 #: js/turtledefs.js:311
 msgid "The Shell block is used to change the appearance of the mouse."
-msgstr ""
+msgstr "<h2>表示ブロック（ネズミ）</h2><br>ネズミの見た目を、指定したがぞうに変える。"
 
 #: js/turtledefs.js:312
 msgid "The Speak block outputs to the text-to-speech synthesizer"
-msgstr ""
+msgstr "<h2>音声ブロック</h2><br>打ち込んだ文字を、機械音声で読み上げる。"
 
 #: js/turtledefs.js:313
 msgid "The Height block returns the height of the canvas."
-msgstr ""
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスのたてはばのすうちを表す。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。<br>図の例では、上向きに進み続けるネズミがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
 #: js/turtledefs.js:314
 msgid "The Width block returns the width of the canvas."
-msgstr ""
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスのたてはばのすうちを表す。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。<br>図の例では、上向きに進み続けるネズミがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
 #: js/turtledefs.js:315
 msgid "The Top block returns the position of the top of the canvas."
-msgstr ""
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの上のｙざひょうち。プラスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、上（y座標）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。<br>図の例では、上向きに進み続けるネズミがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
 #: js/turtledefs.js:315
 #: js/turtledefs.js:316
@@ -2138,11 +2135,11 @@ msgstr ""
 
 #: js/turtledefs.js:316
 msgid "The Bottom block returns the position of the bottom of the canvas."
-msgstr ""
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの下のｙざひょうち。マイナスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。<br>図の例では、上向きに進み続けるネズミがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
 #: js/turtledefs.js:317
 msgid "The Left block returns the position of the left of the canvas."
-msgstr ""
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの左のｘざひょうち。マイナスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上））、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。<br>図の例では、右向きに進み続けるネズミがカンバスの右からはみ出ると、カンバスの左から出てくる。"
 
 #: js/turtledefs.js:317
 #: js/turtledefs.js:318
@@ -2151,31 +2148,31 @@ msgstr ""
 
 #: js/turtledefs.js:318
 msgid "The Right block returns the position of the right of the canvas."
-msgstr ""
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの右のｘざひょうち。プラスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。<br>図の例では、右向きに進み続けるネズミがカンバスの右からはみ出ると、カンバスの左から出てくる。"
 
 #: js/turtledefs.js:320
 msgid "The Mouse-button block returns True if the mouse button is pressed."
-msgstr ""
+msgstr "<h2>真偽ブロック（マウスボタン）</h2><br>マウスのボタンがおされているかどうかはんていする。マウスボタンがおされていれば「真（しん）」、おされていなければ「偽（ぎ）」という値になる。<br>図の例は、ネズミを使って画面上に自由に線をえがけるプログラム。ネズミがパソコンのマウスカーソルの位置にいどうし続けつつ、マウスをおしているときだけペンをおろし、線をえがく。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
 #: js/turtledefs.js:321
 msgid "The Cursor X block returns the horizontal position of the mouse."
-msgstr ""
+msgstr "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの横位置を表すｘざひょうち。<br>図の例は、ネズミを使って画面上に自由に線をえがけるプログラム。ネズミがパソコンのマウスカーソルの位置にいどうし続けつつ、マウスをおしているときだけペンをおろし、線をえがく。"
 
 #: js/turtledefs.js:322
 msgid "The Cursor Y block returns the vertical position of the mouse."
-msgstr ""
+msgstr "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルのたて位置を表すｙざひょうち。<br>図の例は、ネズミを使って画面上に自由に線をえがけるプログラム。ネズミがパソコンのマウスカーソルの位置にいどうし続けつつ、マウスをおしているときだけペンをおろし、線をえがく。"
 
 #: js/turtledefs.js:323
 msgid "The Click block returns True if a mouse has been clicked."
-msgstr ""
+msgstr "<h2>しんぎブロック（クリック）</h2><br>マウスがクリックされたかどうかはんていする。クリックとはおされたマウスボタンが、離されたときのことを示す。クリックされていれば「真（しん）」、されていなければ「偽（ぎ）」という値になる。"
 
 #: js/turtledefs.js:325
 msgid "The Set-name block is used to name a mouse."
-msgstr ""
+msgstr "<h2>文字ブロック</h2><br>ネズミに指定した名前をつけることができる。"
 
 #: js/turtledefs.js:326
 msgid "The Mouse-name block returns the name of a mouse."
-msgstr ""
+msgstr "<h2>文字ブロック</h2><br>このプログラムを実行しているネズミの名前（文字列）を表す。"
 
 #: js/turtledefs.js:329
 msgid "The Dot block extends the duration of a note by 50%."
@@ -2187,7 +2184,7 @@ msgstr ""
 
 #: js/turtledefs.js:330
 msgid "The Tie block works on pairs of notes, combining them into one note."
-msgstr ""
+msgstr "<h2>タイブロック</h2><br>２つの音をつなげて１つの音にする。「音の高さブロック」を入れて使う。同じ高さの音だけ、つなぐことができる。"
 
 #: js/turtledefs.js:331
 msgid "The Multiply note value block changes the duration of notes by changing their note values."
@@ -2325,7 +2322,7 @@ msgstr ""
 
 #: js/turtledefs.js:369
 msgid "The Chorus block adds a chorus effect."
-msgstr ""
+msgstr "<h2>コーラスブロック</h2><br>広がりのある音のひびきにする。はやさとずれで、ひびきが残る感じを調節できる。<br>"
 
 #: js/turtledefs.js:370
 msgid "The Phaser block adds a sweeping sound."
@@ -2337,7 +2334,7 @@ msgstr ""
 
 #: js/turtledefs.js:372
 msgid "The Tremolo block adds a wavering effect."
-msgstr ""
+msgstr "<h2>トレモロブロック</h2><br>ゆれるような音のひびきにする。はやさで、ゆれのはやさを調節できる。<br>"
 
 #: js/turtledefs.js:373
 msgid "The Harmonic block will add harmonics to the contained notes."
@@ -2466,11 +2463,11 @@ msgstr ""
 #: js/turtledefs.js:413
 #: js/turtledefs.js:414
 msgid "The Store in block will store a value in a box."
-msgstr "<h2>数の箱（値を入れる）</h2><br>指定した箱に、指定した数値を入れる。"
+msgstr "<h2>数の箱（あたいを入れる）</h2><br>指定した箱に、指定したすうちを入れる。"
 
 #: js/turtledefs.js:415
 msgid "The Box block returns the value stored in a box."
-msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱の数値を使う。"
+msgstr "<h2>すうちブロック</h2><br>すうちブロックとして、箱のすうちを使う。"
 
 #: js/turtledefs.js:417
 msgid "The Abs block returns the absolute value."
@@ -2615,7 +2612,7 @@ msgstr ""
 
 #: js/turtledefs.js:457
 msgid "The Set heading block sets the heading of the mouse."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度に変える。"
 
 #: js/turtledefs.js:458
 msgid "The Bezier block draws a Bezier curve."
@@ -2790,12 +2787,12 @@ msgstr "新しいプロジェクト"
 #: js/toolbar.js:328
 #: js/toolbar.js:376
 msgid "Load plugin"
-msgstr ""
+msgstr "プラグインを読みこむ"
 
 #: js/toolbar.js:337
 #: js/toolbar.js:385
 msgid "Save as HTML"
-msgstr "HTMLを保存"
+msgstr "HTMLをほぞん"
 
 #: js/toolbar.js:338
 #: js/toolbar.js:386
@@ -2820,7 +2817,7 @@ msgstr ""
 #: js/toolbar.js:344
 #: js/toolbar.js:392
 msgid "Confirm"
-msgstr ""
+msgstr "作成する"
 
 #: js/toolbar.js:345
 msgid "English (United States)"
@@ -2899,22 +2896,22 @@ msgstr "作曲家"
 #: js/SaveInterface.js:201
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr "MIDIのアウトプット楽譜にもまとめましょうか？"
+msgstr "MIDIのアウトプットがくふにもまとめましょうか？"
 
 #: js/SaveInterface.js:203
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr "ギターのTABも楽譜にまとめましょうか？"
+msgstr "ギターのTABもがくふにまとめましょうか？"
 
 #: js/SaveInterface.js:205
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr "Lilypond楽譜のフォーマットで保存"
+msgstr "Lilypondがくふのフォーマットでほぞん"
 
 #: js/SaveInterface.js:207
 #.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
 msgid "Save as PDF"
-msgstr "PDFで保存する"
+msgstr "PDFでほぞん"
 
 #: js/SaveInterface.js:224
 #: js/basicblocks.js:5138
@@ -2940,7 +2937,7 @@ msgstr "ミスター・マウス"
 
 #: js/SaveInterface.js:344
 msgid "Do you want to save your project?"
-msgstr "プロジェクトを保存しますか"
+msgstr "プロジェクトをほぞんしますか"
 
 #: js/basicblocks.js:76
 #: js/synthutils.js:67
@@ -2984,7 +2981,7 @@ msgstr "サイン波"
 #.TRANS: sawtooth wave
 #.TRANS: sawtooth wave
 msgid "sawtooth"
-msgstr "ノコギリ波(サー）"
+msgstr "ノコギリ波（サー）"
 
 #: js/basicblocks.js:131
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -3012,12 +3009,12 @@ msgstr "音程の違い"
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr "ピッチ数値"
+msgstr "音の高さを数で表示"
 
 #: js/basicblocks.js:184
 #.TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
-msgstr "音高をヘルツにする"
+msgstr "音の高さをヘルツで表示"
 
 #: js/basicblocks.js:206
 #.TRANS: MIDI is a technical standard for electronic music
@@ -3051,7 +3048,7 @@ msgstr "名前"
 #: js/basicblocks.js:4456
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr "オクターヴ"
+msgstr "オクターヴの高さ"
 
 #: js/basicblocks.js:212
 #: js/basicblocks.js:304
@@ -3078,17 +3075,17 @@ msgstr "数値をオクターヴ表記へ"
 #.TRANS: pitch inversion rotates a pitch around another pitch
 ## 転回＝てんかい
 msgid "invert"
-msgstr "転回"
+msgstr "両方向にずれる"
 
 #: js/basicblocks.js:327
 #.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
-msgstr "転回を (奇数)"
+msgstr "転回を （奇数）"
 
 #: js/basicblocks.js:344
 #.TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
-msgstr "転回を (偶数)"
+msgstr "転回を （偶数）"
 
 #: js/basicblocks.js:359
 #.TRANS: register is the octave of the current pitch
@@ -3124,47 +3121,47 @@ msgstr "音階で3度下"
 #.TRANS: seventh means the note is the six scale degrees above current note
 #.TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
-msgstr "音階で7度上"
+msgstr "7度の音"
 
 #: js/basicblocks.js:440
 #: js/basicblocks.js:2502
 #.TRANS: sixth means the note is the five scale degrees above current note
 #.TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
-msgstr "音階で6度上"
+msgstr "6度の音"
 
 #: js/basicblocks.js:452
 #: js/basicblocks.js:2514
 #.TRANS: fifth means the note is the four scale degrees above current note
 #.TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
-msgstr "音階で5度上"
+msgstr "5度の音"
 
 #: js/basicblocks.js:464
 #: js/basicblocks.js:2526
 #.TRANS: fourth means the note is three scale degrees above current note
 #.TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
-msgstr "音階で4度上"
+msgstr "４度の音"
 
 #: js/basicblocks.js:476
 #: js/basicblocks.js:2538
 #.TRANS: third means the note is two scale degrees above current note
 #.TRANS: third means the note is two scale degrees above current note
 msgid "third"
-msgstr "音階で3度上"
+msgstr "3度の音"
 
 #: js/basicblocks.js:488
 #: js/basicblocks.js:2550
 #.TRANS: second means the note is one scale degree above current note
 #.TRANS: second means the note is one scale degree above current note
 msgid "second"
-msgstr "音階で2度上"
+msgstr "2度の音"
 
 #: js/basicblocks.js:512
 #.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
-msgstr "音階内の移調"
+msgstr "調を変える（+/-）"
 
 #: js/basicblocks.js:561
 #: js/basicblocks.js:4436
@@ -3180,7 +3177,7 @@ msgstr "音度"
 #: js/basicblocks.js:607
 #.TRANS: step some number of notes in current musical scale
 msgid "scalar step"
-msgstr "音階内の動き"
+msgstr "音階内を上る／下りる（+/-）"
 
 #: js/basicblocks.js:655
 #: js/timbre.js:611
@@ -3262,7 +3259,7 @@ msgstr "ハイパス・フィルター"
 #: js/basicblocks.js:762
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
-msgstr "カスタムモード(音階）"
+msgstr "音階"
 
 #: js/basicblocks.js:790
 #.TRANS: makes a mapping between pitches and drum sounds
@@ -3272,7 +3269,7 @@ msgstr "音高-ドラム・マッパー"
 #: js/basicblocks.js:803
 #.TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
-msgstr "音高をスライダーで作る"
+msgstr "ヘルツスライダー"
 
 #: js/basicblocks.js:818
 #: js/basicblocks.js:831
@@ -3281,7 +3278,7 @@ msgstr "音高をスライダーで作る"
 #.TRANS: widget to generate pitches using a slider
 #.TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
-msgstr "ピアノ・キーボード"
+msgstr "キーボード"
 
 #: js/basicblocks.js:854
 #.TRANS: generate a progressive sequence of pitches
@@ -3290,17 +3287,16 @@ msgstr "音高の数列を作る"
 
 #: js/basicblocks.js:893
 msgid "G major scale"
-msgstr "G メジャー音階（ト長調）"
+msgstr "Gメジャー"
 
 #: js/basicblocks.js:904
 msgid "C major scale"
-msgstr "C メジャー音階（ハ長調）"
+msgstr "Cメジャー"
 
 #: js/basicblocks.js:916
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
-## 音高と時刻のグラフ is about equally as good
 msgid "pitch-time matrix"
-msgstr "音高・時刻行列"
+msgstr "フレーズメーカー"
 
 #: js/basicblocks.js:943
 msgid "1/64 note"
@@ -3364,7 +3360,7 @@ msgstr "３連符"
 
 #: js/basicblocks.js:1093
 msgid "simple tuplet"
-msgstr "シンプルな～連符"
+msgstr "連符（わり算）"
 
 #: js/basicblocks.js:1160
 #.TRANS: oscillator time (in milliseconds)
@@ -3425,7 +3421,7 @@ msgstr "長さ"
 #: js/blocks.js:2907
 #: plugins/bitcoin.rtp:27
 msgid "value"
-msgstr "数値"
+msgstr "値"
 
 #: js/basicblocks.js:1392
 msgid "define frequency"
@@ -3449,7 +3445,7 @@ msgstr "拍を～倍にするファクター"
 #.TRANS: number of beats played per minute
 #.TRANS: sets tempo by defniing a beat and beats per minute
 msgid "beats per minute"
-msgstr "BPM(一分当たりの拍数)"
+msgstr "BPM（一分当たりの拍数）"
 
 #: js/basicblocks.js:1436
 #.TRANS: count of current measure in meter
@@ -3460,7 +3456,7 @@ msgstr "小節の数"
 #.TRANS: count of current beat in meter
 ## trying "what beat"
 msgid "beat count"
-msgstr "拍の数"
+msgstr "拍の位置"
 
 #: js/basicblocks.js:1458
 #.TRANS: count the number of notes
@@ -3471,12 +3467,12 @@ msgstr "音符の合計数"
 #: js/basicblocks.js:1469
 #.TRANS: number of whole notes that have been played
 msgid "whole notes played"
-msgstr "再生された全音符の数"
+msgstr "さいせいされた全音符の数"
 
 #: js/basicblocks.js:1480
 #.TRANS: number of notes that have been played
 msgid "notes played"
-msgstr "再生された音符の数"
+msgstr "全体の拍の数"
 
 #: js/basicblocks.js:1491
 #.TRANS: don't lock notes to master clock
@@ -3526,26 +3522,26 @@ msgstr "アクション実行"
 
 #: js/basicblocks.js:1536
 msgid "on every note do"
-msgstr "全部の拍に～する"
+msgstr "全部の音符に～する"
 
 #: js/basicblocks.js:1550
 #: js/basicblocks.js:1566
 #.TRANS: sets tempo by defniing a beat and beats per minute
 #.TRANS: old block to set master tempo which doesn't set value of beat
 msgid "master beats per minute"
-msgstr "マスターBPM(一分あたりの拍数)"
+msgstr "全体のスピードを決める"
 
 #: js/basicblocks.js:1551
 #: js/basicblocks.js:1578
 #: js/basicblocks.js:1593
 msgid "bpm"
-msgstr "BPM"
+msgstr "１分あたりの拍の数"
 
 #: js/basicblocks.js:1551
 #: js/basicblocks.js:1578
 #: js/basicblocks.js:1593
 msgid "beat value"
-msgstr "拍子の値"
+msgstr "１拍"
 
 #: js/basicblocks.js:1616
 #.TRANS: anacrusis
@@ -3619,7 +3615,7 @@ msgstr "ハーモニックス"
 #.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
 ## This seems to have a lot of great stuff: https://ja.wikipedia.org/wiki/%E9%9D%9E%E5%92%8C%E5%A3%B0%E9%9F%B3#%E5%88%BA%E7%B9%8D%E9%9F%B3
 msgid "neighbor"
-msgstr "隣接音"
+msgstr "音を加える（＋/-）"
 
 #: js/basicblocks.js:1749
 #: js/basicblocks.js:2417
@@ -3639,7 +3635,7 @@ msgstr "ディストーション"
 #: js/timbre.js:1586
 #.TRANS: a wavering effect in a musical tone
 msgid "tremolo"
-msgstr "トレモロ・エフェクタ"
+msgstr "トレモロ"
 
 #: js/basicblocks.js:1798
 #: js/basicblocks.js:1816
@@ -3651,7 +3647,7 @@ msgstr "トレモロ・エフェクタ"
 #: js/timbre.js:1823
 #.TRANS: rate at which tremolo wavers
 msgid "rate"
-msgstr "レート"
+msgstr "はやさ"
 
 #: js/basicblocks.js:1800
 #: js/basicblocks.js:1835
@@ -3659,7 +3655,7 @@ msgstr "レート"
 #: js/timbre.js:1755
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
-msgstr "トレモロ・エフェクタの大きさ"
+msgstr "大きさ"
 
 #: js/basicblocks.js:1815
 #: js/timbre.js:1586
@@ -3682,11 +3678,11 @@ msgstr "基本周波数"
 #: js/timbre.js:1586
 #.TRANS: musical effect to simulate a choral sound
 msgid "chorus"
-msgstr "コーラスエフェクタ"
+msgstr "コーラス"
 
 #: js/basicblocks.js:1835
 msgid "delay"
-msgstr "ディレイエフェクタ"
+msgstr "ずれ"
 
 #: js/basicblocks.js:1853
 #: js/timbre.js:1586
@@ -3731,11 +3727,11 @@ msgstr "シンセの名前"
 #: js/basicblocks.js:1963
 #.TRANS: set the characteristics of a custom instrument
 msgid "set timbre"
-msgstr "音色の設定"
+msgstr "音色をせってい"
 
 #: js/basicblocks.js:1976
 msgid "set temperament"
-msgstr "音律を設定"
+msgstr "音律をせってい"
 
 #: js/basicblocks.js:1988
 msgid "octave space"
@@ -3812,17 +3808,17 @@ msgstr "長３度下"
 #: js/basicblocks.js:2430
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'V"
-msgstr "和音' + ' ' + 'V"
+msgstr "５度' + ' ' + 'の和音"
 
 #: js/basicblocks.js:2442
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'IV"
-msgstr "和音' + ' ' + 'IV"
+msgstr "４度' + ' ' + 'の和音"
 
 #: js/basicblocks.js:2454
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord' + ' ' + 'I"
-msgstr "和音' + ' ' + 'I"
+msgstr "１度' + ' ' + 'の和音"
 
 #: js/basicblocks.js:2589
 #.TRANS: define a custom mode
@@ -3854,7 +3850,7 @@ msgstr ""
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: set the key and mode, e.g. C Major
 msgid "set key"
-msgstr "調の設定"
+msgstr "調をせってい"
 
 #: js/basicblocks.js:2660
 #.TRANS: key, e.g., C in C Major
@@ -4052,16 +4048,16 @@ msgstr "スネアドラム"
 #: js/basicblocks.js:2973
 #.TRANS: set the current drum sound for playback
 msgid "set drum"
-msgstr "ドラムを設定"
+msgstr "ドラムをせってい"
 
 #: js/basicblocks.js:2985
 msgid "sound effect"
-msgstr ""
+msgstr "こうかおん"
 
 #: js/basicblocks.js:3011
 #.TRANS: orientation or compass direction
 msgid "heading"
-msgstr "向き"
+msgstr "向き（ネズミ）"
 
 #: js/basicblocks.js:3022
 #: js/basicblocks.js:3045
@@ -4074,7 +4070,7 @@ msgstr "向き"
 #: js/basicblocks.js:5191
 #.TRANS: y coordinate
 msgid "y"
-msgstr "y座標"
+msgstr "yざひょう（たて）"
 
 #: js/basicblocks.js:3033
 #: js/basicblocks.js:3045
@@ -4087,12 +4083,12 @@ msgstr "y座標"
 #: js/basicblocks.js:5191
 #.TRANS: x coordinate
 msgid "x"
-msgstr "x座標"
+msgstr "xざひょう（よこ）"
 
 #: js/basicblocks.js:3044
 #.TRANS: scroll canvas image by x, y position
 msgid "scroll xy"
-msgstr "xyスクロール"
+msgstr "カンバスを動かす"
 
 #: js/basicblocks.js:3059
 #: js/musickeyboard.js:218
@@ -4104,7 +4100,7 @@ msgstr "xyスクロール"
 #.TRANS: erase the screen and return the mice to the center position
 #.TRANS: clear all subdivisions from the ruler.
 msgid "clear"
-msgstr "消去"
+msgstr "もとにもどす"
 
 #: js/basicblocks.js:3070
 #.TRANS: control point in a bezier curve
@@ -4126,7 +4122,7 @@ msgstr "ベジェ曲線"
 #.TRANS: draws a part of the circumference of a circle
 ## ひらがな＝えん\E3\81
 msgid "arc"
-msgstr "円弧"
+msgstr "円をえがいていどう"
 
 #: js/basicblocks.js:3119
 ## 角度＝かくど；ジーニアス英和辞典
@@ -4141,12 +4137,12 @@ msgstr "半径"
 #: js/basicblocks.js:3133
 #.TRANS: set compass heading
 msgid "set heading"
-msgstr "向きを設定"
+msgstr "向きを変える"
 
 #: js/basicblocks.js:3145
 #.TRANS: set xy position
 msgid "set xy"
-msgstr "xy座標の設定"
+msgstr "指定ざひょうにいどう"
 
 #: js/basicblocks.js:3160
 #: js/basicblocks.js:4301
@@ -4155,7 +4151,7 @@ msgstr "xy座標の設定"
 #: plugins/rodi.rtp:379
 #.TRANS: turn right (clockwise)
 msgid "right"
-msgstr "右に曲がる"
+msgstr "右を向く"
 
 #: js/basicblocks.js:3172
 #: js/basicblocks.js:4311
@@ -4164,7 +4160,7 @@ msgstr "右に曲がる"
 #: plugins/rodi.rtp:366
 #.TRANS: turn left (counter-clockwise)
 msgid "left"
-msgstr "左に曲がる"
+msgstr "左を向く"
 
 #: js/basicblocks.js:3196
 #: plugins/rodi.rtp:73
@@ -4266,12 +4262,12 @@ msgstr "ペンを上げる"
 #: js/basicblocks.js:3412
 #.TRANS: put down the pen so that it draws when it is moved
 msgid "pen down"
-msgstr "ペン下ろす"
+msgstr "ペンを下ろす"
 
 #: js/basicblocks.js:3423
 #.TRANS: set the width of the line drawn by the pen
 msgid "set pen size"
-msgstr "ペンの大きさの設定"
+msgstr "太さをせってい"
 
 #: js/basicblocks.js:3435
 #.TRANS: set degree of translucence of the pen color
@@ -4287,7 +4283,7 @@ msgstr "色相を設定"
 #: js/basicblocks.js:3457
 ## ひらがな＝のうたん
 msgid "set shade"
-msgstr "濃淡を設定"
+msgstr "色のこさをせってい"
 
 #: js/basicblocks.js:3469
 #.TRANS: set the level of vividness of the pen color
@@ -4297,7 +4293,7 @@ msgstr "灰色を設定"
 #: js/basicblocks.js:3480
 ## 色の設定
 msgid "set color"
-msgstr "色を設定"
+msgstr "色をせってい"
 
 #: js/basicblocks.js:3494
 #.TRANS: convert a real number to an integer
@@ -4327,7 +4323,7 @@ msgstr "評価"
 #: js/basicblocks.js:3596
 ## Based on Scratch po (L40) 
 msgid "mod"
-msgstr "～で割った余り(mod)"
+msgstr "～で割った余り（mod）"
 
 #: js/basicblocks.js:3619
 ## 平方根＝へいほうこん http://jisho.org/word/%E5%B9%B3%E6%96%B9%E6%A0%B9 
@@ -4360,27 +4356,27 @@ msgstr "ランダム"
 
 #: js/basicblocks.js:3719
 msgid "min"
-msgstr "最小値"
+msgstr "さいしょうち"
 
 #: js/basicblocks.js:3719
 msgid "max"
-msgstr "最大値"
+msgstr "さいだいち"
 
 #: js/basicblocks.js:3740
-## check this
+## JA just refers to box right now
 msgid "add 1 to"
-msgstr "～に１を足す"
+msgstr "箱に１をたす"
 
 #: js/basicblocks.js:3751
 #: js/basicblocks.js:3755
 msgid "add"
-msgstr "足す"
+msgstr "加える"
 
 #: js/basicblocks.js:3751
 #: js/basicblocks.js:3755
 #: plugins/finance.rtp:28
 msgid "to"
-msgstr "箱へ"
+msgstr "～へ"
 
 #: js/basicblocks.js:3753
 #: js/basicblocks.js:3813
@@ -4399,19 +4395,19 @@ msgstr "箱へ"
 
 #: js/basicblocks.js:3831
 msgid "box 2"
-msgstr "箱２の数値"
+msgstr "箱２のすうち"
 
 #: js/basicblocks.js:3844
 msgid "store in box 2"
-msgstr "箱２に数値を入れる"
+msgstr "箱２にすうちを入れる"
 
 #: js/basicblocks.js:3857
 msgid "box 1"
-msgstr "箱１の数値"
+msgstr "箱１のすうち"
 
 #: js/basicblocks.js:3870
 msgid "store in box 1"
-msgstr "箱１に数値を入れる"
+msgstr "箱１にすうちを入れる"
 
 #: js/basicblocks.js:3904
 #.TRANS: return value from a function
@@ -4478,8 +4474,6 @@ msgstr "ヒープの長さ"
 #: js/basicblocks.js:4183
 #: plugins/heap.rtp:134
 #.TRANS: Is the heap empty?
-## Literally means "throw away the heap"
-## I am guessing
 msgid "heap empty?"
 msgstr "ヒープは空ですか？"
 
@@ -4534,24 +4528,21 @@ msgid "push"
 msgstr "プッシュ"
 
 #: js/basicblocks.js:4321
-## 上端＝じょうたん;http://jisho.org/search/%E4%B8%8A%E7%AB%AF 
 msgid "top"
-msgstr "上端"
+msgstr "ざひょうち（上）"
 
 #: js/basicblocks.js:4331
-## 下端＝かたん；http://jisho.org/word/%E4%B8%8B%E7%AB%AF 
 msgid "bottom"
-msgstr "下端"
+msgstr "ざひょうち（下）"
 
 #: js/basicblocks.js:4341
 ## 幅=はば；http://jisho.org/word/%E5%B9%85 
 msgid "width"
-msgstr "幅(横)"
+msgstr "カンバスのよこはば"
 
 #: js/basicblocks.js:4351
-## 縦;http://jisho.org/word/%E7%B8%A6 and https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q119659291 
 msgid "height"
-msgstr "高さ(縦)"
+msgstr "カンバスのたてはば"
 
 #: js/basicblocks.js:4362
 #.TRANS: stops playback of an audio recording
@@ -4566,7 +4557,7 @@ msgstr "プレーバック"
 #: js/basicblocks.js:4386
 ## Maybe 話す
 msgid "speak"
-msgstr "声を出す"
+msgstr "しゃべる"
 
 #: js/basicblocks.js:4426
 ## A/Vを停止
@@ -4587,7 +4578,7 @@ msgstr "音符の高さを周波数表示へ"
 #: js/basicblocks.js:4472
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
-msgstr "シェル"
+msgstr "ネズミへんこう"
 
 #: js/basicblocks.js:4472
 #: js/basicblocks.js:4487
@@ -4596,11 +4587,11 @@ msgstr "大きさ"
 
 #: js/basicblocks.js:4472
 msgid "image"
-msgstr "イメージ"
+msgstr "がぞうそざい"
 
 #: js/basicblocks.js:4487
 msgid "obj"
-msgstr "オブジェクト"
+msgstr "そざい"
 
 #: js/basicblocks.js:4524
 #.TRANS: factor used in determining how many duplications to make
@@ -4642,7 +4633,7 @@ msgstr "スイッチ"
 #: plugins/rodi.rtp:75
 #: plugins/rodi.rtp:417
 msgid "stop"
-msgstr "止めます"
+msgstr "止める"
 
 #: js/basicblocks.js:4624
 msgid "wait for"
@@ -4698,7 +4689,7 @@ msgstr "～回くり返す"
 #: js/basicblocks.js:4769
 ## fushou
 msgid "unknown"
-msgstr "不詳"
+msgstr "不明"
 
 #: js/basicblocks.js:4781
 #.TRANS: Open a palette of blocks.
@@ -4707,7 +4698,7 @@ msgstr "パレットを開きます"
 
 #: js/basicblocks.js:4785
 msgid "Rhythm"
-msgstr "リズム"
+msgstr "音符"
 
 #: js/basicblocks.js:4794
 #.TRANS: Move this block to the trash.
@@ -4753,7 +4744,7 @@ msgstr "ブロックを作る"
 
 #: js/basicblocks.js:4861
 msgid "save as ABC"
-msgstr "ABCの保存"
+msgstr "ABCでほぞん"
 
 #: js/basicblocks.js:4864
 #: js/basicblocks.js:4875
@@ -4763,11 +4754,11 @@ msgstr "名"
 
 #: js/basicblocks.js:4872
 msgid "save as lilypond"
-msgstr "Lilypondのファイルフォーマットで保存"
+msgstr "Lilypondのフォーマットでほぞん"
 
 #: js/basicblocks.js:4883
 msgid "save svg"
-msgstr "svgで保存"
+msgstr "svgでほぞん"
 
 #: js/basicblocks.js:4893
 msgid "no background"
@@ -4801,7 +4792,7 @@ msgstr "ミュージック・ブロックス"
 
 #: js/basicblocks.js:4983
 msgid "print"
-msgstr "表示"
+msgstr "結果を表示"
 
 #: js/basicblocks.js:5008
 ## 音量＝おんりょう
@@ -4823,11 +4814,11 @@ msgstr "時間"
 
 #: js/basicblocks.js:5080
 msgid "cursor y"
-msgstr "y座標カーソル"
+msgstr "「y」ざひょうち（カーソル）"
 
 #: js/basicblocks.js:5091
 msgid "cursor x"
-msgstr "x座標カーソル"
+msgstr "「x」ざひょうち（カーソル）"
 
 #: js/basicblocks.js:5102
 msgid "mouse button"
@@ -4911,7 +4902,7 @@ msgstr "ネズミの名前"
 #: js/basicblocks.js:5339
 #: js/basicblocks.js:5356
 msgid "set name"
-msgstr "名前をつける"
+msgstr "ネズミに名前をつける"
 
 #: js/basicblocks.js:5340
 #: plugins/translate.rtp:95
@@ -4936,24 +4927,24 @@ msgstr "マスター音量"
 #.TRANS: a rapid, slight variation in pitch
 #.TRANS: set the loudness level
 msgid "set synth volume"
-msgstr "シンセの音量を設定"
+msgstr "楽器の音量をせってい"
 
 #: js/basicblocks.js:5469
 #: js/basicblocks.js:5497
 msgid "synth"
-msgstr "シンセサイザー"
+msgstr "楽器"
 
 #: js/basicblocks.js:5482
 #.TRANS: set the loudness level
 msgid "set drum volume"
-msgstr ""
+msgstr "ドラムの音量をせってい"
 
 #: js/basicblocks.js:5511
 #: js/basicblocks.js:5524
 #.TRANS: set the loudness level
 #.TRANS: set the loudness level
 msgid "set master volume"
-msgstr "マスター音量を設定"
+msgstr "全体の音量をせってい"
 
 #: js/basicblocks.js:5535
 #.TRANS: set an articulation (change in volume)
@@ -4968,7 +4959,7 @@ msgstr "デクレシェンド"
 #: js/basicblocks.js:5561
 #.TRANS: a gradual increase in loudness
 msgid "crescendo"
-msgstr "クレッシェンド"
+msgstr "クレシェンド"
 
 #: js/playback.js:28
 #: js/playback.js:28
@@ -4980,7 +4971,7 @@ msgstr "クレッシェンド"
 #: js/rhythmruler.js:1703
 #: js/rhythmruler.js:1703
 msgid "pause"
-msgstr "休止"
+msgstr "止める"
 
 #: js/playback.js:31
 #: js/playback.js:31
@@ -4991,7 +4982,7 @@ msgstr "休止"
 #: js/temperament.js:1609
 #: js/modewidget.js:59
 msgid "play all"
-msgstr "全て再生する"
+msgstr "全てさいせい"
 
 #: js/playback.js:77
 #: js/help.js:92
@@ -5007,7 +4998,7 @@ msgstr "全て再生する"
 #: js/modewidget.js:101
 #: js/pitchstaircase.js:545
 msgid "close"
-msgstr "終了"
+msgstr "とじる"
 
 #: js/playback.js:87
 #: js/help.js:107
@@ -5061,7 +5052,7 @@ msgstr "ネズミ"
 #: js/pitchstaircase.js:84
 #: plugins/rodi.rtp:195
 msgid "play"
-msgstr "再生"
+msgstr "実行"
 
 #: js/rubrics.js:478
 ## Literally means "mouse relations"
@@ -5119,12 +5110,12 @@ msgstr "Lilypondはこのモードを無視します"
 #: js/macros.js:57
 #: js/macros.js:203
 msgid "box1"
-msgstr ""
+msgstr "箱１"
 
 #: js/macros.js:58
 #: js/macros.js:204
 msgid "box2"
-msgstr ""
+msgstr "箱２"
 
 #: js/blocks.js:1200
 msgid "Consider breaking this stack into parts."
@@ -5160,7 +5151,7 @@ msgstr "プレイバック用の音楽を準備（コンパイル）します"
 #: js/languagebox.js:92
 ## Check
 msgid "Refresh your browser to change your language preference."
-msgstr "言語を変更するにはブラウザを再起動する必要があります。"
+msgstr "ブラウザをこうしんしてください。"
 
 #: js/help.js:53
 msgid "previous page"
@@ -5192,23 +5183,23 @@ msgstr "グラフにクリックして音符をどちらのドラムに変える
 
 #: js/pitchslider.js:388
 msgid "move up"
-msgstr "上に動く"
+msgstr "上げる"
 
 #: js/pitchslider.js:394
 msgid "move down"
-msgstr "下に動く"
+msgstr "下げる"
 
 #: js/pitchslider.js:401
 msgid "Use the slider to change the pitch."
-msgstr "スライダーでピッチを変えます。"
+msgstr "スライダーで音の高さを変えます。"
 
 #: js/pitchtimematrix.js:198
 msgid "export"
-msgstr "エクスポート"
+msgstr "テーブルをほぞん"
 
 #: js/pitchtimematrix.js:203
 msgid "sort"
-msgstr "整理"
+msgstr "ならべなおす"
 
 #: js/pitchtimematrix.js:290
 #: js/pitchtimematrix.js:298
@@ -5217,18 +5208,18 @@ msgstr "整理"
 #: js/rhythmruler.js:1628
 #: js/rhythmruler.js:1628
 msgid "expand"
-msgstr "膨らむ"
+msgstr "テーブルを広げる"
 
 #: js/pitchtimematrix.js:305
 #: js/pitchtimematrix.js:305
 #: js/rhythmruler.js:1638
 #: js/rhythmruler.js:1638
 msgid "collapse"
-msgstr "縮む"
+msgstr "テーブルをちぢめる"
 
 #: js/pitchtimematrix.js:469
 msgid "Click on the table to add notes."
-msgstr "行列にクリックすると音符やメロディが作ることができます。"
+msgstr "ます目をクリックするとメロディやリズムを作れます。"
 
 #: js/pitchtimematrix.js:731
 #: js/pitchtimematrix.js:863
@@ -5254,9 +5245,8 @@ msgstr "フィルターを加える"
 #: js/rhythmruler.js:1481
 #: js/modewidget.js:95
 #: js/pitchstaircase.js:534
-## Uses the Katakana version for computer terminology according to http://jisho.org/word/%E3%82%A2%E3%83%B3%E3%83%89%E3%82%A5 
 msgid "undo"
-msgstr "元にもどす"
+msgstr "１つもどす"
 
 #: js/timbre.js:820
 msgid "Click on buttons to open the timbre design tools."
@@ -5281,7 +5271,7 @@ msgstr "ビブラートの量"
 #: js/timbre.js:1752
 ## https://effector-hakase.com/delay/
 msgid "delay (MS)"
-msgstr "ディレイ・エフェクター(ms)"
+msgstr "ディレイ・エフェクター（ms）"
 
 #: js/timbre.js:1896
 msgid "distortion amount"
@@ -5290,19 +5280,19 @@ msgstr "ディストーションの量"
 #: js/tempo.js:75
 #: js/tempo.js:78
 msgid "The beats per minute must be between 30 and 1000."
-msgstr "BPM(一分あたりの拍数)は30から1000である必要があります"
+msgstr "BPM（一分あたりの拍数）は30から1000である必要があります"
 
 #: js/tempo.js:339
 msgid "speed up"
-msgstr "スピードアップ"
+msgstr "はやくする"
 
 #: js/tempo.js:355
 msgid "slow down"
-msgstr "スローダウン"
+msgstr "おそくする"
 
 #: js/tempo.js:431
 msgid "Adjust the tempo with the buttons."
-msgstr "ボタンでテンポが設定できます。"
+msgstr "１分あたりの拍数でテンポを決められます。"
 
 #: js/rhythmruler.js:134
 #: js/rhythmruler.js:134
@@ -5324,15 +5314,15 @@ msgstr "ギター"
 
 #: js/rhythmruler.js:1436
 msgid "save rhythms"
-msgstr "リズムを保存"
+msgstr "リズムだけをほぞん"
 
 #: js/rhythmruler.js:1442
 msgid "save drum machine"
-msgstr "ドラムマシーンを保存"
+msgstr "ドラムとしてほぞん"
 
 #: js/rhythmruler.js:1819
 msgid "Click on the ruler to divide it."
-msgstr "ルーラーをクリックすると割ることができます。"
+msgstr "クリックするとリズムをわけることができます。"
 
 #: js/temperament.js:1621
 msgid "table"
@@ -5344,16 +5334,16 @@ msgstr "音高を足す"
 
 #: js/modewidget.js:77
 msgid "rotate counter clockwise"
-msgstr "反時計回り"
+msgstr "左回りにずれる"
 
 #: js/modewidget.js:83
 msgid "rotate clockwise"
-msgstr "時計回り"
+msgstr "右回りにずれる"
 
 #: js/modewidget.js:200
 #.TRANS: A circle of notes represents the musical mode.
 msgid "Click in the circle to select notes for the mode."
-msgstr "円のなかでクリックして音階のピッチが選ばれます。"
+msgstr "クリックで音の高さを選んで音階を設定できます。"
 
 #: js/pitchstaircase.js:475
 msgid "play chord"
@@ -5409,7 +5399,7 @@ msgstr "コントラバス"
 #: js/musicutils.js:259
 #.TRANS: musical instrument
 msgid "acoustic guitar"
-msgstr ""
+msgstr "アコースティック・ギター"
 
 #: js/synthutils.js:37
 #: js/musicutils.js:260
@@ -5445,25 +5435,25 @@ msgstr "トランペット"
 #: js/musicutils.js:298
 #.TRANS: musical instrument
 msgid "banjo"
-msgstr ""
+msgstr "バンジョー"
 
 #: js/synthutils.js:49
 #: js/musicutils.js:299
 #.TRANS: musical instrument
 msgid "koto"
-msgstr ""
+msgstr "箏"
 
 #: js/synthutils.js:51
 #: js/musicutils.js:300
 #.TRANS: musical instrument
 msgid "dulcimer"
-msgstr ""
+msgstr "ダルシマー"
 
 #: js/synthutils.js:53
 #: js/musicutils.js:301
 #.TRANS: musical instrument
 msgid "electric guitar"
-msgstr ""
+msgstr "エレクトリック・ギター"
 
 #: js/synthutils.js:57
 #: js/musicutils.js:266
@@ -5490,12 +5480,12 @@ msgstr "シンプル・シンセ４"
 #: js/musicutils.js:286
 #.TRANS: a musical instrument
 msgid "gong"
-msgstr ""
+msgstr "ゴング"
 
 #: js/musicutils.js:80
 #.TRANS: ordinal number. Please keep exactly one space between each number.
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
-msgstr ""
+msgstr "１度 2度 3度 4度 5度 6度 7度 8度 9度 10度 11度 12度"
 
 #: js/musicutils.js:159
 #.TRANS: twelve semi-tone scale for music
@@ -6402,11 +6392,11 @@ msgstr "光の強さ"
 #: plugins/rodi.rtp:286
 ## http://jisho.org/word/%E8%B5%A4%E5%A4%96　赤外＝せきがい 
 msgid "infrared light (left)"
-msgstr "赤外光　(左）"
+msgstr "赤外光　（左）"
 
 #: plugins/rodi.rtp:300
 msgid "infrared light (right)"
-msgstr "赤外光　(右）"
+msgstr "赤外光　（右）"
 
 #: plugins/rodi.rtp:314
 msgid "distance"
@@ -6542,7 +6532,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "ロデイ"
 
 #~msgid "Save your project to a server."
-#~msgstr "サーバーにプロジェクトを保存"
+#~msgstr "サーバーにプロジェクトをほぞん"
 
 #~msgid "multiply beat"
 #~msgstr "拍を倍に"
@@ -6798,7 +6788,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "画面上に表示されているもの（ブロックスを含む）を全て消します。"
 
 #~msgid "The save-stack button saves a stack onto a custom palette."
-#~msgstr "スタック保存ボタンを押すと、スタックはカスタムパレットの下に保存されます。"
+#~msgstr "スタックほぞんボタンを押すと、スタックはカスタムパレットの下にほぞんされます。"
 
 #~msgid "Search"
 #~msgstr "検索"
@@ -6886,7 +6876,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "ネズミが見つかりません"
 
 #~msgid "You can use multiple <em>Drum</em> blocks within a <em>Note</em> block."
-#~msgstr "<em>ドラム</em>ブロックは一つ以上<em>音符</em>ブロックに入れることができます。"
+#~msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。<br><br>　"
 
 #~msgid "eighth note ♪"
 #~msgstr "８分音符　♪"
