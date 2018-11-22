@@ -334,7 +334,7 @@ function Logo () {
         createjs.Ticker.framerate = 30;
     }
 
-    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
         this.synth = new Synth();
         this.synth.changeInTemperament = false;
@@ -608,7 +608,7 @@ function Logo () {
 
         this.sounds = [];
 
-        if (activity._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (var instrumentName in instruments[turtle]) {
                     this.synth.stopSound(turtle, instrumentName);
@@ -986,7 +986,7 @@ function Logo () {
     this.initMediaDevices = function () {
         var that = this;
         console.log('INIT MICROPHONE');
-        if (activity._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             var mic = new Tone.UserMedia();
             try {
                 mic.open();
@@ -1132,7 +1132,7 @@ function Logo () {
         this.inHarmonic[turtle] = [];
         this.partials[turtle] = [];
 
-        if (activity._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             this.playbackQueue[turtle] = [];
         } else {
             // Don't empty playback queue of precompiled content.
@@ -1206,7 +1206,7 @@ function Logo () {
 
         this.embeddedGraphicsFinished = {};
 
-        if (activity._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             this._prepSynths();
         }
 
@@ -1957,7 +1957,7 @@ function Logo () {
             if (targetTurtle !== null) {
                 that._runFromBlock(that, targetTurtle, args[1], isflow, receivedArg);
             } else {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
                 } else {
                     that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk)
@@ -2542,7 +2542,7 @@ function Logo () {
             }
 
             if (!foundTargetTurtle) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk);
                 } else {
                     that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk);
@@ -2567,14 +2567,14 @@ function Logo () {
 
             var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle == null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
                 } else {
                     that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk)
                 }
             } else {
                 if (that.turtles.turtleList[targetTurtle].running) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.errorMsg(_('Mouse is already running.'), blk);
                     } else {
                         that.errorMsg(_('Turtle is already running.'), blk);
@@ -2609,7 +2609,7 @@ function Logo () {
 
             var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle == null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
                 } else {
                     that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk)
@@ -2631,7 +2631,7 @@ function Logo () {
 
             var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle == null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
                 } else {
                     that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk)
@@ -7346,7 +7346,7 @@ function Logo () {
             // deprecated
             var targetTurtle = that._getTargetTurtle(args[0]);
             if (targetTurtle === null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     that.errorMsg(_('Cannot find mouse') + ' ' + args[0], blk)
                 } else {
                     that.errorMsg(_('Cannot find turtle') + ' ' + args[0], blk)
@@ -7640,7 +7640,7 @@ function Logo () {
             volume = 0;
         }
 
-        if (activity._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.setMasterVolume(volume);
         }
     };
@@ -7652,7 +7652,7 @@ function Logo () {
             volume = 0;
         }
 
-        if (activity._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             switch (synth) {
             case 'noise1':
             case 'noise2':
@@ -8362,7 +8362,7 @@ function Logo () {
                                 }
                             };
 
-                            if (activity._THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                            if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                                 // Parameters related to effects
                                 var paramsEffects = {
                                     'doVibrato': doVibrato,
@@ -8526,7 +8526,7 @@ function Logo () {
                         }
 
                         if (newBeatValue > 0) {
-                            if (activity._THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                            if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                                 for (var i = 0; i < drums.length; i++) {
                                     if (that.drumStyle[turtle].length > 0) {
                                         if (!that.suppressOutput[turtle]) {
@@ -8552,7 +8552,7 @@ function Logo () {
                 }
 
                 if (!that.suppressOutput[turtle]) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                         that.synth.start();
                     }
                 }
@@ -8609,7 +8609,7 @@ function Logo () {
         }
 
         // Don't record in optimize mode or Turtle Blocks.
-        if (activity._THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
+        if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
             this.playbackQueue[turtle].push(obj);
         }
     };
@@ -8740,7 +8740,7 @@ function Logo () {
                     }
                     break;
                 case 'notes':
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         if (that.blinkState) {
                             that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
                         }
@@ -8899,7 +8899,7 @@ function Logo () {
             }
         };
 
-        if (activity._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             this._prepSynths();
         }
 
@@ -10261,7 +10261,7 @@ function Logo () {
                 }
 
                 if (i === that.turtles.turtleList.length) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
                         that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
@@ -10427,7 +10427,7 @@ function Logo () {
                 }
 
                 if (value == null) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
                         that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
@@ -10487,7 +10487,7 @@ function Logo () {
                 }
 
                 if (value == null) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
                         that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
@@ -10637,7 +10637,7 @@ function Logo () {
                 }
 
                 if (value == null) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
                         that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
@@ -10665,7 +10665,7 @@ function Logo () {
                 }
 
                 if (i === that.turtles.turtleList.length) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
                     } else {
                         that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
@@ -10813,7 +10813,7 @@ function Logo () {
                 // No need to do anything here.
                 break;
             case 'tofrequency':
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     var block = that.blocks.blockList[blk];
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];

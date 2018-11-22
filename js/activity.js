@@ -16,13 +16,13 @@
 // scratch. -- Walter Bender, October 2014.
 
 function Activity() {
-this._THIS_IS_MUSIC_BLOCKS_ = true;
-this._THIS_IS_TURTLE_BLOCKS_ = !this._THIS_IS_MUSIC_BLOCKS_;
-this._ERRORMSGTIMEOUT_ = 15000;
-this.LEADING = 0;
+_THIS_IS_MUSIC_BLOCKS_ = true;
+_THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+_ERRORMSGTIMEOUT_ = 15000;
+LEADING = 0;
 cellSize = 55;
 
-if (this._THIS_IS_TURTLE_BLOCKS_) {
+if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
         window.fbAsyncInit = function () {
             FB.init({
@@ -50,7 +50,7 @@ if (this._THIS_IS_TURTLE_BLOCKS_) {
     } catch (e) {};
 }
 
-if (this._THIS_IS_MUSIC_BLOCKS_) {
+if (_THIS_IS_MUSIC_BLOCKS_) {
     beginnerMode = true;
     firstTimeUser = false;
     try {
@@ -145,7 +145,7 @@ try {
     'prefixfree.min'
 ];
 
-if (this._THIS_IS_MUSIC_BLOCKS_) {
+if (_THIS_IS_MUSIC_BLOCKS_) {
      MUSICBLOCKS_EXTRAS = [
         'Tone.min',
         'widgets/modewidget',
@@ -355,7 +355,7 @@ this.doPluginsAndPaletteCols = function(){
     cameraID = null;
 
     // default values
-    const DEFAULTDELAY = 500; // milleseconds
+const    DEFAULTDELAY = 500; // milleseconds
     const TURTLESTEP = -1; // Run in step-by-step mode
 
     BLOCKSCALES = [1, 1.5, 2, 3, 4];
@@ -385,7 +385,7 @@ this.doPluginsAndPaletteCols = function(){
 
 }
 
-this._findBlocks = function()  {
+_findBlocks = function()  {
     // _showHideAuxMenu(false);
      leftpos = Math.floor(canvas.width / 4);
      toppos;
@@ -483,7 +483,7 @@ this._findBlocks = function()  {
     boundary.hide();
 };
 
-this.setHomeContainers = function(){
+setHomeContainers = function(){
     if (homeButtonContainers[0] === null) {
         return;
     }
@@ -656,7 +656,7 @@ this._allClear = function(){
     }
 };
 
-this._doFastButton = function(env) {
+_doFastButton = function(env) {
     blocks.activeBlock = null;
     hideDOMLabel();
 
@@ -668,7 +668,7 @@ this._doFastButton = function(env) {
      currentDelay = logo.turtleDelay;
      playingWidget = false;
     logo.setTurtleDelay(0);
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         logo.synth.resume();
 
         if (docById('ptmDiv').style.visibility === 'visible') {
@@ -750,11 +750,11 @@ this._doSlowButton = function() {
     });
 
     logo.setTurtleDelay(DEFAULTDELAY);
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         logo.synth.resume();
     }
 
-    if (this._THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
+    if (_THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
         logo.pitchTimeMatrix.playAll();
     } else if (!turtles.running()) {
         logo.runLogoCommands();
@@ -773,7 +773,7 @@ this._doStepButton = function() {
     });
 
      turtleCount = Object.keys(logo.stepQueue).length;
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         logo.synth.resume();
     }
 
@@ -802,7 +802,7 @@ this._doSlowMusicButton = function() {
     });
 
     logo.setNoteDelay(DEFAULTDELAY);
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         logo.synth.resume();
     }
 
@@ -825,7 +825,7 @@ this._doStepMusicButton = function() {
     });
 
      turtleCount = Object.keys(logo.stepQueue).length;
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         logo.synth.resume();
     }
 
@@ -853,14 +853,14 @@ this.doHardStopButton = function(onblur) {
         onblur = false;
     }
 
-    if (onblur && this._THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
+    if (onblur && _THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
         console.log('Ignoring hard stop due to blur');
         return;
     }
 
     logo.doStopTurtle();
 
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         logo._setMasterVolume(0);
 
         if (docById('tempoDiv') != null && docById('tempoDiv').style.visibility === 'visible') {
@@ -929,7 +929,7 @@ this.closeAnalytics = function(chartBitmap, ctx) {
      button = this;
     button.x = (canvas.width / (2 * turtleBlocksScale)) + (300 / Math.sqrt(2));
     button.y = 200.0;
-    this.closeButton = this._makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
+    this.closeButton = _makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
     this.closeButton.on('click', function (event) {
         button.closeButton.visible = false;
         stage.removeChild(chartBitmap);
@@ -952,7 +952,7 @@ this.doAnalytics = function() {
     // statsContainer.visible = false;
     // scrollOnContainer.visible = false;
     // scrollOffContainer.visible = false;
-    this.deltaY(-55 - this.LEADING);
+    this.deltaY(-55 - LEADING);
     _showHideAuxMenu(false);
 
     blocks.activeBlock = null;
@@ -1551,12 +1551,12 @@ this.__makeNewNote = function(octave, solf) {
     blocks.activeBlock = blocks.blockList.length - 1;
 }
 
-this.__keyPressed = function(event) {
+__keyPressed = function(event) {
     if (docById('labelDiv').classList.contains('hasKeyboard')) {
         return;
     }
 
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         if (docById('BPMInput').classList.contains('hasKeyboard')) {
             return;
         }
@@ -1621,13 +1621,13 @@ this.__keyPressed = function(event) {
         this.doSearch();
     }
 
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
          disableKeys = docById('lilypondModal').style.display === 'block' || searchWidget.style.visibility === 'visible' || docById('planet-iframe').style.display === '' || docById('paste').style.visibility === 'visible' || docById('wheelDiv').style.display === '' || logo.turtles.running();
     } else {
          disableKeys = searchWidget.style.visibility === 'visible' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
     }
 
-     disableArrowKeys = this._THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible');
+     disableArrowKeys = _THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible');
 
     if (event.altKey && !disableKeys) {
         switch (event.keyCode) {
@@ -1644,7 +1644,7 @@ this.__keyPressed = function(event) {
                 // logo.playback(-1);
                 break;
             case 82: // 'R'
-                this._doFastButton();
+                _doFastButton();
                 break;
             case 83: // 'S'
                 logo.doStopTurtle();
@@ -1668,37 +1668,37 @@ this.__keyPressed = function(event) {
     } else if (event.shiftKey && !disableKeys) {
         switch (event.keyCode) {
             case KEYCODE_D:
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this.__makeNewNote(5, 'do');
                 }
                 break;
             case KEYCODE_R:
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this.__makeNewNote(5, 're');
                 }
                 break;
             case KEYCODE_M:
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this.__makeNewNote(5, 'mi');
                 }
                 break;
             case KEYCODE_F:
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this.__makeNewNote(5, 'fa');
                 }
                 break;
             case KEYCODE_S:
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this.__makeNewNote(5, 'sol');
                 }
                 break;
             case KEYCODE_L:
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this.__makeNewNote(5, 'la');
                 }
                 break;
             case KEYCODE_T:
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     this.__makeNewNote(5, 'ti');
                 }
                 break;
@@ -1782,7 +1782,7 @@ this.__keyPressed = function(event) {
                     } else if (palettes.activePalette != null) {
                         palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
                     } else {
-                        this._findBlocks;
+                       _findBlocks;
                     }
                     stage.update();
                     break;
@@ -1813,37 +1813,37 @@ this.__keyPressed = function(event) {
                     }
                     break;
                 case KEYCODE_D:
-                    if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         this.__makeNewNote(4, 'do');
                     }
                     break;
                 case KEYCODE_R:
-                    if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         this.__makeNewNote(4, 're');
                     }
                     break;
                 case KEYCODE_M:
-                    if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         this.__makeNewNote(4, 'mi');
                     }
                     break;
                 case KEYCODE_F:
-                    if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         this.__makeNewNote(4, 'fa');
                     }
                     break;
                 case KEYCODE_S:
-                    if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         this.__makeNewNote(4, 'sol');
                     }
                     break;
                 case KEYCODE_L:
-                    if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         this.__makeNewNote(4, 'la');
                     }
                     break;
                 case KEYCODE_T:
-                    if (this._THIS_IS_MUSIC_BLOCKS_) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
                         this.__makeNewNote(4, 'ti');
                     }
                     break;
@@ -2129,52 +2129,52 @@ this._restoreTrash = function() {
 this.closeSubMenus = function() {
     if (confirmContainer.visible) {
         confirmContainer.visible = false;
-        restoreContainer.y = 95.5 + this.LEADING;
+        restoreContainer.y = 95.5 + LEADING;
 
-        openMergeContainer.y = 95.5 + this.LEADING;
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
-            beginnerModeContainer.y = 95.5 + this.LEADING;
-            advancedModeContainer.y = 95.5 + this.LEADING;
+        openMergeContainer.y = 95.5 + LEADING;
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            beginnerModeContainer.y = 95.5 + LEADING;
+            advancedModeContainer.y = 95.5 + LEADING;
         }
 
-        languageContainer.y = 95.5 + this.LEADING;
+        languageContainer.y = 95.5 + LEADING;
         if (!beginnerMode) {
-            pluginsContainer = 95.5 + this.LEADING;
-            deletePluginContainer = 95.5 + this.LEADING;
-            statsContainer = 95.5 + this.LEADING;
-            scrollOnContainer = 95.5 + this.LEADING;
-            scrollOffContainer = 95.5 + this.LEADING;
+            pluginsContainer = 95.5 + LEADING;
+            deletePluginContainer = 95.5 + LEADING;
+            statsContainer = 95.5 + LEADING;
+            scrollOnContainer = 95.5 + LEADING;
+            scrollOffContainer = 95.5 + LEADING;
         }
 
-        this.deltaY(-55 - this.LEADING);
+        this.deltaY(-55 - LEADING);
     } else if (uploadContainer.visible) {
         saveHTMLContainer.visible = false;
         uploadContainer.visible = false;
         saveSVGContainer.visible = false;
         savePNGContainer.visible = false;
         saveArtworkContainer.visible = false;
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             saveWAVContainer.visible = false;
             saveLilypondContainer.visible = false;
             saveABCContainer.visible = false;
         }
 
-        openMergeContainer.y = 95.5 + this.LEADING;
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
-            beginnerModeContainer.y = 95.5 + this.LEADING;
-            advancedModeContainer.y = 95.5 + this.LEADING;
+        openMergeContainer.y = 95.5 + LEADING;
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            beginnerModeContainer.y = 95.5 + LEADING;
+            advancedModeContainer.y = 95.5 + LEADING;
         }
 
-        languageContainer.y = 95.5 + this.LEADING;
-        restoreContainer.y = 95.5 + this.LEADING;
+        languageContainer.y = 95.5 + LEADING;
+        restoreContainer.y = 95.5 + LEADING;
         if (!beginnerMode) {
-            pluginsContainer = 95.5 + this.LEADING;
-            deletePluginContainer = 95.5 + this.LEADING;
-            statsContainer = 95.5 + this.LEADING;
-            scrollOnContainer = 95.5 + this.LEADING;
-            scrollOffContainer = 95.5 + this.LEADING;
+            pluginsContainer = 95.5 + LEADING;
+            deletePluginContainer = 95.5 + LEADING;
+            statsContainer = 95.5 + LEADING;
+            scrollOnContainer = 95.5 + LEADING;
+            scrollOffContainer = 95.5 + LEADING;
         }
-        this.deltaY(-55 - this.LEADING);
+        this.deltaY(-55 - LEADING);
     }
 };
 
@@ -2186,10 +2186,10 @@ this._deleteBlocksBox = function() {
         confirmContainer.visible = true;
         confirmContainer.x = newContainer.x;
         confirmContainer.y = 27.5;
-        this.deltaY(55 + this.LEADING);
+        this.deltaY(55 + LEADING);
     } else {
         confirmContainer.visible = false;
-        this.deltaY(-55 - this.LEADING);
+        this.deltaY(-55 - LEADING);
     }
 };
 
@@ -2207,14 +2207,14 @@ this._afterDelete = function() {
     }
 
     confirmContainer.visible = false;
-    this.deltaY(-55 - this.LEADING);
+    this.deltaY(-55 - LEADING);
     _showHideAuxMenu(true);
 };
 
 
 // function _doPlaybackBox() {
     // _hideBoxes();
-    // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, this._makeButton, logo);
+    // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
 // };
 
 this.sendAllToTrash = function(addStartBlock, doNotSave) {
@@ -2366,7 +2366,7 @@ this.doSave = function() {
             saveSVGContainer.visible = true;
             savePNGContainer.visible = true;
             saveArtworkContainer.visible = true;
-            if (this._THIS_IS_MUSIC_BLOCKS_) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
                 saveWAVContainer.visible = true;
                 saveLilypondContainer.visible = true;
                 saveABCContainer.visible = true;
@@ -2405,27 +2405,27 @@ this.doSave = function() {
             saveSVGContainer.y = 27.5;
             savePNGContainer.y = 27.5;
             saveArtworkContainer.y = 27.5;
-            if (this._THIS_IS_MUSIC_BLOCKS_) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
                 saveWAVContainer.y = 27.5;
                 saveLilypondContainer.y = 27.5;
                 saveABCContainer.y = 27.5;
             }
 
-            this.deltaY(55 + this.LEADING);
+            this.deltaY(55 + LEADING);
         } else {
             saveHTMLContainer.visible = false;
             uploadContainer.visible = false;
             saveSVGContainer.visible = false;
             savePNGContainer.visible = false;
             saveArtworkContainer.visible = false;
-            if (this._THIS_IS_MUSIC_BLOCKS_) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
                 saveWAVContainer.visible = false;
                 saveLilypondContainer.visible = false;
                 saveABCContainer.visible = false;
             }
 
             // Move it down since we are about to move it up.
-            this.deltaY(-55 - this.LEADING);
+            this.deltaY(-55 - LEADING);
             _showHideAuxMenu(true);
         }
     }
@@ -2463,17 +2463,17 @@ this.doLoad = function(merge) {
 
 window.prepareExport = this.prepareExport;
 
-this.runProject = function(env) {
+runProject = function(env) {
     console.log('Running Project from Event');
-    document.removeEventListener('finishedLoading', this.runProject);
+    document.removeEventListener('finishedLoading',runProject);
     setTimeout(function () {
         console.log('Run');
         this._changeBlockVisibility();
-        this._doFastButton(env);
+        _doFastButton(env);
     }, 5000);
 }
 
-this.loadProject = function(projectID, flags, env) {
+loadProject = function(projectID, flags, env) {
     //set default value of run
     flags = typeof flags !== 'undefined' ? flags : {
         run: false,
@@ -2517,7 +2517,7 @@ this.loadProject = function(projectID, flags, env) {
                     turtles.turtleList[turtle].doClear(true, true, false);
                 }
 
-                this.runProject(env);
+               runProject(env);
 
                 if (show) {
                     this._changeBlockVisibility();
@@ -2552,11 +2552,11 @@ function loadStartWrapper(func, arg1, arg2, arg3) {
     var time2 = new Date();
     var elapsedTime = time2.getTime() - time1.getTime();
     var timeLeft = Math.max(6000 - elapsedTime);
-    setTimeout(this.showContents, timeLeft);
+    setTimeout(showContents, timeLeft);
 };
 
 // Hides the loading animation and unhides the background.
-this.showContents = function() {
+showContents = function() {
     docById('loading-image-container').style.display = 'none';
     // docById('canvas').style.display = 'none';
     docById('hideContents').style.display = 'block';
@@ -2778,7 +2778,7 @@ this.errorMsg = function(msg, blk, text, timeout) {
     if (timeout != undefined) {
          myTimeout = timeout;
     } else {
-         myTimeout = this._ERRORMSGTIMEOUT_;
+         myTimeout = _ERRORMSGTIMEOUT_;
     }
 
     if (myTimeout > 0) {
@@ -2819,7 +2819,7 @@ this._showPolar = function() {
 //     blocks.pasteStack();
 // };
 
-this.prepareExport = function() {
+prepareExport = function() {
     // We don't save blocks in the trash, so we need to
     // consolidate the block list and remap the connections.
      blockMap = [];
@@ -3023,7 +3023,7 @@ this._setupAndroidToolbar = function(showPalettesPopover) {
     }
 
     headerContainer = new createjs.Shape();
-    headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 2 + 2 * this.LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * this.LEADING).f(platformColor.aux).r(0, -cellSize * 3 + 3 * this.LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * this.LEADING).f(platformColor.sub).r(0, -cellSize * 4 + 4 * this.LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * this.LEADING);
+    headerContainer.graphics.f(platformColor.header).r(0, -cellSize * 2 + 2 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING).f(platformColor.aux).r(0, -cellSize * 3 + 3 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING).f(platformColor.sub).r(0, -cellSize * 4 + 4 * LEADING, screen.width / turtleBlocksScale, 3 * cellSize + 3 * LEADING);
 
     /*
     if (platformColor.doHeaderShadow) {
@@ -3064,7 +3064,7 @@ this._setupAndroidToolbar = function(showPalettesPopover) {
 
     if (sugarizerCompatibility.isInsideSugarizer()) {
         buttonNames.push([STOPBUTTON, function () {
-            sugarizerCompatibility.data.blocks = this.prepareExport();
+            sugarizerCompatibility.data.blocks = prepareExport();
             sugarizerCompatibility.saveLocally(function () {
                 sugarizerCompatibility.sugarizerStop();
             });
@@ -3078,7 +3078,7 @@ this._setupAndroidToolbar = function(showPalettesPopover) {
 
     // Load the logo
     logoContainer = new createjs.Container();
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
          logoText = new createjs.Text(_('About Music Blocks'), '14px Sans', '#282828');
     } else {
          logoText = new createjs.Text(_('Turtle Blocks'), '14px Sans', '#282828');
@@ -3091,7 +3091,7 @@ this._setupAndroidToolbar = function(showPalettesPopover) {
          bitmap = new createjs.Bitmap(img);
         logoContainer.addChild(bitmap);
         stage.addChild(logoContainer);
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             bitmap.x = 0;
         } else {
             bitmap.x = 37.5;
@@ -3143,68 +3143,68 @@ this._setupAndroidToolbar = function(showPalettesPopover) {
 
     // Add the palette buttons here so that the hover tooltips
     // for the other buttons do not get occluded.
-    this._setupPaletteMenu(turtleBlocksScale);
+    _setupPaletteMenu(turtleBlocksScale);
 
      language = localStorage.languagePreference;
 
-    runContainer = this._makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
+    runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
 
     if (beginnerMode && language === 'ja') {
-        this._loadButtonDragHandler(runContainer, x, y, this._doFastButton, null, null, null, null);
+       _loadButtonDragHandler(runContainer, x, y, _doFastButton, null, null, null, null);
     } else {
-        this._loadButtonDragHandler(runContainer, x, y, this._doFastButton, this._openAuxMenu, null, null, null);
+       _loadButtonDragHandler(runContainer, x, y, _doFastButton, this._openAuxMenu, null, null, null);
     }
 
     onscreenButtons.push(runContainer);
 
     x += 1.5 * dx;
 
-    hardStopTurtleContainer = this._makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
-    this._loadButtonDragHandler(hardStopTurtleContainer, x, y, this.doHardStopButton, null, null, null, null);
+    hardStopTurtleContainer = _makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+   _loadButtonDragHandler(hardStopTurtleContainer, x, y, this.doHardStopButton, null, null, null, null);
     onscreenButtons.push(hardStopTurtleContainer);
 
-    stopTurtleContainer = this._makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
-    this._loadButtonDragHandler(stopTurtleContainer, x, y, this.doStopButton, null, null, null, null);
+    stopTurtleContainer = _makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+   _loadButtonDragHandler(stopTurtleContainer, x, y, this.doStopButton, null, null, null, null);
     onscreenButtons.push(stopTurtleContainer);
 
     if (!beginnerMode || language !== 'ja') {
-        slowContainer = this._makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
-        this._loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, this._doSlowButton, null, null, null, null);
+        slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
+       _loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, this._doSlowButton, null, null, null, null);
 
-        stepContainer = this._makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
-        this._loadButtonDragHandler(stepContainer, x - dx, y - btnSize, this._doStepButton, null, null, null, null);
+        stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
+       _loadButtonDragHandler(stepContainer, x - dx, y - btnSize, this._doStepButton, null, null, null, null);
     }
 
     // Move to the right
      x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
 
-    newContainer = this._makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(newContainer, x, y, this._deleteBlocksBox, null, null, null, null);
+    newContainer = _makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
+   _loadButtonDragHandler(newContainer, x, y, this._deleteBlocksBox, null, null, null, null);
     onscreenButtons.push(newContainer);
 
     x += dx;
 
-    openContainer = this._makeButton(OPENBUTTON, _('Load project from file'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(openContainer, x, y, this.doLoad, null, null, null, null);
+    openContainer = _makeButton(OPENBUTTON, _('Load project from file'), x, y, btnSize, 0);
+   _loadButtonDragHandler(openContainer, x, y, this.doLoad, null, null, null, null);
     onscreenButtons.push(openContainer);
 
     x += dx;
 
-    saveContainer = this._makeButton(SAVEBUTTON, _('Save Project'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(saveContainer, x, y, this.doSave, null, null, null, null);
+    saveContainer = _makeButton(SAVEBUTTON, _('Save Project'), x, y, btnSize, 0);
+   _loadButtonDragHandler(saveContainer, x, y, this.doSave, null, null, null, null);
     onscreenButtons.push(saveContainer);
 
     x += dx;
 
     if (planet) {
-        planetContainer = this._makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(planetContainer, x, y, this._doOpenSamples, null, null, null, null);
+        planetContainer = _makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
+       _loadButtonDragHandler(planetContainer, x, y, this._doOpenSamples, null, null, null, null);
 
         document.querySelector('#myOpenFile').addEventListener('change', function (event) {
             planet.closePlanet();
         });
     } else {
-        planetContainer = this._makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
+        planetContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
     }
 
     onscreenButtons.push(planetContainer);
@@ -3212,8 +3212,8 @@ this._setupAndroidToolbar = function(showPalettesPopover) {
     // Move to the far right
     x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
 
-    helpContainer = this._makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(helpContainer, x, y, this._showHelp, null, null, null, null);
+    helpContainer = _makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
+   _loadButtonDragHandler(helpContainer, x, y, this._showHelp, null, null, null, null);
     onscreenButtons.push(helpContainer);
 
     this._setupAuxMenu(turtleBlocksScale);
@@ -3257,44 +3257,44 @@ this._setupSubMenus = function(turtleBlocksScale) {
     // Advanced Save Box Buttons: HTML, SVG, etc.
     // Force left-aligned labels
      x = 27.5;
-    saveHTMLContainer = this._makeButton(SAVEDARKBUTTON, _('Save project'), x, y, cellsize, 0);
+    saveHTMLContainer = _makeButton(SAVEDARKBUTTON, _('Save project'), x, y, cellsize, 0);
     saveHTMLContainer.visible = false;
     __addEventHandlers(saveHTMLContainer, save.saveHTML.bind(save));
 
     if (planet) {
-        uploadContainer = this._makeButton(UPLOADPLANETBUTTON, _('Share project'), x, y, cellsize, 0);
+        uploadContainer = _makeButton(UPLOADPLANETBUTTON, _('Share project'), x, y, cellsize, 0);
         uploadContainer.visible = false;
         __addEventHandlers(uploadContainer, this.doUploadToPlanet);
     } else {
-        uploadContainer = this._makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
+        uploadContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
         uploadContainer.visible = false;
     }
 
     // Force center-aligned labels
-     x = 95.5 + this.LEADING;
-    saveSVGContainer = this._makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
+     x = 95.5 + LEADING;
+    saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
     saveSVGContainer.visible = false;
     __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
 
-    savePNGContainer = this._makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
+    savePNGContainer = _makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
     savePNGContainer.visible = false;
     __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
 
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
-        saveWAVContainer = this._makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        saveWAVContainer = _makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
         saveWAVContainer.visible = false;
         __addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
 
-        saveLilypondContainer = this._makeButton(SAVELILYPONDBUTTON, _('Save sheet music'), x, y, cellsize, 0);
+        saveLilypondContainer = _makeButton(SAVELILYPONDBUTTON, _('Save sheet music'), x, y, cellsize, 0);
         saveLilypondContainer.visible = false;
         __addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
 
-        saveABCContainer = this._makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
+        saveABCContainer = _makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
         saveABCContainer.visible = false;
         __addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
     }
 
-    saveArtworkContainer = this._makeButton(SAVEBLOCKARTWORKBUTTON, _('Save block artwork'), x, y, cellsize, 0);
+    saveArtworkContainer = _makeButton(SAVEBLOCKARTWORKBUTTON, _('Save block artwork'), x, y, cellsize, 0);
     saveArtworkContainer.visible = false;
     __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
 
@@ -3304,7 +3304,7 @@ this._setupSubMenus = function(turtleBlocksScale) {
 
     // ALways create these buttons (but not use them in beginner mode)
     // Clear Box Confirm Button
-    confirmContainer = this._makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
+    confirmContainer = _makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
     confirmContainer.visible = false;
     __addEventHandlers(confirmContainer, this._afterDelete);
 
@@ -3325,8 +3325,8 @@ this._setupAuxMenu = function(turtleBlocksScale) {
      y = Math.floor(btnSize / 2);
 
      x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
-    menuContainer = this._makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 95.5 : undefined);
-    this._loadButtonDragHandler(menuContainer, x, y, this._doMenuButton, null, null, null, null);
+    menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 95.5 : undefined);
+   _loadButtonDragHandler(menuContainer, x, y, this._doMenuButton, null, null, null, null);
 
      dx = btnSize;
 
@@ -3336,22 +3336,22 @@ this._setupAuxMenu = function(turtleBlocksScale) {
     } else {
          x = Math.floor(canvas.width / turtleBlocksScale) - 20.5 * btnSize / 2;
 
-        statsContainer = this._makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(statsContainer, x, y, this.doAnalytics, null, null, null, null);
+        statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
+       _loadButtonDragHandler(statsContainer, x, y, this.doAnalytics, null, null, null, null);
         onscreenMenu.push(statsContainer);
         statsContainer.visible = false;
 
         x += dx;
 
-        pluginsContainer = this._makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(pluginsContainer, x, y, this.doOpenPlugin, null, null, null, null);
+        pluginsContainer = _makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, btnSize, 0);
+       _loadButtonDragHandler(pluginsContainer, x, y, this.doOpenPlugin, null, null, null, null);
         onscreenMenu.push(pluginsContainer);
         pluginsContainer.visible = false;
 
         x += dx;
 
-        deletePluginContainer = this._makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(deletePluginContainer, x, y, this.deletePlugin, null, null, null, null);
+        deletePluginContainer = _makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, btnSize, 0);
+       _loadButtonDragHandler(deletePluginContainer, x, y, this.deletePlugin, null, null, null, null);
         onscreenMenu.push(deletePluginContainer);
         deletePluginContainer.visible = false;
 
@@ -3373,12 +3373,12 @@ this._setupAuxMenu = function(turtleBlocksScale) {
             scrollOffContainer.visible = false;
         }
 
-        scrollOnContainer = this._makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(scrollOnContainer, x, y, this.setScroller, null, null, null, null);
+        scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
+       _loadButtonDragHandler(scrollOnContainer, x, y, this.setScroller, null, null, null, null);
         onscreenMenu.push(scrollOnContainer);
 
-        scrollOffContainer = this._makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(scrollOffContainer, x, y, this.setScroller, null, null, null, null);
+        scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
+       _loadButtonDragHandler(scrollOffContainer, x, y, this.setScroller, null, null, null, null);
         onscreenMenu.push(scrollOffContainer);
         scrollOffContainer.visible = false;
 
@@ -3390,35 +3390,35 @@ this._setupAuxMenu = function(turtleBlocksScale) {
 
     x += 2 * dx;
 
-    openMergeContainer = this._makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(openMergeContainer, x, y, this._doMergeLoad, null, null, null, null);
+    openMergeContainer = _makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
+   _loadButtonDragHandler(openMergeContainer, x, y, this._doMergeLoad, null, null, null, null);
     onscreenMenu.push(openMergeContainer);
     openMergeContainer.visible = false;
 
     x += dx;
 
-    restoreContainer = this._makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(restoreContainer, x, y, this._restoreTrash, null, null, null, null);
+    restoreContainer = _makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
+   _loadButtonDragHandler(restoreContainer, x, y, this._restoreTrash, null, null, null, null);
     onscreenMenu.push(restoreContainer);
     restoreContainer.visible = false;
 
 
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         x += 1.5 * dx;
-        beginnerModeContainer = this._makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(beginnerModeContainer, x, y, this.doSwitchMode, null, null, null, null);
+        beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
+       _loadButtonDragHandler(beginnerModeContainer, x, y, this.doSwitchMode, null, null, null, null);
         beginnerModeContainer.visible = false;
         onscreenMenu.push(beginnerModeContainer);
 
-        advancedModeContainer = this._makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
-        this._loadButtonDragHandler(advancedModeContainer, x, y, this.doSwitchMode, null, null, null, null);
+        advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
+       _loadButtonDragHandler(advancedModeContainer, x, y, this.doSwitchMode, null, null, null, null);
         onscreenMenu.push(advancedModeContainer);
         advancedModeContainer.visible = false;
     }
 
     // Force center-aligned labels
     x += dx;
-    languageContainer = this._makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
+    languageContainer = _makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
     languageContainer.visible = false;
     onscreenMenu.push(languageContainer);
 
@@ -3426,7 +3426,7 @@ this._setupAuxMenu = function(turtleBlocksScale) {
     menuButtonsVisible = false;
 };
 
-this._setupPaletteMenu = function(turtleBlocksScale) {
+_setupPaletteMenu = function(turtleBlocksScale) {
     // Clean up if we've been here before.
     if (homeButtonContainers.length !== 0) {
         stage.removeChild(homeButtonContainers[0]);
@@ -3449,11 +3449,11 @@ this._setupPaletteMenu = function(turtleBlocksScale) {
      dx = btnSize;
 
     homeButtonContainers = [];
-    homeButtonContainers.push(this._makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
-    this._loadButtonDragHandler(homeButtonContainers[0], x, y, this._findBlocks, null, null, null, null);
+    homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
+   _loadButtonDragHandler(homeButtonContainers[0], x, y,_findBlocks, null, null, null, null);
 
-    homeButtonContainers.push(this._makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
-    this._loadButtonDragHandler(homeButtonContainers[1], x, y, this._findBlocks, null, null, null, null);
+    homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
+   _loadButtonDragHandler(homeButtonContainers[1], x, y,_findBlocks, null, null, null, null);
     homeButtonContainers[1].visible = false;
 
     homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
@@ -3462,28 +3462,28 @@ this._setupPaletteMenu = function(turtleBlocksScale) {
 
     x += dx;
 
-    hideBlocksContainer = this._makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(hideBlocksContainer, x, y, this._changeBlockVisibility, null, null, null, null);
+    hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
+   _loadButtonDragHandler(hideBlocksContainer, x, y, this._changeBlockVisibility, null, null, null, null);
 
     x += dx;
 
-    collapseBlocksContainer = this._makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(collapseBlocksContainer, x, y, this._toggleCollapsibleStacks, null, null, null, null);
+    collapseBlocksContainer = _makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
+   _loadButtonDragHandler(collapseBlocksContainer, x, y, this._toggleCollapsibleStacks, null, null, null, null);
 
     x += dx;
 
-    smallerContainer = this._makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(smallerContainer, x, y, this.doSmallerBlocks, null, null, null, null);
+    smallerContainer = _makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, btnSize, 0);
+   _loadButtonDragHandler(smallerContainer, x, y, this.doSmallerBlocks, null, null, null, null);
 
-    smallerOffContainer = this._makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, btnSize, 0);
+    smallerOffContainer = _makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, btnSize, 0);
     smallerOffContainer.visible = false;
 
     x += dx;
 
-    largerContainer = this._makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
-    this._loadButtonDragHandler(largerContainer, x, y, this.doLargerBlocks, null, null, null, null);
+    largerContainer = _makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
+   _loadButtonDragHandler(largerContainer, x, y, this.doLargerBlocks, null, null, null, null);
 
-    largerOffContainer = this._makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, btnSize, 0);
+    largerOffContainer = _makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, btnSize, 0);
     largerOffContainer.visible = false;
 };
 
@@ -3553,7 +3553,7 @@ this._doMenuAnimation = function(arg) {
                 onscreenMenu[button].visible = true;
             }
 
-            if (this._THIS_IS_MUSIC_BLOCKS_) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
                 if (beginnerMode) {
                     advancedModeContainer.visible = false;
                 } else {
@@ -3583,7 +3583,7 @@ this._toggleToolbar = function() {
     }
 
     if (buttonsVisible) {
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             if (beginnerMode) {
                 advancedModeContainer.visible = false;
             } else {
@@ -3598,7 +3598,7 @@ this._toggleToolbar = function() {
     update = true;
 };
 
-this._makeButton = function(name, label, x, y, size, rotation, parent) {
+_makeButton = function(name, label, x, y, size, rotation, parent) {
      container = new createjs.Container();
 
     if (parent == undefined) {
@@ -3696,7 +3696,7 @@ this._makeButton = function(name, label, x, y, size, rotation, parent) {
     return container;
 };
 
-this._loadButtonDragHandler = function(container, ox, oy, action, hoverAction) { // longAction, extraLongAction, longImg, extraLongImg) {
+_loadButtonDragHandler = function(container, ox, oy, action, hoverAction) { // longAction, extraLongAction, longImg, extraLongImg) {
     // Prevent multiple button presses (i.e., debounce).
      lockTimer = null;
      locked = false;
@@ -3909,7 +3909,7 @@ this._openAuxMenu = function() {
 this._showHideAuxMenu = function(resize) {
      cellsize = 55;
     if (!resize && toolbarHeight === 0) {
-        dy = cellsize + this.LEADING + 5;
+        dy = cellsize + LEADING + 5;
         toolbarHeight = dy;
         for ( i = 0; i < onscreenButtons.length; i++) {
             onscreenButtons[i].y += dy;
@@ -3922,7 +3922,7 @@ this._showHideAuxMenu = function(resize) {
             onscreenMenu[i].visible = true;
         }
 
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             if (beginnerMode) {
                 advancedModeContainer.visible = false;
             } else {
@@ -3998,7 +3998,7 @@ this._showHideAuxMenu = function(resize) {
     saveSVGContainer.visible = false;
     savePNGContainer.visible = false;
     saveArtworkContainer.visible = false;
-    if (this._THIS_IS_MUSIC_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         saveWAVContainer.visible = false;
         saveLilypondContainer.visible = false;
         saveABCContainer.visible = false;
@@ -4267,7 +4267,7 @@ this.domReady =  function(doc) {
             .setTurtles(turtles)
             .setSetPlaybackStatus(setPlaybackStatus)
             .setErrorMsg(this.errorMsg)
-            .setHomeContainers(this.setHomeContainers, boundary)
+            .setHomeContainers(setHomeContainers, boundary)
             .setContextMenu(this.piemenuBlockContext);
     
         turtles.setBlocks(blocks);
@@ -4324,7 +4324,7 @@ this.domReady =  function(doc) {
     
         playbackOnLoad = function () {
             /*
-            if (this._THIS_IS_TURTLE_BLOCKS_) {
+            if (_THIS_IS_TURTLE_BLOCKS_) {
                 // Play playback queue if there is one.
                 for (turtle in logo.playbackQueue) {
                     if (logo.playbackQueue[turtle].length > 0) {
@@ -4348,7 +4348,7 @@ this.domReady =  function(doc) {
     
             this.hideMusicBlocks = function () {
                 this.hideSearchWidget();
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
                     storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
                     storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
@@ -4447,7 +4447,7 @@ this.domReady =  function(doc) {
                 docById('statusButtonsDiv').style.visibility = storage.getItem('isStatusHidden');
                 docById('statusTableDiv').style.visibility = storage.getItem('isStatusHidden');
     
-                if (this._THIS_IS_MUSIC_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
                     docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
                     docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
@@ -4585,7 +4585,7 @@ this.domReady =  function(doc) {
     
             this.saveLocally = function () {
                 console.log('overwriting session data');
-                 data = this.prepareExport();
+                 data = prepareExport();
                  svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
                 if (svgData === null || svgData === '') {
                     this.planet.ProjectStorage.saveLocally(data, null);
@@ -4640,7 +4640,7 @@ this.domReady =  function(doc) {
             this.init = function () {
                 this.iframe = document.getElementById('planet-iframe');
                 try {
-                    this.iframe.contentWindow.makePlanet(this._THIS_IS_MUSIC_BLOCKS_, storage, window._);
+                    this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage, window._);
                     this.planet = this.iframe.contentWindow.p;
                     this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
                     this.planet.setPlanetClose(this.closePlanet.bind(this));
@@ -4678,7 +4678,7 @@ this.domReady =  function(doc) {
         toolbar.init(beginnerMode);
     
         toolbar.renderLogoIcon(this._showAboutPage);
-        toolbar.renderPlayIcon(this._doFastButton);
+        toolbar.renderPlayIcon(_doFastButton);
         toolbar.renderStopIcon(this.doStopButton);
         toolbar.renderNewProjectIcon(this._afterDelete);
         toolbar.renderLoadIcon(this.doLoad);
@@ -4702,11 +4702,11 @@ this.domReady =  function(doc) {
     
             __saveLocally = function () {
                 console.log('overwriting session data (local)');
-                 data = this.prepareExport();
+                 data = prepareExport();
                  svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
     
                 if (sugarizerCompatibility.isInsideSugarizer()) {
-                    //sugarizerCompatibility.data.blocks = this.prepareExport();
+                    //sugarizerCompatibility.data.blocks = prepareExport();
                     storage = sugarizerCompatibility.data;
                 } else {
                     storage = localStorage;
@@ -4724,7 +4724,7 @@ this.domReady =  function(doc) {
     
                 try {
                      p = storage.currentProject;
-                    storage['SESSION' + p] = this.prepareExport();
+                    storage['SESSION' + p] = prepareExport();
                 } catch (e) {
                     console.log(e);
                 }
@@ -4775,7 +4775,7 @@ this.domReady =  function(doc) {
             ['_doSaveBlockArtwork', save.saveBlockArtwork.bind(save)]
         ]);
     
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             saveBox.setiables([
                 ['_doSaveWAV', save.saveWAV.bind(save)],
                 ['_doSaveAbc', save.saveAbc.bind(save)],
@@ -4805,7 +4805,7 @@ this.domReady =  function(doc) {
         */
     
         // FIXME: Third arg indicates beginner mode
-        if (this._THIS_IS_MUSIC_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             initBasicProtoBlocks(palettes, blocks, beginnerMode);
         } else {
             initBasicProtoBlocks(palettes, blocks);
@@ -5139,7 +5139,7 @@ this.domReady =  function(doc) {
         if (projectID != null) {
             setTimeout(function () {
                 console.log('loading ' + projectID);
-                loadStartWrapper(this.loadProject, projectID, flags, env);
+                loadStartWrapper(loadProject, projectID, flags, env);
             }, 200); // 2000
         } else {
             setTimeout(function () {
@@ -5151,7 +5151,7 @@ this.domReady =  function(doc) {
         document.addEventListener('mousewheel', this.scrollEvent, false);
         document.addEventListener('DOMMouseScroll', this.scrollEvent, false);
     
-        document.onkeydown = this.__keyPressed;
+        document.onkeydown = __keyPressed;
         this._hideStopButton();
     };
 
