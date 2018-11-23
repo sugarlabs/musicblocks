@@ -98,7 +98,7 @@ function Activity() {
     _makeButton = this._makeButton;
     _loadButtonDragHandler = this._loadButtonDragHandler;
     pasted = this.pasted;
-    deltaY = this.deltaY;
+
     _openAuxMenu = this._openAuxMenu;
     _showHideAuxMenu = this._showHideAuxMenu;
     piemenuBlockContext = this.piemenuBlockContext;
@@ -249,6 +249,11 @@ function Activity() {
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
 
+
+    /**
+     * Initialises major variables and renders default stack
+     * 
+     */
     this.setupDependencies = function () {
         // blocks = new Blocks(this);
         createDefaultStack();
@@ -362,6 +367,10 @@ function Activity() {
         toolbarHeight = document.getElementById('toolbars').offsetHeight;
     }
 
+    /**
+     * Sets up right click functionality opening the context menus 
+     * (if block is right clicked)
+     */
     this.doContextMenus = function () {
         document.addEventListener("contextmenu", function (event) {
             stageX = event.x;
@@ -402,6 +411,9 @@ function Activity() {
         }, false);
     }
 
+    /**
+     * Sets up plugin and palette boiler plate     * 
+     */
     this.doPluginsAndPaletteCols = function () {
         // Calculate the palette colors.
         /*
@@ -474,6 +486,11 @@ function Activity() {
         doStopButton();
     };
 
+
+    /**
+     * Recenters blocks by finding their position on the screen
+     * and moving them accordingly
+     */
     this._findBlocks = function () {
         // that._showHideAuxMenu(false);
         var leftpos = Math.floor(canvas.width / 4);
@@ -576,6 +593,10 @@ function Activity() {
         boundary.hide();
     };
 
+    /**
+     * @param zero {hides container}
+     * @param one {shows container}
+     */
     this.setHomeContainers = function (zero, one) {
         if (homeButtonContainers[0] === null) {
             return;
@@ -585,6 +606,9 @@ function Activity() {
         homeButtonContainers[1].visible = one;
     };
 
+    /**
+     * @return {SVG} returns SVG of blocks
+     */
     this._printBlockSVG = function () {
         blocks.activeBlock = null;
         var startCounter = 0;
@@ -706,6 +730,9 @@ function Activity() {
         return '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + encodeURIComponent(svg);
     };
 
+    /**
+     * Clears "canvas"
+     */
     this._allClear = function () {
         blocks.activeBlock = null;
         hideDOMLabel();
@@ -749,6 +776,11 @@ function Activity() {
         }
     };
 
+    /**
+     * @param env {specifies environment}
+     * Sets up play button functionality
+     * Runs music blocks
+     */
     this._doFastButton = function (env) {
         blocks.activeBlock = null;
         hideDOMLabel();
@@ -833,6 +865,9 @@ function Activity() {
         }
     };
 
+    /**
+     * Runs music blocks at a slower rate
+     */
     this._doSlowButton = function () {
         blocks.activeBlock = null;
         hideDOMLabel();
@@ -856,6 +891,9 @@ function Activity() {
         }
     };
 
+    /** 
+     * Runs music blocks step by step 
+     */
     this._doStepButton = function () {
         blocks.activeBlock = null;
         hideDOMLabel();
@@ -938,6 +976,12 @@ function Activity() {
     //     }
     // };
 
+    /**
+     * @param onblur {when object loses focus}
+     * 
+     * Stops running of music blocks. 
+     * Stops all mid-way synths
+     */
     this.doHardStopButton = function (onblur) {
         blocks.activeBlock = null;
         hideDOMLabel();
@@ -964,6 +1008,9 @@ function Activity() {
         }
     };
 
+    /**
+     * Switches between beginner/advanced mode
+     */
     this.doSwitchMode = function () {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
@@ -1000,12 +1047,18 @@ function Activity() {
     //     pasteBox.hide();
     // };
 
+    /**
+     * Initialises the functionality of the horizScrollIcon 
+     */
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
         setScrollerButton();
     };
 
+    /**
+     * REDUNDANT: sets old toolbar scroll button
+     */
     function setScrollerButton() {
         if (scrollBlockContainer) {
             scrollOffContainer.visible = true;
@@ -1018,6 +1071,12 @@ function Activity() {
         refreshCanvas();
     };
 
+    /**
+     * @param chartBitmap bitmap of analysis charts
+     * @param ctx canvas
+     * Renders close icon and functionality to 
+     * stop analytics of the MB project
+     */
     this.closeAnalytics = function (chartBitmap, ctx) {
         blocks.activeBlock = null;
         var button = this;
@@ -1033,7 +1092,12 @@ function Activity() {
         });
     };
 
-    _isCanvasBlank = function (canvas) {
+    /**
+     * @param canvas {compares existing canvas with a new blank canvas}
+     * @return {boolean} {if canvas is blank }
+     * Checks if the canvas is blank 
+     */
+    function _isCanvasBlank (canvas) {
         var blank = document.createElement('canvas');
         blank.width = canvas.width;
         blank.height = canvas.height;
@@ -1041,6 +1105,10 @@ function Activity() {
     };
 
 
+    /**
+     * Renders and carries out analysis 
+     * of the MB project
+     */
     closeAnalytics = this.closeAnalytics;
     var th = this;
     this.doAnalytics = function () {
@@ -1049,7 +1117,7 @@ function Activity() {
         // statsContainer.visible = false;
         // scrollOnContainer.visible = false;
         // scrollOffContainer.visible = false;
-        that.deltaY(-55 - LEADING);
+       deltaY(-55 - LEADING);
         that._showHideAuxMenu(false);
 
         blocks.activeBlock = null;
@@ -1096,7 +1164,9 @@ function Activity() {
         console.log('Setting optimize to ' + state);
         logo.setOptimize(state);
     };
-
+    /**
+     * Increases block size
+     */
     this.doLargerBlocks = function () {
         blocks.activeBlock = null;
         // hideDOMLabel();
@@ -1109,6 +1179,9 @@ function Activity() {
         that.setSmallerLargerStatus();
     };
 
+    /**
+     * Decreases block size
+     */
     this.doSmallerBlocks = function () {
         blocks.activeBlock = null;
         // hideDOMLabel();
@@ -1121,6 +1194,10 @@ function Activity() {
         that.setSmallerLargerStatus();
     };
 
+    /**
+     * If either the block size has reached its minimum or maximum
+     * then the icons to make them smaller/bigger will be hidden
+     */
     this.setSmallerLargerStatus = function () {
         if (BLOCKSCALES[blockscale] > 1) {
             smallerContainer.visible = true;
@@ -1139,6 +1216,9 @@ function Activity() {
         }
     };
 
+    /**
+     * Removes loaded plugin
+     */
     this.deletePlugin = function () {
         blocks.activeBlock = null;
         if (palettes.paletteObject !== null) {
@@ -1208,12 +1288,18 @@ function Activity() {
     //     logo.runLogoCommands();
     // };
 
+    /**
+     * Hides all grids (Cartesian/polar)
+     */
     this.hideGrids = function () {
         turtles.setGridLabel(_('Cartesian'));
         that._hideCartesian();
         that._hidePolar();
     };
 
+    /**
+     * Renders Cartesian/Polar grids and changes button labels accordingly
+     */
     this._doCartesianPolar = function () {
         if (cartesianBitmap.visible && polarBitmap.visible) {
             that._hideCartesian();
@@ -1235,6 +1321,9 @@ function Activity() {
         update = true;
     };
 
+    /**
+     * Sets up block actions with regards to different mouse events
+     */
     this._setupBlocksContainerEvents = function () {
         var moving = false;
         var lastCoords = {
@@ -1245,14 +1334,14 @@ function Activity() {
 
         var __wheelHandler = function (event) {
             // vertical scroll
-            if (event.that.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
-                        blocksContainer.y -= event.that.deltaY;
+                        blocksContainer.y -= event.deltaY;
                     }
                 } else {
                     if (event.clientX > cellSize) {
-                        blocksContainer.y -= event.that.deltaY;
+                        blocksContainer.y -= event.deltaY;
                     }
                 }
             }
@@ -1339,6 +1428,9 @@ function Activity() {
         });
     };
 
+    /**
+     * Sets up scrolling functionality in palette and across canvas
+     */
     function scrollEvent(event) {
         var data = event.wheelDelta || -event.detail;
         var delta = Math.max(-1, Math.min(1, (data)));
@@ -1378,6 +1470,10 @@ function Activity() {
     //     cameraID = id;
     // };
 
+    /**
+     * @param imagePath {path of grid to be rendered}
+     * Renders grid 
+     */
     this._createGrid = function (imagePath) {
         var img = new Image();
         img.src = imagePath;
@@ -1397,6 +1493,13 @@ function Activity() {
         return bitmap;
     };
 
+    /**
+     * @param  fillColor   {inner color of message}
+     * @param  strokeColor {border of message}
+     * @param  callback    {callback function assigned to particular message}
+     * @param  y           {position on canvas}
+     * @return {description}
+     */
     this._createMsgContainer = function (fillColor, strokeColor, callback, y) {
         var container = new createjs.Container();
         stage.addChild(container);
@@ -1446,14 +1549,21 @@ function Activity() {
             unescape(encodeURIComponent(svgData)));
     };
 
+    
+    /**
+     * Some error messages have special artwork.
+     */
     this._createErrorContainers = function () {
-        // Some error messages have special artwork.
         for (var i = 0; i < ERRORARTWORK.length; i++) {
             var name = ERRORARTWORK[i];
             that._makeErrorArtwork(name);
         }
     };
 
+    /**
+     * @param  name {specifies svg to be rendered}
+     * renders error message with appropriate artwork
+     */
     this._makeErrorArtwork = function (name) {
         var container = new createjs.Container();
         stage.addChild(container);
@@ -1495,9 +1605,13 @@ function Activity() {
         img.src = 'images/' + name + '.svg';
     };
 
-    // Prepare the search widget
+    /**
+     * @param  searchWidget      {searchWidget element}
+     * @param  blocks            {all blocks}
+     * @param  searchSuggestions {suggestions from user input}
+     * @param  doSearch          {search function callback}
+     */
     this.prepSearchWidget = function (searchWidget, blocks, searchSuggestions, doSearch) {
-        that.doSearch = that.doSearch;
         var that = this;
         searchWidget.style.visibility = 'hidden';
         searchBlockPosition = [100, 100];
@@ -1523,6 +1637,9 @@ function Activity() {
         };
     }
 
+    /**
+     * Hides search widget
+     */
     this.hideSearchWidget = function () {
         // Hide the jQuery search results widget
         var obj = docByClass('ui-menu');
@@ -1533,6 +1650,9 @@ function Activity() {
         searchWidget.style.visibility = 'hidden';
     };
 
+    /**
+     * Shows search widget
+     */
     this.showSearchWidget = function () {
         if (searchWidget.style.visibility === 'visible') {
             that.hideSearchWidget();
@@ -1559,6 +1679,9 @@ function Activity() {
         }
     };
 
+    /**
+     * Uses JQuery to add autocompleted search suggestions
+     */
     this.doSearch = function () {
         var $j = jQuery.noConflict();
 
@@ -1597,6 +1720,9 @@ function Activity() {
         }
     };
 
+    /**
+     * Makes initial "start up" note for a brand new MB project
+     */
     this.__makeNewNote = function (octave, solf) {
         var newNote = [
             [0, 'newnote', 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
@@ -1648,6 +1774,9 @@ function Activity() {
         blocks.activeBlock = blocks.blockList.length - 1;
     }
 
+    /**
+     * Handles keyboard shortcuts in MB
+     */
     function __keyPressed(event) {
         var that = this;
         if (docById('labelDiv').classList.contains('hasKeyboard')) {
@@ -1956,15 +2085,26 @@ function Activity() {
         }
     };
 
+    /**
+     * @return currentKeyCode 
+     */
     this.getCurrentKeyCode = function () {
         return currentKeyCode;
     };
 
+    /**
+     * Sets current key code to 0
+     */
     this.clearCurrentKeyCode = function () {
         currentKey = '';
         currentKeyCode = 0;
     };
 
+    /**
+     * Handles resizing for MB. 
+     * Detects width/height changes and closes any menus before actual resize.
+     * Repositions containers/palette/home buttons
+     */
     function _onResize(force) {
         var $j = jQuery.noConflict();
         console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
@@ -2124,9 +2264,12 @@ function Activity() {
         _onResize(false);
     };
 
+    /**
+     * Restore last stack pushed to trashStack back onto canvas.
+     * Hides palettes before update
+     * Repositions blocks about trash area
+     */
     this._restoreTrash = function () {
-        // Restore last stack pushed to trashStack.
-        // First, hide the palettes as they will need updating.
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2136,7 +2279,7 @@ function Activity() {
         refreshCanvas();
 
         var dx = 0;
-        var dy = -cellSize * 3; // Reposition blocks about trash area.
+        var dy = -cellSize * 3; // Reposition
 
         if (blocks.trashStacks.length === 0) {
             console.log('Trash is empty--nothing to do');
@@ -2224,6 +2367,9 @@ function Activity() {
         blocks.refreshCanvas();
     };
 
+    /**
+     * Closes all sub menus
+     */
     this.closeSubMenus = function () {
         if (confirmContainer.visible) {
             confirmContainer.visible = false;
@@ -2244,7 +2390,7 @@ function Activity() {
                 scrollOffContainer = 95.5 + LEADING;
             }
 
-            that.deltaY(-55 - LEADING);
+           deltaY(-55 - LEADING);
         } else if (uploadContainer.visible) {
             saveHTMLContainer.visible = false;
             uploadContainer.visible = false;
@@ -2272,7 +2418,7 @@ function Activity() {
                 scrollOnContainer = 95.5 + LEADING;
                 scrollOffContainer = 95.5 + LEADING;
             }
-            that.deltaY(-55 - LEADING);
+           deltaY(-55 - LEADING);
         }
     };
 
@@ -2284,13 +2430,16 @@ function Activity() {
             confirmContainer.visible = true;
             confirmContainer.x = newContainer.x;
             confirmContainer.y = 27.5;
-            that.deltaY(55 + LEADING);
+           deltaY(55 + LEADING);
         } else {
             confirmContainer.visible = false;
-            that.deltaY(-55 - LEADING);
+           deltaY(-55 - LEADING);
         }
     };
 
+    /**
+     * REDUNDANT: Hides aux menu
+     */
     this.hideAuxMenu = function () {
         if (toolbarHeight > 0) {
             that._showHideAuxMenu(false);
@@ -2298,6 +2447,9 @@ function Activity() {
         }
     };
 
+    /**
+     * Sets up a new "clean" MB i.e. new project instance
+     */
     this._afterDelete = function () {
         that.sendAllToTrash(true, false);
         if (planet !== undefined) {
@@ -2305,7 +2457,7 @@ function Activity() {
         }
 
         confirmContainer.visible = false;
-        that.deltaY(-55 - LEADING);
+       deltaY(-55 - LEADING);
         that._showHideAuxMenu(true);
     };
 
@@ -2315,8 +2467,15 @@ function Activity() {
     //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, that._makeButton, logo);
     // };
 
+    /**
+     * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
+     * @param {boolean} doNotSave     {if true discards any changes to project}
+     * 
+     * Hide the palettes before update.
+     * Then deletes everything/sends all to trash
+     */
     this.sendAllToTrash = function (addStartBlock, doNotSave) {
-        // First, hide the palettes as they will need updating.
+        
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2381,6 +2540,9 @@ function Activity() {
     //     }
     // };
 
+    /**
+     * Toggles block/palette visibility
+     */
     this._changeBlockVisibility = function () {
         hideDOMLabel();
 
@@ -2402,6 +2564,9 @@ function Activity() {
         // _changePaletteVisibility();
     };
 
+    /**
+     * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
+     */
     this._toggleCollapsibleStacks = function () {
         hideDOMLabel();
 
@@ -2410,6 +2575,9 @@ function Activity() {
         }
     };
 
+    /**
+     * When turtle stops running restore stop button to normal state
+     */
     this.onStopTurtle = function () {
         // TODO: plugin support
         if (stopTurtleContainer === null) {
@@ -2422,6 +2590,9 @@ function Activity() {
         }
     };
 
+    /**
+     * When turtle starts running change stop button to running state
+     */
     this.onRunTurtle = function () {
         // TODO: plugin support
         // If the stop button is hidden, show it.
@@ -2434,24 +2605,38 @@ function Activity() {
         }
     };
 
+    /**
+     * Updates all canvas elements
+     */
     function refreshCanvas() {
         update = true;
     };
-
+    
+    /**
+     * This set makes it so the stage only re-renders when an
+     * event handler indicates a change has happened. 
+     */
     this.__tick = function (event) {
-        // This set makes it so the stage only re-renders when an
-        // event handler indicates a change has happened.
+        
         if (update || createjs.Tween.hasActiveTweens()) {
             update = false; // Only update once
             stage.update(event);
         }
     };
 
+    /**
+     * Opens samples on planet after closing all sub menus
+     */
     this._doOpenSamples = function () {
         that.closeSubMenus();
         planet.openPlanet();
     };
 
+    /**
+     * Saves project
+     * If beginner, assigns default "My Project" title to html file
+     * If advanced, assigns custom title to html file 
+     */
     this.doSave = function () {
         if (beginnerMode) {
             that.closeSubMenus();
@@ -2509,7 +2694,7 @@ function Activity() {
                     saveABCContainer.y = 27.5;
                 }
 
-                that.deltaY(55 + LEADING);
+               deltaY(55 + LEADING);
             } else {
                 saveHTMLContainer.visible = false;
                 uploadContainer.visible = false;
@@ -2523,12 +2708,15 @@ function Activity() {
                 }
 
                 // Move it down since we are about to move it up.
-                that.deltaY(-55 - LEADING);
+               deltaY(-55 - LEADING);
                 that._showHideAuxMenu(true);
             }
         }
     };
 
+    /**
+     * Uploads MB file to Planet
+     */
     this.doUploadToPlanet = function () {
         planet.openPlanet();
     };
@@ -2538,6 +2726,10 @@ function Activity() {
     //     // add code for facebook share link
     // };
 
+    /** 
+     * @param merge {if specified the selected file's blocks merge into current project}
+     *  Loads/merges existing MB file
+     */
     this.doLoad = function (merge) {
         that.closeSubMenus();
         if (merge === undefined) {
@@ -2561,6 +2753,10 @@ function Activity() {
 
     window.prepareExport = prepareExport;
 
+    /**
+     * @param env {specifies environment}
+     * Runs music blocks project
+     */
     this.runProject = function (env) {
         console.log('Running Project from Event');
         document.removeEventListener('finishedLoading', this.runProject);
@@ -2571,6 +2767,13 @@ function Activity() {
         }, 5000);
     }
 
+    /**
+     * @param  projectID {Planet project ID}
+     * @param  flags     {parameteres}
+     * @param  env       {specifies environment}
+     * 
+     * Loads MB project from Planet
+     */
     this.loadProject = function (projectID, flags, env) {
         //set default value of run
         flags = typeof flags !== 'undefined' ? flags : {
@@ -2640,9 +2843,13 @@ function Activity() {
         }
     };
 
-    // Calculate time such that no matter how long it takes to
-    // load the program, the loading animation will cycle at least
-    // once.
+    /**
+     * Calculate time such that no matter how long it takes to
+     * load the program, the loading animation will cycle at least
+     * once.
+     * 
+     * @param loadProject all params are from load project function
+     */
     this.loadStartWrapper = function (func, arg1, arg2, arg3) {
         var time1 = new Date();
         func(arg1, arg2, arg3);
@@ -2653,7 +2860,10 @@ function Activity() {
         setTimeout(that.showContents, timeLeft);
     };
 
-    // Hides the loading animation and unhides the background.
+    /**
+     * Hides the loading animation and unhides the background. 
+     * Shows contents of MB after loading screen.
+     */
     this.showContents = function () {
         docById('loading-image-container').style.display = 'none';
         // docById('canvas').style.display = 'none';
@@ -2742,6 +2952,10 @@ function Activity() {
         update = true;
     };
 
+
+    /**
+     * Hides all message containers
+     */
     this.hideMsgs = function () {
         errorMsgText.parent.visible = false;
         if (errorMsgArrow != null) {
@@ -2756,6 +2970,7 @@ function Activity() {
 
         refreshCanvas();
     };
+
 
     this.textMsg = function (msg) {
         if (msgText == null) {
@@ -2888,24 +3103,36 @@ function Activity() {
         refreshCanvas();
     };
 
+    /**
+     * Hides cartesian grid
+     */
     this._hideCartesian = function () {
         cartesianBitmap.visible = false;
         cartesianBitmap.updateCache();
         update = true;
     };
 
+    /**
+     * Shows cartesian grid
+     */
     this._showCartesian = function () {
         cartesianBitmap.visible = true;
         cartesianBitmap.updateCache();
         update = true;
     };
 
+    /**
+     * Hides polar grid
+     */
     this._hidePolar = function () {
         polarBitmap.visible = false;
         polarBitmap.updateCache();
         update = true;
     };
 
+    /**
+     * Shows polar grid
+     */
     this._showPolar = function () {
         polarBitmap.visible = true;
         polarBitmap.updateCache();
@@ -2916,10 +3143,16 @@ function Activity() {
     //     that.closeSubMenus();
     //     blocks.pasteStack();
     // };
-
+   
+    /**
+     * We don't save blocks in the trash, so we need to
+     * consolidate the block list and remap the connections.
+     * 
+     * Next, save the playback queue, but don't save the
+     * playback queue if we are saving to Lilypond.
+     */
     function prepareExport() {
-        // We don't save blocks in the trash, so we need to
-        // consolidate the block list and remap the connections.
+        
         var blockMap = [];
         var hasMatrixDataBlock = false;
         for (var blk = 0; blk < blocks.blockList.length; blk++) {
@@ -3049,8 +3282,7 @@ function Activity() {
             data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
         }
 
-        // Next, save the playback queue, but don't save the
-        // playback queue if we are saving to Lilypond.
+        // remap block connections
 
         if (logo.runningLilypond) {
             logo.playbackQueue = {};
@@ -3071,8 +3303,10 @@ function Activity() {
         return JSON.stringify(data);
     };
 
+    /**
+     * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
+     */
     this.doOpenPlugin = function () {
-        // Click on the plugin open chooser in the DOM (.json).
         pluginChooser.focus();
         pluginChooser.click();
     };
@@ -3110,6 +3344,9 @@ function Activity() {
     //         handleComplete);
     // };
 
+    /**
+     * REDUNDANT: Repositions toolbar icons and tooltips  
+     */
     this._setupAndroidToolbar = function (showPalettesPopover) {
         // NOTE: see getMainToolbarButtonNames in turtledefs.js
 
@@ -3318,10 +3555,17 @@ function Activity() {
         that._setupSubMenus(turtleBlocksScale);
     };
 
+    /**
+     * Specifies that loading an MB project should merge it 
+     * within the existing project
+     */
     this._doMergeLoad = function () {
         that.doLoad(true);
     };
 
+    /**
+     * REDUNDANT
+     */
     this._setupSubMenus = function (turtleBlocksScale) {
         // Each sub menu is positioned above the aux menus
         var cellsize = 55;
@@ -3408,6 +3652,9 @@ function Activity() {
 
     };
 
+    /**
+     * REDUNDANT
+     */
     this._setupAuxMenu = function (turtleBlocksScale) {
         if (menuContainer !== undefined) {
             stage.removeChild(menuContainer);
@@ -3524,6 +3771,10 @@ function Activity() {
         menuButtonsVisible = false;
     };
 
+    /**
+     * Sets up palette buttons and functions
+     * e.g. Home, Collapse, Expand
+     */
     this._setupPaletteMenu = function (turtleBlocksScale) {
         // Clean up if we've been here before.
         if (homeButtonContainers.length !== 0) {
@@ -3590,21 +3841,33 @@ function Activity() {
     //     p.popdown();
     // };
 
+    /**
+     * Shows help page
+     */
     this._showHelp = function () {
         var helpWidget = new HelpWidget();
         helpWidget.init(null);
     };
 
+    /**
+     * Shows about page
+     */
     this._showAboutPage = function () {
         var helpWidget = new HelpWidget();
         helpWidget.init(null);
         helpWidget.showPageByName(_('About'));
     };
 
+    /** 
+     * REDUNDANT
+     */
     this._doMenuButton = function () {
         that._doMenuAnimation(true);
     };
 
+    /**
+     * REDUNDANT
+     */
     this._doMenuAnimation = function (arg) {
         if (arg === undefined) {
             var animate = true;
@@ -3668,6 +3931,9 @@ function Activity() {
         }, timeout);
     };
 
+    /**
+     * REDUNDANT
+     */
     this._toggleToolbar = function () {
         buttonsVisible = !buttonsVisible;
         menuContainer.visible = buttonsVisible;
@@ -3696,6 +3962,9 @@ function Activity() {
         update = true;
     };
 
+    /**
+     * REDUNDANT: Makes toolbar buttons 
+     */
     this._makeButton = function (name, label, x, y, size, rotation, parent) {
         var container = new createjs.Container();
 
@@ -3794,9 +4063,15 @@ function Activity() {
         return container;
     };
 
-
-
-    this._loadButtonDragHandler = function (container, ox, oy, action, hoverAction) { // longAction, extraLongAction, longImg, extraLongImg) {
+    /**
+     * @param container longAction
+     * @param ox extraLongAction, 
+     * @param oy longImg, 
+     * @param hoverAction extraLongImg
+     * 
+     * Handles button dragging, long hovering and prevents multiple button presses
+     */
+    this._loadButtonDragHandler = function (container, ox, oy, action, hoverAction) { 
         // Prevent multiple button presses (i.e., debounce).
         var lockTimer = null;
         var locked = false;
@@ -3942,6 +4217,9 @@ function Activity() {
         });
     };
 
+    /**
+     * Handles pasted strings into input fields
+     */
     this.pasted = function () {
         var pasteinput = docById('paste').value;
         var rawData = pasteinput;
@@ -3967,7 +4245,14 @@ function Activity() {
         pasteBox.hide();
     };
 
-    this.deltaY = function (dy) {
+    /** 
+     * 
+     * @param dy how much of a change in y  
+     * 
+     * Handles changes in y coordinates of elements when e.g aux toolbar is opened
+     * Repositions elements on screen by a certain amount (dy)
+     */
+    deltaY = function (dy) {
         toolbarHeight += dy;
         for (var i = 0; i < onscreenButtons.length; i++) {
             onscreenButtons[i].y += dy;
@@ -4000,12 +4285,20 @@ function Activity() {
     };
 
 
+    /** 
+     * REDUNDANT: Open aux menu
+     */
     this._openAuxMenu = function () {
         if (!turtles.running() && toolbarHeight === 0) {
             that._showHideAuxMenu(false);
         }
     };
 
+    /**
+     * @param resize checks if resize occurred
+     * 
+     * Toggles Aux menu visibility and positioning 
+     */
     this._showHideAuxMenu = function (resize) {
         var cellsize = 55;
         if (!resize && toolbarHeight === 0) {
@@ -4107,6 +4400,13 @@ function Activity() {
         refreshCanvas();
     };
 
+    /**
+     * @param activeBlock which block do the menus relate to
+     * @param stageX x coord of stage
+     * @param stageY y coord of stage
+     * 
+     * Sets up context menu for each block
+     */
     this.piemenuBlockContext = function (activeBlock, stageX, stageY) {
         if (activeBlock === null) {
             console.log('that.piemenuBlockContext: no active block');
@@ -4233,6 +4533,10 @@ function Activity() {
         }, 500);
     };
 
+    /**
+     * Ran once dom is ready and editable
+     * Sets up dependencies and vars
+     */
     this.domReady = function (doc) {
         // _onResize = _onResize;
         // var that = this;
@@ -4269,6 +4573,9 @@ function Activity() {
 
     };
 
+    /**
+     * Inits everything. The main function.
+     */
     this.init = function () {
         console.log('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
         this._clientWidth = document.body.clientWidth;
