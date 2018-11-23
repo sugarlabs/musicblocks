@@ -89,7 +89,6 @@ function Activity() {
     _doMergeLoad = this._doMergeLoad;
     _setupSubMenus = this._setupSubMenus;
     _setupAuxMenu = this._setupAuxMenu;
-    _setupPaletteMenu = this._setupPaletteMenu;
     _showHelp = this._showHelp;
     _showAboutPage = this._showAboutPage;
     _doMenuButton = this._doMenuButton;
@@ -3349,7 +3348,6 @@ function Activity() {
      */
     this._setupAndroidToolbar = function (showPalettesPopover) {
         // NOTE: see getMainToolbarButtonNames in turtledefs.js
-
         if (headerContainer !== undefined) {
             stage.removeChild(headerContainer);
             for (var i in onscreenButtons) {
@@ -3478,7 +3476,7 @@ function Activity() {
 
         // Add the palette buttons here so that the hover tooltips
         // for the other buttons do not get occluded.
-        that._setupPaletteMenu(turtleBlocksScale);
+        _setupPaletteMenu(turtleBlocksScale);
 
         var language = localStorage.languagePreference;
 
@@ -3775,7 +3773,7 @@ function Activity() {
      * Sets up palette buttons and functions
      * e.g. Home, Collapse, Expand
      */
-    this._setupPaletteMenu = function (turtleBlocksScale) {
+    _setupPaletteMenu = function (turtleBlocksScale) {
         // Clean up if we've been here before.
         if (homeButtonContainers.length !== 0) {
             stage.removeChild(homeButtonContainers[0]);
