@@ -25,10 +25,11 @@ function Activity() {
     searchSuggestions = [];
     homeButtonContainers = [];
 
-    that = this;
+    var that = this;
 
     setHomeContainers = this.setHomeContainers
     _printBlockSVG = this._printBlockSVG;
+    _findBlocks = this._findBlocks;
     _allClear = this._allClear;
     _doFastButton = this._doFastButton;
     _doSlowButton = this._doSlowButton;
@@ -37,6 +38,9 @@ function Activity() {
     doSwitchMode = this.doSwitchMode;
     closeAnalytics = this.closeAnalytics;
     doAnalytics = this.doAnalytics;
+    doLargerBlocks = this.doLargerBlocks;
+    doSmallerBlocks = this.doSmallerBlocks;
+    setSmallerLargerStatus = this.setSmallerLargerStatus;
     deletePlugin = this.deletePlugin;
     hideGrids = this.hideGrids;
     _doCartesianPolar = this._doCartesianPolar;
@@ -48,13 +52,57 @@ function Activity() {
     hideSearchWidget = this.hideSearchWidget;
     showSearchWidget = this.showSearchWidget;
     doSearch = this.doSearch;
-    __keyPressed = this.__keyPressed;
+    __makeNewNote = this.__makeNewNote;
+    getCurrentKeyCode = this.getCurrentKeyCode;
+    clearCurrentKeyCode = this.clearCurrentKeyCode;
     _restoreTrash = this._restoreTrash;
     closeSubMenus = this.closeSubMenus;
     _deleteBlocksBox = this._deleteBlocksBox;
     hideAuxMenu = this.hideAuxMenu;
     onStopTurtle = this.onStopTurtle;
     onRunTurtle = this.onRunTurtle;
+    _tick = this._tick;
+    _doOpenSamples = this._doOpenSamples;
+    doSave = this.doSave;
+    doUploadToPlanet = this.doUploadToPlanet;
+    _afterDelete = this._afterDelete;
+    sendAllToTrash = this.sendAllToTrash;
+    _changeBlockVisibility = this._changeBlockVisibility;
+    _toggleCollapsibleStacks = this._toggleCollapsibleStacks;
+    doLoad = this.doLoad;
+    runProject = this.runProject;
+    loadProject = this.loadProject;
+loadStartWrapper = this.loadStartWrapper;
+showContents  = this.showContents;
+_loadStart = this._loadStart;
+hideMsgs = this.hideMsgs;
+textMsg = this.textMsg;
+errorMsg = this.errorMsg;
+_hideCartesian = this._hideCartesian;
+_showCartesian = this._showCartesian;
+_hidePolar = this._hidePolar;
+_showPolar = this._showPolar;
+doOpenPlugin = this.doOpenPlugin;
+_hideStopButton = this._hideStopButton;
+_showStopButton = this._showStopButton;
+_setupAndroidToolbar = this._setupAndroidToolbar;
+_doMergeLoad = this._doMergeLoad;
+_setupSubMenus = this._setupSubMenus;
+_setupAuxMenu = this._setupAuxMenu;
+_setupPaletteMenu = this._setupPaletteMenu;
+_showHelp = this._showHelp;
+_showAboutPage = this._showAboutPage;
+_doMenuButton = this._doMenuButton;
+_doMenuAnimation = this._doMenuAnimation;
+_toggleToolbar = this._toggleToolbar;
+_makeButton = this._makeButton;
+_loadButtonDragHandler = this._loadButtonDragHandler;
+pasted = this.pasted;
+deltaY = this.deltaY;
+_openAuxMenu = this._openAuxMenu;
+_showHideAuxMenu = this._showHideAuxMenu;
+piemenuBlockContext = this.piemenuBlockContext;
+
     // scrollOffContainer = undefined;
     // scrollOnContainer = undefined;
 
@@ -232,7 +280,7 @@ function Activity() {
 
         // Set up a file chooser for the doOpen function.
         fileChooser = docById('myOpenFile');
-        // Set up a file chooser for the doOpenPlugin function.
+        // Set up a file chooser for the that.doOpenPlugin function.
         pluginChooser = docById('myOpenPlugin');
         // The file chooser for all files.
         allFilesChooser = docById('myOpenAll');
@@ -337,7 +385,7 @@ function Activity() {
                         // FIXME: check Z-order in case there are
                         // overlapping blocks.
                         blocks.activeBlock = i;
-                        piemenuBlockContext(i);
+                        that.piemenuBlockContext(i);
                         console.log('Found a hit.');
                         break;
                     }
@@ -349,7 +397,7 @@ function Activity() {
                 }
             } else {
                 // Block context menu
-                piemenuBlockContext(blocks.activeBlock, stageX, stageY);
+                that.piemenuBlockContext(blocks.activeBlock, stageX, stageY);
             }
         }, false);
     }
@@ -427,7 +475,7 @@ function Activity() {
     };
 
     this._findBlocks = function () {
-        // _showHideAuxMenu(false);
+        // that._showHideAuxMenu(false);
         var leftpos = Math.floor(canvas.width / 4);
         var toppos;
         blocks.activeBlock = null;
@@ -669,7 +717,7 @@ function Activity() {
 
         logo.boxes = {};
         logo.time = 0;
-        hideMsgs();
+        that.hideMsgs();
         logo.setBackgroundColor(-1);
         logo.notationOutput = '';
         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -921,12 +969,12 @@ function Activity() {
         var mode = localStorage.beginnerMode;
 
         if (mode === null || mode === 'true') {
-            textMsg(_('Refresh your browser to change to advanced mode.'));
+            that.textMsg(_('Refresh your browser to change to advanced mode.'));
             localStorage.setItem('beginnerMode', false);
             beginnerModeContainer.visible = false;
             advancedModeContainer.visible = true;
         } else {
-            textMsg(_('Refresh your browser to change to beginner mode.'));
+            that.textMsg(_('Refresh your browser to change to beginner mode.'));
             localStorage.setItem('beginnerMode', true);
             beginnerModeContainer.visible = true;
             advancedModeContainer.visible = false;
@@ -952,13 +1000,13 @@ function Activity() {
     //     pasteBox.hide();
     // };
 
-    setScroller = function () {
+    function setScroller () {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
         setScrollerButton();
     };
 
-    setScrollerButton = function () {
+    function setScrollerButton() {
         if (scrollBlockContainer) {
             scrollOffContainer.visible = true;
             scrollOnContainer.visible = false;
@@ -975,7 +1023,7 @@ function Activity() {
         var button = this;
         button.x = (canvas.width / (2 * turtleBlocksScale)) + (300 / Math.sqrt(2));
         button.y = 200.0;
-        this.closeButton = _makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
+        this.closeButton = that._makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
         this.closeButton.on('click', function (event) {
             button.closeButton.visible = false;
             stage.removeChild(chartBitmap);
@@ -991,6 +1039,8 @@ function Activity() {
         blank.height = canvas.height;
         return canvas.toDataURL() == blank.toDataURL();
     };
+    
+    
     closeAnalytics = this.closeAnalytics;
     var th = this;
     this.doAnalytics = function () {
@@ -999,13 +1049,13 @@ function Activity() {
         // statsContainer.visible = false;
         // scrollOnContainer.visible = false;
         // scrollOffContainer.visible = false;
-        deltaY(-55 - LEADING);
-        _showHideAuxMenu(false);
+        that.deltaY(-55 - LEADING);
+        that._showHideAuxMenu(false);
 
         blocks.activeBlock = null;
         myChart = docById('myChart');
 
-        if (this._isCanvasBlank(myChart) == false) {
+        if (_isCanvasBlank(myChart) == false) {
             return;
         }
 
@@ -1047,7 +1097,7 @@ function Activity() {
         logo.setOptimize(state);
     };
 
-    doLargerBlocks = function () {
+    this.doLargerBlocks = function () {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
@@ -1056,10 +1106,10 @@ function Activity() {
             blocks.setBlockScale(BLOCKSCALES[blockscale]);
         }
 
-        setSmallerLargerStatus();
+        that.setSmallerLargerStatus();
     };
 
-    function doSmallerBlocks() {
+    this.doSmallerBlocks = function () {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
@@ -1068,10 +1118,10 @@ function Activity() {
             blocks.setBlockScale(BLOCKSCALES[blockscale]);
         }
 
-        setSmallerLargerStatus();
+        that.setSmallerLargerStatus();
     };
 
-    function setSmallerLargerStatus() {
+    this.setSmallerLargerStatus = function () {
         if (BLOCKSCALES[blockscale] > 1) {
             smallerContainer.visible = true;
             smallerOffContainer.visible = false;
@@ -1160,24 +1210,24 @@ function Activity() {
 
     this.hideGrids = function () {
         turtles.setGridLabel(_('Cartesian'));
-        _hideCartesian();
-        _hidePolar();
+        that._hideCartesian();
+        that._hidePolar();
     };
 
     this._doCartesianPolar = function () {
         if (cartesianBitmap.visible && polarBitmap.visible) {
-            _hideCartesian();
+            that._hideCartesian();
             //.TRANS: hide Polar coordinate overlay grid
             turtles.setGridLabel(_('Hide grid'));
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
-            _hidePolar();
+            that._hidePolar();
             //.TRANS: show Cartesian coordinate overlay grid
             turtles.setGridLabel(_('Cartesian'));
         } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
-            _showCartesian();
+            that._showCartesian();
             turtles.setGridLabel(_('Cartesian') + ' + ' + _('Polar'));
         } else if (cartesianBitmap.visible && !polarBitmap.visible) {
-            _showPolar();
+            that._showPolar();
             //.TRANS: show Polar coordinate overlay grid
             turtles.setGridLabel(_('Polar'));
         }
@@ -1195,14 +1245,14 @@ function Activity() {
 
         var __wheelHandler = function (event) {
             // vertical scroll
-            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+            if (event.that.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
-                        blocksContainer.y -= event.deltaY;
+                        blocksContainer.y -= event.that.deltaY;
                     }
                 } else {
                     if (event.clientX > cellSize) {
-                        blocksContainer.y -= event.deltaY;
+                        blocksContainer.y -= event.that.deltaY;
                     }
                 }
             }
@@ -1537,9 +1587,9 @@ function Activity() {
                 searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
                 searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
             } else if (deprecatedBlockNames.indexOf(searchInput) > -1) {
-                blocks.errorMsg(_('This block is deprecated.'));
+                blocks.that.errorMsg(_('This block is deprecated.'));
             } else {
-                blocks.errorMsg(_('Block cannot be found.'));
+                blocks.that.errorMsg(_('Block cannot be found.'));
             }
 
             searchWidget.value = '';
@@ -1547,7 +1597,7 @@ function Activity() {
         }
     };
 
-    function __makeNewNote(octave, solf) {
+    this.__makeNewNote = function (octave, solf) {
         var newNote = [
             [0, 'newnote', 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
             [1, 'divide', 0, 0, [0, 2, 3]],
@@ -1598,7 +1648,7 @@ function Activity() {
         blocks.activeBlock = blocks.blockList.length - 1;
     }
 
-    this.__keyPressed = function (event) {
+     function __keyPressed (event) {
         var that = this;
         if (docById('labelDiv').classList.contains('hasKeyboard')) {
             return;
@@ -1717,44 +1767,44 @@ function Activity() {
             switch (event.keyCode) {
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'do');
+                        that.__makeNewNote(5, 'do');
                     }
                     break;
                 case KEYCODE_R:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 're');
+                        that.__makeNewNote(5, 're');
                     }
                     break;
                 case KEYCODE_M:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'mi');
+                        that.__makeNewNote(5, 'mi');
                     }
                     break;
                 case KEYCODE_F:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'fa');
+                        that.__makeNewNote(5, 'fa');
                     }
                     break;
                 case KEYCODE_S:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'sol');
+                        that.__makeNewNote(5, 'sol');
                     }
                     break;
                 case KEYCODE_L:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'la');
+                        that.__makeNewNote(5, 'la');
                     }
                     break;
                 case KEYCODE_T:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        __makeNewNote(5, 'ti');
+                        that.__makeNewNote(5, 'ti');
                     }
                     break;
             }
         } else {
             if (docById('paste').style.visibility === 'visible' && event.keyCode === RETURN) {
                 if (docById('paste').value.length > 0) {
-                    pasted();
+                    that.pasted();
                 }
             } else if (!disableKeys) {
                 switch (event.keyCode) {
@@ -1848,7 +1898,7 @@ function Activity() {
                             searchWidget.style.visibility = 'hidden';
                         } else {
                             // toggle full screen
-                            // _toggleToolbar();
+                            // that._toggleToolbar();
                         }
                         break;
                     case RETURN:
@@ -1862,37 +1912,37 @@ function Activity() {
                         break;
                     case KEYCODE_D:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'do');
+                            that.__makeNewNote(4, 'do');
                         }
                         break;
                     case KEYCODE_R:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 're');
+                            that.__makeNewNote(4, 're');
                         }
                         break;
                     case KEYCODE_M:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'mi');
+                            that.__makeNewNote(4, 'mi');
                         }
                         break;
                     case KEYCODE_F:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'fa');
+                            that.__makeNewNote(4, 'fa');
                         }
                         break;
                     case KEYCODE_S:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'sol');
+                            that.__makeNewNote(4, 'sol');
                         }
                         break;
                     case KEYCODE_L:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'la');
+                            that.__makeNewNote(4, 'la');
                         }
                         break;
                     case KEYCODE_T:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            __makeNewNote(4, 'ti');
+                            that.__makeNewNote(4, 'ti');
                         }
                         break;
                     default:
@@ -1906,11 +1956,11 @@ function Activity() {
         }
     };
 
-    function getCurrentKeyCode() {
+    this.getCurrentKeyCode = function () {
         return currentKeyCode;
     };
 
-    function clearCurrentKeyCode() {
+    this.clearCurrentKeyCode = function () {
         currentKey = '';
         currentKeyCode = 0;
     };
@@ -1969,7 +2019,7 @@ function Activity() {
         if (confirmContainer !== null && languageContainer.visible) {
             if (toolbarHeight > 0) {
                 console.log('Closing menus before resize.');
-                _showHideAuxMenu(true);
+                that._showHideAuxMenu(true);
             }
         }
 
@@ -2032,7 +2082,7 @@ function Activity() {
 
         trashcan.resizeEvent(turtleBlocksScale);
 
-        _setupAndroidToolbar(mobileSize);
+        that._setupAndroidToolbar(mobileSize);
 
         // Reposition coordinate grids.
         cartesianBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (600);
@@ -2194,7 +2244,7 @@ function Activity() {
                 scrollOffContainer = 95.5 + LEADING;
             }
 
-            deltaY(-55 - LEADING);
+            that.deltaY(-55 - LEADING);
         } else if (uploadContainer.visible) {
             saveHTMLContainer.visible = false;
             uploadContainer.visible = false;
@@ -2222,7 +2272,7 @@ function Activity() {
                 scrollOnContainer = 95.5 + LEADING;
                 scrollOffContainer = 95.5 + LEADING;
             }
-            deltaY(-55 - LEADING);
+            that.deltaY(-55 - LEADING);
         }
     };
 
@@ -2234,38 +2284,38 @@ function Activity() {
             confirmContainer.visible = true;
             confirmContainer.x = newContainer.x;
             confirmContainer.y = 27.5;
-            deltaY(55 + LEADING);
+            that.deltaY(55 + LEADING);
         } else {
             confirmContainer.visible = false;
-            deltaY(-55 - LEADING);
+            that.deltaY(-55 - LEADING);
         }
     };
 
     this.hideAuxMenu = function () {
         if (toolbarHeight > 0) {
-            _showHideAuxMenu(false);
+            that._showHideAuxMenu(false);
             menuButtonsVisible = false;
         }
     };
 
-    function _afterDelete() {
-        sendAllToTrash(true, false);
+    this._afterDelete = function () {
+        that.sendAllToTrash(true, false);
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
         }
 
         confirmContainer.visible = false;
-        deltaY(-55 - LEADING);
-        _showHideAuxMenu(true);
+        that.deltaY(-55 - LEADING);
+        that._showHideAuxMenu(true);
     };
 
 
     // function _doPlaybackBox() {
     //     // _hideBoxes();
-    //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
+    //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, that._makeButton, logo);
     // };
 
-    function sendAllToTrash(addStartBlock, doNotSave) {
+    this.sendAllToTrash = function (addStartBlock, doNotSave) {
         // First, hide the palettes as they will need updating.
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
@@ -2331,7 +2381,7 @@ function Activity() {
     //     }
     // };
 
-    function _changeBlockVisibility() {
+    this._changeBlockVisibility = function () {
         hideDOMLabel();
 
         if (blocks.visible) {
@@ -2352,7 +2402,7 @@ function Activity() {
         // _changePaletteVisibility();
     };
 
-    function _toggleCollapsibleStacks() {
+    this._toggleCollapsibleStacks = function () {
         hideDOMLabel();
 
         if (blocks.visible) {
@@ -2367,7 +2417,7 @@ function Activity() {
         }
 
         if (stopTurtleContainer.visible) {
-            _hideStopButton();
+            that._hideStopButton();
             setPlaybackStatus();
         }
     };
@@ -2380,7 +2430,7 @@ function Activity() {
         }
 
         if (!stopTurtleContainer.visible) {
-            _showStopButton();
+            that._showStopButton();
         }
     };
 
@@ -2388,7 +2438,7 @@ function Activity() {
         update = true;
     };
 
-    function __tick(event) {
+    this.__tick = function (event) {
         // This set makes it so the stage only re-renders when an
         // event handler indicates a change has happened.
         if (update || createjs.Tween.hasActiveTweens()) {
@@ -2397,12 +2447,12 @@ function Activity() {
         }
     };
 
-    function _doOpenSamples() {
+    this._doOpenSamples = function () {
         that.closeSubMenus();
         planet.openPlanet();
     };
 
-    function doSave() {
+    this.doSave = function () {
         if (beginnerMode) {
             that.closeSubMenus();
             save.saveHTML(_('My Project'));
@@ -2459,7 +2509,7 @@ function Activity() {
                     saveABCContainer.y = 27.5;
                 }
 
-                deltaY(55 + LEADING);
+                that.deltaY(55 + LEADING);
             } else {
                 saveHTMLContainer.visible = false;
                 uploadContainer.visible = false;
@@ -2473,22 +2523,22 @@ function Activity() {
                 }
 
                 // Move it down since we are about to move it up.
-                deltaY(-55 - LEADING);
-                _showHideAuxMenu(true);
+                that.deltaY(-55 - LEADING);
+                that._showHideAuxMenu(true);
             }
         }
     };
 
-    function doUploadToPlanet() {
+    this.doUploadToPlanet = function () {
         planet.openPlanet();
     };
 
-    function doShareOnFacebook() {
-        alert('Facebook Sharing : disabled'); // remove when add fb share link
-        // add code for facebook share link
-    };
+    // function doShareOnFacebook() {
+    //     alert('Facebook Sharing : disabled'); // remove when add fb share link
+    //     // add code for facebook share link
+    // };
 
-    function doLoad(merge) {
+    this.doLoad = function (merge) {
         that.closeSubMenus();
         if (merge === undefined) {
             merge = false;
@@ -2511,17 +2561,17 @@ function Activity() {
 
     window.prepareExport = prepareExport;
 
-    function runProject(env) {
+    this.runProject = function (env) {
         console.log('Running Project from Event');
-        document.removeEventListener('finishedLoading', runProject);
+        document.removeEventListener('finishedLoading', this.runProject);
         setTimeout(function () {
             console.log('Run');
-            _changeBlockVisibility();
+            that._changeBlockVisibility();
             that._doFastButton(env);
         }, 5000);
     }
 
-    function loadProject(projectID, flags, env) {
+    this.loadProject = function (projectID, flags, env) {
         //set default value of run
         flags = typeof flags !== 'undefined' ? flags : {
             run: false,
@@ -2535,12 +2585,12 @@ function Activity() {
         setTimeout(function () {
             try {
                 planet.openProjectFromPlanet(projectID, function () {
-                    loadStartWrapper(_loadStart);
+                    that.loadStartWrapper(that._loadStart);
                 });
             } catch (e) {
                 console.log(e);
-                console.log('_loadStart on error');
-                loadStartWrapper(_loadStart);
+                console.log('that._loadStart on error');
+                that.loadStartWrapper(that._loadStart);
             }
 
             planet.initialiseNewProject();
@@ -2557,7 +2607,7 @@ function Activity() {
         var __functionload = function () {
             setTimeout(function () {
                 if (!collapse && firstRun) {
-                    _toggleCollapsibleStacks();
+                    that._toggleCollapsibleStacks();
                 }
 
                 if (run && firstRun) {
@@ -2565,17 +2615,17 @@ function Activity() {
                         turtles.turtleList[turtle].doClear(true, true, false);
                     }
 
-                    runProject(env);
+                    that.runProject(env);
 
                     if (show) {
-                        _changeBlockVisibility();
+                        that._changeBlockVisibility();
                     }
 
                     if (!collapse) {
-                        _toggleCollapsibleStacks();
+                        that._toggleCollapsibleStacks();
                     }
                 } else if (!show) {
-                    _changeBlockVisibility();
+                    that._changeBlockVisibility();
                 }
 
                 document.removeEventListener('finishedLoading', __functionload);
@@ -2593,18 +2643,18 @@ function Activity() {
     // Calculate time such that no matter how long it takes to
     // load the program, the loading animation will cycle at least
     // once.
-    function loadStartWrapper(func, arg1, arg2, arg3) {
+    this.loadStartWrapper = function (func, arg1, arg2, arg3) {
         var time1 = new Date();
         func(arg1, arg2, arg3);
 
         var time2 = new Date();
         var elapsedTime = time2.getTime() - time1.getTime();
         var timeLeft = Math.max(6000 - elapsedTime);
-        setTimeout(showContents, timeLeft);
+        setTimeout(that.showContents, timeLeft);
     };
 
     // Hides the loading animation and unhides the background.
-    function showContents() {
+    this.showContents = function () {
         docById('loading-image-container').style.display = 'none';
         // docById('canvas').style.display = 'none';
         docById('hideContents').style.display = 'block';
@@ -2613,13 +2663,13 @@ function Activity() {
         // Warn the user -- chrome only -- if the browser level is
         // not set to 100%
         if (window.innerWidth !== window.outerWidth) {
-            blocks.errorMsg(_('Please set browser zoom level to 100%'));
+            blocks.that.errorMsg(_('Please set browser zoom level to 100%'));
             console.log('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
         }
         */
     };
 
-    function _loadStart() {
+    this._loadStart = function () {
         // where to put this?
         // palettes.updatePalettes();
         justLoadStart = function () {
@@ -2692,7 +2742,7 @@ function Activity() {
         update = true;
     };
 
-    function hideMsgs() {
+    this.hideMsgs = function () {
         errorMsgText.parent.visible = false;
         if (errorMsgArrow != null) {
             errorMsgArrow.removeAllChildren();
@@ -2707,7 +2757,7 @@ function Activity() {
         refreshCanvas();
     };
 
-    function textMsg(msg) {
+    this.textMsg = function (msg) {
         if (msgText == null) {
             // The container may not be ready yet, so do nothing.
             return;
@@ -2721,7 +2771,7 @@ function Activity() {
         refreshCanvas();
     };
 
-    function errorMsg(msg, blk, text, timeout) {
+    this.errorMsg = function (msg, blk, text, timeout) {
         /*
         if (logo.optimize) {
             return;
@@ -2733,7 +2783,7 @@ function Activity() {
 
         // Hide the button, as the program is going to be
         // terminated.
-        _hideStopButton();
+        that._hideStopButton();
 
         if (errorMsgText == null) {
             // The container may not be ready yet, so do nothing.
@@ -2831,41 +2881,41 @@ function Activity() {
 
         if (myTimeout > 0) {
             errorMsgTimeoutID = setTimeout(function () {
-                hideMsgs();
+                that.hideMsgs();
             }, myTimeout);
         }
 
         refreshCanvas();
     };
 
-    function _hideCartesian() {
+    this._hideCartesian = function () {
         cartesianBitmap.visible = false;
         cartesianBitmap.updateCache();
         update = true;
     };
 
-    function _showCartesian() {
+    this._showCartesian = function () {
         cartesianBitmap.visible = true;
         cartesianBitmap.updateCache();
         update = true;
     };
 
-    function _hidePolar() {
+    this._hidePolar = function () {
         polarBitmap.visible = false;
         polarBitmap.updateCache();
         update = true;
     };
 
-    function _showPolar() {
+    this._showPolar = function () {
         polarBitmap.visible = true;
         polarBitmap.updateCache();
         update = true;
     };
 
-    function pasteStack() {
-        that.closeSubMenus();
-        blocks.pasteStack();
-    };
+    // function pasteStack() {
+    //     that.closeSubMenus();
+    //     blocks.pasteStack();
+    // };
 
     function prepareExport() {
         // We don't save blocks in the trash, so we need to
@@ -3021,13 +3071,13 @@ function Activity() {
         return JSON.stringify(data);
     };
 
-    function doOpenPlugin() {
+    this.doOpenPlugin = function () {
         // Click on the plugin open chooser in the DOM (.json).
         pluginChooser.focus();
         pluginChooser.click();
     };
 
-    function _hideStopButton() {
+    this._hideStopButton = function () {
         if (stopTurtleContainer === null) {
             return;
         }
@@ -3036,7 +3086,7 @@ function Activity() {
         hardStopTurtleContainer.visible = true;
     };
 
-    function _showStopButton() {
+    this._showStopButton = function () {
         if (stopTurtleContainer === null) {
             return;
         }
@@ -3045,22 +3095,22 @@ function Activity() {
         hardStopTurtleContainer.visible = false;
     };
 
-    function blinkPasteButton(bitmap) {
-        function handleComplete() {
-            createjs.Tween.get(bitmap).to({
-                alpha: 1,
-                visible: true
-            }, 500);
-        };
+    // function blinkPasteButton(bitmap) {
+    //     function handleComplete() {
+    //         createjs.Tween.get(bitmap).to({
+    //             alpha: 1,
+    //             visible: true
+    //         }, 500);
+    //     };
 
-        createjs.Tween.get(bitmap).to({
-            alpha: 0,
-            visible: false
-        }, 1000).call(
-            handleComplete);
-    };
+    //     createjs.Tween.get(bitmap).to({
+    //         alpha: 0,
+    //         visible: false
+    //     }, 1000).call(
+    //         handleComplete);
+    // };
 
-    function _setupAndroidToolbar(showPalettesPopover) {
+    this._setupAndroidToolbar = function (showPalettesPopover) {
         // NOTE: see getMainToolbarButtonNames in turtledefs.js
 
         if (headerContainer !== undefined) {
@@ -3090,9 +3140,9 @@ function Activity() {
                 scrolling = false;
                 var diff = event.stageY - firstY;
                 if (diff > 55 && !menuButtonsVisible) {
-                    _doMenuAnimation(false);
+                    that._doMenuAnimation(false);
                 } else if (diff < -55 && menuButtonsVisible) {
-                    _doMenuAnimation(false);
+                    that._doMenuAnimation(false);
                 }
             }, null, true);
 
@@ -3101,9 +3151,9 @@ function Activity() {
                 scrolling = false;
                 var diff = event.stageY - firstY;
                 if (diff > 55 && !menuButtonsVisible) {
-                    _doMenuAnimation(false);
+                    that._doMenuAnimation(false);
                 } else if (diff < -55 && menuButtonsVisible) {
-                    _doMenuAnimation(false);
+                    that._doMenuAnimation(false);
                 }
             }, null, true);
         });
@@ -3178,7 +3228,7 @@ function Activity() {
             });
         };
         logoContainer.on('click', function (event) {
-            _showAboutPage(); // show about page
+            that._showAboutPage(); // show about page
         });
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
@@ -3191,68 +3241,68 @@ function Activity() {
 
         // Add the palette buttons here so that the hover tooltips
         // for the other buttons do not get occluded.
-        _setupPaletteMenu(turtleBlocksScale);
+        that._setupPaletteMenu(turtleBlocksScale);
 
         var language = localStorage.languagePreference;
 
-        runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
+        runContainer = that._makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
 
         if (beginnerMode && language === 'ja') {
-            _loadButtonDragHandler(runContainer, x, y, that._doFastButton, null, null, null, null);
+            that._loadButtonDragHandler(runContainer, x, y, that._doFastButton, null, null, null, null);
         } else {
-            _loadButtonDragHandler(runContainer, x, y, that._doFastButton, _openAuxMenu, null, null, null);
+            that._loadButtonDragHandler(runContainer, x, y, that._doFastButton, that._openAuxMenu, null, null, null);
         }
 
         onscreenButtons.push(runContainer);
 
         x += 1.5 * dx;
 
-        hardStopTurtleContainer = _makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
-        _loadButtonDragHandler(hardStopTurtleContainer, x, y, that.doHardStopButton, null, null, null, null);
+        hardStopTurtleContainer = that._makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+        that._loadButtonDragHandler(hardStopTurtleContainer, x, y, that.doHardStopButton, null, null, null, null);
         onscreenButtons.push(hardStopTurtleContainer);
 
-        stopTurtleContainer = _makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
-        _loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
+        stopTurtleContainer = that._makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+        that._loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
         onscreenButtons.push(stopTurtleContainer);
 
         if (!beginnerMode || language !== 'ja') {
-            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, that._doSlowButton, null, null, null, null);
+            slowContainer = that._makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
+            that._loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, that._doSlowButton, null, null, null, null);
 
-            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
-            _loadButtonDragHandler(stepContainer, x - dx, y - btnSize, that._doStepButton, null, null, null, null);
+            stepContainer = that._makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
+            that._loadButtonDragHandler(stepContainer, x - dx, y - btnSize, that._doStepButton, null, null, null, null);
         }
 
         // Move to the right
         var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
 
-        newContainer = _makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
-        _loadButtonDragHandler(newContainer, x, y, that._deleteBlocksBox, null, null, null, null);
+        newContainer = that._makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(newContainer, x, y, that._deleteBlocksBox, null, null, null, null);
         onscreenButtons.push(newContainer);
 
         x += dx;
 
-        openContainer = _makeButton(OPENBUTTON, _('Load project from file'), x, y, btnSize, 0);
-        _loadButtonDragHandler(openContainer, x, y, doLoad, null, null, null, null);
+        openContainer = that._makeButton(OPENBUTTON, _('Load project from file'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(openContainer, x, y, that.doLoad, null, null, null, null);
         onscreenButtons.push(openContainer);
 
         x += dx;
 
-        saveContainer = _makeButton(SAVEBUTTON, _('Save Project'), x, y, btnSize, 0);
-        _loadButtonDragHandler(saveContainer, x, y, doSave, null, null, null, null);
+        saveContainer = that._makeButton(SAVEBUTTON, _('Save Project'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(saveContainer, x, y, that.doSave, null, null, null, null);
         onscreenButtons.push(saveContainer);
 
         x += dx;
 
         if (planet) {
-            planetContainer = _makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
-            _loadButtonDragHandler(planetContainer, x, y, _doOpenSamples, null, null, null, null);
+            planetContainer = that._makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(planetContainer, x, y, that._doOpenSamples, null, null, null, null);
 
             document.querySelector('#myOpenFile').addEventListener('change', function (event) {
                 planet.closePlanet();
             });
         } else {
-            planetContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
+            planetContainer = that._makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
         }
 
         onscreenButtons.push(planetContainer);
@@ -3260,19 +3310,19 @@ function Activity() {
         // Move to the far right
         x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
 
-        helpContainer = _makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
-        _loadButtonDragHandler(helpContainer, x, y, _showHelp, null, null, null, null);
+        helpContainer = that._makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(helpContainer, x, y, that._showHelp, null, null, null, null);
         onscreenButtons.push(helpContainer);
 
-        _setupAuxMenu(turtleBlocksScale);
-        _setupSubMenus(turtleBlocksScale);
+        that._setupAuxMenu(turtleBlocksScale);
+        that._setupSubMenus(turtleBlocksScale);
     };
 
-    function _doMergeLoad() {
-        doLoad(true);
+    this._doMergeLoad = function () {
+        that.doLoad(true);
     };
 
-    function _setupSubMenus(turtleBlocksScale) {
+    this._setupSubMenus = function (turtleBlocksScale) {
         // Each sub menu is positioned above the aux menus
         var cellsize = 55;
         var y = Math.floor(-3 * cellsize / 2);
@@ -3305,44 +3355,44 @@ function Activity() {
         // Advanced Save Box Buttons: HTML, SVG, etc.
         // Force left-aligned labels
         var x = 27.5;
-        saveHTMLContainer = _makeButton(SAVEDARKBUTTON, _('Save project'), x, y, cellsize, 0);
+        saveHTMLContainer = that._makeButton(SAVEDARKBUTTON, _('Save project'), x, y, cellsize, 0);
         saveHTMLContainer.visible = false;
         __addEventHandlers(saveHTMLContainer, save.saveHTML.bind(save));
 
         if (planet) {
-            uploadContainer = _makeButton(UPLOADPLANETBUTTON, _('Share project'), x, y, cellsize, 0);
+            uploadContainer = that._makeButton(UPLOADPLANETBUTTON, _('Share project'), x, y, cellsize, 0);
             uploadContainer.visible = false;
-            __addEventHandlers(uploadContainer, doUploadToPlanet);
+            __addEventHandlers(uploadContainer, that.doUploadToPlanet);
         } else {
-            uploadContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
+            uploadContainer = that._makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
             uploadContainer.visible = false;
         }
 
         // Force center-aligned labels
         var x = 95.5 + LEADING;
-        saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
+        saveSVGContainer = that._makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
         saveSVGContainer.visible = false;
         __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
 
-        savePNGContainer = _makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
+        savePNGContainer = that._makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
         savePNGContainer.visible = false;
         __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            saveWAVContainer = _makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
+            saveWAVContainer = that._makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
             saveWAVContainer.visible = false;
             __addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
 
-            saveLilypondContainer = _makeButton(SAVELILYPONDBUTTON, _('Save sheet music'), x, y, cellsize, 0);
+            saveLilypondContainer = that._makeButton(SAVELILYPONDBUTTON, _('Save sheet music'), x, y, cellsize, 0);
             saveLilypondContainer.visible = false;
             __addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
 
-            saveABCContainer = _makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
+            saveABCContainer = that._makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
             saveABCContainer.visible = false;
             __addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
         }
 
-        saveArtworkContainer = _makeButton(SAVEBLOCKARTWORKBUTTON, _('Save block artwork'), x, y, cellsize, 0);
+        saveArtworkContainer = that._makeButton(SAVEBLOCKARTWORKBUTTON, _('Save block artwork'), x, y, cellsize, 0);
         saveArtworkContainer.visible = false;
         __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
 
@@ -3352,13 +3402,13 @@ function Activity() {
 
         // ALways create these buttons (but not use them in beginner mode)
         // Clear Box Confirm Button
-        confirmContainer = _makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
+        confirmContainer = that._makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
         confirmContainer.visible = false;
-        __addEventHandlers(confirmContainer, _afterDelete);
+        __addEventHandlers(confirmContainer, that._afterDelete);
 
     };
 
-    function _setupAuxMenu(turtleBlocksScale) {
+    this._setupAuxMenu = function (turtleBlocksScale) {
         if (menuContainer !== undefined) {
             stage.removeChild(menuContainer);
             for (var i in onscreenMenu) {
@@ -3373,8 +3423,8 @@ function Activity() {
         var y = Math.floor(btnSize / 2);
 
         var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
-        menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 95.5 : undefined);
-        _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
+        menuContainer = that._makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 95.5 : undefined);
+        that._loadButtonDragHandler(menuContainer, x, y, that._doMenuButton, null, null, null, null);
 
         var dx = btnSize;
 
@@ -3384,22 +3434,22 @@ function Activity() {
         } else {
             var x = Math.floor(canvas.width / turtleBlocksScale) - 20.5 * btnSize / 2;
 
-            statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
-            _loadButtonDragHandler(statsContainer, x, y, that.doAnalytics, null, null, null, null);
+            statsContainer = that._makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(statsContainer, x, y, that.doAnalytics, null, null, null, null);
             onscreenMenu.push(statsContainer);
             statsContainer.visible = false;
 
             x += dx;
 
-            pluginsContainer = _makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, btnSize, 0);
-            _loadButtonDragHandler(pluginsContainer, x, y, doOpenPlugin, null, null, null, null);
+            pluginsContainer = that._makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(pluginsContainer, x, y, that.doOpenPlugin, null, null, null, null);
             onscreenMenu.push(pluginsContainer);
             pluginsContainer.visible = false;
 
             x += dx;
 
-            deletePluginContainer = _makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, btnSize, 0);
-            _loadButtonDragHandler(deletePluginContainer, x, y, that.deletePlugin, null, null, null, null);
+            deletePluginContainer = that._makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(deletePluginContainer, x, y, that.deletePlugin, null, null, null, null);
             onscreenMenu.push(deletePluginContainer);
             deletePluginContainer.visible = false;
 
@@ -3421,12 +3471,12 @@ function Activity() {
                 scrollOffContainer.visible = false;
             }
 
-            scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
-            _loadButtonDragHandler(scrollOnContainer, x, y, setScroller, null, null, null, null);
+            scrollOnContainer = that._makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(scrollOnContainer, x, y, setScroller, null, null, null, null);
             onscreenMenu.push(scrollOnContainer);
 
-            scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
-            _loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
+            scrollOffContainer = that._makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
             onscreenMenu.push(scrollOffContainer);
             scrollOffContainer.visible = false;
 
@@ -3438,35 +3488,35 @@ function Activity() {
 
         x += 2 * dx;
 
-        openMergeContainer = _makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
-        _loadButtonDragHandler(openMergeContainer, x, y, _doMergeLoad, null, null, null, null);
+        openMergeContainer = that._makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(openMergeContainer, x, y, that._doMergeLoad, null, null, null, null);
         onscreenMenu.push(openMergeContainer);
         openMergeContainer.visible = false;
 
         x += dx;
 
-        restoreContainer = _makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
-        _loadButtonDragHandler(restoreContainer, x, y, that._restoreTrash, null, null, null, null);
+        restoreContainer = that._makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(restoreContainer, x, y, that._restoreTrash, null, null, null, null);
         onscreenMenu.push(restoreContainer);
         restoreContainer.visible = false;
 
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             x += 1.5 * dx;
-            beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
-            _loadButtonDragHandler(beginnerModeContainer, x, y, that.doSwitchMode, null, null, null, null);
+            beginnerModeContainer = that._makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(beginnerModeContainer, x, y, that.doSwitchMode, null, null, null, null);
             beginnerModeContainer.visible = false;
             onscreenMenu.push(beginnerModeContainer);
 
-            advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
-            _loadButtonDragHandler(advancedModeContainer, x, y, that.doSwitchMode, null, null, null, null);
+            advancedModeContainer = that._makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(advancedModeContainer, x, y, that.doSwitchMode, null, null, null, null);
             onscreenMenu.push(advancedModeContainer);
             advancedModeContainer.visible = false;
         }
 
         // Force center-aligned labels
         x += dx;
-        languageContainer = _makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
+        languageContainer = that._makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
         languageContainer.visible = false;
         onscreenMenu.push(languageContainer);
 
@@ -3474,7 +3524,7 @@ function Activity() {
         menuButtonsVisible = false;
     };
 
-    function _setupPaletteMenu(turtleBlocksScale) {
+    this._setupPaletteMenu = function (turtleBlocksScale) {
         // Clean up if we've been here before.
         if (homeButtonContainers.length !== 0) {
             stage.removeChild(homeButtonContainers[0]);
@@ -3497,11 +3547,11 @@ function Activity() {
         var dx = btnSize;
 
         homeButtonContainers = [];
-        homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
-        _loadButtonDragHandler(homeButtonContainers[0], x, y, this._findBlocks, null, null, null, null);
+        homeButtonContainers.push(that._makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
+        that._loadButtonDragHandler(homeButtonContainers[0], x, y, that._findBlocks, null, null, null, null);
 
-        homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
-        _loadButtonDragHandler(homeButtonContainers[1], x, y, this._findBlocks, null, null, null, null);
+        homeButtonContainers.push(that._makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
+        that._loadButtonDragHandler(homeButtonContainers[1], x, y, that._findBlocks, null, null, null, null);
         homeButtonContainers[1].visible = false;
 
         homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
@@ -3510,52 +3560,52 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
-        _loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer = that._makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(hideBlocksContainer, x, y, that._changeBlockVisibility, null, null, null, null);
 
         x += dx;
 
-        collapseBlocksContainer = _makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
-        _loadButtonDragHandler(collapseBlocksContainer, x, y, _toggleCollapsibleStacks, null, null, null, null);
+        collapseBlocksContainer = that._makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(collapseBlocksContainer, x, y, that._toggleCollapsibleStacks, null, null, null, null);
 
         x += dx;
 
-        smallerContainer = _makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, btnSize, 0);
-        _loadButtonDragHandler(smallerContainer, x, y, doSmallerBlocks, null, null, null, null);
+        smallerContainer = that._makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(smallerContainer, x, y, that.doSmallerBlocks, null, null, null, null);
 
-        smallerOffContainer = _makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, btnSize, 0);
+        smallerOffContainer = that._makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, btnSize, 0);
         smallerOffContainer.visible = false;
 
         x += dx;
 
-        largerContainer = _makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
-        _loadButtonDragHandler(largerContainer, x, y, doLargerBlocks, null, null, null, null);
+        largerContainer = that._makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(largerContainer, x, y, that.doLargerBlocks, null, null, null, null);
 
-        largerOffContainer = _makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, btnSize, 0);
+        largerOffContainer = that._makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, btnSize, 0);
         largerOffContainer.visible = false;
     };
 
-    function doPopdownPalette() {
-        var p = new PopdownPalette(palettes);
-        p.popdown();
-    };
+    // function doPopdownPalette() {
+    //     var p = new PopdownPalette(palettes);
+    //     p.popdown();
+    // };
 
-    function _showHelp() {
+    this._showHelp = function () {
         var helpWidget = new HelpWidget();
         helpWidget.init(null);
     };
 
-    function _showAboutPage() {
+    this._showAboutPage = function () {
         var helpWidget = new HelpWidget();
         helpWidget.init(null);
         helpWidget.showPageByName(_('About'));
     };
 
-    function _doMenuButton() {
-        _doMenuAnimation(true);
+    this._doMenuButton = function () {
+        that._doMenuAnimation(true);
     };
 
-    function _doMenuAnimation(arg) {
+    this._doMenuAnimation = function (arg) {
         if (arg === undefined) {
             var animate = true;
         } else {
@@ -3588,13 +3638,13 @@ function Activity() {
             }
         } else {
             // Race conditions during load
-            setTimeout(_doMenuAnimation, 50);
+            setTimeout(that._doMenuAnimation, 50);
         }
 
         setTimeout(function () {
             if (menuButtonsVisible) {
                 menuButtonsVisible = false;
-                _showHideAuxMenu(false);
+                that._showHideAuxMenu(false);
             } else {
                 menuButtonsVisible = true;
                 for (var button in onscreenMenu) {
@@ -3612,13 +3662,13 @@ function Activity() {
                     that.setScrollerButton()
                 }
 
-                _showHideAuxMenu(false);
+                that._showHideAuxMenu(false);
             }
             update = true;
         }, timeout);
     };
 
-    function _toggleToolbar() {
+    this._toggleToolbar = function () {
         buttonsVisible = !buttonsVisible;
         menuContainer.visible = buttonsVisible;
         headerContainer.visible = buttonsVisible;
@@ -3646,7 +3696,7 @@ function Activity() {
         update = true;
     };
 
-    function _makeButton(name, label, x, y, size, rotation, parent) {
+    this._makeButton = function (name, label, x, y, size, rotation, parent) {
         var container = new createjs.Container();
 
         if (parent == undefined) {
@@ -3746,7 +3796,7 @@ function Activity() {
 
 
 
-    function _loadButtonDragHandler(container, ox, oy, action, hoverAction) { // longAction, extraLongAction, longImg, extraLongImg) {
+    this._loadButtonDragHandler = function (container, ox, oy, action, hoverAction) { // longAction, extraLongAction, longImg, extraLongImg) {
         // Prevent multiple button presses (i.e., debounce).
         var lockTimer = null;
         var locked = false;
@@ -3837,7 +3887,7 @@ function Activity() {
                 isLong = true;
                 if (longImg !== null) {
                     container.visible = false;
-                    container = _makeButton(longImg, '', ox, oy, cellSize, 0);
+                    container = that._makeButton(longImg, '', ox, oy, cellSize, 0);
                 }
             }, 500);
 
@@ -3845,7 +3895,7 @@ function Activity() {
                 isExtraLong = true;
                 if (extraLongImg !== null) {
                     container.visible = false;
-                    container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
+                    container = that._makeButton(extraLongImg, '', ox, oy, cellSize, 0);
                 }
             }, 1000);
             */
@@ -3892,7 +3942,7 @@ function Activity() {
         });
     };
 
-    function pasted() {
+    this.pasted = function () {
         var pasteinput = docById('paste').value;
         var rawData = pasteinput;
         if (rawData == null || rawData == '') {
@@ -3903,7 +3953,7 @@ function Activity() {
         try {
             var obj = JSON.parse(cleanData);
         } catch (e) {
-            errorMsg(_('Could not parse JSON input.'));
+            that.errorMsg(_('Could not parse JSON input.'));
             return;
         }
 
@@ -3917,7 +3967,7 @@ function Activity() {
         pasteBox.hide();
     };
 
-    function deltaY(dy) {
+    this.deltaY = function (dy) {
         toolbarHeight += dy;
         for (var i = 0; i < onscreenButtons.length; i++) {
             onscreenButtons[i].y += dy;
@@ -3950,13 +4000,13 @@ function Activity() {
     };
 
 
-    function _openAuxMenu() {
+    this._openAuxMenu = function () {
         if (!turtles.running() && toolbarHeight === 0) {
-            _showHideAuxMenu(false);
+            that._showHideAuxMenu(false);
         }
     };
 
-    function _showHideAuxMenu(resize) {
+    this._showHideAuxMenu = function (resize) {
         var cellsize = 55;
         if (!resize && toolbarHeight === 0) {
             dy = cellsize + LEADING + 5;
@@ -4057,9 +4107,9 @@ function Activity() {
         refreshCanvas();
     };
 
-    function piemenuBlockContext(activeBlock, stageX, stageY) {
+    this.piemenuBlockContext = function (activeBlock, stageX, stageY) {
         if (activeBlock === null) {
-            console.log('piemenuBlockContext: no active block');
+            console.log('that.piemenuBlockContext: no active block');
             return;
         }
 
@@ -4246,7 +4296,7 @@ function Activity() {
         createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
         createjs.Ticker.framerate = 30;
         // createjs.Ticker.addEventListener('tick', stage);
-        createjs.Ticker.addEventListener('tick', __tick);
+        createjs.Ticker.addEventListener('tick', that.__tick);
 
         that._createMsgContainer('#ffffff', '#7a7a7a', function (text) {
             msgText = text;
@@ -4320,9 +4370,9 @@ function Activity() {
             .setGetStageScale(getStageScale)
             .setTurtles(turtles)
             .setSetPlaybackStatus(setPlaybackStatus)
-            .setErrorMsg(errorMsg)
+            .setErrorMsg(that.errorMsg)
             .setHomeContainers(that.setHomeContainers, boundary)
-            .setContextMenu(piemenuBlockContext);
+            .setContextMenu(that.piemenuBlockContext);
 
         turtles.setBlocks(blocks);
 
@@ -4346,16 +4396,16 @@ function Activity() {
             .setTurtles(turtles)
             .setStage(turtleContainer)
             .setRefreshCanvas(refreshCanvas)
-            .setTextMsg(textMsg)
-            .setErrorMsg(errorMsg)
-            .setHideMsgs(hideMsgs)
+            .setTextMsg(that.textMsg)
+            .setErrorMsg(that.errorMsg)
+            .setHideMsgs(that.hideMsgs)
             .setOnStopTurtle(that.onStopTurtle)
             .setOnRunTurtle(that.onRunTurtle)
             .setGetStageX(getStageX)
             .setGetStageY(getStageY)
             .setGetStageMouseDown(getStageMouseDown)
-            .setGetCurrentKeyCode(getCurrentKeyCode)
-            .setClearCurrentKeyCode(clearCurrentKeyCode)
+            .setGetCurrentKeyCode(that.getCurrentKeyCode)
+            .setClearCurrentKeyCode(that.clearCurrentKeyCode)
             // .setMeSpeak(meSpeak)
             .setSetPlaybackStatus(setPlaybackStatus);
 
@@ -4369,11 +4419,11 @@ function Activity() {
             .setPaste(paste);
 
         languageBox = new LanguageBox();
-        languageBox.setMessage(textMsg);
+        languageBox.setMessage(that.textMsg);
 
         // show help on startup if first time uer
         if (firstTimeUser) {
-            _showHelp();
+            that._showHelp();
         }
 
         playbackOnLoad = function () {
@@ -4570,12 +4620,12 @@ function Activity() {
 
                 this.closePlanet();
                 if (!merge) {
-                    sendAllToTrash(false, true);
+                    that.sendAllToTrash(false, true);
                 }
 
                 if (data == undefined) {
                     console.log('loadRawProject: data is undefined... punting');
-                    errorMsg('loadRawProject: project undefined');
+                    that.errorMsg('loadRawProject: project undefined');
                     return;
                 }
 
@@ -4609,7 +4659,7 @@ function Activity() {
 
                 } catch (e) {
                     console.log('loadRawProject: could not parse project data');
-                    errorMsg(e);
+                    that.errorMsg(e);
                 }
 
                 loading = false;
@@ -4728,22 +4778,22 @@ function Activity() {
         toolbar = new Toolbar();
         toolbar.init(beginnerMode);
 
-        toolbar.renderLogoIcon(_showAboutPage);
+        toolbar.renderLogoIcon(that._showAboutPage);
         toolbar.renderPlayIcon(that._doFastButton);
         toolbar.renderStopIcon(that.doHardStopButton);
-        toolbar.renderNewProjectIcon(_afterDelete);
-        toolbar.renderLoadIcon(doLoad);
+        toolbar.renderNewProjectIcon(that._afterDelete);
+        toolbar.renderLoadIcon(that.doLoad);
         toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveBlockArtwork.bind(save));
-        toolbar.renderPlanetIcon(planet, _doOpenSamples);
-        toolbar.renderMenuIcon(_showHideAuxMenu);
-        toolbar.renderHelpIcon(_showHelp);
+        toolbar.renderPlanetIcon(planet, that._doOpenSamples);
+        toolbar.renderMenuIcon(that._showHideAuxMenu);
+        toolbar.renderHelpIcon(that._showHelp);
         toolbar.renderModeSelectIcon(that.doSwitchMode);
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(that._doStepButton);
-        toolbar.renderAdvancedIcons(that.doAnalytics, doOpenPlugin, that.deletePlugin);
+        toolbar.renderAdvancedIcons(that.doAnalytics, that.doOpenPlugin, that.deletePlugin);
         // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);  
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
-        toolbar.renderMergeIcon(doLoad);
+        toolbar.renderMergeIcon(that.doLoad);
         toolbar.renderRestoreIcon(that._restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
 
@@ -4810,7 +4860,7 @@ function Activity() {
         /*
         saveBox = new SaveBox();
         if (planet) {
-            var planetItem = ['_doSavePlanet', doUploadToPlanet];
+            var planetItem = ['_doSavePlanet', that.doUploadToPlanet];
         } else {
             var planetItem = ['_doSavePlanet', null];
         }
@@ -4822,7 +4872,7 @@ function Activity() {
             ['_doSaveHTML', save.saveHTML.bind(save)],
             ['_doSaveSVG', save.saveSVG.bind(save)],
             ['_doSavePNG', save.savePNG.bind(save)],
-            ['_doSavePlanet', doUploadToPlanet],
+            ['_doSavePlanet', that.doUploadToPlanet],
             ['_doSaveBlockArtwork', save.saveBlockArtwork.bind(save)]
         ]);
 
@@ -4840,7 +4890,7 @@ function Activity() {
         */
 
         var __clearFunction = function () {
-            sendAllToTrash(true, false);
+            that.sendAllToTrash(true, false);
             if (planet !== undefined) {
                 planet.initialiseNewProject.bind(planet);
             }
@@ -4902,7 +4952,7 @@ function Activity() {
                     var rawData = reader.result;
                     if (rawData == null || rawData === '') {
                         console.log('rawData is ' + rawData);
-                        errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
                     } else {
                         var cleanData = rawData.replace('\n', ' ');
 
@@ -4929,7 +4979,7 @@ function Activity() {
                                 };
 
                                 stage.addEventListener('trashsignal', __listener, false);
-                                sendAllToTrash(false, false);
+                                that.sendAllToTrash(false, false);
                                 if (planet) {
                                     planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
                                 }
@@ -4943,7 +4993,7 @@ function Activity() {
                             loading = false;
                             refreshCanvas();
                         } catch (e) {
-                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             console.log(e);
                             document.body.style.cursor = 'default';
                             loading = false;
@@ -4969,7 +5019,7 @@ function Activity() {
                 setTimeout(function () {
                     var rawData = reader.result;
                     if (rawData == null || rawData === '') {
-                        errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
                     } else {
                         var cleanData = rawData.replace('\n', ' ');
 
@@ -5006,7 +5056,7 @@ function Activity() {
                             };
 
                             stage.addEventListener('trashsignal', __listener, false);
-                            sendAllToTrash(false, false);
+                            that.sendAllToTrash(false, false);
                             if (planet !== undefined) {
                                 planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf('.')));
                             }
@@ -5015,7 +5065,7 @@ function Activity() {
                             refreshCanvas();
                         } catch (e) {
                             console.log(e);
-                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             document.body.style.cursor = 'default';
                             loading = false;
                         }
@@ -5061,7 +5111,7 @@ function Activity() {
                 document.body.style.cursor = 'wait';
 
                 setTimeout(function () {
-                    obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList, palettes.pluginMacros);
+                    obj = processRawPluginData(reader.result, palettes, blocks, that.errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList, palettes.pluginMacros);
                     // Save plugins to local storage.
                     if (obj != null) {
                         var pluginObj = preparePluginExports(obj);
@@ -5171,7 +5221,7 @@ function Activity() {
                                 var url = args[1];
                                 break;
                             default:
-                                errorMsg('Invalid parameters');
+                                that.errorMsg('Invalid parameters');
                         }
                     }
                 }
@@ -5190,20 +5240,20 @@ function Activity() {
         if (projectID != null) {
             setTimeout(function () {
                 console.log('loading ' + projectID);
-                loadStartWrapper(loadProject, projectID, flags, env);
+                that.loadStartWrapper(that.loadProject, projectID, flags, env);
             }, 200); // 2000
         } else {
             setTimeout(function () {
                 console.log('load new Start block');
-                loadStartWrapper(_loadStart);
+                that.loadStartWrapper(that._loadStart);
             }, 200); // 2000
         }
 
         document.addEventListener('mousewheel', scrollEvent, false);
         document.addEventListener('DOMMouseScroll', scrollEvent, false);
 
-        this.document.onkeydown = that.__keyPressed;
-        _hideStopButton();
+        document.onkeydown = __keyPressed;
+        that._hideStopButton();
     };
 };
 
