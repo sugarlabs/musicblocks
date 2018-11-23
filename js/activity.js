@@ -72,36 +72,36 @@ function Activity() {
     doLoad = this.doLoad;
     runProject = this.runProject;
     loadProject = this.loadProject;
-loadStartWrapper = this.loadStartWrapper;
-showContents  = this.showContents;
-_loadStart = this._loadStart;
-hideMsgs = this.hideMsgs;
-textMsg = this.textMsg;
-errorMsg = this.errorMsg;
-_hideCartesian = this._hideCartesian;
-_showCartesian = this._showCartesian;
-_hidePolar = this._hidePolar;
-_showPolar = this._showPolar;
-doOpenPlugin = this.doOpenPlugin;
-_hideStopButton = this._hideStopButton;
-_showStopButton = this._showStopButton;
-_setupAndroidToolbar = this._setupAndroidToolbar;
-_doMergeLoad = this._doMergeLoad;
-_setupSubMenus = this._setupSubMenus;
-_setupAuxMenu = this._setupAuxMenu;
-_setupPaletteMenu = this._setupPaletteMenu;
-_showHelp = this._showHelp;
-_showAboutPage = this._showAboutPage;
-_doMenuButton = this._doMenuButton;
-_doMenuAnimation = this._doMenuAnimation;
-_toggleToolbar = this._toggleToolbar;
-_makeButton = this._makeButton;
-_loadButtonDragHandler = this._loadButtonDragHandler;
-pasted = this.pasted;
-deltaY = this.deltaY;
-_openAuxMenu = this._openAuxMenu;
-_showHideAuxMenu = this._showHideAuxMenu;
-piemenuBlockContext = this.piemenuBlockContext;
+    loadStartWrapper = this.loadStartWrapper;
+    showContents = this.showContents;
+    _loadStart = this._loadStart;
+    hideMsgs = this.hideMsgs;
+    textMsg = this.textMsg;
+    errorMsg = this.errorMsg;
+    _hideCartesian = this._hideCartesian;
+    _showCartesian = this._showCartesian;
+    _hidePolar = this._hidePolar;
+    _showPolar = this._showPolar;
+    doOpenPlugin = this.doOpenPlugin;
+    _hideStopButton = this._hideStopButton;
+    _showStopButton = this._showStopButton;
+    _setupAndroidToolbar = this._setupAndroidToolbar;
+    _doMergeLoad = this._doMergeLoad;
+    _setupSubMenus = this._setupSubMenus;
+    _setupAuxMenu = this._setupAuxMenu;
+    _setupPaletteMenu = this._setupPaletteMenu;
+    _showHelp = this._showHelp;
+    _showAboutPage = this._showAboutPage;
+    _doMenuButton = this._doMenuButton;
+    _doMenuAnimation = this._doMenuAnimation;
+    _toggleToolbar = this._toggleToolbar;
+    _makeButton = this._makeButton;
+    _loadButtonDragHandler = this._loadButtonDragHandler;
+    pasted = this.pasted;
+    deltaY = this.deltaY;
+    _openAuxMenu = this._openAuxMenu;
+    _showHideAuxMenu = this._showHideAuxMenu;
+    piemenuBlockContext = this.piemenuBlockContext;
 
     // scrollOffContainer = undefined;
     // scrollOnContainer = undefined;
@@ -1000,7 +1000,7 @@ piemenuBlockContext = this.piemenuBlockContext;
     //     pasteBox.hide();
     // };
 
-    function setScroller () {
+    function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
         setScrollerButton();
@@ -1039,8 +1039,8 @@ piemenuBlockContext = this.piemenuBlockContext;
         blank.height = canvas.height;
         return canvas.toDataURL() == blank.toDataURL();
     };
-    
-    
+
+
     closeAnalytics = this.closeAnalytics;
     var th = this;
     this.doAnalytics = function () {
@@ -1648,7 +1648,7 @@ piemenuBlockContext = this.piemenuBlockContext;
         blocks.activeBlock = blocks.blockList.length - 1;
     }
 
-     function __keyPressed (event) {
+    function __keyPressed(event) {
         var that = this;
         if (docById('labelDiv').classList.contains('hasKeyboard')) {
             return;
