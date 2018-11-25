@@ -29,14 +29,14 @@ function TemperamentWidget () {
         cell.style.height = cell.style.width; 
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -175,13 +175,13 @@ function TemperamentWidget () {
             var divAppend1 = docById('clearNotes');
             divAppend1.style.height = '30px';
             divAppend1.style.marginLeft = '3px';
-            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = '212px';
 
             var divAppend2 = docById('standardOctave');
             divAppend2.style.height = '30px';
             divAppend2.style.marginRight = '3px';
-            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = (BUTTONDIVWIDTH / 2) - 8 + 'px';
         } else {
             var divAppend1 = document.createElement('div');
@@ -191,7 +191,7 @@ function TemperamentWidget () {
             divAppend1.style.position = 'absolute';
             divAppend1.style.zIndex = 2;
             divAppend1.style.paddingTop = '5px';
-            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.height = '25px';
             divAppend1.style.width = docById('wheelDiv2').style.width;
             divAppend1.style.marginTop = docById('wheelDiv2').style.height;
@@ -430,15 +430,15 @@ function TemperamentWidget () {
             notesCell[i,0] = notesRow[i].insertCell(-1);
             notesCell[i,0].innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' + i + '" data-id="' + i + '">&nbsp;&nbsp;';
             notesCell[i,0].style.width = 40 + 'px';
-            notesCell[i,0].style.backgroundColor = MATRIXBUTTONCOLOR;
+            notesCell[i,0].style.backgroundColor = platformColor.selectorBackground;
             notesCell[i,0].style.textAlign = 'center';
 
             notesCell[i,0].onmouseover=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
             };
 
             notesCell[i,0].onmouseout=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = platformColor.selectorBackground;
             };
 
             var playImage = docById('play_' + i);
@@ -538,7 +538,7 @@ function TemperamentWidget () {
         docById('editOctave').innerHTML += '<tr><td colspan="4" id="userEdit"></td></tr>';
         var menuItems =  document.querySelectorAll("#editMenus");
         for(var i = 0; i < editMenus.length; i++) {
-            menuItems[i].style.background = MATRIXBUTTONCOLOR; 
+            menuItems[i].style.background = platformColor.selectorBackground; 
             menuItems[i].style.height = 30 + 'px';
             menuItems[i].style.textAlign = 'center';
             menuItems[i].style.fontWeight = 'bold';
@@ -548,33 +548,33 @@ function TemperamentWidget () {
         that.equalEdit();
 
         menuItems[0].onclick = function(event) {
-            menuItems[1].style.background = MATRIXBUTTONCOLOR;
-            menuItems[2].style.background = MATRIXBUTTONCOLOR;
-            menuItems[3].style.background = MATRIXBUTTONCOLOR;
+            menuItems[1].style.background = platformColor.selectorBackground;
+            menuItems[2].style.background = platformColor.selectorBackground;
+            menuItems[3].style.background = platformColor.selectorBackground;
             menuItems[0].style.background = '#c8C8C8';
             that.equalEdit();
         };
 
         menuItems[1].onclick = function(event) {
-            menuItems[0].style.background = MATRIXBUTTONCOLOR;
-            menuItems[2].style.background = MATRIXBUTTONCOLOR;
-            menuItems[3].style.background = MATRIXBUTTONCOLOR;
+            menuItems[0].style.background = platformColor.selectorBackground;
+            menuItems[2].style.background = platformColor.selectorBackground;
+            menuItems[3].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = '#c8C8C8';
             that.ratioEdit();
         };
 
         menuItems[2].onclick = function(event) {
-            menuItems[0].style.background = MATRIXBUTTONCOLOR;
-            menuItems[1].style.background = MATRIXBUTTONCOLOR;
-            menuItems[3].style.background = MATRIXBUTTONCOLOR;
+            menuItems[0].style.background = platformColor.selectorBackground;
+            menuItems[1].style.background = platformColor.selectorBackground;
+            menuItems[3].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = '#c8C8C8';
             that.arbitraryEdit();
         };
 
         menuItems[3].onclick = function(event) {
-            menuItems[0].style.background = MATRIXBUTTONCOLOR;
-            menuItems[1].style.background = MATRIXBUTTONCOLOR;
-            menuItems[2].style.background = MATRIXBUTTONCOLOR;
+            menuItems[0].style.background = platformColor.selectorBackground;
+            menuItems[1].style.background = platformColor.selectorBackground;
+            menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = '#c8C8C8';
             that.octaveSpaceEdit();
         };
@@ -608,13 +608,13 @@ function TemperamentWidget () {
             var divAppend1 = docById('preview');
             divAppend1.style.height = '30px';
             divAppend1.style.marginLeft = '3px';
-            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = '215px';
 
             var divAppend2 = docById('done_');
             divAppend2.style.height = '30px';
             divAppend2.style.marginRight = '3px';
-            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = '205px';
         }
 
@@ -764,13 +764,13 @@ function TemperamentWidget () {
             var divAppend1 = docById('preview');
             divAppend1.style.height = '30px';
             divAppend1.style.marginLeft = '3px';
-            divAppend1.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = '215px';
 
             var divAppend2 = docById('done_');
             divAppend2.style.height = '30px';
             divAppend2.style.marginRight = '3px';
-            divAppend2.style.backgroundColor = MATRIXBUTTONCOLOR;
+            divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = '205px';
         }
 
@@ -1070,7 +1070,7 @@ function TemperamentWidget () {
         divAppend.innerHTML = 'Done';
         divAppend.style.textAlign = 'center';
         divAppend.style.paddingTop = '5px';
-        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        divAppend.style.backgroundColor = platformColor.selectorBackground;
         divAppend.style.height = '25px';
         divAppend.style.marginTop = '40px';
         divAppend.style.overflow = 'auto';
@@ -1199,7 +1199,7 @@ function TemperamentWidget () {
         divAppend.style.textAlign = 'center';
         divAppend.style.paddingTop = '5px';
         divAppend.style.marginLeft = '-70px';
-        divAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        divAppend.style.backgroundColor = platformColor.selectorBackground;
         divAppend.style.height = '25px';
         divAppend.style.marginTop = '40px';
         divAppend.style.overflow = 'auto';
@@ -1604,7 +1604,7 @@ function TemperamentWidget () {
         temperamentCell.style.minHeight = temperamentCell.style.height;
         temperamentCell.style.maxHeight = temperamentCell.style.height;
         temperamentCell.style.textAlign = 'center';
-        temperamentCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
 

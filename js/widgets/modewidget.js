@@ -209,14 +209,14 @@ function ModeWidget() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -679,7 +679,7 @@ function ModeWidget() {
             }
 
             var cell = table.rows[MODEMAP[that.cells[i] % 12][0]].cells[MODEMAP[that.cells[i] % 12][1]];
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             if (that._lastNotePlayed != null && that._lastNotePlayed !== cell) {
                 that._lastNotePlayed.style.backgroundColor = 'black';

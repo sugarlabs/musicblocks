@@ -238,11 +238,11 @@ function Tempo () {
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
@@ -253,11 +253,11 @@ function Tempo () {
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         // We use this cell as a handle for dragging.
@@ -345,11 +345,11 @@ function Tempo () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = platformColor.selectorBackground;
             };
 
             var cell = this._addButton(row, 'down.svg', ICONSIZE, _('slow down'));
@@ -361,11 +361,11 @@ function Tempo () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = platformColor.selectorBackground;
             };
 
             var cell = row.insertCell();
@@ -377,7 +377,7 @@ function Tempo () {
             cell.style.height = BUTTONSIZE + 'px';
             cell.style.minHeight = cell.style.height;
             cell.style.maxHeight = cell.style.height;
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             var row = buttonTable.insertRow();
             canvasCells.push(row.insertCell());
@@ -441,14 +441,14 @@ function Tempo () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;

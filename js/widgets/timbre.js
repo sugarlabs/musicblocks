@@ -97,14 +97,14 @@ function TimbreWidget () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover = function () {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout = function () {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -347,7 +347,7 @@ function TimbreWidget () {
                 blockValue = this.env.length - 1;
             }
 
-            docById('envelopeButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+            docById('envelopeButtonCell').style.backgroundColor = platformColor.selectorBackground;
             for (var i = 0; i < 4; i++) {
                 this.synthVals['envelope'][this.adsrMap[i]] = parseFloat(this.ENVs[i]) / 100;
                 docById('myRange' + i).value = parseFloat(this.ENVs[i]);
@@ -357,7 +357,7 @@ function TimbreWidget () {
 
             this._logo.synth.createSynth(0, this.instrumentName, this.synthVals['oscillator']['source'], this.synthVals);
         } else if (this.isActive['amsynth'] === true) {
-            docById('synthButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR
+            docById('synthButtonCell').style.backgroundColor = platformColor.selectorBackground
             if (this.AMSynthesizer.length > 1) {
                 blockValue = this.AMSynthesizer.length - 1;
             }
@@ -368,7 +368,7 @@ function TimbreWidget () {
             this._update(blockValue, this.AMSynthParams[0], 0);
             this._logo.synth.createSynth(0, this.instrumentName, 'amsynth', this.amSynthParamvals);
         } else if (this.isActive['fmsynth'] === true) {
-            docById('synthButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR
+            docById('synthButtonCell').style.backgroundColor = platformColor.selectorBackground
             if (this.FMSynthesizer.length > 1) {
                 blockValue = this.FMSynthesizer.length - 1;
             }
@@ -379,7 +379,7 @@ function TimbreWidget () {
             this._update(blockValue, this.FMSynthParams[0], 0);
             this._logo.synth.createSynth(0, this.instrumentName, 'fmsynth', this.fmSynthParamvals);
         } else if (this.isActive['noisesynth'] === true) {
-            docById('synthButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR
+            docById('synthButtonCell').style.backgroundColor = platformColor.selectorBackground
             if (this.NoiseSynthesizer.length > 1) {
                 blockValue = this.NoiseSynthesizer.length - 1;
             }
@@ -390,7 +390,7 @@ function TimbreWidget () {
             this._update(blockValue, this.NoiseSynthParams[0], 0);
             this._logo.synth.createSynth(0, this.instrumentName, 'noisesynth', this.noiseSynthParamvals);
         } else if (this.isActive['duosynth'] === true) {
-            docById('synthButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR
+            docById('synthButtonCell').style.backgroundColor = platformColor.selectorBackground
             if (this.duoSynthesizer.length > 1) {
                 blockValue = this.duoSynthesizer.length - 1;
             }
@@ -405,7 +405,7 @@ function TimbreWidget () {
             this._update(blockValue, this.duoSynthParams[1], 1);
             this._logo.synth.createSynth(0, this.instrumentName, 'duosynth', this.duoSynthParamVals);
         } else if (this.isActive['oscillator']) {
-            docById('oscillatorButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+            docById('oscillatorButtonCell').style.backgroundColor = platformColor.selectorBackground;
             if (this.osc.length > 1) {
                 blockValue = this.osc.length - 1;
             }
@@ -420,7 +420,7 @@ function TimbreWidget () {
             this._logo.synth.createSynth(0, this.instrumentName, this.oscParams[0], this.synthVals);
         } else if (this.isActive['filter']) {
             for (var i = 0; i < this.fil.length; i++) {
-                docById('filterButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+                docById('filterButtonCell').style.backgroundColor = platformColor.selectorBackground;
                 docById('sel' + i).value = this.filterParams[i * 3];
                 this._update(i, this.filterParams[i * 3], 0);
                 instrumentsFilters[0][this.instrumentName][i]['filterType'] = this.filterParams[i * 3];
@@ -458,7 +458,7 @@ function TimbreWidget () {
                 instrumentsFilters[0][this.instrumentName][i]['filterFrequency'] = parseFloat(this.filterParams[2 + i * 3]);
             }
         } else if (this.isActive['tremolo'] === true) {
-            docById('effectsButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+            docById('effectsButtonCell').style.backgroundColor = platformColor.selectorBackground;
             if (this.tremoloEffect.length !== 1) {
                 blockValue = this.tremoloEffect.length - 1;
             }
@@ -469,7 +469,7 @@ function TimbreWidget () {
                 this._update(blockValue, this.tremoloParams[i], i);
             }
         } else if (this.isActive['vibrato'] === true) {
-            docById('effectsButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+            docById('effectsButtonCell').style.backgroundColor = platformColor.selectorBackground;
             if (this.vibratoEffect.length !== 1) {
                 blockValue = this.vibratoEffect.length - 1;
             }
@@ -480,7 +480,7 @@ function TimbreWidget () {
                 this._update(blockValue, this.vibratoParams[i], i);
             }
         } else if (this.isActive['phaser'] === true) {
-            docById('effectsButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+            docById('effectsButtonCell').style.backgroundColor = platformColor.selectorBackground;
             if (this.phaserEffect.length !== 1) {
                 blockValue = this.phaserEffect.length - 1;
             }
@@ -491,7 +491,7 @@ function TimbreWidget () {
                 this._update(blockValue, this.phaserParams[i], i);
             }
         } else if (this.isActive['chorus'] === true) {
-            docById('effectsButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+            docById('effectsButtonCell').style.backgroundColor = platformColor.selectorBackground;
             if (this.chorusEffect.length !== 1) {
                 blockValue = this.chorusEffect.length - 1;
             }
@@ -502,7 +502,7 @@ function TimbreWidget () {
                 this._update(blockValue, this.chorusParams[i], i);
             }
         } else if (this.isActive['distortion'] === true) {
-            docById('effectsButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
+            docById('effectsButtonCell').style.backgroundColor = platformColor.selectorBackground;
             if (this.distortionEffect.length !== 1) {
                 blockValue = this.dstortionEffect.length - 1;
             }
@@ -546,11 +546,11 @@ function TimbreWidget () {
 
         _unhighlightButtons = function () {
             addFilterButtonCell.style.backgroundColor = '#808080';
-            synthButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            oscillatorButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            envelopeButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            effectsButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            filterButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            synthButtonCell.style.backgroundColor = platformColor.selectorBackground;
+            oscillatorButtonCell.style.backgroundColor = platformColor.selectorBackground;
+            envelopeButtonCell.style.backgroundColor = platformColor.selectorBackground;
+            effectsButtonCell.style.backgroundColor = platformColor.selectorBackground;
+            filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
@@ -572,7 +572,7 @@ function TimbreWidget () {
         cell.style.height = BUTTONSIZE + 'px';
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         var timbreInput = docById('timbreName');
         timbreInput.classList.add('hasKeyboard');
 
@@ -961,7 +961,7 @@ function TimbreWidget () {
         env.innerHTML = htmlElements;
         var envAppend = document.createElement('div');
         envAppend.id = 'envAppend';
-        envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        envAppend.style.backgroundColor = platformColor.selectorBackground;
         envAppend.style.height = '30px';
         envAppend.style.marginTop = '40px';
         envAppend.style.overflow = 'auto';
@@ -1250,7 +1250,7 @@ function TimbreWidget () {
         env.innerHTML = htmlElements;
         var envAppend = document.createElement('div');
         envAppend.id = 'envAppend';
-        envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        envAppend.style.backgroundColor = platformColor.selectorBackground;
         envAppend.style.height = '30px';
         envAppend.style.marginTop = '40px';
         envAppend.style.overflow = 'auto';
@@ -1344,7 +1344,7 @@ function TimbreWidget () {
         env.innerHTML = htmlElements;
         var envAppend = document.createElement('div');
         envAppend.id = 'envAppend';
-        envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        envAppend.style.backgroundColor = platformColor.selectorBackground;
         envAppend.style.height = '30px';
         envAppend.style.marginTop = '40px';
         envAppend.style.overflow = 'auto';
@@ -1576,7 +1576,7 @@ function TimbreWidget () {
         env.innerHTML = htmlElements;
         var envAppend = document.createElement('div');
         envAppend.id = 'envAppend';
-        envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        envAppend.style.backgroundColor = platformColor.selectorBackground;
         envAppend.style.height = '30px';
         envAppend.style.marginTop = '40px';
         envAppend.style.overflow = 'auto';

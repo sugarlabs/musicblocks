@@ -337,7 +337,7 @@ function RhythmRuler () {
                       that._rulerSelected = cell.parentNode.id[5];
                     var noteValues = that.Rulers[that._rulerSelected][0];
                     var noteValue = noteValues[cell.cellIndex];
-                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1500);
         };
@@ -969,7 +969,7 @@ function RhythmRuler () {
             }
 
             // And highlight its cell.
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             // Calculate any offset in playback.
             var d = new Date();
@@ -1451,7 +1451,7 @@ function RhythmRuler () {
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         var numberInput = docById('dissectNumber');
 
@@ -1832,14 +1832,14 @@ function RhythmRuler () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover = function () {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout = function () {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;

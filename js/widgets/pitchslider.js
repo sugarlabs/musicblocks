@@ -33,14 +33,14 @@ function PitchSlider() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -220,11 +220,11 @@ function PitchSlider() {
         };
 
         cell.onmouseover = function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout = function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         // We use this cell as a handle for dragging.
@@ -337,7 +337,7 @@ function PitchSlider() {
             cellDiv.style.height = Math.floor(w / SLIDERHEIGHT) + 'px';
             cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
             cellDiv.style.top = SLIDERHEIGHT + 'px';
-            cellDiv.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cellDiv.style.backgroundColor = platformColor.selectorBackground;
             sliderCell.appendChild(cellDiv);
 
             // Add a paragraph element for the slider value.

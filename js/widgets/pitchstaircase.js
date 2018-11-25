@@ -33,14 +33,14 @@ function PitchStaircase () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -270,7 +270,7 @@ function PitchStaircase () {
 
     this._playOne = function (stepCell) {
         // The frequency is stored in the stepCell.
-        stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        stepCell.style.backgroundColor = platformColor.selectorBackground;
         var frequency = Number(stepCell.getAttribute('id'));
         this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
 
@@ -288,7 +288,7 @@ function PitchStaircase () {
             pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
             var pscTableCell = docById('stepTable' + i);
             var stepCell = pscTableCell.rows[0].cells[1];
-            stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
             this._logo.synth.trigger(0, pitchnotes, 1, 'default', null,null);
         }
 
@@ -309,7 +309,7 @@ function PitchStaircase () {
         var last = this.Stairs.length - 1;
         var pscTableCell = docById('stepTable' + last);
         var stepCell = pscTableCell.rows[0].cells[1];
-        stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        stepCell.style.backgroundColor = platformColor.selectorBackground;
         this._logo.synth.trigger(0, pitchnotes, 1, 'default', null, null);
         this._playNext(this.Stairs.length - 2, -1);
     };
@@ -361,7 +361,7 @@ function PitchStaircase () {
 
             var pscTableCell = docById('stepTable' + index);
             var stepCell = pscTableCell.rows[0].cells[1];
-            stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
             that._logo.synth.trigger(0, pitchnotes, 1, 'default', null, null);
             if (index < that.Stairs.length || index > -1) {
                 that._playNext(index + next, next);
@@ -483,19 +483,19 @@ function PitchStaircase () {
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
@@ -504,11 +504,11 @@ function PitchStaircase () {
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         var cell = row.insertCell();
@@ -516,19 +516,19 @@ function PitchStaircase () {
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         docById('musicratio1').classList.add('hasKeyboard');
 
         var cell = row.insertCell();
         cell.innerHTML = '<h2>:</h2>';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         var cell = row.insertCell();
         cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         docById('musicratio2').classList.add('hasKeyboard');
 
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
@@ -553,11 +553,11 @@ function PitchStaircase () {
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         // We use this cell as a handle for dragging.

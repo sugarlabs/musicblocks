@@ -169,7 +169,7 @@ function StatusMatrix() {
         var iconSize = Math.floor(this._cellScale * 24);
 
         var cell = row.insertCell();
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         cell.className = 'headcol';
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.width = (BUTTONSIZE * this._cellScale) + 'px';
@@ -202,7 +202,7 @@ function StatusMatrix() {
 
             cell.innerHTML = '&nbsp;<b>' + label + '</b>&nbsp;'
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -210,7 +210,7 @@ function StatusMatrix() {
             cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
             cell.innerHTML = '&nbsp;<b>' + _('note') + '</b>&nbsp;'
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
         }
 
         // One row per voice (turtle)
@@ -380,14 +380,14 @@ function StatusMatrix() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;

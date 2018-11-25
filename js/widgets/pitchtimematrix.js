@@ -287,7 +287,7 @@ function PitchTimeMatrix () {
             }
         };
 
-        var expandCell = this._addButton(row, 'expand-button.svg', iconSize, _('expand'), '');
+        var expandCell = this._addButton(row, 'expand-button.svg', ICONSIZE, _('expand'), '');
         
         expandCell.onclick = function () {
             var ptmDiv = docById('ptmDiv');
@@ -481,14 +481,14 @@ function PitchTimeMatrix () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -1294,7 +1294,7 @@ function PitchTimeMatrix () {
 
             // Highlight first note.
             var cell = row.cells[this._colIndex];
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             // If we are in a tuplet, we don't update the column until
             // we've played all of the notes in the column span.
@@ -1302,7 +1302,7 @@ function PitchTimeMatrix () {
                 this._spanCounter = 1;
                 var row = docById('ptmTupletNoteValueRow');
                 var tupletCell = row.cells[this._colIndex];
-                tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                tupletCell.style.backgroundColor = platformColor.selectorBackground;
             } else {
                 this._spanCounter = 0;
                 this._colIndex += 1;
@@ -1365,11 +1365,11 @@ function PitchTimeMatrix () {
                 var cell = row.cells[that._colIndex];
 
                 if (cell != undefined) {
-                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                     if (cell.colSpan > 1) {
                         var row = docById('ptmTupletNoteValueRow');
                         var tupletCell = row.cells[that._notesCounter];
-                        tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                        tupletCell.style.backgroundColor = platformColor.selectorBackground;
                     }
                 }
 

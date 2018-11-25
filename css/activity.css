@@ -397,7 +397,7 @@ input.number {
 }
 
 input.dissectNumber {
-    background-color: #c374e9 !important;
+    background-color: #8CC6FF !important;
     text-align: center;
     font-size: 24px;
     font-weight: bold !important;
@@ -409,7 +409,7 @@ input.dissectNumber {
 }
 
 input.musicratio1, input.musicratio2   {
-    background-color: #c374e9 !important;
+    background-color: #8CC6FF !important;
     text-align: center;
     font-size: 24px;
     font-weight: bold !important;
@@ -421,7 +421,7 @@ input.musicratio1, input.musicratio2   {
 }
 
 input.BPMInput {
-    background-color: #c374e9 !important;
+    background-color: #8CC6FF !important;
     text-align: center;
     font-size: 24px;
     font-weight: bold !important;
@@ -783,7 +783,7 @@ table {
 }
 
 input.timbreName {
-    background-color: #c374e9 !important;
+    background-color: #8CC6FF !important;
     text-align: center;
     font-size: 24px;
     resize: none !important;
@@ -840,7 +840,7 @@ input.timbreName {
 #userEdit input {
     height: 40px;
     width: 40px; 
-    background: rgb(195, 116, 233);
+    background: #8CC6FF;
     border: 1px solid black;
     text-align: center; 
 }
