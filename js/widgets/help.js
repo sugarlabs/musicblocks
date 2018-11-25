@@ -62,11 +62,11 @@ function HelpWidget () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = platformColor.selectorSelected;
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = platformColor.selectorBackground;
             };
 
             var cell = this._addButton(row, 'down.svg', ICONSIZE, _('next page'));
@@ -81,13 +81,21 @@ function HelpWidget () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = platformColor.selectorSelected;
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = platformColor.selectorBackground;
             };
-        }
+        } else {
+            if (blocks.activeBlock.name === null) {
+                helpDiv.style.display = 'none';
+            } else {
+                var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
+	    }
+
+            var cell = this._addLabel(row, ICONSIZE, label);
+	}
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
 
@@ -96,11 +104,11 @@ function HelpWidget () {
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorSelected;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         // We use this cell as a handle for dragging.
@@ -263,15 +271,26 @@ function HelpWidget () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorSelected;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
+
+        return cell;
+    };
+
+    this._addLabel = function(row, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;' + label + '&nbsp;&nbsp;';
+        cell.style.height = cell.style.width;
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         return cell;
     };
