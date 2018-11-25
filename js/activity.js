@@ -27,81 +27,26 @@ function Activity() {
 
     var that = this;
 
-    setHomeContainers = this.setHomeContainers
-    _printBlockSVG = this._printBlockSVG;
     _findBlocks = this._findBlocks;
-    _allClear = this._allClear;
     _doFastButton = this._doFastButton;
     _doSlowButton = this._doSlowButton;
-    _doStepButton = this._doStepButton;
     doHardStopButton = this.doHardStopButton;
-    doSwitchMode = this.doSwitchMode;
-    closeAnalytics = this.closeAnalytics;
-    doAnalytics = this.doAnalytics;
-    doLargerBlocks = this.doLargerBlocks;
-    doSmallerBlocks = this.doSmallerBlocks;
-    setSmallerLargerStatus = this.setSmallerLargerStatus;
-    deletePlugin = this.deletePlugin;
-    hideGrids = this.hideGrids;
-    _doCartesianPolar = this._doCartesianPolar;
     _setupBlocksContainerEvents = this._setupBlocksContainerEvents
-    _createGrid = this._createGrid;
-    _createMsgContainer = this._createMsgContainer;
-    _createErrorContainers = this._createErrorContainers;
-    _makeErrorArtwork = this._makeErrorArtwork;
-    hideSearchWidget = this.hideSearchWidget;
-    showSearchWidget = this.showSearchWidget;
-    doSearch = this.doSearch;
     __makeNewNote = this.__makeNewNote;
     getCurrentKeyCode = this.getCurrentKeyCode;
     clearCurrentKeyCode = this.clearCurrentKeyCode;
-    _restoreTrash = this._restoreTrash;
-    closeSubMenus = this.closeSubMenus;
     _deleteBlocksBox = this._deleteBlocksBox;
-    hideAuxMenu = this.hideAuxMenu;
     onStopTurtle = this.onStopTurtle;
     onRunTurtle = this.onRunTurtle;
-    _tick = this._tick;
-    _doOpenSamples = this._doOpenSamples;
     doSave = this.doSave;
-    doUploadToPlanet = this.doUploadToPlanet;
-    _afterDelete = this._afterDelete;
-    sendAllToTrash = this.sendAllToTrash;
-    _changeBlockVisibility = this._changeBlockVisibility;
-    _toggleCollapsibleStacks = this._toggleCollapsibleStacks;
-    doLoad = this.doLoad;
     runProject = this.runProject;
     loadProject = this.loadProject;
     loadStartWrapper = this.loadStartWrapper;
     showContents = this.showContents;
     _loadStart = this._loadStart;
-    hideMsgs = this.hideMsgs;
-    textMsg = this.textMsg;
-    errorMsg = this.errorMsg;
-    _hideCartesian = this._hideCartesian;
-    _showCartesian = this._showCartesian;
-    _hidePolar = this._hidePolar;
-    _showPolar = this._showPolar;
-    doOpenPlugin = this.doOpenPlugin;
-    _hideStopButton = this._hideStopButton;
-    _showStopButton = this._showStopButton;
-    _setupAndroidToolbar = this._setupAndroidToolbar;
-    _doMergeLoad = this._doMergeLoad;
-    _setupSubMenus = this._setupSubMenus;
-    _setupAuxMenu = this._setupAuxMenu;
-    _showHelp = this._showHelp;
-    _showAboutPage = this._showAboutPage;
-    _doMenuButton = this._doMenuButton;
-    _doMenuAnimation = this._doMenuAnimation;
-    _toggleToolbar = this._toggleToolbar;
-    _makeButton = this._makeButton;
+    _setupAndroidToolbar = this._setupAndroidToolbar;;
     _loadButtonDragHandler = this._loadButtonDragHandler;
-    pasted = this.pasted;
-
-    _openAuxMenu = this._openAuxMenu;
-    _showHideAuxMenu = this._showHideAuxMenu;
-    piemenuBlockContext = this.piemenuBlockContext;
-
+    
     // scrollOffContainer = undefined;
     // scrollOnContainer = undefined;
 
@@ -284,7 +229,7 @@ function Activity() {
 
         // Set up a file chooser for the doOpen function.
         fileChooser = docById('myOpenFile');
-        // Set up a file chooser for the that.doOpenPlugin function.
+        // Set up a file chooser for the doOpenPlugin function.
         pluginChooser = docById('myOpenPlugin');
         // The file chooser for all files.
         allFilesChooser = docById('myOpenAll');
@@ -393,7 +338,7 @@ function Activity() {
                         // FIXME: check Z-order in case there are
                         // overlapping blocks.
                         blocks.activeBlock = i;
-                        that.piemenuBlockContext(i);
+                        piemenuBlockContext(i);
                         console.log('Found a hit.');
                         break;
                     }
@@ -405,7 +350,7 @@ function Activity() {
                 }
             } else {
                 // Block context menu
-                that.piemenuBlockContext(blocks.activeBlock, stageX, stageY);
+                piemenuBlockContext(blocks.activeBlock, stageX, stageY);
             }
         }, false);
     }
@@ -490,7 +435,7 @@ function Activity() {
      * and moving them accordingly
      */
     this._findBlocks = function () {
-        // that._showHideAuxMenu(false);
+        // _showHideAuxMenu(false);
         var leftpos = Math.floor(canvas.width / 4);
         var toppos;
         blocks.activeBlock = null;
@@ -587,7 +532,7 @@ function Activity() {
         }
 
         // Blocks are all home, so reset go-home-button.
-        that.setHomeContainers(false, true);
+        setHomeContainers(false, true);
         boundary.hide();
     };
 
@@ -595,7 +540,7 @@ function Activity() {
      * @param zero {hides container}
      * @param one {shows container}
      */
-    this.setHomeContainers = function (zero, one) {
+    setHomeContainers = function (zero, one) {
         if (homeButtonContainers[0] === null) {
             return;
         }
@@ -607,7 +552,7 @@ function Activity() {
     /**
      * @return {SVG} returns SVG of blocks
      */
-    this._printBlockSVG = function () {
+    _printBlockSVG = function () {
         blocks.activeBlock = null;
         var startCounter = 0;
         var svg = '';
@@ -731,7 +676,7 @@ function Activity() {
     /**
      * Clears "canvas"
      */
-    this._allClear = function () {
+    _allClear = function () {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -742,7 +687,7 @@ function Activity() {
 
         logo.boxes = {};
         logo.time = 0;
-        that.hideMsgs();
+        hideMsgs();
         logo.setBackgroundColor(-1);
         logo.notationOutput = '';
         for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -892,7 +837,7 @@ function Activity() {
     /** 
      * Runs music blocks step by step 
      */
-    this._doStepButton = function () {
+    _doStepButton = function () {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -1009,17 +954,17 @@ function Activity() {
     /**
      * Switches between beginner/advanced mode
      */
-    this.doSwitchMode = function () {
+    doSwitchMode = function () {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
 
         if (mode === null || mode === 'true') {
-            that.textMsg(_('Refresh your browser to change to advanced mode.'));
+            textMsg(_('Refresh your browser to change to advanced mode.'));
             localStorage.setItem('beginnerMode', false);
             beginnerModeContainer.visible = false;
             advancedModeContainer.visible = true;
         } else {
-            that.textMsg(_('Refresh your browser to change to beginner mode.'));
+            textMsg(_('Refresh your browser to change to beginner mode.'));
             localStorage.setItem('beginnerMode', true);
             beginnerModeContainer.visible = true;
             advancedModeContainer.visible = false;
@@ -1080,7 +1025,7 @@ function Activity() {
         var button = this;
         button.x = (canvas.width / (2 * turtleBlocksScale)) + (300 / Math.sqrt(2));
         button.y = 200.0;
-        this.closeButton = that._makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
+        this.closeButton = _makeButton(CANCELBUTTON, _('Close'), button.x, button.y, 55, 0);
         this.closeButton.on('click', function (event) {
             button.closeButton.visible = false;
             stage.removeChild(chartBitmap);
@@ -1109,14 +1054,14 @@ function Activity() {
      */
     closeAnalytics = this.closeAnalytics;
     var th = this;
-    this.doAnalytics = function () {
+    doAnalytics = function () {
         // pluginsContainer.visible = false;
         // deletePluginContainer.visible = false;
         // statsContainer.visible = false;
         // scrollOnContainer.visible = false;
         // scrollOffContainer.visible = false;
        deltaY(-55 - LEADING);
-        that._showHideAuxMenu(false);
+        _showHideAuxMenu(false);
 
         blocks.activeBlock = null;
         myChart = docById('myChart');
@@ -1165,7 +1110,7 @@ function Activity() {
     /**
      * Increases block size
      */
-    this.doLargerBlocks = function () {
+    doLargerBlocks = function () {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
@@ -1174,13 +1119,13 @@ function Activity() {
             blocks.setBlockScale(BLOCKSCALES[blockscale]);
         }
 
-        that.setSmallerLargerStatus();
+        setSmallerLargerStatus();
     };
 
     /**
      * Decreases block size
      */
-    this.doSmallerBlocks = function () {
+    doSmallerBlocks = function () {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
@@ -1189,14 +1134,14 @@ function Activity() {
             blocks.setBlockScale(BLOCKSCALES[blockscale]);
         }
 
-        that.setSmallerLargerStatus();
+        setSmallerLargerStatus();
     };
 
     /**
      * If either the block size has reached its minimum or maximum
      * then the icons to make them smaller/bigger will be hidden
      */
-    this.setSmallerLargerStatus = function () {
+    setSmallerLargerStatus = function () {
         if (BLOCKSCALES[blockscale] > 1) {
             smallerContainer.visible = true;
             smallerOffContainer.visible = false;
@@ -1217,7 +1162,7 @@ function Activity() {
     /**
      * Removes loaded plugin
      */
-    this.deletePlugin = function () {
+    deletePlugin = function () {
         blocks.activeBlock = null;
         if (palettes.paletteObject !== null) {
             palettes.paletteObject._promptPaletteDelete();
@@ -1289,29 +1234,29 @@ function Activity() {
     /**
      * Hides all grids (Cartesian/polar)
      */
-    this.hideGrids = function () {
+    hideGrids = function () {
         turtles.setGridLabel(_('Cartesian'));
-        that._hideCartesian();
-        that._hidePolar();
+        _hideCartesian();
+        _hidePolar();
     };
 
     /**
      * Renders Cartesian/Polar grids and changes button labels accordingly
      */
-    this._doCartesianPolar = function () {
+    _doCartesianPolar = function () {
         if (cartesianBitmap.visible && polarBitmap.visible) {
-            that._hideCartesian();
+            _hideCartesian();
             //.TRANS: hide Polar coordinate overlay grid
             turtles.setGridLabel(_('Hide grid'));
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
-            that._hidePolar();
+            _hidePolar();
             //.TRANS: show Cartesian coordinate overlay grid
             turtles.setGridLabel(_('Cartesian'));
         } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
-            that._showCartesian();
+            _showCartesian();
             turtles.setGridLabel(_('Cartesian') + ' + ' + _('Polar'));
         } else if (cartesianBitmap.visible && !polarBitmap.visible) {
-            that._showPolar();
+            _showPolar();
             //.TRANS: show Polar coordinate overlay grid
             turtles.setGridLabel(_('Polar'));
         }
@@ -1472,7 +1417,7 @@ function Activity() {
      * @param imagePath {path of grid to be rendered}
      * Renders grid 
      */
-    this._createGrid = function (imagePath) {
+    _createGrid = function (imagePath) {
         var img = new Image();
         img.src = imagePath;
         var container = new createjs.Container();
@@ -1498,7 +1443,7 @@ function Activity() {
      * @param  y           {position on canvas}
      * @return {description}
      */
-    this._createMsgContainer = function (fillColor, strokeColor, callback, y) {
+    _createMsgContainer = function (fillColor, strokeColor, callback, y) {
         var container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
@@ -1551,10 +1496,10 @@ function Activity() {
     /**
      * Some error messages have special artwork.
      */
-    this._createErrorContainers = function () {
+    _createErrorContainers = function () {
         for (var i = 0; i < ERRORARTWORK.length; i++) {
             var name = ERRORARTWORK[i];
-            that._makeErrorArtwork(name);
+            _makeErrorArtwork(name);
         }
     };
 
@@ -1562,7 +1507,7 @@ function Activity() {
      * @param  name {specifies svg to be rendered}
      * renders error message with appropriate artwork
      */
-    this._makeErrorArtwork = function (name) {
+    _makeErrorArtwork = function (name) {
         var container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
@@ -1631,14 +1576,14 @@ function Activity() {
         searchSuggestions = searchSuggestions.reverse();
 
         searchWidget.onclick = function () {
-            that.doSearch();
+            doSearch();
         };
     }
 
     /**
      * Hides search widget
      */
-    this.hideSearchWidget = function () {
+    hideSearchWidget = function () {
         // Hide the jQuery search results widget
         var obj = docByClass('ui-menu');
         if (obj.length > 0) {
@@ -1651,9 +1596,9 @@ function Activity() {
     /**
      * Shows search widget
      */
-    this.showSearchWidget = function () {
+    showSearchWidget = function () {
         if (searchWidget.style.visibility === 'visible') {
-            that.hideSearchWidget();
+            hideSearchWidget();
         } else {
             var obj = docByClass('ui-menu');
             if (obj.length > 0) {
@@ -1672,7 +1617,7 @@ function Activity() {
             // focus.
             setTimeout(function () {
                 searchWidget.focus();
-                that.doSearch();
+                doSearch();
             }, 500);
         }
     };
@@ -1680,7 +1625,7 @@ function Activity() {
     /**
      * Uses JQuery to add autocompleted search suggestions
      */
-    this.doSearch = function () {
+    doSearch = function () {
         var $j = jQuery.noConflict();
 
         $j('#search').autocomplete({
@@ -1708,9 +1653,9 @@ function Activity() {
                 searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
                 searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
             } else if (deprecatedBlockNames.indexOf(searchInput) > -1) {
-                blocks.that.errorMsg(_('This block is deprecated.'));
+                blocks.errorMsg(_('This block is deprecated.'));
             } else {
-                blocks.that.errorMsg(_('Block cannot be found.'));
+                blocks.errorMsg(_('Block cannot be found.'));
             }
 
             searchWidget.value = '';
@@ -1843,7 +1788,7 @@ function Activity() {
 
         // Check for RETURN in search widget ahead of other events.
         if (event.keyCode === RETURN && docById('search').value.length > 0) {
-            that.doSearch();
+            doSearch();
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -1863,7 +1808,7 @@ function Activity() {
                     blocks.prepareStackForCopy();
                     break;
                 case 69: // 'E'
-                    that._allClear();
+                    _allClear();
                     break;
                 case 80: // 'P'
                     // logo.playback(-1);
@@ -1931,7 +1876,7 @@ function Activity() {
         } else {
             if (docById('paste').style.visibility === 'visible' && event.keyCode === RETURN) {
                 if (docById('paste').value.length > 0) {
-                    that.pasted();
+                    pasted();
                 }
             } else if (!disableKeys) {
                 switch (event.keyCode) {
@@ -2025,12 +1970,12 @@ function Activity() {
                             searchWidget.style.visibility = 'hidden';
                         } else {
                             // toggle full screen
-                            // that._toggleToolbar();
+                            // _toggleToolbar();
                         }
                         break;
                     case RETURN:
                         if (disableArrowKeys) {} else if (docById('search').value.length > 0) {
-                            that.doSearch();
+                            doSearch();
                         } else {
                             if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
                                 logo.runLogoCommands();
@@ -2157,7 +2102,7 @@ function Activity() {
         if (confirmContainer !== null && languageContainer.visible) {
             if (toolbarHeight > 0) {
                 console.log('Closing menus before resize.');
-                that._showHideAuxMenu(true);
+                _showHideAuxMenu(true);
             }
         }
 
@@ -2267,13 +2212,13 @@ function Activity() {
      * Hides palettes before update
      * Repositions blocks about trash area
      */
-    this._restoreTrash = function () {
+    _restoreTrash = function () {
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
 
         blocks.activeBlock = null;
-        that.closeSubMenus();
+        closeSubMenus();
         refreshCanvas();
 
         var dx = 0;
@@ -2368,7 +2313,7 @@ function Activity() {
     /**
      * Closes all sub menus
      */
-    this.closeSubMenus = function () {
+    closeSubMenus = function () {
         if (confirmContainer.visible) {
             confirmContainer.visible = false;
             restoreContainer.y = 95.5 + LEADING;
@@ -2423,8 +2368,8 @@ function Activity() {
     this._deleteBlocksBox = function () {
         // if save or settings is open, close them.
         if (!confirmContainer.visible) {
-            that.closeSubMenus();
-            that.hideAuxMenu();
+            closeSubMenus();
+            hideAuxMenu();
             confirmContainer.visible = true;
             confirmContainer.x = newContainer.x;
             confirmContainer.y = 27.5;
@@ -2438,9 +2383,9 @@ function Activity() {
     /**
      * REDUNDANT: Hides aux menu
      */
-    this.hideAuxMenu = function () {
+    hideAuxMenu = function () {
         if (toolbarHeight > 0) {
-            that._showHideAuxMenu(false);
+            _showHideAuxMenu(false);
             menuButtonsVisible = false;
         }
     };
@@ -2448,21 +2393,21 @@ function Activity() {
     /**
      * Sets up a new "clean" MB i.e. new project instance
      */
-    this._afterDelete = function () {
-        that.sendAllToTrash(true, false);
+    _afterDelete = function () {
+        sendAllToTrash(true, false);
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
         }
 
         confirmContainer.visible = false;
        deltaY(-55 - LEADING);
-        that._showHideAuxMenu(true);
+        _showHideAuxMenu(true);
     };
 
 
     // function _doPlaybackBox() {
     //     // _hideBoxes();
-    //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, that._makeButton, logo);
+    //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
     // };
 
     /**
@@ -2472,7 +2417,7 @@ function Activity() {
      * Hide the palettes before update.
      * Then deletes everything/sends all to trash
      */
-    this.sendAllToTrash = function (addStartBlock, doNotSave) {
+    sendAllToTrash = function (addStartBlock, doNotSave) {
         
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
@@ -2541,7 +2486,7 @@ function Activity() {
     /**
      * Toggles block/palette visibility
      */
-    this._changeBlockVisibility = function () {
+    _changeBlockVisibility = function () {
         hideDOMLabel();
 
         if (blocks.visible) {
@@ -2565,7 +2510,7 @@ function Activity() {
     /**
      * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
      */
-    this._toggleCollapsibleStacks = function () {
+    _toggleCollapsibleStacks = function () {
         hideDOMLabel();
 
         if (blocks.visible) {
@@ -2583,7 +2528,7 @@ function Activity() {
         }
 
         if (stopTurtleContainer.visible) {
-            that._hideStopButton();
+            _hideStopButton();
             setPlaybackStatus();
         }
     };
@@ -2599,7 +2544,7 @@ function Activity() {
         }
 
         if (!stopTurtleContainer.visible) {
-            that._showStopButton();
+            _showStopButton();
         }
     };
 
@@ -2625,8 +2570,8 @@ function Activity() {
     /**
      * Opens samples on planet after closing all sub menus
      */
-    this._doOpenSamples = function () {
-        that.closeSubMenus();
+    _doOpenSamples = function () {
+        closeSubMenus();
         planet.openPlanet();
     };
 
@@ -2637,11 +2582,11 @@ function Activity() {
      */
     this.doSave = function () {
         if (beginnerMode) {
-            that.closeSubMenus();
+            closeSubMenus();
             save.saveHTML(_('My Project'));
         } else {
             if (!saveHTMLContainer.visible) {
-                that.closeSubMenus();
+                closeSubMenus();
                 saveHTMLContainer.visible = true;
                 uploadContainer.visible = true;
                 saveSVGContainer.visible = true;
@@ -2707,7 +2652,7 @@ function Activity() {
 
                 // Move it down since we are about to move it up.
                deltaY(-55 - LEADING);
-                that._showHideAuxMenu(true);
+                _showHideAuxMenu(true);
             }
         }
     };
@@ -2715,7 +2660,7 @@ function Activity() {
     /**
      * Uploads MB file to Planet
      */
-    this.doUploadToPlanet = function () {
+    doUploadToPlanet = function () {
         planet.openPlanet();
     };
 
@@ -2728,8 +2673,8 @@ function Activity() {
      * @param merge {if specified the selected file's blocks merge into current project}
      *  Loads/merges existing MB file
      */
-    this.doLoad = function (merge) {
-        that.closeSubMenus();
+    doLoad = function (merge) {
+        closeSubMenus();
         if (merge === undefined) {
             merge = false;
         }
@@ -2746,7 +2691,7 @@ function Activity() {
         document.querySelector('#myOpenFile').click();
         window.scroll(0, 0);
         that.doHardStopButton();
-        that._allClear();
+        _allClear();
     };
 
     window.prepareExport = prepareExport;
@@ -2760,7 +2705,7 @@ function Activity() {
         document.removeEventListener('finishedLoading', this.runProject);
         setTimeout(function () {
             console.log('Run');
-            that._changeBlockVisibility();
+            _changeBlockVisibility();
             that._doFastButton(env);
         }, 5000);
     }
@@ -2808,7 +2753,7 @@ function Activity() {
         var __functionload = function () {
             setTimeout(function () {
                 if (!collapse && firstRun) {
-                    that._toggleCollapsibleStacks();
+                    _toggleCollapsibleStacks();
                 }
 
                 if (run && firstRun) {
@@ -2819,14 +2764,14 @@ function Activity() {
                     that.runProject(env);
 
                     if (show) {
-                        that._changeBlockVisibility();
+                        _changeBlockVisibility();
                     }
 
                     if (!collapse) {
-                        that._toggleCollapsibleStacks();
+                        _toggleCollapsibleStacks();
                     }
                 } else if (!show) {
-                    that._changeBlockVisibility();
+                    _changeBlockVisibility();
                 }
 
                 document.removeEventListener('finishedLoading', __functionload);
@@ -2871,7 +2816,7 @@ function Activity() {
         // Warn the user -- chrome only -- if the browser level is
         // not set to 100%
         if (window.innerWidth !== window.outerWidth) {
-            blocks.that.errorMsg(_('Please set browser zoom level to 100%'));
+            blocks.errorMsg(_('Please set browser zoom level to 100%'));
             console.log('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
         }
         */
@@ -2954,7 +2899,7 @@ function Activity() {
     /**
      * Hides all message containers
      */
-    this.hideMsgs = function () {
+    hideMsgs = function () {
         errorMsgText.parent.visible = false;
         if (errorMsgArrow != null) {
             errorMsgArrow.removeAllChildren();
@@ -2970,7 +2915,7 @@ function Activity() {
     };
 
 
-    this.textMsg = function (msg) {
+    textMsg = function (msg) {
         if (msgText == null) {
             // The container may not be ready yet, so do nothing.
             return;
@@ -2984,7 +2929,7 @@ function Activity() {
         refreshCanvas();
     };
 
-    this.errorMsg = function (msg, blk, text, timeout) {
+    errorMsg = function (msg, blk, text, timeout) {
         /*
         if (logo.optimize) {
             return;
@@ -2996,7 +2941,7 @@ function Activity() {
 
         // Hide the button, as the program is going to be
         // terminated.
-        that._hideStopButton();
+        _hideStopButton();
 
         if (errorMsgText == null) {
             // The container may not be ready yet, so do nothing.
@@ -3094,7 +3039,7 @@ function Activity() {
 
         if (myTimeout > 0) {
             errorMsgTimeoutID = setTimeout(function () {
-                that.hideMsgs();
+                hideMsgs();
             }, myTimeout);
         }
 
@@ -3104,7 +3049,7 @@ function Activity() {
     /**
      * Hides cartesian grid
      */
-    this._hideCartesian = function () {
+    _hideCartesian = function () {
         cartesianBitmap.visible = false;
         cartesianBitmap.updateCache();
         update = true;
@@ -3113,7 +3058,7 @@ function Activity() {
     /**
      * Shows cartesian grid
      */
-    this._showCartesian = function () {
+    _showCartesian = function () {
         cartesianBitmap.visible = true;
         cartesianBitmap.updateCache();
         update = true;
@@ -3122,7 +3067,7 @@ function Activity() {
     /**
      * Hides polar grid
      */
-    this._hidePolar = function () {
+    _hidePolar = function () {
         polarBitmap.visible = false;
         polarBitmap.updateCache();
         update = true;
@@ -3131,14 +3076,14 @@ function Activity() {
     /**
      * Shows polar grid
      */
-    this._showPolar = function () {
+    _showPolar = function () {
         polarBitmap.visible = true;
         polarBitmap.updateCache();
         update = true;
     };
 
     // function pasteStack() {
-    //     that.closeSubMenus();
+    //     closeSubMenus();
     //     blocks.pasteStack();
     // };
    
@@ -3304,12 +3249,12 @@ function Activity() {
     /**
      * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
      */
-    this.doOpenPlugin = function () {
+    doOpenPlugin = function () {
         pluginChooser.focus();
         pluginChooser.click();
     };
 
-    this._hideStopButton = function () {
+    _hideStopButton = function () {
         if (stopTurtleContainer === null) {
             return;
         }
@@ -3318,7 +3263,7 @@ function Activity() {
         hardStopTurtleContainer.visible = true;
     };
 
-    this._showStopButton = function () {
+    _showStopButton = function () {
         if (stopTurtleContainer === null) {
             return;
         }
@@ -3374,9 +3319,9 @@ function Activity() {
                 scrolling = false;
                 var diff = event.stageY - firstY;
                 if (diff > 55 && !menuButtonsVisible) {
-                    that._doMenuAnimation(false);
+                    _doMenuAnimation(false);
                 } else if (diff < -55 && menuButtonsVisible) {
-                    that._doMenuAnimation(false);
+                    _doMenuAnimation(false);
                 }
             }, null, true);
 
@@ -3385,9 +3330,9 @@ function Activity() {
                 scrolling = false;
                 var diff = event.stageY - firstY;
                 if (diff > 55 && !menuButtonsVisible) {
-                    that._doMenuAnimation(false);
+                    _doMenuAnimation(false);
                 } else if (diff < -55 && menuButtonsVisible) {
-                    that._doMenuAnimation(false);
+                    _doMenuAnimation(false);
                 }
             }, null, true);
         });
@@ -3462,7 +3407,7 @@ function Activity() {
             });
         };
         logoContainer.on('click', function (event) {
-            that._showAboutPage(); // show about page
+            _showAboutPage(); // show about page
         });
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
@@ -3479,64 +3424,64 @@ function Activity() {
 
         var language = localStorage.languagePreference;
 
-        runContainer = that._makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
+        runContainer = _makeButton(PLAYBUTTON, _('Play'), x, y, btnSize, 0);
 
         if (beginnerMode && language === 'ja') {
             that._loadButtonDragHandler(runContainer, x, y, that._doFastButton, null, null, null, null);
         } else {
-            that._loadButtonDragHandler(runContainer, x, y, that._doFastButton, that._openAuxMenu, null, null, null);
+            that._loadButtonDragHandler(runContainer, x, y, that._doFastButton, _openAuxMenu, null, null, null);
         }
 
         onscreenButtons.push(runContainer);
 
         x += 1.5 * dx;
 
-        hardStopTurtleContainer = that._makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+        hardStopTurtleContainer = _makeButton(STOPBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
         that._loadButtonDragHandler(hardStopTurtleContainer, x, y, that.doHardStopButton, null, null, null, null);
         onscreenButtons.push(hardStopTurtleContainer);
 
-        stopTurtleContainer = that._makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
+        stopTurtleContainer = _makeButton(STOPTURTLEBUTTON, _('Stop') + ' [Alt-S]', x, y, btnSize, 0);
         that._loadButtonDragHandler(stopTurtleContainer, x, y, doStopButton, null, null, null, null);
         onscreenButtons.push(stopTurtleContainer);
 
         if (!beginnerMode || language !== 'ja') {
-            slowContainer = that._makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
+            slowContainer = _makeButton(SLOWBUTTON, _('Run slowly'), x - 2 * dx, y - btnSize, btnSize, 0);
             that._loadButtonDragHandler(slowContainer, x - 2 * dx, y - btnSize, that._doSlowButton, null, null, null, null);
 
-            stepContainer = that._makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
-            that._loadButtonDragHandler(stepContainer, x - dx, y - btnSize, that._doStepButton, null, null, null, null);
+            stepContainer = _makeButton(STEPBUTTON, _('Run step by step'), x - dx, y - btnSize, btnSize, 0);
+            that._loadButtonDragHandler(stepContainer, x - dx, y - btnSize, _doStepButton, null, null, null, null);
         }
 
         // Move to the right
         var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
 
-        newContainer = that._makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
+        newContainer = _makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
         that._loadButtonDragHandler(newContainer, x, y, that._deleteBlocksBox, null, null, null, null);
         onscreenButtons.push(newContainer);
 
         x += dx;
 
-        openContainer = that._makeButton(OPENBUTTON, _('Load project from file'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(openContainer, x, y, that.doLoad, null, null, null, null);
+        openContainer = _makeButton(OPENBUTTON, _('Load project from file'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(openContainer, x, y, doLoad, null, null, null, null);
         onscreenButtons.push(openContainer);
 
         x += dx;
 
-        saveContainer = that._makeButton(SAVEBUTTON, _('Save Project'), x, y, btnSize, 0);
+        saveContainer = _makeButton(SAVEBUTTON, _('Save Project'), x, y, btnSize, 0);
         that._loadButtonDragHandler(saveContainer, x, y, that.doSave, null, null, null, null);
         onscreenButtons.push(saveContainer);
 
         x += dx;
 
         if (planet) {
-            planetContainer = that._makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
-            that._loadButtonDragHandler(planetContainer, x, y, that._doOpenSamples, null, null, null, null);
+            planetContainer = _makeButton(UPLOADPLANETBUTTON, _('Find and share projects'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(planetContainer, x, y, _doOpenSamples, null, null, null, null);
 
             document.querySelector('#myOpenFile').addEventListener('change', function (event) {
                 planet.closePlanet();
             });
         } else {
-            planetContainer = that._makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
+            planetContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable'), x, y, btnSize, 0);
         }
 
         onscreenButtons.push(planetContainer);
@@ -3544,26 +3489,26 @@ function Activity() {
         // Move to the far right
         x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
 
-        helpContainer = that._makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(helpContainer, x, y, that._showHelp, null, null, null, null);
+        helpContainer = _makeButton(HELPBUTTON, _('Help'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(helpContainer, x, y, _showHelp, null, null, null, null);
         onscreenButtons.push(helpContainer);
 
-        that._setupAuxMenu(turtleBlocksScale);
-        that._setupSubMenus(turtleBlocksScale);
+        _setupAuxMenu(turtleBlocksScale);
+        _setupSubMenus(turtleBlocksScale);
     };
 
     /**
      * Specifies that loading an MB project should merge it 
      * within the existing project
      */
-    this._doMergeLoad = function () {
-        that.doLoad(true);
+    _doMergeLoad = function () {
+        doLoad(true);
     };
 
     /**
      * REDUNDANT
      */
-    this._setupSubMenus = function (turtleBlocksScale) {
+    _setupSubMenus = function (turtleBlocksScale) {
         // Each sub menu is positioned above the aux menus
         var cellsize = 55;
         var y = Math.floor(-3 * cellsize / 2);
@@ -3596,44 +3541,44 @@ function Activity() {
         // Advanced Save Box Buttons: HTML, SVG, etc.
         // Force left-aligned labels
         var x = 27.5;
-        saveHTMLContainer = that._makeButton(SAVEDARKBUTTON, _('Save project'), x, y, cellsize, 0);
+        saveHTMLContainer = _makeButton(SAVEDARKBUTTON, _('Save project'), x, y, cellsize, 0);
         saveHTMLContainer.visible = false;
         __addEventHandlers(saveHTMLContainer, save.saveHTML.bind(save));
 
         if (planet) {
-            uploadContainer = that._makeButton(UPLOADPLANETBUTTON, _('Share project'), x, y, cellsize, 0);
+            uploadContainer = _makeButton(UPLOADPLANETBUTTON, _('Share project'), x, y, cellsize, 0);
             uploadContainer.visible = false;
-            __addEventHandlers(uploadContainer, that.doUploadToPlanet);
+            __addEventHandlers(uploadContainer, doUploadToPlanet);
         } else {
-            uploadContainer = that._makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
+            uploadContainer = _makeButton(PLANETDISABLEDBUTTON, _('Offline. Sharing is unavailable.'), x, y, cellsize, 0);
             uploadContainer.visible = false;
         }
 
         // Force center-aligned labels
         var x = 95.5 + LEADING;
-        saveSVGContainer = that._makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
+        saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
         saveSVGContainer.visible = false;
         __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
 
-        savePNGContainer = that._makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
+        savePNGContainer = _makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
         savePNGContainer.visible = false;
         __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            saveWAVContainer = that._makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
+            saveWAVContainer = _makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
             saveWAVContainer.visible = false;
             __addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
 
-            saveLilypondContainer = that._makeButton(SAVELILYPONDBUTTON, _('Save sheet music'), x, y, cellsize, 0);
+            saveLilypondContainer = _makeButton(SAVELILYPONDBUTTON, _('Save sheet music'), x, y, cellsize, 0);
             saveLilypondContainer.visible = false;
             __addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
 
-            saveABCContainer = that._makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
+            saveABCContainer = _makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
             saveABCContainer.visible = false;
             __addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
         }
 
-        saveArtworkContainer = that._makeButton(SAVEBLOCKARTWORKBUTTON, _('Save block artwork'), x, y, cellsize, 0);
+        saveArtworkContainer = _makeButton(SAVEBLOCKARTWORKBUTTON, _('Save block artwork'), x, y, cellsize, 0);
         saveArtworkContainer.visible = false;
         __addEventHandlers(saveArtworkContainer, save.saveBlockArtwork.bind(save));
 
@@ -3643,16 +3588,16 @@ function Activity() {
 
         // ALways create these buttons (but not use them in beginner mode)
         // Clear Box Confirm Button
-        confirmContainer = that._makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
+        confirmContainer = _makeButton(EMPTYTRASHCONFIRMBUTTON, _('confirm'), x, y, cellsize, 0);
         confirmContainer.visible = false;
-        __addEventHandlers(confirmContainer, that._afterDelete);
+        __addEventHandlers(confirmContainer, _afterDelete);
 
     };
 
     /**
      * REDUNDANT
      */
-    this._setupAuxMenu = function (turtleBlocksScale) {
+    _setupAuxMenu = function (turtleBlocksScale) {
         if (menuContainer !== undefined) {
             stage.removeChild(menuContainer);
             for (var i in onscreenMenu) {
@@ -3667,8 +3612,8 @@ function Activity() {
         var y = Math.floor(btnSize / 2);
 
         var x = Math.floor(canvas.width / turtleBlocksScale) - 3 * btnSize / 2;
-        menuContainer = that._makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 95.5 : undefined);
-        that._loadButtonDragHandler(menuContainer, x, y, that._doMenuButton, null, null, null, null);
+        menuContainer = _makeButton(MENUBUTTON, _('Auxilary menu'), x, y, btnSize, menuButtonsVisible ? 95.5 : undefined);
+        that._loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
         var dx = btnSize;
 
@@ -3678,22 +3623,22 @@ function Activity() {
         } else {
             var x = Math.floor(canvas.width / turtleBlocksScale) - 20.5 * btnSize / 2;
 
-            statsContainer = that._makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
-            that._loadButtonDragHandler(statsContainer, x, y, that.doAnalytics, null, null, null, null);
+            statsContainer = _makeButton(STATSBUTTON, _('Display statistics'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(statsContainer, x, y, doAnalytics, null, null, null, null);
             onscreenMenu.push(statsContainer);
             statsContainer.visible = false;
 
             x += dx;
 
-            pluginsContainer = that._makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, btnSize, 0);
-            that._loadButtonDragHandler(pluginsContainer, x, y, that.doOpenPlugin, null, null, null, null);
+            pluginsContainer = _makeButton(PLUGINSBUTTON, _('Load plugin from file'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(pluginsContainer, x, y, doOpenPlugin, null, null, null, null);
             onscreenMenu.push(pluginsContainer);
             pluginsContainer.visible = false;
 
             x += dx;
 
-            deletePluginContainer = that._makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, btnSize, 0);
-            that._loadButtonDragHandler(deletePluginContainer, x, y, that.deletePlugin, null, null, null, null);
+            deletePluginContainer = _makeButton(PLUGINSDELETEBUTTON, _('Delete plugin'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(deletePluginContainer, x, y, deletePlugin, null, null, null, null);
             onscreenMenu.push(deletePluginContainer);
             deletePluginContainer.visible = false;
 
@@ -3715,11 +3660,11 @@ function Activity() {
                 scrollOffContainer.visible = false;
             }
 
-            scrollOnContainer = that._makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
+            scrollOnContainer = _makeButton(SCROLLUNLOCKBUTTON, _('Enable horizontal scrolling'), x, y, btnSize, 0);
             that._loadButtonDragHandler(scrollOnContainer, x, y, setScroller, null, null, null, null);
             onscreenMenu.push(scrollOnContainer);
 
-            scrollOffContainer = that._makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
+            scrollOffContainer = _makeButton(SCROLLLOCKBUTTON, _('Disable horizontal scrolling'), x, y, btnSize, 0);
             that._loadButtonDragHandler(scrollOffContainer, x, y, setScroller, null, null, null, null);
             onscreenMenu.push(scrollOffContainer);
             scrollOffContainer.visible = false;
@@ -3732,35 +3677,35 @@ function Activity() {
 
         x += 2 * dx;
 
-        openMergeContainer = that._makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(openMergeContainer, x, y, that._doMergeLoad, null, null, null, null);
+        openMergeContainer = _makeButton(OPENMERGEBUTTON, _('Merge with current project'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(openMergeContainer, x, y, _doMergeLoad, null, null, null, null);
         onscreenMenu.push(openMergeContainer);
         openMergeContainer.visible = false;
 
         x += dx;
 
-        restoreContainer = that._makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(restoreContainer, x, y, that._restoreTrash, null, null, null, null);
+        restoreContainer = _makeButton(RESTORETRASHBUTTON, _('Restore'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(restoreContainer, x, y, _restoreTrash, null, null, null, null);
         onscreenMenu.push(restoreContainer);
         restoreContainer.visible = false;
 
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             x += 1.5 * dx;
-            beginnerModeContainer = that._makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
-            that._loadButtonDragHandler(beginnerModeContainer, x, y, that.doSwitchMode, null, null, null, null);
+            beginnerModeContainer = _makeButton(BEGINNERBUTTON, _('Switch to advanced mode'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(beginnerModeContainer, x, y, doSwitchMode, null, null, null, null);
             beginnerModeContainer.visible = false;
             onscreenMenu.push(beginnerModeContainer);
 
-            advancedModeContainer = that._makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
-            that._loadButtonDragHandler(advancedModeContainer, x, y, that.doSwitchMode, null, null, null, null);
+            advancedModeContainer = _makeButton(ADVANCEDBUTTON, _('Switch to beginner mode'), x, y, btnSize, 0);
+            that._loadButtonDragHandler(advancedModeContainer, x, y, doSwitchMode, null, null, null, null);
             onscreenMenu.push(advancedModeContainer);
             advancedModeContainer.visible = false;
         }
 
         // Force center-aligned labels
         x += dx;
-        languageContainer = that._makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
+        languageContainer = _makeButton(LANGUAGEBUTTON, _('Select language'), x, y, btnSize, 0);
         languageContainer.visible = false;
         onscreenMenu.push(languageContainer);
 
@@ -3795,10 +3740,10 @@ function Activity() {
         var dx = btnSize;
 
         homeButtonContainers = [];
-        homeButtonContainers.push(that._makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
+        homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
         that._loadButtonDragHandler(homeButtonContainers[0], x, y, that._findBlocks, null, null, null, null);
 
-        homeButtonContainers.push(that._makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
+        homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
         that._loadButtonDragHandler(homeButtonContainers[1], x, y, that._findBlocks, null, null, null, null);
         homeButtonContainers[1].visible = false;
 
@@ -3808,28 +3753,28 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = that._makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(hideBlocksContainer, x, y, that._changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility, null, null, null, null);
 
         x += dx;
 
-        collapseBlocksContainer = that._makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(collapseBlocksContainer, x, y, that._toggleCollapsibleStacks, null, null, null, null);
+        collapseBlocksContainer = _makeButton(COLLAPSEBLOCKSBUTTON, _('Expand/collapse blocks'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(collapseBlocksContainer, x, y, _toggleCollapsibleStacks, null, null, null, null);
 
         x += dx;
 
-        smallerContainer = that._makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(smallerContainer, x, y, that.doSmallerBlocks, null, null, null, null);
+        smallerContainer = _makeButton(SMALLERBUTTON, _('Decrease block size'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(smallerContainer, x, y, doSmallerBlocks, null, null, null, null);
 
-        smallerOffContainer = that._makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, btnSize, 0);
+        smallerOffContainer = _makeButton(SMALLERDISABLEBUTTON, _('Cannot be further decreased'), x, y, btnSize, 0);
         smallerOffContainer.visible = false;
 
         x += dx;
 
-        largerContainer = that._makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(largerContainer, x, y, that.doLargerBlocks, null, null, null, null);
+        largerContainer = _makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
+        that._loadButtonDragHandler(largerContainer, x, y, doLargerBlocks, null, null, null, null);
 
-        largerOffContainer = that._makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, btnSize, 0);
+        largerOffContainer = _makeButton(BIGGERDISABLEBUTTON, _('Cannot be further increased'), x, y, btnSize, 0);
         largerOffContainer.visible = false;
     };
 
@@ -3841,7 +3786,7 @@ function Activity() {
     /**
      * Shows help page
      */
-    this._showHelp = function () {
+    _showHelp = function () {
         var helpWidget = new HelpWidget();
         helpWidget.init(null);
     };
@@ -3849,7 +3794,7 @@ function Activity() {
     /**
      * Shows about page
      */
-    this._showAboutPage = function () {
+    _showAboutPage = function () {
         var helpWidget = new HelpWidget();
         helpWidget.init(null);
         helpWidget.showPageByName(_('About'));
@@ -3858,14 +3803,14 @@ function Activity() {
     /** 
      * REDUNDANT
      */
-    this._doMenuButton = function () {
-        that._doMenuAnimation(true);
+    _doMenuButton = function () {
+        _doMenuAnimation(true);
     };
 
     /**
      * REDUNDANT
      */
-    this._doMenuAnimation = function (arg) {
+    _doMenuAnimation = function (arg) {
         if (arg === undefined) {
             var animate = true;
         } else {
@@ -3898,13 +3843,13 @@ function Activity() {
             }
         } else {
             // Race conditions during load
-            setTimeout(that._doMenuAnimation, 50);
+            setTimeout(_doMenuAnimation, 50);
         }
 
         setTimeout(function () {
             if (menuButtonsVisible) {
                 menuButtonsVisible = false;
-                that._showHideAuxMenu(false);
+                _showHideAuxMenu(false);
             } else {
                 menuButtonsVisible = true;
                 for (var button in onscreenMenu) {
@@ -3922,7 +3867,7 @@ function Activity() {
                     that.setScrollerButton()
                 }
 
-                that._showHideAuxMenu(false);
+                _showHideAuxMenu(false);
             }
             update = true;
         }, timeout);
@@ -3931,7 +3876,7 @@ function Activity() {
     /**
      * REDUNDANT
      */
-    this._toggleToolbar = function () {
+    _toggleToolbar = function () {
         buttonsVisible = !buttonsVisible;
         menuContainer.visible = buttonsVisible;
         headerContainer.visible = buttonsVisible;
@@ -3962,7 +3907,7 @@ function Activity() {
     /**
      * REDUNDANT: Makes toolbar buttons 
      */
-    this._makeButton = function (name, label, x, y, size, rotation, parent) {
+    _makeButton = function (name, label, x, y, size, rotation, parent) {
         var container = new createjs.Container();
 
         if (parent == undefined) {
@@ -4159,7 +4104,7 @@ function Activity() {
                 isLong = true;
                 if (longImg !== null) {
                     container.visible = false;
-                    container = that._makeButton(longImg, '', ox, oy, cellSize, 0);
+                    container = _makeButton(longImg, '', ox, oy, cellSize, 0);
                 }
             }, 500);
 
@@ -4167,7 +4112,7 @@ function Activity() {
                 isExtraLong = true;
                 if (extraLongImg !== null) {
                     container.visible = false;
-                    container = that._makeButton(extraLongImg, '', ox, oy, cellSize, 0);
+                    container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
                 }
             }, 1000);
             */
@@ -4217,7 +4162,7 @@ function Activity() {
     /**
      * Handles pasted strings into input fields
      */
-    this.pasted = function () {
+    pasted = function () {
         var pasteinput = docById('paste').value;
         var rawData = pasteinput;
         if (rawData == null || rawData == '') {
@@ -4228,7 +4173,7 @@ function Activity() {
         try {
             var obj = JSON.parse(cleanData);
         } catch (e) {
-            that.errorMsg(_('Could not parse JSON input.'));
+            errorMsg(_('Could not parse JSON input.'));
             return;
         }
 
@@ -4285,9 +4230,9 @@ function Activity() {
     /** 
      * REDUNDANT: Open aux menu
      */
-    this._openAuxMenu = function () {
+    _openAuxMenu = function () {
         if (!turtles.running() && toolbarHeight === 0) {
-            that._showHideAuxMenu(false);
+            _showHideAuxMenu(false);
         }
     };
 
@@ -4296,7 +4241,7 @@ function Activity() {
      * 
      * Toggles Aux menu visibility and positioning 
      */
-    this._showHideAuxMenu = function (resize) {
+    _showHideAuxMenu = function (resize) {
         var cellsize = 55;
         if (!resize && toolbarHeight === 0) {
             dy = cellsize + LEADING + 5;
@@ -4404,9 +4349,9 @@ function Activity() {
      * 
      * Sets up context menu for each block
      */
-    this.piemenuBlockContext = function (activeBlock, stageX, stageY) {
+    piemenuBlockContext = function (activeBlock, stageX, stageY) {
         if (activeBlock === null) {
-            console.log('that.piemenuBlockContext: no active block');
+            console.log('piemenuBlockContext: no active block');
             return;
         }
 
@@ -4602,15 +4547,15 @@ function Activity() {
         // createjs.Ticker.addEventListener('tick', stage);
         createjs.Ticker.addEventListener('tick', that.__tick);
 
-        that._createMsgContainer('#ffffff', '#7a7a7a', function (text) {
+        _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
             msgText = text;
         }, 130);
 
-        that._createMsgContainer('#ffcbc4', '#ff0031', function (text) {
+        _createMsgContainer('#ffcbc4', '#ff0031', function (text) {
             errorMsgText = text;
         }, 130);
 
-        that._createErrorContainers();
+        _createErrorContainers();
 
         /* Z-Order (top to bottom):
          *   menus
@@ -4648,12 +4593,12 @@ function Activity() {
         turtles = new Turtles();
         turtles
             .setCanvas(canvas)
-            .setClear(that._allClear)
-            .setHideMenu(that.hideAuxMenu)
+            .setClear(_allClear)
+            .setHideMenu(hideAuxMenu)
             .setMasterStage(stage)
             .setStage(turtleContainer)
-            .setHideGrids(that.hideGrids)
-            .setDoGrid(that._doCartesianPolar)
+            .setHideGrids(hideGrids)
+            .setDoGrid(_doCartesianPolar)
             .setRefreshCanvas(refreshCanvas);
 
         // Put the boundary in the blocks container so it scrolls
@@ -4674,9 +4619,9 @@ function Activity() {
             .setGetStageScale(getStageScale)
             .setTurtles(turtles)
             .setSetPlaybackStatus(setPlaybackStatus)
-            .setErrorMsg(that.errorMsg)
-            .setHomeContainers(that.setHomeContainers, boundary)
-            .setContextMenu(that.piemenuBlockContext);
+            .setErrorMsg(errorMsg)
+            .setHomeContainers(setHomeContainers, boundary)
+            .setContextMenu(piemenuBlockContext);
 
         turtles.setBlocks(blocks);
 
@@ -4687,7 +4632,7 @@ function Activity() {
             .setRefreshCanvas(refreshCanvas)
             .setSize(cellSize)
             .setTrashcan(trashcan)
-            .setSearch(that.showSearchWidget, that.hideSearchWidget)
+            .setSearch(showSearchWidget, hideSearchWidget)
             .setBlocks(blocks)
             .init();
 
@@ -4700,9 +4645,9 @@ function Activity() {
             .setTurtles(turtles)
             .setStage(turtleContainer)
             .setRefreshCanvas(refreshCanvas)
-            .setTextMsg(that.textMsg)
-            .setErrorMsg(that.errorMsg)
-            .setHideMsgs(that.hideMsgs)
+            .setTextMsg(textMsg)
+            .setErrorMsg(errorMsg)
+            .setHideMsgs(hideMsgs)
             .setOnStopTurtle(that.onStopTurtle)
             .setOnRunTurtle(that.onRunTurtle)
             .setGetStageX(getStageX)
@@ -4723,11 +4668,11 @@ function Activity() {
             .setPaste(paste);
 
         languageBox = new LanguageBox();
-        languageBox.setMessage(that.textMsg);
+        languageBox.setMessage(textMsg);
 
         // show help on startup if first time uer
         if (firstTimeUser) {
-            that._showHelp();
+            _showHelp();
         }
 
         playbackOnLoad = function () {
@@ -4752,7 +4697,7 @@ function Activity() {
             this.mainCanvas = null;
 
             this.hideMusicBlocks = function () {
-                that.hideSearchWidget();
+                hideSearchWidget();
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
                     storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
@@ -4924,19 +4869,19 @@ function Activity() {
 
                 this.closePlanet();
                 if (!merge) {
-                    that.sendAllToTrash(false, true);
+                    sendAllToTrash(false, true);
                 }
 
                 if (data == undefined) {
                     console.log('loadRawProject: data is undefined... punting');
-                    that.errorMsg('loadRawProject: project undefined');
+                    errorMsg('loadRawProject: project undefined');
                     return;
                 }
 
                 console.log('loadRawProject ' + data);
                 loading = true;
                 document.body.style.cursor = 'wait';
-                that._allClear();
+                _allClear();
 
                 // First, hide the palettes as they will need updating.
                 for (var name in blocks.palettes.dict) {
@@ -4963,7 +4908,7 @@ function Activity() {
 
                 } catch (e) {
                     console.log('loadRawProject: could not parse project data');
-                    that.errorMsg(e);
+                    errorMsg(e);
                 }
 
                 loading = false;
@@ -5074,7 +5019,7 @@ function Activity() {
             ['logo', logo],
             ['turtles', turtles],
             ['storage', storage],
-            ['printBlockSVG', that._printBlockSVG],
+            ['printBlockSVG', _printBlockSVG],
             ['planet', planet]
         ]);
         save.init();
@@ -5082,23 +5027,23 @@ function Activity() {
         toolbar = new Toolbar();
         toolbar.init(beginnerMode);
 
-        toolbar.renderLogoIcon(that._showAboutPage);
+        toolbar.renderLogoIcon(_showAboutPage);
         toolbar.renderPlayIcon(that._doFastButton);
         toolbar.renderStopIcon(that.doHardStopButton);
-        toolbar.renderNewProjectIcon(that._afterDelete);
-        toolbar.renderLoadIcon(that.doLoad);
+        toolbar.renderNewProjectIcon(_afterDelete);
+        toolbar.renderLoadIcon(doLoad);
         toolbar.renderSaveIcons(save.saveHTML.bind(save), save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveBlockArtwork.bind(save));
-        toolbar.renderPlanetIcon(planet, that._doOpenSamples);
-        toolbar.renderMenuIcon(that._showHideAuxMenu);
-        toolbar.renderHelpIcon(that._showHelp);
-        toolbar.renderModeSelectIcon(that.doSwitchMode);
+        toolbar.renderPlanetIcon(planet, _doOpenSamples);
+        toolbar.renderMenuIcon(_showHideAuxMenu);
+        toolbar.renderHelpIcon(_showHelp);
+        toolbar.renderModeSelectIcon(doSwitchMode);
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
-        toolbar.renderRunStepIcon(that._doStepButton);
-        toolbar.renderAdvancedIcons(that.doAnalytics, that.doOpenPlugin, that.deletePlugin);
+        toolbar.renderRunStepIcon(_doStepButton);
+        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
         // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);  
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
-        toolbar.renderMergeIcon(that.doLoad);
-        toolbar.renderRestoreIcon(that._restoreTrash);
+        toolbar.renderMergeIcon(doLoad);
+        toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
 
         if (planet != undefined) {
@@ -5164,7 +5109,7 @@ function Activity() {
         /*
         saveBox = new SaveBox();
         if (planet) {
-            var planetItem = ['_doSavePlanet', that.doUploadToPlanet];
+            var planetItem = ['_doSavePlanet', doUploadToPlanet];
         } else {
             var planetItem = ['_doSavePlanet', null];
         }
@@ -5176,7 +5121,7 @@ function Activity() {
             ['_doSaveHTML', save.saveHTML.bind(save)],
             ['_doSaveSVG', save.saveSVG.bind(save)],
             ['_doSavePNG', save.savePNG.bind(save)],
-            ['_doSavePlanet', that.doUploadToPlanet],
+            ['_doSavePlanet', doUploadToPlanet],
             ['_doSaveBlockArtwork', save.saveBlockArtwork.bind(save)]
         ]);
 
@@ -5194,7 +5139,7 @@ function Activity() {
         */
 
         var __clearFunction = function () {
-            that.sendAllToTrash(true, false);
+            sendAllToTrash(true, false);
             if (planet !== undefined) {
                 planet.initialiseNewProject.bind(planet);
             }
@@ -5256,7 +5201,7 @@ function Activity() {
                     var rawData = reader.result;
                     if (rawData == null || rawData === '') {
                         console.log('rawData is ' + rawData);
-                        that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        errorMsg(_('Cannot load project from the file. Please check the file type.'));
                     } else {
                         var cleanData = rawData.replace('\n', ' ');
 
@@ -5283,7 +5228,7 @@ function Activity() {
                                 };
 
                                 stage.addEventListener('trashsignal', __listener, false);
-                                that.sendAllToTrash(false, false);
+                                sendAllToTrash(false, false);
                                 if (planet) {
                                     planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
                                 }
@@ -5297,7 +5242,7 @@ function Activity() {
                             loading = false;
                             refreshCanvas();
                         } catch (e) {
-                            that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             console.log(e);
                             document.body.style.cursor = 'default';
                             loading = false;
@@ -5323,7 +5268,7 @@ function Activity() {
                 setTimeout(function () {
                     var rawData = reader.result;
                     if (rawData == null || rawData === '') {
-                        that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        errorMsg(_('Cannot load project from the file. Please check the file type.'));
                     } else {
                         var cleanData = rawData.replace('\n', ' ');
 
@@ -5360,7 +5305,7 @@ function Activity() {
                             };
 
                             stage.addEventListener('trashsignal', __listener, false);
-                            that.sendAllToTrash(false, false);
+                            sendAllToTrash(false, false);
                             if (planet !== undefined) {
                                 planet.initialiseNewProject(files[0].name.substr(0, files[0].name.lastIndexOf('.')));
                             }
@@ -5369,7 +5314,7 @@ function Activity() {
                             refreshCanvas();
                         } catch (e) {
                             console.log(e);
-                            that.errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             document.body.style.cursor = 'default';
                             loading = false;
                         }
@@ -5415,7 +5360,7 @@ function Activity() {
                 document.body.style.cursor = 'wait';
 
                 setTimeout(function () {
-                    obj = processRawPluginData(reader.result, palettes, blocks, that.errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList, palettes.pluginMacros);
+                    obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList, palettes.pluginMacros);
                     // Save plugins to local storage.
                     if (obj != null) {
                         var pluginObj = preparePluginExports(obj);
@@ -5452,8 +5397,8 @@ function Activity() {
         // Enabled mouse over and mouse out events.
         stage.enableMouseOver(10); // default is 20
 
-        cartesianBitmap = that._createGrid('data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CARTESIAN))));
-        polarBitmap = that._createGrid('data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(POLAR))));
+        cartesianBitmap = _createGrid('data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CARTESIAN))));
+        polarBitmap = _createGrid('data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(POLAR))));
 
         var URL = window.location.href;
         var projectID = null;
@@ -5525,7 +5470,7 @@ function Activity() {
                                 var url = args[1];
                                 break;
                             default:
-                                that.errorMsg('Invalid parameters');
+                                errorMsg('Invalid parameters');
                         }
                     }
                 }
@@ -5557,7 +5502,7 @@ function Activity() {
         document.addEventListener('DOMMouseScroll', scrollEvent, false);
 
         document.onkeydown = __keyPressed;
-        that._hideStopButton();
+        _hideStopButton();
     };
 };
 
