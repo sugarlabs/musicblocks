@@ -21,7 +21,7 @@ function RhythmRuler () {
     const BUTTONDIVWIDTH = 535;  // 9 buttons 535 = (55 + 4) * 9
     const OUTERWINDOWWIDTH = 675;
     const INNERWINDOWWIDTH = 600;
-    const ROWHEIGHT = 110;
+    const ROWHEIGHT = 130;
     const RULERHEIGHT = 70;
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
