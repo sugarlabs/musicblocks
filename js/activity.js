@@ -32,7 +32,6 @@ function Activity() {
     _doSlowButton = this._doSlowButton;
     doHardStopButton = this.doHardStopButton;
     _setupBlocksContainerEvents = this._setupBlocksContainerEvents
-    __makeNewNote = this.__makeNewNote;
     getCurrentKeyCode = this.getCurrentKeyCode;
     clearCurrentKeyCode = this.clearCurrentKeyCode;
     _deleteBlocksBox = this._deleteBlocksBox;
@@ -1666,7 +1665,7 @@ function Activity() {
     /**
      * Makes initial "start up" note for a brand new MB project
      */
-    this.__makeNewNote = function (octave, solf) {
+    __makeNewNote = function (octave, solf) {
         var newNote = [
             [0, 'newnote', 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
             [1, 'divide', 0, 0, [0, 2, 3]],
@@ -1839,37 +1838,37 @@ function Activity() {
             switch (event.keyCode) {
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.__makeNewNote(5, 'do');
+                        __makeNewNote(5, 'do');
                     }
                     break;
                 case KEYCODE_R:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.__makeNewNote(5, 're');
+                        __makeNewNote(5, 're');
                     }
                     break;
                 case KEYCODE_M:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.__makeNewNote(5, 'mi');
+                        __makeNewNote(5, 'mi');
                     }
                     break;
                 case KEYCODE_F:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.__makeNewNote(5, 'fa');
+                        __makeNewNote(5, 'fa');
                     }
                     break;
                 case KEYCODE_S:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.__makeNewNote(5, 'sol');
+                        __makeNewNote(5, 'sol');
                     }
                     break;
                 case KEYCODE_L:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.__makeNewNote(5, 'la');
+                        __makeNewNote(5, 'la');
                     }
                     break;
                 case KEYCODE_T:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.__makeNewNote(5, 'ti');
+                        __makeNewNote(5, 'ti');
                     }
                     break;
             }
@@ -1984,37 +1983,37 @@ function Activity() {
                         break;
                     case KEYCODE_D:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.__makeNewNote(4, 'do');
+                            __makeNewNote(4, 'do');
                         }
                         break;
                     case KEYCODE_R:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.__makeNewNote(4, 're');
+                            __makeNewNote(4, 're');
                         }
                         break;
                     case KEYCODE_M:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.__makeNewNote(4, 'mi');
+                            __makeNewNote(4, 'mi');
                         }
                         break;
                     case KEYCODE_F:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.__makeNewNote(4, 'fa');
+                            __makeNewNote(4, 'fa');
                         }
                         break;
                     case KEYCODE_S:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.__makeNewNote(4, 'sol');
+                            __makeNewNote(4, 'sol');
                         }
                         break;
                     case KEYCODE_L:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.__makeNewNote(4, 'la');
+                            __makeNewNote(4, 'la');
                         }
                         break;
                     case KEYCODE_T:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.__makeNewNote(4, 'ti');
+                            __makeNewNote(4, 'ti');
                         }
                         break;
                     default:
