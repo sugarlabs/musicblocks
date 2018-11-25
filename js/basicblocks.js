@@ -4869,7 +4869,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('savelilypond');
     newblock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savelilypond'] = newblock;
-    newblock.staticLabels.push(_('save as lilypond'));
+    newblock.staticLabels.push(_('save as Lilypond'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(_('title') + '.ly');
@@ -4880,7 +4880,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('savesvg');
     newblock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savesvg'] = newblock;
-    newblock.staticLabels.push(_('save svg'));
+    newblock.staticLabels.push(_('save as SVG'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(_('title') + '.svg');

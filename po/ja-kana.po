@@ -516,16 +516,16 @@ msgid "Offline. Sharing is unavailable."
 msgstr ""
 
 #: js/activity.js:4303
-msgid "Save as .svg"
-msgstr ".svgで ほぞん"
+msgid "Save as SVG"
+msgstr "SVGで ほぞん"
 
 #: js/activity.js:4307
-msgid "Save as .png"
-msgstr ".pngで ほぞん"
+msgid "Save as PNG"
+msgstr "PNGで ほぞん"
 
 #: js/activity.js:4312
-msgid "Save as .wav"
-msgstr ".wavで ほぞん"
+msgid "Save as WAV"
+msgstr "WAVで ほぞん"
 
 #: js/activity.js:4316
 #: js/turtledefs.js:184
@@ -535,8 +535,8 @@ msgid "Save sheet music"
 msgstr "がくふ (Lilypondの フォーマット)で ほぞん"
 
 #: js/activity.js:4320
-msgid "Save as .abc"
-msgstr ".abcの フォーマットで ほぞん"
+msgid "Save as ABC"
+msgstr "ABCの フォーマットで ほぞん"
 
 #: js/activity.js:4325
 #: js/toolbar.js:343
@@ -2794,26 +2794,6 @@ msgstr ""
 msgid "Save as HTML"
 msgstr "HTMLをほぞん"
 
-#: js/toolbar.js:338
-#: js/toolbar.js:386
-msgid "Save as svg"
-msgstr ""
-
-#: js/toolbar.js:339
-#: js/toolbar.js:387
-msgid "Save as png"
-msgstr ""
-
-#: js/toolbar.js:340
-#: js/toolbar.js:388
-msgid "Save as wav"
-msgstr ""
-
-#: js/toolbar.js:342
-#: js/toolbar.js:390
-msgid "Save as abc"
-msgstr ""
-
 #: js/toolbar.js:344
 #: js/toolbar.js:392
 msgid "Confirm"
@@ -4751,10 +4731,6 @@ msgstr "せつぞくの ばんごう"
 msgid "make block"
 msgstr "ブロックを つくる"
 
-#: js/basicblocks.js:4861
-msgid "save as ABC"
-msgstr "「ABC」で ほぞん"
-
 #: js/basicblocks.js:4864
 #: js/basicblocks.js:4875
 #: js/basicblocks.js:4886
@@ -4764,10 +4740,6 @@ msgstr "めい"
 #: js/basicblocks.js:4872
 msgid "save as lilypond"
 msgstr "Lilypondの ファイルフォーマットで ほぞん"
-
-#: js/basicblocks.js:4883
-msgid "save svg"
-msgstr "svgで ほぞん"
 
 #: js/basicblocks.js:4893
 msgid "no background"
