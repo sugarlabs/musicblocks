@@ -3443,7 +3443,10 @@ msgstr "拍を～倍にするファクター"
 #.TRANS: number of beats played per minute
 #.TRANS: sets tempo by defniing a beat and beats per minute
 msgid "beats per minute"
-msgstr "BPM（一分当たりの拍数）"
+msgstr "スピードを決める"
+
+msgid "beats per minute2"
+msgstr "１分当たりの拍の数"
 
 #: js/basicblocks.js:1436
 #.TRANS: count of current measure in meter

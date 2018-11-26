@@ -195,6 +195,15 @@ function StatusMatrix() {
             case 'namedbox':
                 var label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].privateData;
                 break;
+            case 'bpm':
+            case 'bpmfactor':
+                var language = localStorage.languagePreference;
+                if (language === 'ja') {
+                    var label = _('beats per minute2');
+                } else {
+                    var label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock.staticLabels[0];
+                }
+                break;
             default:
                 var label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock.staticLabels[0];
                 break;
@@ -263,7 +272,7 @@ function StatusMatrix() {
         statusDiv.style.top = y + 'px';
         statusDiv.style.left = x + 'px';
 
-	this._logo.updatingStatusMatrix = true;
+        this._logo.updatingStatusMatrix = true;
 
         var activeTurtles = 0;
         for (var turtle = 0; turtle < this._logo.turtles.turtleList.length; turtle++) {
@@ -284,7 +293,7 @@ function StatusMatrix() {
                     break;
                 case 'mynotevalue':
                     var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
-		    break;
+                    break;
                 case 'elapsednotes2':
                     var blk = this._logo.statusFields[i][0];
                     var cblk = this._logo.blocks.blockList[blk].connections[1];
@@ -317,10 +326,10 @@ function StatusMatrix() {
                                 value += ' ';
                             }
 
-			    var freq = this._logo.synth.getFrequency(notes[j], this._logo.synth.changeInTemperament);
-			    if (typeof(freq) === 'number') {
-				value += freq.toFixed(2);
-			    }
+                            var freq = this._logo.synth.getFrequency(notes[j], this._logo.synth.changeInTemperament);
+                            if (typeof(freq) === 'number') {
+                                value += freq.toFixed(2);
+                            }
                         }
                     }
                     break;
