@@ -71,7 +71,7 @@ msgstr "スタート"
 
 #: js/block.js:1052
 msgid "matrix"
-msgstr "音高・時刻行列"
+msgstr "フレーズメーカー"
 
 #: js/block.js:1055
 #: js/basicblocks.js:928
@@ -84,9 +84,8 @@ msgid "drum mapper"
 msgstr "ドラム・ピッチ行列"
 
 #: js/block.js:1061
-## ひらがな＝じょうぎ
 msgid "ruler"
-msgstr "ルーラー"
+msgstr "リズムメーカー"
 
 #: js/block.js:1064
 #: js/basicblocks.js:748
