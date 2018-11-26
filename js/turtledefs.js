@@ -126,7 +126,7 @@ function createHelpContent() {
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
-            [_('Palette buttons'), _('This toolbar contains the palette buttons, including Rhythm, Pitch, Tone, Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
+            [_('Palette buttons'), _('This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Play'), _('Click the run button to run the project in fast mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RUNBUTTON)))],
             [_('Stop'), _('Stop the music (and the mice).') + ' ' + _('You can also type Alt-S to stop.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STOPTURTLEBUTTON)))],
             [_('New Project'), _('Initialise a new project.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(NEWBUTTON)))],
@@ -161,7 +161,7 @@ function createHelpContent() {
             //.TRANS: the buttons used to open various palettes of blocks
             [_('Palette buttons'),
              //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
-             _('This toolbar contains the palette buttons, including Rhythm, Pitch, Tone, Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
+             _('This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             // [_('Play music'), _('Click to run the music note by note.') + ' ' + _('Alternatively, you can hit the ENTER or RETURN key.'), 'header-icons/play-button.svg'],
             [_('Run fast'), _('Click the run button to run the project in fast mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RUNBUTTON)))],
             [_('Run slow'), _('Click to run the project in slow mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SLOWBUTTON)))],

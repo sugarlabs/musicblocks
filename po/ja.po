@@ -1364,7 +1364,7 @@ msgstr "パレットボタン"
 #: js/turtledefs.js:129
 #: js/turtledefs.js:164
 #.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
-msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
+msgid "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
 msgstr "ミュージック・ブロックスの左側には、プログラミングに使うさまざまなブロックをグループ分けした「パレットボタン」がある。"
 
 #: js/turtledefs.js:129
