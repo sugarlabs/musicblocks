@@ -4528,7 +4528,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['media'] = newblock;
     if (language === 'ja') {
 	//.TRANS: "video material" is used instead of an image in Japanese
-	newblock.staticLabels.push('video material');
+	newblock.staticLabels.push(_('video material'));
     } else {
 	newblock.image = 'images/load-media.svg'
     }
