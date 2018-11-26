@@ -4598,6 +4598,9 @@ msgstr "大きさ"
 msgid "image"
 msgstr "イメージ"
 
+msgid "video material"
+msgstr "がぞうそざい"
+
 #: js/basicblocks.js:4487
 msgid "obj"
 msgstr "オブジェクト"
