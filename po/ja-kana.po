@@ -1165,6 +1165,12 @@ msgstr "ひひょうじ"
 msgid "show"
 msgstr "ひょうじする"
 
+msgid "show1"
+msgstr "スタンプ"
+
+msgid "show2"
+msgstr "ひょうじする"
+
 #: js/palette.js:1001
 #: js/palette.js:1002
 msgid "popout"
@@ -4136,6 +4142,12 @@ msgstr "「xy」ざひょうの せってい"
 msgid "right"
 msgstr "みぎに まがる"
 
+msgid "right1"
+msgstr "みぎをむく"
+
+msgid "right2"
+msgstr "ざひょうち（みぎ）"
+
 #: js/basicblocks.js:3172
 #: js/basicblocks.js:4311
 #: plugins/rodi.rtp:81
@@ -4144,6 +4156,12 @@ msgstr "みぎに まがる"
 #.TRANS: turn left (counter-clockwise)
 msgid "left"
 msgstr "ひだりに まがる"
+
+msgid "left1"
+msgstr "ひだりをむく"
+
+msgid "left2"
+msgstr "ざひょうち（ひだり）"
 
 #: js/basicblocks.js:3196
 #: plugins/rodi.rtp:73

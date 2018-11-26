@@ -1166,6 +1166,12 @@ msgstr "隠す"
 msgid "show"
 msgstr "表示する"
 
+msgid "show1"
+msgstr "スタンプ"
+
+msgid "show2"
+msgstr "表示する"
+
 #: js/palette.js:1001
 #: js/palette.js:1002
 msgid "popout"
@@ -4133,18 +4139,32 @@ msgstr "xy座標の設定"
 #: plugins/rodi.rtp:79
 #: plugins/rodi.rtp:344
 #: plugins/rodi.rtp:379
+#: msgstr "右に曲がる"
 #.TRANS: turn right (clockwise)
 msgid "right"
-msgstr "右に曲がる"
+msgstr "右を向く"
+
+msgid "right1"
+msgstr "右を向く"
+
+msgid "right2"
+msgstr "ざひょうち（右）"
 
 #: js/basicblocks.js:3172
 #: js/basicblocks.js:4311
 #: plugins/rodi.rtp:81
 #: plugins/rodi.rtp:343
 #: plugins/rodi.rtp:366
+#: msgstr "左に曲がる"
 #.TRANS: turn left (counter-clockwise)
 msgid "left"
-msgstr "左に曲がる"
+msgstr "左を向く"
+
+msgid "left1"
+msgstr "左を向く"
+
+msgid "left2"
+msgstr "ざひょうち（左）"
 
 #: js/basicblocks.js:3196
 #: plugins/rodi.rtp:73
