@@ -90,6 +90,10 @@ function Block(protoblock, blocks, overrideName) {
     // actions to attend to.
     this._check_meter_block = null;
 
+    // Mouse position in events
+    this.original = {'x': 0, 'y': 0};
+    this.offset = {'x': 0, 'y': 0};
+
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this._createCache = function (callback, args, counter) {
@@ -1854,14 +1858,6 @@ function Block(protoblock, blocks, overrideName) {
 
         this._calculateBlockHitArea();
 
-        // Remove any old event handlers that are kicking around.
-        this.container.removeAllEventListeners('mouseover');
-        this.container.removeAllEventListeners('click');
-        this.container.removeAllEventListeners('pressmove');
-        this.container.removeAllEventListeners('mousedown');
-        this.container.removeAllEventListeners('mouseout');
-        this.container.removeAllEventListeners('pressup');
-
         this.container.on('mouseover', function (event) {
             docById('contextWheelDiv').style.display = 'none';
 
@@ -1880,6 +1876,29 @@ function Block(protoblock, blocks, overrideName) {
         var getInput = window.hasMouse;
 
         this.container.on('click', function (event) {
+            // We might be able to check which button was clicked.
+            if ('nativeEvent' in event) {
+                if ('button' in event.nativeEvent && event.nativeEvent.button == 2) {
+                    that.piemenuBlockContext(thisBlock);
+                    return;
+                } else if ('ctrlKey' in event.nativeEvent && event.nativeEvent.ctrlKey) {
+                    that.piemenuBlockContext(thisBlock);
+                    return;
+                } else if ('shiftKey' in event.nativeEvent && event.nativeEvent.shiftKey) {
+                    if (that.blocks.turtles.running()) {
+                        that.blocks.logo.doStopTurtle();
+                        
+                        setTimeout(function () {
+                            that.blocks.logo.runLogoCommands(topBlock);
+                        }, 250);
+                    } else {
+                        that.blocks.logo.runLogoCommands(topBlock);
+                    }
+
+                    return;
+                }
+            }
+
             if (that.blocks.getLongPressStatus()) {
                 return;
             }
@@ -1933,6 +1952,24 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }
+            } else if (!moved) {
+                if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
+                    var topBlock = that.blocks.findTopBlock(thisBlock);
+                    console.log('running from ' + that.blocks.blockList[topBlock].name);
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        that.blocks.logo.synth.resume();
+                    }
+
+                    if (that.blocks.turtles.running()) {
+                        that.blocks.logo.doStopTurtle();
+
+                        setTimeout(function () {
+                            that.blocks.logo.runLogoCommands(topBlock);
+                        }, 250);
+                    } else {
+                        that.blocks.logo.runLogoCommands(topBlock);
+                    }
+                }
             }
         });
 
@@ -1961,110 +1998,84 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             moved = false;
-            var original = {
+            that.original = {
                 x: event.stageX / that.blocks.getStageScale(),
                 y: event.stageY / that.blocks.getStageScale()
             };
 
-            var offset = {
-                x: Math.round(that.container.x - original.x),
-                y: Math.round(that.container.y - original.y)
+            that.offset = {
+                x: Math.round(that.container.x - that.original.x),
+                y: Math.round(that.container.y - that.original.y)
             };
+        });
 
-            that.container.on('mouseout', function (event) {
-                if (!that.blocks.logo.runningLilypond) {
-                    document.body.style.cursor = 'default';
-                }
+        this.container.on('pressmove', function (event) {
+            // FIXME: More voodoo
+            event.nativeEvent.preventDefault();
 
-                if (!that.blocks.getLongPressStatus()) {
-                    that._mouseoutCallback(event, moved, haveClick, false);
-                }
+            // Don't allow silence block to be dragged out of a note.
+            if (that.name === 'rest2') {
+                return;
+            }
 
-                that.blocks.unhighlight(thisBlock, true);
-                that.blocks.activeBlock = null;
+            if (window.hasMouse) {
+                moved = true;
+            } else {
+                // Make it eaiser to select text on mobile.
+                setTimeout(function () {
+                    moved = Math.abs(event.stageX / that.blocks.getStageScale() - that.original.x) + Math.abs(event.stageY / that.blocks.getStageScale() - that.original.y) > 20 && !window.hasMouse;
+                    getInput = !moved;
+                }, 200);
+            }
 
-                moved = false;
-            });
+            var oldX = that.container.x;
+            var oldY = that.container.y;
 
-            that.container.on('pressup', function (event) {
-                if (!that.blocks.getLongPressStatus()) {
-                    that._mouseoutCallback(event, moved, haveClick, true);
-                }
+            var dx = Math.round(event.stageX / that.blocks.getStageScale() + that.offset.x - oldX);
+            var dy = Math.round(event.stageY / that.blocks.getStageScale() + that.offset.y - oldY);
 
-                that.blocks.unhighlight(thisBlock, true);
-                that.blocks.activeBlock = null;
+            var finalPos = oldY + dy;
+            if (that.blocks.stage.y === 0 && finalPos < 45) {
+                dy += 45 - finalPos;
+            }
 
-                moved = false;
-            });
+            if (that.blocks.longPressTimeout != null) {
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
+            }
 
-            that.container.on('pressmove', function (event) {
-                // FIXME: More voodoo
-                event.nativeEvent.preventDefault();
+            if (!moved && that.label != null) {
+                that.label.style.display = 'none';
+            }
 
-                // Don't allow silence block to be dragged out of a note.
-                if (that.name === 'rest2') {
-                    return;
-                }
+            that.blocks.moveBlockRelative(thisBlock, dx, dy);
 
-                if (window.hasMouse) {
-                    moved = true;
-                } else {
-                    // Make it eaiser to select text on mobile.
-                    setTimeout(function () {
-                        moved = Math.abs(event.stageX / that.blocks.getStageScale() - original.x) + Math.abs(event.stageY / that.blocks.getStageScale() - original.y) > 20 && !window.hasMouse;
-                        getInput = !moved;
-                    }, 200);
-                }
+            // If we are over the trash, warn the user.
+            if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(), event.stageY / that.blocks.getStageScale())) {
+                trashcan.startHighlightAnimation();
+            } else {
+                trashcan.stopHighlightAnimation();
+            }
 
-                var oldX = that.container.x;
-                var oldY = that.container.y;
+            if (that.isValueBlock() && that.name !== 'media') {
+                // Ensure text is on top
+                var z = that.container.children.length - 1;
+                that.container.setChildIndex(that.text, z);
+            }
 
-                var dx = Math.round(event.stageX / that.blocks.getStageScale() + offset.x - oldX);
-                var dy = Math.round(event.stageY / that.blocks.getStageScale() + offset.y - oldY);
-
-                var finalPos = oldY + dy;
-                if (that.blocks.stage.y === 0 && finalPos < 45) {
-                    dy += 45 - finalPos;
-                }
-
-                if (that.blocks.longPressTimeout != null) {
-                    clearTimeout(that.blocks.longPressTimeout);
-                    that.blocks.longPressTimeout = null;
-                    that.blocks.clearLongPress();
-                }
-
-                if (!moved && that.label != null) {
-                    that.label.style.display = 'none';
-                }
-
-                that.blocks.moveBlockRelative(thisBlock, dx, dy);
-
-                // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(), event.stageY / that.blocks.getStageScale())) {
-                    trashcan.startHighlightAnimation();
-                } else {
-                    trashcan.stopHighlightAnimation();
-                }
-
-                if (that.isValueBlock() && that.name !== 'media') {
-                    // Ensure text is on top
-                    var z = that.container.children.length - 1;
-                    that.container.setChildIndex(that.text, z);
-                }
-
-                // ...and move any connected blocks.
-                that.blocks.findDragGroup(thisBlock)
-                if (that.blocks.dragGroup.length > 0) {
-                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
-                        var blk = that.blocks.dragGroup[b];
-                        if (b !== 0) {
-                            that.blocks.moveBlockRelative(blk, dx, dy);
-                        }
+            // ...and move any connected blocks.
+            that.blocks.findDragGroup(thisBlock)
+            if (that.blocks.dragGroup.length > 0) {
+                for (var b = 0; b < that.blocks.dragGroup.length; b++) {
+                    var blk = that.blocks.dragGroup[b];
+                    if (b !== 0) {
+                        that.blocks.moveBlockRelative(blk, dx, dy);
                     }
                 }
+            }
 
-                that.blocks.refreshCanvas();
-            });
+            that.blocks.refreshCanvas();
         });
 
         this.container.on('mouseout', function (event) {
@@ -5190,6 +5201,129 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
+    /**
+     * @param activeBlock which block do the menus relate to
+     * @param stageX x coord of stage
+     * @param stageY y coord of stage
+     * 
+     * Sets up context menu for each block
+     */
+    this.piemenuBlockContext = function () {
+        var that = this;
+        var thisBlock = this.blocks.blockList.indexOf(this);
+
+        console.log('Showing context menu for ' + this.name);
+
+        // Position the widget centered over the active block.
+        docById('contextWheelDiv').style.position = 'absolute';
+
+        var x = this.blocks.blockList[thisBlock].container.x;
+        var y = this.blocks.blockList[thisBlock].container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.getStageScale();
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.getStageScale();
+
+        docById('contextWheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
+        docById('contextWheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+
+        docById('contextWheelDiv').style.display = '';
+
+        labels = ['imgsrc:header-icons/copy-button.svg',
+                  'imgsrc:header-icons/paste-disabled-button.svg',
+                  'imgsrc:header-icons/extract-button.svg',
+                  'imgsrc:header-icons/empty-trash-button.svg',
+                  'imgsrc:header-icons/cancel-button.svg'
+                 ];
+
+        var topBlock = this.blocks.findTopBlock(thisBlock);
+        if (this.name === 'action') {
+            labels.push('imgsrc:header-icons/save-blocks-button.svg');
+        }
+
+        if (this.name in BLOCKHELP) {
+            labels.push('imgsrc:header-icons/help-button.svg');
+            var helpButton = labels.length - 1;
+        } else {
+            var helpButton = null;
+        }
+
+        var wheel = new wheelnav('contextWheelDiv', null, 250, 250);
+        wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
+        wheel.slicePathFunction = slicePath().DonutSlice;
+        wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        wheel.slicePathCustom.minRadiusPercent = 0.2;
+        wheel.slicePathCustom.maxRadiusPercent = 0.6;
+        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+        wheel.sliceInitPathCustom = wheel.slicePathCustom;
+        wheel.clickModeRotate = false;
+        wheel.initWheel(labels);
+        wheel.createWheel();
+
+        wheel.navItems[0].setTooltip(_('Copy'));
+        wheel.navItems[1].setTooltip(_('Paste'));
+        wheel.navItems[2].setTooltip(_('Extract'));
+        wheel.navItems[3].setTooltip(_('Move to trash'));
+        wheel.navItems[4].setTooltip(_('Close'));
+        if (this.blocks.blockList[topBlock].name === 'action') {
+            wheel.navItems[5].setTooltip(_('Save stack'));
+        }
+
+        if (helpButton !== null) {
+            wheel.navItems[helpButton].setTooltip(_('Help'));
+        }
+
+        wheel.navItems[0].selected = false;
+
+        wheel.navItems[0].navigateFunction = function () {
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.prepareStackForCopy();
+            wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
+            wheel.navItems[1].refreshNavItem(true);
+            wheel.refreshWheel();
+        };
+
+        wheel.navItems[1].navigateFunction = function () {
+            that.blocks.pasteStack();
+        };
+
+        wheel.navItems[2].navigateFunction = function () {
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.extract();
+            docById('contextWheelDiv').style.display = 'none';
+        };
+
+        wheel.navItems[3].navigateFunction = function () {
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.extract();
+            that.blocks.sendStackToTrash(that.blocks.blockList[thisBlock]);
+            docById('contextWheelDiv').style.display = 'none';
+        };
+
+        wheel.navItems[4].navigateFunction = function () {
+            docById('contextWheelDiv').style.display = 'none';
+        };
+
+        if (this.name === 'action') {
+            wheel.navItems[5].navigateFunction = function () {
+                that.blocks.activeBlock = thisBlock;
+                that.blocks.saveStack();
+            };
+        }
+
+        if (helpButton !== null) {
+            wheel.navItems[helpButton].navigateFunction = function () {
+                that.blocks.activeBlock = thisBlock;
+                var helpWidget = new HelpWidget();
+                helpWidget.init(blocks);
+                docById('contextWheelDiv').style.display = 'none';
+            };
+        }
+
+        setTimeout(function () {
+            console.log('Setting stage click to false.');
+            that.blocks.stageClick = false;
+        }, 500);
+    };
 };
 
 

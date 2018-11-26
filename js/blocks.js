@@ -39,7 +39,6 @@ function Blocks (activity) {
     this.trashcan = null;
     this.updateStage = null;
     this.getStageScale = null;
-    this.contextMenu = null;
     // Did the user right cick?
     this.stageClick = false;
 
@@ -218,12 +217,6 @@ function Blocks (activity) {
     // on blocks.
     this.setLogo = function (logo) {
         this.logo = logo;
-        return this;
-    };
-
-    // We need to access the right-click (and long press) context menu.
-    this.setContextMenu = function (contextMenu) {
-        this.contextMenu = contextMenu;
         return this;
     };
 
@@ -3607,7 +3600,7 @@ function Blocks (activity) {
         }
 
         this.inLongPress = true;
-        this.contextMenu(this.activeBlock);
+        this.blockList[this.activeBlock].piemenuBlockContext();
     };
 
     this.pasteStack = function () {

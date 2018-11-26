@@ -316,43 +316,10 @@ function Activity() {
      */
     this.doContextMenus = function () {
         document.addEventListener("contextmenu", function (event) {
-            stageX = event.x;
-            stageY = event.y;
-
             event.preventDefault();
             event.stopPropagation();
-
-            blocks.stageClick = true;
-
-            if (blocks.activeBlock === null) {
-                console.log('Right-click context menu: Active block is null: looking for a block under the click');
-                // Is there a block we can make active?
-                for (i = 0; i < blocks.blockList.length; i++) {
-                    if (blocks.blockList[i].ignore()) {
-                        continue;
-                    }
-
-                    myBlock = blocks.blockList[i];
-                    if (stageX > myBlock.container.x && stageX < myBlock.container.x + myBlock.width && stageY > myBlock.container.y && stageY < myBlock.container.y + myBlock.hitHeight) {
-                        // FIXME: check Z-order in case there are
-                        // overlapping blocks.
-                        blocks.activeBlock = i;
-                        piemenuBlockContext(i);
-                        console.log('Found a hit.');
-                        break;
-                    }
-                }
-
-                if (i === blocks.blockList.length) {
-                    console.log('No block found.');
-                    docById('contextWheelDiv').style.display = 'none';
-                }
-            } else {
-                // Block context menu
-                piemenuBlockContext(blocks.activeBlock, stageX, stageY);
-            }
         }, false);
-    }
+    };
 
     /**
      * Sets up plugin and palette boiler plate     * 
@@ -1317,8 +1284,6 @@ function Activity() {
             if (stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
                 stageX = event.stageX;
                 stageY = event.stageY;
-                // blocks.stageClick = true;
-                // _piemenuStageContext();
             }
 
         };
@@ -4342,139 +4307,6 @@ function Activity() {
     };
 
     /**
-     * @param activeBlock which block do the menus relate to
-     * @param stageX x coord of stage
-     * @param stageY y coord of stage
-     * 
-     * Sets up context menu for each block
-     */
-    piemenuBlockContext = function (activeBlock, stageX, stageY) {
-        if (activeBlock === null) {
-            console.log('piemenuBlockContext: no active block');
-            return;
-        }
-
-        console.log('Showing context menu for ' + blocks.blockList[activeBlock].name);
-
-        // Position the widget centered over the active block.
-        docById('contextWheelDiv').style.position = 'absolute';
-
-        if (stageX === null || stageY === null) {
-            var x = blocks.blockList[activeBlock].container.x;
-            var y = blocks.blockList[activeBlock].container.y;
-
-            var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.getStageScale();
-            var canvasTop = blocks.canvas.offsetTop + 6 * blocks.getStageScale();
-
-            docById('contextWheelDiv').style.left = Math.round((x + blocks.stage.x) * blocks.getStageScale() + canvasLeft) - 150 + 'px';
-            docById('contextWheelDiv').style.top = Math.round((y + blocks.stage.y) * blocks.getStageScale() + canvasTop) - 150 + 'px';
-
-        } else {
-            docById('contextWheelDiv').style.left = stageX - 175 + 'px';
-            docById('contextWheelDiv').style.top = stageY - 175 + 'px';
-        }
-
-        docById('contextWheelDiv').style.display = '';
-
-        labels = ['imgsrc:header-icons/copy-button.svg',
-            'imgsrc:header-icons/paste-disabled-button.svg',
-            'imgsrc:header-icons/extract-button.svg',
-            'imgsrc:header-icons/empty-trash-button.svg',
-            'imgsrc:header-icons/cancel-button.svg'
-        ];
-
-        var topBlock = blocks.findTopBlock(activeBlock);
-        if (blocks.blockList[topBlock].name === 'action') {
-            labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        }
-
-        var name = blocks.blockList[blocks.activeBlock].name;
-        if (name in BLOCKHELP) {
-            labels.push('imgsrc:header-icons/help-button.svg');
-            var helpButton = labels.length - 1;
-        } else {
-            var helpButton = null;
-        }
-
-        var wheel = new wheelnav('contextWheelDiv', null, 250, 250);
-        wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
-        wheel.slicePathFunction = slicePath().DonutSlice;
-        wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        wheel.slicePathCustom.minRadiusPercent = 0.2;
-        wheel.slicePathCustom.maxRadiusPercent = 0.6;
-        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-        wheel.sliceInitPathCustom = wheel.slicePathCustom;
-        wheel.clickModeRotate = false;
-        wheel.initWheel(labels);
-        wheel.createWheel();
-
-        wheel.navItems[0].setTooltip(_('Copy'));
-        wheel.navItems[1].setTooltip(_('Paste'));
-        wheel.navItems[2].setTooltip(_('Extract'));
-        wheel.navItems[3].setTooltip(_('Move to trash'));
-        wheel.navItems[4].setTooltip(_('Close'));
-        if (blocks.blockList[topBlock].name === 'action') {
-            wheel.navItems[5].setTooltip(_('Save stack'));
-        }
-
-        if (helpButton !== null) {
-            wheel.navItems[helpButton].setTooltip(_('Help'));
-        }
-
-        wheel.navItems[0].selected = false;
-
-        wheel.navItems[0].navigateFunction = function () {
-            blocks.activeBlock = activeBlock;
-            blocks.prepareStackForCopy();
-            wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
-            wheel.navItems[1].refreshNavItem(true);
-            wheel.refreshWheel();
-        };
-
-        wheel.navItems[1].navigateFunction = function () {
-            blocks.pasteStack();
-        };
-
-        wheel.navItems[2].navigateFunction = function () {
-            blocks.activeBlock = activeBlock;
-            blocks.extract();
-            docById('contextWheelDiv').style.display = 'none';
-        };
-
-        wheel.navItems[3].navigateFunction = function () {
-            blocks.activeBlock = activeBlock;
-            blocks.extract();
-            blocks.sendStackToTrash(blocks.blockList[activeBlock]);
-            docById('contextWheelDiv').style.display = 'none';
-        };
-
-        wheel.navItems[4].navigateFunction = function () {
-            docById('contextWheelDiv').style.display = 'none';
-        };
-
-        if (blocks.blockList[activeBlock].name === 'action') {
-            wheel.navItems[5].navigateFunction = function () {
-                blocks.activeBlock = activeBlock;
-                blocks.saveStack();
-            };
-        }
-
-        if (helpButton !== null) {
-            wheel.navItems[helpButton].navigateFunction = function () {
-                blocks.activeBlock = activeBlock;
-                var helpWidget = new HelpWidget();
-                helpWidget.init(blocks);
-                docById('contextWheelDiv').style.display = 'none';
-            };
-        }
-
-        setTimeout(function () {
-            console.log('Setting stage click to false.');
-            blocks.stageClick = false;
-        }, 500);
-    };
-
-    /**
      * Ran once dom is ready and editable
      * Sets up dependencies and vars
      */
@@ -4619,8 +4451,7 @@ function Activity() {
             .setTurtles(turtles)
             .setSetPlaybackStatus(setPlaybackStatus)
             .setErrorMsg(errorMsg)
-            .setHomeContainers(setHomeContainers, boundary)
-            .setContextMenu(piemenuBlockContext);
+            .setHomeContainers(setHomeContainers, boundary);
 
         turtles.setBlocks(blocks);
 
