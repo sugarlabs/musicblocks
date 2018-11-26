@@ -4384,7 +4384,7 @@ msgstr "～へ"
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 msgid "value1"
-msgstr "数値"
+msgstr "すうち"
 
 #: js/basicblocks.js:3813
 #: js/basicblocks.js:5188
