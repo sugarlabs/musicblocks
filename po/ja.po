@@ -1546,8 +1546,17 @@ msgstr "ミュージック・ブロックスガイド"
 
 #: js/turtledefs.js:154
 #: js/turtledefs.js:200
-msgid "Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:"
-msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。ミュージック・ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。ミュージック・ブロックスの最新バージョンは"
+msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。ミュージック・"
+
+msgid "A full list of contributors can be found in the Music Blocks GitHub repository."
+msgstr "ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。ミュージック・"
+
+msgid "Music Blocks is licensed under the AGPL."
+msgstr "ブロックスのプログラムは、だれでも自由にみることができる。ミュージック・"
+
+msgid "The current version is"
+msgstr "ブロックスの最新バージョンは"
 
 #: js/turtledefs.js:154
 #: js/turtledefs.js:200

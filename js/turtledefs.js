@@ -151,7 +151,7 @@ function createHelpContent() {
             [_('Collapse'), _('Collapse the graphics window.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)))],
             [_('Keyboard shortcuts'), _('You can type d to create a do block and r to create a re block etc.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SHORTCUTSBUTTON)))],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:') + ' ' + VERSION, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts.') + ' ' + _('A full list of contributors can be found in the Music Blocks GitHub repository.') + ' ' + _('Music Blocks is licensed under the AGPL.') + ' ' + _('The current version is') + ' ' + VERSION, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))]
         ];
     } else {
@@ -197,7 +197,7 @@ function createHelpContent() {
             [_('Restore'), _('Restore blocks from the trash.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RESTORETRASHBUTTON)))],
             [_('Keyboard shortcuts'), _('You can type d to create a do block and r to create a re block etc.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SHORTCUTSBUTTON)))],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://sugarlabs.github.io/musicblocks/guide', _('Music Blocks Guide')],
-            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:') + ' ' + VERSION, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
+            [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts.') + ' ' + _('A full list of contributors can be found in the Music Blocks GitHub repository.') + ' ' + _('Music Blocks is licensed under the AGPL.') + ' ' + _('The current version is') + ' ' + VERSION, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))]
         ];
     }
