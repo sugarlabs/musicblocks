@@ -4073,6 +4073,15 @@ msgstr "向き（ネズミ）"
 msgid "y"
 msgstr "yざひょう（たて）"
 
+msgid "y1"
+msgstr "yざひょう（たて）"
+
+msgid "y2"
+msgstr "たていどう"
+
+msgid "y3"
+msgstr "yざひょうち"
+
 #: js/basicblocks.js:3033
 #: js/basicblocks.js:3045
 #: js/basicblocks.js:3071
@@ -4085,6 +4094,15 @@ msgstr "yざひょう（たて）"
 #.TRANS: x coordinate
 msgid "x"
 msgstr "xざひょう（よこ）"
+
+msgid "x1"
+msgstr "xざひょう（よこ）"
+
+msgid "x2"
+msgstr "よこいどう"
+
+msgid "x3"
+msgstr "xざひょうち"
 
 #: js/basicblocks.js:3044
 #.TRANS: scroll canvas image by x, y position

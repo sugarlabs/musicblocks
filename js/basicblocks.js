@@ -3029,7 +3029,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['y'] = newblock;
     //.TRANS: y coordinate
-    newblock.staticLabels.push(_('y'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('y3'));
+    } else {
+        newblock.staticLabels.push(_('y'));
+    }
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('y')) {
@@ -3040,7 +3044,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['graphics'];
     blocks.protoBlockDict['x'] = newblock;
     //.TRANS: x coordinate
-    newblock.staticLabels.push(_('x'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('x3'));
+    } else {
+        newblock.staticLabels.push(_('x'));
+    }
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('x')) {
@@ -3052,7 +3060,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['scrollxy'] = newblock;
     //.TRANS: scroll canvas image by x, y position
     newblock.staticLabels.push(_('scroll xy'));
-    newblock.staticLabels.push(_('x'), _('y'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('x2'), _('y2'));
+    } else {
+        newblock.staticLabels.push(_('x'), _('y'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(0);
@@ -3078,7 +3090,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['controlpoint2'] = newblock;
     //.TRANS: control point in a bezier curve
     newblock.staticLabels.push(_('control point 2'))
-    newblock.staticLabels.push(_('x'), _('y'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('x1'), _('y1'));
+    } else {
+        newblock.staticLabels.push(_('x'), _('y'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(100);
@@ -3094,7 +3110,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['controlpoint1'] = newblock;
     //.TRANS: control point in a Bezier curve
     newblock.staticLabels.push(_('control point 1'));
-    newblock.staticLabels.push(_('x'), _('y'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('x1'), _('y1'));
+    } else {
+        newblock.staticLabels.push(_('x'), _('y'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(100);
@@ -3110,7 +3130,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['bezier'] = newblock;
     //.TRANS: Bézier curves employ at least three points to define a curve
     newblock.staticLabels.push(_('bezier'));
-    newblock.staticLabels.push(_('x'), _('y'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('x1'), _('y1'));
+    } else {
+        newblock.staticLabels.push(_('x'), _('y'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(0);
@@ -3153,7 +3177,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['setxy'] = newblock;
     //.TRANS: set xy position
     newblock.staticLabels.push(_('set xy'));
-    newblock.staticLabels.push(_('x'), _('y'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('x1'), _('y1'));
+    } else {
+        newblock.staticLabels.push(_('x'), _('y'));
+    }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.defaults.push(0);
