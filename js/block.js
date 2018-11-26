@@ -261,7 +261,8 @@ function Block(protoblock, blocks, overrideName) {
 
         this.container.updateCache();
     };
-
+    
+    //Checks if it is trash
     this.unhighlight = function () {
         if (this.trash) {
             return;
@@ -344,6 +345,7 @@ function Block(protoblock, blocks, overrideName) {
         // artwork and recalculate the hitarea.
         var that = this;
 
+        //Position media & Sets child index
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
@@ -385,6 +387,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.container !== null) {
             var that = this;
+            //uses function update cache and calculate block hit area
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
@@ -401,7 +404,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-
+//check if collapsible
     this._newArtwork = function (plusMinus) {
         if (this.isCollapsible()) {
             var proto = new ProtoBlock('collapse');
@@ -512,11 +515,11 @@ function Block(protoblock, blocks, overrideName) {
 
         this.generateArtwork(true, []);
     };
-
+//define image and that
     this._addImage = function () {
         var image = new Image();
         var that = this;
-
+//add child,position_media,update cache
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -692,7 +695,7 @@ function Block(protoblock, blocks, overrideName) {
         }
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
-
+//Define 'thisBlock' variable
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -849,11 +852,11 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-
+//generateCollapseArtwork
     this._generateCollapseArtwork = function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-
+//refresh canvas,cleanup after load
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
@@ -867,7 +870,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.expandButtonBitmap.visible = false;
             }
         };
-
+//Process Collapse button
         var __processCollapseButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -890,7 +893,7 @@ function Block(protoblock, blocks, overrideName) {
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
-
+//process expand button
         var __processExpandButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -912,7 +915,7 @@ function Block(protoblock, blocks, overrideName) {
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
-
+//check if collapsed is null and switch the name
         var __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
@@ -992,7 +995,7 @@ function Block(protoblock, blocks, overrideName) {
 
             __processExpandButton(that);
         };
-
+//collapse block bitmap
         var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
@@ -1007,7 +1010,7 @@ function Block(protoblock, blocks, overrideName) {
         var artwork = this.collapseArtwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', '');
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
-
+//Sets test,button bitmap to invisible 
     this.hide = function () {
         this.container.visible = false;
         if (this.isCollapsible()) {
@@ -1162,7 +1165,7 @@ function Block(protoblock, blocks, overrideName) {
             image.src = imagePath;
         }
     };
-
+//Open media
     this._doOpenMedia = function (thisBlock) {
         var fileChooser = docById('myOpenAll');
         var that = this;
@@ -1580,7 +1583,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.blocks.refreshCanvas();
     };
-
+//Position text
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
@@ -1620,7 +1623,7 @@ function Block(protoblock, blocks, overrideName) {
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
-
+//position media
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
@@ -1630,7 +1633,7 @@ function Block(protoblock, blocks, overrideName) {
         bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
         bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
     };
-
+//position collapse label
     this._positionCollapseLabel = function (blockScale) {
         if (this.isInlineCollapsible()) {
             this.collapseText.x = Math.floor(((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale / 2) + 0.5);
@@ -1901,7 +1904,7 @@ function Block(protoblock, blocks, overrideName) {
             moved = false;
         });
     };
-
+//Mouse callback
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         if (!this.blocks.logo.runningLilypond) {
@@ -2111,7 +2114,7 @@ function Block(protoblock, blocks, overrideName) {
         this.container.setChildIndex(this.highlightBitmap, 0);
         this.updateCache();
     };
-
+//changes label
     this._changeLabel = function () {
         var that = this;
         var x = this.container.x;
@@ -2699,7 +2702,7 @@ function Block(protoblock, blocks, overrideName) {
             }, 100);
         }
     };
-
+//check if pie menu is ok to launch
     this.piemenuOKtoLaunch = function () {
         if (this._piemenuExitTime === null) {
             return true;
@@ -3009,7 +3012,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
         };
-
+//pitch preview
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3167,7 +3170,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Set up event handlers
         var that = this;
-
+//Change selectionabd set value to notevalue
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3183,7 +3186,7 @@ function Block(protoblock, blocks, overrideName) {
             var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
             that.blocks.setPitchOctave(that.connections[0], octave);
         };
-
+//Preview pitch
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3292,7 +3295,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-
+//Exit menu function
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -3424,7 +3427,7 @@ function Block(protoblock, blocks, overrideName) {
         this._tabsWheel.createWheel(tabsLabels);
         
         var that = this;
-
+//Selection changed function
         var __selectionChanged = function () {
             that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
             that.value = Number(that.text.text);
@@ -3434,7 +3437,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-
+//Exit menu
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -3480,7 +3483,8 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-
+//if that._noteValueWheel.selectedNavItemIndex === k) 
+         // that._tabsWheel.navItems[n + j].navItem.show();
         var __showHide = function () {
             var i = that._noteValueWheel.selectedNavItemIndex;
             for (var k = 0; k < WHEELVALUES.length; k++) {
@@ -4088,7 +4092,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-
+//Preview voice
         var __voicePreview = function () {
             var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
@@ -4634,7 +4638,7 @@ function Block(protoblock, blocks, overrideName) {
                 }, 1000 / 10); // slight delay between notes
             }
         };
-
+//set mode to MUSICALMODES
         var __prepScale = function () {
             var activeTabs = [0];
             var mode = MUSICALMODES[that.value];
@@ -4966,7 +4970,10 @@ function Block(protoblock, blocks, overrideName) {
 
 };
 
-
+/*
+if (arguments.length === 1) {
+            return element;
+*/
 function $() {
     var elements = new Array();
 
