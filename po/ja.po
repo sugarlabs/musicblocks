@@ -1525,7 +1525,7 @@ msgstr "キーボードのショートカット"
 
 #: js/turtledefs.js:152
 #: js/turtledefs.js:198
-msgid "You can type \"d\" to create a \"do\" block, \"r\" to create a \"re\" block, etc."
+msgid "You can type d to create a do block and r to create a re block etc."
 msgstr "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。<br><br>★ショートカットキー<br>d ……　「ド」（４分音符、４オクターヴ）<br>r ……　「レ」（４分音符、４オクターヴ）<br>m ……　「ミ」（４分音符、４オクターヴ）<br>f ……　「ファ」（４分音符、４オクターヴ）<br>s ……　「ソ」（４分音符、４オクターヴ）<br>l ……　「ラ」（４分音符、４オクターヴ）<br>t ……　「シ」（４分音符、４オクターヴ）<br>"
 
 #: js/turtledefs.js:153
