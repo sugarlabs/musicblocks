@@ -1222,6 +1222,9 @@ msgstr "検索"
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
+msgstr "連符"
+
+msgid "rhythm1"
 msgstr "連符（かけ算）"
 
 #: js/turtledefs.js:25

@@ -1105,7 +1105,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['rhythm'] = newblock;
     //.TRANS: an arrangement of notes based on duration
-    newblock.staticLabels.push(_('rhythm'));
+    if (language === 'ja') {
+	//.TRANS: rhythm block
+	newblock.staticLabels.push(_('rhythm1'));
+    } else {
+	newblock.staticLabels.push(_('rhythm'));
+    }
     newblock.staticLabels.push(_('number of notes'), _('note value'));
     newblock.extraWidth = 10;
     newblock.adjustWidthToLabel();
@@ -1120,7 +1125,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['rhythm2'] = newblock;
     //.TRANS: an arrangement of notes based on duration
-    newblock.staticLabels.push(_('rhythm'));
+    if (language === 'ja') {
+	//.TRANS: rhythm block
+	newblock.staticLabels.push(_('rhythm1'));
+    } else {
+	newblock.staticLabels.push(_('rhythm'));
+    }
     newblock.staticLabels.push(_('number of notes'), _('note value'));
     newblock.extraWidth = 10;
     newblock.adjustWidthToLabel();
@@ -4816,7 +4826,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'textin';
-    newblock.defaults.push(_('Rhythm'));
+    newblock.defaults.push(_('rhythm'));
     if (beginnerMode && !beginnerBlock('openpalette')) {
         newblock.hidden = true;
     }
