@@ -989,7 +989,24 @@ function PopdownPalette(palettes) {
             html += '<div class="palette">';
             var icon = PALETTEICONS[name].replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
             //.TRANS: popout: to detach as a separate window
-            html += format('<h2 data-name="{n}"> \
+	    var language = localStorage.languagePreference;
+	    if (language === 'ja') {
+		//.TRANS: show2 is show as in make visible (the opposite of hide)
+		html += format('<h2 data-name="{n}"> \
+                                {i}<span>{n}</span> \
+                                <img class="hide-button" src="header-icons/hide.svg" \
+                                     alt="{' + _('hide') + '}" \
+                                     title="{' + _('hide') + '}" /> \
+                                <img class="show-button" src="header-icons/show.svg" \
+                                     alt="{' + _('show2') + '}" \
+                                     title="{' + _('show2') + '}" /> \
+                                <img class="popout-button" src="header-icons/popout.svg" \
+                                     alt="{' + _('popout') + '}" \
+                                     title="{' + _('popout') + '}" /> \
+                            </h2>',
+                               {i: icon, n: toTitleCase(_(name))});
+	    } else {
+		html += format('<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
                                      alt="{' + _('hide') + '}" \
@@ -1001,7 +1018,8 @@ function PopdownPalette(palettes) {
                                      alt="{' + _('popout') + '}" \
                                      title="{' + _('popout') + '}" /> \
                             </h2>',
-                           {i: icon, n: toTitleCase(_(name))});
+                               {i: icon, n: toTitleCase(_(name))});
+	    }
             html += '<ul>';
             this.models[name].update();
 
