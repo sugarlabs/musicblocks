@@ -262,7 +262,7 @@ function Block(protoblock, blocks, overrideName) {
         this.container.updateCache();
     };
     
-    //Checks if it is trash
+    //Checks if it is trash?,in collapsed?,bitmap is ready?
     this.unhighlight = function () {
         if (this.trash) {
             return;
@@ -345,7 +345,7 @@ function Block(protoblock, blocks, overrideName) {
         // artwork and recalculate the hitarea.
         var that = this;
 
-        //Position media & Sets child index
+        //if bitmap is not equal to null then Position media & Sets child index
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
@@ -387,7 +387,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.container !== null) {
             var that = this;
-            //uses function update cache and calculate block hit area
+            // function to collapse Button Bitmap and expand button bitmap to scaleX nad scaleY update cache and calculate block hit area
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
@@ -404,7 +404,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-//check if collapsible
+//check if collapsible and if name = interval
     this._newArtwork = function (plusMinus) {
         if (this.isCollapsible()) {
             var proto = new ProtoBlock('collapse');
@@ -414,7 +414,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 proto.extraWidth = 40;
             }
-
+//or switch the name
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
@@ -515,7 +515,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.generateArtwork(true, []);
     };
-//define image and that
+//define image and that variables
     this._addImage = function () {
         var image = new Image();
         var that = this;
@@ -893,7 +893,7 @@ function Block(protoblock, blocks, overrideName) {
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
-//process expand button
+//if line is collapsible then expand button bitmap to 4 protoblock or else expand button bitmap to 10 protoblock
         var __processExpandButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -1010,7 +1010,7 @@ function Block(protoblock, blocks, overrideName) {
         var artwork = this.collapseArtwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', '');
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
-//Sets test,button bitmap to invisible 
+//if it is collapsible, then set visibity to false 
     this.hide = function () {
         this.container.visible = false;
         if (this.isCollapsible()) {
@@ -1165,7 +1165,7 @@ function Block(protoblock, blocks, overrideName) {
             image.src = imagePath;
         }
     };
-//Open media
+
     this._doOpenMedia = function (thisBlock) {
         var fileChooser = docById('myOpenAll');
         var that = this;
@@ -1583,7 +1583,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.blocks.refreshCanvas();
     };
-//Position text
+//customize text
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
@@ -1623,7 +1623,7 @@ function Block(protoblock, blocks, overrideName) {
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
-//position media
+//if width is grater than height, then width * blockscale else height * blockscale
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
@@ -1904,7 +1904,7 @@ function Block(protoblock, blocks, overrideName) {
             moved = false;
         });
     };
-//Mouse callback
+//set cursor style to default
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         if (!this.blocks.logo.runningLilypond) {
@@ -2114,7 +2114,7 @@ function Block(protoblock, blocks, overrideName) {
         this.container.setChildIndex(this.highlightBitmap, 0);
         this.updateCache();
     };
-//changes label
+//customize the label and canvas
     this._changeLabel = function () {
         var that = this;
         var x = this.container.x;
@@ -2702,7 +2702,7 @@ function Block(protoblock, blocks, overrideName) {
             }, 100);
         }
     };
-//check if pie menu is ok to launch
+//if pie menu's exit time is null then return true,set variable d to new date,now to time else return false
     this.piemenuOKtoLaunch = function () {
         if (this._piemenuExitTime === null) {
             return true;
@@ -3170,7 +3170,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Set up event handlers
         var that = this;
-//Change selectionabd set value to notevalue
+//Change selection and set value to notevalue
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3427,7 +3427,7 @@ function Block(protoblock, blocks, overrideName) {
         this._tabsWheel.createWheel(tabsLabels);
         
         var that = this;
-//Selection changed function
+//set value to number of text
         var __selectionChanged = function () {
             that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
             that.value = Number(that.text.text);
@@ -3437,7 +3437,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-//Exit menu
+//remove value wheel,exitwheel and set wheel style to none
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -4638,7 +4638,7 @@ function Block(protoblock, blocks, overrideName) {
                 }, 1000 / 10); // slight delay between notes
             }
         };
-//set mode to MUSICALMODES
+//set mode to MUSICALMODES and active tabs to 0
         var __prepScale = function () {
             var activeTabs = [0];
             var mode = MUSICALMODES[that.value];
@@ -4971,8 +4971,8 @@ function Block(protoblock, blocks, overrideName) {
 };
 
 /*
-if (arguments.length === 1) {
-            return element;
+set elements to a array
+if element is string,then set element's id to element
 */
 function $() {
     var elements = new Array();
