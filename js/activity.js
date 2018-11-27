@@ -2647,6 +2647,7 @@ function Activity() {
             console.log('MERGE LOAD');
             merging = true;
         } else {
+            console.log('LOAD NEW');
             merging = false;
         }
 
@@ -4882,7 +4883,7 @@ function Activity() {
         toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
         // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);  
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
-        toolbar.renderMergeIcon(doLoad);
+        toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
 
