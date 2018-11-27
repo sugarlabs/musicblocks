@@ -3886,18 +3886,17 @@ msgstr "ちょう３ど した"
 
 #: js/basicblocks.js:2440
 #.TRANS: a chord is a group fo three or more notes.
-msgid "chord' + ' ' + 'V"
-msgstr "わおん' + ' ' + 'V"
+msgid "chord"
+msgstr "わおん"
 
-#: js/basicblocks.js:2452
-#.TRANS: a chord is a group fo three or more notes.
-msgid "chord' + ' ' + 'IV"
-msgstr "わおん' + ' ' + 'IV"
+msgid "chord5"
+msgstr "5 どの わおん"
 
-#: js/basicblocks.js:2464
-#.TRANS: a chord is a group fo three or more notes.
-msgid "chord' + ' ' + 'I"
-msgstr "わおん' + ' ' + 'I"
+msgid "chord4"
+msgstr "4 どの わおん"
+
+msgid "chord1"
+msgstr "1 どの わおん"
 
 #: js/basicblocks.js:2599
 #.TRANS: define a custom mode

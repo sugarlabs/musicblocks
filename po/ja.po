@@ -3882,13 +3882,17 @@ msgstr "長３度下"
 
 #: js/basicblocks.js:2440
 #.TRANS: a chord is a group fo three or more notes.
-msgid "chord' + ' ' + 'V"
-msgstr "５度' + ' ' + 'の和音"
+msgid "chord"
+msgstr "の和音"
 
-#: js/basicblocks.js:2452
-#.TRANS: a chord is a group fo three or more notes.
-msgid "chord' + ' ' + 'IV"
-msgstr "４度' + ' ' + 'の和音"
+msgid "chord1"
+msgstr "1度の和音"
+
+msgid "chord4"
+msgstr "4度の和音"
+
+msgid "chord5"
+msgstr "５度の和音"
 
 #: js/basicblocks.js:2464
 #.TRANS: a chord is a group fo three or more notes.

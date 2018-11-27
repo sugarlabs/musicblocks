@@ -2442,7 +2442,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['chordV'] = newblock;
     //.TRANS: a chord is a group fo three or more notes.
-    newblock.staticLabels.push(_('chord' + ' ' + 'V'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('chord5'));
+    } else {
+        newblock.staticLabels.push(_('chord') + ' ' + 'V');
+    }
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('chordV')) {
@@ -2454,7 +2458,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['chordIV'] = newblock;
     //.TRANS: a chord is a group fo three or more notes.
-    newblock.staticLabels.push(_('chord' + ' ' + 'IV'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('chord4'));
+    } else {
+        newblock.staticLabels.push(_('chord') + ' ' + 'IV');
+    }
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('chordIV')) {
@@ -2466,7 +2474,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['chordI'] = newblock;
     //.TRANS: a chord is a group fo three or more notes.
-    newblock.staticLabels.push(_('chord' + ' ' + 'I'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('chord1'));
+    } else {
+        newblock.staticLabels.push(_('chord') + ' ' + 'I');
+    }
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('chordI')) {
