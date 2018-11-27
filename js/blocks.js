@@ -772,7 +772,6 @@ function Blocks (activity) {
 
                 this._moveBlock(cblk, nx, ny);
             } else {
-                console.log('Move the parent block');
                 var dx = cdock[0] - bdock[0];
                 var dy = cdock[1] - bdock[1];
                 var nx = this.blockList[cblk].container.x + dx;
