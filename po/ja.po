@@ -1871,7 +1871,7 @@ msgid "The Crescendo block will increase the volume of the contained notes by a 
 msgstr "<h2>クレシェンドブロック</h2><br>音量をだんだん大きくする。"
 
 #: js/turtledefs.js:240
-msgid "For example, if you have 7 notes in sequence contained in a Crescendo block with a value of 5, the final note will be at 35% more than the starting volume."
+msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
 msgstr "<br>たとえば、７つの音に、すうちが５の「クレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がふえ、さいごの音はさいしょの音よりも３５パーセント音量が大きくなる。<br><br>　"
 
 #: js/turtledefs.js:241
@@ -1879,7 +1879,7 @@ msgid "The Decrescendo block will decrease the volume of the contained notes by 
 msgstr "<h2>デクレシェンドブロック</h2><br>音量をだんだん小さくする。"
 
 #: js/turtledefs.js:241
-msgid "For example, if you have 7 notes in sequence contained in a Decrescendo block with a value of 5, the final note will be at 35% less than the starting volume."
+msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
 msgstr "<br>たとえば、７つの音にすうちが５の「デクレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がへり、さいごの音はさいしょの音よりも３５パーセント音量が小さくなる。"
 
 #: js/turtledefs.js:242
