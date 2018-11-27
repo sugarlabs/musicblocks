@@ -19,11 +19,13 @@ function Toolbar() {
     this.renderLogoIcon = function (onclick) {
         var logoIcon = document.getElementById('mb-logo');
         logoIcon.onmouseenter = function () {
-            document.body.style.cursor = "pointer";
+            document.body.style.cursor = 'pointer';
         };
+
         logoIcon.onmouseleave = function () {
-            document.body.style.cursor = "default";
+            document.body.style.cursor = 'default';
         };
+
         logoIcon.onclick = function () {
             onclick();
         };
@@ -32,15 +34,16 @@ function Toolbar() {
     this.renderPlayIcon = function (onclick) {
         var playIcon = document.getElementById('play');
         var stopIcon = document.getElementById('stop');
+
         playIcon.onclick = function () {
             onclick();
             stopIcon.style.color = stopIconColorWhenPlaying;
         };
-
     };
 
     this.renderStopIcon = function (onclick) {
         var stopIcon = document.getElementById('stop');
+
         stopIcon.onclick = function () {
             onclick();
             stopIcon.style.color = 'white';
@@ -49,6 +52,7 @@ function Toolbar() {
 
     this.renderNewProjectIcon = function (onclick) {
         var newProjectIcon = document.getElementById('new-project');
+
         newProjectIcon.onclick = function () {
             onclick();
         };
@@ -56,6 +60,7 @@ function Toolbar() {
 
     this.renderLoadIcon = function (onclick) {
         var loadIcon = document.getElementById('load');
+
         loadIcon.onclick = function () {
             onclick();
         };
@@ -67,45 +72,52 @@ function Toolbar() {
         if (beginnerMode) {
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.style.display = 'none';
+
             saveButton.onclick = function () {
                 html_onclick();
-            }
+            };
         } else {
             saveButton.style.display = 'none';
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = function () {
-
                 var saveHTML = document.getElementById('save-html');
+
                 saveHTML.onclick = function () {
                     html_onclick();
                 };
 
                 var saveSVG = document.getElementById('save-svg');
+
                 saveSVG.onclick = function () {
                     svg_onclick();
                 };
 
                 var savePNG = document.getElementById('save-png');
+
                 savePNG.onclick = function () {
                     png_onclick();
                 };
 
                 var saveWAV = document.getElementById('save-wav');
+
                 saveWAV.onclick = function () {
                     wave_onclick();
                 };
 
                 var saveLY = document.getElementById('save-ly');
+
                 saveLY.onclick = function () {
                     ly_onclick();
                 };
 
                 var saveABC = document.getElementById('save-abc');
+
                 saveABC.onclick = function () {
                     abc_onclick();
                 };
 
                 var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
+
                 saveArtworkSVG.onclick = function () {
                     blockartworksvg_onclick();
                 };
@@ -119,7 +131,7 @@ function Toolbar() {
 
         if (planet) {
             planetIcon.onclick = function () {
-                document.getElementById('toolbars').style.display = "none";
+                document.getElementById('toolbars').style.display = 'none';
                 onclick();
             };
         } else {
@@ -148,6 +160,7 @@ function Toolbar() {
 
     this.renderHelpIcon = function (onclick) {
         var helpIcon = document.getElementById('helpIcon');
+
         helpIcon.onclick = function () {
             onclick();
         };
@@ -173,6 +186,7 @@ function Toolbar() {
             runSlowlyIcon.style.display = 'none';
 
         }
+
         runSlowlyIcon.onclick = function () {
             onclick();
             document.getElementById('stop').style.color = stopIconColorWhenPlaying;
@@ -185,6 +199,7 @@ function Toolbar() {
         if (beginnerMode && language === 'ja') {
             runStepByStepIcon.style.display = 'none';
         }
+
         runStepByStepIcon.onclick = function () {
             onclick();
             document.getElementById('stop').style.color = stopIconColorWhenPlaying;
@@ -210,10 +225,10 @@ function Toolbar() {
                 delPlugin_onclick();
             };
         } else {
-            displayStatsIcon.style.display = "none";
-            loadPluginIcon.style.display = "none";
-            delPluginIcon.style.display = "none";
-            enableHorizScrollIcon.style.display = "none";
+            displayStatsIcon.style.display = 'none';
+            loadPluginIcon.style.display = 'none';
+            delPluginIcon.style.display = 'none';
+            enableHorizScrollIcon.style.display = 'none';
         }
     };
 
@@ -229,6 +244,7 @@ function Toolbar() {
 
     this.renderMergeIcon = function (onclick) {
         var mergeWithCurrentIcon = document.getElementById('mergeWithCurrentIcon');
+
         mergeWithCurrentIcon.onclick = function () {
             onclick();
         };
@@ -236,6 +252,7 @@ function Toolbar() {
 
     this.renderRestoreIcon = function (onclick) {
         var restoreIcon = document.getElementById('restoreIcon');
+
         restoreIcon.onclick = function () {
             onclick();
         };
@@ -245,66 +262,79 @@ function Toolbar() {
         var languageSelectIcon = document.getElementById('languageSelectIcon');
         languageSelectIcon.onclick = function () {
             var enUS = document.getElementById('enUS');
+
             enUS.onclick = function () {
                 languageBox.enUS_onclick();
             };
 
             var enUK = document.getElementById('enUK');
+
             enUK.onclick = function () {
                 languageBox.enUK_onclick();
             };
 
             var es = document.getElementById('es');
+
             es.onclick = function () {
                 languageBox.es_onclick();
             };
 
             var ja = document.getElementById('ja');
+
             ja.onclick = function () {
                 languageBox.ja_onclick();
             };
 
             var kana = document.getElementById('kana');
+
             kana.onclick = function () {
                 languageBox.kana_onclick();
             };
 
             var zhCN = document.getElementById('zhCN');
+
             zhCN.onclick = function () {
                 languageBox.zhCN_onclick();
             };
 
             var th = document.getElementById('th');
+
             th.onclick = function () {
                 languageBox.th_onclick();
             };
 
             var ayc = document.getElementById('ayc');
+
             ayc.onclick = function () {
                 languageBox.ayc_onclick();
             };
 
             var gug = document.getElementById('gug');
+
             gug.onclick = function () {
                 languageBox.gug_onclick();
             };
 
             var hi = document.getElementById('hi');
+
             hi.onclick = function () {
                 languageBox.hi_onclick();
             };
 
             var ibo = document.getElementById('ibo');
+
             ibo.onclick = function () {
                 languageBox.ibo_onclick();
             };
 
             var ar = document.getElementById('ar');
+
             ar.onclick = function () {
                 languageBox.ar_onclick();
             };
 
             var he = document.getElementById('he');
+
             he.onclick = function () {
                 languageBox.he_onclick();
             };
@@ -312,97 +342,97 @@ function Toolbar() {
     };
 
     var strings = [
-        ["mb-logo", _("About Music Blocks")],
-        ["play", _("Play")],
-        ["stop", _("Stop")],
-        ["newFile", _("New project")],
-        ["load", _("Load project from file")],
-        ["saveButton", _("Save project")],
-        ["saveButtonAdvanced", _("Save project")],
-        ["planetIcon", _("Find and share projects")],
-        ["planetIconDisabled", _("Offline. Sharing is unavailable")],
-        ["toggleAuxBtn", _("Auxilary menu")],
-        ["helpIcon", _("Help")],
-        ["runSlowlyIcon", _("Run slowly")],
-        ["runStepByStepIcon", _("Run step by step")],
-        ["displayStatsIcon", _("Display statistics")],
-        ["loadPluginIcon", _("Load plugin")],
-        ["delPluginIcon", _("Delete plugin")],
-        ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
-        ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-        ["mergeWithCurrentIcon", _("Merge with current project")],
-        ["restoreIcon", _("Restore")],
-        ["beginnerMode", _("Switch to beginner mode")],
-        ["advancedMode", _("Switch to advanced mode")],
-        ["languageSelectIcon", _("Select language")],
-        ["save-html", _("Save as HTML"), 'innerHTML'],
-        ["save-svg", _("Save as SVG"), 'innerHTML'],
-        ["save-png", _("Save as PNG"), 'innerHTML'],
-        ["save-wav", _("Save as WAV"), 'innerHTML'],
-        ["save-abc", _("Save as ABC"), 'innerHTML'],
-        ["save-ly", _("Save sheet music"), 'innerHTML'],
-        ["save-blockartwork-svg", _("Save block artwork"), 'innerHTML'],
-        ["new-project", _("Confirm"), 'innerHTML'],
-        ["enUS", _("English (United States)"), 'innerHTML'],
-        ["enUK", _("English (United Kingdom)"), 'innerHTML'],
-        ["ja", _("日本語"), 'innerHTML'],
-        ["es", _("español"), 'innerHTML'],
-        ["kana", _("にほんご"), 'innerHTML'],
-        ["zhCN", _("中文"), 'innerHTML'],
-        ["th", _("ภาษาไทย"), 'innerHTML'],
-        ["ayc", _("aymara"), 'innerHTML'],
-        ["gug", _("guarani"), 'innerHTML'],
-        ["hi", _("हिंदी"), 'innerHTML'],
-        ["ibo", _("igbo"), 'innerHTML'],
-        ["ar", _("عربى"), 'innerHTML'],
-        ["he", _("עִברִית"), 'innerHTML'],
+        ['mb-logo', _('About Music Blocks')],
+        ['play', _('Play')],
+        ['stop', _('Stop')],
+        ['newFile', _('New project')],
+        ['load', _('Load project from file')],
+        ['saveButton', _('Save project')],
+        ['saveButtonAdvanced', _('Save project')],
+        ['planetIcon', _('Find and share projects')],
+        ['planetIconDisabled', _('Offline. Sharing is unavailable')],
+        ['toggleAuxBtn', _('Auxilary menu')],
+        ['helpIcon', _('Help')],
+        ['runSlowlyIcon', _('Run slowly')],
+        ['runStepByStepIcon', _('Run step by step')],
+        ['displayStatsIcon', _('Display statistics')],
+        ['loadPluginIcon', _('Load plugin')],
+        ['delPluginIcon', _('Delete plugin')],
+        ['enableHorizScrollIcon', _('Enable horizontal scrolling')],
+        ['disableHorizScrollIcon', _('Disable horizontal scrolling')],
+        ['mergeWithCurrentIcon', _('Merge with current project')],
+        ['restoreIcon', _('Restore')],
+        ['beginnerMode', _('Switch to beginner mode')],
+        ['advancedMode', _('Switch to advanced mode')],
+        ['languageSelectIcon', _('Select language')],
+        ['save-html', _('Save as HTML'), 'innerHTML'],
+        ['save-svg', _('Save as SVG'), 'innerHTML'],
+        ['save-png', _('Save as PNG'), 'innerHTML'],
+        ['save-wav', _('Save as WAV'), 'innerHTML'],
+        ['save-abc', _('Save as ABC'), 'innerHTML'],
+        ['save-ly', _('Save sheet music'), 'innerHTML'],
+        ['save-blockartwork-svg', _('Save block artwork'), 'innerHTML'],
+        ['new-project', _('Confirm'), 'innerHTML'],
+        ['enUS', _('English (United States)'), 'innerHTML'],
+        ['enUK', _('English (United Kingdom)'), 'innerHTML'],
+        ['ja', _('日本語'), 'innerHTML'],
+        ['es', _('español'), 'innerHTML'],
+        ['kana', _('にほんご'), 'innerHTML'],
+        ['zhCN', _('中文'), 'innerHTML'],
+        ['th', _('ภาษาไทย'), 'innerHTML'],
+        ['ayc', _('aymara'), 'innerHTML'],
+        ['gug', _('guarani'), 'innerHTML'],
+        ['hi', _('हिंदी'), 'innerHTML'],
+        ['ibo', _('igbo'), 'innerHTML'],
+        ['ar', _('عربى'), 'innerHTML'],
+        ['he', _('עִברִית'), 'innerHTML'],
     ];
 
     // Workaround for FF
     var strings_ = [
-        _("About Music Blocks"),
-        _("Play"),
-        _("Stop"),
-        _("New project"),
-        _("Load project from file"),
-        _("Save project"),
-        _("Save project"),
-        _("Find and share projects"),
-        _("Offline. Sharing is unavailable"),
-        _("Auxilary menu"),
-        _("Help"),
-        _("Run slowly"),
-        _("Run step by step"),
-        _("Display statistics"),
-        _("Load plugin"),
-        _("Delete plugin"),
-        _("Enable horizontal scrolling"),
-        _("Disable horizontal scrolling"),
-        _("Merge with current project"),
-        _("Restore"),
-        _("Switch to beginner mode"),
-        _("Switch to advanced mode"),
-        _("Select language"),
-        _("Save as HTML"),
-        _("Save as SVG"),
-        _("Save as PNG"),
-        _("Save as WAV"),
-        _("Save as ABC"),
-        _("Save sheet music"),
-        _("Save block artwork"),
-        _("Confirm"),
-        _("Select language"),
+        _('About Music Blocks'),
+        _('Play'),
+        _('Stop'),
+        _('New project'),
+        _('Load project from file'),
+        _('Save project'),
+        _('Save project'),
+        _('Find and share projects'),
+        _('Offline. Sharing is unavailable'),
+        _('Auxilary menu'),
+        _('Help'),
+        _('Run slowly'),
+        _('Run step by step'),
+        _('Display statistics'),
+        _('Load plugin'),
+        _('Delete plugin'),
+        _('Enable horizontal scrolling'),
+        _('Disable horizontal scrolling'),
+        _('Merge with current project'),
+        _('Restore'),
+        _('Switch to beginner mode'),
+        _('Switch to advanced mode'),
+        _('Select language'),
+        _('Save as HTML'),
+        _('Save as SVG'),
+        _('Save as PNG'),
+        _('Save as WAV'),
+        _('Save as ABC'),
+        _('Save sheet music'),
+        _('Save block artwork'),
+        _('Confirm'),
+        _('Select language'),
     ];
 
     this.init = function (mode) {
         var beginnerMode = document.getElementById('beginnerMode');
         var advancedMode = document.getElementById('advancedMode');
         if (mode || mode === 'null') {
-            advancedMode.style.display = "block";
-            beginnerMode.style.display = "none";
+            advancedMode.style.display = 'block';
+            beginnerMode.style.display = 'none';
         } else {
-            advancedMode.style.display = "none";
-            beginnerMode.style.display = "display";
+            advancedMode.style.display = 'none';
+            beginnerMode.style.display = 'display';
         }
 
         for (var i = 0; i < strings.length; i++) {
@@ -412,7 +442,7 @@ function Toolbar() {
             if (strings[i].length === 3) {
                 elem.innerHTML = obj[1];
             } else {
-                elem.setAttribute("data-tooltip", trans);
+                elem.setAttribute('data-tooltip', trans);
             }
         }
 
@@ -431,7 +461,7 @@ function Toolbar() {
     };
 
     this.disableTooltips = function (jquery) {
-        jquery(".tooltipped").tooltip('remove');
+        jquery('.tooltipped').tooltip('remove');
         tooltipsDisabled = true;
     }
 };
