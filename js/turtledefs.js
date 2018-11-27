@@ -239,7 +239,7 @@ function createHelpContent() {
         // Volume palette
         'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg'],
         'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg'],
-        'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('e.g., guitar, violin, snare drum, etc.') + ' ' + _('The default volume is 50; the range is 0 (silence) to 100 (full volume).'), 'documentation', 'set-synth-volume-block.svg'],
+        'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('e.g., guitar, violin, snare drum, etc.') + ' ' + _('The default volume is 50.') + ' ' + _('The range is 0 for silence to 100 for full volume.'), 'documentation', 'set-synth-volume-block.svg'],
         'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'set-master-volume-block.svg'],
         // Drum palette
         // 'playdrum' is described on the Rhythm palette.
@@ -256,9 +256,9 @@ function createHelpContent() {
         'modewidget': [_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', 'custom-mode-block.svg'],
         // Flow palette
         'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
-        'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example, a simple drum machine, a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
-        'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example, if the mouse button is pressed, a snare drum will play.') + ' ' + _('Otherwise (else) a kick drum will play.'), 'documentation', 'if-conditional-block.svg'],
-        'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example, if the mouse button is pressed, a snare drum will play.') + ' ' + _('Otherwise (else) a kick drum will play.'), 'documentation', 'elif-conditional-block.svg'],
+        'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
+        'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.') + ' ' + _('Else a kick drum will play.'), 'documentation', 'if-conditional-block.svg'],
+        'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.') + ' ' + _('Else a kick drum will play.'), 'documentation', 'elif-conditional-block.svg'],
         'backward': [_('The Backward block runs code in reverse order (Musical retrograde).'), 'documentation', 'box-1-block.svg'],
         // Action palette
         'action': [_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', 'action-block.svg'],
