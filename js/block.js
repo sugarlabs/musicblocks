@@ -345,7 +345,8 @@ function Block(protoblock, blocks, overrideName) {
         // artwork and recalculate the hitarea.
         var that = this;
 
-        //if bitmap is not equal to null then Position media & Sets child index
+        //if bitmap is not equal to null then Position media & Sets child
+        //@param-that = this = resize function
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
@@ -388,6 +389,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.container !== null) {
             var that = this;
             // function to collapse Button Bitmap and expand button bitmap to scaleX nad scaleY update cache and calculate block hit area
+            //@param-that = this = container
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
@@ -853,7 +855,8 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 //generateCollapseArtwork
-    this._generateCollapseArtwork = function (postProcess) {
+    //param postProcess = null
+    this._generateCollatpseArt work = function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 //refresh canvas,cleanup after load
@@ -871,6 +874,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 //Process Collapse button
+        //@param - that = generateCollapseArt
         var __processCollapseButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -878,7 +882,6 @@ function Block(protoblock, blocks, overrideName) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = that.protoblock.scale / 3;
 
                 that.container.addChild(that.collapseButtonBitmap);
-
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
                     that.collapseButtonBitmap.y = 4 * that.protoblock.scale;
@@ -894,6 +897,7 @@ function Block(protoblock, blocks, overrideName) {
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
 //if line is collapsible then expand button bitmap to 4 protoblock or else expand button bitmap to 10 protoblock
+         //@param - that = generateCollapseArt
         var __processExpandButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -916,6 +920,7 @@ function Block(protoblock, blocks, overrideName) {
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 //check if collapsed is null and switch the name
+        
         var __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
@@ -995,7 +1000,8 @@ function Block(protoblock, blocks, overrideName) {
 
             __processExpandButton(that);
         };
-//collapse block bitmap
+//collapse block bitmap 
+        //@param - bitmap - null
         var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
@@ -1584,6 +1590,7 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     };
 //customize text
+    
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
@@ -1623,6 +1630,10 @@ function Block(protoblock, blocks, overrideName) {
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
+    //@param-bitmap - image
+    //@param-width-width of canvas
+    //@param-height-height of canvas
+    //@param-blockscale-scale
 //if width is grater than height, then width * blockscale else height * blockscale
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
@@ -1904,6 +1915,10 @@ function Block(protoblock, blocks, overrideName) {
             moved = false;
         });
     };
+    //@param-event- mouse
+    //@param-moved-cursor moved
+    //@param-haveClick-when clickd
+    //@param-hideDOM-hide mouse
 //set cursor style to default
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
