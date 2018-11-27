@@ -1291,7 +1291,12 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('note4');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note4'] = newblock;
-    newblock.staticLabels.push(_('note value') + ' ' + _('drum'));
+    if (language === 'ja') {
+	//.TRANS: Japanese only: note value block for drum
+        newblock.staticLabels.push(_('note value drum'));
+    } else {
+        newblock.staticLabels.push(_('note value') + ' ' + _('drum'));
+    }
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('note4')) {

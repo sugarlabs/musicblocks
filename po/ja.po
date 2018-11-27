@@ -212,6 +212,9 @@ msgstr "リズムメーカー"
 msgid "note value"
 msgstr "音の長さ"
 
+msgid "note value drum"
+msgstr "音符（ドラム）"
+
 #: js/block.js:1095
 #: js/block.js:1558
 #: js/block.js:1580

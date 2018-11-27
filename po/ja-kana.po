@@ -214,6 +214,9 @@ msgstr "リズム ルーラー"
 msgid "note value"
 msgstr "おんか"
 
+msgid "note value drum"
+msgstr "おんぷ（ドラム）"
+
 #: js/block.js:1095
 #: js/block.js:1558
 #: js/block.js:1580
