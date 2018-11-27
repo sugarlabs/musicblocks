@@ -1213,18 +1213,18 @@ function Activity() {
         if (cartesianBitmap.visible && polarBitmap.visible) {
             _hideCartesian();
             //.TRANS: hide Polar coordinate overlay grid
-            turtles.setGridLabel(_('Hide grid'));
+            turtles.setGridLabel(_('hide Polar'));
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
             //.TRANS: show Cartesian coordinate overlay grid
-            turtles.setGridLabel(_('Cartesian'));
+            turtles.setGridLabel(_('show Cartesian'));
         } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
             _showCartesian();
-            turtles.setGridLabel(_('Cartesian') + ' + ' + _('Polar'));
+            turtles.setGridLabel(_('show Polar'));
         } else if (cartesianBitmap.visible && !polarBitmap.visible) {
             _showPolar();
             //.TRANS: show Polar coordinate overlay grid
-            turtles.setGridLabel(_('Polar'));
+            turtles.setGridLabel(_('hide Cartersian'));
         }
 
         update = true;
