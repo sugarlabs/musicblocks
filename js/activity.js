@@ -3869,7 +3869,7 @@ function Activity() {
     };
 
     /**
-     * REDUNDANT: Makes toolbar buttons 
+     * Makes non-toolbar buttons 
      */
     _makeButton = function (name, label, x, y, size, rotation, parent) {
         var container = new createjs.Container();
@@ -3887,12 +3887,20 @@ function Activity() {
         if (container.x < 55) {
             text.textAlign = 'left';
             text.x = -14;
+        } else if (container.x > 255) {
+            text.textAlign = 'right';
+            text.x = 14;
         } else {
             text.textAlign = 'center';
             text.x = 0;
         }
 
-        text.y = 30;
+        if (y > 255) {
+            text.y = -60;
+        } else {
+            text.y = 30;
+        }
+
         text.visible = false;
 
         var circles;
@@ -3907,8 +3915,10 @@ function Activity() {
                         var bg = new createjs.Shape();
                         if (container.children[c].textAlign === 'center') {
                             bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 8, container.children[c].y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-                        } else {
+                        } else if (container.children[c].textAlign === 'left') {
                             bg.graphics.beginFill('#FFF').drawRoundRect(b.x - 22, container.children[c].y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                        } else {
+                            bg.graphics.beginFill('#FFF').drawRoundRect(b.x + 8, container.children[c].y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
                         }
                         container.addChildAt(bg, 0);
                     }
