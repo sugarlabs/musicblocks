@@ -501,4 +501,14 @@ function createHelpContent() {
         'startturtle': [_('The Start mouse block starts the specified mouse.'), 'documentation', 'status.svg'],
         'stopturtle': [_('The Stop mouse block stops the specified mouse.'), 'documentation', 'status.svg'],
     }
+
+    var language = localStorage.languagePreference;
+    if (beginnerMode && language === 'ja') {
+	BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'];
+	BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', 'set-key-block.svg'];
+	BLOCKHELP['settimbre'] = [_('The Set timbre block selects a voice for the synthesizer,'), 'documentation', 'start-block.svg'];
+	BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', 'box-2-block.svg'];
+	BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', 'broadcast-block.svg'];
+	BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', 'rhythm-ruler-block.svg'];
+    }
 };
