@@ -262,7 +262,7 @@ function Block(protoblock, blocks, overrideName) {
         this.container.updateCache();
     };
     
-    //Checks if it is trash?,in collapsed?,bitmap is ready?
+    //Checks if bitmap is al to null
     this.unhighlight = function () {
         if (this.trash) {
             return;
@@ -519,11 +519,11 @@ function Block(protoblock, blocks, overrideName) {
 
         this.generateArtwork(true, []);
     };
-//define image and that variables
+// define a new image
     this._addImage = function () {
         var image = new Image();
         var that = this;
-//add child,position_media,update cache
+//position_media & update cache
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -699,7 +699,7 @@ function Block(protoblock, blocks, overrideName) {
         }
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
-//Define 'thisBlock' variable
+//Define a variable to blocklist
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -861,7 +861,7 @@ function Block(protoblock, blocks, overrideName) {
     this._generateCollatpseArt work = function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-//refresh canvas and clean canvas after loading
+//refresh and clean canvas after loading
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
@@ -875,8 +875,8 @@ function Block(protoblock, blocks, overrideName) {
                 that.expandButtonBitmap.visible = false;
             }
         };
-//Process Collapse button
-        //@param - that = generateCollapseArt
+/*create a new bitmap image
+       @param - that = generateCollapseArt*/
         var __processCollapseButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -1647,7 +1647,7 @@ Set bitmap's x and y position equal */
         bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
         bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
     };
-//position collapse label
+//position label
     this._positionCollapseLabel = function (blockScale) {
         if (this.isInlineCollapsible()) {
             this.collapseText.x = Math.floor(((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale / 2) + 0.5);
@@ -2720,7 +2720,7 @@ set cursor style to default*/
             }, 100);
         }
     };
-//if pie menu's exit time is null then return true,set variable d to new date,now to time else return false
+//Cjeck if pie menu is ok to launch
     this.piemenuOKtoLaunch = function () {
         if (this._piemenuExitTime === null) {
             return true;
@@ -3313,7 +3313,7 @@ set cursor style to default*/
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-//Exit menu function
+//Exit menu
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -3455,7 +3455,7 @@ set cursor style to default*/
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-//remove value wheel,exitwheel and set wheel style to none
+//set pie menu's exit time to current time
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -3501,8 +3501,7 @@ set cursor style to default*/
         }
 
         this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-//if that._noteValueWheel.selectedNavItemIndex === k) 
-         // that._tabsWheel.navItems[n + j].navItem.show();
+
         var __showHide = function () {
             var i = that._noteValueWheel.selectedNavItemIndex;
             for (var k = 0; k < WHEELVALUES.length; k++) {
