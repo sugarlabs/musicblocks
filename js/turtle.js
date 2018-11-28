@@ -1894,7 +1894,7 @@ function Turtles () {
                 that.doGrid();
             });
 
-            that._gridLabel = new createjs.Text(_('Cartesian'), '14px Sans', '#282828');
+            that._gridLabel = new createjs.Text(_('show Cartesian'), '14px Sans', '#282828');
             that._gridLabel.textAlign = 'center';
             that._gridLabel.x = 27.5;
             that._gridLabel.y = 55;

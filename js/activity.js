@@ -1201,7 +1201,7 @@ function Activity() {
      * Hides all grids (Cartesian/polar)
      */
     hideGrids = function () {
-        turtles.setGridLabel(_('Cartesian'));
+        turtles.setGridLabel(_('show Cartesian'));
         _hideCartesian();
         _hidePolar();
     };
