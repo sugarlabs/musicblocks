@@ -262,7 +262,10 @@ function Block(protoblock, blocks, overrideName) {
         this.container.updateCache();
     };
     
-    //Checks if bitmap is al to null
+    /*
+    remove highlight from block
+    return{void}
+    */
     this.unhighlight = function () {
         if (this.trash) {
             return;
@@ -519,7 +522,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.generateArtwork(true, []);
     };
-// define a new image
+// Add a new image
     this._addImage = function () {
         var image = new Image();
         var that = this;
@@ -699,7 +702,7 @@ function Block(protoblock, blocks, overrideName) {
         }
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
-//Define a variable to blocklist
+//after the image loading
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -856,9 +859,9 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-/* set a variable to blocklist
+/* Generate the collapsed art
     param postProcess = null*/
-    this._generateCollatpseArt work = function (postProcess) {
+    this._generateCollatpseArt= function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 //refresh and clean canvas after loading
@@ -1637,7 +1640,7 @@ function Block(protoblock, blocks, overrideName) {
     @param-width-width of canvas
     @param-height-height of canvas
     @param-blockscale-scale
-Set bitmap's x and y position equal */
+Position inserted media */
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
@@ -2720,7 +2723,7 @@ set cursor style to default*/
             }, 100);
         }
     };
-//Cjeck if pie menu is ok to launch
+//Check if pie menu is ok to launch
     this.piemenuOKtoLaunch = function () {
         if (this._piemenuExitTime === null) {
             return true;
