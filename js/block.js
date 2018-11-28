@@ -421,7 +421,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 proto.extraWidth = 40;
             }
-//or switch the name
+
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
@@ -526,7 +526,7 @@ function Block(protoblock, blocks, overrideName) {
     this._addImage = function () {
         var image = new Image();
         var that = this;
-//position_media & update cache
+//when image has loaded
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -702,7 +702,7 @@ function Block(protoblock, blocks, overrideName) {
         }
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
-//after the image loading
+//after the image has loaded
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -864,7 +864,8 @@ function Block(protoblock, blocks, overrideName) {
     this._generateCollatpseArt= function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-//refresh and clean canvas after loading
+/*refresh and clean canvas after loading
+After the image has finished collapsing*/
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
@@ -878,7 +879,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.expandButtonBitmap.visible = false;
             }
         };
-/*create a new bitmap image
+/*Processing the collapse button
        @param - that = generateCollapseArt*/
         var __processCollapseButton = function (that) {
             var image = new Image();
@@ -901,7 +902,7 @@ function Block(protoblock, blocks, overrideName) {
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
-/*set a new Image
+/*When expanding buttons
          @param - that = generateCollapseArt*/
         var __processExpandButton = function (that) {
             var image = new Image();
@@ -924,7 +925,7 @@ function Block(protoblock, blocks, overrideName) {
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
-/*switch the name
+/*Processing the hilighted collapsed image
   @param-bitmap-null
   @param-that-generateCollapseArt*/
         var __processHighlightCollapseBitmap = function (bitmap, that) {
