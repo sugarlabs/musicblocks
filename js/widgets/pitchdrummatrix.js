@@ -122,26 +122,26 @@ function PitchDrumMatrix() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
 
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
 
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
             pdmDiv.style.visibility = 'hidden';
@@ -151,7 +151,7 @@ function PitchDrumMatrix() {
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - pdmDiv.getBoundingClientRect().left;

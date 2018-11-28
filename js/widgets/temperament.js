@@ -1414,11 +1414,11 @@ function TemperamentWidget () {
 
         var cell = docById('buttonsRow').cells[1];
         if (this._playing) {
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         } else {
             this._logo.synth.setMasterVolume(0);
             this._logo.synth.stop();
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
 
         var duration = 1 / 2;
@@ -1538,7 +1538,7 @@ function TemperamentWidget () {
                     __playLoop(i);
                 }, that._logo.defaultBPMFactor * 1000 * duration);
             } else {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 if (i !== -1) {
                     setTimeout(function () {
                         if (that.circleIsVisible == false && docById('wheelDiv4') == null) {
@@ -1606,19 +1606,19 @@ function TemperamentWidget () {
         temperamentCell.style.textAlign = 'center';
         temperamentCell.style.backgroundColor = platformColor.selectorBackground;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick = function(event) {
             that.playAll();
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
 
         cell.onclick = function() {
             that._save();
         };
 
-        var noteCell = this._addButton(row, 'play-button.svg', ICONSIZE, _('table'));
+        var noteCell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Table'));
 
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
@@ -1697,13 +1697,13 @@ function TemperamentWidget () {
             }
         }
 
-        var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('add pitches'));
+        var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add pitches'));
 
         addButtonCell.onclick = function(event) {
             that.edit();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
         cell.onclick = function () {
             that._logo.synth.setMasterVolume(0);
             that._logo.synth.stop();
@@ -1724,7 +1724,7 @@ function TemperamentWidget () {
             }
         };
 
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - temperamentDiv.getBoundingClientRect().left;

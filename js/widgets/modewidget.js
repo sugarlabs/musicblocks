@@ -56,49 +56,49 @@ function ModeWidget() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick=function() {
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
 
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'rotate-left.svg', ICONSIZE, _('rotate counter clockwise'));
+        var cell = this._addButton(row, 'rotate-left.svg', ICONSIZE, _('Rotate counter clockwise'));
 
         cell.onclick=function() {
             that._rotateLeft();
         }
 
-        var cell = this._addButton(row, 'rotate-right.svg', ICONSIZE, _('rotate clockwise'));
+        var cell = this._addButton(row, 'rotate-right.svg', ICONSIZE, _('Rotate clockwise'));
 
         cell.onclick=function() {
             that._rotateRight();
         }
 
-        var cell = this._addButton(row, 'invert.svg', ICONSIZE, _('invert'));
+        var cell = this._addButton(row, 'invert.svg', ICONSIZE, _('Invert'));
 
         cell.onclick=function() {
             that._invert();
         }
 
-        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
 
         cell.onclick=function() {
             that._undo();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
             docById('modeDiv').style.visibility = 'hidden';
@@ -108,7 +108,7 @@ function ModeWidget() {
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - modeDiv.getBoundingClientRect().left;

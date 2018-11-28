@@ -177,7 +177,7 @@ function PitchTimeMatrix () {
         // Add the buttons to the top row.
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
 
@@ -185,27 +185,27 @@ function PitchTimeMatrix () {
             that.playAll(row);
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('export'));
+        var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
         cell.onclick=function() {
             that._export();
         }
 
-        var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('sort'));
+        var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('Sort'));
         cell.onclick=function() {
             that._sort();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
         cell.onclick=function() {
             that._rowOffset = [];
             for (var i = 0; i < that._rowMap.length; i++) {
@@ -222,7 +222,7 @@ function PitchTimeMatrix () {
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - ptmDiv.getBoundingClientRect().left;
@@ -1323,7 +1323,7 @@ function PitchTimeMatrix () {
             this.__playNote(0, 0, playButtonCell);
         } else {
             this._stopOrCloseClicked = true;
-            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
     };
 
@@ -1358,7 +1358,7 @@ function PitchTimeMatrix () {
             if (noteCounter === that._notesToPlay.length - 1) {
                 that._resetMatrix();
 
-                playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that.playingNow = false;
             } else {
                 var row = docById('ptmNoteValueRow');
@@ -1451,7 +1451,7 @@ function PitchTimeMatrix () {
                     that.__playNote(time, noteCounter, playButtonCell);
                 } else {
                     that._resetMatrix();
-                    playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                    playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);

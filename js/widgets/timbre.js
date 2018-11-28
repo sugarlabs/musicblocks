@@ -301,7 +301,7 @@ function TimbreWidget () {
         } else {
             this._logo.synth.setMasterVolume(0);
             this._logo.synth.stop();
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
 
         var that = this;
@@ -321,7 +321,7 @@ function TimbreWidget () {
                     __playLoop(i);
                 }, that._logo.defaultBPMFactor * 1000 * that.notesToPlay[i - 1][1]);
             } else {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that._playing = false;
             }
         };
@@ -553,13 +553,13 @@ function TimbreWidget () {
             filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
 
         cell.onclick = function () {
             that._play(row);
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         cell.onclick = function () {
             that._save();
         };
@@ -588,7 +588,7 @@ function TimbreWidget () {
             blk.updateCache();
         };
 
-        var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
+        var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('Synthesizer'));
         synthButtonCell.id = 'synthButtonCell';
         this.isActive['synth'] = false;
 
@@ -608,7 +608,7 @@ function TimbreWidget () {
             }
         }
 
-        var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
+        var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('Oscillator'));
         oscillatorButtonCell.id = 'oscillatorButtonCell';
         this.isActive['oscillator'] = false;
 
@@ -644,7 +644,7 @@ function TimbreWidget () {
             }
         }
 
-        var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
+        var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('Envelope'));
         envelopeButtonCell.id = 'envelopeButtonCell';
         this.isActive['envelope'] = false;
 
@@ -679,7 +679,7 @@ function TimbreWidget () {
         }
 
 
-        var effectsButtonCell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
+        var effectsButtonCell = this._addButton(row, 'effects.svg', ICONSIZE, _('Effects'));
         effectsButtonCell.id = 'effectsButtonCell';
         this.isActive['effects'] = false;
 
@@ -693,7 +693,7 @@ function TimbreWidget () {
             that._effects();
         }
 
-        var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
+        var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('Filter'));
         filterButtonCell.id = 'filterButtonCell';
         this.isActive['filter'] = false;
 
@@ -724,7 +724,7 @@ function TimbreWidget () {
             that._filter();
         }
 
-        var addFilterButtonCell = this._addButton(row, 'filter+.svg', ICONSIZE, _('add filter'));
+        var addFilterButtonCell = this._addButton(row, 'filter+.svg', ICONSIZE, _('Add filter'));
         addFilterButtonCell.style.backgroundColor = '#808080';
 
         addFilterButtonCell.onclick = function () {
@@ -740,12 +740,12 @@ function TimbreWidget () {
         }
 
 
-        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
         cell.onclick = function () {
             that._undo();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick = function () {
             docById('timbreDiv').style.visibility = 'hidden';
@@ -755,7 +755,7 @@ function TimbreWidget () {
             that._logo.hideMsgs();
         };
 
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - timbreDiv.getBoundingClientRect().left;

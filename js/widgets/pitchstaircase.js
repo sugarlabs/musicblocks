@@ -81,7 +81,7 @@ function PitchStaircase () {
 
             // The play button for this row.
             // var cell = stepTableRow.insertCell();
-            var playCell = this._addButton(stepTableRow, 'play-button.svg', ICONSIZE, _('play'));
+            var playCell = this._addButton(stepTableRow, 'play-button.svg', ICONSIZE, _('Play'));
             playCell.className = 'headcol';  // This cell is fixed horizontally.
             playCell.setAttribute('id', i);
 
@@ -472,12 +472,12 @@ function PitchStaircase () {
 
         var that = this;
 
-        var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('play chord'));
+        var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('Play chord'));
         cell.onclick=function() {
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'play-scale.svg', ICONSIZE, _('play scale'));
+        var cell = this._addButton(row, 'play-scale.svg', ICONSIZE, _('Play scale'));
         cell.onclick=function() {
             that.playUpAndDown();
         };
@@ -498,7 +498,7 @@ function PitchStaircase () {
             this.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         cell.onclick=function() {
             that._save(0);
         };
@@ -531,18 +531,18 @@ function PitchStaircase () {
         cell.style.backgroundColor = platformColor.selectorBackground;
         docById('musicratio2').classList.add('hasKeyboard');
 
-        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
         cell.onclick=function() {
             that._undo();
         };
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
         cell.onclick=function() {
 	    while (that._undo()) {
 	    }
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
         cell.onclick=function() {
             docById('pscDiv').style.visibility = 'hidden';
             docById('pscButtonsDiv').style.visibility = 'hidden';
@@ -561,7 +561,7 @@ function PitchStaircase () {
         };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - pscDiv.getBoundingClientRect().left;

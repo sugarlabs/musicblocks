@@ -3420,7 +3420,7 @@ function Activity() {
         // Move to the right
         var x = Math.floor(canvas.width / turtleBlocksScale) - 13 * btnSize / 2;
 
-        newContainer = _makeButton(NEWBUTTON, _('New Project'), x, y, btnSize, 0);
+        newContainer = _makeButton(NEWBUTTON, _('New project'), x, y, btnSize, 0);
         that._loadButtonDragHandler(newContainer, x, y, that._deleteBlocksBox, null, null, null, null);
         onscreenButtons.push(newContainer);
 
@@ -3521,16 +3521,16 @@ function Activity() {
 
         // Force center-aligned labels
         var x = 95.5 + LEADING;
-        saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as .svg'), x, y, cellsize, 0);
+        saveSVGContainer = _makeButton(SAVESVGBUTTON, _('Save as SVG'), x, y, cellsize, 0);
         saveSVGContainer.visible = false;
         __addEventHandlers(saveSVGContainer, save.saveSVG.bind(save));
 
-        savePNGContainer = _makeButton(SAVEPNGBUTTON, _('Save as .png'), x, y, cellsize, 0);
+        savePNGContainer = _makeButton(SAVEPNGBUTTON, _('Save as PNG'), x, y, cellsize, 0);
         savePNGContainer.visible = false;
         __addEventHandlers(savePNGContainer, save.savePNG.bind(save));
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            saveWAVContainer = _makeButton(SAVEWAVBUTTON, _('Save as .wav'), x, y, cellsize, 0);
+            saveWAVContainer = _makeButton(SAVEWAVBUTTON, _('Save as WAV'), x, y, cellsize, 0);
             saveWAVContainer.visible = false;
             __addEventHandlers(saveWAVContainer, save.saveWAV.bind(save));
 
@@ -3538,7 +3538,7 @@ function Activity() {
             saveLilypondContainer.visible = false;
             __addEventHandlers(saveLilypondContainer, save.saveLilypond.bind(save));
 
-            saveABCContainer = _makeButton(SAVEABCBUTTON, _('Save as .abc'), x, y, cellsize, 0);
+            saveABCContainer = _makeButton(SAVEABCBUTTON, _('Save as ABC'), x, y, cellsize, 0);
             saveABCContainer.visible = false;
             __addEventHandlers(saveABCContainer, save.saveAbc.bind(save));
         }

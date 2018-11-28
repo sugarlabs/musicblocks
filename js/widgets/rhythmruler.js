@@ -854,7 +854,7 @@ function RhythmRuler () {
 
     this.__resume = function () {
         var iconSize = ICONSIZE;
-        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         this._logo.setTurtleDelay(0);
         this._playingAll = true;
         this._playing = true;
@@ -1422,7 +1422,7 @@ function RhythmRuler () {
         // For the button callbacks
         var that = this;
 
-        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
+        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
 
         this._playAllCell.onclick = function () {
             if (that._playing) {
@@ -1433,13 +1433,13 @@ function RhythmRuler () {
             }
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save rhythms'), '');
         cell.onclick = function () {
             // that._save(0);
             that._saveTuplets(0);
         };
 
-        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
+        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
         cell.onclick = function () {
             that._saveMachine(0);
         };
@@ -1478,24 +1478,24 @@ function RhythmRuler () {
             }
         };
 
-        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'), '');
+        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('Undo'), '');
         cell.onclick = function () {
             that._undo();
         };
 
         //.TRANS: user can tap out a rhythm by clicking on a ruler.
-        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('tap a rhythm'), '');
+        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('Tap a rhythm'), '');
         this._tapButton.onclick = function () {
             that._tap();
         };
 
         //.TRANS: clear all subdivisions from the ruler.
-        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
+        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('Clear'), '');
         cell.onclick = function () {
             that._clear();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'), '');
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
 
         cell.onclick = function () {
             // If the piemenu was open, close it.
@@ -1542,7 +1542,7 @@ function RhythmRuler () {
         };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
+        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('Drag'), '');
 
         dragCell.style.cursor = 'move';
 
@@ -1671,7 +1671,7 @@ function RhythmRuler () {
         var rhythmRulerTable = docById('rhythmRulerTable');
         for (var i = 0; i < this.Rulers.length; i++) {
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
-            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'), '<br>');
+            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('Play'), '<br>');
             drumcell.setAttribute('id', i);
             drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
 
@@ -1679,7 +1679,7 @@ function RhythmRuler () {
                 var id = Number(this.getAttribute('id'));
                 if (that._playing) {
                     if (that._rulerPlaying === id) {
-                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._playing = false;
                         that._playingOne = false;
                         that._playingAll = false;
@@ -1700,7 +1700,7 @@ function RhythmRuler () {
                         that._cellCounter = 0;
                         that._startingTime = null;
                         that._rulerPlaying = id;
-                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._elapsedTimes[id] = 0;
                         that._offsets[id] = 0;
                         that._playOne();

@@ -182,7 +182,7 @@ function MusicKeyboard() {
             }
         // }
 
-        var cell = this._addButton(row1, 'play-button.svg', ICONSIZE, _('play'));
+        var cell = this._addButton(row1, 'play-button.svg', ICONSIZE, _('Play'));
 
         cell.onclick = function() {
             that._logo.setTurtleDelay(0);
@@ -205,7 +205,7 @@ function MusicKeyboard() {
             }
         };
 
-        var cell = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('Save'));
 
         cell.onclick = function() {
             if (selected.length > 0) {
@@ -215,7 +215,7 @@ function MusicKeyboard() {
             }
         };
 
-        var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
             selected = [];
@@ -237,7 +237,7 @@ function MusicKeyboard() {
             selected1 = [];
         };
 
-        var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - mkbDiv.getBoundingClientRect().left;

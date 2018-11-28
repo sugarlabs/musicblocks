@@ -210,7 +210,7 @@ function PitchSlider() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'));
 
         cell.onclick = function() {
             sliderDiv.style.visibility = 'hidden';
@@ -228,7 +228,7 @@ function PitchSlider() {
         };
 
         // We use this cell as a handle for dragging.
-        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'));
+        var cell = this._addButton(row, 'grab.svg', iconSize, _('Drag'));
 
         cell.style.cursor = 'move';
 
@@ -385,13 +385,13 @@ function PitchSlider() {
                 that._save(this);
             };
 
-            var upCell = this._addButton(upRow, 'up.svg', iconSize, _('move up'));
+            var upCell = this._addButton(upRow, 'up.svg', iconSize, _('Move up'));
 
             upCell.onclick = function() {
                 that._moveSlider(this, 1);
             };
 
-            var downCell = this._addButton(downRow, 'down.svg', iconSize, _('move down'));
+            var downCell = this._addButton(downRow, 'down.svg', iconSize, _('Move down'));
 
             downCell.onclick = function() {
                 that._moveSlider(this, -1);

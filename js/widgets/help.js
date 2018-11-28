@@ -50,7 +50,7 @@ function HelpWidget () {
         var that = this;
 
         if (blocks === null) {
-            var cell = this._addButton(row, 'up.svg', ICONSIZE, _('previous page'));
+            var cell = this._addButton(row, 'up.svg', ICONSIZE, _('Previous page'));
 
             cell.onclick=function() {
                 page = page - 1;
@@ -69,7 +69,7 @@ function HelpWidget () {
                 this.style.backgroundColor = platformColor.selectorBackground;
             };
 
-            var cell = this._addButton(row, 'down.svg', ICONSIZE, _('next page'));
+            var cell = this._addButton(row, 'down.svg', ICONSIZE, _('Next page'));
 
             cell.onclick=function() {
                 page = page + 1;
@@ -97,7 +97,7 @@ function HelpWidget () {
             var cell = this._addLabel(row, ICONSIZE, label);
 	}
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
             helpDiv.style.display = 'none';
@@ -112,7 +112,7 @@ function HelpWidget () {
         };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left;
