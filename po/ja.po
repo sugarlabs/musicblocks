@@ -451,7 +451,7 @@ msgstr "ブラウザ表示を100%に設定してください。"
 #: js/toolbar.js:345
 #: js/toolbar.js:393
 msgid "About Music Blocks"
-msgstr "ミュージック・ブロックスについて／ミュージック・ブロックスについて"
+msgstr "ミュージック・ブロックスについて"
 
 #: js/activity.js:3326
 msgid "Turtle Blocks"
@@ -1590,7 +1590,7 @@ msgstr "ミスター・マウスのツアーはここで終わり。ミュージ
 
 #: js/turtledefs.js:164
 msgid "Run fast"
-msgstr "速いスピードで再生"
+msgstr "実行"
 
 #: js/turtledefs.js:172
 msgid "Expand/collapse collapsible blocks"
@@ -3855,7 +3855,7 @@ msgstr ""
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: set the key and mode, e.g. C Major
 msgid "set key"
-msgstr "音階"
+msgstr "音階をせってい"
 
 #: js/basicblocks.js:2687
 #.TRANS: key, e.g., C in C Major
@@ -4185,7 +4185,7 @@ msgstr "右を向く"
 #.TRANS: turn right (clockwise)
 #.TRANS: right side of the screen
 msgid "right"
-msgstr "右を向く"
+msgstr "ざひょうち（右）"
 
 #: js/basicblocks.js:3233
 #.TRANS: left1 is left when turning left (counter-clockwise)
@@ -4200,7 +4200,7 @@ msgstr "左を向く"
 #.TRANS: turn left (counter-clockwise)
 #.TRANS: left side of the screen
 msgid "left"
-msgstr "左を向く"
+msgstr "ざひょうち（左）"
 
 #: js/basicblocks.js:3261
 #: plugins/rodi.rtp:73
@@ -5088,7 +5088,7 @@ msgstr "蝙蝠"
 
 #: js/lilypond.js:177
 msgid "Lilypond ignoring mode"
-msgstr "Lilypondはこのモードを無視します"
+msgstr "Lilypondはこの音階を無視します"
 
 #: js/macros.js:57
 #: js/macros.js:203
@@ -5917,7 +5917,7 @@ msgstr "～で整理する"
 
 #: js/StringHelper.js:41
 msgid "Load More Projects"
-msgstr "プロジェクトをもっとろーどする"
+msgstr "プロジェクトをもっとロードする"
 
 #: js/StringHelper.js:42
 msgid "Last Updated"
