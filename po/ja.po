@@ -391,11 +391,11 @@ msgstr "説明"
 
 #: js/activity.js:928
 msgid "Refresh your browser to change to advanced mode."
-msgstr "高度モードを設定するため、ブラウザをこうしんして下さい。"
+msgstr "高度モードにするには、ブラウザをこうしんして下さい。"
 
 #: js/activity.js:933
 msgid "Refresh your browser to change to beginner mode."
-msgstr "簡単モードを設定するため、ブラウザをこうしんして下さい。"
+msgstr "かんたんモードにするには、ブラウザをこうしんしてください"
 
 #: js/activity.js:1204
 #: js/turtle.js:1897
@@ -407,21 +407,21 @@ msgstr "うがん（ざひょう）を表示"
 #: js/activity.js:1216
 #.TRANS: hide Polar coordinate overlay grid
 msgid "hide Polar"
-msgstr ""
+msgstr "中心の角度をかくす"
 
 #: js/activity.js:1220
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "show Cartesian"
-msgstr ""
+msgstr "ほうがん（ざひょう）を表示"
 
 #: js/activity.js:1223
 msgid "show Polar"
-msgstr ""
+msgstr "中心の角度を表示"
 
 #: js/activity.js:1227
 #.TRANS: show Polar coordinate overlay grid
 msgid "hide Cartersian"
-msgstr ""
+msgstr "ほうがん（ざひょう）をかくす"
 
 #: js/activity.js:1620
 msgid "This block is deprecated."
@@ -697,7 +697,7 @@ msgstr "これより大きくできない"
 #: js/turtledefs.js:191
 #: js/help.js:238
 msgid "About"
-msgstr ""
+msgstr "ミュージック・ブロックスについて"
 
 #: js/activity.js:4151
 msgid "Could not parse JSON input."
@@ -1111,7 +1111,7 @@ msgstr "文字そざい"
 
 #: js/palette.js:817
 msgid "effect"
-msgstr ""
+msgstr "こうかおん"
 
 #: js/palette.js:826
 ## To be checked
@@ -1566,7 +1566,7 @@ msgstr "ミュージック・ブロックスにかかわってきた人のいち
 #: js/turtledefs.js:153
 #: js/turtledefs.js:191
 msgid "Music Blocks is licensed under the AGPL."
-msgstr "ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。"
+msgstr "ミュージック・ブロックスのプログラムは、だれでも自由にみたり、変更したりすることができる。"
 
 #: js/turtledefs.js:153
 #: js/turtledefs.js:191
@@ -5133,7 +5133,7 @@ msgstr "プレイバック用の音楽を準備（コンパイル）します"
 
 #: js/languagebox.js:92
 msgid "Refresh your browser to change your language preference."
-msgstr "ブラウザをこうしんしてください。"
+msgstr "言語を変更するには、ブラウザをこうしんしてください。"
 
 #: js/help.js:53
 msgid "Previous page"
@@ -5685,7 +5685,7 @@ msgstr "マイナー・ペンタトニック音階"
 #: js/musicutils.js:212
 #.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
 msgid "major pentatonic"
-msgstr ""
+msgstr "メジャー・ペンタトニック音階"
 
 #: js/musicutils.js:213
 msgid "chinese"
