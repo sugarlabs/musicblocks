@@ -345,7 +345,7 @@ function Block(protoblock, blocks, overrideName) {
         // artwork and recalculate the hitarea.
         var that = this;
 
-        /*if bitmap is not equal to null then Position media & Sets child
+        /*Position media
         @param-that = this = resize function*/
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
@@ -388,7 +388,8 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.container !== null) {
             var that = this;
-            /* function to collapse Button Bitmap and expand button bitmap to scaleX nad scaleY update cache and calculate block hit area
+            /* Update Cache
+            *Calculate hit area
             @param-that = this = container*/
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
@@ -406,7 +407,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-/*check if collapsible and if name = interval
+/*set a new Protoblock
 @param-plusMinus-new variable*/
     this._newArtwork = function (plusMinus) {
         if (this.isCollapsible()) {
@@ -855,12 +856,12 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-/*generateCollapseArtwork
+/* set a variable to blocklist
     param postProcess = null*/
     this._generateCollatpseArt work = function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-//refresh canvas,cleanup after load
+//refresh canvas and clean canvas after loading
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
@@ -897,7 +898,7 @@ function Block(protoblock, blocks, overrideName) {
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
-/*if line is collapsible then expand button bitmap to 4 protoblock or else expand button bitmap to 10 protoblock
+/*set a new Image
          @param - that = generateCollapseArt*/
         var __processExpandButton = function (that) {
             var image = new Image();
@@ -920,7 +921,7 @@ function Block(protoblock, blocks, overrideName) {
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
-/*check if collapsed is null and switch the name
+/*switch the name
   @param-bitmap-null
   @param-that-generateCollapseArt*/
         var __processHighlightCollapseBitmap = function (bitmap, that) {
@@ -1002,7 +1003,7 @@ function Block(protoblock, blocks, overrideName) {
 
             __processExpandButton(that);
         };
-/*collapse block bitmap 
+/*replace fill color to stroke color
         @param - bitmap - null*/
         var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
@@ -1636,7 +1637,7 @@ function Block(protoblock, blocks, overrideName) {
     @param-width-width of canvas
     @param-height-height of canvas
     @param-blockscale-scale
-if width is grater than height, then width * blockscale else height * blockscale*/
+Set bitmap's x and y position equal */
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
