@@ -403,13 +403,13 @@ function Block(protoblock, blocks, overrideName) {
         // artwork and recalculate the hitarea.
         var that = this;
 
-	/*
-	 * After the new artwork is created, this function is used to add
-	 * decorations.
-	 * @param-that = this
-	 * @return{void}
-	 * @public
-	 */
+        /*
+         * After the new artwork is created, this function is used to add
+         * decorations.
+         * @param-that = this
+         * @return{void}
+         * @public
+         */
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
@@ -452,13 +452,13 @@ function Block(protoblock, blocks, overrideName) {
         if (this.container !== null) {
             var that = this;
 
-	    /*
-	     * After new buttons are creates, they are cached and a
-	     * new hit are is calculated
-	     * @param-that = this = container
-	     * @return{void}
-	     * @private
-	     */
+            /*
+             * After new buttons are creates, they are cached and a
+             * new hit are is calculated
+             * @param-that = this = container
+             * @return{void}
+             * @private
+             */
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
@@ -602,11 +602,11 @@ function Block(protoblock, blocks, overrideName) {
         var image = new Image();
         var that = this;
 
-	/*
-	 * The loader
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * The loader
+         * @return{void}
+         * @private
+         */
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -1035,11 +1035,11 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-	/* 
-	 * Run the postprocess function after the artwork is loaded
-	 * @return{void}
-	 * @private
-	 */
+        /* 
+         * Run the postprocess function after the artwork is loaded
+         * @return{void}
+         * @private
+         */
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
@@ -1054,12 +1054,12 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 
-	/*
-	 * Create the artwork for the collapse buttons
-	 * @param - that = this
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Create the artwork for the collapse buttons
+         * @param - that = this
+         * @return{void}
+         * @private
+         */
         var __processCollapseButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -1082,12 +1082,12 @@ function Block(protoblock, blocks, overrideName) {
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
 
-	/*
-	 * Create the artwork for the expand buttons
-	 * @param - that = this
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Create the artwork for the expand buttons
+         * @param - that = this
+         * @return{void}
+         * @private
+         */
         var __processExpandButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -1110,13 +1110,13 @@ function Block(protoblock, blocks, overrideName) {
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 
-	/*
-	 * Processing the highlighted collapsed image
-	 * @param-bitmap = highlight artwork
-	 * @param-that = this
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Processing the highlighted collapsed image
+         * @param-bitmap = highlight artwork
+         * @param-that = this
+         * @return{void}
+         * @private
+         */
         var __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
@@ -1197,13 +1197,13 @@ function Block(protoblock, blocks, overrideName) {
             __processExpandButton(that);
         };
 
-	/*
-	 * Processing the collapsed block
-	 * @param-bitmap = block artwork
-	 * @param-that = this
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Processing the collapsed block
+         * @param-bitmap = block artwork
+         * @param-that = this
+         * @return{void}
+         * @private
+         */
         var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
@@ -3379,11 +3379,11 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 
-	/*
-	 * Preview the selected pitch using the synth
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Preview the selected pitch using the synth
+         * @return{void}
+         * @private
+         */
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3543,11 +3543,11 @@ function Block(protoblock, blocks, overrideName) {
         // Set up event handlers
         var that = this;
 
-	/*
-	 * Change selection and set value to notevalue
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Change selection and set value to notevalue
+         * @return{void}
+         * @private
+         */
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3564,11 +3564,11 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.setPitchOctave(that.connections[0], octave);
         };
 
-	/*
-	 * Preview pitch
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Preview pitch
+         * @return{void}
+         * @private
+         */
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3679,11 +3679,11 @@ function Block(protoblock, blocks, overrideName) {
             that.updateCache();
         };
 
-	/*
-	 * Exit menu
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Exit menu
+         * @return{void}
+         * @private
+         */
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -3817,11 +3817,11 @@ function Block(protoblock, blocks, overrideName) {
         
         var that = this;
 
-	/*
-	 * set value to number of text
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * set value to number of text
+         * @return{void}
+         * @private
+         */
         var __selectionChanged = function () {
             that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
             that.value = Number(that.text.text);
@@ -3832,11 +3832,11 @@ function Block(protoblock, blocks, overrideName) {
             that.updateCache();
         };
 
-	/*
-	 * set pie menu's exit time to current time
-	 * @return{void}
-	 * @public
-	 */
+        /*
+         * set pie menu's exit time to current time
+         * @return{void}
+         * @public
+         */
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -4503,11 +4503,11 @@ function Block(protoblock, blocks, overrideName) {
             that.updateCache();
         };
 
-	/*
-	 * Preview voice
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * Preview voice
+         * @return{void}
+         * @private
+         */
         var __voicePreview = function () {
             var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
@@ -5056,11 +5056,11 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 
-	/*
-	 * prepare scale
-	 * @return{void}
-	 * @private
-	 */
+        /*
+         * prepare scale
+         * @return{void}
+         * @private
+         */
         var __prepScale = function () {
             var activeTabs = [0];
             var mode = MUSICALMODES[that.value];
