@@ -262,10 +262,11 @@ function Block(protoblock, blocks, overrideName) {
         this.container.updateCache();
     };
     
-    /*
-    remove highlight from block
-    return{void}
-    */
+/*
+ * remove highlight from block
+ * @return{void}
+ * @public
+ */
     this.unhighlight = function () {
         if (this.trash) {
             return;
@@ -348,11 +349,12 @@ function Block(protoblock, blocks, overrideName) {
         // artwork and recalculate the hitarea.
         var that = this;
 
-        /*
-        Position media
-        @param-that = this = resize function
-        return{void}
-        */
+/*
+ * Position media
+ * @param-that = this = resize function
+ * @return{void}
+ * @public
+ */
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
@@ -394,12 +396,13 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.container !== null) {
             var that = this;
-            /*
-            Update Cache
-            Calculate hit area
-            @param-that = this = container
-            return{void}
-            */
+/*
+ * Update Cache
+ * Calculate hit area
+ * @param-that = this = container
+ * @return{void}
+ * @public
+ */
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
@@ -417,10 +420,11 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 /*
-set a new Protoblock
-@param-plusMinus-new variable
-return{void}
-*/
+ * set a new Protoblock
+ * @param-plusMinus-new variable
+ * @return{void}
+ * @public
+ */
     this._newArtwork = function (plusMinus) {
         if (this.isCollapsible()) {
             var proto = new ProtoBlock('collapse');
@@ -532,16 +536,18 @@ return{void}
         this.generateArtwork(true, []);
     };
 /*
-Add a new image
-return{void}
-*/
+ * Add a new image
+ * @return{void}
+ * @public
+ */
     this._addImage = function () {
         var image = new Image();
         var that = this;
 /*
-when image has loaded
-return{void}
-*/
+ * when image has loaded
+ * @return{void}
+ * @public
+ */
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -718,9 +724,10 @@ return{void}
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
 /*
-after the image has loaded
-return{void}
-*/
+ * after the image has loaded
+ * @return{void}
+ * @public
+ */
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -878,17 +885,20 @@ return{void}
         }
     };
 /* 
-Generate the collapsed art
-@param postProcess = null
-*/
+ * Generate the collapsed art
+ * @param postProcess = null
+ * @return{void}
+ * @public
+ */
     this._generateCollatpseArt= function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-/*
-refresh and clean canvas after loading
-After the image has finished collapsing
-return{void}
-*/
+/* 
+ * refresh and clean canvas after loading
+ * After the image has finished collapsing
+ * @return{void}
+ * @public
+ */
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
@@ -903,10 +913,11 @@ return{void}
             }
         };
 /*
-Processing the collapse button
-@param - that = generateCollapseArt
-return{void}
-       */
+ * Processing the collapse button
+ * @param - that = generateCollapseArt
+ * @return{void}
+ * @public
+ */
         var __processCollapseButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -929,10 +940,11 @@ return{void}
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
 /*
-When expanding buttons
-@param - that = generateCollapseArt
-return{void}
-         */
+ * When expanding buttons
+ * @param - that = generateCollapseArt
+ * @return{void}
+ * @public
+ */
         var __processExpandButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -955,11 +967,12 @@ return{void}
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 /*
-Processing the hilighted collapsed image
-@param-bitmap-null
-@param-that-generateCollapseArt
-return{void}
-  */
+ * Processing the hilighted collapsed image
+ * @param-bitmap-null
+ * @param-that-generateCollapseArt
+ * @return{void}
+ * @public
+ */
         var __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
@@ -1040,10 +1053,11 @@ return{void}
             __processExpandButton(that);
         };
 /*
-replace fill color to stroke color
-@param - bitmap - null
-return{void}
-*/
+ * replace fill color to stroke color
+ * @param - bitmap - null
+ * @return{void}
+ * @public
+ */
         var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
@@ -1059,9 +1073,9 @@ return{void}
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
 /*
-if it is collapsible, then set visibity to false 
-return{void}
-*/
+ * if it is collapsible, then set visibity to false 
+ * return{void}
+ */
     this.hide = function () {
         this.container.visible = false;
         if (this.isCollapsible()) {
@@ -1635,10 +1649,11 @@ return{void}
         this.blocks.refreshCanvas();
     };
 /*
-customize text
-@param-blockscale-scale
-return{void}
-*/  
+ * customize text
+ * @param-blockscale-scale
+ * @return{void}
+ * @public
+ */  
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
@@ -1678,14 +1693,15 @@ return{void}
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
- /*
-@param-bitmap - image
-@param-width-width of canvas
-@param-height-height of canvas
-@param-blockscale-scale
-Position inserted media 
-return{void}
-*/
+/*
+ * @param-bitmap - image
+ * @param-width-width of canvas
+ * @param-height-height of canvas
+ * @param-blockscale-scale
+ * Position inserted media 
+ * @return{void}
+ * @public
+ */
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
@@ -1696,9 +1712,10 @@ return{void}
         bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
     };
 /*
-position label
-return{void}
-*/
+ * position label
+ * @return{void}
+ * @public
+ */
     this._positionCollapseLabel = function (blockScale) {
         if (this.isInlineCollapsible()) {
             this.collapseText.x = Math.floor(((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale / 2) + 0.5);
@@ -1969,11 +1986,15 @@ return{void}
             moved = false;
         });
     };
-    /*@param-event- mouse
-    @param-moved-cursor moved
-    @param-haveClick-when clickd
-    @param-hideDOM-hide mouse
-set cursor style to default*/
+/*
+ * @param-event- mouse
+ * @param-moved-cursor moved
+ * @param-haveClick-when clickd
+ * @param-hideDOM-hide mouse
+ * set cursor style to default
+ * @return {void}
+ * @public
+ */
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         if (!this.blocks.logo.runningLilypond) {
@@ -2183,9 +2204,11 @@ set cursor style to default*/
         this.container.setChildIndex(this.highlightBitmap, 0);
         this.updateCache();
     };
-/*customize the label and canvas
-return{void}
-*/
+/*
+ * customize the label and canvas
+ * @return{void}
+ * @public
+ */
     this._changeLabel = function () {
         var that = this;
         var x = this.container.x;
@@ -2774,9 +2797,10 @@ return{void}
         }
     };
 /*
-Check if pie menu is ok to launch
-return{void}
-*/
+ * Check if pie menu is ok to launch
+ * @return{void}
+ * @public
+ */
     this.piemenuOKtoLaunch = function () {
         if (this._piemenuExitTime === null) {
             return true;
@@ -3087,9 +3111,10 @@ return{void}
             }
         };
 /*
-pitch preview
-return{void}
-*/
+ * pitch preview
+ * @return{void}
+ * @public
+ */
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3248,9 +3273,10 @@ return{void}
         // Set up event handlers
         var that = this;
 /*
-Change selection and set value to notevalue
-return{void}
-*/
+ * Change selection and set value to notevalue
+ * @return{void}
+ * @public
+ */
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3267,9 +3293,10 @@ return{void}
             that.blocks.setPitchOctave(that.connections[0], octave);
         };
 /*
-Preview pitch
-return{void}
-*/
+ * Preview pitch
+ * @return{void}
+ * @public
+ */
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3379,9 +3406,10 @@ return{void}
             that.updateCache();
         };
 /*
-Exit menu
-return{void}
-*/
+ * Exit menu
+ * @return{void}
+ * @public
+ */
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -3514,9 +3542,10 @@ return{void}
         
         var that = this;
 /*
-set value to number of text
-return{void}
-*/
+ * set value to number of text
+ * @return{void}
+ * @public
+ */
         var __selectionChanged = function () {
             that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
             that.value = Number(that.text.text);
@@ -3527,9 +3556,10 @@ return{void}
             that.updateCache();
         };
 /*
-set pie menu's exit time to current time
-return{void}
-*/
+ * set pie menu's exit time to current time
+ * @return{void}
+ * @public
+ */
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -4184,9 +4214,10 @@ return{void}
             that.updateCache();
         };
 /*
-Preview voice
-return{void}
-*/
+ * Preview voice
+ * @return{void}
+ * @public
+ */
         var __voicePreview = function () {
             var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
@@ -4733,9 +4764,10 @@ return{void}
             }
         };
 /*
-prepare scale
-return{void}
-*/
+ * prepare scale
+ * @return{void}
+ * @public
+ */
         var __prepScale = function () {
             var activeTabs = [0];
             var mode = MUSICALMODES[that.value];
@@ -5068,10 +5100,11 @@ return{void}
 };
 
 /*
-set elements to a array
-if element is string,then set element's id to element
-return{void}
-*/
+ * set elements to a array
+ * if element is string,then set element's id to element
+ * @public
+ * @return{void}
+ */
 function $() {
     var elements = new Array();
 
