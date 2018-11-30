@@ -3705,10 +3705,10 @@ function Activity() {
         var dx = btnSize;
 
         homeButtonContainers = [];
-        homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [HOME]', x, y, btnSize, 0));
+        homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [' + _('HOME') + ']', x, y, btnSize, 0));
         that._loadButtonDragHandler(homeButtonContainers[0], x, y, that._findBlocks, null, null, null, null);
 
-        homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [HOME]', x, y - btnSize, btnSize, 0));
+        homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [' + _('HOME') + ']', x, y - btnSize, btnSize, 0));
         that._loadButtonDragHandler(homeButtonContainers[1], x, y, that._findBlocks, null, null, null, null);
         homeButtonContainers[1].visible = false;
 
