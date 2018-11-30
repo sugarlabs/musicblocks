@@ -453,7 +453,7 @@ msgstr "中心の角度をかくす"
 
 #: js/activity.js:1223
 msgid "show Polar"
-msgstr "中心の角度を表示"
+msgstr "ほうがんと角度を表示"
 
 #: js/activity.js:1227
 #.TRANS: show Polar coordinate overlay grid
@@ -1426,7 +1426,7 @@ msgstr "ミスター・マウスに会おう！"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:159
-## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
+## 指揮＝しき https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
 msgstr "ミスター・マウスは、ミュージック・ブロックスの指揮者。"
 
@@ -1599,7 +1599,7 @@ msgstr "ネズミを元の位置にもどし、ペンでえがいた線をすべ
 #: js/turtledefs.js:150
 #: js/turtledefs.js:170
 msgid "Collapse the graphics window."
-msgstr "ネズミがいどうしたり、ペンで線をえがいたりできる「カンバス」の表示サイズを　しゅくしょうしたり、かくだいしたりする。"
+msgstr "ネズミがいどうしたり、ペンで線をえがいたりできる「カンバス」の表示サイズを しゅくしょうしたり、かくだいしたりする。"
 
 #: js/turtledefs.js:151
 #: js/turtledefs.js:189
@@ -1609,7 +1609,7 @@ msgstr "キーボードのショートカット"
 #: js/turtledefs.js:151
 #: js/turtledefs.js:189
 msgid "You can type d to create a do block and r to create a re block etc."
-msgstr "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。<br><br>★ショートカットキー<br><em> d</em> ……　「ド」（４分音符、４オクターヴ）<br><em> r</em> ……　「レ」（４分音符、４オクターヴ）<br><em> m</em> ……　「ミ」（４分音符、４オクターヴ）<br><em> f</em> ……　「ファ」（４分音符、４オクターヴ）<br><em> s</em> ……　「ソ」（４分音符、４オクターヴ）<br><em> l</em> ……　「ラ」（４分音符、４オクターヴ）<br><em> t</em> ……　「シ」（４分音符、４オクターヴ）<br>"
+msgstr "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。<br><br>★ショートカットキー<br><em> d</em> …… 「ド」（４分音符、４オクターヴ）<br><em> r</em> …… 「レ」（４分音符、４オクターヴ）<br><em> m</em> …… 「ミ」（４分音符、４オクターヴ）<br><em> f</em> …… 「ファ」（４分音符、４オクターヴ）<br><em> s</em> …… 「ソ」（４分音符、４オクターヴ）<br><em> l</em> …… 「ラ」（４分音符、４オクターヴ）<br><em> t</em> …… 「シ」（４分音符、４オクターヴ）<br>"
 
 #: js/turtledefs.js:152
 #: js/turtledefs.js:190
@@ -1774,7 +1774,7 @@ msgstr ""
 
 #: js/turtledefs.js:213
 msgid "The Pitch Number block will play a pitch associated by its number, e.g, 1 for C, 7 for G."
-msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを、数で表示する。たとえば、「ド」ならば０、「ソ」ならば７と表示される。"
+msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数で表示する。たとえば、オクターヴ４の「ド」の音は０、オクターヴ４の「ソ」の音は７、オクターヴ３の「シ」の音は-１と表示される。"
 
 #: js/turtledefs.js:214
 msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
@@ -1837,7 +1837,7 @@ msgstr "<h2>音律（おんりつ）をせっていブロック</h2><br>ミュ�
 #: js/turtledefs.js:359
 #: js/turtledefs.js:498
 msgid "The Set timbre block selects a voice for the synthesizer,"
-msgstr "<h2>音色をせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br>　"
+msgstr "<h2>音色をせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br> "
 
 #: js/turtledefs.js:226
 msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
@@ -1861,7 +1861,7 @@ msgstr "<h2>クレシェンドブロック</h2><br>音量をだんだん大き�
 
 #: js/turtledefs.js:231
 msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr "<br>たとえば、７つの音に、すうちが５の「クレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がふえ、さいごの音はさいしょの音よりも３５パーセント音量が大きくなる。<br><br>　"
+msgstr "<br>たとえば、７つの音に、すうちが５の「クレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がふえ、さいごの音はさいしょの音よりも３５パーセント音量が大きくなる。<br><br> "
 
 #: js/turtledefs.js:232
 msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
@@ -1885,7 +1885,7 @@ msgstr "デフォルトは音量５０。"
 
 #: js/turtledefs.js:233
 msgid "The range is 0 for silence to 100 for full volume."
-msgstr "０から１００までのすうちをせっていできる。<br><br>　"
+msgstr "０から１００までのすうちをせっていできる。<br><br> "
 
 #: js/turtledefs.js:234
 msgid "The Set master volume block sets the volume for all synthesizers."
@@ -1930,7 +1930,7 @@ msgstr "<br><br>３連符（れんぷ）や５連符（れんぷ）など、２�
 
 #: js/turtledefs.js:245
 msgid "The Music keyboard block opens a piano keyboard that can be used to create notes."
-msgstr "<h2>キーボードブロック</h2><br>ピアノのキーボードを表示する。作った音をデータ化することができる。<br><br>　"
+msgstr "<h2>キーボードブロック</h2><br>ピアノのキーボードを表示する。作った音をデータ化することができる。<br><br> "
 
 #: js/turtledefs.js:246
 msgid "The Tempo block opens a metronome to visualize the beat."
@@ -1942,7 +1942,7 @@ msgstr "<h2>モード（音階）ブロック</h2><br>いろいろな音階を�
 
 #: js/turtledefs.js:249
 msgid "The Repeat block will repeat the contained blocks."
-msgstr "<h2>実行ブロック（くり返し）</h2><br>はさまれているブロックのプログラムを、入力した回数だけくり返す。"
+msgstr "<h2>実行ブロック（くり返し）</h2><br>図の例では、「ソ」の音が４回えんそうされる。"
 
 #: js/turtledefs.js:249
 msgid "In this example the note will be played 4 times."
@@ -1968,7 +1968,7 @@ msgstr "<h2>じょうけんブロック</h2><br>じょうけんブロックを�
 #: js/turtledefs.js:502
 #: js/turtledefs.js:503
 msgid "In this example if the mouse button is pressed a snare drum will play."
-msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「スネアドラム」ブロックを、"
+msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「スネアドラム」ブロックをえんそうする。"
 
 #: js/turtledefs.js:251
 #: js/turtledefs.js:252
@@ -2145,7 +2145,7 @@ msgstr "<h2>ペンブロック</h2><br>ネズミの動きに合わせて線を�
 
 #: js/turtledefs.js:294
 msgid "The Color block returns the current pen color."
-msgstr ""
+msgstr "げんざいのペンの色を、すうちでひょうじする。"
 
 #: js/turtledefs.js:295
 msgid "The Set-color block changes the pen color."
@@ -3018,7 +3018,7 @@ msgstr "ノコギリ波（サー）"
 
 #: js/basicblocks.js:131
 #.TRANS: musical transposition (adjustment of pitch up or down)
-##　Maybe トランスポーズ Non-musicians may understand first better (though I need to verify if understood)；移調＝いちょう;https://ja.wikipedia.org/wiki/%E7%A7%BB%E8%AA%BF
+## Maybe トランスポーズ Non-musicians may understand first better (though I need to verify if understood)；移調＝いちょう;https://ja.wikipedia.org/wiki/%E7%A7%BB%E8%AA%BF
 msgid "transposition"
 msgstr "移調"
 
@@ -3213,7 +3213,7 @@ msgstr "音階内を上る／下りる"
 
 #: js/basicblocks.js:655
 #.TRANS: there are different types (sine, triangle, square...) of oscillators.
-## 発振機=はっしんき　http://jisho.org/word/%E7%99%BA%E6%8C%AF%E6%A9%9F or http://jisho.org/word/%E6%8C%AF%E5%8B%95%E5%AD%90 
+## 発振機=はっしんき http://jisho.org/word/%E7%99%BA%E6%8C%AF%E6%A9%9F or http://jisho.org/word/%E6%8C%AF%E5%8B%95%E5%AD%90 
 msgid "oscillator"
 msgstr "オシレータ―"
 
@@ -3439,7 +3439,7 @@ msgstr "タイ"
 #: js/basicblocks.js:1270
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
-##　I need to look this up.
+## I need to look this up.
 msgid "dot"
 msgstr "付点音符"
 
@@ -3548,7 +3548,7 @@ msgstr "拍子"
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 msgid "do1"
-msgstr "～する"
+msgstr "アクション実行"
 
 #: js/basicblocks.js:1523
 #: js/basicblocks.js:1542
@@ -3560,9 +3560,8 @@ msgstr "～する"
 #: js/basicblocks.js:4752
 #.TRANS: do (take) an action
 #.TRANS: take (do) some action
-## アクションis "action" and する is "to do"
 msgid "do"
-msgstr "アクション実行"
+msgstr "アクション"
 
 #: js/basicblocks.js:1537
 #: js/basicblocks.js:1542
@@ -4134,7 +4133,7 @@ msgstr "yざひょう（たて）"
 #: js/basicblocks.js:3072
 #.TRANS: x coordinate
 msgid "x3"
-msgstr "xざひょうち"
+msgstr "xざひょうち（ネズミ）"
 
 #: js/basicblocks.js:3074
 #: js/basicblocks.js:3090
@@ -4361,7 +4360,7 @@ msgstr "太さをせってい"
 
 #: js/basicblocks.js:3507
 #.TRANS: set degree of translucence of the pen color
-## 透明=とうめい　https://ja.wikipedia.org/wiki/%E9%80%8F%E6%98%8E
+## 透明=とうめい https://ja.wikipedia.org/wiki/%E9%80%8F%E6%98%8E
 msgid "set translucency"
 msgstr "透明度を設定"
 
@@ -4666,12 +4665,12 @@ msgstr "メデイアを停止"
 
 #: js/basicblocks.js:4520
 msgid "duration (ms)"
-msgstr "長さ（1秒間の1000分の1）"
+msgstr "長さ（ミリ秒）"
 
 #: js/basicblocks.js:4535
 #: js/basicblocks.js:4540
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
-## 周波数=しゅうはすう　https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
+## 周波数=しゅうはすう https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
 msgid "note to frequency"
 msgstr "音符の高さを周波数表示へ"
 
@@ -5318,14 +5317,14 @@ msgstr "フィルターを加える"
 #: js/modewidget.js:95
 #: js/pitchstaircase.js:534
 msgid "Undo"
-msgstr "元に戻す"
+msgstr "１つもどす"
 
 #: js/timbre.js:820
 msgid "Click on buttons to open the timbre design tools."
 msgstr "ボタンをクリックするとカスタム音色ツールが開きます。"
 
 #: js/timbre.js:1018
-## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
+## Does tone.js have translations? I do not even know what this is suppose to mean in English... Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
 msgid "harmonicity"
 msgstr "倍音の音色"
 
@@ -6154,7 +6153,7 @@ msgstr "翻訳"
 
 #: plugins/translate.rtp:78
 #: plugins/translate.rtp:89
-##　You could say hello in Japanese, which is こんにちは but if this is like a "hello world" thing, then English may be better. Or ハロー
+## You could say hello in Japanese, which is こんにちは but if this is like a "hello world" thing, then English may be better. Or ハロー
 msgid "hello"
 msgstr "こんにちは"
 
@@ -6287,7 +6286,7 @@ msgid "get carbs"
 msgstr "炭水化物"
 
 #: plugins/nutrition.rtp:113
-##　Get is ambiguous English word. Translates to "Take Dietary Fiber"
+## Get is ambiguous English word. Translates to "Take Dietary Fiber"
 msgid "get fiber"
 msgstr "食物繊維をとる"
 
@@ -6400,8 +6399,9 @@ msgid "water"
 msgstr "水"
 
 #: plugins/bitcoin.rtp:27
+## Maybe no need, but this did seem to come up in dictionary"
 msgid "bitcoin"
-msgstr "ビットコイン"　#Maybe no need, but this did seem to come up in dictionary"
+msgstr "ビットコイン"
 
 #: plugins/facebook.rtp:27
 ## I was just thinking it maybe should be 現在のプロジェクト
@@ -6474,7 +6474,7 @@ msgid "duration"
 msgstr "期間の設定"
 
 #: plugins/rodi.rtp:250
-## 発光＝はっこう　Pretty sure most people would understand "LED" as well http://jisho.org/word/%EF%BC%AC%EF%BC%A5%EF%BC%A4 
+## 発光＝はっこう Pretty sure most people would understand "LED" as well http://jisho.org/word/%EF%BC%AC%EF%BC%A5%EF%BC%A4 
 msgid "led"
 msgstr "発光ダイオード"
 
@@ -6483,13 +6483,13 @@ msgid "light intensity"
 msgstr "光の強さ"
 
 #: plugins/rodi.rtp:286
-## http://jisho.org/word/%E8%B5%A4%E5%A4%96　赤外＝せきがい 
+## http://jisho.org/word/%E8%B5%A4%E5%A4%96 赤外＝せきがい 
 msgid "infrared light (left)"
-msgstr "赤外光　（左）"
+msgstr "赤外光 （左）"
 
 #: plugins/rodi.rtp:300
 msgid "infrared light (right)"
-msgstr "赤外光　（右）"
+msgstr "赤外光 （右）"
 
 #: plugins/rodi.rtp:314
 msgid "distance"
@@ -6568,7 +6568,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "ドラムとしてほぞん"
 
 #~msgid "whole note 𝅝"
-#~msgstr "全音符　𝅝"
+#~msgstr "全音符 𝅝"
 
 #~msgid "To copy a stack to the clipboard, right-click on the stack."
 #~msgstr "コードスタックをコピーするため、右クリック"
@@ -6583,7 +6583,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "「プラネット」サーバは今使えません"
 
 #~msgid "You can use multiple <em>Drum</em> blocks within a <em>Note</em> block."
-#~msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。<br><br>　"
+#~msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。<br><br> "
 
 #~msgid "You can also use Alt+V to paste a stack of blocks. "
 #~msgstr "Alt+Vでブロックスを貼り付けることもできます。"
@@ -6661,7 +6661,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "分子"
 
 #~msgid "eighth note ♪"
-#~msgstr "８分音符　♪"
+#~msgstr "８分音符 ♪"
 
 #~msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 #~msgstr "オーギュメントブロックには 1, 2, 3, 4, 5, 6, 7, 8 のいずれかの数をいれて下さい。"
@@ -6778,7 +6778,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "長押しでスロー再生"
 
 #~msgid "1/64 note 𝅘𝅥𝅱"
-#~msgstr "６４分音符　𝅘𝅥𝅱"
+#~msgstr "６４分音符 𝅘𝅥𝅱"
 
 #~msgid "end hollow line"
 #~msgstr "（中空の）線を終わらせる"
@@ -6844,7 +6844,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "スネアドラム"
 
 #~msgid "1/32 note 𝅘𝅥𝅰"
-#~msgstr "32分音符　𝅘𝅥𝅰"
+#~msgstr "32分音符 𝅘𝅥𝅰"
 
 #~msgid "The Dispatch block is used to trigger an event."
 #~msgstr "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのネズミに送る。<br>イベントの発生は、各スクリプトが【イベントの時にアクション】で指定したアクションの引きがねとしてはたらく。"
@@ -6865,7 +6865,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "鼯"
 
 #~msgid "1/16 note ♬"
-#~msgstr "16分音符　♬"
+#~msgstr "16分音符 ♬"
 
 #~msgid "food"
 #~msgstr "食べ物"
@@ -6982,7 +6982,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "クラウド"
 
 #~msgid "quarter note ♩"
-#~msgstr "4分音符　♩"
+#~msgstr "4分音符 ♩"
 
 #~msgid "add filter"
 #~msgstr "フィルターを加える"

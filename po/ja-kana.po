@@ -453,7 +453,7 @@ msgstr "ちゅうしんの かくどを かくす"
 
 #: js/activity.js:1223
 msgid "show Polar"
-msgstr "ちゅうしんの かくどを ひょうじ"
+msgstr "ほうがんと かくどの ひょうじ"
 
 #: js/activity.js:1227
 #.TRANS: show Polar coordinate overlay grid
@@ -549,7 +549,7 @@ msgstr "ゆっくり じっこう する"
 #: js/toolbar.js:357
 #: js/toolbar.js:405
 msgid "Run step by step"
-msgstr "ブロックを ひとつ ずつ じっこう する"
+msgstr "ブロックを ひとつずつ じっこうする"
 
 #: js/activity.js:3423
 #: js/turtledefs.js:132
@@ -730,7 +730,7 @@ msgstr "ホーム"
 
 #: js/activity.js:3721
 msgid "Show/hide block"
-msgstr "ブロックを ひょうじ する/かくす"
+msgstr "ブロックを ひょうじする/かくす"
 
 #: js/activity.js:3726
 msgid "Expand/collapse blocks"
@@ -740,21 +740,21 @@ msgstr "ブロックを ひろげる/おりたたむ"
 #: js/turtledefs.js:147
 #: js/turtledefs.js:183
 msgid "Decrease block size"
-msgstr "ブロックの ひょうじを ちいさく する"
+msgstr "ブロックのひょうじを ちいさくする"
 
 #: js/activity.js:3734
 msgid "Cannot be further decreased"
-msgstr "これより ちいさく できない"
+msgstr "これより ちいさくできない"
 
 #: js/activity.js:3739
 #: js/turtledefs.js:148
 #: js/turtledefs.js:184
 msgid "Increase block size"
-msgstr "ブロックの ひょうじを おおきく する"
+msgstr "ブロックのひょうじを おおきくする"
 
 #: js/activity.js:3742
 msgid "Cannot be further increased"
-msgstr "これより おおきく できない"
+msgstr "これより おおきくできない"
 
 #: js/activity.js:3765
 #: js/turtledefs.js:153
@@ -1052,7 +1052,7 @@ msgstr "ばいおん ブロック が「ばいおん ウェート ブロック�
 #: js/logo.js:6845
 #: js/logo.js:6932
 msgid "Setting volume to 0."
-msgstr "おんりょうを 「0」に　せってい しています。"
+msgstr "おんりょうを 「0」に せってい しています。"
 
 #: js/logo.js:6851
 #: js/logo.js:6938
@@ -1314,7 +1314,7 @@ msgstr "おんぷ"
 #: js/basicblocks.js:1651
 #.TRANS: musical meter (time signature)
 msgid "meter"
-msgstr "びょうし"
+msgstr "ひょうし"
 
 #: js/turtledefs.js:25
 msgid "intervals"
@@ -1339,9 +1339,8 @@ msgstr "おんりょう"
 
 #: js/turtledefs.js:25
 #: js/rubrics.js:478
-## Could also be 流動 りゅうどう
 msgid "flow"
-msgstr "じっこう手順"
+msgstr "じっこうてじゅん"
 
 #: js/turtledefs.js:25
 msgid "boxes"
@@ -1373,7 +1372,7 @@ msgstr "くらべる"
 #: js/turtledefs.js:25
 #: js/rubrics.js:478
 msgid "media"
-msgstr "他のメディア"
+msgstr "ほかのメディア"
 
 #: js/turtledefs.js:25
 #: js/rubrics.js:478
@@ -1387,7 +1386,7 @@ msgstr "ヒープ"
 #: js/turtledefs.js:25
 ## 合奏=がっそう
 msgid "ensemble"
-msgstr "合奏"
+msgstr "がっそう"
 
 #: js/turtledefs.js:25
 ## May be いろいろ
@@ -1426,7 +1425,7 @@ msgstr "ミスター・マウスに あおう！"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:159
-## 指揮＝しき　https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
+## 指揮＝しき https://ja.wikipedia.org/wiki/%E6%8C%87%E6%8F%AE_%28%E9%9F%B3%E6%A5%BD%29
 msgid "Mr Mouse is our Music Blocks conductor."
 msgstr "ミスター・マウスは、  ミュージック・ブロックスの しきしゃ。"
 
@@ -1529,7 +1528,7 @@ msgstr "ブロックをひょうじする／かくす"
 #: js/turtledefs.js:140
 #: js/turtledefs.js:171
 msgid "Hide or show the blocks and the palettes."
-msgstr "クリックすると、 パレットボタンと プログラムの ブロックを がめんじょうに　ひょうじさせたり、かくしたりすることができる。"
+msgstr "クリックすると、 パレットボタンと プログラムの ブロックを がめんじょうに ひょうじさせたり、かくしたりすることができる。"
 
 #: js/turtledefs.js:141
 msgid "Expand/collapse collapsable blocks"
@@ -1575,7 +1574,7 @@ msgstr "モードを せってい"
 #: js/turtledefs.js:145
 #: js/turtledefs.js:181
 msgid "Switch between beginner and advance modes."
-msgstr "ミュージック・ブロックスを　かんたんモード／はってんモード　に きりかえる。 モードによって つかえる きのうや ブロックの しゅるいが かわる。"
+msgstr "ミュージック・ブロックスを かんたんモード／はってんモード に きりかえる。 モードによって つかえる きのうや ブロックの しゅるいが かわる。"
 
 #: js/turtledefs.js:146
 #: js/turtledefs.js:187
@@ -1600,7 +1599,7 @@ msgstr "ネズミを もとのいちに もどし、 ペンで えがいた せ�
 #: js/turtledefs.js:150
 #: js/turtledefs.js:170
 msgid "Collapse the graphics window."
-msgstr "ネズミが いどうしたり、 ペンで せんを えがいたり できる 「カンバス」の ひょうじサイズを　しゅくしょう／かくだいする。<br>カンバスを しゅくしょう したばあいは、 プログラムを  ふつうの そくどで じっこう しても、 ブロックが かくれない。 ふつうの じっこうそくどで プログラムの どうさ かくにんを したいときなどに べんりだ。"
+msgstr "ネズミが いどうしたり、 ペンで せんを えがいたり できる 「カンバス」の ひょうじサイズを しゅくしょう／かくだいする。<br>カンバスを しゅくしょう したばあいは、 プログラムを  ふつうの そくどで じっこう しても、 ブロックが かくれない。 ふつうの じっこうそくどで プログラムの どうさ かくにんを したいときなどに べんりだ。"
 
 #: js/turtledefs.js:151
 #: js/turtledefs.js:189
@@ -1610,7 +1609,7 @@ msgstr "キーボードのショートカット"
 #: js/turtledefs.js:151
 #: js/turtledefs.js:189
 msgid "You can type d to create a do block and r to create a re block etc."
-msgstr "キーボードの ショートカット<br><br>キーボードを つかうと、 パレットボタンから ブロックを ドラッグして はいち するだけでなく、 ボタンを おすだけで ちょくせつ ブロックを おくことが できる。<br><br>★ショートカットキー<br> d ……　「ド」（４ぶおんぷ、４オクターヴ）<br> r ……　「レ」（４ぶおんぷ、４オクターヴ）<br> m ……　「ミ」（４ぶおんぷ、４オクターヴ）<br> f ……　「ファ」（４ぶおんぷ、４オクターヴ）<br> s ……　「ソ」（４ぶおんぷ、４オクターヴ）<br> l ……　「ラ」（４ぶおんぷ、４オクターヴ）<br> t ……　「シ」（４ぶおんぷ、４オクターヴ）"
+msgstr "キーボードの ショートカット<br><br>キーボードを つかうと、 パレットボタンから ブロックを ドラッグして はいち するだけでなく、 ボタンを おすだけで ちょくせつ ブロックを おくことが できる。<br><br>★ショートカットキー<br> d …… 「ド」（４ぶおんぷ、４オクターヴ）<br> r …… 「レ」（４ぶおんぷ、４オクターヴ）<br> m …… 「ミ」（４ぶおんぷ、４オクターヴ）<br> f …… 「ファ」（４ぶおんぷ、４オクターヴ）<br> s …… 「ソ」（４ぶおんぷ、４オクターヴ）<br> l …… 「ラ」（４ぶおんぷ、４オクターヴ）<br> t …… 「シ」（４ぶおんぷ、４オクターヴ）"
 
 #: js/turtledefs.js:152
 #: js/turtledefs.js:190
@@ -1693,7 +1692,7 @@ msgstr "じゆうなほうこうに／たてほうこうにスクロール"
 
 #: js/turtledefs.js:182
 msgid "You can scroll the blocks on the canvas."
-msgstr "カンバスじょうを ドラッグそうさ したときに、 がめんを スクロール させることができる ほうこうを　じょうげ だけ と じょうげさゆう に かえる。"
+msgstr "カンバスじょうを ドラッグそうさ したときに、 がめんを スクロール させることができる ほうこうを じょうげ だけ と じょうげさゆう に かえる。"
 
 #: js/turtledefs.js:185
 msgid "Display statistics about your Music project."
@@ -1717,7 +1716,7 @@ msgstr "<h2>ドラム ブロック</h2><br>「おんぷブロック」 の な�
 
 #: js/turtledefs.js:200
 msgid "A rest of the specified note value duration can be constructed using a Silence block."
-msgstr "<h2>きゅうふブロック</h2><br>おとがない ぶぶんに つかわれる。★きゅうふとは<br>やすみのながさ。"
+msgstr "<h2>きゅうふブロック</h2><br>おとがない ぶぶんに つかわれる。<br>★きゅうふとは<br>やすみのながさ。"
 
 #: js/turtledefs.js:201
 msgid "The Note value block is the value of the duration of the note currently being played."
@@ -1725,7 +1724,7 @@ msgstr "<h2>おとのながさ ブロック</h2><br>おとの ながさを ひ�
 
 #: js/turtledefs.js:203
 msgid "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
-msgstr "<h2>びょうし ブロック</h2><br>ひょうしを せっていする。　ひょうじゅんは　４ぶんの　４びょうし。<br><br>★ひょうしとは<br>はくが いくつか まとまったもの。<br>★４ぶんの４びょうしとは<br>４ぶおんぷが ４つでひとまとまりになった ひょうし。<br>★はくとは<br>くりかえされる リズムのこと。"
+msgstr "<h2>びょうし ブロック</h2><br>ひょうしを せっていする。 ひょうじゅんは ４ぶんの ４びょうし。<br><br>★ひょうしとは<br>はくが いくつか まとまったもの。<br>★４ぶんの４びょうしとは<br>４ぶおんぷが ４つでひとまとまりになった ひょうし。<br>★はくとは<br>くりかえされる リズムのこと。"
 
 #: js/turtledefs.js:204
 msgid "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
@@ -1742,7 +1741,7 @@ msgstr "<h2>ぜんぶの おんぷに ～するブロック</h2><br>すべての
 #: js/turtledefs.js:207
 #: js/turtledefs.js:496
 msgid "The Beat count block is the number of the current beat,"
-msgstr "<h2>はくの いちブロック</h2><br>br>しょうせつの なかで なんぱくめかを あらわす かず。"
+msgstr "<h2>はくの いちブロック</h2><br>しょうせつの なかで なんぱくめかを あらわす かず。"
 
 #: js/turtledefs.js:207
 msgid "eg 1, 2, 3, or 4."
@@ -1775,11 +1774,11 @@ msgstr ""
 
 #: js/turtledefs.js:213
 msgid "The Pitch Number block will play a pitch associated by its number, e.g, 1 for C, 7 for G."
-msgstr "<h2>おとのたかさを数でひょうじブロック</h2><br>おとのたかさを、数でひょうじする。たとえば、「ド」ならば０、「ソ」ならば７とひょうじされる。"
+msgstr "<h2>おとの たかさを かずで ひょうじ ブロック</h2><br>おとの たかさを かずで ひょうじする。 たとえば、 オクターヴ４の 「ド」 の おとは ０、 オクターヴ４の 「ソ」 の おとは ７、 オクターヴ３の 「シ」 の おとは -１ と ひょうじされる。"
 
 #: js/turtledefs.js:214
 msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
-msgstr "<h2>おんかいないをのぼる／おりるブロック</h2>br>おんかいない を じゅんばんに （ある いっていの かんかくで） のぼりながら、 または おりながら おとを えんそう する。 すうちを せっていする ことで、 つぎの おとは まえの おとと いくつちがうか が きまる。"
+msgstr "<h2>おんかいないをのぼる／おりるブロック</h2><br>おんかいない を じゅんばんに （ある いっていの かんかくで） のぼりながら、 または おりながら おとを えんそう する。 すうちを せっていする ことで、 つぎの おとは まえの おとと いくつちがうか が きまる。"
 
 #: js/turtledefs.js:214
 msgid "eg if the last note played was sol, Scalar Step 1 will play la."
@@ -1799,16 +1798,16 @@ msgstr "<br><br>ずのれいでは、 ソがラに、 ラがシに、 シがド�
 
 #: js/turtledefs.js:217
 msgid "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
-msgstr "<h2>おとのたかさをヘルツでひょうじブロック</h2><br>おとのたかさをヘルツでひょうじする。<br>たとえば、オクターヴが４のラの音は、４４０ヘルツというすうちで表すことができる。<br><br>★ヘルツとは<br>おとのたかさを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちがおおきい）ほど、音が高くなる。<br><br>"
+msgstr "<h2>おとの たかさを ヘルツで ひょうじ ブロック</h2><br>おとの たかさを ヘルツで ひょうじ する。<br>たとえば、 オクターヴが４の ラのおとは、 ４４０ヘルツという すうちで あらわすことが できる。<br><br>★ヘルツとは<br>おとの たかさを あらわす しゅうはすう。<br>★しゅうはすうとは<br>おとが １びょうかん に なんかい しんどうするかを あらわす すうち。 しゅうはすうが たかい （すうちが おおきい） ほど、 おとが たかくなる。"
 
 #: js/turtledefs.js:218
 msgid "The Pitch number block is the value of the pitch of the note currently being played."
-msgstr "<h2>おとのたかさを かずでひょうじ ブロック</h2><br>おとの たかさを かずで ひょうじする。 たとえば、 「ド」 ならば ０、 「ソ」ならば ７ と ひょうじされる。"
+msgstr "<h2>おとのたかさを かずでひょうじ ブロック</h2><br>おとの たかさを かずで ひょうじする。 たとえば、 「ド_４」 ならば １、 「ソ_４」 ならば ７ 、「シ_３」ならば-１、と ひょうじされる。"
 
 #: js/turtledefs.js:220
 #: js/turtledefs.js:497
 msgid "The Set key block is used to set the key and mode,"
-msgstr "<h2>ちょうをせっていブロック</h2><br>ちょうの ぶぶんに おとのたかさ、おんかいの ぶぶんに おんかいのしゅるいを えらび、ちょうを せっていする。<br><br>★ちょうとは<br>ちゅうしんてきな やくわりを はたすおとと、 おんかいの しゅるいによって きまる、 きょくの かんじ。 ちゅうしんてきな やくわりを はたすおと だけを  さすこともある。<br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。"
+msgstr "<h2>おんかいブロック</h2><br>ちょうの ぶぶんに おとのたかさ、おんかいの ぶぶんに おんかいのしゅるいを えらび、ちょうを せっていする。<br><br>★ちょうとは<br>ちゅうしんてきな やくわりを はたすおとと、 おんかいの しゅるいによって きまる、 きょくの かんじ。 ちゅうしんてきな やくわりを はたすおと だけを  さすこともある。<br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。"
 
 #: js/turtledefs.js:220
 msgid "eg C Major"
@@ -1890,7 +1889,7 @@ msgstr " ０から １００までの すうちを せってい できる。"
 
 #: js/turtledefs.js:233
 msgid "The range is 0 for silence to 100 for full volume."
-msgstr "０から１００までのすうちをせっていできる。<br><br>　"
+msgstr "０から１００までのすうちをせっていできる。<br><br> "
 
 #: js/turtledefs.js:234
 msgid "The Set master volume block sets the volume for all synthesizers."
@@ -1911,7 +1910,7 @@ msgstr "<h2>じっこうじょうきょうブロック</h2><br>ブロックの�
 
 #: js/turtledefs.js:240
 msgid "The Pitch-time Matrix block opens a tool to create musical phrases."
-msgstr "<h2>フレーズメーカーブロック</h2><br>フレーズを作るためのテーブルをひょうじする。作ったフレーズをデータ化することができる。<br><br>★フレーズとは<br>ひとまとまりの音楽。<br><br>"
+msgstr "<h2>フレーズメーカーブロック</h2><br>フレーズを つくるための テーブルを  ひょうじする。 つくった フレーズを データに することが できる。<br><br>"
 
 #: js/turtledefs.js:241
 msgid "The Rhythm Maker block opens a tool to create drum machines."
@@ -1951,7 +1950,7 @@ msgstr "<h2>じっこうブロック（くりかえし）</h2><br>はさまれ�
 
 #: js/turtledefs.js:249
 msgid "In this example the note will be played 4 times."
-msgstr "<br><br>ずのれい では、 「アクション」が ４かい じっこうされる。"
+msgstr "<br><br>ずのれい では、 「ソ」 の おとが ４かい えんそうされる。"
 
 #: js/turtledefs.js:250
 msgid "The Forever block will repeat the contained blocks forever."
@@ -1966,14 +1965,14 @@ msgstr "<br><br>ずのれいは 「アクション」の じっこうを くり�
 #: js/turtledefs.js:502
 #: js/turtledefs.js:503
 msgid "Conditionals lets your program take different actions depending on the condition."
-msgstr "<h2>じょうけんブロック</h2><br>＜じょうけんブロック＞<br>じょうけんブロックを つかうと、 じょうけんによって ちがう はたらきをする プログラムを つくることが できる。"
+msgstr "<h2>じょうけんブロック</h2><br>じょうけんブロックを つかうと、 じょうけんによって ちがう はたらきをする プログラムを つくることが できる。 "
 
 #: js/turtledefs.js:251
 #: js/turtledefs.js:252
 #: js/turtledefs.js:502
 #: js/turtledefs.js:503
 msgid "In this example if the mouse button is pressed a snare drum will play."
-msgstr "<br><br>ずのれいでは、 もし、 パソコンの マウスを ながおし していれば 「スネアドラム」 ブロックを、"
+msgstr "<br><br>ずのれい では、 もし、 パソコンのマウスを ながおし していれば 「スネアドラム」ブロックを えんそうする。"
 
 #: js/turtledefs.js:251
 #: js/turtledefs.js:252
@@ -2017,11 +2016,11 @@ msgstr "<h2>イベントブロック（はっせい）</h2><br>していした �
 #: js/turtledefs.js:396
 #: js/turtledefs.js:398
 msgid "The Do block is used to initiate an action."
-msgstr "<h2>アクションブロック（してい）</h2><br>していした アクションブロックを じっこうする。 <br>ずのれいは、 きまったアクション ではなく、 ２つの うち どちらか １つの アクションを ランダムに じっこうさせる。"
+msgstr "<h2>アクションブロック（してい）</h2><br>していした アクションブロックを じっこうする。"
 
 #: js/turtledefs.js:259
 msgid "In the example, it is used with the One of block to choose a random phase."
-msgstr "<br><br>図の例は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムにじっこうさせる。"
+msgstr "<br><br>ずのれいは、 きまったアクション ではなく、 ２つの うち どちらか １つの アクションを ランダムに じっこうさせる。"
 
 #: js/turtledefs.js:261
 msgid "The Store in Box 1 block is used to store a value in Box 1."
@@ -2086,15 +2085,15 @@ msgstr "<h2>すうちブロック（けいさん）</h2><br>２つの すうち�
 
 #: js/turtledefs.js:276
 msgid "The Greater-than block returns True if the top number is greater than the bottom number."
-msgstr "<h2>しんぎブロック（大なり）</h2><br>２つの すうちをくらべて、 すうちの だいしょうを はんてい する。「＞」は うえの すうちが したの すうちよりも おおきければ 「しん（しん）」、 したの すうちと おなじか ちいさければ 「にせ（ぎ）」という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
+msgstr "<h2>しんぎブロック（だい なり）</h2><br>２つの すうちをくらべて、 すうちの だいしょうを はんてい する。「＞」は うえの すうちが したの すうちよりも おおきければ 「しん（しん）」、 したの すうちと おなじか ちいさければ 「にせ（ぎ）」という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
 
 #: js/turtledefs.js:277
 msgid "The Less-than block returns True if the top number is less than the bottom number."
-msgstr "<h2>しんぎブロック（小なり）</h2><br>２つの すうちをくらべて、 すうちの だいしょうを はんてい する。 「＜」は うえの すうちが したの すうちよりも ちいさければ 「しん（しん）」、 したの すうちと おなじか おおきければ 「にせ（ぎ）」という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
+msgstr "<h2>しんぎブロック（しょう なり）</h2><br>２つの すうちをくらべて、 すうちの だいしょうを はんてい する。 「＜」は うえの すうちが したの すうちよりも ちいさければ 「しん（しん）」、 したの すうちと おなじか おおきければ 「にせ（ぎ）」という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
 
 #: js/turtledefs.js:278
 msgid "The Equal block returns True if the two numbers are equal."
-msgstr "<h2>しんぎブロック（等しい）</h2><br>２つの すうちを くらべて、 おなじ すうちで あるかどうか はんてい する。 「＝」は、 ２つの すうちが おなじ であれば 「しん（しん）」、 おなじ でなければ 「にせ（ぎ）」 という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
+msgstr "<h2>しんぎブロック（ひとしい）</h2><br>２つの すうちを くらべて、 おなじ すうちで あるかどうか はんてい する。 「＝」は、 ２つの すうちが おなじ であれば 「しん（しん）」、 おなじ でなければ 「にせ（ぎ）」 という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
 
 #: js/turtledefs.js:280
 msgid "The Forward block moves the mouse forward."
@@ -2138,27 +2137,27 @@ msgstr "<h2>すうち ブロック</h2><br>ネズミの むいている かく�
 
 #: js/turtledefs.js:291
 msgid "The Set-pen-size block changes the size of the pen."
-msgstr "<h2>ペン ブロック</h2><br>ネズミが えがく せんの ふとさを かえる。 ふとさには、 0より おおきい あたいを つかう。"
+msgstr "<h2>ペンブロック</h2><br>ネズミが えがく せんの ふとさを かえる。 ふとさには、 0より おおきい あたいを つかう。"
 
 #: js/turtledefs.js:292
 msgid "The Pen-up block raises the pen so that it does not draw."
-msgstr "<h2>ペン ブロック</h2><br>ネズミの うごきに あわせて せんを えがくことを やめる。"
+msgstr "<h2>ペンブロック</h2><br>ネズミの うごきに あわせて せんを えがくことを やめる。"
 
 #: js/turtledefs.js:293
 msgid "The Pen-down block lowers the pen so that it draws."
-msgstr "<h2>ペン ブロック</h2><br>ネズミの うごきに あわせて せんを えがく。"
+msgstr "<h2>ペンブロック</h2><br>ネズミの うごきに あわせて せんを えがく。"
 
 #: js/turtledefs.js:294
 msgid "The Color block returns the current pen color."
-msgstr ""
+msgstr "げんざいの ペンの いろを、 すうちで ひょうじする。"
 
 #: js/turtledefs.js:295
 msgid "The Set-color block changes the pen color."
-msgstr "<h2>ペンブ ロック</h2><br>ネズミが えがく せんのいろを かえる。 いろは がめんじょうで えらぶ ほか、 それぞれ すうちで きめることも できる。 いろは、 0いじょうで、 100より ちいさい あたいになる。"
+msgstr "<h2>ペンブロック</h2><br>ネズミが えがく せんのいろを かえる。 いろは がめんじょうで えらぶ ほか、 それぞれ すうちで きめることも できる。 いろは、 0いじょうで、 100より ちいさい あたいになる。"
 
 #: js/turtledefs.js:296
 msgid "The Set-shade block changes the pen color from dark to light."
-msgstr "<h2>ペンブ ロック</h2><br>ネズミがえがく線の色のこさをせっていする。"
+msgstr "<h2>ペンブロック</h2><br>ネズミが えがく せんの いろの こさを せっていする。"
 
 #: js/turtledefs.js:298
 msgid "The Print block displays text at the top of the screen."
@@ -2182,15 +2181,15 @@ msgstr "<h2>ひょうじブロック（ネズミ）</h2><br>ネズミの みた�
 
 #: js/turtledefs.js:303
 msgid "The Speak block outputs to the text-to-speech synthesizer"
-msgstr "<h2>おんせいブロック</h2><br>うちこんだ もじを、 きかい おんせい で　よみあげる。"
+msgstr "<h2>おんせいブロック</h2><br>うちこんだ もじを、 きかい おんせい で よみあげる。"
 
 #: js/turtledefs.js:304
 msgid "The Height block returns the height of the canvas."
-msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの たてはば の すうちを あらわす。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。<br>ずのれいでは、 うわむきに すすみ つづける ネズミが カンバスの じょうたん から はみでると、 カンバスの かたん から でてくる。"
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの たてはば の すうちを あらわす。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
 
 #: js/turtledefs.js:305
 msgid "The Width block returns the width of the canvas."
-msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの たてはば の すうちを あらわす。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。<br>ずのれいでは、 うわむきに すすみ つづける ネズミが カンバスの じょうたん から はみでると、 カンバスの かたん から でてくる。"
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの たてはば の すうちを あらわす。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
 
 #: js/turtledefs.js:306
 msgid "The Top block returns the position of the top of the canvas."
@@ -2220,15 +2219,15 @@ msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの み�
 
 #: js/turtledefs.js:311
 msgid "The Mouse-button block returns True if the mouse button is pressed."
-msgstr "<h2>しんぎブロック（マウスボタン）</h2><br>マウスの ボタンが おされているか どうか はんてい する。 マウスボタンが おされていれば 「しん（しん）」、 おされていなければ「にせ（ぎ）」と いう あたいになる。<br>ずのれいは、　ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
+msgstr "<h2>しんぎブロック（マウスボタン）</h2><br>マウスの ボタンが おされているか どうか はんてい する。 マウスボタンが おされていれば 「しん（しん）」、 おされていなければ「にせ（ぎ）」と いう あたいになる。<br>ずのれいは、 ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
 
 #: js/turtledefs.js:312
 msgid "The Cursor X block returns the horizontal position of the mouse."
-msgstr "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの よこいち を あらわす ｘざひょうち。<br>ずのれいは、　ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。"
+msgstr "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの よこいち を あらわす ｘざひょうち。<br>ずのれいは、 ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。"
 
 #: js/turtledefs.js:313
 msgid "The Cursor Y block returns the vertical position of the mouse."
-msgstr "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの たていち を あらわす ｙざひょうち。<br>ずのれいは、　ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。"
+msgstr "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの たていち を あらわす ｙざひょうち。<br>ずのれいは、 ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。"
 
 #: js/turtledefs.js:314
 msgid "The Click block returns True if a mouse has been clicked."
@@ -3023,7 +3022,7 @@ msgstr "ノコギリは(サー）"
 
 #: js/basicblocks.js:131
 #.TRANS: musical transposition (adjustment of pitch up or down)
-##　Maybe トランスポーズ Non-musicians may understand first better (though I need to verify if understood)；移調＝いちょう;https://ja.wikipedia.org/wiki/%E7%A7%BB%E8%AA%BF
+## Maybe トランスポーズ Non-musicians may understand first better (though I need to verify if understood)；移調＝いちょう;https://ja.wikipedia.org/wiki/%E7%A7%BB%E8%AA%BF
 msgid "transposition"
 msgstr "いちょう"
 
@@ -3218,7 +3217,7 @@ msgstr "おんかいないを のぼる／おりる"
 
 #: js/basicblocks.js:655
 #.TRANS: there are different types (sine, triangle, square...) of oscillators.
-## 発振機=はっしんき　http://jisho.org/word/%E7%99%BA%E6%8C%AF%E6%A9%9F or http://jisho.org/word/%E6%8C%AF%E5%8B%95%E5%AD%90 
+## 発振機=はっしんき http://jisho.org/word/%E7%99%BA%E6%8C%AF%E6%A9%9F or http://jisho.org/word/%E6%8C%AF%E5%8B%95%E5%AD%90 
 msgid "oscillator"
 msgstr "オシレータ―"
 
@@ -3444,7 +3443,7 @@ msgstr "タイ"
 #: js/basicblocks.js:1270
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
-##　I need to look this up.
+## I need to look this up.
 msgid "dot"
 msgstr "ふてんおんぷ"
 
@@ -3553,7 +3552,7 @@ msgstr "びょうし"
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 msgid "do1"
-msgstr "～する"
+msgstr "アクション じっこう"
 
 #: js/basicblocks.js:1523
 #: js/basicblocks.js:1542
@@ -3565,9 +3564,8 @@ msgstr "～する"
 #: js/basicblocks.js:4752
 #.TRANS: do (take) an action
 #.TRANS: take (do) some action
-## アクションis "action" and する is "to do"
 msgid "do"
-msgstr "アクションじっこう"
+msgstr "アクション"
 
 #: js/basicblocks.js:1537
 #: js/basicblocks.js:1542
@@ -3898,7 +3896,7 @@ msgstr "おんかいの おんすう"
 #: js/basicblocks.js:2658
 #.TRANS: the mode in music is 'major', 'minor', etc.
 msgid "current mode"
-msgstr "げんだいの　おんかい"
+msgstr "げんだいの おんかい"
 
 #: js/basicblocks.js:2669
 #.TRANS: the key is a group of pitches with which a music composition is created
@@ -4139,7 +4137,7 @@ msgstr "yざひょう（たて）"
 #: js/basicblocks.js:3072
 #.TRANS: x coordinate
 msgid "x3"
-msgstr "xざひょうち"
+msgstr "xざひょうち（ネズミ）"
 
 #: js/basicblocks.js:3074
 #: js/basicblocks.js:3090
@@ -4169,7 +4167,7 @@ msgstr "たていどう"
 #: js/basicblocks.js:3105
 #.TRANS: erase the screen and return the mice to the center position
 msgid "clear"
-msgstr "もとにもどす"
+msgstr "１つもどす"
 
 #: js/basicblocks.js:3116
 #.TRANS: control point in a bezier curve
@@ -4366,7 +4364,7 @@ msgstr "ふとさを せってい"
 
 #: js/basicblocks.js:3507
 #.TRANS: set degree of translucence of the pen color
-## 透明=とうめい　https://ja.wikipedia.org/wiki/%E9%80%8F%E6%98%8E
+## 透明=とうめい https://ja.wikipedia.org/wiki/%E9%80%8F%E6%98%8E
 msgid "set translucency"
 msgstr "透明度をせってい"
 
@@ -4652,7 +4650,7 @@ msgstr "カンバスの たてはば"
 #: js/basicblocks.js:4446
 #.TRANS: stops playback of an audio recording
 msgid "stop play"
-msgstr "再生を停止"
+msgstr "ていし"
 
 #: js/basicblocks.js:4458
 #.TRANS: play an audio recording
@@ -4671,12 +4669,12 @@ msgstr "メデイアを ていし"
 
 #: js/basicblocks.js:4520
 msgid "duration (ms)"
-msgstr "ながさ（1秒間の1000分の1）"
+msgstr "ながさ（ミリびょう）"
 
 #: js/basicblocks.js:4535
 #: js/basicblocks.js:4540
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
-## 周波数=しゅうはすう　https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
+## 周波数=しゅうはすう https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
 msgid "note to frequency"
 msgstr "おんぷの たかさを しゅうはすう ひょうじへ"
 
@@ -5334,7 +5332,7 @@ msgid "Click on buttons to open the timbre design tools."
 msgstr "ボタンをクリックするとカスタムねいろツールが開きます。"
 
 #: js/timbre.js:1018
-## Does tone.js have translations? I do not even know what this is suppose to mean in English...　Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
+## Does tone.js have translations? I do not even know what this is suppose to mean in English... Guessing "Tone color of harmonics" because I think it had something to do with controlling the individual harmonics... 倍音＝ばいおん http://jisho.org/word/%E5%80%8D%E9%9F%B3 
 msgid "harmonicity"
 msgstr "ばいおんの ねいろ"
 
@@ -6163,7 +6161,7 @@ msgstr "ほんやく"
 
 #: plugins/translate.rtp:78
 #: plugins/translate.rtp:89
-##　You could say hello in Japanese, which is こんにちは but if this is like a "hello world" thing, then English may be better. Or ハロー
+## You could say hello in Japanese, which is こんにちは but if this is like a "hello world" thing, then English may be better. Or ハロー
 msgid "hello"
 msgstr "こんにちは"
 
@@ -6296,7 +6294,7 @@ msgid "get carbs"
 msgstr "たんす いかぶつ"
 
 #: plugins/nutrition.rtp:113
-##　Get is ambiguous English word. Translates to "Take Dietary Fiber"
+## Get is ambiguous English word. Translates to "Take Dietary Fiber"
 msgid "get fiber"
 msgstr "せんいしつを とる"
 
@@ -6410,7 +6408,7 @@ msgstr "水"
 
 #: plugins/bitcoin.rtp:27
 msgid "bitcoin"
-msgstr "ビットコイン"　#Maybe no need, but this did seem to come up in dictionary"
+msgstr "ビットコイン" #Maybe no need, but this did seem to come up in dictionary"
 
 #: plugins/facebook.rtp:27
 ## I was just thinking it maybe should be 現在のプロジェクト
@@ -6483,7 +6481,7 @@ msgid "duration"
 msgstr "期間のせってい"
 
 #: plugins/rodi.rtp:250
-## 発光＝はっこう　Pretty sure most people would understand "LED" as well http://jisho.org/word/%EF%BC%AC%EF%BC%A5%EF%BC%A4 
+## 発光＝はっこう Pretty sure most people would understand "LED" as well http://jisho.org/word/%EF%BC%AC%EF%BC%A5%EF%BC%A4 
 msgid "led"
 msgstr "発光ダイオード"
 
@@ -6492,13 +6490,13 @@ msgid "light intensity"
 msgstr "光の強さ"
 
 #: plugins/rodi.rtp:286
-## http://jisho.org/word/%E8%B5%A4%E5%A4%96　赤外＝せきがい 
+## http://jisho.org/word/%E8%B5%A4%E5%A4%96 赤外＝せきがい 
 msgid "infrared light (left)"
-msgstr "赤外光　（左）"
+msgstr "赤外光 （左）"
 
 #: plugins/rodi.rtp:300
 msgid "infrared light (right)"
-msgstr "赤外光　（右）"
+msgstr "赤外光 （右）"
 
 #: plugins/rodi.rtp:314
 msgid "distance"
