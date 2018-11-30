@@ -348,8 +348,11 @@ function Block(protoblock, blocks, overrideName) {
         // artwork and recalculate the hitarea.
         var that = this;
 
-        /*Position media
-        @param-that = this = resize function*/
+        /*
+        Position media
+        @param-that = this = resize function
+        return{void}
+        */
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
@@ -391,9 +394,12 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.container !== null) {
             var that = this;
-            /* Update Cache
-            *Calculate hit area
-            @param-that = this = container*/
+            /*
+            Update Cache
+            Calculate hit area
+            @param-that = this = container
+            return{void}
+            */
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
@@ -410,8 +416,11 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-/*set a new Protoblock
-@param-plusMinus-new variable*/
+/*
+set a new Protoblock
+@param-plusMinus-new variable
+return{void}
+*/
     this._newArtwork = function (plusMinus) {
         if (this.isCollapsible()) {
             var proto = new ProtoBlock('collapse');
@@ -522,11 +531,17 @@ function Block(protoblock, blocks, overrideName) {
 
         this.generateArtwork(true, []);
     };
-// Add a new image
+/*
+Add a new image
+return{void}
+*/
     this._addImage = function () {
         var image = new Image();
         var that = this;
-//when image has loaded
+/*
+when image has loaded
+return{void}
+*/
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -702,7 +717,10 @@ function Block(protoblock, blocks, overrideName) {
         }
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
-//after the image has loaded
+/*
+after the image has loaded
+return{void}
+*/
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -859,13 +877,18 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-/* Generate the collapsed art
-    param postProcess = null*/
+/* 
+Generate the collapsed art
+@param postProcess = null
+*/
     this._generateCollatpseArt= function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-/*refresh and clean canvas after loading
-After the image has finished collapsing*/
+/*
+refresh and clean canvas after loading
+After the image has finished collapsing
+return{void}
+*/
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
@@ -879,8 +902,11 @@ After the image has finished collapsing*/
                 that.expandButtonBitmap.visible = false;
             }
         };
-/*Processing the collapse button
-       @param - that = generateCollapseArt*/
+/*
+Processing the collapse button
+@param - that = generateCollapseArt
+return{void}
+       */
         var __processCollapseButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -902,8 +928,11 @@ After the image has finished collapsing*/
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
-/*When expanding buttons
-         @param - that = generateCollapseArt*/
+/*
+When expanding buttons
+@param - that = generateCollapseArt
+return{void}
+         */
         var __processExpandButton = function (that) {
             var image = new Image();
             image.onload = function () {
@@ -925,9 +954,12 @@ After the image has finished collapsing*/
 
             image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
-/*Processing the hilighted collapsed image
-  @param-bitmap-null
-  @param-that-generateCollapseArt*/
+/*
+Processing the hilighted collapsed image
+@param-bitmap-null
+@param-that-generateCollapseArt
+return{void}
+  */
         var __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
@@ -1007,8 +1039,11 @@ After the image has finished collapsing*/
 
             __processExpandButton(that);
         };
-/*replace fill color to stroke color
-        @param - bitmap - null*/
+/*
+replace fill color to stroke color
+@param - bitmap - null
+return{void}
+*/
         var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
@@ -1023,7 +1058,10 @@ After the image has finished collapsing*/
         var artwork = this.collapseArtwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', '');
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
-//if it is collapsible, then set visibity to false 
+/*
+if it is collapsible, then set visibity to false 
+return{void}
+*/
     this.hide = function () {
         this.container.visible = false;
         if (this.isCollapsible()) {
@@ -1596,8 +1634,11 @@ After the image has finished collapsing*/
 
         this.blocks.refreshCanvas();
     };
-/*customize text
-  @param-blockscale-scale*/  
+/*
+customize text
+@param-blockscale-scale
+return{void}
+*/  
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
@@ -1637,11 +1678,14 @@ After the image has finished collapsing*/
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
-    /*@param-bitmap - image
-    @param-width-width of canvas
-    @param-height-height of canvas
-    @param-blockscale-scale
-Position inserted media */
+ /*
+@param-bitmap - image
+@param-width-width of canvas
+@param-height-height of canvas
+@param-blockscale-scale
+Position inserted media 
+return{void}
+*/
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
@@ -1651,7 +1695,10 @@ Position inserted media */
         bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
         bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
     };
-//position label
+/*
+position label
+return{void}
+*/
     this._positionCollapseLabel = function (blockScale) {
         if (this.isInlineCollapsible()) {
             this.collapseText.x = Math.floor(((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale / 2) + 0.5);
@@ -2136,7 +2183,9 @@ set cursor style to default*/
         this.container.setChildIndex(this.highlightBitmap, 0);
         this.updateCache();
     };
-//customize the label and canvas
+/*customize the label and canvas
+return{void}
+*/
     this._changeLabel = function () {
         var that = this;
         var x = this.container.x;
@@ -2724,7 +2773,10 @@ set cursor style to default*/
             }, 100);
         }
     };
-//Check if pie menu is ok to launch
+/*
+Check if pie menu is ok to launch
+return{void}
+*/
     this.piemenuOKtoLaunch = function () {
         if (this._piemenuExitTime === null) {
             return true;
@@ -3034,7 +3086,10 @@ set cursor style to default*/
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
         };
-//pitch preview
+/*
+pitch preview
+return{void}
+*/
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3192,7 +3247,10 @@ set cursor style to default*/
 
         // Set up event handlers
         var that = this;
-//Change selection and set value to notevalue
+/*
+Change selection and set value to notevalue
+return{void}
+*/
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3208,7 +3266,10 @@ set cursor style to default*/
             var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
             that.blocks.setPitchOctave(that.connections[0], octave);
         };
-//Preview pitch
+/*
+Preview pitch
+return{void}
+*/
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
@@ -3317,7 +3378,10 @@ set cursor style to default*/
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-//Exit menu
+/*
+Exit menu
+return{void}
+*/
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -3449,7 +3513,10 @@ set cursor style to default*/
         this._tabsWheel.createWheel(tabsLabels);
         
         var that = this;
-//set value to number of text
+/*
+set value to number of text
+return{void}
+*/
         var __selectionChanged = function () {
             that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
             that.value = Number(that.text.text);
@@ -3459,7 +3526,10 @@ set cursor style to default*/
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-//set pie menu's exit time to current time
+/*
+set pie menu's exit time to current time
+return{void}
+*/
         var __exitMenu = function () {
             var d = new Date();
             that._piemenuExitTime = d.getTime();
@@ -4113,7 +4183,10 @@ set cursor style to default*/
             that.container.setChildIndex(that.text, z);
             that.updateCache();
         };
-//Preview voice
+/*
+Preview voice
+return{void}
+*/
         var __voicePreview = function () {
             var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             var i = voiceLabels.indexOf(label);
@@ -4659,7 +4732,10 @@ set cursor style to default*/
                 }, 1000 / 10); // slight delay between notes
             }
         };
-//set mode to MUSICALMODES and active tabs to 0
+/*
+prepare scale
+return{void}
+*/
         var __prepScale = function () {
             var activeTabs = [0];
             var mode = MUSICALMODES[that.value];
@@ -4994,6 +5070,7 @@ set cursor style to default*/
 /*
 set elements to a array
 if element is string,then set element's id to element
+return{void}
 */
 function $() {
     var elements = new Array();
