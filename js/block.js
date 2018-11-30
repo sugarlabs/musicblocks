@@ -1031,7 +1031,7 @@ function Block(protoblock, blocks, overrideName) {
      * @return{void}
      * @private
      */
-    this._generateCollatpseArt= function (postProcess) {
+    this._generateCollapseArtwork = function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
