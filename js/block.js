@@ -401,7 +401,7 @@ function Block(protoblock, blocks, overrideName) {
  * Calculate hit area
  * @param-that = this = container
  * @return{void}
- * @public
+ * @private
  */
             var _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
@@ -423,7 +423,7 @@ function Block(protoblock, blocks, overrideName) {
  * set a new Protoblock
  * @param-plusMinus-new variable
  * @return{void}
- * @public
+ * @private
  */
     this._newArtwork = function (plusMinus) {
         if (this.isCollapsible()) {
@@ -538,7 +538,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * Add a new image
  * @return{void}
- * @public
+ * @private
  */
     this._addImage = function () {
         var image = new Image();
@@ -726,7 +726,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * after the image has loaded
  * @return{void}
- * @public
+ * @private
  */
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
@@ -888,7 +888,7 @@ function Block(protoblock, blocks, overrideName) {
  * Generate the collapsed art
  * @param postProcess = null
  * @return{void}
- * @public
+ * @private
  */
     this._generateCollatpseArt= function (postProcess) {
         var that = this;
@@ -897,7 +897,7 @@ function Block(protoblock, blocks, overrideName) {
  * refresh and clean canvas after loading
  * After the image has finished collapsing
  * @return{void}
- * @public
+ * @private
  */
         var __finishCollapse = function (that) {
             if (postProcess !== null) {
@@ -916,7 +916,7 @@ function Block(protoblock, blocks, overrideName) {
  * Processing the collapse button
  * @param - that = generateCollapseArt
  * @return{void}
- * @public
+ * @private
  */
         var __processCollapseButton = function (that) {
             var image = new Image();
@@ -943,7 +943,7 @@ function Block(protoblock, blocks, overrideName) {
  * When expanding buttons
  * @param - that = generateCollapseArt
  * @return{void}
- * @public
+ * @private
  */
         var __processExpandButton = function (that) {
             var image = new Image();
@@ -971,7 +971,7 @@ function Block(protoblock, blocks, overrideName) {
  * @param-bitmap-null
  * @param-that-generateCollapseArt
  * @return{void}
- * @public
+ * @private
  */
         var __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
@@ -1056,7 +1056,7 @@ function Block(protoblock, blocks, overrideName) {
  * replace fill color to stroke color
  * @param - bitmap - null
  * @return{void}
- * @public
+ * @private
  */
         var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
@@ -1652,7 +1652,7 @@ function Block(protoblock, blocks, overrideName) {
  * customize text
  * @param-blockscale-scale
  * @return{void}
- * @public
+ * @private
  */  
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
@@ -1700,7 +1700,7 @@ function Block(protoblock, blocks, overrideName) {
  * @param-blockscale-scale
  * Position inserted media 
  * @return{void}
- * @public
+ * @private
  */
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
@@ -1714,7 +1714,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * position label
  * @return{void}
- * @public
+ * @private
  */
     this._positionCollapseLabel = function (blockScale) {
         if (this.isInlineCollapsible()) {
@@ -1993,7 +1993,7 @@ function Block(protoblock, blocks, overrideName) {
  * @param-hideDOM-hide mouse
  * set cursor style to default
  * @return {void}
- * @public
+ * @private
  */
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
@@ -2207,7 +2207,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * customize the label and canvas
  * @return{void}
- * @public
+ * @private
  */
     this._changeLabel = function () {
         var that = this;
@@ -3113,7 +3113,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * pitch preview
  * @return{void}
- * @public
+ * @private
  */
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
@@ -3275,7 +3275,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * Change selection and set value to notevalue
  * @return{void}
- * @public
+ * @private
  */
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
@@ -3295,7 +3295,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * Preview pitch
  * @return{void}
- * @public
+ * @private
  */
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
@@ -3408,7 +3408,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * Exit menu
  * @return{void}
- * @public
+ * @private
  */
         var __exitMenu = function () {
             var d = new Date();
@@ -3544,7 +3544,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * set value to number of text
  * @return{void}
- * @public
+ * @private
  */
         var __selectionChanged = function () {
             that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
@@ -4216,7 +4216,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * Preview voice
  * @return{void}
- * @public
+ * @private
  */
         var __voicePreview = function () {
             var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
@@ -4766,7 +4766,7 @@ function Block(protoblock, blocks, overrideName) {
 /*
  * prepare scale
  * @return{void}
- * @public
+ * @private
  */
         var __prepScale = function () {
             var activeTabs = [0];
