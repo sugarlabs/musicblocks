@@ -1514,7 +1514,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['offbeatdo'] = newblock;
     // #TRANS: on musical 'offbeat' do some action
-    newblock.staticLabels.push(_('on weak beat do'));
+    if (language === 'ja') {
+        newblock.staticLabels.push(_('on weak beat'), _('beat'));
+        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+        newblock.staticLabels.push(_('do1'));
+    } else {
+        // #TRANS: 'on' musical 'beat' 'do' some action
+        newblock.staticLabels.push(_('on weak beat'), _('beat'), _('do'));
+    }
     newblock.oneArgBlock();
     newblock.defaults.push(_('action'));
     newblock.adjustWidthToLabel();
