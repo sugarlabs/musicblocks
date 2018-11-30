@@ -114,45 +114,88 @@ function Blocks () {
     // We stage deletion of prototype action blocks on the palette so
     // as to avoid palette refresh race conditions.
     this.deleteActionTimeout = 0;
-
+/*
+ * Gets the long press Status
+ * @public
+ * @return this.inLongPress
+ */
     this.getLongPressStatus = function () {
         return this.inLongPress;
     };
-
+/*
+ * Clear long press
+ * @public
+ * @return {void}
+ */
     this.clearLongPress = function () {
         this.inLongPress = false;
     };
-
+/*
+ * Set Playback status
+ * @param - setPlaybackStatus - new variable
+ * @public
+ * @return this
+ */
     this.setSetPlaybackStatus = function (setPlaybackStatus) {
         this.setPlaybackStatus = setPlaybackStatus;
         return this;
     };
-
+/*
+ * Sets Canvas
+ * @param - canvas
+ * @public
+ * @return this
+ */
     this.setCanvas = function (canvas) {
         this.canvas = canvas;
         return this;
     };
-
+/*
+ * Sets stage
+ * @param - stage - staging area
+ * @public
+ * @return this
+ */
     this.setStage = function (stage) {
         this.stage = stage;
         return this;
     };
-
+/*
+ * Refresh the canvas
+ * @param - refreshCanvas - new variable
+ * @public
+ * @return this
+ */
     this.setRefreshCanvas = function (refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
     };
-
+/*
+ * Sets Trashcan
+ * @param - trashcan - new variable
+ * @public
+ * @return this
+ */
     this.setTrashcan = function (trashcan) {
         this.trashcan = trashcan;
         return this;
     };
-
+/*
+ * Updates the stage
+ * @param - updateStage - new variable
+ * @public
+ * @return this
+ */
     this.setUpdateStage = function (updateStage) {
         this.updateStage = updateStage;
         return this;
     };
-
+/*
+ * Sets Stage scale
+ * @param - getStageScale - new variable
+ * @public
+ * @return this
+ */
     this.setGetStageScale = function (getStageScale) {
         this.getStageScale = getStageScale;
         return this;
@@ -293,7 +336,11 @@ function Blocks () {
             this.blockMoved(blk);
         }
     };
-
+/*
+ * Set the bottom most block
+ * @public
+ * @return maxy
+ */
     this.bottomMostBlock = function () {
         var maxy = -1000;
         for (var blk in this.blockList) {
@@ -361,11 +408,21 @@ function Blocks () {
         this.boundary = boundary;
         return this;
     };
-
+/*
+ * Action block
+ * @param - name - new variable
+ * @private
+ * @return 'do', 'doArg', 'calc', 'calcArg
+ */
     this._actionBlock = function (name) {
         return ['do', 'doArg', 'calc', 'calcArg'].indexOf(name) !== -1;
     };
-
+/*
+ * Names the Action block
+ * @param - name - variable from actionBlock function
+ * @private
+ * @return 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'
+ */
     this._namedActionBlock = function (name) {
         return ['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(name) !== -1;
     };
@@ -955,7 +1012,12 @@ function Blocks () {
             }
         }
     };
-
+/*
+ * Deletes the next Default element
+ * @param - thisBlock
+ * @public
+ * @return {void}
+ */
     this.deleteNextDefault = function (thisBlock) {
         if (thisBlock == undefined) {
             return;
@@ -1667,7 +1729,14 @@ function Blocks () {
             console.log('No container yet for block ' + myBlock.name);
         }
     };
-
+/*
+ * Moves relative stack
+ * @param blk - block
+ * @param dx - x position
+ * @param dy - y position
+ * @public
+ * @return {void}
+ */
     this.moveStackRelative = function (blk, dx, dy) {
         this.findDragGroup(blk)
         if (this.dragGroup.length > 0) {
@@ -2060,7 +2129,13 @@ function Blocks () {
             this.highlightedBlock = null;
         }
     };
-
+/*
+ * Unhilights block
+ * @param - blk - block
+ * @param - unhilight - new variable
+ * @public
+ * @return {void}
+ */
     this.highlight = function (blk, unhighlight) {
         if (!this.visible) {
             return;
@@ -2650,7 +2725,12 @@ function Blocks () {
         }
         return value;
     };
-
+/*
+ * Finds a unique custom name
+ * @param - name - new variable
+ * @public
+ * @return value
+ */
     this.findUniqueCustomName = function (name) {
         var noteNames = [];
         for (var blk = 0; blk < this.blockList.length; blk++) {
@@ -2843,7 +2923,13 @@ function Blocks () {
             }
         }
     };
-
+/*
+ * Renames the named OS
+ * @param oldName
+ * @param newName - new variable
+ * @private
+ * @return 'do', 'doArg', 'calc', 'calcArg
+ */
     this.renameNameddos = function (oldName, newName) {
         if (oldName === newName) {
             return;
@@ -3052,7 +3138,12 @@ function Blocks () {
 
         return false;
     };
-
+/*
+ * Sets new calc block
+ * @param - name -new variable
+ * @public
+ * @return boolean
+ */
     this.newNamedcalcBlock = function (name) {
         if (this.protoBlockDict['myCalc_' + name] === undefined) {
             var myCalcBlock = new ProtoBlock('namedcalc');
@@ -3532,7 +3623,11 @@ function Blocks () {
         this._pasteDX = 0;
         this._pasteDY = 0;
     };
-
+/*
+ * Triggers the long press of key
+ * @public
+ * @return {void}
+ */
     this.triggerLongPress = function () {
         if (this.longPressTimeout != null) {
             clearTimeout(this.longPressTimeout);
@@ -3603,7 +3698,11 @@ function Blocks () {
             }
         }
     };
-
+/*
+ * Copy Block objects
+ * @public
+ * @return blockObj
+ */
     this._copyBlocksToObj = function () {
         var blockObjs = [];
         var blockMap = {};
@@ -4849,7 +4948,12 @@ function Blocks () {
 
         this.refreshCanvas;
     };
-
+/*
+ * Deletes the Action Block
+ * @param - myblock - new variable
+ * @public
+ * @return {void}
+ */
     this.deleteActionBlock = function (myBlock) {
         var actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
