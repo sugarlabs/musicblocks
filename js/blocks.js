@@ -337,7 +337,7 @@ function Blocks () {
         }
     };
    /*
-    * Setd the bottom most block as maxy
+    * Set the bottom most block as maxy
     * @public
     * @return maxy
     */
@@ -409,7 +409,7 @@ function Blocks () {
         return this;
     };
    /*
-    * Sets a action block
+    * Sets an action block
     * @param - name - new variable
     * @private
     * @return 'do', 'doArg', 'calc', 'calcArg
@@ -2031,7 +2031,7 @@ function Blocks () {
         }
     };
    /*
-    * Searches the Argument Flow
+    * Searches for the Argument Flow
     * @private
     * @return{void}
     */
@@ -2169,7 +2169,7 @@ function Blocks () {
         }
     };
    /*
-    * Hides Blocklist
+    * Hides the block in blocklist
     * @public
     * return {void}
     */
@@ -2180,7 +2180,7 @@ function Blocks () {
         this.visible = false;
     };
    /*
-    * Shows Blocklist
+    * Shows Block of blocklist
     * @public
     * return {void}
     */
@@ -2754,7 +2754,7 @@ function Blocks () {
         return value;
     };
    /*
-    * Finds a unique custom name
+    * Finds a unique custom name for blocklist
     * @param - name - new variable
     * @public
     * @return value
@@ -2778,7 +2778,7 @@ function Blocks () {
         return value;
     }
     /*
-    * Finds a unique temperament name
+    * Finds a unique temperament name for blocklist
     * @param - name - new variable
     * @public
     * @return value
@@ -2818,7 +2818,7 @@ function Blocks () {
         }
     };
     /*
-    * Rename the boxes
+    * Rename the block boxes
     * @param - oldName - old name of boxes
     * @param - newName - new variable
     * @public
@@ -2963,7 +2963,7 @@ function Blocks () {
         }
     };
    /*
-    * Renames the named OS
+    * Renames the old name to new name
     * @param oldName
     * @param newName - new variable
     * @private
@@ -3011,7 +3011,7 @@ function Blocks () {
         }
     };
     /*
-    * Stores a new things in blocks
+    * Stores new things in blocks
     * @param - name - new variable
     * @public
     * @return {void}
@@ -3183,7 +3183,7 @@ function Blocks () {
         return false;
     };
    /*
-    * Sets a new named Protoblock
+    * Sets a new Protoblock called CalcBlock
     * @param - name -new variable
     * @public
     * @return boolean
@@ -3668,7 +3668,7 @@ function Blocks () {
         this._pasteDY = 0;
     };
    /*
-    * Triggers the long press of key
+    * Triggers the long press of keys and clears timeout
     * @public
     * @return {void}
     */
