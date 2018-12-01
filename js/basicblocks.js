@@ -4588,6 +4588,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('media');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['media'] = newblock;
+    /*
     if (language === 'ja') {
         //.TRANS: "video material" is used instead of an image in Japanese
         newblock.staticLabels.push(_('video material'));
@@ -4595,6 +4596,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     } else {
         newblock.image = 'images/load-media.svg'
     }
+    */
+    newblock.image = 'images/load-media.svg'
     newblock.mediaBlock();
     newblock.dockTypes[0] = 'mediaout';
     if (beginnerMode && !beginnerBlock('media')) {
