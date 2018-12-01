@@ -61,12 +61,12 @@ function showMaterialHighlight(x, y, r, event, scale, stage) {
         active: new createjs.Shape()
     };
 
-    circles.highlight.graphics.f(HIGHLIGHTCOLOR).drawCircle(0, 0, r);
+    circles.highlight.graphics.f(HIGHLIGHTCOLOR).drawCircle(-6, -6, r);
     circles.highlight.alpha = 0.3;
     circles.highlight.x = x;
     circles.highlight.y = y;
 
-    circles.active.graphics.f(ACTIVECOLOR).drawCircle(0, 0, r);
+    circles.active.graphics.f(ACTIVECOLOR).drawCircle(-6, -6, r);
     circles.active.alpha = 0;
 
     stage.addChild(circles.highlight, circles.active);
