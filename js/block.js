@@ -2377,7 +2377,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2884,6 +2884,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([1, 2, 3], this.value);
                     break;
                 }
+				
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
                 case 'setpensize':
@@ -2901,6 +2902,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'duplicatenotes':
                     this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
                     break;
+				case 'setheading':
+                    this._piemenuNumber([0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330], this.value);
+                    break;	
                 case 'rhythm2':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
                     break;
@@ -2938,6 +2942,7 @@ function Block(protoblock, blocks, overrideName) {
                             var index = this.blocks.blockList[i].connections[1];
                             var temperament = this.blocks.blockList[index].value;
                         }
+						
                     }
                     if (temperament === undefined) {
                         temperament = 'equal';
