@@ -114,6 +114,7 @@ function Blocks () {
     // We stage deletion of prototype action blocks on the palette so
     // as to avoid palette refresh race conditions.
     this.deleteActionTimeout = 0;
+  
    /*
     * Returns the long press Status
     * @public
@@ -122,6 +123,7 @@ function Blocks () {
     this.getLongPressStatus = function () {
         return this.inLongPress;
     };
+   
    /*
     * Erases the long Process
     * @public
@@ -130,6 +132,7 @@ function Blocks () {
     this.clearLongPress = function () {
         this.inLongPress = false;
     };
+	
    /*
     * Set the Set Playback status variable
     * @param - setPlaybackStatus - new variable
@@ -140,6 +143,7 @@ function Blocks () {
         this.setPlaybackStatus = setPlaybackStatus;
         return this;
     };
+	
    /*
     * Sets the Canvas to use
     * @param - canvas
@@ -150,6 +154,7 @@ function Blocks () {
         this.canvas = canvas;
         return this;
     };
+	
    /*
     * Sets the stage
     * @param - stage - staging area
@@ -160,6 +165,7 @@ function Blocks () {
         this.stage = stage;
         return this;
     };
+	
    /*
     * Refreshes the canvas to use
     * @param - refreshCanvas - new variable
@@ -170,6 +176,7 @@ function Blocks () {
         this.refreshCanvas = refreshCanvas;
         return this;
     };
+	
    /*
     * Sets the Trashcan
     * @param - trashcan - new variable
@@ -180,6 +187,7 @@ function Blocks () {
         this.trashcan = trashcan;
         return this;
     };
+	
    /*
     * Updates the stage for usage
     * @param - updateStage - new variable
@@ -190,6 +198,7 @@ function Blocks () {
         this.updateStage = updateStage;
         return this;
     };
+	
    /*
     * Sets the Stage scale
     * @param - getStageScale - new variable
@@ -336,6 +345,7 @@ function Blocks () {
             this.blockMoved(blk);
         }
     };
+	
    /*
     * Set the bottom most block as maxy
     * @public
@@ -408,6 +418,7 @@ function Blocks () {
         this.boundary = boundary;
         return this;
     };
+	
    /*
     * Sets an action block
     * @param - name - new variable
@@ -417,6 +428,7 @@ function Blocks () {
     this._actionBlock = function (name) {
         return ['do', 'doArg', 'calc', 'calcArg'].indexOf(name) !== -1;
     };
+	
    /*
     * Names the Action block defined above
     * @param - name - variable from actionBlock function
@@ -575,7 +587,13 @@ function Blocks () {
             }
         }
     };
-
+	
+   /*
+    * Add or remove the Vspace blocks
+    * @param - blk - block
+    * @private
+    * @return 0
+    */
     this._addRemoveVspaceBlock = function (blk) {
         var myBlock = this.blockList[blk];
 
@@ -1012,6 +1030,7 @@ function Blocks () {
             }
         }
     };
+	
    /*
     * Deletes the next Default element 
     * @param - thisBlock
@@ -1675,6 +1694,7 @@ function Blocks () {
 
         this.refreshCanvas();
     };
+	
    /*
     * Checks the bounds for screen
     * @public
@@ -1698,6 +1718,7 @@ function Blocks () {
             this.boundary.hide();
         }
     };
+	
    /*
     * Moves Blocks and Adjust Docks
     * @public
@@ -1737,6 +1758,7 @@ function Blocks () {
             console.log('No container yet for block ' + myBlock.name);
         }
     };
+	
    /*
     * Moves the relative stack
     * @param blk - block
@@ -1893,6 +1915,13 @@ function Blocks () {
         return blk;
     };
 
+   /*
+    * Checks two blocks 
+    * @param - firstblk - new block
+    * @param - childblk - new block 
+    * @public
+    * @return boolean
+    */
     this.sameGeneration = function (firstBlk, childBlk) {
         if (firstBlk == null || childBlk == null) {
             return false;
@@ -2030,6 +2059,7 @@ function Blocks () {
             }
         }
     };
+	
    /*
     * Searches for the Argument Flow
     * @private
@@ -2115,6 +2145,7 @@ function Blocks () {
             }
         }
     };
+	
    /*
     * Unhilights everything
     * @public
@@ -2125,6 +2156,7 @@ function Blocks () {
             this.unhighlight(blk);
         }
     };
+	
    /*
     * Unhilights things
     * @public
@@ -2149,6 +2181,7 @@ function Blocks () {
             this.highlightedBlock = null;
         }
     };
+	
    /*
     * Hilights the block
     * @param - blk - block
@@ -2168,6 +2201,7 @@ function Blocks () {
             this.highlightedBlock = blk;
         }
     };
+	
    /*
     * Hides the block in blocklist
     * @public
@@ -2179,6 +2213,7 @@ function Blocks () {
         }
         this.visible = false;
     };
+	
    /*
     * Shows Block of blocklist
     * @public
@@ -2191,6 +2226,16 @@ function Blocks () {
         this.visible = true;
     };
 
+   /*
+    * Sets a new block with connections
+    * @param - name - new variable
+    * @param - blockOffset - new variable
+    * @param - connections 
+    * @param - postPorcess
+    * @param - postProcessArg - Post process Argument
+    * @private
+    * @return {void}
+    */
     this._makeNewBlockWithConnections = function (name, blockOffset, connections, postProcess, postProcessArg) {
         if (typeof(collapsed) === 'undefined') {
             collapsed = false
@@ -2753,6 +2798,7 @@ function Blocks () {
         }
         return value;
     };
+	
    /*
     * Finds a unique custom name for blocklist
     * @param - name - new variable
@@ -2777,7 +2823,8 @@ function Blocks () {
         }
         return value;
     }
-    /*
+	
+   /*
     * Finds a unique temperament name for blocklist
     * @param - name - new variable
     * @public
@@ -2817,7 +2864,8 @@ function Blocks () {
             }
         }
     };
-    /*
+	
+   /*
     * Rename the block boxes
     * @param - oldName - old name of boxes
     * @param - newName - new variable
@@ -2847,6 +2895,13 @@ function Blocks () {
         }
     };
 
+   /*
+    * Rename what is stored in boxes
+    * @param - oldName - old name of boxes
+    * @param - newName - new variable
+    * @public
+    * return {void}
+    */
     this.renameStoreinBoxes = function (oldName, newName) {
         if (oldName === newName || oldName === _('box')) {
             return;
@@ -2881,6 +2936,13 @@ function Blocks () {
         }
     };
 
+   /*
+    * Rename what is stored in the boxes part 2
+    * @param - oldName - old name of boxes
+    * @param - newName - new variable
+    * @public
+    * return {void}
+    */
     this.renameStorein2Boxes = function (oldName, newName) {
         if (oldName === newName || oldName === _('box')) {
             return;
@@ -2902,6 +2964,13 @@ function Blocks () {
         }
     };
 
+   /*
+    * Rename the named boxes
+    * @param - oldName - old name of boxes
+    * @param - newName - new variable
+    * @public
+    * return {void}
+    */
     this.renameNamedboxes = function (oldName, newName) {
         if (oldName === newName || oldName === _('box')) {
             return;
@@ -2924,6 +2993,13 @@ function Blocks () {
         }
     };
 
+   /*
+    * Rename Dos
+    * @param - oldName - old name of boxes
+    * @param - newName - new variable
+    * @public
+    * return {void}
+    */
     this.renameDos = function (oldName, newName, skipBlock) {
         if (oldName === newName) {
             return;
@@ -2962,6 +3038,7 @@ function Blocks () {
             }
         }
     };
+	
    /*
     * Renames the old name to new name
     * @param oldName
@@ -3010,6 +3087,7 @@ function Blocks () {
             // this.palettes.show();
         }
     };
+	
     /*
     * Stores new things in blocks
     * @param - name - new variable
@@ -3046,6 +3124,12 @@ function Blocks () {
         }
     };
 
+   /*
+    * Checks what is stored in boxes
+    * @param - name - new variable
+    * @public
+    * return {void}
+    */
     this.newStorein2Block = function (name) {
         if (name == null) {
             console.log('null name passed to newStorein2Block');
@@ -3072,6 +3156,12 @@ function Blocks () {
         }
     };
 
+   /*
+    * Checks the new named box blocks
+    * @param - name - new variable
+    * @public
+    * return {void}
+    */
     this.newNamedboxBlock = function (name) {
         if (name == null) {
             console.log('null name passed to newNamedboxBlock');
@@ -3182,6 +3272,7 @@ function Blocks () {
 
         return false;
     };
+	
    /*
     * Sets a new Protoblock called CalcBlock
     * @param - name -new variable
@@ -3204,6 +3295,12 @@ function Blocks () {
         return false;
     };
 
+   /*
+    * Checks the new named Argument blocks
+    * @param - name - new variable
+    * @public
+    * return boolean
+    */
     this.newNameddoArgBlock = function (name) {
         if (this.protoBlockDict['myDoArg_' + name] === undefined) {
             var myDoArgBlock = new ProtoBlock('nameddoArg');
@@ -3220,6 +3317,12 @@ function Blocks () {
         return false;
     };
 
+   /*
+    * Checks the new named calc Argument Blocks
+    * @param - name - new variable
+    * @public
+    * return boolean
+    */
     this.newNamedcalcArgBlock = function (name) {
         if (this.protoBlockDict['myCalcArg_' + name] === undefined) {
             var myCalcArgBlock = new ProtoBlock('namedcalcArg');
@@ -3667,6 +3770,7 @@ function Blocks () {
         this._pasteDX = 0;
         this._pasteDY = 0;
     };
+	
    /*
     * Triggers the long press of keys and clears timeout
     * @public
@@ -3742,6 +3846,7 @@ function Blocks () {
             }
         }
     };
+	
   /*
    * Copies the Block to objects
    * @public
@@ -3820,6 +3925,12 @@ function Blocks () {
         return false;
     };
 
+   /*
+    * loads the new blocks
+    * @param - blockObj - Block Objects
+    * @public
+    * return {void}
+    */
     this.loadNewBlocks = function (blockObjs) {
         var playbackQueueStartsHere = null;
 
@@ -4918,6 +5029,7 @@ function Blocks () {
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);
     };
+	
     /*
     * Cleanup the stacks
     * @private
@@ -4996,6 +5108,7 @@ function Blocks () {
 
         this.refreshCanvas;
     };
+	
    /*
     * Deletes the Action Block
     * @param - myblock - new variable
