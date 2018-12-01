@@ -262,10 +262,10 @@ function Block(protoblock, blocks, overrideName) {
             // but not the uncollapsed highlighted artwork.
             this.highlightBitmap.visible = false;
             if (this.disconnectedHighlightBitmap !== null) {
-                this.disconnectedHighlightBitmap.visible = false; 
+                this.disconnectedHighlightBitmap.visible = false;
             }
 
-            this.highlightBitmap.visible = false; 
+            this.highlightBitmap.visible = false;
         } else {
             // Show the highlighted artwork.
             // If the block is disconnected, use the disconnected bitmap.
@@ -276,7 +276,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (this.disconnectedHighlightBitmap !== null) {
                     this.disconnectedHighlightBitmap.visible = false;
                 }
-                
+
                 this.highlightBitmap.visible = true;
             }
 
@@ -301,7 +301,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.container.updateCache();
     };
-    
+
     /*
      * Remove highlight from block
      * @return{void}
@@ -325,7 +325,7 @@ function Block(protoblock, blocks, overrideName) {
         // Always hide the highlighted artwork.
         this.highlightBitmap.visible = false;
         if (this.disconnectedHighlightBitmap !== null) {
-            this.disconnectedHighlightBitmap.visible = false; 
+            this.disconnectedHighlightBitmap.visible = false;
         }
 
         this.container.visible = true;
@@ -958,7 +958,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {   
+            if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {
                 label = label.substr(0, STRINGLEN) + '...';
             }
 
@@ -1025,7 +1025,7 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    /* 
+    /*
      * Generate the collapsed artwork
      * @param postProcess = a process to run after the artwork is generated
      * @return{void}
@@ -1035,7 +1035,7 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-        /* 
+        /*
          * Run the postprocess function after the artwork is loaded
          * @return{void}
          * @private
@@ -1164,7 +1164,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'drum':
                     that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', platformColor.blockText);
-                    break;    
+                    break;
                 case 'rhythmruler2':
                     that.collapseText = new createjs.Text(_('rhythm maker'), fontSize + 'px Sans', platformColor.blockText);
                     break;
@@ -1524,7 +1524,7 @@ function Block(protoblock, blocks, overrideName) {
         var isCollapsed = this.collapsed;
         // Toggle the state.
         this.collapsed = !isCollapsed;
-        
+
         // These are the buttons to collapse/expand the stack.
         this.collapseButtonBitmap.visible = isCollapsed;
         this.expandButtonBitmap.visible = !isCollapsed;
@@ -1657,7 +1657,7 @@ function Block(protoblock, blocks, overrideName) {
             var c = this.blocks.blockList[nblk].connections[1];
             if (c !== null) {
                 // Only look for standard form: / 1 4
-                if (this.blocks.blockList[c].name === 'divide') { 
+                if (this.blocks.blockList[c].name === 'divide') {
                     var c1 = this.blocks.blockList[c].connections[1];
                     var c2 = this.blocks.blockList[c].connections[2];
                     if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
@@ -1695,7 +1695,7 @@ function Block(protoblock, blocks, overrideName) {
         var c = this.connections[1];
         if (c !== null) {
             // Only look for standard form: / 1 4
-            if (this.blocks.blockList[c].name === 'divide') { 
+            if (this.blocks.blockList[c].name === 'divide') {
                 var c1 = this.blocks.blockList[c].connections[1];
                 var c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
@@ -1883,7 +1883,7 @@ function Block(protoblock, blocks, overrideName) {
      * @param-blockscale is used to scale the text
      * @return{void}
      * @private
-     */  
+     */
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
@@ -1930,7 +1930,7 @@ function Block(protoblock, blocks, overrideName) {
      * @param-width-width of canvas
      * @param-height-height of canvas
      * @param-blockscale-scale
-     * Position inserted media 
+     * Position inserted media
      * @return{void}
      * @private
      */
@@ -2016,7 +2016,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else if ('shiftKey' in event.nativeEvent && event.nativeEvent.shiftKey) {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtle();
-                        
+
                         setTimeout(function () {
                             that.blocks.logo.runLogoCommands(topBlock);
                         }, 250);
@@ -2377,7 +2377,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2514,7 +2514,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         } else if (this.name === 'customNote') {
             if (!this.blocks.logo.customTemperamentDefined) {
-                // If custom temperament is not defined by user, 
+                // If custom temperament is not defined by user,
                 // then custom temperament is supposed to be equal temperament.
                 var obj = splitSolfege(this.value);
                 var solfnotes_ = _('ti la sol fa mi re do').split(' ');
@@ -2535,7 +2535,7 @@ function Block(protoblock, blocks, overrideName) {
                     if (pitchNumber !== 'pitchNumber') {
                         noteLabels.push(TEMPERAMENT['custom'][pitchNumber][1]);
                         noteValues.push(TEMPERAMENT['custom'][pitchNumber][1]);
-                    }   
+                    }
                 }
                 this._piemenuPitches(noteLabels, noteValues, '', selectednote, '', true);
             }
@@ -2626,7 +2626,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             var drumLabels = [];
-            var drumValues = [];            
+            var drumValues = [];
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
@@ -2658,7 +2658,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             var effectLabels = [];
-            var effectValues = [];            
+            var effectValues = [];
             var effectcategories = [];
             var effectcategoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
@@ -2722,7 +2722,7 @@ function Block(protoblock, blocks, overrideName) {
             console.log(this.value + ' ' + DEFAULTVOICE + ' ' + selectedvoice);
 
             var voiceLabels = [];
-            var voiceValues = [];            
+            var voiceValues = [];
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < VOICENAMES.length; i++) {
@@ -2758,7 +2758,7 @@ function Block(protoblock, blocks, overrideName) {
             console.log(this.value + ' ' + DEFAULTNOISE + ' ' + selectednoise);
 
             var noiseLabels = [];
-            var noiseValues = [];            
+            var noiseValues = [];
             var categories = [];
             var categoriesList = [];
             for (var i = 0; i < NOISENAMES.length; i++) {
@@ -2901,6 +2901,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'duplicatenotes':
                     this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
                     break;
+                case 'setheading':
+                    this._piemenuNumber([0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330], this.value);
+                    break;
                 case 'rhythm2':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
                     break;
@@ -2939,9 +2942,11 @@ function Block(protoblock, blocks, overrideName) {
                             var temperament = this.blocks.blockList[index].value;
                         }
                     }
+
                     if (temperament === undefined) {
                         temperament = 'equal';
                     }
+
                     if (temperament === 'equal') {
                         this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
                     } else {
@@ -3241,7 +3246,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.75;
         }
-        
+
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
@@ -3306,7 +3311,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
         docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
+
         // Navigate to a the current note value.
         var i = noteValues.indexOf(note);
         if (i === -1) {
@@ -3525,7 +3530,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
         docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
+
         // Navigate to a the current note value.
         var i = noteValues.indexOf(note);
         if (i === -1) {
@@ -3704,7 +3709,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
         docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
+
         // Navigate to a the current accidental value.
         var i = accidentalValues.indexOf(accidental);
         if (i === -1) {
@@ -3814,7 +3819,7 @@ function Block(protoblock, blocks, overrideName) {
         this._tabsWheel.clickModeRotate = false;
         this._tabsWheel.navAngle = -180 / WHEELVALUES.length + 180 / (WHEELVALUES.length * subWheelValues[WHEELVALUES[0]].length);
         this._tabsWheel.createWheel(tabsLabels);
-        
+
         var that = this;
 
         /*
@@ -3982,8 +3987,8 @@ function Block(protoblock, blocks, overrideName) {
             this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
             this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
         } else if (wheelValues.length > 10) {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.4;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.8;
+            this._numberWheel.slicePathCustom.minRadiusPercent = 0.5;
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.9;
         } else {
             this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
@@ -4321,7 +4326,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
         docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
+
         // Navigate to a the current selectedValue value.
         var i = menuValues.indexOf(selectedValue);
         if (i === -1) {
@@ -4405,7 +4410,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.width = '300px';
         docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
         docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
+
         // Navigate to a the current boolean value.
         var i = booleanValues.indexOf(boolean);
         if (i === -1) {
@@ -4552,7 +4557,7 @@ function Block(protoblock, blocks, overrideName) {
         docById('wheelDiv').style.width = '400px';
         docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 400, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
         docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 450, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
-        
+
         // navigate to a specific starting point
         var i = voiceValues.indexOf(voice);
         if (i === -1) {
@@ -5070,7 +5075,7 @@ function Block(protoblock, blocks, overrideName) {
 
             activeTabs.push(12);
             activeTabs.push(12);
-            
+
             for (var k = mode.length - 1; k >= 0; k--) {
                 activeTabs.push(last(activeTabs) - mode[k]);
             }
@@ -5197,7 +5202,7 @@ function Block(protoblock, blocks, overrideName) {
                     newValue = uniqueValue;
                     this.value = newValue;
                     var label = this.value.toString();
-                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {  
+                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
                         label = label.substr(0, STRINGLEN) + '...';
                     }
                     this.text.text = label;
@@ -5212,13 +5217,13 @@ function Block(protoblock, blocks, overrideName) {
                 for (var pitchNumber in TEMPERAMENT['custom']) {
                     if (pitchNumber !== 'pitchNumber') {
                         if (oldValue == TEMPERAMENT['custom'][pitchNumber][1]) {
-                         TEMPERAMENT['custom'][pitchNumber][1] = newValue;   
+                         TEMPERAMENT['custom'][pitchNumber][1] = newValue;
                         }
-                    }   
+                    }
                 }
                 this.value = newValue;
                 var label = this.value.toString();
-                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {  
+                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
                     label = label.substr(0, STRINGLEN) + '...';
                 }
                 this.text.text = label;
@@ -5270,7 +5275,7 @@ function Block(protoblock, blocks, overrideName) {
             var label = this.value.toString();
         }
 
-        if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {   
+        if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {
             var slen = label.length - 5;
             var nlabel = '' + label.substr(0, slen) + '...';
             while (getTextWidth(nlabel, 'bold 20pt Sans') > TEXTWIDTH) {
