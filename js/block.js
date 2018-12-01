@@ -2903,7 +2903,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
                     break;
 				case 'setheading':
-                    this._piemenuNumber([0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330], this.value);
+                    this._piemenuNumber([0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330], this.value);
                     break;	
                 case 'rhythm2':
                     this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
