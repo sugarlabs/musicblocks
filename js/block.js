@@ -384,23 +384,39 @@ function Block(protoblock, blocks, overrideName) {
         this.container.updateCache();
     };
 
+    /*
+     * Resize and update number of slots in argClamp
+     * @param-slotList how many slots to use
+     * @return{void}
+     * @public
+     */
     this.updateArgSlots = function (slotList) {
-        // Resize and update number of slots in argClamp
         this.argClampSlots = slotList;
         this._newArtwork();
         this.regenerateArtwork(false);
     };
 
+    /*
+     * Resize an expandable block.
+     * @param-clamp which clamp to update (ifthenelse has 2 clamps)
+     * @param-plusMinus how many slots to add or subtract
+     * @return{void}
+     * @public
+     */
     this.updateSlots = function (clamp, plusMinus) {
-        // Resize an expandable block.
         this.clampCount[clamp] += plusMinus;
         this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
     };
 
+    /*
+     * If the block scale changes, we need to regenerate the
+     * artwork and recalculate the hitarea.
+     * @param-scale new block scale
+     * @return{void}
+     * @public
+     */
     this.resize = function (scale) {
-        // If the block scale changes, we need to regenerate the
-        // artwork and recalculate the hitarea.
         var that = this;
 
         /*
@@ -579,14 +595,18 @@ function Block(protoblock, blocks, overrideName) {
         this.hitHeight = obj[4];
     };
 
+    /*
+     * Load any artwork associated with the block and create any
+     * extra parts. Image components are loaded asynchronously so
+     * most the work happens in callbacks.
+     *
+     * We also need a text label for some blocks. For number and
+     * text blocks, this is the primary label; for parameter
+     * blocks, this is used to display the current block value.
+     * @return{void}
+     * @public
+     */
     this.imageLoad = function () {
-        // Load any artwork associated with the block and create any
-        // extra parts. Image components are loaded asynchronously so
-        // most the work happens in callbacks.
-
-        // We also need a text label for some blocks. For number and
-        // text blocks, this is the primary label; for parameter
-        // blocks, this is used to display the current block value.
         var fontSize = 10 * this.protoblock.scale;
         this.text = new createjs.Text('', fontSize + 'px Sans', platformColor.blockText);
 
@@ -1220,7 +1240,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     /*
-     * Hide a block
+     * Hide this block
      * @return{void}
      * @public
      */
@@ -1273,6 +1293,11 @@ function Block(protoblock, blocks, overrideName) {
         return false;
     };
 
+    /*
+     * Show this block
+     * @return{void}
+     * @public
+     */
     this.show = function () {
         // If it is not in the trash and not in collapsed, then show it.
         if (!this.trash && !this.inCollapsed) {
