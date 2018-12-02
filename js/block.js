@@ -1769,7 +1769,7 @@ this._oscTimeLabel = function () {
                 var c1 = this.blocks.blockList[c].connections[1];
                 var c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
-                    v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+                    v = this.blocks.blockList[c1].value / this.blocks.blockList[c2].value;
                    
                 }
             }
