@@ -305,7 +305,7 @@ function Blocks (activity) {
         var someCollapsed = false;
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (myBlock.name === 'newnote' || myBlock.name === 'interval') {
+            if (myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') {
                 continue;
             }
 
@@ -323,7 +323,7 @@ function Blocks (activity) {
             // If any blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-                if (myBlock.name === 'newnote' || myBlock.name === 'interval') {
+                if (myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') {
                     continue;
                 }
 
@@ -335,7 +335,7 @@ function Blocks (activity) {
             // If no blocks are collapsed, collapse them all.
             for (var blk in this.blockList) {
                 var myBlock = this.blockList[blk];
-                if (myBlock.name === 'newnote' || myBlock.name === 'interval') {
+                if (myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') {
                     continue;
                 }
 
@@ -439,7 +439,7 @@ function Blocks (activity) {
     // Returns the block size.
     this._getBlockSize = function (blk) {
         var myBlock = this.blockList[blk];
-        if ((myBlock.name === 'newnote' || myBlock.name === 'interval') && myBlock.collapsed) {
+        if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
             return 1;
         }
 
@@ -649,7 +649,7 @@ function Blocks (activity) {
         }
 
         // If the note value block is collapsed, spoof size.
-        if ((myBlock.name === 'newnote' || myBlock.name === 'interval') && myBlock.collapsed) {
+        if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
             size = 1
         }
 
