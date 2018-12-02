@@ -14,8 +14,8 @@
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ['newnote', 'interval'];
-const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval'];
+const INLINECOLLAPSIBLES = ['newnote', 'interval', 'osctime'];
+const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval', 'osctime'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', "effectsname", 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'effectsname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
@@ -1194,6 +1194,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'interval':
                     that.collapseText = new createjs.Text(_('scalar interval'), fontSize + 'px Sans', platformColor.blockText);
                     break;
+				case 'osctime':
+                    that.collapseText = new createjs.Text(_('milliseconds'), fontSize + 'px Sans', platformColor.blockText);
+                    break;
                 case 'temperament':
                     that.collapseText = new createjs.Text(_('temperament'), fontSize + 'px Sans', platformColor.blockText);
                     break;
@@ -1567,6 +1570,9 @@ function Block(protoblock, blocks, overrideName) {
             case 'interval':
                 this._intervalLabel();
                 break;
+			case 'osctime':
+                this._oscTimeLabel();
+                break;
             default:
                 console.log('What do we do with a collapsed ' + this.name + ' block?');
                 break;
@@ -1752,7 +1758,41 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
+this._oscTimeLabel = function () {
+        // Find Hertz and value to display on the collapsed note value
+        // block.
+        var v = '';
+        var c = this.connections[1];
+        if (c !== null) {
+            // Only look for standard form: / 1000 3 2
+            if (this.blocks.blockList[c].name === 'divide') {
+                var c1 = this.blocks.blockList[c].connections[1];
+                var c2 = this.blocks.blockList[c].connections[2];
+                if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
+                    v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+                   
+                }
+            }
+        }
 
+        c = this.connections[2];
+        c = this.blocks.findFirstPitchBlock(c);
+        var p = this._getPitch(c);
+        if (c === null) {
+            this.collapseText.text = _('silence') + ' | ' + v;
+        } else if (p === '' && v === '') {
+            this.collapseText.text = _('note value');
+        } else {
+            // Are there more pitch blocks in this note?
+            c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
+            // Update the collapsed-block label.
+            if (c === null) {
+                this.collapseText.text = p + ' | ' + v;
+            } else {
+                this.collapseText.text = p + '... | ' + v;
+            }
+        }
+    };
     this._getPitch = function (c) {
         if (c === null) {
             return '';
