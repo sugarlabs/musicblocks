@@ -145,7 +145,7 @@ function Blocks () {
     };
 	
    /*
-    * Sets the Canvas to use
+    * Sets the Canvas
     * @param - canvas
     * @public
     * @return this
@@ -167,7 +167,7 @@ function Blocks () {
     };
 	
    /*
-    * Refreshes the canvas to use
+    * Refreshes the canvas
     * @param - refreshCanvas - new variable
     * @public
     * @return this
@@ -178,7 +178,7 @@ function Blocks () {
     };
 	
    /*
-    * Sets the Trashcan
+    * Sets the Trashcan to delete blocks
     * @param - trashcan - new variable
     * @public
     * @return this
@@ -189,7 +189,7 @@ function Blocks () {
     };
 	
    /*
-    * Updates the stage for usage
+    * Updates the stage
     * @param - updateStage - new variable
     * @public
     * @return this
@@ -420,7 +420,7 @@ function Blocks () {
     };
 	
    /*
-    * Sets an action block
+    * Sets a new block called action block
     * @param - name - new variable
     * @private
     * @return 'do', 'doArg', 'calc', 'calcArg
@@ -1916,7 +1916,9 @@ function Blocks () {
     };
 
    /*
-    * Checks two blocks 
+    * Checks if the 2 blocks are having the same generation
+    * Sets a new block called myBlock equal to blocklist
+    * Checks if childBlk and myBlock are equal
     * @param - firstblk - new block
     * @param - childblk - new block 
     * @public
@@ -2937,7 +2939,7 @@ function Blocks () {
     };
 
    /*
-    * Rename what is stored in the boxes part 2
+    * Rename what is stored in the boxes 
     * @param - oldName - old name of boxes
     * @param - newName - new variable
     * @public
