@@ -812,6 +812,15 @@ function RhythmRuler () {
     };
 
     this._clear = function () {
+        this._logo.synth.stop();
+        this._logo.resetSynth(0);
+        this._playing = false;
+        this._playingAll = false;
+        this._playingOne = false;
+        this._rulerPlaying = -1;
+        this._startingTime = null;
+        var iconSize = ICONSIZE;
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         for (r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while(this.Rulers[r][1].length > 0) {
