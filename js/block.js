@@ -1768,9 +1768,12 @@ this._oscTimeLabel = function () {
             if (this.blocks.blockList[c].name === 'divide') {
                 var c1 = this.blocks.blockList[c].connections[1];
                 var c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
-                    v = this.blocks.blockList[c1].value / this.blocks.blockList[c2].value;
-                   
+				if (this.blocks.blockList[c].name === 'divide') {
+					var ci = this.blocks.blockList[c2].connections[1];
+                    var cii = this.blocks.blockList[c2].connections[2];
+					if (this.blocks.blockList[ci].name === 'number' && this.blocks.blockList[cii].name === 'number') {
+                    v = this.blocks.blockList[c1].value / this.blocks.blockList[ci].value * this.blocks.blockList[cii].value;
+            }
                 }
             }
         }
