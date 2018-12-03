@@ -26,6 +26,11 @@ const PITCHBLOCKS = ['pitch', 'steppitch', 'hertz', 'pitchnumber', 'scaledegree'
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
+/*
+ * Sets storage point
+ * @public
+ * @return {void}
+ */
 function Blocks () {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
@@ -125,7 +130,7 @@ function Blocks () {
     };
    
    /*
-    * Erases the long Process
+    * Set Long press to false
     * @public
     * @return {void}
     */
@@ -211,6 +216,12 @@ function Blocks () {
     };
 
     // Change the scale of the blocks (and the protoblocks on the palette).
+   /*
+    * Sets a new scale for artwork
+    * @param - scale -new variable
+    * @public
+    * @return {void}
+    */
     this.setBlockScale = function (scale) {
         console.log('New block scale is ' + scale);
         this.blockScale = scale;
@@ -242,49 +253,87 @@ function Blocks () {
         }
     };
 
-    // We need access to the msg block...
+    /*
+     * Access the message block
+     * @param - msgText -new variable
+     * @public
+     * @return {void}
+     */
     this.setMsgText = function (msgText) {
         this.msgText = msgText;
     };
 
-    // and the Error msg function.
+    /*
+     * Access the error message
+     * @param - errorMsg -new variable
+     * @public
+     * @return this
+     */
     this.setErrorMsg = function (errorMsg) {
         this.errorMsg = errorMsg;
         return this;
     };
 
-    // We need access to the macro dictionary because we add to it.
+    /*
+     * Access the macro dictionary to add data to it
+     * @param - obj - object
+     * @public
+     * @return this
+     */
     this.setMacroDictionary = function (obj) {
         this.macroDict = obj;
         return this;
     };
 
-    // We need access to the turtles list because we associate a
-    // turtle with each start block.
+    /*
+     * Access the turtles because we associate turtles with start block
+     * @param - turtles 
+     * @public
+     * @return this
+     */
     this.setTurtles = function (turtles) {
         this.turtles = turtles;
         return this;
     };
 
-    // We need to access the "pseudo-Logo interpreter" when we click
-    // on blocks.
+    /*
+     * Access logo interpreter when we click on blocks
+     * @param - logo
+     * @public
+     * @return this
+     */
     this.setLogo = function (logo) {
         this.logo = logo;
         return this;
     };
 
-    // We need to access the right-click (and long press) context menu.
+    /*
+     * Access the context menu
+     * @param - contextMenu
+     * @public
+     * @return this
+     */
     this.setContextMenu = function (contextMenu) {
         this.contextMenu = contextMenu;
         return this;
     };
 
-    // The scale of the graphics is determined by screen size.
+    /*
+     * Sets a new scale for screen
+     * @param - scale -new variable
+     * @public
+     * @return this
+     */
     this.setScale = function (scale) {
         // this.blockScale = scale;
         return this;
     };
    
+    /*
+     * Extract the blocks
+     * @public
+     * @return {void}
+     */
     this.extract = function () {
         if (this.activeBlock != null) {
             // Don't extract silence blocks.
@@ -294,6 +343,13 @@ function Blocks () {
         }
     };
 
+    /*
+     * Extract the blocks
+     * @param - blk - blocks
+     * @param - adjustDock - new variable
+     * @private
+     * @return {void}
+     */
     this._extractBlock = function (blk, adjustDock) {
         // Remove a single block from within a stack.
         var blkObj = this.blockList[blk];
@@ -362,8 +418,11 @@ function Blocks () {
         return maxy;
     };
 
-    // Toggle state of collapsible blocks, except note blocks, which
-    // are handled separately.
+    /*
+     * Toggle all the collapsible blocks except note blocks
+     * @public
+     * @return {void}
+     */
     this.toggleCollapsibles = function () {
         var allCollapsed = true;
         var someCollapsed = false;
@@ -412,7 +471,13 @@ function Blocks () {
         }
     };
 
-    // We need access to the go-home buttons and boundary.
+    /*
+     * Access go-home button and boundary
+     * @param - setHomeContainers
+     * @param - boundary
+     * @public
+     * @return this
+     */
     this.setHomeContainers = function (setContainers, boundary) {
         this._setHomeButtonContainers = setContainers;
         this.boundary = boundary;
@@ -439,8 +504,11 @@ function Blocks () {
         return ['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(name) !== -1;
     };
 
-    // Adjust the docking postions of all blocks in the current drag
-    // group.
+    /*
+     * Adjust Docking position of Blocks in drag group
+     * @private
+     * @return {void}
+     */
     this._adjustBlockPositions = function () {
         if (this.dragGroup.length < 2) {
             return;
@@ -450,10 +518,11 @@ function Blocks () {
         this.adjustDocks(this.dragGroup[0], true)
     };
 
-    // Adjust the size of the clamp in an expandable block when blocks
-    // are inserted into (or removed from) the child flow. This is a
-    // common operation for start and action blocks, but also for
-    // repeat, forever, if, etc.
+    /*
+     * Adjust the clamp of expandable block
+     * @public
+     * @return {void}
+     */
     this.adjustExpandableClampBlock = function () {
         if (this.clampBlocksToCheck.length === 0) {
             return;
@@ -475,6 +544,14 @@ function Blocks () {
             this._adjustArgClampBlock([blk]);
         }
 
+        /*
+         * Adjusts the Clamp
+         * @param - blk - block
+         * @param - myBlock - new var
+         * @param - clamp
+         * @private
+         * @return {void}
+         */
         var __clampAdjuster = function (blk, myBlock, clamp) {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
@@ -512,7 +589,12 @@ function Blocks () {
         __clampAdjuster(blk, myBlock, clamp);
     };
 
-    // Returns the block size.
+    /*
+     * Return the block size
+     * @param - blk - block
+     * @private
+     * @return block size
+     */
     this._getBlockSize = function (blk) {
         var myBlock = this.blockList[blk];
         if ((myBlock.name === 'newnote' || myBlock.name === 'interval') && myBlock.collapsed) {
@@ -522,7 +604,12 @@ function Blocks () {
         return myBlock.size;
     };
 
-    // Adjust the slot sizes of arg clamps.
+    /*
+     * Adjust the clamp of arg block
+     * @param - argBlocksToCheck -new variable
+     * @private
+     * @return {void}
+     */
     this._adjustArgClampBlock = function (argBlocksToCheck) {
         if (argBlocksToCheck.length === 0) {
             return;
@@ -561,9 +648,12 @@ function Blocks () {
         }
     };
 
-    // We also adjust the size of twoarg blocks. It is similar to how
-    // we adjust clamps, but enough different that it is in its own
-    // function.
+    /*
+     * Adjust the size of two arg blocks
+     * @param - argBlocksToCheck -new variable
+     * @private
+     * @return {void}
+     */
     this._adjustExpandableTwoArgBlock = function (argBlocksToCheck) {
         if (argBlocksToCheck.length === 0) {
             return;
@@ -605,6 +695,12 @@ function Blocks () {
 
         var that = this;
 
+        /*
+         * checks the number of VSpace blocks
+         * @param - blk - block
+         * @private
+         * @return 0
+         */
         var __howManyVSpaceBlocksBelow = function (blk) {
             // Need to know how many vspace blocks are below the block
             // we're checking against.
@@ -641,6 +737,12 @@ function Blocks () {
 
             var that = this;
 
+            /*
+             * Adjusts the space
+             * @param - args - arguments
+             * @private
+             * @return {void}
+             */
             var __vspaceAdjuster = function (args) {
                 var thisBlock = args[0];
                 var nextBlock = args[1];
@@ -673,6 +775,12 @@ function Blocks () {
         };
     };
 
+    /*
+     * Get the block units in this stack
+     * @param - blk - block
+     * @private
+     * @return size
+     */
     this._getStackSize = function (blk) {
         // How many block units in this stack?
         var size = 0;
@@ -746,6 +854,13 @@ function Blocks () {
         return size;
     };
 
+    /*
+     * Adjust the docks
+     * @param - blk - block
+     * @param - resetLoopCounter
+     * @public
+     * @return {void}
+     */
     this.adjustDocks = function (blk, resetLoopCounter) {
         // Give a block, adjust the dock positions
         // of all of the blocks connected to it
@@ -869,6 +984,14 @@ function Blocks () {
         }
     };
 
+    /*
+     * Add a default block whenever the user removes the name from an action block
+     * @param - parentblk - new variable
+     * @param - oldBlock - old block
+     * @param - skipOldBlock
+     * @public
+     * @return {void}
+     */
     this.addDefaultBlock = function (parentblk, oldBlock, skipOldBlock) {
         // Add an action name whenever the user removes the name from
         // an action block.  Add a box name whenever the user removes
@@ -882,6 +1005,12 @@ function Blocks () {
             var cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 var that = this;
+                /*
+                 * Update Palette
+                 * @param - args - arguments
+                 * @public
+                 * @return {void}
+                 */
                 var postProcess = function (args) {
                     var parentblk = args[0];
                     var oldBlock = args[1];
@@ -932,6 +1061,12 @@ function Blocks () {
             var cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 var that = this;
+                /*
+                 * Adjust Docks
+                 * @param - args - arguments
+                 * @public
+                 * @return {void}
+                 */
                 var postProcess = function (args) {
                     var parentblk = args[0];
                     var oldBlock = args[1];
@@ -973,6 +1108,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Remove Pitch block if silent
+     * @param - thisBlock -new variable
+     * @private
+     * @return {void}
+     */
     this._deletePitchBlocks = function (thisBlock) {
         // Remove any pitch blocks from a Note block if silent
         // block is inserted.
@@ -1070,6 +1211,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Remove the silence block from note block
+     * @param - thisBlock -new variable
+     * @public
+     * @return {void}
+     */
     this.deletePreviousDefault = function (thisBlock) {
         // Remove the Silence block from a Note block if another block
         // is inserted anywhere after the Silence block.
@@ -1106,6 +1253,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * SWhen a block is moved, do the following
+     * @param - thisBlock -new variable
+     * @public
+     * @return {void}
+     */
     this.blockMoved = function (thisBlock) {
         // When a block is moved, we have lots of things to check:
         // (0) Is it inside of a expandable block?
@@ -1605,6 +1758,13 @@ function Blocks () {
         this.refreshCanvas();
     };
 
+    /*
+     * Test the connection between 2 blocks
+     * @param - type1 - block1
+     * @param - type2 - block2
+     * @private
+     * @return boolean
+     */
     this._testConnectionType = function (type1, type2) {
         // Can these two blocks dock?
         if (type1 === 'in' && type2 === 'out') {
@@ -1670,6 +1830,11 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * update the block positions
+     * @public
+     * @return {void}
+     */
     this.updateBlockPositions = function () {
         // Create the block image if it doesn't yet exist.
         for (var blk = 0; blk < this.blockList.length; blk++) {
@@ -1677,6 +1842,11 @@ function Blocks () {
         }
     };
 
+    /*
+     * Move all the blocks to the top
+     * @public
+     * @return {void}
+     */
     this.bringToTop = function () {
         // Move all the blocks to the top layer of the stage
         this._adjustTheseStacks = [];
@@ -1729,6 +1899,14 @@ function Blocks () {
         this.adjustDocks(blk, true);
     };
 
+    /*
+     * Move blocks to x and y
+     * @param - blk - block
+     * @param - x - x position
+     * @param - y - y position
+     * @public
+     * @return {void}
+     */
     this._moveBlock = function (blk, x, y) {
         // Move a block (and its label) to x, y.
         var myBlock = this.blockList[blk];
@@ -1743,6 +1921,14 @@ function Blocks () {
         }
     };
 
+    /*
+     * Move blocks to dx and dy
+     * @param - blk - block
+     * @param - dx - updated x position
+     * @param - dy - updated y position
+     * @public
+     * @return {void}
+     */
     this.moveBlockRelative = function (blk, dx, dy) {
         // Move a block (and its label) by dx, dy.
         this.inLongPress = false;
@@ -1776,6 +1962,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Update the block if value is not assigned to it
+     * @param - blk - block
+     * @public
+     * @return {void}
+     */
     this.updateBlockText = function (blk) {
         // When we create new blocks, we may not have assigned the
         // value yet.
@@ -1799,7 +1991,7 @@ function Blocks () {
             var label = i18nSolfege(obj[0]);
             var attr = obj[1];
 
-            if (attr !== '♮') {
+            if (attr !== 'â™®') {
                 label += attr;
             }
             break;
@@ -1811,7 +2003,7 @@ function Blocks () {
             var label = WESTERN2EISOLFEGENAMES[obj[0]];
             var attr = obj[1];
 
-            if (attr !== '♮') {
+            if (attr !== 'â™®') {
                 label += attr;
             }
             break;
@@ -1879,6 +2071,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Find the topmost block in the stack
+     * @param - blk - block
+     * @public
+     * @return blk
+     */
     this.findTopBlock = function (blk) {
         // Find the top block in a stack.
         if (blk == null) {
@@ -1959,7 +2157,13 @@ function Blocks () {
         return false;
     }
 
-
+    /*
+     * Check if there is a block in any of the stacks
+     * @param - thisBlock - new variable
+     * @param - names - names of blocks
+     * @private
+     * @return boolean
+     */
     this._blockInStack = function (thisBlock, names) {
         // Is there a block of any of these names in this stack?
         var counter = 0;
@@ -1985,6 +2189,12 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * Find the bottom-most block in the stack
+     * @param - blk - block
+     * @public
+     * @return blk
+     */
     this.findBottomBlock = function (blk) {
         // Find the bottom block in a stack.
         if (blk == null) {
@@ -2014,6 +2224,13 @@ function Blocks () {
         return blk;
     };
 
+    /*
+     * Count all the blocks in the stack
+     * @param - blk - block
+     * @private
+     * c = 0
+     * @return c
+     */
     this._countBlocksInStack = function (blk) {
         // Counts blocks in a stack starting from blk.
         var c = 0;
@@ -2028,6 +2245,11 @@ function Blocks () {
         return c;
     };
 
+    /*
+     * Find blocks with null in first connection
+     * @public
+     * @return {void}
+     */
     this.findStacks = function () {
         // Find any blocks with null in the first connection.
         this.stackList = [];
@@ -2038,6 +2260,11 @@ function Blocks () {
         }
     };
 
+    /*
+     * Move clamp blocks
+     * @private
+     * @return {void}
+     */
     this._findClamps = function () {
         // Find any clamp blocks.
         this._expandablesList = [];
@@ -2050,6 +2277,11 @@ function Blocks () {
         this._searchForArgFlow();
     };
 
+    /*
+     * find any expandable arg blocks
+     * @public
+     * @return {void}
+     */
     this._findTwoArgs = function () {
         // Find any expandable arg blocks.
         this._expandablesList = [];
@@ -2077,6 +2309,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Search for expandable blocks
+     * @param - blk - block
+     * @private
+     * @return {void}
+     */
     this._searchForExpandables = function (blk) {
         // Find the expandable blocks below blk in a stack.
         while (blk != null && this.blockList[blk] != null && !this.blockList[blk].isValueBlock()) {
@@ -2111,6 +2349,11 @@ function Blocks () {
         }
     };
 
+    /*
+     * Expand 2 arg blocks
+     * @private
+     * @return {void}
+     */
     this._expandTwoArgs = function () {
         // Expand expandable 2-arg blocks as needed.
         this._findTwoArgs();
@@ -2118,6 +2361,11 @@ function Blocks () {
         this.refreshCanvas();
     };
 
+    /*
+     * expand expandable clamp blocks
+     * @private
+     * @return {void}
+     */
     this._expandClamps = function () {
         // Expand expandable clamp blocks as needed.
         this._findClamps();
@@ -2135,6 +2383,13 @@ function Blocks () {
         this.refreshCanvas();
     };
 
+    /*
+     * Change disabled status of blocks
+     * @param - name
+     * @param - flag
+     * @public
+     * @return {void}
+     */
     this.changeDisabledStatus = function (name, flag) {
         // Some blocks, e.g., sensor blocks for Butia, change their
         // appearance depending upon if they have been enabled or
@@ -2261,6 +2516,14 @@ function Blocks () {
         }
     };
 
+    /*
+     * Create new block
+     * @param - name
+     * @param - postProcess
+     * @param - postProcessArg
+     * @public
+     * @return {void}
+     */
     this.makeNewBlock = function (name, postProcess, postProcessArg) {
         // Create a new block
         if (!name in this.protoBlockDict) {
@@ -2317,6 +2580,13 @@ function Blocks () {
         return myBlock;
     };
 
+    /*
+     * Make new blocks from proto block
+     * @param - name
+     * @param - arg - argument
+     * @public
+     * @return {void}
+     */
     this.makeBlock = function (name, arg) {
         // Make a new block from a proto block.
         // Called from palettes.
@@ -2698,6 +2968,12 @@ function Blocks () {
         return blk;
     };
 
+    /*
+     * Generate a drag group from blocks
+     * @param - blk - block
+     * @public
+     * @return {void}
+     */
     this.findDragGroup = function (blk) {
         // Generate a drag group from blocks connected to blk
         if (blk == null) {
@@ -2710,6 +2986,12 @@ function Blocks () {
         this._calculateDragGroup(blk);
     };
 
+    /*
+     * Calculate the number of blocks connected to block
+     * @param - blk - block
+     * @private
+     * @return {void}
+     */
     this._calculateDragGroup = function (blk) {
         // Give a block, find all the blocks connected to it
         this.dragLoopCounter += 1;
@@ -2753,6 +3035,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Set protoblock visibility to false
+     * @param - state
+     * @public
+     * @return {void}
+     */
     this.setActionProtoVisiblity = function (state) {
         // By default, the nameddo protoblock is hidden.
         var actionsPalette = this.palettes.dict['action'];
@@ -2775,6 +3063,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Find a unique custom name
+     * @param - name
+     * @public
+     * @return {void}
+     */S
     this.findUniqueActionName = function (name) {
         // If we have a stack named 'action', make the protoblock visible.
         if (name === _('action')) {
@@ -2851,6 +3145,11 @@ function Blocks () {
         return value;
     }
 
+    /*
+     * Find the drum with a url name
+     * @private
+     * @return {void}
+     */
     this._findDrumURLs = function () {
         // Make sure we initialize any drum with a URL name.
         for (var blk = 0; blk < this.blockList.length; blk++) {
@@ -3189,6 +3488,12 @@ function Blocks () {
         myBoxBlock.palette.add(myBoxBlock, true);
     };
 
+    /*
+     * Set a new local argument block
+     * @param - blk - block
+     * @private
+     * @return {void}
+     */
     this._newLocalArgBlock = function (name) {
         // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
@@ -3223,6 +3528,12 @@ function Blocks () {
         }, 100); // 500
     };
 
+    /*
+     * Remove old entries
+     * @param - name
+     * @private
+     * @return {void}
+     */
     this._removeNamedoEntries = function (name) {
         // Delete any old palette entries.
         // console.log('DELETE: removing old palette entries for ' + name);
@@ -3245,6 +3556,14 @@ function Blocks () {
         }
     };
 
+    /*
+     * Add a new named do block
+     * @param - name
+     * @param - hasReturn
+     * @param - hasArgs
+     * @public
+     * @return boolean
+     */
     this.newNameddoBlock = function (name, hasReturn, hasArgs) {
         // Depending upon the form of the associated action block, we
         // want to add a named do, a named calc, a named do w/args, or
@@ -3359,6 +3678,13 @@ function Blocks () {
         }
     };
 
+    /*
+     * return list of containing clamp blocks
+     * @param - blk - block
+     * @param - clampList
+     * @public
+     * @return list of clamp blocks
+     */
     this.findNestedClampBlocks = function (blk, clampList) {
         // Returns a list of containing clamp block or []
         if (this.blockList[blk] == null) {
@@ -3387,6 +3713,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * return a expandable block or null
+     * @param - blk - block
+     * @public
+     * @return expandable block
+     */
     this.insideExpandableBlock = function (blk) {
         // Returns a containing expandable block or null
         if (this.blockList[blk] == null) {
@@ -3412,6 +3744,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * return a note block or null 
+     * @param - blk - block
+     * @public
+     * @return note block
+     */
     this._insideNoteBlock = function (blk) {
         // Returns a containing note block or null
         if (this.blockList[blk] == null) {
@@ -3441,6 +3779,12 @@ function Blocks () {
         }
     };
 
+    // /*
+     * find the block instance
+     * @param - blkName 
+     * @public
+     * @return boolean
+     */
     this.findBlockInstance = function (blkName) {
         // Returns true if block of name blkName is loaded.
         for (blk = 0; blk < this.blockList.length; blk++) {
@@ -3452,6 +3796,12 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * return first collapsible block
+     * @param - blk - block
+     * @public
+     * @return null or collapsible block
+     */
     this.insideInlineCollapsibleBlock = function (blk) {
         // Return the first containing note block, if any.
         if (blk === null) {
@@ -3473,6 +3823,12 @@ function Blocks () {
         return this.insideInlineCollapsibleBlock(c0);
     };
 
+    /*
+     * Return first note block
+     * @param - blk - block
+     * @public
+     * @return note block
+     */
     this.findNoteBlock = function (blk) {
         // Returns first note block found.
         if (blk === null) {
@@ -3493,6 +3849,12 @@ function Blocks () {
         return this.findNoteBlock(c);
     };
 
+    /*
+     * Return first interval block
+     * @param - blk - block
+     * @public
+     * @return null or blk
+     */
     this.findNestedIntervalBlock = function (blk) {
         // Returns first interval block found.
         if (blk === null) {
@@ -3513,6 +3875,12 @@ function Blocks () {
         return this.findNestedIntervalBlock(c);
     };
 
+    /*
+     * Find first pitch block
+     * @param - blk - block
+     * @public
+     * @return null or blk
+     */
     this.findFirstPitchBlock = function (blk) {
         // Returns first pitch block found.
         if (blk === null) {
@@ -3529,6 +3897,12 @@ function Blocks () {
         return this.findFirstPitchBlock(c);
     };
 
+    /*
+     * Return octave associated with pitch block
+     * @param - blk - block
+     * @public
+     * @return 4
+     */
     this.findPitchOctave = function (blk) {
         // Returns octave associated with pitch block.
         if (blk === null) {
@@ -3549,6 +3923,13 @@ function Blocks () {
         }
     };
 
+    /*
+     * St the pitch block octave
+     * @param - blk - block
+     * @param - octave
+     * @public
+     * @return {void}
+     */
     this.setPitchOctave = function (blk, octave) {
         // Set octave associated with pitch block
         if (blk === null) {
@@ -3570,6 +3951,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Cheeck if number block used as interval block
+     * @param - blk - block
+     * @public
+     * @return boolean
+     */
     this.intervalModifierNumber = function (blk) {
         // Is a number block being used as an addant to an
         // interval (or transpose) block?
@@ -3598,6 +3985,12 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * Modifies the Octave number
+     * @param - blk - block
+     * @public
+     * @return boolean
+     */
     this.octaveModifierNumber = function (blk) {
         // Is a number block being used as multipicant with a
         // modelength block?
@@ -3629,6 +4022,12 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * Check if number block is used as a note value number
+     * @param - blk - block
+     * @public
+     * @return boolean
+     */
     this.noteValueNumber = function (blk, c) {
         // Is a number block being used as a note value denominator
         // argument?
@@ -3685,6 +4084,12 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * Return the note value number value
+     * @param - blk - block
+     * @public
+     * @return 1
+     */
     this.noteValueValue = function (blk) {
         // Return the number block value being used as a note value
         // denominator argument.
@@ -3742,6 +4147,12 @@ function Blocks () {
         return 1;
     };
 
+    /*
+     * Check if number block is being used as octave
+     * @param - blk - block
+     * @public
+     * @return boolean
+     */
     this.octaveNumber = function (blk) {
         // Is this a number block being used as an octave argument?
         if (blk === null) {
@@ -3752,6 +4163,11 @@ function Blocks () {
         return (myBlock.name === 'number' && myBlock.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 && this.blockList[myBlock.connections[0]].connections[2] === blk);
     };
 
+    /*
+     * Prepares the stack for copying blocks
+     * @public
+     * @return {void}
+     */
     this.prepareStackForCopy = function () {
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
@@ -3788,6 +4204,11 @@ function Blocks () {
         this.contextMenu(this.activeBlock);
     };
 
+    /*
+     * Paste the copied stack blocks
+     * @public
+     * @return {void}
+     */
     this.pasteStack = function () {
         // Copy a stack of blocks by creating a blockObjs and passing
         // it to this.load.
@@ -3811,6 +4232,11 @@ function Blocks () {
         }
     };
 
+    /*
+     * Save the stack
+     * @public
+     * @return {void}
+     */
     this.saveStack = function () {
         // Save a stack of blocks to local storage and the 'myblocks'
         // palette by creating a blockObjs and ...
@@ -3902,6 +4328,13 @@ function Blocks () {
         return blockObjs;
     };
 
+    /*
+     * Add these to Palette
+     * @param - name 
+     * @param - obj - object
+     * @public
+     * @return {void}
+     */
     this.addToMyPalette = function (name, obj) {
         // On the palette we store the macro as a basic block.
         var myBlock = new ProtoBlock('macro_' + name);
@@ -3917,6 +4350,12 @@ function Blocks () {
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
     };
 
+    /*
+     * Finds the block instance
+     * @param - blkName - block name
+     * @public
+     * @return boolean
+     */
     this.findBlockInstance = function (blkName) {
         // Returns true if block of name blkName is loaded.
         for (var blk = 0; blk < this.blockList.length; blk++) {
@@ -4949,6 +5388,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Cleanup after loading
+     * @param - name
+     * @public
+     * @return {void}
+     */
     this.cleanupAfterLoad = function (name) {
         // If all the blocks are loaded, we can make the final adjustments.
         this._loadCounter -= 1;
@@ -5068,6 +5513,12 @@ function Blocks () {
 
     };
 
+    /*
+     * Search for return block in action stack
+     * @param - blk - block
+     * @public
+     * @return boolean
+     */
     this.actionHasReturn = function (blk) {
         // Look for a return block in an action stack.
         if (this.blockList[blk].name !== 'action') {
@@ -5082,6 +5533,12 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * Search for argument block in action stack
+     * @param - blk - block
+     * @public
+     * @return boolean
+     */
     this.actionHasArgs = function (blk) {
         // Look for an arg blocks in an action stack.
         if (this.blockList[blk].name !== 'action') {
@@ -5096,6 +5553,12 @@ function Blocks () {
         return false;
     };
 
+    /*
+     * Move the stack with blk to the top
+     * @param - blk - block
+     * @public
+     * @return {void}
+     */
     this.raiseStackToTop = function (blk) {
         // Move the stack associated with blk to the top.
         var topBlk = this.findTopBlock(blk);
@@ -5199,6 +5662,12 @@ function Blocks () {
         }
     };
 
+    /*
+     * Send the stacks to Trash
+     * @param - myBlock
+     * @public
+     * @return {void}
+     */
     this.sendStackToTrash = function (myBlock) {
         // First, hide the palettes as they will need updating.
         for (var name in this.palettes.dict) {
