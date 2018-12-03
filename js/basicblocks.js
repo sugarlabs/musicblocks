@@ -1168,7 +1168,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['osctime'] = newblock;
     //.TRANS: oscillator time (in milliseconds)
     newblock.staticLabels.push(_('milliseconds'));
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(200);
     if (beginnerMode && !beginnerBlock('osctime')) {
@@ -1205,7 +1207,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: the amount to shift to the offbeat note
     newblock.staticLabels.push(_('swing value'));
     newblock.staticLabels.push(_('note value'));
-    newblock.extraWidth = 20;
+    newblock.extraWidth = 40;
     newblock.adjustWidthToLabel();
     newblock.flowClampTwoArgBlock();
     newblock.defaults.push(1 / 24);

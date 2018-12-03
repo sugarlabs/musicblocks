@@ -1194,7 +1194,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'interval':
                     that.collapseText = new createjs.Text(_('scalar interval'), fontSize + 'px Sans', platformColor.blockText);
                     break;
-				case 'osctime':
+                case 'osctime':
                     that.collapseText = new createjs.Text(_('milliseconds'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'temperament':
@@ -1570,7 +1570,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'interval':
                 this._intervalLabel();
                 break;
-			case 'osctime':
+            case 'osctime':
                 this._oscTimeLabel();
                 break;
             default:
@@ -1758,22 +1758,23 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
-this._oscTimeLabel = function () {
+
+    this._oscTimeLabel = function () {
         // Find Hertz and value to display on the collapsed note value
         // block.
         var v = '';
         var c = this.connections[1];
         if (c !== null) {
-            // Only look for standard form: / 1000 3 2
+            // Only look for standard form: / 1000 / 3 2
             if (this.blocks.blockList[c].name === 'divide') {
                 var c1 = this.blocks.blockList[c].connections[1];
                 var c2 = this.blocks.blockList[c].connections[2];
-				if (this.blocks.blockList[c].name === 'divide') {
-					var ci = this.blocks.blockList[c2].connections[1];
+                if (c1 !== null && c2 !== null && this.blocks.blockList[c2].name === 'divide') {
+                    var ci = this.blocks.blockList[c2].connections[1];
                     var cii = this.blocks.blockList[c2].connections[2];
-					if (this.blocks.blockList[ci].name === 'number' && this.blocks.blockList[cii].name === 'number') {
-                    v = this.blocks.blockList[c1].value / this.blocks.blockList[ci].value * this.blocks.blockList[cii].value;
-            }
+                    if (ci !== null && cii !== null && this.blocks.blockList[ci].name === 'number' && this.blocks.blockList[cii].name === 'number') {
+                        v = this.blocks.blockList[c1].value / this.blocks.blockList[ci].value * this.blocks.blockList[cii].value;
+                    }
                 }
             }
         }
@@ -1789,13 +1790,18 @@ this._oscTimeLabel = function () {
             // Are there more pitch blocks in this note?
             c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
             // Update the collapsed-block label.
-            if (c === null) {
-                this.collapseText.text = p + ' | ' + v;
+            if (v !== '') {
+                if (c === null) {
+                    this.collapseText.text = p + ' | ' + v.toFixed(0);
+                } else {
+                    this.collapseText.text = p + '... | ' + v.toFixed(0);
+                }
             } else {
-                this.collapseText.text = p + '... | ' + v;
+                this.collapseText.text = p + '...';
             }
         }
     };
+
     this._getPitch = function (c) {
         if (c === null) {
             return '';
