@@ -1116,7 +1116,9 @@ function Turtle (name, turtles, drum) {
         this.color = Number(color);
         var results = getcolor(this.color);
         this.canvasValue = results[0];
+        this.value = results[0];
         this.canvasChroma = results[1];
+        this.chroma = results[1];
         this.canvasColor = results[2];
         this.processColor();
     };
