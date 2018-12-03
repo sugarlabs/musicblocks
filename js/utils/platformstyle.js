@@ -32,13 +32,13 @@ console.log('On platform: ', platform);
 window.platformColor = {
     blockText: '#282828',
     paletteColors: {
-	'widgets': ['#7CD622', '#57AD02', '#77C428', '#B4EB7D'],
-	'pitch': ['#7CD622', '#57AD02', '#77C428', '#B4EB7D'],
+	'widgets': ['#10F39C', '#10DF64', '#00E164', '#00C87D'],
+	'pitch': ['#10F39C', '#10DF64', '#00E164', '#00C87D'],
 	'rhythm': ['#FE994F', '#E86B0E', '#FF8B2D', '#FEC092'],
 	'meter': ['#FE994F', '#E86B0E', '#FF8B2D', '#FEC092'],
 	'tone': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#A1EEEF'],
 	'ornament': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#A1EEEF'],
-	'intervals': ['#7CD622', '#57AD02', '#77C428', '#B4EB7D'],
+	'intervals': ['#10F39C', '#10DF64', '#00E164', '#00C87D'],
 	'volume': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#A1EEEF'],
 	'drum': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#A1EEEF'],
 	'graphics': ['#92A9FF', '#5370DC', '#728FF9', '#CDD8FF'],
