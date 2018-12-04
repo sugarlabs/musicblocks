@@ -72,6 +72,8 @@ window.platformColor = {
     paletteText: '#666666',
     selectorBackground: '#8CC6FF',
     selectorSelected: '#1A8CFF',
+	labelColor: '#90c100',
+	tupletBackground: '#57e751',
 };
 
 document.querySelector('meta[name=theme-color]')
