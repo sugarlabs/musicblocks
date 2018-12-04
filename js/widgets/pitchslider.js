@@ -327,7 +327,7 @@ function PitchSlider() {
             sliderCell.style.minWidth = sliderCell.style.width;
             sliderCell.style.maxWidth = sliderCell.style.width;
             sliderCell.style.height = (BUTTONSIZE + SLIDERHEIGHT) * this._cellScale + 'px';
-            sliderCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            sliderCell.style.backgroundColor = platformColor.selectorBackground;
             sliderCell.setAttribute('tabIndex', 1);
 
             // Add a div to hold the slider.

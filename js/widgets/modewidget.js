@@ -193,7 +193,7 @@ function ModeWidget() {
         var cell = row.insertCell();
         cell.colSpan = 18;
         cell.innerHTML = '&nbsp;';
-        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         this._makeClickable();
         //.TRANS: A circle of notes represents the musical mode.
@@ -418,7 +418,7 @@ function ModeWidget() {
         cell.style.width = cell.width;
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         cell.style.fontSize = this._cellScale * 100 + '%';
         cell.innerHTML = '<font color="white">' + halfstep + '</font>';
         cell.setAttribute('id', halfstep);
@@ -448,7 +448,7 @@ function ModeWidget() {
                 j += currentMode[k];
                 k += 1;
             } else {
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.style.backgroundColor = platformColor.selectorBackground;
             }
 
             if (i === 0) {
@@ -461,7 +461,7 @@ function ModeWidget() {
                     that._saveState();
 
                     if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        this.style.backgroundColor = platformColor.selectorBackground;
                         that._setModeName()
                     } else {
                         this.style.backgroundColor = 'black';
@@ -750,7 +750,7 @@ function ModeWidget() {
         for (var i = 1; i < 12; i++) {
             var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor === 'black') {
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.style.backgroundColor = platformColor.selectorBackground;
             }
         }
     };

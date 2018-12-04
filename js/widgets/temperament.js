@@ -390,7 +390,7 @@ function TemperamentWidget () {
         
         var menuItems =  document.querySelectorAll("#menuLabels");
         for(var i = 0; i < menuLabels.length; i++) {
-            menuItems[i].style.background = MATRIXLABELCOLOR; 
+            menuItems[i].style.background = platformColor.labelColor; 
             menuItems[i].style.height = 30 + 'px';
             menuItems[i].style.textAlign = 'center';
             menuItems[i].style.fontWeight = 'bold';
@@ -456,7 +456,7 @@ function TemperamentWidget () {
             notesCell[i,1] = notesRow[i].insertCell(-1);
             notesCell[i,1].id = 'pitchNumber_' + i;
             notesCell[i,1].innerHTML = i;
-            notesCell[i,1].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,1].style.backgroundColor = platformColor.selectorBackground;
             notesCell[i,1].style.textAlign = 'center';
 
             ratios[i] = this.ratios[i];
@@ -465,7 +465,7 @@ function TemperamentWidget () {
             //Ratio
             notesCell[i,2] = notesRow[i].insertCell(-1);
             notesCell[i,2].innerHTML = ratios[i];
-            notesCell[i,2].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,2].style.backgroundColor = platformColor.selectorBackground;
             notesCell[i,2].style.textAlign = 'center';
 
             if (this.inTemperament !== 'custom') {
@@ -473,14 +473,14 @@ function TemperamentWidget () {
                 notesCell[i,3] = notesRow[i].insertCell(-1);
                 notesCell[i,3].innerHTML = this.intervals[i];
                 notesCell[i,3].style.width = 120 + 'px';
-                notesCell[i,3].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,3].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[i,3].style.textAlign = 'center';
                     
                 //Notes
                 notesCell[i,4] = notesRow[i].insertCell(-1);
                 notesCell[i,4].innerHTML = this.notes[i];
                 notesCell[i,4].style.width = 50 + 'px';
-                notesCell[i,4].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,4].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[i,4].style.textAlign = 'center';
 
                 //Mode
@@ -495,14 +495,14 @@ function TemperamentWidget () {
                     notesCell[i,5].innerHTML = 'Non Scalar';
                 }
                 notesCell[i,5].style.width = 100 + 'px';
-                notesCell[i,5].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                notesCell[i,5].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[i,5].style.textAlign = 'center';
             }
                 
             //Frequency
             notesCell[i,6] = notesRow[i].insertCell(-1);
             notesCell[i,6].innerHTML = this.frequencies[i];
-            notesCell[i,6].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            notesCell[i,6].style.backgroundColor = platformColor.selectorBackground;
             notesCell[i,6].style.textAlign = 'center';
 
             if (this.inTemperament == 'custom') {
@@ -1480,14 +1480,14 @@ function TemperamentWidget () {
 
                 that.notesCircle.refreshWheel();
             } else if (that.circleIsVisible == true && docById('wheelDiv4') == null) {
-                docById('pitchNumber_' + i).style.background = MATRIXLABELCOLOR;
+                docById('pitchNumber_' + i).style.background = platformColor.labelColor;
                 if (that.playbackForward == false && i < pitchNumber) {
                     var j = i + 1;
-                    docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                    docById('pitchNumber_' + j).style.background = platformColor.selectorBackground;
                 } else {
                     if (i !== 0) {
                         var j = i - 1;
-                        docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                        docById('pitchNumber_' + j).style.background = platformColor.selectorBackground;
                     }
                 }     
             } else if (docById('wheelDiv4') !== null) {
@@ -1549,7 +1549,7 @@ function TemperamentWidget () {
                             that.notesCircle.refreshWheel();   
                         } else if (that.circleIsVisible == true && docById('wheelDiv4') == null) {
                             var j = i - 1;
-                            docById('pitchNumber_' + j).style.background = MATRIXNOTECELLCOLOR;
+                            docById('pitchNumber_' + j).style.background = platformColor.selectorBackground;
                         } else if (docById('wheelDiv4') !== null) {
                             that.wheel1.navItems[i-1].fillAttr = '#e0e0e0';
                             that.wheel1.navItems[i-1].sliceHoverAttr.fill = '#e0e0e0';
