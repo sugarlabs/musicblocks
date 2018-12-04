@@ -968,7 +968,7 @@ function PitchTimeMatrix () {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.textAlign = 'center';
         cell.innerHTML = noteValueToDisplay;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.style.backgroundColor = platformColor.rhythmcellcolor;
         this._matrixHasTuplets = true;
     };
 
@@ -1022,7 +1022,7 @@ function PitchTimeMatrix () {
             cell.style.lineHeight = 60 + '%';
             cell.style.textAlign = 'center';
             cell.innerHTML = noteValueToDisplay;
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = platformColor.rhythmcellcolor;
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
@@ -1331,7 +1331,7 @@ function PitchTimeMatrix () {
         var row = docById('ptmNoteValueRow');
         for (var i = 0; i < row.cells.length; i++) {
             var cell = row.cells[i];
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
         if (that._matrixHasTuplets) {
