@@ -92,7 +92,7 @@ function PitchStaircase () {
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = BUTTONSIZE + 'px';
-            stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
 
             var cellWidth = Number(stepCell.style.width.replace(/px/, ''));
             var svgWidth = cellWidth.toString();
@@ -275,7 +275,7 @@ function PitchStaircase () {
         this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
 
         setTimeout(function () {
-            stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
         }, 1000)
     };
 
@@ -296,7 +296,7 @@ function PitchStaircase () {
             for (var i = 0; i < that.Stairs.length; i++) {
                 var pscTableCell = docById('stepTable' + i);
                 var stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
         }, 1000);
     };
@@ -325,7 +325,7 @@ function PitchStaircase () {
                 for (var i = 0; i < that.Stairs.length; i++) {
                     var pscTableCell = docById('stepTable' + i);
                     var stepCell = pscTableCell.rows[0].cells[1];
-                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    stepCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1000);
             return;
@@ -336,7 +336,7 @@ function PitchStaircase () {
                 for (var i = 0; i < that.Stairs.length; i++) {
                     var pscTableCell = docById('stepTable' + i);
                     var stepCell = pscTableCell.rows[0].cells[1];
-                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    stepCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1000);
 
@@ -356,7 +356,7 @@ function PitchStaircase () {
         setTimeout(function () {
             if (pscTableCell != null) {
                 var stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
 
             var pscTableCell = docById('stepTable' + index);
