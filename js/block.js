@@ -2046,7 +2046,7 @@ function Block(protoblock, blocks, overrideName) {
      */
     this._calculateBlockHitArea = function () {
         var hitArea = new createjs.Shape();
-        hitArea.graphics.beginFill('#FFF').drawRect(0, 0, this.width, this.hitHeight);
+        hitArea.graphics.beginFill('platformColor.hitAreaGraphicsBeginFill').drawRect(0, 0, this.width, this.hitHeight);
         this.container.hitArea = hitArea;
     };
 
@@ -2770,7 +2770,7 @@ function Block(protoblock, blocks, overrideName) {
                 filterValues.push(FILTERTYPES[i][1]);
             }
 
-            this._piemenuBasic(filterLabels, filterValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
+            this._piemenuBasic(filterLabels, filterValues, selectedtype, platformColor.piemenuBasic);
         } else if (this.name === 'oscillatortype') {
             if (this.value != null) {
                 var selectedtype = this.value;
@@ -2785,7 +2785,7 @@ function Block(protoblock, blocks, overrideName) {
                 oscValues.push(OSCTYPES[i][1]);
             }
 
-            this._piemenuBasic(oscLabels, oscValues, selectedtype, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
+            this._piemenuBasic(oscLabels, oscValues, selectedtype, platformColor.piemenuBasic);
         } else if (this.name === 'voicename') {
             if (this.value != null) {
                 var selectedvoice = this.value;
@@ -2872,7 +2872,7 @@ function Block(protoblock, blocks, overrideName) {
                 temperamentValues.push(TEMPERAMENTS[i][1]);
             }
 
-            this._piemenuBasic(temperamentLabels, temperamentValues, selectedTemperament, ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989']);
+            this._piemenuBasic(temperamentLabels, temperamentValues, selectedTemperament, platformColor.piemenuBasic);
         } else if (this.name === 'boolean') {
             if (this.value != null) {
                 var selectedvalue = this.value;
@@ -3311,7 +3311,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._pitchWheel.keynavigateEnabled = false;
 
-        this._pitchWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'];
+        this._pitchWheel.colors = platformColor.pitchWheelcolors;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -3327,7 +3327,7 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(noteLabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -3338,7 +3338,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.createWheel(['x', ' ']);
 
         if (!custom) {
-            this._accidentalsWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428'];
+            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
             this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
             this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.50;
@@ -3353,7 +3353,7 @@ function Block(protoblock, blocks, overrideName) {
 
             for (var i = 0; i < 9; i++) {
                 accidentalLabels.push(null);
-                this._accidentalsWheel.colors.push('#c0c0c0');
+                this._accidentalsWheel.colors.push(platformColor.accidentalsWheelcolorspush);
             }
 
             this._accidentalsWheel.animatetime = 0; // 300;
@@ -3361,7 +3361,7 @@ function Block(protoblock, blocks, overrideName) {
             this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
         }
         if (hasOctaveWheel) {
-            this._octavesWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+            this._octavesWheel.colors = platformColor.octavesWheelcolors;
             this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
             this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
@@ -3560,7 +3560,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._pitchWheel.keynavigateEnabled = false;
 
-        this._pitchWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'];
+        this._pitchWheel.colors = platformColor.pitchWheelcolors;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -3571,7 +3571,7 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(noteLabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -3581,7 +3581,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
 
-        this._octavesWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+        this._octavesWheel.colors = platformColor.octavesWheelcolors;
         this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
         this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
@@ -3722,7 +3722,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._accidentalWheel.keynavigateEnabled = false;
 
-        this._accidentalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._accidentalWheel.colors = platformColor.accidentalsWheelcolors;
         this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
         this._accidentalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -3734,7 +3734,7 @@ function Block(protoblock, blocks, overrideName) {
         this._accidentalWheel.createWheel(labels);
         this._accidentalWheel.setTooltips(accidentalLabels)
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -3855,7 +3855,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._noteValueWheel.keynavigateEnabled = false;
 
-        this._noteValueWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._noteValueWheel.colors = platformColor.noteValueWheelcolors;
         this._noteValueWheel.slicePathFunction = slicePath().DonutSlice;
         this._noteValueWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._noteValueWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -3866,7 +3866,7 @@ function Block(protoblock, blocks, overrideName) {
         this._noteValueWheel.clickModeRotate = false;
         this._noteValueWheel.createWheel(noteValueLabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -3883,7 +3883,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        this._tabsWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._tabsWheel.colors = platformColor.tabsWheelcolors;
         this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
         this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
@@ -4054,7 +4054,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._numberWheel.keynavigateEnabled = false;
 
-        this._numberWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._numberWheel.colors = platformColor.numberWheelcolors;
         this._numberWheel.slicePathFunction = slicePath().DonutSlice;
         this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         if (wheelValues.length > 16) {
@@ -4074,7 +4074,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -4236,7 +4236,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -4339,7 +4339,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (colors === undefined) {
-            colors = ['#77c428', '#93e042', '#5ba900'];
+            colors = platformColor.piemenuBasicundefined;
         }
 
         docById('wheelDiv').style.display = '';
@@ -4440,7 +4440,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._booleanWheel.keynavigateEnabled = false;
 
-        this._booleanWheel.colors = ['#d3cf76', '#b8b45f'];
+        this._booleanWheel.colors = platformColor.booleanWheelcolors;
         this._booleanWheel.slicePathFunction = slicePath().DonutSlice;
         this._booleanWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._booleanWheel.slicePathCustom.minRadiusPercent = 0;
@@ -4513,7 +4513,7 @@ function Block(protoblock, blocks, overrideName) {
             return;
         }
 
-        const COLORS = ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'];
+        const COLORS = platformColor.piemenuVoicesColors;
         var colors = [];
 
         for (var i = 0; i < voiceLabels.length; i++) {
@@ -4552,7 +4552,7 @@ function Block(protoblock, blocks, overrideName) {
         this._voiceWheel.animatetime = 0; // 300;
         this._voiceWheel.createWheel(voiceLabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -4680,7 +4680,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalNameWheel.keynavigateEnabled = false;
 
         //Customize slicePaths for proper size
-        this._intervalNameWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._intervalNameWheel.colors = platformColor.intervalNameWheelcolors;
         this._intervalNameWheel.slicePathFunction = slicePath().DonutSlice;
         this._intervalNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -4698,7 +4698,7 @@ function Block(protoblock, blocks, overrideName) {
         this._intervalNameWheel.animatetime = 0; // 300;
         this._intervalNameWheel.createWheel(labels);
 
-        this._intervalWheel.colors = ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'];
+        this._intervalWheel.colors = platformColor.intervalWheelcolors;
         this._intervalWheel.slicePathFunction = slicePath().DonutSlice;
         this._intervalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._intervalWheel.slicePathCustom.minRadiusPercent = 0.8;
@@ -4721,7 +4721,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._intervalWheel.createWheel(numbers);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -4875,7 +4875,7 @@ function Block(protoblock, blocks, overrideName) {
 
         wheelnav.cssMode = true;
 
-        this._modeWheel.colors = ['#77c428', '#93e042'];
+        this._modeWheel.colors = platformColor.modeWheelcolors;
         this._modeWheel.slicePathFunction = slicePath().DonutSlice;
         this._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._modeWheel.slicePathCustom.minRadiusPercent = 0.85;
@@ -4890,7 +4890,7 @@ function Block(protoblock, blocks, overrideName) {
         this._modeWheel.animatetime = 0; // 300;
         this._modeWheel.createWheel(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
 
-        this._modeGroupWheel.colors = ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'];
+        this._modeGroupWheel.colors = platformColor.modeGroupWheelcolors;
         this._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
         this._modeGroupWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._modeGroupWheel.slicePathCustom.minRadiusPercent = 0.15;
@@ -4911,7 +4911,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._modeGroupWheel.createWheel(xlabels);
 
-        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -4982,9 +4982,9 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
                 var modename = MODE_PIE_MENUS[grp][i];
                 if (modename === ' ') {
-                    colors.push('#4b8b0e');
+                    colors.push(platformColor.modePieMenusIfColorPush);
                 } else {
-                    colors.push('#66a62d');
+                    colors.push(modePieMenusElseColorPush);
                 }
             }
 
@@ -5512,7 +5512,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         var wheel = new wheelnav('contextWheelDiv', null, 250, 250);
-        wheel.colors = ['#808080', '#909090', '#808080', '#909090', '#707070'];
+        wheel.colors = platformColor.wheelcolors;
         wheel.slicePathFunction = slicePath().DonutSlice;
         wheel.slicePathCustom = slicePath().DonutSliceCustomization();
         wheel.slicePathCustom.minRadiusPercent = 0.2;
