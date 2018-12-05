@@ -57,7 +57,7 @@ block.value = Math.pow(base, exp);
 //* block:cos *// simpleOneArgBlock('cos');
 //* arg:cos *// block.value = Math.cos(logo.parseArg(logo, turtle, conns[1]));
 //* block:tan *// simpleOneArgBlock('tan');
-//* arg:sin *// block.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));
+//* arg:tan *// block.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));
 
 //* block:asin *// simpleOneArgBlock('asin');
 //* arg:asin *// block.value = Math.asin(logo.parseArg(logo, turtle, conns[1]));

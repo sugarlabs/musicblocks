@@ -1,0 +1,845 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="335"
+   height="615"
+   style=""
+   version="1.1"
+   id="svg9691"
+   sodipodi:docname="transform18.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata9697">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs9695" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     id="namedview9693"
+     showgrid="false"
+     inkscape:zoom="17.366082"
+     inkscape:cx="118.13886"
+     inkscape:cy="576.87534"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg_1" />
+  <rect
+     id="backgroundrect"
+     width="100%"
+     height="100%"
+     x="0"
+     y="0"
+     fill="none"
+     stroke="none" />
+  <g
+     class="currentLayer"
+     style=""
+     id="g9689">
+    <title
+       id="title9451">Layer 1</title>
+    <g
+       id="svg_1"
+       class="">
+      <g
+         id="svg_2">
+        <g
+           transform="translate(525,-147) scale(1.5) "
+           id="svg_3">
+          <path
+             d="m-349.5,112 L-349.5,108 A4,4 90 0 1 -345.5,104 L-341.5,104 L-336.5,98 L-331.5,104 L-322.5,104 L-262.5,104 L-258.5,104 A4,4 90 0 1 -254.5,108 L-254.5,112 L-254.5,116 L-254.5,120 A4,4 90 0 1 -258.5,124 L-262.5,124 L-322.5,124 L-323.5,124 L-323.5,126 L-331.5,126 L-331.5,124 L-332.5,124 L-336.5,124 A5,5 90 0 0 -341.5,129 L-341.5,133 L-341.5,137 L-341.5,473 L-341.5,477 A5,5 90 0 0 -336.5,482 L-332.5,482 L-332.5,484 L-322.5,484 L-322.5,482 L-314.5,482 L-314.5,488 L-314.5,494 L-314.5,498 A4,4 90 0 1 -318.5,502 L-322.5,502 L-331.5,502 L-336.5,508 L-341.5,502 L-345.5,502 A4,4 90 0 1 -349.5,498 L-349.5,494 z"
+             style="fill:#DAA926;fill-opacity:1;stroke:#DAAF30;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+             id="svg_4" />
+          <text
+             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             id="svg_5"
+             y="97.5"
+             x="-350">
+            <tspan
+               x="-330"
+               y="119.5"
+               id="svg_6">start</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="svg_15"
+       class="">
+      <g
+         id="svg_16">
+        <g
+           transform="translate(539,-106) scale(1.5) "
+           id="svg_17">
+          <path
+             d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-322.5,98 L-262.5,98 L-258.5,98 A4,4 90 0 1 -254.5,102 L-254.5,106 L-258.5,106 L-258.5,103 L-262.5,103 L-262.5,113 L-258.5,113 L-258.5,110 L-254.5,110 L-254.5,114 A4,4 90 0 1 -258.5,118 L-262.5,118 L-322.5,118 L-323.5,118 L-323.5,120 L-331.5,120 L-331.5,118 L-332.5,118 L-336.5,118 A5,5 90 0 0 -341.5,123 L-341.5,127 L-341.5,131 L-341.5,173 L-341.5,177 A5,5 90 0 0 -336.5,182 L-332.5,182 L-332.5,184 L-322.5,184 L-322.5,182 L-314.5,182 L-314.5,188 L-314.5,194 L-314.5,198 A4,4 90 0 1 -318.5,202 L-322.5,202 L-331.5,202 L-332.5,202 L-332.5,204 L-340.5,204 L-340.5,202 L-341.5,202 L-345.5,202 A4,4 90 0 1 -349.5,198 L-349.5,194 z"
+             style="fill:#FF8B2D;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+             id="svg_18" />
+          <text
+             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             id="svg_19"
+             y="97.5"
+             x="-350">
+            <tspan
+               x="-330"
+               y="112.5"
+               id="svg_20">note</tspan>
+          </text>
+          <text
+             style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+             id="svg_21"
+             y="97.5"
+             x="-350">
+            <tspan
+               x="-265"
+               y="109.5"
+               id="svg_22">value</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="svg_30"
+       class="">
+      <g
+         transform="translate(671,-106) scale(1.5) "
+         id="svg_31">
+        <path
+           d="m-341.5,106 L-341.5,102 A4,4 90 0 1 -337.5,98 L-333.5,98 L-323.5,98 L-293.5,98 L-289.5,98 A4,4 90 0 1 -285.5,102 L-285.5,106 L-289.5,106 L-289.5,103 L-293.5,103 L-293.5,113 L-289.5,113 L-289.5,110 L-285.5,110 L-285.5,127 L-289.5,127 L-289.5,124 L-293.5,124 L-293.5,134 L-289.5,134 L-289.5,131 L-285.5,131 L-285.5,135 A4,4 90 0 1 -289.5,139 L-293.5,139 L-323.5,139 L-333.5,139 L-337.5,139 A4,4 90 0 1 -341.5,135 L-341.5,131 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_32" />
+        <text
+           style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_33"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-296"
+             y="120.5"
+             id="svg_34">➗</tspan>
+        </text>
+        <text
+           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_35"
+           y="97.5"
+           x="-350" />
+        <text
+           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_37"
+           y="97.5"
+           x="-350" />
+      </g>
+    </g>
+    <g
+       id="svg_39"
+       class="">
+      <g
+         transform="translate(757,-106) scale(1.5) "
+         id="svg_40">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_41" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_42"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_43">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_44"
+       class="">
+      <g
+         transform="translate(757,-74) scale(1.5) "
+         id="svg_45">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_46" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_47"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_48">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_49"
+       class="">
+      <g
+         transform="translate(553,-74) scale(1.5) "
+         id="svg_50">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-311.5,98 L-307.5,98 A4,4 90 0 1 -303.5,102 L-303.5,106 L-303.5,110 L-303.5,114 A4,4 90 0 1 -307.5,118 L-311.5,118 L-331.5,118 L-332.5,118 L-332.5,120 L-340.5,120 L-340.5,118 L-341.5,118 L-345.5,118 A4,4 90 0 1 -349.5,114 L-349.5,110 z"
+           style="fill:#B0B0B0;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_51" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_52"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-314"
+             y="111.5"
+             id="svg_53">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_54"
+       class="">
+      <g
+         transform="translate(553,-42) scale(1.5) "
+         id="svg_55">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-301.5,98 L-297.5,98 A4,4 90 0 1 -293.5,102 L-293.5,106 L-297.5,106 L-297.5,103 L-301.5,103 L-301.5,113 L-297.5,113 L-297.5,110 L-293.5,110 L-293.5,127 L-297.5,127 L-297.5,124 L-301.5,124 L-301.5,134 L-297.5,134 L-297.5,131 L-293.5,131 L-293.5,135 A4,4 90 0 1 -297.5,139 L-301.5,139 L-331.5,139 L-332.5,139 L-332.5,141 L-340.5,141 L-340.5,139 L-341.5,139 L-345.5,139 A4,4 90 0 1 -349.5,135 L-349.5,131 L-349.5,110 L-349.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_56" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_57"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="121.5"
+             id="svg_58">pitch</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_59"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="109.5"
+             id="svg_60">name</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_61"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="130.5"
+             id="svg_62">octave</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_63"
+       class="">
+      <g
+         transform="translate(627,-42) scale(1.5) "
+         id="svg_64">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_65" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_66"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_67">sol</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_68"
+       class="">
+      <g
+         transform="translate(627,-10) scale(1.5) "
+         id="svg_69">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_70" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_71"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_72">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_73"
+       class="">
+      <g
+         transform="translate(539,52) scale(1.5) "
+         id="svg_74">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-298.1552734375,98 L-294.1552734375,98 A4,4 90 0 1 -290.1552734375,102 L-290.1552734375,106 L-294.1552734375,106 L-294.1552734375,103 L-298.1552734375,103 L-298.1552734375,113 L-294.1552734375,113 L-294.1552734375,110 L-290.1552734375,110 L-290.1552734375,114 A4,4 90 0 1 -294.1552734375,118 L-298.1552734375,118 L-331.5,118 L-332.5,118 L-332.5,120 L-340.5,120 L-340.5,118 L-341.5,118 L-345.5,118 A4,4 90 0 1 -349.5,114 L-349.5,110 L-349.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_75" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_76"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-300"
+             y="111.5"
+             id="svg_77">register</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_78"
+           y="97.5"
+           x="-350" />
+      </g>
+    </g>
+    <g
+       id="svg_80"
+       class="">
+      <g
+         transform="translate(618,52) scale(1.5) "
+         id="svg_81">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_82" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_83"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_84">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_85"
+       class="">
+      <g
+         id="svg_86">
+        <g
+           transform="translate(539,84) scale(1.5) "
+           id="svg_87">
+          <path
+             d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-322.5,98 L-262.5,98 L-258.5,98 A4,4 90 0 1 -254.5,102 L-254.5,106 L-258.5,106 L-258.5,103 L-262.5,103 L-262.5,113 L-258.5,113 L-258.5,110 L-254.5,110 L-254.5,114 A4,4 90 0 1 -258.5,118 L-262.5,118 L-322.5,118 L-323.5,118 L-323.5,120 L-331.5,120 L-331.5,118 L-332.5,118 L-336.5,118 A5,5 90 0 0 -341.5,123 L-341.5,127 L-341.5,131 L-341.5,173 L-341.5,177 A5,5 90 0 0 -336.5,182 L-332.5,182 L-332.5,184 L-322.5,184 L-322.5,182 L-314.5,182 L-314.5,188 L-314.5,194 L-314.5,198 A4,4 90 0 1 -318.5,202 L-322.5,202 L-331.5,202 L-332.5,202 L-332.5,204 L-340.5,204 L-340.5,202 L-341.5,202 L-345.5,202 A4,4 90 0 1 -349.5,198 L-349.5,194 z"
+             style="fill:#FF8B2D;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+             id="svg_88" />
+          <text
+             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             id="svg_89"
+             y="97.5"
+             x="-350">
+            <tspan
+               x="-330"
+               y="112.5"
+               id="svg_90">note</tspan>
+          </text>
+          <text
+             style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+             id="svg_91"
+             y="97.5"
+             x="-350">
+            <tspan
+               x="-265"
+               y="109.5"
+               id="svg_92">value</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="svg_100"
+       class="">
+      <g
+         transform="translate(671,84) scale(1.5) "
+         id="svg_101">
+        <path
+           d="m-341.5,106 L-341.5,102 A4,4 90 0 1 -337.5,98 L-333.5,98 L-323.5,98 L-293.5,98 L-289.5,98 A4,4 90 0 1 -285.5,102 L-285.5,106 L-289.5,106 L-289.5,103 L-293.5,103 L-293.5,113 L-289.5,113 L-289.5,110 L-285.5,110 L-285.5,127 L-289.5,127 L-289.5,124 L-293.5,124 L-293.5,134 L-289.5,134 L-289.5,131 L-285.5,131 L-285.5,135 A4,4 90 0 1 -289.5,139 L-293.5,139 L-323.5,139 L-333.5,139 L-337.5,139 A4,4 90 0 1 -341.5,135 L-341.5,131 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_102" />
+        <text
+           style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_103"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-296"
+             y="120.5"
+             id="svg_104">➗</tspan>
+        </text>
+        <text
+           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_105"
+           y="97.5"
+           x="-350" />
+        <text
+           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_107"
+           y="97.5"
+           x="-350" />
+      </g>
+    </g>
+    <g
+       id="svg_109"
+       class="">
+      <g
+         transform="translate(757,84) scale(1.5) "
+         id="svg_110">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_111" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_112"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_113">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_114"
+       class="">
+      <g
+         transform="translate(757,116) scale(1.5) "
+         id="svg_115">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_116" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_117"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_118">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_119"
+       class="">
+      <g
+         transform="translate(553,116) scale(1.5) "
+         id="svg_120">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-311.5,98 L-307.5,98 A4,4 90 0 1 -303.5,102 L-303.5,106 L-303.5,110 L-303.5,114 A4,4 90 0 1 -307.5,118 L-311.5,118 L-331.5,118 L-332.5,118 L-332.5,120 L-340.5,120 L-340.5,118 L-341.5,118 L-345.5,118 A4,4 90 0 1 -349.5,114 L-349.5,110 z"
+           style="fill:#B0B0B0;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_121" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_122"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-314"
+             y="111.5"
+             id="svg_123">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_124"
+       class="">
+      <g
+         transform="translate(553,148) scale(1.5) "
+         id="svg_125">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-301.5,98 L-297.5,98 A4,4 90 0 1 -293.5,102 L-293.5,106 L-297.5,106 L-297.5,103 L-301.5,103 L-301.5,113 L-297.5,113 L-297.5,110 L-293.5,110 L-293.5,127 L-297.5,127 L-297.5,124 L-301.5,124 L-301.5,134 L-297.5,134 L-297.5,131 L-293.5,131 L-293.5,135 A4,4 90 0 1 -297.5,139 L-301.5,139 L-331.5,139 L-332.5,139 L-332.5,141 L-340.5,141 L-340.5,139 L-341.5,139 L-345.5,139 A4,4 90 0 1 -349.5,135 L-349.5,131 L-349.5,110 L-349.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_126" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_127"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="121.5"
+             id="svg_128">pitch</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_129"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="109.5"
+             id="svg_130">name</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_131"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="130.5"
+             id="svg_132">octave</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_133"
+       class="">
+      <g
+         transform="translate(627,148) scale(1.5) "
+         id="svg_134">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_135" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_136"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_137">mi</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_138"
+       class="">
+      <g
+         transform="translate(627,180) scale(1.5) "
+         id="svg_139">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_140" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_141"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_142">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_143"
+       class="">
+      <g
+         transform="translate(539,242) scale(1.5) "
+         id="svg_144">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-298.1552734375,98 L-294.1552734375,98 A4,4 90 0 1 -290.1552734375,102 L-290.1552734375,106 L-294.1552734375,106 L-294.1552734375,103 L-298.1552734375,103 L-298.1552734375,113 L-294.1552734375,113 L-294.1552734375,110 L-290.1552734375,110 L-290.1552734375,114 A4,4 90 0 1 -294.1552734375,118 L-298.1552734375,118 L-331.5,118 L-332.5,118 L-332.5,120 L-340.5,120 L-340.5,118 L-341.5,118 L-345.5,118 A4,4 90 0 1 -349.5,114 L-349.5,110 L-349.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_145" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_146"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-300"
+             y="111.5"
+             id="svg_147">register</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_148"
+           y="97.5"
+           x="-350" />
+      </g>
+    </g>
+    <g
+       id="svg_150"
+       class="">
+      <g
+         transform="translate(618,242) scale(1.5) "
+         id="svg_151">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_152" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_153"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_154">-1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_155"
+       class="">
+      <g
+         id="svg_156">
+        <g
+           transform="translate(539,274) scale(1.5) "
+           id="svg_157">
+          <path
+             d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-322.5,98 L-262.5,98 L-258.5,98 A4,4 90 0 1 -254.5,102 L-254.5,106 L-258.5,106 L-258.5,103 L-262.5,103 L-262.5,113 L-258.5,113 L-258.5,110 L-254.5,110 L-254.5,114 A4,4 90 0 1 -258.5,118 L-262.5,118 L-322.5,118 L-323.5,118 L-323.5,120 L-331.5,120 L-331.5,118 L-332.5,118 L-336.5,118 A5,5 90 0 0 -341.5,123 L-341.5,127 L-341.5,131 L-341.5,173 L-341.5,177 A5,5 90 0 0 -336.5,182 L-332.5,182 L-332.5,184 L-322.5,184 L-322.5,182 L-314.5,182 L-314.5,188 L-314.5,194 L-314.5,198 A4,4 90 0 1 -318.5,202 L-322.5,202 L-331.5,202 L-332.5,202 L-332.5,204 L-340.5,204 L-340.5,202 L-341.5,202 L-345.5,202 A4,4 90 0 1 -349.5,198 L-349.5,194 z"
+             style="fill:#FF8B2D;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+             id="svg_158" />
+          <text
+             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             id="svg_159"
+             y="97.5"
+             x="-350">
+            <tspan
+               x="-330"
+               y="112.5"
+               id="svg_160">note</tspan>
+          </text>
+          <text
+             style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+             id="svg_161"
+             y="97.5"
+             x="-350">
+            <tspan
+               x="-265"
+               y="109.5"
+               id="svg_162">value</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="svg_170"
+       class="">
+      <g
+         transform="translate(671,274) scale(1.5) "
+         id="svg_171">
+        <path
+           d="m-341.5,106 L-341.5,102 A4,4 90 0 1 -337.5,98 L-333.5,98 L-323.5,98 L-293.5,98 L-289.5,98 A4,4 90 0 1 -285.5,102 L-285.5,106 L-289.5,106 L-289.5,103 L-293.5,103 L-293.5,113 L-289.5,113 L-289.5,110 L-285.5,110 L-285.5,127 L-289.5,127 L-289.5,124 L-293.5,124 L-293.5,134 L-289.5,134 L-289.5,131 L-285.5,131 L-285.5,135 A4,4 90 0 1 -289.5,139 L-293.5,139 L-323.5,139 L-333.5,139 L-337.5,139 A4,4 90 0 1 -341.5,135 L-341.5,131 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_172" />
+        <text
+           style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_173"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-296"
+             y="120.5"
+             id="svg_174">➗</tspan>
+        </text>
+        <text
+           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_175"
+           y="97.5"
+           x="-350" />
+        <text
+           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_177"
+           y="97.5"
+           x="-350" />
+      </g>
+    </g>
+    <g
+       id="svg_179"
+       class="">
+      <g
+         transform="translate(757,274) scale(1.5) "
+         id="svg_180">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_181" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_182"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_183">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_184"
+       class="">
+      <g
+         transform="translate(757,306) scale(1.5) "
+         id="svg_185">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_186" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_187"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_188">2</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_189"
+       class="">
+      <g
+         transform="translate(553,306) scale(1.5) "
+         id="svg_190">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-311.5,98 L-307.5,98 A4,4 90 0 1 -303.5,102 L-303.5,106 L-303.5,110 L-303.5,114 A4,4 90 0 1 -307.5,118 L-311.5,118 L-331.5,118 L-332.5,118 L-332.5,120 L-340.5,120 L-340.5,118 L-341.5,118 L-345.5,118 A4,4 90 0 1 -349.5,114 L-349.5,110 z"
+           style="fill:#B0B0B0;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_191" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_192"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-314"
+             y="111.5"
+             id="svg_193">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_194"
+       class="">
+      <g
+         transform="translate(553,338) scale(1.5) "
+         id="svg_195">
+        <path
+           d="m-349.5,106 L-349.5,102 A4,4 90 0 1 -345.5,98 L-341.5,98 L-341.5,100 L-331.5,100 L-331.5,98 L-301.5,98 L-297.5,98 A4,4 90 0 1 -293.5,102 L-293.5,106 L-297.5,106 L-297.5,103 L-301.5,103 L-301.5,113 L-297.5,113 L-297.5,110 L-293.5,110 L-293.5,127 L-297.5,127 L-297.5,124 L-301.5,124 L-301.5,134 L-297.5,134 L-297.5,131 L-293.5,131 L-293.5,135 A4,4 90 0 1 -297.5,139 L-301.5,139 L-331.5,139 L-332.5,139 L-332.5,141 L-340.5,141 L-340.5,139 L-341.5,139 L-345.5,139 A4,4 90 0 1 -349.5,135 L-349.5,131 L-349.5,110 L-349.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_196" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_197"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="121.5"
+             id="svg_198">pitch</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_199"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="109.5"
+             id="svg_200">name</tspan>
+        </text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="svg_201"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-304"
+             y="130.5"
+             id="svg_202">octave</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_203"
+       class="">
+      <g
+         transform="translate(627,338) scale(1.5) "
+         id="svg_204">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_205" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_206"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_207">sol</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_208"
+       class="">
+      <g
+         transform="translate(627,370) scale(1.5) "
+         id="svg_209">
+        <path
+           d="m-341.5,98 L-281.5,98 L-281.5,118 L-341.5,118 L-341.5,110 L-341.5,109 L-347.5,109 L-347.5,112 L-349.5,112 L-349.5,104 L-347.5,104 L-347.5,107 L-341.5,107 L-341.5,106 z"
+           style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="svg_210" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="svg_211"
+           y="97.5"
+           x="-350">
+          <tspan
+             x="-337"
+             y="111.5"
+             id="svg_212">4</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

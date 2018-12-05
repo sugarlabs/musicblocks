@@ -122,35 +122,36 @@ function PitchDrumMatrix() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
 
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
 
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
             pdmDiv.style.visibility = 'hidden';
             pdmButtonsDiv.style.visibility = 'hidden';
             pdmTableDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - pdmDiv.getBoundingClientRect().left;
@@ -250,7 +251,7 @@ function PitchDrumMatrix() {
 
             // A cell for the row label
             var labelCell = pdmTableRow.insertCell();
-            labelCell.style.backgroundColor = MATRIXLABELCOLOR;
+            labelCell.style.backgroundColor = platformColor.labelColor;
             labelCell.style.fontSize = this._cellScale * 100 + '%';
             labelCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -274,7 +275,7 @@ function PitchDrumMatrix() {
         // An extra row for the note and tuplet values
         var pdmTableRow = pdmTable.insertRow();
         var labelCell = pdmTableRow.insertCell();
-        labelCell.style.backgroundColor =  MATRIXRHYTHMCELLCOLOR;
+        labelCell.style.backgroundColor = platformColor.labelColor;
         labelCell.style.fontSize = this._cellScale * 100 + '%';
         labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -308,6 +309,8 @@ function PitchDrumMatrix() {
         for (var i = 0; i < this.drums.length; i++) {
             this._addDrum(i);
         }
+
+	this._logo.textMsg(_('Click in the grid to map notes to drums.'));
     };
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -319,14 +322,14 @@ function PitchDrumMatrix() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -344,16 +347,16 @@ function PitchDrumMatrix() {
             cell.style.width = cell.width;
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
-            cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             cell.onmouseover=function() {
                 if (this.style.backgroundColor !== 'black'){
-                    this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    this.style.backgroundColor = platformColor.selectorSelected;
                 }
             }
             cell.onmouseout=function() {
                 if (this.style.backgroundColor !== 'black'){
-                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    this.style.backgroundColor = platformColor.selectorBackground;
                 }
             }
 
@@ -380,7 +383,7 @@ function PitchDrumMatrix() {
         }
 
         cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(name) + '" title="' + name + '" alt="' + name + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
     };
 
     this.makeClickable = function() {
@@ -403,7 +406,7 @@ function PitchDrumMatrix() {
                 cell.onclick = function() {
                     var rowcol = this.id.split(',');
                     if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        this.style.backgroundColor = platformColor.selectorBackground;
                         that._setCellPitchDrum(rowcol[1], rowcol[0], false);
                     } else {
                         this.style.backgroundColor = 'black';
@@ -492,7 +495,7 @@ function PitchDrumMatrix() {
         var pdmTable = docById('pdmTable');
         var pdmTableRow = pdmTable.rows[i];
         var pitchCell = pdmTableRow.cells[0];
-        pitchCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        pitchCell.style.backgroundColor = platformColor.selectorBackground;
 
         if (pairs[i][1] !== -1) {
             this._setPairCell(pairs[i][0], pairs[i][1], cell, true);
@@ -509,7 +512,7 @@ function PitchDrumMatrix() {
                 for (var i = 0; i < pdmTable.rows.length - 1; i++) {
                     var pdmTableRow = pdmTable.rows[i];
                     var pitchCell = pdmTableRow.cells[0];
-                    pitchCell.style.backgroundColor = MATRIXLABELCOLOR;
+                    pitchCell.style.backgroundColor = platformColor.labelColor;
                 }
             }, 1000);
         }
@@ -543,7 +546,7 @@ function PitchDrumMatrix() {
                     var pitchBlock = this._rowBlocks[rowi];
                     var drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                     var obj = cell.id.split(',');  // row,column
                     this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
                 }
@@ -606,7 +609,7 @@ function PitchDrumMatrix() {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                     this._setCellPitchDrum(j, i, false);
                 }
             }

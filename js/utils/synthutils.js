@@ -11,129 +11,157 @@
 
 const POLYCOUNT = 3;
 
-var VOICENAMES = [
-    //.TRANS: musical instrument
-    [_('violin'), 'violin', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    [_('cello'), 'cello', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    // [_('bass'), 'basse', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    [_('guitar'), 'guitar', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    [_('flute'), 'flute', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    [_('clarinet'), 'clarinet', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    [_('saxophone'), 'saxophone', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    [_('tuba'), 'tuba', 'images/voices.svg'],
-    //.TRANS: musical instrument
-    [_('trumpet'), 'trumpet', 'images/voices.svg'],
-    //.TRANS: polytone synthesizer
-    [_('default'), 'default', 'images/synth.svg'],
-    //.TRANS: simple monotone synthesizer
-    [_('simple 1'), 'mono1', 'images/synth.svg'],
-    //.TRANS: simple monotone synthesizer
-    [_('simple 2'), 'mono2', 'images/synth.svg'],
-    //.TRANS: simple monotone synthesizer
-    [_('simple 3'), 'mono3', 'images/synth.svg'],
-    //.TRANS: simple monotone synthesizer
-    [_('simple 4'), 'mono4', 'images/synth.svg'],
+var NOISENAMES = [
     //.TRANS: white noise synthesizer
-    [_('white noise'), 'noise1', 'images/synth.svg'],
+    [_('white noise'), 'noise1', 'images/synth.svg', 'electronic'],
     //.TRANS: brown noise synthesizer
-    [_('brown noise'), 'noise2', 'images/synth.svg'],
+    [_('brown noise'), 'noise2', 'images/synth.svg', 'electronic'],
     //.TRANS: pink noise synthesizer
-    [_('pink noise'), 'noise3', 'images/synth.svg'],
-    //.TRANS: sine wave
-    [_('sine'), 'sine', 'images/synth.svg'],
-    //.TRANS: square wave
-    [_('square'), 'square', 'images/synth.svg'],
-    //.TRANS: sawtooth wave
-    [_('sawtooth'), 'sawtooth', 'images/synth.svg'],
-    //.TRANS: triangle wave
-    [_('triangle'), 'triangle', 'images/synth.svg'],
-    //.TRANS: customize voice
-    [_('custom'), 'custom', 'images/synth.svg'],
+    [_('pink noise'), 'noise3', 'images/synth.svg', 'electronic'],
 ];
 
+var VOICENAMES = [
+    //.TRANS: musical instrument
+    [_('piano'), 'piano', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('violin'), 'violin', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('cello'), 'cello', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('bass'), 'bass', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('acoustic guitar'), 'acousticguitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('flute'), 'flute', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('clarinet'), 'clarinet', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('saxophone'), 'saxophone', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('tuba'), 'tuba', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('trumpet'), 'trumpet', 'images/voices.svg', 'wind'],
+    //.TRANS: musical instrument
+    [_('banjo'), 'banjo', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('koto'), 'koto', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('electric guitar'), 'electricguitar', 'images/voices.svg', 'string'],
+    //.TRANS: polytone synthesizer
+    [_('default'), 'default', 'images/synth.svg', 'electronic'],
+    //.TRANS: simple monotone synthesizer
+    [_('simple 1'), 'mono1', 'images/synth.svg', 'electronic'],
+    //.TRANS: simple monotone synthesizer
+    // [_('simple-2'), 'mono2', 'images/synth.svg', 'electronic'],
+    //.TRANS: simple monotone synthesizer
+    // [_('simple-3'), 'mono3', 'images/synth.svg', 'electronic'],
+    //.TRANS: simple monotone synthesizer
+    // [_('simple-4'), 'mono4', 'images/synth.svg', 'electronic'],
+    //.TRANS: sine wave
+    [_('sine'), 'sine', 'images/synth.svg', 'electronic'],
+    //.TRANS: square wave
+    [_('square'), 'square', 'images/synth.svg', 'electronic'],
+    //.TRANS: sawtooth wave
+    [_('sawtooth'), 'sawtooth', 'images/synth.svg', 'electronic'],
+    //.TRANS: triangle wave
+    [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
+    //.TRANS: customize voice
+    [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
+];
 
 // drum symbols are from
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
 var DRUMNAMES = [
     //.TRANS: musical instrument
-    [_('snare drum'), 'snare drum', 'images/snaredrum.svg', 'sn'],
+    [_('snare drum'), 'snare drum', 'images/snaredrum.svg', 'sn', 'drum'],
     //.TRANS: musical instrument
-    [_('kick drum'), 'kick drum', 'images/kick.svg', 'hh'],
+    [_('kick drum'), 'kick drum', 'images/kick.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
-    [_('tom tom'), 'tom tom', 'images/tom.svg', 'tomml'],
+    [_('tom tom'), 'tom tom', 'images/tom.svg', 'tomml', 'drum'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl'],
+    [_('floor tom tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl', 'drum'],
     //.TRANS: a drum made from an inverted cup
-    [_('cup drum'), 'cup drum', 'images/cup.svg', 'hh'],
+    [_('cup drum'), 'cup drum', 'images/cup.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
-    [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg', 'hh'],
+    [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
-    [_('hi hat'), 'hi hat', 'images/hihat.svg', 'hh'],
+    [_('hi hat'), 'hi hat', 'images/hihat.svg', 'hh', 'bell'],
     //.TRANS: a small metal bell
-    [_('ride bell'), 'ride bell', 'images/ridebell.svg', 'rb'],
+    [_('ride bell'), 'ride bell', 'images/ridebell.svg', 'rb', 'bell'],
     //.TRANS: musical instrument
-    [_('cow bell'), 'cow bell', 'images/cowbell.svg', 'cb'],
+    [_('cow bell'), 'cow bell', 'images/cowbell.svg', 'cb', 'bell'],
     //.TRANS: musical instrument
-    [_('triangle bell'), 'triangle bell', 'images/trianglebell.svg', 'tri'],
+    [_('triangle bell'), 'triangle bell', 'images/trianglebell.svg', 'tri', 'bell'],
     //.TRANS: musical instrument
-    [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca'],
+    [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: a musically tuned set of bells
-    [_('chime'), 'chine', 'images/chine.svg', 'cymca'],
+    [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
+    //.TRANS: a musical instrument
+    [_('gong'), 'gong', 'images/gong.svg', 'cymca', 'bell'],
     //.TRANS: sound effect
-    [_('clang'), 'clang', 'images/clang.svg', 'cymca'],
+    [_('clang'), 'clang', 'images/clang.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
-    [_('crash'), 'crash', 'images/crash.svg', 'cymca'],
+    [_('crash'), 'crash', 'images/crash.svg', 'cymca', 'effect'],
     //.TRANS: sound effect
-    [_('bottle'), 'bottle', 'images/bottle.svg', 'hh'],
+    [_('bottle'), 'bottle', 'images/bottle.svg', 'hh', 'effect'],
     //.TRANS: sound effect
-    [_('clap'), 'clap', 'images/clap.svg', 'hc'],
+    [_('clap'), 'clap', 'images/clap.svg', 'hc', 'effect'],
     //.TRANS: sound effect
-    [_('slap'), 'slap', 'images/slap.svg', 'vibs'],
+    [_('slap'), 'slap', 'images/slap.svg', 'vibs', 'effect'],
     //.TRANS: sound effect
-    [_('splash'), 'splash', 'images/splash.svg', 'hh'],
+    [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
     //.TRANS: sound effect
-    [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh'],
+    [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
     //.TRANS: animal sound effect
-    [_('cat'), 'cat', 'images/cat.svg', 'hh'],
+    [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh'],
+    [_('cricket'), 'cricket', 'images/cricket.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('dog'), 'dog', 'images/dog.svg', 'hh'],
+    [_('dog'), 'dog', 'images/dog.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/duck.svg', 'hh'],
+    [_('duck'), 'duck', 'images/duck.svg', 'hh', 'animal'],
+];
+
+// Some "drums" are sound effects.
+var EFFECTSNAMES = [
+    'duck', 'dog', 'cricket', 'cat', 'bubbles', 'splash', 'bottle',
 ];
 
 var SOUNDSAMPLESDEFINES = [
     "samples/violin", "samples/cello", "samples/flute", "samples/guitar",
     "samples/clarinet", "samples/saxophone", "samples/tuba", "samples/trumpet",
-    "samples/basse", "samples/bottle", "samples/clap", "samples/darbuka",
+    "samples/bass", "samples/bottle", "samples/clap", "samples/darbuka",
     "samples/hihat", "samples/splash", "samples/bubbles", "samples/cowbell",
     "samples/dog", "samples/kick", "samples/tom", "samples/cat",
     "samples/crash", "samples/duck", "samples/ridebell", "samples/triangle",
-    "samples/chine", "samples/cricket", "samples/fingercymbal",
+    "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
-    "samples/snare"
+    "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
+    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
 ]
 
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
 const SAMPLECENTERNO = {
-  'violin': 51,
-  'cello': 39,
-  'basse': 15,
-  'guitar': 39,
-  'flute': 57,
-  'saxophone': 51,
-  'clarinet': 39,
-  'tuba': 49,
-  'trumpet': 27
+    'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'violin': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
+    'cello': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
+    'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
+    'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'flute': ['F#5', 57], // pitchToNumber('F#', 57, 'C Major')],
+    'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
+    'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'tuba': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
+    'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
+    'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
+    'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
+    'electricguitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
 };
 
 
@@ -206,12 +234,199 @@ function Synth() {
     };
 
     this.samples = null;
-    this.samplesuffix = "_SAMPLE";
+    this.samplesuffix = '_SAMPLE';
     this.samplesManifest = null;
+    this.changeInTemperament = false;
+    this.inTemperament = 'equal';
+    this.startingPitch = 'C4';
+    this.noteFrequencies = {};
+
+    this.temperamentChanged = function(temperament, startingPitch) {
+        var startPitch = startingPitch;
+        var t = TEMPERAMENT[temperament];
+        var len = startPitch.length;
+        var number = pitchToNumber(startPitch.substring(0, len - 1), startPitch.slice(-1), 'C major');
+        startPitchObj = numberToPitch(number);
+        startPitch = (startPitchObj[0] + startPitchObj[1]).toString();
+
+        if (startPitch.substring(1, len - 1) === FLAT || startPitch.substring(1, len - 1) === 'b' ) {
+            startPitch = startPitch.replace(FLAT, 'b');
+        } else if (startPitch.substring(1, len - 1) === SHARP || startPitch.substring(1, len - 1) === '#' ) {
+            startPitch = startPitch.replace(SHARP, '#');
+        }
+        
+        var frequency = Tone.Frequency(startPitch).toFrequency();
+
+        this.noteFrequencies = {
+            // note: [octave, Frequency]
+            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency],
+            [getNoteFromInterval(startingPitch, 'minor 2')[0]]: [getNoteFromInterval(startingPitch, 'minor 2')[1], t['minor 2'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 1')[0]]: [getNoteFromInterval(startingPitch, 'augmented 1')[1], t['augmented 1'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 2')[0]]: [getNoteFromInterval(startingPitch, 'major 2')[1], t['major 2'] * frequency],
+            [getNoteFromInterval(startingPitch, 'minor 3')[0]]: [getNoteFromInterval(startingPitch, 'minor 3')[1], t['minor 3'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 2')[0]]: [getNoteFromInterval(startingPitch, 'augmented 2')[1], t['augmented 2'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 3')[0]]: [getNoteFromInterval(startingPitch, 'major 3')[1], t['major 3'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 3')[0]]: [getNoteFromInterval(startingPitch, 'augmented 3')[1], t['augmented 3'] * frequency],
+            [getNoteFromInterval(startingPitch, 'diminished 4')[0]]: [getNoteFromInterval(startingPitch, 'diminished 4')[1], t['diminished 4'] * frequency],
+            [getNoteFromInterval(startingPitch, 'perfect 4')[0]]: [getNoteFromInterval(startingPitch, 'perfect 4')[1], t['perfect 4'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 4')[0]]: [getNoteFromInterval(startingPitch, 'augmented 4')[1], t['augmented 4'] * frequency],
+            [getNoteFromInterval(startingPitch, 'diminished 5')[0]]: [getNoteFromInterval(startingPitch, 'diminished 5')[1], t['diminished 5'] * frequency],
+            [getNoteFromInterval(startingPitch, 'perfect 5')[0]]: [getNoteFromInterval(startingPitch, 'perfect 5')[1], t['perfect 5'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 5')[0]]: [getNoteFromInterval(startingPitch, 'augmented 5')[1], t['augmented 5'] * frequency],
+            [getNoteFromInterval(startingPitch, 'minor 6')[0]]: [getNoteFromInterval(startingPitch, 'minor 6')[1], t['minor 6'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 6')[0]]: [getNoteFromInterval(startingPitch, 'major 6')[1], t['major 6'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 6')[0]]: [getNoteFromInterval(startingPitch, 'augmented 6')[1], t['augmented 6'] * frequency],
+            [getNoteFromInterval(startingPitch, 'minor 7')[0]]: [getNoteFromInterval(startingPitch, 'minor 7')[1], t['minor 7'] * frequency],
+            [getNoteFromInterval(startingPitch, 'major 7')[0]]: [getNoteFromInterval(startingPitch, 'major 7')[1], t['major 7'] * frequency],
+            [getNoteFromInterval(startingPitch, 'augmented 7')[0]]: [getNoteFromInterval(startingPitch, 'augmented 7')[1], t['augmented 7'] * frequency],
+            [getNoteFromInterval(startingPitch, 'diminished 8')[0]]: [getNoteFromInterval(startingPitch, 'diminished 8')[1], t['diminished 8'] * frequency],
+            [getNoteFromInterval(startingPitch, 'perfect 8')[0]]: [getNoteFromInterval(startingPitch, 'perfect 8')[1], t['perfect 8'] * frequency]
+        };
+
+        for (var key in this.noteFrequencies) {
+            if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === 'b' ) {
+                var note = key.substring(0, 1) + '' + 'b';
+                this.noteFrequencies[note] = this.noteFrequencies[key];
+                delete this.noteFrequencies[key]; 
+            } else if (key.substring(1, key.length) === SHARP || key.substring(1, key.length) === '#' ) {
+                var note = key.substring(0, 1) + '' + '#';
+                this.noteFrequencies[note] = this.noteFrequencies[key];
+                delete this.noteFrequencies[key]; 
+            }
+        }
+
+        this.changeInTemperament = false;
+    };
+
+    this.getFrequency = function(notes, changeInTemperament) {
+        return this._getFrequency(notes, changeInTemperament);
+    };
+
+    this._getFrequency = function(notes, changeInTemperament, temperament) {
+        if (changeInTemperament) {
+            if (temperament === undefined) {
+                this.temperamentChanged(this.inTemperament, this.startingPitch);
+            } else {
+                //To get frequencies in Temperament Widget.
+                this.temperamentChanged(temperament, this.startingPitch);
+            }
+            
+        }
+
+        if (this.inTemperament === 'equal') {
+            if (typeof(notes) === 'string') {
+                var len = notes.length;
+                var note = notes.substring(0, len - 1);
+                var octave = Number(notes.slice(-1));
+                return pitchToFrequency(note, octave, 0, null);
+            } else if (typeof(notes) === 'number') {
+                return notes;
+            } else {
+                var results = [];
+                for (i = 0; i < notes.length; i++) {
+                    if (typeof(notes[i]) === 'string') {
+                        var len = notes[i].length;
+                        var note = notes[i].substring(0, len - 1);
+                        var octave = Number(notes[i].slice(-1));
+                        results.push(pitchToFrequency(note, octave, 0, null));
+                    } else {
+                        results.push(notes[i]);
+                    }
+                }
+                return results;
+            }
+        }
+
+        var that = this;
+
+        var __getFrequency = function (oneNote) {
+            var len = oneNote.length;
+
+            for (var note in that.noteFrequencies) {
+                if (note === oneNote.substring(0, len - 1)) { 
+                    if (that.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
+                        //Note to be played is in the same octave.
+                        return that.noteFrequencies[note][1];
+                    } else { 
+                        //Note to be played is not in the same octave.
+                        var power = Number(oneNote.slice(-1)) - that.noteFrequencies[note][0];
+                        return that.noteFrequencies[note][1] * Math.pow(2, power);
+                    }
+                }
+            }
+
+        };
+
+        if (typeof(notes) === 'string') {
+            return __getFrequency(notes);
+        } else if (typeof(notes) === 'object') {
+            var results = [];
+            for (var i = 0; i < notes.length; i++) {
+                if (typeof(notes[i]) === 'string') {
+                    results.push(__getFrequency(notes[i]));
+                } else {
+                    // Hertz?
+                    results.push(notes[i]);
+                }
+            }
+
+            return results;
+        } else {
+            // Hertz?
+            return notes;
+        }
+    };
+
+    this.getCustomFrequency = function (notes) {
+
+        var __getCustomFrequency = function (oneNote) {
+            var octave = oneNote.slice(-1);
+            oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
+            var pitch = that.startingPitch;
+            var startPitchFrequency = pitchToFrequency(pitch.substring(0, pitch.length - 1), pitch.slice(-1), 0, 'C Major');
+            if (typeof(oneNote) === 'number') {
+                oneNote = oneNote;
+            } else {
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        if (oneNote == TEMPERAMENT['custom'][pitchNumber][1]) {
+                            var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
+                            return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
+                        }
+                    }   
+                }
+            }
+
+        }
+
+        if (typeof(notes) === 'string') {
+            return __getCustomFrequency(notes);
+        } else if (typeof(notes) === 'object') {
+            var results = [];
+            for (var i = 0; i < notes.length; i++) {
+                if (typeof(notes[i]) === 'string') {
+                    results.push(__getCustomFrequency(notes[i]));
+                } else {
+                    // Hertz?
+                    results.push(notes[i]);
+                }
+            }
+
+            return results;
+        } else {
+            // Hertz?
+            return notes;
+        }
+    }
+
+    this.resume = function () {
+        this.tone.context.resume();
+    };
 
     this.loadSamples = function () {
         this.samplesManifest = {
             'voice': [
+                {'name': 'piano', 'data': PIANO_SAMPLE},
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
                 {'name': 'flute', 'data': FLUTE_SAMPLE},
@@ -220,7 +435,12 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
-                {'name': 'basse', 'data': BASSE_SAMPLE}
+		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+                {'name': 'bass', 'data': BASS_SAMPLE},
+		{'name': 'banjo', 'data': BANJO_SAMPLE},
+		{'name': 'koto', 'data': KOTO_SAMPLE},
+		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+		{'name': 'electricguitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -238,7 +458,8 @@ function Synth() {
                 {'name': 'duck', 'data': DUCK_SAMPLE},
                 {'name': 'ride bell', 'data': RIDEBELL_SAMPLE},
                 {'name': 'triangle bell', 'data': TRIANGLE_SAMPLE},
-                {'name': 'chine', 'data': CHINE_SAMPLE},
+                {'name': 'chime', 'data': CHIME_SAMPLE},
+                {'name': 'gong', 'data': GONG_SAMPLE},
                 {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
@@ -249,7 +470,7 @@ function Synth() {
             ]
         }
 
-        if (this.samples == null) {
+        if (this.samples === null) {
             this.samples = {};
             for (var type in this.samplesManifest) {
                 if (this.samplesManifest.hasOwnProperty(type)) {
@@ -288,27 +509,18 @@ function Synth() {
 
     this.recorder = new Recorder(Tone.Master);
 
-    this.download = function (blob){
-        var filename = prompt('Filename:', 'untitled.wav');
-        if (fileExt(filename) !== 'wav') {
-            filename += '.wav';
-        }
-
-        download(filename, URL.createObjectURL(blob));
-    };
-
     // Function that provides default parameters for various synths
     this.getDefaultParamValues = function (sourceName) {
         // sourceName may need to be 'untranslated'
         var sourceNameLC = sourceName.toLowerCase();
-        if (getOscillatorTypes(sourceNameLC) != null) {
+        if (getOscillatorTypes(sourceNameLC) !== null) {
             sourceNameLC = getOscillatorTypes(sourceNameLC);
         }
 
         switch(sourceNameLC) {
         case 'amsynth':
             var synthOptions = {
-                'harmonicity': 3,
+                'harmonicity': 1,
                 'detune': 0,
                 'envelope': {
                     'attack': 0.01,
@@ -329,7 +541,7 @@ function Synth() {
             break;
         case'fmsynth':
             var synthOptions = {
-                'harmonicity': 3,
+                'harmonicity': 1,
                 'modulationIndex': 10,
                 'detune': 0,
                 'envelope': {
@@ -497,17 +709,19 @@ function Synth() {
     this._createSampleSynth = function (turtle, instrumentName, sourceName, params) {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
-            console.log(sourceName);
-            var tempSynth = new Tone.Sampler(this.samples.voice[sourceName]);
+            console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
+	    var noteDict = {};
+	    noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+	    var tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
-            var tempSynth = new Tone.Sampler(this.samples.drum[sourceName]);
+            var tempSynth = new Tone.Player(this.samples.drum[sourceName]);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, 'drum'];
             console.log(DEFAULTDRUM);
-            var tempSynth = new Tone.Sampler(this.samples.drum[DEFAULTDRUM]);
+            var tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
         }
 
         return tempSynth;
@@ -613,7 +827,7 @@ function Synth() {
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (turtle, instrumentName, sourceName, params) {
         // We may have a race condition with the samples loader.
-        if (this.samples == null) {
+        if (this.samples === null) {
             this.samplesQueue.push([instrumentName, sourceName, params]);
 
             var that = this;
@@ -626,7 +840,9 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
-        if (instruments[turtle][sourceName] == null) {
+        if (sourceName in instruments[turtle]) {
+            console.log(sourceName + ' already loaded');
+        } else {
             console.log('loading ' + sourceName);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
@@ -639,10 +855,37 @@ function Synth() {
     }
 
     this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
-        if (paramsEffects == null && paramsFilters == null) {
+        if (this.inTemperament !== 'equal' && this.inTemperament !== 'custom') {
+            if (typeof(notes) === 'number') {
+                notes = notes;
+            } else {
+                var notes1 = notes;
+                notes = this._getFrequency(notes, this.changeInTemperament);
+                if (notes === undefined) {
+                    if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
+                        notes = notes1.substring(0, 1) + '' + 'bb' + notes1.substring(notes1.length - 1, notes1.length);
+                    } else if (notes1.substring(1, notes1.length - 1) == DOUBLESHARP) {
+                        notes = notes1.substring(0, 1) + '' + 'x' + notes1.substring(notes1.length - 1, notes1.length);
+                    } else {
+                        notes = notes1;
+                    }
+                }
+            }
+        }
+
+        if (this.inTemperament == 'custom') {
+            var notes1 = notes;    
+            notes = this.getCustomFrequency(notes);
+            if (notes === undefined) {
+                notes = notes1;
+            } 
+            console.log(notes);   
+        }
+
+        if (paramsEffects === null && paramsFilters === null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
-            if (paramsFilters != null && paramsFilters != undefined) {
+            if (paramsFilters !== null && paramsFilters !== undefined) {
                 var numFilters = paramsFilters.length;  // no. of filters
                 var k = 0;
                 var temp_filters = [];
@@ -655,7 +898,7 @@ function Synth() {
                 }
             }
 
-            if (paramsEffects != null && paramsEffects != undefined) {
+            if (paramsEffects !== null && paramsEffects !== undefined) {
                 if (paramsEffects.doVibrato) {
                     var vibrato = new Tone.Vibrato(1 / paramsEffects.vibratoFrequency, paramsEffects.vibratoIntensity);
                     synth.chain(vibrato, Tone.Master);
@@ -695,28 +938,24 @@ function Synth() {
                 if (paramsEffects.doPartials) {
                     // Depending on the synth, the oscillator is found
                     // somewhere else in the synth obj.
-                    if (synth.oscillator != undefined) {
+                    if (synth.oscillator !== undefined) {
                         synth.oscillator.partials = paramsEffects.partials;
-                    } else if (synth.voices != undefined) {
+                    } else if (synth.voices !== undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].oscillator.partials = paramsEffects.partials;
                         }
-                    } else {
-                        console.log('cannot find oscillator to apply partials');
                     }
                 }
 
                 if (paramsEffects.doPortamento) {
                     // Depending on the synth, the oscillator is found
                     // somewhere else in the synth obj.
-                    if (synth.oscillator != undefined) {
+                    if (synth.oscillator !== undefined) {
                         synth.portamento = paramsEffects.portamento;
-                    } else if (synth.voices != undefined) {
+                    } else if (synth.voices !== undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].portamento = paramsEffects.portamento;
                         }
-                    } else {
-                        console.log('cannot find oscillator to apply portamento');
                     }
                 }
 
@@ -730,9 +969,9 @@ function Synth() {
                     for (var i = 0; i < paramsEffects['neighborArgNote1'].length; i++) {
                         var note1 = paramsEffects['neighborArgNote1'][i].replace('♯', '#').replace('♭', 'b');
                         var note2 = paramsEffects['neighborArgNote2'][i].replace('♯', '#').replace('♭', 'b');
-                        obj.push({'time' : 0, 'note' : note1, 'duration': firstTwoBeats},
-                                 {'time' : firstTwoBeats, 'note' : note2, 'duration': firstTwoBeats},
-                                 {'time' : firstTwoBeats * 2, 'note' : note1, 'duration': finalBeat});
+                        obj.push({'time': 0, 'note': note1, 'duration': firstTwoBeats},
+                                 {'time': firstTwoBeats, 'note': note2, 'duration': firstTwoBeats},
+                                 {'time': firstTwoBeats * 2, 'note': note1, 'duration': finalBeat});
                     }
 
                     var neighborEffect = new Tone.Part(function(time, value){
@@ -742,15 +981,13 @@ function Synth() {
             }
 
             if (!paramsEffects.doNeighbor) {
-                if (setNote != undefined && setNote) {
-                    if (synth.oscillator != undefined) {
+                if (setNote !== undefined && setNote) {
+                    if (synth.oscillator !== undefined) {
                         synth.setNote(notes);
-                    } else if (synth.voices != undefined) {
+                    } else if (synth.voices !== undefined) {
                         for (i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].setNote(notes);
                         }
-                    } else {
-                        console.log('cannot find oscillator to setNote');
                     }
                 } else {
                     synth.triggerAttackRelease(notes, beatValue);
@@ -758,7 +995,7 @@ function Synth() {
             }
 
             setTimeout(function () {
-                if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
+                if (paramsEffects && paramsEffects !== null && paramsEffects !== undefined) {
                     if (paramsEffects.doVibrato) {
                         vibrato.dispose();
                     }
@@ -784,7 +1021,7 @@ function Synth() {
                     }
                 }
 
-                if (paramsFilters && paramsFilters != null && paramsFilters != undefined) {
+                if (paramsFilters && paramsFilters !== null && paramsFilters !== undefined) {
                     for (k = 0; k < numFilters; k++) {
                         temp_filters[k].dispose();
                     }
@@ -795,25 +1032,25 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-
+	// console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
         if (paramsEffects !== null && paramsEffects !== undefined) {
-            if (paramsEffects['vibratoIntensity'] != 0) {
+            if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
             }
 
-            if (paramsEffects['distortionAmount'] != 0) {
+            if (paramsEffects['distortionAmount'] !== 0) {
                 paramsEffects.doDistortion = true;
             }
 
-            if (paramsEffects['tremoloFrequency'] != 0) {
+            if (paramsEffects['tremoloFrequency'] !== 0) {
                 paramsEffects.doTremolo = true;
             }
 
-            if (paramsEffects['rate'] != 0) {
+            if (paramsEffects['rate'] !== 0) {
                 paramsEffects.doPhaser = true;
             }
 
-            if (paramsEffects['chorusRate'] != 0) {
+            if (paramsEffects['chorusRate'] !== 0) {
                 paramsEffects.doChorus = true;
             }
 
@@ -838,19 +1075,15 @@ function Synth() {
         switch(flag) {
         case 1:  // drum
             if (instrumentName.slice(0, 4) === 'http') {
-                tempSynth.triggerAttack(0, beatValue);
+                tempSynth.start();
             } else if (instrumentName.slice(0, 4) === 'file') {
-                tempSynth.triggerAttack(0, beatValue);
+                tempSynth.start();
             } else {
-                tempSynth.triggerAttack(0);
+                tempSynth.start();
             }
             break;
         case 2:  // voice sample
-            var centerNo = SAMPLECENTERNO[sampleName];
-            var obj = noteToPitchOctave(notes);
-            var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
-            tempNotes = noteNum - centerNo;
-            this._performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters, setNote);
+            this._performNotes(tempSynth.toMaster(), notes, beatValue, paramsEffects, paramsFilters, setNote);
             break;
         case 3:  // builtin synth
             if (typeof(notes) === 'object') {
@@ -870,7 +1103,15 @@ function Synth() {
     };
 
     this.stopSound = function (turtle, instrumentName) {
-        instruments[turtle][instrumentName].triggerRelease();
+        var flag = instrumentsSource[instrumentName][0];
+        switch(flag) {
+        case 1:  // drum
+            instruments[turtle][instrumentName].stop();
+            break;
+        default:
+            instruments[turtle][instrumentName].triggerRelease();
+            break;
+        }
     };
 
     this.start = function () {
@@ -883,7 +1124,7 @@ function Synth() {
 
     this.setVolume = function (turtle, instrumentName, volume) {
         // volume in decibals
-        var db = this.tone.gainToDb(volume / 100);
+        var db = Tone.gainToDb(volume / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
         }
@@ -900,8 +1141,9 @@ function Synth() {
     };
 
     this.setMasterVolume = function (volume) {
-        var db = this.tone.gainToDb(volume / 100);
+        var db = Tone.gainToDb(volume / 100);
         Tone.Master.volume.rampTo(db, 0.01);
     };
 
+    return this;
 };

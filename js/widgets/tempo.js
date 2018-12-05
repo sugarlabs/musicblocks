@@ -14,6 +14,7 @@
 
 
 function Tempo () {
+    const TEMPOSYNTH = 'bottle';
     const TEMPOINTERVAL = 5;
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
@@ -58,6 +59,10 @@ function Tempo () {
 
         // Restart the interval.
         var that = this;
+        if (this._intervalID !== null) {
+            clearInterval(this._intervalID);
+        }
+
         this._intervalID = setInterval(function() {
             that._draw();
         }, TEMPOINTERVAL);
@@ -67,15 +72,18 @@ function Tempo () {
         this.BPMs[i] = docById('BPMInput' + i).value
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
+            this._logo.errorMsg(_('The beats per minute must be between 30 and 1000.'));
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
+            this._logo.errorMsg(_('The beats per minute must be between 30 and 1000.'));
         }
 
         this._updateBPM(i);
+        docById('BPMInput' + i).value = this.BPMs[i];
     };
 
     this._speedUp = function (i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) + 5;
+        this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
@@ -86,7 +94,7 @@ function Tempo () {
     };
 
     this._slowDown = function (i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) - 5;
+        this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
         }
@@ -116,7 +124,7 @@ function Tempo () {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this._logo.synth.trigger(0, 'C4', 0.125, 'default', null, null);
+                this._logo.synth.trigger(0, ['C2'], 0.0625, TEMPOSYNTH, null, null, false);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
@@ -177,7 +185,13 @@ function Tempo () {
         this._firstClickTimes = null;
         this._intervals = [];
         this.isMoving = true;
+        if (this._intervalID != undefined && this._intervalID != null) {
+            clearInterval(this._intervalID);
+        }
+
         this._intervalID = null;
+
+        this._logo.synth.loadSynth(0, getDrumSynthName(TEMPOSYNTH));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -209,44 +223,45 @@ function Tempo () {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'pause-button.svg', ICONSIZE, _('pause'));
+        var cell = this._addButton(row, 'pause-button.svg', ICONSIZE, _('Pause'));
 
         cell.onclick=function() {
             if (that.isMoving) {
                 that.pause();
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                 that.isMoving = false;
             } else {
                 that.resume();
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                 that.isMoving = true;
             }
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
             that.hide();
+            that._logo.hideMsgs();
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - tempoDiv.getBoundingClientRect().left;
@@ -330,11 +345,11 @@ function Tempo () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = platformColor.selectorBackground;
             };
 
             var cell = this._addButton(row, 'down.svg', ICONSIZE, _('slow down'));
@@ -346,11 +361,11 @@ function Tempo () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+                this.style.backgroundColor = platformColor.selectorBackground;
             };
 
             var cell = row.insertCell();
@@ -362,7 +377,7 @@ function Tempo () {
             cell.style.height = BUTTONSIZE + 'px';
             cell.style.minHeight = cell.style.height;
             cell.style.maxHeight = cell.style.height;
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             var row = buttonTable.insertRow();
             canvasCells.push(row.insertCell());
@@ -413,6 +428,7 @@ function Tempo () {
             });
         }
 
+        this._logo.textMsg(_('Adjust the tempo with the buttons.'));
         this.resume();
     };
 
@@ -425,14 +441,14 @@ function Tempo () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;

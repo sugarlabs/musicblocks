@@ -11,12 +11,16 @@
 //
 
 // Length of a long touch
+const TEXTWIDTH = 240; // 90
+const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
+const INLINECOLLAPSIBLES = ['newnote', 'interval', 'osctime'];
+const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval', 'osctime'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname'];
-const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'voicename', 'modename'];
-const EXTRAWIDENAMES = ['modename'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', "effectsname", 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
+const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'effectsname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
+const EXTRAWIDENAMES = [];
+const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'effectsname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -29,7 +33,8 @@ function Block(protoblock, blocks, overrideName) {
     this.name = protoblock.name;
     this.overrideName = overrideName;
     this.blocks = blocks;
-    this.collapsed = false;  // Is this block in a collapsed stack?
+    this.collapsed = false;  // Is this collapsible block collapsed?
+    this.inCollapsed = false;  // Is this block in a collapsed stack?
     this.trash = false;  // Is this block in the trash?
     this.loadComplete = false;  // Has the block finished loading?
     this.label = null;  // Editable textview in DOM.
@@ -45,18 +50,21 @@ function Block(protoblock, blocks, overrideName) {
     // All blocks have at a container and least one bitmap.
     this.container = null;
     this.bounds = null;
+    this.width = 0;
+    this.height = 0;
+    this.hitHeight = 0;
     this.bitmap = null;
     this.highlightBitmap = null;
+    this.disconnectedBitmap = null;
+    this.disconnectedHighlightBitmap = null;
 
     // The svg from which the bitmaps are generated
     this.artwork = null;
     this.collapseArtwork = null;
 
-    // Start and Action blocks has a collapse button (in a separate
-    // container).
-    this.collapseContainer = null;
-    this.collapseBitmap = null;
-    this.expandBitmap = null;
+    // Start and Action blocks has a collapse button
+    this.collapseButtonBitmap = null;
+    this.expandButtonBitmap = null;
     this.collapseBlockBitmap = null;
     this.highlightCollapseBlockBitmap = null;
     this.collapseText = null;
@@ -74,17 +82,40 @@ function Block(protoblock, blocks, overrideName) {
     this.postProcessArg = this;
 
     // Lock on label change
-    this._label_lock = false;
+    this._labelLock = false;
+    this._piemenuExitTime = null;
+    this._triggerLongPress = false;
+
+    // If we update the parameters of a meter block, we have extra
+    // actions to attend to.
+    this._check_meter_block = null;
+
+    // Mouse position in events
+    this.original = {'x': 0, 'y': 0};
+    this.offset = {'x': 0, 'y': 0};
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this._createCache = function (callback, args) {
+    this._createCache = function (callback, args, counter) {
+        if (counter === undefined) {
+            var loopCount = 0;
+        } else {
+            var loopCount = counter;
+        }
+
+        if (loopCount > 3) {
+            console.log('COULD NOT CREATE CACHE');
+            return;
+        }
+
         var that = this;
         this.bounds = this.container.getBounds();
 
-        if (this.bounds == null) {
+        if (this.bounds === null) {
             setTimeout(function () {
-                that._createCache(callback, args);
+                // Try regenerating the artwork
+                that.regenerateArtwork(true, []);
+                that._createCache(callback, args, loopCount + 1);
             }, 100);
         } else {
             this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
@@ -94,19 +125,71 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    // Does this race condition still occur?
-    this.updateCache = function () {
+    this.updateCache = function (counter) {
+        if (counter === undefined) {
+            var loopCount = 0;
+        } else {
+            var loopCount = counter;
+        }
+
+        if (loopCount > 3) {
+            console.log('COULD NOT UPDATE CACHE');
+            return;
+        }
+
         var that = this;
 
         if (this.bounds == null) {
             setTimeout(function () {
-                console.log('CACHE NOT READY');
-                that.updateCache();
+                // console.log('UPDATE CACHE: BOUNDS NOT READY');
+                that.updateCache(loopCount + 1);
             }, 200);
         } else {
             this.container.updateCache();
             this.blocks.refreshCanvas();
         }
+    };
+
+    this.ignore = function () {
+        if (this.bitmap === null) {
+            return true;
+        }
+
+        if (this.name === 'hidden') {
+            return true;
+        }
+
+        if (this.name === 'hiddennoflow') {
+            return true;
+        }
+
+        if (this.trash) {
+            return true;
+        }
+
+        if (this.inCollapsed) {
+            return true;
+        }
+
+        if (this.disconnectedBitmap !== null && this.disconnectedHighlightBitmap !== null) {
+            if (!this.bitmap.visible && !this.highlightBitmap.visible && !this.disconnectedBitmap.visible && !this.disconnectedHighlightBitmap.visible) {
+                if (this.collapseBlockBitmap === null) {
+                    return true;
+                } else if (!this.collapseBlockBitmap.visible && !this.highlightCollapseBlockBitmap.visible) {
+                    return true;
+                }
+            }
+        } else {
+            if (!this.bitmap.visible && !this.highlightBitmap.visible) {
+                if (this.collapseBlockBitmap === null) {
+                    return true;
+                } else if (!this.collapseBlockBitmap.visible && !this.highlightCollapseBlockBitmap.visible) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     };
 
     this.offScreen = function (boundary) {
@@ -121,86 +204,232 @@ function Block(protoblock, blocks, overrideName) {
         return this.name + ' block';
     };
 
+    this.isCollapsible = function () {
+        return COLLAPSIBLES.indexOf(this.name) !== -1;
+    };
+
+    this.isInlineCollapsible = function () {
+        return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
+    };
+
     this.highlight = function () {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
-            // We may have a race condition.
-            if (this.highlightCollapseBlockBitmap) {
-                this.highlightCollapseBlockBitmap.visible = true;
-                this.collapseBlockBitmap.visible = false;
-                this.collapseText.visible = true;
-                this.bitmap.visible = false;
-                this.highlightBitmap.visible = false;
+        if (this.trash) {
+            return;
+        }
+
+        if (this.inCollapsed) {
+            // In collapsed, so do nothing.
+            return;
+        }
+
+        if (!this.container.visible) {
+            // block is hidden, so do nothing.
+            return;
+        }
+
+        if (this.disconnectedBitmap !== null) {
+            if (!this.bitmap.visible && !this.disconnectedBitmap.visible) {
+                // block is hidden, so do nothing.
+                return;
             }
+        } else if (!this.bitmap.visible) {
+            return;
+        }
+
+        // Always hide the non-highlighted artwork.
+        this.container.visible = true;
+        this.bitmap.visible = false;
+        if (this.disconnectedBitmap !== null) {
+            this.disconnectedBitmap.visible = false;
+        }
+
+        // If it is a collapsed collapsable, hightlight the collapsed state.
+        if (this.collapsed) {
+            // Show the highlighted collapsed artwork.
+            if (this.highlightCollapseBlockBitmap !== null) {
+                this.highlightCollapseBlockBitmap.visible = true;
+            }
+
+            if (this.collapseText !== null) {
+                this.collapseText.visible = true;
+            }
+
+            // and hide the unhighlighted collapsed artwork...
+            if (this.collapseBlockBitmap !== null) {
+                this.collapseBlockBitmap.visible = false;
+            }
+
+            // but not the uncollapsed highlighted artwork.
+            this.highlightBitmap.visible = false;
+            if (this.disconnectedHighlightBitmap !== null) {
+                this.disconnectedHighlightBitmap.visible = false;
+            }
+
+            this.highlightBitmap.visible = false;
         } else {
-            this.bitmap.visible = false;
-            this.highlightBitmap.visible = true;
-            if (COLLAPSABLES.indexOf(this.name) !== -1) {
+            // Show the highlighted artwork.
+            // If the block is disconnected, use the disconnected bitmap.
+            if (this.isDisconnected()) {
+                this.disconnectedHighlightBitmap.visible = true;
+                this.highlightBitmap.visible = false;
+            } else {
+                if (this.disconnectedHighlightBitmap !== null) {
+                    this.disconnectedHighlightBitmap.visible = false;
+                }
+
+                this.highlightBitmap.visible = true;
+            }
+
+            // If it is an uncollapsed collapsable, make sure the
+            // collapsed artwork is hidden.
+            if (this.isCollapsible()) {
                 // There could be a race condition when making a
                 // new action block.
-                if (this.highlightCollapseBlockBitmap) {
-                    if (this.collapseText !== null) {
-                        this.collapseText.visible = false;
-                    }
-                    if (this.collapseBlockBitmap.visible !== null) {
-                        this.collapseBlockBitmap.visible = false;
-                    }
-                    if (this.highlightCollapseBlockBitmap.visible !== null) {
-                        this.highlightCollapseBlockBitmap.visible = false;
-                    }
-                }
-            }
-        }
-
-        this.updateCache();
-    };
-
-    this.unhighlight = function () {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
-            if (this.highlightCollapseBlockBitmap) {
-                this.highlightCollapseBlockBitmap.visible = false;
-                this.collapseBlockBitmap.visible = true;
-                this.collapseText.visible = true;
-                this.bitmap.visible = false;
-                this.highlightBitmap.visible = false;
-            }
-        } else {
-            this.bitmap.visible = true;
-            this.highlightBitmap.visible = false;
-            if (COLLAPSABLES.indexOf(this.name) !== -1) {
-                if (this.highlightCollapseBlockBitmap) {
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseBlockBitmap.visible = false;
+                if (this.collapseText !== null) {
                     this.collapseText.visible = false;
                 }
+
+                if (this.collapseBlockBitmap !== null) {
+                    this.collapseBlockBitmap.visible = false;
+                }
+
+                if (this.highlightCollapseBlockBitmap !== null) {
+                    this.highlightCollapseBlockBitmap.visible = false;
+                }
             }
         }
 
-        this.updateCache();
+        this.container.updateCache();
     };
 
+    /*
+     * Remove highlight from block
+     * @return{void}
+     * @public
+     */
+    this.unhighlight = function () {
+        if (this.trash) {
+            return;
+        }
+
+        if (this.inCollapsed) {
+            // In collapsed, so do nothing.
+            return;
+        }
+
+        if (this.bitmap === null) {
+            console.log('bitmap not ready');
+            return;
+        }
+
+        // Always hide the highlighted artwork.
+        this.highlightBitmap.visible = false;
+        if (this.disconnectedHighlightBitmap !== null) {
+            this.disconnectedHighlightBitmap.visible = false;
+        }
+
+        this.container.visible = true;
+
+        // If it is a collapsed collapsable, unhightlight the collapsed state.
+        if (this.collapsed) {
+            // Show the unhighlighted collapsed artwork.'
+            // We may have a race condition...
+            if (this.collapseBlockBitmap !== null) {
+                this.collapseBlockBitmap.visible = true;
+            }
+
+            if (this.collapseText !== null) {
+                this.collapseText.visible = true;
+            }
+
+            // but not the highlighted collapsed artwork...
+            if (this.highlightCollapseBlockBitmap !== null) {
+                this.highlightCollapseBlockBitmap.visible = false;
+            }
+
+            // and not the uncollapsed artwork.
+            this.bitmap.visible = false;
+        } else {
+            // If the block is disconnected, use the disconnected bitmap.
+            if (this.isDisconnected()) {
+                this.disconnectedBitmap.visible = true;
+                this.bitmap.visible = false;
+            } else {
+                if (this.disconnectedBitmap !== null) {
+                    this.disconnectedBitmap.visible = false;
+                }
+
+                this.bitmap.visible = true;
+            }
+
+            this.container.visible = true;
+
+            if (this.isCollapsible()) {
+                // There could be a race condition when making a
+                // new action block.
+                if (this.collapseText !== null) {
+                    this.collapseText.visible = false;
+                }
+
+                if (this.collapseBlockBitmap !== null) {
+                    this.collapseBlockBitmap.visible = false;
+                }
+
+                if (this.highlightCollapseBlockBitmap !== null) {
+                    this.highlightCollapseBlockBitmap.visible = false;
+                }
+            }
+        }
+
+        this.container.updateCache();
+    };
+
+    /*
+     * Resize and update number of slots in argClamp
+     * @param-slotList how many slots to use
+     * @return{void}
+     * @public
+     */
     this.updateArgSlots = function (slotList) {
-        // Resize and update number of slots in argClamp
         this.argClampSlots = slotList;
         this._newArtwork();
         this.regenerateArtwork(false);
     };
 
+    /*
+     * Resize an expandable block.
+     * @param-clamp which clamp to update (ifthenelse has 2 clamps)
+     * @param-plusMinus how many slots to add or subtract
+     * @return{void}
+     * @public
+     */
     this.updateSlots = function (clamp, plusMinus) {
-        // Resize an expandable block.
         this.clampCount[clamp] += plusMinus;
         this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
     };
 
+    /*
+     * If the block scale changes, we need to regenerate the
+     * artwork and recalculate the hitarea.
+     * @param-scale new block scale
+     * @return{void}
+     * @public
+     */
     this.resize = function (scale) {
-        // If the block scale changes, we need to regenerate the
-        // artwork and recalculate the hitarea.
         var that = this;
 
+        /*
+         * After the new artwork is created, this function is used to add
+         * decorations.
+         * @param-that = this
+         * @return{void}
+         * @public
+         */
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
-                z = that.container.getNumChildren() - 1;
+                z = that.container.children.length - 1;
                 that.container.setChildIndex(that.imageBitmap, z);
             }
 
@@ -213,6 +442,8 @@ function Block(protoblock, blocks, overrideName) {
                         break;
                     }
                 }
+            } else if (that.isCollapsible()) {
+                that._ensureDecorationOnTop();
             }
 
             that.updateCache();
@@ -234,32 +465,49 @@ function Block(protoblock, blocks, overrideName) {
             this._positionText(scale);
         }
 
-        if (this.collapseContainer !== null) {
-            this.collapseContainer.uncache();
+        if (this.container !== null) {
+            var that = this;
+
+            /*
+             * After new buttons are creates, they are cached and a
+             * new hit are is calculated
+             * @param-that = this = container
+             * @return{void}
+             * @private
+             */
             var _postProcess = function (that) {
-                that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 2;
-                that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 2;
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
 
-                that._positionCollapseContainer(that.protoblock.scale);
-                var bounds = that.collapseContainer.getBounds();
-                that.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-
-                // that._positionCollapseContainer(that.protoblock.scale);
-                that._calculateCollapseHitArea();
+                that.updateCache();
+                that._calculateBlockHitArea();
             };
 
-            this._generateCollapseArtwork(_postProcess);
-            var fontSize = 10 * scale;
-            this.collapseText.font = fontSize + 'px Sans';
-            this._positionCollapseLabel(scale);
+            if (this.isCollapsible()) {
+                this._generateCollapseArtwork(_postProcess);
+                var fontSize = 10 * scale;
+                this.collapseText.font = fontSize + 'px Sans';
+                this._positionCollapseLabel(scale);
+            }
         }
     };
 
+    /*
+     * Create new artwork for a block
+     * @param-plusMinus specifies how much a clamp block expands or contracts
+     * @return{void}
+     * @private
+     */
     this._newArtwork = function (plusMinus) {
-        if (COLLAPSABLES.indexOf(this.name) > -1) {
+        if (this.isCollapsible()) {
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
-            proto.extraWidth = 10;
+            if (this.name === 'interval') {
+                proto.extraWidth = 80;
+            } else {
+                proto.extraWidth = 40;
+            }
+
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
@@ -277,6 +525,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'less':
                 var obj = this.protoblock.generator(this.clampCount[0]);
                 break;
+            case 'makeblock':
             case 'calcArg':
             case 'doArg':
             case 'namedcalcArg':
@@ -323,6 +572,7 @@ function Block(protoblock, blocks, overrideName) {
 
             this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
             break;
+        case 'makeblock':
         case 'calcArg':
             this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
             for (var i = 2; i < obj[1].length; i++) {
@@ -339,26 +589,44 @@ function Block(protoblock, blocks, overrideName) {
             this.docks[i][0] = obj[1][i][0];
             this.docks[i][1] = obj[1][i][1];
         }
+
+        this.width = obj[2];
+        this.height = obj[3];
+        this.hitHeight = obj[4];
     };
 
+    /*
+     * Load any artwork associated with the block and create any
+     * extra parts. Image components are loaded asynchronously so
+     * most the work happens in callbacks.
+     *
+     * We also need a text label for some blocks. For number and
+     * text blocks, this is the primary label; for parameter
+     * blocks, this is used to display the current block value.
+     * @return{void}
+     * @public
+     */
     this.imageLoad = function () {
-        // Load any artwork associated with the block and create any
-        // extra parts. Image components are loaded asynchronously so
-        // most the work happens in callbacks.
-
-        // We need a text label for some blocks. For number and text
-        // blocks, this is the primary label; for parameter blocks,
-        // this is used to display the current block value.
         var fontSize = 10 * this.protoblock.scale;
-        this.text = new createjs.Text('', fontSize + 'px Sans', '#000000');
+        this.text = new createjs.Text('', fontSize + 'px Sans', platformColor.blockText);
 
         this.generateArtwork(true, []);
     };
 
+    /*
+     * Add an image to a block
+     * @return{void}
+     * @private
+     */
     this._addImage = function () {
         var image = new Image();
         var that = this;
 
+        /*
+         * The loader
+         * @return{void}
+         * @private
+         */
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -371,10 +639,14 @@ function Block(protoblock, blocks, overrideName) {
         image.src = this.image;
     };
 
+    /*
+     * Sometimes (in the case of namedboxes and nameddos) we need
+     * to regenerate the artwork associated with a block.
+     * @param-is the collapse artwork also generated?
+     * @return{void}
+     * @public
+    */
     this.regenerateArtwork = function (collapse) {
-        // Sometimes (in the case of namedboxes and nameddos) we need
-        // to regenerate the artwork associated with a block.
-
         // First we need to remove the old artwork.
         if (this.bitmap != null) {
             this.container.removeChild(this.bitmap);
@@ -384,9 +656,17 @@ function Block(protoblock, blocks, overrideName) {
             this.container.removeChild(this.highlightBitmap);
         }
 
-        if (collapse && this.collapseBitmap !== null) {
-            this.collapseContainer.removeChild(this.collapseBitmap);
-            this.collapseContainer.removeChild(this.expandBitmap);
+        if (this.disconnectedBitmap != null) {
+            this.container.removeChild(this.disconnectedBitmap);
+        }
+
+        if (this.disconnectedHighlightBitmap != null) {
+            this.container.removeChild(this.disconnectedHighlightBitmap);
+        }
+
+        if (collapse && this.collapseBlockBitmap !== null) {
+            this.container.removeChild(this.collapseButtonBitmap);
+            this.container.removeChild(this.expandButtonBitmap);
             this.container.removeChild(this.collapseBlockBitmap);
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
@@ -395,6 +675,12 @@ function Block(protoblock, blocks, overrideName) {
         this.generateArtwork(false);
     };
 
+    /*
+     * Generate the artwork for a block.
+     * @param-the first time, add the event handlers
+     * @return{void}
+     * @public
+    */
     this.generateArtwork = function (firstTime) {
         // Get the block labels from the protoblock.
         var that = this;
@@ -402,7 +688,7 @@ function Block(protoblock, blocks, overrideName) {
         var block_label = '';
 
         // Create the highlight bitmap for the block.
-        var __processHighlightBitmap = function (name, bitmap, that) {
+        var __processHighlightBitmap = function (bitmap, that) {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
             }
@@ -412,7 +698,9 @@ function Block(protoblock, blocks, overrideName) {
             that.highlightBitmap.x = 0;
             that.highlightBitmap.y = 0;
             that.highlightBitmap.name = 'bmp_highlight_' + thisBlock;
-            that.highlightBitmap.cursor = 'pointer';
+            if (!that.blocks.logo.runningLilypond) {
+                that.highlightBitmap.cursor = 'pointer';
+            }
             // Hide highlight bitmap to start.
             that.highlightBitmap.visible = false;
 
@@ -434,7 +722,7 @@ function Block(protoblock, blocks, overrideName) {
 
                     that._finishImageLoad();
                 } else {
-                    if (that.name === 'start' || that.name === 'drum') {
+                    if (that.isCollapsible) {
                         that._ensureDecorationOnTop();
                     }
 
@@ -444,7 +732,7 @@ function Block(protoblock, blocks, overrideName) {
                     // Adjust the text position.
                     that._positionText(that.protoblock.scale);
 
-                    if (COLLAPSABLES.indexOf(that.name) !== -1) {
+                    if (that.isCollapsible()) {
                         that.bitmap.visible = !that.collapsed;
                         that.highlightBitmap.visible = false;
                         that.updateCache();
@@ -460,8 +748,68 @@ function Block(protoblock, blocks, overrideName) {
             that._createCache(__callback, firstTime);
         };
 
+        // Create the disconnect highlight bitmap for the block.
+        var __processDisconnectedHighlightBitmap = function (bitmap, that) {
+            if (that.disconnectedHighlightBitmap != null) {
+                that.container.removeChild(that.disconnectedHighlightBitmap);
+            }
+
+            that.disconnectedHighlightBitmap = bitmap;
+            that.container.addChild(that.disconnectedHighlightBitmap);
+            that.disconnectedHighlightBitmap.x = 0;
+            that.disconnectedHighlightBitmap.y = 0;
+            that.disconnectedHighlightBitmap.name = 'bmp_disconnect_hightlight_' + thisBlock;
+            if (!that.blocks.logo.runningLilypond) {
+                that.disconnectedHighlightBitmap.cursor = 'pointer';
+            }
+            // Hide disconnected bitmap to start.
+            that.disconnectedHighlightBitmap.visible = false;
+
+            if (that.protoblock.disabled) {
+                var artwork = that.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', safeSVG(block_label));
+            } else {
+                var artwork = that.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
+            }
+
+            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+            }
+
+            _blockMakeBitmap(artwork, __processHighlightBitmap, that);
+        };
+
+        // Create the disconnect bitmap for the block.
+        var __processDisconnectedBitmap = function (bitmap, that) {
+            if (that.disconnectedBitmap != null) {
+                that.container.removeChild(that.disconnectedBitmap);
+            }
+
+            that.disconnectedBitmap = bitmap;
+            that.container.addChild(that.disconnectedBitmap);
+            that.disconnectedBitmap.x = 0;
+            that.disconnectedBitmap.y = 0;
+            that.disconnectedBitmap.name = 'bmp_disconnect_' + thisBlock;
+            if (!that.blocks.logo.runningLilypond) {
+                that.disconnectedBitmap.cursor = 'pointer';
+            }
+            // Hide disconnected bitmap to start.
+            that.disconnectedBitmap.visible = false;
+
+            if (that.protoblock.disabled) {
+                var artwork = that.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', safeSVG(block_label));
+            } else {
+                var artwork = that.artwork.replace(/fill_color/g, platformColor.paletteColors[that.protoblock.palette.name][3]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
+            }
+
+            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+            }
+
+            _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
+        };
+
         // Create the bitmap for the block.
-        var __processBitmap = function (name, bitmap, that) {
+        var __processBitmap = function (bitmap, that) {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
             }
@@ -477,22 +825,21 @@ function Block(protoblock, blocks, overrideName) {
             if (that.protoblock.disabled) {
                 var artwork = that.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', safeSVG(block_label));
             } else {
-                var artwork = that.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
+                var artwork = that.artwork.replace(/fill_color/g, platformColor.disconnected).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(block_label));
             }
 
             for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
                 artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
-            that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
-            _makeBitmap(artwork, that.name, __processHighlightBitmap, that);
+            _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
         if (this.overrideName) {
             if (['storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
-                if (block_label.length > 8) {
-                    block_label = block_label.substr(0, 7) + '...';
+                if (getTextWidth(block_label, 'bold 20pt Sans') > TEXTWIDTH) {
+                    block_label = ' ' + block_label.substr(0, STRINGLEN) + '...';
                 }
             } else {
                 block_label = this.overrideName;
@@ -508,11 +855,17 @@ function Block(protoblock, blocks, overrideName) {
 
         if (firstTime) {
             // Create artwork and dock.
+            this.protoblock.scale = this.blocks.blockScale;
+
             var obj = this.protoblock.generator();
             this.artwork = obj[0];
             for (var i = 0; i < obj[1].length; i++) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], this.protoblock.dockTypes[i]]);
             }
+
+            this.width = obj[2];
+            this.height = obj[3];
+            this.hitHeight = obj[4];
         }
 
         if (this.protoblock.disabled) {
@@ -525,9 +878,16 @@ function Block(protoblock, blocks, overrideName) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
 
-        _makeBitmap(artwork, this.name, __processBitmap, this);
+        that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
+
+        _blockMakeBitmap(artwork, __processBitmap, this);
     };
 
+    /*
+     * After the block artwork has loaded, update labels, etc.
+     * @return{void}
+     * @private
+     */
     this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -542,11 +902,15 @@ function Block(protoblock, blocks, overrideName) {
                 case 'eastindiansolfege':
                     this.value = 'sol';
                     break;
+                case 'customNote':
+                    var len = this.blocks.logo.synth.startingPitch.length;
+                    this.value = this.blocks.logo.synth.startingPitch.substring(0, len - 1) + '(+0)';
+                    break;
                 case 'notename':
                     this.value = 'G';
                     break;
                 case 'rest':
-                    this.value = _('rest');
+                    this.value = 'rest';
                     break;
                 case 'boolean':
                     this.value = true;
@@ -555,28 +919,37 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = NUMBERBLOCKDEFAULT;
                     break;
                 case 'modename':
-                    this.value = getModeName(DEFAULTMODE);
+                    this.value = DEFAULTMODE;
                     break;
                 case 'accidentalname':
                     this.value = DEFAULTACCIDENTAL;
                     break;
                 case 'intervalname':
-                    this.value = getIntervalName(DEFAULTINTERVAL);
+                    this.value = DEFAULTINTERVAL;
                     break;
                 case 'invertmode':
-                    this.value = getInvertMode(DEFAULTINVERT);
+                    this.value = DEFAULTINVERT;
                     break;
                 case 'voicename':
-                    this.value = getVoiceName(DEFAULTVOICE);
+                    this.value = DEFAULTVOICE;
+                    break;
+                case 'noiseename':
+                    this.value = DEFAULTNOISE;
                     break;
                 case 'drumname':
-                    this.value = getDrumName(DEFAULTDRUM);
+                    this.value = DEFAULTDRUM;
+                    break;
+                case 'effectsname':
+                    this.value = DEFAULTEFFECT;
                     break;
                 case 'filtertype':
-                    this.value = getFilterTypes(DEFAULTFILTERTYPE);
+                    this.value = DEFAULTFILTERTYPE;
                     break;
                 case 'oscillatortype':
-                    this.value = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
+                    this.value = DEFAULTOSCILLATORTYPE;
+                    break;
+                case 'temperamentname':
+                    this.value = 'equal';
                     break;
                 }
             }
@@ -605,8 +978,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            if (WIDENAMES.indexOf(this.name) === -1 && label.length > 8) {
-                label = label.substr(0, 7) + '...';
+            if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {
+                label = label.substr(0, STRINGLEN) + '...';
             }
 
             this.text.text = label;
@@ -618,7 +991,7 @@ function Block(protoblock, blocks, overrideName) {
             this._positionText(this.protoblock.scale);
         }
 
-        if (COLLAPSABLES.indexOf(this.name) === -1) {
+        if (!this.isCollapsible()) {
             this.loadComplete = true;
             if (this.postProcess !== null) {
                 this.postProcess(this.postProcessArg);
@@ -627,21 +1000,37 @@ function Block(protoblock, blocks, overrideName) {
 
             this.blocks.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
+            /*
             if (this.trash) {
-                this.collapseContainer.visible = false;
                 this.collapseText.visible = false;
+                this.collapseButtonBitmap.visible = false;
+                this.expandButtonBitmap.visible = false;
             }
+            */
         } else {
-            // Start blocks and Action blocks can collapse, so add an
-            // event handler.
-            var proto = new ProtoBlock('collapse');
-            proto.scale = this.protoblock.scale;
-            proto.extraWidth = 10;
-            proto.basicBlockCollapsed();
+            // Some blocks, e.g., Start blocks and Action blocks can
+            // collapse, so add an event handler.
+            if (this.isInlineCollapsible()) {
+                var proto = new ProtoBlock('collapse-note');
+                proto.scale = this.protoblock.scale;
+                if (this.name === 'interval') {
+                    proto.extraWidth = 80;
+                } else {
+                    proto.extraWidth = 40;
+                }
+                proto.zeroArgBlock();
+            } else {
+                var proto = new ProtoBlock('collapse');
+                proto.scale = this.protoblock.scale;
+                proto.extraWidth = 40;
+                proto.basicBlockCollapsed();
+            }
+
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
+
             var postProcess = function (that) {
-                that._loadCollapsibleEventHandlers();
+                // that._loadCollapsibleEventHandlers();
                 that.loadComplete = true;
 
                 if (that.postProcess !== null) {
@@ -650,15 +1039,105 @@ function Block(protoblock, blocks, overrideName) {
                 }
             };
 
-            this._generateCollapseArtwork(postProcess);
+            if (this.isCollapsible()) {
+                this._generateCollapseArtwork(postProcess);
+            }
         }
     };
 
+    /*
+     * Generate the collapsed artwork
+     * @param postProcess = a process to run after the artwork is generated
+     * @return{void}
+     * @private
+     */
     this._generateCollapseArtwork = function (postProcess) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-        var __processHighlightCollapseBitmap = function (name, bitmap, that) {
+        /*
+         * Run the postprocess function after the artwork is loaded
+         * @return{void}
+         * @private
+         */
+        var __finishCollapse = function (that) {
+            if (postProcess !== null) {
+                postProcess(that);
+            }
+
+            that.blocks.refreshCanvas();
+            that.blocks.cleanupAfterLoad(that.name);
+            if (that.trash) {
+                that.collapseText.visible = false;
+                that.collapseButtonBitmap.visible = false;
+                that.expandButtonBitmap.visible = false;
+            }
+        };
+
+        /*
+         * Create the artwork for the collapse buttons
+         * @param - that = this
+         * @return{void}
+         * @private
+         */
+        var __processCollapseButton = function (that) {
+            var image = new Image();
+            image.onload = function () {
+                that.collapseButtonBitmap = new createjs.Bitmap(image);
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = that.protoblock.scale / 3;
+
+                that.container.addChild(that.collapseButtonBitmap);
+                that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
+                if (that.isInlineCollapsible()) {
+                    that.collapseButtonBitmap.y = 4 * that.protoblock.scale;
+                } else {
+                    that.collapseButtonBitmap.y = 10 * that.protoblock.scale;
+                }
+
+                that.collapseButtonBitmap.visible = !that.collapsed;
+
+                __finishCollapse(that);
+            };
+
+            image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
+        };
+
+        /*
+         * Create the artwork for the expand buttons
+         * @param - that = this
+         * @return{void}
+         * @private
+         */
+        var __processExpandButton = function (that) {
+            var image = new Image();
+            image.onload = function () {
+                that.expandButtonBitmap = new createjs.Bitmap(image);
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = that.protoblock.scale / 3;
+
+                that.container.addChild(that.expandButtonBitmap);
+                that.expandButtonBitmap.visible = that.collapsed;
+
+                that.expandButtonBitmap.x = 2 * that.protoblock.scale;
+                if (that.isInlineCollapsible()) {
+                    that.expandButtonBitmap.y = 4 * that.protoblock.scale;
+                } else {
+                    that.expandButtonBitmap.y = 10 * that.protoblock.scale;
+                }
+
+                __processCollapseButton(that);
+            };
+
+            image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
+        };
+
+        /*
+         * Processing the highlighted collapsed image
+         * @param-bitmap = highlight artwork
+         * @param-that = this
+         * @return{void}
+         * @private
+         */
+        var __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
             that.container.addChild(that.highlightCollapseBlockBitmap);
@@ -668,41 +1147,61 @@ function Block(protoblock, blocks, overrideName) {
                 var fontSize = 10 * that.protoblock.scale;
                 switch (that.name) {
                 case 'action':
-                    that.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'start':
-                    that.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'matrix':
-                    that.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'status':
-                    that.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'pitchdrummatrix':
-                    that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('drum mapper'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'rhythmruler':
-                    that.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'timbre':
-                    that.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'pitchstaircase':
-                    that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'tempo':
-                    that.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'modewidget':
-                    that.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'pitchslider':
-                    that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', platformColor.blockText);
+                    break;
+                case 'musickeyboard':
+                    that.collapseText = new createjs.Text(_('keyboard'), fontSize + 'px Sans', platformColor.blockText);
                     break;
                 case 'drum':
-                    that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', platformColor.blockText);
                     break;
+                case 'rhythmruler2':
+                    that.collapseText = new createjs.Text(_('rhythm maker'), fontSize + 'px Sans', platformColor.blockText);
+                    break;
+                case 'newnote':
+                    that.collapseText = new createjs.Text(_('note value'), fontSize + 'px Sans', platformColor.blockText);
+                    break;
+                case 'interval':
+                    that.collapseText = new createjs.Text(_('scalar interval'), fontSize + 'px Sans', platformColor.blockText);
+                    break;
+                case 'osctime':
+                    that.collapseText = new createjs.Text(_('milliseconds'), fontSize + 'px Sans', platformColor.blockText);
+                    break;
+                case 'temperament':
+                    that.collapseText = new createjs.Text(_('temperament'), fontSize + 'px Sans', platformColor.blockText);
+                    break;
+                default:
+                    that.collapseText = new createjs.Text('foobar', fontSize + 'px Sans', platformColor.blockText);
                 }
 
                 that.collapseText.textAlign = 'left';
@@ -713,50 +1212,22 @@ function Block(protoblock, blocks, overrideName) {
             that._positionCollapseLabel(that.protoblock.scale);
             that.collapseText.visible = that.collapsed;
             that._ensureDecorationOnTop();
-            that.updateCache();
 
-            that.collapseContainer = new createjs.Container();
-            that.collapseContainer.snapToPixelEnabled = true;
+            // Save the collapsed block artwork for export.
+            var artwork = that.collapseArtwork.replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name]).replace('block_label', safeSVG(that.collapseText.text));
+            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] = artwork;
 
-            var image = new Image();
-            image.onload = function () {
-                that.collapseBitmap = new createjs.Bitmap(image);
-                that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 2;
-                that.collapseContainer.addChild(that.collapseBitmap);
-                that.collapseBitmap.visible = !that.collapsed;
-                finishCollapseButton(that);
-            };
-
-            image.src = 'images/collapse.svg';
-
-            finishCollapseButton = function (that) {
-                var image = new Image();
-                image.onload = function () {
-                    that.expandBitmap = new createjs.Bitmap(image);
-                    that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 2;
-                    that.collapseContainer.addChild(that.expandBitmap);
-                    that.expandBitmap.visible = that.collapsed;
-
-                    var bounds = that.collapseContainer.getBounds();
-                    that.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                    that.blocks.stage.addChild(that.collapseContainer);
-                    if (postProcess !== null) {
-                        postProcess(that);
-                    }
-
-                    that.blocks.refreshCanvas();
-                    that.blocks.cleanupAfterLoad(that.name);
-                    if (that.trash) {
-                        that.collapseContainer.visible = false;
-                        that.collapseText.visible = false;
-                    }
-                };
-
-                image.src = 'images/expand.svg';
-            }
+            __processExpandButton(that);
         };
 
-        var __processCollapseBitmap = function (name, bitmap, that) {
+        /*
+         * Processing the collapsed block
+         * @param-bitmap = block artwork
+         * @param-that = this
+         * @return{void}
+         * @private
+         */
+        var __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
@@ -764,31 +1235,137 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.refreshCanvas();
 
             var artwork = that.collapseArtwork;
-            _makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', ''), '', __processHighlightCollapseBitmap, that);
+            _blockMakeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', ''), __processHighlightCollapseBitmap, that);
         };
 
-        var artwork = this.collapseArtwork;
-        _makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', __processCollapseBitmap, this);
+        var artwork = this.collapseArtwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', '');
+        _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
 
+    /*
+     * Hide this block
+     * @return{void}
+     * @public
+     */
     this.hide = function () {
         this.container.visible = false;
-        if (this.collapseContainer !== null) {
-            this.collapseContainer.visible = false;
+        if (this.isCollapsible()) {
             this.collapseText.visible = false;
+            this.expandButtonBitmap.visible = false;
+            this.collapseButtonBitmap.visible = false;
         }
+
+        this.updateCache();
+        this.blocks.refreshCanvas();
     };
 
+    /*
+     * Is this block disconnected from other blocks?
+     * @return{boolean} true if the block is disconnected from other blocks
+     * @public
+     */
+    this.isDisconnected = function () {
+        if (this.disconnectedBitmap === null) {
+            return false;
+        }
+
+        if (this.connections[0] !== null) {
+            return false;
+        }
+
+        if (COLLAPSIBLES.indexOf(this.name) !== -1) {
+            if (INLINECOLLAPSIBLES.indexOf(this.name) === -1) {
+                return false;
+            }
+        }
+
+        if (this.isArgBlock()) {
+            return true;
+        }
+
+        if (last(this.connections) === null) {
+            return true;
+        }
+
+        if (this.blocks.blockList[last(this.connections)].name === 'hidden') {
+            if (last(this.blocks.blockList[last(this.connections)].connections) === null) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    /*
+     * Show this block
+     * @return{void}
+     * @public
+     */
     this.show = function () {
-        if (!this.trash) {
-            // If it is an action block or it is not collapsed then show it.
-            if (!(COLLAPSABLES.indexOf(this.name) === -1 && this.collapsed)) {
-                this.container.visible = true;
-                if (this.collapseContainer !== null) {
-                    this.collapseContainer.visible = true;
+        // If it is not in the trash and not in collapsed, then show it.
+        if (!this.trash && !this.inCollapsed) {
+            this.container.visible = true;
+            if (this.isCollapsible()) {
+                if (this.collapsed) {
+                    this.bitmap.visible = false;
+                    this.highlightBitmap.visible = false;
+                    this.collapseBlockBitmap.visible = true;
+                    this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseText.visible = true;
+                    this.expandButtonBitmap.visible = true;
+                    this.collapseButtonBitmap.visible = false;
+                    if (this.disconnectedBitmap !== null) {
+                        this.disconnectedBitmap.visible = false;
+                    }
+
+                    if (this.disconnectedHighlightBitmap !== null) {
+                        this.disconnectedHighlightBitmap.visible = false;
+                    }
+                } else {
+                    // If the block is disconnected, use the disconnected bitmap.
+                    if (this.isDisconnected()) {
+                        this.disconnectedBitmap.visible = true;
+                        this.bitmap.visible = false;
+                    } else {
+                        if (this.disconnectedBitmap !== null) {
+                            this.disconnectedBitmap.visible = false;
+                        }
+
+                        this.bitmap.visible = true;
+                    }
+
+                    this.highlightBitmap.visible = false;
+                    if (this.disconnectedHighlightBitmap !== null) {
+                        this.disconnectedHighlightBitmap.visible = false;
+                    }
+
+                    this.collapseBlockBitmap.visible = false;
+                    this.highlightCollapseBlockBitmap.visible = false;
+                    this.collapseText.visible = false;
+                    this.expandButtonBitmap.visible = false;
+                    this.collapseButtonBitmap.visible = true;
+                }
+            } else {
+                // If the block is disconnected, use the disconnected bitmap.
+                if (this.isDisconnected()) {
+                    this.disconnectedBitmap.visible = true;
+                    this.bitmap.visible = false;
+                } else {
+                    if (this.disconnectedBitmap !== null) {
+                        this.disconnectedBitmap.visible = false;
+                    }
+
+                    this.bitmap.visible = true;
+                }
+
+                this.highlightBitmap.visible = false;
+                if (this.disconnectedHighlightBitmap !== null) {
+                    this.disconnectedHighlightBitmap.visible = false;
                 }
             }
+
+            this.updateCache();
+            this.blocks.refreshCanvas();
         }
     };
 
@@ -844,7 +1421,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.removeChildBitmap = function (name) {
-        for (var child = 0; child < this.container.getNumChildren(); child++) {
+        for (var child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
                 break;
@@ -887,7 +1464,7 @@ function Block(protoblock, blocks, overrideName) {
 
             var bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.value = myContainer.getCacheDataURL();
+            that.value = myContainer.bitmapCache.getCacheDataURL();
             that.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
@@ -937,103 +1514,500 @@ function Block(protoblock, blocks, overrideName) {
         window.scroll(0, 0)
     };
 
+    this.setCollapsedState = function () {
+        // Mark it as in a collapsed block and hide it.
+        this.inCollapsed = true;
+        this.hide();
+    };
+
+    this.setUncollapsedState = function (nblk) {
+        // It could be a block inside a note block, which may or may
+        // not be hidden depending on the collapsed state of the
+        // containing note block.
+        if (nblk === null) {
+            this.inCollapsed = false;
+            this.show();
+        } else {
+            // if we are inside of a collapsed note block, do nothing.
+            if (this.blocks.blockList[nblk].collapsed) {
+            } else {
+                this.inCollapsed = false;
+                this.show();
+            }
+        }
+    };
+
     this.collapseToggle = function () {
-        // Find the blocks to collapse/expand
-        var that = this;
+        // Find the blocks to collapse/expand inside of a collapable
+        // block.
         var thisBlock = this.blocks.blockList.indexOf(this);
         this.blocks.findDragGroup(thisBlock);
 
-        var __toggle = function () {
-            var collapse = that.collapsed;
-            if (that.collapseBitmap === null) {
-                console.log('collapse bitmap not ready');
-                return;
-            }
-            that.collapsed = !collapse;
-
-            // These are the buttons to collapse/expand the stack.
-            that.collapseBitmap.visible = collapse;
-            that.expandBitmap.visible = !collapse;
-
-            // These are the collpase-state bitmaps.
-            that.collapseBlockBitmap.visible = !collapse;
-            that.highlightCollapseBlockBitmap.visible = false;
-            that.collapseText.visible = !collapse;
-
-            if (collapse) {
-                that.bitmap.visible = true;
-            } else {
-                that.bitmap.visible = false;
-                that.updateCache();
-            }
-            that.highlightBitmap.visible = false;
-
-            if (that.name === 'action') {
-                // Label the collapsed block with the action label
-                if (that.connections[1] !== null) {
-                    var text = that.blocks.blockList[that.connections[1]].value;
-                    if (text.length > 8) {
-                        text = text.substr(0, 7) + '...';
-                    }
-                    that.collapseText.text = text;
-                } else {
-                    that.collapseText.text = '';
-                }
-            }
-
-            // Make sure the text is on top.
-            var z = that.container.getNumChildren() - 1;
-            that.container.setChildIndex(that.collapseText, z);
-
-            // Set collapsed state of blocks in drag group.
-            if (that.blocks.dragGroup.length > 0) {
-                for (var b = 1; b < that.blocks.dragGroup.length; b++) {
-                    var blk = that.blocks.dragGroup[b];
-                    that.blocks.blockList[blk].collapsed = !collapse;
-                    that.blocks.blockList[blk].container.visible = collapse;
-                }
-            }
-
-            that.collapseContainer.updateCache();
-            that.updateCache();
+        if (this.collapseBlockBitmap === null) {
+            console.log('collapse bitmap not ready');
+            return;
         }
 
-        __toggle();
+        // Remember the current state.
+        var isCollapsed = this.collapsed;
+        // Toggle the state.
+        this.collapsed = !isCollapsed;
+
+        // These are the buttons to collapse/expand the stack.
+        this.collapseButtonBitmap.visible = isCollapsed;
+        this.expandButtonBitmap.visible = !isCollapsed;
+
+        // These are the collpase-state bitmaps.
+        this.collapseBlockBitmap.visible = !isCollapsed;
+        this.highlightCollapseBlockBitmap.visible = false;
+        this.collapseText.visible = !isCollapsed;
+
+        if (this.isInlineCollapsible() && this.collapseText.visible) {
+            switch(this.name) {
+            case 'newnote':
+                this._newNoteLabel();
+                break;
+            case 'interval':
+                this._intervalLabel();
+                break;
+            case 'osctime':
+                this._oscTimeLabel();
+                break;
+            default:
+                console.log('What do we do with a collapsed ' + this.name + ' block?');
+                break;
+            }
+        }
+
+        this.bitmap.visible = this.collapsed;
+        this.highlightBitmap.visible = false;
+        if (this.disconnectedBitmap !== null) {
+            this.disconnectedBitmap.visible = false;
+        }
+
+        if (this.disconnectedHighlightBitmap !== null) {
+            this.disconnectedHighlightBitmap.visible = false;
+        }
+
+        this.updateCache();
+
+        if (this.name === 'action') {
+            // Label the collapsed block with the action label.
+            if (this.connections[1] !== null) {
+                var text = this.blocks.blockList[this.connections[1]].value;
+                if (getTextWidth(text, 'bold 20pt Sans') > TEXTWIDTH) {
+                    text = text.substr(0, STRINGLEN) + '...';
+                }
+
+                this.collapseText.text = text;
+            } else {
+                this.collapseText.text = '';
+            }
+        }
+
+        // Make sure the text is on top.
+        var z = this.container.children.length - 1;
+        this.container.setChildIndex(this.collapseText, z);
+
+        if (this.isInlineCollapsible()) {
+            // Only collapse the contents of the note block.
+            this._toggle_inline(thisBlock, isCollapsed);
+        } else {
+            // Set collapsed state of all of the blocks in the drag group.
+            if (this.blocks.dragGroup.length > 0) {
+                for (var b = 1; b < this.blocks.dragGroup.length; b++) {
+                    var blk = this.blocks.dragGroup[b];
+                    if (this.collapsed) { // if (this.blocks.blockList[blk].inCollapsed) {
+                        this.blocks.blockList[blk].setCollapsedState();
+                    } else {
+                        this.blocks.blockList[blk].setUncollapsedState(this.blocks.insideInlineCollapsibleBlock(blk));
+                    }
+                }
+            }
+        }
+
+        this.updateCache();
+        this.unhighlight();
+        this.blocks.refreshCanvas();
     };
 
+    this._intervalLabel = function () {
+        // Find pitch and value to display on the collapsed interval
+        // block.
+        var degrees = DEGREES.split(' ');
+        var intervalLabels = {};
+        for (var i = 0; i < degrees.length; i++) {
+            intervalLabels[i] = degrees[i];
+        }
+
+        var intervals = [];
+        var i = 0;
+
+        var c = this.blocks.blockList.indexOf(this);
+        while (c !== null) {
+            var lastIntervalBlock = c;
+            var n = this.blocks.blockList[c].connections[1];
+            var cblock = this.blocks.blockList[n];
+            if (cblock.name === 'number') {
+                if (Math.abs(cblock.value) in intervalLabels) {
+                    if (cblock.value < 0) {
+                        intervals.push('-' + intervalLabels[-cblock.value]);
+                    } else {
+                        intervals.push('+' + intervalLabels[cblock.value]);
+                    }
+                } else {
+                    if (cblock.value < 0) {
+                        intervals.push('-' + cblock.value);
+                    } else {
+                        intervals.push('+' + cblock.value);
+                    }
+                }
+            } else {
+                intervals.push('');
+            }
+
+            i += 1;
+            if (i > 5) {
+                console.log('loop?');
+                break;
+            }
+
+            c = this.blocks.findNestedIntervalBlock(this.blocks.blockList[c].connections[2]);
+        }
+
+        var itext = '';
+        for (var i = intervals.length; i > 0; i--) {
+            itext += ' ' + intervals[i - 1];
+        }
+
+        var v = '';
+        var nblk = this.blocks.findNoteBlock(lastIntervalBlock);
+        if (nblk === null) {
+            this.collapseText.text = _('scalar interval') + itext;
+        } else {
+            var c = this.blocks.blockList[nblk].connections[1];
+            if (c !== null) {
+                // Only look for standard form: / 1 4
+                if (this.blocks.blockList[c].name === 'divide') {
+                    var c1 = this.blocks.blockList[c].connections[1];
+                    var c2 = this.blocks.blockList[c].connections[2];
+                    if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
+                        v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (this.blocks.blockList[c2].value in NSYMBOLS) {
+                                v += NSYMBOLS[this.blocks.blockList[c2].value];
+                            }
+                        }
+                    }
+                }
+            }
+
+            c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
+            var p = this._getPitch(c);
+            if (c === null || p === '') {
+                this.collapseText.text = _('scalar interval') + itext;
+            } else {
+                // Are there more pitch blocks in this note?
+                c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
+                // Update the collapsed-block label.
+                if (c === null) {
+                    this.collapseText.text = p  + ' | ' + v + itext;
+                } else {
+                    this.collapseText.text = p + '...' + ' | ' + v + itext;
+                }
+            }
+        }
+    };
+
+    this._newNoteLabel = function () {
+        // Find pitch and value to display on the collapsed note value
+        // block.
+        var v = '';
+        var c = this.connections[1];
+        if (c !== null) {
+            // Only look for standard form: / 1 4
+            if (this.blocks.blockList[c].name === 'divide') {
+                var c1 = this.blocks.blockList[c].connections[1];
+                var c2 = this.blocks.blockList[c].connections[2];
+                if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
+                    v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (this.blocks.blockList[c2].value in NSYMBOLS) {
+                            v += NSYMBOLS[this.blocks.blockList[c2].value];
+                        }
+                    }
+                }
+            }
+        }
+
+        c = this.connections[2];
+        c = this.blocks.findFirstPitchBlock(c);
+        var p = this._getPitch(c);
+        if (c === null) {
+            this.collapseText.text = _('silence') + ' | ' + v;
+        } else if (p === '' && v === '') {
+            this.collapseText.text = _('note value');
+        } else {
+            // Are there more pitch blocks in this note?
+            c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
+            // Update the collapsed-block label.
+            if (c === null) {
+                this.collapseText.text = p + ' | ' + v;
+            } else {
+                this.collapseText.text = p + '... | ' + v;
+            }
+        }
+    };
+
+    this._oscTimeLabel = function () {
+        // Find Hertz and value to display on the collapsed note value
+        // block.
+        var v = '';
+        var c = this.connections[1];
+        if (c !== null) {
+            // Only look for standard form: / 1000 / 3 2
+            if (this.blocks.blockList[c].name === 'divide') {
+                var c1 = this.blocks.blockList[c].connections[1];
+                var c2 = this.blocks.blockList[c].connections[2];
+                if (c1 !== null && c2 !== null && this.blocks.blockList[c2].name === 'divide') {
+                    var ci = this.blocks.blockList[c2].connections[1];
+                    var cii = this.blocks.blockList[c2].connections[2];
+                    if (ci !== null && cii !== null && this.blocks.blockList[ci].name === 'number' && this.blocks.blockList[cii].name === 'number') {
+                        v = this.blocks.blockList[c1].value / this.blocks.blockList[ci].value * this.blocks.blockList[cii].value;
+                    }
+                }
+            }
+        }
+
+        c = this.connections[2];
+        c = this.blocks.findFirstPitchBlock(c);
+        var p = this._getPitch(c);
+        if (c === null) {
+            this.collapseText.text = _('silence') + ' | ' + v;
+        } else if (p === '' && v === '') {
+            this.collapseText.text = _('note value');
+        } else {
+            // Are there more pitch blocks in this note?
+            c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
+            // Update the collapsed-block label.
+            if (v !== '') {
+                if (c === null) {
+                    this.collapseText.text = p + ' | ' + v.toFixed(0);
+                } else {
+                    this.collapseText.text = p + '... | ' + v.toFixed(0);
+                }
+            } else {
+                this.collapseText.text = p + '...';
+            }
+        }
+    };
+
+    this._getPitch = function (c) {
+        if (c === null) {
+            return '';
+        }
+
+        switch(this.blocks.blockList[c].name) {
+        case 'pitch':
+            var c1 = this.blocks.blockList[c].connections[1];
+            var c2 = this.blocks.blockList[c].connections[2];
+            if (this.blocks.blockList[c2].name === 'number') {
+                if (this.blocks.blockList[c1].name === 'solfege') {
+                    var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+                    var stripped = this.blocks.blockList[c1].value.replace(SHARP, '').replace(FLAT, '').replace(DOUBLESHARP, '').replace(DOUBLEFLAT, '');
+                    var i = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'].indexOf(stripped);
+                    if (this.blocks.blockList[c1].value.indexOf(SHARP) !== -1) {
+                        return solfnotes_[i] + SHARP + ' ' + this.blocks.blockList[c2].value;
+                    } else if (this.blocks.blockList[c1].value.indexOf(FLAT) !== -1) {
+                        return solfnotes_[i] + FLAT + ' ' + this.blocks.blockList[c2].value;
+                    } else if (this.blocks.blockList[c1].value.indexOf(DOUBLESHARP) !== -1) {
+                        return solfnotes_[i] + DOUBLESHARP + ' ' + this.blocks.blockList[c2].value;
+                    } else if (this.blocks.blockList[c1].value.indexOf(DOUBLEFLAT) !== -1) {
+                        return solfnotes_[i] + DOUBLEFLAT + ' ' + this.blocks.blockList[c2].value;
+                    } else {
+                        return solfnotes_[i] + ' ' + this.blocks.blockList[c2].value;
+                    }
+                } else if (this.blocks.blockList[c1].name === 'notename') {
+                    return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
+                }
+            }
+            break;
+        case 'scaledegree':
+            var c1 = this.blocks.blockList[c].connections[1];
+            var c2 = this.blocks.blockList[c].connections[2];
+            if (this.blocks.blockList[c2].name === 'number') {
+                if (this.blocks.blockList[c1].name === 'number') {
+                    var degrees = DEGREES.split(' ');
+                    var i = this.blocks.blockList[c1].value - 1;
+                    if (i > 0 && i < degrees.length) {
+                        return degrees[i] + ' ' + this.blocks.blockList[c2].value;
+                    } else {
+                        return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
+                    }
+                }
+            }
+            break;
+        case 'hertz':
+            var c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === 'number') {
+                return this.blocks.blockList[c1].value + 'HZ';
+            }
+            break;
+        case 'steppitch':
+            var c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c1].value < 0) {
+                //.TRANS: scalar step
+                return _('down') + ' ' + Math.abs(this.blocks.blockList[c1].value);
+            } else
+                return _('up') + ' ' + this.blocks.blockList[c1].value;
+            break;
+        case 'pitchnumber':
+            var c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === 'number') {
+                //.TRANS: pitch number
+                return _('pitch') + ' ' + this.blocks.blockList[c1].value;
+            }
+            break;
+        case 'playdrum':
+            return _('drum');
+            break;
+        case 'rest2':
+            return _('silence');
+            break;
+        default:
+            return '';
+        }
+    };
+
+    this._toggle_inline = function (thisBlock, collapse) {
+        // Toggle the collapsed state of blocks inside of a note (or
+        // interval) block and reposition any blocks below
+        // it. Finally, resize any surrounding clamps.
+
+        // Set collapsed state of note value arg blocks...
+        if (this.connections[1] !== null) {
+            this.blocks.findDragGroup(this.connections[1]);
+            for (var b = 0; b < this.blocks.dragGroup.length; b++) {
+                var blk = this.blocks.dragGroup[b];
+                this.blocks.blockList[blk].container.visible = collapse;
+                if (collapse) {
+                    this.blocks.blockList[blk].inCollapsed = false;
+                } else {
+                    this.blocks.blockList[blk].inCollapsed = true;
+                }
+            }
+        }
+
+        // and the blocks inside the clamp.
+        if (this.connections[2] !== null) {
+            this.blocks.findDragGroup(this.connections[2]);
+            for (var b = 0; b < this.blocks.dragGroup.length; b++) {
+                var blk = this.blocks.dragGroup[b];
+                // Look to see if the local parent block is collapsed.
+                var parent = this.blocks.insideInlineCollapsibleBlock(blk);
+                if (parent === null || !this.blocks.blockList[parent].collapsed) {
+                    this.blocks.blockList[blk].container.visible = collapse;
+                    if (collapse) {
+                        this.blocks.blockList[blk].inCollapsed = false;
+                    } else {
+                        this.blocks.blockList[blk].inCollapsed = true;
+                    }
+                } else {
+                    // Parent is collapsed, so keep hidden.
+                    this.blocks.blockList[blk].container.visible = false;
+                    this.blocks.blockList[blk].inCollapsed = true;
+                }
+            }
+        }
+
+        // Reposition the blocks below.
+        if (this.connections[3] != null) {
+            // The last connection is flow. The second to last
+            // connection is child flow.  FIX ME: This will not work
+            // if there is more than one arg, e.g. n > 4.
+            var n = this.docks.length;
+            if (collapse) {
+                var dy = this.blocks.blockList[thisBlock].docks[n - 1][1] - this.blocks.blockList[thisBlock].docks[n - 2][1];
+            } else {
+                var dy = this.blocks.blockList[thisBlock].docks[n - 2][1] - this.blocks.blockList[thisBlock].docks[n - 1][1];
+            }
+
+            this.blocks.findDragGroup(this.connections[3]);
+            for (var b = 0; b < this.blocks.dragGroup.length; b++) {
+                var blk = this.blocks.dragGroup[b];
+                this.blocks.moveBlockRelative(blk, 0, dy);
+            }
+
+            this.blocks.adjustDocks(thisBlock, true);
+        }
+
+        // Look to see if we are in a clamp block. If so, readjust.
+        clampList = [];
+        this.blocks.findNestedClampBlocks(thisBlock, clampList);
+        if (clampList.length > 0) {
+            this.blocks.clampBlocksToCheck = clampList;
+            this.blocks.adjustExpandableClampBlock();
+        }
+
+        this.blocks.refreshCanvas();
+    };
+
+    /*
+     * Position any addition text on a block
+     * @param-blockscale is used to scale the text
+     * @return{void}
+     * @private
+     */
     this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
         var fontSize = 10 * blockScale;
         this.text.font = fontSize + 'px Sans';
-        this.text.x = TEXTX * blockScale / 2.;
-        this.text.y = TEXTY * blockScale / 2.;
+        this.text.x = Math.floor((TEXTX * blockScale / 2.) + 0.5);
+        this.text.y = Math.floor((TEXTY * blockScale / 2.) + 0.5);
 
         // Some special cases
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
-            this.text.x = VALUETEXTX * blockScale / 2.;
+            this.text.x = Math.floor((VALUETEXTX * blockScale / 2.) + 0.5);
             if (EXTRAWIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 3.0;
             } else if (WIDENAMES.indexOf(this.name) !== -1) {
-                this.text.x *= 1.75;
+                this.text.x = Math.floor((this.text.x * 1.75) + 0.5);
+            } else if (this.name === 'text') {
+                this.text.x = Math.floor((this.width / 2) + 0.5);
             }
+        } else if (this.name === 'nameddo') {
+            this.text.textAlign = 'center';
+            this.text.x = Math.floor((this.width / 2) + 0.5);
         } else if (this.protoblock.args === 0) {
             var bounds = this.container.getBounds();
-            this.text.x = bounds.width - 25;
+            this.text.x = Math.floor(this.width - 25 + 0.5);
+        } else if (this.isCollapsible()) {
+            this.text.x += Math.floor(15 * blockScale);
         } else {
             this.text.textAlign = 'left';
             if (this.docks[0][2] === 'booleanout') {
-                this.text.y = this.docks[0][1];
+                this.text.y = Math.floor(this.docks[0][1] + 0.5);
             }
         }
 
         // Ensure text is on top.
-        z = this.container.getNumChildren() - 1;
+        z = this.container.children.length - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
 
+    /*
+     * Position media artwork on a block.
+     * @param-bitmap - image
+     * @param-width-width of canvas
+     * @param-height-height of canvas
+     * @param-blockscale-scale
+     * Position inserted media
+     * @return{void}
+     * @private
+     */
     this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
@@ -1044,228 +2018,43 @@ function Block(protoblock, blocks, overrideName) {
         bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
     };
 
-    this._calculateCollapseHitArea = function () {
-        var bounds = this.collapseContainer.getBounds();
-        var hitArea = new createjs.Shape();
-        var w2 = bounds.width;
-        var h2 = bounds.height;
-
-        hitArea.graphics.beginFill('#FFF').drawRect(0, 0, w2, h2);
-        hitArea.x = 0;
-        hitArea.y = 0;
-        this.collapseContainer.hitArea = hitArea;
-    };
-
+    /*
+     * Position the label for a collapsed block
+     * @param-blockscale-scale
+     * @return{void}
+     * @private
+     */
     this._positionCollapseLabel = function (blockScale) {
-        this.collapseText.x = COLLAPSETEXTX * blockScale / 2;
-        this.collapseText.y = COLLAPSETEXTY * blockScale / 2;
+        if (this.isInlineCollapsible()) {
+            this.collapseText.x = Math.floor(((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale / 2) + 0.5);
+            this.collapseText.y = Math.floor(((COLLAPSETEXTY - 8) * blockScale / 2) + 0.5);
+        } else {
+            this.collapseText.x = Math.floor(((COLLAPSETEXTX + 30) * blockScale / 2) + 0.5);
+            this.collapseText.y = Math.floor(((COLLAPSETEXTY) * blockScale / 2) + 0.5);
+        }
 
         // Ensure text is on top.
-        z = this.container.getNumChildren() - 1;
+        z = this.container.children.length - 1;
         this.container.setChildIndex(this.collapseText, z);
     };
 
-    this._positionCollapseContainer = function (blockScale) {
-        this.collapseContainer.x = this.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2);
-        this.collapseContainer.y = this.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2);
-    };
-
-    // These are the event handlers for collapsible blocks.
-    this._loadCollapsibleEventHandlers = function () {
-        var that = this;
-        var thisBlock = this.blocks.blockList.indexOf(this);
-
-        this._calculateCollapseHitArea();
-
-        this.collapseContainer.on('mouseover', function (event) {
-            document.body.style.cursor = 'pointer';
-            that.blocks.highlight(thisBlock, true);
-            that.blocks.activeBlock = thisBlock;
-            that.blocks.refreshCanvas();
-        });
-
-        var haveClick = false;
-        var moved = false;
-        var locked = false;
-        var sawMouseDownEvent = false;
-
-        this.collapseContainer.on('click', function (event) {
-            that.blocks.activeBlock = thisBlock;
-            haveClick = true;
-
-            if (locked) {
-                return;
-            }
-
-            locked = true;
-            setTimeout(function () {
-                locked = false;
-            }, 500);
-
-            hideDOMLabel();
-
-            if (!moved) {
-                that.collapseToggle();
-                // haveClick = false;
-            }
-        });
-
-        this.collapseContainer.on('mousedown', function (event) {
-            sawMouseDownEvent = true;
-            // Always show the trash when there is a block selected,
-            trashcan.show();
-
-            // Raise entire stack to the top.
-            that.blocks.raiseStackToTop(thisBlock);
-            // And the collapse button
-            that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.getNumChildren() - 1);
-            moved = false;
-            var original = {
-                x: event.stageX / that.blocks.getStageScale(),
-                y: event.stageY / that.blocks.getStageScale()
-            };
-
-            var offset = {
-                x: Math.round(that.collapseContainer.x - original.x),
-                y: Math.round(that.collapseContainer.y - original.y)
-            };
-
-            that.collapseContainer.removeAllEventListeners('mouseout');
-            that.collapseContainer.on('mouseout', function (event) {
-                that._collapseOut(event, moved, haveClick);
-                moved = false;
-                sawMouseDownEvent = false;
-            });
-
-            that.collapseContainer.removeAllEventListeners('pressup');
-            that.collapseContainer.on('pressup', function (event) {
-                // if (sawMouseDownEvent && haveClick) {
-                //     return;
-                // }
-
-                if (!sawMouseDownEvent && !moved) {
-                    // Sometimes we don't see a mousedown event, so
-                    // treat this like a click.
-                    that.collapseToggle();
-                } else {
-                    that._collapseOut(event, moved, haveClick, true);
-                }
-                moved = false;
-                sawMouseDownEvent = false;
-            });
-
-            that.collapseContainer.removeAllEventListeners('pressmove');
-            that.collapseContainer.on('pressmove', function (event) {
-                // FIXME: More voodoo
-                event.nativeEvent.preventDefault();
-                moved = true;
-
-                var oldX = that.collapseContainer.x;
-                var oldY = that.collapseContainer.y;
-
-                var dx = Math.round(event.stageX / that.blocks.getStageScale() + offset.x - oldX);
-                var dy = Math.round(event.stageY / that.blocks.getStageScale() + offset.y - oldY);
-
-
-                var finalPos = oldY + dy;
-                if (that.blocks.stage.y === 0 && finalPos < 45) {
-                    dy += 45 - finalPos;
-                }
-
-                if (that.blocks.longPressTimeout != null) {
-                    clearTimeout(that.blocks.longPressTimeout);
-                    that.blocks.longPressTimeout = null;
-                    that.blocks.clearLongPressButtons();
-                }
-
-                that.blocks.moveBlockRelative(thisBlock, dx, dy);
-
-                // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(), event.stageY / that.blocks.getStageScale())) {
-                    trashcan.startHighlightAnimation();
-                } else {
-                    trashcan.stopHighlightAnimation();
-                }
-
-                that._positionCollapseContainer(that.protoblock.scale);
-
-                // ...and move any connected blocks.
-                that.blocks.findDragGroup(thisBlock)
-                if (that.blocks.dragGroup.length > 0) {
-                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
-                        var blk = that.blocks.dragGroup[b];
-                        if (b !== 0) {
-                            that.blocks.moveBlockRelative(blk, dx, dy);
-                        }
-                    }
-                }
-
-                that.blocks.refreshCanvas();
-                sawMouseDownEvent = false;
-            });
-        });
-    };
-
-    this._collapseOut = function (event, moved, haveClick) {
-        var thisBlock = this.blocks.blockList.indexOf(this);
-        document.body.style.cursor = 'default';
-
-        // Always hide the trash when there is no block selected.
-        trashcan.hide();
-        this.blocks.unhighlight(thisBlock);
-        if (moved) {
-            // Check if block is in the trash.
-            if (trashcan.overTrashcan(event.stageX / this.blocks.getStageScale(), event.stageY / this.blocks.getStageScale())) {
-                if (trashcan.isVisible)
-                    this.blocks.sendStackToTrash(this);
-            } else {
-                // Otherwise, process move.
-                this.blocks.blockMoved(thisBlock);
-            }
-        }
-
-        if (this.blocks.activeBlock !== this) {
-            return;
-        }
-
-        this.blocks.unhighlight(null);
-        this.blocks.activeBlock = null;
-        this.blocks.refreshCanvas();
-    };
-
+    /*
+     * Determine the hit area for a block
+     * DEPRECATED
+     * @return{void}
+     * @private
+     */
     this._calculateBlockHitArea = function () {
         var hitArea = new createjs.Shape();
-        var bounds = this.container.getBounds()
-
-        if (bounds === null) {
-            console.log('block cache for ' + this.name + ' not ready... waiting.');
-
-            var __callback = function (that) {
-                that._calculateBlockHitArea();
-            };
-
-            this._createCache(__callback);
-            return;
-        }
-
-        // Since hitarea is concave, we only detect hits on top
-        // section of block. Otherwise we would not be able to grab
-        // blocks placed inside of clamps.
-        if (this.isClampBlock() || this.isArgClamp()) {
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale);
-        } else if (this.isNoHitBlock()) {
-            // No hit area
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
-        } else {
-            // Shrinking the height makes it easier to grab blocks below
-            // in the stack.
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
-        }
-
+        hitArea.graphics.beginFill('platformColor.hitAreaGraphicsBeginFill').drawRect(0, 0, this.width, this.hitHeight);
         this.container.hitArea = hitArea;
     };
 
-    // These are the event handlers for block containers.
+    /*
+     * These are the event handlers for block containers.
+     * @return{void}
+     * @private
+     */
     this._loadEventHandlers = function () {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
@@ -1273,7 +2062,12 @@ function Block(protoblock, blocks, overrideName) {
         this._calculateBlockHitArea();
 
         this.container.on('mouseover', function (event) {
-            document.body.style.cursor = 'pointer';
+            docById('contextWheelDiv').style.display = 'none';
+
+            if (!that.blocks.logo.runningLilypond) {
+                document.body.style.cursor = 'pointer';
+            }
+
             that.blocks.highlight(thisBlock, true);
             that.blocks.activeBlock = thisBlock;
             that.blocks.refreshCanvas();
@@ -1285,6 +2079,33 @@ function Block(protoblock, blocks, overrideName) {
         var getInput = window.hasMouse;
 
         this.container.on('click', function (event) {
+            // We might be able to check which button was clicked.
+            if ('nativeEvent' in event) {
+                if ('button' in event.nativeEvent && event.nativeEvent.button == 2) {
+                    that.piemenuBlockContext(thisBlock);
+                    return;
+                } else if ('ctrlKey' in event.nativeEvent && event.nativeEvent.ctrlKey) {
+                    that.piemenuBlockContext(thisBlock);
+                    return;
+                } else if ('shiftKey' in event.nativeEvent && event.nativeEvent.shiftKey) {
+                    if (that.blocks.turtles.running()) {
+                        that.blocks.logo.doStopTurtle();
+
+                        setTimeout(function () {
+                            that.blocks.logo.runLogoCommands(topBlock);
+                        }, 250);
+                    } else {
+                        that.blocks.logo.runLogoCommands(topBlock);
+                    }
+
+                    return;
+                }
+            }
+
+            if (that.blocks.getLongPressStatus()) {
+                return;
+            }
+
             that.blocks.activeBlock = thisBlock;
             haveClick = true;
 
@@ -1299,21 +2120,33 @@ function Block(protoblock, blocks, overrideName) {
 
             hideDOMLabel();
 
-            if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
+            dx = (event.stageX / that.blocks.getStageScale()) - that.container.x;
+            if (!moved && that.isCollapsible() && dx < 30 / that.blocks.getStageScale()) {
+                that.collapseToggle();
+            } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === 'media') {
                     that._doOpenMedia(thisBlock);
                 } else if (that.name === 'loadFile') {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
                     if (!that.trash) {
-                        that._changeLabel();
+                        if (that._triggerLongPress) {
+                            that._triggerLongPress = false;
+                        } else {
+                            that._changeLabel();
+                        }
                     }
                 } else {
-                    if (!that.blocks.getLongPressStatus()) {
+                    if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            that.blocks.logo.synth.resume();
+                        }
+
                         if (that.blocks.turtles.running()) {
                             that.blocks.logo.doStopTurtle();
+
                             setTimeout(function () {
                                 that.blocks.logo.runLogoCommands(topBlock);
                             }, 250);
@@ -1322,21 +2155,39 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }
+            } else if (!moved) {
+                if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
+                    var topBlock = that.blocks.findTopBlock(thisBlock);
+                    console.log('running from ' + that.blocks.blockList[topBlock].name);
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        that.blocks.logo.synth.resume();
+                    }
+
+                    if (that.blocks.turtles.running()) {
+                        that.blocks.logo.doStopTurtle();
+
+                        setTimeout(function () {
+                            that.blocks.logo.runLogoCommands(topBlock);
+                        }, 250);
+                    } else {
+                        that.blocks.logo.runLogoCommands(topBlock);
+                    }
+                }
             }
         });
 
         this.container.on('mousedown', function (event) {
-            // Track time for detecting long pause...
-            // but only for top block in stack.
-            if (that.connections[0] == null) {
-                var d = new Date();
-                that.blocks.mouseDownTime = d.getTime();
+            docById('contextWheelDiv').style.display = 'none';
 
-                that.blocks.longPressTimeout = setTimeout(function () {
-                    that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
-                    that.blocks.triggerLongPress();
-                }, LONGPRESSTIME);
-            }
+            // Track time for detecting long pause...
+            var d = new Date();
+            that.blocks.mouseDownTime = d.getTime();
+
+            that.blocks.longPressTimeout = setTimeout(function () {
+                that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                that._triggerLongPress = true;
+                that.blocks.triggerLongPress();
+            }, LONGPRESSTIME);
 
             // Always show the trash when there is a block selected,
             trashcan.show();
@@ -1346,126 +2197,101 @@ function Block(protoblock, blocks, overrideName) {
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.getNumChildren() - 1);
+                that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.children.length - 1);
             }
 
             moved = false;
-            var original = {
+            that.original = {
                 x: event.stageX / that.blocks.getStageScale(),
                 y: event.stageY / that.blocks.getStageScale()
             };
 
-            var offset = {
-                x: Math.round(that.container.x - original.x),
-                y: Math.round(that.container.y - original.y)
+            that.offset = {
+                x: Math.round(that.container.x - that.original.x),
+                y: Math.round(that.container.y - that.original.y)
             };
+        });
 
-            that.container.removeAllEventListeners('mouseout');
-            that.container.on('mouseout', function (event) {
-                document.body.style.cursor = 'default';
-                if (!that.blocks.getLongPressStatus()) {
-                    that._mouseoutCallback(event, moved, haveClick, false);
-                }
+        this.container.on('pressmove', function (event) {
+            // FIXME: More voodoo
+            event.nativeEvent.preventDefault();
 
-                moved = false;
-            });
+            // Don't allow silence block to be dragged out of a note.
+            if (that.name === 'rest2') {
+                return;
+            }
 
-            that.container.removeAllEventListeners('pressup');
-            that.container.on('pressup', function (event) {
-                if (!that.blocks.getLongPressStatus()) {
-                    that._mouseoutCallback(event, moved, haveClick, true);
-                }
+            if (window.hasMouse) {
+                moved = true;
+            } else {
+                // Make it eaiser to select text on mobile.
+                setTimeout(function () {
+                    moved = Math.abs(event.stageX / that.blocks.getStageScale() - that.original.x) + Math.abs(event.stageY / that.blocks.getStageScale() - that.original.y) > 20 && !window.hasMouse;
+                    getInput = !moved;
+                }, 200);
+            }
 
-                moved = false;
-            });
+            var oldX = that.container.x;
+            var oldY = that.container.y;
 
-            that.container.removeAllEventListeners('pressmove');
-            that.container.on('pressmove', function (event) {
-                // FIXME: More voodoo
-                event.nativeEvent.preventDefault();
+            var dx = Math.round(event.stageX / that.blocks.getStageScale() + that.offset.x - oldX);
+            var dy = Math.round(event.stageY / that.blocks.getStageScale() + that.offset.y - oldY);
 
-                // Don't allow silence block to be dragged out of a note.
-                if (that.name === 'rest2') {
-                    return;
-                }
+            var finalPos = oldY + dy;
+            if (that.blocks.stage.y === 0 && finalPos < 45) {
+                dy += 45 - finalPos;
+            }
 
-                if (window.hasMouse) {
-                    moved = true;
-                } else {
-                    // Make it eaiser to select text on mobile.
-                    setTimeout(function () {
-                        moved = Math.abs(event.stageX / that.blocks.getStageScale() - original.x) + Math.abs(event.stageY / that.blocks.getStageScale() - original.y) > 20 && !window.hasMouse;
-                        getInput = !moved;
-                    }, 200);
-                }
+            if (that.blocks.longPressTimeout != null) {
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
+            }
 
-                var oldX = that.container.x;
-                var oldY = that.container.y;
+            if (!moved && that.label != null) {
+                that.label.style.display = 'none';
+            }
 
-                var dx = Math.round(event.stageX / that.blocks.getStageScale() + offset.x - oldX);
-                var dy = Math.round(event.stageY / that.blocks.getStageScale() + offset.y - oldY);
+            that.blocks.moveBlockRelative(thisBlock, dx, dy);
 
-                var finalPos = oldY + dy;
-                if (that.blocks.stage.y === 0 && finalPos < 45) {
-                    dy += 45 - finalPos;
-                }
+            // If we are over the trash, warn the user.
+            if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(), event.stageY / that.blocks.getStageScale())) {
+                trashcan.startHighlightAnimation();
+            } else {
+                trashcan.stopHighlightAnimation();
+            }
 
-                // Add some wiggle room for longPress.
-                // if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+            if (that.isValueBlock() && that.name !== 'media') {
+                // Ensure text is on top
+                var z = that.container.children.length - 1;
+                that.container.setChildIndex(that.text, z);
+            }
 
-                if (that.blocks.longPressTimeout != null) {
-                    clearTimeout(that.blocks.longPressTimeout);
-                    that.blocks.longPressTimeout = null;
-                    that.blocks.clearLongPressButtons();
-                }
-
-                if (!moved && that.label != null) {
-                    that.label.style.display = 'none';
-                }
-
-                that.blocks.moveBlockRelative(thisBlock, dx, dy);
-
-                // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(), event.stageY / that.blocks.getStageScale())) {
-                    trashcan.startHighlightAnimation();
-                } else {
-                    trashcan.stopHighlightAnimation();
-                }
-
-                if (that.isValueBlock() && that.name !== 'media') {
-                    // Ensure text is on top
-                    var z = that.container.getNumChildren() - 1;
-                    that.container.setChildIndex(that.text, z);
-                } else if (that.collapseContainer != null) {
-                    that._positionCollapseContainer(that.protoblock.scale);
-                }
-
-                // ...and move any connected blocks.
-                that.blocks.findDragGroup(thisBlock)
-                if (that.blocks.dragGroup.length > 0) {
-                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
-                        var blk = that.blocks.dragGroup[b];
-                        if (b !== 0) {
-                            that.blocks.moveBlockRelative(blk, dx, dy);
-                        }
+            // ...and move any connected blocks.
+            that.blocks.findDragGroup(thisBlock)
+            if (that.blocks.dragGroup.length > 0) {
+                for (var b = 0; b < that.blocks.dragGroup.length; b++) {
+                    var blk = that.blocks.dragGroup[b];
+                    if (b !== 0) {
+                        that.blocks.moveBlockRelative(blk, dx, dy);
                     }
                 }
+            }
 
-                that.blocks.refreshCanvas();
-
-                // } else {
-                    // Didn't really move enough to be considered a move.
-                    // moved = false;
-                // }
-            });
+            that.blocks.refreshCanvas();
         });
 
         this.container.on('mouseout', function (event) {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
-                that.blocks.clearLongPressButtons();
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
             }
+
+            that.blocks.unhighlight(thisBlock, true);
+            that.blocks.activeBlock = null;
 
             moved = false;
         });
@@ -1474,16 +2300,33 @@ function Block(protoblock, blocks, overrideName) {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
-                that.blocks.clearLongPressButtons();
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
             }
+
+            that.blocks.unhighlight(thisBlock, true);
+            that.blocks.activeBlock = null;
 
             moved = false;
         });
     };
 
+    /*
+     * Common code for processing events
+     * @param-event- mouse
+     * @param-moved-cursor moved
+     * @param-haveClick-when clickd
+     * @param-hideDOM-hide mouse
+     * set cursor style to default
+     * @return {void}
+     * @private
+     */
     this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
-        document.body.style.cursor = 'default';
+        if (!this.blocks.logo.runningLilypond) {
+            document.body.style.cursor = 'default';
+        }
 
         // Always hide the trash when there is no block selected.
         trashcan.hide();
@@ -1491,7 +2334,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
-            this.blocks.clearLongPressButtons();
+            this.blocks.clearLongPress();
         }
 
         if (moved) {
@@ -1534,51 +2377,175 @@ function Block(protoblock, blocks, overrideName) {
         if (hideDOM) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
-            if (this.bounds != null && (event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.bounds.width || event.stageY < this.container.y || event.stageY > this.container.y + this.bounds.height)) {
-                this._labelChanged();
-                hideDOMLabel();
+            if ((event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.width || event.stageY < this.container.y || event.stageY > this.container.y + this.hitHeight)) {
+                // There are lots of special cases where we want to
+                // use piemenus. Make sure this is not one of them.
+                if (!this._usePiemenu()) {
+                    this._labelChanged(true);
+                    hideDOMLabel();
+                }
+
                 this.blocks.unhighlight(null);
                 this.blocks.refreshCanvas();
-            } else if (this.blocks.activeBlock !== thisBlock) {
-                // Are we in a different block altogether?
-                hideDOMLabel();
-                this.blocks.unhighlight(null);
-                this.blocks.refreshCanvas();
-            } else {
-                // this.blocks.unhighlight(null);
-                // this.blocks.refreshCanvas();
             }
 
             this.blocks.activeBlock = null;
         }
     };
 
+    this._usePiemenu = function () {
+        // Check on all the special cases were we want to use a pie menu.
+        this._check_meter_block = null;
+
+        // Special pie menus
+        if (PIEMENUS.indexOf(this.name) !== -1) {
+            return true;
+        }
+
+        // Numeric pie menus
+        var blk = this.blocks.blockList.indexOf(this);
+
+        if (this.blocks.octaveNumber(blk)) {
+            return true;
+        }
+
+        if (this.blocks.noteValueNumber(blk, 2)) {
+            return true;
+        }
+
+        if (this.blocks.noteValueNumber(blk, 1)) {
+            return true;
+        }
+
+        if (this.blocks.octaveModifierNumber(blk)) {
+            return true;
+        }
+
+        if (this.blocks.intervalModifierNumber(blk)) {
+            return true;
+        }
+
+        if (this._usePieNumberC3()) {
+            return true;
+        }
+
+        if (this._usePieNumberC2()) {
+            return true;
+        }
+
+        if (this._usePieNumberC1()) {
+            return true;
+        }
+
+        return false;
+    };
+
+    this._usePieNumberC1 = function () {
+        // Return true if this number block plugs into Connection 1 of
+        // a block that uses a pie menu. Add block names to the list
+        // below and the switch statement in the _changeLabel
+        // function.
+        var cblk = this.connections[0];
+
+        if (cblk === null) {
+            return false;
+        }
+
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+            return false;
+        }
+
+        var blk = this.blocks.blockList.indexOf(this);
+        if (this.blocks.blockList[cblk].connections[1] === blk) {
+            return true;
+        }
+
+        return false;
+    };
+
+    this._usePieNumberC2 = function () {
+        // Return true if this number block plugs into Connection 2 of
+        // a block that uses a pie menu. Add block names to the list
+        // below and the switch statement in the _changeLabel
+        // function.
+        var cblk = this.connections[0];
+
+        if (cblk === null) {
+            return false;
+        }
+
+        if (['setsynthvolume', 'tremolo', 'chorus', 'phaser', 'duosynth'].indexOf(this.blocks.blockList[cblk].name) === -1) {
+            return false;
+        }
+
+        var blk = this.blocks.blockList.indexOf(this);
+        if (this.blocks.blockList[cblk].connections[2] === blk) {
+            return true;
+        }
+
+        return false;
+    };
+
+    this._usePieNumberC3 = function () {
+        // Return true if this number block plugs into Connection 3 of
+        // a block that uses a pie menu. Add block names to the list
+        // below and the switch statement in the _changeLabel
+        // function.
+        var cblk = this.connections[0];
+
+        if (cblk === null) {
+            return false;
+        }
+
+        if (['chorus'].indexOf(this.blocks.blockList[cblk].name) === -1) {
+            return false;
+        }
+
+        var blk = this.blocks.blockList.indexOf(this);
+        if (this.blocks.blockList[cblk].connections[3] === blk) {
+            return true;
+        }
+
+        return false;
+    };
+
     this._ensureDecorationOnTop = function () {
         // Find the turtle decoration and move it to the top.
-        for (var child = 0; child < this.container.getNumChildren(); child++) {
+        for (var child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === 'decoration') {
                 // Drum block in collapsed state is less wide.
-                if (this.name === 'drum') {
-                    var bounds = this.container.getBounds();
-                    if (this.collapsed) {
-                        var dx = 25 * this.protoblock.scale / 2;
-                    } else {
-                        var dx = 0;
-                    }
-                    for (var turtle = 0; turtle < this.blocks.turtles.turtleList.length; turtle++) {
-                        if (this.blocks.turtles.turtleList[turtle].startBlock === this) {
-                            this.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * this.protoblock.scale / 2;
-                            break;
-                        }
+                // Deprecated
+                var dx = 0;
+                if (this.name === 'drum' && this.collapsed) {
+                    var dx = 25 * this.protoblock.scale / 2;
+                }
+
+                for (var turtle = 0; turtle < this.blocks.turtles.turtleList.length; turtle++) {
+                    if (this.blocks.turtles.turtleList[turtle].startBlock === this) {
+                        this.blocks.turtles.turtleList[turtle].decorationBitmap.x = this.width - dx - 30 * this.protoblock.scale / 2;
+                        break;
                     }
                 }
 
-                this.container.setChildIndex(this.container.children[child], this.container.getNumChildren() - 1);
+                this.container.setChildIndex(this.container.children[child], this.container.children.length - 1);
                 break;
             }
         }
+
+        this.container.setChildIndex(this.bitmap, 0);
+        this.container.setChildIndex(this.highlightBitmap, 0);
+        if (this.disconnectedBitmap !== null) {
+            this.container.setChildIndex(this.disconnectedBitmap, 0);
+        }
+
+        this.updateCache();
     };
 
+    /*
+     * Change the label in a parameter block
+     * @return{void}
+     * @private
+     */
     this._changeLabel = function () {
         var that = this;
         var x = this.container.x;
@@ -1587,7 +2554,7 @@ function Block(protoblock, blocks, overrideName) {
         var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
         var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
-        var selectorWidth = 100;
+        var selectorWidth = 150;
 
         var movedStage = false;
         if (!window.hasMouse && this.blocks.stage.y + y > 75) {
@@ -1606,92 +2573,56 @@ function Block(protoblock, blocks, overrideName) {
         var labelElem = docById('labelDiv');
 
         if (this.name === 'text') {
-            var type = 'text';
             labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
             this.label = docById('textLabel');
         } else if (this.name === 'solfege') {
-            var type = 'solfege';
-
             var obj = splitSolfege(this.value);
-            var selectednote = obj[0];
-            var selectedattr = obj[1];
 
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
 
-            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
-            for (var i = 0; i < SOLFNOTES.length; i++) {
-                if (selectednote === solfnotes_[i]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + solfnotes_[i] + '</option>';
-                } else if (selectednote === SOLFNOTES[i]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + solfnotes_[i] + '</option>';
-                } else {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '">' + solfnotes_[i] + '</option>';
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            }
+        } else if (this.name === 'customNote') {
+            if (!this.blocks.logo.customTemperamentDefined) {
+                // If custom temperament is not defined by user,
+                // then custom temperament is supposed to be equal temperament.
+                var obj = splitSolfege(this.value);
+                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+
+                if (this.piemenuOKtoLaunch()) {
+                    this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
                 }
-            }
-
-            labelHTML += '</select>';
-            if (selectedattr === '') {
-                selectedattr = '♮';
-            }
-
-            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-            for (var i = 0; i < SOLFATTRS.length; i++) {
-                if (selectedattr === SOLFATTRS[i]) {
-                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
+            } else {
+                if (this.value != null) {
+                    var selectedNote = this.value;
                 } else {
-                    labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
+                    var selectedNote = TEMPERAMENT['custom']['0'][1];
                 }
-            }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('solfegeLabel');
-            this.labelattr = docById('noteattrLabel');
+                var noteLabels = [];
+                var noteValues = [];
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        noteLabels.push(TEMPERAMENT['custom'][pitchNumber][1]);
+                        noteValues.push(TEMPERAMENT['custom'][pitchNumber][1]);
+                    }
+                }
+                this._piemenuPitches(noteLabels, noteValues, '', selectednote, '', true);
+            }
         } else if (this.name === 'eastindiansolfege') {
-            var type = 'solfege';
-
             var obj = splitSolfege(this.value);
-            var selectednote = WESTERN2EISOLFEGENAMES[obj[0]];
+            var selectednote = obj[0];
             var selectedattr = obj[1];
 
-            var eisolfnotes_ = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa'];
-
-            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
-            for (var i = 0; i < SOLFNOTES.length; i++) {
-                if (selectednote === eisolfnotes_[i]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + eisolfnotes_[i] + '</option>';
-                } else if (selectednote === WESTERN2EISOLFEGENAMES[SOLFNOTES[i]]) {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + eisolfnotes_[i] + '</option>';
-                } else {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '">' + eisolfnotes_[i] + '</option>';
-                }
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
-
-            labelHTML += '</select>';
-            if (selectedattr === '') {
-                selectedattr = '♮';
-            }
-
-            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-            for (var i = 0; i < SOLFATTRS.length; i++) {
-                if (selectedattr === SOLFATTRS[i]) {
-                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-                } else {
-                    labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('solfegeLabel');
-            this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
-            var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
-            const NOTEATTRS = ['𝄪', '♯', '♮', '♭', '𝄫'];
             if (this.value != null) {
                 var selectednote = this.value[0];
                 if (this.value.length === 1) {
@@ -1706,366 +2637,2604 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedattr = '♮'
             }
 
-            var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
-            for (var i = 0; i < NOTENOTES.length; i++) {
-                if (selectednote === NOTENOTES[i]) {
-                    labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
-                } else {
-                    labelHTML += '<option value="' + NOTENOTES[i] + '">' + NOTENOTES[i] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
             if (selectedattr === '') {
                 selectedattr = '♮';
             }
 
-            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-
-            for (var i = 0; i < NOTEATTRS.length; i++) {
-                if (selectedattr === NOTEATTRS[i]) {
-                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-                } else {
-                    labelHTML += '<option value="' + NOTEATTRS[i] + '">' + NOTEATTRS[i] + '</option>';
-                }
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote, selectedattr);
             }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('notenameLabel');
-            this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'modename') {
-            var type = 'modename';
             if (this.value != null) {
-                var selectedmode = this.value[0];
+                var selectedmode = this.value;
             } else {
-                var selectedmode = getModeName(DEFAULTMODE);
+                var selectedmode = DEFAULTMODE;
             }
 
-            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #3ea4a3; width: 150px;">'
-            for (var i = 0; i < MODENAMES.length; i++) {
-                if (MODENAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
-                } else if (selectedmode === MODENAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
-                } else if (selectedmode === MODENAMES[i][1]) {
-                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
-                } else {
-                    labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
-                }
-            }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('modenameLabel');
-            selectorWidth = 150;
+            this._piemenuModes(selectedmode);
         } else if (this.name === 'accidentalname') {
-            var type = 'accidentalname';
             if (this.value != null) {
-                var selectedaccidental = this.value[0];
+                var selectedaccidental = this.value;
             } else {
                 var selectedaccidental = DEFAULTACCIDENTAL;
             }
 
-            var labelHTML = '<select name="accidentalname" id="accidentalnameLabel" style="position: absolute;  background-color: #88e20a; width: 90px;">'
-            for (var i = 0; i < ACCIDENTALNAMES.length; i++) {
-                if (selectedaccidental === ACCIDENTALNAMES[i]) {
-                    labelHTML += '<option value="' + selectedaccidental + '" selected>' + selectedaccidental + '</option>';
-                } else {
-                    labelHTML += '<option value="' + ACCIDENTALNAMES[i] + '">' + ACCIDENTALNAMES[i] + '</option>';
-                }
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuAccidentals(ACCIDENTALLABELS, ACCIDENTALNAMES, selectedaccidental);
             }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('accidentalnameLabel');
-            selectorWidth = 150;
+            // labelElem.innerHTML = '';
+            // this.label = docById('accidentalnameLabel');
         } else if (this.name === 'intervalname') {
-            var type = 'intervalname';
             if (this.value != null) {
                 var selectedinterval = this.value;
             } else {
-                var selectedinterval = getIntervalName(DEFAULTINTERVAL);
+                var selectedinterval = DEFAULTINTERVAL;
             }
 
-            var labelHTML = '<select name="intervalname" id="intervalnameLabel" style="position: absolute;  background-color: #3ea4a3; width: 90px;">'
-            for (var i = 0; i < INTERVALNAMES.length; i++) {
-                if (INTERVALNAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + INTERVALNAMES[i][1] + '">' + INTERVALNAMES[i][1] + '</option>';
-                } else if (selectedinterval === INTERVALNAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedinterval + '" selected>' + selectedinterval + '</option>';
-                } else if (selectedinterval === INTERVALNAMES[i][1]) {
-                    labelHTML += '<option value="' + selectedinterval + '" selected>' + selectedinterval + '</option>';
-                } else {
-                    labelHTML += '<option value="' + INTERVALNAMES[i][0] + '">' + INTERVALNAMES[i][0] + '</option>';
-                }
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuIntervals(selectedinterval);
             }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('intervalnameLabel');
-            selectorWidth = 150;
         } else if (this.name === 'invertmode') {
-            var type = 'invertmode';
             if (this.value != null) {
                 var selectedinvert = this.value;
             } else {
-                var selectedinvert = getInvertMode(DEFAULTINVERT);
+                var selectedinvert = DEFAULTINVERT;
             }
 
-            var labelHTML = '<select name="invertmode" id="invertModeLabel" style="position: absolute;  background-color: #3ea4a3; width: 60px;">'
+            var invertLabels = [];
+            var invertValues = [];
+
             for (var i = 0; i < INVERTMODES.length; i++) {
-                if (INVERTMODES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + INVERTMODES[i][1] + '">' + INVERTMODES[i][1] + '</option>';
-                } else if (selectedinvert === INVERTMODES[i][0]) {
-                    labelHTML += '<option value="' + selectedinvert + '" selected>' + selectedinvert + '</option>';
-                } else if (selectedinvert === INVERTMODES[i][1]) {
-                    labelHTML += '<option value="' + selectedinvert + '" selected>' + selectedinvert + '</option>';
-                } else {
-                    labelHTML += '<option value="' + INVERTMODES[i][0] + '">' + INVERTMODES[i][0] + '</option>';
-                }
+                invertLabels.push(_(INVERTMODES[i][1]));
+                invertValues.push(INVERTMODES[i][1]);
             }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('invertModeLabel');
-            selectorWidth = 150;
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuBasic(invertLabels, invertValues, selectedinvert);
+            }
         } else if (this.name === 'drumname') {
-            var type = 'drumname';
             if (this.value != null) {
-                var selecteddrum = getDrumName(this.value);
+                var selecteddrum = this.value;
             } else {
-                var selecteddrum = getDrumName(DEFAULTDRUM);
+                var selecteddrum = DEFAULTDRUM;
             }
 
-            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            var drumLabels = [];
+            var drumValues = [];
+            var categories = [];
+            var categoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                if (DRUMNAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + DRUMNAMES[i][1] + '">' + DRUMNAMES[i][1] + '</option>';
-                } else if (selecteddrum === DRUMNAMES[i][0]) {
-                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
-                } else if (selecteddrum === DRUMNAMES[i][1]) {
-                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
-                } else {
-                    labelHTML += '<option value="' + DRUMNAMES[i][0] + '">' + DRUMNAMES[i][0] + '</option>';
+                if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) === -1) {
+                    var label = _(DRUMNAMES[i][1]);
+                    if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                        drumLabels.push(label.substr(0, 8) + '...');
+                    } else {
+                        drumLabels.push(label);
+                    }
+
+                    drumValues.push(DRUMNAMES[i][1]);
+
+                    if (categoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                        categoriesList.push(DRUMNAMES[i][4]);
+                    }
+
+                    categories.push(categoriesList.indexOf(DRUMNAMES[i][4]));
                 }
             }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('drumnameLabel');
-            selectorWidth = 150;
+            this._piemenuVoices(drumLabels, drumValues, categories, selecteddrum);
+
+        } else if (this.name === 'effectsname') {
+            if (this.value != null) {
+                var selecteddrum = this.value;
+            } else {
+                var selectedeffect = DEFAULTEFFECT;
+            }
+
+            var effectLabels = [];
+            var effectValues = [];
+            var effectcategories = [];
+            var effectcategoriesList = [];
+            for (var i = 0; i < DRUMNAMES.length; i++) {
+                if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) !== -1) {
+                    console.log("found");
+                    var label = _(DRUMNAMES[i][1]);
+                    if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                        effectLabels.push(label.substr(0, 8) + '...');
+                    } else {
+                        effectLabels.push(label);
+                    }
+
+                    effectValues.push(DRUMNAMES[i][1]);
+
+                    if (effectcategoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                        effectcategoriesList.push(DRUMNAMES[i][4]);
+                    }
+
+                    effectcategories.push(effectcategoriesList.indexOf(DRUMNAMES[i][4]));
+                }
+            }
+
+            this._piemenuVoices(effectLabels, effectValues, effectcategories, selectedeffect);
         } else if (this.name === 'filtertype') {
-            var type = 'filtertype';
             if (this.value != null) {
-                var selectedtype = getFilterTypes(this.value);
+                var selectedtype = this.value;
             } else {
-                var selectedtype = getFilterTypes(DEFAULTFILTERTYPE);
+                var selectedtype = DEFAULTFILTERTYPE;
             }
 
-            var labelHTML = '<select name="filtertype" id="filtertypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            var filterLabels = [];
+            var filterValues = [];
             for (var i = 0; i < FILTERTYPES.length; i++) {
-                if (FILTERTYPES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + FILTERTYPES[i][1] + '">' + FILTERTYPES[i][1] + '</option>';
-                } else if (selectedtype === FILTERTYPES[i][0]) {
-                    labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
-                } else if (selectedtype === FILTERTYPES[i][1]) {
-                    labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
-                } else {
-                    labelHTML += '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0] + '</option>';
-                }
+                filterLabels.push(_(FILTERTYPES[i][0]));
+                filterValues.push(FILTERTYPES[i][1]);
             }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('filtertypeLabel');
-            selectorWidth = 150;
+            this._piemenuBasic(filterLabels, filterValues, selectedtype, platformColor.piemenuBasic);
         } else if (this.name === 'oscillatortype') {
-            var type = 'oscillatortype';
             if (this.value != null) {
-                var selectedosctype = getOscillatorTypes(this.value);
+                var selectedtype = this.value;
             } else {
-                var selectedosctype = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
+                var selectedtype = DEFAULTOSCILLATORTYPE;
             }
 
-            var labelHTML = '<select name="oscillatortype" id="oscillatortypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            var oscLabels = [];
+            var oscValues = [];
             for (var i = 0; i < OSCTYPES.length; i++) {
-                if (OSCTYPES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + OSCTYPES[i][1] + '">' + OSCTYPES[i][1] + '</option>';
-                } else if (selectedosctype === OSCTYPES[i][0]) {
-                    labelHTML += '<option value="' + selectedosctype + '" selected>' + selectedosctype + '</option>';
-                } else if (selectedosctype === OSCTYPES[i][1]) {
-                    labelHTML += '<option value="' + selectedosctype + '" selected>' + selectedosctype + '</option>';
-                } else {
-                    labelHTML += '<option value="' + OSCTYPES[i][0] + '">' + OSCTYPES[i][0] + '</option>';
-                }
+                oscLabels.push(_(OSCTYPES[i][1]));
+                oscValues.push(OSCTYPES[i][1]);
             }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('oscillatortypeLabel');
-            selectorWidth = 150;
+            this._piemenuBasic(oscLabels, oscValues, selectedtype, platformColor.piemenuBasic);
         } else if (this.name === 'voicename') {
-            var type = 'voicename';
             if (this.value != null) {
-                var selectedvoice = getVoiceName(this.value);
+                var selectedvoice = this.value;
             } else {
-                var selectedvoice = getVoiceName(DEFAULTVOICE);
+                var selectedvoice = DEFAULTVOICE;
             }
 
-            var labelHTML = '<select name="voicename" id="voicenameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            console.log(this.value + ' ' + DEFAULTVOICE + ' ' + selectedvoice);
+
+            var voiceLabels = [];
+            var voiceValues = [];
+            var categories = [];
+            var categoriesList = [];
             for (var i = 0; i < VOICENAMES.length; i++) {
-                if (VOICENAMES[i][0].length === 0) {
-                    // work around some weird i18n bug
-                    labelHTML += '<option value="' + VOICENAMES[i][1] + '">' + VOICENAMES[i][1] + '</option>';
-                } else if (selectedvoice === VOICENAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedvoice + '" selected>' + selectedvoice + '</option>';
-                } else if (selectedvoice === VOICENAMES[i][1]) {
-                    labelHTML += '<option value="' + selectedvoice + '" selected>' + selectedvoice + '</option>';
-                } else {
-                    labelHTML += '<option value="' + VOICENAMES[i][0] + '">' + VOICENAMES[i][0] + '</option>';
+                // Skip custom voice in Beginner Mode.
+                if (beginnerMode && VOICENAMES[i][1] === 'custom') {
+                    continue;
                 }
+
+                var label = _(VOICENAMES[i][1]);
+                if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                    voiceLabels.push(label.substr(0, 8) + '...');
+                } else {
+                    voiceLabels.push(label);
+                }
+
+                voiceValues.push(VOICENAMES[i][1]);
+
+                if (categoriesList.indexOf(VOICENAMES[i][3]) === -1) {
+                    categoriesList.push(VOICENAMES[i][3]);
+                }
+
+                categories.push(categoriesList.indexOf(VOICENAMES[i][3]));
             }
 
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('voicenameLabel');
-            selectorWidth = 150;
+            this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
+        } else if (this.name === 'noisename') {
+            if (this.value != null) {
+                var selectednoisee = this.value;
+            } else {
+                var selectednoise = DEFAULTNOISE;
+            }
+
+            console.log(this.value + ' ' + DEFAULTNOISE + ' ' + selectednoise);
+
+            var noiseLabels = [];
+            var noiseValues = [];
+            var categories = [];
+            var categoriesList = [];
+            for (var i = 0; i < NOISENAMES.length; i++) {
+                var label = NOISENAMES[i][0];
+                if (getTextWidth(label, 'bold 48pt Sans') > 600) {
+                    noiseLabels.push(label.substr(0, 16) + '...');
+                } else {
+                    noiseLabels.push(label);
+                }
+
+                noiseValues.push(NOISENAMES[i][1]);
+
+                if (categoriesList.indexOf(NOISENAMES[i][3]) === -1) {
+                    categoriesList.push(NOISENAMES[i][3]);
+                }
+
+                categories.push(categoriesList.indexOf(NOISENAMES[i][3]));
+            }
+
+            this._piemenuVoices(noiseLabels, noiseValues, categories, selectednoise, 90);
+        } else if (this.name === 'temperamentname') {
+            if (this.value != null) {
+                var selectedTemperament = this.value;
+            } else {
+                var selectedTemperament = DEFAULTTEMPERAMENT;
+            }
+
+            var temperamentLabels = [];
+            var temperamentValues = [];
+            for (var i = 0; i < TEMPERAMENTS.length; i++) {
+                // Skip custom temperament in Beginner Mode.
+                if (beginnerMode && TEMPERAMENTS[i][1] === 'custom') {
+                    continue;
+                }
+
+                temperamentLabels.push(TEMPERAMENTS[i][0]);
+                temperamentValues.push(TEMPERAMENTS[i][1]);
+            }
+
+            this._piemenuBasic(temperamentLabels, temperamentValues, selectedTemperament, platformColor.piemenuBasic);
         } else if (this.name === 'boolean') {
-            var type = 'boolean';
             if (this.value != null) {
                 var selectedvalue = this.value;
             } else {
                 var selectedvalue = true;
             }
 
-            var BOOLSTRINGS = [[_('true'), 'true'], [_('false'), 'false']];
+            var booleanLabels = [_('true'), _('false')];
+            var booleanValues = [true, false];
 
-            var labelHTML = '<select name="booleanstring" id="booleanLabel" style="position: absolute;  background-color: #f2ec4d; width: 60px;">'
-            if (this.value) {
-                labelHTML += '<option value="' + _('true') + '" selected>' + _('true') + '</option>';
-                labelHTML += '<option value="' + _('false') + '">' + _('false') + '</option>';
-            } else {
-                labelHTML += '<option value="' + _('true') + '">' + _('true') + '</option>';
-                labelHTML += '<option value="' + _('false') + '" selected>' + _('false') + '</option>';
-            }
-
-            labelHTML += '</select>';
-            labelElem.innerHTML = labelHTML;
-            this.label = docById('booleanLabel');
+            this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
         } else {
-            var type = 'number';
-            labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
-            labelElem.classList.add('hasKeyboard');
-            this.label = docById('numberLabel');
+            // If the number block is connected to a pitch block, then
+            // use the pie menu for octaves. Other special cases as well.
+            var blk = this.blocks.blockList.indexOf(this);
+            if (this.blocks.octaveNumber(blk)) {
+                this._piemenuNumber([8, 7, 6, 5, 4, 3, 2, 1], this.value);
+            } else if (this.blocks.noteValueNumber(blk, 2)) {
+                var cblk = this.connections[0];
+                if (cblk !== null) {
+                    cblk = this.blocks.blockList[cblk].connections[0];
+                    if (cblk !== null && ['rhythm2', 'stuplet'].indexOf(this.blocks.blockList[cblk].name) !== -1) {
+                        this._piemenuNumber([2, 4, 8, 16], this.value);
+                    } else {
+                        this._piemenuNoteValue(this.value);
+                    }
+                } else {
+                    this._piemenuNoteValue(this.value);
+                }
+            } else if (this.blocks.noteValueNumber(blk, 1)) {
+                var d = this.blocks.noteValueValue(blk);
+                if (d === 1) {
+                    var values = [8, 7, 6, 5, 4, 3, 2, 1];
+                } else {
+                    var values = [];
+                    for (var i = 0; i < Math.min(d, 16); i++) {
+                        values.push(i + 1);
+                    }
+                }
+
+                var cblk = this.connections[0];
+                if (cblk !== null) {
+                    cblk = this.blocks.blockList[cblk].connections[0];
+                    if (cblk !== null && ['neighbor', 'neighbor2', 'rhythm2', 'stuplet'].indexOf(this.blocks.blockList[cblk].name) !== -1) {
+                        var values = [3, 2, 1];
+                    }
+                }
+
+                this._piemenuNumber(values, this.value);
+            } else if (this.blocks.octaveModifierNumber(blk)) {
+                this._piemenuNumber([-2, -1, 0, 1, 2], this.value);
+            } else if (this.blocks.intervalModifierNumber(blk)) {
+                var name = this.blocks.blockList[this.blocks.blockList[this.connections[0]].connections[0]].name;
+                switch(name) {
+                case 'interval':
+                case 'setscalartransposition':
+                    this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
+                    break;
+                case 'semitoneinterval':
+                case 'settransposition':
+                    this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    break;
+                }
+            } else if (this._usePieNumberC3()) {
+                switch (this.blocks.blockList[this.connections[0]].name) {
+                case 'chorus':
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+                }
+            } else if (this._usePieNumberC2()) {
+                switch (this.blocks.blockList[this.connections[0]].name) {
+                case 'duosynth':
+                    this._piemenuNumber([10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+                case 'setsynthvolume':
+                case 'tremolo':
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+                case 'chorus':
+                    this._piemenuNumber([2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10], this.value);
+                    break;
+                case 'phaser':
+                    this._piemenuNumber([1, 2, 3], this.value);
+                    break;
+                }
+            } else if (this._usePieNumberC1()) {
+                switch (this.blocks.blockList[this.connections[0]].name) {
+                case 'setpensize':
+                    this._piemenuNumber([1, 2, 3, 5, 10, 15, 25, 50, 100], this.value);
+                    break;
+                case 'setcolor':
+                case 'sethue':
+                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90], this.value, this.blocks.blockList[this.connections[0]].name);
+                    break;
+                case 'setshade':
+                case 'settranslucency':
+                case 'setgrey':
+                    this._piemenuColor([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0], this.value, this.blocks.blockList[this.connections[0]].name);
+                    break;
+                case 'duplicatenotes':
+                    this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
+                    break;
+                case 'setheading':
+                    this._piemenuNumber([0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330], this.value);
+                    break;
+                case 'rhythm2':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
+                    break;
+                case 'stuplet':
+                    this._piemenuNumber([3, 5, 7, 11], this.value);
+                    break;
+                case 'amsynth':  // harmocity
+                    this._piemenuNumber([1, 2], this.value);
+                    break;
+                case 'fmsynth':  // modulation index
+                    this._piemenuNumber([1, 5, 10, 15, 20, 25], this.value);
+                    break;
+                case 'chorus':
+                    this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5], this.value);
+                    break;
+                case 'phaser':
+                case 'tremolo':
+                    this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20], this.value);
+                    break;
+                case 'rhythmicdot2':
+                    this._piemenuNumber([1, 2, 3], this.value);
+                    break;
+                case 'register':
+                    this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
+                    break;
+                case 'scaledegree':
+                    this._piemenuScaleDegree([1, 2, 3, 4, 5, 6, 7], this.value);
+                    break;
+                case 'meter':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], this.value);
+                    break;
+                case 'pitchnumber':
+                    for (var i = 0; i < this.blocks.blockList.length; i++) {
+                        if (this.blocks.blockList[i].name == 'settemperament' && this.blocks.blockList[i].connections[0] !== null) {
+                            var index = this.blocks.blockList[i].connections[1];
+                            var temperament = this.blocks.blockList[index].value;
+                        }
+                    }
+
+                    if (temperament === undefined) {
+                        temperament = 'equal';
+                    }
+
+                    if (temperament === 'equal') {
+                        this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    } else {
+                        var pitchNumbers = [];
+                        for (var i = 0; i < TEMPERAMENT[temperament]['pitchNumber']; i++) {
+                            pitchNumbers.push(i);
+                        }
+                        this._piemenuNumber(pitchNumbers, this.value);
+                    }
+                    break;
+                case 'neighbor':
+                case 'neighbor2':
+                case 'steppitch':
+                case 'interval':
+                case 'setscalartransposition':
+                    this._piemenuNumber([-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
+                    break;
+                case 'decrescendo':
+                case 'crescendo':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 10, 15, 20], this.value);
+                    break;
+                case 'harmonic2':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], this.value);
+                    break;
+                case 'vibrato':
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], this.value);
+                    break;
+                case 'semitoneinterval':
+                case 'settransposition':
+                    this._piemenuNumber([-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    break;
+                case 'setnotevolume':
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+                case 'dis':
+                case 'duosynth':
+                    this._piemenuNumber([10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
+                    break;
+                case 'articulation':
+                    this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25], this.value);
+                    break;
+                }
+            } else {
+                labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
+                labelElem.classList.add('hasKeyboard');
+                this.label = docById('numberLabel');
+            }
         }
 
-        var focused = false;
+        var blk = this.blocks.blockList.indexOf(this);
+        if (!this._usePiemenu()) {
+            var focused = false;
 
-        var __blur = function (event) {
-            // Not sure why the change in the input is not available
-            // immediately in FireFox. We need a workaround if hardware
-            // acceleration is enabled.
+            var __blur = function (event) {
+                // Not sure why the change in the input is not available
+                // immediately in FireFox. We need a workaround if hardware
+                // acceleration is enabled.
+                if (!focused) {
+                    return;
+                }
 
-            if (!focused) {
-                return;
+                that._labelChanged(true, true);
+
+                event.preventDefault();
+
+                labelElem.classList.remove('hasKeyboard');
+
+                window.scroll(0, 0);
+                that.label.removeEventListener('keypress', __keypress);
+
+                if (movedStage) {
+                    that.blocks.stage.y = fromY;
+                    that.blocks.updateStage();
+                }
+            };
+
+
+            var __input = function (event) {
+                that._labelChanged(false);
+            };
+
+            if (this.name === 'text' || this.name === 'number') {
+                this.label.addEventListener('blur', __blur);
+                this.label.addEventListener('input', __input);
             }
 
-            that._labelChanged();
+            var __keypress = function (event) {
+                if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+                    __blur(event);
+                }
+            };
 
-            event.preventDefault();
+            this.label.addEventListener('keypress', __keypress);
 
-            labelElem.classList.remove('hasKeyboard');
+            this.label.addEventListener('change', function () {
+                that._labelChanged(true, true);
+            });
 
-            window.scroll(0, 0);
-            that.label.removeEventListener('keypress', __keypress);
+            this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
+            this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
+            this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
-            if (movedStage) {
-                that.blocks.stage.y = fromY;
-                that.blocks.updateStage();
+            this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+            this.label.style.display = '';
+            this.label.focus();
+            if (this.labelattr != null) {
+                this.labelattr.style.display = '';
+            }
+
+            // Firefox fix
+            setTimeout(function () {
+                that.label.style.display = '';
+                that.label.focus();
+                focused = true;
+            }, 100);
+        }
+    };
+
+    /*
+     * Check if pie menu is ok to launch
+     * @return{void}
+     * @public
+     */
+    this.piemenuOKtoLaunch = function () {
+        if (this._piemenuExitTime === null) {
+            return true;
+        }
+
+        var d = new Date();
+        var now = d.getTime();
+        if (now - this._piemenuExitTime > 200) {
+            return true;
+        }
+
+        console.log('Pie Menu not OK to launch');
+        return false;
+    };
+
+    this._noteValueNumber = function (c) {
+        // Is this a number block being used as a note value
+        // denominator argument?
+        var dblk = this.connections[0];
+        // Are we connected to a divide block?
+        if (this.name === 'number' && dblk !== null && this.blocks.blockList[dblk].name === 'divide') {
+            // Are we the denominator (c == 2) or numerator (c == 1)?
+            if (this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)) {
+                // Is the divide block connected to a note value block?
+                cblk = this.blocks.blockList[dblk].connections[0];
+                if (cblk !== null) {
+                    // Is it the first or second arg?
+                    switch (this.blocks.blockList[cblk].name) {
+                    case 'newnote':
+                    case 'pickup':
+                    case 'tuplet4':
+                    case 'newstaccato':
+                    case 'newslur':
+                    case 'elapsednotes2':
+                        if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case 'meter':
+                        this._check_meter_block = cblk;
+                    case 'setbpm2':
+                    case 'setmasterbpm2':
+                    case 'stuplet':
+                    case 'rhythm2':
+                    case 'newswing2':
+                    case 'vibrato':
+                    case 'neighbor':
+                    case 'neighbor2':
+                        if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return false;
+    };
+
+    this._noteValueValue = function () {
+        // Return the number block value being used as a note value
+        // denominator argument.
+        var dblk = this.connections[0];
+        // We are connected to a divide block.
+        // Is the divide block connected to a note value block?
+        cblk = this.blocks.blockList[dblk].connections[0];
+        if (cblk !== null) {
+            // Is it the first or second arg?
+            switch (this.blocks.blockList[cblk].name) {
+            case 'newnote':
+            case 'pickup':
+            case 'tuplet4':
+            case 'newstaccato':
+            case 'newslur':
+            case 'elapsednotes2':
+                if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                    cblk = this.blocks.blockList[dblk].connections[2];
+                    return this.blocks.blockList[cblk].value;
+                } else {
+                    return 1;
+                }
+                break;
+            case 'meter':
+                this._check_meter_block = cblk;
+            case 'setbpm2':
+            case 'setmasterbpm2':
+            case 'stuplet':
+            case 'rhythm2':
+            case 'newswing2':
+            case 'vibrato':
+            case 'neighbor':
+            case 'neighbor2':
+                if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                    if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                        cblk = this.blocks.blockList[dblk].connections[2];
+                        return this.blocks.blockList[cblk].value;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+                break;
+            }
+        }
+
+        return 1;
+    };
+
+    this._octaveNumber = function () {
+        // Is this a number block being used as an octave argument?
+        return (this.name === 'number' && this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency', 'scaledegree'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 && this.blocks.blockList[this.connections[0]].connections[2] === this.blocks.blockList.indexOf(this));
+    };
+
+    this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental, custom) {
+        // wheelNav pie menu for pitch selection
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        if (custom === undefined) {
+            custom = false;
+        }
+        // Some blocks have both pitch and octave, so we can modify
+        // both at once.
+        var hasOctaveWheel = (this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1);
+
+        // If we are attached to a sset key block, we want to order
+        // pitch by fifths.
+        if (this.connections[0] !== null && ['setkey', 'setkey2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1) {
+            noteLabels = ['C', 'G', 'D', 'A', 'E', 'B', 'F'];
+            noteValues = ['C', 'G', 'D', 'A', 'E', 'B', 'F'];
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // the pitch selector
+        this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
+
+        if (!custom) {
+            // the accidental selector
+            this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
+        }
+        // the octave selector
+        if (hasOctaveWheel) {
+            this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
+        }
+
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+
+        this._pitchWheel.colors = platformColor.pitchWheelcolors;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        if (!custom) {
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        } else {
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.75;
+        }
+
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 0; // 300;
+        this._pitchWheel.createWheel(noteLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        if (!custom) {
+            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
+            this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
+            this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.50;
+            this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
+            this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
+            this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
+
+            var accidentalLabels = [];
+            for (var i = 0; i < accidentals.length; i++) {
+                accidentalLabels.push(accidentals[i]);
+            }
+
+            for (var i = 0; i < 9; i++) {
+                accidentalLabels.push(null);
+                this._accidentalsWheel.colors.push(platformColor.accidentalsWheelcolorspush);
+            }
+
+            this._accidentalsWheel.animatetime = 0; // 300;
+            this._accidentalsWheel.createWheel(accidentalLabels);
+            this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
+        }
+        if (hasOctaveWheel) {
+            this._octavesWheel.colors = platformColor.octavesWheelcolors;
+            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+            this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+            var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
+            this._octavesWheel.animatetime = 0; // 300;
+            this._octavesWheel.createWheel(octaveLabels);
+        }
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        // Navigate to a the current note value.
+        var i = noteValues.indexOf(note);
+        if (i === -1) {
+            i = 4;
+        }
+
+        this._pitchWheel.navigateWheel(i);
+        if (!custom) {
+            // Navigate to a the current accidental value.
+            if (accidental === '') {
+                this._accidentalsWheel.navigateWheel(2);
+            } else {
+                switch(accidental) {
+                case DOUBLEFLAT:
+                    this._accidentalsWheel.navigateWheel(4);
+                    break;
+                case FLAT:
+                    this._accidentalsWheel.navigateWheel(3);
+                    break;
+                case NATURAL:
+                    this._accidentalsWheel.navigateWheel(2);
+                    break;
+                case SHARP:
+                    this._accidentalsWheel.navigateWheel(1);
+                    break;
+                case DOUBLESHARP:
+                    this._accidentalsWheel.navigateWheel(0);
+                    break;
+                default:
+                    this._accidentalsWheel.navigateWheel(2);
+                    break;
+                }
+            }
+        }
+
+        if (hasOctaveWheel) {
+            // Use the octave associated with this block, if available.
+            var pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+
+            // Navigate to current octave
+            this._octavesWheel.navigateWheel(8 - pitchOctave);
+        }
+
+        // Set up event handlers
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            that.value = noteValues[i];
+            if (!custom) {
+                var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+                if (attr !== '♮') {
+                    label += attr;
+                    that.value += attr;
+                }
+            }
+
+            that.text.text = label;
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            if (hasOctaveWheel) {
+                // Set the octave of the pitch block if available
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+                that.blocks.setPitchOctave(that.connections[0], octave);
             }
         };
 
-        if (this.name === 'text' || this.name === 'number') {
-            this.label.addEventListener('blur', __blur);
+        /*
+         * Preview the selected pitch using the synth
+         * @return{void}
+         * @private
+         */
+        var __pitchPreview = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            var note = noteValues[i];
+            if (!custom) {
+                var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+
+                if (label === ' ') {
+                    return;
+                } else if (attr !== '♮') {
+                    note += attr;
+                }
+            }
+
+            if (hasOctaveWheel) {
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            } else {
+                octave = 4;
+            }
+
+            // FIX ME: get key signature if available
+            // FIX ME: get moveable if available
+            var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
+            if (!custom) {
+                obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+            }
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+
+            __selectionChanged();
+        };
+
+        // Set up handlers for pitch preview.
+        for (var i = 0; i < noteValues.length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+        if (!custom) {
+            for (var i = 0; i < accidentals.length; i++) {
+                this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
+        }
+        if (hasOctaveWheel) {
+            for (var i = 0; i < 8; i++) {
+                this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
         }
 
-        var __keypress = function (event) {
-            if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
-                __blur(event);
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            if (!custom) {
+                that._accidentalsWheel.removeWheel();
+            }
+            that._exitWheel.removeWheel();
+            if (hasOctaveWheel) {
+                that._octavesWheel.removeWheel();
+            }
+        };
+    };
+
+    this._piemenuScaleDegree = function (noteValues, note) {
+        // wheelNav pie menu for scale degree pitch selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        var noteLabels = [];
+        for (var i = 0; i < noteValues.length; i++) {
+            noteLabels.push(noteValues[i].toString());
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        this._pitchWheel = new wheelnav('wheelDiv', null, 600, 600);
+        this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+
+        this._pitchWheel.colors = platformColor.pitchWheelcolors;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 0; // 300;
+        this._pitchWheel.createWheel(noteLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        this._octavesWheel.colors = platformColor.octavesWheelcolors;
+        this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+        this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+        this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+        this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+        this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+        var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
+        this._octavesWheel.animatetime = 0; // 300;
+        this._octavesWheel.createWheel(octaveLabels);
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        // Navigate to a the current note value.
+        var i = noteValues.indexOf(note);
+        if (i === -1) {
+            i = 4;
+        }
+
+        this._pitchWheel.navigateWheel(i);
+
+        // Use the octave associated with this block, if available.
+        var pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+
+        // Navigate to current octave
+        this._octavesWheel.navigateWheel(8 - pitchOctave);
+
+        // Set up event handlers
+        var that = this;
+
+        /*
+         * Change selection and set value to notevalue
+         * @return{void}
+         * @private
+         */
+        var __selectionChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            that.value = noteValues[i];
+            that.text.text = label;
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            // Set the octave of the pitch block if available
+            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            that.blocks.setPitchOctave(that.connections[0], octave);
+        };
+
+        /*
+         * Preview pitch
+         * @return{void}
+         * @private
+         */
+        var __pitchPreview = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            var note = noteValues[i];
+            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+
+            // FIX ME: get key signature if available
+            // FIX ME: get moveable if available
+
+            var noteName = scaleDegreeToPitch('C major', note);
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, 'default', null, null);
+
+            __selectionChanged();
+        };
+
+        // Set up handlers for pitch preview.
+        for (var i = 0; i < noteValues.length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        for (var i = 0; i < 8; i++) {
+            this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that._octavesWheel.removeWheel();
+        };
+    };
+
+    this._piemenuAccidentals = function (accidentalLabels, accidentalValues, accidental) {
+        // wheelNav pie menu for accidental selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // the accidental selector
+        this._accidentalWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._accidentalWheel.raphael);
+
+        var labels = [];
+        for (var i = 0; i < accidentalLabels.length; i++) {
+            var obj = accidentalLabels[i].split(' ');
+            labels.push(last(obj));
+        }
+
+        labels.push(null);
+
+        wheelnav.cssMode = true;
+
+        this._accidentalWheel.keynavigateEnabled = false;
+
+        this._accidentalWheel.colors = platformColor.accidentalsWheelcolors;
+        this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
+        this._accidentalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
+        this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
+        this._accidentalWheel.titleRotateAngle = 0;
+        this._accidentalWheel.animatetime = 0; // 300;
+        this._accidentalWheel.createWheel(labels);
+        this._accidentalWheel.setTooltips(accidentalLabels)
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._accidentalWheel.navItems[that._accidentalWheel.selectedNavItemIndex].title;
+            var i = labels.indexOf(label);
+            that.value = accidentalValues[i];
+            that.text.text = accidentalLabels[i];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        /*
+         * Exit menu
+         * @return{void}
+         * @private
+         */
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._accidentalWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        // Navigate to a the current accidental value.
+        var i = accidentalValues.indexOf(accidental);
+        if (i === -1) {
+            i = 2;
+        }
+
+        this._accidentalWheel.navigateWheel(i);
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < accidentalLabels.length; i++) {
+            this._accidentalWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+                __exitMenu();
+        };
+    };
+
+    this._piemenuNoteValue = function (noteValue) {
+        // input form and  wheelNav pie menu for note value selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // We want powers of two on the bottom, nearest the input box
+        // as it is most common.
+        const WHEELVALUES = [3, 2, 7, 5];
+        var subWheelValues = {
+            2: [1, 2, 4, 8, 16, 32],
+            3: [1, 3, 6, 9, 12, 27],
+            5: [1, 5, 10, 15, 20, 25],
+            7: [1, 7, 14, 21, 28, 35],
+        };
+
+        var cblk = this.connections[0];
+        if (cblk !== null) {
+            cblk = this.blocks.blockList[cblk].connections[0];
+            if (cblk !== null && ['neighbor', 'neighbor2'].indexOf(this.blocks.blockList[cblk].name) !== -1) {
+                var subWheelValues = {
+                    2: [8, 16, 32, 64],
+                    3: [9, 12, 27, 54],
+                    5: [10, 15, 20, 25],
+                    7: [14, 21, 28, 35],
+                };
+            }
+        }
+
+        // the noteValue selector
+        this._noteValueWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._noteValueWheel.raphael);
+        // submenu wheel
+        this._tabsWheel = new wheelnav('_tabsWheel', this._noteValueWheel.raphael);
+
+        var noteValueLabels = [];
+        for (var i = 0; i < WHEELVALUES.length; i++) {
+            noteValueLabels.push(WHEELVALUES[i].toString());
+        }
+
+        wheelnav.cssMode = true;
+
+        this._noteValueWheel.keynavigateEnabled = false;
+
+        this._noteValueWheel.colors = platformColor.noteValueWheelcolors;
+        this._noteValueWheel.slicePathFunction = slicePath().DonutSlice;
+        this._noteValueWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._noteValueWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._noteValueWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._noteValueWheel.sliceSelectedPathCustom = this._noteValueWheel.slicePathCustom;
+        this._noteValueWheel.sliceInitPathCustom = this._noteValueWheel.slicePathCustom;
+        this._noteValueWheel.animatetime = 0; // 300;
+        this._noteValueWheel.clickModeRotate = false;
+        this._noteValueWheel.createWheel(noteValueLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var tabsLabels = [];
+        for (var i = 0; i < WHEELVALUES.length; i++) {
+            for (var j = 0; j < subWheelValues[WHEELVALUES[i]].length; j++) {
+                tabsLabels.push(subWheelValues[WHEELVALUES[i]][j].toString());
+            }
+        }
+
+        this._tabsWheel.colors = platformColor.tabsWheelcolors;
+        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
+        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
+        this._tabsWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.clickModeRotate = false;
+        this._tabsWheel.navAngle = -180 / WHEELVALUES.length + 180 / (WHEELVALUES.length * subWheelValues[WHEELVALUES[0]].length);
+        this._tabsWheel.createWheel(tabsLabels);
+
+        var that = this;
+
+        /*
+         * set value to number of text
+         * @return{void}
+         * @private
+         */
+        var __selectionChanged = function () {
+            that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
+            that.value = Number(that.text.text);
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        /*
+         * set pie menu's exit time to current time
+         * @return{void}
+         * @public
+         */
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._noteValueWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that.label.style.display = 'none';
+            if (that._check_meter_block !== null) {
+                that.blocks.meter_block_changed(that._check_meter_block);
             }
         };
 
-        this.label.addEventListener('keypress', __keypress);
+        var labelElem = docById('labelDiv');
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + noteValue + '" />';
+        labelElem.classList.add('hasKeyboard');
+        this.label = docById('numberLabel');
+
+        // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged();
+            that._labelChanged(true);
         });
 
-        if (this.labelattr != null) {
-            this.labelattr.addEventListener('change', function () {
-                that._labelChanged();
-            });
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+
+        var selectorWidth = 150;
+        var left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft);
+        var top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop);
+        this.label.style.left = left + 'px';
+        this.label.style.top = top + 'px';
+
+        docById('wheelDiv').style.left = Math.min(Math.max((left - (300 - selectorWidth) / 2), 0), this.blocks.turtles._canvas.width - 300)  + 'px';
+        if (top - 300 < 0) {
+            docById('wheelDiv').style.top = (top + 40) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (top - 300) + 'px';
         }
 
-        this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
-        this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
+        this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
 
-        // There may be a second select used for # and b.
-        if (this.labelattr != null) {
-            this.label.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 50) * this.blocks.getStageScale() + canvasLeft) + 'px';
-            this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
-            this.labelattr.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        var __showHide = function () {
+            var i = that._noteValueWheel.selectedNavItemIndex;
+            for (var k = 0; k < WHEELVALUES.length; k++) {
+                for (var j = 0; j < subWheelValues[WHEELVALUES[0]].length; j++) {
+                    var n = k * subWheelValues[WHEELVALUES[0]].length;
+                    if (that._noteValueWheel.selectedNavItemIndex === k) {
+                        that._tabsWheel.navItems[n + j].navItem.show();
+                    } else {
+                        that._tabsWheel.navItems[n + j].navItem.hide();
+                    }
+                }
+            }
+        };
+
+        for (var i = 0; i < noteValueLabels.length; i++) {
+            this._noteValueWheel.navItems[i].navigateFunction = __showHide;
+        }
+
+        // Navigate to a the current noteValue value.
+        // Special case 1 to use power of 2.
+        if (noteValue === 1) {
+            this._noteValueWheel.navigateWheel(1);
+            this._tabsWheel.navigateWheel(0);
         } else {
-            this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            for (var i = 0; i < WHEELVALUES.length; i++) {
+                for (var j = 0; j < subWheelValues[WHEELVALUES[i]].length; j++) {
+                    if (subWheelValues[WHEELVALUES[i]][j] === noteValue) {
+                        this._noteValueWheel.navigateWheel(i);
+                        this._tabsWheel.navigateWheel(i * subWheelValues[WHEELVALUES[i]].length + j);
+                        break;
+                    }
+                }
+
+                if (j < subWheelValues[WHEELVALUES[i]].length) {
+                    break;
+                }
+            }
+
+            if (i === WHEELVALUES.length) {
+                this._noteValueWheel.navigateWheel(1);
+                this._tabsWheel.navigateWheel(2);
+            }
         }
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
         this.label.focus();
-        if (this.labelattr != null) {
-            this.labelattr.style.display = '';
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < tabsLabels.length; i++) {
+            this._tabsWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
         }
 
-        // Firefox fix
-        setTimeout(function () {
-            that.label.style.display = '';
-            that.label.focus();
-            focused = true;
-            if (that.labelattr != null) {
-                that.labelattr.style.display = '';
-            }
-        }, 100);
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            __exitMenu();
+        };
     };
 
-    this._labelChanged = function () {
-        // Update the block values as they change in the DOM label.
-        if (this == null || this.label == null) {
-            this._label_lock = false;
+    this._piemenuNumber = function (wheelValues, selectedValue) {
+        // input form and  wheelNav pie menu for number selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
             return;
         }
 
-        this._label_lock = true;
+        docById('wheelDiv').style.display = '';
 
-        this.label.style.display = 'none';
-        if (this.labelattr != null) {
-            this.labelattr.style.display = 'none';
+        // the number selector
+        this._numberWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._numberWheel.raphael);
+
+        var wheelLabels = [];
+        for (var i = 0; i < wheelValues.length; i++) {
+            wheelLabels.push(wheelValues[i].toString());
         }
+
+        // spacer
+        wheelLabels.push(null);
+
+        wheelnav.cssMode = true;
+
+        this._numberWheel.keynavigateEnabled = false;
+
+        this._numberWheel.colors = platformColor.numberWheelcolors;
+        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
+        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        if (wheelValues.length > 16) {
+            this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        } else if (wheelValues.length > 10) {
+            this._numberWheel.slicePathCustom.minRadiusPercent = 0.5;
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        } else {
+            this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        }
+
+        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
+        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
+        // this._numberWheel.titleRotateAngle = 0;
+        this._numberWheel.animatetime = 0; // 300;
+        this._numberWheel.createWheel(wheelLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
+            that.text.text = wheelLabels[that._numberWheel.selectedNavItemIndex];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._numberWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that.label.style.display = 'none';
+
+            if (that._check_meter_block !== null) {
+                that.blocks.meter_block_changed(that._check_meter_block);
+            }
+        };
+
+        var labelElem = docById('labelDiv');
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + selectedValue + '" />';
+        labelElem.classList.add('hasKeyboard');
+        this.label = docById('numberLabel');
+
+        // this.label.addEventListener('keypress', __keypress);
+
+        this.label.addEventListener('change', function () {
+            that._labelChanged(true);
+        });
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+
+        var selectorWidth = 150;
+        var left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft);
+        var top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop);
+        this.label.style.left = left + 'px';
+        this.label.style.top = top + 'px';
+
+        docById('wheelDiv').style.left = Math.min(Math.max((left - (300 - selectorWidth) / 2), 0), this.blocks.turtles._canvas.width - 300)  + 'px';
+        if (top - 300 < 0) {
+            docById('wheelDiv').style.top = (top + 40) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (top - 300) + 'px';
+        }
+
+        this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+
+        // Navigate to a the current number value.
+        var i = wheelValues.indexOf(selectedValue);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._numberWheel.navigateWheel(i);
+
+        this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        this.label.style.display = '';
+        this.label.focus();
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < wheelLabels.length; i++) {
+            this._numberWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            __exitMenu();
+        };
+    };
+
+    this._piemenuColor = function (wheelValues, selectedValue, mode) {
+        // input form and  wheelNav pie menu for setcolor selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // the number selector
+        this._numberWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._numberWheel.raphael);
+
+        var wheelLabels = [];
+        for (var i = 0; i < wheelValues.length; i++) {
+            wheelLabels.push(wheelValues[i].toString());
+        }
+
+        wheelnav.cssMode = true;
+
+        this._numberWheel.keynavigateEnabled = false;
+
+        this._numberWheel.colors = [];
+        if (mode === 'setcolor') {
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.colors.push(COLORS40[Math.floor(wheelValues[i] / 2.5)][2]);
+            }
+        } else if (mode === 'sethue') {
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.colors.push(getMunsellColor(wheelValues[i], 50, 50));
+            }
+        } else {
+            if (mode === 'setshade') {
+                for (var i = 0; i < wheelValues.length; i++) {
+                    this._numberWheel.colors.push(getMunsellColor(0, wheelValues[i], 0));
+                }
+            } else if (mode === 'settranslucency') {
+                for (var i = 0; i < wheelValues.length; i++) {
+                    this._numberWheel.colors.push(getMunsellColor(35, 70, 100 - wheelValues[i]));
+                }
+            } else {
+                for (var i = 0; i < wheelValues.length; i++) {
+                    this._numberWheel.colors.push(getMunsellColor(60, 60, wheelValues[i]));
+                }
+            }
+
+            for (var i = 0; i < wheelValues.length; i++) {
+                wheelLabels.push(null);
+            }
+        }
+
+        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
+        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
+        this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
+
+        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
+        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
+        // this._numberWheel.titleRotateAngle = 0;
+        this._numberWheel.animatetime = 0; // 300;
+        this._numberWheel.createWheel(wheelLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
+            that.text.text = wheelLabels[that._numberWheel.selectedNavItemIndex];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._numberWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that.label.style.display = 'none';
+        };
+
+        var labelElem = docById('labelDiv');
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + selectedValue + '" />';
+        labelElem.classList.add('hasKeyboard');
+        this.label = docById('numberLabel');
+
+        // this.label.addEventListener('keypress', __keypress);
+
+        this.label.addEventListener('change', function () {
+            that._labelChanged(true);
+        });
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+
+        var selectorWidth = 150;
+        var left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft);
+        var top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop);
+        this.label.style.left = left + 'px';
+        this.label.style.top = top + 'px';
+
+        docById('wheelDiv').style.left = Math.min(Math.max((left - (300 - selectorWidth) / 2), 0), this.blocks.turtles._canvas.width - 300)  + 'px';
+        if (top - 300 < 0) {
+            docById('wheelDiv').style.top = (top + 40) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (top - 300) + 'px';
+        }
+
+        this.label.style.width = Math.round(selectorWidth * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+
+        // Navigate to a the current number value.
+        var i = wheelValues.indexOf(selectedValue);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._numberWheel.navigateWheel(i);
+
+        this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        this.label.style.display = '';
+        this.label.focus();
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < wheelLabels.length; i++) {
+            this._numberWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            __exitMenu();
+        };
+    };
+
+    this._piemenuBasic = function (menuLabels, menuValues, selectedValue, colors) {
+        // basic wheelNav pie menu
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        if (colors === undefined) {
+            colors = platformColor.piemenuBasicundefined;
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // the selectedValueh selector
+        this._basicWheel = new wheelnav('wheelDiv', null, 800, 800);
+
+        var labels = [];
+        for (var i = 0; i < menuLabels.length; i++) {
+            labels.push(menuLabels[i]);
+        }
+
+        wheelnav.cssMode = true;
+
+        this._basicWheel.keynavigateEnabled = false;
+
+        this._basicWheel.colors = colors;
+        this._basicWheel.slicePathFunction = slicePath().DonutSlice;
+        this._basicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._basicWheel.slicePathCustom.minRadiusPercent = 0;
+        this._basicWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        this._basicWheel.sliceSelectedPathCustom = this._basicWheel.slicePathCustom;
+        this._basicWheel.sliceInitPathCustom = this._basicWheel.slicePathCustom;
+        this._basicWheel.titleRotateAngle = 0;
+        this._basicWheel.animatetime = 0; // 300;
+        this._basicWheel.createWheel(labels);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex].title;
+            var i = labels.indexOf(label);
+            that.value = menuValues[i];
+            that.text.text = menuLabels[i];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._basicWheel.removeWheel();
+        };
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        // Navigate to a the current selectedValue value.
+        var i = menuValues.indexOf(selectedValue);
+        if (i === -1) {
+            i = 1;
+        }
+
+        this._basicWheel.navigateWheel(i);
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < menuLabels.length; i++) {
+            this._basicWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+    };
+
+    this._piemenuBoolean = function (booleanLabels, booleanValues, boolean) {
+        // wheelNav pie menu for boolean selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // the booleanh selector
+        this._booleanWheel = new wheelnav('wheelDiv', null, 600, 600);
+
+        var labels = [];
+        for (var i = 0; i < booleanLabels.length; i++) {
+            labels.push(booleanLabels[i])
+        }
+
+        wheelnav.cssMode = true;
+
+        this._booleanWheel.keynavigateEnabled = false;
+
+        this._booleanWheel.colors = platformColor.booleanWheelcolors;
+        this._booleanWheel.slicePathFunction = slicePath().DonutSlice;
+        this._booleanWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._booleanWheel.slicePathCustom.minRadiusPercent = 0;
+        this._booleanWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._booleanWheel.sliceSelectedPathCustom = this._booleanWheel.slicePathCustom;
+        this._booleanWheel.sliceInitPathCustom = this._booleanWheel.slicePathCustom;
+        // this._booleanWheel.titleRotateAngle = 0;
+        this._booleanWheel.animatetime = 0; // 300;
+        this._booleanWheel.createWheel(labels);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._booleanWheel.navItems[that._booleanWheel.selectedNavItemIndex].title;
+            var i = labels.indexOf(label);
+            that.value = booleanValues[i];
+            that.text.text = booleanLabels[i];
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._booleanWheel.removeWheel();
+        };
+
+        // Position the widget over the note block.
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        // Navigate to a the current boolean value.
+        var i = booleanValues.indexOf(boolean);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._booleanWheel.navigateWheel(i);
+
+        // Hide the widget when the selection is made.
+        this._booleanWheel.navItems[0].navigateFunction = function () {
+            __selectionChanged();
+            __exitMenu();
+        };
+
+        this._booleanWheel.navItems[1].navigateFunction = function () {
+            __selectionChanged();
+            __exitMenu();
+        };
+    };
+
+    this._piemenuVoices = function (voiceLabels, voiceValues, categories, voice, rotate) {
+        // wheelNav pie menu for voice selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        const COLORS = platformColor.piemenuVoicesColors;
+        var colors = [];
+
+        for (var i = 0; i < voiceLabels.length; i++) {
+            colors.push(COLORS[categories[i] % COLORS.length]);
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // the voice selector
+        if (localStorage.kanaPreference === 'kana') {
+            this._voiceWheel = new wheelnav('wheelDiv', null, 1200, 1200);
+        } else {
+            this._voiceWheel = new wheelnav('wheelDiv', null, 800, 800);
+        }
+
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._voiceWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._voiceWheel.keynavigateEnabled = false;
+
+        this._voiceWheel.colors = colors;
+        this._voiceWheel.slicePathFunction = slicePath().DonutSlice;
+        this._voiceWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._voiceWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._voiceWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._voiceWheel.sliceSelectedPathCustom = this._voiceWheel.slicePathCustom;
+        this._voiceWheel.sliceInitPathCustom = this._voiceWheel.slicePathCustom;
+        if (rotate === undefined) {
+            this._voiceWheel.titleRotateAngle = 0;
+        } else {
+            this._voiceWheel.titleRotateAngle = rotate;
+        }
+
+        this._voiceWheel.animatetime = 0; // 300;
+        this._voiceWheel.createWheel(voiceLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
+            var i = voiceLabels.indexOf(label);
+            that.value = voiceValues[i];
+            that.text.text = label;
+
+            if (getDrumName(that.value) === null) {
+                that.blocks.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
+            } else {
+                that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+            }
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+        };
+
+        /*
+         * Preview voice
+         * @return{void}
+         * @private
+         */
+        var __voicePreview = function () {
+            var label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
+            var i = voiceLabels.indexOf(label);
+            var voice = voiceValues[i];
+            var timeout = 0;
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(voice) === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(voice);
+                if (voice === 'default') {
+                    that.blocks.logo.synth.createDefaultSynth(0);
+                }
+
+                that.blocks.logo.synth.loadSynth(0, voice);
+                // give the synth time to load
+                var timeout = 500;
+            }
+
+            setTimeout(function () {
+                that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+                that.blocks.logo.setSynthVolume(0, voice, DEFAULTVOLUME);
+                that.blocks.logo.synth.trigger(0, 'G4', 1 / 4, voice, null, null, false);
+                that.blocks.logo.synth.start();
+
+            }, timeout);
+
+            __selectionChanged();
+        };
+
+        // position widget
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '400px';
+        docById('wheelDiv').style.width = '400px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 400, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 450, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        // navigate to a specific starting point
+        var i = voiceValues.indexOf(voice);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._voiceWheel.navigateWheel(i);
+
+        // Set up handlers for voice preview.
+        for (var i = 0; i < voiceValues.length; i++) {
+            this._voiceWheel.navItems[i].navigateFunction = __voicePreview;
+        }
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+        };
+    };
+
+    this._piemenuIntervals = function (selectedInterval) {
+        // pie menu for interval selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        // Use advanced constructor for more wheelnav on same div
+        var language = localStorage.languagePreference;
+        if (language === 'ja') {
+            this._intervalNameWheel = new wheelnav('wheelDiv', null, 1500, 1500);
+        } else {
+            this._intervalNameWheel = new wheelnav('wheelDiv', null, 800, 800);
+        }
+
+        this._intervalWheel = new wheelnav('this._intervalWheel', this._intervalNameWheel.raphael);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._intervalNameWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._intervalNameWheel.keynavigateEnabled = false;
+
+        //Customize slicePaths for proper size
+        this._intervalNameWheel.colors = platformColor.intervalNameWheelcolors;
+        this._intervalNameWheel.slicePathFunction = slicePath().DonutSlice;
+        this._intervalNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._intervalNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._intervalNameWheel.sliceSelectedPathCustom = this._intervalNameWheel.slicePathCustom;
+        this._intervalNameWheel.sliceInitPathCustom = this._intervalNameWheel.slicePathCustom;
+        this._intervalNameWheel.titleRotateAngle = 0;
+        this._intervalNameWheel.clickModeRotate = false;
+        // this._intervalNameWheel.clickModeRotate = false;
+        var labels = [];
+        for (var i = 0; i < INTERVALS.length; i++) {
+            labels.push(_(INTERVALS[i][1]));
+        }
+
+        this._intervalNameWheel.animatetime = 0; // 300;
+        this._intervalNameWheel.createWheel(labels);
+
+        this._intervalWheel.colors = platformColor.intervalWheelcolors;
+        this._intervalWheel.slicePathFunction = slicePath().DonutSlice;
+        this._intervalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._intervalWheel.slicePathCustom.minRadiusPercent = 0.8;
+        this._intervalWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._intervalWheel.sliceSelectedPathCustom = this._intervalWheel.slicePathCustom;
+        this._intervalWheel.sliceInitPathCustom = this._intervalWheel.slicePathCustom;
+
+        //Disable rotation, set navAngle and create the menus
+        this._intervalWheel.clickModeRotate = false;
+        // Align each set of numbers with its corresponding interval
+        this._intervalWheel.navAngle = -(180 / labels.length) + (180 / (8 * labels.length));
+        this._intervalWheel.animatetime = 0; // 300;
+
+        var numbers = [];
+        for (var i = 0; i < INTERVALS.length; i++) {
+            for (var j = 1; j < 9; j++) {
+                numbers.push(j.toString());
+            }
+        }
+
+        this._intervalWheel.createWheel(numbers);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        // position widget
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '400px';
+        docById('wheelDiv').style.width = '400px';
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 400, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 450, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        // Add function to each main menu for show/hide sub menus
+        // FIXME: Add all tabs to each interval
+        var __setupAction = function (i, activeTabs) {
+            that._intervalNameWheel.navItems[i].navigateFunction = function () {
+                for (var l = 0; l < labels.length; l++) {
+                    for (var j = 0; j < 8; j++) {
+                        if (l !== i) {
+                            that._intervalWheel.navItems[l * 8 + j].navItem.hide();
+                        } else if (activeTabs.indexOf(j + 1) === -1) {
+                            that._intervalWheel.navItems[l * 8 + j].navItem.hide();
+                        } else {
+                            that._intervalWheel.navItems[l * 8 + j].navItem.show();
+                        }
+                    }
+                }
+            };
+        };
+
+        // Set up action for interval name so number tabs will
+        // initialize on load.
+        for (var i = 0; i < INTERVALS.length; i++) {
+            __setupAction(i, INTERVALS[i][2]);
+        }
+
+        // navigate to a specific starting point
+        var obj = selectedInterval.split(' ');
+        for (var i = 0; i < INTERVALS.length; i++) {
+            if (obj[0] === INTERVALS[i][1]) {
+                break;
+            }
+        }
+
+        if (i === INTERVALS.length) {
+            i = 0;
+        }
+
+        this._intervalNameWheel.navigateWheel(i);
+
+        var j = Number(obj[1]);
+        if (INTERVALS[i][2].indexOf(j) !== -1) {
+            this._intervalWheel.navigateWheel(j - 1);
+        } else {
+            this._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
+        }
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+        };
+
+        var __selectionChanged = function () {
+            var label = that._intervalNameWheel.navItems[that._intervalNameWheel.selectedNavItemIndex].title;
+            var number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
+
+            that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + ' ' + number;
+            if (label === 'perfect 1') {
+                that.text.text = _('unison');
+            } else {
+                that.text.text = label + ' ' + number;
+            }
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+            var obj = getNote('C', 4, INTERVALVALUES[that.value][0], 'C major', false, null, null);
+            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, 'default', null, null);
+        };
+
+        // Set up handlers for preview.
+        for (var i = 0; i < 8 * labels.length; i++) {
+            this._intervalWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+
+        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
+    };
+
+    this._piemenuModes = function (selectedMode) {
+        // pie menu for mode selection
+
+        if (this.blocks.stageClick) {
+            console.log('stageClick: aborting piemenu display');
+            return;
+        }
+
+        // Look for a key block
+        var key = 'C';
+        var modeGroup = '7';  // default mode group
+        var octave = false;
+
+        var c = this.connections[0];
+        if (c !== null) {
+            if (this.blocks.blockList[c].name === 'setkey2') {
+                var c1 = this.blocks.blockList[c].connections[1];
+                if (c1 !== null) {
+                    if (this.blocks.blockList[c1].name === 'notename') {
+                        var key = this.blocks.blockList[c1].value;
+                    }
+                }
+            }
+        }
+
+        docById('wheelDiv').style.display = '';
+
+        //Use advanced constructor for more wheelnav on same div
+        this._modeWheel = new wheelnav('wheelDiv', null, 1200, 1200);
+        this._modeGroupWheel = new wheelnav('_modeGroupWheel', this._modeWheel.raphael);
+        this._modeNameWheel = null;  // We build this wheel based on the group selection.
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._modeWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._modeWheel.colors = platformColor.modeWheelcolors;
+        this._modeWheel.slicePathFunction = slicePath().DonutSlice;
+        this._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._modeWheel.slicePathCustom.minRadiusPercent = 0.85;
+        this._modeWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._modeWheel.sliceSelectedPathCustom = this._modeWheel.slicePathCustom;
+        this._modeWheel.sliceInitPathCustom = this._modeWheel.slicePathCustom;
+
+        // Disable rotation, set navAngle and create the menus
+        this._modeWheel.clickModeRotate = false;
+        this._modeWheel.navAngle = -90;
+        // this._modeWheel.selectedNavItemIndex = 2;
+        this._modeWheel.animatetime = 0; // 300;
+        this._modeWheel.createWheel(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
+
+        this._modeGroupWheel.colors = platformColor.modeGroupWheelcolors;
+        this._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
+        this._modeGroupWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._modeGroupWheel.slicePathCustom.minRadiusPercent = 0.15;
+        this._modeGroupWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this._modeGroupWheel.sliceSelectedPathCustom = this._modeGroupWheel.slicePathCustom;
+        this._modeGroupWheel.sliceInitPathCustom = this._modeGroupWheel.slicePathCustom;
+
+        // Disable rotation, set navAngle and create the menus
+        // this._modeGroupWheel.clickModeRotate = false;
+        this._modeGroupWheel.navAngle = -90;
+        // this._modeGroupWheel.selectedNavItemIndex = 2;
+        this._modeGroupWheel.animatetime = 0; // 300;
+
+        var xlabels = [];
+        for (modegroup in MODE_PIE_MENUS) {
+            xlabels.push(modegroup);
+        }
+
+        this._modeGroupWheel.createWheel(xlabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.15;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', '▶']); // imgsrc:header-icons/play-button.svg']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var title = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
+            if (title === ' ') {
+                that._modeNameWheel.navigateWheel((that._modeNameWheel.selectedNavItemIndex + 1) % that._modeNameWheel.navItems.length);
+            } else {
+                that.text.text = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
+
+                if (that.text.text === _('major') + ' / ' + _('ionian')) {
+                    that.value = 'major';
+                } else if (that.text.text === _('minor') + ' / ' + _('aeolian')) {
+                    that.value = 'aeolian';
+                } else {
+                    for (var i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
+                        var modename = MODE_PIE_MENUS[modeGroup][i];
+
+                        if (_(modename) === that.text.text) {
+                            that.value = modename;
+                            break;
+                        }
+                    }
+                }
+
+                // Make sure text is on top.
+                var z = that.container.children.length - 1;
+                that.container.setChildIndex(that.text, z);
+                that.updateCache();
+            }
+        };
+
+        // Add function to each main menu for show/hide sub menus
+        var __setupAction = function (i, activeTabs) {
+            that._modeNameWheel.navItems[i].navigateFunction = function () {
+                for (var j = 0; j < 12; j++) {
+                    if (activeTabs.indexOf(j) === -1) {
+                        that._modeWheel.navItems[j].navItem.hide();
+                    } else {
+                        that._modeWheel.navItems[j].navItem.show();
+                    }
+                }
+
+                __selectionChanged();
+            };
+        };
+
+        // Build a pie menu of modes based on the current mode group.
+        var __buildModeNameWheel = function (grp) {
+            var newWheel = false;
+            if (that._modeNameWheel === null) {
+                that._modeNameWheel = new wheelnav('_modeNameWheel', that._modeWheel.raphael);
+                newWheel = true;
+            }
+
+            that._modeNameWheel.keynavigateEnabled = false;
+
+            // Customize slicePaths
+            var colors = [];
+            for (var i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+                var modename = MODE_PIE_MENUS[grp][i];
+                if (modename === ' ') {
+                    colors.push(platformColor.modePieMenusIfColorPush);
+                } else {
+                    colors.push(modePieMenusElseColorPush);
+                }
+            }
+
+            that._modeNameWheel.colors = colors;
+            that._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
+            that._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            that._modeNameWheel.slicePathCustom.minRadiusPercent = 0.3; //0.15;
+            that._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.85;
+            that._modeNameWheel.sliceSelectedPathCustom = that._modeNameWheel.slicePathCustom;
+            that._modeNameWheel.sliceInitPathCustom = that._modeNameWheel.slicePathCustom;
+            that._modeNameWheel.titleRotateAngle = 0;
+            // that._modeNameWheel.clickModeRotate = false;
+            that._modeNameWheel.navAngle = -90;
+            var labels = new Array();
+            for (var i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+                var modename = MODE_PIE_MENUS[grp][i];
+                switch (modename) {
+                case 'ionian':
+                case 'major':
+                    labels.push(_('major') + ' / ' + _('ionian'));
+                    break;
+                case 'aeolian':
+                case 'minor':
+                    labels.push(_('minor') + ' / ' + _('aeolian'));
+                    break;
+                default:
+                    if (modename === ' ') {
+                        labels.push(' ');
+                    } else {
+                        labels.push(_(modename));
+                    }
+                    break;
+                }
+            }
+
+            that._modeNameWheel.animatetime = 0; // 300;
+            if (newWheel) {
+                that._modeNameWheel.createWheel(labels);
+            } else {
+                for (var i = 0; i < that._modeNameWheel.navItems.length; i++) {
+                    // Maybe there is a method that does this.
+                    that._modeNameWheel.navItems[i].title = labels[i];
+                    that._modeNameWheel.navItems[i].basicNavTitleMax.title = labels[i];
+                    that._modeNameWheel.navItems[i].basicNavTitleMin.title = labels[i];
+                    that._modeNameWheel.navItems[i].hoverNavTitleMax.title = labels[i];
+                    that._modeNameWheel.navItems[i].hoverNavTitleMin.title = labels[i];
+                    that._modeNameWheel.navItems[i].selectedNavTitleMax.title = labels[i];
+                    that._modeNameWheel.navItems[i].selectedNavTitleMin.title = labels[i];
+                    that._modeNameWheel.navItems[i].initNavTitle.title = labels[i];
+                    that._modeNameWheel.navItems[i].fillAttr = colors[i];
+                    that._modeNameWheel.navItems[i].sliceHoverAttr.fill = colors[i];
+                    that._modeNameWheel.navItems[i].slicePathAttr.fill = colors[i];
+                    that._modeNameWheel.navItems[i].sliceSelectedAttr.fill = colors[i];
+                }
+
+                that._modeNameWheel.refreshWheel();
+            }
+
+            // Special case for Japanese
+            var language = localStorage.languagePreference;
+            if (language === 'ja') {
+                for (var i = 0; i < that._modeNameWheel.navItems.length; i++) {
+                    that._modeNameWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+                }
+            }
+
+            // Set up tabs for each mode.
+            var i = 0;
+            for (var j = 0; j < MODE_PIE_MENUS[grp].length; j++) {
+                var modename = MODE_PIE_MENUS[grp][j];
+                var activeTabs = [0];
+                if (modename !== ' ') {
+                    var mode = MUSICALMODES[modename];
+                    for (var k = 0; k < mode.length; k++) {
+                        activeTabs.push(last(activeTabs) + mode[k]);
+                    }
+                }
+
+                __setupAction(i, activeTabs);
+                i += 1;
+            }
+
+            // Look for the selected mode.
+            for (var i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+                if (MODE_PIE_MENUS[grp][i] === selectedMode) {
+                    break;
+                }
+            }
+
+            // if we didn't find the mode, use a default
+            if (i === labels.length) {
+                i = 0; // major/ionian
+            }
+
+            that._modeNameWheel.navigateWheel(i);
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            if (that._modeNameWheel !== null) {
+                that._modeNameWheel.removeWheel();
+            }
+        };
+
+        var __playNote = function () {
+            var o = 0;
+            if (octave) {
+                var o = 12;
+            }
+
+            var i = that._modeWheel.selectedNavItemIndex;
+            // The mode doesn't matter here, since we are using semi-tones.
+            var obj = getNote(key, 4, i + o, key + ' chromatic', false, null, null);
+            obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, 'default');
+            }
+
+            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, 'default', null, null);
+        };
+
+        var __playScale = function (activeTabs, idx) {
+            // loop through selecting modeWheel slices with a delay.
+            if (idx < activeTabs.length) {
+                if (activeTabs[idx] < 12) {
+                    octave = false;
+                    that._modeWheel.navigateWheel(activeTabs[idx]);
+                } else {
+                    octave = true;
+                    that._modeWheel.navigateWheel(0);
+                }
+
+                setTimeout(function () {
+                    __playScale(activeTabs, idx + 1);
+                }, 1000 / 10); // slight delay between notes
+            }
+        };
+
+        /*
+         * prepare scale
+         * @return{void}
+         * @private
+         */
+        var __prepScale = function () {
+            var activeTabs = [0];
+            var mode = MUSICALMODES[that.value];
+            for (var k = 0; k < mode.length - 1; k++) {
+                activeTabs.push(last(activeTabs) + mode[k]);
+            }
+
+            activeTabs.push(12);
+            activeTabs.push(12);
+
+            for (var k = mode.length - 1; k >= 0; k--) {
+                activeTabs.push(last(activeTabs) - mode[k]);
+            }
+
+            __playScale(activeTabs, 0);
+        };
+
+        // position widget
+        var x = this.container.x;
+        var y = this.container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '600px';
+        docById('wheelDiv').style.width = '600px';
+
+        // This widget is large. Be sure it fits on the screen.
+        docById('wheelDiv').style.left = Math.min(this.blocks.turtles._canvas.width - 600, Math.max(0, Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)) + 'px';
+        docById('wheelDiv').style.top = Math.min(this.blocks.turtles._canvas.height - 650, Math.max(0, Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)) + 'px';
+
+        for (var i = 0; i < 12; i++) {
+            that._modeWheel.navItems[i].navigateFunction = __playNote;
+        }
+
+        // navigate to a specific starting point
+        for (modeGroup in MODE_PIE_MENUS) {
+            for (var j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
+                var modename = MODE_PIE_MENUS[modeGroup][j];
+                if (modename === selectedMode) {
+                    break;
+                }
+            }
+
+            if (j < MODE_PIE_MENUS[modeGroup].length) {
+                break;
+            }
+        }
+
+        if (selectedMode === 'major') {
+            modeGroup = '7';
+        }
+
+        var __buildModeWheel = function () {
+            var i = that._modeGroupWheel.selectedNavItemIndex;
+            modeGroup = that._modeGroupWheel.navItems[i].title;
+            __buildModeNameWheel(modeGroup);
+        };
+
+        for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
+            this._modeGroupWheel.navItems[i].navigateFunction = __buildModeWheel;
+        }
+
+        for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
+            if (this._modeGroupWheel.navItems[i].title === modeGroup) {
+                this._modeGroupWheel.navigateWheel(i);
+                break;
+            }
+        }
+
+        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
+        this._exitWheel.navItems[1].navigateFunction = __prepScale;
+    };
+
+    this._labelChanged = function (closeInput, change) {
+        // Update the block values as they change in the DOM label.
+        if (this === null || this.label === null) {
+            this._labelLock = false;
+            return;
+        }
+
+        this._labelLock = true;
+
+        if (closeInput) {
+            this.label.style.display = 'none';
+            if (this.labelattr != null) {
+                this.labelattr.style.display = 'none';
+            }
+        }
+
+        // The pie menu may be visible too, so hide it.
+        docById('wheelDiv').style.display = 'none';
 
         var oldValue = this.value;
-
-        if (this.label.value === '') {
-            this.label.value = '_';
-        }
-
         var newValue = this.label.value;
 
         if (this.labelattr != null) {
@@ -2082,10 +5251,14 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
+        var c = this.connections[0];
+
         if (oldValue === newValue) {
             // Nothing to do in this case.
-            this._label_lock = false;
-            return;
+            this._labelLock = false;
+            if (this.name !== 'text' || c === null || this.blocks.blockList[c].name !== 'storein') {
+                return;
+            }
         }
 
         var c = this.connections[0];
@@ -2095,9 +5268,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'action':
                 var that = this;
 
-                setTimeout(function () {
-                    that.blocks.palettes.removeActionPrototype(oldValue);
-                }, 1000);
+                that.blocks.palettes.removeActionPrototype(oldValue);
 
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
@@ -2105,13 +5276,33 @@ function Block(protoblock, blocks, overrideName) {
                     newValue = uniqueValue;
                     this.value = newValue;
                     var label = this.value.toString();
-                    if (label.length > 8) {
-                        label = label.substr(0, 7) + '...';
+                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                        label = label.substr(0, STRINGLEN) + '...';
                     }
                     this.text.text = label;
                     this.label.value = newValue;
                     this.updateCache();
                 }
+                break;
+            case 'pitch':
+                // In case of custom temperament
+                var uniqueValue = this.blocks.findUniqueCustomName(newValue);
+                newValue = uniqueValue;
+                for (var pitchNumber in TEMPERAMENT['custom']) {
+                    if (pitchNumber !== 'pitchNumber') {
+                        if (oldValue == TEMPERAMENT['custom'][pitchNumber][1]) {
+                         TEMPERAMENT['custom'][pitchNumber][1] = newValue;
+                        }
+                    }
+                }
+                this.value = newValue;
+                var label = this.value.toString();
+                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                    label = label.substr(0, STRINGLEN) + '...';
+                }
+                this.text.text = label;
+                this.label.value = newValue;
+                this.updateCache();
                 break;
             default:
                 break;
@@ -2120,7 +5311,12 @@ function Block(protoblock, blocks, overrideName) {
 
         // Update the block value and block text.
         if (this.name === 'number') {
-            this.value = Number(newValue);
+            if (this.value === '-') {
+                this.value = -1;
+            } else {
+                this.value = Number(newValue);
+            }
+
             if (isNaN(this.value)) {
                 var thisBlock = this.blocks.blockList.indexOf(this);
                 this.blocks.errorMsg(newValue + ': Not a number', thisBlock);
@@ -2153,21 +5349,33 @@ function Block(protoblock, blocks, overrideName) {
             var label = this.value.toString();
         }
 
-        if (WIDENAMES.indexOf(this.name) === -1 && label.length > 8) {
-            label = label.substr(0, 7) + '...';
+        if (WIDENAMES.indexOf(this.name) === -1 && getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH ) {
+            var slen = label.length - 5;
+            var nlabel = '' + label.substr(0, slen) + '...';
+            while (getTextWidth(nlabel, 'bold 20pt Sans') > TEXTWIDTH) {
+                slen -= 1;
+                nlabel = '' + label.substr(0, slen) + '...';
+                var foo = getTextWidth(nlabel, 'bold 20pt Sans');
+                if (slen <= STRINGLEN) {
+                    break;
+                }
+            }
+
+            label = nlabel;
         }
 
         this.text.text = label;
 
-        // and hide the DOM textview...
-        this.label.style.display = 'none';
+        if (closeInput) {
+            // and hide the DOM textview...
+            this.label.style.display = 'none';
+        }
 
         // Make sure text is on top.
-        var z = this.container.getNumChildren() - 1;
+        var z = this.container.children.length - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
 
-        var c = this.connections[0];
         if (this.name === 'text' && c != null) {
             var cblock = this.blocks.blockList[c];
             switch (cblock.name) {
@@ -2190,8 +5398,7 @@ function Block(protoblock, blocks, overrideName) {
                         if (block.name === 'nameddo' && block.defaults.length === 0) {
                             block.hidden = true;
                         }
-                    }
-                    else {
+                    } else {
                         if (block.name === 'nameddo' && block.defaults[0] === oldValue) {
                             blockPalette.remove(block, oldValue);
                         }
@@ -2208,29 +5415,35 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.palettes.show();
                 break;
             case 'storein':
-                // If the label was the name of a storein, update the
-                // associated box this.blocks and the palette buttons.
-                if (this.value !== 'box') {
-                    this.blocks.newStoreinBlock(this.value);
-                    this.blocks.newStorein2Block(this.value);
-                    this.blocks.newNamedboxBlock(this.value);
+                // Check to see which connection we are using in
+                // cblock.  We only do something if blk is attached to
+                // the name connection (1).
+                blk = this.blocks.blockList.indexOf(this);
+                if (cblock.connections[1] === blk && closeInput) {
+                    // If the label was the name of a storein, update the
+                    // associated box this.blocks and the palette buttons.
+                    if (this.value !== 'box') {
+                        this.blocks.newStoreinBlock(this.value);
+                        this.blocks.newStorein2Block(this.value);
+                        this.blocks.newNamedboxBlock(this.value);
+                    }
+
+                    // Rename both box <- name and namedbox blocks.
+                    this.blocks.renameBoxes(oldValue, newValue);
+                    this.blocks.renameNamedboxes(oldValue, newValue);
+                    this.blocks.renameStoreinBoxes(oldValue, newValue);
+                    this.blocks.renameStorein2Boxes(oldValue, newValue);
+
+                    this.blocks.palettes.hide();
+                    this.blocks.palettes.updatePalettes('boxes');
+                    this.blocks.palettes.show();
                 }
-
-                // Rename both box <- name and namedbox blocks.
-                this.blocks.renameBoxes(oldValue, newValue);
-                this.blocks.renameNamedboxes(oldValue, newValue);
-                this.blocks.renameStoreinBoxes(oldValue, newValue);
-                this.blocks.renameStorein2Boxes(oldValue, newValue);
-
-                this.blocks.palettes.hide();
-                this.blocks.palettes.updatePalettes('boxes');
-                this.blocks.palettes.show();
                 break;
             case 'setdrum':
             case 'playdrum':
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     if (newValue.slice(0, 4) === 'http') {
-                        this.blocks.logo.synth.loadSynth(newValue);
+                        this.blocks.logo.synth.loadSynth(0, newValue);
                     }
                 }
                 break;
@@ -2240,34 +5453,167 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // We are done changing the label, so unlock.
-        this._label_lock = false;
+        this._labelLock = false;
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the synth for the selected drum.
             if (this.name === 'drumname') {
-                this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
+                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+            } else if (this.name === 'effectsname') {
+                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === 'voicename') {
-                this.blocks.logo.synth.loadSynth(getVoiceSynthName(this.value));
+                this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
+            } else if (this.name === 'noisename') {
+                this.blocks.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
             }
         }
     };
 
+    /*
+     * Sets up context menu for each block
+     */
+    this.piemenuBlockContext = function () {
+        var that = this;
+        var thisBlock = this.blocks.blockList.indexOf(this);
+
+        console.log('Showing context menu for ' + this.name);
+
+        // Position the widget centered over the active block.
+        docById('contextWheelDiv').style.position = 'absolute';
+
+        var x = this.blocks.blockList[thisBlock].container.x;
+        var y = this.blocks.blockList[thisBlock].container.y;
+
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.getStageScale();
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.getStageScale();
+
+        docById('contextWheelDiv').style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 150 + 'px';
+        docById('contextWheelDiv').style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 150 + 'px';
+
+        docById('contextWheelDiv').style.display = '';
+
+        labels = ['imgsrc:header-icons/copy-button.svg',
+                  'imgsrc:header-icons/paste-disabled-button.svg',
+                  'imgsrc:header-icons/extract-button.svg',
+                  'imgsrc:header-icons/empty-trash-button.svg',
+                  'imgsrc:header-icons/cancel-button.svg'
+                 ];
+
+        var topBlock = this.blocks.findTopBlock(thisBlock);
+        if (this.name === 'action') {
+            labels.push('imgsrc:header-icons/save-blocks-button.svg');
+        }
+
+        if (this.name in BLOCKHELP) {
+            labels.push('imgsrc:header-icons/help-button.svg');
+            var helpButton = labels.length - 1;
+        } else {
+            var helpButton = null;
+        }
+
+        var wheel = new wheelnav('contextWheelDiv', null, 250, 250);
+        wheel.colors = platformColor.wheelcolors;
+        wheel.slicePathFunction = slicePath().DonutSlice;
+        wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        wheel.slicePathCustom.minRadiusPercent = 0.2;
+        wheel.slicePathCustom.maxRadiusPercent = 0.6;
+        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+        wheel.sliceInitPathCustom = wheel.slicePathCustom;
+        wheel.clickModeRotate = false;
+        wheel.initWheel(labels);
+        wheel.createWheel();
+
+        wheel.navItems[0].setTooltip(_('Copy'));
+        wheel.navItems[1].setTooltip(_('Paste'));
+        wheel.navItems[2].setTooltip(_('Extract'));
+        wheel.navItems[3].setTooltip(_('Move to trash'));
+        wheel.navItems[4].setTooltip(_('Close'));
+        if (this.blocks.blockList[topBlock].name === 'action') {
+            wheel.navItems[5].setTooltip(_('Save stack'));
+        }
+
+        if (helpButton !== null) {
+            wheel.navItems[helpButton].setTooltip(_('Help'));
+        }
+
+        wheel.navItems[0].selected = false;
+
+        wheel.navItems[0].navigateFunction = function () {
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.prepareStackForCopy();
+            wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
+            wheel.navItems[1].refreshNavItem(true);
+            wheel.refreshWheel();
+        };
+
+        wheel.navItems[1].navigateFunction = function () {
+            that.blocks.pasteStack();
+        };
+
+        wheel.navItems[2].navigateFunction = function () {
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.extract();
+            docById('contextWheelDiv').style.display = 'none';
+        };
+
+        wheel.navItems[3].navigateFunction = function () {
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.extract();
+            that.blocks.sendStackToTrash(that.blocks.blockList[thisBlock]);
+            docById('contextWheelDiv').style.display = 'none';
+        };
+
+        wheel.navItems[4].navigateFunction = function () {
+            docById('contextWheelDiv').style.display = 'none';
+        };
+
+        if (this.name === 'action') {
+            wheel.navItems[5].navigateFunction = function () {
+                that.blocks.activeBlock = thisBlock;
+                that.blocks.saveStack();
+            };
+        }
+
+        if (helpButton !== null) {
+            wheel.navItems[helpButton].navigateFunction = function () {
+                that.blocks.activeBlock = thisBlock;
+                var helpWidget = new HelpWidget();
+                helpWidget.init(blocks);
+                docById('contextWheelDiv').style.display = 'none';
+            };
+        }
+
+        setTimeout(function () {
+            console.log('Setting stage click to false.');
+            that.blocks.stageClick = false;
+        }, 500);
+    };
 };
 
-
+/*
+ * set elements to a array
+ * if element is string,then set element's id to element
+ * @public
+ * @return{void}
+ */
 function $() {
     var elements = new Array();
 
     for (var i = 0; i < arguments.length; i++) {
         var element = arguments[i];
-        if (typeof element === 'string')
+        if (typeof element === 'string') {
             element = docById(element);
-        if (arguments.length === 1)
+        }
+
+        if (arguments.length === 1) {
             return element;
+        }
+
         elements.push(element);
     }
+
     return elements;
-}
+};
 
 
 window.hasMouse = false;
@@ -2277,13 +5623,14 @@ document.addEventListener('mousemove', function (e) {
 });
 
 
-function _makeBitmap(data, name, callback, args) {
+function _blockMakeBitmap(data, callback, args) {
     // Async creation of bitmap from SVG data.
     // Works with Chrome, Safari, Firefox (untested on IE).
     var img = new Image();
+
     img.onload = function () {
         var bitmap = new createjs.Bitmap(img);
-        callback(name, bitmap, args);
+        callback(bitmap, args);
     };
 
     img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));

@@ -13,8 +13,10 @@
         "radians": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = logo.parseArg(logo, turtle, conns[1]) * (Math.PI/180);", 
         "degrees": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = logo.parseArg(logo, turtle, conns[1]) * (180/Math.PI);", 
         "acos": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = Math.acos(logo.parseArg(logo, turtle, conns[1]));", 
-        "pi": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = Math.PI;", 
-        "sin": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));"
+        "pi": "var block = logo.blocks.blockList[blk];var conns = block.connecti
+ons;block.value = Math.PI;", 
+        "sin": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = Math.sin(logo.parseArg(logo, turtle, conns[1]));", 
+        "tan": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));"
     }, 
     "PALETTEHIGHLIGHTCOLORS": {
         "maths": "#ffb1b3"

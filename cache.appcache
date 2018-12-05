@@ -9,9 +9,9 @@ js/utils.js
 js/trash.js
 js/samples.js
 js/artwork.js
-js/samplesviewer.js
 js/basicblocks.js
 js/activity.js
+js/toolbar.js
 js/palette.js
 js/savebox.js
 js/pluginsviewer.js
@@ -99,7 +99,7 @@ icons/help-button.svg
 icons/polar-button.svg
 icons/plugin-button.svg
 icons/fast-button.svg
-icons/empty-trash-button.svg
+icons/new-project-button.svg
 icons/collapse-blocks-button.svg
 icons/close-toolbar-button.svg
 icons/open-button.svg

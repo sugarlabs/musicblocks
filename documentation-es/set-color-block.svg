@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="56.103935mm"
+   height="38.232296mm"
+   viewBox="0 0 56.103935 38.232297"
+   version="1.1"
+   id="svg1870">
+  <defs
+     id="defs1864" />
+  <metadata
+     id="metadata1867">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <text
+     y="32.014584"
+     x="34.798836"
+     id="text572"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan570"
+       y="36.777096"
+       x="53.055092" />
+  </text>
+  <text
+     y="32.014584"
+     x="34.798836"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text3783">
+    <tspan
+       style="stroke-width:0.39687499"
+       x="53.055092"
+       y="36.777096"
+       id="tspan3781" />
+  </text>
+  <g
+     transform="scale(0.396875)"
+     id="g472">
+    <path
+       d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 37.792969 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+       style="fill:#728ff9;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       id="path462" />
+    <text
+       style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+       id="text466">
+      <tspan
+         x="54"
+         y="14"
+         id="tspan464">fijar color</tspan>
+    </text>
+    <text
+       style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+       id="text470">
+      <tspan
+         x="54"
+         y="12"
+         id="tspan468" />
+    </text>
+  </g>
+  <g
+     transform="matrix(0.396875,0,0,0.396875,22.5397,0)"
+     id="g482">
+    <path
+       d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+       style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       id="path476" />
+    <text
+       style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+       id="text480">
+      <tspan
+         x="13"
+         y="14"
+         id="tspan478">0</tspan>
+    </text>
+  </g>
+  <path
+     id="path486"
+     style="fill:#728ff9;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,11.707817 v -1.5875 c 2.8e-7,-0.8767518 0.71074816,-1.5874995 1.5875,-1.5874995 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 19.8560225 1.5875 c 0.876752,0 1.5875,0.7107477 1.5875,1.5874995 v 1.5875 h -1.5875 v -1.190624 h -1.5875 v 3.96875 h 1.5875 v -1.190626 h 1.5875 v 1.5875 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 H 27.19821 7.3421875 6.9453125 v 0.79375 h -3.175 v -0.79375 h -0.396875 -1.5875 c -0.87675204,0 -1.5875,-0.710748 -1.5875,-1.5875 v -1.5875 z" />
+  <text
+     x="2.6458335"
+     y="8.3343801"
+     id="text490"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan488"
+       y="13.89063"
+       x="26.458336">fijar sombra</tspan>
+  </text>
+  <text
+     y="8.3343801"
+     id="text494"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan492"
+       y="13.09688"
+       x="23.8125" />
+  </text>
+  <g
+     transform="matrix(0.396875,0,0,0.396875,27.396645,8.33438)"
+     id="g506">
+    <path
+       d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+       style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       id="path500" />
+    <text
+       style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+       id="text504">
+      <tspan
+         x="13"
+         y="14"
+         id="tspan502">50</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.396875,0,0,0.396875,0,16.66875)"
+     id="g520">
+    <path
+       d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 53.364258 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+       style="fill:#728ff9;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       id="path510" />
+    <text
+       style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+       id="text514">
+      <tspan
+         x="70"
+         y="14"
+         id="tspan512">fijar pluma</tspan>
+    </text>
+    <text
+       style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+       id="text518">
+      <tspan
+         x="70"
+         y="12"
+         id="tspan516" />
+    </text>
+  </g>
+  <g
+     transform="matrix(0.396875,0,0,0.396875,28.71956,16.66875)"
+     id="g530">
+    <path
+       d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+       style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       id="path524" />
+    <text
+       style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+       id="text528">
+      <tspan
+         x="13"
+         y="14"
+         id="tspan526">5</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.396875,0,0,0.396875,22.225,29.89792)"
+     id="g560">
+    <path
+       d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+       style="fill:#728ff9;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       id="path554" />
+    <text
+       style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+       id="text558">
+      <tspan
+         x="13"
+         y="14"
+         id="tspan556">color</tspan>
+    </text>
+  </g>
+</svg>

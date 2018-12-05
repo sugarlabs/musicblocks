@@ -25,10 +25,10 @@ function PlaybackWidget() {
     /*
     this._playAll = function () {
         if (this._logo.turtles.running()) {
-            this._playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            this._playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
             this._logo.playback(-1);
 	} else {
-            this._playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            this._playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
             this._logo.stopTurtle = true;
         }
     };
@@ -68,13 +68,13 @@ function PlaybackWidget() {
         // For the button callbacks
         var that = this;
 
-        this._playcell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+        this._playcell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         this._playcell.onclick = function () {
             that._logo.playback(-1);  // that._playAll();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick = function () {
             playbackTableDiv.style.visibility = 'hidden';
@@ -84,7 +84,7 @@ function PlaybackWidget() {
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - playbackDiv.getBoundingClientRect().left;
@@ -200,7 +200,7 @@ function PlaybackWidget() {
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.left = '1px';
 
-            var buttonCell = this._addButton(row, 'play-button.svg', iconSize, _('play'));
+            var buttonCell = this._addButton(row, 'play-button.svg', iconSize, _('Play'));
             buttonCell.setAttribute('id', activeTurtles);
 
             buttonCell.onclick = function () {

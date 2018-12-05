@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2831"
+   version="1.1"
+   viewBox="0 0 92.449832 16.668749"
+   height="16.668749mm"
+   width="92.449829mm"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="do-block.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1278"
+     inkscape:window-height="773"
+     id="namedview32"
+     showgrid="false"
+     inkscape:zoom="1.0883999"
+     inkscape:cx="217.78391"
+     inkscape:cy="29.531251"
+     inkscape:window-x="0"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2831"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs2825" />
+  <metadata
+     id="metadata2828">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="scale(0.26458333,0.26458333)"
+     id="g852">
+    <g
+       transform="scale(1.5,1.5)"
+       id="g850">
+      <path
+         inkscape:connector-curvature="0"
+         d="m 0.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 0,2 10,0 0,-2 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z"
+         style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path840" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text844">
+        <tspan
+           x="46"
+           y="14"
+           id="tspan842">～する</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text848">
+        <tspan
+           x="46"
+           y="12"
+           id="tspan846" />
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,53.357638,0)"
+     id="g862">
+    <g
+       transform="scale(1.5,1.5)"
+       id="g860">
+      <path
+         inkscape:connector-curvature="0"
+         d="m 8.5,0.5 90,0 0,20 -90,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
+         style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path854" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text858">
+        <tspan
+           x="13"
+           y="14"
+           id="tspan856">part 1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,53.357638,8.334379)"
+     id="g1048">
+    <g
+       transform="scale(1.5,1.5)"
+       id="g1046">
+      <path
+         inkscape:connector-curvature="0"
+         d="m 8.5,0.5 90,0 0,20 -90,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
+         style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1040" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text1044">
+        <tspan
+           x="13"
+           y="14"
+           id="tspan1042">part 2</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,30.735763,0)"
+     id="g1076">
+    <g
+       transform="scale(1.5,1.5)"
+       id="g1074">
+      <path
+         sodipodi:nodetypes="csscccssccccccccccccccccsscccssccccccccccc"
+         inkscape:connector-curvature="0"
+         d="m -19.944443,8.5 0,-4 c 0,-2.209139 1.790861,-4 4,-4 l 4,0 9.9999999,0 58.4444431,0 4,0 c 2.209139,0 4,1.790861 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -58.4444431,0 -9.9999999,0 -4,0 c -2.209139,0 -6.12663,-3.401885 -4,-4 l 0,-4 0,-21 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 z"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1060" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text1064">
+        <tspan
+           x="54"
+           y="23"
+           id="tspan1062">どちらかを選ぶ</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text1068">
+        <tspan
+           x="54"
+           y="12"
+           id="tspan1066">これか</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text1072">
+        <tspan
+           x="54"
+           y="33"
+           id="tspan1070">それか</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

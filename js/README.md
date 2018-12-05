@@ -32,13 +32,12 @@ Export utilities
 * `lilypond.js` -- save in Lilypond format
 
 Other utilities
-* `analytics.js` -- analyse blocks in project
+* `rubrics.js` -- analyse blocks in project
 * `background.js` -- extenstion utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
-* `samplesviewer.js` -- planet interface
-* `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
-* `trash.js` -- trash-can manager
+* sugarizer-`compatibility.js` -- datastore utilities used by sugarizer
+* `trash.js` -- trash can manager
 * `turtledefs.js` -- strings and palettes unique to Music Blocks
 
 Subdirectories with additional utilities
@@ -73,20 +72,20 @@ you may also need to modify `macro.js`.
 
 * If you want to add a new palette with multiple blocks for a specific
 application, you may want to write a plugin. Please see:
-[plugin](http://github.com/walterbender/musicblocks/tree/master/plugins)
+[plugin](http://github.com/sugarlabs/musicblocks/tree/master/plugins)
 instead.
 
 Note: As with any change, please make your own copy by cloning this
-[respository](https://github.com/walterbender/musicblocks.git). Make
+[respository](https://github.com/sugarlabs/musicblocks.git). Make
 your changes, test them, and then make a pull request.
 
 ## How to define a new block in basicblocks.js
 
-[basicblocks.js](https://github.com/walterbender/musicblocks/blob/master/js/basicblocks.js)
+[basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
 is where each block is defined, its palette assigned, its shape and
 label defined, and any default arguments assigned.
 
-[logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)
+[logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 is where the code associated with running each block is defined.
 
 1. Define the type of block
@@ -173,7 +172,7 @@ macro in `macro.js`:
 e.g., `pitchNumberBlock.dockTypes[1] = 'numberin';`
 
 Check
-[protoblock.js](https://github.com/walterbender/turtleblocksjs/blob/master/js/protoblocks.js) for additional block properties.
+[protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js) for additional block properties.
 
 ## Macro expansions
 
@@ -251,7 +250,7 @@ More details can be found in the comment at the top of `macros.js`.
                         [8, 'hidden', 0, 0, [0, null]]];
   ```
 
-## How to define block function in [logo.js](https://github.com/walterbender/musicblocks/blob/master/js/logo.js)
+## How to define block function in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 
 There are two basic types of blocks: *flow* blocks, that connect vertically, and *arg* blocks, that connect horizontally, into *flow* blocks.
 
@@ -356,8 +355,8 @@ In order to set up a new synth effect:
 
 ## Odds and ends
 
-* You should add your new block to the analytics found in
-  [analytics.js](https://github.com/walterbender/musicblocks/blob/master/js/analytics.js)
+* You should add your new block to the rubrics found in
+  [rubrics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/rubrics.js)
 
 * As mentioned above, if you are adding user-facing strings, be sure
   to add them in this format: `_('string')` This allows the string to

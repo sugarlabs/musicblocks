@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg3045"
+   version="1.1"
+   viewBox="0 0 76.332288 41.128129"
+   height="41.128128mm"
+   width="76.332291mm">
+  <defs
+     id="defs3039" />
+  <metadata
+     id="metadata3042">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-499.26101,-341.7845)"
+     id="layer1">
+    <g
+       id="g1204"
+       transform="matrix(0.26458333,0,0,0.26458333,523.86726,363.88339)">
+      <g
+         id="g1202"
+         transform="scale(1.5)">
+        <path
+           id="path1196"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 107.27051 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1200"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan1198"
+             y="14"
+             x="13">音程の違い</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1218"
+       transform="matrix(0.26458333,0,0,0.26458333,502.96518,363.88339)">
+      <g
+         id="g1216"
+         transform="scale(1.5)">
+        <path
+           id="path1206"
+           style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 33.344727 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+        <text
+           id="text1210"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan1208"
+             y="14"
+             x="50">前へ進む</tspan>
+        </text>
+        <text
+           id="text1214"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan1212"
+             y="12"
+             x="50" />
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1252"
+       transform="matrix(0.26458333,0,0,0.26458333,104.76726,186.87714)">
+      <g
+         id="g1232"
+         transform="translate(1491,628)">
+        <g
+           id="g1230"
+           transform="scale(1.5)">
+          <path
+             id="path1220"
+             style="fill:#ffbf00;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 58 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -58 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+          <text
+             id="text1224"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+            <tspan
+               id="tspan1222"
+               y="22"
+               x="20">アクション</tspan>
+          </text>
+          <text
+             id="text1228"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+            <tspan
+               id="tspan1226"
+               y="6"
+               x="83" />
+          </text>
+        </g>
+      </g>
+      <g
+         id="g1250"
+         transform="matrix(0.5,0,0,0.5,1491,640)">
+        <g
+           id="g1248"
+           style="isolation:isolate">
+          <g
+             data-name="レイヤー 2"
+             id="g1246">
+            <g
+               id="g1244">
+              <rect
+                 id="rect1234"
+                 style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+                 ry="5"
+                 rx="5"
+                 height="42"
+                 width="42"
+                 x="0"
+                 y="0" />
+              <path
+                 id="path1236"
+                 style="fill:#ffffff"
+                 d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z" />
+              <path
+                 id="path1238"
+                 style="fill:#ffffff"
+                 d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z" />
+              <path
+                 id="path1240"
+                 style="fill:#ffffff"
+                 d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z" />
+              <path
+                 id="path1242"
+                 style="fill:#ffffff"
+                 d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z" />
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g1262"
+       transform="matrix(0.26458333,0,0,0.26458333,533.39226,355.41672)">
+      <g
+         id="g1260"
+         transform="scale(1.5)">
+        <path
+           id="path1254"
+           style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1258"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan1256"
+             y="14"
+             x="13">アクション</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,499.26101,341.7845)"
+       id="g1276">
+      <g
+         id="g1274"
+         transform="scale(1.5)">
+        <path
+           id="path1264"
+           style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 74.49707 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+        <text
+           id="text1268"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan1266"
+             y="14"
+             x="91">全ての音符に～する</tspan>
+        </text>
+        <text
+           id="text1272"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan1270"
+             y="12"
+             x="91" />
+        </text>
+      </g>
+    </g>
+    <g
+       id="g1286"
+       transform="matrix(0.26458333,0,0,0.26458333,536.30267,341.7845)">
+      <g
+         id="g1284"
+         transform="scale(1.5)">
+        <path
+           id="path1278"
+           style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text1282"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan1280"
+             y="14"
+             x="13">アクション</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

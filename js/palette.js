@@ -11,9 +11,10 @@
 
 // All things related to palettes
 
-const PROTOBLOCKSCALE = 1.0;
-const PALETTELEFTMARGIN = 10;
-
+const PROTOBLOCKSCALE = 0.75;
+const PALETTELEFTMARGIN = Math.floor(10 * PROTOBLOCKSCALE);
+const PALETTE_SCALE_FACTOR = 0.5;
+const PALETTE_WIDTH_FACTOR = 3;
 
 function maxPaletteHeight(menuSize, scale) {
     // Palettes don't start at the top of the screen and the last
@@ -48,6 +49,7 @@ function paletteBlockButtonPush(blocks, name, arg) {
 // the palette container.
 //
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
+const NPALETTES = 3;
 
 
 function Palettes () {
@@ -56,30 +58,30 @@ function Palettes () {
     this.refreshCanvas = null;
     this.stage = null;
     this.cellSize = null;
+    this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
     this.scrollDiff = 0;
     this.originalSize = 55;  // this is the original svg size
     this.trashcan = null;
-    this.initial_x = 55;
-    this.initial_y = 55;
     this.firstTime = true;
     this.background = null;
-    this.upIndicator = null;
-    this.upIndicatorStatus = false;
-    this.downIndicator = null;
-    this.downIndicatorStatus = true;
     this.circles = {};
-    this.palette_text = new createjs.Text('', '20px Arial', '#ff7700');
+    // paletteText is used for the highlighted tooltip
+    this.paletteText = new createjs.Text('', '20px Sans', platformColor.paletteText);
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
+    this.paletteVisible = false;
     this.pluginsDeleteStatus = false;
     this.visible = true;
     this.scale = 1.0;
     this.mobile = false;
+    // Top of the palette
+    this.top = 55 + 20 + LEADING;
     this.current = DEFAULTPALETTE;
-    this.x = null;
-    this.y = null;
-    this.container = null;
+    this.x = [];  // We track x and y for each of the multipalettes
+    this.y = [];
+    this.showSearchWidget = null;
+    this.hideSearchWidget = null;
 
     this.pluginMacros = {};  // some macros are defined in plugins
 
@@ -88,19 +90,119 @@ function Palettes () {
     } else {
         storage = localStorage;
     }
-
+    
     // The collection of palettes.
     this.dict = {};
+    this.selectorButtonsOff = [];  // Select between palettes
+    this.selectorButtonsOn = [];  // Select between palettes in their on state
     this.buttons = {};  // The toolbar button for each palette.
+    this.labels = {};  // The label for each button.
 
     this.init = function () {
         this.halfCellSize = Math.floor(this.cellSize / 2);
-        this.x = 0;
-        this.y = this.cellSize;
+        for (var i = 0; i < MULTIPALETTES.length; i++) {
+            this._makeSelectorButton(i);
+            this.x.push(0);
+            // This is the top of the palette buttons stack
+            this.y.push((this.top + LEADING) / PALETTE_SCALE_FACTOR);
+        }
+    };
 
-        this.container = new createjs.Container();
-        this.container.snapToPixelEnabled = true;
-        this.stage.addChild(this.container);
+    this.deltaY = function (dy) {
+        for (var i = 0; i < this.selectorButtonsOff.length; i++) {
+            this.selectorButtonsOff[i].y += dy;
+            this.selectorButtonsOn[i].y += dy;
+        }
+
+        for (var b in this.buttons) {
+            this.buttons[b].y += dy;
+        }
+
+        for (var l in this.labels) {
+            this.labels[l].y += dy;
+        }
+
+        for (var m in this.dict) {
+            this.dict[m]._moveMenuRelative(0, dy);
+            if (dy < 0 && this.dict[m].visible) {
+                this.dict[m]._resetLayout();
+                this.dict[m].showMenu();
+                this.dict[m]._showMenuItems();
+            }
+        }
+
+        this.background.y += dy;
+    };
+
+    this._makeSelectorButton = function (i) {
+        console.log('makeSelectorButton ' + i);
+
+        __processSelectButtonOff = function (that, name, bitmap, arg) {
+            var scale = 1.5 * that.cellSize / that.originalSize;
+            bitmap.x = arg * scale * 55;
+            bitmap.y = that.top;
+            bitmap.scaleX = scale;
+            bitmap.scaleY = scale;
+            // FIXME: rescale needs to reset all of this.
+            that.stage.addChild(bitmap);
+            that.selectorButtonsOff.push(bitmap);
+            that.selectorButtonsOff[i].on('click', function (event) {
+                console.log('SHOWING ' + i + ' via mouse click');
+                that.showSelection(i);
+            });
+
+            that.selectorButtonsOff[i].on('mouseover', function (event) {
+                that.showSelection(i);
+            });
+        };
+
+        __processSelectButtonOn = function (that, name, bitmap, arg) {
+            var scale = 1.5 * that.cellSize / that.originalSize;
+            bitmap.x = arg * scale * 55;
+            bitmap.y = that.top;
+            bitmap.scaleX = scale;
+            bitmap.scaleY = scale;
+            // FIXME: rescale needs to reset all of this.
+            that.stage.addChild(bitmap);
+            that.selectorButtonsOn.push(bitmap);
+        };
+
+        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('background_fill_color', platformColor.selectorBackground).replace(/stroke_color/g, platformColor.ruleColor).replace(/fill_color/g, platformColor.background), MULTIPALETTENAMES[i], __processSelectButtonOff, i);
+
+        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('background_fill_color', platformColor.selectorSelected).replace(/stroke_color/g, platformColor.ruleColor).replace(/fill_color/g, platformColor.background), MULTIPALETTENAMES[i], __processSelectButtonOn, i);
+    };
+
+    this.showSelection = function (i) {
+        for (var j = 0; j < this.selectorButtonsOn.length; j++) {
+            if (j === i) {
+                this.selectorButtonsOn[j].visible = true;
+            } else {
+                this.selectorButtonsOn[j].visible = false;
+            }
+        }
+
+        for (var name in this.buttons) {
+            if (this.buttons[name] === undefined) {
+                continue;
+            }
+
+            if (this.labels[name] === undefined) {
+                continue;
+            }
+
+            if (name === 'search') {
+                this.buttons[name].visible = true;
+                this.labels[name].visible = true;
+            } else if (MULTIPALETTES[i].indexOf(name) === -1) {
+                this.buttons[name].visible = false;
+                this.labels[name].visible = false;
+            } else {
+                this.buttons[name].visible = true;
+                this.labels[name].visible = true;
+            }
+        }
+
+        this.refreshCanvas();
     };
 
     this.setCanvas = function (canvas) {
@@ -124,7 +226,7 @@ function Palettes () {
     };
 
     this.setSize = function (size) {
-        this.cellSize = size;
+        this.cellSize = Math.floor((size * PALETTE_SCALE_FACTOR) + 0.5);
         return this;
     };
 
@@ -156,8 +258,17 @@ function Palettes () {
     // We need access to the macro dictionary because we load them.
     this.setMacroDictionary = function (obj) {
         this.macroDict = obj;
-
         return this;
+    };
+
+    this.setSearch = function (show, hide) {
+        this.showSearchWidget = show;
+        this.hideSearchWidget = hide;
+        return this;
+    }
+
+    this.getSearchPos = function () {
+        return [this.cellSize, this.top + this.cellSize * 1.75]
     };
 
     this.getPluginMacroExpansion = function (blkname, x, y) {
@@ -171,40 +282,6 @@ function Palettes () {
         return (obj);
     };
 
-    this.menuScrollEvent = function (direction, scrollSpeed) {
-        var keys = Object.keys(this.buttons);
-        var diff = direction * scrollSpeed;
-        if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
-            this.upIndicator.visible = false;
-            this.upIndicatorStatus = this.upIndicator.visible;
-            this.refreshCanvas();
-            return;
-        } else {
-            this.upIndicatorStatus = this.upIndicator.visible;
-            this.upIndicator.visible = true;
-        }
-
-        if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
-            this.downIndicator.visible = false;
-            this.downIndicatorStatus = this.downIndicator.visible;
-            this.refreshCanvas();
-            return;
-        } else {
-            this.downIndicator.visible = true;
-            this.downIndicatorStatus = this.downIndicator.visible;
-        }
-
-        this.scrollDiff += diff;
-
-        for (var name in this.buttons) {
-            this.buttons[name].y += diff;
-            this.buttons[name].visible = true;
-        }
-
-        this._updateButtonMasks();
-        this.refreshCanvas();
-    };
-
     this._updateButtonMasks = function () {
         for (var name in this.buttons) {
             var s = new createjs.Shape();
@@ -216,71 +293,33 @@ function Palettes () {
     };
 
     this.hidePaletteIconCircles = function () {
-        // palette_text might not be defined yet.
+        // paletteText might not be defined yet.
         if (!sugarizerCompatibility.isInsideSugarizer()) {
-            hidePaletteNameDisplay(this.palette_text, this.stage);
+            hidePaletteNameDisplay(this.paletteText, this.stage);
         }
 
         hideButtonHighlight(this.circles, this.stage);
     };
 
     this.getProtoNameAndPalette = function (name) {
-        var obj = [null, null, null];
         for (var b in this.blocks.protoBlockDict) {
             // Don't return deprecated blocks.
             if (name === this.blocks.protoBlockDict[b].staticLabels[0] && !this.blocks.protoBlockDict[b].hidden) {
-                obj = [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
+                return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
             }
         }
 
-        return obj;
+        return [null, null, null];
     };
 
     this.makePalettes = function (hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            shape.graphics.f('#a2c5d8').r(0, 0, 55, windowHeight()).ef();
-            shape.width = 55;
+            shape.graphics.f(platformColor.ruleColor).r(0, this.top, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef().f(platformColor.paletteBackground).r(2, this.top + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, 8 * STANDARDBLOCKHEIGHT - 4).ef();
+            shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
             this.background = shape;
-        }
-
-        function __processUpIcon(palettes, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
-            palettes.stage.addChild(bitmap);
-            bitmap.x = 55;
-            bitmap.y = 55;
-            bitmap.visible = false;
-            palettes.upIndicator = bitmap;
-
-            palettes.upIndicator.on('click', function (event) {
-                palettes.menuScrollEvent(1, 40);
-                palettes.hidePaletteIconCircles();
-            });
-        };
-
-        function __processDownIcon(palettes, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
-            palettes.stage.addChild(bitmap);
-            bitmap.x = 55;
-            bitmap.y = (windowHeight() / palettes.scale) - 27;
-
-            bitmap.visible = true;
-            palettes.downIndicator = bitmap;
-
-            palettes.downIndicator.on('click', function (event) {
-                palettes.menuScrollEvent(-1, 40);
-                palettes.hidePaletteIconCircles();
-            });
-        };
-
-        if (this.upIndicator == null && this.firstTime) {
-            makePaletteBitmap(this, UPICON.replace('#000000', '#FFFFFF'), 'up', __processUpIcon, null);
-        }
-
-        if (this.downbIndicator == null && this.firstTime) {
-            makePaletteBitmap(this, DOWNICON.replace('#000000', '#FFFFFF'), 'down', __processDownIcon, null);
         }
 
         this.firstTime = false;
@@ -297,15 +336,26 @@ function Palettes () {
             }
 
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(-that.halfCellSize, -that.halfCellSize, that.cellSize, that.cellSize);
-            hitArea.x = that.halfCellSize;
-            hitArea.y = that.halfCellSize;
+            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, that.cellSize * PALETTE_WIDTH_FACTOR, that.cellSize);
             that.buttons[name].hitArea = hitArea;
             that.buttons[name].visible = false;
 
             that.dict[name].makeMenu(true);
-            that.dict[name]._moveMenu(that.cellSize, that.cellSize);
+            that.dict[name]._moveMenu( Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, that.top);
             that.dict[name]._updateMenu(false);
+
+            // Add tooltip for palette buttons
+            if (localStorage.kanaPreference === 'kana') {
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Sans', platformColor.paletteText);
+            } else {
+                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Sans', platformColor.paletteText);
+            }
+
+            var r = that.cellSize / 2;
+            that.labels[name].x = Math.floor(that.buttons[name].x + 2.2 * r);
+            that.labels[name].y = Math.floor(that.buttons[name].y + r / 2);
+            that.stage.addChild(that.labels[name]);
+
             that._loadPaletteButtonHandler(name);
         };
 
@@ -316,9 +366,27 @@ function Palettes () {
                 this.buttons[name] = new createjs.Container();
                 this.buttons[name].snapToPixelEnabled = true;
                 this.stage.addChild(this.buttons[name]);
-                this.buttons[name].x = this.x;
-                this.buttons[name].y = this.y + this.scrollDiff;
-                this.y += this.cellSize;
+                // Which multipalette are we in?
+                if (name === 'search') {
+                    this.buttons[name].x = 0;
+                    this.buttons[name].y = this.top + this.cellSize * 1.75;
+                } else if (!beginnerMode || SKIPPALETTES.indexOf(name) === -1) {
+                    for (var i = 0; i < MULTIPALETTES.length; i++) {
+                        if (MULTIPALETTES[i].indexOf(name) !== -1) {
+                            this.buttons[name].x = this.x[i];
+                            this.buttons[name].y = this.y[i] + this.scrollDiff;
+                            this.y[i] += this.cellSize;
+                            break;
+                        }
+                    }
+
+                    if (i === MULTIPALETTES.length) {
+                        // We didn't find a match...
+                        this.buttons[name].x = this.x[1];
+                        this.buttons[name].y = this.y[1] + this.scrollDiff;
+                        this.y[1] += this.cellSize;
+                    }
+                }
 
                 makePaletteBitmap(this, PALETTEICONS[name], name, __processButtonIcon, null);
             }
@@ -329,6 +397,22 @@ function Palettes () {
         if (this.mobile) {
             return;
         }
+
+        if (name=='search' && this.showSearchWidget !== null) {
+            for (var i in this.dict) {
+                if (this.dict[i].visible) {
+                    this.dict[i].hideMenu();
+                    this.dict[i]._hideMenuItems();
+                }
+            }
+
+            console.log('searching');
+            this.dict[name].visible = true;
+            this.showSearchWidget(true);
+            return;
+        }
+
+        this.hideSearchWidget(true);
 
         for (var i in this.dict) {
             if (this.dict[i] === this.dict[name]) {
@@ -350,21 +434,14 @@ function Palettes () {
             return;
         }
 
-        for (var name in this.buttons) {
-            this.buttons[name].visible = true;
+        for (var i = 0; i < this.selectorButtonsOff.length; i++) {
+            this.selectorButtonsOff[i].visible = true;
         }
+
+        this.showSelection(0);
 
         if (this.background != null) {
             this.background.visible = true;
-        }
-
-        // If the palette indicators were visible, restore them.
-        if (this.upIndicatorStatus) {
-            this.upIndicator.visible = true;
-        }
-
-        if (this.downIndicatorStatus && this.downIndicator != null) {
-            this.downIndicator.visible = true;
         }
 
         this.refreshCanvas();
@@ -374,16 +451,22 @@ function Palettes () {
         // Hide the menu buttons and the palettes themselves.
         for (var name in this.buttons) {
             this.buttons[name].visible = false;
+            this.labels[name].visible = false;
         }
 
         for (var name in this.dict) {
             this.dict[name].hideMenu();
         }
 
-        if (this.upIndicator != null) {
-            this.upIndicator.visible = false;
-            this.downIndicator.visible = false;
+        this.hideSearchWidget(true);
+
+        if (this.background !== null) {
             this.background.visible = false;
+        }
+
+        for (var i = 0; i < this.selectorButtonsOff.length; i++) {
+            this.selectorButtonsOn[i].visible = false;
+            this.selectorButtonsOff[i].visible = false;
         }
 
         this.refreshCanvas();
@@ -403,8 +486,10 @@ function Palettes () {
                 myPalettes.dict[showPalette]._resetLayout();
                 // Show the action palette after adding/deleting new
                 // nameddo blocks.
-                myPalettes.dict[showPalette].showMenu();
-                myPalettes.dict[showPalette]._showMenuItems();
+                // myPalettes.dict[showPalette].showMenu();
+                // myPalettes.dict[showPalette]._showMenuItems();
+                myPalettes.dict[showPalette].hideMenu();
+                myPalettes.dict[showPalette]._hideMenuItems();
                 myPalettes.refreshCanvas();
             }, 100);
         } else {
@@ -459,11 +544,13 @@ function Palettes () {
         }
 
         this.buttons[name].removeAllChildren();
+        this.labels[name].removeAllChildren();
         var btnKeys = Object.keys(this.dict);
         for (var btnKey = btnKeys.indexOf(name) + 1; btnKey < btnKeys.length; btnKey++) {
             this.buttons[btnKeys[btnKey]].y -= this.cellSize;
         }
         delete this.buttons[name];
+        delete this.labels[name];
         delete this.dict[name];
         this.y -= this.cellSize;
         this.makePalettes(true);
@@ -490,7 +577,7 @@ function Palettes () {
             var py = this.dict[name].menuContainer.y;
             var height = Math.min(maxPaletteHeight(this.cellSize, this.scale), this.dict[name].y);
             if (this.dict[name].menuContainer.visible && px < x &&
-                x < px + MENUWIDTH && py < y && y < py + height) {
+                x < px + MENUWIDTH * PROTOBLOCKSCALE && py < y && y < py + height) {
                 return this.dict[name];
             }
         }
@@ -500,77 +587,79 @@ function Palettes () {
     // Palette Button event handlers
     this._loadPaletteButtonHandler = function (name) {
         var locked = false;
+        var searchlocked = false;
         var scrolling = false;
         var that = this;
-
-        this.buttons[name].on('mousedown', function (event) {
-            scrolling = true;
-            var lastY = event.stageY;
-
-            that.buttons[name].removeAllEventListeners('pressmove');
-            that.buttons[name].on('pressmove', function (event) {
-                if (!scrolling) {
-                    return;
-                }
-
-                var diff = event.stageY - lastY;
-                that.menuScrollEvent(diff, 10);
-                lastY = event.stageY;
-            });
-
-            that.buttons[name].removeAllEventListeners('pressup');
-            that.buttons[name].on('pressup', function (event) {
-                scrolling = false;
-            }, null, true);  // once = true
-        });
 
         // A palette button opens or closes a palette.
         this.buttons[name].on('mouseover', function (event) {
             document.body.style.cursor = 'pointer';
             that.mouseOver = true;
-            var r = that.cellSize / 2;
+            var r = 1;
             that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
 
-            /*add tooltip for palette buttons*/
-            that.palette_text = new createjs.Text(_(name), '20px Arial', 'black');
-            that.palette_text.x = that.buttons[name].x + 2.2 * r;
-            that.palette_text.y = that.buttons[name].y + 5 * r / 8;
-            that.stage.addChild(that.palette_text);
+            // Add a background
+            that.paletteHighlight = new createjs.Shape();
+            that.paletteHighlight.graphics.f(platformColor.paletteSelected).r(that.buttons[name].x + 2, that.buttons[name].y + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, that.cellSize).ef();
+            that.stage.addChildAt(that.paletteHighlight, 2);
         });
 
         this.buttons[name].on('pressup', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
-            if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.palette_text, that.stage);
-            }
-
             hideButtonHighlight(that.circles, that.stage);
         });
 
         this.buttons[name].on('mouseout', function (event) {
             document.body.style.cursor = 'default';
             that.mouseOver = false;
-            if (!sugarizerCompatibility.isInsideSugarizer()) {
-                hidePaletteNameDisplay(that.palette_text, that.stage);
-            }
-
             hideButtonHighlight(that.circles, that.stage);
+            that.stage.removeChild(that.paletteHighlight);
         });
 
+
         this.buttons[name].on('click', function (event) {
-            if (locked) {
-                return;
+            var clickOutside = function(event) {                
+                setTimeout(function () {
+                    searchlocked = false;
+                }, 500);
+
+                if (!that.dict['search'].visible && searchlocked) {
+                    that.showPalette('search');
+                } else { 
+                    document.removeEventListener('click', clickOutside);
+                    that.dict['search'].hide();
+                }
+
+                that.refreshCanvas();
+            };
+
+            if (name === "search") {
+                searchlocked = true;
+                document.addEventListener("click", clickOutside);
+            } else {
+                if (locked) {
+                    return;
+                }
+
+                locked = true;
+                searchlocked = false;
+
+                setTimeout(function () {
+                    locked = false;
+                }, 500);
+
+                if (!that.dict[name].visible && name !== 'search') {
+                    that.dict['search'].hide();                        
+                    if (!searchlocked) {
+                        that.showPalette(name);
+                    }
+                } else { 
+                    that.dict[name].hide();
+                }
+
+                that.refreshCanvas();
             }
-            locked = true;
-
-            setTimeout(function () {
-                locked = false;
-            }, 500);
-
-            that.dict[name]._moveMenu(that.initial_x, that.initial_y);
-            that.showPalette(name);
-            that.refreshCanvas();
         });
     };
 
@@ -604,13 +693,13 @@ function Palettes () {
 
         // Force an update if a block was removed.
         if (blockRemoved) {
-            this.hide();
+            // this.hide();
             this.updatePalettes('action');
-            if (this.mobile) {
-                this.hide();
-            } else {
-                this.show();
-            }
+            // if (this.mobile) {
+            //     this.hide();
+            // } else {
+            //     this.show();
+            // }
         }
     };
 
@@ -630,9 +719,10 @@ function PaletteModel(palette, palettes, name) {
         for (var blk in this.palette.protoList) {
             var block = this.palette.protoList[blk];
             // Don't show hidden blocks on the menus
-            if (block.hidden) {
-                continue;
-            }
+            // But we still make them.
+            // if (block.hidden) {
+            //     continue;
+            // }
 
             // Create a proto block for each palette entry.
             var blkname = block.name;
@@ -709,7 +799,7 @@ function PaletteModel(palette, palettes, name) {
             }
 
             var protoBlock = this.palettes.blocks.protoBlockDict[blkname];
-            if (protoBlock == null) {
+            if (protoBlock === null) {
                 console.log('Could not find block ' + blkname);
                 continue;
             }
@@ -723,6 +813,9 @@ function PaletteModel(palette, palettes, name) {
             case 'drumname':
                 label = _('drum');
                 break;
+            case 'effectsname':
+                label = _('effect');
+                break;    
             case 'solfege':
                 label = i18nSolfege('sol');
                 break;
@@ -737,6 +830,10 @@ function PaletteModel(palette, palettes, name) {
                 break;
             case 'voicename':
                 label = _('voice name');
+                break;
+            case 'temperamentname':
+                //TRANS: https://en.wikipedia.org/wiki/Musical_temperament
+                label = _('temperament');
                 break;
             case 'accidentalname':
                 //TRANS: accidental refers to sharps, flats, etc.
@@ -791,14 +888,19 @@ function PaletteModel(palette, palettes, name) {
                 }
             }
 
-            if (['do', 'nameddo', 'namedbox', 'namedcalc', 'doArg', 'calcArg', 'nameddoArg', 'namedcalcArg'].indexOf(protoBlock.name) != -1 && label != null && label.length > 8) {
-                label = label.substr(0, 7) + '...';
+            if (['do', 'nameddo', 'namedbox', 'namedcalc', 'doArg', 'calcArg', 'nameddoArg', 'namedcalcArg'].indexOf(protoBlock.name) != -1 && label != null) {
+                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {  
+                    label = label.substr(0, STRINGLEN) + '...';
+                }
             }
 
             // Don't display the label on image blocks.
             if (protoBlock.image) {
                 label = '';
             }
+
+            var saveScale = protoBlock.scale;
+            protoBlock.scale = DEFAULTBLOCKSCALE;
 
             // Finally, the SVGs!
             switch (protoBlock.name) {
@@ -812,22 +914,27 @@ function PaletteModel(palette, palettes, name) {
                 svg.setOutie(true);
                 var artwork = svg.basicBox();
                 var docks = svg.docks;
+                var height = svg.getHeight();
                 break;
             case 'nameddo':
                 // so the label will fit
                 var svg = new SVG();
                 svg.init();
                 svg.setScale(protoBlock.scale);
-                svg.setExpand(30, 0, 0, 0);
+                svg.setExpand(60, 0, 0, 0);
                 var artwork = svg.basicBlock();
                 var docks = svg.docks;
+                var height = svg.getHeight();
                 break;
             default:
                 var obj = protoBlock.generator();
                 var artwork = obj[0];
                 var docks = obj[1];
+                var height = obj[3];
                 break;
             }
+
+            protoBlock.scale = saveScale;
 
             if (protoBlock.disabled) {
                 artwork = artwork
@@ -852,13 +959,15 @@ function PaletteModel(palette, palettes, name) {
                 blkname,
                 modname,
                 height: STANDARDBLOCKHEIGHT,
+                actualHeight: height,
                 label,
                 artwork,
                 artwork64: 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))),
                 docks,
                 image: block.image,
                 scale: block.scale,
-                palettename: this.palette.name
+                palettename: this.palette.name,
+                hidden: block.hidden
             });
         }
     };
@@ -880,7 +989,24 @@ function PopdownPalette(palettes) {
             html += '<div class="palette">';
             var icon = PALETTEICONS[name].replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
             //.TRANS: popout: to detach as a separate window
-            html += format('<h2 data-name="{n}"> \
+	    var language = localStorage.languagePreference;
+	    if (language === 'ja') {
+		//.TRANS: show2 is show as in make visible (the opposite of hide)
+		html += format('<h2 data-name="{n}"> \
+                                {i}<span>{n}</span> \
+                                <img class="hide-button" src="header-icons/hide.svg" \
+                                     alt="{' + _('hide') + '}" \
+                                     title="{' + _('hide') + '}" /> \
+                                <img class="show-button" src="header-icons/show.svg" \
+                                     alt="{' + _('show2') + '}" \
+                                     title="{' + _('show2') + '}" /> \
+                                <img class="popout-button" src="header-icons/popout.svg" \
+                                     alt="{' + _('popout') + '}" \
+                                     title="{' + _('popout') + '}" /> \
+                            </h2>',
+                               {i: icon, n: toTitleCase(_(name))});
+	    } else {
+		html += format('<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
                                      alt="{' + _('hide') + '}" \
@@ -892,7 +1018,8 @@ function PopdownPalette(palettes) {
                                      alt="{' + _('popout') + '}" \
                                      title="{' + _('popout') + '}" /> \
                             </h2>',
-                           {i: icon, n: toTitleCase(_(name))});
+                               {i: icon, n: toTitleCase(_(name))});
+	    }
             html += '<ul>';
             this.models[name].update();
 
@@ -910,6 +1037,7 @@ function PopdownPalette(palettes) {
             }
             html += '</div>';
         }
+
         document.querySelector('#popdown-palette').innerHTML = html;
 
         var that = this;
@@ -944,7 +1072,7 @@ function PopdownPalette(palettes) {
                 // console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = palette._makeBlockFromPalette(palette.protoList[e.dataset.blk], e.dataset.modname, function (newBlock) {
                     // Move the block and the drag group.
-                    that.palettes.blocks._moveBlock(newBlock, 75 - that.palettes.blocks.stage.x, 75 - that.palettes.blocks.stage.y);
+                    that.palettes.blocks._moveBlock(newBlock, Math.floor(75 - that.palettes.blocks.stage.x), Math.floor(75 - that.palettes.blocks.stage.y));
                     that.palettes.blocks.findDragGroup(newBlock);
                     for (var i in that.palettes.blocks.dragGroup) {
                         that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], 0, 0);
@@ -974,6 +1102,7 @@ function Palette(palettes, name) {
     this.menuContainer = null;
     this.protoList = [];
     this.protoContainers = {};
+    this.protoHeights = {};
     this.background = null;
     this.scrollDiff = 0
     this.y = 0;
@@ -991,21 +1120,25 @@ function Palette(palettes, name) {
         var that = this;
 
         function __processButtonIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.8;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.6;
+            bitmap.y = 6;
             that.menuContainer.addChild(bitmap);
-            that.palettes.container.addChild(that.menuContainer);
+            // that.palettes.container.addChild(that.menuContainer);
         };
 
         function __processCloseIcon(palette, name, bitmap, args) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.5;
             that.menuContainer.addChild(bitmap);
-            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT;
-            bitmap.y = 0;
+            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT * 2 / 3;
+            bitmap.y = 8;
 
+            // Define the hit area for the entire header area; the
+            // left half is for draggging, the right half is for the
+            // close button.
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(-paletteWidth / 2, -STANDARDBLOCKHEIGHT / 2, paletteWidth, STANDARDBLOCKHEIGHT);
-            hitArea.x = paletteWidth / 2;
-            hitArea.y = STANDARDBLOCKHEIGHT / 2;
+            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth * 1 / 4, STANDARDBLOCKHEIGHT);
+            hitArea.x = paletteWidth - STANDARDBLOCKHEIGHT;
+            hitArea.y = 0;
             that.menuContainer.hitArea = hitArea;
             that.menuContainer.visible = false;
 
@@ -1028,7 +1161,6 @@ function Palette(palettes, name) {
             that.upButton.on('click', function (event) {
                 that.scrollEvent(STANDARDBLOCKHEIGHT, 10);
             });
-
         };
 
         function __processDownIcon(palette, name, bitmap, args) {
@@ -1084,11 +1216,11 @@ function Palette(palettes, name) {
             makePaletteBitmap(palette, FADEDDOWNICON, name, __makeFadedDownIcon, null);
             makePaletteBitmap(palette, FADEDUPICON, name, __makeFadedUpIcon, null);
             makePaletteBitmap(palette, UPICON, name, __processUpIcon, null);
-            makePaletteBitmap(palette, CLOSEICON, name, __processCloseIcon, null);
+            makePaletteBitmap(palette, CLOSEICON.replace('fill_color', platformColor.selectorSelected), name, __processCloseIcon, null);
             makePaletteBitmap(palette, PALETTEICONS[name], name, __processButtonIcon, null);
         };
 
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             this.menuContainer = new createjs.Container();
             this.menuContainer.snapToPixelEnabled = true;
         }
@@ -1097,11 +1229,11 @@ function Palette(palettes, name) {
             return;
         }
 
-        var paletteWidth = MENUWIDTH + this._getOverflowWidth();
+        var paletteWidth = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
-        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', '#282828').replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
+        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', platformColor.selectorSelected).replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
     };
 
     this._getDownButtonY = function () {
@@ -1122,7 +1254,7 @@ function Palette(palettes, name) {
 
     this._updateBlockMasks = function () {
         var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
-        var w = MENUWIDTH + this._getOverflowWidth();
+        var w = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         for (var i in this.protoContainers) {
             var s = new createjs.Shape();
             s.graphics.r(0, 0, w, h);
@@ -1135,13 +1267,18 @@ function Palette(palettes, name) {
     this._getOverflowWidth = function() {
         var maxWidth = 0;
         for(var i in this.protoList) {
+            if (this.protoList[i].hidden) {
+                continue;
+            }
+
             maxWidth = Math.max(maxWidth, this.protoList[i].textWidth);
         }
-        return (maxWidth  > 100 ? maxWidth - 30 : 0);
+
+        return (maxWidth  > 100 ? (maxWidth - 30) * PROTOBLOCKSCALE : 0);
     }
 
     this._updateBackground = function () {
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             return;
         }
 
@@ -1163,18 +1300,18 @@ function Palette(palettes, name) {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
-        shape.graphics.f('#949494').r(0, 0, MENUWIDTH + this._getOverflowWidth(), h).ef();
-        shape.width = MENUWIDTH + this._getOverflowWidth();
+        shape.graphics.f(platformColor.ruleColor).r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef().f(platformColor.paletteBackground).r(2, 2, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth() - 4, h - 4).ef();
+        shape.width = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         shape.height = h;
         this.background.addChild(shape);
 
         this.background.x = this.menuContainer.x;
-        this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
+        this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT / 2;
     };
 
     this._resetLayout = function () {
         // Account for menu toolbar
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             console.log('menuContainer is null');
             return;
         }
@@ -1183,26 +1320,29 @@ function Palette(palettes, name) {
             this.protoContainers[i].y -= this.scrollDiff;
         }
 
-        this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
+        // a bit more than the header height
+        this.y = this.menuContainer.y + 50;
         var items = [];
+        var heights = [];
         // Reverse order
         for (var i in this.protoContainers) {
             items.push(this.protoContainers[i]);
+            heights.push(this.protoHeights[i]);
         }
+
         var n = items.length;
         for (var j = 0; j < n; j++) {
             var i = items.pop();
+            var h = heights.pop();
             i.x = this.menuContainer.x;
-            i.y = this.y;
-            var bounds = i.getBounds();
-            if (bounds != null) {
-                // Pack them in a bit tighter
-                this.y += bounds.height - (STANDARDBLOCKHEIGHT * 0.1);
+            if (h === undefined) {
+                h = STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE;
             } else {
-                // If artwork isn't ready, assume it is of standard
-                // size, e.g., and action block.
-                this.y += STANDARDBLOCKHEIGHT * 0.9;
+                h = h * PROTOBLOCKSCALE;
             }
+
+            i.y = this.y;
+            this.y += Math.floor(h + (STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1));
         }
 
         for (var i in this.protoContainers) {
@@ -1224,6 +1364,15 @@ function Palette(palettes, name) {
             that.protoContainers[modname].hitArea = hitArea;
             that._loadPaletteMenuItemHandler(protoListBlk, modname);
             that.palettes.refreshCanvas();
+
+            for (var b in that.model.blocks) {
+                if (that.model.blocks[b].modname === modname) {
+                    if (that.protoHeights[modname] === undefined) {
+                        // console.log('assigning height to ' + modname);
+                        that.protoHeights[modname] = that.model.blocks[b].actualHeight;
+                    }
+                }
+            }
         };
 
         function __processBitmap(palette, modname, bitmap, args) {
@@ -1231,7 +1380,7 @@ function Palette(palettes, name) {
             var blk = args[1];
             var protoListBlk = args[2];
 
-            if (that.protoContainers[modname] == undefined) {
+            if (that.protoContainers[modname] === undefined) {
                 console.log('no protoContainer for ' + modname);
                 return;
             }
@@ -1248,13 +1397,14 @@ function Palette(palettes, name) {
                 image.onload = function () {
                     var bitmap = new createjs.Bitmap(image);
                     if (image.width > image.height) {
-                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / image.width * (b.scale / 2);
+                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / image.width * (b.scale / 2) * PROTOBLOCKSCALE;
                     } else {
-                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / image.height * (b.scale / 2);
+                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / image.height * (b.scale / 2) * PROTOBLOCKSCALE;
                     }
                     that.protoContainers[modname].addChild(bitmap);
-                    bitmap.x = MEDIASAFEAREA[0] * (b.scale / 2);
-                    bitmap.y = MEDIASAFEAREA[1] * (b.scale / 2);
+                    bitmap.x = Math.floor((MEDIASAFEAREA[0] * (b.scale / 2)) + 0.5) * PROTOBLOCKSCALE;
+                    
+                    bitmap.y = Math.floor((MEDIASAFEAREA[1] * (b.scale / 2)) + 0.5) * PROTOBLOCKSCALE;
                     __calculateBounds(palette, blk, modname, protoListBlk);
                 };
 
@@ -1269,7 +1419,7 @@ function Palette(palettes, name) {
             makePaletteBitmap(palette, b.artwork, b.modname, __processBitmap, args);
         };
 
-        if (this.menuContainer == null) {
+        if (this.menuContainer === null) {
             this.makeMenu(true);
         } else {
             // Hide the menu while we update.
@@ -1284,18 +1434,23 @@ function Palette(palettes, name) {
         this.model.update();
 
         var blocks = this.model.blocks;
-        if (BUILTINPALETTES.indexOf(name) == -1)
+        if (BUILTINPALETTES.indexOf(name) === -1)
             blocks.reverse();
 
         for (var blk in blocks) {
             var b = blocks[blk];
+
+            if (b.hidden) {
+                continue;
+            }
+
             if (!this.protoContainers[b.modname]) {
                 // create graphics for the palette entry for this block
                 this.protoContainers[b.modname] = new createjs.Container();
                 this.protoContainers[b.modname].snapToPixelEnabled = true;
 
-                this.protoContainers[b.modname].x = this.menuContainer.x;
-                this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
+                this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
+                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE + 0.5);
                 this.palettes.stage.addChild(this.protoContainers[b.modname]);
                 this.protoContainers[b.modname].visible = false;
 
@@ -1309,9 +1464,10 @@ function Palette(palettes, name) {
                 // argument.
                 makePaletteBitmap(this, PALETTEFILLER.replace(/filler_height/g, b.height.toString()), b.modname, __processFiller, [b, blk, this.protoList[blk]]);
             } else {
-                this.protoContainers[b.modname].x = this.menuContainer.x;
-                this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
-                this.y += Math.ceil(b.height * PROTOBLOCKSCALE);
+                this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
+                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE + 0.5);
+                this.protoHeights[b.modname] = b.actualHeight;
+                this.y += Math.ceil(b.actualHeight * PROTOBLOCKSCALE);
             }
         }
 
@@ -1324,7 +1480,10 @@ function Palette(palettes, name) {
 
     this._moveMenu = function (x, y) {
         // :sigh: race condition on iOS 7.1.2
-        if (this.menuContainer == null) return;
+        if (this.menuContainer === null) {
+            return;
+        }
+
         var dx = x - this.menuContainer.x;
         var dy = y - this.menuContainer.y;
         this.menuContainer.x = x;
@@ -1359,16 +1518,21 @@ function Palette(palettes, name) {
     };
 
     this.hideMenu = function () {
+        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+            this.palettes.hideSearchWidget(true);
+        }
+
+        this.palettes.paletteVisible = false;
         if (this.menuContainer != null) {
             this.menuContainer.visible = false;
             this._hideMenuItems();
         }
 
         this.palettes.pluginsDeleteStatus = false;
-        this._moveMenu(this.palettes.cellSize, this.palettes.cellSize);
     };
 
     this.showMenu = function () {
+        this.palettes.paletteVisible = true;
         if (this.palettes.mobile) {
             this.menuContainer.visible = false;
         } else {
@@ -1384,6 +1548,10 @@ function Palette(palettes, name) {
     };
 
     this._hideMenuItems = function () {
+        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+            this.palettes.hideSearchWidget(true);
+        }
+
         for (var i in this.protoContainers) {
             this.protoContainers[i].visible = false;
         }
@@ -1539,7 +1707,7 @@ function Palette(palettes, name) {
 
         this._updateBlockMasks();
         var stage = this.palettes.stage;
-        stage.setChildIndex(this.menuContainer, stage.getNumChildren() - 1);
+        stage.setChildIndex(this.menuContainer, stage.children.length - 1);
         this.palettes.refreshCanvas();
         this.count += 1;
     };
@@ -1627,14 +1795,14 @@ function Palette(palettes, name) {
     };
 
     // Palette Menu event handlers
-    this._loadPaletteMenuHandler =function () {
+    this._loadPaletteMenuHandler = function () {
         // The palette menu is the container for the protoblocks. One
         // palette per palette button.
 
         var that = this;
         var locked = false;
         var trashcan = this.palettes.trashcan;
-        var paletteWidth = MENUWIDTH + this._getOverflowWidth();
+        var paletteWidth = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
 
         this.menuContainer.on('click', function (event) {
             if (Math.round(event.stageX / that.palettes.scale) > that.menuContainer.x + paletteWidth - STANDARDBLOCKHEIGHT) {
@@ -1646,6 +1814,7 @@ function Palette(palettes, name) {
             if (locked) {
                 return;
             }
+            
             locked = true;
             setTimeout(function () {
                 locked = false;
@@ -1667,29 +1836,12 @@ function Palette(palettes, name) {
             that.palettes.refreshCanvas();
         });
 
-        this.menuContainer.on('mousedown', function (event) {
-            // Move them all?
-            var offset = {
-                x: that.menuContainer.x - Math.round(event.stageX / that.palettes.scale),
-                y: that.menuContainer.y - Math.round(event.stageY / that.palettes.scale)
-            };
+        this.menuContainer.on('mouseover', function(event) {
+            document.body.style.cursor = 'pointer';
+        });
 
-            that.menuContainer.removeAllEventListeners('pressmove');
-            that.menuContainer.on('pressmove', function (event) {
-                var oldX = that.menuContainer.x;
-                var oldY = that.menuContainer.y;
-                that.menuContainer.x = Math.round(event.stageX / that.palettes.scale) + offset.x;
-                that.menuContainer.y = Math.round(event.stageY / that.palettes.scale) + offset.y;
-                that.palettes.refreshCanvas();
-                var dx = that.menuContainer.x - oldX;
-                var dy = that.menuContainer.y - oldY;
-                that.palettes.initial_x = that.menuContainer.x;
-                that.palettes.initial_y = that.menuContainer.y;
-
-                // Hide the menu items while drag.
-                that._hideMenuItems();
-                that._moveMenuItemsRelative(dx, dy);
-            });
+        this.menuContainer.on('mouseout', function(event) {
+            document.body.style.cursor = 'default';
         });
     };
 
@@ -1711,7 +1863,7 @@ function Palette(palettes, name) {
 
         this.protoContainers[blkname].on('mousedown', function (event) {
             var stage = that.palettes.stage;
-            stage.setChildIndex(that.protoContainers[blkname], stage.getNumChildren() - 1);
+            stage.setChildIndex(that.protoContainers[blkname], stage.children.length - 1);
 
             var h = Math.min(maxPaletteHeight(that.palettes.cellSize, that.palettes.scale), that.palettes.y);
             var clickY = event.stageY/that.palettes.scale;
@@ -1882,7 +2034,7 @@ function Palette(palettes, name) {
     };
 
     this._makeBlockFromPalette = function (protoblk, blkname, callback) {
-        if (protoblk == null) {
+        if (protoblk === null) {
             console.log('null protoblk?');
             return;
         }
@@ -1980,8 +2132,14 @@ function Palette(palettes, name) {
             var newBlk = protoblk.name;
             break;
         default:
+            console.log(blkname);
+            if (blkname === 'nameddo') {
+                var arg = _('action');
+            } else {
+                var arg = '__NOARG__';
+            }
+
             var newBlk = blkname;
-            var arg = '__NOARG__';
             break;
         }
 
@@ -2033,7 +2191,7 @@ function Palette(palettes, name) {
             var macroExpansion = null;
             if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1) {
                 var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
-                if (macroExpansion == null) {
+                if (macroExpansion === null) {
                     // Maybe it is a plugin macro?
                     if (blkname in this.palettes.pluginMacros) {
                         var macroExpansion = this.palettes.getPluginMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
@@ -2108,6 +2266,7 @@ function Palette(palettes, name) {
     return this;
 };
 
+
 function initPalettes (palettes) {
     // Instantiate the palettes object on first load.
 
@@ -2122,7 +2281,8 @@ function initPalettes (palettes) {
     setTimeout(function () {
         palettes.show();
         palettes.bringToTop();
-    }, 6000);
+        palettes.showSelection(0);
+    }, 1000); // 6000
 };
 
 

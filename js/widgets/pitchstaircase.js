@@ -22,6 +22,7 @@ function PitchStaircase () {
 
     // A list of stair steps.
     this.Stairs = [];
+    this.stairPitchBlocks = [];
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -32,14 +33,14 @@ function PitchStaircase () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -80,7 +81,7 @@ function PitchStaircase () {
 
             // The play button for this row.
             // var cell = stepTableRow.insertCell();
-            var playCell = this._addButton(stepTableRow, 'play-button.svg', ICONSIZE, _('play'));
+            var playCell = this._addButton(stepTableRow, 'play-button.svg', ICONSIZE, _('Play'));
             playCell.className = 'headcol';  // This cell is fixed horizontally.
             playCell.setAttribute('id', i);
 
@@ -91,7 +92,7 @@ function PitchStaircase () {
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = BUTTONSIZE + 'px';
-            stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
 
             var cellWidth = Number(stepCell.style.width.replace(/px/, ''));
             var svgWidth = cellWidth.toString();
@@ -118,15 +119,55 @@ function PitchStaircase () {
     this._undo = function () {
         if (this._history.length === 0) {
             console.log('nothing for undo to undo');
-            return;
+            return false;
         }
 
         // Remove the last entry...
         var i = this._history.pop();
         this.Stairs.splice(i, 1);
 
+        // Remove the last block added to the tempo widget
+        var blk = this.stairPitchBlocks.pop();
+        console.log('removing block ' + blk);
+        // Find the block above
+        var c0 = this._logo.blocks.blockList[blk].connections[0];
+        // And the block below, if any
+        var c1 = last(this._logo.blocks.blockList[blk].connections);
+
+        // Check for vspaces below the hertz block
+        if (c1 !== null) {
+            if (this._logo.blocks.blockList[c1].name === 'vspace') {
+		var c2 = last(this._logo.blocks.blockList[c1].connections);
+		if (this._logo.blocks.blockList[c2].name === 'vspace') {
+		    var c = last(this._logo.blocks.blockList[c2].connections);
+		    this._logo.blocks.blockList[c2].connections[1] = null;
+		} else {
+		    var c = last(this._logo.blocks.blockList[c1].connections);
+		    this._logo.blocks.blockList[c1].connections[1] = null;
+		}
+	    }
+	} else {
+	    var c = c1;
+	}
+
+        // Disconnect from the block above
+        var i = this._logo.blocks.blockList[c0].connections.indexOf(blk);
+        this._logo.blocks.blockList[c0].connections[i] = c;
+        this._logo.blocks.blockList[blk].connections[0] = null;
+
+        // And send the blocks to the trash
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blk]);
+
+        // Force the clamp to adjust.
+        this._logo.blocks.blockMoved(c0);
+        this._logo.blocks.adjustDocks(this._logo.blocks.findTopBlock(c0));
+        this._logo.blocks.clampThisToCheck = [[this._logo.blocks.findTopBlock(c0), 0]];
+        this._logo.blocks.adjustExpandableClampBlock();
+
         // And rebuild the stairs.
         this._refresh();
+
+	return true;
     };
 
     this._dissectStair = function (event) {
@@ -166,19 +207,21 @@ function PitchStaircase () {
             return;
         }
 
+        // TODO: look to see if the same frequency is already in the list.
+
         var obj = frequencyToPitch(parseFloat(frequency) / inputNum);
         var foundStep = false;
         var isStepDeleted = true;
 
         for (var i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1)]);
+                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
                 foundStep = true;
                 break;
             }
 
             if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1)]);
+                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
                 foundStep = true;
                 isStepDeleted = false;
                 break;
@@ -186,11 +229,40 @@ function PitchStaircase () {
         }
 
         if (!foundStep) {
-            this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1)]);
+            this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
             this._history.push(this.Stairs.length - 1);
         } else {
             this._history.push(i);
         }
+
+        // Add a new block to the tempo widget
+        var note  = this.Stairs[i][0];
+        var octave = this.Stairs[i][1];
+        var frequency = this.Stairs[i][2];
+        var pitch = frequencyToPitch(frequency);
+
+        var bb = last(this.stairPitchBlocks);
+        var b = this._logo.blocks.findBottomBlock(bb);
+        var c = last(this._logo.blocks.blockList[b].connections);
+
+        if (pitch[2] === 0) {  // 0 cents means we have an exact match to a named pitch
+            var newStack = [[0, 'pitch', 0, 0, [null, 1, 2, c]], [1, ['notename', {'value': pitch[1]}], 0, 0, [0]], [2, ['number', {'value': pitch[1]}], 0, 0, [0]]];
+        } else {
+            // var newStack = [[0, 'hertz', 0, 0, [null, 1, c]], [1, ['number', {'value': frequency.toFixed(2)}], 0, 0, [0]]];
+            var newStack = [[0, 'hertz', 0, 0, [null, 1, 6]], [1, 'multiply', 0, 0, [0, 2, 3]], [2, ['number', {'value': this.Stairs[n][5].toFixed(2)}], 0, 0, [1]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': this.Stairs[n][4]}], 0, 0, [3]], [5, ['number', {'value': this.Stairs[n][3]}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, 7]], [7, 'vspace', 0, 0, [6, c]]];
+        }
+
+        var blk = this._logo.blocks.blockList.length;
+        console.log(newStack);
+        this._logo.blocks.loadNewBlocks(newStack);
+
+        // Make the connections
+        var i = this._logo.blocks.blockList[b].connections.length - 1;
+        this._logo.blocks.blockList[b].connections[i] = blk;
+        this._logo.blocks.blockList[blk].connections[0] = b;
+        this._logo.blocks.adjustDocks(b, true);
+
+        this.stairPitchBlocks.push(blk);
 
         this._makeStairs(i, isStepDeleted);
         this._resizeWidget();
@@ -198,11 +270,12 @@ function PitchStaircase () {
 
     this._playOne = function (stepCell) {
         // The frequency is stored in the stepCell.
-        stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        stepCell.style.backgroundColor = platformColor.selectorBackground;
         var frequency = Number(stepCell.getAttribute('id'));
         this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
+
         setTimeout(function () {
-            stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
         }, 1000)
     };
 
@@ -215,7 +288,7 @@ function PitchStaircase () {
             pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
             var pscTableCell = docById('stepTable' + i);
             var stepCell = pscTableCell.rows[0].cells[1];
-            stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
             this._logo.synth.trigger(0, pitchnotes, 1, 'default', null,null);
         }
 
@@ -223,7 +296,7 @@ function PitchStaircase () {
             for (var i = 0; i < that.Stairs.length; i++) {
                 var pscTableCell = docById('stepTable' + i);
                 var stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
         }, 1000);
     };
@@ -236,7 +309,7 @@ function PitchStaircase () {
         var last = this.Stairs.length - 1;
         var pscTableCell = docById('stepTable' + last);
         var stepCell = pscTableCell.rows[0].cells[1];
-        stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        stepCell.style.backgroundColor = platformColor.selectorBackground;
         this._logo.synth.trigger(0, pitchnotes, 1, 'default', null, null);
         this._playNext(this.Stairs.length - 2, -1);
     };
@@ -252,7 +325,7 @@ function PitchStaircase () {
                 for (var i = 0; i < that.Stairs.length; i++) {
                     var pscTableCell = docById('stepTable' + i);
                     var stepCell = pscTableCell.rows[0].cells[1];
-                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    stepCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1000);
             return;
@@ -263,7 +336,7 @@ function PitchStaircase () {
                 for (var i = 0; i < that.Stairs.length; i++) {
                     var pscTableCell = docById('stepTable' + i);
                     var stepCell = pscTableCell.rows[0].cells[1];
-                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    stepCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1000);
 
@@ -283,12 +356,12 @@ function PitchStaircase () {
         setTimeout(function () {
             if (pscTableCell != null) {
                 var stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
 
             var pscTableCell = docById('stepTable' + index);
             var stepCell = pscTableCell.rows[0].cells[1];
-            stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
             that._logo.synth.trigger(0, pitchnotes, 1, 'default', null, null);
             if (index < that.Stairs.length || index > -1) {
                 that._playNext(index + next, next);
@@ -307,8 +380,8 @@ function PitchStaircase () {
         var previousBlock = 0;
 
         for (var i = 0; i < this.Stairs.length; i++) {
-            console.log(this._initialFrequency + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
-
+            // console.log(this._initialFrequency + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
+            console.log(this.Stairs[i][5] + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
             var noteobj = frequencyToPitch(this.Stairs[i][2]);
             var note  = this.Stairs[i][0];
             var octave = this.Stairs[i][1];
@@ -327,7 +400,7 @@ function PitchStaircase () {
                 var hiddenBlockName = 'hidden';
 
                 newStack.push([hertzBlockIdx, 'pitch', 0, 0, [previousBlock, noteIdx, octaveIdx, hiddenIdx]]);
-                newStack.push([noteIdx, ['text', {'value': pitch[0]}], 0, 0, [pitchBlockIdx]]);
+                newStack.push([noteIdx, ['notename', {'value': pitch[0]}], 0, 0, [pitchBlockIdx]]);
                 newStack.push([octaveIdx, ['number', {'value': pitch[1]}], 0, 0, [pitchBlockIdx]])
             } else {
                 var hertzBlockIdx = newStack.length;
@@ -341,7 +414,8 @@ function PitchStaircase () {
                 var hiddenBlockName = 'vspace';
                 newStack.push([hertzBlockIdx, 'hertz', 0, 0, [previousBlock, multiplyIdx, vspaceIdx]]);
                 newStack.push([multiplyIdx, 'multiply', 0, 0, [hertzBlockIdx, frequencyIdx, divideIdx]]);
-                newStack.push([frequencyIdx, ['number', {'value': this._initialFrequency.toFixed(2)}], 0, 0, [multiplyIdx]]);
+                // newStack.push([frequencyIdx, ['number', {'value': this._initialFrequency.toFixed(2)}], 0, 0, [multiplyIdx]]);
+                newStack.push([frequencyIdx, ['number', {'value': this.Stairs[i][5].toFixed(2)}], 0, 0, [multiplyIdx]]);
                 newStack.push([divideIdx, 'divide', 0, 0, [multiplyIdx, numeratorIdx, denominatorIdx]]);
                 newStack.push([numeratorIdx, ['number', {'value': this.Stairs[i][4]}], 0, 0, [divideIdx]]);
                 newStack.push([denominatorIdx, ['number', {'value': this.Stairs[i][3]}], 0, 0, [divideIdx]]);
@@ -351,8 +425,7 @@ function PitchStaircase () {
 
             if (i === this.Stairs.length - 1) {
                 newStack.push([hiddenIdx, hiddenBlockName, 0, 0, [hertzBlockIdx, null]]);
-            }
-            else {
+            } else {
                 newStack.push([hiddenIdx, hiddenBlockName, 0, 0, [hertzBlockIdx, hiddenIdx + 1]]);
             }
 
@@ -364,7 +437,13 @@ function PitchStaircase () {
 
     this.init = function (logo) {
         this._logo = logo;
-        this._initialFrequency = this.Stairs[0][2];
+        for (var i = 0; i < this.Stairs.length; i++) {
+            this.Stairs[i].push(1);  // denominator
+            this.Stairs[i].push(1);  // numerator
+            this.Stairs[i].push(this.Stairs[i][2]);  // initial frequency
+        }
+
+        // this._initialFrequency = this.Stairs[0][2];
         this._history = [];
 
         var w = window.innerWidth;
@@ -393,43 +472,43 @@ function PitchStaircase () {
 
         var that = this;
 
-        var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('play chord'));
+        var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('Play chord'));
         cell.onclick=function() {
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'play-scale.svg', ICONSIZE, _('play scale'));
+        var cell = this._addButton(row, 'play-scale.svg', ICONSIZE, _('Play scale'));
         cell.onclick=function() {
             that.playUpAndDown();
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         cell.onclick=function() {
             that._save(0);
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         var cell = row.insertCell();
@@ -437,45 +516,52 @@ function PitchStaircase () {
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         docById('musicratio1').classList.add('hasKeyboard');
 
         var cell = row.insertCell();
         cell.innerHTML = '<h2>:</h2>';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         var cell = row.insertCell();
         cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         docById('musicratio2').classList.add('hasKeyboard');
 
-        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
         cell.onclick=function() {
             that._undo();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
+        cell.onclick=function() {
+	    while (that._undo()) {
+	    }
+        };
+
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
         cell.onclick=function() {
             docById('pscDiv').style.visibility = 'hidden';
             docById('pscButtonsDiv').style.visibility = 'hidden';
             docById('pscTableDiv').style.visibility = 'hidden';
             docById('musicratio1').classList.remove('hasKeyboard');
             docById('musicratio2').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - pscDiv.getBoundingClientRect().left;
@@ -549,6 +635,8 @@ function PitchStaircase () {
 
         pscTableDiv.innerHTML = '<div id="pscOuterDiv"><div id="pscInnerDiv"><table cellpadding="0px" id="pscTable"></table></div></div>';
         this._refresh();
+
+        this._logo.textMsg(_('Click on a note to create a new step.'));
     };
 
     this._resizeWidget = function() {

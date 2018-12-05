@@ -24,7 +24,6 @@ function ModeWidget() {
         this._logo = logo;
         this._modeBlock = modeBlock;
         this._locked = false;
-        console.log(this._logo.keySignature);
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
 
@@ -57,58 +56,59 @@ function ModeWidget() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick=function() {
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
 
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'rotate-left.svg', ICONSIZE, _('rotate counter clockwise'));
+        var cell = this._addButton(row, 'rotate-left.svg', ICONSIZE, _('Rotate counter clockwise'));
 
         cell.onclick=function() {
             that._rotateLeft();
         }
 
-        var cell = this._addButton(row, 'rotate-right.svg', ICONSIZE, _('rotate clockwise'));
+        var cell = this._addButton(row, 'rotate-right.svg', ICONSIZE, _('Rotate clockwise'));
 
         cell.onclick=function() {
             that._rotateRight();
         }
 
-        var cell = this._addButton(row, 'invert.svg', ICONSIZE, _('invert'));
+        var cell = this._addButton(row, 'invert.svg', ICONSIZE, _('Invert'));
 
         cell.onclick=function() {
             that._invert();
         }
 
-        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
 
         cell.onclick=function() {
             that._undo();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
             docById('modeDiv').style.visibility = 'hidden';
             docById('modeButtonsDiv').style.visibility = 'hidden';
             docById('modeTableDiv').style.visibility = 'hidden';
+            that._logo.hideMsgs();
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - modeDiv.getBoundingClientRect().left;
@@ -193,9 +193,11 @@ function ModeWidget() {
         var cell = row.insertCell();
         cell.colSpan = 18;
         cell.innerHTML = '&nbsp;';
-        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         this._makeClickable();
+        //.TRANS: A circle of notes represents the musical mode.
+        this._logo.textMsg(_('Click in the circle to select notes for the mode.'));
     };
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -207,14 +209,14 @@ function ModeWidget() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
@@ -416,7 +418,7 @@ function ModeWidget() {
         cell.style.width = cell.width;
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
         cell.style.fontSize = this._cellScale * 100 + '%';
         cell.innerHTML = '<font color="white">' + halfstep + '</font>';
         cell.setAttribute('id', halfstep);
@@ -431,7 +433,9 @@ function ModeWidget() {
 
         var table = docById('modeTable');
         var n = table.rows.length - 1;
-        table.rows[n].cells[0].innerHTML = getModeName(currentModeName[1]);
+
+        console.log(_(currentModeName[1]));
+        table.rows[n].cells[0].innerHTML = currentModeName[0] + ' ' + _(currentModeName[1]);
 
         var that = this;
         var k = 0;
@@ -444,7 +448,7 @@ function ModeWidget() {
                 j += currentMode[k];
                 k += 1;
             } else {
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.style.backgroundColor = platformColor.selectorBackground;
             }
 
             if (i === 0) {
@@ -457,7 +461,7 @@ function ModeWidget() {
                     that._saveState();
 
                     if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        this.style.backgroundColor = platformColor.selectorBackground;
                         that._setModeName()
                     } else {
                         this.style.backgroundColor = 'black';
@@ -675,7 +679,7 @@ function ModeWidget() {
             }
 
             var cell = table.rows[MODEMAP[that.cells[i] % 12][0]].cells[MODEMAP[that.cells[i] % 12][1]];
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             if (that._lastNotePlayed != null && that._lastNotePlayed !== cell) {
                 that._lastNotePlayed.style.backgroundColor = 'black';
@@ -746,7 +750,7 @@ function ModeWidget() {
         for (var i = 1; i < 12; i++) {
             var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor === 'black') {
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.style.backgroundColor = platformColor.selectorBackground;
             }
         }
     };
@@ -773,19 +777,22 @@ function ModeWidget() {
         var table = docById('modeTable');
 	var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
+        var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
 
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
-                table.rows[n].cells[0].innerHTML = getModeName(mode);
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
-                    this._logo.blocks.blockList[this._modeBlock].value = getModeName(mode);
-                    this._logo.blocks.blockList[this._modeBlock].text.text = getModeName(mode);
+                    this._logo.blocks.blockList[this._modeBlock].value = mode;
+
+                    this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
                     this._logo.blocks.blockList[this._modeBlock].updateCache();
 
                     this._logo.refreshCanvas();
                 }
+
+                table.rows[n].cells[0].innerHTML = currentKey + ' ' + _(mode);
                 return;
             }
         }
@@ -795,14 +802,14 @@ function ModeWidget() {
 
     this._save = function() {
         var table = docById('modeTable');
-	var n = table.rows.length - 1;
+        var n = table.rows.length - 1;
 
         // If the mode is not in the list, save it as the new custom mode.
         if (table.rows[n].cells[0].innerHTML === '') {
             customMode = this._calculateMode();
             console.log('custom mode: ' + customMode);
             storage.custommode = JSON.stringify(customMode);
-	}
+        }
 
         var modeName = table.rows[n].cells[0].innerHTML;
         if (modeName === '') {
@@ -822,8 +829,8 @@ function ModeWidget() {
             var j = 11 - i;
             var cell = table.rows[MODEMAP[j][0]].cells[MODEMAP[j][1]];
             if (cell.style.backgroundColor !== 'black') {
-		continue;
-	    }
+                continue;
+            }
 
             p += 1;
             var pitch = NOTESTABLE[(j + 1) % 12];
@@ -835,10 +842,10 @@ function ModeWidget() {
             var octaveidx = pitchidx + 2;
 
             if (p === modeLength) {
-		newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, null]]);
-	    } else {
-		newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, pitchidx + 3]]);
-	    }
+                newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, null]]);
+            } else {
+                newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, pitchidx + 3]]);
+            }
             newStack.push([notenameidx, ['solfege', {'value': pitch}], 0, 0, [pitchidx]]);
             newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchidx]]);
             var previousBlock = pitchidx;
@@ -859,17 +866,17 @@ function ModeWidget() {
         for (var i = 0; i < 12; i++) {
             var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor !== 'black') {
-		continue;
-	    }
+                continue;
+            }
 
             p += 1;
             var idx = newStack.length;
 
             if (p === modeLength) {
-		newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, null]]);
-	    } else {
-		newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, idx + 2]]);
-	    }
+                newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, null]]);
+            } else {
+                newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, idx + 2]]);
+            }
 
             newStack.push([idx + 1, ['number', {'value': i}], 0, 0, [idx]]);
             var previousBlock = idx;

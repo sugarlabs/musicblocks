@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="109.10342mm"
+   height="42.465626mm"
+   viewBox="0 0 109.10342 42.465626"
+   version="1.1"
+   id="svg2831">
+  <defs
+     id="defs2825" />
+  <metadata
+     id="metadata2828">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(98.193072,127.76154)"
+     id="g4266">
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-154.28474,-293.65529)"
+       id="g1120-4">
+      <g
+         transform="translate(212,627)"
+         id="g1100-7">
+        <g
+           transform="scale(1.5)"
+           id="g1098-4">
+          <path
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+             style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path1088-4" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text1092-3">
+            <tspan
+               x="20"
+               y="15"
+               id="tspan1090-0">note</tspan>
+          </text>
+          <text
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text1096-7">
+            <tspan
+               x="85"
+               y="12"
+               id="tspan1094-8">value</tspan>
+          </text>
+        </g>
+      </g>
+      <g
+         transform="matrix(0.5,0,0,0.5,212,631)"
+         id="g1118-6">
+        <g
+           style="isolation:isolate"
+           id="g1116-8">
+          <g
+             id="g1114-8"
+             data-name="レイヤー 2">
+            <g
+               id="g1112-4">
+              <rect
+                 y="0"
+                 x="0"
+                 width="42"
+                 height="42"
+                 rx="5"
+                 ry="5"
+                 style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+                 id="rect1102-3" />
+              <path
+                 d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
+                 style="fill:#ffffff"
+                 id="path1104-1" />
+              <path
+                 d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
+                 style="fill:#ffffff"
+                 id="path1106-4" />
+              <path
+                 d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
+                 style="fill:#ffffff"
+                 id="path1108-9" />
+              <path
+                 d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
+                 style="fill:#ffffff"
+                 id="path1110-2" />
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-63.268076,-127.76154)"
+       id="g1138-0">
+      <g
+         transform="scale(1.5)"
+         id="g1136-6">
+        <path
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1122-8" />
+        <text
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1126-9">
+          <tspan
+             x="54"
+             y="23"
+             id="tspan1124-2">➗</tspan>
+        </text>
+        <text
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1130-6">
+          <tspan
+             x="54"
+             y="12"
+             id="tspan1128-6" />
+        </text>
+        <text
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1134-4">
+          <tspan
+             x="54"
+             y="33"
+             id="tspan1132-9" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-40.646201,-127.76154)"
+       id="g1148-5">
+      <g
+         transform="scale(1.5)"
+         id="g1146-0">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1140-4" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1144-8">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan1142-7">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-94.621202,-119.42717)"
+       id="g1158-1">
+      <g
+         transform="scale(1.5)"
+         id="g1156-7">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1150-2" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1154-7">
+          <tspan
+             x="36"
+             y="14"
+             id="tspan1152-2">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-94.621202,-111.09279)"
+       id="g1176-2">
+      <g
+         transform="scale(1.5)"
+         id="g1174-6">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1160-1" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1164-0">
+          <tspan
+             x="46"
+             y="24"
+             id="tspan1162-6">pitch</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1168-1">
+          <tspan
+             x="46"
+             y="12"
+             id="tspan1166-5">name</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1172-9">
+          <tspan
+             x="46"
+             y="33"
+             id="tspan1170-4">octave</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-75.174327,-111.09279)"
+       id="g1186-9">
+      <g
+         transform="scale(1.5)"
+         id="g1184-0">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1178-9" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1182-1">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan1180-7">sol</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-75.174327,-102.75842)"
+       id="g1196-7">
+      <g
+         transform="scale(1.5)"
+         id="g1194-1">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1188-1" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1192-5">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan1190-9">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-40.646201,-119.42717)"
+       id="g1214-7">
+      <g
+         transform="scale(1.5)"
+         id="g1212-7">
+        <path
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 33.90625 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 26.5 h -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1198-6" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1202-7">
+          <tspan
+             x="58"
+             y="23"
+             id="tspan1200-3">random</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1206-6">
+          <tspan
+             x="58"
+             y="12"
+             id="tspan1204-5">min</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1210-6">
+          <tspan
+             x="58"
+             y="33"
+             id="tspan1208-3">max</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-16.474034,-119.42717)"
+       id="g1224-9">
+      <g
+         transform="scale(1.5)"
+         id="g1222-4">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1216-8" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1220-1">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan1218-2">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458334,0,0,0.26458334,-16.474034,-111.09279)"
+       id="g1234-9">
+      <g
+         transform="scale(1.5)"
+         id="g1232-3">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path1226-9" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1230-0">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan1228-8">16</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

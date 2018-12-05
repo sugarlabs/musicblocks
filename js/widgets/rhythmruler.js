@@ -18,9 +18,10 @@
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
 function RhythmRuler () {
-    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
+    const BUTTONDIVWIDTH = 535;  // 9 buttons 535 = (55 + 4) * 9
     const OUTERWINDOWWIDTH = 675;
     const INNERWINDOWWIDTH = 600;
+    const ROWHEIGHT = 130;
     const RULERHEIGHT = 70;
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
@@ -59,6 +60,8 @@ function RhythmRuler () {
     this._mouseDownCell = null;
     this._mouseUpCell = null;
 
+    this._wheel = null;
+
     this._noteWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 3);
     };
@@ -66,26 +69,26 @@ function RhythmRuler () {
     this._calculateZebraStripes = function(rulerno) {
         var ruler = docById('ruler' + rulerno);
         if (this._rulerSelected % 2 === 0) {
-            var evenColor = MATRIXNOTECELLCOLOR;
+            var evenColor = platformColor.selectorBackground;
         } else {
-            var evenColor = MATRIXNOTECELLCOLORHOVER;
+            var evenColor = platformColor.selectorSelected;
         }
 
         for (var i = 0; i < ruler.cells.length; i++) {
             var newCell = ruler.cells[i];
-            if (evenColor === MATRIXNOTECELLCOLOR) {
+            if (evenColor === platformColor.selectorBackground) {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    newCell.style.backgroundColor = platformColor.selectorBackground;
                 } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    newCell.style.backgroundColor = platformColor.selectorSelected;
                 }
             }
 
-            if (evenColor === MATRIXNOTECELLCOLORHOVER) {
+            if (evenColor === platformColor.selectorSelected) {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    newCell.style.backgroundColor = platformColor.selectorSelected;
                 } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    newCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }
         }
@@ -137,8 +140,12 @@ function RhythmRuler () {
                 // Play a count off before starting tapping.
                 var interval = this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
 
-                var drumBlockNo = this._logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
-                var drum = this._logo.blocks.blockList[drumBlockNo].value;
+                if (this.Drums[this._rulerSelected] === null) {
+                    var drum = 'snare drum';
+                } else {
+                    var drumBlockNo = this._logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
+                    var drum = this._logo.blocks.blockList[drumBlockNo].value;
+                }
 
                 var that = this;
                 // FIXME: Should be based on meter
@@ -167,6 +174,8 @@ function RhythmRuler () {
             this._rulerSelected = cell.parentNode.id[5];
             this.__dissectByNumber(cell, inputNum, true);
         }
+
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__startTapping = function (noteValues, interval) {
@@ -328,7 +337,7 @@ function RhythmRuler () {
                       that._rulerSelected = cell.parentNode.id[5];
                     var noteValues = that.Rulers[that._rulerSelected][0];
                     var noteValue = noteValues[cell.cellIndex];
-                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1500);
         };
@@ -451,6 +460,8 @@ function RhythmRuler () {
 
             divisionHistory.push(cell.cellIndex);
         }
+
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__divideFromList = function (cell, newNoteValues, addToUndoList) {
@@ -499,6 +510,8 @@ function RhythmRuler () {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
+
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__dissectByNumber = function (cell, inputNum, addToUndoList) {
@@ -526,7 +539,17 @@ function RhythmRuler () {
             ruler.deleteCell(newCellIndex);
 
             var noteValue = noteValues[newCellIndex];
-            var newNoteValue = inputNum * noteValue;
+            var newNoteValue = 0;
+            
+            if(inputNum * noteValue <= 256) {
+                newNoteValue = inputNum * noteValue;
+                this._logo.hideMsgs();
+            } else {
+                console.log('Top max value exceeded');
+                this._logo.errorMsg(('Maximum value of 256 has been exceeded.'));
+                newNoteValue = inputNum;
+            }
+
             var tempwidth = this._noteWidth(newNoteValue);
             var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
             var difference = parseFloat(this._noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
@@ -549,6 +572,8 @@ function RhythmRuler () {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
+
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this._tieRuler = function (event) {
@@ -567,6 +592,8 @@ function RhythmRuler () {
             this._rulerSelected = cell.parentNode.id[5];
             this.__tie(true);
         }
+
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__tie = function (addToUndoList) {
@@ -680,7 +707,7 @@ function RhythmRuler () {
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
-            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            newCell.style.backgroundColor = platformColor.selectorBackground;
             newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1, this._cellScale);
 
             noteValues[newCellIndex] = oldCellNoteValue / inputNum;
@@ -714,7 +741,7 @@ function RhythmRuler () {
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
-            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            newCell.style.backgroundColor = platformColor.selectorBackground;
 
             var obj = rationalToFraction(newNoteValue);
             newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0], this._cellScale);
@@ -774,6 +801,8 @@ function RhythmRuler () {
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
+
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this._tap = function () {
@@ -783,17 +812,28 @@ function RhythmRuler () {
     };
 
     this._clear = function () {
+        this._logo.synth.stop();
+        this._logo.resetSynth(0);
+        this._playing = false;
+        this._playingAll = false;
+        this._playingOne = false;
+        this._rulerPlaying = -1;
+        this._startingTime = null;
+        var iconSize = ICONSIZE;
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         for (r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while(this.Rulers[r][1].length > 0) {
                 this._undo();
             }
         }
+
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this.__pause = function () {
         var iconSize = ICONSIZE;
-        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         this._playing = false;
         this._playingAll = false;
         this._playingOne = false;
@@ -823,7 +863,7 @@ function RhythmRuler () {
 
     this.__resume = function () {
         var iconSize = ICONSIZE;
-        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         this._logo.setTurtleDelay(0);
         this._playingAll = true;
         this._playing = true;
@@ -840,6 +880,7 @@ function RhythmRuler () {
 
     this._playAll = function () {
         this._logo.synth.stop();
+        this._logo.resetSynth(0);
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
@@ -856,12 +897,14 @@ function RhythmRuler () {
 
     this._playOne = function () {
         this._logo.synth.stop();
+        this._logo.resetSynth(0);
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
             this._elapsedTimes[this._rulerSelected] = 0;
             this._offsets[this._rulerSelected] = 0;
         }
+        console.log("this._rulerSelected " +this._rulerSelected);
 
         this.__loop(0, this._rulerSelected, 0);
     };
@@ -887,19 +930,55 @@ function RhythmRuler () {
         var noteValue = noteValues[colIndex];
 
         noteTime = Math.abs(1 / noteValue);
-        var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
-        var drum = this._logo.blocks.blockList[drumblockno].value;
+        if (this.Drums[rulerNo] === null) {
+            var drum = 'snare drum';
+        } else {
+            var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
+            var drum = this._logo.blocks.blockList[drumblockno].value;
+        }
+
+        var foundDrum = false;
+        // Convert i18n drum name to English.
+        for (var d = 0; d < DRUMNAMES.length; d++) {
+            if (DRUMNAMES[d][0].replace('-', ' ') === drum) {
+                drum = DRUMNAMES[d][1];
+                foundDrum = true;
+                break;
+            } else if (DRUMNAMES[d][1] === drum) {
+                foundDrum = true;
+                break;
+            }
+        }
+
+        var foundVoice = false;
+        if (!foundDrum) {
+            for (var d = 0; d < VOICENAMES.length; d++) {
+                if (VOICENAMES[d][0] === drum) {
+                    drum = VOICENAMES[d][1];
+                    foundVoice = true;
+                    break;
+                } else if (VOICENAMES[d][1] === drum) {
+                    foundVoice = true;
+                    break;
+                }
+            }
+        }
 
         var that = this;
 
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-                that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
+                // console.log(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
+                if (foundVoice) {
+                    that._logo.synth.trigger(0, 'C4', that._logo.defaultBPMFactor / noteValue, drum, null, null, false);
+                } else if (foundDrum) {
+                    that._logo.synth.trigger(0, ['C4'], that._logo.defaultBPMFactor / noteValue, drum, null, null);
+                }
             }
 
             // And highlight its cell.
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.style.backgroundColor = platformColor.selectorBackground;
 
             // Calculate any offset in playback.
             var d = new Date();
@@ -921,6 +1000,7 @@ function RhythmRuler () {
     };
 
     this._save = function(selectedRuler) {
+        // Deprecated -- replaced by save tuplets code
         var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -933,7 +1013,11 @@ function RhythmRuler () {
             var noteValues = that.Rulers[selectedRuler][0];
             // Get the first word of drum's name (ignore the word 'drum' itself)
             // and add 'rhythm'.
-            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('rhythm');
+            if (that.Drums[selectedRuler] === null) {
+                var stack_value = _('snare drum') + ' ' + _('rhythm');
+            } else {
+                var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('rhythm');
+            }
             var delta = selectedRuler * 42;
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
@@ -974,7 +1058,100 @@ function RhythmRuler () {
         }, 500);
     };
 
-    this._saveDrumMachine = function(selectedRuler) {
+    this._saveTuplets = function(selectedRuler) {
+        var that = this;
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        this._logo.refreshCanvas();
+
+        setTimeout( function() {
+            var ruler = docById('ruler' + selectedRuler);
+            var noteValues = that.Rulers[selectedRuler][0];
+            if (that.Drums[selectedRuler] === null) {
+                var stack_value = _('snare drum') + ' ' + _('rhythm');
+            } else {
+                var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('rhythm');
+            }
+            var delta = selectedRuler * 42;
+            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
+            var previousBlock = 0;
+            var sameNoteValue = 1;
+            for (var i = 0; i < ruler.cells.length; i++) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
+                    sameNoteValue += 1;
+                    continue;
+                } else {
+                    var idx = newStack.length;
+                    var noteValue = noteValues[i];
+                    var obj = rationalToFraction(1 / Math.abs(noteValue));
+                    var n = obj[1]/sameNoteValue ;
+                    if (Number.isInteger(n)) {
+                        newStack.push([idx, 'stuplet', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
+                        newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
+                        newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+                        newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ['number', {'value': n}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
+                    } else {
+                        newStack.push([idx, 'rhythm2', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
+                        newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
+                        newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+                        newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
+                    }
+                    
+                    if (i == ruler.cells.length - 1) {
+                        newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
+                    } else {
+                        newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, idx + 7]]);
+                    }
+                    previousBlock = idx + 6;
+                    sameNoteValue = 1;
+                }
+            }
+
+            that._logo.blocks.loadNewBlocks(newStack);
+            if (selectedRuler > that.Rulers.length - 2) {
+                return;
+            } else {
+                that._saveTuplets(selectedRuler + 1);
+            }
+        }, 500);
+    };
+
+    this._saveMachine = function(selectedRuler) {
+        // We are either saving a drum machine or a voice machine.
+        if (this.Drums[selectedRuler] === null) {
+            var drum = 'snare drum';
+        } else {
+            var drumBlockNo = this._logo.blocks.blockList[this.Drums[selectedRuler]].connections[1];
+            var drum = this._logo.blocks.blockList[drumBlockNo].value;
+        }
+
+        for (var d = 0; d < DRUMNAMES.length; d++) {
+            if (DRUMNAMES[d][1] === drum) {
+                if (EFFECTSNAMES.indexOf(drum) === -1) {
+                    this._saveDrumMachine(selectedRuler, drum, false);
+                } else {
+                    this._saveDrumMachine(selectedRuler, drum, true);
+                }
+
+                return;
+            }
+        }
+
+        for (var d = 0; d < VOICENAMES.length; d++) {
+            if (VOICENAMES[d][1] === drum) {
+                this._saveVoiceMachine(selectedRuler, drum);
+                return;
+            }
+        }
+    };
+
+    this._saveDrumMachine = function(selectedRuler, drum, effect) {
         var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -985,11 +1162,19 @@ function RhythmRuler () {
         setTimeout(function () {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-
             var delta = selectedRuler * 42;
-            var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
-            newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
-            var previousBlock = 1;
+
+            // Just save the action, not the drum machine itself.
+            // var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
+            // newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
+            if (that.Drums[selectedRuler] === null) {
+                var action_name = _('snare drum') + ' ' + _('action');
+            } else {
+                var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('action');
+            }
+
+            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
+            var previousBlock = 0; // 1
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
                 if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
@@ -1000,9 +1185,6 @@ function RhythmRuler () {
                     var noteValue = noteValues[i];
 
                     var obj = rationalToFraction(1 / Math.abs(noteValue));
-
-                    var drumBlockNo = that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1];
-                    var drum = that._logo.blocks.blockList[drumBlockNo].value;
 
                     if (sameNoteValue === 1) {
                         // Add a note block.
@@ -1018,7 +1200,11 @@ function RhythmRuler () {
                             newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
                             newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
                             newStack.push([idx + 5, 'playdrum', 0, 0, [idx + 4, idx + 6, null]]);
-                            newStack.push([idx + 6, ['drumname', {'value': drum}], 0, 0, [idx + 5]]);
+                            if (effect) {
+                                newStack.push([idx + 6, ['effectsname', {'value': drum}], 0, 0, [idx + 5]]);
+                            } else {
+                                newStack.push([idx + 6, ['drumname', {'value': drum}], 0, 0, [idx + 5]]);
+                            }
                         }
                         if (i == ruler.cells.length - 1) {
                             newStack.push([idx + 7, 'hidden', 0, 0, [idx, null]]);
@@ -1047,7 +1233,11 @@ function RhythmRuler () {
                             newStack.push([idx + 5, ['number', {'value': noteValue}], 0, 0, [idx + 3]]);
                             newStack.push([idx + 6, 'vspace', 0, 0, [idx + 2, idx + 7]]);
                             newStack.push([idx + 7, 'playdrum', 0, 0, [idx + 6, idx + 8, null]]);
-                            newStack.push([idx + 8, ['drumname', {'value': drum}], 0, 0, [idx + 7]]);
+                            if (effect) {
+                                newStack.push([idx + 8, ['effectsname', {'value': drum}], 0, 0, [idx + 7]]);
+                            } else {
+                                newStack.push([idx + 8, ['drumname', {'value': drum}], 0, 0, [idx + 7]]);
+                            }
                         }
                         newStack.push([idx + 9, 'hidden', 0, 0, [idx + 2, null]]);
                     }
@@ -1060,14 +1250,133 @@ function RhythmRuler () {
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {
-                that._saveDrumMachine(selectedRuler + 1);
+                that._saveMachine(selectedRuler + 1);
+            }
+        }, 500);
+    };
+
+    this._saveVoiceMachine = function(selectedRuler, voice) {
+        var that = this;
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        this._logo.refreshCanvas();
+
+        setTimeout(function () {
+            var ruler = docById('ruler' + selectedRuler);
+            var noteValues = that.Rulers[selectedRuler][0];
+            var delta = selectedRuler * 42;
+
+            // Just save the action, not the drum machine itself.
+            // var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
+            // newStack.push([1, 'settimbre', 0, 0, [0, 2, 4, 3]]);
+            // newStack.push([2, ['voicename', {'value': voice}], 0, 0, [1]]);
+            // newStack.push([3, 'hidden', 0, 0, [1, null]]);
+            // newStack.push([4, 'forever', 0, 0, [1, 6, 5]]);
+            // newStack.push([5, 'hidden', 0, 0, [4, null]]);
+
+            // This should never happen.
+            if (that.Drums[selectedRuler] === null) {
+                var action_name = _('guitar') + ' ' + _('action');
+            } else {
+                var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('action');
+            }
+
+            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
+            newStack.push([2, 'settimbre', 0, 0, [0, 3, 5, 4]]);
+            newStack.push([3, ['voicename', {'value': voice}], 0, 0, [2]]);
+            newStack.push([4, 'hidden', 0, 0, [2, null]]);
+            var previousBlock = 2;
+            var sameNoteValue = 1;
+            for (var i = 0; i < ruler.cells.length; i++) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
+                    sameNoteValue += 1;
+                    continue;
+                } else {
+                    var idx = newStack.length;
+                    var noteValue = noteValues[i];
+
+                    var obj = rationalToFraction(1 / Math.abs(noteValue));
+
+                    if (sameNoteValue === 1) {
+                        // Add a note block.
+                        if (noteValue < 0) {
+                            newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
+                            newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
+                            newStack.push([idx + 2, ['number', {'value': obj[0]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                            newStack.push([idx + 5, 'rest2', 0, 0, [idx + 4, idx + 6]]);
+                            newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
+                            if (i == ruler.cells.length - 1) {
+                                newStack.push([idx + 7, 'hidden', 0, 0, [idx, null]]);
+                            } else {
+                                newStack.push([idx + 7, 'hidden', 0, 0, [idx, idx + 8]]);
+                                previousBlock = idx + 7;
+                            }
+                        } else {
+                            newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 8]]);
+                            newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
+                            newStack.push([idx + 2, ['number', {'value': obj[0]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                            newStack.push([idx + 5, 'pitch', 0, 0, [idx + 4, idx + 6, idx + 7, null]]);
+                            newStack.push([idx + 6, ['notename', {'value': 'C'}], 0, 0, [idx + 5]]);
+                            newStack.push([idx + 7, ['number', {'value': 4}], 0, 0, [idx + 5]]);
+                            if (i == ruler.cells.length - 1) {
+                                newStack.push([idx + 8, 'hidden', 0, 0, [idx, null]]);
+                            } else {
+                                newStack.push([idx + 8, 'hidden', 0, 0, [idx, idx + 9]]);
+                                previousBlock = idx + 8;
+                            }
+                        }
+                    } else {
+                        // Add a note block inside a repeat block.
+                        if (i == ruler.cells.length - 1) {
+                            newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, null]]);
+                        } else {
+                            newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 11]]);
+                            previousBlock = idx;
+                        }
+                        newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
+                        if (noteValue < 0) {
+                            newStack.push([idx + 2, 'newnote', 0, 0, [idx, idx + 3, idx + 6, idx + 9]]);
+                            newStack.push([idx + 3, 'divide', 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                            newStack.push([idx + 4, ['number', {'value': 1}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 5, ['number', {'value': -noteValue}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 6, 'vspace', 0, 0, [idx + 2, idx + 7]]);
+                            newStack.push([idx + 7, 'rest2', 0, 0, [idx + 6, idx + 8]]);
+                            newStack.push([idx + 8, 'hidden', 0, 0, [idx + 7, null]]);
+                            newStack.push([idx + 9, 'hidden', 0, 0, [idx + 2, null]]);
+                        } else {
+                            newStack.push([idx + 2, 'newnote', 0, 0, [idx, idx + 3, idx + 6, idx + 10]]);
+                            newStack.push([idx + 3, 'divide', 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                            newStack.push([idx + 4, ['number', {'value': 1}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 5, ['number', {'value': noteValue}], 0, 0, [idx + 3]]);
+                            newStack.push([idx + 6, 'vspace', 0, 0, [idx + 2, idx + 7]]);
+                            newStack.push([idx + 7, 'pitch', 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
+                            newStack.push([idx + 8, ['notename', {'value': 'C'}], 0, 0, [idx + 7]]);
+                            newStack.push([idx + 9, ['number', {'value': 4}], 0, 0, [idx + 7]]);
+                            newStack.push([idx + 10, 'hidden', 0, 0, [idx + 2, null]]);
+                        }
+                    }
+
+                    sameNoteValue = 1;
+                }
+            }
+
+            that._logo.blocks.loadNewBlocks(newStack);
+            if (selectedRuler > that.Rulers.length - 2) {
+                return;
+            } else {
+                that._saveMachine(selectedRuler + 1);
             }
         }, 500);
     };
 
     this.init = function (logo) {
         console.log('init RhythmRuler');
-
         this._logo = logo;
 
         this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
@@ -1077,6 +1386,14 @@ function RhythmRuler () {
         this._playingAll = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
+        this._expanded = false;
+
+        // If there are no drums, add one.
+        if (this.Drums.length === 0) {
+            this.Drums.push(null);
+            this.Rulers.push([[1], []]);
+        }
+
         this._elapsedTimes = [];
         this._offsets = [];
         for (var i = 0; i < this.Rulers.length; i++) {
@@ -1094,8 +1411,10 @@ function RhythmRuler () {
         var rulerDiv = docById('rulerDiv');
         rulerDiv.style.visibility = 'visible';
         rulerDiv.setAttribute('draggable', 'true');
-        rulerDiv.style.left = '200px';
-        rulerDiv.style.top = '150px';
+        this._left = 200;
+        this._top = 150;
+        rulerDiv.style.left = this._left + 'px';
+        rulerDiv.style.top = this._top + 'px';
 
         // The widget buttons
         var widgetButtonsDiv = docById('rulerButtonsDiv');
@@ -1112,7 +1431,7 @@ function RhythmRuler () {
         // For the button callbacks
         var that = this;
 
-        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
+        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
 
         this._playAllCell.onclick = function () {
             if (that._playing) {
@@ -1123,14 +1442,15 @@ function RhythmRuler () {
             }
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save rhythms'), '');
         cell.onclick = function () {
-            that._save(0);
+            // that._save(0);
+            that._saveTuplets(0);
         };
 
-        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
+        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
         cell.onclick = function () {
-            that._saveDrumMachine(0);
+            that._saveMachine(0);
         };
 
         // An input for setting the dissect number
@@ -1140,9 +1460,13 @@ function RhythmRuler () {
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         var numberInput = docById('dissectNumber');
+
+        numberInput.onfocus = function (event) {
+            // that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
+        };
 
         numberInput.onkeydown = function (event) {
             if (event.keyCode === DEL) {
@@ -1163,30 +1487,38 @@ function RhythmRuler () {
             }
         };
 
-        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'), '');
+        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('Undo'), '');
         cell.onclick = function () {
             that._undo();
         };
 
         //.TRANS: user can tap out a rhythm by clicking on a ruler.
-        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('tap a rhythm'), '');
+        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('Tap a rhythm'), '');
         this._tapButton.onclick = function () {
             that._tap();
         };
 
         //.TRANS: clear all subdivisions from the ruler.
-        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
+        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('Clear'), '');
         cell.onclick = function () {
             that._clear();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'), '');
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
 
         cell.onclick = function () {
+            // If the piemenu was open, close it.
+            // docById('wheelDiv').style.display = 'none';
+            // docById('contextWheelDiv').style.display = 'none';
+
             // Save the new dissect history.
             var dissectHistory = [];
             var drums = [];
             for (var i = 0; i < that.Rulers.length; i++) {
+                if (that.Drums[i] === null) {
+                    continue;
+                }
+
                 var history = [];
                 for (var j = 0; j < that.Rulers[i][1].length; j++) {
                     history.push(that.Rulers[i][1][j]);
@@ -1215,10 +1547,11 @@ function RhythmRuler () {
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
+            that._logo.hideMsgs();
         };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
+        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('Drag'), '');
 
         dragCell.style.cursor = 'move';
 
@@ -1248,11 +1581,13 @@ function RhythmRuler () {
         canvas.ondrop = function (e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - that._dx;
-                rulerDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                rulerDiv.style.top = y + 'px';
+                that._left = e.clientX - that._dx;
+                that._top = e.clientY - that._dy;
+                rulerDiv.style.left = that._left + 'px';
+                rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
+
+                // that._positionWheel();
             }
         };
 
@@ -1263,11 +1598,13 @@ function RhythmRuler () {
         rulerDiv.ondrop = function (e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - that._dx;
-                rulerDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                rulerDiv.style.top = y + 'px';
+                that._left = e.clientX - that._dx;
+                that._top = e.clientY - that._dy;
+                rulerDiv.style.left = that._left + 'px';
+                rulerDiv.style.top = that._top + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
+
+                // that._positionWheel();
             }
         };
 
@@ -1281,6 +1618,34 @@ function RhythmRuler () {
                 e.dataTransfer.setData('text/plain', '');
             } else {
                 e.preventDefault();
+            }
+        };
+
+        var expandCell = this._addButton(row, 'expand-button.svg', iconSize, _('expand'), '');
+        
+        expandCell.onclick = function () {
+            var rulerDiv = docById('rulerDiv');
+
+            if (that._expanded) {
+                rulerDiv.style.width = that._initial_w;
+                rulerDiv.style.height = that._initial_h;
+
+                var n = Math.min(Math.floor((window.innerHeight * 0.5) / 100), 2);
+                var outerDiv = docById('rulerOuterDiv');
+                outerDiv.style.height = ROWHEIGHT * n + 'px';
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+
+                that._expanded = false;
+            } else {
+                rulerDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
+                rulerDiv.style.height = Math.max(100 + ROWHEIGHT * that.Rulers.length, Math.min(900, window.innerHeight)) + 'px';
+
+                var outerDiv = docById('rulerOuterDiv');
+                outerDiv.style.height = Math.max(100 + ROWHEIGHT * that.Rulers.length, Math.min(900 - 20, window.innerHeight - 20)) + 'px';
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collapse') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                that._expanded = true;
             }
         };
 
@@ -1298,11 +1663,11 @@ function RhythmRuler () {
         var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 2);
         var outerDiv = docById('rulerOuterDiv');
         if (this.Rulers.length > n) {
-            outerDiv.style.height = 85 * n + 'px';
+            outerDiv.style.height = ROWHEIGHT * n + 'px';
             var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 25 + 'px';  // Add a bit of extra space for the horizontal slider.
         } else {
-            outerDiv.style.height = 85 * this.Rulers.length + 'px';
+            outerDiv.style.height = ROWHEIGHT * this.Rulers.length + 'px';
             var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 25 + 'px';  // Add a bit of extra space for the horizontal slider.
         }
@@ -1315,7 +1680,7 @@ function RhythmRuler () {
         var rhythmRulerTable = docById('rhythmRulerTable');
         for (var i = 0; i < this.Rulers.length; i++) {
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
-            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'), '<br>');
+            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('Play'), '<br>');
             drumcell.setAttribute('id', i);
             drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
 
@@ -1323,7 +1688,7 @@ function RhythmRuler () {
                 var id = Number(this.getAttribute('id'));
                 if (that._playing) {
                     if (that._rulerPlaying === id) {
-                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._playing = false;
                         that._playingOne = false;
                         that._playingAll = false;
@@ -1344,7 +1709,7 @@ function RhythmRuler () {
                         that._cellCounter = 0;
                         that._startingTime = null;
                         that._rulerPlaying = id;
-                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._elapsedTimes[id] = 0;
                         that._offsets[id] = 0;
                         that._playOne();
@@ -1381,15 +1746,15 @@ function RhythmRuler () {
                 rulerSubCell.style.lineHeight = 60 + ' % ';
                 if (i % 2 === 0) {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
                     } else {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
                     }
                 } else {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
                     } else {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
                     }
                 }
 
@@ -1408,6 +1773,10 @@ function RhythmRuler () {
 
         // Restore dissect history.
         for (var drum = 0; drum < this.Drums.length; drum++) {
+            if (this.Drums[i] === null) {
+                continue;
+            }
+
             for (var i = 0; i < this._dissectHistory.length; i++) {
                 if (this._dissectHistory[i][1] !== this.Drums[drum]) {
                     continue;
@@ -1455,6 +1824,12 @@ function RhythmRuler () {
                 }
             }
         }
+
+        this._logo.textMsg(_('Click on the ruler to divide it.'));
+
+        this._initial_w = rulerDiv.style.width;
+        this._initial_h = rulerDiv.style.height;
+        // this._piemenuRuler(this._rulerSelected);
     };
 
     this._addButton = function(row, icon, iconSize, label, extras) {
@@ -1466,16 +1841,177 @@ function RhythmRuler () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover = function () {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
         cell.onmouseout = function () {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
     };
+
+    this._piemenuRuler = function (selectedRuler) {
+        return;  // In progress
+        /*
+        // piemenu version of ruler
+        docById('wheelDiv2').style.display = '';
+        docById('wheelDiv2').style.position = 'absolute';
+        docById('wheelDiv2').style.left = '600px';
+        docById('wheelDiv2').style.top = '300px';
+
+        if (selectedRuler === undefined) {
+            selectedRuler = 0;
+        }
+
+        if (this._wheel !== null) {
+            this._wheel.removeWheel();
+        }
+
+        console.log(this.Rulers[selectedRuler]);
+        this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
+        this._wheel.wheelRadius = 200;
+        this._wheel.maxPercent = 1.6;
+        this._wheel.colors = [platformColor.selectorBackground, platformColor.selectorSelected];
+        this._wheel.navItemsContinuous = true;
+        this._wheel.markerPathFunction = markerPath().PieLineMarker;
+        this._wheel.clickModeRotate = false;
+        this._wheel.markerEnable = true;
+        this._wheel.slicePathFunction = slicePath().DonutSlice;
+        this._wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+
+        var labels = [];
+        for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
+            if (this.Rulers[selectedRuler][0][i] < 17 && this.Rulers[selectedRuler][0][i] > 0) {
+                labels.push('1/' + this.Rulers[selectedRuler][0][i]);
+            } else {
+                labels.push(' ');
+            }
+        }
+
+        console.log(labels);
+        this._wheel.initWheel(labels);
+
+        for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
+            this._wheel.navItems[i].sliceAngle = 360 / Math.abs(this.Rulers[selectedRuler][0][i]);
+        }
+
+        this._wheel.createWheel();
+        */
+    };
+
+    this._piemenuNumber = function (wheelValues, selectedValue) {
+        // input form and  wheelNav pie menu for number selection
+        docById('wheelDiv').style.display = '';
+
+        // the number selector
+        this._numberWheel = new wheelnav('wheelDiv', null, 600, 600);
+        // exit button
+        this._exitWheel = new wheelnav('_exitWheel', this._numberWheel.raphael);
+
+        var wheelLabels = [];
+        for (var i = 0; i < wheelValues.length; i++) {
+            wheelLabels.push(wheelValues[i].toString());
+        }
+
+        // spacer
+        wheelLabels.push(null);
+
+        wheelnav.cssMode = true;
+
+        this._numberWheel.keynavigateEnabled = true;
+
+        this._numberWheel.colors = ['#ffb2bc', '#ffccd6'];
+        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
+        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+        if (wheelValues.length > 16) {
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        } else {
+            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        }
+
+        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
+        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
+        // this._numberWheel.titleRotateAngle = 0;
+        this._numberWheel.animatetime = 300;
+        this._numberWheel.createWheel(wheelLabels);
+
+        this._exitWheel.colors = ['#808080', '#c0c0c0'];
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var that = this;
+
+        var __selectionChanged = function () {
+            var numberInput = docById('dissectNumber');
+            numberInput.value = wheelValues[that._numberWheel.selectedNavItemIndex];
+        };
+
+        var __exitMenu = function () {
+            var d = new Date();
+            that._piemenuExitTime = d.getTime();
+            docById('wheelDiv').style.display = 'none';
+            that._numberWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var numberInput = docById('dissectNumber');
+
+        this._positionWheel();
+
+        // Navigate to a the current number value.
+        var i = wheelValues.indexOf(selectedValue);
+        if (i === -1) {
+            i = 0;
+        }
+
+        this._numberWheel.navigateWheel(i);
+
+        // Hide the widget when the selection is made.
+        for (var i = 0; i < wheelLabels.length; i++) {
+            this._numberWheel.navItems[i].navigateFunction = function () {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Or use the exit wheel...
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            __exitMenu();
+        };
+    };
+
+    this._positionWheel = function() {
+        if (docById('wheelDiv').style.display == 'none') {
+            return;
+        }
+
+        docById('wheelDiv').style.position = 'absolute';
+        docById('wheelDiv').style.height = '300px';
+        docById('wheelDiv').style.width = '300px';
+
+        // Position the widget over the note block.
+        var x = this._left + 100;
+        var y = this._top;
+        var selectorWidth = 150;
+
+        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';        
+        if (y - 300 < 0) {
+            docById('wheelDiv').style.top = (y + 60) + 'px';
+        } else {
+            docById('wheelDiv').style.top = (y - 300) + 'px';
+        }
+    };
+
+
 };

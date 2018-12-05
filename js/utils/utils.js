@@ -153,10 +153,18 @@ function last (myList) {
 };
 
 
+function getTextWidth(text, font) {
+    // re-use canvas object for better performance
+    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement('canvas'));
+    var context = canvas.getContext('2d');
+    context.font = font;
+    var metrics = context.measureText(text);
+    return metrics.width;
+};
+
+
 function doSVG (canvas, logo, turtles, width, height, scale) {
-    // Aggregate SVG output from each turtle. If there is none, use
-    // the MUSICICON.
-    var MUSICICON = '<g transform="matrix(20,0,0,20,-2500,-200)"> <g style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000" transform="translate(0.32906,-0.2)"> <path d="m 138.47094,26.82 q 0,-1.16 1.24,-2.02 0.96,-0.64 1.94,-0.64 0.68,0.02 1.18,0.34 l 0,-11.84 0.44,0 0,12.94 q 0,1.32 -1.34,2.1 -0.86,0.5 -1.8,0.5 -0.98,0 -1.44,-0.7 -0.22,-0.32 -0.22,-0.68 z" /> </g> <g transform="translate(-12.52094,4.8)" style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"> <path d="m 138.47094,26.82 q 0,-1.16 1.24,-2.02 0.96,-0.64 1.94,-0.64 0.68,0.02 1.18,0.34 l 0,-11.84 0.44,0 0,12.94 q 0,1.32 -1.34,2.1 -0.86,0.5 -1.8,0.5 -0.98,0 -1.44,-0.7 -0.22,-0.32 -0.22,-0.68 z" /> </g> <path style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 130.81346,17 12.29007,-5 0,2 -12.29007,5 z" /> </g>';
+    // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
     var turtleSVG = '';
     for (var turtle in turtles.turtleList) {
@@ -167,14 +175,14 @@ function doSVG (canvas, logo, turtles, width, height, scale) {
     var svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">\n';
     svg += '<g transform="scale(' + scale + ',' + scale + ')">\n';
     svg += logo.svgOutput;
-    svg += '</g>';
 
     if (turtleSVG === '') {
-        svg += MUSICICON;
+        return "";
     } else {
         svg += turtleSVG;
     }
 
+    svg += '</g>';
     svg += '</svg>';
     return svg;
 };
@@ -192,6 +200,10 @@ function isSVGEmpty (turtles) {
 
 
 function fileExt (file) {
+    if (file === null) {
+        return '';
+    }
+
     var parts = file.split('.');
     if (parts.length === 1 || (parts[0] === '' && parts.length === 2)) {
         return '';
@@ -222,6 +234,13 @@ function _ (text) {
     }
 
     replaced = replaced.replace(/ /g, '-');
+
+    if (localStorage.kanaPreference === 'kana') {
+        var lang = document.webL10n.getLanguage();
+	if (lang === 'ja') {
+	    replaced = 'kana-' + replaced;
+	}
+    }
 
     try {
         var translation = document.webL10n.get(replaced);
@@ -391,6 +410,11 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
     }
 
     // Create the plugin protoblocks.
+    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
+    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
+    // Maybe:
+    // var g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
+
     if ('BLOCKPLUGINS' in obj) {
         for (var block in obj['BLOCKPLUGINS']) {
             console.log('adding plugin block ' + block);
@@ -434,13 +458,17 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
         }
     }
 
-    // Push the protoblocks onto their palettes.
-    for (var protoblock in blocks.protoBlockDict) {
-        if (blocks.protoBlockDict[protoblock].palette === undefined) {
-            console.log('Cannot find palette for protoblock ' + protoblock);
-        } else {
-            blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
-        }
+    try {
+	// Push the protoblocks onto their palettes.
+	for (var protoblock in blocks.protoBlockDict) {
+            if (blocks.protoBlockDict[protoblock].palette === undefined) {
+		console.log('Cannot find palette for protoblock ' + protoblock);
+            } else {
+		blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
+            }
+	}
+    } catch (e) {
+	console.log(e);
     }
 
     palettes.updatePalettes();
@@ -541,32 +569,6 @@ function prepareMacroExports (name, stack, macroDict) {
     }
 
     return JSON.stringify(macroDict);
-};
-
-
-function doSaveSVG (logo, desc) {
-    var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
-    download(desc, 'data:image/svg+xml;utf8,' + svg, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-};
-
-
-function doSaveLilypond (logo, desc) {
-    download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-};
-
-
-function doSaveAbc (logo, desc) {
-    download(desc, 'data:text;utf8,' + encodeURIComponent(logo.notationOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-};
-
-
-function download (filename, data) {
-    var a = document.createElement('a');
-    a.setAttribute('href', data);
-    a.setAttribute('download', filename);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
 };
 
 // Some block-specific code
@@ -684,44 +686,9 @@ function hideDOMLabel () {
         numberLabel.style.display = 'none';
     }
 
-    var solfegeLabel = docById('solfegeLabel');
-    if (solfegeLabel !== null) {
-        solfegeLabel.style.display = 'none';
-    }
-
-    var notenameLabel = docById('notenameLabel');
-    if (notenameLabel !== null) {
-        notenameLabel.style.display = 'none';
-    }
-
-    var noteattrLabel = docById('noteattrLabel');
-    if (noteattrLabel !== null) {
-        noteattrLabel.style.display = 'none';
-    }
-
-    var drumnameLabel = docById('drumnameLabel');
-    if (drumnameLabel !== null) {
-        drumnameLabel.style.display = 'none';
-    }
-
-    var voicenameLabel = docById('voicenameLabel');
-    if (voicenameLabel !== null) {
-        voicenameLabel.style.display = 'none';
-    }
-
-    var modenameLabel = docById('modenameLabel');
-    if (modenameLabel !== null) {
-        modenameLabel.style.display = 'none';
-    }
-
-    var filtertypeLabel = docById('filtertypeLabel');
-    if (filtertypeLabel !== null) {
-        filtertypeLabel.style.display = 'none';
-    }
-
-    var oscillatortypeLabel = docById('oscillatortypeLabel');
-    if (oscillatortypeLabel !== null) {
-        oscillatortypeLabel.style.display = 'none';
+    var piemenu = docById('wheelDiv');
+    if (piemenu !== null) {
+        piemenu.style.display = 'none';
     }
 };
 
@@ -803,7 +770,7 @@ function LCD (a, b) {
 };
 
 
-function GCD( a, b) {
+function GCD (a, b) {
     a = Math.abs(a);
     b = Math.abs(b);
 
@@ -814,6 +781,49 @@ function GCD( a, b) {
     }
 
     return a;
+};
+
+
+function rationalSum (a, b) {
+    if (a === 0 || b === 0) {
+        console.log('divide by zero?');
+        return [0, 1];
+    }
+
+    // Make sure a and b components are integers.
+    if (Math.floor(a[0]) !== a[0]) {
+        var obja0 = rationalToFraction(a[0]);
+    } else {
+        var obja0 = [a[0], 1];
+    }
+
+    if (Math.floor(b[0]) !== b[0]) {
+        var objb0 = rationalToFraction(b[0]);
+    } else {
+        var objb0 = [b[0], 1];
+    }
+
+    if (Math.floor(a[1]) !== a[1]) {
+        var obja1 = rationalToFraction(a[1]);
+    } else {
+        var obja1 = [a[1], 1];
+    }
+
+    if (Math.floor(b[1]) !== b[1]) {
+        var objb1 = rationalToFraction(b[1]);
+    } else {
+        var objb1 = [b[1], 1];
+    }
+
+    a[0] = obja0[0] * obja1[1];
+    a[1] = obja0[1] * obja1[0];
+    b[0] = objb0[0] * objb1[1];
+    b[1] = objb0[1] * objb1[0];
+
+    // Find the least common denomenator
+    var lcd = LCD(a[1], b[1]);
+    var c0 = a[0] * lcd / a[1] + b[0] * lcd / b[1];
+    return [a[0] * lcd / a[1] + b[0] * lcd / b[1], lcd];
 };
 
 
@@ -1061,3 +1071,19 @@ function oneHundredToFraction (d) {
 
     }
 };
+
+
+function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+};
+
+
+function hexToRGB(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+	r: parseInt(result[1], 16),
+	g: parseInt(result[2], 16),
+	b: parseInt(result[3], 16)
+    } : null;
+};
+

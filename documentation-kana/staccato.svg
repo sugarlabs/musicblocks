@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="88.767715mm"
+   height="67.46875mm"
+   viewBox="0 0 88.767715 67.46875"
+   version="1.1"
+   id="svg1368"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="staccato.svg">
+  <defs
+     id="defs1362" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2"
+     inkscape:cx="234.51404"
+     inkscape:cy="86.706654"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata1365">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(257.56243,81.44866)">
+    <g
+       id="g48"
+       transform="matrix(0.26458333,0,0,0.26458333,-257.56243,-81.44866)">
+      <g
+         transform="scale(1.5)"
+         id="g46">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 27.241211 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 105 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#3ea4a3;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path36" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text40">
+          <tspan
+             x="5"
+             y="15"
+             id="tspan38">スタッカート</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text44">
+          <tspan
+             x="53"
+             y="12"
+             id="tspan42" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-235.60201,-81.44866)"
+       id="g66">
+      <g
+         transform="scale(1.5)"
+         id="g64">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path50" />
+        <text
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text54">
+          <tspan
+             x="54"
+             y="24"
+             id="tspan52">/</tspan>
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text58">
+          <tspan
+             x="54"
+             y="12"
+             id="tspan56" />
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text62">
+          <tspan
+             x="54"
+             y="33"
+             id="tspan60" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-212.84784,-81.44866)"
+       id="g76">
+      <g
+         transform="scale(1.5)"
+         id="g74">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path68" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text72">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan70">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-212.84784,-72.981994)"
+       id="g86">
+      <g
+         transform="scale(1.5)"
+         id="g84">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path78" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text82">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan80">32</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-253.85826,-72.981994)"
+       id="g96">
+      <g
+         transform="scale(1.5)"
+         id="g94">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path88" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text92">
+          <tspan
+             x="36"
+             y="14"
+             id="tspan90">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-253.85826,-64.515327)"
+       id="g272">
+      <g
+         transform="scale(1.5)"
+         id="g270">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path260" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text264">
+          <tspan
+             x="20"
+             y="15"
+             id="tspan262">おんぷ</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text268">
+          <tspan
+             x="85"
+             y="12"
+             id="tspan266">あたい</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-218.93326,-64.515327)"
+       id="g290">
+      <g
+         transform="scale(1.5)"
+         id="g288">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path274" />
+        <text
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text278">
+          <tspan
+             x="54"
+             y="24"
+             id="tspan276">/</tspan>
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text282">
+          <tspan
+             x="54"
+             y="12"
+             id="tspan280" />
+        </text>
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text286">
+          <tspan
+             x="54"
+             y="33"
+             id="tspan284" />
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-196.17909,-64.515327)"
+       id="g300">
+      <g
+         transform="scale(1.5)"
+         id="g298">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path292" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text296">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan294">1</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-196.17909,-56.04866)"
+       id="g310">
+      <g
+         transform="scale(1.5)"
+         id="g308">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path302" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text306">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan304">4</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-250.15409,-56.04866)"
+       id="g320">
+      <g
+         transform="scale(1.5)"
+         id="g318">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path312" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text316">
+          <tspan
+             x="36"
+             y="14"
+             id="tspan314">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-250.15409,-47.581993)"
+       id="g338">
+      <g
+         transform="scale(1.5)"
+         id="g336">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path322" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text326">
+          <tspan
+             x="46"
+             y="24"
+             id="tspan324">ピッチ</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text330">
+          <tspan
+             x="46"
+             y="12"
+             id="tspan328">なまえ</tspan>
+        </text>
+        <text
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+           id="text334">
+          <tspan
+             x="46"
+             y="33"
+             id="tspan332">オクターヴ</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-230.57493,-47.581993)"
+       id="g348">
+      <g
+         transform="scale(1.5)"
+         id="g346">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path340" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text344">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan342">sol</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-230.57493,-39.115327)"
+       id="g358">
+      <g
+         transform="scale(1.5)"
+         id="g356">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path350" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+           id="text354">
+          <tspan
+             x="13"
+             y="14"
+             id="tspan352">4</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

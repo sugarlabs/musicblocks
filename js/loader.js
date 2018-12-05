@@ -12,7 +12,8 @@ requirejs.config({
         easel: "../lib/easeljs",
         twewn: "../lib/tweenjs",
         prefixfree: "../bower_components/prefixfree/prefixfree.min",
-        samples: "../sounds/samples"
+        samples: "../sounds/samples",
+        planet: "../js/planet"
     },
     packages: []
 });

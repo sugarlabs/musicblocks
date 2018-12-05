@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   height="55"
+   width="55"
+   id="svg12"
+   version="1.1"
+   viewBox="0 0 55 54.999999">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>アセット 80</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs16" />
+  <title
+     id="title2">アセット 80</title>
+  <g
+     transform="matrix(0.69498069,0,0,0.69498069,5.0000002,11.397297)"
+     data-name="レイヤー 2"
+     id="レイヤー_2">
+    <g
+       id="Icon">
+      <path
+         id="path4"
+         style="fill:#ffffff"
+         d="m 61.63,14.12 h -7.82 v 3.13 h -9.37 v -3.13 h -1.56 a 3.13,3.13 0 0 0 -3.13,3.13 v 10.94 a 3.13,3.13 0 0 0 3.13,3.12 h 1.56 v 3.13 h 9.37 v -3.13 h 7.82 a 3.12,3.12 0 0 0 3.12,-3.12 V 17.25 a 3.13,3.13 0 0 0 -3.12,-3.13 z" />
+      <path
+         id="path6"
+         style="fill:#ffffff"
+         d="m 29.71,28 4.76,-4.76 a 1.29,1.29 0 0 0 0.4,-1 v 0 a 1.42,1.42 0 0 0 -0.44,-1 L 29.71,16.5 a 1.3647161,1.3647161 0 0 0 -1.93,1.93 l 2.42,2.42 h -8.3 a 1.37,1.37 0 1 0 0,2.74 h 8.34 L 27.78,26 a 1.37,1.37 0 0 0 0,1.93 1.35,1.35 0 0 0 1.93,0.07 z" />
+      <path
+         id="path8"
+         style="fill:#ffffff"
+         d="M 31.38,11.6 V 2.05 a 2.05,2.05 0 0 0 -2.05,-2 H 10.74 V 2.73 H 3.92 V 0 H 2.05 A 2.05,2.05 0 0 0 0,2.05 v 39.56 a 2,2 0 0 0 2.05,2 h 1.87 v 2.73 h 6.82 v -2.69 h 11.77 a 2,2 0 0 0 2,-2 v -9.59 a 2,2 0 0 0 -2,-2.05 H 6.82 V 13.64 h 22.51 a 2,2 0 0 0 2.05,-2.04 z" />
+    </g>
+  </g>
+</svg>
