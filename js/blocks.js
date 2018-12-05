@@ -296,7 +296,7 @@ function Blocks () {
     };
 
     /*
-     * Access "pseudo-Logo interpreter" when we click on blocks
+     * Access "Logo interpreter" when we click on blocks
      * @param - logo
      * @public
      * @return this
@@ -518,8 +518,9 @@ function Blocks () {
     };
 
     /*
-     *  Adjust the size of the clamp in an expandable block when block are inserted into (or removed from) the child flow. This is a
-       common operation for start and action blocks, but also for repeat, forever, if, etc.
+     *  Adjust the size of the clamp in an expandable block when block are inserted into (or removed from)
+        the child flow. This is a common operation for start and action blocks, but also for repeat, forever,
+	if, etc.
      * @public
      * @return {void}
      */
@@ -697,7 +698,7 @@ function Blocks () {
         var that = this;
 
         /*
-         * checks the number of VSpace blocks are below the block we are checking aginst
+         * Checks the number of VSpace blocks are below the block we are checking against
          * @param - blk - block
          * @private
          * @return 0
@@ -2346,7 +2347,7 @@ function Blocks () {
     };
 
     /*
-     * expand expandable clamp blocks as needed
+     * Expand expandable clamp blocks as needed
      * @private
      * @return {void}
      */
@@ -2369,7 +2370,7 @@ function Blocks () {
     /*
      * Some blocks, e.g., sensor blocks for Butia, change their
        appearance depending upon if they have been enabled or
-       disabled. If they have , change their disabled status
+       disabled. If they have, change their disabled status
      * @param - name
      * @param - flag
      * @public
@@ -2563,7 +2564,7 @@ function Blocks () {
     };
 
     /*
-     * Make new blocks from proto block,which is called from Palettes
+     * Make new blocks from proto block, which is called from Palettes
      * @param - name
      * @param - arg - argument
      * @public
@@ -2949,7 +2950,7 @@ function Blocks () {
     };
 
     /*
-     * Generate a drag group from blocks connected to blk
+     * Generate a drag group from the blocks connected to blk.
      * @param - blk - block
      * @public
      * @return {void}
@@ -2966,7 +2967,7 @@ function Blocks () {
     };
 
     /*
-     * Give a block, find all the blocks connected to it
+     * Give a block, find all the blocks connected to it.
      * @param - blk - block
      * @private
      * @return {void}
@@ -3506,7 +3507,7 @@ function Blocks () {
     };
 
     /*
-     * Remove any old entries
+     * Remove any old entries.
      * @param - name
      * @private
      * @return {void}
@@ -3655,7 +3656,7 @@ function Blocks () {
     };
 
     /*
-     * return list of containing clamp blocks or []
+     * return list of containing clamp blocks... or []
      * @param - blk - block
      * @param - clampList
      * @public
@@ -3689,7 +3690,7 @@ function Blocks () {
     };
 
     /*
-     * Return a containing expandable block or null
+     * Return a containing expandable block or null.
      * @param - blk - block
      * @public
      * @return expandable block
@@ -3753,7 +3754,7 @@ function Blocks () {
     };
 
     /*
-     * find the block instance
+     * Find the block instance.
      * @param - blkName 
      * @public
      * @return boolean
@@ -3796,7 +3797,7 @@ function Blocks () {
     };
 
     /*
-     * Return first note block found
+     * Return first note block found.
      * @param - blk - block
      * @public
      * @return note block
@@ -3821,7 +3822,7 @@ function Blocks () {
     };
 
     /*
-     * Return first interval block found
+     * Return first interval block found.
      * @param - blk - block
      * @public
      * @return null or blk
@@ -3846,7 +3847,7 @@ function Blocks () {
     };
 
     /*
-     * Returns first pitch block found
+     * Returns first pitch block found.
      * @param - blk - block
      * @public
      * @return null or blk
@@ -3867,7 +3868,7 @@ function Blocks () {
     };
 
     /*
-     * Return octave associated with pitch block
+     * Return octave associated with pitch block.
      * @param - blk - block
      * @public
      * @return 4
@@ -3892,7 +3893,7 @@ function Blocks () {
     };
 
     /*
-     * Set octave associated with pitch block
+     * Set octave associated with pitch block.
      * @param - blk - block
      * @param - octave
      * @public
@@ -3919,7 +3920,7 @@ function Blocks () {
     };
 
     /*
-     * Cheeck if number block used as addant to an interval block
+     * Cheeck if number block used as...interval block.
      * @param - blk - block
      * @public
      * @return boolean
@@ -3951,8 +3952,8 @@ function Blocks () {
     };
 
     /*
-     * Check if a number block being used as multipicant with a
-       modelength block?
+     * Check if a number block is being used as multipicant with a
+       modelength block.
      * @param - blk - block
      * @public
      * @return boolean
@@ -3986,7 +3987,7 @@ function Blocks () {
     };
 
     /*
-     * Check if number block is used as a note value denominator argument
+     * Check if number block is used as a note value denominator argument.
      * @param - blk - block
      * @public
      * @return boolean
@@ -4108,7 +4109,7 @@ function Blocks () {
     };
 
     /*
-     * Check if a number block being used as an octave argument?
+     * Check if a number block being used as... argument?
      * @param - blk - block
      * @public
      * @return boolean
@@ -4191,7 +4192,7 @@ function Blocks () {
 
     /*
      * Save a stack of blocks to local storage and the 'myblocks'
-       palette by creating a blockObjs
+       palette by creating a blockObjs.
      * @public
      * @return {void}
      */
@@ -4232,7 +4233,7 @@ function Blocks () {
     };
 	
   /*
-   * Copies the Block to objects
+   * Copies the Block to objects.
    * @public
    * @return blockObj
    */
@@ -4321,7 +4322,7 @@ function Blocks () {
     };
 
    /*
-    * loads the new blocks
+    * loads the new blocks.
     * @param - blockObj - Block Objects
     * @public
     * return {void}
@@ -5525,7 +5526,7 @@ function Blocks () {
     };
 	
    /*
-    * Deletes the Action Block
+    * Deletes the Action Block.
     * @param - myblock - new variable
     * @public
     * @return {void}
