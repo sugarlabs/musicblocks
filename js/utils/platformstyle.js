@@ -74,7 +74,27 @@ window.platformColor = {
     selectorSelected: '#1A8CFF',
     labelColor: '#90c100',
     tupletBackground: '#57e751',
-    rhythmcellcolor: '#c8c8c8'
+    rhythmcellcolor: '#c8c8c8',
+	hitAreaGraphicsBeginFill: '#FFF',
+	piemenuBasic: ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'],
+	pitchWheelcolors: ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'],
+	exitWheelcolors: ['#808080', '#c0c0c0'],
+	accidentalsWheelcolors: ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428'],
+	accidentalsWheelcolorspush: '#c0c0c0',
+	octavesWheelcolors: ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'],
+	noteValueWheelcolors: ['#ffb2bc', '#ffccd6'],
+	tabsWheelcolors: ['#ffb2bc', '#ffccd6'],
+	numberWheelcolors: ['#ffb2bc', '#ffccd6'],
+	piemenuBasicundefined: ['#77c428', '#93e042', '#5ba900'],
+	booleanWheelcolors: ['#d3cf76', '#b8b45f'],
+	piemenuVoicesColors: ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'],
+	intervalNameWheelcolors: ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'],
+	intervalWheelcolors: ['#77c428', '#93e042', '#77c428', '#5ba900', '#93e042'],
+	modeWheelcolors: ['#77c428', '#93e042'],
+	modeGroupWheelcolors: ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'],
+	modePieMenusIfColorPush: '#4b8b0e',
+	modePieMenusElseColorPush: '#66a62d',
+	wheelcolors: ['#808080', '#909090', '#808080', '#909090', '#707070'],
 };
 
 document.querySelector('meta[name=theme-color]')
