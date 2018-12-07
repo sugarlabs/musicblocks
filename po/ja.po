@@ -437,7 +437,7 @@ msgstr "高度モードにするには、ブラウザをこうしんして下さ
 
 #: js/activity.js:933
 msgid "Refresh your browser to change to beginner mode."
-msgstr "かんたんモードにするには、ブラウザをこうしんしてください"
+msgstr "はってんモードにするには、ブラウザをこうしんしてください。"
 
 #: js/activity.js:1204
 #: js/activity.js:1220
@@ -908,7 +908,7 @@ msgstr "フレーズメーカーには、音の高さブロックとドラムブ
 #: js/logo.js:3903
 #: js/logo.js:3926
 msgid "Beats per minute must be > 30."
-msgstr "１分あたりの拍の数には３０より大きいあたいをせっていしてください。"
+msgstr "１分あたりの拍の数には、３０より大きいあたいをせっていしてください。"
 
 #: js/logo.js:3833
 #: js/logo.js:3855
@@ -916,11 +916,11 @@ msgstr "１分あたりの拍の数には３０より大きいあたいをせっ
 #: js/logo.js:3906
 #: js/logo.js:3929
 msgid "Maximum beats per minute is 1000."
-msgstr "BPM(一分あたりの拍数)は最大1000とします。"
+msgstr "１分あたりの拍数は最大１０００です。"
 
 #: js/logo.js:3999
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "フレーズメーカーには、音の高さブロックとドラムブロックを組み合わせてください。"
+msgstr "フレーズメーカーには、音の高さブロックと音符ブロックを組み合わせてください。"
 
 #: js/logo.js:4036
 msgid "Attack value should be from 0 to 100."
@@ -1476,7 +1476,7 @@ msgstr "プログラムは、このボタンをおすかわりに、キーボー
 #: js/turtledefs.js:132
 #: js/turtledefs.js:175
 msgid "Initialize a new project."
-msgstr "新規作成"
+msgstr "新しいプロジェクトを作る。"
 
 #: js/turtledefs.js:133
 #: js/turtledefs.js:176
@@ -1490,7 +1490,7 @@ msgstr "げんざい開いているプロジェクトをほぞんする。"
 
 #: js/turtledefs.js:135
 msgid "This button opens a viewer for sharing projects and for finding example projects."
-msgstr "このボタンをクリックするとプロジェクトを見つけたりシェアしたりウィンドーが開きます。"
+msgstr "インターネットの「プラネット（わくせい）」というページから、ほかの人が作ったプロジェクトを選んで、読みこむことができる。"
 
 #: js/turtledefs.js:136
 #: js/turtledefs.js:174
@@ -1599,7 +1599,7 @@ msgstr "ネズミを元の位置にもどし、ペンでえがいた線をすべ
 #: js/turtledefs.js:150
 #: js/turtledefs.js:170
 msgid "Collapse the graphics window."
-msgstr "ネズミがいどうしたり、ペンで線をえがいたりできる「カンバス」の表示サイズを しゅくしょうしたり、かくだいしたりする。"
+msgstr "ネズミがいどうしたり、ペンで線をえがいたりできる「カンバス」の表示サイズを しゅくしょうしたり、かくだいしたりする。カンバスをしゅくしょうした場合は、プログラムをふつうのそくどで実行しても、ブロックがかくれない。ふつうの実行そくどでプログラムの動作かくにんをしたいときなどに便利だ。"
 
 #: js/turtledefs.js:151
 #: js/turtledefs.js:189
@@ -1630,7 +1630,7 @@ msgstr "ミュージック・ブロックスガイド"
 #: js/turtledefs.js:153
 #: js/turtledefs.js:191
 msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
-msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。"
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、<a href="https://www.gnu.org/philosophy/free-sw.ja.html">オープンソース</a>のツールだ。"
 
 #: js/turtledefs.js:153
 #: js/turtledefs.js:191
@@ -1640,12 +1640,12 @@ msgstr "ミュージック・ブロックスにかかわってきた人のいち
 #: js/turtledefs.js:153
 #: js/turtledefs.js:191
 msgid "Music Blocks is licensed under the AGPL."
-msgstr "ミュージック・ブロックスのプログラムは、だれでも自由にみたり、変更したりすることができる。"
+msgstr "ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。"
 
 #: js/turtledefs.js:153
 #: js/turtledefs.js:191
 msgid "The current version is"
-msgstr "ミュージック・ブロックスの最新バージョンはブロックスの最新バージョンは"
+msgstr "ミュージック・ブロックスの最新バージョンは"
 
 #: js/turtledefs.js:153
 #: js/turtledefs.js:191
@@ -1942,11 +1942,11 @@ msgstr "<h2>モード（音階）ブロック</h2><br>いろいろな音階を�
 
 #: js/turtledefs.js:249
 msgid "The Repeat block will repeat the contained blocks."
-msgstr "<h2>実行ブロック（くり返し）</h2><br>図の例では、「ソ」の音が４回えんそうされる。"
+msgstr "<h2>実行ブロック（くり返し）</h2><br>はさまれているブロックのプログラムを、入力した回数だけくり返す。"
 
 #: js/turtledefs.js:249
 msgid "In this example the note will be played 4 times."
-msgstr "<br><br>図の例では、「アクション」が４回実行される。"
+msgstr "<br><br>図の例では、「ソ」の音が４回えんそうされる"
 
 #: js/turtledefs.js:250
 msgid "The Forever block will repeat the contained blocks forever."
@@ -2211,7 +2211,7 @@ msgstr "<br>図の例では、右向きに進み続けるネズミがカンバ�
 
 #: js/turtledefs.js:309
 msgid "The Right block returns the position of the right of the canvas."
-msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの右のｘざひょうち。プラスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。<br>図の例では、右向きに進み続けるネズミがカンバスの右からはみ出ると、カンバスの左から出てくる。"
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの右のｘざひょうち。プラスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。"
 
 #: js/turtledefs.js:311
 msgid "The Mouse-button block returns True if the mouse button is pressed."
@@ -2981,7 +2981,7 @@ msgstr "プロジェクトをほぞんしますか"
 #.TRANS: square wave
 ## 矩形波＝くけいは；https://synth-voice.sakura.ne.jp/synth-voice/html5/synth-basic01.html;http://jisho.org/word/%E7%9F%A9%E5%BD%A2%E6%B3%A2 
 msgid "square"
-msgstr "矩形波（スクエア）"
+msgstr "四角の波"
 
 #: js/basicblocks.js:88
 #: js/basicblocks.js:662
@@ -2993,7 +2993,7 @@ msgstr "矩形波（スクエア）"
 #.TRANS: triangle wave
 #.TRANS: triangle wave
 msgid "triangle"
-msgstr "三角波（トライアングル）"
+msgstr "三角の波"
 
 #: js/basicblocks.js:100
 #: js/synthutils.js:65
@@ -3014,7 +3014,7 @@ msgstr "サイン波"
 #.TRANS: sawtooth wave
 #.TRANS: sawtooth wave
 msgid "sawtooth"
-msgstr "ノコギリ波（サー）"
+msgstr "ぎざぎざの波"
 
 #: js/basicblocks.js:131
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -3904,7 +3904,7 @@ msgstr ""
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: set the key and mode, e.g. C Major
 msgid "set key"
-msgstr "音階をせってい"
+msgstr "調をせってい"
 
 #: js/basicblocks.js:2694
 #.TRANS: key, e.g., C in C Major
@@ -4714,7 +4714,7 @@ msgstr "複製ファクター"
 #: js/basicblocks.js:4643
 #.TRANS: play music backward
 msgid "backward"
-msgstr "逆向きに実行"
+msgstr "ぎゃく向きに実行"
 
 #: js/basicblocks.js:4655
 #.TRANS: play each note more than once
@@ -5195,7 +5195,7 @@ msgstr "プレイバック用の音楽を準備（コンパイル）します"
 
 #: js/languagebox.js:92
 msgid "Refresh your browser to change your language preference."
-msgstr "言語を変更するには、ブラウザをこうしんしてください。"
+msgstr "言語を変えるには、ブラウザをこうしんしてください。"
 
 #: js/help.js:53
 msgid "Previous page"

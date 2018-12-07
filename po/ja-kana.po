@@ -772,7 +772,7 @@ msgstr "JSONの インプットの パースが できません。"
 #: js/activity.js:5112
 #: js/activity.js:5158
 msgid "Cannot load project from the file. Please check the file type."
-msgstr "プロジェクトを よみこめません。ファイルの しゅるいを かくにん して ください。"
+msgstr "プロジェクトを よみこめません。 ファイルの しゅるいを かくにんしてください。"
 
 #: js/logo.js:31
 ## http://jisho.org/word/%E5%A6%A5%E5%BD%93 ; 妥当=だとう; maybe just ヴァリッド(http://jisho.org/word/%E3%83%B4%E3%82%A1%E3%83%AA%E3%83%83%E3%83%89 )
@@ -900,7 +900,7 @@ msgstr "ちょうふく している ピッチすうちは むし します"
 
 #: js/logo.js:3706
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "フレーズメーカーには、おとのたかさ ブロックと ドラム ブロックを くみあわせて ください。"
+msgstr "フレーズメーカー には、 おとのたかさブロック と ドラムブロック を くみあわせてください。"
 
 #: js/logo.js:3830
 #: js/logo.js:3852
@@ -908,7 +908,7 @@ msgstr "フレーズメーカーには、おとのたかさ ブロックと ド�
 #: js/logo.js:3903
 #: js/logo.js:3926
 msgid "Beats per minute must be > 30."
-msgstr "１分あたりの拍の数には３０よりおおきいあたいをせっていしてください。"
+msgstr "１ぷんあたりの はくのかずには ３０より おおきいあたいを せっていしてください。"
 
 #: js/logo.js:3833
 #: js/logo.js:3855
@@ -916,11 +916,11 @@ msgstr "１分あたりの拍の数には３０よりおおきいあたいをせ
 #: js/logo.js:3906
 #: js/logo.js:3929
 msgid "Maximum beats per minute is 1000."
-msgstr "BPM(いっぷん あたりの はく すう)は さいだい 1000と します。"
+msgstr "１ぷんあたりの はくすうは さいだい１０００です。"
 
 #: js/logo.js:3999
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "フレーズメーカーには、 おとのたかさ ブロックと ドラムブロックを くみあわせて ください。"
+msgstr "フレーズメーカーには、 おとのたかさ ブロックと おんぷブロックを くみあわせて ください。"
 
 #: js/logo.js:4036
 msgid "Attack value should be from 0 to 100."
@@ -1184,7 +1184,7 @@ msgstr "おんかい名"
 
 #: js/palette.js:829
 msgid "invert mode"
-msgstr "おんかいを はんてん させる"
+msgstr "ちょうを はんてん させる"
 
 #: js/palette.js:832
 msgid "voice name"
@@ -1807,7 +1807,7 @@ msgstr "<h2>おとのたかさを かずでひょうじ ブロック</h2><br>お
 #: js/turtledefs.js:220
 #: js/turtledefs.js:497
 msgid "The Set key block is used to set the key and mode,"
-msgstr "<h2>おんかいブロック</h2><br>ちょうの ぶぶんに おとのたかさ、おんかいの ぶぶんに おんかいのしゅるいを えらび、ちょうを せっていする。<br><br>★ちょうとは<br>ちゅうしんてきな やくわりを はたすおとと、 おんかいの しゅるいによって きまる、 きょくの かんじ。 ちゅうしんてきな やくわりを はたすおと だけを  さすこともある。<br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。"
+msgstr "<h2>ちょうをせっていブロック</h2><br>ちょうの ぶぶんに おとのたかさ、おんかいの ぶぶんに おんかいのしゅるいを えらび、ちょうを せっていする。<br><br>★ちょうとは<br>ちゅうしんてきな やくわりを はたすおとと、 おんかいの しゅるいによって きまる、 きょくの かんじ。 ちゅうしんてきな やくわりを はたすおと だけを  さすこともある。<br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。"
 
 #: js/turtledefs.js:220
 msgid "eg C Major"
@@ -1942,7 +1942,7 @@ msgstr "<h2>メトロノームブロック</h2><br>メトロノームを ひょ�
 
 #: js/turtledefs.js:247
 msgid "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
-msgstr "<h2>モード（おんかい）ブロック</h2><br>いろいろな おんかいを さがす ツールを ひょうじする。おんかいは、 おとと おとの かんかくを きめながら さがすことが できる。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。"
+msgstr "<h2>モード（おんかい）ブロック</h2><br>いろいろな ちょうを さがす ツールを ひょうじする。おんかいは、 おとと おとの かんかくを きめながら さがすことが できる。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。"
 
 #: js/turtledefs.js:249
 msgid "The Repeat block will repeat the contained blocks."
@@ -2149,7 +2149,7 @@ msgstr "<h2>ペンブロック</h2><br>ネズミの うごきに あわせて �
 
 #: js/turtledefs.js:294
 msgid "The Color block returns the current pen color."
-msgstr "げんざいの ペンの いろを、 すうちで ひょうじする。"
+msgstr "<h2>ペンブロック</h2>げんざいの ペンの いろを、 すうちで ひょうじする。"
 
 #: js/turtledefs.js:295
 msgid "The Set-color block changes the pen color."
@@ -2202,7 +2202,7 @@ msgstr "<br>ずのれいでは、 うわむきに すすみ つづける ネズ�
 
 #: js/turtledefs.js:307
 msgid "The Bottom block returns the position of the bottom of the canvas."
-msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの かたん の ｙざひょうち。 マイナスの すうち。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。<br>ずのれいでは、 うわむきに すすみ つづける ネズミが カンバスの じょうたん から はみでると、 カンバスの かたん から でてくる。"
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの かたん の ｙざひょうち。 マイナスの すうち。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
 
 #: js/turtledefs.js:308
 msgid "The Left block returns the position of the left of the canvas."
@@ -2215,7 +2215,7 @@ msgstr "<br>ずのれいでは、 みぎむきに すすみ つづける ネズ�
 
 #: js/turtledefs.js:309
 msgid "The Right block returns the position of the right of the canvas."
-msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの みぎはし の ｘざひょうち。 プラスの すうち。カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。<br>ずのれいでは、 みぎむきに すすみ つづける ネズミが カンバスの うたん から はみでると、 カンバスの ひだりはし から でてくる。"
+msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの みぎはし の ｘざひょうち。 プラスの すうち。カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
 
 #: js/turtledefs.js:311
 msgid "The Mouse-button block returns True if the mouse button is pressed."
@@ -2369,7 +2369,7 @@ msgstr ""
 
 #: js/turtledefs.js:354
 msgid "The Semi-tone interval block calculates a relative interval based on half steps."
-msgstr "<em>半おんかい的音程</em>ブロックはおんかいを無視、半音であたらしい音高をけいさんして鳴らします。"
+msgstr "<em>半おんかい的音程</em>ブロックはちょうを無視、半音であたらしい音高をけいさんして鳴らします。"
 
 #: js/turtledefs.js:354
 msgid "In the figure, we add sol# to sol."
@@ -2985,7 +2985,7 @@ msgstr "プロジェクトを ほぞん しますか"
 #.TRANS: square wave
 ## 矩形波＝くけいは；https://synth-voice.sakura.ne.jp/synth-voice/html5/synth-basic01.html;http://jisho.org/word/%E7%9F%A9%E5%BD%A2%E6%B3%A2 
 msgid "square"
-msgstr "くけいは（スクエア）"
+msgstr "しかくの なみ"
 
 #: js/basicblocks.js:88
 #: js/basicblocks.js:662
@@ -2997,7 +2997,7 @@ msgstr "くけいは（スクエア）"
 #.TRANS: triangle wave
 #.TRANS: triangle wave
 msgid "triangle"
-msgstr "さんかくは（トライアングル）"
+msgstr "さんかくの なみ"
 
 #: js/basicblocks.js:100
 #: js/synthutils.js:65
@@ -3018,7 +3018,7 @@ msgstr "サインは"
 #.TRANS: sawtooth wave
 #.TRANS: sawtooth wave
 msgid "sawtooth"
-msgstr "ノコギリは(サー）"
+msgstr "ぎざぎざの なみ"
 
 #: js/basicblocks.js:131
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -3208,7 +3208,7 @@ msgstr "ヘルツ"
 #: js/basicblocks.js:591
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
-msgstr "音度"
+msgstr "おんど"
 
 #: js/basicblocks.js:607
 #.TRANS: step some number of notes in current musical scale
@@ -3574,7 +3574,7 @@ msgstr "強拍に"
 
 #: js/basicblocks.js:1558
 msgid "on every note do"
-msgstr "ぜんぶの おんぷに～する"
+msgstr "すべての おんぷに～する"
 
 #: js/basicblocks.js:1572
 #: js/basicblocks.js:1588
@@ -3882,7 +3882,7 @@ msgstr "1どの わおん"
 #.TRANS: define a custom mode
 ## http://jisho.org/word/%E5%AE%9A%E7%BE%A9 
 msgid "define mode"
-msgstr "おんかいを ていぎ する"
+msgstr "ちょうを ていぎ する"
 
 #: js/basicblocks.js:2636
 msgid "moveable Do"
@@ -3908,7 +3908,7 @@ msgstr "げんだいの ちょう"
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: set the key and mode, e.g. C Major
 msgid "set key"
-msgstr "ちょうをせって"
+msgstr "ちょうをせってい"
 
 #: js/basicblocks.js:2694
 #.TRANS: key, e.g., C in C Major
@@ -5158,7 +5158,7 @@ msgstr "こうもり"
 
 #: js/lilypond.js:177
 msgid "Lilypond ignoring mode"
-msgstr "Lilypondは このおんかいを むし します"
+msgstr "Lilypondは このちょうを むし します"
 
 #: js/macros.js:57
 #: js/macros.js:203
@@ -5203,7 +5203,7 @@ msgstr "プレイバックようの おんがくを じゅんび（コンパイ�
 
 #: js/languagebox.js:92
 msgid "Refresh your browser to change your language preference."
-msgstr "げんごを変更するには、ブラウザをこうしんしてください。"
+msgstr "げんごを かえるには、 ブラウザを こうしんしてください。"
 
 #: js/help.js:53
 msgid "Previous page"
@@ -5325,7 +5325,7 @@ msgstr "フィルターを くわえる"
 #: js/modewidget.js:95
 #: js/pitchstaircase.js:534
 msgid "Undo"
-msgstr ""
+msgstr "１つもどす"
 
 #: js/timbre.js:820
 msgid "Click on buttons to open the timbre design tools."
@@ -5401,7 +5401,7 @@ msgstr "ギター"
 
 #: js/rhythmruler.js:1436
 msgid "Save rhythms"
-msgstr ""
+msgstr "リズムだけをほぞん"
 
 #: js/rhythmruler.js:1442
 msgid "Save drum machine"
@@ -5410,7 +5410,7 @@ msgstr "ドラム として ほぞん"
 #: js/rhythmruler.js:1487
 #.TRANS: user can tap out a rhythm by clicking on a ruler.
 msgid "Tap a rhythm"
-msgstr ""
+msgstr "リズムをタップする"
 
 #: js/rhythmruler.js:1819
 msgid "Click on the ruler to divide it."
@@ -5439,7 +5439,7 @@ msgstr ""
 #: js/modewidget.js:200
 #.TRANS: A circle of notes represents the musical mode.
 msgid "Click in the circle to select notes for the mode."
-msgstr "クリックでおとのたかさを選んでおんかいをせっていできます。"
+msgstr "クリックでおとのたかさを選んでちょうをせっていできます。"
 
 #: js/pitchstaircase.js:475
 msgid "Play chord"
@@ -5447,7 +5447,7 @@ msgstr "わおんを さいせい する"
 
 #: js/pitchstaircase.js:480
 msgid "Play scale"
-msgstr "おんかいを さいせい する"
+msgstr "ちょうを さいせい する"
 
 #: js/pitchstaircase.js:639
 msgid "Click on a note to create a new step."
@@ -5495,7 +5495,7 @@ msgstr "コントラバス"
 #: js/musicutils.js:259
 #.TRANS: musical instrument
 msgid "acoustic guitar"
-msgstr "アコースティック・ギター"
+msgstr "アコースティック"
 
 #: js/synthutils.js:37
 #: js/musicutils.js:260
@@ -5549,7 +5549,7 @@ msgstr "ダルシマー"
 #: js/musicutils.js:301
 #.TRANS: musical instrument
 msgid "electric guitar"
-msgstr "エレキギター"
+msgstr "エレクトリック"
 
 #: js/synthutils.js:57
 #: js/musicutils.js:266
@@ -6524,7 +6524,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "時間前"
 
 #~msgid "play scale"
-#~msgstr "おんかいを さいせい する"
+#~msgstr "ちょうを さいせい する"
 
 #~msgid "ml"
 #~msgstr "モ"
