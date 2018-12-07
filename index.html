@@ -120,8 +120,9 @@
 
 <script>
   var loadIt = function() {
+      console.log(document.webL10n.getLanguage());
       console.log(localStorage.languagePreference);
-      if (localStorage.languagePreference === 'ja') {
+      if (localStorage.languagePreference === 'ja' || document.webL10n.getLanguage() == 'ja') {
 	  document.getElementById('loading-image-container').innerHTML = '<img src="loading-animation-ja.svg" style="width: 100%; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />"'
       } else {
 	  document.getElementById('loading-image-container').innerHTML = '<img src="loading-animation.gif" style="max-width:90%; width: 1024px; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />"'

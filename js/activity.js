@@ -3372,9 +3372,17 @@ function Activity() {
                 refreshCanvas();
             });
         };
+
         logoContainer.on('click', function (event) {
             _showAboutPage(); // show about page
         });
+
+	var language = localStorage.languagePreference;
+	if (language == 'ja') {
+	    var LOGO = LOGOJA1;
+	} else {
+	    var LOGO = LOGODEFAULT;
+	}
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)));
 

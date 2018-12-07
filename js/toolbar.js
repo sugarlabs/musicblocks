@@ -18,6 +18,10 @@ function Toolbar() {
 
     this.renderLogoIcon = function (onclick) {
         var logoIcon = document.getElementById('mb-logo');
+        if (language === 'ja') {
+            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
+        }
+
         logoIcon.onmouseenter = function () {
             document.body.style.cursor = 'pointer';
         };
