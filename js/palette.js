@@ -263,7 +263,6 @@ function Palettes () {
 
     this.setSearch = function (show, hide) {
         this.showSearchWidget = show;
-        this.hideSearchWidget = hide;
         return this;
     }
 
