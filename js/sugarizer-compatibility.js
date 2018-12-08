@@ -20,6 +20,9 @@ define(["sugar-web/env", "sugar-web/activity/activity", "sugar-web/datastore"], 
         },
 
         isInsideSugarizer: function () {
+	    // Work-around since MB is not part of Sugarizier but if
+	    // someone has the env set, it breaks MB.  return
+	    // env.isSugarizer();
             return false;
         },
 
