@@ -1549,7 +1549,7 @@ msgstr "すべてのブロックを、カンバスのまんなかに配置する
 #: js/turtledefs.js:143
 #: js/turtledefs.js:180
 msgid "Cartesian"
-msgstr "うがん（ざひょう）を表示"
+msgstr "ほうがん（ざひょう）を表示"
 
 #: js/turtledefs.js:143
 #: js/turtledefs.js:180
@@ -4175,14 +4175,14 @@ msgstr "コントロール点２"
 #: js/basicblocks.js:3158
 #: js/basicblocks.js:3205
 msgid "x1"
-msgstr "xざひょう（よこ）"
+msgstr "xざひょう（ネズミ）"
 
 #: js/basicblocks.js:3118
 #: js/basicblocks.js:3138
 #: js/basicblocks.js:3158
 #: js/basicblocks.js:3205
 msgid "y1"
-msgstr "yざひょう（たて）"
+msgstr "yざひょう（ネズミ）"
 
 #: js/basicblocks.js:3136
 #.TRANS: control point in a Bezier curve
@@ -5487,7 +5487,7 @@ msgstr "コントラバス"
 #: js/musicutils.js:259
 #.TRANS: musical instrument
 msgid "acoustic guitar"
-msgstr "アコースティック・ギター"
+msgstr "アコースティック"
 
 #: js/synthutils.js:37
 #: js/musicutils.js:260

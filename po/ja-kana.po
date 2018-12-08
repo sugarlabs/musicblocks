@@ -4179,14 +4179,14 @@ msgstr "コントロール点２"
 #: js/basicblocks.js:3158
 #: js/basicblocks.js:3205
 msgid "x1"
-msgstr "xざひょう（よこ）"
+msgstr "xざひょう（ネズミ）"
 
 #: js/basicblocks.js:3118
 #: js/basicblocks.js:3138
 #: js/basicblocks.js:3158
 #: js/basicblocks.js:3205
 msgid "y1"
-msgstr "yざひょう（たて）"
+msgstr "yざひょう（ネズミ）"
 
 #: js/basicblocks.js:3136
 #.TRANS: control point in a Bezier curve
