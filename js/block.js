@@ -4552,6 +4552,15 @@ function Block(protoblock, blocks, overrideName) {
         this._voiceWheel.animatetime = 0; // 300;
         this._voiceWheel.createWheel(voiceLabels);
 
+        // Special case for Japanese
+        var language = localStorage.languagePreference;
+        if (language === 'ja') {
+            for (var i = 0; i < this._voiceWheel.navItems.length; i++) {
+                this._voiceWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                this._voiceWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+            }
+        }
+
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
