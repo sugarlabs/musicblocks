@@ -1556,6 +1556,9 @@ msgstr "うがん（ざひょう）をひょうじ"
 msgid "Polar"
 msgstr "ちゅうしんのかくどとほうがん（ざひょう）をひょうじ"
 
+msgid "Cartesian/Polar"
+msgstr ""
+
 #: js/turtledefs.js:143
 #: js/turtledefs.js:180
 msgid "Show or hide a coordinate grid."

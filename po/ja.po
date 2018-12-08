@@ -1556,6 +1556,9 @@ msgstr "うがん（ざひょう）を表示"
 msgid "Polar"
 msgstr "中心の角度とほうがん（ざひょう）を表示"
 
+msgid "Cartesian/Polar"
+msgstr "中心の角度とほうがん（ざひょう）をひょうじ"
+
 #: js/turtledefs.js:143
 #: js/turtledefs.js:180
 msgid "Show or hide a coordinate grid."
