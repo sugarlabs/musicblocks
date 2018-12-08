@@ -1776,7 +1776,7 @@ msgid "Pitch can be specified in terms of C D E F G A B."
 msgstr ""
 
 #: js/turtledefs.js:213
-msgid "The Pitch Number block will play a pitch associated by its number, e.g, 1 for C, 7 for G."
+msgid "The Pitch Number block will play a pitch associated by its number, e.g, 0 for C, 7 for G."
 msgstr "<h2>おとの たかさを かずで ひょうじ ブロック</h2><br>おとの たかさを かずで ひょうじする。 たとえば、 オクターヴ４の 「ド」 の おとは ０、 オクターヴ４の 「ソ」 の おとは ７、 オクターヴ３の 「シ」 の おとは -１ と ひょうじされる。"
 
 #: js/turtledefs.js:214
