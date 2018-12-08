@@ -223,7 +223,7 @@ function createHelpContent() {
         'pitch': [_('The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', 'note-value-block.svg'],
         'solfege': [_('Pitch can be specified in terms of do re mi fa sol la ti.'), 'documentation', 'note-value-block.svg'],
         'notename': [_('Pitch can be specified in terms of C D E F G A B.'), 'documentation', 'note-name-block.svg'],
-        'pitchnumber': [_('The Pitch Number block will play a pitch associated by its number, e.g, 0 for C, 7 for G.'), 'documentation', 'pitch-number-block.svg'],
+        'pitchnumber': [_('The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G.'), 'documentation', 'pitch-number-block.svg'],
         'steppitch': [_('The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,') + ' ' + _('eg if the last note played was sol, Scalar Step 1 will play la.'), 'documentation', 'set-key-block.svg'],
         'hertz': [_('The Hertz block (in combination with a Number block) will play a sound at the specified frequency.'), 'documentation', 'hertz-block.svg'],
         'setscalartransposition': [_('The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.') + ' ' + _('In the example shown above, sol is shifted up to la.'), 'documentation', 'scalar-transpose-block.svg'],
@@ -235,7 +235,7 @@ function createHelpContent() {
         'interval': [_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', 'scalar-interval-block.svg'],
         'settemperament': [_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', 'set-temperament-block.svg'],
         // Tone palette
-        'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar, piano, violin, or cello.'), 'documentation', 'start-block.svg'],
+        'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'start-block.svg'],
         'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato-block.svg'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur-block.svg'],
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg'],
@@ -243,7 +243,7 @@ function createHelpContent() {
         // Volume palette
         'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg'],
         'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg'],
-        'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('eg guitar, violin, snare drum, etc.') + ' ' + _('The default volume is 50.') + ' ' + _('The range is 0 for silence to 100 for full volume.'), 'documentation', 'set-synth-volume-block.svg'],
+        'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('eg guitar violin snare drum etc.') + ' ' + _('The default volume is 50.') + ' ' + _('The range is 0 for silence to 100 for full volume.'), 'documentation', 'set-synth-volume-block.svg'],
         'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'set-master-volume-block.svg'],
         // Drum palette
         // 'playdrum' is described on the Rhythm palette.
@@ -369,7 +369,7 @@ function createHelpContent() {
         'measureintervalsemitones': [_('The Scalar interval block measures the distance between two notes in semi-tones.'), 'documentation', 'status.svg'],
         'doubly': [_('The Doubly block will double the size of an interval.'), 'documentation', 'status.svg'],
         // Tone palette
-        'voicename': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar, piano, violin, or cello.'), 'documentation', 'set-timbre-block.svg'],
+        'voicename': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'set-timbre-block.svg'],
         'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', 'chorus-block.svg'],
         'phaser': [_('The Phaser block adds a sweeping sound.'), 'documentation', 'phaser-block.svg'],
         'dis': [_('The Distortion block adds distortion to the pitch.'), 'documentation', 'distortion-block.svg'],

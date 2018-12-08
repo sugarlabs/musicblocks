@@ -1780,7 +1780,7 @@ msgid "Pitch can be specified in terms of C D E F G A B."
 msgstr ""
 
 #: js/turtledefs.js:213
-msgid "The Pitch Number block will play a pitch associated by its number, e.g, 0 for C, 7 for G."
+msgid "The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G."
 msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数で表示する。たとえば、オクターヴ４の「ド」の音は０、オクターヴ４の「ソ」の音は７、オクターヴ３の「シ」の音は-１と表示される。"
 
 #: js/turtledefs.js:214
@@ -1883,7 +1883,7 @@ msgid "The Set synth volume block will change the volume of a particular synth,"
 msgstr "<h2>楽器の音量をせっていブロック</h2><br>ギター、ヴァイオリン、スネアドラムなどの楽器の音量をせっていする。"
 
 #: js/turtledefs.js:233
-msgid "eg guitar, violin, snare drum, etc."
+msgid "eg guitar violin snare drum etc."
 msgstr "<br><br>例えば、ギター、バイオリン、スネアドラムなど。"
 
 #: js/turtledefs.js:233
@@ -2391,7 +2391,7 @@ msgid "The Doubly block will double the size of an interval."
 msgstr ""
 
 #: js/turtledefs.js:359
-msgid "eg guitar, piano, violin, or cello."
+msgid "eg guitar piano violin or cello."
 msgstr "（例えば、ギター、ピアノ、バイオリン、チェロなど）。"
 
 #: js/turtledefs.js:360
