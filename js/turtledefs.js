@@ -261,7 +261,7 @@ function createHelpContent() {
         // Flow palette
         'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
         'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
-        'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.') + ' ' + _('Else a kick drum will play.'), 'documentation', 'if-conditional-block.svg'],
+        'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'if-conditional-block.svg'],
         'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.') + ' ' + _('Else a kick drum will play.'), 'documentation', 'elif-conditional-block.svg'],
         'backward': [_('The Backward block runs code in reverse order (Musical retrograde).'), 'documentation', 'box-1-block.svg'],
         // Action palette
