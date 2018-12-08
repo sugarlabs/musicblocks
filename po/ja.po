@@ -898,6 +898,10 @@ msgstr "ピッチ数値の数のうち、0未満あるいは11より大きい数
 msgid "Ignoring duplicate pitch numbers."
 msgstr "重複しているピッチ数値は無視します"
 
+#: js/blocks.js
+msgid "You must always have at least one start block."
+msgstr "スタートブロックは、１つ以上残しておいてください。"
+
 #: js/logo.js:3706
 msgid "You must have at least one pitch block and one drum block in the matrix."
 msgstr "フレーズメーカーには、音の高さブロックとドラムブロックを組み合わせてください。"
