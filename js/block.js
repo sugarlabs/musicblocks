@@ -504,15 +504,22 @@ function Block(protoblock, blocks, overrideName) {
      * @private
      */
     this._newArtwork = function (plusMinus) {
-        if (this.isCollapsible()) {
-            var proto = new ProtoBlock('collapse');
+        if (this.isInlineCollapsible()) {
+            var proto = new ProtoBlock('collapse-note');
             proto.scale = this.protoblock.scale;
             if (this.name === 'interval') {
                 proto.extraWidth = 80;
             } else {
                 proto.extraWidth = 40;
             }
-
+            proto.zeroArgBlock();
+            var obj = proto.generator();
+            this.collapseArtwork = obj[0];
+            var obj = this.protoblock.generator(this.clampCount[0]);
+        } else if (this.isCollapsible()) {
+            var proto = new ProtoBlock('collapse');
+            proto.scale = this.protoblock.scale;
+            proto.extraWidth = 40;
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
