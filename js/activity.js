@@ -392,9 +392,9 @@ function Activity() {
         pluginsImages = {};
 
     }
-
+    
     window.onblur = function () {
-        doStopButton();
+        that.doHardStopButton(true);
     };
 
     /**
@@ -4379,7 +4379,7 @@ function Activity() {
         this._outerWidth = window.outerWidth;
         this._outerHeight = window.outerHeight;
 
-        console.log('window inner/outer width/height: ' + this.innerWidth + ', ' + this.innerHeight + ' ' + this.outerWidth + ', ' + this.outerHeight);
+        console.log('window inner/outer width/height: ' + this._innerWidth + ', ' + this._innerHeight + ' ' + this._outerWidth + ', ' + this._outerHeight);
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
             //sugarizerCompatibility.data.blocks = prepareExport();
