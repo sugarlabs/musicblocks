@@ -1561,7 +1561,7 @@ msgid "Polar"
 msgstr "ちゅうしんのかくどとほうがん（ざひょう）をひょうじ"
 
 msgid "Cartesian/Polar"
-msgstr ""
+msgstr "ちゅうしんのかくどとほうがん（ざひょう）をひょうじ"
 
 #: js/turtledefs.js:143
 #: js/turtledefs.js:180
