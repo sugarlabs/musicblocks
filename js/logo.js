@@ -7667,6 +7667,11 @@ function Logo () {
                     } else if (that.unhighlightQueue[turtle].length > 0) {
                         // The child flow is finally complete, so unhighlight.
                         setTimeout(function () {
+                            if (!turtle in that.unhighlightQueue) {
+                                console.log('turtle ' + turtle + ' not found in unhighlightQueue');
+                                return;
+                            }
+
                             if (that.blocks.visible) {
                                 that.blocks.unhighlight(that.unhighlightQueue[turtle].pop());
                             } else {
@@ -9182,6 +9187,16 @@ function Logo () {
     this._dispatchTurtleSignals = function (turtle, beatValue, blk, delay) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
+        if (!turtle in this.embeddedGraphics) {
+            console.log('Could not find turtle ' + turtle + 'in embeddedGraphics.');
+            return;
+        }
+
+        if (!blk in this.embeddedGraphics[turtle]) {
+            console.log('Could not find blk ' + blk + 'in embeddedGraphics.');
+            return;
+        }
+
         if (this.embeddedGraphics[turtle][blk].length === 0)
             return;
 

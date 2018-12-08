@@ -636,7 +636,13 @@ function PitchTimeMatrix () {
 
     this._export = function() {
         var exportWindow = window.open('');
+        console.log(exportWindow);
         var exportDocument = exportWindow.document;
+        if (exportDocument === undefined) {
+            console.log('Could not create export window');
+            return;
+        }
+
         var title = exportDocument.createElement('title');
         title.innerHTML = 'Music Matrix';
         exportDocument.head.appendChild(title);
