@@ -4779,7 +4779,10 @@ function Activity() {
 
             this.initialiseNewProject = function (name) {
                 this.planet.ProjectStorage.initialiseNewProject(name);
+                sendAllToTrash();
+                refreshCanvas();
                 blocks.trashStacks = [];
+                that._loadStart();
                 this.saveLocally();
             };
 
