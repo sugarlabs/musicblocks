@@ -32,7 +32,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('acoustic guitar'), 'acousticguitar', 'images/voices.svg', 'string'],
+    [_('acoustic guitar'), 'acoustic guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
@@ -50,7 +50,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('electric guitar'), 'electricguitar', 'images/voices.svg', 'string'],
+    [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -152,7 +152,7 @@ const SAMPLECENTERNO = {
     'cello': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
-    'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'acoustic guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'flute': ['F#5', 57], // pitchToNumber('F#', 57, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -161,7 +161,7 @@ const SAMPLECENTERNO = {
     'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
-    'electricguitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
 };
 
 
@@ -435,12 +435,12 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
-		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+		{'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
 		{'name': 'koto', 'data': KOTO_SAMPLE},
 		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electricguitar', 'data': ELECTRICGUITAR_SAMPLE}
+		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
