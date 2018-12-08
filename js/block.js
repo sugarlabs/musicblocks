@@ -212,6 +212,11 @@ function Block(protoblock, blocks, overrideName) {
         return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
     };
 
+    /*
+     * Show the highlight artwork
+     * @return{void}
+     * @public
+     */
     this.highlight = function () {
         if (this.trash) {
             return;
@@ -2737,7 +2742,6 @@ function Block(protoblock, blocks, overrideName) {
             var effectcategoriesList = [];
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) !== -1) {
-                    console.log("found");
                     var label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, 'bold 48pt Sans') > 400) {
                         effectLabels.push(label.substr(0, 8) + '...');
@@ -3155,7 +3159,6 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        console.log('Pie Menu not OK to launch');
         return false;
     };
 
@@ -4311,6 +4314,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this._numberWheel.navigateWheel(i);
+        // docById('wheelDiv').style.display = '';
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
@@ -5224,7 +5228,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.navItems[1].navigateFunction = __prepScale;
     };
 
-    this._labelChanged = function (closeInput, change) {
+    this._labelChanged = function (closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
         if (this === null || this.label === null) {
             this._labelLock = false;
@@ -5241,7 +5245,9 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // The pie menu may be visible too, so hide it.
-        docById('wheelDiv').style.display = 'none';
+        if (notPieMenu === undefined) {
+            docById('wheelDiv').style.display = 'none';
+        }
 
         var oldValue = this.value;
         var newValue = this.label.value;
