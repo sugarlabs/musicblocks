@@ -1763,6 +1763,15 @@ function Turtles () {
 
                 that._collapseButton.removeAllEventListeners('click');
                 that._collapseButton.on('click', function (event) {
+                    // If the aux toolbar is open, close it.
+                    var auxToolbar = docById('aux-toolbar');
+                    if (auxToolbar.style.display === 'block') {
+                        var menuIcon = docById('menu');
+                        auxToolbar.style.display = 'none';
+                        menuIcon.innerHTML = 'menu';
+                        docById('toggleAuxBtn').className -= 'blue darken-1';
+                    }
+
                     that.collapse();
                 });
 
@@ -1948,14 +1957,14 @@ function Turtles () {
                     that.collapse();
                 }
 
-		that._locked = false;
-		if (that._queue.length === 3) {
-		    that.scale = that._queue[2];
-		    that.w = that._queue[0] / that.scale;
-		    that.h = that._queue[1] / that.scale;
-		    that._queue = [];
-		    that.makeBackground();
-		}
+                that._locked = false;
+                if (that._queue.length === 3) {
+                    that.scale = that._queue[2];
+                    that.w = that._queue[0] / that.scale;
+                    that.h = that._queue[1] / that.scale;
+                    that._queue = [];
+                    that.makeBackground();
+                }
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
@@ -1964,7 +1973,7 @@ function Turtles () {
 
         if (!this._locked) {
             __makeBoundary();
-	}
+        }
 
         return this;
     };
