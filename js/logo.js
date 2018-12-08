@@ -139,7 +139,7 @@ function Logo() {
     this.playbackQueue = {};
     this.playbackTime = 0;
 
-    this.blk = undefined;
+    // blk = undefined;
     this.args = [];
     this.childFlow = null;
     this.childFlowCount = 0;
@@ -1574,7 +1574,1032 @@ function Logo() {
         }
     };
 
-    this.dispatch = function () {
+    
+
+    this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
+        
+        ///////
+        this.alreadyRunning = true;
+        ///////
+        // Run a stack of blocks, beginning with blk.
+        var logo = that; // For plugin backward compatibility
+        this.receivedArg = receivedArg;
+
+        // Sometimes we don't want to unwind the entire queue.
+        if (queueStart === undefined) {
+            queueStart = 0;
+        }
+
+        // (1) Evaluate any arguments (beginning with connection[1]);
+        var args = this.args;
+        
+        if (that.blocks.blockList[blk].protoblock.args > 0) {
+            for (var i = 1; i < that.blocks.blockList[blk].protoblock.args + 1; i++) {
+                if (that.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && that.blocks.blockList[blk].connections[i] == null) {
+                    console.log('skipping null inflow args');
+                } else {
+                    args.push(that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i], blk, receivedArg));
+                }
+            }
+        }
+
+        // (2) Run function associated with the block;
+        if (that.blocks.blockList[blk].isValueBlock()) {
+            var nextFlow = null;
+        } else {
+            // All flow blocks have a last connection (nextFlow), but
+            // it can be null (i.e., end of a flow).
+            if (that.backward[turtle].length > 0) {
+                // We only run backwards in the "first generation" children.
+                if (that.blocks.blockList[last(that.backward[turtle])].name === 'backward') {
+                    var c = 1;
+                } else {
+                    var c = 2;
+                }
+
+                if (!that.blocks.sameGeneration(that.blocks.blockList[last(that.backward[turtle])].connections[c], blk)) {
+                    var nextFlow = last(that.blocks.blockList[blk].connections);
+                } else {
+                    var nextFlow = that.blocks.blockList[blk].connections[0];
+                    if (that.blocks.blockList[nextFlow].name === 'action' || that.blocks.blockList[nextFlow].name === 'backward') {
+                        nextFlow = null;
+                    } else {
+                        if (!that.blocks.sameGeneration(that.blocks.blockList[last(that.backward[turtle])].connections[c], nextFlow)) {
+                            var nextFlow = last(that.blocks.blockList[blk].connections);
+                        } else {
+                            var nextFlow = that.blocks.blockList[blk].connections[0];
+                        }
+                    }
+                }
+            } else {
+                var nextFlow = last(that.blocks.blockList[blk].connections);
+            }
+
+            if (nextFlow === -1) {
+                nextFlow = null;
+            }
+
+            var queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
+            if (nextFlow != null) { // This could be the last block
+                that.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+        }
+
+        // Some flow blocks have childflows, e.g., repeat.
+        // var that.childFlow = this.that.childFlow;
+        // var that.childFlowCount = 0;
+        // var actionArgs = [];
+
+        if (that.blocks.visible) {
+            if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
+                that.blocks.highlight(blk, false);
+            }
+        }
+
+        switch (that.blocks.blockList[blk].name) {
+            case 'dispatch':
+                // Dispatch an event.
+                this.dispatch(this);
+                break;
+            case 'listen':
+                this.listen(this);
+                break;
+            case 'start':
+            case 'drum':
+                this.drum(this);
+                break;
+            case 'nameddo':
+                this.nameddo(this);
+                break;
+            case 'action':
+            case 'do':
+                this.do(this);
+                break;
+            case 'nameddoArg':
+                this.nameddoArg(this);
+                break;
+            case 'doArg':
+                this.doArg(this);
+                break;
+            case 'forever':
+                this.forever(this);
+                break;
+            case 'hidden':
+            case 'hiddennoflow':
+                // Hidden block is used at end of clamps and actions to
+                // trigger listeners.
+                break;
+            case 'break':
+                this.break(this);
+                break;
+            case 'wait':
+                this.wait(this);
+                break;
+            case 'comment':
+                this.comment(this);
+                break;
+            case 'print':
+                this.printBlock(this);
+                break;
+            case 'speak':
+                this.speak(this);
+                break;
+            case 'newturtle':
+                this.newturtle(this);
+                break;
+            case 'setturtle':
+                this.setturtle(this);
+                break;
+            case 'repeat':
+                this.repeat(this);
+                break;
+            case 'clamp':
+                this.clamp(this);
+                break;
+            case 'until':
+                // Similar to 'while'
+                this.until(this);
+                break;
+            case 'movable': // legacy typo
+                this.moveable(this);
+                break;
+            case 'waitFor':
+                this.waitFor(this);
+                break;
+            case 'if':
+                this.ifBlock(this);
+                break;
+            case 'ifthenelse':
+                this.ifthenelse(this);
+                break;
+            case 'while':
+                // While is tricky because we need to recalculate
+                // args[0] each time, so we requeue the While block
+                // itself.
+                this.whileBlock(this);
+                break;
+            case 'storein2':
+                this.storein2(this);
+                break;
+            case 'storein':
+                this.storein(this);
+                break;
+            case 'incrementOne':
+                var i = 1;
+            case 'increment':
+                this.increment(this);
+                break;
+            case 'clear':
+                this.clearBlock(this);
+                break;
+            case 'setxy':
+                this.setxy(this);
+                break;
+            case 'scrollxy':
+                this.scrollxy(this);
+                break;
+            case 'arc':
+                this, arc(this);
+                break;
+            case 'bezier':
+                this.bezier(this);
+                break;
+            case 'controlpoint1':
+                this.controlpoint1(this);
+                break;
+            case 'controlpoint2':
+                this.controlpoint2(this);
+                break;
+            case 'return':
+                this.return(this);
+                break;
+            case 'returnToUrl':
+                this.returnToUrl(this);
+                break;
+            case 'forward':
+                this.forwardBlock(this);
+                break;
+            case 'back':
+                this.backBlock(this);
+                break;
+            case 'right':
+                this.rightBlock(this);
+                break;
+            case 'left':
+                this.leftBlock(this);
+                break;
+            case 'setheading':
+                this.setHeading(this);
+                break;
+            case 'show':
+                this.show(this);
+                break;
+            case 'turtleshell':
+                this.turtleshell(this);
+                break;
+            case 'setturtlename':
+                this.setturtlename(this);
+                break;
+            case 'setturtlename2':
+                this.setturtlename2(this);
+                break;
+            case 'startTurtle':
+                this.startTurtle(this);
+                break;
+            case 'stopTurtle':
+                this.stopTurtle(this);
+                break;
+            case 'turtlesync':
+                this.turtlesync(this);
+                break;
+            case 'setcolor':
+                this.setcolor(this);
+                break;
+            case 'setfont':
+                this.setfont(this);
+                break;
+            case 'sethue':
+                this.sethue(this);
+                break;
+            case 'setshade':
+                this.setshade(this);
+                break;
+            case 'settranslucency':
+                this.settranslucency(this);
+                break;
+            case 'setgrey':
+                this.setgrey(this);
+                break;
+            case 'setpensize':
+                this.setpensize(this);
+                break;
+            case 'fill':
+                this.fill(this);
+                break;
+                // Deprecated
+            case 'beginfill':
+                that.turtles.turtleList[turtle].doStartFill(this);
+                break;
+                break;
+                // Deprecated
+            case 'endfill':
+                that.turtles.turtleList[turtle].doEndFill(this);
+                break;
+                break;
+            case 'hollowline':
+                this.hollowline(this);
+                break;
+                // Deprecated
+            case 'beginhollowline':
+                that.turtles.turtleList[turtle].doStartHollowLine(this);
+                break;
+                break;
+                // Deprecated
+            case 'endhollowline':
+                that.turtles.turtleList[turtle].doEndHollowLine(this);
+                break;
+                break;
+                // Deprecated
+            case 'fillscreen':
+                this.fillscreen(this);
+                break;
+            case 'nobackground':
+                this.nobackground(this);
+                break;
+            case 'background':
+                this.backgroundBlock(this);
+                break;
+            case 'penup':
+                this.penup(this);
+                break;
+            case 'pendown':
+                this.pendown(this);
+                break;
+            case 'openProject':
+                this.openProject(this);
+                break;
+            case 'vspace':
+                break;
+            case 'playback':
+                this.playback(this);
+                break;
+            case 'stopplayback':
+                this.stopplayback(this);
+                break;
+            case 'stopvideocam':
+                this.stopvideocam(this);
+                break;
+            case 'showblocks':
+                this.showblocks(this);
+                break;
+            case 'hideblocks':
+                this.hideblocks(this);
+                break;
+            case 'savesvg':
+                this.savesvg(this);
+                break;
+            case 'showHeap':
+                this.showHeap(this);
+                break;
+            case 'emptyHeap':
+                this.emptyHeap(this);
+                break;
+            case 'reverseHeap':
+                this.reverseHeap(this);
+                break;
+            case 'push':
+                this.pushBlock(this);
+                break;
+            case 'saveHeap':
+                this.saveHeap(this);
+                break;
+            case 'loadHeap':
+                this.loadHeap(this);
+                break;
+            case 'loadHeapFromApp':
+                this.loadHeapFromApp(this);
+                break;
+            case 'saveHeapToApp':
+                this.saveHeapToApp(this);
+                break;
+            case 'setHeapEntry':
+                this.setHeapEntry(this);
+                break;
+
+                // Actions for music-related blocks
+            case 'savelilypond':
+            
+                this.savelilypond(this);
+                break;
+            case 'amsynth':
+                this.amsynth(this);
+                break;
+            case 'fmsynth':
+                this.fmsynth(this);
+                break;
+            case 'duosynth':
+                this.duosynth(this);
+                break;
+            case 'saveabc':
+                this.saveabc(this);
+                break;
+                // Deprecated
+            case 'setkey':
+                this.setkey(this);
+                break;
+            case 'setkey2':
+                this.setkey2(this);
+                break;
+            case 'definemode':
+                this.definemode(this);
+                break;
+            case 'rhythmruler2':
+            case 'rhythmruler':
+                this.rhytmruler(this);
+                break;
+            case 'pitchstaircase':
+                this.pitchstaircase(this);
+                break;
+            case 'tempo':
+                this.tempoBlock(this);
+                break;
+            case 'pitchslider':
+                this.pitchslider(this);
+                break;
+            case 'musickeyboard':
+                this.musickeyboard(this);
+                break;
+            case 'pitchdrummatrix':
+                this.pitchdrummatrix(this);
+                break;
+            case 'timbre':
+                this.timbre(this);
+                break;
+            case 'modewidget':
+                this.modewidget(this);
+                break;
+            case 'temperament1':
+                break;
+            case 'temperament':
+                this.temperament(this);
+                break;
+                // Deprecated
+            case 'setmasterbpm':
+                this.setmasterbpm(this);
+                break;
+                // Deprecated
+            case 'setbpm':
+                this.setbpm(this);
+                break;
+            case 'setmasterbpm2':
+                this.setmasterbpm2(this);
+                break;
+            case 'setbpm3':
+                this.setbpm3(this);
+                break;
+            case 'setbpm2':
+                this.setbpm2(this);
+                break;
+            case 'status':
+                this.statusBlock(this);
+                break;
+            case 'matrix':
+                this.matrixBlock(this);
+                break;
+            case 'envelope':
+                this.envelope(this);
+                break;
+            case 'filter':
+                this.filter(this);
+                break;
+            case 'oscillator':
+                this.oscillator(this);
+                break;
+            case 'invert1':
+                this.invert1(this);
+                break;
+            case 'switch':
+                this.switchBlock(this);
+                break;
+            case 'defaultcase':
+            case 'case':
+                this.caseBlock(this);
+                break;
+            case 'invert2':
+            case 'invert':
+                // Deprecated
+                if (that.blocks.blockList[blk].name === 'invert') {
+                    that.invertList[turtle].push([args[0], args[1], 'even']);
+                } else {
+                    that.invertList[turtle].push([args[0], args[1], 'odd']);
+                }
+                that.childFlow = args[2];
+                that.childFlowCount = 1;
+
+                var listenerName = '_invert_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.invertList[turtle].pop(this);
+                    break;
+                };
+
+                that._setListener(turtle, listenerName, __listener);
+                break;
+            case 'backward':
+                this.backward(this);
+                break;
+            case 'rest2':
+                this.rest2(this);
+                break;
+            case 'steppitch':
+                this.steppitch(this);
+                break;
+            case 'playnoise':
+                this.playnoise(this);
+                break;
+            case 'playdrum':
+                this.playdrum(this);
+                break;
+            case 'setpitchnumberoffset':
+                this.setpitchnumberoffset(this);
+                break;
+            case 'custompitch':
+                this.custompitch(this);
+                break;
+            case 'pitchnumber':
+            case 'scaledegree':
+            case 'pitch':
+                this.pitch(this);
+                break;
+            case 'rhythm2':
+            case 'rhythm':
+                this.rhythm(this);
+                break;
+                // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
+                // deprecated
+            case 'wholeNote':
+                this.wholeNote(this);
+                break;
+            case 'halfNote':
+                this.halfNote(this);
+                break;
+            case 'quarterNote':
+                this.quarterNote(this);
+                break;
+            case 'eighthNote':
+                this.eighthNote(this);
+                break;
+            case 'sixteenthNote':
+                this.sixteenthNote(this);
+                break;
+            case 'thirtysecondNote':
+                this.thirtysecondNote(this);
+                break;
+            case 'sixtyfourthNote':
+                this.sixtyfourthNote(this);
+                break;
+
+            case 'pickup':
+                this.pickup(this);
+                break;
+            case 'everybeatdo':
+                // Set up a listener for every beat for this turtle.
+                this.everybeatdo(this);
+                break;
+            case 'offbeatdo':
+                // Set up a listener for this turtle/offbeat combo.
+                this.offbeatdo(this);
+                break;
+            case 'onbeatdo':
+                // Set up a listener for this turtle/onbeat combo.
+                this.onbeatdo(this);
+                break;
+            case 'meter':
+                this.meter(this);
+                break;
+            case 'osctime':
+            case 'newnote':
+            case 'note':
+                // We queue up the child flow of the note clamp and
+                // once all of the children are run, we trigger a
+                // _playnote_ event, then wait for the note to play.
+                // The note can be specified by pitch or synth blocks.
+                // The osctime block specifies the duration in
+                // milleseconds while the note block specifies
+                // duration as a beat value. Note: we should consider
+                // the use of the global timer in Tone.js for more
+                // accuracy.
+
+                this.note(this);
+                break;
+            case 'rhythmicdot':
+            case 'rhythmicdot2':
+                // Dotting a note will increase its play time by
+                // a(2 - 1/2^n)
+                this.rhythmicdot2(this);
+                break;
+            case 'settimbre':
+                this.settimbre(this);
+                break;
+            case 'decrescendo':
+            case 'crescendo':
+                this.crescendo(this);
+                break;
+                // Deprecated
+            case 'darbuka':
+            case 'clang':
+            case 'bottle':
+            case 'duck':
+            case 'snare':
+            case 'hihat':
+            case 'tom':
+            case 'kick':
+            case 'pluck':
+            case 'triangle1':
+            case 'slap':
+            case 'frogs':
+            case 'fingercymbals':
+            case 'cup':
+            case 'cowbell':
+            case 'splash':
+            case 'ridebell':
+            case 'floortom':
+            case 'crash':
+            case 'chine':
+            case 'dog':
+            case 'cat':
+            case 'clap':
+            case 'bubbles':
+            case 'cricket':
+                this.cricket(this);
+                break;
+            case 'setdrum':
+                this.setdrum(this);
+                break;
+            case 'setvoice':
+                this.setvoice(this);
+                break;
+            case 'vibrato':
+                this.vibrato(this);
+                break;
+            case 'dis':
+                this.dis(this);
+                break;
+            case 'tremolo':
+                this.tremolo(this);
+                break;
+            case 'phaser':
+                this.phaser(this);
+                break;
+            case 'chorus':
+                this.chorus(this);
+                break;
+            case 'harmonic2':
+                this.harmonic2(this);
+                break;
+            case 'harmonic':
+                this.harmonic(this);
+                break;
+            case 'partial':
+                this.partial(this);
+                break;
+            case 'neighbor': // semi-tone step
+            case 'neighbor2': // scalar step
+                this.neighbor2(this);
+                break;
+            case 'interval':
+                this.interval(this);
+                break;
+            case 'semitoneinterval':
+                this.semitoneinterval(this);
+                break;
+            case 'newstaccato':
+            case 'staccato':
+                this.staccato(this);
+                break;
+            case 'newslur':
+            case 'slur':
+                this.slur(this);
+                break;
+            case 'glide':
+                // TODO: Duration should be the sum of all the notes (like
+                // in a tie). If we set the synth portamento and use
+                // setNote for all but the first note, it should produce a
+                // glissando.
+                this.glide(this);
+                break;
+            case 'drift':
+                this.drift(this);
+                break;
+            case 'tie':
+                this.tie(this);
+                break;
+            case 'newswing':
+            case 'newswing2':
+            case 'swing':
+                this.swingBlock(this);
+                break;
+            case 'duplicatenotes':
+                this.duplicatenotes(this);
+                break;
+            case 'skipnotes':
+                this.skipnotes(this);
+                break;
+            case 'multiplybeatfactor':
+                this.multiplybeatfactor(this);
+                break;
+            case 'setscalartransposition':
+                this.setscalartransposition(this);
+                break;
+            case 'register':
+                this.register(this);
+                break;
+            case 'settransposition':
+                this.settransposition(this);
+                break;
+                // deprecated
+            case 'sharp':
+                this.sharp(this);
+                break;
+                // deprecated
+            case 'flat':
+                this.flat(this);
+                break;
+            case 'accidental':
+                this.accidental(this);
+                break;
+            case 'articulation':
+                this.articulation(this);
+                break;
+            case 'setnotevolume': // master volume
+                this.setnotevolume(this);
+                break;
+            case 'settemperament':
+                this.settemperament(this);
+                break;
+            case 'setnotevolume2':
+                // master volume in clamp form
+                this.setnotevolume2(this);
+                break;
+            case 'setsynthvolume':
+                this.setsynthvolume(this);
+                break;
+            case 'setsynthvolume2':
+                // set synth volume in clamp form
+                this.setsynthvolume2(this);
+                break;
+                // Deprecated P5 tone generator replaced by macro.
+            case 'tone':
+                break;
+            case 'tone2':
+                this.tone2(this);
+                break;
+            case 'hertz':
+                this.hertz(this);
+                break;
+                // deprecated
+            case 'triangle':
+            case 'sine':
+            case 'square':
+            case 'sawtooth':
+                this.sawtooth(this);
+                break;
+                // Deprecated
+            case 'playfwd':
+                this.playfwd(this);
+                break;
+                // Deprecated
+            case 'playbwd':
+                this.playbwd(this);
+                break;
+            case 'stuplet':
+                this.stuplet(this);
+                break;
+                // deprecated
+            case 'tuplet2':
+            case 'tuplet3':
+                this.tuplet3(this);
+                break;
+            case 'tuplet4':
+                this.tuplet4(this);
+                break;
+            case 'deleteblock':
+                this.deleteblock(this);
+                break;
+            case 'moveblock':
+                this.moveblock(this);
+                break;
+            case 'runblock':
+                this.runblock(this);
+                break;
+            case 'dockblock':
+                this.dockblock(this);
+                break;
+            case 'openpalette':
+                this.openpalette(this);
+                break;
+            case 'setxyturtle':
+                this.setxyturtle(this);
+                break;
+            default:
+                this.defaultCase(this);
+                break;
+        }
+
+        // (3) Queue block below the current block.
+
+        // Is the block in a queued clamp?
+        if (blk !== that.ignoringBlock) {
+            if (blk in that.endOfClampSignals[turtle]) {
+                var n = that.endOfClampSignals[turtle][blk].length;
+                for (var i = 0; i < n; i++) {
+                    var signal = that.endOfClampSignals[turtle][blk].pop();
+                    if (signal != null) {
+                        that.stage.dispatchEvent(signal);
+                    }
+                }
+            }
+        } else {
+            console.log('Ignoring block on overlapped start.');
+        }
+
+        if (docById('statusDiv').style.visibility === 'visible') {
+            if (!that.inStatusMatrix) {
+                that.statusMatrix.updateAll();
+            }
+        }
+
+        // If there is a child flow, queue it.
+        if (that.childFlow != null) {
+            if (that.blocks.blockList[blk].name === 'doArg' || that.blocks.blockList[blk].name === 'nameddoArg') {
+                var queueBlock = new Queue(that.childFlow, that.childFlowCount, blk, actionArgs);
+            } else {
+                var queueBlock = new Queue(that.childFlow, that.childFlowCount, blk, receivedArg);
+            }
+
+            // We need to keep track of the parent block to the child
+            // flow so we can unlightlight the parent block after the
+            // child flow completes.
+            if (that.parentFlowQueue[turtle] != undefined) {
+                that.parentFlowQueue[turtle].push(blk);
+                that.turtles.turtleList[turtle].queue.push(queueBlock);
+            } else {
+                console.log('cannot find queue for turtle ' + turtle);
+            }
+        }
+
+        var nextBlock = null;
+        var parentBlk = null;
+
+        // Run the last flow in the queue.
+        if (that.turtles.turtleList[turtle].queue.length > queueStart) {
+            nextBlock = last(that.turtles.turtleList[turtle].queue).blk;
+            parentBlk = last(that.turtles.turtleList[turtle].queue).parentBlk;
+            passArg = last(that.turtles.turtleList[turtle].queue).args;
+            // Since the forever block starts at -1, it will never === 1.
+            if (last(that.turtles.turtleList[turtle].queue).count === 1) {
+                // Finished child so pop it off the queue.
+                that.turtles.turtleList[turtle].queue.pop();
+            } else {
+                // Decrement the counter for repeating that flow.
+                last(that.turtles.turtleList[turtle].queue).count -= 1;
+            }
+        }
+
+        if (nextBlock != null) {
+            if (parentBlk !== blk) {
+                // The wait block waits waitTimes longer than other
+                // blocks before it is unhighlighted.
+                if (that.turtleDelay === TURTLESTEP) {
+                    that.unhighlightStepQueue[turtle] = blk;
+                } else {
+                    if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
+                        setTimeout(function () {
+                            if (that.blocks.visible) {
+                                that.blocks.unhighlight(blk);
+                            }
+                        }, that.turtleDelay + that.waitTimes[turtle]);
+                    }
+                }
+            }
+
+            if ((that.backward[turtle].length > 0 && that.blocks.blockList[blk].connections[0] == null) || (that.backward[turtle].length === 0 && last(that.blocks.blockList[blk].connections) == null)) {
+                if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
+                    // If we are at the end of the child flow, queue the
+                    // unhighlighting of the parent block to the flow.
+                    if (that.unhighlightQueue[turtle] === undefined) {
+                        console.log('cannot find highlight queue for turtle ' + turtle);
+                    } else if (that.parentFlowQueue[turtle].length > 0 && that.turtles.turtleList[turtle].queue.length > 0 && last(that.turtles.turtleList[turtle].queue).parentBlk !== last(that.parentFlowQueue[turtle])) {
+                        that.unhighlightQueue[turtle].push(last(that.parentFlowQueue[turtle]));
+                        // that.unhighlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
+                    } else if (that.unhighlightQueue[turtle].length > 0) {
+                        // The child flow is finally complete, so unhighlight.
+                        setTimeout(function () {
+                            if (that.blocks.visible) {
+                                that.blocks.unhighlight(that.unhighlightQueue[turtle].pop());
+                            } else {
+                                that.unhighlightQueue[turtle].pop();
+                            }
+                        }, that.turtleDelay);
+                    }
+                }
+            }
+
+            // We don't update parameter blocks when running full speed.
+            if (that.turtleDelay !== 0) {
+                for (var pblk in that.parameterQueue[turtle]) {
+                    that._updateParameterBlock(that, turtle, that.parameterQueue[turtle][pblk]);
+                }
+            }
+
+            if (isflow) {
+                that._runFromBlockNow(that, turtle, nextBlock, isflow, passArg, queueStart);
+            } else {
+                that._runFromBlock(that, turtle, nextBlock, isflow, passArg);
+            }
+        } else {
+            that.alreadyRunning = false;
+            if (!that.prematureRestart) {
+                // console.log('Make sure any unissued signals are dispatched.');
+                for (var b in that.endOfClampSignals[turtle]) {
+                    for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
+                        if (that.endOfClampSignals[turtle][b][i] != null) {
+                            if (that.butNotThese[turtle][b] == null || that.butNotThese[turtle][b].indexOf(i) === -1) {
+                                that.stage.dispatchEvent(that.endOfClampSignals[turtle][b][i]);
+                            }
+                        }
+                    }
+                }
+
+                // Make sure SVG path is closed.
+                that.turtles.turtleList[turtle].closeSVG();
+
+                // Mark the turtle as not running.
+                that.turtles.turtleList[turtle].running = false;
+                if (!that.turtles.running() && queueStart === 0) {
+                    that.onStopTurtle();
+                }
+            }
+
+            // Because flow can come from calc blocks, we are not
+            // ensured that the turtle is really finished running
+            // yet. Hence the timeout.
+            __checkCompletionState = function () {
+                if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
+                    if (that.runningLilypond) {
+                        console.log('saving lilypond output:');
+                        save.afterSaveLilypond();
+                        that.runningLilypond = false;
+                    } else if (that.runningAbc) {
+                        console.log('saving abc output:');
+                        save.afterSaveAbc();
+                        that.runningAbc = false;
+                    } else if (that.suppressOutput[turtle]) {
+                        console.log('finishing compiling');
+                        if (!that.recording) {
+                            that.errorMsg(_('Playback is ready.'));
+                        }
+
+                        that.setPlaybackStatus();
+                        that.compiling = false;
+                        for (t in that.turtles.turtleList) {
+                            that.turtles.turtleList[t].doPenUp();
+                            that.turtles.turtleList[t].doSetXY(that._saveX[t], that._saveY[t]);
+                            that.turtles.turtleList[t].color = that._saveColor[t];
+                            that.turtles.turtleList[t].value = that._saveValue[t];
+                            that.turtles.turtleList[t].chroma = that._saveChroma[t];
+                            that.turtles.turtleList[t].stroke = that._saveStroke[t];
+                            that.turtles.turtleList[t].canvasAlpha = that._saveCanvasAlpha[t];
+                            that.turtles.turtleList[t].doSetHeading(that._saveOrientation[t]);
+                            that.turtles.turtleList[t].penState = that._savePenState[t];
+                        }
+                    }
+
+                    // Give the last note time to play.
+                    console.log('SETTING LAST NOTE TIMEOUT: ' + that.recording + ' ' + that.suppressOutput[turtle]);
+                    that.lastNoteTimeout = setTimeout(function () {
+                        console.log('LAST NOTE PLAYED');
+                        that.lastNoteTimeout = null;
+                        if (that.suppressOutput[turtle] && that.recording) {
+                            that.suppressOutput[turtle] = false;
+                            that.checkingCompletionState = false;
+                            that.saveLocally();
+                            console.log('PLAYBACK FOR RECORD');
+                            that.playback(-1, true);
+                            // that.recording = false;
+                        } else {
+                            that.suppressOutput[turtle] = false;
+                            that.checkingCompletionState = false;
+
+                            // Reset the cursor...
+                            document.body.style.cursor = 'default';
+
+                            // And save the session.
+                            that.saveLocally();
+                        }
+                    }, 1000);
+                } else if (that.suppressOutput[turtle]) {
+                    setTimeout(function () {
+                        __checkCompletionState();
+                    }, 250);
+                }
+            };
+
+            if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
+                if (!that.checkingCompletionState) {
+                    that.checkingCompletionState = true;
+                    setTimeout(function () {
+                        __checkCompletionState();
+                    }, 250);
+                }
+            }
+
+            if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
+                // Nothing else to do... so cleaning up.
+                if (that.turtles.turtleList[turtle].queue.length === 0 || blk !== last(that.turtles.turtleList[turtle].queue).parentBlk) {
+                    setTimeout(function () {
+                        if (that.blocks.visible) {
+                            that.blocks.unhighlight(blk);
+                        }
+                    }, that.turtleDelay);
+                }
+
+                // Unhighlight any parent blocks still highlighted.
+                for (var b in that.parentFlowQueue[turtle]) {
+                    if (that.blocks.visible) {
+                        that.blocks.unhighlight(that.parentFlowQueue[turtle][b]);
+                    }
+                }
+
+                // Make sure the turtles are on top.
+                var i = that.stage.children.length - 1;
+                that.stage.setChildIndex(that.turtles.turtleList[turtle].container, i);
+                that.refreshCanvas();
+            }
+
+            for (var arg in that.evalOnStopList) {
+                eval(that.evalOnStopList[arg]);
+            }
+
+            if (!that.turtles.running() && queueStart === 0) {
+                // TODO: Enable playback button here
+                if (that.showBlocksAfterRun) {
+                    // If this is a status stack, not run showBlocks.
+                    if (blk !== null && that.blocks.blockList[blk].connections[0] !== null && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'status') {
+                        console.log('running status block');
+                    } else {
+                        that.showBlocks();
+                        that.showBlocksAfterRun = false;
+                    }
+                }
+                document.getElementById('stop').style.color = 'white';
+                console.log('fin');
+            }
+        }
+    };
+
+    this.dispatch = function (that) {
         if (this.args.length === 1) {
             // If the event is not in the event list, add it.
             if (!(this.args[0] in that.eventList)) {
@@ -1586,7 +2611,7 @@ function Logo() {
 
     }
 
-    this.listen = function () {
+    this.listen = function (that) {
         if (this.args.length === 2) {
             if (!(this.args[1] in that.actions)) {
                 that.errorMsg(NOACTIONERRORMSG, this.blk, this.args[1]);
@@ -1616,7 +2641,7 @@ function Logo() {
 
     }
 
-    this.drum = function () {
+    this.drum = function (that) {
         if (this.args.length === 1) {
             that.childFlow = this.args[0];
             that.childFlowCount = 1;
@@ -1624,7 +2649,7 @@ function Logo() {
 
     }
 
-    this.nameddo = function () {
+    this.nameddo = function (that) {
         var name = that.blocks.blockList[this.blk].privateData;
         if (name in that.actions) {
             if (that.justCounting[turtle].length === 0) {
@@ -1668,7 +2693,7 @@ function Logo() {
         // block.
     }
 
-    this.do = function () {
+    this.do = function (that) {
         if (this.args.length > 0) {
             if (this.args[0] in that.actions) {
                 if (that.justCounting[turtle].length === 0) {
@@ -1686,7 +2711,7 @@ function Logo() {
 
     }
 
-    this.namedoArg = function () {
+    this.namedoArg = function (that) {
         var name = that.blocks.blockList[this.blk].privateData;
         while (actionArgs.length > 0) {
             actionArgs.pop();
@@ -1743,7 +2768,7 @@ function Logo() {
 
     }
 
-    this.doArg = function () {
+    this.doArg = function (that) {
         while (actionArgs.length > 0) {
             actionArgs.pop();
         }
@@ -1774,7 +2799,7 @@ function Logo() {
 
     }
 
-    this.forever = function () {
+    this.forever = function (that) {
         if (this.args.length === 1) {
             that.childFlow = this.args[0];
             // If we are running in non-interactive mode, we
@@ -1788,7 +2813,7 @@ function Logo() {
 
     }
 
-    this.break = function () {
+    this.break = function (that) {
         that._doBreak(turtle);
         // Since we pop the queue, we need to unhighlight our
         // parent.
@@ -1801,14 +2826,14 @@ function Logo() {
 
     }
 
-    this.wait = function () {
+    this.wait = function (that) {
         if (this.args.length === 1) {
             that._doWait(turtle, this.args[0]);
         }
 
     }
 
-    this.comment = function () {
+    this.comment = function (that) {
         if (this.args[0] !== null) {
             console.log(this.args[0].toString());
             if (!that.suppressOutput[turtle] && that.turtleDelay > 0) {
@@ -1818,7 +2843,7 @@ function Logo() {
 
     }
 
-    this.printBlock = function () {
+    this.printBlock = function (that) {
         if (!that.inStatusMatrix) {
             if (this.args.length === 1) {
                 if (this.args[0] !== null) {
@@ -1840,7 +2865,7 @@ function Logo() {
 
     }
 
-    this.speak = function () {
+    this.speak = function (that) {
         if (this.args.length === 1) {
             if (that.meSpeak !== null) {
                 if (that.inNoteBlock[turtle].length > 0) {
@@ -1859,7 +2884,7 @@ function Logo() {
 
     }
 
-    this.newturtle = function () {
+    this.newturtle = function (that) {
         var cblk = that.blocks.blockList[this.blk].connections[1];
         var turtleName = that.parseArg(that, turtle, cblk, this.blk, receivedArg);
         if (that._getTargetTurtle(turtleName) === null) {
@@ -1905,7 +2930,7 @@ function Logo() {
 
     }
 
-    this.setturtle = function () {
+    this.setturtle = function (that) {
         targetTurtle = that._getTargetTurtle(this.args[0]);
         if (targetTurtle !== null) {
             that._runFromBlock(that, targetTurtle, this.args[1], isflow, receivedArg);
@@ -1919,7 +2944,7 @@ function Logo() {
 
     }
 
-    this.repeat = function () {
+    this.repeat = function (that) {
         if (this.args[1] === undefined) {
             // nothing to do
 
@@ -1937,7 +2962,7 @@ function Logo() {
 
     }
 
-    this.clamp = function () {
+    this.clamp = function (that) {
         if (this.args.length === 1) {
             that.childFlow = this.args[0];
             that.childFlowCount = 1;
@@ -1945,7 +2970,7 @@ function Logo() {
 
     }
 
-    this.until = function () {
+    this.until = function (that) {
         if (this.args.length === 2) {
             // Queue the child flow.
             that.childFlow = this.args[1];
@@ -1981,14 +3006,14 @@ function Logo() {
 
     }
 
-    this.moveable = function () {
+    this.moveable = function (that) {
         if (this.args.length === 1) {
             that.moveable[turtle] = this.args[0];
         }
 
     }
 
-    this.waitFor = function () {
+    this.waitFor = function (that) {
         if (this.args.length === 1) {
             if (!this.args[0]) {
                 // Requeue.
@@ -2024,7 +3049,7 @@ function Logo() {
 
     }
 
-    this.ifBlock = function () {
+    this.ifBlock = function (that) {
         if (this.args.length === 2) {
             if (this.args[0]) {
                 that.childFlow = this.args[1];
@@ -2034,7 +3059,7 @@ function Logo() {
 
     }
 
-    this.ifthenelse = function () {
+    this.ifthenelse = function (that) {
         if (this.args.length === 3) {
             if (this.args[0]) {
                 that.childFlow = this.args[1];
@@ -2047,7 +3072,7 @@ function Logo() {
 
     }
 
-    this.whileBlock = function () {
+    this.whileBlock = function (that) {
         if (this.args.length === 2) {
             if (this.args[0]) {
                 // We will add the outflow of the while block
@@ -2085,21 +3110,21 @@ function Logo() {
 
     }
 
-    this.storein2 = function () {
+    this.storein2 = function (that) {
         if (this.args.length === 1) {
             that.boxes[that.blocks.blockList[this.blk].privateData] = this.args[0];
         }
 
     }
 
-    this.storein = function () {
+    this.storein = function (that) {
         if (this.args.length === 2) {
             that.boxes[this.args[0]] = this.args[1];
         }
 
     }
 
-    this.increment = function () {
+    this.increment = function (that) {
         // If the 2nd arg is not set, default to 1.
         if (this.args.length === 2) {
             var i = this.args[1];
@@ -2125,7 +3150,7 @@ function Logo() {
 
     }
 
-    this.clearBlock = function () {
+    this.clearBlock = function (that) {
         if (that.inMatrix) {
             // ignore clear block in matrix
         } else if (that.inNoteBlock[turtle].length > 0) {
@@ -2149,7 +3174,7 @@ function Logo() {
 
     }
 
-    this.setxy = function () {
+    this.setxy = function (that) {
         if (this.args.length === 2) {
             if (typeof (this.args[0]) === 'string' || typeof (this.args[1]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2180,7 +3205,7 @@ function Logo() {
 
     }
 
-    this.scrollxy = function () {
+    this.scrollxy = function (that) {
         if (this.args.length === 2) {
             if (typeof (this.args[0]) === 'string' || typeof (this.args[1]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2211,7 +3236,7 @@ function Logo() {
 
     }
 
-    this.arc = function () {
+    this.arc = function (that) {
         if (this.args.length === 2) {
             if (typeof (this.args[0]) === 'string' || typeof (this.args[1]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2242,7 +3267,7 @@ function Logo() {
 
     }
 
-    this.bezier = function () {
+    this.bezier = function (that) {
         if (this.args.length === 2) {
             if (typeof (this.args[0]) === 'string' || typeof (this.args[1]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2266,7 +3291,7 @@ function Logo() {
 
     }
 
-    this.controlpoint1 = function () {
+    this.controlpoint1 = function (that) {
         if (this.args.length === 2) {
             if (typeof (this.args[0]) === 'string' || typeof (this.args[1]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2283,7 +3308,7 @@ function Logo() {
 
     }
 
-    this.controlpoint12 = function () {
+    this.controlpoint12 = function (that) {
         if (this.args.length === 2) {
             if (typeof (this.args[0]) === 'string' || typeof (this.args[1]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2300,14 +3325,14 @@ function Logo() {
 
     }
 
-    this.return = function () {
+    this.return = function (that) {
         if (this.args.length === 1) {
             that.returns.push(this.args[0]);
         }
 
     }
 
-    this.returnToUrl = function () {
+    this.returnToUrl = function (that) {
         var URL = window.location.href;
         var urlParts;
         var outurl;
@@ -2345,7 +3370,7 @@ function Logo() {
 
     }
 
-    this.forwardBlock = function () {
+    this.forwardBlock = function (that) {
         if (this.args.length === 1) {
             if (typeof (this.args[0]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2376,7 +3401,7 @@ function Logo() {
 
     }
 
-    this.backBlock = function () {
+    this.backBlock = function (that) {
         if (this.args.length === 1) {
             if (typeof (this.args[0]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2407,7 +3432,7 @@ function Logo() {
 
     }
 
-    this.rightBlock = function () {
+    this.rightBlock = function (that) {
         if (this.args.length === 1) {
             if (typeof (this.args[0]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2438,7 +3463,7 @@ function Logo() {
 
     }
 
-    this.leftBlock = function () {
+    this.leftBlock = function (that) {
         if (this.args.length === 1) {
             if (typeof (this.args[0]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2469,7 +3494,7 @@ function Logo() {
 
     }
 
-    this.setHeading = function () {
+    this.setHeading = function (that) {
         if (this.args.length === 1) {
             if (typeof (this.args[0]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2492,7 +3517,7 @@ function Logo() {
 
     }
 
-    this.show = function () {
+    this.show = function (that) {
         if (this.args.length === 2) {
             if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(this.blk);
@@ -2509,7 +3534,7 @@ function Logo() {
 
     }
 
-    this.turtleshell = function () {
+    this.turtleshell = function (that) {
         if (this.args.length === 2) {
             if (typeof (this.args[0]) === 'string') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -2520,7 +3545,7 @@ function Logo() {
 
     }
 
-    this.setturtlename = function () {
+    this.setturtlename = function (that) {
         var foundTargetTurtle = false;
         if (this.args[0] === null || this.args[1] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
@@ -2556,7 +3581,7 @@ function Logo() {
 
     }
 
-    this.setturtlename2 = function () {
+    this.setturtlename2 = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2566,7 +3591,7 @@ function Logo() {
 
     }
 
-    this.startTurtle = function () {
+    this.startTurtle = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2610,7 +3635,7 @@ function Logo() {
 
     }
 
-    this.stopTurtle = function () {
+    this.stopTurtle = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2634,7 +3659,7 @@ function Logo() {
 
     }
 
-    this.turtlesync = function () {
+    this.turtlesync = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2653,7 +3678,7 @@ function Logo() {
 
     }
 
-    this.setcolor = function () {
+    this.setcolor = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2680,7 +3705,7 @@ function Logo() {
 
     }
 
-    this.setfont = function () {
+    this.setfont = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2692,7 +3717,7 @@ function Logo() {
 
     }
 
-    this.sethue = function () {
+    this.sethue = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2719,7 +3744,7 @@ function Logo() {
 
     }
 
-    this.setshade = function () {
+    this.setshade = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2746,7 +3771,7 @@ function Logo() {
 
     }
 
-    this.settranslucency = function () {
+    this.settranslucency = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2775,7 +3800,7 @@ function Logo() {
 
     }
 
-    this.setgrey = function () {
+    this.setgrey = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2802,7 +3827,7 @@ function Logo() {
 
     }
 
-    this.setpensize = function () {
+    this.setpensize = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -2829,7 +3854,7 @@ function Logo() {
 
     }
 
-    this.fill = function () {
+    this.fill = function (that) {
         if (this.args[0] === undefined) {
             // nothing to do
 
@@ -2882,7 +3907,7 @@ function Logo() {
 
     }
 
-    this.hollowline = function () {
+    this.hollowline = function (that) {
         if (this.args[0] === undefined) {
             // nothing to do
 
@@ -2918,7 +3943,7 @@ function Logo() {
 
     }
 
-    this.fillscreen = function () {
+    this.fillscreen = function (that) {
         if (this.args.length === 3) {
             var hue = that.turtles.turtleList[turtle].color;
             var value = that.turtles.turtleList[turtle].value;
@@ -2934,17 +3959,17 @@ function Logo() {
 
     }
 
-    this.nobackground = function () {
+    this.nobackground = function (that) {
         that.svgBackground = false;
 
     }
 
-    this.backgroundBlock = function () {
+    this.backgroundBlock = function (that) {
         that.setBackgroundColor(turtle);
 
     }
 
-    this.penup = function () {
+    this.penup = function (that) {
         if (that.inNoteBlock[turtle].length > 0) {
             that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(this.blk);
         } else {
@@ -2956,7 +3981,7 @@ function Logo() {
 
     }
 
-    this.pendown = function () {
+    this.pendown = function (that) {
         if (that.inNoteBlock[turtle].length > 0) {
             that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(this.blk);
         } else {
@@ -2968,7 +3993,7 @@ function Logo() {
 
     }
 
-    this.openProject = function () {
+    this.openProject = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -3004,7 +4029,7 @@ function Logo() {
 
     }
 
-    this.playback = function () {
+    this.playback = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -3018,7 +4043,7 @@ function Logo() {
 
     }
 
-    this.stopplayback = function () {
+    this.stopplayback = function (that) {
         for (var sound in that.sounds) {
             that.sounds[sound].stop();
         }
@@ -3026,26 +4051,26 @@ function Logo() {
 
     }
 
-    this.stopvideocam = function () {
+    this.stopvideocam = function (that) {
         if (cameraID != null) {
             doStopVideoCam(that.cameraID, that.setCameraID);
         }
 
     }
 
-    this.showblocks = function () {
+    this.showblocks = function (that) {
         that.showBlocks();
         that.setTurtleDelay(DEFAULTDELAY);
 
     }
 
-    this.hideblocks = function () {
+    this.hideblocks = function (that) {
         that.hideBlocks();
         that.setTurtleDelay(0);
 
     }
 
-    this.savesvg = function () {
+    this.savesvg = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -3061,7 +4086,7 @@ function Logo() {
 
     }
 
-    this.showHeap = function () {
+    this.showHeap = function (that) {
         if (!(turtle in that.turtleHeaps)) {
             that.turtleHeaps[turtle] = [];
         }
@@ -3069,17 +4094,17 @@ function Logo() {
 
     }
 
-    this.emptyHeap = function () {
+    this.emptyHeap = function (that) {
         that.turtleHeaps[turtle] = [];
 
     }
 
-    this.reverseHeap = function () {
+    this.reverseHeap = function (that) {
         that.turtleHeaps[turtle] = that.turtleHeaps[turtle].reverse();
 
     }
 
-    this.pushBlock = function () {
+    this.pushBlock = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -3093,14 +4118,14 @@ function Logo() {
 
     }
 
-    this.saveHeap = function () {
+    this.saveHeap = function (that) {
         if (this.args[0] !== null && turtle in that.turtleHeaps) {
             save.download('json', 'data:text/json;charset-utf-8,' + JSON.stringify(that.turtleHeaps[turtle]), this.args[0]);
         }
 
     }
 
-    this.loadHeap = function () {
+    this.loadHeap = function (that) {
         if (this.args[0] === null || this.args[1] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -3137,7 +4162,7 @@ function Logo() {
 
     }
 
-    this.loadHeapFromApp = function () {
+    this.loadHeapFromApp = function (that) {
         var block = that.blocks.blockList[this.blk];
         if (turtle in that.turtleHeaps) {
             var oldHeap = that.turtleHeaps[turtle];
@@ -3166,7 +4191,7 @@ function Logo() {
 
     }
 
-    this.saveHeapToApp = function () {
+    this.saveHeapToApp = function (that) {
         if (this.args[0] === null || this.args[1] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -3186,7 +4211,7 @@ function Logo() {
 
     }
 
-    this.setHeapEntry = function () {
+    this.setHeapEntry = function (that) {
         if (this.args[0] === null || this.args[1] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -3221,14 +4246,14 @@ function Logo() {
 
     }
 
-    this.savelilypond = function () {
+    this.savelilypond = function (that) {
         if (this.args.length === 1) {
             save.afterSaveLilypond(this.args[0]);
         }
 
     }
 
-    this.amsynth = function () {
+    this.amsynth = function (that) {
         var harmonicity;
         if (that.inTimbre) {
             that.timbre.AMSynthParams = [];
@@ -3261,7 +4286,7 @@ function Logo() {
 
     }
 
-    this.fmsynth = function () {
+    this.fmsynth = function (that) {
         var modulationIndex;
         if (that.inTimbre) {
             that.timbre.FMSynthParams = [];
@@ -3294,7 +4319,7 @@ function Logo() {
 
     }
 
-    this.duosynth = function () {
+    this.duosynth = function (that) {
         var synthVibratoRate;
         var synthVibratoAmount;
         if (that.inTimbre) {
@@ -3334,21 +4359,21 @@ function Logo() {
 
     }
 
-    this.saveabc = function () {
+    this.saveabc = function (that) {
         if (this.args.length === 1) {
             save.afterSaveAbc(this.args[0]);
         }
 
     }
 
-    this.setkey = function () {
+    this.setkey = function (that) {
         if (this.args.length === 1) {
             that.keySignature[turtle] = this.args[0];
         }
 
     }
 
-    this.setkey2 = function () {
+    this.setkey2 = function (that) {
         if (this.args.length === 2) {
             var modename = 'major';
             for (var mode in MUSICALMODES) {
@@ -3372,7 +4397,7 @@ function Logo() {
 
     }
 
-    this.definemode = function () {
+    this.definemode = function (that) {
         if (this.args[1] === undefined) {
             // nothing to do
 
@@ -3436,7 +4461,7 @@ function Logo() {
 
     }
 
-    this.rhytmruler = function () {
+    this.rhytmruler = function (that) {
         if (that.blocks.blockList[this.blk].name === 'rhythmruler') {
             that.childFlow = this.args[1];
         } else {
@@ -3464,7 +4489,7 @@ function Logo() {
 
     }
 
-    this.pitchstaircase = function () {
+    this.pitchstaircase = function (that) {
         if (that.pitchStaircase == null) {
             that.pitchStaircase = new PitchStaircase();
         }
@@ -3488,7 +4513,7 @@ function Logo() {
 
     }
 
-    this.tempoBlock = function () {
+    this.tempoBlock = function (that) {
         that.childFlow = this.args[0];
         that.childFlowCount = 1;
 
@@ -3511,7 +4536,7 @@ function Logo() {
 
     }
 
-    this.pitchslider = function () {
+    this.pitchslider = function (that) {
         if (that.pitchSlider == null) {
             that.pitchSlider = new PitchSlider();
         }
@@ -3534,7 +4559,7 @@ function Logo() {
 
     }
 
-    this.musickeyboard = function () {
+    this.musickeyboard = function (that) {
         if (this.args.length === 1) {
             that.childFlow = this.args[0];
             that.childFlowCount = 1;
@@ -3559,7 +4584,7 @@ function Logo() {
 
     }
 
-    this.pitchdrummatrix = function () {
+    this.pitchdrummatrix = function (that) {
         if (this.args.length === 1) {
             that.childFlow = this.args[0];
             that.childFlowCount = 1;
@@ -3592,7 +4617,7 @@ function Logo() {
 
     }
 
-    this.timbre = function () {
+    this.timbre = function (that) {
         if (that.timbre == null) {
             that.timbre = new TimbreWidget();
         }
@@ -3654,7 +4679,7 @@ function Logo() {
 
     }
 
-    this.modewidget = function () {
+    this.modewidget = function (that) {
         if (this.args.length === 1) {
             that.childFlow = this.args[0];
             that.childFlowCount = 1;
@@ -3675,7 +4700,7 @@ function Logo() {
 
     }
 
-    this.temperament = function () {
+    this.temperament = function (that) {
         if (that.temperament == null) {
             that.temperament = new TemperamentWidget();
         }
@@ -3706,7 +4731,7 @@ function Logo() {
 
     }
 
-    this.setmasterbpm = function () {
+    this.setmasterbpm = function (that) {
         if (this.args.length === 1 && typeof (this.args[0]) === 'number') {
             if (this.args[0] < 30) {
                 that.errorMsg(_('Beats per minute must be > 30.'))
@@ -3729,7 +4754,7 @@ function Logo() {
 
     }
 
-    this.setbpm = function () {
+    this.setbpm = function (that) {
         if (this.args.length === 2 && typeof (this.args[0]) === 'number') {
             if (this.args[0] < 30) {
                 that.errorMsg(_('Beats per minute must be > 30.'))
@@ -3758,7 +4783,7 @@ function Logo() {
 
     }
 
-    this.setmasterbpm2 = function () {
+    this.setmasterbpm2 = function (that) {
         if (this.args.length === 2 && typeof (this.args[0]) === 'number' && typeof (this.args[1]) === 'number') {
             var bpm = this.args[0] * this.args[1] / 0.25
             if (bpm < 30) {
@@ -3783,7 +4808,7 @@ function Logo() {
 
     }
 
-    this.setbpm3 = function () {
+    this.setbpm3 = function (that) {
         if (this.args.length === 2 && typeof (this.args[0]) === 'number' && typeof (this.args[1]) === 'number') {
             var bpm = this.args[0] * this.args[1] / 0.25
             if (bpm < 30) {
@@ -3808,7 +4833,7 @@ function Logo() {
 
     }
 
-    this.setbpm2 = function () {
+    this.setbpm2 = function (that) {
         if (this.args.length === 3 && typeof (this.args[0]) === 'number' && typeof (this.args[1]) == 'number') {
             var bpm = this.args[0] * this.args[1] / 0.25
             if (this.args[0] < 30) {
@@ -3837,7 +4862,7 @@ function Logo() {
 
     }
 
-    this.statusBlock = function () {
+    this.statusBlock = function (that) {
         if (that.statusMatrix == null) {
             that.statusMatrix = new StatusMatrix();
         }
@@ -3863,7 +4888,7 @@ function Logo() {
 
     }
 
-    this.matrixBlock = function () {
+    this.matrixBlock = function (that) {
         if (this.args.length === 1) {
             that.childFlow = this.args[0];
             that.childFlowCount = 1;
@@ -3925,7 +4950,7 @@ function Logo() {
 
     }
 
-    this.envelope = function () {
+    this.envelope = function (that) {
         var synth_source = "sine";
         if (this.args.length === 4 && typeof (this.args[0]) === 'number') {
             if (this.args[0] < 0 || this.args[0] > 100) {
@@ -3969,7 +4994,7 @@ function Logo() {
 
     }
 
-    this.filter = function () {
+    this.filter = function (that) {
         var filtertype = DEFAULTFILTERTYPE;
         var freq;
         var rollOff;
@@ -4011,7 +5036,7 @@ function Logo() {
 
     }
 
-    this.oscillator = function () {
+    this.oscillator = function (that) {
         var oscillatorType = DEFAULTOSCILLATORTYPE;
         var partials = 0;
 
@@ -4042,7 +5067,7 @@ function Logo() {
 
     }
 
-    this.invert1 = function () {
+    this.invert1 = function (that) {
         if (this.args[3] === undefined) {
             // Nothing to do...
 
@@ -4103,7 +5128,7 @@ function Logo() {
 
     }
 
-    this.switchBlock = function () {
+    this.switchBlock = function (that) {
         that.switchBlocks[turtle].push(this.blk);
         that.switchCases[turtle][this.blk] = [];
 
@@ -4148,7 +5173,7 @@ function Logo() {
 
     }
 
-    this.caseBlock = function () {
+    this.caseBlock = function (that) {
         var switchBlk = last(that.switchBlocks[turtle]);
         if (switchBlk === null) {
             that.errorMsg(_('The Case Block must be used inside of a Switch Block.'), this.blk);
@@ -4164,7 +5189,7 @@ function Logo() {
 
     }
 
-    this.rest2 = function () {
+    this.rest2 = function (that) {
         if (that.inNoteBlock[turtle].length > 0) {
             that.notePitches[turtle][last(that.inNoteBlock[turtle])].push('rest');
             that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(4);
@@ -4176,7 +5201,7 @@ function Logo() {
 
     }
 
-    this.backward = function () {
+    this.backward = function (that) {
         that.backward[turtle].push(this.blk);
         // Set child to bottom block inside clamp
         that.childFlow = that.blocks.findBottomBlock(this.args[0]);
@@ -4204,7 +5229,7 @@ function Logo() {
 
     }
 
-    this.steppitch = function () {
+    this.steppitch = function (that) {
         // Similar to pitch but calculated from previous note played.
         if (!that.inMatrix && that.inNoteBlock[turtle].length === 0) {
             that.errorMsg(_('The Scalar Step Block must be used inside of a Note Block.'), this.blk);
@@ -4312,7 +5337,7 @@ function Logo() {
 
     }
 
-    this.playnoise = function () {
+    this.playnoise = function (that) {
         if (this.args.length !== 1 || this.args[0] == null || typeof (this.args[0]) !== 'string') {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             var arg = 'noise1';
@@ -4351,7 +5376,7 @@ function Logo() {
 
     }
 
-    this.playdrum = function () {
+    this.playdrum = function (that) {
         if (this.args.length !== 1 || this.args[0] == null || typeof (this.args[0]) !== 'string') {
             this.errorMsg(NOINPUTERRORMSG, this.blk);
             var arg = DEFAULTDRUM;
@@ -4414,7 +5439,7 @@ function Logo() {
             var noteBeatValue = 4;
             var beatValue = bpmFactor / noteBeatValue;
 
-            __callback = function () {
+            __callback = function (that) {
                 var j = this.inNoteBlock[turtle].indexOf(this.blk);
                 this.inNoteBlock[turtle].splice(j, 1);
             };
@@ -4433,7 +5458,7 @@ function Logo() {
 
     }
 
-    this.setpitchnumberoffset = function () {
+    this.setpitchnumberoffset = function (that) {
         console.log(this.args[0] + ' ' + this.args[1]);
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
@@ -4454,7 +5479,7 @@ function Logo() {
 
     }
 
-    this.custompitch = function () {
+    this.custompitch = function (that) {
         if (this.args[0] == null || this.args[1] == null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             that.stopTurtle = true;
@@ -4466,7 +5491,7 @@ function Logo() {
 
     }
 
-    this.pitch = function () {
+    this.pitch = function (that) {
         var useSolfegeName = false;
         if (that.blocks.blockList[this.blk].name === 'pitchnumber') {
             if (this.args.length !== 1 || this.args[0] == null) {
@@ -4890,7 +5915,7 @@ function Logo() {
                 var noteBeatValue = 4;
                 var beatValue = bpmFactor / noteBeatValue;
 
-                __callback = function () {
+                __callback = function (that) {
                     var j = that.inNoteBlock[turtle].indexOf(this.blk);
                     that.inNoteBlock[turtle].splice(j, 1);
                 };
@@ -4903,7 +5928,7 @@ function Logo() {
 
     }
 
-    this.rhythm = function () {
+    this.rhythm = function (that) {
         if (this.args[0] === null || typeof (this.args[0]) !== 'number' || this.args[0] < 1) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             var arg0 = 3;
@@ -4981,14 +6006,14 @@ function Logo() {
             var beatValue = bpmFactor / noteBeatValue;
             __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                 setTimeout(function () {
-                    that._processNote(thisBeat, blk, turtle, callback);
+                    that._processNote(thisBeat, this.blk, turtle, callback);
                 }, timeout);
             };
 
             for (var i = 0; i < arg0; i++) {
                 if (i === arg0 - 1) {
 
-                    __callback = function () {
+                    __callback = function (that) {
                         delete that.noteDrums[turtle][this.blk];
                         var j = that.inNoteBlock[turtle].indexOf(this.blk);
                         that.inNoteBlock[turtle].splice(j, 1);
@@ -5005,42 +6030,42 @@ function Logo() {
         }
 
     }
-    this.wholeNote = function () {
+    this.wholeNote = function (that) {
         that._processNote(1, this.blk, turtle);
 
     }
 
-    this.halfNote = function () {
+    this.halfNote = function (that) {
         that._processNote(2, this.blk, turtle);
 
     }
 
-    this.quartreNote = function () {
+    this.quartreNote = function (that) {
         that._processNote(4, this.blk, turtle);
 
     }
 
-    this.eighthNote = function () {
+    this.eighthNote = function (that) {
         that._processNote(8, this.blk, turtle);
 
     }
 
-    this.sixteenthNote = function () {
+    this.sixteenthNote = function (that) {
         that._processNote(16, this.blk, turtle);
 
     }
 
-    this.thirtysecondNote = function () {
+    this.thirtysecondNote = function (that) {
         that._processNote(32, this.blk, turtle);
 
     }
 
-    this.sixtyfourthNote = function () {
+    this.sixtyfourthNote = function (that) {
         that._processNote(64, this.blk, turtle);
 
     }
 
-    this.pickup = function () {
+    this.pickup = function (that) {
         if (this.args.length !== 1 || typeof (this.args[0]) !== 'number') {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -5058,7 +6083,7 @@ function Logo() {
 
     }
 
-    this.everybeatdo = function () {
+    this.everybeatdo = function (that) {
         if (!(this.args[0] in that.actions)) {
             that.errorMsg(NOACTIONERRORMSG, this.blk, this.args[1]);
         } else {
@@ -5087,7 +6112,7 @@ function Logo() {
 
     }
 
-    this.offbeatdo = function () {
+    this.offbeatdo = function (that) {
         if (!(this.args[0] in that.actions)) {
             that.errorMsg(NOACTIONERRORMSG, this.blk, this.args[1]);
         } else {
@@ -5116,7 +6141,7 @@ function Logo() {
 
     }
 
-    this.onbeatdo = function () {
+    this.onbeatdo = function (that) {
         if (this.args.length === 2) {
             if (!(this.args[1] in that.actions)) {
                 that.errorMsg(NOACTIONERRORMSG, this.blk, this.args[1]);
@@ -5151,7 +6176,7 @@ function Logo() {
 
     }
 
-    this.meter = function () {
+    this.meter = function (that) {
         if (this.args[0] === null || typeof (this.args[0]) !== 'number') {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             var arg0 = 4;
@@ -5183,7 +6208,7 @@ function Logo() {
     }
 
 
-    this.note = function () {
+    this.note = function (that) {
         if (this.args[1] === undefined) {
             // Should never happen, but if it does, nothing to do.
 
@@ -5334,7 +6359,7 @@ function Logo() {
 
     }
 
-    this.rhythmicdot2 = function () {
+    this.rhythmicdot2 = function (that) {
         if (that.blocks.blockList[this.blk].name === 'rhythmicdot') {
             var arg = 1;
         } else {
@@ -5389,7 +6414,7 @@ function Logo() {
 
     }
 
-    this.settimbre = function () {
+    this.settimbre = function (that) {
         if (this.args[0] === null) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             that.childFlow = this.args[1];
@@ -5445,7 +6470,7 @@ function Logo() {
 
     }
 
-    this.crescendo = function () {
+    this.crescendo = function (that) {
         if (this.args.length > 1 && this.args[0] !== 0) {
             if (that.blocks.blockList[this.blk].name === 'crescendo') {
                 that.crescendoDelta[turtle].push(this.args[0]);
@@ -5490,7 +6515,7 @@ function Logo() {
 
     }
 
-    this.cricket = function () {
+    this.cricket = function (that) {
         that.drumStyle[turtle].push(that.blocks.blockList[this.blk].name);
         that.childFlow = this.args[0];
         that.childFlowCount = 1;
@@ -5506,7 +6531,7 @@ function Logo() {
 
     }
 
-    this.setdrum = function () {
+    this.setdrum = function (that) {
         var drumname = DEFAULTDRUM;
         for (var drum in DRUMNAMES) {
             if (DRUMNAMES[drum][0] === this.args[0]) {
@@ -5539,7 +6564,7 @@ function Logo() {
 
     }
 
-    this.setvoice = function () {
+    this.setvoice = function (that) {
         var voicename = null;
         for (var voice in VOICENAMES) {
             if (VOICENAMES[voice][0] === this.args[0]) {
@@ -5582,7 +6607,7 @@ function Logo() {
 
     }
 
-    this.vibrato = function () {
+    this.vibrato = function (that) {
         var intensity = this.args[0];
         var rate = this.args[1];
 
@@ -5623,7 +6648,7 @@ function Logo() {
 
     }
 
-    this.dis = function () {
+    this.dis = function (that) {
         var distortion = (this.args[0] / 100);
         if (distortion < 0 || distortion > 1) {
             that.errorMsg(_('Distortion must be from 0 to 100.'), this.blk);
@@ -5652,7 +6677,7 @@ function Logo() {
 
     }
 
-    this.tremolo = function () {
+    this.tremolo = function (that) {
         var frequency = this.args[0];
         var depth = (this.args[1] / 100);
 
@@ -5688,7 +6713,7 @@ function Logo() {
 
     }
 
-    this.phaser = function () {
+    this.phaser = function (that) {
         var rate = this.args[0];
         var octaves = this.args[1];
         var baseFrequency = this.args[2];
@@ -5723,7 +6748,7 @@ function Logo() {
 
     }
 
-    this.chorus = function () {
+    this.chorus = function (that) {
         var chorusRate = this.args[0];
         var delayTime = this.args[1];
         var chorusDepth = (this.args[2] / 100);
@@ -5765,7 +6790,7 @@ function Logo() {
 
     }
 
-    this.harmonic2 = function () {
+    this.harmonic2 = function (that) {
         if (typeof (this.args[0]) !== 'number' || this.args[0] < 0) {
             //.TRANS: partials components in a harmonic series
             that.errorMsg(_('Partial must be greater than or equal to 0.'));
@@ -5800,7 +6825,7 @@ function Logo() {
 
     }
 
-    this.harmonic = function () {
+    this.harmonic = function (that) {
         that.inHarmonic[turtle].push(this.blk);
         that.partials[turtle].push([]);
 
@@ -5819,7 +6844,7 @@ function Logo() {
 
     }
 
-    this.partial = function () {
+    this.partial = function (that) {
         if (typeof (this.args[0]) !== 'number' || this.args[0] > 1 || this.args[0] < 0) {
             //.TRANS: partials are weighted components in a harmonic series
             that.errorMsg(_('Partial weight must be between 0 and 1.'));
@@ -5837,7 +6862,7 @@ function Logo() {
 
     }
 
-    this.neighbor2 = function () {
+    this.neighbor2 = function (that) {
         if (typeof (this.args[0]) !== 'number' || typeof (this.args[1]) !== 'number') {
             that.errorMsg(NANERRORMSG, this.blk);
             that.stopTurtle = true;
@@ -5864,7 +6889,7 @@ function Logo() {
 
     }
 
-    this.interval = function () {
+    this.interval = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -5899,7 +6924,7 @@ function Logo() {
 
     }
 
-    this.semitoneinterval = function () {
+    this.semitoneinterval = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -5937,7 +6962,7 @@ function Logo() {
 
     }
 
-    this.staccato = function () {
+    this.staccato = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -5970,7 +6995,7 @@ function Logo() {
 
     }
 
-    this.slur = function () {
+    this.slur = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6010,7 +7035,7 @@ function Logo() {
 
     }
 
-    this.glide = function () {
+    this.glide = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6050,7 +7075,7 @@ function Logo() {
 
     }
 
-    this.drift = function () {
+    this.drift = function (that) {
         if (this.args[0] === undefined) {
             // Nothing to do.
 
@@ -6071,7 +7096,7 @@ function Logo() {
 
     }
 
-    this.tie = function () {
+    this.tie = function (that) {
         if (this.args[0] === undefined) {
             // Nothing to do.
 
@@ -6156,7 +7181,7 @@ function Logo() {
 
     }
 
-    this.swingBlock = function () {
+    this.swingBlock = function (that) {
         // Grab a bit from the next note to give to the current note.
         if (that.blocks.blockList[this.blk].name === 'newswing2') {
             if (this.args[2] === undefined) {
@@ -6216,7 +7241,7 @@ function Logo() {
 
     }
 
-    this.duplicatenotes = function () {
+    this.duplicatenotes = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6244,7 +7269,7 @@ function Logo() {
                 for (var t in that.connectionStore) {
                     if (t !== turtle.toString()) {
                         for (var b in that.connectionStore[t]) {
-                            if (b === this.blk.toString()) {
+                            if (b === blk.toString()) {
                                 return t;
                             }
                         }
@@ -6355,7 +7380,7 @@ function Logo() {
 
     }
 
-    this.skipnotes = function () {
+    this.skipnotes = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6386,7 +7411,7 @@ function Logo() {
 
     }
 
-    this.multiplybeatfactor = function () {
+    this.multiplybeatfactor = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6414,7 +7439,7 @@ function Logo() {
 
     }
 
-    this.setscalartransposition = function () {
+    this.setscalartransposition = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6454,14 +7479,14 @@ function Logo() {
 
     }
 
-    this.register = function () {
+    this.register = function (that) {
         if (this.args[0] !== null && typeof (this.args[0]) === 'number') {
             that.register[turtle] = Math.floor(this.args[0]);
         }
 
     }
 
-    this.settransposition = function () {
+    this.settransposition = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6497,7 +7522,7 @@ function Logo() {
 
     }
 
-    this.sharp = function () {
+    this.sharp = function (that) {
         if (this.args[0] === undefined) {
             // Nothing to do.
 
@@ -6527,7 +7552,7 @@ function Logo() {
 
     }
 
-    this.flat = function () {
+    this.flat = function (that) {
         if (this.args[0] === undefined) {
             // Nothing to do.
 
@@ -6557,7 +7582,7 @@ function Logo() {
 
     }
 
-    this.accidental = function () {
+    this.accidental = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6611,7 +7636,7 @@ function Logo() {
 
     }
 
-    this.articulation = function () {
+    this.articulation = function (that) {
         if (this.args[1] === undefined) {
             // Nothing to do.
 
@@ -6675,7 +7700,7 @@ function Logo() {
 
     }
 
-    this.setnotevolume = function () {
+    this.setnotevolume = function (that) {
         if (this.args.length === 1) {
             if (typeof (this.args[0]) !== 'number') {
                 that.errorMsg(NANERRORMSG, this.blk);
@@ -6705,7 +7730,7 @@ function Logo() {
 
     }
 
-    this.settemperament = function () {
+    this.settemperament = function (that) {
         that.synth.inTemperament = this.args[0];
         that.synth.startingPitch = this.args[1] + '' + this.args[2];
 
@@ -6719,7 +7744,7 @@ function Logo() {
 
     }
 
-    this.setnotevolume2 = function () {
+    this.setnotevolume2 = function (that) {
         // Used by fff ff f p pp ppp blocks
         if (this.args[1] === undefined) {
             // Nothing to do.
@@ -6770,7 +7795,7 @@ function Logo() {
 
     }
 
-    this.setsynthvolume2 = function () {
+    this.setsynthvolume2 = function (that) {
         if (this.args[0] === null || typeof (this.args[0]) !== 'string') {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             var arg0 = 'default';
@@ -6853,7 +7878,7 @@ function Logo() {
 
     }
 
-    this.setsynthvolume2 = function () {
+    this.setsynthvolume2 = function (that) {
         if (this.args[2] === undefined) {
             // Nothing to do.
 
@@ -6958,7 +7983,7 @@ function Logo() {
 
     }
 
-    this.tone2 = function () {
+    this.tone2 = function (that) {
         if (_THIS_IS_TURTLE_BLOCKS_) {
             if (typeof (that.turtleOscs[turtle]) === 'undefined') {
                 that.turtleOscs[turtle] = new p5.TriOsc();
@@ -6979,7 +8004,7 @@ function Logo() {
 
     }
 
-    this.hertz = function () {
+    this.hertz = function (that) {
         if (this.args[0] === null || typeof (this.args[0]) !== 'number' || this.args[0] <= 0) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             var arg = 392;
@@ -7089,7 +8114,7 @@ function Logo() {
 
     }
 
-    this.sawtooth = function () {
+    this.sawtooth = function (that) {
         if (this.args.length === 1) {
             var obj = frequencyToPitch(this.args[0]);
             // obj[2] is cents
@@ -7122,19 +8147,19 @@ function Logo() {
 
     }
 
-    this.playfwd = function () {
+    this.playfwd = function (that) {
         that.pitchTimeMatrix.playDirection = 1;
         that._runFromBlock(that, turtle, this.args[0]);
 
     }
 
-    this.playbwd = function () {
+    this.playbwd = function (that) {
         that.pitchTimeMatrix.playDirection = -1;
         that._runFromBlock(that, turtle, this.args[0]);
 
     }
 
-    this.stuplet = function () {
+    this.stuplet = function (that) {
         if (this.args[0] === null || typeof (this.args[0]) !== 'number' || this.args[0] <= 0) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             var arg0 = 3;
@@ -7197,7 +8222,7 @@ function Logo() {
             for (var i = 0; i < arg0; i++) {
                 if (i === arg0 - 1) {
 
-                    __callback = function () {
+                    __callback = function (that) {
                         delete that.noteDrums[turtle][this.blk];
                         var j = that.inNoteBlock[turtle].indexOf(this.blk);
                         that.inNoteBlock[turtle].splice(j, 1);
@@ -7215,7 +8240,7 @@ function Logo() {
 
     }
 
-    this.tuplet3 = function () {
+    this.tuplet3 = function (that) {
         if (that.inMatrix) {
             if (that.blocks.blockList[this.blk].name === 'tuplet3') {
                 that.tupletParams.push([this.args[0], (1 / this.args[1]) * that.beatFactor[turtle]]);
@@ -7244,7 +8269,7 @@ function Logo() {
 
     }
 
-    this.tuplet4 = function () {
+    this.tuplet4 = function (that) {
         if (this.args[1] === undefined) {
             // nothing to do
 
@@ -7311,7 +8336,7 @@ function Logo() {
 
                 __tupletPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                     setTimeout(function () {
-                        that._processNote(thisBeat, blk, turtle, callback);
+                        that._processNote(thisBeat, this.blk, turtle, callback);
                     }, timeout);
                 };
 
@@ -7322,7 +8347,7 @@ function Logo() {
 
                     if (i === beatValues.length - 1) {
 
-                        __callback = function () {
+                        __callback = function (that) {
                             delete that.noteDrums[turtle][this.blk];
                             var j = that.inNoteBlock[turtle].indexOf(this.blk);
                             that.inNoteBlock[turtle].splice(j, 1);
@@ -7346,7 +8371,7 @@ function Logo() {
 
     }
 
-    this.deleteblock = function () {
+    this.deleteblock = function (that) {
         if (this.args.length < 1) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
             that.stopTurtle = true;
@@ -7382,7 +8407,7 @@ function Logo() {
 
     }
 
-    this.moveblock = function () {
+    this.moveblock = function (that) {
         if (this.args.length < 3) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -7399,7 +8424,7 @@ function Logo() {
 
     }
 
-    this.runblock = function () {
+    this.runblock = function (that) {
         if (this.args.length < 1) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -7427,7 +8452,7 @@ function Logo() {
 
     }
 
-    this.dockblock = function () {
+    this.dockblock = function (that) {
         if (this.args.length < 3) {
             console.log(this.args.length + ' < 3');
             that.errorMsg(NOINPUTERRORMSG, this.blk);
@@ -7488,7 +8513,7 @@ function Logo() {
 
     }
 
-    this.openpalette = function () {
+    this.openpalette = function (that) {
         if (this.args.length < 1) {
             that.errorMsg(NOINPUTERRORMSG, this.blk);
 
@@ -7505,7 +8530,7 @@ function Logo() {
 
     }
 
-    this.setxyturtle = function () {
+    this.setxyturtle = function (that) {
         // deprecated
         var targetTurtle = that._getTargetTurtle(this.args[0]);
         if (targetTurtle === null) {
@@ -7525,7 +8550,7 @@ function Logo() {
 
     }
 
-    this.defaultCase = function () {
+    this.defaultCase = function (that) {
         if (that.blocks.blockList[this.blk].name in that.evalFlowDict) {
             eval(that.evalFlowDict[that.blocks.blockList[this.blk].name]);
         } else {
@@ -7544,1028 +8569,6 @@ function Logo() {
         }
 
     }
-
-    this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
-        
-        ///////
-        this.alreadyRunning = true;
-        ///////
-        // Run a stack of blocks, beginning with blk.
-        var logo = that; // For plugin backward compatibility
-        this.receivedArg = receivedArg;
-
-        // Sometimes we don't want to unwind the entire queue.
-        if (queueStart === undefined) {
-            queueStart = 0;
-        }
-
-        // (1) Evaluate any arguments (beginning with connection[1]);
-        var args = this.args;
-        this.blk = blk;
-        if (that.blocks.blockList[blk].protoblock.args > 0) {
-            for (var i = 1; i < that.blocks.blockList[blk].protoblock.args + 1; i++) {
-                if (that.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && that.blocks.blockList[blk].connections[i] == null) {
-                    console.log('skipping null inflow args');
-                } else {
-                    args.push(that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i], blk, receivedArg));
-                }
-            }
-        }
-
-        // (2) Run function associated with the block;
-        if (that.blocks.blockList[blk].isValueBlock()) {
-            var nextFlow = null;
-        } else {
-            // All flow blocks have a last connection (nextFlow), but
-            // it can be null (i.e., end of a flow).
-            if (that.backward[turtle].length > 0) {
-                // We only run backwards in the "first generation" children.
-                if (that.blocks.blockList[last(that.backward[turtle])].name === 'backward') {
-                    var c = 1;
-                } else {
-                    var c = 2;
-                }
-
-                if (!that.blocks.sameGeneration(that.blocks.blockList[last(that.backward[turtle])].connections[c], blk)) {
-                    var nextFlow = last(that.blocks.blockList[blk].connections);
-                } else {
-                    var nextFlow = that.blocks.blockList[blk].connections[0];
-                    if (that.blocks.blockList[nextFlow].name === 'action' || that.blocks.blockList[nextFlow].name === 'backward') {
-                        nextFlow = null;
-                    } else {
-                        if (!that.blocks.sameGeneration(that.blocks.blockList[last(that.backward[turtle])].connections[c], nextFlow)) {
-                            var nextFlow = last(that.blocks.blockList[blk].connections);
-                        } else {
-                            var nextFlow = that.blocks.blockList[blk].connections[0];
-                        }
-                    }
-                }
-            } else {
-                var nextFlow = last(that.blocks.blockList[blk].connections);
-            }
-
-            if (nextFlow === -1) {
-                nextFlow = null;
-            }
-
-            var queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
-            if (nextFlow != null) { // This could be the last block
-                that.turtles.turtleList[turtle].queue.push(queueBlock);
-            }
-        }
-
-        // Some flow blocks have childflows, e.g., repeat.
-        // var that.childFlow = this.that.childFlow;
-        // var that.childFlowCount = 0;
-        // var actionArgs = [];
-
-        if (that.blocks.visible) {
-            if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
-                that.blocks.highlight(blk, false);
-            }
-        }
-
-        switch (that.blocks.blockList[blk].name) {
-            case 'dispatch':
-                // Dispatch an event.
-                this.dispatch();
-                break;
-            case 'listen':
-                this.listen();
-                break;
-            case 'start':
-            case 'drum':
-                this.drum();
-                break;
-            case 'nameddo':
-                this.nameddo();
-                break;
-            case 'action':
-            case 'do':
-                this.do();
-                break;
-            case 'nameddoArg':
-                this.nameddoArg();
-                break;
-            case 'doArg':
-                this.doArg();
-                break;
-            case 'forever':
-                this.forever();
-                break;
-            case 'hidden':
-            case 'hiddennoflow':
-                // Hidden block is used at end of clamps and actions to
-                // trigger listeners.
-                break;
-            case 'break':
-                this.break();
-                break;
-            case 'wait':
-                this.wait();
-                break;
-            case 'comment':
-                this.comment();
-                break;
-            case 'print':
-                this.printBlock();
-                break;
-            case 'speak':
-                this.speak();
-                break;
-            case 'newturtle':
-                this.newturtle();
-                break;
-            case 'setturtle':
-                this.setturtle();
-                break;
-            case 'repeat':
-                this.repeat();
-                break;
-            case 'clamp':
-                this.clamp();
-                break;
-            case 'until':
-                // Similar to 'while'
-                this.until();
-                break;
-            case 'movable': // legacy typo
-                this.moveable();
-                break;
-            case 'waitFor':
-                this.waitFor();
-                break;
-            case 'if':
-                this.ifBlock();
-                break;
-            case 'ifthenelse':
-                this.ifthenelse();
-                break;
-            case 'while':
-                // While is tricky because we need to recalculate
-                // args[0] each time, so we requeue the While block
-                // itself.
-                this.whileBlock();
-                break;
-            case 'storein2':
-                this.storein2();
-                break;
-            case 'storein':
-                this.storein();
-                break;
-            case 'incrementOne':
-                var i = 1;
-            case 'increment':
-                this.increment();
-                break;
-            case 'clear':
-                this.clearBlock();
-                break;
-            case 'setxy':
-                this.setxy();
-                break;
-            case 'scrollxy':
-                this.scrollxy();
-                break;
-            case 'arc':
-                this, arc();
-                break;
-            case 'bezier':
-                this.bezier();
-                break;
-            case 'controlpoint1':
-                this.controlpoint1();
-                break;
-            case 'controlpoint2':
-                this.controlpoint2();
-                break;
-            case 'return':
-                this.return();
-                break;
-            case 'returnToUrl':
-                this.returnToUrl();
-                break;
-            case 'forward':
-                this.forwardBlock();
-                break;
-            case 'back':
-                this.backBlock();
-                break;
-            case 'right':
-                this.rightBlock();
-                break;
-            case 'left':
-                this.leftBlock();
-                break;
-            case 'setheading':
-                this.setHeading();
-                break;
-            case 'show':
-                this.show();
-                break;
-            case 'turtleshell':
-                this.turtleshell();
-                break;
-            case 'setturtlename':
-                this.setturtlename();
-                break;
-            case 'setturtlename2':
-                this.setturtlename2();
-                break;
-            case 'startTurtle':
-                this.startTurtle();
-                break;
-            case 'stopTurtle':
-                this.stopTurtle();
-                break;
-            case 'turtlesync':
-                this.turtlesync();
-                break;
-            case 'setcolor':
-                this.setcolor();
-                break;
-            case 'setfont':
-                this.setfont();
-                break;
-            case 'sethue':
-                this.sethue();
-                break;
-            case 'setshade':
-                this.setshade();
-                break;
-            case 'settranslucency':
-                this.settranslucency();
-                break;
-            case 'setgrey':
-                this.setgrey();
-                break;
-            case 'setpensize':
-                this.setpensize();
-                break;
-            case 'fill':
-                this.fill();
-                break;
-                // Deprecated
-            case 'beginfill':
-                that.turtles.turtleList[turtle].doStartFill();
-                break;
-                break;
-                // Deprecated
-            case 'endfill':
-                that.turtles.turtleList[turtle].doEndFill();
-                break;
-                break;
-            case 'hollowline':
-                this.hollowline();
-                break;
-                // Deprecated
-            case 'beginhollowline':
-                that.turtles.turtleList[turtle].doStartHollowLine();
-                break;
-                break;
-                // Deprecated
-            case 'endhollowline':
-                that.turtles.turtleList[turtle].doEndHollowLine();
-                break;
-                break;
-                // Deprecated
-            case 'fillscreen':
-                this.fillscreen();
-                break;
-            case 'nobackground':
-                this.nobackground();
-                break;
-            case 'background':
-                this.backgroundBlock();
-                break;
-            case 'penup':
-                this.penup();
-                break;
-            case 'pendown':
-                this.pendown();
-                break;
-            case 'openProject':
-                this.openProject();
-                break;
-            case 'vspace':
-                break;
-            case 'playback':
-                this.playback();
-                break;
-            case 'stopplayback':
-                this.stopplayback();
-                break;
-            case 'stopvideocam':
-                this.stopvideocam();
-                break;
-            case 'showblocks':
-                this.showblocks();
-                break;
-            case 'hideblocks':
-                this.hideblocks();
-                break;
-            case 'savesvg':
-                this.savesvg();
-                break;
-            case 'showHeap':
-                this.showHeap();
-                break;
-            case 'emptyHeap':
-                this.emptyHeap();
-                break;
-            case 'reverseHeap':
-                this.reverseHeap();
-                break;
-            case 'push':
-                this.pushBlock();
-                break;
-            case 'saveHeap':
-                this.saveHeap();
-                break;
-            case 'loadHeap':
-                this.loadHeap();
-                break;
-            case 'loadHeapFromApp':
-                this.loadHeapFromApp();
-                break;
-            case 'saveHeapToApp':
-                this.saveHeapToApp();
-                break;
-            case 'setHeapEntry':
-                this.setHeapEntry();
-                break;
-
-                // Actions for music-related blocks
-            case 'savelilypond':
-                this.savelilypond();
-                break;
-            case 'amsynth':
-                this.amsynth();
-                break;
-            case 'fmsynth':
-                this.fmsynth();
-                break;
-            case 'duosynth':
-                this.duosynth();
-                break;
-            case 'saveabc':
-                this.saveabc();
-                break;
-                // Deprecated
-            case 'setkey':
-                this.setkey();
-                break;
-            case 'setkey2':
-                this.setkey2();
-                break;
-            case 'definemode':
-                this.definemode();
-                break;
-            case 'rhythmruler2':
-            case 'rhythmruler':
-                this.rhytmruler();
-                break;
-            case 'pitchstaircase':
-                this.pitchstaircase();
-                break;
-            case 'tempo':
-                this.tempoBlock();
-                break;
-            case 'pitchslider':
-                this.pitchslider();
-                break;
-            case 'musickeyboard':
-                this.musickeyboard();
-                break;
-            case 'pitchdrummatrix':
-                this.pitchdrummatrix();
-                break;
-            case 'timbre':
-                this.timbre();
-                break;
-            case 'modewidget':
-                this.modewidget();
-                break;
-            case 'temperament1':
-                break;
-            case 'temperament':
-                this.temperament();
-                break;
-                // Deprecated
-            case 'setmasterbpm':
-                this.setmasterbpm();
-                break;
-                // Deprecated
-            case 'setbpm':
-                this.setbpm();
-                break;
-            case 'setmasterbpm2':
-                this.setmasterbpm2();
-                break;
-            case 'setbpm3':
-                this.setbpm3();
-                break;
-            case 'setbpm2':
-                this.setbpm2();
-                break;
-            case 'status':
-                this.statusBlock();
-                break;
-            case 'matrix':
-                this.matrixBlock();
-                break;
-            case 'envelope':
-                this.envelope();
-                break;
-            case 'filter':
-                this.filter();
-                break;
-            case 'oscillator':
-                this.oscillator();
-                break;
-            case 'invert1':
-                this.invert1();
-                break;
-            case 'switch':
-                this.switchBlock();
-                break;
-            case 'defaultcase':
-            case 'case':
-                this.caseBlock();
-                break;
-            case 'invert2':
-            case 'invert':
-                // Deprecated
-                if (that.blocks.blockList[blk].name === 'invert') {
-                    that.invertList[turtle].push([args[0], args[1], 'even']);
-                } else {
-                    that.invertList[turtle].push([args[0], args[1], 'odd']);
-                }
-                that.childFlow = args[2];
-                that.childFlowCount = 1;
-
-                var listenerName = '_invert_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __listener = function (event) {
-                    that.invertList[turtle].pop();
-                    break;
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-                break;
-            case 'backward':
-                this.backward();
-                break;
-            case 'rest2':
-                this.rest2();
-                break;
-            case 'steppitch':
-                this.steppitch();
-                break;
-            case 'playnoise':
-                this.playnoise();
-                break;
-            case 'playdrum':
-                this.playdrum();
-                break;
-            case 'setpitchnumberoffset':
-                this.setpitchnumberoffset();
-                break;
-            case 'custompitch':
-                this.custompitch();
-                break;
-            case 'pitchnumber':
-            case 'scaledegree':
-            case 'pitch':
-                this.pitch();
-                break;
-            case 'rhythm2':
-            case 'rhythm':
-                this.rhythm();
-                break;
-                // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
-                // deprecated
-            case 'wholeNote':
-                this.wholeNote();
-                break;
-            case 'halfNote':
-                this.halfNote();
-                break;
-            case 'quarterNote':
-                this.quarterNote();
-                break;
-            case 'eighthNote':
-                this.eighthNote();
-                break;
-            case 'sixteenthNote':
-                this.sixteenthNote();
-                break;
-            case 'thirtysecondNote':
-                this.thirtysecondNote();
-                break;
-            case 'sixtyfourthNote':
-                this.sixtyfourthNote();
-                break;
-
-            case 'pickup':
-                this.pickup();
-                break;
-            case 'everybeatdo':
-                // Set up a listener for every beat for this turtle.
-                this.everybeatdo();
-                break;
-            case 'offbeatdo':
-                // Set up a listener for this turtle/offbeat combo.
-                this.offbeatdo();
-                break;
-            case 'onbeatdo':
-                // Set up a listener for this turtle/onbeat combo.
-                this.onbeatdo();
-                break;
-            case 'meter':
-                this.meter();
-                break;
-            case 'osctime':
-            case 'newnote':
-            case 'note':
-                // We queue up the child flow of the note clamp and
-                // once all of the children are run, we trigger a
-                // _playnote_ event, then wait for the note to play.
-                // The note can be specified by pitch or synth blocks.
-                // The osctime block specifies the duration in
-                // milleseconds while the note block specifies
-                // duration as a beat value. Note: we should consider
-                // the use of the global timer in Tone.js for more
-                // accuracy.
-
-                this.note();
-                break;
-            case 'rhythmicdot':
-            case 'rhythmicdot2':
-                // Dotting a note will increase its play time by
-                // a(2 - 1/2^n)
-                this.rhythmicdot2();
-                break;
-            case 'settimbre':
-                this.settimbre();
-                break;
-            case 'decrescendo':
-            case 'crescendo':
-                this.crescendo();
-                break;
-                // Deprecated
-            case 'darbuka':
-            case 'clang':
-            case 'bottle':
-            case 'duck':
-            case 'snare':
-            case 'hihat':
-            case 'tom':
-            case 'kick':
-            case 'pluck':
-            case 'triangle1':
-            case 'slap':
-            case 'frogs':
-            case 'fingercymbals':
-            case 'cup':
-            case 'cowbell':
-            case 'splash':
-            case 'ridebell':
-            case 'floortom':
-            case 'crash':
-            case 'chine':
-            case 'dog':
-            case 'cat':
-            case 'clap':
-            case 'bubbles':
-            case 'cricket':
-                this.cricket();
-                break;
-            case 'setdrum':
-                this.setdrum();
-                break;
-            case 'setvoice':
-                this.setvoice();
-                break;
-            case 'vibrato':
-                this.vibrato();
-                break;
-            case 'dis':
-                this.dis();
-                break;
-            case 'tremolo':
-                this.tremolo();
-                break;
-            case 'phaser':
-                this.phaser();
-                break;
-            case 'chorus':
-                this.chorus();
-                break;
-            case 'harmonic2':
-                this.harmonic2();
-                break;
-            case 'harmonic':
-                this.harmonic();
-                break;
-            case 'partial':
-                this.partial();
-                break;
-            case 'neighbor': // semi-tone step
-            case 'neighbor2': // scalar step
-                this.neighbor2();
-                break;
-            case 'interval':
-                this.interval();
-                break;
-            case 'semitoneinterval':
-                this.semitoneinterval();
-                break;
-            case 'newstaccato':
-            case 'staccato':
-                this.staccato();
-                break;
-            case 'newslur':
-            case 'slur':
-                this.slur();
-                break;
-            case 'glide':
-                // TODO: Duration should be the sum of all the notes (like
-                // in a tie). If we set the synth portamento and use
-                // setNote for all but the first note, it should produce a
-                // glissando.
-                this.glide();
-                break;
-            case 'drift':
-                this.drift();
-                break;
-            case 'tie':
-                this.tie();
-                break;
-            case 'newswing':
-            case 'newswing2':
-            case 'swing':
-                this.swingBlock();
-                break;
-            case 'duplicatenotes':
-                this.duplicatenotes();
-                break;
-            case 'skipnotes':
-                this.skipnotes();
-                break;
-            case 'multiplybeatfactor':
-                this.multiplybeatfactor();
-                break;
-            case 'setscalartransposition':
-                this.setscalartransposition();
-                break;
-            case 'register':
-                this.register();
-                break;
-            case 'settransposition':
-                this.settransposition();
-                break;
-                // deprecated
-            case 'sharp':
-                this.sharp();
-                break;
-                // deprecated
-            case 'flat':
-                this.flat();
-                break;
-            case 'accidental':
-                this.accidental();
-                break;
-            case 'articulation':
-                this.articulation();
-                break;
-            case 'setnotevolume': // master volume
-                this.setnotevolume();
-                break;
-            case 'settemperament':
-                this.settemperament();
-                break;
-            case 'setnotevolume2':
-                // master volume in clamp form
-                this.setnotevolume2();
-                break;
-            case 'setsynthvolume':
-                this.setsynthvolume();
-                break;
-            case 'setsynthvolume2':
-                // set synth volume in clamp form
-                this.setsynthvolume2();
-                break;
-                // Deprecated P5 tone generator replaced by macro.
-            case 'tone':
-                break;
-            case 'tone2':
-                this.tone2();
-                break;
-            case 'hertz':
-                this.hertz();
-                break;
-                // deprecated
-            case 'triangle':
-            case 'sine':
-            case 'square':
-            case 'sawtooth':
-                this.sawtooth();
-                break;
-                // Deprecated
-            case 'playfwd':
-                this.playfwd();
-                break;
-                // Deprecated
-            case 'playbwd':
-                this.playbwd();
-                break;
-            case 'stuplet':
-                this.stuplet();
-                break;
-                // deprecated
-            case 'tuplet2':
-            case 'tuplet3':
-                this.tuplet3();
-                break;
-            case 'tuplet4':
-                this.tuplet4();
-                break;
-            case 'deleteblock':
-                this.deleteblock();
-                break;
-            case 'moveblock':
-                this.moveblock();
-                break;
-            case 'runblock':
-                this.runblock();
-                break;
-            case 'dockblock':
-                this.dockblock();
-                break;
-            case 'openpalette':
-                this.openpalette();
-                break;
-            case 'setxyturtle':
-                this.setxyturtle();
-                break;
-            default:
-                this.defaultCase();
-                break;
-        }
-
-        // (3) Queue block below the current block.
-
-        // Is the block in a queued clamp?
-        if (blk !== that.ignoringBlock) {
-            if (blk in that.endOfClampSignals[turtle]) {
-                var n = that.endOfClampSignals[turtle][blk].length;
-                for (var i = 0; i < n; i++) {
-                    var signal = that.endOfClampSignals[turtle][blk].pop();
-                    if (signal != null) {
-                        that.stage.dispatchEvent(signal);
-                    }
-                }
-            }
-        } else {
-            console.log('Ignoring block on overlapped start.');
-        }
-
-        if (docById('statusDiv').style.visibility === 'visible') {
-            if (!that.inStatusMatrix) {
-                that.statusMatrix.updateAll();
-            }
-        }
-
-        // If there is a child flow, queue it.
-        if (that.childFlow != null) {
-            if (that.blocks.blockList[blk].name === 'doArg' || that.blocks.blockList[blk].name === 'nameddoArg') {
-                var queueBlock = new Queue(that.childFlow, that.childFlowCount, blk, actionArgs);
-            } else {
-                var queueBlock = new Queue(that.childFlow, that.childFlowCount, blk, receivedArg);
-            }
-
-            // We need to keep track of the parent block to the child
-            // flow so we can unlightlight the parent block after the
-            // child flow completes.
-            if (that.parentFlowQueue[turtle] != undefined) {
-                that.parentFlowQueue[turtle].push(blk);
-                that.turtles.turtleList[turtle].queue.push(queueBlock);
-            } else {
-                console.log('cannot find queue for turtle ' + turtle);
-            }
-        }
-
-        var nextBlock = null;
-        var parentBlk = null;
-
-        // Run the last flow in the queue.
-        if (that.turtles.turtleList[turtle].queue.length > queueStart) {
-            nextBlock = last(that.turtles.turtleList[turtle].queue).blk;
-            parentBlk = last(that.turtles.turtleList[turtle].queue).parentBlk;
-            passArg = last(that.turtles.turtleList[turtle].queue).args;
-            // Since the forever block starts at -1, it will never === 1.
-            if (last(that.turtles.turtleList[turtle].queue).count === 1) {
-                // Finished child so pop it off the queue.
-                that.turtles.turtleList[turtle].queue.pop();
-            } else {
-                // Decrement the counter for repeating that flow.
-                last(that.turtles.turtleList[turtle].queue).count -= 1;
-            }
-        }
-
-        if (nextBlock != null) {
-            if (parentBlk !== blk) {
-                // The wait block waits waitTimes longer than other
-                // blocks before it is unhighlighted.
-                if (that.turtleDelay === TURTLESTEP) {
-                    that.unhighlightStepQueue[turtle] = blk;
-                } else {
-                    if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
-                        setTimeout(function () {
-                            if (that.blocks.visible) {
-                                that.blocks.unhighlight(blk);
-                            }
-                        }, that.turtleDelay + that.waitTimes[turtle]);
-                    }
-                }
-            }
-
-            if ((that.backward[turtle].length > 0 && that.blocks.blockList[blk].connections[0] == null) || (that.backward[turtle].length === 0 && last(that.blocks.blockList[blk].connections) == null)) {
-                if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
-                    // If we are at the end of the child flow, queue the
-                    // unhighlighting of the parent block to the flow.
-                    if (that.unhighlightQueue[turtle] === undefined) {
-                        console.log('cannot find highlight queue for turtle ' + turtle);
-                    } else if (that.parentFlowQueue[turtle].length > 0 && that.turtles.turtleList[turtle].queue.length > 0 && last(that.turtles.turtleList[turtle].queue).parentBlk !== last(that.parentFlowQueue[turtle])) {
-                        that.unhighlightQueue[turtle].push(last(that.parentFlowQueue[turtle]));
-                        // that.unhighlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
-                    } else if (that.unhighlightQueue[turtle].length > 0) {
-                        // The child flow is finally complete, so unhighlight.
-                        setTimeout(function () {
-                            if (that.blocks.visible) {
-                                that.blocks.unhighlight(that.unhighlightQueue[turtle].pop());
-                            } else {
-                                that.unhighlightQueue[turtle].pop();
-                            }
-                        }, that.turtleDelay);
-                    }
-                }
-            }
-
-            // We don't update parameter blocks when running full speed.
-            if (that.turtleDelay !== 0) {
-                for (var pblk in that.parameterQueue[turtle]) {
-                    that._updateParameterBlock(that, turtle, that.parameterQueue[turtle][pblk]);
-                }
-            }
-
-            if (isflow) {
-                that._runFromBlockNow(that, turtle, nextBlock, isflow, passArg, queueStart);
-            } else {
-                that._runFromBlock(that, turtle, nextBlock, isflow, passArg);
-            }
-        } else {
-            that.alreadyRunning = false;
-            if (!that.prematureRestart) {
-                // console.log('Make sure any unissued signals are dispatched.');
-                for (var b in that.endOfClampSignals[turtle]) {
-                    for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
-                        if (that.endOfClampSignals[turtle][b][i] != null) {
-                            if (that.butNotThese[turtle][b] == null || that.butNotThese[turtle][b].indexOf(i) === -1) {
-                                that.stage.dispatchEvent(that.endOfClampSignals[turtle][b][i]);
-                            }
-                        }
-                    }
-                }
-
-                // Make sure SVG path is closed.
-                that.turtles.turtleList[turtle].closeSVG();
-
-                // Mark the turtle as not running.
-                that.turtles.turtleList[turtle].running = false;
-                if (!that.turtles.running() && queueStart === 0) {
-                    that.onStopTurtle();
-                }
-            }
-
-            // Because flow can come from calc blocks, we are not
-            // ensured that the turtle is really finished running
-            // yet. Hence the timeout.
-            __checkCompletionState = function () {
-                if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
-                    if (that.runningLilypond) {
-                        console.log('saving lilypond output:');
-                        save.afterSaveLilypond();
-                        that.runningLilypond = false;
-                    } else if (that.runningAbc) {
-                        console.log('saving abc output:');
-                        save.afterSaveAbc();
-                        that.runningAbc = false;
-                    } else if (that.suppressOutput[turtle]) {
-                        console.log('finishing compiling');
-                        if (!that.recording) {
-                            that.errorMsg(_('Playback is ready.'));
-                        }
-
-                        that.setPlaybackStatus();
-                        that.compiling = false;
-                        for (t in that.turtles.turtleList) {
-                            that.turtles.turtleList[t].doPenUp();
-                            that.turtles.turtleList[t].doSetXY(that._saveX[t], that._saveY[t]);
-                            that.turtles.turtleList[t].color = that._saveColor[t];
-                            that.turtles.turtleList[t].value = that._saveValue[t];
-                            that.turtles.turtleList[t].chroma = that._saveChroma[t];
-                            that.turtles.turtleList[t].stroke = that._saveStroke[t];
-                            that.turtles.turtleList[t].canvasAlpha = that._saveCanvasAlpha[t];
-                            that.turtles.turtleList[t].doSetHeading(that._saveOrientation[t]);
-                            that.turtles.turtleList[t].penState = that._savePenState[t];
-                        }
-                    }
-
-                    // Give the last note time to play.
-                    console.log('SETTING LAST NOTE TIMEOUT: ' + that.recording + ' ' + that.suppressOutput[turtle]);
-                    that.lastNoteTimeout = setTimeout(function () {
-                        console.log('LAST NOTE PLAYED');
-                        that.lastNoteTimeout = null;
-                        if (that.suppressOutput[turtle] && that.recording) {
-                            that.suppressOutput[turtle] = false;
-                            that.checkingCompletionState = false;
-                            that.saveLocally();
-                            console.log('PLAYBACK FOR RECORD');
-                            that.playback(-1, true);
-                            // that.recording = false;
-                        } else {
-                            that.suppressOutput[turtle] = false;
-                            that.checkingCompletionState = false;
-
-                            // Reset the cursor...
-                            document.body.style.cursor = 'default';
-
-                            // And save the session.
-                            that.saveLocally();
-                        }
-                    }, 1000);
-                } else if (that.suppressOutput[turtle]) {
-                    setTimeout(function () {
-                        __checkCompletionState();
-                    }, 250);
-                }
-            };
-
-            if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
-                if (!that.checkingCompletionState) {
-                    that.checkingCompletionState = true;
-                    setTimeout(function () {
-                        __checkCompletionState();
-                    }, 250);
-                }
-            }
-
-            if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
-                // Nothing else to do... so cleaning up.
-                if (that.turtles.turtleList[turtle].queue.length === 0 || blk !== last(that.turtles.turtleList[turtle].queue).parentBlk) {
-                    setTimeout(function () {
-                        if (that.blocks.visible) {
-                            that.blocks.unhighlight(blk);
-                        }
-                    }, that.turtleDelay);
-                }
-
-                // Unhighlight any parent blocks still highlighted.
-                for (var b in that.parentFlowQueue[turtle]) {
-                    if (that.blocks.visible) {
-                        that.blocks.unhighlight(that.parentFlowQueue[turtle][b]);
-                    }
-                }
-
-                // Make sure the turtles are on top.
-                var i = that.stage.children.length - 1;
-                that.stage.setChildIndex(that.turtles.turtleList[turtle].container, i);
-                that.refreshCanvas();
-            }
-
-            for (var arg in that.evalOnStopList) {
-                eval(that.evalOnStopList[arg]);
-            }
-
-            if (!that.turtles.running() && queueStart === 0) {
-                // TODO: Enable playback button here
-                if (that.showBlocksAfterRun) {
-                    // If this is a status stack, not run showBlocks.
-                    if (blk !== null && that.blocks.blockList[blk].connections[0] !== null && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'status') {
-                        console.log('running status block');
-                    } else {
-                        that.showBlocks();
-                        that.showBlocksAfterRun = false;
-                    }
-                }
-                document.getElementById('stop').style.color = 'white';
-                console.log('fin');
-            }
-        }
-    };
 
     this._setMasterVolume = function (volume) {
         if (volume > 100) {
@@ -13305,6 +13308,7 @@ function Logo() {
     };
 
     this.notationEndHarmonics = function (turtle) {
+
         this.notationStaging[turtle].push('end harmonics');
         this.pickupPoint[turtle] = null;
     };
