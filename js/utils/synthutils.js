@@ -26,8 +26,6 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('veena'), 'veena', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('bongo'), 'bongo', 'images/voices.svg', 'string'],
-    //.TRANS: musical instrument
     [_('piano'), 'piano', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg', 'string'],
@@ -82,6 +80,8 @@ var VOICENAMES = [
 // drum symbols are from
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
 var DRUMNAMES = [
+    //.TRANS: musical instrument
+    [_('bongo'), 'bongo', 'images/voices.svg', 'bolo', 'drum'],
     //.TRANS: musical instrument
     [_('snare drum'), 'snare drum', 'images/snaredrum.svg', 'sn', 'drum'],
     //.TRANS: musical instrument
