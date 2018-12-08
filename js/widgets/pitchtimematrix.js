@@ -195,9 +195,11 @@ function PitchTimeMatrix () {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
-        cell.onclick=function() {
-            that._export();
+        if (!localStorage.beginnerMode) {
+            var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
+            cell.onclick=function() {
+                that._export();
+            }
         }
 
         var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('Sort'));
