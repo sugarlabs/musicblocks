@@ -20,7 +20,7 @@ define(["sugar-web/env", "sugar-web/activity/activity", "sugar-web/datastore"], 
         },
 
         isInsideSugarizer: function () {
-            return env.isSugarizer();
+            return false;
         },
 
         loadData: function (callback) {
