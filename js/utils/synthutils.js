@@ -54,13 +54,13 @@ var VOICENAMES = [
     //.TRANS: polytone synthesizer
     [_('default'), 'default', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple 1'), 'mono1', 'images/synth.svg', 'electronic'],
+    [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-2'), 'mono2', 'images/synth.svg', 'electronic'],
+    // [_('simple-2'), 'simple 2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-3'), 'mono3', 'images/synth.svg', 'electronic'],
+    // [_('simple-3'), 'simple 3', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-4'), 'mono4', 'images/synth.svg', 'electronic'],
+    // [_('simple-4'), 'simple 4', 'images/synth.svg', 'electronic'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg', 'electronic'],
     //.TRANS: square wave
@@ -213,10 +213,10 @@ function Synth() {
         'noise2': 1,
         'noise3': 1,
         'poly': 1,
-        'mono1': 1,
-        'mono2': 1,
-        'mono3': 1,
-        'mono4': 1,
+        'simple 1': 1,
+        'simple 2': 1,
+        'simple 3': 1,
+        'simple 4': 1,
         'custom': 1,
     };
 
@@ -597,10 +597,10 @@ function Synth() {
                 }
             };
             break;
-        case 'mono1':
-        case 'mono2':
-        case 'mono3':
-        case 'mono4':
+        case 'simple 1':
+        case 'simple 2':
+        case 'simple 3':
+        case 'simple 4':
             var synthOptions = {
                 'oscillator': {
                     'type': 'sine'
@@ -735,10 +735,10 @@ function Synth() {
         }
 
         switch (sourceName) {
-        case 'mono1':
-        case 'mono2':
-        case 'mono3':
-        case 'mono4':
+        case 'simple 1':
+        case 'simple 2':
+        case 'simple 3':
+        case 'simple 4':
             instrumentsSource[instrumentName] = [3, sourceName];
             console.log(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
