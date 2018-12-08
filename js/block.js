@@ -4997,7 +4997,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (modename === ' ') {
                     colors.push(platformColor.modePieMenusIfColorPush);
                 } else {
-                    colors.push(modePieMenusElseColorPush);
+                    colors.push(platformColor.modePieMenusElseColorPush);
                 }
             }
 
