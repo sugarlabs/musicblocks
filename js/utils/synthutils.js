@@ -26,6 +26,10 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
+ 	[_('mandolin'), 'mandolin', 'images/voices.svg', 'electronic'],
+    //.TRANS: musical instrument
+ 	[_('autoharp'), 'autoharp', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('bass'), 'bass', 'images/voices.svg', 'string'],
@@ -142,6 +146,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
     "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
+	"samples/autoharp","samples/mandolin",
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -162,6 +167,8 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'autoharp': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'mandolin': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
 };
 
 
@@ -440,7 +447,9 @@ function Synth() {
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
 		{'name': 'koto', 'data': KOTO_SAMPLE},
 		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
+		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
+		{'name': 'autoharp', 'data': AUTOHARP_SAMPLE },
+		{'name': 'mandolin', 'data': MANDOLIN_SAMPLE},
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
