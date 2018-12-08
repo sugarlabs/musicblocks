@@ -180,6 +180,8 @@ function StatusMatrix() {
             var cell = row.insertCell(i + 1);
             cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
 
+            console.log(this._logo.statusFields[i][1]);
+
             switch (this._logo.statusFields[i][1]) {
             case 'plus':
             case 'minus':
@@ -203,6 +205,7 @@ function StatusMatrix() {
                 } else {
                     var label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock.staticLabels[0];
                 }
+                console.log(label);
                 break;
             default:
                 var label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock.staticLabels[0];
