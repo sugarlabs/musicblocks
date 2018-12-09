@@ -1686,6 +1686,16 @@ function Turtles () {
 
                 that._expandButton.removeAllEventListeners('click');
                 that._expandButton.on('click', function (event) {
+
+                     // If the aux toolbar is open, close it.
+                     var auxToolbar = docById('aux-toolbar');
+                     if (auxToolbar.style.display === 'block') {
+                         var menuIcon = docById('menu');
+                         auxToolbar.style.display = 'none';
+                         menuIcon.innerHTML = 'menu';
+                         docById('toggleAuxBtn').className -= 'blue darken-1';
+                     }
+
                     that.hideMenu();
                     that.scaleStage(1.0);
                     that._expandedBoundary.visible = true;
@@ -1771,8 +1781,8 @@ function Turtles () {
                         menuIcon.innerHTML = 'menu';
                         docById('toggleAuxBtn').className -= 'blue darken-1';
                     }
-
-                    that.collapse();
+                    
+                    that.collapse();    
                 });
 
                 that._collapseButton.removeAllEventListeners('mouseover');
