@@ -11972,12 +11972,11 @@ function Logo () {
                 var value = getStepSizeUp(this.keySignature[turtle], noteObj[0], n, this.synth.inTemperament);
                 noteObj = getNote(noteObj[0], noteObj[1], value, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg, this.synth.inTemperament);
             } else {
-                for (var i in n) {
+                for (var i = 0; i < n; i++) {
                     var value = getStepSizeUp(this.keySignature[turtle], noteObj[0]);
                     noteObj = getNote(noteObj[0], noteObj[1], value, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg, this.synth.inTemperament);
                 }
             }
-
         } else if (n < 0) {
             var noteObj = getNote(note, octave, 0, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg, this.synth.inTemperament);
             var note1 = noteObj[0];
