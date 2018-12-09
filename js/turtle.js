@@ -21,7 +21,7 @@ const SCALEFACTOR = 4
 // Turtle sprite
 const TURTLEBASEPATH = 'images/';
 
-function Turtle(name, turtles, drum) {
+function Turtle (name, turtles, drum) {
     this.name = name;
     this.turtles = turtles;
     this.drum = drum;
@@ -1690,7 +1690,6 @@ function Turtles () {
 
                 that._expandButton.removeAllEventListeners('click');
                 that._expandButton.on('click', function (event) {
-
                     // If the aux toolbar is open, close it.
                     var auxToolbar = docById('aux-toolbar');
                     if (auxToolbar.style.display === 'block') {
@@ -1699,7 +1698,6 @@ function Turtles () {
                         menuIcon.innerHTML = 'menu';
                         docById('toggleAuxBtn').className -= 'blue darken-1';
                     }
-
                     that.hideMenu();
                     that.scaleStage(1.0);
                     that._expandedBoundary.visible = true;
