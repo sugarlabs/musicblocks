@@ -1029,6 +1029,7 @@ function Activity() {
         // scrollOffContainer.visible = false;
        deltaY(-55 - LEADING);
         _showHideAuxMenu(false);
+        toolbar.closeAuxToolbar();
 
         blocks.activeBlock = null;
         myChart = docById('myChart');
@@ -2359,6 +2360,7 @@ function Activity() {
      * Sets up a new "clean" MB i.e. new project instance
      */
     _afterDelete = function () {
+       toolbar.closeAuxToolbar();
         sendAllToTrash(true, false);
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
