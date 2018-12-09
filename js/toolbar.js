@@ -468,4 +468,13 @@ function Toolbar() {
         jquery('.tooltipped').tooltip('remove');
         tooltipsDisabled = true;
     }
+
+    this.closeAuxToolbar = function() {
+        if (auxToolbar.style.display === 'block') {
+            var menuIcon = docById('menu');
+            auxToolbar.style.display = 'none';
+            menuIcon.innerHTML = 'menu';
+            docById('toggleAuxBtn').className -= 'blue darken-1';
+        }
+    }
 };
