@@ -215,14 +215,19 @@
 #localglobal{
 	top: 7px;
 }
-@media only screen and (max-width: 500px)  {
+
 	#logo-container {
 		left: initial !important;
 		-webkit-transform: initial !important;
 		    -ms-transform: initial !important;
-		        transform: initial !important;
+				transform: initial !important;
 	}
-}
+
+	@media only screen and (max-width: 655px)  {
+		#logo-container{
+			font-size: 0;
+		}
+	}
 a {
 	cursor: pointer;
 }
