@@ -3033,7 +3033,7 @@ msgstr "こちらをごらんください"
 
 #: js/SaveInterface.js:24
 msgid "Hide"
-msgstr ""
+msgstr "隠す"
 
 #: js/SaveInterface.js:80
 #: js/SaveInterface.js:84
