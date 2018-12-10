@@ -332,3 +332,8 @@ a {
 	border-radius: 23px;
 	max-width: calc(100% - 2px);
 }
+
+.inactiveLink {
+	pointer-events: none;
+	cursor: default;
+ }
