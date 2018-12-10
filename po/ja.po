@@ -3029,11 +3029,11 @@ msgstr "このコードは、がいとうする場合、へんしゅうされた
 
 #: js/SaveInterface.js:24
 msgid "Show"
-msgstr "こちらをごらんください"
+msgstr "プロジェクトのコードを表示する"
 
 #: js/SaveInterface.js:24
 msgid "Hide"
-msgstr "隠す"
+msgstr "プロジェクトのコードを非表示にする"
 
 #: js/SaveInterface.js:80
 #: js/SaveInterface.js:84
