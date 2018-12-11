@@ -25,7 +25,7 @@ if (GUIDEURL === 'guide url' || GUIDEURL === '') {
 
 const NUMBERBLOCKDEFAULT = 4;
 const DEFAULTPALETTE = 'rhythm';
-const TITLESTRING = _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.')
+const TITLESTRING = _('Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.')
 const VERSION = '2.6';
 
 // We don't include 'extras' since we want to be able to delete
