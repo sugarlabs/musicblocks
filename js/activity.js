@@ -2049,7 +2049,7 @@ function Activity() {
         var dy = -cellSize * 3; // Reposition
 
         if (blocks.trashStacks.length === 0) {
-            console.log('Trash is empty--nothing to do');
+            console.log('Trash is emptnothing to do');
             return;
         }
 
@@ -2169,7 +2169,9 @@ function Activity() {
      * Then deletes everything/sends all to trash
      */
     sendAllToTrash = function (addStartBlock, doNotSave) {
-
+        // Return to home position after loading new blocks.
+        blocksContainer.x = 0;
+        blocksContainer.y = 0;
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2300,7 +2302,7 @@ function Activity() {
         if (!stopTurtleContainer.visible) {
             _showStopButton();
         }
-	*/
+        */
     };
 
     /**
@@ -2428,6 +2430,7 @@ function Activity() {
             planet.initialiseNewProject();
             // Restore default cursor
             loading = false;
+
             document.body.style.cursor = 'default';
             update = true;
         }, 200);
@@ -2948,7 +2951,7 @@ function Activity() {
 
         stopTurtleContainer.visible = false;
         hardStopTurtleContainer.visible = true;
-	*/
+        */
     };
 
     _showStopButton = function () {
@@ -2959,7 +2962,7 @@ function Activity() {
 
         stopTurtleContainer.visible = true;
         hardStopTurtleContainer.visible = false;
-	*/
+        */
     };
 
     // function blinkPasteButton(bitmap) {
@@ -3499,7 +3502,7 @@ function Activity() {
             slowContainer.y += dy;
             stepContainer.y += dy;
         }
-	*/
+        */
         refreshCanvas();
     };
 

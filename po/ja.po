@@ -1680,7 +1680,7 @@ msgstr "もっとくわしく知るには"
 #: js/turtledefs.js:207
 ## しょうさい＝詳細
 msgid "A detailed guide to Music Blocks is available."
-msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。<br><a href="https://github.com/sugarlabs/musicblocks/tree/master/guide-ja">https://github.com/sugarlabs/musicblocks/tree/master/guide-ja</a>"
+msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。<br><a href=\\"https://github.com/sugarlabs/musicblocks/tree/master/guide-ja\\" target=\\"_blank\\">https://github.com/sugarlabs/musicblocks/tree/master/guide-ja</a>"
 
 #: js/turtledefs.js:169
 #: js/turtledefs.js:207
@@ -1691,7 +1691,7 @@ msgstr "ミュージック・ブロックスガイド"
 #: js/turtledefs.js:170
 #: js/turtledefs.js:208
 msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
-msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、<a href="https://www.gnu.org/philosophy/free-sw.ja.html">オープンソース</a>のツールだ。"
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、<a href=\\"https://www.gnu.org/philosophy/free-sw.ja.html\\" target=\\"_blank\\">オープンソース</a>のツールだ。"
 
 #: js/turtledefs.js:170
 #: js/turtledefs.js:208
@@ -3059,15 +3059,15 @@ msgstr ""
 #: js/SaveInterface.js:24
 #: js/SaveInterface.js:24
 msgid "Music Blocks Project"
-msgstr ""
+msgstr "ミュージック・ブロックスのプロジェクト"
 
 #: js/SaveInterface.js:24
 msgid "This project was created in Music Blocks"
-msgstr "このプロジェクトは、ミュージック・ブロックス"
+msgstr "このプロジェクトは、ミュージック・ブロックスで作成されました。"
 
 #: js/SaveInterface.js:24
 msgid "Music Blocks is a Free/Libre Software application."
-msgstr "ミュージック・ブロックスは、音楽のちしきを楽しみながら身につけることのできる、オープンソースのフリーソフトです"
+msgstr "ミュージック・ブロックスは、音楽のちしきを楽しみながら身につけることのできる、オープンソースのソフトです。"
 
 #: js/SaveInterface.js:24
 msgid "The source code can be accessed at"
@@ -3079,15 +3079,15 @@ msgstr "もっと詳しく知りたい場合は、ミュージック・ブロッ
 
 #: js/SaveInterface.js:24
 msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
-msgstr "このプロジェクトをひらくには、ミュージック・ブロックスにアクセスし、このファイルをアプリケーションのウィンドウにドラッグするか"
+msgstr "このプロジェクトをひらくには、ミュージック・ブロックスにアクセスし、このファイルをアプリケーションのウィンドウにドラッグするか、"
 
 #: js/SaveInterface.js:24
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
-msgstr "、「ファイルからプロジェクトを読みこむ」ボタンをおして、ファイルをひらいてください。"
+msgstr "「ファイルからプロジェクトを読みこむ」ボタンをおして、ファイルをひらいてください。"
 
 #: js/SaveInterface.js:24
 msgid "Project Code"
-msgstr ""
+msgstr "プロジェクトのコード"
 
 #: js/SaveInterface.js:24
 msgid "This code stores data about the blocks in a project."
@@ -4308,7 +4308,7 @@ msgstr "向き（ネズミ）"
 #: js/basicblocks.js:3059
 #.TRANS: y coordinate
 msgid "y3"
-msgstr "yざひょうち"
+msgstr "yざひょうち（ネズミ）"
 
 #: js/basicblocks.js:3061
 #: js/basicblocks.js:3092
@@ -5737,7 +5737,7 @@ msgstr "バンジョー"
 #: js/musicutils.js:299
 #.TRANS: musical instrument
 msgid "koto"
-msgstr "箏"
+msgstr "こと"
 
 #: js/synthutils.js:51
 #: js/musicutils.js:300
