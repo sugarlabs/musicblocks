@@ -4116,6 +4116,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.staticLabels.push(_('event'));
         //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
         newblock.staticLabels.push(_('do1'));
+	newblock.extraWidth = 15;
     } else {
         newblock.staticLabels.push(_('event'), _('do'));
     }
