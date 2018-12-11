@@ -469,8 +469,9 @@ function Toolbar() {
         tooltipsDisabled = true;
     }
 
-    this.closeAuxToolbar = function() {
+    this.closeAuxToolbar = function(onclick) {
         if (auxToolbar.style.display === 'block') {
+            onclick(false);
             var menuIcon = docById('menu');
             auxToolbar.style.display = 'none';
             menuIcon.innerHTML = 'menu';
