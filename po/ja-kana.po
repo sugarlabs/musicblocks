@@ -3058,15 +3058,15 @@ msgstr ""
 #: js/SaveInterface.js:24
 #: js/SaveInterface.js:24
 msgid "Music Blocks Project"
-msgstr ""
+msgstr "ミュージック・ブロックスの プロジェクト"
 
 #: js/SaveInterface.js:24
 msgid "This project was created in Music Blocks"
-msgstr "このプロジェクトは、ミュージック・ブロックス"
+msgstr "この プロジェクトは、 ミュージック・ブロックスで さくせい されました。"
 
 #: js/SaveInterface.js:24
 msgid "Music Blocks is a Free/Libre Software application."
-msgstr "ミュージック・ブロックスは、 おんがくの ちしきを たのしみながら みにつける ことの できる、 オープンソースの フリーソフト です"
+msgstr "ミュージック・ブロックスは、 おんがくの ちしきを たのしみながら みにつける ことの できる、 オープンソースの ソフト です。"
 
 #: js/SaveInterface.js:24
 msgid "The source code can be accessed at"
@@ -3078,15 +3078,15 @@ msgstr "もっと くわしく しりたい ばあいは、 ミュージック�
 
 #: js/SaveInterface.js:24
 msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
-msgstr "このプロジェクトを ひらくには、 ミュージック・ブロックスに アクセスし、 このファイルを アプリケーションの ウィンドウに ドラッグ するか"
+msgstr "このプロジェクトを ひらくには、 ミュージック・ブロックスに アクセスし、 このファイルを アプリケーションの ウィンドウに ドラッグ するか、"
 
 #: js/SaveInterface.js:24
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
-msgstr "、 「ファイルから プロジェクトを よみこむ」 ボタンを おして、 ファイルを ひらいて ください。"
+msgstr "「ファイルから プロジェクトを よみこむ」 ボタンを おして、 ファイルを ひらいて ください。"
 
 #: js/SaveInterface.js:24
 msgid "Project Code"
-msgstr ""
+msgstr "プロジェクトの コード"
 
 #: js/SaveInterface.js:24
 msgid "This code stores data about the blocks in a project."
