@@ -3062,7 +3062,7 @@ msgstr "ミュージック・ブロックスの プロジェクト"
 
 #: js/SaveInterface.js:24
 msgid "This project was created in Music Blocks"
-msgstr "この プロジェクトは、 <a href=\\"https://musicblocks.sugarlabs.org\\" t\arget=\\"_blank\\">ミュージック・ブロックス</a>で さくせい されました。"
+msgstr "この プロジェクトは、 <a href=\\"https://musicblocks.sugarlabs.org\\" target=\\"_blank\\">ミュージック・ブロックス</a>で さくせい されました。"
 
 #: js/SaveInterface.js:24
 msgid "Music Blocks is a Free/Libre Software application."
