@@ -2159,9 +2159,6 @@ function Activity() {
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
         }
-
-       // confirmContainer.visible = false;
-       deltaY(-55 - LEADING);
     };
 
 
@@ -2441,6 +2438,7 @@ function Activity() {
             planet.initialiseNewProject();
             // Restore default cursor
             loading = false;
+
             document.body.style.cursor = 'default';
             update = true;
         }, 200);
