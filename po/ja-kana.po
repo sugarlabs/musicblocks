@@ -4307,7 +4307,7 @@ msgstr "むき（ネズミ）"
 #: js/basicblocks.js:3059
 #.TRANS: y coordinate
 msgid "y3"
-msgstr "yざひょうち"
+msgstr "yざひょうち（ネズミ）"
 
 #: js/basicblocks.js:3061
 #: js/basicblocks.js:3092
