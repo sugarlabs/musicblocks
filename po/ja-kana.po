@@ -1270,7 +1270,7 @@ msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/README.md"
 
 #: js/turtledefs.js:28
 ## Need to refine this
-msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgid "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
 msgstr "おんがくと さんすうと プログラミングを むすびつけ、 ふかく たのしむことができる ツール。 それが、 ミュージック・ブロックスだ。"
 
 #: js/turtledefs.js:35

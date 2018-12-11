@@ -2262,7 +2262,7 @@ msgstr ""
 
 #: js/turtledefs.js:28
 #.TRANS: Bloques de Música es una colección de herramientas de manipulación para explorar conceptos musicales fundamentales de una manera integradora y divertido.
-msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgid "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
 msgstr "Warurt'äwinaka wakichata pankaxa warurt'äwinaka tuqita suma qawayata wali k'uchi yatxatañataki wakichatawa"
 
 #: js/turtledefs.js:35

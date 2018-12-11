@@ -2092,7 +2092,7 @@ msgid "guide url"
 msgstr ""
 
 #: js/turtledefs.js:28
-msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgid "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
 msgstr "Music Blocksคือศูนย์ร่วมอุปกรณ์ต่างๆเพื่อสำรวจแนวคิดเรื่องดนตรีด้วยวิธีที่สนุกและครบถ้วน"
 
 #: js/turtledefs.js:35
