@@ -2049,7 +2049,7 @@ function Activity() {
         var dy = -cellSize * 3; // Reposition
 
         if (blocks.trashStacks.length === 0) {
-            console.log('Trash is emptnothing to do');
+            console.log('Trash is empty--nothing to do');
             return;
         }
 
