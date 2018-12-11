@@ -546,7 +546,7 @@ function RhythmRuler () {
                 this._logo.hideMsgs();
             } else {
                 console.log('Top max value exceeded');
-                this._logo.errorMsg(('Maximum value of 256 has been exceeded.'));
+                this._logo.errorMsg(_('Maximum value of 256 has been exceeded.'));
                 newNoteValue = inputNum;
             }
 
