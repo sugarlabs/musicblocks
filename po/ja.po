@@ -5737,7 +5737,7 @@ msgstr "バンジョー"
 #: js/musicutils.js:299
 #.TRANS: musical instrument
 msgid "koto"
-msgstr "箏"
+msgstr "こと"
 
 #: js/synthutils.js:51
 #: js/musicutils.js:300
