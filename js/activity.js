@@ -255,7 +255,7 @@ function Activity() {
         chartBitmap = null;
         merging = false;
         loading = false;
-	// On-screen buttons
+        // On-screen buttons
         smallerContainer = null;
         largerContainer = null;
         smallerOffContainer = null;
@@ -918,7 +918,7 @@ function Activity() {
     closeAnalytics = this.closeAnalytics;
     var th = this;
     doAnalytics = function () {
-	deltaY(-55 - LEADING);  // DO WE NEED THIS?
+        deltaY(-55 - LEADING);  // DO WE NEED THIS?
         toolbar.closeAuxToolbar();
 
         blocks.activeBlock = null;
@@ -1994,8 +1994,8 @@ function Activity() {
 
         trashcan.resizeEvent(turtleBlocksScale);
 
-	// We need to reposition the palette buttons
-	_setupPaletteMenu(turtleBlocksScale);
+        // We need to reposition the palette buttons
+        _setupPaletteMenu(turtleBlocksScale);
 
         // Reposition coordinate grids.
         cartesianBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (600);
@@ -2175,7 +2175,10 @@ function Activity() {
      * Then deletes everything/sends all to trash
      */
     sendAllToTrash = function (addStartBlock, doNotSave) {
-        
+        // Return to home position after loading new blocks.
+        blocksContainer.x = 0;
+        blocksContainer.y = 0;
+
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2298,7 +2301,7 @@ function Activity() {
     this.onRunTurtle = function () {
         // TODO: plugin support
         // If the stop button is hidden, show it.
-	/*
+        /*
         if (stopTurtleContainer === null) {
             return;
         }
@@ -2306,7 +2309,7 @@ function Activity() {
         if (!stopTurtleContainer.visible) {
             _showStopButton();
         }
-	*/
+        */
     };
 
     /**
@@ -2332,10 +2335,10 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function () {
-	if (auxToolbar.style.display === 'block') {
+        if (auxToolbar.style.display === 'block') {
             toolbar.closeAuxToolbar();
-	    deltaY(-55 - LEADING);
-	}
+            deltaY(-55 - LEADING);
+        }
 
         planet.openPlanet();
     };
@@ -2952,25 +2955,25 @@ function Activity() {
     };
 
     _hideStopButton = function () {
-	/*
+        /*
         if (stopTurtleContainer === null) {
             return;
         }
 
         stopTurtleContainer.visible = false;
         hardStopTurtleContainer.visible = true;
-	*/
+        */
     };
 
     _showStopButton = function () {
-	/*
+        /*
         if (stopTurtleContainer === null) {
             return;
         }
 
         stopTurtleContainer.visible = true;
         hardStopTurtleContainer.visible = false;
-	*/
+        */
     };
 
     // function blinkPasteButton(bitmap) {
@@ -3510,7 +3513,7 @@ function Activity() {
             slowContainer.y += dy;
             stepContainer.y += dy;
         }
-	*/
+        */
         refreshCanvas();
     };
 
