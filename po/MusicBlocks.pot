@@ -21,7 +21,7 @@ msgstr ""
 #: js/block.js:5410
 #: js/block.js:5419
 #: js/block.js:5430
-#: js/activity.js:2268
+#: js/activity.js:2133
 #: js/palette.js:770
 #: js/palette.js:779
 #: js/palette.js:788
@@ -67,8 +67,8 @@ msgstr ""
 #: js/block.js:1165
 #: js/logo.js:1573
 #: js/logo.js:11540
-#: js/turtle.js:664
-#: js/turtle.js:665
+#: js/turtle.js:668
+#: js/turtle.js:669
 #: js/basicblocks.js:4172
 #: js/lilypond.js:586
 #: js/lilypond.js:737
@@ -128,7 +128,7 @@ msgstr ""
 #: js/block.js:1198
 #: js/block.js:1884
 #: js/palette.js:818
-#: js/turtle.js:483
+#: js/turtle.js:487
 #: js/turtledefs.js:35
 #: js/basicblocks.js:1300
 #: js/basicblocks.js:3033
@@ -347,6 +347,10 @@ msgstr ""
 msgid "aeolian"
 msgstr ""
 
+#: js/block.js:5344
+msgid "Not a number"
+msgstr ""
+
 #: js/block.js:5548
 #: js/LocalCard.js:17
 msgid "Copy"
@@ -365,7 +369,7 @@ msgid "Move to trash"
 msgstr ""
 
 #: js/block.js:5552
-#: js/activity.js:995
+#: js/activity.js:891
 #: js/playback.js:77
 #: js/help.js:100
 #: js/status.js:57
@@ -387,7 +391,6 @@ msgid "Save stack"
 msgstr ""
 
 #: js/block.js:5558
-#: js/activity.js:3466
 #: js/turtledefs.js:154
 #: js/turtledefs.js:185
 #: js/toolbar.js:359
@@ -395,44 +398,44 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: js/activity.js:929
+#: js/activity.js:845
 msgid "Refresh your browser to change to advanced mode."
 msgstr ""
 
-#: js/activity.js:934
+#: js/activity.js:848
 msgid "Refresh your browser to change to beginner mode."
 msgstr ""
 
-#: js/activity.js:1205
-#: js/activity.js:1221
-#: js/turtle.js:1908
+#: js/activity.js:1096
+#: js/activity.js:1112
+#: js/turtle.js:1919
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "show Cartesian"
 msgstr ""
 
-#: js/activity.js:1217
+#: js/activity.js:1108
 #.TRANS: hide Polar coordinate overlay grid
 msgid "hide Polar"
 msgstr ""
 
-#: js/activity.js:1224
+#: js/activity.js:1115
 msgid "show Polar"
 msgstr ""
 
-#: js/activity.js:1228
+#: js/activity.js:1119
 #.TRANS: show Polar coordinate overlay grid
 msgid "hide Cartersian"
 msgstr ""
 
-#: js/activity.js:1621
+#: js/activity.js:1512
 msgid "This block is deprecated."
 msgstr ""
 
-#: js/activity.js:1623
+#: js/activity.js:1514
 msgid "Block cannot be found."
 msgstr ""
 
-#: js/activity.js:2551
+#: js/activity.js:2354
 #: js/SaveInterface.js:30
 #: js/SaveInterface.js:91
 #: js/SaveInterface.js:119
@@ -443,296 +446,70 @@ msgstr ""
 msgid "My Project"
 msgstr ""
 
-#: js/activity.js:2785
+#: js/activity.js:2518
 msgid "Please set browser zoom level to 100%"
 msgstr ""
 
-#: js/activity.js:3325
-#: js/toolbar.js:349
-#: js/toolbar.js:397
-msgid "About Music Blocks"
-msgstr ""
-
-#: js/activity.js:3327
-msgid "Turtle Blocks"
-msgstr ""
-
-#: js/activity.js:3401
-#: js/turtledefs.js:147
-#: js/toolbar.js:350
-#: js/toolbar.js:398
-#: js/playback.js:203
-#: js/musickeyboard.js:185
-#: js/pitchdrummatrix.js:125
-#: js/pitchtimematrix.js:180
-#: js/pitchtimematrix.js:1334
-#: js/pitchtimematrix.js:1334
-#: js/pitchtimematrix.js:1369
-#: js/pitchtimematrix.js:1369
-#: js/pitchtimematrix.js:1462
-#: js/pitchtimematrix.js:1462
-#: js/timbre.js:304
-#: js/timbre.js:304
-#: js/timbre.js:324
-#: js/timbre.js:324
-#: js/timbre.js:556
-#: js/tempo.js:235
-#: js/tempo.js:235
-#: js/rhythmruler.js:1683
-#: js/rhythmruler.js:1691
-#: js/rhythmruler.js:1691
-#: js/temperament.js:1421
-#: js/temperament.js:1421
-#: js/temperament.js:1541
-#: js/temperament.js:1541
-#: js/pitchstaircase.js:84
-msgid "Play"
-msgstr ""
-
-#: js/activity.js:3413
-#: js/activity.js:3417
-#: js/turtledefs.js:148
-#: js/turtledefs.js:184
-#: js/toolbar.js:351
-#: js/toolbar.js:399
-#: js/temperament.js:1417
-#: js/temperament.js:1417
-msgid "Stop"
-msgstr ""
-
-#: js/activity.js:3422
-#: js/toolbar.js:360
-#: js/toolbar.js:408
-msgid "Run slowly"
-msgstr ""
-
-#: js/activity.js:3425
-#: js/turtledefs.js:156
-#: js/turtledefs.js:183
-#: js/toolbar.js:361
-#: js/toolbar.js:409
-msgid "Run step by step"
-msgstr ""
-
-#: js/activity.js:3432
-#: js/turtledefs.js:149
-#: js/turtledefs.js:192
-#: js/toolbar.js:352
-#: js/toolbar.js:400
-#: js/StringHelper.js:19
-msgid "New project"
-msgstr ""
-
-#: js/activity.js:3438
-#: js/turtledefs.js:150
-#: js/turtledefs.js:193
-#: js/toolbar.js:353
-#: js/toolbar.js:401
-msgid "Load project from file"
-msgstr ""
-
-#: js/activity.js:3444
-msgid "Save Project"
-msgstr ""
-
-#: js/activity.js:3451
-#: js/turtledefs.js:152
-#: js/toolbar.js:356
-#: js/toolbar.js:404
-msgid "Find and share projects"
-msgstr ""
-
-#: js/activity.js:3458
-#: js/toolbar.js:357
-#: js/toolbar.js:405
-msgid "Offline. Sharing is unavailable"
-msgstr ""
-
-#: js/activity.js:3518
-#: js/turtledefs.js:151
-#: js/turtledefs.js:194
-#: js/toolbar.js:354
-#: js/toolbar.js:355
-#: js/toolbar.js:402
-#: js/toolbar.js:403
-msgid "Save project"
-msgstr ""
-
-#: js/activity.js:3523
-#: js/GlobalCard.js:34
-#: js/LocalCard.js:34
-msgid "Share project"
-msgstr ""
-
-#: js/activity.js:3527
-msgid "Offline. Sharing is unavailable."
-msgstr ""
-
-#: js/activity.js:3533
-#: js/toolbar.js:373
-#: js/toolbar.js:421
-msgid "Save as SVG"
-msgstr ""
-
-#: js/activity.js:3537
-#: js/toolbar.js:374
-#: js/toolbar.js:422
-msgid "Save as PNG"
-msgstr ""
-
-#: js/activity.js:3542
-#: js/toolbar.js:375
-#: js/toolbar.js:423
-msgid "Save as WAV"
-msgstr ""
-
-#: js/activity.js:3546
-#: js/turtledefs.js:196
-#: js/toolbar.js:377
-#: js/toolbar.js:425
-msgid "Save sheet music"
-msgstr ""
-
-#: js/activity.js:3550
-#: js/toolbar.js:376
-#: js/toolbar.js:424
-msgid "Save as ABC"
-msgstr ""
-
-#: js/activity.js:3555
-#: js/toolbar.js:378
-#: js/toolbar.js:426
-msgid "Save block artwork"
-msgstr ""
-
-#: js/activity.js:3565
-msgid "confirm"
-msgstr ""
-
-#: js/activity.js:3589
-#: js/toolbar.js:358
-#: js/toolbar.js:406
-msgid "Auxilary menu"
-msgstr ""
-
-#: js/activity.js:3600
-#: js/turtledefs.js:202
-#: js/toolbar.js:362
-#: js/toolbar.js:410
-msgid "Display statistics"
-msgstr ""
-
-#: js/activity.js:3607
-msgid "Load plugin from file"
-msgstr ""
-
-#: js/activity.js:3614
-#: js/turtledefs.js:203
-#: js/toolbar.js:364
-#: js/toolbar.js:412
-msgid "Delete plugin"
-msgstr ""
-
-#: js/activity.js:3637
-#: js/toolbar.js:365
-#: js/toolbar.js:413
-msgid "Enable horizontal scrolling"
-msgstr ""
-
-#: js/activity.js:3641
-#: js/toolbar.js:366
-#: js/toolbar.js:414
-msgid "Disable horizontal scrolling"
-msgstr ""
-
-#: js/activity.js:3654
-#: js/toolbar.js:367
-#: js/toolbar.js:415
-#: js/LocalCard.js:52
-msgid "Merge with current project"
-msgstr ""
-
-#: js/activity.js:3661
-#: js/turtledefs.js:161
-#: js/turtledefs.js:205
-#: js/toolbar.js:368
-#: js/toolbar.js:416
-msgid "Restore"
-msgstr ""
-
-#: js/activity.js:3669
-#: js/toolbar.js:370
-#: js/toolbar.js:418
-msgid "Switch to advanced mode"
-msgstr ""
-
-#: js/activity.js:3674
-#: js/toolbar.js:369
-#: js/toolbar.js:417
-msgid "Switch to beginner mode"
-msgstr ""
-
-#: js/activity.js:3682
-#: js/turtledefs.js:163
-#: js/turtledefs.js:204
-#: js/toolbar.js:371
-#: js/toolbar.js:419
-#: js/toolbar.js:428
-msgid "Select language"
-msgstr ""
-
-#: js/activity.js:3717
-#: js/activity.js:3717
-#: js/activity.js:3720
-#: js/activity.js:3720
+#: js/activity.js:3029
+#: js/activity.js:3029
+#: js/activity.js:3032
+#: js/activity.js:3032
 #: js/turtledefs.js:159
 #: js/turtledefs.js:190
 msgid "Home"
 msgstr ""
 
-#: js/activity.js:3730
+#: js/activity.js:3042
 msgid "Show/hide block"
 msgstr ""
 
-#: js/activity.js:3735
+#: js/activity.js:3047
 msgid "Expand/collapse blocks"
 msgstr ""
 
-#: js/activity.js:3740
+#: js/activity.js:3052
 #: js/turtledefs.js:164
 #: js/turtledefs.js:200
 msgid "Decrease block size"
 msgstr ""
 
-#: js/activity.js:3743
+#: js/activity.js:3055
 msgid "Cannot be further decreased"
 msgstr ""
 
-#: js/activity.js:3748
+#: js/activity.js:3060
 #: js/turtledefs.js:165
 #: js/turtledefs.js:201
 msgid "Increase block size"
 msgstr ""
 
-#: js/activity.js:3751
+#: js/activity.js:3063
 msgid "Cannot be further increased"
 msgstr ""
 
-#: js/activity.js:3774
+#: js/activity.js:3086
 #: js/turtledefs.js:170
 #: js/turtledefs.js:208
 msgid "About"
 msgstr ""
 
-#: js/activity.js:4160
+#: js/activity.js:3465
 msgid "Could not parse JSON input."
 msgstr ""
 
-#: js/activity.js:5057
-#: js/activity.js:5098
-#: js/activity.js:5124
-#: js/activity.js:5170
+#: js/activity.js:3963
+msgid "project undefined"
+msgstr ""
+
+#: js/activity.js:4252
+#: js/activity.js:4293
+#: js/activity.js:4319
+#: js/activity.js:4365
 msgid "Cannot load project from the file. Please check the file type."
+msgstr ""
+
+#: js/activity.js:4522
+msgid "Invalid parameters"
 msgstr ""
 
 #: js/logo.js:32
@@ -942,12 +719,20 @@ msgstr ""
 msgid "The Scalar Step Block must be used inside of a Note Block."
 msgstr ""
 
+#: js/logo.js:4335
+msgid "The Scalar Step Block must be preceded by a Pitch Block."
+msgstr ""
+
 #: js/logo.js:4446
 msgid "Noise Block: Did you mean to use a Note block?"
 msgstr ""
 
 #: js/logo.js:4526
 msgid "Drum Block: Did you mean to use a Note block?"
+msgstr ""
+
+#: js/logo.js:4591
+msgid "Scalar transpositions are equal to Semitone transpositions for custom temperament."
 msgstr ""
 
 #: js/logo.js:4998
@@ -1035,6 +820,10 @@ msgstr ""
 msgid "custom"
 msgstr ""
 
+#: js/logo.js:6970
+msgid "Synth not found"
+msgstr ""
+
 #: js/logo.js:7137
 msgid "Hertz Block: Did you mean to use a Note block?"
 msgstr ""
@@ -1054,6 +843,12 @@ msgstr ""
 
 #: js/logo.js:8621
 msgid "synth cannot play chords."
+msgstr ""
+
+#: js/logo.js:10016
+#: js/logo.js:10061
+#: js/logo.js:10069
+msgid "Invalid argument"
 msgstr ""
 
 #: js/logo.js:11158
@@ -1093,11 +888,11 @@ msgstr ""
 msgid "Warning: block argument type mismatch"
 msgstr ""
 
-#: js/logo.js:12348
+#: js/logo.js:12347
 msgid "Lilypond cannot process tempo of "
 msgstr ""
 
-#: js/logo.js:12376
+#: js/logo.js:12375
 msgid "Lilypond cannot process pickup of "
 msgstr ""
 
@@ -1211,9 +1006,9 @@ msgstr ""
 msgid "show"
 msgstr ""
 
-#: js/turtle.js:482
-#: js/turtle.js:660
-#: js/turtle.js:661
+#: js/turtle.js:486
+#: js/turtle.js:664
+#: js/turtle.js:665
 #: js/basicblocks.js:4151
 #: js/basicblocks.js:4163
 #: js/lilypond.js:586
@@ -1223,17 +1018,17 @@ msgstr ""
 msgid "start drum"
 msgstr ""
 
-#: js/turtle.js:1624
+#: js/turtle.js:1628
 msgid "Expand"
 msgstr ""
 
-#: js/turtle.js:1739
+#: js/turtle.js:1751
 #: js/turtledefs.js:167
 #: js/turtledefs.js:187
 msgid "Collapse"
 msgstr ""
 
-#: js/turtle.js:1827
+#: js/turtle.js:1838
 #: js/turtledefs.js:166
 #: js/turtledefs.js:186
 msgid "Clean"
@@ -1399,8 +1194,48 @@ msgid "Click to show the palettes of blocks and drag blocks from the palettes on
 msgstr ""
 
 #: js/turtledefs.js:147
+#: js/toolbar.js:350
+#: js/toolbar.js:398
+#: js/playback.js:203
+#: js/musickeyboard.js:185
+#: js/pitchdrummatrix.js:125
+#: js/pitchtimematrix.js:180
+#: js/pitchtimematrix.js:1334
+#: js/pitchtimematrix.js:1334
+#: js/pitchtimematrix.js:1369
+#: js/pitchtimematrix.js:1369
+#: js/pitchtimematrix.js:1462
+#: js/pitchtimematrix.js:1462
+#: js/timbre.js:304
+#: js/timbre.js:304
+#: js/timbre.js:324
+#: js/timbre.js:324
+#: js/timbre.js:556
+#: js/tempo.js:235
+#: js/tempo.js:235
+#: js/rhythmruler.js:1683
+#: js/rhythmruler.js:1691
+#: js/rhythmruler.js:1691
+#: js/temperament.js:1421
+#: js/temperament.js:1421
+#: js/temperament.js:1541
+#: js/temperament.js:1541
+#: js/pitchstaircase.js:84
+msgid "Play"
+msgstr ""
+
+#: js/turtledefs.js:147
 #: js/turtledefs.js:181
 msgid "Click the run button to run the project in fast mode."
+msgstr ""
+
+#: js/turtledefs.js:148
+#: js/turtledefs.js:184
+#: js/toolbar.js:351
+#: js/toolbar.js:399
+#: js/temperament.js:1417
+#: js/temperament.js:1417
+msgid "Stop"
 msgstr ""
 
 #: js/turtledefs.js:148
@@ -1415,7 +1250,22 @@ msgstr ""
 
 #: js/turtledefs.js:149
 #: js/turtledefs.js:192
+#: js/toolbar.js:352
+#: js/toolbar.js:400
+#: js/StringHelper.js:19
+msgid "New project"
+msgstr ""
+
+#: js/turtledefs.js:149
+#: js/turtledefs.js:192
 msgid "Initialize a new project."
+msgstr ""
+
+#: js/turtledefs.js:150
+#: js/turtledefs.js:193
+#: js/toolbar.js:353
+#: js/toolbar.js:401
+msgid "Load project from file"
 msgstr ""
 
 #: js/turtledefs.js:150
@@ -1425,7 +1275,22 @@ msgstr ""
 
 #: js/turtledefs.js:151
 #: js/turtledefs.js:194
+#: js/toolbar.js:354
+#: js/toolbar.js:355
+#: js/toolbar.js:402
+#: js/toolbar.js:403
+msgid "Save project"
+msgstr ""
+
+#: js/turtledefs.js:151
+#: js/turtledefs.js:194
 msgid "Save your project to a file."
+msgstr ""
+
+#: js/turtledefs.js:152
+#: js/toolbar.js:356
+#: js/toolbar.js:404
+msgid "Find and share projects"
 msgstr ""
 
 #: js/turtledefs.js:152
@@ -1454,6 +1319,13 @@ msgstr ""
 #: js/turtledefs.js:155
 #: js/turtledefs.js:182
 msgid "Click to run the project in slow mode."
+msgstr ""
+
+#: js/turtledefs.js:156
+#: js/turtledefs.js:183
+#: js/toolbar.js:361
+#: js/toolbar.js:409
+msgid "Run step by step"
 msgstr ""
 
 #: js/turtledefs.js:156
@@ -1497,6 +1369,13 @@ msgstr ""
 
 #: js/turtledefs.js:161
 #: js/turtledefs.js:205
+#: js/toolbar.js:368
+#: js/toolbar.js:416
+msgid "Restore"
+msgstr ""
+
+#: js/turtledefs.js:161
+#: js/turtledefs.js:205
 msgid "Restore blocks from the trash."
 msgstr ""
 
@@ -1508,6 +1387,14 @@ msgstr ""
 #: js/turtledefs.js:162
 #: js/turtledefs.js:198
 msgid "Switch between beginner and advance modes."
+msgstr ""
+
+#: js/turtledefs.js:163
+#: js/turtledefs.js:204
+#: js/toolbar.js:371
+#: js/toolbar.js:419
+#: js/toolbar.js:428
+msgid "Select language"
 msgstr ""
 
 #: js/turtledefs.js:163
@@ -1617,6 +1504,12 @@ msgid "This button opens a viewer for loading example projects."
 msgstr ""
 
 #: js/turtledefs.js:196
+#: js/toolbar.js:377
+#: js/toolbar.js:425
+msgid "Save sheet music"
+msgstr ""
+
+#: js/turtledefs.js:196
 msgid "Save your project to as a Lilypond file."
 msgstr ""
 
@@ -1629,7 +1522,19 @@ msgid "You can scroll the blocks on the canvas."
 msgstr ""
 
 #: js/turtledefs.js:202
+#: js/toolbar.js:362
+#: js/toolbar.js:410
+msgid "Display statistics"
+msgstr ""
+
+#: js/turtledefs.js:202
 msgid "Display statistics about your Music project."
+msgstr ""
+
+#: js/turtledefs.js:203
+#: js/toolbar.js:364
+#: js/toolbar.js:412
+msgid "Delete plugin"
 msgstr ""
 
 #: js/turtledefs.js:203
@@ -2772,14 +2677,85 @@ msgstr ""
 msgid "The Stop mouse block stops the specified mouse."
 msgstr ""
 
+#: js/toolbar.js:349
+#: js/toolbar.js:397
+msgid "About Music Blocks"
+msgstr ""
+
+#: js/toolbar.js:357
+#: js/toolbar.js:405
+msgid "Offline. Sharing is unavailable"
+msgstr ""
+
+#: js/toolbar.js:358
+#: js/toolbar.js:406
+msgid "Auxilary menu"
+msgstr ""
+
+#: js/toolbar.js:360
+#: js/toolbar.js:408
+msgid "Run slowly"
+msgstr ""
+
 #: js/toolbar.js:363
 #: js/toolbar.js:411
 msgid "Load plugin"
 msgstr ""
 
+#: js/toolbar.js:365
+#: js/toolbar.js:413
+msgid "Enable horizontal scrolling"
+msgstr ""
+
+#: js/toolbar.js:366
+#: js/toolbar.js:414
+msgid "Disable horizontal scrolling"
+msgstr ""
+
+#: js/toolbar.js:367
+#: js/toolbar.js:415
+#: js/LocalCard.js:52
+msgid "Merge with current project"
+msgstr ""
+
+#: js/toolbar.js:369
+#: js/toolbar.js:417
+msgid "Switch to beginner mode"
+msgstr ""
+
+#: js/toolbar.js:370
+#: js/toolbar.js:418
+msgid "Switch to advanced mode"
+msgstr ""
+
 #: js/toolbar.js:372
 #: js/toolbar.js:420
 msgid "Save as HTML"
+msgstr ""
+
+#: js/toolbar.js:373
+#: js/toolbar.js:421
+msgid "Save as SVG"
+msgstr ""
+
+#: js/toolbar.js:374
+#: js/toolbar.js:422
+msgid "Save as PNG"
+msgstr ""
+
+#: js/toolbar.js:375
+#: js/toolbar.js:423
+msgid "Save as WAV"
+msgstr ""
+
+#: js/toolbar.js:376
+#: js/toolbar.js:424
+msgid "Save as ABC"
+msgstr ""
+
+#: js/toolbar.js:378
+#: js/toolbar.js:426
+msgid "Save block artwork"
 msgstr ""
 
 #: js/toolbar.js:379
@@ -5266,6 +5242,10 @@ msgstr ""
 msgid "tap a rhythm"
 msgstr ""
 
+#: js/rhythmruler.js:549
+msgid "Maximum value of 256 has been exceeded."
+msgstr ""
+
 #: js/rhythmruler.js:1281
 #: js/synthutils.js:33
 #: js/musicutils.js:258
@@ -5873,6 +5853,11 @@ msgstr ""
 msgid "Like project"
 msgstr ""
 
+#: js/GlobalCard.js:34
+#: js/LocalCard.js:34
+msgid "Share project"
+msgstr ""
+
 #: js/GlobalCard.js:37
 #: js/LocalCard.js:37
 msgid "Share"
@@ -6337,16 +6322,28 @@ msgstr ""
 msgid "You need to select a file."
 msgstr ""
 
-#: js/turtledefs.js:23
-#~msgid "Music Blocks is a collection of tools for exploring musical concepts."
+#: js/activity.js:3327
+#~msgid "Turtle Blocks"
 #~msgstr ""
 
-#: js/turtledefs.js:365
+#: js/activity.js:3444
+#~msgid "Save Project"
+#~msgstr ""
+
+#: js/activity.js:3527
+#~msgid "Offline. Sharing is unavailable."
+#~msgstr ""
+
+#: js/activity.js:3565
+#~msgid "confirm"
+#~msgstr ""
+
+#: js/activity.js:3607
+#~msgid "Load plugin from file"
+#~msgstr ""
+
+#: js/turtledefs.js:369
 #~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
-#~msgstr ""
-
-#: js/SaveInterface.js:24
-#~msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
 #~msgstr ""
 
 #: js/StringHelper.js:30
