@@ -918,6 +918,7 @@ function Activity() {
     closeAnalytics = this.closeAnalytics;
     var th = this;
     doAnalytics = function () {
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
         myChart = docById('myChart');
 
@@ -954,7 +955,6 @@ function Activity() {
 
         options = getChartOptions(__callback);
         myRadarChart = new Chart(ctx).Radar(data, options);
-        toolbar.closeAuxToolbar(deltaY);
     };
 
     // DEPRECATED
@@ -2148,13 +2148,11 @@ function Activity() {
      * Sets up a new "clean" MB i.e. new project instance
      */
     _afterDelete = function () {
-
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
         sendAllToTrash(true, false);
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
         }
-
-        toolbar.closeAuxToolbar(deltaY);
     };
 
 
@@ -2328,8 +2326,8 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function () {
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
-        toolbar.closeAuxToolbar(deltaY);
     };
 
     /**
@@ -2338,6 +2336,7 @@ function Activity() {
      * If advanced, assigns custom title to html file 
      */
     this.doSave = function () {
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (beginnerMode) {
             save.saveHTML(_('My Project'));
         }
@@ -2360,7 +2359,7 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
-
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
         }
@@ -2379,7 +2378,6 @@ function Activity() {
         window.scroll(0, 0);
         that.doHardStopButton();
         _allClear();
-        toolbar.closeAuxToolbar(deltaY);
     };
 
     window.prepareExport = prepareExport;
