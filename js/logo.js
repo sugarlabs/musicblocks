@@ -4332,7 +4332,7 @@ function Logo () {
             }
 
             if (that.lastNotePlayed[turtle] == null) {
-                that.errorMsg('The Scalar Step Block must be preceded by a Pitch Block.', blk);
+                that.errorMsg(_('The Scalar Step Block must be preceded by a Pitch Block.'), blk);
                 that.stopTurtle = true;
                 break;
             }
@@ -4588,7 +4588,7 @@ function Logo () {
                     var obj = numberToPitch(Math.floor(arg0 + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch, that.pitchNumberOffset[turtle]);
 
                     if (that.synth.inTemperament == 'custom' && (that.scalarTransposition[turtle] + that.transposition[turtle]) !== 0) {
-                        that.errorMsg('Scalar transpositions are equal to Semitone transpositions for custom temperament.');
+                        that.errorMsg(_('Scalar transpositions are equal to Semitone transpositions for custom temperament.'));
                     }
                     
                     note = obj[0];
@@ -6967,7 +6967,7 @@ function Logo () {
             }
 
             if (synth === null) {
-                that.errorMsg(synth + 'not found', blk);
+                that.errorMsg(_('Synth not found'), blk);
                 synth = 'default';
             }
 
@@ -10013,7 +10013,7 @@ function Logo () {
                         var value = action_args[Number(name) - 1];
                         that.blocks.blockList[blk].value = value;
                     } else {
-                        that.errorMsg('Invalid argument', blk);
+                        that.errorMsg(_('Invalid argument'), blk);
                         that.blocks.blockList[blk].value = 0;
                     }
                 }
@@ -10058,7 +10058,7 @@ function Logo () {
                 // If an action block with an arg is clicked,
                 // the arg will have no value.
                 if (actionArgs == null) {
-                    that.errorMsg('Invalid argument', blk);
+                    that.errorMsg(_('Invalid argument'), blk);
                     that.blocks.blockList[blk].value = 0
                 }
 
@@ -10066,7 +10066,7 @@ function Logo () {
                     var value = actionArgs[Number(name) - 1];
                     that.blocks.blockList[blk].value = value;
                 } else {
-                    that.errorMsg('Invalid argument', blk);
+                    that.errorMsg(_('Invalid argument'), blk);
                     that.blocks.blockList[blk].value = 0
                 }
 

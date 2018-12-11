@@ -113,7 +113,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.bounds === null) {
             setTimeout(function () {
-                // Try regenerating the artwork
+                console.log('// Try regenerating the artwork');
                 that.regenerateArtwork(true, []);
                 that._createCache(callback, args, loopCount + 1);
             }, 100);
@@ -141,7 +141,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.bounds == null) {
             setTimeout(function () {
-                // console.log('UPDATE CACHE: BOUNDS NOT READY');
+                console.log('UPDATE CACHE: BOUNDS NOT READY');
                 that.updateCache(loopCount + 1);
             }, 200);
         } else {
@@ -5341,7 +5341,7 @@ function Block(protoblock, blocks, overrideName) {
 
             if (isNaN(this.value)) {
                 var thisBlock = this.blocks.blockList.indexOf(this);
-                this.blocks.errorMsg(newValue + ': Not a number', thisBlock);
+                this.blocks.errorMsg(newValue + ': ' + _('Not a number'), thisBlock);
                 this.blocks.refreshCanvas();
                 this.value = oldValue;
             }
