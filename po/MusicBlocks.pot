@@ -2846,6 +2846,10 @@ msgid "Alternatively, open the file in Music Blocks using the Load project butto
 msgstr ""
 
 #: js/SaveInterface.js:24
+msgid "Project Code"
+msgstr ""
+
+#: js/SaveInterface.js:24
 msgid "This code stores data about the blocks in a project."
 msgstr ""
 
@@ -6321,26 +6325,6 @@ msgstr ""
 #: plugins/heap.rtp:85
 msgid "You need to select a file."
 msgstr ""
-
-#: js/activity.js:3327
-#~msgid "Turtle Blocks"
-#~msgstr ""
-
-#: js/activity.js:3444
-#~msgid "Save Project"
-#~msgstr ""
-
-#: js/activity.js:3527
-#~msgid "Offline. Sharing is unavailable."
-#~msgstr ""
-
-#: js/activity.js:3565
-#~msgid "confirm"
-#~msgstr ""
-
-#: js/activity.js:3607
-#~msgid "Load plugin from file"
-#~msgstr ""
 
 #: js/turtledefs.js:369
 #~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
