@@ -3063,11 +3063,11 @@ msgstr "ミュージック・ブロックスのプロジェクト"
 
 #: js/SaveInterface.js:24
 msgid "This project was created in Music Blocks"
-msgstr "このプロジェクトは、<a href=\\"https://musicblocks.sugarlabs.org\\" target=\\"_blank\\">ミュージック・ブロックス</a>で作成されました。"
+msgstr "このプロジェクトは、ミュージック・ブロックスで作成されました。"
 
 #: js/SaveInterface.js:24
 msgid "Music Blocks is a Free/Libre Software application."
-msgstr "ミュージック・ブロックスは、音楽のちしきを楽しみながら身につけることのできる、<a href=\\"https://www.gnu.org/philosophy/free-sw.ja.html\\" target=\\"_blank\\">オープンソースのソフト</a>です。"
+msgstr "ミュージック・ブロックスは、音楽のちしきを楽しみながら身につけることのできる、オープンソースのソフトです。"
 
 #: js/SaveInterface.js:24
 msgid "The source code can be accessed at"
@@ -3079,7 +3079,7 @@ msgstr "もっと詳しく知りたい場合は、ミュージック・ブロッ
 
 #: js/SaveInterface.js:24
 msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
-msgstr "このプロジェクトをひらくには、ミュージック・ブロックスにアクセスし、このファイルをアプリケーションのウィンドウにドラッグするか、 "
+msgstr "このプロジェクトをひらくには、ミュージック・ブロックスにアクセスし、このファイルをアプリケーションのウィンドウにドラッグするか、"
 
 #: js/SaveInterface.js:24
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
