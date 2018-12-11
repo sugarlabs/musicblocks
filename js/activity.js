@@ -918,9 +918,7 @@ function Activity() {
     closeAnalytics = this.closeAnalytics;
     var th = this;
     doAnalytics = function () {
-	deltaY(-55 - LEADING);  // DO WE NEED THIS?
-        toolbar.closeAuxToolbar();
-
+        
         blocks.activeBlock = null;
         myChart = docById('myChart');
 
@@ -957,6 +955,7 @@ function Activity() {
 
         options = getChartOptions(__callback);
         myRadarChart = new Chart(ctx).Radar(data, options);
+        toolbar.closeAuxToolbar(deltaY);
     };
 
     // DEPRECATED
@@ -1954,9 +1953,6 @@ function Activity() {
             return;
         }
 
-        // If any menus were open, close them.
-        toolbar.closeAuxToolbar();  // DO WE NEED THIS?
-
         var smallSide = Math.min(w, h);
 
         if (smallSide < cellSize * 9) {
@@ -2048,7 +2044,6 @@ function Activity() {
         }
 
         blocks.activeBlock = null;
-        toolbar.closeAuxToolbar();
         refreshCanvas();
 
         var dx = 0;
@@ -2154,14 +2149,13 @@ function Activity() {
      * Sets up a new "clean" MB i.e. new project instance
      */
     _afterDelete = function () {
-       toolbar.closeAuxToolbar();
+       
         sendAllToTrash(true, false);
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
         }
 
-       // confirmContainer.visible = false;
-       deltaY(-55 - LEADING);
+        toolbar.closeAuxToolbar(deltaY);
     };
 
 
@@ -2335,12 +2329,8 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function () {
-	if (auxToolbar.style.display === 'block') {
-            toolbar.closeAuxToolbar();
-	    deltaY(-55 - LEADING);
-	}
-
         planet.openPlanet();
+        toolbar.closeAuxToolbar(deltaY);
     };
 
     /**
@@ -2350,7 +2340,6 @@ function Activity() {
      */
     this.doSave = function () {
         if (beginnerMode) {
-            toolbar.closeAuxToolbar();
             save.saveHTML(_('My Project'));
         }
     };
@@ -2372,7 +2361,7 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
-        toolbar.closeAuxToolbar();
+        
         if (merge === undefined) {
             merge = false;
         }
@@ -2391,6 +2380,7 @@ function Activity() {
         window.scroll(0, 0);
         that.doHardStopButton();
         _allClear();
+        toolbar.closeAuxToolbar(deltaY);
     };
 
     window.prepareExport = prepareExport;

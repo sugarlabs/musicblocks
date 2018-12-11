@@ -469,12 +469,15 @@ function Toolbar() {
         tooltipsDisabled = true;
     }
 
-    this.closeAuxToolbar = function() {
+    this.closeAuxToolbar = function(deltaY) {
         if (auxToolbar.style.display === 'block') {
             var menuIcon = docById('menu');
             auxToolbar.style.display = 'none';
             menuIcon.innerHTML = 'menu';
             docById('toggleAuxBtn').className -= 'blue darken-1';
+            if(deltaY !== undefined) {
+                deltaY(-55 - LEADING);
+            }
         }
     }
 };
