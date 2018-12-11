@@ -1387,7 +1387,7 @@ msgstr "アート"
 
 #: js/turtledefs.js:144
 #: js/turtledefs.js:175
-## Maybe just have "Music Blocks" in roman. Otherwise, ミュージック・ブロックス
+## Maybe just have Music Blocks in roman. Otherwise, ミュージック・ブロックス
 msgid "Welcome to Music Blocks"
 msgstr "ミュージック・ブロックスへようこそ"
 
@@ -1680,7 +1680,7 @@ msgstr "もっとくわしく知るには"
 #: js/turtledefs.js:207
 ## しょうさい＝詳細
 msgid "A detailed guide to Music Blocks is available."
-msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。<br><a href=\\"https://github.com/sugarlabs/musicblocks/tree/master/guide-ja\\" target=\\"_blank\\">https://github.com/sugarlabs/musicblocks/tree/master/guide-ja</a>"
+msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。"
 
 #: js/turtledefs.js:169
 #: js/turtledefs.js:207
@@ -1691,7 +1691,7 @@ msgstr "ミュージック・ブロックスガイド"
 #: js/turtledefs.js:170
 #: js/turtledefs.js:208
 msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
-msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、<a href=\\"https://www.gnu.org/philosophy/free-sw.ja.html\\" target=\\"_blank\\">オープンソース</a>のツールだ。"
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。"
 
 #: js/turtledefs.js:170
 #: js/turtledefs.js:208
