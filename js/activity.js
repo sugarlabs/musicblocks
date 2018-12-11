@@ -44,7 +44,7 @@ function Activity() {
     _loadStart = this._loadStart;
     _setupAndroidToolbar = this._setupAndroidToolbar;;
     _loadButtonDragHandler = this._loadButtonDragHandler;
-    
+
     if (_THIS_IS_TURTLE_BLOCKS_) {
         function facebookInit() {
             window.fbAsyncInit = function () {
@@ -228,7 +228,7 @@ function Activity() {
         pluginChooser = docById('myOpenPlugin');
         // The file chooser for all files.
         allFilesChooser = docById('myOpenAll');
-        auxToolbar  = docById('aux-toolbar');
+        auxToolbar = docById('aux-toolbar');
 
         // Are we running off of a server?
         server = true;
@@ -255,7 +255,7 @@ function Activity() {
         chartBitmap = null;
         merging = false;
         loading = false;
-	// On-screen buttons
+        // On-screen buttons
         smallerContainer = null;
         largerContainer = null;
         smallerOffContainer = null;
@@ -361,7 +361,7 @@ function Activity() {
         pluginsImages = {};
 
     }
-    
+
     window.onblur = function () {
         that.doHardStopButton(true);
     };
@@ -379,14 +379,14 @@ function Activity() {
         logo.showBlocks();
         blocksContainer.x = 0;
         blocksContainer.y = 0;
-        
-        
-    if (auxToolbar.style.display === 'block') {
+
+
+        if (auxToolbar.style.display === 'block') {
             toppos = 90 + toolbarHeight;
         } else {
             toppos = 90;
         }
-        
+
 
 
         palettes.updatePalettes();
@@ -903,7 +903,7 @@ function Activity() {
      * @return {boolean} {if canvas is blank }
      * Checks if the canvas is blank 
      */
-    function _isCanvasBlank (canvas) {
+    function _isCanvasBlank(canvas) {
         var blank = document.createElement('canvas');
         blank.width = canvas.width;
         blank.height = canvas.height;
@@ -918,7 +918,6 @@ function Activity() {
     closeAnalytics = this.closeAnalytics;
     var th = this;
     doAnalytics = function () {
-        
         blocks.activeBlock = null;
         myChart = docById('myChart');
 
@@ -1347,7 +1346,7 @@ function Activity() {
             unescape(encodeURIComponent(svgData)));
     };
 
-    
+
     /**
      * Some error messages have special artwork.
      */
@@ -1990,8 +1989,8 @@ function Activity() {
 
         trashcan.resizeEvent(turtleBlocksScale);
 
-	// We need to reposition the palette buttons
-	_setupPaletteMenu(turtleBlocksScale);
+        // We need to reposition the palette buttons
+        _setupPaletteMenu(turtleBlocksScale);
 
         // Reposition coordinate grids.
         cartesianBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (600);
@@ -2149,7 +2148,7 @@ function Activity() {
      * Sets up a new "clean" MB i.e. new project instance
      */
     _afterDelete = function () {
-       
+
         sendAllToTrash(true, false);
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
@@ -2172,7 +2171,7 @@ function Activity() {
      * Then deletes everything/sends all to trash
      */
     sendAllToTrash = function (addStartBlock, doNotSave) {
-        
+
         for (var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2295,7 +2294,7 @@ function Activity() {
     this.onRunTurtle = function () {
         // TODO: plugin support
         // If the stop button is hidden, show it.
-	/*
+        /*
         if (stopTurtleContainer === null) {
             return;
         }
@@ -2312,13 +2311,13 @@ function Activity() {
     function refreshCanvas() {
         update = true;
     };
-    
+
     /**
      * This set makes it so the stage only re-renders when an
      * event handler indicates a change has happened. 
      */
     this.__tick = function (event) {
-        
+
         if (update || createjs.Tween.hasActiveTweens()) {
             update = false; // Only update once
             stage.update(event);
@@ -2361,7 +2360,7 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
-        
+
         if (merge === undefined) {
             merge = false;
         }
@@ -2775,7 +2774,7 @@ function Activity() {
     //     closeSubMenus();
     //     blocks.pasteStack();
     // };
-   
+
     /**
      * We don't save blocks in the trash, so we need to
      * consolidate the block list and remap the connections.
@@ -2784,7 +2783,7 @@ function Activity() {
      * playback queue if we are saving to Lilypond.
      */
     function prepareExport() {
-        
+
         var blockMap = [];
         var hasMatrixDataBlock = false;
         for (var blk = 0; blk < blocks.blockList.length; blk++) {
@@ -2944,7 +2943,7 @@ function Activity() {
     };
 
     _hideStopButton = function () {
-	/*
+        /*
         if (stopTurtleContainer === null) {
             return;
         }
@@ -2955,7 +2954,7 @@ function Activity() {
     };
 
     _showStopButton = function () {
-	/*
+        /*
         if (stopTurtleContainer === null) {
             return;
         }
@@ -3292,7 +3291,7 @@ function Activity() {
      * 
      * Handles button dragging, long hovering and prevents multiple button presses
      */
-    this._loadButtonDragHandler = function (container, ox, oy, action, hoverAction) { 
+    this._loadButtonDragHandler = function (container, ox, oy, action, hoverAction) {
         // Prevent multiple button presses (i.e., debounce).
         var lockTimer = null;
         var locked = false;
@@ -4460,57 +4459,57 @@ function Activity() {
                     if (newUrlParts[i].indexOf('=') > 0) {
                         var args = newUrlParts[i].split('=');
                         switch (args[0].toLowerCase()) {
-                        case 'file':
-                            console.log('Warning: old Music Blocks URLs will no longer work.');
-                            break;
-                        case 'id':
-                            projectID = args[1];
-                            break;
-                        case 'run':
-                            if (args[1].toLowerCase() === 'true')
-                                flags.run = true;
-                            break;
-                        case 'show':
-                            if (args[1].toLowerCase() === 'true')
-                                flags.show = true;
-                            break;
-                        case 'collapse':
-                            if (args[1].toLowerCase() === 'true')
-                                flags.collapse = true;
-                            break;
-                        case 'inurl':
-                            var url = args[1];
-                            var getJSON = function (url) {
-                                return new Promise(function (resolve, reject) {
-                                    var xhr = new XMLHttpRequest();
-                                    xhr.open('get', url, true);
-                                    xhr.responseType = 'json';
-                                    xhr.onload = function () {
-                                        var status = xhr.status;
-                                        if (status === 200) {
-                                            resolve(xhr.response);
-                                        } else {
-                                            reject(status);
-                                        }
-                                    };
-                                    xhr.send();
-                                });
-                            };
+                            case 'file':
+                                console.log('Warning: old Music Blocks URLs will no longer work.');
+                                break;
+                            case 'id':
+                                projectID = args[1];
+                                break;
+                            case 'run':
+                                if (args[1].toLowerCase() === 'true')
+                                    flags.run = true;
+                                break;
+                            case 'show':
+                                if (args[1].toLowerCase() === 'true')
+                                    flags.show = true;
+                                break;
+                            case 'collapse':
+                                if (args[1].toLowerCase() === 'true')
+                                    flags.collapse = true;
+                                break;
+                            case 'inurl':
+                                var url = args[1];
+                                var getJSON = function (url) {
+                                    return new Promise(function (resolve, reject) {
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.open('get', url, true);
+                                        xhr.responseType = 'json';
+                                        xhr.onload = function () {
+                                            var status = xhr.status;
+                                            if (status === 200) {
+                                                resolve(xhr.response);
+                                            } else {
+                                                reject(status);
+                                            }
+                                        };
+                                        xhr.send();
+                                    });
+                                };
 
-                            getJSON(url).then(function (data) {
-                                // console.log('Your JSON result is:  ' + data.arg);
-                                n = data.arg;
-                                env.push(parseInt(n));
-                            }, function (status) {
-                                alert('Something went wrong reading JSON-encoded project data.');
-                            });
-                            break;
-                        case 'outurl':
-                            var url = args[1];
-                            break;
-                        default:
-                            errorMsg(_('Invalid parameters'));
-                            break;
+                                getJSON(url).then(function (data) {
+                                    // console.log('Your JSON result is:  ' + data.arg);
+                                    n = data.arg;
+                                    env.push(parseInt(n));
+                                }, function (status) {
+                                    alert('Something went wrong reading JSON-encoded project data.');
+                                });
+                                break;
+                            case 'outurl':
+                                var url = args[1];
+                                break;
+                            default:
+                                errorMsg(_('Invalid parameters'));
+                                break;
                         }
                     }
                 }
