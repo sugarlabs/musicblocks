@@ -49,13 +49,13 @@ function ProjectViewer(Planet) {
             tagcontainer.appendChild(chip);
         }
 
-        // if (Planet.ProjectStorage.isReported(this.id)){
-        //     document.getElementById('projectviewer-report-project').classList.add('disabled');
-        //     document.getElementById('projectviewer-report-project').textContent = this.ReportDisabledButton;
-        // } else {
-        //     document.getElementById('projectviewer-report-project').classList.remove('disabled');
-        //     document.getElementById('projectviewer-report-project').textContent = this.ReportEnabledButton;
-        // }
+        if (Planet.ProjectStorage.isReported(this.id)){
+            document.getElementById('projectviewer-report-project').style.display = 'none';
+            document.getElementById('projectviewer-report-project-disabled').style.display = 'block';
+        } else {
+            document.getElementById('projectviewer-report-project').style.display = 'block';
+            document.getElementById('projectviewer-report-project-disabled').style.display = 'none';
+        }
 
         jQuery('#projectviewer').modal('open');
     };
@@ -109,8 +109,8 @@ function ProjectViewer(Planet) {
         if (data.success) {
             document.getElementById('submittext').textContent = this.ReportSuccess;
             Planet.ProjectStorage.report(this.id,true);
-            document.getElementById('projectviewer-report-project').classList.add('disabled');
-            document.getElementById('projectviewer-report-project').value = this.ReportDisabledButton;
+            document.getElementById('projectviewer-report-project').style.display = 'none';
+            document.getElementById('projectviewer-report-project-disabled').style.display = 'block';
         } else {
             document.getElementById('submittext').textContent = this.ReportError;
         }

@@ -296,7 +296,7 @@ a {
 	padding-bottom: 75%;
 }
 
-#projectviewer-report-project {
+#projectviewer-report-project, #projectviewer-report-project-disabled {
 	padding-top: 10px;
 	padding-right: 5px;
 }
