@@ -297,7 +297,11 @@ a {
 }
 
 .report-project-div {
-	position: absolute;
+	position: relative;
+}
+
+.modal {
+	width: 80% !important;
 }
 
 .report-card {
