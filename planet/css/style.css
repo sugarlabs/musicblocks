@@ -296,12 +296,12 @@ a {
 	padding-bottom: 75%;
 }
 
-.report-project-div {
-	position: relative;
+#projectviewer-report-project {
+	padding: 1%;
 }
 
-.modal {
-	width: 80% !important;
+.report-project-div {
+	position: relative;
 }
 
 .report-card {

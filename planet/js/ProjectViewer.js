@@ -49,13 +49,13 @@ function ProjectViewer(Planet) {
             tagcontainer.appendChild(chip);
         }
 
-        if (Planet.ProjectStorage.isReported(this.id)){
-            document.getElementById('projectviewer-report-project').classList.add('disabled');
-            document.getElementById('projectviewer-report-project').textContent = this.ReportDisabledButton;
-        } else {
-            document.getElementById('projectviewer-report-project').classList.remove('disabled');
-            document.getElementById('projectviewer-report-project').textContent = this.ReportEnabledButton;
-        }
+        // if (Planet.ProjectStorage.isReported(this.id)){
+        //     document.getElementById('projectviewer-report-project').classList.add('disabled');
+        //     document.getElementById('projectviewer-report-project').textContent = this.ReportDisabledButton;
+        // } else {
+        //     document.getElementById('projectviewer-report-project').classList.remove('disabled');
+        //     document.getElementById('projectviewer-report-project').textContent = this.ReportEnabledButton;
+        // }
 
         jQuery('#projectviewer').modal('open');
     };
