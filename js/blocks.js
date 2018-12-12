@@ -709,7 +709,7 @@ function Blocks (activity) {
          * @return number of vspace blocks found below this block
          */
         var __howManyVSpaceBlocksBelow = function (blk) {
-           
+   
             var nextBlock = last(that.blockList[blk].connections);
             if (nextBlock && that.blockList[nextBlock].name === 'vspace') {
                 return 1 + __howManyVSpaceBlocksBelow(nextBlock);
@@ -1360,6 +1360,8 @@ function Blocks (activity) {
         // Is the added block above or below?
         var insertAfterDefault = true;
 
+	console.log('moving ' + this.blockList[thisBlock].name);
+
         for (var b = 0; b < this.blockList.length; b++) {
             // Don't connect to yourself.
             if (b === thisBlock) {
@@ -1371,6 +1373,14 @@ function Blocks (activity) {
                 continue;
             }
 
+            if (COLLAPSIBLES.indexOf(this.blockList[b].name) !== -1) {
+		if (INLINECOLLAPSIBLES.indexOf(this.blockList[b].name) === -1) {
+		    if (this.blockList[b].collapsed) {
+			continue;
+		    }
+		}
+	    }
+		
             // Don't connect to a block in the trash.
             if (this.blockList[b].trash) {
                 continue;
@@ -4899,7 +4909,6 @@ function Blocks (activity) {
                         console.log(TEMPERAMENT['custom']);
                         that.logo.customTemperamentDefined = true;     //This is for custom pitch pie menu
                     }
-                   
                 };
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
                 break;
