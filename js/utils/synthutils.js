@@ -52,7 +52,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
     //.TRANS: polytone synthesizer
-    [_('default'), 'default', 'images/synth.svg', 'electronic'],
+    [_('electronic synth'), 'electronic synth', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
     [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -698,8 +698,8 @@ function Synth() {
     this.createDefaultSynth = function (turtle) {
         console.log('create default poly/default/custom synth for turtle ' + turtle);
         var default_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth).toMaster();
-        instruments[turtle]['default'] = default_synth;
-        instrumentsSource['default'] = [0, 'default'];
+        instruments[turtle]['electronic synth'] = default_synth;
+        instrumentsSource['electronic synth'] = [0, 'electronic synth'];
         instruments[turtle]['custom'] = default_synth;
         instrumentsSource['custom'] = [0, 'custom'];
     };
@@ -1061,7 +1061,7 @@ function Synth() {
         }
 
         var tempNotes = notes;
-        var tempSynth = instruments[turtle]['default'];
+        var tempSynth = instruments[turtle]['electronic synth'];
         var flag = 0;
         if (instrumentName in instruments[turtle]) {
             tempSynth = instruments[turtle][instrumentName];

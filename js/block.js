@@ -2718,7 +2718,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) === -1) {
                     var label = _(DRUMNAMES[i][1]);
-                    if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                    if (getTextWidth(label, 'bold 30pt Sans') > 400) {
                         drumLabels.push(label.substr(0, 8) + '...');
                     } else {
                         drumLabels.push(label);
@@ -2750,7 +2750,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) !== -1) {
                     var label = _(DRUMNAMES[i][1]);
-                    if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                    if (getTextWidth(label, 'Bold 30pt Sans') > 400) {
                         effectLabels.push(label.substr(0, 8) + '...');
                     } else {
                         effectLabels.push(label);
@@ -2817,7 +2817,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 var label = _(VOICENAMES[i][1]);
-                if (getTextWidth(label, 'bold 48pt Sans') > 400) {
+                if (getTextWidth(label, 'bold 30pt Sans') > 400) {
                     voiceLabels.push(label.substr(0, 8) + '...');
                 } else {
                     voiceLabels.push(label);
@@ -2848,7 +2848,7 @@ function Block(protoblock, blocks, overrideName) {
             var categoriesList = [];
             for (var i = 0; i < NOISENAMES.length; i++) {
                 var label = NOISENAMES[i][0];
-                if (getTextWidth(label, 'bold 48pt Sans') > 600) {
+                if (getTextWidth(label, 'bold 30pt Sans') > 600) {
                     noiseLabels.push(label.substr(0, 16) + '...');
                 } else {
                     noiseLabels.push(label);
@@ -3499,19 +3499,19 @@ function Block(protoblock, blocks, overrideName) {
             if (!custom) {
                 obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
             }
-            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, 'default');
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.logo.setSynthVolume(0, 'default', PREVIEWVOLUME);
-            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, 'default', null, null);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
 
             __selectionChanged();
         };
@@ -3668,19 +3668,19 @@ function Block(protoblock, blocks, overrideName) {
             // FIX ME: get moveable if available
 
             var noteName = scaleDegreeToPitch('C major', note);
-            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, 'default');
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, 'default', null, null);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, DEFAULTVOICE, null, null);
 
             __selectionChanged();
         };
@@ -4565,12 +4565,12 @@ function Block(protoblock, blocks, overrideName) {
 
         // Special case for Japanese
         var language = localStorage.languagePreference;
-        if (language === 'ja') {
+        // if (language === 'ja') {
             for (var i = 0; i < this._voiceWheel.navItems.length; i++) {
                 this._voiceWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
                 this._voiceWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
             }
-        }
+        // }
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -4619,7 +4619,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 that.blocks.logo.instrumentNames[0].push(voice);
-                if (voice === 'default') {
+                if (voice === DEFAULTVOICE) {
                     that.blocks.logo.synth.createDefaultSynth(0);
                 }
 
@@ -4836,19 +4836,19 @@ function Block(protoblock, blocks, overrideName) {
             var obj = getNote('C', 4, INTERVALVALUES[that.value][0], 'C major', false, null, null);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
 
-            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, 'default');
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, 'default', null, null);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
         };
 
         // Set up handlers for preview.
@@ -5123,19 +5123,19 @@ function Block(protoblock, blocks, overrideName) {
             var obj = getNote(key, 4, i + o, key + ' chromatic', false, null, null);
             obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
 
-            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf('default') === -1) {
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push('default');
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, 'default');
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, 'default', DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, 'default', null, null);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
         };
 
         var __playScale = function (activeTabs, idx) {

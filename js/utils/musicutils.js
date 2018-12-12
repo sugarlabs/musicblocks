@@ -262,7 +262,7 @@ const SELECTORSTRINGS = [
     _('saxophone'),
     _('tuba'),
     _('trumpet'),
-    _('default'),
+    _('electronic synth'),
     _('simple 1'),
     _('simple 2'),
     _('simple 3'),
@@ -631,7 +631,7 @@ const TEMPERAMENT = {
 
 const DEFAULTINVERT = 'even';
 const DEFAULTINTERVAL = 'perfect' + ' 5';
-const DEFAULTVOICE = 'default';
+const DEFAULTVOICE = 'electronic synth';
 const DEFAULTNOISE = 'noise1';
 const DEFAULTDRUM = 'kick drum';
 const DEFAULTEFFECT = 'duck';

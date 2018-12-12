@@ -687,7 +687,7 @@ function ModeWidget() {
             that._lastNotePlayed = cell;
 
             var noteToPlay = getNote(that._pitch, 4, that.cells[i], '', false, null, that._logo.errorMsg);
-            that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, 'default', null, null);
+            that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
             that.__playNextNote(time, noteCounter + 1);
         }, 1000 * time);
     };
@@ -701,7 +701,7 @@ function ModeWidget() {
         var cell = table.rows[MODEMAP[idx][0]].cells[MODEMAP[idx][1]];
         if (cell.style.backgroundColor === 'black') {
             var noteToPlay = getNote(this._pitch, 4, idx, '', false, null, this._logo.errorMsg);
-            this._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, 'default', null, null);
+            this._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, DEFAULTVOICE, null, null);
         }
     };
 

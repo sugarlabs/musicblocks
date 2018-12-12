@@ -49,7 +49,7 @@ function PitchSlider() {
     this._play = function (cell) {
         var cellIndex = cell.cellIndex;
         var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
-        this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
+        this._logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
         return;
     };
 

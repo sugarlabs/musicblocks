@@ -1230,10 +1230,10 @@ function Logo () {
         this.oscList[turtle] = {};
         this.bpm[turtle] = [];
         this.inSetTimbre[turtle] = false;
-        this.instrumentNames[turtle] = ['default'];
+        this.instrumentNames[turtle] = ['electronic synth'];
         this.inCrescendo[turtle] = [];
         this.crescendoDelta[turtle] = [];
-        this.crescendoInitialVolume[turtle] = {'default': [DEFAULTVOLUME]};
+        this.crescendoInitialVolume[turtle] = {'electronic synth': [DEFAULTVOLUME]};
         this.intervals[turtle] = [];
         this.semitoneIntervals[turtle] = [];
         this.markup[turtle] = [];
@@ -6825,7 +6825,7 @@ function Logo () {
         case 'setsynthvolume':
             if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = 'default';
+                var arg0 = 'electronic synth';
             } else {
                 var arg0 = args[0];
             }
@@ -6849,8 +6849,8 @@ function Logo () {
 
             var synth = null;
 
-            if (arg0 === 'default' || arg0 ===  _('default')) {
-                synth = 'default';
+            if (arg0 === 'electronic synth' || arg0 ===  _('electronic synth')) {
+                synth = 'electronic synth';
             } else if (arg0 === 'custom' || arg0 ===  _('custom')) {
                 synth = 'custom';
             }
@@ -6881,7 +6881,7 @@ function Logo () {
 
             if (synth === null) {
                 that.errorMsg(synth + 'not found', blk);
-                synth = 'default';
+                synth = 'electronic synth';
             }
 
             if (that.instrumentNames[turtle].indexOf(synth) === -1) {
@@ -6912,7 +6912,7 @@ function Logo () {
 
             if (args[0] === null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = 'default';
+                var arg0 = 'electronic synth';
             } else {
                 var arg0 = args[0];
             }
@@ -6936,8 +6936,8 @@ function Logo () {
 
             var synth = null;
 
-            if (arg0 === 'default' || arg0 ===  _('default')) {
-                synth = 'default';
+            if (arg0 === 'electronic synth' || arg0 ===  _('electronic synth')) {
+                synth = 'electronic synth';
             } else if (arg0 === 'custom' || args[0] ===  _('custom')) {
                 synth = 'custom';
             }
@@ -6968,7 +6968,7 @@ function Logo () {
 
             if (synth === null) {
                 that.errorMsg(_('Synth not found'), blk);
-                synth = 'default';
+                synth = 'electronic synth';
             }
 
             if (that.instrumentNames[turtle].indexOf(synth) === -1) {
@@ -8039,11 +8039,11 @@ function Logo () {
         if (this.inCrescendo[turtle].length > 0 && this.crescendoDelta[turtle].length === 0) {
             this.inCrescendo[turtle].pop();
             for (var synth in this.synthVolume[turtle]) {
-                this.setSynthVolume(turtle, 'default', last(this.synthVolume[turtle][synth]));
+                this.setSynthVolume(turtle, 'electronic synth', last(this.synthVolume[turtle][synth]));
                 this._playbackPush(turtle, [this.previousTurtleTime[turtle], 'setsynthvolume', synth, last(this.synthVolume[turtle][synth])]);
             }
         } else if (this.crescendoDelta[turtle].length > 0) {
-            if (last(this.synthVolume[turtle]['default']) === last(this.crescendoInitialVolume[turtle]['default']) && this.justCounting[turtle].length === 0) {
+            if (last(this.synthVolume[turtle]['electronic synth']) === last(this.crescendoInitialVolume[turtle]['electronic synth']) && this.justCounting[turtle].length === 0) {
                 this.notationBeginCrescendo(turtle, last(this.crescendoDelta[turtle]));
             }
 
@@ -8688,11 +8688,11 @@ function Logo () {
                                             }
                                         } else {
                                             if (!that.suppressOutput[turtle]) {
-                                                that.synth.trigger(turtle, notes[d], beatValue, 'default', paramsEffects, null, false);
+                                                that.synth.trigger(turtle, notes[d], beatValue, 'electronic synth', paramsEffects, null, false);
                                             }
 
                                             if (that.justCounting[turtle].length === 0) {
-                                                that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'default', __getParamsEffects(paramsEffects), null]);
+                                                that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'electronic synth', __getParamsEffects(paramsEffects), null]);
                                             }
                                         }
                                     }
@@ -9728,7 +9728,7 @@ function Logo () {
      * @returns {void}
      */
     this.resetSynth = function (turtle) {
-        if (!('default' in instruments[turtle])) {
+        if (!('electronic synth' in instruments[turtle])) {
             this.synth.createDefaultSynth(turtle);
         }
 
@@ -12058,7 +12058,7 @@ function Logo () {
             }
 
             // Make sure there is a default synth for each turtle
-            if (!('default' in instruments[turtle])) {
+            if (!('electronic synth' in instruments[turtle])) {
                 this.synth.createDefaultSynth(turtle);
             }
 
@@ -12079,7 +12079,7 @@ function Logo () {
                 }
             }
 
-            this.synthVolume[turtle] = {'default': [DEFAULTVOLUME],
+            this.synthVolume[turtle] = {'electronic synth': [DEFAULTVOLUME],
                                         'noise1': [DEFAULTVOLUME],
                                         'noise2': [DEFAULTVOLUME],
                                         'noise3': [DEFAULTVOLUME]};

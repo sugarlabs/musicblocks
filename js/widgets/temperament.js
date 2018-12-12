@@ -335,7 +335,7 @@ function TemperamentWidget () {
             that.temporaryRatios = that.ratios.slice();
             that.temporaryRatios[i] = ratio;
             that._logo.resetSynth(0);
-            that._logo.synth.trigger(0, frequency, that._logo.defaultBPMFactor * 0.01, 'default', null, null);
+            that._logo.synth.trigger(0, frequency, that._logo.defaultBPMFactor * 0.01, 'electronic synth', null, null);
             that.createMainWheel(that.temporaryRatios);
         };
 
@@ -1179,7 +1179,7 @@ function TemperamentWidget () {
         }
         var pitchNumber = this.tempRatios.length - 1;
         this._logo.resetSynth(0);
-        this._logo.synth.trigger(0, frequency, this._logo.defaultBPMFactor * 0.01, 'default', null, null);
+        this._logo.synth.trigger(0, frequency, this._logo.defaultBPMFactor * 0.01, 'electronic synth', null, null);
         this._createInnerWheel(this.tempRatios, pitchNumber);
     }
 
@@ -1402,7 +1402,7 @@ function TemperamentWidget () {
             var notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
         }
         
-        this._logo.synth.trigger(0, notes, this._logo.defaultBPMFactor * duration, 'default', null, null);
+        this._logo.synth.trigger(0, notes, this._logo.defaultBPMFactor * duration, 'electronic synth', null, null);
     };
 
     this.playAll = function() {
@@ -1440,7 +1440,7 @@ function TemperamentWidget () {
                 p++;
             }
             if (that._playing) {
-                that._logo.synth.trigger(0, startPitch, that._logo.defaultBPMFactor * duration, 'default', null, null);
+                that._logo.synth.trigger(0, startPitch, that._logo.defaultBPMFactor * duration, 'electronic synth', null, null);
                 that.playNote(i);
             }
 

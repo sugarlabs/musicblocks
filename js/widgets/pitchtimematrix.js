@@ -214,7 +214,7 @@ function PitchTimeMatrix () {
                 that._rowMap[i] = i;
             }
 
-            that._logo.synth.stopSound(0, 'default');
+            that._logo.synth.stopSound(0, DEFAULTVOICE);
             that._logo.synth.stop();
             that._stopOrCloseClicked = true;
             ptmTableDiv.style.visibility = 'hidden';
@@ -1317,11 +1317,11 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
-                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
             }
 
             for (var i = 0; i < drumNotes.length; i++) {
@@ -1427,11 +1427,11 @@ function PitchTimeMatrix () {
                        }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
-                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
@@ -1565,12 +1565,12 @@ function PitchTimeMatrix () {
                 if (drumName != null) {
                     this._logo.synth.trigger(0, 'C2', noteValue, drumName, null, null);
                 } else if (this.rowLabels[j] === 'hertz') {
-                    this._logo.synth.trigger(0, Number(note), noteValue, 'default', null, null);
+                    this._logo.synth.trigger(0, Number(note), noteValue, DEFAULTVOICE, null, null);
                 } else if (graphicsBlock !== true) {
                     if (typeof(note) === 'string') {
-                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
+                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, DEFAULTVOICE, null, null);
                     } else {
-                        this._logo.synth.trigger(0, note, noteValue, 'default', null, null);
+                        this._logo.synth.trigger(0, note, noteValue, DEFAULTVOICE, null, null);
                     }
                 } else {
                     console.log('Cannot parse note object: ' + obj);

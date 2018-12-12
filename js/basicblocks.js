@@ -5572,7 +5572,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampTwoArgBlock();
     newblock.dockTypes[1] = 'textin';
-    newblock.defaults.push('default');
+    newblock.defaults.push(DEFAULTVOICE);
     newblock.defaults.push(50);
     newblock.hidden = true;
 
@@ -5585,7 +5585,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.dockTypes[1] = 'textin';
-    newblock.defaults.push('default');
+    newblock.defaults.push(DEFAULTDRUM);
     newblock.defaults.push(50);
     if (beginnerMode && !beginnerBlock('setdrumvolume')) {
         newblock.hidden = true;
@@ -5600,7 +5600,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
     newblock.dockTypes[1] = 'textin';
-    newblock.defaults.push('default');
+    newblock.defaults.push(DEFAULTVOICE);
     newblock.defaults.push(50);
     if (beginnerMode && !beginnerBlock('setsynthvolume')) {
         newblock.hidden = true;
