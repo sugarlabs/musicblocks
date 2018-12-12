@@ -59,15 +59,14 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // PITCH PALETTE
 
-    // deprecated
     var newblock = new ProtoBlock('rest');
     newblock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['rest'] = newblock;
     newblock.valueBlock();
     newblock.dockTypes[0] = 'textout';
     newblock.hidden = true;
+    newblock.deprecated = true;
 
-    // deprecated
     // macro
     var newblock = new ProtoBlock('square');
     newblock.palette = palettes.dict['pitch'];
@@ -78,8 +77,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(440);
     newblock.hidden = true;
+    newblock.deprecated = true;
 
-    // deprecated
     // macro
     var newblock = new ProtoBlock('triangle');
     newblock.palette = palettes.dict['pitch'];
@@ -90,8 +89,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(440);
     newblock.hidden = true;
+    newblock.deprecated = true;
 
-    // deprecated
     // macro
     var newblock = new ProtoBlock('sine');
     newblock.palette = palettes.dict['pitch'];
@@ -102,8 +101,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(440);
     newblock.hidden = true;
+    newblock.deprecated = true;
 
-    // deprecated
     // macro
     var newblock = new ProtoBlock('sawtooth');
     newblock.palette = palettes.dict['pitch'];
@@ -114,6 +113,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(440);
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     // Status blocks
     var newblock = new ProtoBlock('invertmode');
@@ -319,7 +319,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // deprecated
     var newblock = new ProtoBlock('invert2');
     newblock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert2'] = newblock;
@@ -334,8 +333,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'solfegein';
     newblock.dockTypes[2] = 'anyin';
     newblock.hidden = true;
+    newblock.deprecated = true;
 
-    // deprecated
     // macro
     var newblock = new ProtoBlock('invert');
     newblock.palette = palettes.dict['pitch'];
@@ -1100,7 +1099,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // deprecated
     var newblock = new ProtoBlock('rhythm');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['rhythm'] = newblock;
@@ -1120,6 +1118,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     var newblock = new ProtoBlock('rhythm2');
     newblock.palette = palettes.dict['rhythm'];
@@ -1253,7 +1252,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // Deprecated
     // macro
     var newblock = new ProtoBlock('rhythmicdot');
     newblock.palette = palettes.dict['rhythm'];
@@ -1263,6 +1261,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.flowClampZeroArgBlock();
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     // macro
     var newblock = new ProtoBlock('rhythmicdot2');
@@ -1294,7 +1293,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note4'] = newblock;
     if (language === 'ja') {
-	//.TRANS: Japanese only: note value block for drum
+        //.TRANS: Japanese only: note value block for drum
         newblock.staticLabels.push(_('note value drum'));
     } else {
         newblock.staticLabels.push(_('note value') + ' ' + _('drum'));
@@ -1372,7 +1371,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
-    // deprecated
     var newblock = new ProtoBlock('note');
     newblock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note'] = newblock;
@@ -1381,6 +1379,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(4);
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     // macro
     var newblock = new ProtoBlock('newnote');
@@ -1884,7 +1883,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // deprecated by set timbre block
     // macro
     var newblock = new ProtoBlock('setvoice');
     newblock.palette = palettes.dict['tone'];
@@ -1896,6 +1894,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     newblock.defaults.push('violin');
     newblock.hidden = true;
+    newblock.deprecated = true;
     if (beginnerMode && !beginnerBlock('setvoice')) {
         newblock.hidden = true;
     }
@@ -1959,7 +1958,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // deprecated
     var newblock = new ProtoBlock('synthname');
     newblock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['synthname'] = newblock;
@@ -1968,6 +1966,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[0] = 'textout';
     newblock.parameterBlock();
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     var newblock = new ProtoBlock('voicename');
     newblock.palette = palettes.dict['tone'];
@@ -1989,7 +1988,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'textin';
     //.TRANS: user-defined
-    newblock.defaults.push(_('custom'));   
+    newblock.defaults.push(_('custom'));
     if (beginnerMode && !beginnerBlock('settimbre')) {
         newblock.hidden = true;
     }
@@ -2012,13 +2011,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('octave space'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
-    newblock.hidden = true; 
+    newblock.hidden = true;
 
     var newblock = new ProtoBlock('temperamentname');
     newblock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['temperamentname'] = newblock;
     newblock.valueBlock();
-    newblock.hidden = true; 
+    newblock.hidden = true;
     newblock.extraWidth = 50;
     newblock.dockTypes[0] = 'anyout';
     if (beginnerMode && !beginnerBlock('temperamentname')) {
@@ -2029,10 +2028,10 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['temperament1'] = newblock;
     newblock.staticLabels.push(_('define temperament'));
-    newblock.hidden = true; 
+    newblock.hidden = true;
     newblock.extraWidth = 20;
     newblock.adjustWidthToLabel();
-    newblock.stackClampOneArgBlock();   
+    newblock.stackClampOneArgBlock();
 
     // INTERVALS (PITCH TRANSFORMS) PALETTE
 
@@ -2675,7 +2674,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // Deprecated
     var newblock = new ProtoBlock('setkey');
     newblock.palette = palettes.dict['intervals'];
     blocks.protoBlockDict['setkey'] = newblock;
@@ -2686,6 +2684,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     newblock.defaults.push('C');
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     var newblock = new ProtoBlock('setkey2');
     newblock.palette = palettes.dict['intervals'];
@@ -4116,7 +4115,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.staticLabels.push(_('event'));
         //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
         newblock.staticLabels.push(_('do1'));
-	newblock.extraWidth = 15;
+        newblock.extraWidth = 15;
     } else {
         newblock.staticLabels.push(_('event'), _('do'));
     }
@@ -4157,7 +4156,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // Deprecated
     var newblock = new ProtoBlock('drum');
     newblock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['drum'] = newblock;
@@ -4166,6 +4164,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.stackClampZeroArgBlock();
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     var newblock = new ProtoBlock('start');
     newblock.palette = palettes.dict['action'];
@@ -4956,7 +4955,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // deprecated in favor of save button
     var newblock = new ProtoBlock('saveabc');
     newblock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['saveabc'] = newblock;
@@ -4966,8 +4964,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.abc');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
+    newblock.deprecated = true;
 
-    // deprecated in favor of save button
     var newblock = new ProtoBlock('savelilypond');
     newblock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savelilypond'] = newblock;
@@ -4977,8 +4975,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.ly');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
+    newblock.deprecated = true;
 
-    // deprecated in favor of save button
     var newblock = new ProtoBlock('savesvg');
     newblock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savesvg'] = newblock;
@@ -4988,6 +4986,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(_('title') + '.svg');
     newblock.dockTypes[1] = 'textin';
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     var newblock = new ProtoBlock('nobackground');
     newblock.palette = palettes.dict['extras'];
@@ -5618,7 +5617,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // deprecated
     var newblock = new ProtoBlock('setnotevolume2');
     newblock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['setnotevolume2'] = newblock;
@@ -5628,6 +5626,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(50);
     newblock.hidden = true;
+    newblock.deprecated = true;
 
     // macro
     var newblock = new ProtoBlock('articulation');

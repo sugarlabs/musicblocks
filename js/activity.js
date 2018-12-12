@@ -189,9 +189,9 @@ function Activity() {
     }
 
 
-    /**
+    /*
      * Initialises major variables and renders default stack
-     * 
+     *
      */
     this.setupDependencies = function () {
         // blocks = new Blocks(this);
@@ -280,8 +280,8 @@ function Activity() {
         toolbarHeight = document.getElementById('toolbars').offsetHeight;
     }
 
-    /**
-     * Sets up right click functionality opening the context menus 
+    /*
+     * Sets up right click functionality opening the context menus
      * (if block is right clicked)
      */
     this.doContextMenus = function () {
@@ -291,8 +291,8 @@ function Activity() {
         }, false);
     };
 
-    /**
-     * Sets up plugin and palette boiler plate     * 
+    /*
+     * Sets up plugin and palette boiler plate
      */
     this.doPluginsAndPaletteCols = function () {
         // Calculate the palette colors.
@@ -366,7 +366,7 @@ function Activity() {
         that.doHardStopButton(true);
     };
 
-    /**
+    /*
      * Recenters blocks by finding their position on the screen
      * and moving them accordingly
      */
@@ -472,7 +472,7 @@ function Activity() {
         boundary.hide();
     };
 
-    /**
+    /*
      * @param zero {hides container}
      * @param one {shows container}
      */
@@ -485,7 +485,7 @@ function Activity() {
         homeButtonContainers[1].visible = one;
     };
 
-    /**
+    /*
      * @return {SVG} returns SVG of blocks
      */
     _printBlockSVG = function () {
@@ -609,7 +609,7 @@ function Activity() {
         return '<svg xmlns="http://www.w3.org/2000/svg" width="' + xMax + '" height="' + yMax + '">' + encodeURIComponent(svg);
     };
 
-    /**
+    /*
      * Clears "canvas"
      */
     _allClear = function () {
@@ -655,7 +655,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * @param env {specifies environment}
      * Sets up play button functionality
      * Runs music blocks
@@ -744,7 +744,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Runs music blocks at a slower rate
      */
     this._doSlowButton = function () {
@@ -770,8 +770,8 @@ function Activity() {
         }
     };
 
-    /** 
-     * Runs music blocks step by step 
+    /*
+     * Runs music blocks step by step
      */
     _doStepButton = function () {
         blocks.activeBlock = null;
@@ -802,10 +802,10 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * @param onblur {when object loses focus}
-     * 
-     * Stops running of music blocks. 
+     *
+     * Stops running of music blocks.
      * Stops all mid-way synths
      */
     this.doHardStopButton = function (onblur) {
@@ -834,7 +834,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Switches between beginner/advanced mode
      */
     doSwitchMode = function () {
@@ -869,18 +869,18 @@ function Activity() {
     //     pasteBox.hide();
     // };
 
-    /**
-     * Initialises the functionality of the horizScrollIcon 
+    /*
+     * Initialises the functionality of the horizScrollIcon
      */
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
     };
 
-    /**
+    /*
      * @param chartBitmap bitmap of analysis charts
      * @param ctx canvas
-     * Renders close icon and functionality to 
+     * Renders close icon and functionality to
      * stop analytics of the MB project
      */
     this.closeAnalytics = function (chartBitmap, ctx) {
@@ -898,10 +898,10 @@ function Activity() {
         });
     };
 
-    /**
+    /*
      * @param canvas {compares existing canvas with a new blank canvas}
      * @return {boolean} {if canvas is blank }
-     * Checks if the canvas is blank 
+     * Checks if the canvas is blank
      */
     function _isCanvasBlank(canvas) {
         var blank = document.createElement('canvas');
@@ -911,8 +911,8 @@ function Activity() {
     };
 
 
-    /**
-     * Renders and carries out analysis 
+    /*
+     * Renders and carries out analysis
      * of the MB project
      */
     closeAnalytics = this.closeAnalytics;
@@ -963,7 +963,7 @@ function Activity() {
         console.log('Setting optimize to ' + state);
         logo.setOptimize(state);
     };
-    /**
+    /*
      * Increases block size
      */
     doLargerBlocks = function () {
@@ -978,7 +978,7 @@ function Activity() {
         setSmallerLargerStatus();
     };
 
-    /**
+    /*
      * Decreases block size
      */
     doSmallerBlocks = function () {
@@ -993,7 +993,7 @@ function Activity() {
         setSmallerLargerStatus();
     };
 
-    /**
+    /*
      * If either the block size has reached its minimum or maximum
      * then the icons to make them smaller/bigger will be hidden
      */
@@ -1015,7 +1015,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Removes loaded plugin
      */
     deletePlugin = function () {
@@ -1087,7 +1087,7 @@ function Activity() {
     //     logo.runLogoCommands();
     // };
 
-    /**
+    /*
      * Hides all grids (Cartesian/polar)
      */
     hideGrids = function () {
@@ -1096,7 +1096,7 @@ function Activity() {
         _hidePolar();
     };
 
-    /**
+    /*
      * Renders Cartesian/Polar grids and changes button labels accordingly
      */
     _doCartesianPolar = function () {
@@ -1120,7 +1120,7 @@ function Activity() {
         update = true;
     };
 
-    /**
+    /*
      * Sets up block actions with regards to different mouse events
      */
     this._setupBlocksContainerEvents = function () {
@@ -1145,7 +1145,7 @@ function Activity() {
                 }
             }
 
-            // horizontal scroll 
+            // horizontal scroll
             if (scrollBlockContainer) {
                 if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
                     if (palettes.paletteVisible) {
@@ -1225,7 +1225,7 @@ function Activity() {
         });
     };
 
-    /**
+    /*
      * Sets up scrolling functionality in palette and across canvas
      */
     function scrollEvent(event) {
@@ -1267,9 +1267,9 @@ function Activity() {
     //     cameraID = id;
     // };
 
-    /**
+    /*
      * @param imagePath {path of grid to be rendered}
-     * Renders grid 
+     * Renders grid
      */
     _createGrid = function (imagePath) {
         var img = new Image();
@@ -1290,7 +1290,7 @@ function Activity() {
         return bitmap;
     };
 
-    /**
+    /*
      * @param  fillColor   {inner color of message}
      * @param  strokeColor {border of message}
      * @param  callback    {callback function assigned to particular message}
@@ -1347,7 +1347,7 @@ function Activity() {
     };
 
 
-    /**
+    /*
      * Some error messages have special artwork.
      */
     _createErrorContainers = function () {
@@ -1357,7 +1357,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * @param  name {specifies svg to be rendered}
      * renders error message with appropriate artwork
      */
@@ -1402,7 +1402,7 @@ function Activity() {
         img.src = 'images/' + name + '.svg';
     };
 
-    /**
+    /*
      * @param  searchWidget      {searchWidget element}
      * @param  blocks            {all blocks}
      * @param  searchSuggestions {suggestions from user input}
@@ -1419,7 +1419,7 @@ function Activity() {
         for (i in blocks.protoBlockDict) {
             blockLabel = blocks.protoBlockDict[i].staticLabels[0];
             if (blockLabel) {
-                if (blocks.protoBlockDict[i].hidden) {
+                if (blocks.protoBlockDict[i].deprecated) {
                     deprecatedBlockNames.push(blockLabel);
                 } else {
                     searchSuggestions.push(blockLabel);
@@ -1434,7 +1434,7 @@ function Activity() {
         };
     }
 
-    /**
+    /*
      * Hides search widget
      */
     hideSearchWidget = function () {
@@ -1447,7 +1447,7 @@ function Activity() {
         searchWidget.style.visibility = 'hidden';
     };
 
-    /**
+    /*
      * Shows search widget
      */
     showSearchWidget = function () {
@@ -1476,7 +1476,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Uses JQuery to add autocompleted search suggestions
      */
     doSearch = function () {
@@ -1517,7 +1517,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Makes initial "start up" note for a brand new MB project
      */
     __makeNewNote = function (octave, solf) {
@@ -1571,7 +1571,7 @@ function Activity() {
         blocks.activeBlock = blocks.blockList.length - 1;
     }
 
-    /**
+    /*
      * Handles keyboard shortcuts in MB
      */
     function __keyPressed(event) {
@@ -1882,14 +1882,14 @@ function Activity() {
         }
     };
 
-    /**
-     * @return currentKeyCode 
+    /*
+     * @return currentKeyCode
      */
     this.getCurrentKeyCode = function () {
         return currentKeyCode;
     };
 
-    /**
+    /*
      * Sets current key code to 0
      */
     this.clearCurrentKeyCode = function () {
@@ -1897,8 +1897,8 @@ function Activity() {
         currentKeyCode = 0;
     };
 
-    /**
-     * Handles resizing for MB. 
+    /*
+     * Handles resizing for MB.
      * Detects width/height changes and closes any menus before actual resize.
      * Repositions containers/palette/home buttons
      */
@@ -2032,7 +2032,7 @@ function Activity() {
         _onResize(false);
     };
 
-    /**
+    /*
      * Restore last stack pushed to trashStack back onto canvas.
      * Hides palettes before update
      * Repositions blocks about trash area
@@ -2134,7 +2134,7 @@ function Activity() {
         blocks.refreshCanvas();
     };
 
-    /**
+    /*
      * Hides aux menu
      */
     hideAuxMenu = function () {
@@ -2144,7 +2144,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Sets up a new "clean" MB i.e. new project instance
      */
     _afterDelete = function () {
@@ -2161,10 +2161,10 @@ function Activity() {
     //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
     // };
 
-    /**
+    /*
      * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
      * @param {boolean} doNotSave     {if true discards any changes to project}
-     * 
+     *
      * Hide the palettes before update.
      * Then deletes everything/sends all to trash
      */
@@ -2236,7 +2236,7 @@ function Activity() {
     //     }
     // };
 
-    /**
+    /*
      * Toggles block/palette visibility
      */
     _changeBlockVisibility = function () {
@@ -2260,7 +2260,7 @@ function Activity() {
         // _changePaletteVisibility();
     };
 
-    /**
+    /*
      * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
      */
     _toggleCollapsibleStacks = function () {
@@ -2271,7 +2271,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * When turtle stops running restore stop button to normal state
      */
     this.onStopTurtle = function () {
@@ -2288,7 +2288,7 @@ function Activity() {
         */
     };
 
-    /**
+    /*
      * When turtle starts running change stop button to running state
      */
     this.onRunTurtle = function () {
@@ -2305,16 +2305,16 @@ function Activity() {
         */
     };
 
-    /**
+    /*
      * Updates all canvas elements
      */
     function refreshCanvas() {
         update = true;
     };
 
-    /**
+    /*
      * This set makes it so the stage only re-renders when an
-     * event handler indicates a change has happened. 
+     * event handler indicates a change has happened.
      */
     this.__tick = function (event) {
 
@@ -2324,7 +2324,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function () {
@@ -2332,10 +2332,10 @@ function Activity() {
         planet.openPlanet();
     };
 
-    /**
+    /*
      * Saves project
      * If beginner, assigns default "My Project" title to html file
-     * If advanced, assigns custom title to html file 
+     * If advanced, assigns custom title to html file
      */
     this.doSave = function () {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
@@ -2344,7 +2344,7 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Uploads MB file to Planet
      */
     doUploadToPlanet = function () {
@@ -2356,7 +2356,7 @@ function Activity() {
     //     // add code for facebook share link
     // };
 
-    /** 
+    /*
      * @param merge {if specified the selected file's blocks merge into current project}
      *  Loads/merges existing MB file
      */
@@ -2384,7 +2384,7 @@ function Activity() {
 
     window.prepareExport = prepareExport;
 
-    /**
+    /*
      * @param env {specifies environment}
      * Runs music blocks project
      */
@@ -2398,11 +2398,11 @@ function Activity() {
         }, 5000);
     }
 
-    /**
+    /*
      * @param  projectID {Planet project ID}
      * @param  flags     {parameteres}
      * @param  env       {specifies environment}
-     * 
+     *
      * Loads MB project from Planet
      */
     this.loadProject = function (projectID, flags, env) {
@@ -2475,11 +2475,11 @@ function Activity() {
         }
     };
 
-    /**
+    /*
      * Calculate time such that no matter how long it takes to
      * load the program, the loading animation will cycle at least
      * once.
-     * 
+     *
      * @param loadProject all params are from load project function
      */
     this.loadStartWrapper = function (func, arg1, arg2, arg3) {
@@ -2492,8 +2492,8 @@ function Activity() {
         setTimeout(that.showContents, timeLeft);
     };
 
-    /**
-     * Hides the loading animation and unhides the background. 
+    /*
+     * Hides the loading animation and unhides the background.
      * Shows contents of MB after loading screen.
      */
     this.showContents = function () {
@@ -2585,7 +2585,7 @@ function Activity() {
     };
 
 
-    /**
+    /*
      * Hides all message containers
      */
     hideMsgs = function () {
@@ -2735,7 +2735,7 @@ function Activity() {
         refreshCanvas();
     };
 
-    /**
+    /*
      * Hides cartesian grid
      */
     _hideCartesian = function () {
@@ -2744,7 +2744,7 @@ function Activity() {
         update = true;
     };
 
-    /**
+    /*
      * Shows cartesian grid
      */
     _showCartesian = function () {
@@ -2753,7 +2753,7 @@ function Activity() {
         update = true;
     };
 
-    /**
+    /*
      * Hides polar grid
      */
     _hidePolar = function () {
@@ -2762,7 +2762,7 @@ function Activity() {
         update = true;
     };
 
-    /**
+    /*
      * Shows polar grid
      */
     _showPolar = function () {
@@ -2776,10 +2776,10 @@ function Activity() {
     //     blocks.pasteStack();
     // };
 
-    /**
+    /*
      * We don't save blocks in the trash, so we need to
      * consolidate the block list and remap the connections.
-     * 
+     *
      * Next, save the playback queue, but don't save the
      * playback queue if we are saving to Lilypond.
      */
@@ -2935,7 +2935,7 @@ function Activity() {
         return JSON.stringify(data);
     };
 
-    /**
+    /*
      * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
      */
     doOpenPlugin = function () {
@@ -2980,15 +2980,15 @@ function Activity() {
     //         handleComplete);
     // };
 
-    /**
-     * Specifies that loading an MB project should merge it 
+    /*
+     * Specifies that loading an MB project should merge it
      * within the existing project
      */
     _doMergeLoad = function () {
         doLoad(true);
     };
 
-    /**
+    /*
      * Sets up palette buttons and functions
      * e.g. Home, Collapse, Expand
      * These menu items are on the canvas, not the toolbar.
@@ -3059,7 +3059,7 @@ function Activity() {
     //     p.popdown();
     // };
 
-    /**
+    /*
      * Shows help page
      */
     _showHelp = function () {
@@ -3067,7 +3067,7 @@ function Activity() {
         helpWidget.init(null);
     };
 
-    /**
+    /*
      * Shows about page
      */
     _showAboutPage = function () {
@@ -3076,14 +3076,14 @@ function Activity() {
         helpWidget.showPageByName(_('About'));
     };
 
-    /** 
+    /*
      * REDUNDANT
      */
     _doMenuButton = function () {
         _doMenuAnimation(true);
     };
 
-    /**
+    /*
      * REDUNDANT
      */
     _doMenuAnimation = function (arg) {
@@ -3142,7 +3142,7 @@ function Activity() {
         }, timeout);
     };
 
-    /**
+    /*
      * REDUNDANT
      */
     _toggleToolbar = function () {
@@ -3173,7 +3173,7 @@ function Activity() {
         update = true;
     };
 
-    /**
+    /*
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
     _makeButton = function (name, label, x, y, size, rotation, parent) {
@@ -3284,12 +3284,12 @@ function Activity() {
         return container;
     };
 
-    /**
+    /*
      * @param container longAction
-     * @param ox extraLongAction, 
-     * @param oy longImg, 
+     * @param ox extraLongAction,
+     * @param oy longImg,
      * @param hoverAction extraLongImg
-     * 
+     *
      * Handles button dragging, long hovering and prevents multiple button presses
      */
     this._loadButtonDragHandler = function (container, ox, oy, action, hoverAction) {
@@ -3438,7 +3438,7 @@ function Activity() {
         });
     };
 
-    /**
+    /*
      * Handles pasted strings into input fields
      */
     pasted = function () {
@@ -3466,10 +3466,10 @@ function Activity() {
         pasteBox.hide();
     };
 
-    /** 
-     * 
-     * @param dy how much of a change in y  
-     * 
+    /*
+     *
+     * @param dy how much of a change in y
+     *
      * Handles changes in y coordinates of elements when e.g aux toolbar is opened
      * Repositions elements on screen by a certain amount (dy)
      */
@@ -3506,7 +3506,7 @@ function Activity() {
         refreshCanvas();
     };
 
-    /** 
+    /*
      * Open aux menu
      */
     _openAuxMenu = function () {
@@ -3515,8 +3515,8 @@ function Activity() {
         }
     };
 
-    /**
-     * Toggles Aux menu visibility and positioning 
+    /*
+     * Toggles Aux menu visibility and positioning
      */
     _showHideAuxMenu = function (resize) {
         var cellsize = 55;
@@ -3557,7 +3557,7 @@ function Activity() {
         refreshCanvas();
     };
 
-    /**
+    /*
      * Ran once dom is ready and editable
      * Sets up dependencies and vars
      */
@@ -3592,7 +3592,7 @@ function Activity() {
         this.init();
     };
 
-    /**
+    /*
      * Inits everything. The main function.
      */
     this.init = function () {
@@ -4119,7 +4119,7 @@ function Activity() {
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
-        // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);  
+        // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
