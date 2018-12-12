@@ -3407,8 +3407,8 @@ i.left {
   }
 }
 
-@media only screen and (max-width: 500px) {
-   .materialize-iso .filler, .materialize-iso .logo {
+@media only screen and (max-width: 550px) {
+  .materialize-iso .filler, .materialize-iso .logo {
     display: none;
   }
 
@@ -3427,24 +3427,6 @@ i.left {
   }
 }
 
-@media only screen and (max-width: 600px) {
-  .materialize-iso .filler, .materialize-iso .logo {
-    display: none;
-  }
-  .materialize-iso nav .main i.material-icons {
-    font-size: 22px;  
-    position: relative;
-    margin: 0;
-    padding: 0;
-  }
-
-  .materialize-iso nav .aux i.material-icons {
-    font-size: 22px;  
-    position: relative;
-    margin: 0;
-    padding: 0;
-  }
-}
 
 @media only screen and (max-width: 400px) {
   .materialize-iso .filler, .materialize-iso .logo {

@@ -296,8 +296,40 @@ a {
 	padding-bottom: 75%;
 }
 
+#projectviewer-report-project, #projectviewer-report-project-disabled {
+	padding-top: 10px;
+	padding-right: 5px;
+}
+
+#projectviewer-download-file, #projectviewer-open-mb {
+	margin-left: -1%;
+}
+
+@media only screen and (max-width: 1100px) {
+	#projectviewer-download-file, #projectviewer-open-mb {
+		margin-left: -25px !important;
+	}
+
+	#projectviewer-report-project, #projectviewer-report-project-disabled {
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+}
+
+@media only screen and (max-width: 650px) {
+	#projectviewer-download-file, #projectviewer-open-mb {
+		font-size: 70%;
+	}
+}
+
+@media only screen and (max-width: 550px) {
+	#projectviewer-download-file, #projectviewer-open-mb {
+		font-size: 60%;
+	}
+}
+
 .report-project-div {
-	position: absolute;
+	position: relative;
 }
 
 .report-card {
