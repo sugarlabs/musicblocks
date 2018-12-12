@@ -297,7 +297,18 @@ a {
 }
 
 #projectviewer-report-project {
-	padding: 1%;
+	padding-top: 10px;
+	padding-right: 5px;
+}
+
+#projectviewer-download-file, #projectviewer-open-mb {
+	margin-left: -1%;
+}
+
+@media only screen and (max-width: 560px) {
+	#projectviewer-download-file,#projectviewer-open-mb {
+		margin-left: -30px !important;
+	}
 }
 
 .report-project-div {
