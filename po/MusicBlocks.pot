@@ -5782,7 +5782,8 @@ msgid "Explore Projects"
 msgstr ""
 
 #: js/StringHelper.js:35
-msgid "View More"
+#: js/helper.js:141
+msgid "Show more tags"
 msgstr ""
 
 #: js/StringHelper.js:36
@@ -5952,6 +5953,10 @@ msgstr ""
 
 #: js/Publisher.js:263
 msgid "Try Again"
+msgstr ""
+
+#: js/helper.js:142
+msgid "Show fewer tags"
 msgstr ""
 
 #: js/LocalCard.js:21
@@ -6342,7 +6347,11 @@ msgstr ""
 #~msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
 #~msgstr ""
 
-#: js/StringHelper.js:50
+#: js/StringHelper.js:35
+#~msgid "View More"
+#~msgstr ""
+
+#: js/StringHelper.js:51
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
 
