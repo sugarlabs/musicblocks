@@ -32,7 +32,7 @@ function StringHelper(Planet) {
         ["deleter-button",_("Delete")],
         ["deleter-cancel",_("Cancel")],
         ["globaltitle",_("Explore Projects")],
-        ["view-more-chips",_("View More")],
+        ["view-more-chips",_("Show more tags")],
         ["option-recent",_("Most recent")],
         ["option-liked",_("Most liked")],
         ["option-downloaded",_("Most downloaded")],
